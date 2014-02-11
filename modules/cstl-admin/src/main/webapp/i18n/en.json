@@ -33,11 +33,11 @@
             },
             "legend": "Service Access constraint",
             "maxheight": {
-                "label": "Max height", 
+                "label": "Max height",
                 "tooltip": "Maximum height value that a client can include in a GetMap."
             },
             "maxwidth": {
-                "label": "Max width", 
+                "label": "Max width",
                 "tooltip": "Maximum width value that a client can include in GetMap."
             }
         },
@@ -168,7 +168,7 @@
             "update": "Update",
             "validate":" Validate",
             "viewer": "Viewer",
-            "width": "Width"     
+            "width": "Width"
            },
         "placeholder": {
             "name": "Type a name...",
@@ -241,6 +241,7 @@
         "add": "Add",
         "add.data": "Add data",
         "add.style": "Add style",
+        "all": "All",
         "all_fem": "All",
         "categories": "Categories",
         "close": "Close",
@@ -329,9 +330,9 @@
                 "data.button": "Show data",
                 "delete.button": "Delete layer",
                 "export.button": "Export",
-                "metadata.button": "See metadata"                
+                "metadata.button": "See metadata"
             },
-            "title": "Layers list"      
+            "title": "Layers list"
     },
     "md": {
         "iso": {
@@ -344,7 +345,7 @@
             "role": "Role",
             "title": "Title",
             "topic.category": "Topic category",
-            "username": "User name"            
+            "username": "User name"
         },
         "listing": {
             "metadata.type": "METADATA",
@@ -379,7 +380,7 @@
           },
           "delete.style.selected": "Permanently delete the selected style.",
           "edit.style.selected": "Edit the selected style.",
-          "msg.no.selected": {
+          "no.selected": {
             "data": "Click on a data to display more information.",
             "layer": "Click on a layer to display more information.",
             "metadata": "Click on a metadata to display more information.",

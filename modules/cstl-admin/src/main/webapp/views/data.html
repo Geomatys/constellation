@@ -22,7 +22,6 @@
                 <li ng-class="{active:filtertype=='VECTOR'}" ng-click="filtertype='VECTOR'"><a translate="label.vector">Vecteur</a></li>
                 <li ng-class="{active:filtertype=='COVERAGE'}" ng-click="filtertype='COVERAGE'"><a translate="label.raster">Raster</a></li>
                 <li ng-class="{active:filtertype=='SENSOR'}" ng-click="filtertype='SENSOR'"><a translate="label.sensor">Capteur</a></li>
-                <li ng-class="{active:filtertype=='VIRTUAL_SENSOR'}" ng-click="filtertype='VIRTUAL_SENSOR'"><a translate="label.data.virtual.sensor">Capteurs virtuels</a></li>
             </ul>
         </div>
     </div>
@@ -30,7 +29,9 @@
         <div class="frame dashboard">
             <div class="navbar title">
                 <div class="navbar-inner">
-                    <a id="dataDashboardTitle" class="brand" href="#" translate="label.data.vector">Données vectorielles</a>
+                    <div ng-show="filtertype=='VECTOR'" class="brand" translate="label.data.vector">Données vectorielles</div>
+                    <div ng-show="filtertype=='COVERAGE'" class="brand" translate="label.data.raster">Données raster</div>
+                    <div ng-show="filtertype=='SENSOR'" class="brand" translate="label.data.sensor">Données capteurs</div>
                 </div>
             </div>
             <div class="navbar sort-navbar">
