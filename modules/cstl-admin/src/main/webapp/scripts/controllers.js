@@ -371,6 +371,7 @@ cstlAdminApp.controller('ServerFileModalController', ['$scope', '$dashboard', '$
     function ($scope, $dashboard, $modalInstance, $growl, dataListing) {
         $scope.columns = [];
         $scope.currentPath = '/';
+        $scope.selected = false;
 
         $scope.close = function() {
             $modalInstance.dismiss('close');
@@ -385,17 +386,26 @@ cstlAdminApp.controller('ServerFileModalController', ['$scope', '$dashboard', '$
         };
 
         $scope.open = function(path, depth) {
+            $scope.selected = false;
             if (depth < $scope.columns.length) {
                 $scope.columns.splice(depth + 1, $scope.columns.length - depth);
             }
             $scope.load(path);
         };
 
+        $scope.chooseFile = function(path, depth) {
+            if (depth < $scope.columns.length) {
+                $scope.columns.splice(depth + 1, $scope.columns.length - depth);
+            }
+            $scope.currentPath = path;
+            $scope.selected = true;
+        };
+
         $scope.select = function(item,depth) {
             if (item.folder) {
                 $scope.open(item.subPath, depth);
             } else {
-
+                $scope.chooseFile(item.subPath, depth);
             }
         };
 

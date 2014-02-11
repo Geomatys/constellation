@@ -1,4 +1,4 @@
-<div class="modal-dialog" id="serverFileModal">
+<div class="modal-dialog" id="serverFileModal" style="width:850px;">
     <div class="modal-content" ng-init="init()">
         <div class="modal-header">
             <button type="button" class="close" ng-click="close()">×</button>
@@ -6,16 +6,16 @@
         </div>
         <div class="modal-body">
             <div class="row" id="folderPart">
-                <ul class="breadcrumb span7">
+                <ul class="breadcrumb col-sm-12">
                     <li class="active"><span class="divider">{{currentPath}}</span></li>
                 </ul>
                 <div>
-                    <div ng-repeat="col in columns" class="span2 well">
-                        <input type="text" placeholder="filter" class="span2" ng-model="search">
+                    <div ng-repeat="col in columns" class="col-sm-3 well block-folders">
+                        <input type="text" placeholder="filter" class="col-sm-12" ng-model="search">
                         <ul class="unstyled">
                             <li ng-repeat="item in col | filter:search">
                                 <i ng-class="{'icon-folder-close-alt':item.folder && !startWith(item.subPath),'icon-folder-open-alt':item.folder && startWith(item.subPath),'icon-file':!item.folder}"></i>
-                                <a type="button" ng-click="select(item,$parent.$index)">{{item.name}}</a>
+                                <a ng-class="{'link-sel':startWith(item.subPath)}" class="trim-name" title="{{item.name}}" type="button" ng-click="select(item,$parent.$index)">{{item.name}}</a>
                             </li>
                         </ul>
                     </div>

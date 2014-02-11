@@ -64,6 +64,27 @@ body {
     cursor: pointer;
 }
 
+a.trim-name {
+    max-width: 140px;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 15px;
+    position: relative;
+    cursor: pointer;
+}
+a.trim-name.link-sel {
+    color: rgb(185, 74, 72);
+}
+ul.unstyled {
+    list-style: none;
+    padding: 0;
+}
+.block-folders {
+    margin: 0 5px;
+}
+
 /*
  * Dashboards
  */
