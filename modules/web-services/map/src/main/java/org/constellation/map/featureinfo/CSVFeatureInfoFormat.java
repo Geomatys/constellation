@@ -110,7 +110,7 @@ public class CSVFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
 
     @Override
     protected void nextProjectedCoverage(ProjectedCoverage graphic, RenderingContext2D context, SearchAreaJ2D queryArea) {
-        final List<Map.Entry<GridSampleDimension,Object>> covResults = getCoverageValues(graphic, context, queryArea);
+        final List<Map.Entry<GridSampleDimension,Object>> covResults = FeatureInfoUtilities.getCoverageValues(graphic, context, queryArea);
 
         if (covResults == null) {
             return;

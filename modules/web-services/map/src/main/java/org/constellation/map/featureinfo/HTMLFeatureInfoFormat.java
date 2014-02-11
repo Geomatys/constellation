@@ -32,6 +32,7 @@ import org.opengis.feature.Property;
 import org.opengis.feature.type.PropertyDescriptor;
 
 import java.awt.Rectangle;
+import java.lang.reflect.Array;
 import java.util.*;
 import javax.measure.unit.Unit;
 import org.geotoolkit.coverage.GridSampleDimension;
@@ -96,11 +97,14 @@ public class HTMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
         final StringBuilder typeBuilder = new StringBuilder();
         final StringBuilder dataBuilder = new StringBuilder();
         
-        typeBuilder.append(feature.getIdentifier().getID());
-        typeBuilder.append("<div style=\"float:left;width:400px;overflow:auto\">");
-        dataBuilder.append("<div style=\"float:left;width:200px;\">");
+        typeBuilder.append("<h2>").append(feature.getIdentifier().getID()).append("</h2>");
+        typeBuilder.append("</br>");
+        typeBuilder.append("<div>");
+        typeBuilder.append("<div class=\"left-part\">");
+        dataBuilder.append("<div class=\"right-part\">");
         recursive(feature, typeBuilder, dataBuilder, 0);
         typeBuilder.append("</div>");
+        dataBuilder.append("</div>");
         dataBuilder.append("</div>");
         
         result.values.add(typeBuilder.toString());
@@ -129,14 +133,36 @@ public class HTMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
             typeBuilder.append(att.getDescriptor().getName().getLocalPart());
             typeBuilder.append("</li>\n");
             
-            dataBuilder.append(String.valueOf(att.getValue()));
-            dataBuilder.append("<br/>\n");
+            final Object value = att.getValue();
+            final String valStr = toString(value);
+            dataBuilder.append("<a class=\"values\" title=\"");
+            dataBuilder.append(valStr);
+            dataBuilder.append("\">");
+            dataBuilder.append(valStr);
+            dataBuilder.append("</a>");
         }
     }
 
+    private String toString(Object value){
+        String str;
+        if(value == null){
+            str = "null";
+        }else if(value.getClass().isArray()){
+            //convert to an object array
+            final Object[] array = new Object[Array.getLength(value)];
+            for(int i=0;i<array.length;i++){
+                array[i] = toString(Array.get(value, i));
+            }                
+            str = Arrays.toString(array);
+        }else{
+            str = String.valueOf(value);
+        }
+        return str;
+    }
+    
     @Override
     protected void nextProjectedCoverage(ProjectedCoverage graphic, RenderingContext2D context, SearchAreaJ2D queryArea) {
-        final List<Map.Entry<GridSampleDimension,Object>> covResults = getCoverageValues(graphic, context, queryArea);
+        final List<Map.Entry<GridSampleDimension,Object>> covResults = FeatureInfoUtilities.getCoverageValues(graphic, context, queryArea);
 
         if (covResults == null) {
             return;
@@ -155,8 +181,9 @@ public class HTMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
         final StringBuilder typeBuilder = new StringBuilder();
         final StringBuilder dataBuilder = new StringBuilder();
         
-        typeBuilder.append("<div style=\"float:left;width:400px;overflow:auto\">");
-        dataBuilder.append("<div style=\"float:left;width:200px;\">");
+        typeBuilder.append("<div>");
+        typeBuilder.append("<div class=\"left-part\">");
+        dataBuilder.append("<div class=\"right-part\">");
         typeBuilder.append("<ul>\n");
         for(Map.Entry<GridSampleDimension,Object> entry : covResults){
             typeBuilder.append("<li>\n");
@@ -176,6 +203,7 @@ public class HTMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
         }
         typeBuilder.append("</ul>\n");
         typeBuilder.append("</div>");
+        dataBuilder.append("</div>");
         dataBuilder.append("</div>");
         
         result.values.add(typeBuilder.toString());
@@ -201,16 +229,34 @@ public class HTMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
                 .append("    </head>\n")
                 
                 .append("    <style>\n")
-                .append("       ul{\n")
-                .append("           margin-top: 0;\n")
-                .append("           margin-bottom: 0;\n")
-                .append("       }\n")
+                .append("ul{\n" +
+                "               margin-top: 0;\n" +
+                "               margin-bottom: 0px;\n" +
+                "           }\n" +
+                "           .left-part{\n" +
+                "               display:inline-block;\n" +
+                "               width:350px;\n" +
+                "               overflow:auto;\n" +
+                "               white-space:nowrap;\n" +
+                "           }\n" +
+                "           .right-part{\n" +
+                "               display:inline-block;\n" +
+                "               width:600px;\n" +
+                "               overflow: hidden;\n" +
+                "           }\n" +
+                "           .values{\n" +
+                "               text-overflow: ellipsis;\n" +
+                "               white-space:nowrap;\n" +
+                "               display:block;\n" +
+                "               overflow: hidden;\n" +
+                "           }")
                 .append("    </style>\n")
                 
                 .append("    <body>\n");
 
         for(LayerResult result : results.values()){
-            response.append(result.layerName).append("<br/>");
+            response.append("<h2>").append(result.layerName).append("</h2>");
+            response.append("<br/>");
             for (final String record : result.values) {
                 response.append(record);
             }
