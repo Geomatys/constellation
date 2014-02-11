@@ -22,8 +22,6 @@ import static org.constellation.map.ws.WMSConstant.EXCEPTION_111_BLANK;
 import static org.constellation.map.ws.WMSConstant.EXCEPTION_111_INIMAGE;
 import static org.constellation.map.ws.WMSConstant.EXCEPTION_130_BLANK;
 import static org.constellation.map.ws.WMSConstant.EXCEPTION_130_INIMAGE;
-import static org.constellation.query.Query.GML;
-import static org.constellation.query.Query.XML;
 import static org.constellation.query.wms.WMSQuery.KEY_BBOX;
 import static org.constellation.query.wms.WMSQuery.KEY_INFO_FORMAT;
 import static org.constellation.query.wms.WMSQuery.KEY_LAYER;
@@ -60,7 +58,6 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.imageio.spi.ServiceRegistry;
 import javax.inject.Named;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
@@ -83,8 +80,6 @@ import org.constellation.converter.DataReferenceConverter;
 import org.constellation.dto.Service;
 import org.constellation.map.featureinfo.FeatureInfoFormat;
 import org.constellation.map.featureinfo.FeatureInfoUtilities;
-import org.constellation.map.visitor.GetFeatureInfoVisitor;
-import org.constellation.map.visitor.WMSVisitorFactory;
 import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.portrayal.internal.PortrayalResponse;
 import org.constellation.provider.CoverageLayerDetails;
@@ -104,7 +99,6 @@ import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.OutputDef;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
-import org.geotoolkit.display2d.service.VisitDef;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.inspire.xml.vs.ExtendedCapabilitiesType;
@@ -1153,7 +1147,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             } else {
                 // No sld given, we use the style.
 
-                final List<String> defaultStyleRefs = layerConf.getStyles();
+                final List<DataReference> defaultStyleRefs = layerConf.getStyles();
                 if (defaultStyleRefs != null && !defaultStyleRefs.isEmpty()) {
                     final DataReference styleRef = defaultStyleRefs.get(0);
                     ms = (styleRef.getLayerId() == null) ? null : getStyle(styleRef);

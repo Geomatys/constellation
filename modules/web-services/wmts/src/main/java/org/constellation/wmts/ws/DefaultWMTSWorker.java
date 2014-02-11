@@ -24,20 +24,14 @@ import java.util.logging.Level;
 import org.apache.sis.storage.DataStoreException;
 
 // Constellation dependencies
-import org.constellation.Cstl;
 import org.constellation.ServiceDef;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Layer;
-import org.constellation.configuration.LayerContext;
 import org.constellation.map.featureinfo.FeatureInfoFormat;
 import org.constellation.map.featureinfo.FeatureInfoUtilities;
 import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.provider.LayerDetails;
 import org.constellation.util.DataReference;
-import org.constellation.wmts.visitor.CSVGraphicVisitor;
-import org.constellation.wmts.visitor.GMLGraphicVisitor;
-import org.constellation.wmts.visitor.HTMLGraphicVisitor;
-import org.constellation.wmts.visitor.TextGraphicVisitor;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.LayerWorker;
@@ -49,7 +43,6 @@ import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
-import org.geotoolkit.display2d.service.VisitDef;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
