@@ -136,7 +136,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$dashboard', 'dataListing'
             var layerData = DataViewer.createLayer(layerName, providerId);
             var layerBackground = DataViewer.createLayer("CNTR_BN_60M_2006", "generic_shp");
             DataViewer.layers = [layerData, layerBackground];
-            DataViewer.initMap();
+            DataViewer.initMap('dataMap');
         };
 
         $scope.deleteData = function() {
@@ -292,11 +292,12 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
         function uploaded(message) {
             $scope.$apply(function() {
                 if (message.indexOf('failed') === -1) {
-                    var fileName = message.substring(message.lastIndexOf("/")+1);
+                    var file = message.substring(message.lastIndexOf("/")+1);
+                    var fileName;
                     var fileExtension;
-                    if (fileName.indexOf(".") !== -1) {
-                        fileName = fileName.substring(0, fileName.lastIndexOf("."));
-                        fileExtension = fileName.substring(fileName.lastIndexOf("."));
+                    if (file.indexOf(".") !== -1) {
+                        fileName = file.substring(0, file.lastIndexOf("."));
+                        fileExtension = file.substring(file.lastIndexOf("."));
                     }
 
                     // Store the providerId for further calls
@@ -360,18 +361,22 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
 
         $scope.displayLayer = function(layer) {
             $scope.layer = layer;
-            var layerData = DataPreviewViewer.createLayer(layer, $scope.providerId);
-            var layerBackground = DataPreviewViewer.createLayer("CNTR_BN_60M_2006", "generic_shp");
-            DataPreviewViewer.layers = [layerData, layerBackground];
-            DataPreviewViewer.initMap();
+            var layerData = DataViewer.createLayer(layer, $scope.providerId);
+            var layerBackground = DataViewer.createLayer("CNTR_BN_60M_2006", "generic_shp");
+            DataViewer.layers = [layerData, layerBackground];
+            DataViewer.initMap('dataPreviewMap');
         };
     }]);
 
-cstlAdminApp.controller('ServerFileModalController', ['$scope', '$dashboard', '$modalInstance', '$growl', 'dataListing',
-    function ($scope, $dashboard, $modalInstance, $growl, dataListing) {
+cstlAdminApp.controller('ServerFileModalController', ['$scope', '$dashboard', '$modalInstance', '$growl', 'dataListing', 'provider',
+    function ($scope, $dashboard, $modalInstance, $growl, dataListing, provider) {
         $scope.columns = [];
+        // current path chosen in server data dir
         $scope.currentPath = '/';
-        $scope.selected = false;
+        // path of the server data dir
+        $scope.prefixPath = '';
+        $scope.finished = false;
+        $scope.layer = '';
 
         $scope.close = function() {
             $modalInstance.dismiss('close');
@@ -386,7 +391,6 @@ cstlAdminApp.controller('ServerFileModalController', ['$scope', '$dashboard', '$
         };
 
         $scope.open = function(path, depth) {
-            $scope.selected = false;
             if (depth < $scope.columns.length) {
                 $scope.columns.splice(depth + 1, $scope.columns.length - depth);
             }
@@ -398,10 +402,10 @@ cstlAdminApp.controller('ServerFileModalController', ['$scope', '$dashboard', '$
                 $scope.columns.splice(depth + 1, $scope.columns.length - depth);
             }
             $scope.currentPath = path;
-            $scope.selected = true;
         };
 
         $scope.select = function(item,depth) {
+            $scope.prefixPath = item.prefixPath;
             if (item.folder) {
                 $scope.open(item.subPath, depth);
             } else {
@@ -413,11 +417,77 @@ cstlAdminApp.controller('ServerFileModalController', ['$scope', '$dashboard', '$
             return $scope.currentPath.indexOf(path) === 0;
         };
 
+        $scope.ok = function() {
+            $scope.finished = true;
+            $scope.loadData();
+        };
+
+        $scope.loadData = function() {
+            var file = $scope.currentPath.substring($scope.currentPath.lastIndexOf("/")+1);
+            var fileName;
+            var fileExtension;
+            if (file.indexOf(".") !== -1) {
+                fileName = file.substring(0, file.lastIndexOf("."));
+                fileExtension = file.substring(file.lastIndexOf("."));
+            }
+            $scope.providerId = fileName;
+
+            if ($scope.uploadType === "vector") {
+                provider.create({
+                    id: fileName
+                }, {
+                    type: "feature-store",
+                    subType: "shapefile",
+                    parameters: {
+                        path: $scope.prefixPath + $scope.currentPath
+                    }
+                });
+                $growl('success','Success','Shapefile data '+ fileName +' successfully added');
+                $modalInstance.close();
+            } else {
+                provider.create({
+                    id: fileName
+                }, {
+                    type: "coverage-store",
+                    subType: "coverage-file",
+                    parameters: {
+                        path: $scope.prefixPath + $scope.currentPath
+                    }
+                }, function() {
+                    if (!fileExtension || fileExtension !== ".nc") {
+                        dataListing.pyramidData({id: fileName}, {value: $scope.prefixPath + $scope.currentPath}, function() {
+                            $growl('success','Success','Coverage data '+ fileName +' successfully added');
+                            $modalInstance.dismiss('close');
+                        });
+                    } else {
+                        displayNetCDF(fileName);
+                    }
+                });
+            }
+
+            function displayNetCDF(providerId) {
+                $scope.coveragesData = dataListing.listCoverage({}, {value: providerId}, function(response) {
+                    for (var key in response.values) {
+                        $scope.displayLayer(response.values[key]);
+                        break;
+                    }
+                });
+            };
+        };
+
+        $scope.displayLayer = function(layer) {
+            $scope.layer = layer;
+            var layerData = DataViewer.createLayer(layer, $scope.providerId);
+            var layerBackground = DataViewer.createLayer("CNTR_BN_60M_2006", "generic_shp");
+            DataViewer.layers = [layerData, layerBackground];
+            DataViewer.initMap('dataServerMap');
+        };
+
         $scope.load($scope.currentPath);
     }]);
 
-cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', '$modal',
-    function ($scope, $dashboard, style, $modal) {
+cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style',
+    function ($scope, $dashboard, style) {
         $scope.filtertype = "";
 
         style.listAll({}, function(response) {

@@ -15,12 +15,19 @@ public class FileBean {
 
     private String subPath;
 
+    private String prefixPath;
+
     public FileBean() {
     }
 
     public FileBean(final String name, final Boolean folder, final String subPath) {
+        this(name, folder, null, subPath);
+    }
+
+    public FileBean(final String name, final Boolean folder, final String prefixPath, final String subPath) {
         this.name = name;
         this.folder = folder;
+        this.prefixPath = prefixPath;
         this.subPath = subPath;
     }
 
@@ -38,6 +45,14 @@ public class FileBean {
 
     public void setFolder(final Boolean folder) {
         this.folder = folder;
+    }
+
+    public String getPrefixPath() {
+        return prefixPath;
+    }
+
+    public void setPrefixPath(final String prefixPath) {
+        this.prefixPath = prefixPath;
     }
 
     public String getSubPath() {

@@ -65,7 +65,7 @@ body {
 }
 
 a.trim-name {
-    max-width: 140px;
+    max-width: 180px;
     display: inline-block;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -73,6 +73,9 @@ a.trim-name {
     line-height: 15px;
     position: relative;
     cursor: pointer;
+}
+a.trim-name.larger {
+    max-width: 225px;
 }
 a.trim-name.link-sel {
     color: rgb(185, 74, 72);

@@ -18,11 +18,11 @@ DataViewer = {
 
     layers : undefined,
 
-    initMap : function(){
+    initMap : function(mapId){
         if (DataViewer.map) {
             DataViewer.map.destroy();
         }
-        DataViewer.map = new OpenLayers.Map('dataMap', {
+        DataViewer.map = new OpenLayers.Map(mapId, {
             controls: [new OpenLayers.Control.Navigation()],
             projection: new OpenLayers.Projection('CRS:84'),
             maxExtent: new OpenLayers.Bounds(-180, -90, 180, 90),

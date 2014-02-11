@@ -188,12 +188,12 @@ public class Data {
                     String extension = child.getName().substring(lastIndexPoint + 1);
 
                     if (extensions.contains(extension.toLowerCase())) {
-                        final FileBean bean = new FileBean(child.getName(), child.isDirectory(), path + "/" + child.getName());
+                        final FileBean bean = new FileBean(child.getName(), child.isDirectory(), root.getAbsolutePath(), path + "/" + child.getName());
                         listBean.add(bean);
                     }
 
                 } else {
-                    final FileBean bean = new FileBean(child.getName(), child.isDirectory(), path + "/" + child.getName());
+                    final FileBean bean = new FileBean(child.getName(), child.isDirectory(), root.getAbsolutePath(), path + "/" + child.getName());
                     listBean.add(bean);
                 }
             }
