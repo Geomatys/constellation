@@ -1067,6 +1067,8 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         }
 
         try {
+            //give the layerRef list used by some FIF
+            featureInfo.setLayersDetails(layerRefs);
             final Object result = featureInfo.getFeatureInfo(sdef, vdef, cdef, selectionArea, getFI);
             return new AbstractMap.SimpleEntry<>(infoFormat, result);
         } catch (PortrayalException ex) {

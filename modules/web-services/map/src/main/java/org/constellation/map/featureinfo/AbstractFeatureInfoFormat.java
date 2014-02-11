@@ -17,6 +17,7 @@
 package org.constellation.map.featureinfo;
 
 import org.constellation.configuration.GetFeatureInfoCfg;
+import org.constellation.provider.LayerDetails;
 import org.geotoolkit.display.SearchArea;
 import org.geotoolkit.display.canvas.RenderingContext;
 import org.geotoolkit.display.PortrayalException;
@@ -52,7 +53,15 @@ public abstract class AbstractFeatureInfoFormat implements FeatureInfoFormat {
      */
     protected final Map<String, java.util.List<ProjectedFeature>> features = new HashMap<String, java.util.List<ProjectedFeature>>();
 
+    /**
+     * GetFeatureInfo configuration.
+     */
     private GetFeatureInfoCfg configuration;
+
+    /**
+     * MapContext Layers details
+     */
+    private List<LayerDetails> layersDetails;
 
     /**
      * {@inheritDoc}
@@ -68,6 +77,22 @@ public abstract class AbstractFeatureInfoFormat implements FeatureInfoFormat {
     @Override
     public void setConfiguration(GetFeatureInfoCfg conf) {
         this.configuration = conf;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<LayerDetails> getLayersDetails() {
+        return layersDetails;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setLayersDetails(List<LayerDetails> layers) {
+        this.layersDetails = layers;
     }
 
     /**

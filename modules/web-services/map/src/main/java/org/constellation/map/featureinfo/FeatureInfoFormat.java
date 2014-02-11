@@ -17,6 +17,7 @@
 package org.constellation.map.featureinfo;
 
 import org.constellation.configuration.GetFeatureInfoCfg;
+import org.constellation.provider.LayerDetails;
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.SceneDef;
@@ -73,4 +74,18 @@ public interface FeatureInfoFormat {
      * @return {@link org.constellation.configuration.GetFeatureInfoCfg} configuration, can be null.
      */
     public GetFeatureInfoCfg getConfiguration();
+
+    /**
+     * Set the list of {@link LayerDetails} from which the {@link SceneDef}
+     * {@link org.geotoolkit.map.MapContext} was build.
+     * @param layers
+     */
+    public void setLayersDetails(List<LayerDetails> layers);
+
+    /**
+     * Get the list of {@link LayerDetails} from which the {@link SceneDef}
+     * {@link org.geotoolkit.map.MapContext} was build.
+     * @return layers or null
+     */
+    public List<LayerDetails> getLayersDetails();
 }
