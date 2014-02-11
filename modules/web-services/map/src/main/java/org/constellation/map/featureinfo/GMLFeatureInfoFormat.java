@@ -44,6 +44,7 @@ import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.referencing.IdentifiedObjects;
 import org.geotoolkit.util.DateRange;
 import org.geotoolkit.ows.xml.GetFeatureInfo;
+import org.opengis.feature.ComplexAttribute;
 import org.opengis.feature.Feature;
 import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.Property;
@@ -70,10 +71,8 @@ import java.util.logging.Logger;
  * A generic FeatureInfoFormat that produce GML output for Features and Coverages.
  * Supported mimeTypes are :
  * <ul>
- *     <li>gml3</li>
- *     <li>gml</li>
- *     <li>xml</li>
  *     <li>application/vnd.ogc.gml</li>
+ *     <li>application/gml+xml</li>
  *     <li>application/vnd.ogc.xml</li>
  *     <li>text/xml</li>
  * </ul>
@@ -177,7 +176,14 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
         builder.append("\t<").append(layerName).append("_layer").append(endMark)
                 .append("\t\t<").append(layerName).append("_feature").append(endMark);
 
-        final LayerDetails layerPostgrid = dp.getByIdentifier(fullLayerName);
+        final List<LayerDetails> layerDetailsList = getLayersDetails();
+        LayerDetails layerPostgrid = null;
+
+        for (LayerDetails layer : layerDetailsList) {
+            if (layer.getType().equals(LayerDetails.TYPE.COVERAGE) && layer.getName().equals(fullLayerName)) {
+                layerPostgrid = layer;
+            }
+        }
 
         final Envelope objEnv;
         final Date time;
@@ -227,10 +233,12 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
              * leverage the database index.
              */
             DateRange dates = null;
-            try {
-                dates = layerPostgrid.getDateRange();
-            } catch (DataStoreException ex) {
-                LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
+            if (layerPostgrid != null) {
+                try {
+                    dates = layerPostgrid.getDateRange();
+                } catch (DataStoreException ex) {
+                    LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
+                }
             }
             if (dates != null && !(dates.isEmpty())) {
                 if (dates.getMaxValue() != null) {
@@ -246,11 +254,13 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
                     .append("</elevation>").append("\n");
         } else {
             SortedSet<Number> elevs = null;
-            try {
-                elevs = layerPostgrid.getAvailableElevations();
-            } catch (DataStoreException ex) {
-                LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
-                elevs = null;
+            if (layerPostgrid != null) {
+                try {
+                    elevs = layerPostgrid.getAvailableElevations();
+                } catch (DataStoreException ex) {
+                    LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
+                    elevs = null;
+                }
             }
             if (elevs != null && !(elevs.isEmpty())) {
                 builder.append("\t\t\t<elevation>").append(elevs.first().toString())
@@ -264,7 +274,10 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
                     .append("</variable>").append("\n");
         }
 
-        final MeasurementRange[] ranges = layerPostgrid.getSampleValueRanges();
+        MeasurementRange[] ranges = null;
+        if (layerPostgrid != null) {
+            ranges = layerPostgrid.getSampleValueRanges();
+        }
         if (ranges != null && ranges.length > 0) {
             final MeasurementRange range = ranges[0];
             if (range != null) {
@@ -293,7 +306,6 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
             super.nextProjectedFeature(graphic, context, queryArea);
         } else {
 
-            //TODO handle features as real GML features here
             final StringBuilder builder   = new StringBuilder();
             final FeatureMapLayer layer   = graphic.getLayer();
             final Feature feature         = graphic.getCandidate();
@@ -312,42 +324,7 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
                 builder.append(margin).append('<').append(ftPrefix).append(ftLocal).append(">\n");
                 margin += "\t";
 
-                for (final Property prop : feature.getProperties()) {
-                    if (prop == null) {
-                        continue;
-                    }
-                    final Name propName = prop.getName();
-                    if (propName == null) {
-                        continue;
-                    }
-                    String pLocal = propName.getLocalPart();
-                    String pPrefix  = acquirePrefix(propName.getNamespaceURI());
-
-                    if (Geometry.class.isAssignableFrom(prop.getType().getBinding())) {
-                        GeometryAttribute geomProp = (GeometryAttribute) prop;
-                        builder.append(margin).append('<').append(pPrefix).append(pLocal).append(">\n");
-                        Marshaller m = null;
-                        try {
-                            m = pool.acquireMarshaller();
-                            StringWriter sw = new StringWriter();
-                            org.opengis.geometry.Geometry gmlGeometry =  JTSUtils.toISO((Geometry) prop.getValue(), geomProp.getType().getCoordinateReferenceSystem());
-                            ObjectFactory factory =  new ObjectFactory();
-                            m.setProperty(Marshaller.JAXB_FRAGMENT, true);
-                            m.marshal(factory.buildAnyGeometry(gmlGeometry), sw);
-                            builder.append(sw.toString());
-                        } catch (JAXBException ex) {
-                            LOGGER.log(Level.WARNING, "JAXB exception while marshalling the geometry", ex);
-                        } finally {
-                            if (m != null) {
-                                pool.recycle(m);
-                            }
-                        }
-                        builder.append(margin).append("</").append(pPrefix).append(pLocal).append(">\n");
-                    } else {
-                        final Object value = prop.getValue();
-                        builder.append(margin).append('<').append(pPrefix).append(pLocal).append('>').append(value).append("</").append(pPrefix).append(pLocal).append(">\n");
-                    }
-                }
+                toGML3(builder, feature, margin);
 
                 // end featureType mark
                 margin = margin.substring(1);
@@ -358,7 +335,7 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
 
             // end feature member mark
             margin = margin.substring(1);
-            builder.append(margin).append("</gml:featureMember>");
+            builder.append(margin).append("</gml:featureMember>\n");
 
             final String result = builder.toString();
             if (builder.length() > 0) {
@@ -373,6 +350,61 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
         }
     }
 
+    private void toGML3(final StringBuilder builder, final ComplexAttribute complexAtt, String margin) {
+        for (final Property prop : complexAtt.getProperties()) {
+            if (prop == null) {
+                continue;
+            }
+            final Name propName = prop.getName();
+            if (propName == null) {
+                continue;
+            }
+            String pLocal = propName.getLocalPart();
+            String pPrefix  = acquirePrefix(propName.getNamespaceURI());
+
+            if (Geometry.class.isAssignableFrom(prop.getType().getBinding())) {
+                GeometryAttribute geomProp = (GeometryAttribute) prop;
+                builder.append(margin).append('<').append(pPrefix).append(pLocal).append(">\n");
+                Marshaller m = null;
+                try {
+                    m = pool.acquireMarshaller();
+                    StringWriter sw = new StringWriter();
+                    org.opengis.geometry.Geometry gmlGeometry =  JTSUtils.toISO((Geometry) prop.getValue(), geomProp.getType().getCoordinateReferenceSystem());
+                    ObjectFactory factory =  new ObjectFactory();
+                    m.setProperty(Marshaller.JAXB_FRAGMENT, true);
+                    m.marshal(factory.buildAnyGeometry(gmlGeometry), sw);
+                    builder.append(sw.toString());
+                } catch (JAXBException ex) {
+                    LOGGER.log(Level.WARNING, "JAXB exception while marshalling the geometry", ex);
+                } finally {
+                    if (m != null) {
+                        pool.release(m);
+                    }
+                }
+                builder.append("\n");
+                builder.append(margin).append("</").append(pPrefix).append(pLocal).append(">\n");
+            } else {
+
+                if (prop instanceof ComplexAttribute) {
+                    final ComplexAttribute complex = (ComplexAttribute) prop;
+                    builder.append(margin).append('<').append(pPrefix).append(pLocal).append(">\n");
+                    margin += "\t";
+
+                    toGML3(builder, complex, margin);
+
+                    margin = margin.substring(1);
+                    builder.append(margin).append("</").append(pPrefix).append(pLocal).append(">\n");
+                } else {
+                    //simple
+                    final Object value = prop.getValue();
+                    builder.append(margin).append('<').append(pPrefix).append(pLocal).append('>')
+                            .append(value)
+                            .append("</").append(pPrefix).append(pLocal).append(">\n");
+                }
+            }
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -383,14 +415,12 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
         final StringBuilder builder = new StringBuilder();
 
         final String mimeType = getFI.getInfoFormat();
-        if (MimeType.APP_GML.equalsIgnoreCase(mimeType)
-            || MimeType.TEXT_XML.equalsIgnoreCase(mimeType)
-            || MimeType.APP_XML.equalsIgnoreCase(mimeType)
-            || Query.XML.equalsIgnoreCase(mimeType)
-            || Query.GML.equalsIgnoreCase(mimeType)) {
-            // GML
+        if (MimeType.TEXT_XML.equalsIgnoreCase(mimeType)
+            || MimeType.APP_XML.equalsIgnoreCase(mimeType)) {
+            // GML map server
             mode = 0;
-        } else if (Query.GML3.equalsIgnoreCase(mimeType)) {
+        } else if (MimeType.APP_GML.equalsIgnoreCase(mimeType)
+                || MimeType.APP_GML_XML.equalsIgnoreCase(mimeType)) {
             // GML 3
             mode = 1;
         }
@@ -398,6 +428,7 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
         //fill coverages and features maps
         getCandidates(sdef, vdef, cdef, searchArea, -1);
 
+        // Map Server GML output
         if (mode == 0) {
             builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").append("\n")
                     .append("<msGMLOutput xmlns:gml=\"http://www.opengis.net/gml\" ")
@@ -421,7 +452,7 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
 
         for (String layerName : values.keySet()) {
             for (final String record : values.get(layerName)) {
-                builder.append(record).append("\n");
+                builder.append(record);
             }
         }
         if (mode == 0) {
@@ -442,13 +473,13 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
     @Override
     public List<String> getSupportedMimeTypes() {
         final List<String> mimes = new ArrayList<String>();
-        mimes.add(Query.GML3);
-        mimes.add(Query.GML);
-        mimes.add(Query.XML);
+        //will return GML 3
         mimes.add(MimeType.APP_GML);
+        mimes.add(MimeType.APP_GML_XML);
+
+        //will return map server GML
         mimes.add(MimeType.APP_XML);
         mimes.add(MimeType.TEXT_XML);
-
         return mimes;
     }
 
