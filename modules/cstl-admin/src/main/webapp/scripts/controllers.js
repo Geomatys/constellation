@@ -297,7 +297,7 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                     var fileExtension;
                     if (file.indexOf(".") !== -1) {
                         fileName = file.substring(0, file.lastIndexOf("."));
-                        fileExtension = file.substring(file.lastIndexOf("."));
+                        fileExtension = file.substring(file.lastIndexOf(".")+1);
                     }
 
                     // Store the providerId for further calls
@@ -324,7 +324,7 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                                 path: message
                             }
                         }, function() {
-                            if (!fileExtension || fileExtension !== ".nc") {
+                            if (!fileExtension || fileExtension !== "nc") {
                                 dataListing.pyramidData({id: fileName}, {value: message}, function() {
                                     $growl('success','Success','Coverage data '+ fileName +' successfully added');
                                     $modalInstance.dismiss('close');
@@ -376,7 +376,10 @@ cstlAdminApp.controller('ServerFileModalController', ['$scope', '$dashboard', '$
         // path of the server data dir
         $scope.prefixPath = '';
         $scope.finished = false;
+        $scope.hasSelectedSomething = false;
         $scope.layer = '';
+        $scope.chooseType = false;
+        $scope.dataType = 'vector';
 
         $scope.close = function() {
             $modalInstance.dismiss('close');
@@ -406,6 +409,7 @@ cstlAdminApp.controller('ServerFileModalController', ['$scope', '$dashboard', '$
 
         $scope.select = function(item,depth) {
             $scope.prefixPath = item.prefixPath;
+            $scope.hasSelectedSomething = true;
             if (item.folder) {
                 $scope.open(item.subPath, depth);
             } else {
@@ -422,17 +426,39 @@ cstlAdminApp.controller('ServerFileModalController', ['$scope', '$dashboard', '$
             $scope.loadData();
         };
 
+        $scope.userChooseType = function() {
+            $scope.finished = true;
+            $scope.loadDataWithKnownExtension($scope.providerId, $scope.dataType);
+        };
+
         $scope.loadData = function() {
             var file = $scope.currentPath.substring($scope.currentPath.lastIndexOf("/")+1);
             var fileName;
             var fileExtension;
             if (file.indexOf(".") !== -1) {
                 fileName = file.substring(0, file.lastIndexOf("."));
-                fileExtension = file.substring(file.lastIndexOf("."));
+                fileExtension = file.substring(file.lastIndexOf(".")+1);
             }
             $scope.providerId = fileName;
 
-            if ($scope.uploadType === "vector") {
+            // test extension type
+            dataListing.extension({}, {value: fileExtension},
+                function(response) {
+                    $scope.dataType = response.dataType;
+                    if ($scope.dataType === "") {
+                        $scope.chooseType = true;
+                    } else {
+                        $scope.loadDataWithKnownExtension(fileName, fileExtension);
+                    }
+                }, function() {
+                    // failure here, impossible to know the extension
+                    $scope.chooseType = true;
+                }
+            );
+        };
+
+        $scope.loadDataWithKnownExtension = function(fileName, fileExtension) {
+            if ($scope.dataType === "vector") {
                 provider.create({
                     id: fileName
                 }, {
@@ -444,7 +470,7 @@ cstlAdminApp.controller('ServerFileModalController', ['$scope', '$dashboard', '$
                 });
                 $growl('success','Success','Shapefile data '+ fileName +' successfully added');
                 $modalInstance.close();
-            } else {
+            } else if ($scope.dataType === "raster") {
                 provider.create({
                     id: fileName
                 }, {
@@ -454,25 +480,28 @@ cstlAdminApp.controller('ServerFileModalController', ['$scope', '$dashboard', '$
                         path: $scope.prefixPath + $scope.currentPath
                     }
                 }, function() {
-                    if (!fileExtension || fileExtension !== ".nc") {
+                    if (!fileExtension || fileExtension !== "nc") {
                         dataListing.pyramidData({id: fileName}, {value: $scope.prefixPath + $scope.currentPath}, function() {
                             $growl('success','Success','Coverage data '+ fileName +' successfully added');
                             $modalInstance.dismiss('close');
                         });
                     } else {
-                        displayNetCDF(fileName);
+                        $scope.displayNetCDF(fileName);
                     }
                 });
+            } else {
+                $growl('warning','Warning','Not implemented choice');
+                $modalInstance.close();
             }
+        };
 
-            function displayNetCDF(providerId) {
-                $scope.coveragesData = dataListing.listCoverage({}, {value: providerId}, function(response) {
-                    for (var key in response.values) {
-                        $scope.displayLayer(response.values[key]);
-                        break;
-                    }
-                });
-            };
+        $scope.displayNetCDF = function(providerId) {
+            $scope.coveragesData = dataListing.listCoverage({}, {value: providerId}, function(response) {
+                for (var key in response.values) {
+                    $scope.displayLayer(response.values[key]);
+                    break;
+                }
+            });
         };
 
         $scope.displayLayer = function(layer) {
