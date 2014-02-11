@@ -16,7 +16,6 @@
  */
 package org.constellation.map.featureinfo;
 
-import com.vividsolutions.jts.geom.Geometry;
 import org.constellation.ws.MimeType;
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.display2d.canvas.RenderingContext2D;
@@ -34,6 +33,12 @@ import org.opengis.feature.type.Name;
 import java.awt.Rectangle;
 import java.util.*;
 import java.util.List;
+import javax.measure.unit.Unit;
+import org.geotoolkit.coverage.GridSampleDimension;
+import org.geotoolkit.display2d.primitive.ProjectedCoverage;
+import org.opengis.feature.ComplexAttribute;
+import org.opengis.feature.type.PropertyDescriptor;
+import org.opengis.util.InternationalString;
 
 /**
  * A generic FeatureInfoFormat that produce CSV output for Features and Coverages.
@@ -43,14 +48,18 @@ import java.util.List;
  * </ul>
  *
  * @author Quentin Boileau (Geomatys)
+ * @author Johann Sorel (Geomatys)
  */
 public class CSVFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
 
-    /**
-     * Contains all features that cover the point requested, for feature layers.
-     */
-    private final Map<String, List<Feature>> features = new HashMap<String, List<Feature>>();
-
+    private static final class LayerResult{
+        private String layerName;
+        private String layerType;
+        private final List<String> values = new ArrayList<String>();
+    }
+    
+    private final Map<String,LayerResult> results = new HashMap<String, LayerResult>();
+        
     public CSVFeatureInfoFormat() {
     }
 
@@ -59,17 +68,91 @@ public class CSVFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
      */
     @Override
     protected void nextProjectedFeature(ProjectedFeature graphic, RenderingContext2D context, SearchAreaJ2D queryArea) {
+        
         final FeatureMapLayer layer = graphic.getLayer();
-        final Feature feature = graphic.getCandidate();
         final String layerName = layer.getName();
-        List<Feature> feat = features.get(layerName);
-        if (feat == null) {
-            feat = new ArrayList<Feature>();
-            features.put(layerName, feat);
+        
+        final Feature feature = graphic.getCandidate();
+        final Collection<PropertyDescriptor> descs = feature.getType().getDescriptors();
+        
+        LayerResult result = results.get(layerName);
+        if(result==null){
+            //first feature of this type
+            result = new LayerResult();
+            result.layerName = layerName;
+            //feature type
+            final StringBuilder typeBuilder = new StringBuilder();
+            for(PropertyDescriptor pd : descs){
+                final Name propName = pd.getName();
+                typeBuilder.append(propName.toString());
+                typeBuilder.append(':');
+                typeBuilder.append(pd.getType().getBinding().getSimpleName());
+                typeBuilder.append(';');
+            }
+            result.layerType = typeBuilder.toString();
+            results.put(layerName, result);
         }
-        feat.add(feature);
+        
+        
+        //the feature values
+        final StringBuilder dataBuilder = new StringBuilder();
+        for(PropertyDescriptor pd : descs){
+            final Property prop = feature.getProperty(pd.getName());
+            if(prop instanceof ComplexAttribute){
+                dataBuilder.append("...complex attribute, use GML or HTML output...");
+            }else if(prop !=null){
+                dataBuilder.append(String.valueOf(prop.getValue()));
+            }
+            dataBuilder.append(';');
+        }
+        result.values.add(dataBuilder.toString());
     }
 
+    @Override
+    protected void nextProjectedCoverage(ProjectedCoverage graphic, RenderingContext2D context, SearchAreaJ2D queryArea) {
+        final List<Map.Entry<GridSampleDimension,Object>> covResults = getCoverageValues(graphic, context, queryArea);
+
+        if (covResults == null) {
+            return;
+        }
+
+        final String layerName = graphic.getLayer().getCoverageReference().getName().getLocalPart();
+        
+        LayerResult result = results.get(layerName);
+        if(result==null){
+            //first feature of this type
+            result = new LayerResult();
+            result.layerName = layerName;
+            //coverage type
+            final StringBuilder typeBuilder = new StringBuilder();
+            for (final Map.Entry<GridSampleDimension,Object> entry : covResults) {
+                final GridSampleDimension gsd = entry.getKey();
+                                
+                final InternationalString title = gsd.getDescription();
+                if(title!=null){
+                    typeBuilder.append(title);
+                }
+                final Unit unit = gsd.getUnits();
+                if(unit!=null){
+                    typeBuilder.append(unit.toString());
+                }
+                typeBuilder.append(';');
+            }
+            result.layerType = typeBuilder.toString();
+            results.put(layerName, result);
+        }
+        
+        //the coverage values
+        final StringBuilder dataBuilder = new StringBuilder();
+        for(Map.Entry<GridSampleDimension,Object> entry : covResults){
+            dataBuilder.append(String.valueOf(entry.getValue()));
+            dataBuilder.append(';');
+        }
+        result.values.add(dataBuilder.toString());
+    }
+
+    
+    
     /**
      * {@inheritDoc}
      */
@@ -81,92 +164,17 @@ public class CSVFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
 
         final StringBuilder builder = new StringBuilder();
 
-        final Map<String, List<String>> values = new HashMap<String, List<String>>();
-        values.putAll(coverages);
-
-        //features
-        for (final String layerName : features.keySet()) {
-            builder.append('#').append(layerName).append("\n");
-            final List<Feature> feat = features.get(layerName);
-
-            if (feat.isEmpty()) {
-                builder.append("No values.").append("\n");
-            } else {
-                //first feature
-                final Feature first = feat.get(0);
-                final int size = first.getProperties().size();
-                int idx = 0;
-                for (Property prop : first.getProperties()) {
-                    if (prop == null) {
-                        continue;
-                    }
-                    final Name propName = prop.getName();
-                    if (propName == null) {
-                        continue;
-                    }
-                    builder.append(propName);
-                    if (idx < size-1) {
-                        builder.append(";");
-                    }
-                    idx++;
-                }
-                builder.append("\n");
-
-                for (final Feature record : feat) {
-                    idx = 0;
-                    for (Property prop : record.getProperties()) {
-                        if (prop == null) {
-                            continue;
-                        }
-
-                        if (Geometry.class.isAssignableFrom(prop.getType().getBinding())) {
-                            builder.append(prop.getType().getBinding().getSimpleName());
-                        } else {
-                            final Object value = prop.getValue();
-                            builder.append(formatPropertyValue(value));
-                        }
-                        if (idx < size-1) {
-                            builder.append(";");
-                        }
-                        idx++;
-                    }
-
-                    builder.append("\n");
-                }
+        for(LayerResult result : results.values()){
+            builder.append(result.layerName).append('\n');
+            builder.append(result.layerType).append('\n');
+            for (final String record : result.values) {
+                builder.append(record).append('\n');
             }
+            builder.append('\n');
         }
-
-        //coverages
-        for (final String layerName : coverages.keySet()) {
-            builder.append('#').append(layerName).append("\n");
-            final List<String> covs = coverages.get(layerName);
-
-            if (covs.isEmpty()) {
-                builder.append("No values.").append("\n");
-            } else {
-                for (final String record : covs) {
-                    builder.append(record).append("\n");
-                }
-            }
-        }
-
-        features.clear();
-        coverages.clear();
-
+        
+        results.clear();
         return builder.toString();
-
-    }
-
-    private String formatPropertyValue(Object value) {
-        String valueStr = "";
-        if (value != null) {
-            if (!(value instanceof Number)) {
-                valueStr = "\"" +value.toString().trim()+"\"";
-            } else {
-                valueStr = value.toString();
-            }
-        }
-        return valueStr;
     }
 
     /**
