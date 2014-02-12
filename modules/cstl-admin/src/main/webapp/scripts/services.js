@@ -49,8 +49,9 @@ cstlAdminApp.factory('webService', ['$resource',
                                              'listAll': { method: 'GET', isArray: false},
                                              'get':  { method: 'GET', url: cstlContext+'api/1/OGC/:type/:id'},
                                              'metadata':  { method: 'GET', url: cstlContext+'api/1/OGC/:type/:id/metadata'},
-                                             'config':  { method: 'GET', url: cstlContext+'api/1/OGC/:type/:id/config'}
-
+                                             'config':  { method: 'GET', url: cstlContext+'api/1/OGC/:type/:id/config'},
+                                             'logs': { method: 'GET', url: cstlContext+'api/1/log/:type/:id}}'},
+                                             'capabilities': { method: 'GET', url: 'WS/:type/:id?REQUEST=GetCapabilities&SERVICE=:TYPE&VERSION=:VERSION'}
                                          });
                                      }]);
 
