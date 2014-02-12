@@ -6,7 +6,7 @@
                 <h4 class="modal-title">Local file</h4>
             </div>
             <div class="modal-body">
-                <div id="part1">
+                <div id="part1" ng-show="$parent.step1">
                     <!-- Upload part -->
                     <span>Data</span>
                     <div class="fileinput fileinput-new" data-provides="fileinput">
@@ -18,7 +18,7 @@
                             <span class="input-group-addon btn btn-default btn-file">
                                 <span class="fileinput-new">Select file</span>
                                 <span class="fileinput-exists">Change</span>
-                                <input type="file" id="file" name="file" ng-model="fileconfirmed" ng-change="verifyExtension()"></span>
+                                <input type="file" name="file" ng-model="$parent.file" ng-change="verifyExtension()"></span>
                             <a class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
                         </div>
                     </div>
@@ -32,34 +32,34 @@
                             <span class="input-group-addon btn btn-default btn-file">
                                 <span class="fileinput-new">Select file</span>
                                 <span class="fileinput-exists">Change</span>
-                                <input type="file" name="metadatafile"></span>
+                                <input type="file" name="metadatafile" ng-model="$parent.metadatafile"></span>
                             <a class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
                         </div>
                     </div>
                 </div>
 
-                <div id="part2">
+                <div id="part2" ng-show="$parent.step2">
                     <!-- Choose data type -->
                     <div class="row">
                         <div class="col-sm-2">
                             <label class="radio">
-                                <input type="radio" name="dataType" value="vector" style="margin-top:12px;"> <img src="images/icon/vector.png" class="img-rounded" translate="layer.listing.data.upload.vector.label">
+                                <input type="radio" ng-model="$parent.uploadType" name="dataType" value="vector" style="margin-top:12px;"> <img src="images/icon/vector.png" class="img-rounded" translate="layer.listing.data.upload.vector.label">
                             </label>
                         </div>
                         <div class="col-sm-2">
                             <label class="radio">
-                                <input type="radio" name="dataType" value="raster" style="margin-top:12px;"> <img src="images/icon/raster.png" class="img-rounded" translate="layer.listing.data.upload.raster.label">
+                                <input type="radio" ng-model="$parent.uploadType" name="dataType" value="raster" style="margin-top:12px;"> <img src="images/icon/raster.png" class="img-rounded" translate="layer.listing.data.upload.raster.label">
                             </label>
                         </div>
                         <div class="col-sm-2">
                             <label class="radio">
-                                <input type="radio" name="dataType" value="sensor" style="margin-top:12px;"> <img src="images/icon/sensor.png" class="img-rounded" translate="layer.listing.data.upload.sensor.label">
+                                <input type="radio" ng-model="$parent.uploadType" name="dataType" value="sensor" style="margin-top:12px;"> <img src="images/icon/sensor.png" class="img-rounded" translate="layer.listing.data.upload.sensor.label">
                             </label>
                         </div>
                     </div>
                 </div>
 
-                <div id="part3">
+                <div id="part3" ng-show="$parent.step3">
                     <!-- Display coverage data -->
                     <div class="row">
                         <div class="col-sm-4">
@@ -77,8 +77,8 @@
             </div>
             <div class="modal-footer">
                 <button type="button" id="cancelButton" class="btn btn-default" ng-click="close()">Close</button>
-                <button type="button" id="nextButton" class="btn btn-primary" ng-click="next();">Next</button>
-                <button type="button" id="submitButton" class="btn btn-primary" ng-click="upload();">Finish</button>
+                <button ng-show="$parent.allowNext" type="button" id="nextButton" class="btn btn-primary" ng-click="next();">Next</button>
+                <button ng-show="$parent.allowSubmit" type="button" id="submitButton" class="btn btn-primary" ng-click="upload();">Finish</button>
             </div>
         </div>
     </div>

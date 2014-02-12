@@ -232,20 +232,24 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
 
 cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$modalInstance', '$ajaxUpload', '$growl', 'provider', 'dataListing',
     function ($scope, $dashboard, $modalInstance, $ajaxUpload, $growl, provider, dataListing) {
-        $scope.layer = '';
+        $scope.layer = null;
+        $scope.file = null;
+        $scope.metadatafile = null;
+        $scope.uploadType = '';
 
-        $scope.init = function() {
-            $("#part2").hide();
-            $("#part3").hide();
-            $("#submitButton").hide();
-            $("#nextButton").hide();
-        };
+        // Handle upload workflow
+        $scope.step1 = true;
+        $scope.step2 = false;
+        $scope.step3 = false;
+        $scope.allowSubmit = false;
+        $scope.allowNext = false;
 
         $scope.next = function() {
-            $("#part1").hide();
-            $("#nextButton").hide();
-            $("#part2").show();
-            $("#submitButton").show();
+            $scope.step1 = false;
+            $scope.step2 = true;
+            $scope.step3 = false;
+            $scope.allowNext = false;
+            $scope.allowSubmit = true;
         };
 
         $scope.close = function() {
@@ -253,9 +257,8 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
         };
 
         $scope.verifyExtension = function() {
-            var selectedFile = $("#file").val();
-            var lastPointIndex = selectedFile.lastIndexOf(".");
-            var extension = selectedFile.substring(lastPointIndex+1, selectedFile.length);
+            var lastPointIndex = $scope.file.lastIndexOf(".");
+            var extension = $scope.file.substring(lastPointIndex+1, $scope.file.length);
             var simplevalue = new SimpleValue(extension);
             $.ajax({
                 type  :   "POST",
@@ -272,21 +275,21 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
         };
 
         function localFileSuccess(data){
-            if(data.dataType!=""){
-                $("#part2 [value="+data.dataType+"]").prop("checked", true);
-                $("#nextButton").hide();
-                $("#submitButton").show();
-            } else {
-                $("#submitButton").hide();
-                $("#nextButton").show();
-            }
+            $scope.$apply(function() {
+                if(data.dataType!=""){
+                    $scope.uploadType = data.dataType;
+                    $scope.allowNext = false;
+                    $scope.allowSubmit = true;
+                } else {
+                    $scope.allowNext = true;
+                    $scope.allowSubmit = false;
+                }
+            });
         };
 
         $scope.upload = function() {
             var form = $('#uploadForm');
             $ajaxUpload(cstlContext + "api/1/data/upload", form, uploaded);
-            $scope.file = form.find('#file').val();
-            $scope.uploadType = form.find("input[name='dataType']:checked").val();
         };
 
         function uploaded(message) {
@@ -346,10 +349,11 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
 
         function displayNetCDF(providerId) {
             $("#uploadForm").find(".modal-dialog").addClass("mapview");
-            $("#part1").hide();
-            $("#part2").hide();
-            $("#part3").show();
-            $("#submitButton").hide();
+            $scope.step1 = false;
+            $scope.step2 = false;
+            $scope.step3 = true;
+            $scope.allowNext = false;
+            $scope.allowSubmit = false;
 
             $scope.coveragesData = dataListing.listCoverage({}, {value: providerId}, function(response) {
                 for (var key in response.values) {
