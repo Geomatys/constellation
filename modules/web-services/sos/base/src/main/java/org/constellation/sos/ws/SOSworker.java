@@ -300,6 +300,8 @@ public class SOSworker extends AbstractWorker {
 
     /**
      * Initialize the database connection.
+     *
+     * @param id identifier of the worker instance.
      */
     public SOSworker(final String id) {
         super(id, ServiceDef.Specification.SOS);
@@ -369,8 +371,7 @@ public class SOSworker extends AbstractWorker {
             observationTemplateIdBase = configuration.getObservationTemplateIdBase() != null ?
             configuration.getObservationTemplateIdBase() : "urn:ogc:object:observationTemplate:unknow:";
 
-            alwaysFeatureCollection   = configuration.getParameters().containsKey(OMFactory.ALWAYS_FEATURE_COLLECTION) ?
-            Boolean.parseBoolean(configuration.getParameters().get(OMFactory.ALWAYS_FEATURE_COLLECTION)) : false;
+            alwaysFeatureCollection   = configuration.getBooleanParameter(OMFactory.ALWAYS_FEATURE_COLLECTION);
 
             final String multiVersProp = getProperty("multipleVersion");
             if (multiVersProp != null) {
@@ -811,7 +812,9 @@ public class SOSworker extends AbstractWorker {
     /**
      * Web service operation which return an sml description of the specified sensor.
      *
-     * @param requestDescSensor A document specifying the id of the sensor that we want the description.
+     * @param request A document specifying the id of the sensor that we want the description.
+     * 
+     * @throws org.constellation.ws.CstlServiceException
      */
     public AbstractSensorML describeSensor(final DescribeSensor request) throws CstlServiceException  {
         LOGGER.log(logLevel, "DescribeSensor request processing\n");
@@ -916,6 +919,8 @@ public class SOSworker extends AbstractWorker {
      * the restriction specified in the query.
      *
      * @param requestObservation a document specifying the parameter of the request.
+     * 
+     * @throws org.constellation.ws.CstlServiceException
      */
     public Object getObservation(final GetObservation requestObservation) throws CstlServiceException {
         LOGGER.log(logLevel, "getObservation request processing\n");
@@ -1372,6 +1377,8 @@ public class SOSworker extends AbstractWorker {
 
     /**
      * Web service operation
+     * @param request
+     * @throws org.constellation.ws.CstlServiceException
      */
     public GetResultResponse getResult(final GetResult request) throws CstlServiceException {
         LOGGER.log(logLevel, "getResult request processing\n");
@@ -2535,7 +2542,7 @@ public class SOSworker extends AbstractWorker {
     @Override
     protected final String getProperty(final String propertyName) {
         if (configuration != null) {
-            return configuration.getParameters().get(propertyName);
+            return configuration.getParameter(propertyName);
         }
         return null;
     }

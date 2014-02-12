@@ -520,9 +520,26 @@ public class SOSConfiguration extends AbstractConfigurationObject {
      */
     public HashMap<String, String> getParameters() {
         if (parameters == null) {
-            this.parameters = new HashMap<String, String>();
+            this.parameters = new HashMap<>();
         }
         return parameters;
+    }
+
+    public String getParameter(final String name) {
+        if (parameters != null) {
+            return parameters.get(name);
+        }
+        return null;
+    }
+
+    public boolean getBooleanParameter(final String name) {
+        if (parameters != null) {
+            final String value = parameters.get(name);
+            if (value != null) {
+                return Boolean.parseBoolean(value);
+            }
+        }
+        return false;
     }
 
     /**
