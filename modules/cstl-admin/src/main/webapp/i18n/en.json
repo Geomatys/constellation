@@ -393,7 +393,7 @@
         "next.button": "Next"
     },
     "service":{
-        "abstract.label": "Service Description",
+        "abstract.label": "Service description",
         "config": {
          "source": "Source",
          "source.choose": "Choose source",

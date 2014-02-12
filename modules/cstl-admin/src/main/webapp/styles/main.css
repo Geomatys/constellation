@@ -89,6 +89,39 @@ ul.unstyled {
 }
 
 /*
+ * Service
+ */
+.service-item .well.started {
+    border-left: #cedd9c 20px solid;
+}
+.service-item .well.stopped {
+    border-left: #db9080 20px solid;
+}
+.service-item .well.not-started {
+    border-left: #777777 20px solid;
+}
+.service-item .btn.dropdown-toggle {
+
+}
+.service-item .btn.started, .service-item .btn.stopped {
+    color: #FFF;
+}
+.service-item .btn.started.hover, .service-item .btn.stopped.hover {
+    color: rgba(255,255,255,.75);
+}
+.service-item .btn.started {
+    background-color: #ee5f5b;
+}
+.service-item .btn.stopped {
+    background-color: #62c462;
+}
+#list-services {
+    background-color: white;
+    padding-top:30px;
+    padding-bottom:30px;
+}
+
+/*
  * Dashboards
  */
 .dashboard .navbar {

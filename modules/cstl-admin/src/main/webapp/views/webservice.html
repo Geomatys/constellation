@@ -24,7 +24,7 @@
     <div class="row" >
         <div class="navbar navbar-default" style="margin-bottom: 0px;">
             <div class="navbar-header">
-                <a class="navbar-brand" href="#">Services disponibles</a>
+                <a class="navbar-brand">Services disponibles</a>
             </div>
             <div class="collapse navbar-collapse">
                 <ul class="nav navbar-nav navbar-right">
@@ -41,14 +41,14 @@
         </div>
     </div>
 
-    <div class="row" style="background-color:white; padding-top:30px; padding-bottom:30px;" id="main" ng-repeat="service in services.instance">
-        <div class="col-sm-6" id="wms-test">
-            <a href="#/webservice/{{service.type.toLocaleLowerCase()}}/{{service.name}}"><h3 class="text-info">{{service.name}} ({{service.type.toLocaleLowerCase()}})</h3></a>
-            <div class="well started" data-state="wms-test">
+    <div class="row" id="list-services">
+        <div class="col-sm-6 service-item" ng-repeat="service in services.instance">
+            <a href="#/webservice/{{service.type.toLocaleLowerCase()}}/{{service.name}}"><h3 class="text-info">{{service.name}} ({{service.type}})</h3></a>
+            <div class="well" ng-class="{'started':service.status=='WORKING','stopped':service.status=='ERROR','not-started':service.status=='NOT_STARTED'}" data-state="wms-test">
                 <div class="row">
-                    <div class="pull-right">
-                        <div class="btn-group">
-                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                    <div class="col-sm-4 col-sm-offset-8">
+                        <div class="dropdown pull-left">
+                            <a data-toggle="dropdown" class="btn dropdown-toggle">
                                 <i class="icon-wrench"></i>
                                 <span class="caret"></span>
                             </a>
@@ -61,21 +61,21 @@
                                 <li class="" ><a href="#" data-action="show-service">Visualiser</a></li>
                             </ul>
                         </div>
-                        <a class="btn btn-default btn-info" href="#" data-action="restart-service" data-service-type="wms" data-service-id="test">
+                        <a class="btn btn-default btn-info">
                             <i class="icon-refresh"></i>
                         </a>
-                        <a class="btn btn-default started" href="#" data-state="wms-test" data-action="toggle-service" data-service-type="wms" data-service-id="test">
-                            <i class="icon-play"></i>
-                            <i class="icon-stop"></i>
+                        <a class="btn btn-default" ng-class="{'started':service.status=='WORKING','stopped':service.status=='ERROR'}">
+                            <i ng-class="{'icon-play':service.status!='WORKING','icon-stop':service.status=='WORKING'}"></i>
                         </a>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-4">
-                        <p><strong>Description du service</strong></p>
-                        <p>test</p>
-                        <p><strong>Données publiées sur le service</strong></p>
-                        <p>0</p>
+                    <div class="col-sm-8">
+                        <p><strong><span translate="service.abstract.label">Service description</span></strong></p>
+                        <p ng-if="service._abstract !==''">{{service._abstract}}</p>
+                        <p ng-if="service._abstract ===''"> - </p>
+                        <p><strong><span translate="service.data.label">Published data on service</span></strong></p>
+                        <p>{{service.layersNumber}}</p>
                     </div>
                 </div>
             </div>
