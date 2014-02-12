@@ -1,246 +1,980 @@
 {
-    "global": {
-        "title": "JHipster",
-        "browsehappy": "Vous utilisez un <strong>ancien</strong> navigateur. Veuillez <a href=\"http://browsehappy.com/\">mettre à jour votre navigateur</a> pour une meilleure expérience.",
-        "menu": {
-            "home": "Accueil",
-            "web-service": "Services web",
-            "data": "Données",
-            "style": "Styles",
-            "map-composition": "Compositions cartographiques",
-            "viewer":"Visualiseur",
-            "account": {
-                "main": "Compte",
-                "settings": "Profil",
-                "password": "Mot de passe",
-                "sessions": "Sessions",
-                "metrics": "Métriques",
-                "logs": "Logs",
-                "login": "S'authentifier",
-                "logout": "Déconnexion"
-            },
-            "language": "Langue"
-        },
-        "language": {
-            "en": "Anglais",
-            "fr": "Français",
-            "de": "Allemand"
-        }
-    },
-    "index": {
-        "title": "index"
-    },
-    "main": {
-        "title": "Bienvenue, Java Hipster !",
-        "subtitle": "Ceci est votre page d'accueil",
-        "logged": {
-            "message": "Vous êtes connecté en tant que \"{{username}}\".",
-            "authenticated": "Si vous voulez vous <a href=\"#/login\">connecter</a>, vous pouvez utiliser les identifiants par défaut : <br/> nom d'utilisateur=\"admin\" et mot de passe =\"admin\"."
-        },
-        "question": "Si vous avez des questions à propos de JHipster:",
-        "link": {
-            "homepage": "Page d'accueil de JHipster",
-            "stackoverflow": "JHipster sur Stack Overflow",
-            "bugtracker": "JHipster bug tracker",
-            "contact": "Contactez-nous sur Twitter @java_hipster"
-        },
-        "like": "Si vous aimez JHipster, donnez nous une étoile sur",
-        "github": "Github"
-    },
-    "login": {
-        "title": "S'authentifier",
-        "form": {
-            "username": "Nom d'utilisateur",
-            "username.placeholder": "Votre nom d'utilisateur",
-            "password": "Mot de passe",
-            "password.placeholder": "Votre mot de passe",
-            "rememberme": "Garder ma connexion ouverte",
-            "button": "Connexion"
-        },
-        "messages": {
-            "error": {
-                "authentication": "<strong>Erreur d'authentification!</strong> Veuillez vérifier vos identifiants de connexion."
-            }
-        }
-    },
-    "settings": {
-        "title": "Profil de l'utilisateur [{{username}}]",
-        "form": {
-            "firstname": "Prénom",
-            "firstname.placeholder": "Votre prénom",
-            "lastname": "Nom",
-            "lastname.placeholder": "Votre nom",
-            "email": "Email",
-            "email.placeholder": "Votre email",
-            "button": "Sauvegarder"
-        },
-        "messages" : {
-            "error": "<strong>Une erreur est survenue!</strong> Votre profil ne peut pas être sauvegardé.",
-            "success": "<strong>Votre profil a été sauvegardé!</strong>",
-            "validate": {
-                "firstname": {
-                    "required": "Votre prénom est requis.",
-                    "minlength": "Votre prénom doit comporter au moins un caractère",
-                    "maxlength": "Votre prénom ne doit pas comporter plus de 50 caractères"
-                },
-                "lastname": {
-                    "required": "Votre nom est requis.",
-                    "minlength": "Votre nom doit comporter au moins un caractère",
-                    "maxlength": "Votre nom ne doit pas comporter plus de 50 caractères"
-                },
-                "email": {
-                    "required": "Votre email est requis.",
-                    "minlength": "Votre email doit comporter au moins un caractère",
-                    "maxlength": "Votre email ne doit pas comporter plus de 50 caractères",
-                    "invalid": "Votre email n'est pas valide."
-                }
-            }
-        }
-    },
-    "password": {
-        "title": "Changer le mot de passe pour [<b>{{username}}</b>]",
-        "form": {
-            "newpassword": "Nouveau mot de passe",
-            "newpassword.placeholder": "Nouveau mot de passe",
-            "confirmpassword": "Confirmation du nouveau mot de passe",
-            "confirmpassword.placeholder": "Confirmation du nouveau mot de passe",
-            "button": "Sauvegarder"
-        },
-        "messages": {
-            "error": {
-                "global": "<strong>Une erreur est survenue!</strong> Le mot de passe n'a pas pu être modifié.",
-                "dontmatch" : "Le nouveau mot de passe et sa confirmation ne sont pas égaux!"
-            },
-            "success": "<strong>La mot de passe a été modifié!</strong>",
-            "validate": {
-                "newpassword": {
-                    "required": "Votre mot de passe est requis.",
-                    "minlength": "Votre mot de passe doit comporter au moins 5 caractères",
-                    "maxlength": "Votre mot de passe ne doit pas comporter plus de 20 caractères"
-                },
-                "confirmpassword": {
-                    "required": "Votre confirmation du mot de passe est requis.",
-                    "minlength": "Votre confirmation du mot de passe doit comporter au moins 5 caractères",
-                    "maxlength": "Votre confirmation du mot de passe ne doit pas comporter plus de 20 caractères"
-                }
-            }
-        }
-    },
-    "sessions": {
-        "title": "Sessions actives de [<b>{{username}}</b>]",
-        "table": {
-            "ipaddress": "Adresse IP",
-            "useragent": "User Agent",
-            "date": "Date",
-            "button": "Invalider"
-        },
-        "messages": {
-            "success": "<strong>Session a été invalidée!</strong>",
-            "error": "<strong>Une erreur est survenue!</strong> La session ne peut pas être invalidée."
-        }
-    },
-    "metrics": {
-        "title": "Métriques de l'application",
-        "refresh.button": "Rafraichir",
-        "jvm": {
-            "title": "Métriques de la JVM",
-            "memory": {
-                "title": "Mémoire",
-                "total": "Mémoire totale",
-                "heap": "Mémoire \"Heap\"",
-                "nonheap": "Mémoire \"Non-Heap\""
-            },
-            "threads": {
-                "title": "Threads",
-                "runnable": "Executable",
-                "timewaiting": "Temps d'attente",
-                "waiting": "En attente",
-                "blocked": "Bloqué"
-            },
-            "gc": {
-                "title": "Garbage collections",
-                "marksweepcount": "Total de \"Mark Sweep\"",
-                "marksweeptime": "Temps \"Mark Sweep\"",
-                "scavengecount": "Total \"Scavenge\"",
-                "scavengetime": "Temps \"Scavenge\""
-            },
-            "http": {
-                "title": "Requêtes HTTP requests (évènements par seconde)",
-                "active": "Requêtes actives :",
-                "total": "Requêtes totales :",
-                "table": {
-                    "code": "Code",
-                    "count": "Total",
-                    "mean": "Médian",
-                    "average": "Moyenne"
-                },
-                "code": {
-                    "ok": "Ok",
-                    "notfound": "Not found",
-                    "servererror": "Server Error"
-                }
-            }
-        },
-        "servicesstats": {
-            "title": "Statistiques des services (Temps en milliseconde)",
-            "table": {
-                "name": "Nom du server",
-                "count": "Total",
-                "mean": "Médian",
-                "min": "Min",
-                "max": "Max",
-                "p50": "p50",
-                "p75": "p75",
-                "p95": "p95",
-                "p99": "p99"
-            }
-        }
-    },
-    "logs": {
-        "title": "Logs",
-        "nbloggers": "Total de {{ total }} \"loggers\".",
-        "filter": "Filtrer",
-        "table": {
-            "name": "Nom",
-            "level": "Niveau"
-        }
-    },
-    "footer": "Ceci est votre pied de page",
-    "main": {
-        "menu": {
-            "ws" : {
-                "create" : {
-                    "title" : "Services web",
-                    "subtitle" : "Créer un service web",
-                    "detail" : "<p>Vous pouvez créer un nouveau service pour ensuite y ajouter des données.</p><p>Services gérés par Constellation :</p>"
-                }
-
-            },
-            "data" : {
-                "create" : {
-                    "title" : "Données",
-                    "subtitle" : "Ajouter une donnée",
-                    "detail" : "<p>Vous pouvez créer une nouvelle donnée.</p><p>Vous pourrez ensuite la publier dans un service web.</p>"
-                }
-            },
-            "map-composition" : {
-                "create" : {
-                    "title" : "Compositions cartographiques",
-                    "subtitle" : "Créer une composition",
-                    "detail" : "<p>Vous pouvez assembler plusieurs données, leur donner un style et ainsi créer vos propres compositions cartographiques.</p>"
-                }
-            },
-            "viewer" : {
-                "create" : {
-                    "title" : "Visualisation de couches",
-                    "subtitle" : "Visualiser les couches",
-                    "detail" : "<p>Vous pouvez visualiser les couches disponibles sur les différents services.</p>"
-                }
-            },
-            "stat" : {
-                "title" : "Statistiques du serveur",
-                "subtitle" : "Voir les statistiques"
-            }
-        }
+"adddata": {
+ "popup": {
+  "datalist": {
+   "subtitle": {
+    "label": "Sélectionnez la donnée à importer puis cliquez sur continuer."
     }
+   },
+  "informations": {
+   "name": {
+    "label": "Alias"
+    },
+   "subtitle": {
+    "label": "Ajoutez un alias à la donnée."
+    }
+   },
+  "style": {
+   "subtitle": {
+    "label": "Sélectionnez le style par défaut de la donnée."
+    }
+   },
+  "title": "Ajout d'une donnée"
+  }
+ },
+"confirm": {
+ "delete": {
+  "style": "Voulez-vous réellement supprimer ce style?"
+  }
+ },
+"create": {
+ "accessconstraint": {
+  "fees": {
+   "label": "Frais"
+   },
+  "label": "Contraintes d'accès",
+  "layerlimit": {
+   "label": "Nombre maximum de couches",
+   "tooltip": "Nombre maximum de couches qu'un client peut inclure dans un GetMap."
+   },
+  "legend": "Contraintes d'accès au service",
+  "maxheight": {
+   "label": "Hauteur maximale",
+   "tooltip": "Hauteur maximum qu'un client peut inclure dans une requête GetMap."
+   },
+  "maxwidth": {
+   "label": "Largeur maximale",
+   "tooltip": "Largeur maximum qu'un client peut inclure dans un GetMap."
+   }
+  },
+ "cancel": {
+  "label": "Annuler"
+  },
+ "contact": {
+  "address": {
+   "city": {
+    "label": "Ville"
+    },
+   "country": {
+    "label": "Pays"
+    },
+   "email": {
+    "label": "Email"
+    },
+   "fax": {
+    "label": "Fax"
+    },
+   "firstname": {
+    "label": "Prénom"
+    },
+   "label": "Adresse",
+   "lastname": {
+    "label": "Nom"
+    },
+   "postcode": {
+    "label": "Code postal"
+    },
+   "state": {
+    "label": "Province"
+    }
+   },
+  "legend": "Information du contact",
+  "name": {
+   "label": "Nom"
+   },
+  "organisation": {
+   "label": "Organisation"
+   },
+  "phone": {
+   "label": "Téléphone"
+   },
+  "position": {
+   "label": "Fonction dans l'organisation"
+   }
+  },
+ "description": {
+  "metadata": {
+   "subtitle": "Service en création:",
+   "title": "Service metadata"
+   },
+  "next": {
+   "label": "Suivant"
+   },
+  "previous": {
+   "label": "Précédant"
+   },
+  "protocol": {
+   "title": "Protocole"
+   },
+  "save": {
+   "label": "Sauver"
+   },
+  "service": {
+   "description": {
+    "label": "Description"
+    },
+   "identifier": {
+    "label": "Identifiant"
+    },
+   "keywords": {
+    "label": "Mots clefs"
+    },
+   "legend": "Description du service",
+   "name": {
+    "label": "Nom"
+    }
+   },
+  "text": {
+   "csw": "CS-W (Catalogue Service for the Web) permet la diffusion de métadonnées de données et de services.",
+   "sos": "SOS (Sensor Observation Service) permet de publier des données de capteurs, en temps réel.",
+   "wcs": "WCS (Web Coverage Service) permet l'échange de données raster continues. Cette norme est conçue pour l'échange d'informations, telles que des valeurs de pixels, dans une photographie aérienne par exemple.",
+   "wfs": "WFS (Web Feature Service) permet de diffuser des données vectorielles géoréférencées sous différents formats tels que GML, Shape, ...",
+   "wms": "WMS (Web Mapping Service) est destiné à l'échange de données géographiques sous la forme d'images géoréférencées.",
+   "wmts": "WMTS (Web Mapping Tile Service) permet de diffuser des données géoréférencées sous forme d'images tuilées (précalculées)",
+   "wps": "WPS (Web Processing Service) permet d'exposer des modèles de géotraitement en tant que services Web."
+   },
+  "title": {
+   "label": "Designing service"
+   },
+  "transactional": "Transactionnel",
+  "version": {
+   "title": "Version"
+   }
+  }
+ },
+"data": {
+ "information": {
+  "page": {
+   "title": "Information sur la donnée"
+   },
+  "tab": {
+   "missing": {
+    "title": "Métadonnées manquantes"
+    },
+   "title": "Information sur l'image"
+   }
+  }
+ },
+"edition": {
+ "style": {
+  "label": {
+   "attribute": "Attribut",
+   "auto": {
+    "intervals": "Par intervalles",
+    "unique": "Par valeurs uniques"
+    },
+   "cancel": "Annuler",
+   "channel": {
+    "blue": "Canal bleu",
+    "green": "Canal vert",
+    "grey": "Canal gris",
+    "red": "Canal rouge"
+    },
+   "channels": "Canaux",
+   "circle": "Cercle",
+   "color": "Couleur",
+   "continuous": "Continue",
+   "cross": "Croix",
+   "dashed": "Pointillés",
+   "delete": "Supprimer",
+   "description": "Description",
+   "edit": "Editer",
+   "fill": "Remplissage",
+   "filters": "Filtres",
+   "font": "Police",
+   "general": "General",
+   "grey": {
+    "scale": "Niveaux de gris"
+    },
+   "label": "Label",
+   "line": "Ligne",
+   "manual": "Manuelle",
+   "marker": "Icône",
+   "max": {
+    "scale": "Echelle max"
+    },
+   "min": {
+    "scale": "Echelle min"
+    },
+   "name": "Nom",
+   "new": {
+    "rules": "Nouvelle(s) règle(s)",
+    "symbolizer": "Nouveau symbole"
+    },
+   "opacity": "Opacité",
+   "overview": "Aperçu",
+   "point": "Point",
+   "polygon": "Polygone",
+   "raster": "Raster",
+   "rgb": "RVB",
+   "rotation": "Rotation",
+   "rules": "Règles",
+   "scale": "Echelle",
+   "see": {
+    "layer": "Voir la couche"
+    },
+   "size": "Taille",
+   "square": "Carré",
+   "star": "Etoile",
+   "stroke": "Contour",
+   "style": "Style",
+   "symbolizers": "Symboles",
+   "text": "Texte",
+   "title": "Titre",
+   "type": "Type",
+   "update": "Mettre à jour",
+   "validate": "Valider",
+   "viewer": "Visualisateur",
+   "width": "Largeur"
+   },
+  "placeholder": {
+   "name": "Entrez un nom...",
+   "number": "Entrez un nombre entier...",
+   "value": "Entrez une valeur..."
+   }
+  }
+ },
+"footer": "Ceci est votre pied de page",
+"global": {
+ "browsehappy": "Vous utilisez un <strong>ancien</strong> navigateur. Veuillez <a href=\"http://browsehappy.com/\">mettre à jour votre navigateur</a> pour une meilleure expérience.",
+ "language": {
+  "de": "Allemand",
+  "en": "Anglais",
+  "fr": "Français"
+  },
+ "menu": {
+  "account": {
+   "login": "S'authentifier",
+   "logout": "Déconnexion",
+   "logs": "Logs",
+   "main": "Compte",
+   "metrics": "Métriques",
+   "password": "Mot de passe",
+   "sessions": "Sessions",
+   "settings": "Profil"
+   },
+  "data": "Données",
+  "home": "Accueil",
+  "language": "Langue",
+  "map-composition": "Compositions cartographiques",
+  "style": "Styles",
+  "viewer": "Visualiseur",
+  "web-service": "Services web"
+  },
+ "title": "JHipster"
+ },
+"growl": {
+ "error": {
+  "data": {
+   "import": {
+    "no": {
+     "geographic": "L'image ne contient pas d'information géographique."
+     }
+    }
+   },
+  "service": {
+   "delete": "Impossible de supprimer le service.",
+   "description": "Impossible de mettre à jour la description du service.",
+   "metadata": "Impossible de mettre à jour les métadonnées du service.",
+   "restart": "Impossible de redémarrer le service.",
+   "start": "Impossible de démarrer le service. Le service est peut être déjà démarré.",
+   "stop": "Impossible d'arrêter le service. Le service n'est peut être pas démarré."
+   },
+  "style": {
+   "delete": "Impossible de supprimer le style.",
+   "link": {
+    "data": "Impossible d'associer le style à la donnée."
+    },
+   "unlink": {
+    "data": "Impossible de dissocier le style de cette donnée."
+    }
+   }
+  },
+ "success": {
+  "service": {
+   "delete": "Service supprimé avec succès.",
+   "description": "Description du service mise à jour avec succès.",
+   "metadata": "Métadonnées du service modifiée avec succès.",
+   "restart": "Service redémarré avec succès.",
+   "start": "Service démarré avec succès.",
+   "stop": "Service arrêté avec succès."
+   },
+  "style": {
+   "delete": "Style supprimé avec succès.",
+   "link": {
+    "data": "Style associé à la donnée avec succès."
+    },
+   "unlink": {
+    "data": "Style dissocié de la donnée avec succès."
+    }
+   }
+  }
+ },
+"homepage": {
+ "data": {
+  "button": {
+   "label": "Ajouter une donnée"
+   },
+  "summary": "<p>Vous pouvez créer une nouvelle donnée.</p><p>Vous pourrez ensuite la publier dans un service web.</p>",
+  "title": {
+   "label": "Données"
+   }
+  },
+ "geoviewer": {
+  "button": {
+   "label": "Visualiser les couches"
+   },
+  "summary": "<p>Vous pouvez visualiser les couches disponibles sur les différents services.</p>",
+  "title": {
+   "label": "Visualisation de couches"
+   }
+  },
+ "mapcontext": {
+  "button": {
+   "label": "Créer une composition"
+   },
+  "summary": "<p>Vous pouvez assembler plusieurs données, leur donner un style et ainsi créer vos propres compositions cartographiques.</p>",
+  "title": {
+   "label": "Compositions cartographiques"
+   }
+  },
+ "stat": {
+  "button": {
+   "label": "Voir les statistiques"
+   },
+  "title": {
+   "label": "Statistiques du serveur"
+   }
+  },
+ "title": "Bienvenue dans Constellation!",
+ "webservices": {
+  "button": {
+   "label": "Créer un service web"
+   },
+  "summary": "<p>Vous pouvez créer un nouveau service pour ensuite y ajouter des données.</p><p>Services gérés par Constellation :</p>",
+  "title": {
+   "label": "Services web"
+   }
+  }
+ },
+"label": {
+ "add": "Ajouter",
+ "all": "Tous",
+ "all_fem": "Toutes",
+ "categories": "Catégories",
+ "close": "Fermer",
+ "comparison": "Comparaison",
+ "create": {
+  "new": {
+   "style": "Créer un nouveau style"
+   }
+  },
+ "data": {
+  "list": "Liste des données",
+  "processed": "Données traitées",
+  "pyramidal": "Données pyramidées",
+  "raster": "Données rasters",
+  "raw": "Données brutes",
+  "sensor": "Données capteurs",
+  "vector": "Données vectorielles",
+  "virtual": {
+   "sensor": "Capteurs virtuels"
+   }
+  },
+ "database": "Base de données",
+ "date": "Date",
+ "delete": "Supprimer",
+ "description": "Description",
+ "edit": "Editer",
+ "error": "Erreur",
+ "file": {
+  "local": "Fichier local",
+  "server": "Fichier serveur"
+  },
+ "finish": "Terminer",
+ "import": {
+  "style": "Importer un style"
+  },
+ "list": {
+  "style": "Liste des styles"
+  },
+ "logical": "Logique",
+ "name": "Nom",
+ "no": {
+  "association": "Aucune association.",
+  "available": {
+   "data": "Aucune donnée displonible.",
+   "layer": "Aucune couche displonible.",
+   "style": "Aucun style displonible."
+   },
+  "description": "Aucune description disponible.",
+  "selected": {
+   "data": "Aucune donnée sélectionnée.",
+   "layer": "Aucune couche sélectionnée.",
+   "metadata": "Aucune métadonnée sélectionnée.",
+   "style": "Aucun style sélectionné."
+   }
+  },
+ "owner": "Propriétaire",
+ "raster": "Raster",
+ "related": {
+  "data": "Donnée(s) associée(s)",
+  "mapcontext": "Composition(s) cartographique(s) associé(s)",
+  "service": "Service(s) associé(s)",
+  "style": "Style(s) associé(s)"
+  },
+ "results": "resultat(s)",
+ "return": "Retour",
+ "search": "Rechercher",
+ "sensor": "Capteur",
+ "success": "Succès",
+ "symbols": "Symboles",
+ "title": "Titre",
+ "type": "Type",
+ "unknown": "Inconnu",
+ "validate": "Valider",
+ "vector": "Vecteur"
+ },
+"layer": {
+ "listing": {
+  "data": {
+   "add": {
+    "button": {
+     "label": "Ajouter une donnée"
+     }
+    },
+   "create": {
+    "button": {
+     "label": "Créer une donnée"
+     }
+    },
+   "upload": {
+    "button": "Envoyer le fichier",
+    "change": {
+     "label": "Changer"
+     },
+    "close": {
+     "button": "Fermer"
+     },
+    "continue": {
+     "button": "Continuer"
+     },
+    "name": {
+     "label": "Nom"
+     },
+    "raster": {
+     "label": "Donnée raster"
+     },
+    "remove": {
+     "label": "Enlever"
+     },
+    "select": {
+     "label": "Choisir un fichier"
+     },
+    "sensor": {
+     "label": "Donnée capteur"
+     },
+    "title": "Envoyer une donnée",
+    "vector": {
+     "label": "Donnée vecteur"
+     }
+    }
+   },
+  "layer": {
+   "label": "couches"
+   },
+  "numberbypage": {
+   "10": {
+    "label": "10 couches"
+    },
+   "100": {
+    "label": "100 couches"
+    },
+   "20": {
+    "label": "20 couches"
+    }
+   },
+  "orderBy": {
+   "date": "Date",
+   "owner": "Propriétaire",
+   "title": "Titre"
+   },
+  "reduce": {
+   "button": {
+    "label": "réduire ou agrandir"
+    }
+   },
+  "selectall": {
+   "button": "sélectionner toutes les couches"
+   },
+  "selected": {
+   "data": {
+    "button": "Données"
+    },
+   "delete": {
+    "button": "Supprimer"
+    },
+   "export": {
+    "button": "Exporter"
+    },
+   "metadata": {
+    "button": "Métadonnées"
+    }
+   },
+  "title": "Liste des couches"
+  }
+ },
+"login": {
+ "form": {
+  "button": "Connexion",
+  "password": "Mot de passe",
+  "rememberme": "Garder ma connexion ouverte",
+  "username": "Nom d'utilisateur"
+  },
+ "messages": {
+  "error": {
+   "authentication": "<strong>Erreur d'authentification!</strong> Veuillez vérifier vos identifiants de connexion."
+   }
+  },
+ "title": "S'authentifier"
+ },
+"logs": {
+ "filter": "Filtrer",
+ "nbloggers": "Total de {{ total }} \"loggers\".",
+ "table": {
+  "level": "Niveau",
+  "name": "Nom"
+  },
+ "title": "Logs"
+ },
+"main": {
+ "menu": {
+  "data": {
+   "create": {
+    "detail": "<p>Vous pouvez créer une nouvelle donnée.</p><p>Vous pourrez ensuite la publier dans un service web.</p>",
+    "subtitle": "Ajouter une donnée",
+    "title": "Données"
+    }
+   },
+  "map-composition": {
+   "create": {
+    "detail": "<p>Vous pouvez assembler plusieurs données, leur donner un style et ainsi créer vos propres compositions cartographiques.</p>",
+    "subtitle": "Créer une composition",
+    "title": "Compositions cartographiques"
+    }
+   },
+  "stat": {
+   "subtitle": "Voir les statistiques",
+   "title": "Statistiques du serveur"
+   },
+  "viewer": {
+   "create": {
+    "detail": "<p>Vous pouvez visualiser les couches disponibles sur les différents services.</p>",
+    "subtitle": "Visualiser les couches",
+    "title": "Visualisation de couches"
+    }
+   },
+  "ws": {
+   "create": {
+    "detail": "<p>Vous pouvez créer un nouveau service pour ensuite y ajouter des données.</p><p>Services gérés par Constellation :</p>",
+    "subtitle": "Créer un service web",
+    "title": "Services web"
+    }
+   }
+  }
+ },
+"md": {
+ "iso": {
+  "abstract": "Résumé",
+  "data": {
+   "date": "Date des données"
+   },
+  "date": {
+   "type": "Type de données"
+   },
+  "keywords": "Mots clefs",
+  "locale": {
+   "data": "Locale des données"
+   },
+  "organization": "Organisation",
+  "role": "Role",
+  "title": "Titre",
+  "topic": {
+   "category": "Catégorie de sujet"
+   },
+  "username": "Nom de l'utilisateur"
+  },
+ "listing": {
+  "metadata": {
+   "type": "METADONNEES"
+   },
+  "no": {
+   "available": {
+    "md": "Pas de métadonnées disponibles"
+    }
+   },
+  "selected": {
+   "delete": {
+    "button": "Supprimer"
+    },
+   "duplicate": {
+    "button": "Dupliquer"
+    },
+   "edit": {
+    "button": "Editer"
+    },
+   "export": {
+    "button": "Exporter"
+    }
+   },
+  "title": "Liste des métadonnées"
+  }
+ },
+"menu": {
+ "administration": {
+  "label": "Administration"
+  },
+ "data": {
+  "label": "Données"
+  },
+ "geoviewer": {
+  "label": "Visualiseur"
+  },
+ "homepage": {
+  "label": "Accueil"
+  },
+ "mapcontext": {
+  "label": "Compositions cartographiques"
+  },
+ "style": {
+  "label": "Styles"
+  },
+ "webservices": {
+  "label": "Services web"
+  }
+ },
+"metadata": {
+ "information": {
+  "tab": {
+   "title": "Métadonnées de l'image"
+   }
+  }
+ },
+"metrics": {
+ "jvm": {
+  "gc": {
+   "marksweepcount": "Total de \"Mark Sweep\"",
+   "marksweeptime": "Temps \"Mark Sweep\"",
+   "scavengecount": "Total \"Scavenge\"",
+   "scavengetime": "Temps \"Scavenge\"",
+   "title": "Garbage collections"
+   },
+  "http": {
+   "active": "Requêtes actives :",
+   "code": {
+    "notfound": "Not found",
+    "ok": "Ok",
+    "servererror": "Server Error"
+    },
+   "table": {
+    "average": "Moyenne",
+    "code": "Code",
+    "count": "Total",
+    "mean": "Médian"
+    },
+   "title": "Requêtes HTTP requests (évènements par seconde)",
+   "total": "Requêtes totales :"
+   },
+  "memory": {
+   "heap": "Mémoire \"Heap\"",
+   "nonheap": "Mémoire \"Non-Heap\"",
+   "title": "Mémoire",
+   "total": "Mémoire totale"
+   },
+  "threads": {
+   "blocked": "Bloqué",
+   "runnable": "Executable",
+   "timewaiting": "Temps d'attente",
+   "title": "Threads",
+   "waiting": "En attente"
+   },
+  "title": "Métriques de la JVM"
+  },
+ "refresh": {
+  "button": "Rafraichir"
+  },
+ "servicesstats": {
+  "table": {
+   "count": "Total",
+   "max": "Max",
+   "mean": "Médian",
+   "min": "Min",
+   "name": "Nom du server",
+   "p50": "p50",
+   "p75": "p75",
+   "p95": "p95",
+   "p99": "p99"
+   },
+  "title": "Statistiques des services (Temps en milliseconde)"
+  },
+ "title": "Métriques de l'application"
+ },
+"msg": {
+ "add": {
+  "data": {
+   "mapcontext": {
+    "association": "Associer une composition carthographique à la donnée sélectionnée."
+    },
+   "service": {
+    "association": "Associer un service à la donnée sélectionnée"
+    },
+   "style": {
+    "association": "Associer le style à donnée sélectionnée."
+    }
+   },
+  "style": {
+   "association": "Associer une donnée au style selectionné."
+   }
+  },
+ "delete": {
+  "style": {
+   "selected": "Supprimer définitivement le style selectionné."
+   }
+  },
+ "edit": {
+  "style": {
+   "selected": "Editer le style selectionné."
+   }
+  },
+ "no": {
+  "selected": {
+   "data": "Cliquez sur une donnée ci-contre pour afficher plus d'informations.",
+   "layer": "Cliquez sur une couche ci-contre pour afficher plus d'informations.",
+   "metadata": "Cliquez sur une fiche de métadonnées ci-contre pour afficher plus d'informations.",
+   "style": "Cliquez sur un style ci-contre pour afficher plus d'informations."
+   }
+  }
+ },
+"password": {
+ "form": {
+  "button": "Sauvegarder",
+  "confirmpassword": "Confirmation du nouveau mot de passe",
+  "newpassword": "Nouveau mot de passe"
+  },
+ "messages": {
+  "error": {
+   "dontmatch": "Le nouveau mot de passe et sa confirmation ne sont pas égaux!",
+   "global": "<strong>Une erreur est survenue!</strong> Le mot de passe n'a pas pu être modifié."
+   },
+  "success": "<strong>La mot de passe a été modifié!</strong>",
+  "validate": {
+   "confirmpassword": {
+    "maxlength": "Votre confirmation du mot de passe ne doit pas comporter plus de 20 caractères",
+    "minlength": "Votre confirmation du mot de passe doit comporter au moins 5 caractères",
+    "required": "Votre confirmation du mot de passe est requis."
+    },
+   "newpassword": {
+    "maxlength": "Votre mot de passe ne doit pas comporter plus de 20 caractères",
+    "minlength": "Votre mot de passe doit comporter au moins 5 caractères",
+    "required": "Votre mot de passe est requis."
+    }
+   }
+  },
+ "title": "Changer le mot de passe pour [<b>{{username}}</b>]"
+ },
+"server": {
+ "choose": {
+  "file": "Choisir un fichier sur le serveur"
+  },
+ "create": {
+  "button": "Créer"
+  },
+ "next": {
+  "button": "Suivant"
+  }
+ },
+"service": {
+ "abstract": {
+  "label": "Description du service"
+  },
+ "config": {
+  "source": "Source"
+  },
+ "create": {
+  "end": {
+   "addlayers": {
+    "label": "Ajouter des couches au service"
+    },
+   "addmetadata": {
+    "label": "Voir les métadonnées"
+    },
+   "description": {
+    "label": "Description du service"
+    },
+   "error": {
+    "alert": {
+     "label": "Erreur. Votre service n'a pas été créé."
+     },
+    "title": "Le service n'a pas été créé"
+    },
+   "success": {
+    "alert": {
+     "label": "Félicitations ! Votre service a été créé avec succès !"
+     },
+    "title": "Service créé avec succès"
+    },
+   "type": {
+    "label": "Type"
+    },
+   "version": {
+    "label": "Version"
+    }
+   }
+  },
+ "data": {
+  "label": "Données publiées sur le service"
+  },
+ "description": {
+  "getcapabilities": {
+   "button": "GetCapabilities"
+   },
+  "logs": {
+   "button": "Logs"
+   },
+  "reload": {
+   "button": "Recharger"
+   },
+  "start": {
+   "button": "Start"
+   },
+  "stop": {
+   "button": "Stop"
+   },
+  "tab": {
+   "data": {
+    "title": "Données"
+    },
+   "description": {
+    "title": "Description du service"
+    },
+   "metadata": {
+    "data": {
+     "title": "Gestion des métadonnées"
+     },
+    "title": "Métadonnées du service"
+    }
+   }
+  },
+ "menu": {
+  "delete": {
+   "label": "Supprimer le service"
+   },
+  "edit": {
+   "label": "Editer"
+   },
+  "getcapabilities": {
+   "label": "GetCapabilities"
+   },
+  "log": {
+   "label": "Log du service"
+   },
+  "show": {
+   "label": "Visualiser"
+   },
+  "url": {
+   "label": "URL du service"
+   }
+  }
+ },
+"sessions": {
+ "messages": {
+  "error": "<strong>Une erreur est survenue!</strong> La session ne peut pas être invalidée.",
+  "success": "<strong>Session a été invalidée!</strong>"
+  },
+ "table": {
+  "button": "Invalider",
+  "date": "Date",
+  "ipaddress": "Adresse IP",
+  "useragent": "User Agent"
+  },
+ "title": "Sessions actives de [<b>{{username}}</b>]"
+ },
+"settings": {
+ "form": {
+  "button": "Sauvegarder",
+  "email": "Email",
+  "firstname": "Prénom",
+  "lastname": "Nom"
+  },
+ "messages": {
+  "error": "<strong>Une erreur est survenue!</strong> Votre profil ne peut pas être sauvegardé.",
+  "success": "<strong>Votre profil a été sauvegardé!</strong>",
+  "validate": {
+   "email": {
+    "invalid": "Votre email n'est pas valide.",
+    "maxlength": "Votre email ne doit pas comporter plus de 50 caractères",
+    "minlength": "Votre email doit comporter au moins un caractère",
+    "required": "Votre email est requis."
+    },
+   "firstname": {
+    "maxlength": "Votre prénom ne doit pas comporter plus de 50 caractères",
+    "minlength": "Votre prénom doit comporter au moins un caractère",
+    "required": "Votre prénom est requis."
+    },
+   "lastname": {
+    "maxlength": "Votre nom ne doit pas comporter plus de 50 caractères",
+    "minlength": "Votre nom doit comporter au moins un caractère",
+    "required": "Votre nom est requis."
+    }
+   }
+  },
+ "title": "Profil de l'utilisateur [{{username}}]"
+ },
+"style": {
+ "listing": {
+  "numberbypage": {
+   "10": {
+    "label": "10 styles"
+    },
+   "100": {
+    "label": "100 styles"
+    },
+   "20": {
+    "label": "20 styles"
+    }
+   }
+  }
+ },
+"webservicepage": {
+ "button": {
+  "create": {
+   "label": "Créer un nouveau service"
+   },
+  "dropdown": {
+   "csw": {
+    "label": "Catalogues (CSW)"
+    },
+   "label": "Carte (WMS)",
+   "wcs": {
+    "label": "Grille de données (WCS)"
+    },
+   "wfs": {
+    "label": "Données vectorielles (WFS)"
+    },
+   "wms": {
+    "label": "Cartes (WMS)"
+    },
+   "wmts": {
+    "label": "Cartes tuilées (WMTS)"
+    },
+   "wps": {
+    "label": "Géotraitements (WPS)"
+    }
+   }
+  },
+ "tab": {
+  "all": "Tous"
+  },
+ "title": "Services disponibles"
+ }
 }
