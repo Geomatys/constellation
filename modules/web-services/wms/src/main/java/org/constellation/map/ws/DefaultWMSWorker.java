@@ -1091,7 +1091,8 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         isWorking();
         final String userLogin   = getUserLogin();
         final LayerDetails layer = getLayerReference(userLogin, getLegend.getLayer());
-        final String layerName   = layer.getName().toString();
+        final Layer layerConf = getConfigurationLayer(getLegend.getLayer(), userLogin);
+        final String layerName = layer.getName().toString();
         if (!layer.isQueryable(ServiceDef.Query.WMS_ALL)) {
             throw new CstlServiceException("You are not allowed to request the layer \""+
                     layerName +"\".", LAYER_NOT_QUERYABLE, KEY_LAYER.toLowerCase());
@@ -1151,9 +1152,8 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 }
             } else {
                 // No sld given, we use the style.
-                final Layer layerRef = getConfigurationLayer(layer.getName(), userLogin);
 
-                final List<DataReference> defaultStyleRefs = layerRef.getStyles();
+                final List<String> defaultStyleRefs = layerConf.getStyles();
                 if (defaultStyleRefs != null && !defaultStyleRefs.isEmpty()) {
                     final DataReference styleRef = defaultStyleRefs.get(0);
                     ms = (styleRef.getLayerId() == null) ? null : getStyle(styleRef);
