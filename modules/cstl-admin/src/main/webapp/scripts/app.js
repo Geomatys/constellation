@@ -104,12 +104,12 @@ cstlAdminApp
         }])
         .run(['$rootScope', '$location', 'AuthenticationSharedService', 'Account',
             function($rootScope, $location, AuthenticationSharedService, Account) {
-//            $rootScope.$on("$routeChangeStart", function(event, next, current) {
-//                // Check if the status of the user. Is it authenticated or not?
-//                AuthenticationSharedService.authenticate({}, function() {
-//                    $rootScope.authenticated = true;
-//                });
-//            });
+            $rootScope.$on("$routeChangeStart", function(event, next, current) {
+                // Check if the status of the user. Is it authenticated or not?
+                AuthenticationSharedService.authenticate({}, function() {
+                    $rootScope.authenticated = true;
+                });
+            });
 
             // Call when the 401 response is returned by the client
             $rootScope.$on('event:auth-loginRequired', function(rejection) {

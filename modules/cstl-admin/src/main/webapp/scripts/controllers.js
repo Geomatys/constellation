@@ -581,8 +581,9 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
     }]);
 
 
-    cstlAdminApp.controller('WebServiceController', ['$scope', 'webService','$modal',
-    function ($scope, webService, $modal) {
+    cstlAdminApp.controller('WebServiceController', ['$scope', 'webService','$modal', 'textService',
+    function ($scope, webService, $modal, textService) {
+
        $scope.services = webService.listAll();
 
         // Show Capa methods
@@ -591,8 +592,8 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
                 templateUrl: 'views/modalCapa.html',
                 controller: 'WebServiceUtilsController',
                 resolve: {
-                    'details': function(webService){
-                        return webService.capabilities({type: type.toLowerCase(), id : name });
+                    'details': function(textService){
+                        return textService.capa(type.toLowerCase(),  name);
                     }
                 }
             });
@@ -605,8 +606,8 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
                 templateUrl: 'views/modalLogs.html',
                 controller: 'WebServiceUtilsController',
                 resolve: {
-                    'details': function(webService){
-                        return webService.logs({type: type.toLowerCase(), id : name });
+                    'details': function(textService){
+                        return textService.logs(type.toLowerCase(), name );
                     }
                 }
             });
@@ -616,15 +617,15 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
 
 cstlAdminApp.controller('WebServiceUtilsController', ['$scope', 'webService', '$modalInstance', 'details',
     function ($scope, webService, $modalInstance, details) {
-        $scope.details = details;
+        $scope.details = details.data;
 
        $scope.close = function() {
             $modalInstance.dismiss('close');
         };
     }]);
 
-cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'webService', '$modal',
-                                                 function ($scope, $routeParams , webService, $modal) {
+cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'webService', '$modal','textService',
+                                                 function ($scope, $routeParams , webService, $modal, textService) {
     $scope.service = webService.get({type: $routeParams.type, id:$routeParams.id});
     $scope.metadata = webService.metadata({type: $routeParams.type, id:$routeParams.id});
     $scope.config = webService.config({type: $routeParams.type, id:$routeParams.id});
@@ -635,8 +636,8 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
             templateUrl: 'views/modalCapa.html',
             controller: 'WebServiceUtilsController',
             resolve: {
-                'details': function(webService){
-                    return webService.capabilities({type: type.toLowerCase(), id : name });
+                'details': function(textService){
+                    return textService.capa( type.toLowerCase(), name );
                 }
             }
         });
@@ -649,8 +650,8 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
              templateUrl: 'views/modalLogs.html',
              controller: 'WebServiceUtilsController',
              resolve: {
-                 'details': function(webService){
-                     return webService.logs({type: type.toLowerCase(), id : name });
+                 'details': function(textService){
+                     return textService.logs(type.toLowerCase(), name );
                  }
              }
          });

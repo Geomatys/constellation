@@ -43,12 +43,6 @@ cstlAdminApp.factory('LogsService', ['$resource',
         });
     }]);
 
-cstlAdminApp.factory('textService', ['$http',
-                                    function ($http){
-
-                                    }]);
-
-
 
 
 cstlAdminApp.factory('webService', ['$resource',
@@ -93,6 +87,20 @@ cstlAdminApp.factory('provider', ['$resource',
         });
     }]);
 
+
+cstlAdminApp.factory('textService', ['$http',
+    function ($http){
+        return {
+            logs : function(type, id){
+                return $http.get(cstlContext+'api/1/log/'+type+'/'+id)
+
+            },
+            capa : function(type, id){
+                return $http.get(cstlContext+'WS/'+type+'/'+id+'?REQUEST=GetCapabilities&SERVICE='+type)
+
+            }
+        }
+    }]);
 
 cstlAdminApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'authService',
     function ($rootScope, $http, authService) {
