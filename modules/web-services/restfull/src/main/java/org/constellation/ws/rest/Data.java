@@ -22,6 +22,8 @@ import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.model.SelectedExtension;
+import org.constellation.provider.CoverageLayerDetails;
+import org.constellation.provider.FeatureLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
@@ -217,8 +219,9 @@ public class Data {
         final File dataDirectory = ConfigDirectory.getDataDirectory();
         File newFile = new File(dataDirectory, fileDetail.getFileName());
         try {
-            if (fileIs != null) {
+            if (fileIs != null && fileDetail != null) {
                 Files.copy(fileIs, newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                fileIs.close();
                 if (newFile.getName().endsWith(".zip")) {
                     final String fileNameWithoutExt = newFile.getName().substring(0, newFile.getName().indexOf("."));
                     final File zipDir = new File(dataDirectory, fileNameWithoutExt);
@@ -226,12 +229,21 @@ public class Data {
                     newFile = zipDir;
                 }
             }
+
+            if (mdFileIs != null && mdFileDetail != null) {
+                final File mdFolder = new File(dataDirectory, "metadata");
+                if (!mdFolder.exists()) {
+                    mdFolder.mkdir();
+                }
+                final File mdFile = new File(mdFolder, mdFileDetail.getFileName());
+                Files.copy(mdFileIs, mdFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                mdFileIs.close();
+            }
         } catch (IOException ex) {
             LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             return Response.status(500).entity("failed").build();
         }
 
-        // TODO: handle metadata uploaded
         return Response.ok(newFile.getAbsolutePath()).header("X-Frame-Options", "SAMEORIGIN").build();
     }
 
@@ -259,10 +271,10 @@ public class Data {
         }
 
         if (choosingFile.exists()) {
-            DataInformation information = MetadataUtilities.generateMetadatasInformation(choosingFile, choosingMetadataFile, dataType);
-            int extensionPoint = filePath.lastIndexOf('.');
-            int lastSlash = filePath.lastIndexOf("/");
-            String dataName = filePath.substring(lastSlash + 1, extensionPoint);
+            final DataInformation information = MetadataUtilities.generateMetadatasInformation(choosingFile, choosingMetadataFile, dataType);
+            final int extensionPoint = filePath.lastIndexOf('.');
+            final int lastSlash = filePath.lastIndexOf("/");
+            final String dataName = filePath.substring(lastSlash + 1, extensionPoint);
             information.setName(dataName);
             return Response.status(200).entity(information).build();
         }
@@ -442,10 +454,10 @@ public class Data {
     }
 
     @GET
-    @Path("metadata/{providerId}/{dataId}/{dataType}")
+    @Path("metadata/{providerId}/{dataId}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getMetadata(final @PathParam("providerId") String providerId, final @PathParam("dataId") String dataId, final @PathParam("dataType") String dataType) throws SQLException, NotRunningServiceException, CoverageStoreException, NoSuchIdentifierException, ProcessException, JAXBException {
+    public Response getMetadata(final @PathParam("providerId") String providerId, final @PathParam("dataId") String dataId) {
 
         //get reader
         final LayerProvider provider = LayerProviderProxy.getInstance().getProvider(providerId);
@@ -455,24 +467,27 @@ public class Data {
 
         final DefaultMetadata metadata = ConfigurationEngine.loadProviderMetadata(providerId, CSWMarshallerPool.getInstance());
         DataInformation information = new DataInformation();
-        switch (dataType) {
-            case "VECTOR":
-                ArrayList<SimplyMetadataTreeNode> meta = MetadataUtilities.getVectorDataInformation(metadata);
-                information.setFileMetadata(meta);
-                break;
-            case "COVERAGE":
-                final Map<String, CoverageMetadataBean> nameSpatialMetadataMap = new HashMap<>(0);
-                final CoverageReference fcr = (CoverageReference) origin;
+        if (layer instanceof FeatureLayerDetails) {
+            final ArrayList<SimplyMetadataTreeNode> meta = MetadataUtilities.getVectorDataInformation(metadata);
+            information.setFileMetadata(meta);
+        } else if (layer instanceof CoverageLayerDetails) {
+            final Map<String, CoverageMetadataBean> nameSpatialMetadataMap = new HashMap<>(0);
+            final CoverageReference fcr = (CoverageReference) origin;
+            try {
                 final GridCoverageReader reader = fcr.acquireReader();
-                information = MetadataUtilities.getRasterDataInformation(reader, metadata, dataType);
-                QName name = new QName(layer.getName().getNamespaceURI(), layer.getName().getLocalPart());
+                information = MetadataUtilities.getRasterDataInformation(reader, metadata, "COVERAGE");
+                final QName name = new QName(layer.getName().getNamespaceURI(), layer.getName().getLocalPart());
                 final CoverageMetadataBean cmb = ConfigurationEngine.loadDataMetadata(providerId, name, GenericDatabaseMarshallerPool.getInstance());
                 nameSpatialMetadataMap.put(dataId, cmb);
                 information.setCoveragesMetadata(nameSpatialMetadataMap);
                 fcr.recycle(reader);
-                break;
-            default:
-                LOGGER.log(Level.INFO, "Type unknown to found metadata");
+            } catch (Exception ex) {
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+                return Response.status(500).entity("failed").build();
+            }
+        } else {
+            LOGGER.log(Level.INFO, "Type unknown to found metadata");
+            return Response.status(500).entity("failed").build();
         }
 
         information.setName(dataId);
