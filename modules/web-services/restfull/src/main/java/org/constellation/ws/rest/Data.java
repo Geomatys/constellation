@@ -230,8 +230,12 @@ public class Data {
                 }
             }
 
-            if (mdFileIs != null && mdFileDetail != null) {
+            if (mdFileIs != null && mdFileDetail != null && !mdFileDetail.getFileName().isEmpty()) {
                 final File mdFolder = new File(dataDirectory, "metadata");
+                if (mdFolder.exists() && mdFolder.isFile()) {
+                    // Ensures we do not have a file named "metadata" in this folder
+                    mdFolder.delete();
+                }
                 if (!mdFolder.exists()) {
                     mdFolder.mkdir();
                 }

@@ -119,8 +119,8 @@ cstlAdminApp.controller('LogsController', ['$scope', 'resolvedLogs', 'LogsServic
         };
     }]);
 
-cstlAdminApp.controller('DataController', ['$scope', '$dashboard', 'dataListing', 'style', '$modal',
-    function ($scope, $dashboard, dataListing, style, $modal) {
+cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 'dataListing', 'style', '$modal',
+    function ($scope, $location, $dashboard, dataListing, style, $modal) {
 
         $scope.filtertype = "VECTOR";
 
@@ -202,6 +202,10 @@ cstlAdminApp.controller('DataController', ['$scope', '$dashboard', 'dataListing'
                 templateUrl: 'views/modalLocalFile.html',
                 controller: 'LocalFileModalController'
             });
+
+            modal.result.then(function(result) {
+                $location.path('/description/'+ result.file +"/"+ result.missing);
+            });
         };
 
         $scope.showServerFilePopup = function() {
@@ -234,6 +238,7 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
     function ($scope, $dashboard, $modalInstance, $ajaxUpload, $growl, provider, dataListing) {
         $scope.layer = null;
         $scope.file = null;
+        $scope.providerId = null;
         $scope.metadatafile = null;
         $scope.uploadType = '';
 
@@ -253,7 +258,11 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
         };
 
         $scope.close = function() {
-            $modalInstance.dismiss('close');
+            if ($scope.step3) {
+                $modalInstance.close({file: $scope.providerId, missing: $scope.metadatafile == null});
+            } else {
+                $modalInstance.dismiss('close');
+            }
         };
 
         $scope.verifyExtension = function() {
@@ -296,7 +305,7 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
             $scope.$apply(function() {
                 if (message.indexOf('failed') === -1) {
                     var file = message.substring(message.lastIndexOf("/")+1);
-                    var fileName;
+                    var fileName = file;
                     var fileExtension;
                     if (file.indexOf(".") !== -1) {
                         fileName = file.substring(0, file.lastIndexOf("."));
@@ -316,7 +325,7 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                             }
                         });
                         $growl('success','Success','Shapefile data '+ fileName +' successfully added');
-                        $modalInstance.close();
+                        $modalInstance.close({file: fileName, missing: $scope.metadatafile == null});
                     } else if ($scope.uploadType === "raster") {
                         provider.create({
                             id: fileName
@@ -330,7 +339,7 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                             if (!fileExtension || fileExtension !== "nc") {
                                 dataListing.pyramidData({id: fileName}, {value: message}, function() {
                                     $growl('success','Success','Coverage data '+ fileName +' successfully added');
-                                    $modalInstance.dismiss('close');
+                                    $modalInstance.close({file: fileName, missing: $scope.metadatafile == null});
                                 });
                             } else {
                                 displayNetCDF(fileName);
@@ -348,7 +357,6 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
         };
 
         function displayNetCDF(providerId) {
-            $("#uploadForm").find(".modal-dialog").addClass("mapview");
             $scope.step1 = false;
             $scope.step2 = false;
             $scope.step3 = true;
@@ -437,7 +445,7 @@ cstlAdminApp.controller('ServerFileModalController', ['$scope', '$dashboard', '$
 
         $scope.loadData = function() {
             var file = $scope.currentPath.substring($scope.currentPath.lastIndexOf("/")+1);
-            var fileName;
+            var fileName = file;
             var fileExtension;
             if (file.indexOf(".") !== -1) {
                 fileName = file.substring(0, file.lastIndexOf("."));
@@ -537,6 +545,35 @@ cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style',
             var $header = $('#stylesDashboard').find('.selected-item').find('.block-header');
             $header.next().slideToggle(200);
             $header.find('i').toggleClass('icon-chevron-down icon-chevron-up');
+        };
+    }]);
+
+cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
+    function ($scope, $routeParams) {
+        $scope.provider = $routeParams.id;
+        $scope.missing = $routeParams.missing;
+        $scope.tabiso = true;
+        $scope.tabcrs = false;
+        $scope.tabdesc = false;
+
+        $scope.selectTab = function(item) {
+            if (item === 'tabiso') {
+                $scope.tabiso = true;
+                $scope.tabcrs = false;
+                $scope.tabdesc = false;
+            } else if (item === 'tabcrs') {
+                $scope.tabiso = false;
+                $scope.tabcrs = true;
+                $scope.tabdesc = false;
+            } else {
+                $scope.tabiso = false;
+                $scope.tabcrs = false;
+                $scope.tabdesc = true;
+            }
+        };
+
+        $scope.ok = function() {
+
         };
     }]);
 
