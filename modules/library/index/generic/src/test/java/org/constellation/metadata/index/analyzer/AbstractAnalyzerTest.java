@@ -95,6 +95,13 @@ public abstract class AbstractAnalyzerTest {
         } else {
             throw new IllegalArgumentException("resource file must be DefaultMetadata:" + obj);
         }
+
+        obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta14.xml"));
+        if (obj instanceof DefaultMetadata) {
+            result.add((DefaultMetadata) obj);
+        } else {
+            throw new IllegalArgumentException("resource file must be DefaultMetadata:" + obj);
+        }
         CSWMarshallerPool.getInstance().recycle(unmarshaller);
         return result;
     }

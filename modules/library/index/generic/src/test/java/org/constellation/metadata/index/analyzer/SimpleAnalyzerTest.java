@@ -137,7 +137,8 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         // -----------------------------------------------------------//
         expectedResult.add("CTDF02");
         expectedResult.add("MDWeb_FR_SY_couche_vecteur_258");
-
+        expectedResult.add("Spot5-Cyprus-THX-IMAGERY3_ortho1");
+        
         assertEquals(expectedResult, result);
 
         /**
@@ -234,6 +235,7 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         expectedResult = new LinkedHashSet<>();
         expectedResult.add("CTDF02");
         expectedResult.add("MDWeb_FR_SY_couche_vecteur_258");
+        expectedResult.add("Spot5-Cyprus-THX-IMAGERY3_ortho1");
 
         assertEquals(expectedResult, result);
     }
@@ -447,6 +449,7 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("CTDF02");
         expectedResult.add("MDWeb_FR_SY_couche_vecteur_258");
+        expectedResult.add("Spot5-Cyprus-THX-IMAGERY3_ortho1");
 
         assertEquals(expectedResult, result);
 
@@ -467,6 +470,7 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         logger.log(Level.FINER, "SortedSearch 2:\n{0}", resultReport);
 
         expectedResult = new LinkedHashSet<>();
+        expectedResult.add("Spot5-Cyprus-THX-IMAGERY3_ortho1");
         expectedResult.add("MDWeb_FR_SY_couche_vecteur_258");
         expectedResult.add("CTDF02");
         expectedResult.add("42292_9s_19900610041000");
@@ -501,6 +505,7 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         expectedResult.add("40510_145_19930221211500");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("42292_5p_19900609195600");
+        expectedResult.add("Spot5-Cyprus-THX-IMAGERY3_ortho1");
 
         assertEquals(expectedResult, result);
 
@@ -521,6 +526,7 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         logger.log(Level.FINER, "SortedSearch 4:\n{0}", resultReport);
 
         expectedResult = new LinkedHashSet<>();
+        expectedResult.add("Spot5-Cyprus-THX-IMAGERY3_ortho1");
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("40510_145_19930221211500");
@@ -595,6 +601,7 @@ public class SimpleAnalyzerTest extends AbstractAnalyzerTest {
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("40510_145_19930221211500");
         expectedResult.add("MDWeb_FR_SY_couche_vecteur_258");
+        expectedResult.add("Spot5-Cyprus-THX-IMAGERY3_ortho1");
 
         assertEquals(expectedResult, result);
     }
