@@ -370,6 +370,23 @@ public class GeotkClassicAnalyzerTest extends AbstractAnalyzerTest {
 
 
         assertEquals(expectedResult, result);
+
+        /**
+         * Test 2 simple search: title = identifier:Spot5-Cyprus-THX-IMAGERY3_ortho*
+         */
+        spatialQuery = new SpatialQuery("identifier:Spot5-Cyprus-THX-IMAGERY3_ortho*", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        for (String s: result) {
+            resultReport = resultReport + s + '\n';
+        }
+
+        logger.log(Level.FINER, " wildCharUnderscoreSearch 1:\n{0}", resultReport);
+
+        expectedResult = new LinkedHashSet<>();
+        expectedResult.add("Spot5-Cyprus-THX-IMAGERY3_ortho1"); 
+
+        assertEquals(expectedResult, result);
     }
 
      /**

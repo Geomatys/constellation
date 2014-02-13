@@ -369,7 +369,7 @@ public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
         String resultReport = "";
 
         /**
-         * Test 1 simple search: title = title1
+         * Test 1 simple search: title = identifier:*MDWeb_FR_SY*
          */
         SpatialQuery spatialQuery = new SpatialQuery("identifier:*MDWeb_FR_SY*", nullFilter, SerialChainFilter.AND);
         Set<String> result = indexSearcher.doSearch(spatialQuery);
@@ -382,6 +382,23 @@ public class WhiteSpaceAnalyzerTest extends AbstractAnalyzerTest {
 
         Set<String> expectedResult = new LinkedHashSet<>();
         //expectedResult.add("MDWeb_FR_SY_couche_vecteur_258"); error '_' is tokenized
+
+        assertEquals(expectedResult, result);
+
+        /**
+         * Test 2 simple search: title = identifier:Spot5-Cyprus-THX-IMAGERY3_ortho*
+         */
+        spatialQuery = new SpatialQuery("identifier:Spot5-Cyprus-THX-IMAGERY3_ortho*", nullFilter, SerialChainFilter.AND);
+        result = indexSearcher.doSearch(spatialQuery);
+
+        for (String s: result) {
+            resultReport = resultReport + s + '\n';
+        }
+
+        logger.log(Level.FINER, " wildCharUnderscoreSearch 1:\n{0}", resultReport);
+
+        expectedResult = new LinkedHashSet<>();
+        //expectedResult.add("Spot5-Cyprus-THX-IMAGERY3_ortho1"); // error
 
         assertEquals(expectedResult, result);
     }
