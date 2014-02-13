@@ -51,6 +51,7 @@ cstlAdminApp.factory('webService', ['$resource',
                                              'listAll': { method: 'GET', isArray: false},
                                              'get':  { method: 'GET', url: cstlContext+'api/1/OGC/:type/:id'},
                                              'metadata':  { method: 'GET', url: cstlContext+'api/1/OGC/:type/:id/metadata'},
+                                             'updateMd': { method: 'POST', url: cstlContext+'api/1/OGC/:type/:id/metadata'},
                                              'config':  { method: 'GET', url: cstlContext+'api/1/OGC/:type/:id/config'},
                                              'logs': { method: 'GET', url: cstlContext+'api/1/log/:type/:id'},
                                              'capabilities': { method: 'GET', url: cstlContext+'WS/:type/:id?REQUEST=GetCapabilities&SERVICE=:type'}
@@ -65,7 +66,8 @@ cstlAdminApp.factory('dataListing', ['$resource',
             'pyramidData':  {method: 'POST', url: cstlContext+'api/1/data/pyramid/:id'},
             'dataFolder':   {method: 'POST', url: cstlContext+'api/1/data/datapath', isArray: true},
             'extension':    {method: 'POST', url: cstlContext+'api/1/data/testextension'},
-            'deleteData':   {method: 'DELETE', url: cstlContext+'api/1/data/:providerid/:dataid'}
+            'deleteData':   {method: 'DELETE', url: cstlContext+'api/1/data/:providerid/:dataid'},
+            'setMetadata':  {method: 'POST', url: cstlContext+'api/1/data/metadata'}
         });
     }]);
 

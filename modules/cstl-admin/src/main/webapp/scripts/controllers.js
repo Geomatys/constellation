@@ -207,7 +207,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
             });
 
             modal.result.then(function(result) {
-                $location.path('/description/'+ result.file +"/"+ result.missing);
+                $location.path('/description/'+ result.type +"/"+ result.file +"/"+ result.missing);
             });
         };
 
@@ -262,7 +262,7 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
 
         $scope.close = function() {
             if ($scope.step3) {
-                $modalInstance.close({file: $scope.providerId, missing: $scope.metadatafile == null});
+                $modalInstance.close({type: $scope.uploadType, file: $scope.providerId, missing: $scope.metadatafile == null});
             } else {
                 $modalInstance.dismiss('close');
             }
@@ -328,7 +328,7 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                             }
                         });
                         $growl('success','Success','Shapefile data '+ fileName +' successfully added');
-                        $modalInstance.close({file: fileName, missing: $scope.metadatafile == null});
+                        $modalInstance.close({type: "vector", file: fileName, missing: $scope.metadatafile == null});
                     } else if ($scope.uploadType === "raster") {
                         provider.create({
                             id: fileName
@@ -342,7 +342,7 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                             if (!fileExtension || fileExtension !== "nc") {
                                 dataListing.pyramidData({id: fileName}, {value: message}, function() {
                                     $growl('success','Success','Coverage data '+ fileName +' successfully added');
-                                    $modalInstance.close({file: fileName, missing: $scope.metadatafile == null});
+                                    $modalInstance.close({type: "raster", file: fileName, missing: $scope.metadatafile == null});
                                 });
                             } else {
                                 displayNetCDF(fileName);
@@ -551,10 +551,11 @@ cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style',
         };
     }]);
 
-cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
-    function ($scope, $routeParams) {
+cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','dataListing','$location',
+    function ($scope, $routeParams, dataListing, $location) {
         $scope.provider = $routeParams.id;
         $scope.missing = $routeParams.missing;
+        $scope.type = $routeParams.type;
         $scope.tabiso = true;
         $scope.tabcrs = false;
         $scope.tabdesc = false;
@@ -575,8 +576,16 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
             }
         };
 
-        $scope.ok = function() {
-
+        $scope.save = function() {
+            dataListing.setMetadata({},
+                {dataName:$scope.provider, anAbstract:$scope.mdabstract, title:$scope.mdtitle, keywords:$scope.mdkeywords,
+                 username:$scope.mdusername, organisationName:$scope.mdorganisationName, role:$scope.mdrole, localeMetadata:$scope.mdlocaleData,
+                 topicCategory:$scope.mdtopicCategory, date:$scope.mddate,dateType:$scope.mddateType,type:$scope.type
+                },
+                function() {
+                    $location.path('/data');
+                }
+            );
         };
     }]);
 

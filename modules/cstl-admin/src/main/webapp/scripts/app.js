@@ -74,7 +74,7 @@ cstlAdminApp
                     templateUrl: 'views/webservice/edit.html',
                     controller: 'WebServiceEditController'
                 })
-                .when('/description/:id/:missing', {
+                .when('/description/:type/:id/:missing', {
                     templateUrl: 'views/description.html',
                     controller: 'DescriptionController'
                 })

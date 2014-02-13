@@ -58,13 +58,16 @@ public class MetadataFeeder {
         addDateStamp(new Date());
 
         final Locale metadataLocale;
-        String[] localeAndCountry = feeded.getLocaleMetadata().split("_");
-        if (localeAndCountry.length == 2) {
-            metadataLocale = new Locale(localeAndCountry[0], localeAndCountry[1]);
-        }else{
-            metadataLocale = new Locale(localeAndCountry[0]);
+        final String localeMd = feeded.getLocaleMetadata();
+        if (localeMd != null) {
+            final String[] localeAndCountry = localeMd.split("_");
+            if (localeAndCountry.length == 2) {
+                metadataLocale = new Locale(localeAndCountry[0], localeAndCountry[1]);
+            }else{
+                metadataLocale = new Locale(localeAndCountry[0]);
+            }
+            addMetadataLocale(metadataLocale);
         }
-        addMetadataLocale(metadataLocale);
 
         addTitle(feeded.getTitle());
         addAbstract(feeded.getAnAbstract());
@@ -72,19 +75,21 @@ public class MetadataFeeder {
 
         addFileIdentifier(feeded.getDataName());
 
-        localeAndCountry = feeded.getLocaleData().split("_");
-        Locale dataLocale;
-        if(localeAndCountry.length==2){
-            dataLocale = new Locale(localeAndCountry[0], localeAndCountry[1]);
-        }else{
-            dataLocale = new Locale(localeAndCountry[0]);
+        final String localeData = feeded.getLocaleData();
+        if (localeData != null) {
+            final String[] localeAndCountry = localeData.split("_");
+            Locale dataLocale;
+            if(localeAndCountry.length==2){
+                dataLocale = new Locale(localeAndCountry[0], localeAndCountry[1]);
+            }else{
+                dataLocale = new Locale(localeAndCountry[0]);
+            }
+
+            addDataLanguage(dataLocale);
         }
 
-        addDataLanguage(dataLocale);
         addKeywords(feeded.getKeywords());
         addTopicCategory(feeded.getTopicCategory());
-
-
     }
 
 
@@ -188,6 +193,9 @@ public class MetadataFeeder {
      * @param dataLocale {@link java.util.Locale} for data locale
      */
     public void addDataLanguage(final Locale dataLocale) {
+        if (dataLocale == null) {
+            return;
+        }
         final DefaultDataIdentification identification = (DefaultDataIdentification) getIdentification(eater);
         if (identification.getLanguages() == null) {
             identification.setLanguages(Collections.singletonList(dataLocale));
@@ -202,6 +210,9 @@ public class MetadataFeeder {
      * @param topicCategoryName topic code to found right {@link org.opengis.metadata.identification.TopicCategory}
      */
     public void addTopicCategory(final String topicCategoryName) {
+        if (topicCategoryName == null) {
+            return;
+        }
         final TopicCategory topic = TopicCategory.valueOf(topicCategoryName);
         final DefaultDataIdentification identification = (DefaultDataIdentification) getIdentification(eater);
         if (identification.getTopicCategories() == null) {
