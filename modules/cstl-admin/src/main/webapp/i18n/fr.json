@@ -875,6 +875,8 @@
   "getcapabilities": {
    "label": "GetCapabilities"
    },
+   "getcapabilities.modal.title" : "Détails du GetCapabilities",
+   "getcapabilities.modal.close" : "Fermer",
   "log": {
    "label": "Log du service"
    },

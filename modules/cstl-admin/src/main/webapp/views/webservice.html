@@ -48,14 +48,14 @@
                 <div class="row">
                     <div class="col-sm-4 col-sm-offset-8">
                         <div class="dropdown pull-left">
-                            <a data-toggle="dropdown" class="btn dropdown-toggle">
+                            <a data-toggle="dropdown" class="btn btn-default dropdown-toggle">
                                 <i class="icon-wrench"></i>
                                 <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a href="edit/wms/test">Editer</a></li>
-                                <li><a href="#" data-action="open-logs" data-logs="http://localhost:8080/constellation/api/1/log/wms/test?l=1000">Log du service</a></li>
-                                <li><a href="#" data-action="open-service-url" data-capabilities="http://localhost:8080/constellation/WS/wms/test?REQUEST=GetCapabilities&SERVICE=WMS&VERSION=1.3.0">URL du service</a></li>
+                                <li><a href="#/webservice/{{service.type.toLocaleLowerCase()}}/{{service.name}}">Editer</a></li>
+                                <li><a ng-click="showLogs(service.type, service.name)">Log du service</a></li>
+                                <li><a ng-click="showCapa(service.type, service.name)">Capacité du service</a></li>
                                 <li><a href="#" data-action="delete-service" data-service-type="wms" data-service-id="test">Supprimer le service</a></li>
                                 <li><a href="#" data-action="open-capabilities" data-capabilities="http://localhost:8080/constellation/WS/wms/test?REQUEST=GetCapabilities&SERVICE=WMS&VERSION=1.3.0">GetCapabilities</a></li>
                                 <li class="" ><a href="#" data-action="show-service">Visualiser</a></li>

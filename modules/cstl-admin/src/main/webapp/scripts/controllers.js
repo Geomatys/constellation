@@ -145,6 +145,9 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
             dataListing.deleteData({providerid: providerId, dataid: layerName});
         };
 
+
+
+
         // Style methods
         $scope.showStyleList = function() {
             var modal = $modal.open({
@@ -577,14 +580,85 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams',
         };
     }]);
 
-cstlAdminApp.controller('WebServiceController', ['$scope', 'webService',
-    function ($scope, webService) {
+
+    cstlAdminApp.controller('WebServiceController', ['$scope', 'webService','$modal',
+    function ($scope, webService, $modal) {
        $scope.services = webService.listAll();
+
+        // Show Capa methods
+        $scope.showCapa = function(type, name) {
+            $modal.open({
+                templateUrl: 'views/modalCapa.html',
+                controller: 'WebServiceUtilsController',
+                resolve: {
+                    'details': function(webService){
+                        return webService.capabilities({type: type.toLowerCase(), id : name });
+                    }
+                }
+            });
+        };
+
+        // Show Logs methods
+        $scope.showLogs = function(type, name) {
+
+            $modal.open({
+                templateUrl: 'views/modalLogs.html',
+                controller: 'WebServiceUtilsController',
+                resolve: {
+                    'details': function(webService){
+                        return webService.logs({type: type.toLowerCase(), id : name });
+                    }
+                }
+            });
+        };
+
     }]);
 
-cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'webService',
-                                                 function ($scope, $routeParams , webService) {
+cstlAdminApp.controller('WebServiceUtilsController', ['$scope', 'webService', '$modalInstance', 'details',
+    function ($scope, webService, $modalInstance, details) {
+        $scope.details = details;
+
+       $scope.close = function() {
+            $modalInstance.dismiss('close');
+        };
+    }]);
+
+cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'webService', '$modal',
+                                                 function ($scope, $routeParams , webService, $modal) {
     $scope.service = webService.get({type: $routeParams.type, id:$routeParams.id});
     $scope.metadata = webService.metadata({type: $routeParams.type, id:$routeParams.id});
     $scope.config = webService.config({type: $routeParams.type, id:$routeParams.id});
-                                                 }]);
+
+    // Show Capa methods
+    $scope.showCapa = function(type, name) {
+        $modal.open({
+            templateUrl: 'views/modalCapa.html',
+            controller: 'WebServiceUtilsController',
+            resolve: {
+                'details': function(webService){
+                    return webService.capabilities({type: type.toLowerCase(), id : name });
+                }
+            }
+        });
+    };
+
+     // Show Logs methods
+     $scope.showLogs = function(type, name) {
+
+         $modal.open({
+             templateUrl: 'views/modalLogs.html',
+             controller: 'WebServiceUtilsController',
+             resolve: {
+                 'details': function(webService){
+                     return webService.logs({type: type.toLowerCase(), id : name });
+                 }
+             }
+         });
+     };
+
+
+    }]);
+
+
+
+

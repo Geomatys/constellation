@@ -437,6 +437,8 @@
            "delete.label": "Delete service",
            "edit.label": "Edit",
            "getcapabilities.label": "GetCapabilities",
+            "getcapabilities.modal.title" : "GetCapabilities Details",
+            "getcapabilities.modal.close" : "close",
            "log.label": "Service log",
            "show.label": "Show",
            "url.label": "Service URL"

@@ -43,6 +43,14 @@ cstlAdminApp.factory('LogsService', ['$resource',
         });
     }]);
 
+cstlAdminApp.factory('textService', ['$http',
+                                    function ($http){
+
+                                    }]);
+
+
+
+
 cstlAdminApp.factory('webService', ['$resource',
                                      function ($resource) {
                                          return $resource(cstlContext+'api/1/admin/instances', {}, {
@@ -50,8 +58,8 @@ cstlAdminApp.factory('webService', ['$resource',
                                              'get':  { method: 'GET', url: cstlContext+'api/1/OGC/:type/:id'},
                                              'metadata':  { method: 'GET', url: cstlContext+'api/1/OGC/:type/:id/metadata'},
                                              'config':  { method: 'GET', url: cstlContext+'api/1/OGC/:type/:id/config'},
-                                             'logs': { method: 'GET', url: cstlContext+'api/1/log/:type/:id}}'},
-                                             'capabilities': { method: 'GET', url: 'WS/:type/:id?REQUEST=GetCapabilities&SERVICE=:TYPE&VERSION=:VERSION'}
+                                             'logs': { method: 'GET', url: cstlContext+'api/1/log/:type/:id'},
+                                             'capabilities': { method: 'GET', url: cstlContext+'WS/:type/:id?REQUEST=GetCapabilities&SERVICE=:type'}
                                          });
                                      }]);
 
