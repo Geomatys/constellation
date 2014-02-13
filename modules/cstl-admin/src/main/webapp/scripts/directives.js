@@ -36,7 +36,29 @@ angular.module('cstlAdminApp')
                 });
             }
         };
-    }]);
+    }])
+
+/**
+ * Datepicker.
+ *
+ * @see http://eternicode.github.io/bootstrap-datepicker/
+ */
+    .directive('datepicker', function() {
+    return {
+        restrict: 'A',
+        link: function(scope, element, attrs) {
+            var options = scope.$eval(attrs['datepicker']) || {};
+            element.datepicker({
+                todayBtn:    options.todayBtn,
+                language:    options.language,
+                orientation: options.orientation,
+                format:      options.format,
+                weekStart:   options.weekStart,
+                viewMode:    options.viewMode,
+                minViewMode: options.minViewMode
+            });
+        }
+    };
+});
 
 
-    

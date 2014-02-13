@@ -551,8 +551,8 @@ cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style',
         };
     }]);
 
-cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','dataListing','$location',
-    function ($scope, $routeParams, dataListing, $location) {
+cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','dataListing','$location', '$translate',
+    function ($scope, $routeParams, dataListing, $location, $translate) {
         $scope.provider = $routeParams.id;
         $scope.missing = $routeParams.missing;
         $scope.type = $routeParams.type;
@@ -586,6 +586,10 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','data
                     $location.path('/data');
                 }
             );
+        };
+
+        $scope.getCurrentLang = function() {
+            return $translate.uses();
         };
     }]);
 
