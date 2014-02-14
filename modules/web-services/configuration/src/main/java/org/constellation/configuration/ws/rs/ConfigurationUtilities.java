@@ -11,6 +11,7 @@ import org.constellation.configuration.AbstractConfigurer;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.ProviderService;
 import org.constellation.provider.StyleProviderProxy;
@@ -327,6 +328,11 @@ public class ConfigurationUtilities {
                                 // Not that service,
                             }
                         }
+                    }
+
+                    // Brut force solution : we restart all providers, otherwise, Constellation seems in trouble to work with newly imported data.
+                    for (LayerProvider provider : LayerProviderProxy.getInstance().getProviders()) {
+                        provider.reload();
                     }
 
                 } catch (Exception e) {
