@@ -16,14 +16,17 @@
     <div class="row bg-white" style="padding-bottom:30px;">
         <div class="col-sm-12">
             <ul class="nav nav-tabs">
-                <li id="requiredISO19115Tab" ng-show="missing" ng-class="{active:missing}">
-                    <a ng-click="selectTab('tabiso')" data-toggle="tab"><span translate="data.information.tab.missing.title"></span></a>
+                <li id="requiredISO19115Tab" ng-show="missing" ng-class="{active:missing && type==='vector'}">
+                    <a ng-click="selectTab('tabiso')" data-toggle="tab"><span translate="data.information.tab.missing.title">Missing metadata</span></a>
                 </li>
-                <li id="crsTab">
+                <li id="crsTab" ng-show="type=='vector'">
                     <a ng-click="selectTab('tabcrs')" data-toggle="tab">CRS</a>
                 </li>
-                <li id="descriptionTab" ng-hide="missing" ng-class="{active:!missing}">
+                <li id="descriptionTab" ng-hide="missing" ng-class="{active:!missing && type==='vector'}">
                     <a ng-click="selectTab('tabdesc')" data-toggle="tab"><span translate="data.information.tab.title"></span></a>
+                </li>
+                <li id="imageInfoTab" ng-show="type=='raster'" ng-class="{active:type==='raster'}">
+                    <a ng-click="selectTab('tabimageinfo')" data-toggle="tab"><span translate="metadata.information.tab.title">Picture metadata</span></a>
                 </li>
             </ul>
 
@@ -96,7 +99,11 @@
                     </div>
                 </div>
                 <div class="tab-pane" ng-class="{active:tabcrs}" ng-show="tabcrs">
-                    CRS
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control" ng-model="crs" value="{{crs}}"/>
+                        </div>
+                    </div>
                 </div>
                 <div class="tab-pane" ng-class="{active:tabdesc}" ng-show="tabdesc">
                     DESC

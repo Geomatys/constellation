@@ -554,25 +554,35 @@ cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style',
 cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','dataListing','$location', '$translate',
     function ($scope, $routeParams, dataListing, $location, $translate) {
         $scope.provider = $routeParams.id;
-        $scope.missing = $routeParams.missing;
+        $scope.missing = $routeParams.missing === 'true';
         $scope.type = $routeParams.type;
-        $scope.tabiso = true;
+
+        $scope.tabiso = $scope.type==='vector' && $scope.missing;
         $scope.tabcrs = false;
-        $scope.tabdesc = false;
+        $scope.tabdesc = $scope.type==='vector' && !$scope.missing;
+        $scope.tabimageinfo = $scope.type==='raster';
 
         $scope.selectTab = function(item) {
             if (item === 'tabiso') {
                 $scope.tabiso = true;
                 $scope.tabcrs = false;
                 $scope.tabdesc = false;
+                $scope.tabimageinfo = false;
             } else if (item === 'tabcrs') {
                 $scope.tabiso = false;
                 $scope.tabcrs = true;
                 $scope.tabdesc = false;
-            } else {
+                $scope.tabimageinfo = false;
+            } else if (item === 'tabdesc') {
                 $scope.tabiso = false;
                 $scope.tabcrs = false;
                 $scope.tabdesc = true;
+                $scope.tabimageinfo = false;
+            } else {
+                $scope.tabiso = false;
+                $scope.tabcrs = false;
+                $scope.tabdesc = false;
+                $scope.tabimageinfo = true;
             }
         };
 
