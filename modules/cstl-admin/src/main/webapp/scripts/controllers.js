@@ -560,8 +560,6 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','data
         $scope.tabcrs = false;
         $scope.tabdesc = false;
 
-        $scope.codeLists = dataListing.codeLists();
-
         $scope.selectTab = function(item) {
             if (item === 'tabiso') {
                 $scope.tabiso = true;
@@ -593,6 +591,8 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','data
         $scope.getCurrentLang = function() {
             return $translate.uses();
         };
+
+        $scope.codeLists = dataListing.codeLists({lang: $scope.getCurrentLang()});
     }]);
 
 

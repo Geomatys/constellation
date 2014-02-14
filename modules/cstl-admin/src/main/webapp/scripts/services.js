@@ -68,7 +68,7 @@ cstlAdminApp.factory('dataListing', ['$resource',
             'extension':    {method: 'POST', url: cstlContext+'api/1/data/testextension'},
             'deleteData':   {method: 'DELETE', url: cstlContext+'api/1/data/:providerid/:dataid'},
             'setMetadata':  {method: 'POST', url: cstlContext+'api/1/data/metadata'},
-            'codeLists':    {method: 'GET', url: cstlContext+'api/1/data/metadataCodeLists/fr'}
+            'codeLists':    {method: 'GET', url: cstlContext+'api/1/data/metadataCodeLists/:lang'}
         });
     }]);
 

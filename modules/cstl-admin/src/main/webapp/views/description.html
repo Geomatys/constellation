@@ -9,7 +9,7 @@
         <div class="navbar">
             <div class="navbar-inner">
                 <div class="brand" translate="data.information.page.title">Data information</div>
-                <div class="pull-right">{{provider}}</div>
+                <div class="brand pull-right">{{provider}}</div>
             </div>
         </div>
     </div>
@@ -32,33 +32,33 @@
                     <div class="row">
                         <div class="col-sm-6">
                             <div class="form-group">
-                                <label class="control-label" for="title" translate="md.iso.title">Title</label>
+                                <div class="control-label" for="title" translate="md.iso.title">Title</div>
                                 <input type="text" class="form-control" ng-model="mdtitle" id="title" required/>
                             </div>
 
                             <div class="form-group">
-                                <label class="control-label" for="abstract" translate="md.iso.abstract">Abstract</label>
+                                <div class="control-label" for="abstract" translate="md.iso.abstract">Abstract</div>
                                 <textarea class="form-control" ng-model="mdabstract" id="abstract" rows="5" required></textarea>
                             </div>
 
                             <div class="form-group">
-                                <label class="control-label" for="keywords" translate="md.iso.keywords">Keywords</label>
+                                <div class="control-label" for="keywords" translate="md.iso.keywords">Keywords</div>
                                 <input type="text" class="form-control" ng-model="mdkeywords" id="keywords" />
                             </div>
 
                             <div class="form-group">
-                                <label class="control-label" for="username" translate="md.iso.username">User name</label>
+                                <div class="control-label" for="username" translate="md.iso.username">User name</div>
                                 <input type="text" class="form-control" ng-model="mdusername" id="username" required
                                            data-validation-matches-message="what?" aria-invalid="false"/>
                             </div>
 
                             <div class="form-group">
-                                <label class="control-label" for="organisationName" translate="md.iso.organization">Organization</label>
+                                <div class="control-label" for="organisationName" translate="md.iso.organization">Organization</div>
                                 <input type="text" class="form-control" ng-model="mdorganisationName" id="organisationName" required/>
                             </div>
 
                             <div class="form-group">
-                                <label class="control-label" for="roleCode" translate="md.iso.role">Role</label>
+                                <div class="control-label" for="roleCode" translate="md.iso.role">Role</div>
                                 <select ng-model="mdrole" class="form-control" id="roleCode" required>
                                     <option ng-repeat="role in codeLists.roles" value="{{role}}">{{role}}</option>
                                 </select>
@@ -68,26 +68,26 @@
 
                         <div class="col-sm-6">
                             <div class="form-group">
-                                <label class="control-label" for="topicCategory" translate="md.iso.topic.category">Topic category</label>
+                                <div class="control-label" for="topicCategory" translate="md.iso.topic.category">Topic category</div>
                                 <select ng-model="mdtopicCategory" class="form-control" id="topicCategory" required>
                                     <option ng-repeat="topic in codeLists.categories" value="{{topic}}">{{topic}}</option>
                                 </select>
                             </div>
 
                             <div class="form-group">
-                                <label class="control-label" for="date" translate="md.iso.data.date">Data date</label>
+                                <div class="control-label" for="date" translate="md.iso.data.date">Data date</div>
                                 <input type="text" class="form-control" ng-model="mddate" id="date" datepicker="{language:getCurrentLang()}" required/>
                             </div>
 
                             <div class="form-group">
-                                <label class="control-label" for="dateType" translate="md.iso.date.type">Date type</label>
+                                <div class="control-label" for="dateType" translate="md.iso.date.type">Date type</div>
                                 <select ng-model="mddateType" class="form-control" id="dateType" required>
                                     <option ng-repeat="dateType in codeLists.dateTypes" value="{{dateType}}">{{dateType}}</option>
                                 </select>
                             </div>
 
                             <div class="form-group">
-                                <label class="control-label" for="localeData" translate="md.iso.locale.data">Locale data</label>
+                                <div class="control-label" for="localeData" translate="md.iso.locale.data">Locale data</div>
                                 <select ng-model="mdlocaleData" class="form-control" id="localeData" required>
                                     <option ng-repeat="lang in codeLists.locales" value="{{lang}}">{{lang}}</option>
                                 </select>
