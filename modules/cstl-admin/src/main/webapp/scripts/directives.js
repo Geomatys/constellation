@@ -38,25 +38,32 @@ angular.module('cstlAdminApp')
         };
     }])
 
-/**
- * Datepicker.
- *
- * @see http://eternicode.github.io/bootstrap-datepicker/
- */
+    /**
+     * Datepicker.
+     *
+     * @see http://eternicode.github.io/bootstrap-datepicker/
+     */
     .directive('datepicker', function() {
     return {
         restrict: 'A',
         link: function(scope, element, attrs) {
-            var options = scope.$eval(attrs['datepicker']) || {};
-            element.datepicker({
-                todayBtn:    options.todayBtn,
-                language:    options.language,
-                orientation: options.orientation,
-                format:      options.format,
-                weekStart:   options.weekStart,
-                viewMode:    options.viewMode,
-                minViewMode: options.minViewMode
-            });
+
+            scope.$watch(attrs['datepicker'], function(newVal) {
+                watchAction(newVal || {});
+            }, true);
+
+            function watchAction(newVal) {
+                element.datepicker('remove');
+                element.datepicker({
+                    todayBtn:    newVal.todayBtn,
+                    language:    newVal.language,
+                    orientation: newVal.orientation,
+                    format:      newVal.format,
+                    weekStart:   newVal.weekStart,
+                    viewMode:    newVal.viewMode,
+                    minViewMode: newVal.minViewMode
+                });
+            }
         }
     };
 });
