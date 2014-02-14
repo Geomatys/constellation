@@ -599,7 +599,7 @@ public class WPSWorker extends AbstractWorker {
         //needed to get the public adress of generated schemas (for feature parameters).
         updateWebDavURL();
         schemaURL = schemaFolder.replace(webdavFolderPath, webdavURL);
-        
+
         //check mandatory IDENTIFIER is not missing.
         if (request.getIdentifier() == null || request.getIdentifier().isEmpty()) {
             throw new CstlServiceException("The parameter " + IDENTIFER_PARAMETER + " must be specified.",
@@ -619,7 +619,7 @@ public class WPSWorker extends AbstractWorker {
                 throw new CstlServiceException("Process " + identifier.getValue() + " not supported by the service.",
                         INVALID_PARAMETER_VALUE, IDENTIFER_PARAMETER.toLowerCase());
             }
-            
+
             final ProcessDescriptionType descriptionType = new ProcessDescriptionType();
             descriptionType.setIdentifier(identifier);                                                                      //Process Identifier
             descriptionType.setTitle(WPSUtils.buildProcessTitle(processDesc));                                              //Process Title
@@ -642,17 +642,22 @@ public class WPSWorker extends AbstractWorker {
                 /*
                  * Whatever the parameter type is, we prepare the name, title, abstract and multiplicity parts.
                  */
-                    final InputDescriptionType in = new InputDescriptionType();                    
-                    
-                    // Parameter informations
-                    in.setIdentifier(new CodeType(WPSUtils.buildProcessIOIdentifiers(processDesc, param, WPSIO.IOType.INPUT)));
-                    in.setTitle(WPSUtils.capitalizeFirstLetter(param.getName().getCode()));
-                    in.setAbstract(WPSUtils.capitalizeFirstLetter(param.getRemarks().toString()));
+                final InputDescriptionType in = new InputDescriptionType();
 
-                    //set occurs
-                    in.setMaxOccurs(BigInteger.valueOf(param.getMaximumOccurs()));
-                    in.setMinOccurs(BigInteger.valueOf(param.getMinimumOccurs()));
-                    
+                // Parameter informations
+                in.setIdentifier(new CodeType(WPSUtils.buildProcessIOIdentifiers(processDesc, param, WPSIO.IOType.INPUT)));
+                in.setTitle(WPSUtils.capitalizeFirstLetter(param.getName().getCode()));
+
+                if (param.getRemarks() != null) {
+                    in.setAbstract(WPSUtils.capitalizeFirstLetter(param.getRemarks().toString()));
+                } else {
+                    in.setAbstract(WPSUtils.capitalizeFirstLetter("No description available"));
+                }
+
+                //set occurs
+                in.setMaxOccurs(BigInteger.valueOf(param.getMaximumOccurs()));
+                in.setMinOccurs(BigInteger.valueOf(param.getMinimumOccurs()));
+
                 // If the Parameter Descriptor isn't a ParameterDescriptorGroup
                 if (param instanceof ParameterDescriptor) {
                     final ParameterDescriptor paramDesc = (ParameterDescriptor) param;
@@ -667,8 +672,8 @@ public class WPSWorker extends AbstractWorker {
                         //Complex type (XML, ...)
                     } else if (WPSIO.isSupportedComplexInputClass(clazz)) {
                         Map<String, Object> userData = null;
-                        if(paramDesc instanceof ExtendedParameterDescriptor) {
-                            userData = ((ExtendedParameterDescriptor)paramDesc).getUserObject();
+                        if (paramDesc instanceof ExtendedParameterDescriptor) {
+                            userData = ((ExtendedParameterDescriptor) paramDesc).getUserObject();
                         }
                         in.setComplexData(WPSUtils.describeComplex(clazz, WPSIO.IOType.INPUT, WPSIO.FormChoice.COMPLEX, userData));
 
@@ -696,8 +701,8 @@ public class WPSWorker extends AbstractWorker {
 
                     } else if (WPSIO.isSupportedReferenceInputClass(clazz)) {
                         Map<String, Object> userData = null;
-                        if(paramDesc instanceof ExtendedParameterDescriptor) {
-                            userData = ((ExtendedParameterDescriptor)paramDesc).getUserObject();
+                        if (paramDesc instanceof ExtendedParameterDescriptor) {
+                            userData = ((ExtendedParameterDescriptor) paramDesc).getUserObject();
                         }
                         in.setComplexData(WPSUtils.describeComplex(clazz, WPSIO.IOType.INPUT, WPSIO.FormChoice.REFERENCE, userData));
 
@@ -705,18 +710,18 @@ public class WPSWorker extends AbstractWorker {
                     } else {
                         throw new CstlServiceException("Process input not supported.", NO_APPLICABLE_CODE);
                     }
-                     
+
                 } else if (param instanceof ParameterDescriptorGroup) {
                     /*
                      * If we get a parameterDescriptorGroup, we must expose the 
                      * parameters contained in it as one single input. To do so,
                      * we'll expose a feature type input.
                      */
-                    FeatureType ft = WPSConvertersUtils.descriptorGroupToFeatureType((ParameterDescriptorGroup)param);
-                    
+                    FeatureType ft = WPSConvertersUtils.descriptorGroupToFeatureType((ParameterDescriptorGroup) param);
+
                     // Build the schema xsd, and store it into temporary folder.
-                    String placeToStore = schemaFolder + "/" +ft.getName().getLocalPart()+".xsd";
-                    String publicAddress = schemaURL + "/" +ft.getName().getLocalPart()+".xsd";
+                    String placeToStore = schemaFolder + "/" + ft.getName().getLocalPart() + ".xsd";
+                    String publicAddress = schemaURL + "/" + ft.getName().getLocalPart() + ".xsd";
                     File xsdStore = new File(placeToStore);
                     try {
                         WPSUtils.storeFeatureSchema(ft, xsdStore);
@@ -725,13 +730,13 @@ public class WPSWorker extends AbstractWorker {
                         userData.put(WPSIO.SCHEMA_KEY, publicAddress);
                         in.setComplexData(WPSUtils.describeComplex(clazz, WPSIO.IOType.INPUT, WPSIO.FormChoice.COMPLEX, userData));
                     } catch (JAXBException ex) {
-                        throw new CstlServiceException("The schema for parameter "+ param.getName().getCode() + "can't be build.", NO_APPLICABLE_CODE);
+                        throw new CstlServiceException("The schema for parameter " + param.getName().getCode() + "can't be build.", NO_APPLICABLE_CODE);
                     }
-                    
+
                 } else {
                     throw new CstlServiceException("Process parameter invalid", NO_APPLICABLE_CODE);
                 }
-                
+
                 dataInputs.getInput().add(in);
             }
             if (!dataInputs.getInput().isEmpty()) {
@@ -748,7 +753,11 @@ public class WPSWorker extends AbstractWorker {
                 //parameter information
                 out.setIdentifier(new CodeType(WPSUtils.buildProcessIOIdentifiers(processDesc, param, WPSIO.IOType.OUTPUT)));
                 out.setTitle(WPSUtils.capitalizeFirstLetter(param.getName().getCode()));
-                out.setAbstract(WPSUtils.capitalizeFirstLetter(param.getRemarks().toString()));
+                if (param.getRemarks() != null) {
+                    out.setAbstract(WPSUtils.capitalizeFirstLetter(param.getRemarks().toString()));
+                } else {
+                    out.setAbstract(WPSUtils.capitalizeFirstLetter("No description available"));
+                }
 
                 //simple parameter
                 if (param instanceof ParameterDescriptor) {
@@ -798,12 +807,12 @@ public class WPSWorker extends AbstractWorker {
                      * parameters contained in it as one single input. To do so,
                      * we'll expose a feature type input.
                      */
-                    FeatureType ft = WPSConvertersUtils.descriptorGroupToFeatureType((ParameterDescriptorGroup)param);
-                    
+                    FeatureType ft = WPSConvertersUtils.descriptorGroupToFeatureType((ParameterDescriptorGroup) param);
+
                     // Input class
-                    final Class clazz = ft.getClass();                    
-                    String placeToStore = schemaFolder + "/" +ft.getName().getLocalPart()+".xsd";
-                    String publicAddress = schemaURL + "/" +ft.getName().getLocalPart()+".xsd";                 
+                    final Class clazz = ft.getClass();
+                    String placeToStore = schemaFolder + "/" + ft.getName().getLocalPart() + ".xsd";
+                    String publicAddress = schemaURL + "/" + ft.getName().getLocalPart() + ".xsd";
                     File xsdStore = new File(placeToStore);
                     try {
                         WPSUtils.storeFeatureSchema(ft, xsdStore);
@@ -811,9 +820,9 @@ public class WPSWorker extends AbstractWorker {
                         userData.put(WPSIO.SCHEMA_KEY, publicAddress);
                         out.setComplexOutput(WPSUtils.describeComplex(clazz, WPSIO.IOType.OUTPUT, WPSIO.FormChoice.COMPLEX, userData));
                     } catch (JAXBException ex) {
-                        throw new CstlServiceException("The schema for parameter "+ param.getName().getCode() + "can't be build.", NO_APPLICABLE_CODE);
+                        throw new CstlServiceException("The schema for parameter " + param.getName().getCode() + "can't be build.", NO_APPLICABLE_CODE);
                     }
-                    
+
                 } else {
                     throw new CstlServiceException("Process parameter invalid", NO_APPLICABLE_CODE);
                 }

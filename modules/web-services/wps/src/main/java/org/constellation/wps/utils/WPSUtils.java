@@ -306,10 +306,15 @@ public class WPSUtils {
     public static boolean isSupportedParameter(GeneralParameterDescriptor toTest, WPSIO.IOType type) {
         boolean isClean = false;
         if (toTest instanceof ParameterDescriptorGroup) {
-            for (GeneralParameterDescriptor desc : ((ParameterDescriptorGroup) toTest).descriptors()) {
-                isClean = isSupportedParameter(desc, type);
-                if (!isClean) {
-                    break;
+            final List<GeneralParameterDescriptor> descs = ((ParameterDescriptorGroup) toTest).descriptors();
+            if (descs.isEmpty()) {
+                isClean = true;
+            } else {
+                for (GeneralParameterDescriptor desc : descs) {
+                    isClean = isSupportedParameter(desc, type);
+                    if (!isClean) {
+                        break;
+                    }
                 }
             }
         } else if (toTest instanceof ParameterDescriptor) {
@@ -477,8 +482,14 @@ public class WPSUtils {
             final List<GeneralParameterDescriptor> descriptors = descGroup.descriptors();
 
             for (final GeneralParameterDescriptor geneDesc : descriptors) {
-                    final String id = buildProcessIOIdentifiers(procDesc, geneDesc, iOType);
-                    map.put(id, geneDesc.getMinimumOccurs() > 0);
+                final String id = buildProcessIOIdentifiers(procDesc, geneDesc, iOType);
+                final boolean required;
+                if (geneDesc instanceof ParameterDescriptor && ((ParameterDescriptor)geneDesc).getDefaultValue() != null) {
+                    required = false;
+                } else {
+                    required = geneDesc.getMinimumOccurs() > 0;
+                }
+                map.put(id, required);
             }
         }
         return map;
