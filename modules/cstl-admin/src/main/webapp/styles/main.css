@@ -182,6 +182,30 @@ ul.unstyled {
     -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
 }
+.nav-tabs>li>a {
+    background-color: #E4E4E4;
+}
+.nav-tabs>li>a:hover, .nav-tabs>li>a:focus {
+    border-color: #eeeeee #eeeeee #dddddd;
+}
+.nav-tabs>li>a {
+    background-color: #E4E4E4;
+    color: #555555;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    line-height: 20px;
+    border: 1px solid transparent;
+    -webkit-border-radius: 4px 4px 0 0;
+    -moz-border-radius: 4px 4px 0 0;
+    border-radius: 4px 4px 0 0;
+}
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:hover, .nav-tabs>li.active>a:focus {
+    color: #5bc0de;
+    background-color: #f2f2f2;
+    border-bottom: 1px solid #ddd;
+    border-top: #5bc0de 2px solid;
+    cursor: default;
+}
 
 /*
  * Dashboards
