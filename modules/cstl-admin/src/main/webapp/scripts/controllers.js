@@ -600,7 +600,7 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','data
 
         $scope.save = function() {
             dataListing.setMetadata({},
-                {dataName:$scope.provider, anAbstract:$scope.mdabstract, title:$scope.mdtitle, keywords:$scope.mdkeywords,
+                {dataName:$scope.provider, dataPath:$uploadFiles.files.file, anAbstract:$scope.mdabstract, title:$scope.mdtitle, keywords:$scope.mdkeywords,
                  username:$scope.mdusername, organisationName:$scope.mdorganisationName, role:$scope.mdrole, localeMetadata:$scope.mdlocaleData,
                  topicCategory:$scope.mdtopicCategory, date:$scope.mddate,dateType:$scope.mddateType,type:$scope.type
                 },
