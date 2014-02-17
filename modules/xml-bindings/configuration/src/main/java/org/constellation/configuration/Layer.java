@@ -19,10 +19,7 @@ package org.constellation.configuration;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.*;
 import javax.xml.namespace.QName;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import java.util.Objects;
@@ -97,9 +94,12 @@ public class Layer {
 
     @XmlElement(name = "owner")
     private String owner;
+
+    @XmlElementWrapper(name="featureInfos")
+    @XmlElement(name="FeatureInfo")
+    private List<GetFeatureInfoCfg> getFeatureInfoCfgs;
     
     public Layer() {
-
     }
 
     public Layer(final QName name) {
@@ -150,6 +150,7 @@ public class Layer {
         this.dimensions   = dimensions;
         this.version      = version != null ? Long.valueOf(version.getTime()): null;
         this.alias        = alias;
+        this.getFeatureInfoCfgs = null;
     }
 
     /**
@@ -360,6 +361,18 @@ public class Layer {
         this.owner = owner;
     }
 
+    /**
+     * Return custom getFeatureInfos
+     * @return a list with GetFeatureInfoCfg, can be null.
+     */
+    public List<GetFeatureInfoCfg> getGetFeatureInfoCfgs() {
+        return getFeatureInfoCfgs;
+    }
+
+    public void setGetFeatureInfoCfgs(final List<GetFeatureInfoCfg> getFeatureInfoCfgs) {
+        this.getFeatureInfoCfgs = getFeatureInfoCfgs;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("[Layer]");
@@ -416,6 +429,12 @@ public class Layer {
                 sb.append("dimension:\n").append(dimension).append('\n');
             }
         }
+        if (getFeatureInfoCfgs != null && !getFeatureInfoCfgs.isEmpty()) {
+            sb.append("featureInfos:\n").append(getFeatureInfoCfgs).append('\n');
+            for (final GetFeatureInfoCfg getFeatureInfoCfg : getFeatureInfoCfgs) {
+                sb.append("featureInfos:\n").append(getFeatureInfoCfg).append('\n');
+            }
+        }
         return sb.toString();
     }
 
@@ -437,7 +456,8 @@ public class Layer {
                    Objects.equals(this.name,         that.name) &&
                    Objects.equals(this.styles,       that.styles) &&
                    Objects.equals(this.opaque,       that.opaque) &&
-                   Objects.equals(this.title,        that.title);
+                   Objects.equals(this.title,        that.title) &&
+                   Objects.equals(this.getFeatureInfoCfgs, that.getFeatureInfoCfgs);
         }
         return false;
     }
@@ -460,6 +480,7 @@ public class Layer {
         hash = 79 * hash + (this.attribution != null ? this.attribution.hashCode() : 0);
         hash = 79 * hash + (this.opaque != null ? this.opaque.hashCode() : 0);
         hash = 79 * hash + (this.crs != null ? this.crs.hashCode() : 0);
+        hash = 79 * hash + (this.getFeatureInfoCfgs != null ? this.getFeatureInfoCfgs.hashCode() : 0);
         return hash;
     }
 }

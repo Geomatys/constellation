@@ -31,14 +31,15 @@ import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.util.DataReference;
 import org.geotoolkit.ogc.xml.v110.BBOXType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
-import org.geotoolkit.util.StringUtilities;
 import org.apache.sis.xml.MarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
 
 /**
  *
- * @author guilhem
+ * @author Guilhem Legal (Geomatys)
+ * @author Cédric Briançon (Geomatys)
+ * @author Quentin Boileau (Geomatys)
  */
 public class ConfigurationXmlBindingTest {
 
@@ -158,6 +159,10 @@ public class ConfigurationXmlBindingTest {
      */
     @Test
     public void layerContextMarshalingTest() throws Exception {
+
+        /////////////////////////////////////////
+        // Test MapContext with customParameters
+        /////////////////////////////////////////
         List<Source> sources = new ArrayList<>();
         Source s1 = new Source("source1", true, null, null);
         Source s2 = new Source("source2", true, null, null);
@@ -188,6 +193,55 @@ public class ConfigurationXmlBindingTest {
         comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
 
+        /////////////////////////////////////////
+        // Test MapContext with custom GetFeatureInfo
+        /////////////////////////////////////////
+        sources = new ArrayList<>();
+        sources.add(s1);
+        sources.add(s2);
+        context = new LayerContext(new Layers(sources));
+
+        List<GFIParam> params = new ArrayList<>();
+        params.add(new GFIParam("paramKey1", "paramValue1"));
+        params.add(new GFIParam("paramKey2", "paramValue2"));
+
+        GetFeatureInfoCfg gfiParam = new GetFeatureInfoCfg("image/png","org.some.package.ClassImage");
+        gfiParam.setGfiParameter(params);
+
+        List<GetFeatureInfoCfg> gfiList = new ArrayList<>();
+        gfiList.add(new GetFeatureInfoCfg("text/xml","org.some.package.ClassXML"));
+        gfiList.add(gfiParam);
+        context.setGetFeatureInfoCfgs(gfiList);
+
+        sw = new StringWriter();
+        marshaller.marshal(context, sw);
+
+        expresult = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
+                + "<ns2:LayerContext xmlns:ns2=\"http://www.constellation.org/config\">" + '\n'
+                + "    <ns2:layers>" + '\n'
+                + "        <ns2:Source id=\"source1\" load_all=\"true\"/>" + '\n'
+                + "        <ns2:Source id=\"source2\" load_all=\"true\"/>" + '\n'
+                + "    </ns2:layers>" + '\n'
+                + "    <ns2:customParameters/>" + '\n'
+                + "    <ns2:featureInfos>" + '\n'
+                + "        <ns2:FeatureInfo mimeType=\"text/xml\" binding=\"org.some.package.ClassXML\"/>" + '\n'
+                + "        <ns2:FeatureInfo mimeType=\"image/png\" binding=\"org.some.package.ClassImage\">" + '\n'
+                + "            <ns2:parameters>" + '\n'
+                + "                <ns2:GFIParam key=\"paramKey1\" value=\"paramValue1\"/>" + '\n'
+                + "                <ns2:GFIParam key=\"paramKey2\" value=\"paramValue2\"/>" + '\n'
+                + "            </ns2:parameters>" + '\n'
+                + "        </ns2:FeatureInfo>" + '\n'
+                + "    </ns2:featureInfos>" + '\n'
+                + "</ns2:LayerContext>\n";
+
+        result = sw.toString();
+        comparator = new XMLComparator(expresult, result);
+        comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
+        comparator.compare();
+
+        /////////////////////////////////////////
+        // Test Source with exclude Layers
+        /////////////////////////////////////////
         sources = new ArrayList<>();
         List<Layer> exclude = new ArrayList<>();
         Layer l1 = new Layer(new QName("layer1"));
@@ -221,6 +275,9 @@ public class ConfigurationXmlBindingTest {
         comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
 
+        /////////////////////////////////////////
+        // Test Source with include Layers
+        /////////////////////////////////////////
         sources = new ArrayList<>();
         List<Layer> include = new ArrayList<>();
         l1 = new Layer(new QName("layer1"));
@@ -254,6 +311,11 @@ public class ConfigurationXmlBindingTest {
         comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
 
+        /////////////////////////////////////////
+        // Test MainLayer and Layer with
+        // title, abstract, keyword, MDUrl, DataUrl,
+        // authUrl, identifier, attribution, opaque and CRS
+        /////////////////////////////////////////
         sources = new ArrayList<>();
         include = new ArrayList<>();
         l1 = new Layer(new QName("layer1"),
@@ -333,6 +395,9 @@ public class ConfigurationXmlBindingTest {
         comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
 
+        /////////////////////////////////////////
+        // Test Layer with StyleReference
+        /////////////////////////////////////////
         sources = new ArrayList<>();
         include = new ArrayList<>();
         l1 = new Layer(new QName("layer1"), Collections.singletonList(new DataReference("${providerStyleType|sldProviderId|styleName}")));
@@ -362,6 +427,9 @@ public class ConfigurationXmlBindingTest {
         comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
 
+        /////////////////////////////////////////
+        // Test Layer with BBOX
+        /////////////////////////////////////////
         sources = new ArrayList<>();
         include = new ArrayList<>();
         final FilterType filter = new FilterType();
@@ -404,6 +472,59 @@ public class ConfigurationXmlBindingTest {
         comparator = new XMLComparator(expresult, result);
         comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
+
+        /////////////////////////////////////////
+        // Test Layer with custom GetFeatureInfo
+        /////////////////////////////////////////
+        sources = new ArrayList<>();
+        include = new ArrayList<>();
+
+        params = new ArrayList<>();
+        params.add(new GFIParam("paramKey1", "paramValue1"));
+        params.add(new GFIParam("paramKey2", "paramValue2"));
+
+        gfiParam = new GetFeatureInfoCfg("image/png","org.some.package.ClassImage");
+        gfiParam.setGfiParameter(params);
+
+        gfiList = new ArrayList<>();
+        gfiList.add(new GetFeatureInfoCfg("text/xml","org.some.package.ClassXML"));
+        gfiList.add(gfiParam);
+
+        l1 = new Layer(new QName("layer1"));
+        l1.setGetFeatureInfoCfgs(gfiList);
+        include.add(l1);
+        s1 = new Source("source1", false, include, null);
+        sources.add(s1);
+        context = new LayerContext(new Layers(sources));
+        sw = new StringWriter();
+        marshaller.marshal(context, sw);
+
+        expresult = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
+                + "<ns2:LayerContext xmlns:ns2=\"http://www.constellation.org/config\">" + '\n'
+                + "    <ns2:layers>" + '\n'
+                + "        <ns2:Source id=\"source1\" load_all=\"false\">" + '\n'
+                + "            <ns2:include>" + '\n'
+                + "                <ns2:Layer name=\"layer1\">" + '\n'
+                + "                    <ns2:featureInfos>" + '\n'
+                + "                        <ns2:FeatureInfo mimeType=\"text/xml\" binding=\"org.some.package.ClassXML\"/>" + '\n'
+                + "                        <ns2:FeatureInfo mimeType=\"image/png\" binding=\"org.some.package.ClassImage\">" + '\n'
+                + "                            <ns2:parameters>" + '\n'
+                + "                                <ns2:GFIParam key=\"paramKey1\" value=\"paramValue1\"/>" + '\n'
+                + "                                <ns2:GFIParam key=\"paramKey2\" value=\"paramValue2\"/>" + '\n'
+                + "                            </ns2:parameters>" + '\n'
+                + "                        </ns2:FeatureInfo>" + '\n'
+                + "                    </ns2:featureInfos>" + '\n'
+                + "                </ns2:Layer>" + '\n'
+                + "            </ns2:include>" + '\n'
+                + "        </ns2:Source>" + '\n'
+                + "    </ns2:layers>" + '\n'
+                + "    <ns2:customParameters/>" + '\n'
+                + "</ns2:LayerContext>\n";
+
+        result = sw.toString();
+        comparator = new XMLComparator(expresult, result);
+        comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
+        comparator.compare();
     }
 
     /**
@@ -413,6 +534,9 @@ public class ConfigurationXmlBindingTest {
      */
     @Test
     public void processContextMarshalingTest() throws Exception {
+        /////////////////////////////////////////
+        // Test ProcessContext load all process
+        /////////////////////////////////////////
         List<ProcessFactory> factories = new ArrayList<>();
         ProcessFactory s1 = new ProcessFactory();
         s1.setAutorityCode("source1");
@@ -440,6 +564,9 @@ public class ConfigurationXmlBindingTest {
         comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
 
+        /////////////////////////////////////////
+        // Test ProcessContext exclude process
+        /////////////////////////////////////////
         factories = new ArrayList<>();
         List<Process> exclude = new ArrayList<>();
         Process l1 = new Process();
@@ -480,6 +607,9 @@ public class ConfigurationXmlBindingTest {
         comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
 
+        /////////////////////////////////////////
+        // Test ProcessContext include process
+        /////////////////////////////////////////
         factories = new ArrayList<>();
         List<Process> include = new ArrayList<>();
         l1 = new Process();
@@ -552,6 +682,9 @@ public class ConfigurationXmlBindingTest {
      */
     @Test
     public void layerContextUnmarshalingTest() throws Exception {
+        /////////////////////////////////////////
+        // Test LayerContext source load all
+        /////////////////////////////////////////
         String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
                 + "<ns2:LayerContext xmlns:ns2=\"http://www.constellation.org/config\">" + '\n'
                 + "    <ns2:layers>" + '\n'
@@ -572,6 +705,9 @@ public class ConfigurationXmlBindingTest {
         assertEquals(expresult.getLayers(), result.getLayers());
         assertEquals(expresult, result);
 
+        /////////////////////////////////////////
+        // Test LayerContext source exclude
+        /////////////////////////////////////////
         xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
                 + "<ns2:LayerContext xmlns:ns2=\"http://www.constellation.org/config\">" + '\n'
                 + "    <ns2:layers>" + '\n'
@@ -602,6 +738,9 @@ public class ConfigurationXmlBindingTest {
 
         assertEquals(expresult, result);
 
+        /////////////////////////////////////////
+        // Test LayerContext source include
+        /////////////////////////////////////////
         xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
                 + "<ns2:LayerContext xmlns:ns2=\"http://www.constellation.org/config\">" + '\n'
                 + "    <ns2:layers>" + '\n'
@@ -631,6 +770,9 @@ public class ConfigurationXmlBindingTest {
 
         assertEquals(expresult, result);
 
+        /////////////////////////////////////////
+        // Test LayerContext complete layer
+        /////////////////////////////////////////
         xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
                 + "<ns2:LayerContext xmlns:ns2=\"http://www.constellation.org/config\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">" + '\n'
                 + "    <ns2:layers>" + '\n'
@@ -719,6 +861,10 @@ public class ConfigurationXmlBindingTest {
         assertEquals(expresult.getMainLayer(), result.getMainLayer());
         assertEquals(expresult, result);
 
+
+        /////////////////////////////////////////
+        // Test LayerContext custom parameters
+        /////////////////////////////////////////
         xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
                 + "<c:LayerContext xmlns:c=\"http://www.constellation.org/config\">" + '\n'
                 + "    <c:layers/>" + '\n'
@@ -737,6 +883,55 @@ public class ConfigurationXmlBindingTest {
         assertEquals(expresult.getLayers(), result.getLayers());
         assertEquals(expresult, result);
 
+        /////////////////////////////////////////
+        // Test MapContext with custom GetFeatureInfo
+        /////////////////////////////////////////
+        xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
+                + "<ns2:LayerContext xmlns:ns2=\"http://www.constellation.org/config\">" + '\n'
+                + "    <ns2:layers>" + '\n'
+                + "        <ns2:Source id=\"source1\" load_all=\"true\"/>" + '\n'
+                + "        <ns2:Source id=\"source2\" load_all=\"true\"/>" + '\n'
+                + "    </ns2:layers>" + '\n'
+                + "    <ns2:customParameters/>" + '\n'
+                + "    <ns2:featureInfos>" + '\n'
+                + "        <ns2:FeatureInfo mimeType=\"image/png\" binding=\"org.some.package.ClassImage\">" + '\n'
+                + "            <ns2:parameters>" + '\n'
+                + "                <ns2:GFIParam key=\"paramKey1\" value=\"paramValue1\"/>" + '\n'
+                + "            </ns2:parameters>" + '\n'
+                + "        </ns2:FeatureInfo>" + '\n'
+                + "    </ns2:featureInfos>" + '\n'
+                + "</ns2:LayerContext>\n";
+
+        result = (LayerContext) unmarshaller.unmarshal(new StringReader(xml));
+        sources = new ArrayList<>();
+        s1 = new Source("source1", true, null, null);
+        s2 = new Source("source2", true, null, null);
+        sources.add(s1);
+        sources.add(s2);
+
+        List<GFIParam> params = new ArrayList<>();
+        params.add(new GFIParam("paramKey1", "paramValue1"));
+
+        GetFeatureInfoCfg gfiParam = new GetFeatureInfoCfg("image/png","org.some.package.ClassImage");
+        gfiParam.setGfiParameter(params);
+
+        List<GetFeatureInfoCfg> gfiList = new ArrayList<>();
+        gfiList.add(gfiParam);
+
+        expresult = new LayerContext(new Layers(sources));
+        expresult.setGetFeatureInfoCfgs(gfiList);
+
+        assertEquals(expresult.getLayers(), result.getLayers());
+        assertEquals(expresult.getGetFeatureInfoCfgs(), result.getGetFeatureInfoCfgs());
+        assertEquals(expresult.getGetFeatureInfoCfgs().get(0).getMimeType(), result.getGetFeatureInfoCfgs().get(0).getMimeType());
+        assertEquals(expresult.getGetFeatureInfoCfgs().get(0).getBinding(), result.getGetFeatureInfoCfgs().get(0).getBinding());
+        assertEquals(expresult.getGetFeatureInfoCfgs().get(0).getGfiParameter().get(0).getKey(), result.getGetFeatureInfoCfgs().get(0).getGfiParameter().get(0).getKey());
+        assertEquals(expresult.getGetFeatureInfoCfgs().get(0).getGfiParameter().get(0).getValue(), result.getGetFeatureInfoCfgs().get(0).getGfiParameter().get(0).getValue());
+        assertEquals(expresult, result);
+
+        /////////////////////////////////////////
+        // Test Layer with StyleReference
+        /////////////////////////////////////////
         xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
                 + "<ns2:LayerContext xmlns:ns2=\"http://www.constellation.org/config\">" + '\n'
                 + "    <ns2:layers>" + '\n'
@@ -763,6 +958,9 @@ public class ConfigurationXmlBindingTest {
 
         assertEquals(expresult, result);
 
+        /////////////////////////////////////////
+        // Test Layer with BBOX
+        /////////////////////////////////////////
         xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
                 + "<ns2:LayerContext xmlns:ns2=\"http://www.constellation.org/config\" xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:gml=\"http://www.opengis.net/gml\">" + '\n'
                 + "    <ns2:layers>" + '\n'
@@ -820,6 +1018,68 @@ public class ConfigurationXmlBindingTest {
         assertEquals(expresult.getLayers(), result.getLayers());
         assertEquals(expresult, result);
 
+        /////////////////////////////////////////
+        // Test Layer with Custom FeatureInfo
+        /////////////////////////////////////////
+        xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
+                + "<ns2:LayerContext xmlns:ns2=\"http://www.constellation.org/config\">" + '\n'
+                + "    <ns2:layers>" + '\n'
+                + "        <ns2:Source id=\"source1\" load_all=\"false\">" + '\n'
+                + "            <ns2:include>" + '\n'
+                + "                <ns2:Layer name=\"layer1\">" + '\n'
+                + "                    <ns2:featureInfos>" + '\n'
+                + "                        <ns2:FeatureInfo mimeType=\"image/png\" binding=\"org.some.package.ClassImage\">" + '\n'
+                + "                            <ns2:parameters>" + '\n'
+                + "                                <ns2:GFIParam key=\"paramKey1\" value=\"paramValue1\"/>" + '\n'
+                + "                            </ns2:parameters>" + '\n'
+                + "                        </ns2:FeatureInfo>" + '\n'
+                + "                    </ns2:featureInfos>" + '\n'
+                + "                </ns2:Layer>" + '\n'
+                + "            </ns2:include>" + '\n'
+                + "        </ns2:Source>" + '\n'
+                + "    </ns2:layers>" + '\n'
+                + "    <ns2:customParameters/>" + '\n'
+                + "</ns2:LayerContext>\n";
+
+        result = (LayerContext) unmarshaller.unmarshal(new StringReader(xml));
+
+        sources = new ArrayList<>();
+        include = new ArrayList<>();
+
+        params = new ArrayList<>();
+        params.add(new GFIParam("paramKey1", "paramValue1"));
+
+        gfiParam = new GetFeatureInfoCfg("image/png","org.some.package.ClassImage");
+        gfiParam.setGfiParameter(params);
+
+        gfiList = new ArrayList<>();
+        gfiList.add(gfiParam);
+
+        l1 = new Layer(new QName("layer1"));
+        l1.setGetFeatureInfoCfgs(gfiList);
+        include.add(l1);
+        s1 = new Source("source1", false, include, null);
+        sources.add(s1);
+        expresult = new LayerContext(new Layers(sources));
+
+        assertEquals(expresult.getMainLayer(), result.getMainLayer());
+        assertEquals(expresult.getSecurity(), result.getSecurity());
+        assertEquals(expresult.getCustomParameters(), result.getCustomParameters());
+        assertEquals(expresult.getLayers().size(), result.getLayers().size());
+        assertEquals(expresult.getLayers().get(0).getId(), result.getLayers().get(0).getId());
+        assertEquals(expresult.getLayers().get(0).getExclude(), result.getLayers().get(0).getExclude());
+        assertEquals(expresult.getLayers().get(0).getLoadAll(), result.getLayers().get(0).getLoadAll());
+
+        Layer resultLayer = result.getLayers().get(0).getInclude().get(0);
+        Layer expLayer = l1;
+        assertEquals(expLayer.getGetFeatureInfoCfgs(), resultLayer.getGetFeatureInfoCfgs());
+        assertEquals(expLayer.getGetFeatureInfoCfgs().get(0).getMimeType(), resultLayer.getGetFeatureInfoCfgs().get(0).getMimeType());
+        assertEquals(expLayer.getGetFeatureInfoCfgs().get(0).getBinding(), resultLayer.getGetFeatureInfoCfgs().get(0).getBinding());
+        assertEquals(expLayer.getGetFeatureInfoCfgs().get(0).getGfiParameter().get(0).getKey(), resultLayer.getGetFeatureInfoCfgs().get(0).getGfiParameter().get(0).getKey());
+        assertEquals(expLayer.getGetFeatureInfoCfgs().get(0).getGfiParameter().get(0).getValue(), resultLayer.getGetFeatureInfoCfgs().get(0).getGfiParameter().get(0).getValue());
+
+        assertEquals(expresult.getLayers(), result.getLayers());
+        assertEquals(expresult, result);
     }
 
     @Test
