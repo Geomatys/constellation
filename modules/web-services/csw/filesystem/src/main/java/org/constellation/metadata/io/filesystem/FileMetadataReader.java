@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 
 // XML dependencies
 import javax.xml.namespace.QName;
@@ -462,6 +463,9 @@ public class FileMetadataReader extends DomMetadataReader implements CSWMetadata
                     results.add(identifier);
                 } else if (f.isDirectory()){
                     results.addAll(getAllIdentifiers(f));
+                } else if(fileName.startsWith(".")){
+                    // do nothing : metadata can't be in a file which begin with a dot.
+                    LOGGER.log(Level.FINER, "File "+fileName + " is not a valid");
                 } else {
                     throw new MetadataIoException("The metadata file : " + f.getPath() + " does not ands with .xml or is not a directory", INVALID_PARAMETER_VALUE);
                 }
