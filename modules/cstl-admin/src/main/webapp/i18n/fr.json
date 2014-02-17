@@ -866,6 +866,16 @@
     }
    }
   },
+    "edit" : {
+        "dashboard.title" : "Liste des couches",
+        "dashboard.header.title": "Titre",
+        "dashboard.header.date": "Date",
+        "dashboard.header.owner": "Propriétaire",
+        "dashboard.header.type": "Type",
+        "dashboard.action.add.button": "Ajouter",
+        "dashboard.action.add.data": "Ajouter une donnée",
+        "dashboard.action.add.layer": "Ajouter une couche"
+    },
  "menu": {
   "delete": {
    "label": "Supprimer le service"
@@ -881,6 +891,8 @@
   "log": {
    "label": "Log du service"
    },
+   "log.modal.title" : "Détails de la log ",
+   "log.modal.close" : "Fermer",
   "show": {
    "label": "Visualiser"
    },

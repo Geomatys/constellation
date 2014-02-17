@@ -433,13 +433,26 @@
            "tab.description.title": "Service description",
            "tab.metadata.title": "Service metadata"
         },
+        "edit" : {
+            "dashboard.title" : "Layers list",
+            "dashboard.header.title": "Title",
+            "dashboard.header.date": "Date",
+            "dashboard.header.owner": "Owner",
+            "dashboard.header.type": "Type",
+            "dashboard.action.add.button": "Add",
+            "dashboard.action.add.data": "Add data",
+            "dashboard.action.add.layer": "Add Layer"
+
+        },
         "menu": {
            "delete.label": "Delete service",
            "edit.label": "Edit",
            "getcapabilities.label": "GetCapabilities",
             "getcapabilities.modal.title" : "GetCapabilities Details",
-            "getcapabilities.modal.close" : "close",
+            "getcapabilities.modal.close" : "Close",
            "log.label": "Service log",
+            "log.modal.title" : "Log Details",
+            "log.modal.close" : "Close",
            "show.label": "Show",
            "url.label": "Service URL"
         }

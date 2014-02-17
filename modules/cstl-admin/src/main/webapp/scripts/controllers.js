@@ -654,7 +654,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
     $scope.service = webService.get({type: $routeParams.type, id:$routeParams.id});
     $scope.metadata = webService.metadata({type: $routeParams.type, id:$routeParams.id});
     $scope.config = webService.config({type: $routeParams.type, id:$routeParams.id});
-
+    $scope.layers = webService.layers({type: $routeParams.type, id:$routeParams.id});
     // Show Capa methods
     $scope.showCapa = function(type, name) {
         $modal.open({
@@ -682,6 +682,26 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
          });
      };
 
+
+     $scope.tabdata = true;
+     $scope.tabdesc = false;
+     $scope.tabmetadata = false;
+
+     $scope.selectTab = function(item) {
+         if (item === 'tabdata') {
+             $scope.tabdata = true;
+             $scope.tabdesc = false;
+             $scope.tabmetadata = false;
+         } else if (item === 'tabdesc') {
+             $scope.tabdata = false;
+             $scope.tabdesc = true;
+             $scope.tabmetadata = false;
+         } else {
+             $scope.tabdata = false;
+             $scope.tabdesc = false;
+             $scope.tabmetadata = true;
+         }
+     };
 
     }]);
 
