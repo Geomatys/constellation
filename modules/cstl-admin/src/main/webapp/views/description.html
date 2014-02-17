@@ -106,7 +106,14 @@
                     </div>
                 </div>
                 <div class="tab-pane" ng-class="{active:tabdesc}" ng-show="tabdesc">
-                    DESC
+                    <div class="row">
+                        <div id="mdDesc" ng-init="createMetadataTree('mdDesc',false)"></div>
+                    </div>
+                </div>
+                <div class="tab-pane" ng-class="{active:tabimageinfo}" ng-show="tabimageinfo">
+                    <div class="row">
+                        <div id="mdImageInfo" ng-init="createMetadataTree('mdImageInfo',true)"></div>
+                    </div>
                 </div>
             </div>
             <button type="button" id="submitButton" class="btn btn-primary pull-right" ng-click="save()" translate="label.validate">Validate</button>

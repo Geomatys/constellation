@@ -66,6 +66,7 @@ cstlAdminApp.factory('dataListing', ['$resource',
             'listCoverage': {method: 'POST', url: cstlContext+'api/1/data/coverage/list/'},
             'pyramidData':  {method: 'POST', url: cstlContext+'api/1/data/pyramid/:id'},
             'dataFolder':   {method: 'POST', url: cstlContext+'api/1/data/datapath', isArray: true},
+            'loadData':     {method: 'POST', url: cstlContext+'api/1/data/load'},
             'extension':    {method: 'POST', url: cstlContext+'api/1/data/testextension'},
             'deleteData':   {method: 'DELETE', url: cstlContext+'api/1/data/:providerid/:dataid'},
             'setMetadata':  {method: 'POST', url: cstlContext+'api/1/data/metadata'},
@@ -294,5 +295,11 @@ cstlAdminApp.service('$growl', function() {
         } else if (type === 'warning') {
             $.growl.warning({title: title, message: msg});
         }
+    };
+});
+
+cstlAdminApp.service('$uploadFiles', function() {
+    return {
+        files : {file: null, mdFile: null}
     };
 });

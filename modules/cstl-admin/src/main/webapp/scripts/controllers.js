@@ -237,8 +237,8 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         };
     }]);
 
-cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$modalInstance', '$ajaxUpload', '$growl', 'provider', 'dataListing',
-    function ($scope, $dashboard, $modalInstance, $ajaxUpload, $growl, provider, dataListing) {
+cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$modalInstance', '$ajaxUpload', '$growl', 'provider', 'dataListing', '$uploadFiles',
+    function ($scope, $dashboard, $modalInstance, $ajaxUpload, $growl, provider, dataListing, $uploadFiles) {
         $scope.layer = null;
         $scope.file = null;
         $scope.providerId = null;
@@ -307,12 +307,24 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
         function uploaded(message) {
             $scope.$apply(function() {
                 if (message.indexOf('failed') === -1) {
-                    var file = message.substring(message.lastIndexOf("/")+1);
-                    var fileName = file;
+                    var files = message.split(',');
+                    var upFile = files[0];
+                    var upMdFile = null;
+                    if (files.length === 2) {
+                        upMdFile = files[1];
+                    }
+
+                    // Stores uploaded files in session for further use
+                    var upFiles = $uploadFiles.files;
+                    upFiles.file = upFile;
+                    upFiles.mdFile = upMdFile;
+
+                    var justFile = upFile.substring(upFile.lastIndexOf("/")+1);
+                    var fileName = justFile;
                     var fileExtension;
-                    if (file.indexOf(".") !== -1) {
-                        fileName = file.substring(0, file.lastIndexOf("."));
-                        fileExtension = file.substring(file.lastIndexOf(".")+1);
+                    if (fileName.indexOf(".") !== -1) {
+                        fileName = fileName.substring(0, fileName.lastIndexOf("."));
+                        fileExtension = justFile.substring(justFile.lastIndexOf(".")+1);
                     }
 
                     // Store the providerId for further calls
@@ -324,7 +336,7 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                             type: "feature-store",
                             subType: "shapefile",
                             parameters: {
-                                path: message
+                                path: upFile
                             }
                         });
                         $growl('success','Success','Shapefile data '+ fileName +' successfully added');
@@ -336,11 +348,11 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                             type: "coverage-store",
                             subType: "coverage-file",
                             parameters: {
-                                path: message
+                                path: upFile
                             }
                         }, function() {
                             if (!fileExtension || fileExtension !== "nc") {
-                                dataListing.pyramidData({id: fileName}, {value: message}, function() {
+                                dataListing.pyramidData({id: fileName}, {value: upFile}, function() {
                                     $growl('success','Success','Coverage data '+ fileName +' successfully added');
                                     $modalInstance.close({type: "raster", file: fileName, missing: $scope.metadatafile == null});
                                 });
@@ -551,8 +563,8 @@ cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style',
         };
     }]);
 
-cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','dataListing','$location', '$translate',
-    function ($scope, $routeParams, dataListing, $location, $translate) {
+cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','dataListing','$location', '$translate', '$uploadFiles',
+    function ($scope, $routeParams, dataListing, $location, $translate, $uploadFiles) {
         $scope.provider = $routeParams.id;
         $scope.missing = $routeParams.missing === 'true';
         $scope.type = $routeParams.type;
@@ -600,6 +612,56 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','data
 
         $scope.getCurrentLang = function() {
             return $translate.uses();
+        };
+
+        $scope.createMetadataTree = function(parentDivId, isCoverageMetadata){
+            var upFile = $uploadFiles.files.file;
+            upFile = upFile.substring(upFile.lastIndexOf("/")+1);
+            var upMdFile = $uploadFiles.files.mdFile;
+            if (upMdFile != null) {
+                upMdFile = upMdFile.substring(upMdFile.lastIndexOf("/")+1);
+            }
+            dataListing.loadData({}, {values: {'filePath': upFile, 'metadataFilePath': upMdFile, dataType: $scope.type}}, function(response) {
+                if (isCoverageMetadata) {
+                    for (var key in response.coveragesMetadata) {
+                        var metadataList = response.coveragesMetadata[key].coverageMetadataTree;
+                        generateMetadataTags(metadataList, parentDivId);
+                    }
+                } else {
+                    var metadataList = response.fileMetadata;
+                    generateMetadataTags(metadataList, parentDivId);
+                }
+
+                $("#"+ parentDivId +" .collapse").collapse('show');
+            });
+
+            function generateMetadataTags(metadataList, parentDivId) {
+                for(var i=0; i<metadataList.length; i++){
+                    var key = metadataList[i];
+                    var name = key.name;
+                    var nameWithoutWhiteSpace = key.nameNoWhiteSpace;
+                    var value = key.value;
+                    var childrenExist = key.childrenExist;
+                    var parentNode = key.parentName;
+                    var depthSpan = key.depthSpan;
+
+                    if(childrenExist){
+                        //root node
+                        if(parentNode === null || parentNode == ''){
+                            var htmlElement =   "<a data-toggle='collapse' data-target='#"+nameWithoutWhiteSpace+"Div' class='col-sm-"+depthSpan+"'>"+name+"</a>" +
+                                "<div class='collapse col-sm-"+depthSpan+"' id='"+nameWithoutWhiteSpace+"Div'><table id='"+nameWithoutWhiteSpace+"' class='table table-striped'></table></div>";
+                            jQuery("#"+ parentDivId).append(htmlElement);
+                        }else{
+                            var htmlElement =   "<a data-toggle='collapse' data-target='#"+nameWithoutWhiteSpace+"Div' class='col-sm-"+depthSpan+"'>"+name+"</a>" +
+                                "<div class='collapse col-sm-"+depthSpan+"' id='"+nameWithoutWhiteSpace+"Div'><table id='"+nameWithoutWhiteSpace+"' class='table table-striped'></table></div>";
+                            jQuery("#"+parentNode+"Div").append(htmlElement);
+                        }
+                    }else{
+                        var htmlElement = "<tr><td>"+name+"</td><td>"+value+"</td></tr>";
+                        jQuery("#"+parentNode).append(htmlElement);
+                    }
+                }
+            };
         };
 
         $scope.codeLists = dataListing.codeLists({lang: $scope.getCurrentLang()});

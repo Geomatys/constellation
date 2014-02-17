@@ -218,6 +218,7 @@ public class Data {
 
         final File dataDirectory = ConfigDirectory.getDataDirectory();
         File newFile = new File(dataDirectory, fileDetail.getFileName());
+        File mdFile = null;
         try {
             if (fileIs != null && fileDetail != null) {
                 Files.copy(fileIs, newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -239,7 +240,7 @@ public class Data {
                 if (!mdFolder.exists()) {
                     mdFolder.mkdir();
                 }
-                final File mdFile = new File(mdFolder, mdFileDetail.getFileName());
+                mdFile = new File(mdFolder, mdFileDetail.getFileName());
                 Files.copy(mdFileIs, mdFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 mdFileIs.close();
             }
@@ -248,7 +249,11 @@ public class Data {
             return Response.status(500).entity("failed").build();
         }
 
-        return Response.ok(newFile.getAbsolutePath()).header("X-Frame-Options", "SAMEORIGIN").build();
+        String result = newFile.getAbsolutePath();
+        if (mdFile != null) {
+            result += ","+ mdFile.getAbsolutePath();
+        }
+        return Response.ok(result).header("X-Frame-Options", "SAMEORIGIN").build();
     }
 
     /**
