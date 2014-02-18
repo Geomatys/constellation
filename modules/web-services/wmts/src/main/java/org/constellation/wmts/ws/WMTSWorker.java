@@ -18,6 +18,8 @@ package org.constellation.wmts.ws;
 
 //J2SE dependencies
 import java.awt.image.BufferedImage;
+import java.util.Map;
+
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.Worker;
 import org.geotoolkit.coverage.TileReference;
@@ -48,12 +50,13 @@ public interface WMTSWorker extends Worker {
     Capabilities getCapabilities(final GetCapabilities getCapabilities) throws CstlServiceException;
 
     /**
-     * Returns a string, which will contain the result of a {@code GetFeatureInfo} request.
+     * Returns an Entry, which will contain the result of a {@code GetFeatureInfo} request and the requested mimeType.
      *
      * @param getFeatureInfo The {@linkplain GetFeatureInfo get feature info} request done on this service.
+     * @return Map.Entry with requested mimeType and getFeatureInfo result object.
      * @throws CstlServiceException
      */
-    String getFeatureInfo(final GetFeatureInfo getFeatureInfo) throws CstlServiceException;
+    Map.Entry<String, Object> getFeatureInfo(final GetFeatureInfo getFeatureInfo) throws CstlServiceException;
 
     /**
      * Returns a {@link BufferedImage}, which is the result of a {@code GetTile} request.

@@ -21,8 +21,8 @@ import static org.constellation.api.QueryConstants.REQUEST_PARAMETER;
 import static org.constellation.api.QueryConstants.SERVICE_PARAMETER;
 import static org.constellation.api.QueryConstants.UPDATESEQUENCE_PARAMETER;
 import static org.constellation.api.QueryConstants.VERSION_PARAMETER;
-import static org.constellation.query.Query.KEY_EXCEPTIONS;
-import static org.constellation.query.Query.KEY_REQUEST;
+import static org.constellation.query.Query.*;
+import static org.constellation.query.Query.XML;
 import static org.constellation.query.wms.WMSQuery.CAPABILITIES;
 import static org.constellation.query.wms.WMSQuery.DESCRIBELAYER;
 import static org.constellation.query.wms.WMSQuery.GETCAPABILITIES;
@@ -82,6 +82,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 import javax.inject.Named;
@@ -204,11 +205,15 @@ public class WMSService extends GridWebService<WMSWorker> {
             //Handle user's requests.
             if (request instanceof GetFeatureInfo) {
                 final GetFeatureInfo requestFeatureInfo = (GetFeatureInfo) request;
-                final GetFeatureInfoVisitor visitor     = worker.getFeatureInfo(requestFeatureInfo);
-                final Object result                     = visitor.getResult();
-                //Need to reset the GML mime format to XML for browsers
-                final String infoFormat                 = visitor.getMimeType();
-                return Response.ok(result, infoFormat).build();
+                final Map.Entry<String, Object> result  = worker.getFeatureInfo(requestFeatureInfo);
+
+                if (result != null) {
+                    final String infoFormat = result.getKey();
+                    return Response.ok(result.getValue(), infoFormat).build();
+                }
+
+                //throw an exception if result of GetFeatureInfo visitor is null
+                throw new CstlServiceException("An error occurred during GetFeatureInfo response building.");
             }
             if (request instanceof GetMap) {
                 final GetMap requestMap     = (GetMap)request;
