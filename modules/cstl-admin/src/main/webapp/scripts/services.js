@@ -59,7 +59,8 @@ cstlAdminApp.factory('webService', ['$resource',
                                              'logs': { method: 'GET', url: cstlContext+'api/1/log/:type/:id'},
                                              'capabilities': { method: 'GET', url: cstlContext+'WS/:type/:id?REQUEST=GetCapabilities&SERVICE=:type'},
                                              'layers' : { method: 'GET', url: cstlContext+'api/1/MAP/:type/:id/layersummary/all', isArray: true},
-                                             'addLayer': { method: 'PUT', url: cstlContext+'api/1/MAP/:type/:id/layer'}
+                                             'addLayer': { method: 'PUT', url: cstlContext+'api/1/MAP/:type/:id/layer'},
+                                             'deleteLayer': { method: 'DELETE', url: cstlContext+'api/1/MAP/:type/:id/:layerid'}
                                          });
                                      }]);
 
