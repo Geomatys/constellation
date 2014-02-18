@@ -96,19 +96,17 @@
                                         <div class="pull-right" page-switcher="{page:currentpage,size:nbbypage,count:countdata}" on-select-page="displayPage(page)"></div>
                                     </div>
                                     <div class="item-list">
-                                        <div class="item coverage" ng-repeat="layer in layers['constellation-config.layerList']['constellation-config.Layer']" >
+                                        <div class="item coverage" ng-repeat="layer in dataList" ng-class="{selected:layer==selected}" ng-click="select(layer)">
                                             <div class="top">
-                                                <span class="item-title">{{layer['@name']}}</span>
+                                                <span class="item-title">{{layer.Name}}</span>
+                                                <span class="pull-right text-right">{{layer.Type}}</span>
                                             </div>
                                             <div class="bottom">
                                                 <div class="block">
-                                                    <i class="icon-calendar"></i>{{layer['constellation-config.Modified-Date'] | date:'yyyy-MM-dd HH:mm:ss'}}
+                                                    <i class="icon-calendar"></i>{{layer.Date | date:'yyyy-MM-dd HH:mm:ss'}}
                                                 </div>
                                                 <div class="block">
-                                                    <i class="icon-user"></i>{{layer['constellation-config.owner']}}
-                                                </div>
-                                                <div class="block">
-                                                    <i class="icon-folder-close-alt"></i>{{layer.Type}}
+                                                    <i class="icon-user"></i>{{layer.Owner}}
                                                 </div>
                                             </div>
                                         </div>

@@ -55,7 +55,7 @@ cstlAdminApp.factory('webService', ['$resource',
                                              'config':  { method: 'GET', url: cstlContext+'api/1/OGC/:type/:id/config'},
                                              'logs': { method: 'GET', url: cstlContext+'api/1/log/:type/:id'},
                                              'capabilities': { method: 'GET', url: cstlContext+'WS/:type/:id?REQUEST=GetCapabilities&SERVICE=:type'},
-                                             'layers' : { method: 'GET', url: cstlContext+'api/1/MAP/:type/:id/layer/all'}
+                                             'layers' : { method: 'GET', url: cstlContext+'api/1/MAP/:type/:id/layersummary/all', isArray: true}
                                          });
                                      }]);
 

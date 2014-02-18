@@ -19,7 +19,9 @@ package org.constellation.rest.api;
 
 import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerList;
+import org.constellation.configuration.LayerSummary;
 import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.configuration.ServiceConfigurer;
 import org.constellation.dto.AddLayer;
@@ -39,6 +41,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.constellation.utils.RESTfulUtilities.ok;
 
@@ -61,6 +65,17 @@ public final class MapServices {
     @Path("{id}/layer/all")
     public Response getLayers(final @PathParam("spec") String spec, final @PathParam("id") String id) throws Exception {
         return ok(new LayerList(getConfigurer(spec).getLayers(id)));
+    }
+
+    @GET
+    @Path("{id}/layersummary/all")
+    public Response getLayersSummary(final @PathParam("spec") String spec, final @PathParam("id") String id) throws Exception {
+        final List<Layer> layers = getConfigurer(spec).getLayers(id);
+        final List<LayerSummary> sumLayers = new ArrayList<>();
+        for (final Layer lay : layers) {
+            sumLayers.add(new LayerSummary(lay));
+        }
+        return ok(sumLayers);
     }
 
     /**

@@ -530,8 +530,10 @@
  "form": {
   "button": "Connexion",
   "password": "Mot de passe",
+  "password.placeholder": "Votre mot de passe",
   "rememberme": "Garder ma connexion ouverte",
-  "username": "Nom d'utilisateur"
+  "username": "Nom d'utilisateur",
+  "username.placeholder": "Votre nom d'utilisateur"
   },
  "messages": {
   "error": {

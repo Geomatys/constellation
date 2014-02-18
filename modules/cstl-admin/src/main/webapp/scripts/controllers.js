@@ -711,12 +711,17 @@ cstlAdminApp.controller('WebServiceUtilsController', ['$scope', 'webService', '$
         };
     }]);
 
-cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'webService', '$modal','textService',
-                                                 function ($scope, $routeParams , webService, $modal, textService) {
+cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'webService', '$modal','textService', '$dashboard',
+                                                 function ($scope, $routeParams , webService, $modal, textService, $dashboard) {
     $scope.service = webService.get({type: $routeParams.type, id:$routeParams.id});
     $scope.metadata = webService.metadata({type: $routeParams.type, id:$routeParams.id});
     $scope.config = webService.config({type: $routeParams.type, id:$routeParams.id});
-    $scope.layers = webService.layers({type: $routeParams.type, id:$routeParams.id});
+
+    $scope.filtertype = "";
+    $scope.layers = webService.layers({type: $routeParams.type, id:$routeParams.id}, {}, function(response) {
+        $dashboard($scope, response);
+    });
+
     // Show Capa methods
     $scope.showCapa = function(type, name) {
         $modal.open({
