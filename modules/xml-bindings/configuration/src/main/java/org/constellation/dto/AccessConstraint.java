@@ -17,6 +17,8 @@
 
 package org.constellation.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import juzu.Mapped;
 
 /**
@@ -72,11 +74,12 @@ public class AccessConstraint {
     public int getLayerLimit() {
         return layerLimit;
     }
-
+    
     public void setLayerLimit(int layerLimit) {
         this.layerLimit = layerLimit;
     }
-
+    @JsonIgnore
+    @JsonProperty("layerLimit")
     public void setLayerLimit(String layerLimit) {
         try {
             this.layerLimit = Integer.parseInt(layerLimit);
@@ -92,7 +95,8 @@ public class AccessConstraint {
     public void setMaxWidth(int maxWidth) {
         this.maxWidth = maxWidth;
     }
-
+    @JsonIgnore
+    @JsonProperty("maxWidth")
     public void setMaxWidth(String maxWidth) {
         try {
             this.maxWidth = Integer.parseInt(maxWidth);
@@ -108,7 +112,8 @@ public class AccessConstraint {
     public void setMaxHeight(int maxHeight) {
         this.maxHeight = maxHeight;
     }
-
+    @JsonIgnore
+    @JsonProperty("maxHeight")
     public void setMaxHeight(String maxHeight) {
         try {
             this.maxHeight = Integer.parseInt(maxHeight);

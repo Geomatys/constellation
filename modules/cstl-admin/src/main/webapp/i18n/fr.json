@@ -861,6 +861,11 @@
    "description": {
     "title": "Description du service"
     },
+    "description.name": "Nom",
+    "description.identifier": "Identifiant",
+    "description.tags": "Etiquettes",
+    "description.description": "Description",
+    "description.version": "Versions",
    "metadata": {
     "data": {
      "title": "Gestion des métadonnées"

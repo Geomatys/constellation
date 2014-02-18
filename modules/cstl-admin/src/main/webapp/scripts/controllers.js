@@ -734,9 +734,10 @@ cstlAdminApp.controller('WebServiceUtilsController', ['$scope', 'webService', '$
         };
     }]);
 
-cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'webService', '$modal','textService', '$dashboard', '$growl',
-                                                 function ($scope, $routeParams , webService, $modal, textService, $dashboard, $growl) {
+cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'webService', '$modal','textService', '$dashboard', '$growl', '$filter',
+                                                 function ($scope, $routeParams , webService, $modal, textService, $dashboard, $growl, $filter) {
     $scope.service = webService.get({type: $routeParams.type, id:$routeParams.id});
+
     $scope.metadata = webService.metadata({type: $routeParams.type, id:$routeParams.id});
     $scope.config = webService.config({type: $routeParams.type, id:$routeParams.id});
 
@@ -744,6 +745,24 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
     $scope.layers = webService.layers({type: $routeParams.type, id:$routeParams.id}, {}, function(response) {
         $dashboard($scope, response);
     });
+
+
+    // static list version wms
+    $scope.wmsVersion = [ { 'id': '1.1.1'}, { 'id': '1.3.0' }];
+
+    // define which version to set
+    $scope.selectedVersion = function (){
+        $scope.metadata.versions = $filter('filter')($scope.wmsVersion, {checked: true});
+    };
+
+    // define which version is Selected
+    $scope.versionIsSelected = function(currentVersion){
+       return $.inArray(currentVersion, $scope.metadata.versions) > -1
+    }
+
+    $scope.saveServiceMetadata = function() {
+      webService.updateMd({type: $scope.service.type, id: $scope.service.name},$scope.metadata)
+    };
 
     // Show Capa methods
     $scope.showCapa = function(type, name) {

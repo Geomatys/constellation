@@ -432,6 +432,11 @@
            "tab.data.title": "Data",
            "tab.metadata.data.title": "Managing metadata",
            "tab.description.title": "Service description",
+           "tab.description.name": "Name",
+           "tab.description.identifier": "Identifier",
+           "tab.description.tags": "Tags",
+           "tab.description.description": "Description",
+           "tab.description.version": "Versions",
            "tab.metadata.title": "Service metadata"
         },
         "edit" : {
