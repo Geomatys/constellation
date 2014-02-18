@@ -4,8 +4,8 @@
             <button type="button" class="close" ng-click="close()">×</button>
             <h4 class="modal-title">Add data</h4>
         </div>
-        <div class="modal-body">
-            <div class="frame dashboard">
+        <div class="modal-body" style="height: 575px;overflow-y: auto;">
+            <div class="dashboard">
                 <div class="navbar title">
                     <div class="navbar-inner">
                         <div class="brand" translate="service.edit.dashboard.title">Data List</div>
@@ -76,7 +76,7 @@
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-default" ng-click="close()">Close</button>
-            <button type="button" class="btn btn-primary" ng-click="choose()">Choose</button>
+            <button type="button" class="btn btn-primary" ng-click="choose(selected)">Choose</button>
         </div>
     </div>
 </div>

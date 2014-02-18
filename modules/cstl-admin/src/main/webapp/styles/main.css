@@ -461,6 +461,9 @@ ul.unstyled {
     height: 30px;
     width: 170px;
 }
+.modal .dashboard .searchbox {
+    width: 150px;
+}
 
 /*
  * Data Viewer

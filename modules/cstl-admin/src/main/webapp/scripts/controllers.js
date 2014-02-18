@@ -822,28 +822,40 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
      $scope.showDataToAdd = function() {
          var modal = $modal.open({
              templateUrl: 'views/modalDataChoose.html',
-             controller: 'DataModalController'
-//             resolve: {
-//                 exclude: function() { return $scope.selected.TargetStyle }
-//             }
-         });
-
-         modal.result.then(function(item) {
-
+             controller: 'DataModalController',
+             resolve: {
+                 service: function() { return $scope.service; }
+                 //exclude: function() { return $scope.selected.TargetStyle }
+             }
          });
      };
 
     }]);
 
-cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', '$dashboard', '$modalInstance',
-    function ($scope, dataListing, $dashboard, $modalInstance) {
+cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webService', '$dashboard', '$modalInstance', 'service', '$growl',
+    function ($scope, dataListing, webService, $dashboard, $modalInstance, service, $growl) {
         $scope.filtertype = "";
         $scope.nbbypage = 5;
+
         dataListing.listAll({}, function(response) {
             $dashboard($scope, response);
         });
 
         $scope.close = function() {
+            $modalInstance.dismiss('close');
+        };
+
+        $scope.choose = function(data) {
+            if (data == null) {
+                $growl('warning','Warning','No layer selected');
+            } else {
+                // Add chosen data to this service
+                webService.addLayer({type: service.type, id: service.name},
+                                    {layerAlias: data.Name, layerId: data.Name, serviceType: service.type, serviceId: service.name,  providerId: data.Provider},
+                                    function() {$growl('success','Success','Layer '+ data.name +' successfully added to service '+ service.name);},
+                                    function() {$growl('error','Error','Layer '+ data.name +' failed to be added to service '+ service.name);}
+                );
+            }
             $modalInstance.dismiss('close');
         };
     }]);
