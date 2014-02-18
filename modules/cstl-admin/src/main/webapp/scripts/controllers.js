@@ -849,17 +849,20 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
          });
 
          modal.result.then(function() {
-             $dashboard.displayPage(1);
-//             $scope.layers = webService.layers({type: $routeParams.type, id:$routeParams.id}, {}, function(response) {
-//                 $dashboard($scope, response);
-//             });
+             $scope.layers = webService.layers({type: $routeParams.type, id:$routeParams.id}, {}, function(response) {
+                 $scope.fullList = response;
+             });
          });
      };
 
      $scope.deleteLayer = function() {
          if ($scope.selected != null) {
              webService.deleteLayer({type: $scope.service.type, id: $scope.service.name, layerid: $scope.selected.Name}, {layernamespace: ''},
-                 function() {$growl('success','Success','Layer '+ $scope.selected.Name +' successfully deleted from service '+ $scope.service.name);},
+                 function() {$growl('success','Success','Layer '+ $scope.selected.Name +' successfully deleted from service '+ $scope.service.name);
+                             $scope.layers = webService.layers({type: $routeParams.type, id:$routeParams.id}, {}, function(response) {
+                                 $scope.fullList = response;
+                             });
+                 },
                  function() {$growl('error','Error','Layer '+ $scope.selected.Name +' failed to be deleted from service '+ $scope.service.name);}
                 );
          }
@@ -896,10 +899,12 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
                 // Add chosen data to this service
                 webService.addLayer({type: service.type, id: service.name},
                                     {layerAlias: data.Name, layerId: data.Name, serviceType: service.type, serviceId: service.name,  providerId: data.Provider},
-                                    function() {$growl('success','Success','Layer '+ data.Name +' successfully added to service '+ service.name);},
-                                    function() {$growl('error','Error','Layer '+ data.Name +' failed to be added to service '+ service.name);}
+                                    function() {$growl('success','Success','Layer '+ data.Name +' successfully added to service '+ service.name);
+                                                $modalInstance.close();},
+                                    function() {$growl('error','Error','Layer '+ data.Name +' failed to be added to service '+ service.name);
+                                                $modalInstance.dismiss('close');}
                 );
-                $modalInstance.close();
+
             }
         };
     }]);

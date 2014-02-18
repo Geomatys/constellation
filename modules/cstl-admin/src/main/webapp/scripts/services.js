@@ -222,6 +222,7 @@ cstlAdminApp.directive('pageSwitcher', function() {
 cstlAdminApp.service('$dashboard', function($filter) {
     return function($scope, fullList) {
 
+        $scope.fullList = fullList || [];
         $scope.dataList = $scope.dataList || [];
         $scope.filtertext = $scope.filtertext || "";
         $scope.filtertype = $scope.filtertype || "";
@@ -235,7 +236,7 @@ cstlAdminApp.service('$dashboard', function($filter) {
 
         // Dashboard methods
         $scope.displayPage = function(page) {
-            var array = $filter('filter')(fullList, {'Type':$scope.filtertype, '$': $scope.filtertext});
+            var array = $filter('filter')($scope.fullList, {'Type':$scope.filtertype, '$': $scope.filtertext});
             array = $filter('orderBy')(array, $scope.ordertype, $scope.orderreverse);
 
             var list = [];
@@ -271,6 +272,9 @@ cstlAdminApp.service('$dashboard', function($filter) {
             $scope.displayPage(1);
         });
         $scope.$watch('filtertype', function() {
+            $scope.displayPage(1);
+        });
+        $scope.$watch('fullList', function() {
             $scope.displayPage(1);
         });
         $scope.$watch('ordertype', function() {
