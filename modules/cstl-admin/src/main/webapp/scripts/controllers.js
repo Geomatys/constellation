@@ -818,8 +818,35 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
          }
      };
 
+     // Allow to choose data to add for this service
+     $scope.showDataToAdd = function() {
+         var modal = $modal.open({
+             templateUrl: 'views/modalDataChoose.html',
+             controller: 'DataModalController'
+//             resolve: {
+//                 exclude: function() { return $scope.selected.TargetStyle }
+//             }
+         });
+
+         modal.result.then(function(item) {
+
+         });
+     };
+
     }]);
 
+cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', '$dashboard', '$modalInstance',
+    function ($scope, dataListing, $dashboard, $modalInstance) {
+        $scope.filtertype = "";
+        $scope.nbbypage = 5;
+        dataListing.listAll({}, function(response) {
+            $dashboard($scope, response);
+        });
+
+        $scope.close = function() {
+            $modalInstance.dismiss('close');
+        };
+    }]);
 
 
 
