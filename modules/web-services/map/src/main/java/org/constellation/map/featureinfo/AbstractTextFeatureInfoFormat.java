@@ -17,6 +17,7 @@
 package org.constellation.map.featureinfo;
 
 import com.vividsolutions.jts.geom.Geometry;
+import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.GridSampleDimension;
 import org.geotoolkit.display2d.canvas.RenderingContext2D;
 import org.geotoolkit.display2d.primitive.ProjectedCoverage;
@@ -57,8 +58,8 @@ public abstract class AbstractTextFeatureInfoFormat extends AbstractFeatureInfoF
         if (results == null) {
             return;
         }
-
-        final String layerName = graphic.getLayer().getCoverageName().getLocalPart();
+        final CoverageReference ref = graphic.getLayer().getCoverageReference();
+        final String layerName = ref.getName().getLocalPart();
         List<String> strs = coverages.get(layerName);
         if (strs == null) {
             strs = new ArrayList<String>();

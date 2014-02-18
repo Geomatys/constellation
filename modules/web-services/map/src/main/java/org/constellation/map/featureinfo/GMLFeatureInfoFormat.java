@@ -17,12 +17,19 @@
 package org.constellation.map.featureinfo;
 
 import com.vividsolutions.jts.geom.Geometry;
+import org.apache.sis.geometry.GeneralDirectPosition;
+import org.apache.sis.measure.MeasurementRange;
+import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.storage.DataStoreException;
+import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.query.Query;
 import org.constellation.ws.MimeType;
+import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.GridSampleDimension;
-import org.geotoolkit.display.exception.PortrayalException;
+import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.display2d.canvas.RenderingContext2D;
 import org.geotoolkit.display2d.primitive.ProjectedCoverage;
 import org.geotoolkit.display2d.primitive.ProjectedFeature;
@@ -30,18 +37,13 @@ import org.geotoolkit.display2d.primitive.SearchAreaJ2D;
 import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
-import org.geotoolkit.geometry.GeneralDirectPosition;
 import org.geotoolkit.geometry.isoonjts.JTSUtils;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.internal.jaxb.ObjectFactory;
 import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.referencing.IdentifiedObjects;
-import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.util.DateRange;
-import org.geotoolkit.util.MeasurementRange;
-import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.ows.xml.GetFeatureInfo;
-import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.feature.Feature;
 import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.Property;
@@ -52,6 +54,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.FactoryException;
 
 import javax.measure.unit.Unit;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import java.awt.Rectangle;
@@ -103,7 +106,7 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
             final Map<String, String> properties = new HashMap<String, String>();
             properties.put(Marshaller.JAXB_FRAGMENT, "true");
             properties.put(Marshaller.JAXB_FORMATTED_OUTPUT, "false");
-            candidate = new MarshallerPool(properties, ObjectFactory.class);
+            candidate = new MarshallerPool(JAXBContext.newInstance(ObjectFactory.class), properties);
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, "JAXB Exception while initializing the marshaller pool", ex);
         }
@@ -147,7 +150,8 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
             return;
         }
 
-        final Name fullLayerName = coverage.getLayer().getCoverageName();
+        final CoverageReference ref = coverage.getLayer().getCoverageReference();
+        final Name fullLayerName = ref.getName();
         String layerName = fullLayerName.getLocalPart();
 
         List<String> strs = coverages.get(layerName);
@@ -264,7 +268,7 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
         if (ranges != null && ranges.length > 0) {
             final MeasurementRange range = ranges[0];
             if (range != null) {
-                final Unit unit = range.getUnits();
+                final Unit unit = range.unit();
                 if (unit != null && !unit.toString().isEmpty()) {
                     builder.append("\t\t\t<unit>").append(unit.toString())
                             .append("</unit>").append("\n");
@@ -335,7 +339,7 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
                             LOGGER.log(Level.WARNING, "JAXB exception while marshalling the geometry", ex);
                         } finally {
                             if (m != null) {
-                                pool.release(m);
+                                pool.recycle(m);
                             }
                         }
                         builder.append(margin).append("</").append(pPrefix).append(pLocal).append(">\n");

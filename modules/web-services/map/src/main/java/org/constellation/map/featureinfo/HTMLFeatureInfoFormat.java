@@ -17,7 +17,7 @@
 package org.constellation.map.featureinfo;
 
 import org.constellation.ws.MimeType;
-import org.geotoolkit.display.exception.PortrayalException;
+import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.display2d.canvas.RenderingContext2D;
 import org.geotoolkit.display2d.primitive.ProjectedFeature;
 import org.geotoolkit.display2d.primitive.SearchAreaJ2D;

@@ -16,7 +16,14 @@
  */
 package org.constellation.map.featureinfo;
 
+import org.apache.sis.geometry.GeneralDirectPosition;
+import org.apache.sis.util.ArraysExt;
+import org.apache.sis.util.logging.Logging;
+import org.apache.sis.geometry.GeneralEnvelope;
+
 import org.constellation.configuration.*;
+
+import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.GridSampleDimension;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.io.CoverageStoreException;
@@ -26,15 +33,12 @@ import org.geotoolkit.display2d.canvas.AbstractGraphicVisitor;
 import org.geotoolkit.display2d.canvas.RenderingContext2D;
 import org.geotoolkit.display2d.primitive.ProjectedCoverage;
 import org.geotoolkit.display2d.primitive.SearchAreaJ2D;
-import org.geotoolkit.geometry.GeneralDirectPosition;
-import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotoolkit.lang.Static;
 import org.geotoolkit.map.CoverageMapLayer;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.crs.DefaultCompoundCRS;
 import org.geotoolkit.util.ArgumentChecks;
-import org.geotoolkit.util.XArrays;
-import org.geotoolkit.util.logging.Logging;
+
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -96,7 +100,15 @@ public final class FeatureInfoUtilities extends Static {
                 for (GetFeatureInfoCfg infoCfg : infos) {
                     if (infoCfg.getMimeType().equals(mimeType)) {
                         featureInfo = FeatureInfoUtilities.getFeatureInfoFormatFromConf(infoCfg);
-                        featureInfo.setConfiguration(infoCfg);
+                    } else if (infoCfg.getMimeType() == null || infoCfg.getMimeType().isEmpty()) {
+
+                        //Find supported mimetypes in FeatureInfoFormat
+                        final FeatureInfoFormat tmpFormat = FeatureInfoUtilities.getFeatureInfoFormatFromConf(infoCfg);
+
+                        final List<String> supportedMime = tmpFormat.getSupportedMimeTypes();
+                        if (!(supportedMime.isEmpty()) && supportedMime.contains(mimeType)) {
+                            featureInfo = tmpFormat;
+                        }
                     }
                 }
             }
@@ -108,7 +120,6 @@ public final class FeatureInfoUtilities extends Static {
             for (GetFeatureInfoCfg infoCfg : generics) {
                 if (infoCfg.getMimeType().equals(mimeType)) {
                     featureInfo = FeatureInfoUtilities.getFeatureInfoFormatFromConf(infoCfg);
-                    featureInfo.setConfiguration(infoCfg);
                 }
             }
         }
@@ -127,17 +138,23 @@ public final class FeatureInfoUtilities extends Static {
      * @throws ConfigurationException if binding class is not an {@link FeatureInfoFormat} instance
      * or declared {@link org.constellation.configuration.GetFeatureInfoCfg} MimeType is not supported by the {@link FeatureInfoFormat} implementation.
      */
-    private static FeatureInfoFormat getFeatureInfoFormatFromConf (final GetFeatureInfoCfg infoConf) throws ClassNotFoundException, ConfigurationException {
+    public static FeatureInfoFormat getFeatureInfoFormatFromConf (final GetFeatureInfoCfg infoConf) throws ClassNotFoundException, ConfigurationException {
         final String mime = infoConf.getMimeType();
         final String binding = infoConf.getBinding();
 
         final FeatureInfoFormat featureInfo = getFeatureInfoFormatFromBinding(binding);
         if (featureInfo != null) {
-            if (mime == null || featureInfo.getSupportedMimeTypes().contains(mime)) {
-                return featureInfo;
+            featureInfo.setConfiguration(infoConf);//give his configuration
+
+            if (mime == null || mime.isEmpty()) {
+                return featureInfo; // empty config mime type -> no need to check
             } else {
-                throw new ConfigurationException("MimeType "+mime+" not supported by FeatureInfo "+binding+
-                        ". Supported output MimeTypes are "+ featureInfo.getSupportedMimeTypes());
+                if (featureInfo.getSupportedMimeTypes().contains(mime)) {
+                    return featureInfo;
+                } else {
+                    throw new ConfigurationException("MimeType "+mime+" not supported by FeatureInfo "+binding+
+                            ". Supported output MimeTypes are "+ featureInfo.getSupportedMimeTypes());
+                }
             }
         }
         return null;
@@ -203,7 +220,7 @@ public final class FeatureInfoUtilities extends Static {
      * @param config service configuration
      * @return a Set of all MimeType from generic list and from layers config without duplicates.
      */
-    public static Set<String> allSupportedMimeTypes (final LayerContext config) throws ConfigurationException{
+    public static Set<String> allSupportedMimeTypes (final LayerContext config) throws ConfigurationException, ClassNotFoundException {
         final Set<String> mimes = new HashSet<String>();
         if (config != null) {
             final Set<GetFeatureInfoCfg> generics = getGenericFeatureInfos(config);
@@ -218,7 +235,16 @@ public final class FeatureInfoUtilities extends Static {
             for (Source source : config.getLayers()) {
                 for (Layer layer : source.getInclude()) {
                     for (GetFeatureInfoCfg infoConf : layer.getGetFeatureInfoCfgs()) {
-                        mimes.add(infoConf.getMimeType());
+
+                        if (infoConf.getMimeType() == null || infoConf.getMimeType().isEmpty()) {
+                            //Empty mimeType -> Find supported mimetypes in format
+                            final FeatureInfoFormat tmpFormat = FeatureInfoUtilities.getFeatureInfoFormatFromConf(infoConf);
+                            tmpFormat.setConfiguration(infoConf); //give his configuration
+                            final List<String> supportedMime = tmpFormat.getSupportedMimeTypes();
+                            mimes.addAll(supportedMime);
+                        } else {
+                            mimes.add(infoConf.getMimeType());
+                        }
                     }
                 }
             }
@@ -321,26 +347,37 @@ public final class FeatureInfoUtilities extends Static {
                     }
                     objCRS = new DefaultCompoundCRS(objCRS.getName().getCode() + " + time", objCRS, temporalCRS);
                     final GeneralEnvelope merged = new GeneralEnvelope(objCRS);
-                    merged.setSubEnvelope(objBounds, 0);
+                    GeneralEnvelope subEnv = merged.subEnvelope(0, objBounds.getDimension());
+                    subEnv.setEnvelope(objBounds);
                     merged.setRange(objBounds.getDimension(), lastTime - day, lastTime);
                     objBounds = merged;
                 }
             }
         }
         double[] resolution = context.getResolution();
-        resolution = XArrays.resize(resolution, objCRS.getCoordinateSystem().getDimension());
+        resolution = ArraysExt.resize(resolution, objCRS.getCoordinateSystem().getDimension());
 
         final GridCoverageReadParam param = new GridCoverageReadParam();
         param.setEnvelope(objBounds);
         param.setResolution(resolution);
 
-        final GridCoverageReader reader = layer.getCoverageReader();
+        final CoverageReference ref = layer.getCoverageReference();
+        GridCoverageReader reader = null;
         final GridCoverage2D coverage;
         try {
-            coverage = (GridCoverage2D) reader.read(layer.getImageIndex(),param);
+            reader = ref.acquireReader();
+            coverage = (GridCoverage2D) reader.read(ref.getImageIndex(),param);
         } catch (CoverageStoreException ex) {
             context.getMonitor().exceptionOccured(ex, Level.INFO);
             return null;
+        } finally {
+            if (reader!= null) {
+                try {
+                    reader.dispose();
+                } catch (CoverageStoreException e) {
+                    context.getMonitor().exceptionOccured(e, Level.INFO);
+                }
+            }
         }
 
         if (coverage == null) {

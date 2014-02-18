@@ -18,10 +18,10 @@ package org.constellation.map.featureinfo;
 
 import org.constellation.Cstl;
 import org.constellation.configuration.GetFeatureInfoCfg;
-import org.geotoolkit.display.canvas.GraphicVisitor;
+import org.geotoolkit.display.SearchArea;
 import org.geotoolkit.display.canvas.RenderingContext;
-import org.geotoolkit.display.exception.PortrayalException;
-import org.geotoolkit.display.primitive.SearchArea;
+import org.geotoolkit.display.PortrayalException;
+import org.geotoolkit.display2d.GraphicVisitor;
 import org.geotoolkit.display2d.canvas.RenderingContext2D;
 import org.geotoolkit.display2d.primitive.ProjectedCoverage;
 import org.geotoolkit.display2d.primitive.ProjectedFeature;

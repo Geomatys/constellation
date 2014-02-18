@@ -17,7 +17,7 @@
 package org.constellation.map.featureinfo;
 
 import org.constellation.configuration.GetFeatureInfoCfg;
-import org.geotoolkit.display.exception.PortrayalException;
+import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
