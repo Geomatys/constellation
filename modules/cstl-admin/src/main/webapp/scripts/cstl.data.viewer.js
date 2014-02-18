@@ -57,7 +57,7 @@ DataViewer = {
 
     createLayerWMS : function(layerName, instance){
         var layer = new OpenLayers.Layer.WMS(layerName,
-            '/constellation/WS/wms/'+ instance,
+            '/cstl-admin/constellation/WS/wms/'+ instance,
             {
                 request:     'GetMap',
                 layers:      layerName,

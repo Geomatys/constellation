@@ -845,6 +845,15 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
                 );
          }
      };
+
+     $scope.showLayer = function() {
+         $('#viewerData').modal("show");
+         var layerName = $scope.selected.Name;
+         var layerData = DataViewer.createLayerWMS(layerName, $scope.service.name);
+         var layerBackground = DataViewer.createLayer("CNTR_BN_60M_2006", "generic_shp");
+         DataViewer.layers = [layerData, layerBackground];
+         DataViewer.initMap('dataMap');
+     };
     }]);
 
 cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webService', '$dashboard', '$modalInstance', 'service', '$growl',

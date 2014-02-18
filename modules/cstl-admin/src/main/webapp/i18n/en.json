@@ -328,10 +328,10 @@
             "reduce.button.label": "Reduce or expand",
             "selectall.button": "select all layers",
             "selected": {
-                "data.button": "Show data",
-                "delete.button": "Delete layer",
+                "data.button": "View",
+                "delete.button": "Delete",
                 "export.button": "Export",
-                "metadata.button": "See metadata"
+                "metadata.button": "Metadata"
             },
             "title": "Layers list"
     },
