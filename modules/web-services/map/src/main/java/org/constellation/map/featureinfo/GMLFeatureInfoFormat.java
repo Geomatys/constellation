@@ -71,8 +71,6 @@ import java.util.logging.Logger;
  * <ul>
  *     <li>application/vnd.ogc.gml</li>
  *     <li>application/gml+xml</li>
- *     <li>application/vnd.ogc.xml</li>
- *     <li>text/xml</li>
  * </ul>
  *
  * @author Quentin Boileau (Geomatys)
@@ -87,7 +85,7 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
      * GML version flag : 0 for mapserver output
      *                    1 for GML 3 output
      */
-    private int mode = 0;
+    private int mode = 1;
 
     private GetFeatureInfo gfi;
 
@@ -411,23 +409,13 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
 
         this.gfi = getFI;
         final StringBuilder builder = new StringBuilder();
-
-        final String mimeType = getFI.getInfoFormat();
-        if (MimeType.TEXT_XML.equalsIgnoreCase(mimeType)
-            || MimeType.APP_XML.equalsIgnoreCase(mimeType)) {
-            // GML map server
-            mode = 0;
-        } else if (MimeType.APP_GML.equalsIgnoreCase(mimeType)
-                || MimeType.APP_GML_XML.equalsIgnoreCase(mimeType)) {
-            // GML 3
-            mode = 1;
-        }
+        mode = 1; //force to GML3
 
         //fill coverages and features maps
         getCandidates(sdef, vdef, cdef, searchArea, -1);
 
-        // Map Server GML output
         if (mode == 0) {
+            // Map Server GML output
             builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").append("\n")
                     .append("<msGMLOutput xmlns:gml=\"http://www.opengis.net/gml\" ")
                     .append("xmlns:xlink=\"http://www.w3.org/1999/xlink\" ")
@@ -474,10 +462,6 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
         //will return GML 3
         mimes.add(MimeType.APP_GML);
         mimes.add(MimeType.APP_GML_XML);
-
-        //will return map server GML
-        mimes.add(MimeType.APP_XML);
-        mimes.add(MimeType.TEXT_XML);
         return mimes;
     }
 

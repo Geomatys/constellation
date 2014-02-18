@@ -307,6 +307,12 @@ public final class FeatureInfoUtilities extends Static {
         for (String mime : infoFormat.getSupportedMimeTypes()) {
             featureInfos.add(new GetFeatureInfoCfg(mime, infoFormat.getClass().getCanonicalName()));
         }
+
+        //XML
+        infoFormat = new XMLFeatureInfoFormat();
+        for (String mime : infoFormat.getSupportedMimeTypes()) {
+            featureInfos.add(new GetFeatureInfoCfg(mime, infoFormat.getClass().getCanonicalName()));
+        }
         return featureInfos;
     }
 
