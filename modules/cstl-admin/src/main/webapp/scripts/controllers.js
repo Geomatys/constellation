@@ -668,8 +668,8 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','data
     }]);
 
 
-    cstlAdminApp.controller('WebServiceController', ['$scope', 'webService','$modal', 'textService',
-    function ($scope, webService, $modal, textService) {
+    cstlAdminApp.controller('WebServiceController', ['$scope', 'webService','$modal', 'textService', '$growl',
+    function ($scope, webService, $modal, textService, $growl) {
 
        $scope.services = webService.listAll();
 
@@ -700,6 +700,29 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','data
             });
         };
 
+        $scope.reload = function(type, name){
+            webService.restart({type: type, id: name}, {value: true},
+                function() { $growl('success','Success','Service '+ name +' successfully reloaded'); },
+                function() { $growl('error','Error','Service '+ name +' reload failed'); }
+            );
+        };
+        $scope.startOrStop = function(type, name, status){
+            if(status==='WORKING'){
+                webService.stop({type: type, id: name}, {}, function(response) {
+                    if (response.status==="Success") {
+                        $scope.services = webService.listAll();
+                        $growl('success','Success','Service '+ name +' successfully stopped');
+                    }
+                }, function() { $growl('error','Error','Service '+ name +' stop failed'); });
+            }else{
+                webService.start({type: type, id: name}, {}, function(response) {
+                    if (response.status==="Success") {
+                        $scope.services = webService.listAll();
+                        $growl('success','Success','Service '+ name +' successfully started');
+                    }
+                }, function() { $growl('error','Error','Service '+ name +' start failed'); });
+            }
+        };
     }]);
 
 cstlAdminApp.controller('WebServiceUtilsController', ['$scope', 'webService', '$modalInstance', 'details',
@@ -711,8 +734,8 @@ cstlAdminApp.controller('WebServiceUtilsController', ['$scope', 'webService', '$
         };
     }]);
 
-cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'webService', '$modal','textService', '$dashboard',
-                                                 function ($scope, $routeParams , webService, $modal, textService, $dashboard) {
+cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'webService', '$modal','textService', '$dashboard', '$growl',
+                                                 function ($scope, $routeParams , webService, $modal, textService, $dashboard, $growl) {
     $scope.service = webService.get({type: $routeParams.type, id:$routeParams.id});
     $scope.metadata = webService.metadata({type: $routeParams.type, id:$routeParams.id});
     $scope.config = webService.config({type: $routeParams.type, id:$routeParams.id});
@@ -751,13 +774,26 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
 
 
      $scope.reload = function(type, name){
-        webService.restart({type: type, id: name});
+        webService.restart({type: type, id: name}, {value: true},
+            function() { $growl('success','Success','Service '+ name +' successfully reloaded'); },
+            function() { $growl('error','Error','Service '+ name +' reload failed'); }
+        );
      };
      $scope.startOrStop = function(type, name, status){
-        if(status=='WORKING'){
-            webService.stop(type, name);
+        if(status==='WORKING'){
+            webService.stop({type: type, id: name}, {}, function(response) {
+                if (response.status==="Success") {
+                    $scope.service.status = "NOT_STARTED";
+                    $growl('success','Success','Service '+ name +' successfully stopped');
+                }
+            }, function() { $growl('error','Error','Service '+ name +' stop failed'); });
         }else{
-            webService.start(type, name);
+            webService.start({type: type, id: name}, {}, function(response) {
+                if (response.status==="Success") {
+                    $scope.service.status = "WORKING";
+                    $growl('success','Success','Service '+ name +' successfully started');
+                }
+            }, function() { $growl('error','Error','Service '+ name +' start failed'); });
         }
      };
 
