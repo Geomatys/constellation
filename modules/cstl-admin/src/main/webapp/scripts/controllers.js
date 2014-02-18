@@ -750,6 +750,18 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
      };
 
 
+     $scope.reload = function(type, name){
+        webService.restart({type: type, id: name});
+     };
+     $scope.startOrStop = function(type, name, status){
+        if(status=='WORKING'){
+            webService.stop(type, name);
+        }else{
+            webService.start(type, name);
+        }
+     };
+
+
      $scope.tabdata = true;
      $scope.tabdesc = false;
      $scope.tabmetadata = false;
