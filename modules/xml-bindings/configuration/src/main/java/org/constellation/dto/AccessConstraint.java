@@ -78,32 +78,33 @@ public class AccessConstraint {
     public void setLayerLimit(int layerLimit) {
         this.layerLimit = layerLimit;
     }
-    @JsonIgnore
-    @JsonProperty("layerLimit")
-    public void setLayerLimit(String layerLimit) {
-        try {
-            this.layerLimit = Integer.parseInt(layerLimit);
-        } catch (NumberFormatException ex) {
-            this.layerLimit = 0;
-        }
-    }
+    
+//    @JsonIgnore
+//    public void setLayerLimit(String layerLimit) {
+//        try {
+//            this.layerLimit = Integer.parseInt(layerLimit);
+//        } catch (NumberFormatException ex) {
+//            this.layerLimit = 0;
+//        }
+//    }
 
     public int getMaxWidth() {
         return maxWidth;
     }
-
+    
+   
     public void setMaxWidth(int maxWidth) {
         this.maxWidth = maxWidth;
     }
-    @JsonIgnore
-    @JsonProperty("maxWidth")
-    public void setMaxWidth(String maxWidth) {
-        try {
-            this.maxWidth = Integer.parseInt(maxWidth);
-        } catch (NumberFormatException ex) {
-            this.maxWidth = 0;
-        }
-    }
+    
+//    @JsonIgnore
+//    public void setMaxWidth(String maxWidth) {
+//        try {
+//            this.maxWidth = Integer.parseInt(maxWidth);
+//        } catch (NumberFormatException ex) {
+//            this.maxWidth = 0;
+//        }
+//    }
 
     public int getMaxHeight() {
         return maxHeight;
@@ -112,13 +113,13 @@ public class AccessConstraint {
     public void setMaxHeight(int maxHeight) {
         this.maxHeight = maxHeight;
     }
-    @JsonIgnore
-    @JsonProperty("maxHeight")
-    public void setMaxHeight(String maxHeight) {
-        try {
-            this.maxHeight = Integer.parseInt(maxHeight);
-        } catch (NumberFormatException ex) {
-            this.maxHeight = 0;
-        }
-    }
+    
+//    @JsonIgnore
+//    public void setMaxHeight(String maxHeight) {
+//        try {
+//            this.maxHeight = Integer.parseInt(maxHeight);
+//        } catch (NumberFormatException ex) {
+//            this.maxHeight = 0;
+//        }
+//    }
 }
