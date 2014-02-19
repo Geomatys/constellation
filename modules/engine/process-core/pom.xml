@@ -59,8 +59,8 @@
   -->
     <dependencies>
         <dependency>
-            <groupId>org.geotoolkit.pending</groupId>
-            <artifactId>geotk-processing-core</artifactId>
+            <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-processing</artifactId>
         </dependency>
 
     </dependencies>

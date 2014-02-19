@@ -63,11 +63,11 @@
   -->
   <dependencies>
      <dependency>
-       <groupId>org.geotoolkit.pending</groupId>
+       <groupId>org.geotoolkit</groupId>
        <artifactId>geotk-xml-sensorML</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
+      <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-temporal</artifactId>
     </dependency>
     <dependency>
@@ -76,15 +76,15 @@
       <version>${sis.version}</version>
     </dependency>
     <dependency>
-     <groupId>org.geotoolkit.pending</groupId>
+     <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-xml-ebrim</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
+      <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-xml-service</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
+      <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-xml-feature-catalogue</artifactId>
     </dependency>
     <dependency>

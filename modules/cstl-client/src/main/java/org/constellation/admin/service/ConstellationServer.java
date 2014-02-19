@@ -47,8 +47,8 @@ import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.dto.DataInformation;
 import org.geotoolkit.client.AbstractRequest;
-import org.geotoolkit.client.AbstractServer;
-import org.geotoolkit.client.ServerFactory;
+import org.geotoolkit.client.AbstractClient;
+import org.geotoolkit.client.ClientFactory;
 import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.security.BasicAuthenticationSecurity;
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
@@ -105,7 +105,7 @@ import static org.constellation.api.QueryConstants.*;
  * @author Benjamin Garcia (Geomatys)
  * @version 0.9
  */
-public class ConstellationServer<S extends Services, P extends Providers, C extends Csws, T extends Tasks> extends AbstractServer {
+public class ConstellationServer<S extends Services, P extends Providers, C extends Csws, T extends Tasks> extends AbstractClient {
 
     protected static final Logger LOGGER = Logging.getLogger("org.constellation.admin.service");
     private static final MarshallerPool POOL = GenericDatabaseMarshallerPool.getInstance();
@@ -145,7 +145,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
     }
 
     @Override
-    public ServerFactory getFactory() {
+    public ClientFactory getFactory() {
         return new ConstellationServerFactory();
     }
 
@@ -444,7 +444,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          * @param service The service name to restart (wms, wfs, csw,...).
          * @param instanceId The instance to rename identifier.
          * @param newName The new name of the instance.
-         * 
+         *
          * @return true if the operation succeed
          */
         public boolean renameInstance(final String service, final String instanceId, final String newName) {
@@ -715,7 +715,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
         /**
          * Restart all layer providers.
-         * 
+         *
          * @return True if the operation succeed.
          */
         public boolean restartAllLayerProviders() {
@@ -730,7 +730,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
         /**
          * Restart all layer providers.
-         * 
+         *
          * @return True if the operation succeed.
          */
         public boolean restartAllStyleProviders() {
@@ -984,7 +984,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
         /**
          * Remove a style in the specified provider.
-         * 
+         *
          * @param id provider id.
          * @param styleName style id.
          * @return true if successful.

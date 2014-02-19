@@ -53,12 +53,12 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
+      <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-jaxp-core</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-processing-quartz</artifactId>
+      <groupId>org.geotoolkit</groupId>
+      <artifactId>geotk-processing</artifactId>
     </dependency>
     <dependency>
       <groupId>net.java.dev.stax-utils</groupId>

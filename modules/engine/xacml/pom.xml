@@ -63,7 +63,7 @@
   -->
   <dependencies>
     <dependency>
-     <groupId>org.geotoolkit.pending</groupId>
+     <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-xml-xacml</artifactId>
     </dependency>
     <dependency>

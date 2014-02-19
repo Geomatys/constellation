@@ -97,7 +97,7 @@
   -->
   <dependencies>
     <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
+      <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-xml-sos</artifactId>
     </dependency>
     <dependency>

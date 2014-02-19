@@ -43,12 +43,12 @@
   <dependencies>
 
     <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-widgets-swing-pending</artifactId>
+      <groupId>org.geotoolkit</groupId>
+      <artifactId>geotk-widgets-swing</artifactId>
       <exclusions>
         <exclusion>
           <artifactId>geotk-jasperreport</artifactId>
-          <groupId>org.geotoolkit.pending</groupId>
+          <groupId>org.geotoolkit</groupId>
         </exclusion>
         <exclusion>
           <artifactId>geotk-coverage-sql</artifactId>
@@ -67,8 +67,8 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-filter-cql</artifactId>
+      <groupId>org.geotoolkit</groupId>
+      <artifactId>geotk-feature</artifactId>
       <scope>compile</scope>
     </dependency>
     <dependency>

@@ -109,7 +109,7 @@ import org.constellation.ws.Worker;
 import org.constellation.ws.rs.GridWebService;
 import org.constellation.ws.rs.provider.SchemaLocatedExceptionResponse;
 //GeotoolKit dependencies
-import org.geotoolkit.client.util.RequestsUtilities;
+import org.geotoolkit.client.RequestsUtilities;
 import org.geotoolkit.display2d.service.DefaultPortrayalService;
 import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
 import org.geotoolkit.ogc.xml.exception.ServiceExceptionType;
@@ -164,7 +164,7 @@ public class WMSService extends GridWebService<WMSWorker> {
         LOGGER.log(Level.INFO, "WMS REST service running ({0} instances)\n", getWorkerMapSize());
     }
 
-    
+
     @Override
     protected Class getWorkerClass() {
         return DefaultWMSWorker.class;
@@ -188,7 +188,7 @@ public class WMSService extends GridWebService<WMSWorker> {
 
         ServiceDef version = null;
         try {
-            
+
             final RequestBase request;
             if (objectRequest == null) {
                 version = worker.getVersionFromNumber(getParameter(VERSION_PARAMETER, false)); // needed if exception is launch before request build
@@ -200,7 +200,7 @@ public class WMSService extends GridWebService<WMSWorker> {
                         INVALID_PARAMETER_VALUE, "request");
             }
             version = worker.getVersionFromNumber(request.getVersion());
-             
+
             //Handle user's requests.
             if (request instanceof GetFeatureInfo) {
                 final GetFeatureInfo requestFeatureInfo = (GetFeatureInfo) request;
@@ -216,7 +216,7 @@ public class WMSService extends GridWebService<WMSWorker> {
                 return Response.ok(map, requestMap.getFormat()).build();
             }
             if (request instanceof GetCapabilities) {
-               
+
                 final GetCapabilities requestCapab         = (GetCapabilities) request;
                 final AbstractWMSCapabilities capabilities = worker.getCapabilities(requestCapab);
 
@@ -249,24 +249,24 @@ public class WMSService extends GridWebService<WMSWorker> {
     private RequestBase adaptQuery(final String request, final Worker worker, final QueryContext queryContext) throws CstlServiceException {
          if (GETMAP.equalsIgnoreCase(request) || MAP.equalsIgnoreCase(request)) {
              return  adaptGetMap(true, queryContext, worker);
-             
+
          } else if (GETFEATUREINFO.equalsIgnoreCase(request)) {
              return adaptGetFeatureInfo(queryContext, worker);
-         
+
          // For backward compatibility between WMS 1.1.1 and WMS 1.0.0, we handle the "Capabilities" request
          // as "GetCapabilities" request in version 1.1.1.
          } else if (GETCAPABILITIES.equalsIgnoreCase(request) || CAPABILITIES.equalsIgnoreCase(request)) {
              return adaptGetCapabilities(request, worker);
-             
+
          } else  if (GETLEGENDGRAPHIC.equalsIgnoreCase(request)) {
              return adaptGetLegendGraphic();
          } else if (DESCRIBELAYER.equalsIgnoreCase(request)) {
-             
+
              return adaptDescribeLayer(worker);
          }
          throw new CstlServiceException("The operation " + request + " is not supported by the service", INVALID_PARAMETER_VALUE, "request");
     }
-    
+
     /**
      * Generate an error response in image if query asks it.
      * Otherwise this call will fallback on normal xml error.
@@ -400,7 +400,7 @@ public class WMSService extends GridWebService<WMSWorker> {
      */
     private GetFeatureInfo adaptGetFeatureInfo(final QueryContext queryContext, final Worker worker) throws CstlServiceException, NumberFormatException {
         final GetMap getMap  = adaptGetMap(false, queryContext, worker);
-        
+
         String version = getParameter(VERSION_PARAMETER, false);
         if (version == null) {
             version = getParameter(KEY_WMTVER, false);
@@ -539,7 +539,7 @@ public class WMSService extends GridWebService<WMSWorker> {
             throw new CstlServiceException("The parameter version must be specified", MISSING_PARAMETER_VALUE, "version");
         }
         w.checkVersionSupported(version, false);
-        
+
         final String strExceptions   = getParameter(KEY_EXCEPTIONS,     false);
         /*
          * we verify that the exception format is an allowed value

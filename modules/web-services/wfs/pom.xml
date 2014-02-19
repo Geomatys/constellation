@@ -68,32 +68,32 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
+      <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-xml-wfs</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
+      <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-xml-om</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
+      <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-xml-xsd</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-shapefile</artifactId>
+      <groupId>org.geotoolkit</groupId>
+      <artifactId>geotk-feature-shapefile</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
+      <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-jaxp-gml</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-om</artifactId>
+      <groupId>org.geotoolkit</groupId>
+      <artifactId>geotk-feature-om</artifactId>
     </dependency>
     <dependency>
-        <groupId>org.geotoolkit.pending</groupId>
-        <artifactId>geotk-sensorML</artifactId>
+        <groupId>org.geotoolkit</groupId>
+        <artifactId>geotk-feature-sensorml</artifactId>
     </dependency>
     <dependency>
       <groupId>org.codehaus.woodstox</groupId>
@@ -108,7 +108,7 @@
        <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
+      <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-jaxp-core</artifactId>
       <scope>test</scope>
       <classifier>tests</classifier>

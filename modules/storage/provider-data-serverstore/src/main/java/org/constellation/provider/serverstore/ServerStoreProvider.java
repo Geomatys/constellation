@@ -22,8 +22,8 @@ import org.constellation.provider.DefaultCoverageStoreLayerDetails;
 import org.constellation.provider.DefaultDataStoreLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.ProviderService;
-import org.geotoolkit.client.Server;
-import org.geotoolkit.client.ServerFinder;
+import org.geotoolkit.client.Client;
+import org.geotoolkit.client.ClientFinder;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.data.FeatureStore;
@@ -45,7 +45,7 @@ import org.constellation.admin.dao.DataRecord.DataType;
  */
 public class ServerStoreProvider extends AbstractLayerProvider{
 
-    private Server server;
+    private Client server;
     private Set<Name> names;
 
     public ServerStoreProvider(ProviderService service, ParameterValueGroup param){
@@ -76,7 +76,7 @@ public class ServerStoreProvider extends AbstractLayerProvider{
         }
         try {
             //create the store
-            server = ServerFinder.open(factoryconfig);
+            server = ClientFinder.open(factoryconfig);
             if(server == null){
                 throw new DataStoreException("Could not create server store for parameters : "+factoryconfig);
             }

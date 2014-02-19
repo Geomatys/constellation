@@ -64,19 +64,15 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.geotoolkit.pending</groupId>
+            <groupId>org.geotoolkit</groupId>
             <artifactId>geotk-jaxp-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.geotoolkit.pending</groupId>
-            <artifactId>geotk-filter-cql</artifactId>
+            <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-feature</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.geotoolkit.pending</groupId>
-            <artifactId>geotk-filter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.geotoolkit.pending</groupId>
+            <groupId>org.geotoolkit</groupId>
             <artifactId>geotk-render2d</artifactId>
         </dependency>
 

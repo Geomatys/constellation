@@ -175,7 +175,7 @@
     </dependency>
     <dependency>
       <groupId>org.geotoolkit</groupId>
-      <artifactId>geotk-coverageio-netcdf</artifactId>
+      <artifactId>geotk-coverage-netcdf</artifactId>
     </dependency>
     <dependency>
       <groupId>org.geotoolkit.project</groupId>

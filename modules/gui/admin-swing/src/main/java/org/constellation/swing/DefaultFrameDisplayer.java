@@ -30,9 +30,9 @@ import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.ObjectFactory;
 import org.constellation.configuration.ProviderReport;
-import org.geotoolkit.client.Server;
-import org.geotoolkit.client.ServerFactory;
-import org.geotoolkit.client.ServerFinder;
+import org.geotoolkit.client.Client;
+import org.geotoolkit.client.ClientFactory;
+import org.geotoolkit.client.ClientFinder;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.coverage.CoverageStoreFinder;
@@ -95,7 +95,7 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
     public void display(final ConstellationServer cstl, final String serviceType, final Instance service) {
         try {
             final String url = cstl.services.getInstanceURL(serviceType, service.getIdentifier());
-            final ServerFactory factory = ServerFinder.getFactoryById(serviceType);
+            final ClientFactory factory = ClientFinder.getFactoryById(serviceType);
             if (factory != null) {
                 final ParameterValueGroup params = factory.getParametersDescriptor().createValue();
                 params.parameter("url").setValue(new URL(url));
@@ -105,7 +105,7 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
                 } catch(ParameterNotFoundException ex) {
                     // do nothing if the parameters does not exist
                 }
-                final Server server = factory.open(params);
+                final Client server = factory.open(params);
                 display(server);
             } else {
                 JOptionPane.showMessageDialog(null, LayerRowModel.BUNDLE.getString("displayFactoryMissing") + serviceType,

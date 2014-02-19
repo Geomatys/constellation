@@ -83,7 +83,7 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-     <groupId>org.geotoolkit.pending</groupId>
+     <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-xml-sensorML</artifactId>
       <scope>test</scope>
     </dependency>

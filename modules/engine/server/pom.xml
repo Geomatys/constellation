@@ -64,16 +64,16 @@
         <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
+      <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-render2d</artifactId>
     </dependency>
       <dependency>
           <groupId>org.geotoolkit</groupId>
-          <artifactId>geotk-coverageio-netcdf</artifactId>
+          <artifactId>geotk-coverage-netcdf</artifactId>
       </dependency>
       <dependency>
-          <groupId>org.geotoolkit.pending</groupId>
-          <artifactId>geotk-coverageio-geotiff</artifactId>
+          <groupId>org.geotoolkit</groupId>
+          <artifactId>geotk-coverage-geotiff</artifactId>
       </dependency>
   </dependencies>
 

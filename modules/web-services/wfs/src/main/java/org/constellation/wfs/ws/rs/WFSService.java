@@ -66,7 +66,7 @@ import static org.constellation.wfs.ws.WFSConstants.*;
 
 // Geotoolkit dependencies
 import org.geotoolkit.ows.xml.RequestBase;
-import org.geotoolkit.client.util.RequestsUtilities;
+import org.geotoolkit.client.RequestsUtilities;
 import org.geotoolkit.ogc.xml.FilterXmlFactory;
 import org.geotoolkit.ogc.xml.SortBy;
 import org.geotoolkit.ogc.xml.XMLFilter;
@@ -280,7 +280,7 @@ public class WFSService extends GridWebService<WFSWorker> {
             return Response.ok(report, "text/xml").status(port).build();
         }
     }
-    
+
     private int getHttpCodeFromErrorCode(final String exceptionCode) {
         if ("CannotLockAllFeatures".equals(exceptionCode) ||
             "FeaturesNotLocked".equals(exceptionCode) ||
@@ -305,7 +305,7 @@ public class WFSService extends GridWebService<WFSWorker> {
             return 200;
         }
     }
-    
+
 
     /**
      * Override the parent method in order to extract namespace mapping
@@ -321,7 +321,7 @@ public class WFSService extends GridWebService<WFSWorker> {
         final Map<String, String> prefixMapping = new LinkedHashMap<>();
         return unmarshallRequestWithMapping(unmarshaller, is, prefixMapping);
     }
-    
+
     @Override
     protected Object unmarshallRequestWithMapping(final Unmarshaller unmarshaller, final InputStream is, final Map<String, String> prefixMapping) throws JAXBException {
         final JAXBEventHandler handler          = new JAXBEventHandler();
@@ -459,7 +459,7 @@ public class WFSService extends GridWebService<WFSWorker> {
         final String handle  = getParameter(HANDLE,  false);
         final String outputFormat  = getParameter("outputFormat", false);
 
-        
+
         final String namespace = getParameter(NAMESPACE, false);
         final Map<String, String> mapping = WebServiceUtilities.extractNamespace(namespace);
 
@@ -485,7 +485,7 @@ public class WFSService extends GridWebService<WFSWorker> {
             }
             mandatory = false;
         }
-        
+
         final String storedQuery = getParameter("storedquery_id", false);
         final List<Parameter> parameters = new ArrayList<Parameter>();
         if (storedQuery != null) {
@@ -634,7 +634,7 @@ public class WFSService extends GridWebService<WFSWorker> {
         final String outputFormat  = getParameter("outputFormat", false);
 
         worker.checkVersionSupported(version, false);
-        
+
         final String namespace = getParameter(NAMESPACE, false);
         final Map<String, String> mapping = WebServiceUtilities.extractNamespace(namespace);
 
@@ -645,7 +645,7 @@ public class WFSService extends GridWebService<WFSWorker> {
         }
 
         final String valueReference = getParameter("valueReference", true);
-        
+
         final String featureVersion = getParameter("featureVersion", false);
 
         String featureId;

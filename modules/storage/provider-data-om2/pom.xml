@@ -56,12 +56,12 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.geotoolkit.pending</groupId>
-            <artifactId>geotk-db-core</artifactId>
+            <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-feature-sql</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.geotoolkit.pending</groupId>
-            <artifactId>geotk-featurestore-core</artifactId>
+            <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-feature-store</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>

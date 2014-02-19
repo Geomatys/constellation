@@ -16,7 +16,7 @@
  */
 package org.constellation.admin.service;
 
-import org.geotoolkit.client.AbstractServerFactory;
+import org.geotoolkit.client.AbstractClientFactory;
 import org.apache.sis.metadata.iso.DefaultIdentifier;
 import org.apache.sis.metadata.iso.citation.DefaultCitation;
 import org.apache.sis.metadata.iso.identification.DefaultServiceIdentification;
@@ -35,7 +35,7 @@ import org.apache.sis.storage.DataStoreException;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class ConstellationServerFactory extends AbstractServerFactory{
+public class ConstellationServerFactory extends AbstractClientFactory{
 
     /** factory identification **/
     public static final String NAME = "cstl-admin";
@@ -49,8 +49,8 @@ public class ConstellationServerFactory extends AbstractServerFactory{
     }
 
     public static final ParameterDescriptor<String> IDENTIFIER = new DefaultParameterDescriptor<String>(
-            AbstractServerFactory.IDENTIFIER.getName().getCode(),
-            AbstractServerFactory.IDENTIFIER.getRemarks(), String.class,NAME,true);
+            AbstractClientFactory.IDENTIFIER.getName().getCode(),
+            AbstractClientFactory.IDENTIFIER.getRemarks(), String.class,NAME,true);
 
     public static final ParameterDescriptor<String> USER = new DefaultParameterDescriptor(
             "User","User login",String.class,null,true);

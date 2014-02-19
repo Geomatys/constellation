@@ -83,16 +83,16 @@
 
         <!-- Geomatys external project -->
         <dependency>
-            <groupId>org.geotoolkit.pending</groupId>
-            <artifactId>geotk-shapefile</artifactId>
+            <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-feature-shapefile</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.geotoolkit.pending</groupId>
+            <groupId>org.geotoolkit</groupId>
             <artifactId>geotk-xml-csw</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.geotoolkit.pending</groupId>
-            <artifactId>geotk-processing-metadata</artifactId>
+            <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-processing</artifactId>
         </dependency>
         
 

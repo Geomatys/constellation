@@ -114,7 +114,7 @@
     </dependency>
     <!-- geotoolkit -->
     <dependency>
-     <groupId>org.geotoolkit.pending</groupId>
+     <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-xml-ows</artifactId>
     </dependency>
 

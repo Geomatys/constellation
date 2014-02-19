@@ -61,11 +61,11 @@
         <artifactId>geotk-coverage-sql</artifactId>
     </dependency>
     <dependency>
-        <groupId>org.geotoolkit.pending</groupId>
+        <groupId>org.geotoolkit</groupId>
         <artifactId>geotk-render2d</artifactId>
     </dependency>
     <dependency>
-        <groupId>org.geotoolkit.pending</groupId>
+        <groupId>org.geotoolkit</groupId>
         <artifactId>geotk-utility-jdbc</artifactId>
     </dependency>
 

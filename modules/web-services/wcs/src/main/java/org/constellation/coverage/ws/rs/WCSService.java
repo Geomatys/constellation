@@ -58,7 +58,7 @@ import org.geotoolkit.gml.xml.v311.GridType;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.geotoolkit.ows.xml.v110.BoundingBoxType;
 import org.geotoolkit.ows.xml.v110.SectionsType;
-import org.geotoolkit.client.util.RequestsUtilities;
+import org.geotoolkit.client.RequestsUtilities;
 import org.geotoolkit.resources.Errors;
 import org.geotoolkit.util.StringUtilities;
 import java.util.Objects;

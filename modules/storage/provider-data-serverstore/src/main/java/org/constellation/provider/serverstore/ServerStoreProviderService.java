@@ -26,8 +26,8 @@ import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderService;
 import static org.constellation.provider.configuration.ProviderParameters.createDescriptor;
-import org.geotoolkit.client.ServerFactory;
-import org.geotoolkit.client.ServerFinder;
+import org.geotoolkit.client.ClientFactory;
+import org.geotoolkit.client.ClientFinder;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.GeneralParameterDescriptor;
@@ -47,7 +47,7 @@ public class ServerStoreProviderService extends AbstractProviderService
 
     static {
         final List<ParameterDescriptorGroup> descs = new ArrayList<ParameterDescriptorGroup>();
-        final Iterator<ServerFactory> ite = ServerFinder.getAllFactories(null).iterator();
+        final Iterator<ClientFactory> ite = ClientFinder.getAllFactories(null).iterator();
         while(ite.hasNext()){
             //copy the descriptor with a minimum number of zero
             final ParameterDescriptorGroup desc = ite.next().getParametersDescriptor();

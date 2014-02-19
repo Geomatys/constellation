@@ -24,7 +24,7 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.geotoolkit.client.Server;
+import org.geotoolkit.client.Client;
 import org.constellation.ServiceDef;
 import org.constellation.provider.*;
 import org.constellation.util.DataReference;
@@ -43,11 +43,11 @@ import org.geotoolkit.data.memory.WrapFeatureCollection;
 import org.geotoolkit.data.query.Query;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.data.session.Session;
-import org.geotoolkit.data.wfs.WebFeatureServer;
+import org.geotoolkit.data.wfs.WebFeatureClient;
 import org.geotoolkit.security.ClientSecurity;
 import org.geotoolkit.security.BasicAuthenticationSecurity;
-import org.geotoolkit.wms.WebMapServer;
-import org.geotoolkit.wmts.WebMapTileServer;
+import org.geotoolkit.wms.WebMapClient;
+import org.geotoolkit.wmts.WebMapTileClient;
 import org.geotoolkit.wmts.xml.WMTSVersion;
 import org.geotoolkit.wms.xml.WMSVersion;
 import org.geotoolkit.feature.DefaultName;
@@ -274,11 +274,11 @@ public final class ConvertersJaxbToGeotk {
                             security = null;
                         }
 
-                        final Server server;
+                        final Client server;
                         if(serviceSpec.equalsIgnoreCase("WMS")){
-                            server = new WebMapServer(new URL(serviceURL), security, WMSVersion.v130);
+                            server = new WebMapClient(new URL(serviceURL), security, WMSVersion.v130);
                         }else{
-                            server = new WebMapTileServer(new URL(serviceURL), security, WMTSVersion.v100);
+                            server = new WebMapTileClient(new URL(serviceURL), security, WMTSVersion.v100);
                         }
 
                         if (server instanceof CoverageStore) {
@@ -387,7 +387,7 @@ public final class ConvertersJaxbToGeotk {
                 if (serviceURL != null) {
                     try {
 
-                        final Server server = new WebFeatureServer(new URL(serviceURL), ServiceDef.WFS_1_1_0.version.toString());
+                        final Client server = new WebFeatureClient(new URL(serviceURL), ServiceDef.WFS_1_1_0.version.toString());
                         if (server instanceof FeatureStore) {
                             final FeatureStore datastore = (FeatureStore) server;
                             final Session session = datastore.createSession(true);

@@ -91,16 +91,16 @@
     </dependency>
     <!-- Geotoolkit pending -->
     <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
+      <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-xml-sld</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
+      <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-svg</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-clients-core</artifactId>
+      <groupId>org.geotoolkit</groupId>
+      <artifactId>geotk-client-store</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>

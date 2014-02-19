@@ -215,7 +215,7 @@
         </dependency>
         <dependency>
           <groupId>org.geotoolkit</groupId>
-          <artifactId>geotk-coverageio-netcdf</artifactId>
+          <artifactId>geotk-coverage-netcdf</artifactId>
           <exclusions>
             <exclusion>
               <groupId>org.slf4j</groupId>
@@ -275,7 +275,7 @@
         </dependency>
         <dependency>
           <groupId>org.geotoolkit</groupId>
-          <artifactId>geotk-coverageio-netcdf</artifactId>
+          <artifactId>geotk-coverage-netcdf</artifactId>
           <exclusions>
             <exclusion>
               <groupId>commons-logging</groupId>
@@ -320,7 +320,7 @@
         </dependency>
         <dependency>
           <groupId>org.geotoolkit</groupId>
-          <artifactId>geotk-coverageio-netcdf</artifactId>
+          <artifactId>geotk-coverage-netcdf</artifactId>
           <exclusions>
             <exclusion>
               <groupId>commons-logging</groupId>
@@ -365,7 +365,7 @@
         </dependency>
         <dependency>
           <groupId>org.geotoolkit</groupId>
-          <artifactId>geotk-coverageio-netcdf</artifactId>
+          <artifactId>geotk-coverage-netcdf</artifactId>
           <exclusions>
             <exclusion>
               <groupId>commons-logging</groupId>
@@ -426,7 +426,7 @@
         </dependency>
         <dependency>
           <groupId>org.geotoolkit</groupId>
-          <artifactId>geotk-coverageio-netcdf</artifactId>
+          <artifactId>geotk-coverage-netcdf</artifactId>
           <exclusions>
             <exclusion>
               <groupId>commons-logging</groupId>
@@ -521,7 +521,7 @@
       <id>withsvg</id>
       <dependencies>
         <dependency>
-          <groupId>org.geotoolkit.pending</groupId>
+          <groupId>org.geotoolkit</groupId>
           <artifactId>geotk-svg</artifactId>
         </dependency>
       </dependencies>

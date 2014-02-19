@@ -57,32 +57,32 @@
     </dependency>
 
     <dependency>
-        <groupId>org.geotoolkit.pending</groupId>
-        <artifactId>geotk-shapefile</artifactId>
-     </dependency>
-     <dependency>
-        <groupId>org.geotoolkit.pending</groupId>
-        <artifactId>geotk-s57</artifactId>
+        <groupId>org.geotoolkit</groupId>
+        <artifactId>geotk-feature-shapefile</artifactId>
     </dependency>
     <dependency>
-        <groupId>org.geotoolkit.pending</groupId>
-        <artifactId>geotk-db-postgres</artifactId>
+        <groupId>com.geomatys</groupId>
+        <artifactId>geomatys-s57</artifactId>
     </dependency>
     <dependency>
-        <groupId>org.geotoolkit.pending</groupId>
-        <artifactId>geotk-gpx</artifactId>
+        <groupId>org.geotoolkit</groupId>
+        <artifactId>geotk-feature-postgres</artifactId>
     </dependency>
     <dependency>
-        <groupId>org.geotoolkit.pending</groupId>
-        <artifactId>geotk-csv</artifactId>
+        <groupId>org.geotoolkit</groupId>
+        <artifactId>geotk-feature-gpx</artifactId>
     </dependency>
     <dependency>
-        <groupId>org.geotoolkit.pending</groupId>
-        <artifactId>geotk-dbf</artifactId>
+        <groupId>org.geotoolkit</groupId>
+        <artifactId>geotk-feature-csv</artifactId>
     </dependency>
     <dependency>
-        <groupId>org.geotoolkit.pending</groupId>
-        <artifactId>geotk-osm-xml</artifactId>
+        <groupId>org.geotoolkit</groupId>
+        <artifactId>geotk-feature-dbf</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.geotoolkit</groupId>
+        <artifactId>geotk-feature-osm</artifactId>
     </dependency>
 
     <dependency>

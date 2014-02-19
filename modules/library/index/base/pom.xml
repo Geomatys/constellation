@@ -52,7 +52,7 @@
   -->
   <dependencies>
     <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
+      <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-spatial-lucene</artifactId>
     </dependency>
     <!-- test dependencies -->
