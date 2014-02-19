@@ -17,6 +17,11 @@
 
 package org.constellation.admin;
 
+import java.util.HashSet;
+import java.util.logging.Logger;
+
+import javax.inject.Inject;
+
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -28,16 +33,13 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.sis.util.logging.Logging;
-import org.constellation.admin.dao.Session;
-import org.constellation.admin.dao.UserRecord;
-
-import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.constellation.engine.register.Role;
+import org.constellation.engine.register.User;
+import org.constellation.engine.register.repository.UserRepository;
+import org.mdweb.model.auth.MDwebRole;
 
 /**
- *
+ * 
  * @author Guilhem Legal (Geomatys)
  * @since 0.8
  */
@@ -48,22 +50,22 @@ public final class DefaultCstlRealm extends AuthorizingRealm {
      */
     private static final Logger LOGGER = Logging.getLogger(DefaultCstlRealm.class);
 
-    /**
-     * Authentication exception message when database connection cannot be established.
-     */
-    private static final String NO_DB_MSG = "Unable to contact authentication database. Refusing the access to anyone.";
-
+    @Inject
+    private UserRepository userRepository;
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected AuthenticationInfo doGetAuthenticationInfo(final AuthenticationToken token) throws UnknownAccountException {
+    protected AuthenticationInfo doGetAuthenticationInfo(final AuthenticationToken token)
+            throws UnknownAccountException {
         final String username = ((UsernamePasswordToken) token).getUsername();
         checkNotNull(username, "Null username are not allowed by this realm.");
 
         // Acquire user record.
-        final UserRecord user = getUser(username);
+        User user = userRepository.findOne(username);
+        if (user == null)
+            throw new UnknownAccountException();
 
         // Build and return authentication info.
         return new SimpleAuthenticationInfo(username, user.getPassword(), getName());
@@ -78,46 +80,19 @@ public final class DefaultCstlRealm extends AuthorizingRealm {
         final String username = (String) principals.getPrimaryPrincipal();
 
         // Acquire user record.
-        final UserRecord user = getUser(username);
+        final User user = userRepository.findOneWithRole(username);
+        final HashSet<String> roles = new HashSet<>();
+        final HashSet<String> permissions = new HashSet<>();
+        for (Role role : user.getRoles()) {
+            roles.add(role.getName());
+            permissions.addAll(MDwebRole.getPermissionListFromRole(role.getName()));
 
+        }
         // Build and return authorization info.
         final SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
-        final HashSet<String> roles = new HashSet<>();
-        roles.addAll(user.getRoles());
         info.setRoles(roles);
-        final HashSet<String> permissions = new HashSet<>();
-        permissions.addAll(user.getPermissions());
         info.setStringPermissions(permissions);
         return info;
-    }
-
-    /**
-     * Retrieves a {@link UserRecord} instance using {@link EmbeddedDatabase#getCachedUser(String)}
-     * or query it from the administration database.
-     *
-     * @param login the user login
-     * @return a {@link UserRecord} instance
-     * @throws UnknownAccountException if the user does not exist
-     */
-    private static UserRecord getUser(final String login) throws UnknownAccountException {
-        UserRecord user = EmbeddedDatabase.getCachedUser(login);
-        if (user == null) {
-            Session session = null;
-            try {
-                session = EmbeddedDatabase.createSession();
-                user = session.readUser(login);
-            } catch (SQLException ex) {
-                LOGGER.log(Level.WARNING, NO_DB_MSG, ex);
-                throw new UnknownAccountException(NO_DB_MSG);
-            } finally {
-                if (session != null) session.close();
-            }
-        }
-        if (user != null) {
-            return user;
-        } else {
-            throw new UnknownAccountException("There is no account for login: " + login);
-        }
     }
 
     private static void checkNotNull(final Object reference, final String message) {

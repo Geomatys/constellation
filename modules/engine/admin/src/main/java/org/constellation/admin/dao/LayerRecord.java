@@ -169,14 +169,5 @@ public final class LayerRecord extends Record {
         return owner;
     }
 
-    public UserRecord getOwner() throws SQLException {
-        ensureConnectionNotClosed();
-        return session.readUser(owner);
-    }
-
-    public void setOwner(final UserRecord owner) throws SQLException {
-        this.owner = owner.getLogin();
-        ensureConnectionNotClosed();
-        session.updateLayer(id, name, namespace, alias, service, data, owner.getLogin());
-    }
+   
 }

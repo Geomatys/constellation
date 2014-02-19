@@ -110,10 +110,6 @@ public final class TaskRecord extends Record {
         return owner;
     }
 
-    public UserRecord getOwner() throws SQLException {
-        ensureConnectionNotClosed();
-        return session.readUser(owner);
-    }
 
     public String getTitle(final Locale locale) throws SQLException {
         ensureConnectionNotClosed();

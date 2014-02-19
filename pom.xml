@@ -157,6 +157,7 @@
   -->
     <properties>
         <!-- Define parent projects versions -->
+        <shiro.version>1.2.1</shiro.version>
         <sis.version>0.4-jdk7-SNAPSHOT</sis.version>
         <geoapi.version>3.1-M04</geoapi.version>
         <geotoolkit.version>4.x-SNAPSHOT</geotoolkit.version>
@@ -164,7 +165,7 @@
         <juzu.version>0.7.0-beta22</juzu.version>
         <slf4j.version>1.7.5</slf4j.version>
         <jersey.version>2.5</jersey.version>
-	<jaxws.version>2.2.8</jaxws.version>
+	    <jaxws.version>2.2.8</jaxws.version>
         <spring.version>4.0.0.RELEASE</spring.version>
         <!-- Define packages for GUI including -->
         <constellation.config>org.constellation.configuration.ws</constellation.config>
@@ -434,12 +435,17 @@
             <dependency>
                <groupId>org.apache.shiro</groupId>
                <artifactId>shiro-core</artifactId>
-               <version>1.2.1</version>
+               <version>${shiro.version}</version>
             </dependency>
             <dependency>
                <groupId>org.apache.shiro</groupId>
                <artifactId>shiro-web</artifactId>
-               <version>1.2.1</version>
+               <version>${shiro.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>org.apache.shiro</groupId>
+              <artifactId>shiro-spring</artifactId>
+              <version>${shiro.version}</version>
             </dependency>
             <!-- milton webdav -->
             <dependency>

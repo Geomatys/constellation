@@ -1,10 +1,8 @@
 package org.constellation.admin.service;
 
-import org.constellation.admin.domain.PersistentToken;
-import org.constellation.admin.domain.User;
-import org.constellation.admin.repository.PersistentTokenRepository;
 import org.constellation.admin.repository.UserRepository;
 import org.constellation.admin.security.SecurityUtils;
+import org.constellation.engine.register.UserDTO;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+
 import java.util.List;
 
 /**
@@ -31,43 +30,23 @@ public class UserService {
     @Inject
     private UserRepository userRepository;
 
-    @Inject
-    private PersistentTokenRepository persistentTokenRepository;
 
-    public void updateUserInformation(User user) {
-        User currentUser = userRepository.findOne(SecurityUtils.getCurrentLogin());
-        currentUser.setFirstName(user.getFirstName());
-        currentUser.setLastName(user.getLastName());
-        currentUser.setEmail(user.getEmail());
+    public void updateUserInformation(UserDTO user) {
+        UserDTO currentUser = userRepository.findOne(SecurityUtils.getCurrentLogin());
+//        currentUser.setFirstName(user.getFirstName());
+//        currentUser.setLastName(user.getLastName());
+//        currentUser.setEmail(user.getEmail());
         userRepository.save(currentUser);
         log.debug("Changed Information for User: {}", currentUser);
     }
 
     public void changePassword(String password) {
-        User currentUser = userRepository.findOne(SecurityUtils.getCurrentLogin());
+        UserDTO currentUser = userRepository.findOne(SecurityUtils.getCurrentLogin());
         String encryptedPassword = passwordEncoder.encode(password);
         currentUser.setPassword(encryptedPassword);
         userRepository.save(currentUser);
         log.debug("Changed password for User: {}", currentUser);
     }
 
-    /**
-     * Persistent Token are used for providing automatic authentication, they should be automatically deleted after
-     * 30 days.
-     * <p/>
-     * <p>
-     * This is scheduled to get fired everyday, at midnight.
-     * </p>
-     */
-    @Scheduled(cron = "0 0 0 * * ?")
-    public void removeOldPersistentTokens() {
-        LocalDate now = new LocalDate();
-        List<PersistentToken> tokens = persistentTokenRepository.findByTokenDateBefore(now.minusMonths(1));
-        for (PersistentToken token : tokens) {
-            log.debug("Deleting token {}", token.getSeries());
-            User user = token.getUser();
-            user.getPersistentTokens().remove(token);
-            persistentTokenRepository.delete(token);
-        }
-    }
+   
 }

@@ -1,17 +1,29 @@
 package org.constellation.engine.register;
 
+import java.util.List;
+
 public interface User {
 
-    public abstract void setName(String name);
+    void setLastname(String lastname);
 
-    public abstract String getName();
+    String getLastname();
 
-    public abstract void setPassword(String password);
+    void setFirstname(String firstname);
 
-    public abstract String getPassword();
+    String getFirstname();
 
-    public abstract void setLogin(String login);
+    String getEmail();
+    
+    void setEmail(String email);
+    
+    void setPassword(String password);
 
-    public abstract String getLogin();
+    String getPassword();
+
+    void setLogin(String login);
+
+    String getLogin();
+
+    List<? extends Role> getRoles();
 
 }

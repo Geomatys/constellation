@@ -9,10 +9,16 @@ public interface UserRepository {
 
     List<? extends User> findAll();
 
+    List<? extends User> all();
+
     void save(User user);
 
     void saveAndFlush(User entity);
 
     void delete(String string);
+    
+    User findOne(String login);
+    
+    User findOneWithRole(String login);
     
 }

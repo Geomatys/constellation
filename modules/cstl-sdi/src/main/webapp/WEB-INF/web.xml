@@ -4,9 +4,10 @@
     <display-name>constellation</display-name>
 
 
-    <listener>
-      <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-    </listener>
+    <context-param>
+      <param-name>overlaid</param-name>
+      <param-value>true</param-value>
+    </context-param>
 
     <listener>
       <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>

@@ -1,137 +1,155 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app version="2.5" metadata-complete="true" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+<web-app version="2.5" metadata-complete="true" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
-    <display-name>constellation</display-name>
-
-
-    <listener>
-      <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-    </listener>
-
-    <listener>
-      <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
-    </listener>
-
-    <context-param>
-        <param-name>contextConfigLocation</param-name>
-        <param-value>WEB-INF/applicationContext.xml</param-value>
-    </context-param>
-
-    <!-- constellation installer -->
-    <listener>
-        <listener-class>org.constellation.Installer</listener-class>
-    </listener>
-
-    <!-- Shiro filter handling security access -->
-    <filter>
-        <filter-name>Shiro</filter-name>
-        <filter-class>org.apache.shiro.web.servlet.IniShiroFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>Shiro</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
-    <filter>
-      <description>Filter that exposes ogcServiceType and ogcServiceName to logging appender.</description>
-      <display-name>MDC Log4j filter</display-name>
-      <filter-name>MDCFilter</filter-name>
-      <filter-class>org.constellation.service.logger.MDCFilter</filter-class>
-    </filter>
-    <filter-mapping>
-      <filter-name>MDCFilter</filter-name>
-      <url-pattern>/WS/*</url-pattern>
-    </filter-mapping>
+  <display-name>constellation</display-name>
 
 
+  <listener>
+    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
 
-    <!-- Filter to allow AJAX cross-origin requests -->
-    <filter>
-        <filter-name>CorsFilter</filter-name>
-        <filter-class>org.constellation.filter.CorsFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>CorsFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
+  <listener>
+    <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+  </listener>
 
-    <!-- REST Servlet for constellation web service -->
-    <servlet>
-        <servlet-name>ServletAdaptor</servlet-name>
-        <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
-        <init-param>
-            <param-name>jersey.config.server.provider.packages</param-name>
-            <param-value>${constellation.services.packages}</param-value>
-        </init-param>
-        <init-param>
-          <param-name>javax.ws.rs.Application</param-name>
-          <param-value>org.constellation.ws.rs.CstlApplication</param-value>
-        </init-param>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>ServletAdaptor</servlet-name>
-        <url-pattern>/WS/*</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>newREST</servlet-name>
-        <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
-        <init-param>
-            <param-name>jersey.config.server.provider.packages</param-name>
-            <param-value>org.constellation.rest.api;
+  <context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>WEB-INF/applicationContext.xml</param-value>
+  </context-param>
+
+  <!-- constellation installer -->
+  <listener>
+    <listener-class>org.constellation.Installer</listener-class>
+  </listener>
+
+  <!-- Shiro filter handling security access -->
+  <filter>
+    <filter-name>shiroFilter</filter-name>
+    <!-- <filter-class>org.apache.shiro.web.servlet.IniShiroFilter</filter-class> -->
+    <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+    <init-param>
+      <param-name>targetFilterLifecycle</param-name>
+      <param-value>true</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>shiroFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <filter>
+    <description>Filter that exposes ogcServiceType and ogcServiceName to logging appender.</description>
+    <display-name>MDC Log4j filter</display-name>
+    <filter-name>MDCFilter</filter-name>
+    <filter-class>org.constellation.service.logger.MDCFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>MDCFilter</filter-name>
+    <url-pattern>/WS/*</url-pattern>
+  </filter-mapping>
+
+
+
+  <!-- Filter to allow AJAX cross-origin requests -->
+  <filter>
+    <filter-name>CorsFilter</filter-name>
+    <filter-class>org.constellation.filter.CorsFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>CorsFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <filter>
+    <filter-name>encodingFilter</filter-name>
+    <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+    <init-param>
+      <param-name>encoding</param-name>
+      <param-value>UTF-8</param-value>
+    </init-param>
+    <init-param>
+      <param-name>forceEncoding</param-name>
+      <param-value>true</param-value>
+    </init-param>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>encodingFilter</filter-name>
+    <url-pattern>/spring/*</url-pattern>
+  </filter-mapping>
+
+  <!-- REST Servlet for constellation web service -->
+  <servlet>
+    <servlet-name>ServletAdaptor</servlet-name>
+    <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+    <init-param>
+      <param-name>jersey.config.server.provider.packages</param-name>
+      <param-value>${constellation.services.packages}</param-value>
+    </init-param>
+    <init-param>
+      <param-name>javax.ws.rs.Application</param-name>
+      <param-value>org.constellation.ws.rs.CstlApplication</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ServletAdaptor</servlet-name>
+    <url-pattern>/WS/*</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>newREST</servlet-name>
+    <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+    <init-param>
+      <param-name>jersey.config.server.provider.packages</param-name>
+      <param-value>org.constellation.rest.api;
                          org.constellation.ws.rest;
                          org.constellation.metadata.ws.rs.provider;
                          org.constellation.ws.rs.provider</param-value>
-        </init-param>
-        <init-param>
-          <param-name>javax.ws.rs.Application</param-name>
-          <param-value>org.constellation.ws.rs.RestApplication</param-value>
-        </init-param>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>newREST</servlet-name>
-        <url-pattern>/api/*</url-pattern>
-    </servlet-mapping>
+    </init-param>
+    <init-param>
+      <param-name>javax.ws.rs.Application</param-name>
+      <param-value>org.constellation.ws.rs.RestApplication</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>newREST</servlet-name>
+    <url-pattern>/api/*</url-pattern>
+  </servlet-mapping>
 
-   <servlet>
-     <servlet-name>spring</servlet-name>
-     <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-     <load-on-startup>1</load-on-startup>
-   </servlet>
+  <servlet>
+    <servlet-name>spring</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
 
-   <servlet-mapping>
-     <servlet-name>spring</servlet-name>
-     <url-pattern>/spring/*</url-pattern>
-   </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>spring</servlet-name>
+    <url-pattern>/spring/*</url-pattern>
+  </servlet-mapping>
 
 
-    <!--  SOAP enabling
+  <!-- SOAP enabling In Glassfish: To enable SOAP service in glassfish remove the property 'metadata-complete="true"' in 
+    the web-app tag (at the top of this document) In Tomcat : 1) Uncomment the WSServletContextListener listener. 2) Rename the 
+    file sun-jaxws.xml.backup in sun-jaxws.xml and uncomment the endpoint you want to enable. > <listener> <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class> 
+    </listener -->
 
-        In Glassfish: To enable SOAP service in glassfish remove the property 'metadata-complete="true"' in the web-app tag (at the top of this document)
-        In Tomcat   : 1) Uncomment the WSServletContextListener listener.
-                      2) Rename the file sun-jaxws.xml.backup  in sun-jaxws.xml and uncomment the endpoint you want to enable.
+  <!-- webdav server servlet -->
+  <servlet>
+    <servlet-name>milton</servlet-name>
+    <servlet-class>com.bradmcevoy.http.MiltonServlet</servlet-class>
+    <init-param>
+      <param-name>resource.factory.class</param-name>
+      <param-value>org.constellation.webdav.WebdavService</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>milton</servlet-name>
+    <url-pattern>/webdav/*</url-pattern>
+  </servlet-mapping>
 
-    >
-   <listener>
-       <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
-   </listener-->
-
-    <!-- webdav server servlet -->
-    <servlet>
-        <servlet-name>milton</servlet-name>
-        <servlet-class>com.bradmcevoy.http.MiltonServlet</servlet-class>
-        <init-param>
-            <param-name>resource.factory.class</param-name>
-            <param-value>org.constellation.webdav.WebdavService</param-value>
-        </init-param>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>milton</servlet-name>
-        <url-pattern>/webdav/*</url-pattern>
-    </servlet-mapping>
-
-    <session-config>
-        <session-timeout>30</session-timeout>
-    </session-config>
+  <session-config>
+    <session-timeout>30</session-timeout>
+  </session-config>
 
 </web-app>

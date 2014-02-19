@@ -2,7 +2,10 @@ package org.constellation.admin.conf;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+
 import liquibase.integration.spring.SpringLiquibase;
+
+import org.constellation.engine.register.repository.UserRepository;
 import org.hibernate.ejb.HibernatePersistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +26,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.inject.Inject;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
+
 import java.util.Properties;
 
 @Configuration
@@ -103,6 +107,11 @@ public class DatabaseConfiguration {
         liquibase.setChangeLog("classpath:META-INF/liquibase/db-changelog.xml");
         liquibase.setContexts("development, production");
         return liquibase;
+    }
+    
+    @Bean
+    public org.constellation.admin.repository.UserRepository userRepository() {
+        return new org.constellation.admin.repository.UserRepository();
     }
 }
 

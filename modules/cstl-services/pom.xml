@@ -532,11 +532,11 @@
   <!-- Dependencies required only for compilation. These dependencies will be included in the JARs' list for which Maven 
     will move into "target/binaries". -->
   <dependencies>
-      <dependency>
-          <groupId>org.constellation.web-services-rest</groupId>
-          <artifactId>cstl-web-restfull</artifactId>
-          <version>${project.version}</version>
-      </dependency>
+    <dependency>
+      <groupId>org.constellation.web-services-rest</groupId>
+      <artifactId>cstl-web-restfull</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Log dependencies -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -594,10 +594,10 @@
       <version>${spring.version}</version>
     </dependency>
 
-   <dependency>
-    <groupId>org.glassfish.jersey.ext</groupId>
-    <artifactId>jersey-spring3</artifactId>
-    <version>${jersey.version}</version>
+    <dependency>
+      <groupId>org.glassfish.jersey.ext</groupId>
+      <artifactId>jersey-spring3</artifactId>
+      <version>${jersey.version}</version>
 
       <exclusions>
         <exclusion>
@@ -650,9 +650,16 @@
 
     <dependency>
       <groupId>org.constellation.engine</groupId>
+      <!-- <artifactId>cstl-engine-spring-security</artifactId> -->
       <artifactId>cstl-engine-shiro</artifactId>
       <version>${project.version}</version>
     </dependency>
+
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-spring</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.constellation.web-services</groupId>
       <artifactId>cstl-web-ogc</artifactId>
@@ -706,9 +713,9 @@
       <artifactId>commons-collections</artifactId>
     </dependency>
     <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>servlet-api</artifactId>
-        <scope>provided</scope>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.ettrema</groupId>
@@ -750,17 +757,17 @@
           </webResources>
         </configuration>
       </plugin>
-       <plugin>
-          <groupId>org.apache.tomcat.maven</groupId>
-          <artifactId>tomcat7-maven-plugin</artifactId>
-          <version>2.2</version>
-          <configuration>
-                    <server>tomcat</server>
-                    <username>admin</username>
-                    <password>admin</password>
-                    <port>8180</port>
-                </configuration>
-        </plugin>
+      <plugin>
+        <groupId>org.apache.tomcat.maven</groupId>
+        <artifactId>tomcat7-maven-plugin</artifactId>
+        <version>2.2</version>
+        <configuration>
+          <server>tomcat</server>
+          <username>admin</username>
+          <password>admin</password>
+          <port>8180</port>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 

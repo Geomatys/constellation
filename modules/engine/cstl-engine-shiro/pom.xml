@@ -20,6 +20,11 @@
     -->
     <dependencies>
         <dependency>
+          <groupId>javax.inject</groupId>
+          <artifactId>javax.inject</artifactId>
+          <version>1</version>
+        </dependency>
+        <dependency>
             <groupId>org.constellation.library</groupId>
             <artifactId>cstl-lib-base</artifactId>
             <version>${project.version}</version>

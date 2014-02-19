@@ -1,12 +1,25 @@
 package org.constellation.configuration.ws.rs;
 
+import static org.constellation.api.CommonConstants.SUCCESS;
+
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLStreamException;
+
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.dao.ProviderRecord;
-import org.constellation.admin.dao.Session;
-import org.constellation.admin.EmbeddedDatabase;
-import org.constellation.admin.dao.UserRecord;
 import org.constellation.configuration.AbstractConfigurer;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigDirectory;
@@ -17,26 +30,10 @@ import org.constellation.provider.ProviderService;
 import org.constellation.provider.StyleProviderProxy;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.WSEngine;
-import static org.constellation.api.CommonConstants.*;
-
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.constellation.ws.Worker;
 import org.geotoolkit.parameter.ParametersExt;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.opengis.parameter.ParameterValueGroup;
-
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.stream.XMLStreamException;
 
 /**
  * @author Benjamin Garcia (Geomatys)
@@ -58,23 +55,6 @@ public class ConfigurationUtilities {
         }
     };
 
-    public static AcknowlegementType getUserName() {
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            final List<UserRecord> users = session.readUsers();
-            String userName = null;
-            if (users != null && !users.isEmpty()) {
-                userName = users.get(0).getLogin();
-            }
-            return new AcknowlegementType(SUCCESS, userName);
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, "Error while reading users", ex);
-        } finally {
-            if (session != null) session.close();
-        }
-        return new AcknowlegementType("Failure", "An error occurs");
-    }
 
     @Deprecated
     public static AcknowlegementType deleteUser(final String userName) {

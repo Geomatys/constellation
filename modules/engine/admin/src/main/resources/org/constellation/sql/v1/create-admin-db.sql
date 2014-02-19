@@ -19,12 +19,27 @@ ALTER TABLE "admin"."i18n" ADD CONSTRAINT i18n_pk PRIMARY KEY ("id","lang");
 CREATE TABLE "admin"."user"(
   "login"    VARCHAR(32) NOT NULL,
   "password" VARCHAR(32) NOT NULL,
-  "name"     VARCHAR(64) NOT NULL,
-  "roles"    VARCHAR(200)
+  "firstname"     VARCHAR(64) NOT NULL,
+  "lastname"     VARCHAR(64) NOT NULL,
+  "email"     VARCHAR(64) NOT NULL
 );
 
 ALTER TABLE "admin"."user" ADD CONSTRAINT user_pk PRIMARY KEY ("login");
 
+CREATE TABLE "admin"."role"(
+  "name"    VARCHAR(32) NOT NULL
+);
+
+ALTER TABLE "admin"."role" ADD CONSTRAINT role_pk PRIMARY KEY ("name");
+
+CREATE TABLE "admin"."user_x_role"(
+  "login"   VARCHAR(32) NOT NULL,
+  "role"    VARCHAR(32) NOT NULL
+);
+
+ALTER TABLE "admin"."user_x_role" ADD CONSTRAINT user_x_role_pk PRIMARY KEY ("login", "role");
+ALTER TABLE "admin"."user_x_role" ADD CONSTRAINT user_x_role_login_fk FOREIGN KEY ("login") REFERENCES "admin"."user"("login");
+ALTER TABLE "admin"."user_x_role" ADD CONSTRAINT user_x_role_role_fk FOREIGN KEY ("role") REFERENCES "admin"."role"("name");
 
 -- providers
 
@@ -176,3 +191,9 @@ CREATE TABLE "admin"."properties"(
   "value"  VARCHAR(64) NOT NULL
 );
 ALTER TABLE "admin"."properties" ADD CONSTRAINT properties_pk PRIMARY KEY ("key");
+
+
+insert into "admin"."user" ("login", "password", "firstname", "lastname", "email" ) values('admin', '21232f297a57a5a743894a0e4a801fc3', 'Frédéric', 'Houbie', 'frederic.houbie@geomatys.com');
+insert into "admin"."role" ("name") values('cstl-admin');
+insert into "admin"."user_x_role" ("login", "role") values('admin', 'cstl-admin');
+

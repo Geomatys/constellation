@@ -1,14 +1,18 @@
 package org.constellation.admin.web.rest;
 
-import com.codahale.metrics.annotation.Timed;
-import org.constellation.admin.domain.User;
-import org.constellation.admin.repository.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.*;
-
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
+
+import org.constellation.admin.repository.UserRepository;
+import org.constellation.engine.register.UserDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.codahale.metrics.annotation.Timed;
 
 /**
  * REST controller for managing users.
@@ -28,9 +32,9 @@ public class UserResource {
             method = RequestMethod.GET,
             produces = "application/json")
     @Timed
-    public User getUser(@PathVariable String login, HttpServletResponse response) {
+    public UserDTO getUser(@PathVariable String login, HttpServletResponse response) {
         log.debug("REST request to get User : {}", login);
-        User user = userRepository.findOne(login);
+        UserDTO user = userRepository.findOne(login);
         if (user == null) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }

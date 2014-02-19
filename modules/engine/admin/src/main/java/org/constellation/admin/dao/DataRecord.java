@@ -174,16 +174,7 @@ public final class DataRecord extends Record {
         return owner;
     }
 
-    public UserRecord getOwner() throws SQLException {
-        ensureConnectionNotClosed();
-        return session.readUser(owner);
-    }
-
-    public void setOwner(final UserRecord owner) throws SQLException {
-        this.owner = owner.getLogin();
-        ensureConnectionNotClosed();
-        session.updateData(id, name, namespace, provider, type, owner.getLogin());
-    }
+  
 
     public List<StyleRecord> getLinkedStyles() throws SQLException {
         ensureConnectionNotClosed();

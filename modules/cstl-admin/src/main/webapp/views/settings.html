@@ -17,40 +17,40 @@
 
                 <div class="form-group">
                     <label translate="settings.form.firstname">First Name</label>
-                    <input type="text" class="form-control" name="firstName" placeholder="{{'settings.form.firstname.placeholder' | translate}}"
-                           ng-model="settingsAccount.firstName" ng-minlength=1 ng-maxlength=50 required>
+                    <input type="text" class="form-control" name="firstname" placeholder="{{'settings.form.firstname.placeholder' | translate}}"
+                           ng-model="settingsAccount.firstname" ng-minlength=1 ng-maxlength=50 required>
                     <div class="error"
-                         ng-show="form.firstName.$dirty && form.firstName.$invalid">
+                         ng-show="form.firstname.$dirty && form.firstname.$invalid">
                         <small class="error"
-                               ng-show="form.firstName.$error.required" translate="settings.messages.validate.firstname.required">
+                               ng-show="form.firstname.$error.required" translate="settings.messages.validate.firstname.required">
                             Your first name is required.
                         </small>
                         <small class="error"
-                               ng-show="form.firstName.$error.minlength" translate="settings.messages.validate.firstname.minlength">
+                               ng-show="form.firstname.$error.minlength" translate="settings.messages.validate.firstname.minlength">
                             Your first name is required to be at least 1 character
                         </small>
                         <small class="error"
-                               ng-show="form.firstName.$error.maxlength" translate="settings.messages.validate.firstname.maxlength">
+                               ng-show="form.firstname.$error.maxlength" translate="settings.messages.validate.firstname.maxlength">
                             Your first name cannot be longer than 50 characters
                         </small>
                     </div>
                 </div>
                 <div class="form-group">
                     <label translate="settings.form.lastname">Last Name</label>
-                    <input type="text" class="form-control" name="lastName" placeholder="{{'settings.form.lastname.placeholder' | translate}}"
-                           ng-model="settingsAccount.lastName" ng-minlength=1 ng-maxlength=50 required>
+                    <input type="text" class="form-control" name="lastname" placeholder="{{'settings.form.lastname.placeholder' | translate}}"
+                           ng-model="settingsAccount.lastname" ng-minlength=1 ng-maxlength=50 required>
                     <div class="error"
-                         ng-show="form.lastName.$dirty && form.lastName.$invalid">
+                         ng-show="form.lastname.$dirty && form.lastName.$invalid">
                         <small class="error"
-                               ng-show="form.lastName.$error.required" translate="settings.messages.validate.firstname.required">
+                               ng-show="form.lastname.$error.required" translate="settings.messages.validate.firstname.required">
                             Your last name is required.
                         </small>
                         <small class="error"
-                               ng-show="form.lastName.$error.minlength" translate="settings.messages.validate.firstname.minlength">
+                               ng-show="form.lastname.$error.minlength" translate="settings.messages.validate.firstname.minlength">
                             Your last name is required to be at least 1 character
                         </small>
                         <small class="error"
-                               ng-show="form.lastName.$error.maxlength" translate="settings.messages.validate.firstname.maxlength">
+                               ng-show="form.lastname.$error.maxlength" translate="settings.messages.validate.firstname.maxlength">
                             Your last name cannot be longer than 50 characters
                         </small>
                     </div>

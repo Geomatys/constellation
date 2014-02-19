@@ -17,6 +17,7 @@
 package org.constellation.configuration.ws.rs;
 
 // J2SE dependencies
+import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 // JAXB dependencies
@@ -41,6 +44,8 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.bind.JAXBElement;
 
+import org.constellation.admin.EmbeddedDatabase;
+import org.constellation.admin.dao.Session;
 // Constellation dependencies
 import org.constellation.configuration.AbstractConfigurer;
 import org.constellation.configuration.AcknowlegementType;
@@ -49,6 +54,8 @@ import org.constellation.configuration.ServiceReport;
 import org.constellation.configuration.factory.AbstractConfigurerFactory;
 import org.constellation.configuration.filter.ConfigurerFilter;
 import org.constellation.configuration.ExceptionReport;
+import org.constellation.engine.register.User;
+import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.CstlServiceException;
@@ -74,13 +81,14 @@ import org.apache.sis.xml.MarshallerPool;
  * <p>
  * This web service enables basic remote management of a Constellation server.
  * </p>
- *
+ * 
  * @author Guilhem Legal (Geomatys)
  * @since 0.1
  */
+@Named
 @Path("configuration")
 @Singleton
-public final class ConfigurationService extends WebService  {
+public final class ConfigurationService extends WebService {
 
     private static WeakReference<ConfigurationService> INSTANCE = null;
 
@@ -90,10 +98,13 @@ public final class ConfigurationService extends WebService  {
     private final List<AbstractConfigurer> configurers = new ArrayList<>();
 
     /**
-     * The factory registry allowing to load the correct implementation specific configurer.
+     * The factory registry allowing to load the correct implementation specific
+     * configurer.
      */
     private static FactoryRegistry factory = new FactoryRegistry(AbstractConfigurerFactory.class);
 
+    @Inject
+    private UserRepository userRepository;
 
     /**
      * Construct the ConfigurationService and configure its context.
@@ -102,7 +113,8 @@ public final class ConfigurationService extends WebService  {
         super();
         try {
             setXMLContext(GenericDatabaseMarshallerPool.getInstance());
-            final Iterator<AbstractConfigurerFactory> ite = factory.getServiceProviders(AbstractConfigurerFactory.class, new ConfigurerFilter(), null, null);
+            final Iterator<AbstractConfigurerFactory> ite = factory.getServiceProviders(
+                    AbstractConfigurerFactory.class, new ConfigurerFilter(), null, null);
             while (ite.hasNext()) {
                 AbstractConfigurerFactory currentfactory = ite.next();
                 try {
@@ -121,7 +133,7 @@ public final class ConfigurationService extends WebService  {
         }
         LOGGER.info("Configuration service runing");
 
-        if(INSTANCE == null || INSTANCE.get() == null){
+        if (INSTANCE == null || INSTANCE.get() == null) {
             INSTANCE = new WeakReference<>(this);
         }
 
@@ -176,12 +188,19 @@ public final class ConfigurationService extends WebService  {
             }
 
             else if (REQUEST_GET_USER_NAME.equalsIgnoreCase(request)) {
-                final AcknowlegementType response = ConfigurationUtilities.getUserName();
-                return Response.ok(response).build();
+                List<? extends User> findAll = userRepository.findAll();
+                AcknowlegementType acknowlegementType;
+                if (findAll.isEmpty())
+                    acknowlegementType = new AcknowlegementType("Failure", "An error occurs");
+                else
+                    acknowlegementType = new AcknowlegementType(SUCCESS, findAll.get(0).getLogin());
+
+                return Response.ok(acknowlegementType).build();
             }
 
             else if (REQUEST_ACCESS.equalsIgnoreCase(request)) {
-                final AcknowlegementType response = new AcknowlegementType(SUCCESS, "You have access to the configuration service");
+                final AcknowlegementType response = new AcknowlegementType(SUCCESS,
+                        "You have access to the configuration service");
                 return Response.ok(response).build();
             }
 
@@ -195,7 +214,8 @@ public final class ConfigurationService extends WebService  {
                         }
                         LOGGER.log(Level.FINER, "request type:{0}", request.getClass().getName());
                     }
-                    final Object response = configurer.treatRequest(request, getUriContext().getQueryParameters(), objectRequest);
+                    final Object response = configurer.treatRequest(request, getUriContext().getQueryParameters(),
+                            objectRequest);
                     if (response != null) {
                         return Response.ok(response).build();
                     }
@@ -203,15 +223,15 @@ public final class ConfigurationService extends WebService  {
             }
 
             throw new CstlServiceException("The operation " + request + " is not supported by the service",
-                                                 OPERATION_NOT_SUPPORTED, REQUEST_PARAMETER);
-
+                    OPERATION_NOT_SUPPORTED, REQUEST_PARAMETER);
 
         } catch (CstlServiceException ex) {
             final String code = StringUtilities.transformCodeName(ex.getExceptionCode().name());
             final ExceptionReport report = new ExceptionReport(ex.getMessage(), code);
-            if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) && !ex.getExceptionCode().equals(ExceptionCode.MISSING_PARAMETER_VALUE) &&
-                !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
-                !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
+            if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)
+                    && !ex.getExceptionCode().equals(ExceptionCode.MISSING_PARAMETER_VALUE)
+                    && !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED)
+                    && !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
                 LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             } else {
                 LOGGER.info(ex.getMessage());
@@ -223,7 +243,7 @@ public final class ConfigurationService extends WebService  {
 
     /**
      * Build a service ExceptionReport
-     *
+     * 
      * @param message
      * @param codeName
      * @return
@@ -235,20 +255,21 @@ public final class ConfigurationService extends WebService  {
         return Response.ok(report).build();
     }
 
-
     /**
      * Receive a file and write it into the static file path.
-     *
-     * @param in The input stream.
+     * 
+     * @param in
+     *            The input stream.
      * @return an Acknowledgment indicating if the operation succeed or not.
-     *
-     * @todo Not implemented. This is just a placeholder where we can customize the
-     *       download action for some users. Will probably be removed in a future version.
+     * 
+     * @todo Not implemented. This is just a placeholder where we can customize
+     *       the download action for some users. Will probably be removed in a
+     *       future version.
      */
     @PUT
     public Response uploadFile(final InputStream in) {
         LOGGER.info("uploading");
-        try  {
+        try {
             final File tmp = File.createTempFile("cstl-", null);
             final File uploadedFile = FileUtilities.buildFileFromStream(in, tmp);
             in.close();
@@ -263,17 +284,16 @@ public final class ConfigurationService extends WebService  {
 
     /**
      * Return a static file present on the server.
-     *
+     * 
      * @return a file.
-     *
-     * @todo Not implemented. This is just a placeholder where we can customize the
-     *       download action for some users. Will probably be removed in a future version.
+     * 
+     * @todo Not implemented. This is just a placeholder where we can customize
+     *       the download action for some users. Will probably be removed in a
+     *       future version.
      */
     private File downloadFile() throws CstlServiceException {
         throw new CstlServiceException("Download operation not implemented", OPERATION_NOT_SUPPORTED);
     }
-
-
 
     /**
      * {@inheritDoc}
@@ -282,8 +302,7 @@ public final class ConfigurationService extends WebService  {
     @PreDestroy
     public void destroy() {
         super.destroy();
-        LOGGER.info("Shutting down the REST Configuration service facade. Disposing " +
-                "all datastore instances.");
+        LOGGER.info("Shutting down the REST Configuration service facade. Disposing " + "all datastore instances.");
         for (AbstractConfigurer configurer : configurers) {
             configurer.destroy();
         }
@@ -298,13 +317,14 @@ public final class ConfigurationService extends WebService  {
     }
 
     @Override
-    protected Object unmarshallRequest(final Unmarshaller unmarshaller, final InputStream is) throws JAXBException, CstlServiceException {
+    protected Object unmarshallRequest(final Unmarshaller unmarshaller, final InputStream is) throws JAXBException,
+            CstlServiceException {
 
         final String request = (String) getParameter(REQUEST_PARAMETER, true);
-        final MultivaluedMap<String,String> parameters = getParameters();
-        for (AbstractConfigurer configurer: configurers) {
-            if (configurer.needCustomUnmarshall(request,parameters)) {
-                return configurer.unmarshall(request,parameters, is);
+        final MultivaluedMap<String, String> parameters = getParameters();
+        for (AbstractConfigurer configurer : configurers) {
+            if (configurer.needCustomUnmarshall(request, parameters)) {
+                return configurer.unmarshall(request, parameters, is);
             }
         }
         return super.unmarshallRequest(unmarshaller, is);

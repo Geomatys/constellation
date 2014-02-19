@@ -199,10 +199,6 @@ public final class Session implements Closeable {
      */
     private final Connection connect;
 
-    /**
-     * Users cache for improved authentication performance.
-     */
-    private final Map<String, UserRecord> userCache;
 
     /**
      * Create a new {@link Session} instance.
@@ -210,9 +206,8 @@ public final class Session implements Closeable {
      * @param connect   the {@link Connection} instance
      * @param userCache a cache for queried users
      */
-    public Session(final Connection connect, final Map<String, UserRecord> userCache) {
+    public Session(final Connection connect) {
         this.connect   = connect;
-        this.userCache = userCache;
     }
 
     /**
@@ -352,67 +347,11 @@ public final class Session implements Closeable {
     }
 
 
-    /**************************************************************************
-     *                           user table queries                           *
-     **************************************************************************/
+  
 
-    /**
-     * Queries a user for the specified {@code login}.
-     *
-     * @param login the user login
-     * @return a {@link UserRecord} instance or {@code null}
-     * @throws SQLException if a database access error occurs
-     */
-    public UserRecord readUser(final String login) throws SQLException {
-        ensureNonNull("login", login);
-        UserRecord user = null;
-        if (userCache != null) {
-            user = userCache.get(login);
-        }
-        if (user == null) {
-            user = new Query(READ_USER).with(login).select().getFirst(UserRecord.class);
-            if (user != null && userCache != null) {
-                userCache.put(login, user);
-            }
-        }
-        return user;
-    }
 
-    /**
-     * Queries the complete list of registered users.
-     *
-     * @return a {@link List} of {@link UserRecord}s
-     * @throws SQLException if a database access error occurs
-     */
-    public List<UserRecord> readUsers() throws SQLException {
-        return new Query(LIST_USERS).select().getAll(UserRecord.class);
-    }
 
-    /**
-     * Inserts a new user.
-     *
-     * @param login    the user login
-     * @param password the user password
-     * @param name     the user name
-     * @param roles    the user roles
-     * @return the inserted {@link UserRecord} instance
-     * @throws SQLException if a database access error occurs
-     */
-    public UserRecord writeUser(final String login, String password, final String name, final List<String> roles) throws SQLException {
-        ensureNonNull("login",    login);
-        ensureNonNull("password", password);
-        ensureNonNull("name",     name);
-
-        // Prepare insertion.
-        password = StringUtilities.MD5encode(password);
-
-        // Proceed to insertion.
-        new Query(WRITE_USER).with(login, password, name, StringUtils.join(roles,',')).update();
-
-        // Return inserted line.
-        return new UserRecord(this, login, password, name, roles);
-    }
-
+   
     /**
      * Updates the user with specified {@code login}.
      *
@@ -422,8 +361,8 @@ public final class Session implements Closeable {
      * @param newRoles the new user roles
      * @throws SQLException if a database access error occurs
      */
-    /* internal */ void updateUser(final String login, final String newPwd, final String newName, final List<String> newRoles) throws SQLException {
-        new Query(UPDATE_USER).with(newPwd, newName, newRoles, login).update();
+    /* internal */ void updateUser(final String login, final String newPwd, final String newName) throws SQLException {
+        new Query(UPDATE_USER).with(newPwd, newName, login).update();
     }
 
 
@@ -537,7 +476,7 @@ public final class Session implements Closeable {
      * @throws SQLException if a database access error occurs
      * @throws IOException if the configuration cannot be written
      */
-    public ProviderRecord writeProvider(final String identifier, final ProviderType type, final String impl, final GeneralParameterValue config, final UserRecord owner) throws SQLException, IOException {
+    public ProviderRecord writeProvider(final String identifier, final ProviderType type, final String impl, final GeneralParameterValue config, final String owner) throws SQLException, IOException {
         ensureNonNull("identifier", identifier);
         ensureNonNull("type",       type);
         ensureNonNull("impl",       impl);
@@ -545,7 +484,7 @@ public final class Session implements Closeable {
 
         // Prepare insertion.
         final StringReader reader = new StringReader(IOUtilities.writeParameter(config));
-        final String login        = owner != null ? owner.getLogin() : null;
+        final String login        = owner;
 
         // Proceed to insertion.
         final int id = new Query(WRITE_PROVIDER).with(identifier, type.name(), impl, reader, login).insert();
@@ -695,7 +634,7 @@ public final class Session implements Closeable {
      * @throws SQLException if a database access error occurs
      * @throws IOException if the body cannot be written
      */
-    public StyleRecord writeStyle(final String name, final ProviderRecord provider, final StyleType type, final MutableStyle body, final UserRecord owner) throws SQLException, IOException {
+    public StyleRecord writeStyle(final String name, final ProviderRecord provider, final StyleType type, final MutableStyle body, final String owner) throws SQLException, IOException {
         ensureNonNull("name",     name);
         ensureNonNull("provider", provider);
         ensureNonNull("type",     type);
@@ -706,7 +645,7 @@ public final class Session implements Closeable {
         final Integer title       = nextIdForI18n();
         final int description     = nextIdForI18n();
         final StringReader reader = new StringReader(IOUtilities.writeStyle(body));
-        final String login        = owner != null ? owner.getLogin() : null;
+        final String login        = owner;
 
         // Proceed to insertion.
         final int id = new Query(WRITE_STYLE).with(name, provider.id, type.name(), date.getTime(), title, description, reader, login).insert();
@@ -800,7 +739,7 @@ public final class Session implements Closeable {
         return stream;
     }
 
-    public DataRecord writeData(final QName name, final ProviderRecord provider, final DataType type, final UserRecord owner) throws SQLException {
+    public DataRecord writeData(final QName name, final ProviderRecord provider, final DataType type, final String owner) throws SQLException {
         ensureNonNull("name",     name);
         ensureNonNull("provider", provider);
         ensureNonNull("type",     type);
@@ -809,8 +748,7 @@ public final class Session implements Closeable {
         final Date date           = new Date();
         final Integer title       = nextIdForI18n();
         final int description     = nextIdForI18n();
-        final String login        = owner != null ? owner.getLogin() : null;
-
+        final String login        = owner;
         // Proceed to insertion.
         final int id = new Query(WRITE_DATA).with(name.getLocalPart(), name.getNamespaceURI(), provider.id, type.name(), date.getTime(), title, description, login).insert();
 
@@ -920,7 +858,7 @@ public final class Session implements Closeable {
         return new Query(LIST_SERVICES_FROM_DATA).with(record.id).select().getAll(ServiceRecord.class);
     }
 
-    public ServiceRecord writeService(final String identifier, final Specification spec, final StringReader config, final UserRecord owner) throws SQLException {
+    public ServiceRecord writeService(final String identifier, final Specification spec, final StringReader config, final String owner) throws SQLException {
         ensureNonNull("identifier", identifier);
         ensureNonNull("spec",       spec);
 
@@ -928,8 +866,7 @@ public final class Session implements Closeable {
         final Date date           = new Date();
         final Integer title       = nextIdForI18n();
         final int description     = nextIdForI18n();
-        final String login        = owner != null ? owner.getLogin() : null;
-
+        final String login        = owner;
         // Proceed to insertion.
         final int id = new Query(WRITE_SERVICE).with(identifier, spec.name(), date.getTime(), title, description, config, login).insert();
 
@@ -1012,7 +949,7 @@ public final class Session implements Closeable {
         return new Query(LIST_LAYERS_FROM_SERVICE).with(service.id).select().getAll(LayerRecord.class);
     }
 
-    public LayerRecord writeLayer(final QName name, final String alias, final ServiceRecord service, final DataRecord data, final Object config, final UserRecord owner) throws SQLException {
+    public LayerRecord writeLayer(final QName name, final String alias, final ServiceRecord service, final DataRecord data, final Object config, final String owner) throws SQLException {
         ensureNonNull("name",   name);
         ensureNonNull("service", service);
         ensureNonNull("data",    data);
@@ -1021,8 +958,7 @@ public final class Session implements Closeable {
         final Date date           = new Date();
         final Integer title       = nextIdForI18n();
         final int description     = nextIdForI18n();
-        final String login        = owner != null ? owner.getLogin() : null;
-
+        final String login        = owner;
         // Proceed to insertion.
         final int id = new Query(WRITE_LAYER).with(name.getLocalPart(), name.getNamespaceURI(), alias, service.id, data.id, date.getTime(), title, description, config, login).insert();
 

@@ -1,6 +1,7 @@
 package org.constellation.admin.test;
 
 import org.constellation.admin.conf.*;
+import org.constellation.gui.admin.conf.CstlConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.*;
@@ -8,6 +9,7 @@ import org.springframework.core.env.Environment;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+
 import java.io.IOException;
 
 @Configuration
@@ -28,6 +30,15 @@ public class ApplicationTestConfiguration {
     @Inject
     private Environment env;
 
+    @Bean
+    public CstlConfig getCstlConfig() {
+        CstlConfig conf = new CstlConfig();
+        conf.setUrl(env.getProperty("cstl.url", "http://localhost:8180/constellation/"));
+        conf.setLogin(env.getProperty("cstl.login", "admin"));
+        conf.setPassword(env.getProperty("cstl.password", "admin"));
+        return conf;
+    }
+    
     /**
      * Initializes cstl-admin test context.
      * <p/>

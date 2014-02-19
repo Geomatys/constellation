@@ -4,6 +4,7 @@ import org.constellation.admin.conf.DispatcherServletConfiguration;
 import org.constellation.admin.repository.UserRepository;
 import org.constellation.admin.test.ApplicationTestConfiguration;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.http.MediaType;
@@ -38,6 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         )
 })
 @DirtiesContext(classMode= DirtiesContext.ClassMode.AFTER_CLASS)
+@Ignore
 public class UserResourceTest {
 
     @Inject

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping("/user")
+@RequestMapping(value="/user", produces="application/json")
 public class UserController {
 
     @Autowired
@@ -27,7 +27,13 @@ public class UserController {
     @RequestMapping(method = RequestMethod.GET)
     public @ResponseBody
     List<? extends User> all() {
-        return userRepository.findAll();
+        return userRepository.all();
+    }
+    
+    @RequestMapping(value="/{login}", method = RequestMethod.GET)
+    public @ResponseBody
+    User oneWithRole(@PathVariable("login") String login) {
+        return userRepository.findOneWithRole(login);
     }
 
     // @Transactional

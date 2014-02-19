@@ -97,7 +97,7 @@ public class SpringDerbyTestCase {
     public void saveUser() {
         UserEntity entity = new UserEntity();
         entity.setLogin("zoz");
-        entity.setName("roro");
+        entity.setLastname("roro");
         entity.setPassword("ppp");
         userRepository.saveAndFlush(entity);
     }

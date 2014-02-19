@@ -1,6 +1,12 @@
 package org.constellation.admin.conf;
 
-import org.constellation.admin.security.*;
+import javax.inject.Inject;
+
+import org.constellation.admin.repository.UserRepository;
+import org.constellation.admin.security.AjaxAuthenticationFailureHandler;
+import org.constellation.admin.security.AjaxAuthenticationSuccessHandler;
+import org.constellation.admin.security.AjaxLogoutSuccessHandler;
+import org.constellation.admin.security.Http401UnauthorizedEntryPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -15,9 +21,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
-import org.springframework.security.web.authentication.RememberMeServices;
-
-import javax.inject.Inject;
 
 @Configuration
 @EnableWebSecurity
@@ -39,10 +42,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Inject
     private Http401UnauthorizedEntryPoint authenticationEntryPoint;
 
-    @Bean
-    public RememberMeServices rememberMeServices() {
-        return new CustomPersistentRememberMeServices(env, userDetailsService());
-    }
+   
 
     @Bean
     public RememberMeAuthenticationProvider rememberMeAuthenticationProvider() {
@@ -59,6 +59,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         return new StandardPasswordEncoder();
     }
 
+    @Bean
+    public UserRepository userRepository() {
+        return new UserRepository();
+    }
+    
     @Bean
     public UserDetailsService userDetailsService() {
         return new  org.constellation.admin.security.UserDetailsService();
@@ -86,11 +91,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .exceptionHandling()
                     .authenticationEntryPoint(authenticationEntryPoint)
                     .and()
-                .rememberMe()
-                    .rememberMeServices(rememberMeServices())
-                    .key(env.getProperty("security.rememberme.key"))
-                    .and()
-                .formLogin()
+                .formLogin()                  
                     .loginProcessingUrl("/app/authentication")
                     .successHandler(ajaxAuthenticationSuccessHandler)
                     .failureHandler(ajaxAuthenticationFailureHandler)
@@ -104,12 +105,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .deleteCookies("JSESSIONID")
                     .permitAll()
                     .and()
+                
                 .csrf()
                     .disable()
                 .authorizeRequests()
                     .antMatchers("/*").permitAll()
-                    .antMatchers("/app/rest/logs/**").hasRole("ADMIN")
+                    .antMatchers("/app/rest/logs/**").hasRole("cstl-admin")
                     .antMatchers("/app/**").authenticated()
-                    .antMatchers("/metrics/**").hasRole("ADMIN");
+                    .antMatchers("/metrics/**").hasRole("cstl-admin");
     }
 }

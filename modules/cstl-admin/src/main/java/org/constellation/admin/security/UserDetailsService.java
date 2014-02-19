@@ -1,8 +1,13 @@
 package org.constellation.admin.security;
 
-import org.constellation.admin.domain.Authority;
-import org.constellation.admin.domain.User;
+import java.util.ArrayList;
+import java.util.Collection;
+
+import javax.inject.Inject;
+
 import org.constellation.admin.repository.UserRepository;
+import org.constellation.engine.register.Role;
+import org.constellation.engine.register.UserDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
@@ -11,10 +16,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * Finds a User in the database.
@@ -33,14 +34,14 @@ public class UserDetailsService implements org.springframework.security.core.use
         log.debug("Authenticating {}", login);
         String lowercaseLogin = login.toLowerCase();
 
-        User userFromDatabase = userRepository.findOne(login);
+        UserDTO userFromDatabase = userRepository.findOne(login);
         if (userFromDatabase == null) {
             throw new UsernameNotFoundException("User " + lowercaseLogin + " was not found in the database");
         }
 
         Collection<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
-        for (Authority authority : userFromDatabase.getAuthorities()) {
-            GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(authority.getName());
+        for (Role authority : userFromDatabase.getRoles()) {
+            GrantedAuthority grantedAuthority = new SimpleGrantedAuthority("ROLE_"+authority.getName());
             grantedAuthorities.add(grantedAuthority);
         }
 

@@ -1,22 +1,22 @@
 package org.constellation.admin.web.rest;
 
-import com.codahale.metrics.annotation.Timed;
-import org.constellation.admin.domain.PersistentToken;
-import org.constellation.admin.domain.User;
-import org.constellation.admin.repository.PersistentTokenRepository;
-import org.constellation.admin.repository.UserRepository;
-import org.constellation.admin.security.SecurityUtils;
-import org.constellation.admin.service.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.*;
+import java.io.IOException;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.List;
+
+import org.constellation.admin.repository.UserRepository;
+import org.constellation.admin.security.SecurityUtils;
+import org.constellation.admin.service.UserService;
+import org.constellation.engine.register.UserDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.codahale.metrics.annotation.Timed;
 
 /**
  * REST controller for managing the current user's account.
@@ -31,9 +31,6 @@ public class AccountResource {
 
     @Inject
     private UserService userService;
-
-    @Inject
-    private PersistentTokenRepository persistentTokenRepository;
 
     /**
      * GET  /rest/authenticate -> check if the user is authenticated.
@@ -54,8 +51,8 @@ public class AccountResource {
             method = RequestMethod.GET,
             produces = "application/json")
     @Timed
-    public User getAccount(HttpServletResponse response) {
-        User user = userRepository.findOne(SecurityUtils.getCurrentLogin());
+    public UserDTO getAccount(HttpServletResponse response) {
+        UserDTO user = userRepository.findOne(SecurityUtils.getCurrentLogin());
         if (user == null) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
@@ -69,7 +66,7 @@ public class AccountResource {
             method = RequestMethod.POST,
             produces = "application/json")
     @Timed
-    public void saveAccount(@RequestBody User user) throws IOException {
+    public void saveAccount(@RequestBody UserDTO user) throws IOException {
         userService.updateUserInformation(user);
     }
 
@@ -88,29 +85,4 @@ public class AccountResource {
         }
     }
 
-    /**
-     * GET  /rest/account/sessions -> get the current open sessions.
-     */
-    @RequestMapping(value = "/rest/account/sessions",
-            method = RequestMethod.GET,
-            produces = "application/json")
-    @Timed
-    public List<PersistentToken> getCurrentSessions(HttpServletResponse response) {
-        User user = userRepository.findOne(SecurityUtils.getCurrentLogin());
-        if (user == null) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        }
-        return persistentTokenRepository.findByUser(user);
-    }
-
-    /**
-     * DELETE  /rest/account/sessions?series={series} -> invalidate an existing session.
-     */
-    @RequestMapping(value = "/rest/account/sessions/{series}",
-            method = RequestMethod.DELETE)
-    @Timed
-    public void invalidateSession(@PathVariable String series) throws UnsupportedEncodingException {
-        String decodedSeries = URLDecoder.decode(series, "UTF-8");
-        persistentTokenRepository.delete(decodedSeries);
-    }
-}
+  }

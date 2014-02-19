@@ -17,14 +17,6 @@
 
 package org.constellation.admin;
 
-import org.apache.sis.util.Static;
-import org.apache.sis.util.logging.Logging;
-import org.constellation.admin.dao.Session;
-import org.constellation.admin.dao.UserRecord;
-import org.constellation.configuration.ConfigDirectory;
-import org.geotoolkit.internal.sql.DefaultDataSource;
-
-import javax.sql.DataSource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -39,7 +31,15 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.sql.DataSource;
+
+import org.apache.sis.util.Static;
+import org.apache.sis.util.logging.Logging;
+import org.constellation.admin.dao.Session;
 import org.constellation.admin.util.SQLExecuter;
+import org.constellation.configuration.ConfigDirectory;
+import org.geotoolkit.internal.sql.DefaultDataSource;
 
 /**
  * Constellation embedded administration database class.
@@ -65,14 +65,7 @@ public final class EmbeddedDatabase extends Static {
      */
     private static DefaultDataSource DATA_SOURCE;
 
-    /**
-     * User cache for improved authentication performance.
-     *
-     * TODO: implement real cache system with a maximum size to reduce memory impact
-     */
-    private static final Map<String, UserRecord> USER_CACHE = new ConcurrentHashMap<>();
-
-
+    
     /**
      * Obtains a administration database {@link org.constellation.admin.dao.Session} instance.
      *
@@ -81,7 +74,7 @@ public final class EmbeddedDatabase extends Static {
      */
     public static Session createSession() throws SQLException {
         getOrCreateDataSource();
-        return new Session(DATA_SOURCE.getConnection(), USER_CACHE);
+        return new Session(DATA_SOURCE.getConnection());
     }
 
     /**
@@ -105,15 +98,7 @@ public final class EmbeddedDatabase extends Static {
         return new SQLExecuter(DATA_SOURCE.getConnection());
     }
 
-    /**
-     * Tries to find a {@link UserRecord} with the specified {@code login} from cache.
-     *
-     * @param login the user login
-     * @return a {@link UserRecord} instance or {@code null}
-     */
-    public static UserRecord getCachedUser(final String login) {
-        return USER_CACHE.get(login);
-    }
+   
 
     /**
      * Sets static connection variables and check if the administration schema named
@@ -177,7 +162,6 @@ public final class EmbeddedDatabase extends Static {
                 session.runSql(stream);
 
                 // Create default admin user.
-                session.writeUser("admin", "admin", "Default Constellation Administrator", Arrays.asList("cstl-admin"));
             }
         } catch (IOException unexpected) {
             throw new IllegalStateException("Unexpected error occurred while trying to create admin database schema.", unexpected);
