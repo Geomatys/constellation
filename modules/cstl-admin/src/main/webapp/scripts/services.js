@@ -48,19 +48,21 @@ cstlAdminApp.factory('LogsService', ['$resource',
 cstlAdminApp.factory('webService', ['$resource',
                                      function ($resource) {
                                          return $resource(cstlContext+'api/1/admin/instances', {}, {
-                                             'listAll': { method: 'GET', isArray: false},
-                                             'get':  { method: 'GET', url: cstlContext+'api/1/OGC/:type/:id'},
-                                             'restart': {method: 'POST', url: cstlContext+'api/1/OGC/:type/:id/restart'},
-                                             'start': {method: 'POST', url: cstlContext+'api/1/OGC/:type/:id/start'},
-                                             'stop': {method: 'POST', url: cstlContext+'api/1/OGC/:type/:id/stop'},
-                                             'metadata':  { method: 'GET', url: cstlContext+'api/1/OGC/:type/:id/metadata'},
-                                             'updateMd': { method: 'POST', url: cstlContext+'api/1/OGC/:type/:id/metadata'},
-                                             'config':  { method: 'GET', url: cstlContext+'api/1/OGC/:type/:id/config'},
-                                             'logs': { method: 'GET', url: cstlContext+'api/1/log/:type/:id'},
-                                             'capabilities': { method: 'GET', url: cstlContext+'WS/:type/:id?REQUEST=GetCapabilities&SERVICE=:type'},
-                                             'layers' : { method: 'GET', url: cstlContext+'api/1/MAP/:type/:id/layersummary/all', isArray: true},
-                                             'addLayer': { method: 'PUT', url: cstlContext+'api/1/MAP/:type/:id/layer'},
-                                             'deleteLayer': { method: 'DELETE', url: cstlContext+'api/1/MAP/:type/:id/:layerid'}
+                                             'listAll':      {method: 'GET', isArray: false},
+                                             'get':          {method: 'GET', url: cstlContext+'api/1/OGC/:type/:id'},
+                                             'create':       {method: 'PUT', url: cstlContext+'api/1/OGC/:type'},
+                                             'delete':       {method: 'DELETE', url: cstlContext+'api/1/OGC/:type/:id'},
+                                             'restart':      {method: 'POST', url: cstlContext+'api/1/OGC/:type/:id/restart'},
+                                             'start':        {method: 'POST', url: cstlContext+'api/1/OGC/:type/:id/start'},
+                                             'stop':         {method: 'POST', url: cstlContext+'api/1/OGC/:type/:id/stop'},
+                                             'metadata':     {method: 'GET', url: cstlContext+'api/1/OGC/:type/:id/metadata'},
+                                             'updateMd':     {method: 'POST', url: cstlContext+'api/1/OGC/:type/:id/metadata'},
+                                             'config':       {method: 'GET', url: cstlContext+'api/1/OGC/:type/:id/config'},
+                                             'logs':         {method: 'GET', url: cstlContext+'api/1/log/:type/:id'},
+                                             'capabilities': {method: 'GET', url: cstlContext+'WS/:type/:id?REQUEST=GetCapabilities&SERVICE=:type'},
+                                             'layers' :      {method: 'GET', url: cstlContext+'api/1/MAP/:type/:id/layersummary/all', isArray: true},
+                                             'addLayer':     {method: 'PUT', url: cstlContext+'api/1/MAP/:type/:id/layer'},
+                                             'deleteLayer':  {method: 'DELETE', url: cstlContext+'api/1/MAP/:type/:id/:layerid'}
                                          });
                                      }]);
 

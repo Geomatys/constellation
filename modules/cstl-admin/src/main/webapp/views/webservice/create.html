@@ -9,7 +9,7 @@
     <div class="form-group">
         <label class="control-label" translate="service.description.tab.description.identifier">Identifier</label>
         <div class="controls">
-            <input type="text" readonly="" id="identifier" ng-model="metadata.identifier" value="">
+            <input type="text" id="identifier" ng-model="metadata.identifier" value="">
         </div>
     </div>
     <div class="form-group">
@@ -30,7 +30,7 @@
         <div id="versionsCheck" class="controls">
             <label ng-repeat="version in wmsVersion">
                 <!--input type="checkbox" name="{{song.url}}" id="{{song.name}}" ng-model="song.checked" ng-change="selectedSongs()"-->
-                <label class="checkbox inline"><input type="checkbox"  id="{{version.id}}"  ng-model="version.checked" ng-change="selectedVersion()" ng-checked="versionIsSelected(version.id)"> {{version.id}}</label>
+                <label class="checkbox inline"><input type="checkbox" ng-model="version.checked" ng-change="selectedVersion()" ng-checked="versionIsSelected(version.id)"> {{version.id}}</label>
             </label>
 
         </div>

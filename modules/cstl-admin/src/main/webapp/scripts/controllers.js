@@ -723,6 +723,14 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','data
                 }, function() { $growl('error','Error','Service '+ name +' start failed'); });
             }
         };
+
+        $scope.deleteService = function(type, name) {
+            webService.delete({type: type, id: name}, {} ,
+                function() { $growl('success','Success','Service '+ name +' successfully deleted');
+                             $scope.services = webService.listAll(); },
+                function() { $growl('error','Error','Service '+ name +' deletion failed'); }
+            );
+        };
     }]);
 
 cstlAdminApp.controller('WebServiceUtilsController', ['$scope', 'webService', '$modalInstance', 'details',
@@ -734,8 +742,8 @@ cstlAdminApp.controller('WebServiceUtilsController', ['$scope', 'webService', '$
         };
     }]);
 
-cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 'webService', '$filter',
-    function ($scope, $routeParams, webService, $filter) {
+cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 'webService', '$filter', '$location', '$growl',
+    function ($scope, $routeParams, webService, $filter, $location, $growl) {
         $scope.type = $routeParams.type;
         $scope.wmsVersion = [ { 'id': '1.1.1'}, { 'id': '1.3.0' }];
 
@@ -750,7 +758,12 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
         }
 
         $scope.saveServiceMetadata = function() {
-            webService.updateMd({type: $scope.type, id: $scope.metadata.name},$scope.metadata)
+            webService.create({type: $scope.type},
+                              {name: $scope.metadata.name, identifier: $scope.metadata.identifier, description: $scope.metadata.description, versions: $scope.metadata.checked},
+                              function() { $growl('success','Success','Service '+ name +' successfully created');
+                                           $location.path('/webservice'); },
+                              function() { $growl('error','Error','Service '+ name +' creation failed'); }
+            );
         };
     }]);
 
