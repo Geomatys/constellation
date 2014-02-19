@@ -470,7 +470,7 @@
      },
      "webservicepage": {
         "button": {
-            "create.label": "Create a new service",
+            "create.label": "Create a service",
                "dropdown": {
                "label": "Map (WMS)",
                "csw.label": "Catalogs (CSW)",

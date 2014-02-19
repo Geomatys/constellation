@@ -971,7 +971,7 @@
 "webservicepage": {
  "button": {
   "create": {
-   "label": "Créer un nouveau service"
+   "label": "Créer un service"
    },
   "dropdown": {
    "csw": {

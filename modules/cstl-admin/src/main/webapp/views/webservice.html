@@ -7,15 +7,11 @@
         <div class="dropdown pull-right">
             <a id="createservice" data-toggle="dropdown" class="btn btn-info btn-large dropdown-toggle">
                 <span class="icon-plus icon-white" style="margin-top: 0px;"></span>
-                Créer un nouveau service
+                <span translate="webservicepage.button.create.label">Create a service</span>
                 <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-                <li><a href="#/webservice/wms" id="wmschoice">Cartes (WMS)</a></li>
-<!--                 <li><a href="create/wmts" id="wmtschoice">Cartes tuilées (WMTS)</a></li> -->
-<!--                 <li><a href="create/wfs" id="wfschoice">Données vectorielles (WFS)</a></li> -->
-<!--                 <li><a href="create/wcs" id="wcschoice">Grille de données (WCS)</a></li> -->
-<!--                 <li><a href="create/wps" id="wpschoice">Géotraitements (WPS)</a></li> -->
+                <li><a href="#/webservice/wms" id="wmschoice" translate="webservicepage.button.dropdown.wms.label">Maps (WMS)</a></li>
             </ul>
         </div>
     </div>
@@ -24,7 +20,7 @@
     <div class="row" >
         <div class="navbar navbar-default" style="margin-bottom: 0px;">
             <div class="navbar-header">
-                <a class="navbar-brand">Services disponibles</a>
+                <a class="navbar-brand" translate="webservicepage.title">Available services</a>
             </div>
             <div class="collapse navbar-collapse">
                 <ul class="nav navbar-nav navbar-right">
@@ -53,11 +49,10 @@
                                 <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a href="#/webservice/{{service.type.toLocaleLowerCase()}}/{{service.name}}">Editer</a></li>
-                                <li><a ng-click="showLogs(service.type, service.name)">Log du service</a></li>
-                                <li><a ng-click="showCapa(service.type, service.name)">Capacité du service</a></li>
-                                <li><a ng-click="deleteService(service.type, service.name)">Supprimer le service</a></li>
-                                <li><a ng-click="showCapa(service.type, service.name)">GetCapabilities</a></li>
+                                <li><a href="#/webservice/{{service.type.toLocaleLowerCase()}}/{{service.name}}" translate="service.menu.edit.label">Edit</a></li>
+                                <li><a ng-click="showLogs(service.type, service.name)" translate="service.menu.log.label">View logs</a></li>
+                                <li><a ng-click="showCapa(service.type, service.name)" translate="service.menu.getcapabilities.label">GetCapabilities</a></li>
+                                <li><a ng-click="deleteService(service.type, service.name)" translate="service.menu.delete.label">Delete</a></li>
                             </ul>
                         </div>
                         <a class="btn btn-default btn-info" ng-click="reload(service.type, service.name)">
@@ -80,42 +75,5 @@
             </div>
         </div>
 
-    </div>
-</div>
-<div class="modal hide fade" id="url-modal">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>URL</h3>
-    </div>
-    <div class="modal-body">
-        <pre id="url-modal-pre"></pre>
-    </div>
-    <div class="modal-footer">
-        <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
-    </div>
-</div>
-<div class="modal hide fade" id="getcapabilities-modal" style="left:40%; width:910px">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>GetCapabilities</h3>
-    </div>
-    <div class="modal-body">
-        <pre id="capabilities-modal-pre" style="background-color: #f8f8ff"><code class="xml"></code></pre>
-    </div>
-    <div class="modal-footer">
-        <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
-    </div>
-</div>
-
-<div class="modal hide fade" id="logs-modal" style="left:40%; width:910px">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>Log</h3>
-    </div>
-    <div class="modal-body">
-        <pre id="logs-modal-pre" style="background-color: #f8f8ff"><code class="xml"></code></pre>
-    </div>
-    <div class="modal-footer">
-        <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
     </div>
 </div>
