@@ -202,12 +202,16 @@ public final class FeatureInfoUtilities extends Static {
             }
 
             for (Source source : config.getLayers()) {
-                for (Layer layer : source.getInclude()) {
-                    for (GetFeatureInfoCfg infoConf : layer.getGetFeatureInfoCfgs()) {
-                        featureinfo = getFeatureInfoFormatFromConf(infoConf);
-                        if (featureinfo == null) {
-                            throw new ConfigurationException("Unknown FeatureInfo configuration binding "+infoConf.getBinding()+
-                            " for layer "+layer.getName().getLocalPart());
+                if (source != null) {
+                    for (Layer layer : source.getInclude()) {
+                        if (layer != null && layer.getGetFeatureInfoCfgs() != null) {
+                            for (GetFeatureInfoCfg infoConf : layer.getGetFeatureInfoCfgs()) {
+                                featureinfo = getFeatureInfoFormatFromConf(infoConf);
+                                if (featureinfo == null) {
+                                    throw new ConfigurationException("Unknown FeatureInfo configuration binding "+infoConf.getBinding()+
+                                    " for layer "+layer.getName().getLocalPart());
+                                }
+                            }
                         }
                     }
                 }
@@ -233,17 +237,21 @@ public final class FeatureInfoUtilities extends Static {
             }
 
             for (Source source : config.getLayers()) {
-                for (Layer layer : source.getInclude()) {
-                    for (GetFeatureInfoCfg infoConf : layer.getGetFeatureInfoCfgs()) {
+                if (source != null) {
+                    for (Layer layer : source.getInclude()) {
+                        if (layer != null && layer.getGetFeatureInfoCfgs() != null) {
+                            for (GetFeatureInfoCfg infoConf : layer.getGetFeatureInfoCfgs()) {
 
-                        if (infoConf.getMimeType() == null || infoConf.getMimeType().isEmpty()) {
-                            //Empty mimeType -> Find supported mimetypes in format
-                            final FeatureInfoFormat tmpFormat = FeatureInfoUtilities.getFeatureInfoFormatFromConf(infoConf);
-                            tmpFormat.setConfiguration(infoConf); //give his configuration
-                            final List<String> supportedMime = tmpFormat.getSupportedMimeTypes();
-                            mimes.addAll(supportedMime);
-                        } else {
-                            mimes.add(infoConf.getMimeType());
+                                if (infoConf.getMimeType() == null || infoConf.getMimeType().isEmpty()) {
+                                    //Empty mimeType -> Find supported mimetypes in format
+                                    final FeatureInfoFormat tmpFormat = FeatureInfoUtilities.getFeatureInfoFormatFromConf(infoConf);
+                                    tmpFormat.setConfiguration(infoConf); //give his configuration
+                                    final List<String> supportedMime = tmpFormat.getSupportedMimeTypes();
+                                    mimes.addAll(supportedMime);
+                                } else {
+                                    mimes.add(infoConf.getMimeType());
+                                }
+                            }
                         }
                     }
                 }
