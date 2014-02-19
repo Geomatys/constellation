@@ -769,6 +769,8 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
 
 cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'webService', '$modal','textService', '$dashboard', '$growl', '$filter',
                                                  function ($scope, $routeParams , webService, $modal, textService, $dashboard, $growl, $filter) {
+
+
     $scope.service = webService.get({type: $routeParams.type, id:$routeParams.id});
 
     $scope.metadata = webService.metadata({type: $routeParams.type, id:$routeParams.id});
@@ -793,8 +795,38 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
        return $.inArray(currentVersion, $scope.metadata.versions) > -1
     }
 
+     $scope.addTag = function() {
+         if ($scope.tagText.length == 0) {
+             return;
+         }
+
+         $scope.metadata.keywords.push($scope.tagText);
+         $scope.tagText = '';
+     }
+
+     $scope.deleteTag = function(key) {
+         if ($scope.metadata.keywords.length > 0 &&
+             $scope.tagText.length == 0 &&
+             key === undefined) {
+             $scope.metadata.keywords.pop();
+         } else if (key != undefined) {
+             $scope.metadata.keywords.splice(key, 1);
+         }
+     }
+
     $scope.saveServiceMetadata = function() {
-      webService.updateMd({type: $scope.service.type, id: $scope.service.name},$scope.metadata)
+      webService.updateMd({type: $scope.service.type, id: $scope.service.name},$scope.metadata,
+          function(response) {
+              if (response.status==="Success") {
+                  $growl('success','Success','Service description successfully updated');
+              }else{
+                  $growl('error','Error','Service description update failed due to :'+response.status);
+              }
+          },
+          function() {
+              $growl('error','Error','Service description update failed');
+          }
+      )
     };
 
     // Show Capa methods
@@ -831,6 +863,8 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
             function() { $growl('error','Error','Service '+ name +' reload failed'); }
         );
      };
+
+
      $scope.startOrStop = function(type, name, status){
         if(status==='WORKING'){
             webService.stop({type: type, id: name}, {}, function(response) {

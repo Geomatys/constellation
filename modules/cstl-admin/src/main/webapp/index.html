@@ -5,23 +5,6 @@
 <!--[if gt IE 8]><!-->
 <html class="no-js">
 <!--<![endif]-->
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>cstl-admin</title>
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width">
-    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-    <!-- build:css(.tmp) styles/main.css -->
-    <link rel="stylesheet" href="styles/bootstrap.css">
-    <link rel="stylesheet" href="styles/font-awesome.css">
-    <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="styles/famfamfam-flags.css">
-    <link rel="stylesheet" href="styles/bootstrap-fileinput.min.css">
-    <link rel="stylesheet" href="styles/bootstrap-datepicker.css">
-    <link rel="stylesheet" href="styles/selectize.bootstarp3.css">
-    <!-- endbuild -->
-</head>
 <body ng-app="cstlAdminApp">
 <!--[if lt IE 10]>
 <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
@@ -46,15 +29,15 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li active-menu="en"><a
-                                                ng-click="changeLanguage(&apos;en&apos;)"><span
+                                ng-click="changeLanguage(&apos;en&apos;)"><span
                                 class="famfamfam-flag-gb"></span> &nbsp;<span
                                 translate="global.language.en">English</span></a></li>
                         <li active-menu="fr"><a
-                                                ng-click="changeLanguage(&apos;fr&apos;)"><span
+                                ng-click="changeLanguage(&apos;fr&apos;)"><span
                                 class="famfamfam-flag-fr"></span> &nbsp;<span
                                 translate="global.language.fr">French</span></a></li>
                         <li active-menu="de"><a
-                                                ng-click="changeLanguage(&apos;de&apos;)"><span
+                                ng-click="changeLanguage(&apos;de&apos;)"><span
                                 class="famfamfam-flag-de"></span> &nbsp;<span
                                 translate="global.language.de">German</span></a></li>
                     </ul>
@@ -79,9 +62,9 @@
                 <li><a href="#/styles"> <span class="glyphicon glyphicon-pencil"></span>
                     <span translate="global.menu.style">Styles</span>
                 </a></li>
-        <!--         <li><a href="#/viewer"> <span class="glyphicon glyphicon-picture"></span> -->
-        <!--             <span translate="global.menu.viewer">visualiseur</span> -->
-        <!--         </a></li> -->
+                <!--         <li><a href="#/viewer"> <span class="glyphicon glyphicon-picture"></span> -->
+                <!--             <span translate="global.menu.viewer">visualiseur</span> -->
+                <!--         </a></li> -->
                 <li class="dropdown pointer"><a class="dropdown-toggle"
                                                 data-toggle="dropdown"> <span> <span
                         class="glyphicon glyphicon-user"></span> <span
@@ -160,11 +143,7 @@
 <script src="scripts/bootstrap-datepicker.js"></script>
 <script src="scripts/bootstrap-datepicker.fr.js"></script>
 
-<!--  JQuery Plugin for tags in layer description -->
-<script src="scripts/microplugin.js" ></script>
-<script src="scripts/sifter.min.js" ></script>
-<script src="scripts/selectize.min.js" ></script>
-<!-- End JQuery Plugin for tags in layer description -->
+
 
 <script src="bower_components/sass-bootstrap/js/affix.js"></script>
 <script src="bower_components/sass-bootstrap/js/alert.js"></script>
@@ -181,4 +160,21 @@
 
 <!-- endbuild -->
 </body>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>cstl-admin</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <!-- build:css(.tmp) styles/main.css -->
+    <link rel="stylesheet" href="styles/bootstrap.css">
+    <link rel="stylesheet" href="styles/font-awesome.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/famfamfam-flags.css">
+    <link rel="stylesheet" href="styles/bootstrap-fileinput.min.css">
+    <link rel="stylesheet" href="styles/bootstrap-datepicker.css">
+
+    <!-- endbuild -->
+</head>
 </html>
