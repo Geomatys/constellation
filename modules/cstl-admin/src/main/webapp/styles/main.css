@@ -33,6 +33,13 @@ body {
     max-height: 68px;
 }
 
+.inline {
+    display: inline-block;
+}
+.checkbox.inline {
+    margin-right: 15px;
+}
+
 .dropdown-menu {
     z-index: 2000;
 }

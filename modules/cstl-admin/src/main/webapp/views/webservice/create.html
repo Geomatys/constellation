@@ -1,39 +1,85 @@
-<fieldset style="padding-left:20px;">
-    <legend><span translate="service.description.tab.description.title">Service description</span></legend>
-    <div class="form-group">
-        <label class="control-label" translate="service.description.tab.description.name">Name</label>
-        <div class="controls">
-            <input type="text" id="name" ng-model="metadata.name" value="">
-        </div>
+<div class="logo-wrapper row">
+    <div class="col-sm-3">
+        <a href="#"><img src="images/constellation.png"></a>
     </div>
-    <div class="form-group">
-        <label class="control-label" translate="service.description.tab.description.identifier">Identifier</label>
-        <div class="controls">
-            <input type="text" id="identifier" ng-model="metadata.identifier" value="">
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="control-label" translate="service.description.tab.description.tags">Tags</label>
-        <div class="controls">
-            <input type="text" id="keywords"  value=""/>
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="control-label" translate="service.description.tab.description.description" >Description</label>
-        <div class="controls">
-            <textarea cols="50" id="inputDescription" class="input-xxlarge" ng-model="metadata.description"></textarea>
-        </div>
-    </div>
+</div>
 
-    <div class="form-group">
-        <label class="control-label" translate="service.description.tab.description.version" >Version</label>
-        <div id="versionsCheck" class="controls">
-            <label ng-repeat="version in wmsVersion">
-                <!--input type="checkbox" name="{{song.url}}" id="{{song.name}}" ng-model="song.checked" ng-change="selectedSongs()"-->
-                <label class="checkbox inline"><input type="checkbox" ng-model="version.checked" ng-change="selectedVersion()" ng-checked="versionIsSelected(version.id)"> {{version.id}}</label>
-            </label>
-
+<div id="description" class="row" style="background-color:white;">
+    <div class="navbar">
+        <div class="navbar-inner">
+            <a class="brand" translate="create.description.title.label">Create a service</a>
         </div>
     </div>
-</fieldset>
-<button class="btn btn-info" style="margin-left:20px;" type="button" ng-click="saveServiceMetadata()">Save</button>
+</div>
+
+<!-- main part -->
+<div class="row" style="background-color:white;">
+    <div class="col-sm-3">
+        <div class="well">
+            <div ng-if="type === 'wms'">
+                <p><h4>WMS</h4></p>
+                <p><span translate="create.description.text.wms"></span></p>
+            </div>
+            <div ng-if="type === 'wfs'">
+                <p><h4>WFS</h4></p>
+                <p><span translate="create.description.text.wfs"></span></p>
+            </div>
+            <div ng-if="type === 'wmts'">
+                <p><h4>WMTS</h4></p>
+                <p><span translate="create.description.text.wmts"></span></p>
+            </div>
+            <div ng-if="type === 'wcs'">
+                <p><h4>WCS</h4></p>
+                <p><span translate="create.description.text.wcs"></span></p>
+            </div>
+            <div ng-if="type === 'wps'">
+                <p><h4>WPS</h4></p>
+                <p><span translate="create.description.text.wps"></span></p>
+            </div>
+            <div ng-if="type === 'sos'">
+                <p><h4>SOS</h4></p>
+                <p><span translate="create.description.text.sos"></span></p>
+            </div>
+            <div ng-if="type === 'csw'">
+                <p><h4>CSW</h4></p>
+                <p><span translate="create.description.text.csw"></span></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-9">
+        <fieldset style="padding-left:20px;">
+            <legend><span translate="service.description.tab.description.title">Service description</span></legend>
+            <div class="form-group">
+                <div class="control-label" translate="service.description.tab.description.name">Name</div>
+                <input type="text" class="form-control" id="name" ng-model="metadata.name" value="">
+            </div>
+            <div class="form-group">
+                <div class="control-label" translate="service.description.tab.description.identifier">Identifier</div>
+                <input type="text" class="form-control" id="identifier" ng-model="metadata.identifier" value="">
+            </div>
+            <div class="form-group">
+                <div class="control-label" translate="service.description.tab.description.tags">Tags</div>
+                <input type="text" class="form-control" id="keywords"  value=""/>
+            </div>
+            <div class="form-group">
+                <div class="control-label" translate="service.description.tab.description.description" >Description</div>
+                <textarea rows="5" id="inputDescription" class="form-control" ng-model="metadata.description"></textarea>
+            </div>
+
+            <div class="form-group">
+                <div class="control-label" translate="service.description.tab.description.version" >Version</div>
+                <div id="versionsCheck">
+                    <div ng-repeat="version in wmsVersion" class="inline">
+                        <!--input type="checkbox" name="{{song.url}}" id="{{song.name}}" ng-model="song.checked" ng-change="selectedSongs()"-->
+                        <div class="checkbox inline"><input type="checkbox" ng-model="version.checked" ng-change="selectedVersion()" ng-checked="versionIsSelected(version.id)"> {{version.id}}</div>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+</div>
+<div class="row" style="background-color:white;">
+    <div class="pull-right" style="margin: 20px 30px;">
+        <button class="btn btn-info" type="button" ng-click="saveServiceMetadata()">Save</button>
+    </div>
+</div>
