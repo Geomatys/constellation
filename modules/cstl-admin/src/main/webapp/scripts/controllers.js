@@ -734,6 +734,26 @@ cstlAdminApp.controller('WebServiceUtilsController', ['$scope', 'webService', '$
         };
     }]);
 
+cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 'webService', '$filter',
+    function ($scope, $routeParams, webService, $filter) {
+        $scope.type = $routeParams.type;
+        $scope.wmsVersion = [ { 'id': '1.1.1'}, { 'id': '1.3.0' }];
+
+        // define which version to set
+        $scope.selectedVersion = function (){
+            $scope.metadata.versions = $filter('filter')($scope.wmsVersion, {checked: true});
+        };
+
+        // define which version is Selected
+        $scope.versionIsSelected = function(currentVersion){
+            return $.inArray(currentVersion, $scope.metadata.versions) > -1
+        }
+
+        $scope.saveServiceMetadata = function() {
+            webService.updateMd({type: $scope.type, id: $scope.metadata.name},$scope.metadata)
+        };
+    }]);
+
 cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'webService', '$modal','textService', '$dashboard', '$growl', '$filter',
                                                  function ($scope, $routeParams , webService, $modal, textService, $dashboard, $growl, $filter) {
     $scope.service = webService.get({type: $routeParams.type, id:$routeParams.id});
