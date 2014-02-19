@@ -24,21 +24,21 @@
             </div>
             <div class="collapse navbar-collapse">
                 <ul class="nav navbar-nav navbar-right">
-                    <li class="active"><a href="#" onclick="filter('', this)">Tous</a></li>
-                    <li><a href="#" onclick="filter('csw', this)">CSW</a></li>
-                    <li><a href="#" onclick="filter('wms', this)">WMS</a></li>
-                    <li><a href="#" onclick="filter('wmts', this)">WMTS</a></li>
-                    <li><a href="#" onclick="filter('wfs', this)">WFS</a></li>
-                    <li><a href="#" onclick="filter('wcs', this)">WCS</a></li>
-                    <li><a href="#" onclick="filter('sos', this)">SOS</a></li>
-                    <li><a href="#" onclick="filter('wps', this)">WPS</a></li>
+                    <li class="active"><a ng-click="typeFilter = null">Tous</a></li>
+                    <li><a ng-click="typeFilter = {type: 'CSW'}">CSW</a></li>
+                    <li><a ng-click="typeFilter = {type: 'WMS'}">WMS</a></li>
+                    <li><a ng-click="typeFilter = {type: 'WMTS'}">WMTS</a></li>
+                    <li><a ng-click="typeFilter = {type: 'WFS'}">WFS</a></li>
+                    <li><a ng-click="typeFilter = {type: 'WCS'}">WCS</a></li>
+                    <li><a ng-click="typeFilter = {type: 'SOS'}">SOS</a></li>
+                    <li><a ng-click="typeFilter = {type: 'WPS'}">WPS</a></li>
                 </ul>
             </div>
         </div>
     </div>
 
     <div class="row bg-white" id="list-services">
-        <div class="col-sm-6 service-item" ng-repeat="service in services.instance">
+        <div class="col-sm-6 service-item" ng-repeat="service in services.instance | filter:typeFilter">
             <a href="#/webservice/{{service.type.toLocaleLowerCase()}}/{{service.name}}"><h3 class="text-info">{{service.name}} ({{service.type}})</h3></a>
             <div class="well" ng-class="{'started':service.status=='WORKING','stopped':service.status=='ERROR','not-started':service.status=='NOT_STARTED'}" data-state="wms-test">
                 <div class="row">
