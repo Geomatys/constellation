@@ -166,7 +166,7 @@ public class ConfigurationEngine {
                 session.close();
         }
 
-        throw new FileNotFoundException("The configuration (" + fileName != null ? fileName : "default"
+        throw new FileNotFoundException("The configuration (" + (fileName != null ? fileName : "default")
                 + ") has not been found.");
     }
 
