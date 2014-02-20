@@ -58,19 +58,8 @@
    "country": {
     "label": "Pays"
     },
-   "email": {
-    "label": "Email"
-    },
-   "fax": {
-    "label": "Fax"
-    },
-   "firstname": {
-    "label": "Prénom"
-    },
    "label": "Adresse",
-   "lastname": {
-    "label": "Nom"
-    },
+   "legend": "Adresse du contact",
    "postcode": {
     "label": "Code postal"
     },
@@ -78,6 +67,18 @@
     "label": "Province"
     }
    },
+  "email": {
+   "label": "Email"
+  },
+  "fax": {
+   "label": "Fax"
+  },
+  "firstname": {
+   "label": "Prénom"
+  },
+  "lastname": {
+   "label": "Nom"
+  },
   "legend": "Information du contact",
   "name": {
    "label": "Nom"
