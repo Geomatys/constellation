@@ -83,8 +83,10 @@ import javax.xml.bind.JAXBException;
 import org.apache.sis.internal.util.UnmodifiableArrayList;
 import org.apache.sis.measure.MeasurementRange;
 import org.apache.sis.measure.Range;
+import org.apache.sis.referencing.crs.DefaultEngineeringCRS;
 import org.apache.sis.referencing.cs.AbstractCS;
 import org.apache.sis.referencing.datum.AbstractDatum;
+import org.apache.sis.referencing.datum.DefaultEngineeringDatum;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.xml.MarshallerPool;
 //Constellation dependencies
@@ -132,7 +134,7 @@ import org.geotoolkit.map.MapItem;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.referencing.ReferencingUtilities;
-import org.geotoolkit.referencing.crs.AbstractSingleCRS;
+
 import org.geotoolkit.referencing.crs.DefaultTemporalCRS;
 import org.geotoolkit.referencing.crs.DefaultVerticalCRS;
 import org.geotoolkit.referencing.cs.DefaultCoordinateSystemAxis;
@@ -179,6 +181,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
+import org.opengis.referencing.datum.EngineeringDatum;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.sld.StyledLayerDescriptor;
 import org.opengis.style.Style;
@@ -1462,10 +1465,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     }else if("temporal".equalsIgnoreCase(crsname)){
                         crs = DefaultTemporalCRS.JAVA;
                     }else{
-                        final AbstractDatum customDatum = new AbstractDatum(Collections.singletonMap("name", crsname));
+                        final EngineeringDatum customDatum = new DefaultEngineeringDatum(Collections.singletonMap("name", crsname));
                         final CoordinateSystemAxis csAxis = new DefaultCoordinateSystemAxis(crsname, "u", AxisDirection.valueOf(crsname), Unit.ONE);
                         final AbstractCS customCs = new AbstractCS(Collections.singletonMap("name", crsname), csAxis);
-                        crs = new AbstractSingleCRS(Collections.singletonMap("name", crsname), customDatum, customCs);
+                        crs = new DefaultEngineeringCRS(Collections.singletonMap("name", crsname), customDatum, customCs);
                     }
 
                     final FeatureMapLayer.DimensionDef fdef = new FeatureMapLayer.DimensionDef(crs, lower, upper);
