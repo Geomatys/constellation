@@ -746,6 +746,27 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
     function ($scope, $routeParams, webService, $filter, $location, $growl) {
         $scope.type = $routeParams.type;
         $scope.wmsVersion = [ { 'id': '1.1.1'}, { 'id': '1.3.0' }];
+        $scope.metadata = {};
+        $scope.metadata.keywords = [];
+
+        $scope.addTag = function() {
+            if ($scope.tagText.length == 0) {
+                return;
+            }
+
+            $scope.metadata.keywords.push($scope.tagText);
+            $scope.tagText = '';
+        };
+
+        $scope.deleteTag = function(key) {
+            if ($scope.metadata.keywords.length > 0 &&
+                $scope.tagText.length == 0 &&
+                key === undefined) {
+                $scope.metadata.keywords.pop();
+            } else if (key != undefined) {
+                $scope.metadata.keywords.splice(key, 1);
+            }
+        };
 
         // define which version to set
         $scope.selectedVersion = function (){
@@ -755,11 +776,20 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
         // define which version is Selected
         $scope.versionIsSelected = function(currentVersion){
             return $.inArray(currentVersion, $scope.metadata.versions) > -1
-        }
+        };
+
+        $scope.addTag = function() {
+            if ($scope.tagText.length == 0) {
+                return;
+            }
+
+            $scope.metadata.keywords.push($scope.tagText);
+            $scope.tagText = '';
+        };
 
         $scope.saveServiceMetadata = function() {
             webService.create({type: $scope.type},
-                              {name: $scope.metadata.name, identifier: $scope.metadata.identifier, description: $scope.metadata.description, versions: $scope.metadata.checked},
+                              {name: $scope.metadata.name, identifier: $scope.metadata.identifier, description: $scope.metadata.description, versions: $scope.metadata.checked, keywords: $scope.metadata.keywords},
                               function() { $growl('success','Success','Service '+ name +' successfully created');
                                            $location.path('/webservice'); },
                               function() { $growl('error','Error','Service '+ name +' creation failed'); }

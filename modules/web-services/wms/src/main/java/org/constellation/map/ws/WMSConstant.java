@@ -24,6 +24,7 @@ import javax.xml.bind.JAXBElement;
 import net.jcip.annotations.Immutable;
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import org.apache.sis.util.iso.DefaultNameFactory;
+import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
 import org.constellation.dto.Service;
 import org.geotoolkit.inspire.xml.vs.ExtendedCapabilitiesType;
@@ -141,32 +142,42 @@ public final class WMSConstant {
         final Contact currentContact = metadata.getServiceContact();
 
         // Create keywords part.
-        final AbstractKeywordList keywordList = WmsXmlFactory.createKeyword(version, metadata.getKeywords());
+        AbstractKeywordList keywordList = null;
+        if (metadata.getKeywords() != null) {
+            keywordList = WmsXmlFactory.createKeyword(version, metadata.getKeywords());
+        }
 
         // Create address part.
-        final AbstractContactAddress address = WmsXmlFactory.createContactAddress(version,"POSTAL",
-                currentContact.getAddress(), currentContact.getCity(), currentContact.getState(),
-                currentContact.getZipCode(), currentContact.getCountry());
-
-        // Create contact part.
-        final AbstractContactPersonPrimary personPrimary = WmsXmlFactory.createContactPersonPrimary(version,
-                currentContact.getFullname(), currentContact.getOrganisation());
-        final AbstractContactInformation contact = WmsXmlFactory.createContactInformation(version,
-                personPrimary, currentContact.getPosition(), address, currentContact.getPhone(), currentContact.getFax(),
-                currentContact.getEmail());
-
-        // url
         AbstractOnlineResource orgUrl = null;
-        if (currentContact.getUrl() != null) {
-            orgUrl = WmsXmlFactory.createOnlineResource(version, currentContact.getUrl());
+        AbstractContactInformation contact = null;
+        if (currentContact != null) {
+            final AbstractContactAddress address = WmsXmlFactory.createContactAddress(version,"POSTAL",
+                    currentContact.getAddress(), currentContact.getCity(), currentContact.getState(),
+                    currentContact.getZipCode(), currentContact.getCountry());
+
+            // Create contact part.
+            final AbstractContactPersonPrimary personPrimary = WmsXmlFactory.createContactPersonPrimary(version,
+                    currentContact.getFullname(), currentContact.getOrganisation());
+            contact = WmsXmlFactory.createContactInformation(version,
+                    personPrimary, currentContact.getPosition(), address, currentContact.getPhone(), currentContact.getFax(),
+                    currentContact.getEmail());
+
+            // url
+            if (currentContact.getUrl() != null) {
+                orgUrl = WmsXmlFactory.createOnlineResource(version, currentContact.getUrl());
+            }
         }
 
         // Create service part.
+        AccessConstraint serviceConstraints = metadata.getServiceConstraints();
+        if (serviceConstraints == null) {
+            serviceConstraints = new AccessConstraint();
+        }
         final AbstractService newService = WmsXmlFactory.createService(version, metadata.getName(),
                 metadata.getIdentifier(), metadata.getDescription(), keywordList, orgUrl, contact,
-                metadata.getServiceConstraints().getFees(), metadata.getServiceConstraints().getAccessConstraint(),
-                metadata.getServiceConstraints().getLayerLimit(), metadata.getServiceConstraints().getMaxWidth(),
-                metadata.getServiceConstraints().getMaxHeight());
+                serviceConstraints.getFees(), serviceConstraints.getAccessConstraint(),
+                serviceConstraints.getLayerLimit(), serviceConstraints.getMaxWidth(),
+                serviceConstraints.getMaxHeight());
 
         // extension
         final NameFactory nf = new DefaultNameFactory();
