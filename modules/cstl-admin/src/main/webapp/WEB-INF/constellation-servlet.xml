@@ -33,6 +33,14 @@
         <prop key="log">true</prop>
       </props>
     </property>
+    <property name="supportedMethods">
+      <list>
+        <value>GET</value>
+        <value>POST</value>
+        <value>PUT</value>
+        <value>DELETE</value>
+      </list>
+    </property>
   </bean>
 
 </beans>
