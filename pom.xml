@@ -515,11 +515,6 @@
                 <version>${geoapi.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>com.geomatys</groupId>
-                <artifactId>geomatys-s57</artifactId>
-                <version>${geotoolkit.version}</version>
-            </dependency>
             <!-- Geotoolkit version -->
             <dependency>
                 <groupId>org.geotoolkit</groupId>
@@ -599,11 +594,6 @@
                 <artifactId>geotk-feature-postgres</artifactId>
                 <version>${geotoolkit.version}</version>
             </dependency>
-	     <dependency>
-	        <groupId>org.geotoolkit</groupId>
-        	<artifactId>geotk-feature-s57</artifactId>
-                 <version>${geotoolkit.version}</version>
-	    </dependency>
             <dependency>
                 <groupId>org.geotoolkit</groupId>
                 <artifactId>geotk-jaxp-core</artifactId>
