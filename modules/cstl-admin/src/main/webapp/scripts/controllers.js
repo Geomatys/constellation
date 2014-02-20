@@ -789,7 +789,7 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
 
         $scope.saveServiceMetadata = function() {
             webService.create({type: $scope.type},
-                              {name: $scope.metadata.name, identifier: $scope.metadata.identifier, description: $scope.metadata.description, versions: $scope.metadata.checked, keywords: $scope.metadata.keywords},
+                              {name: $scope.metadata.name, identifier: $scope.metadata.identifier, description: $scope.metadata.description, versions: $scope.metadata.versions, keywords: $scope.metadata.keywords},
                               function() { $growl('success','Success','Service '+ name +' successfully created');
                                            $location.path('/webservice'); },
                               function() { $growl('error','Error','Service '+ name +' creation failed'); }

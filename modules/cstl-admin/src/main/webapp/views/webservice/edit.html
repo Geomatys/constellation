@@ -239,54 +239,38 @@
                     <fieldset style="padding-left:20px;">
                         <legend><span translate="service.description.tab.description.title">Service description</span></legend>
                         <div class="form-group">
-                            <label class="control-label" translate="service.description.tab.description.name">Name</label>
-                            <div class="controls">
-                                <input type="text" id="name" ng-model="metadata.name" value="">
-                            </div>
+                            <div class="control-label" translate="service.description.tab.description.name">Name</div>
+                            <input type="text" id="name" class="form-control" ng-model="metadata.name" value="">
                         </div>
                         <div class="form-group">
-                            <label class="control-label" translate="service.description.tab.description.identifier">Identifier</label>
-                            <div class="controls">
-                                <input type="text" readonly="" id="identifier" ng-model="metadata.identifier" value="">
-                            </div>
+                            <div class="control-label" translate="service.description.tab.description.identifier">Identifier</div>
+                            <input type="text" readonly="" id="identifier" class="form-control" ng-model="metadata.identifier" value="">
                         </div>
                         <div class="form-group">
-                            <label class="control-label" translate="service.description.tab.description.tags">Tags</label>
-                            <div class="controls">
-                                <div class="tag-input-ctn">
-                                    <div data-ng-repeat="(key, tag) in metadata.keywords" class="input-tag">
-                                        {{ tag }}
-                                        <div class="delete-tag" data-ng-click="deleteTag(key)">&times;</div>
-                                    </div>
-
-                                    <input type="text" data-tag-input="" data-ng-model="tagText" data-ng-style="{width: inputWidth}" data-new-tag="addTag()" data-delete-tag="deleteTag()">
-
+                            <div class="control-label" translate="service.description.tab.description.tags">Tags</div>
+                            <div class="tag-input-ctn">
+                                <div data-ng-repeat="(key, tag) in metadata.keywords" class="input-tag">
+                                    {{ tag }}
+                                    <div class="delete-tag" data-ng-click="deleteTag(key)">&times;</div>
                                 </div>
-                                <!--input ng-model="keywordsStringWithComma" type="text"/-->
-                                <!--input type="text" id="keywords"  ng-model="keywordsStringWithComma" ng-change="applyKeywords()" /-->
+
+                                <input type="text" data-tag-input="" data-ng-model="tagText" data-new-tag="addTag()" data-delete-tag="deleteTag()">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="control-label" translate="service.description.tab.description.description" >Description</label>
-                            <div class="controls">
-                                <textarea cols="50" id="inputDescription" class="input-xxlarge" ng-model="metadata.description"></textarea>
-                            </div>
+                            <div class="control-label" translate="service.description.tab.description.description">Description</div>
+                            <textarea id="inputDescription" class="input-xxlarge form-control" rows="5" ng-model="metadata.description"></textarea>
                         </div>
 
                         <div class="form-group">
-                            <label class="control-label" translate="service.description.tab.description.version" >Version</label>
-                            <div id="versionsCheck" class="controls">
-                                <label ng-repeat="version in wmsVersion">
-                                <!--input type="checkbox" name="{{song.url}}" id="{{song.name}}" ng-model="song.checked" ng-change="selectedSongs()"-->
-                                    <label class="checkbox inline"><input type="checkbox"  id="{{version.id}}"  ng-model="version.checked" ng-change="selectedVersion()" ng-checked="versionIsSelected(version.id)"> {{version.id}}</label>
-                                </label>
+                            <div class="control-label" translate="service.description.tab.description.version" >Version</div>
+                            <div id="versionsCheck">
+                                <div ng-repeat="version in wmsVersion" class="inline">
+                                    <div class="checkbox inline"><input type="checkbox"  id="{{version.id}}"  ng-model="version.checked" ng-change="selectedVersion()" ng-checked="versionIsSelected(version.id)"> {{version.id}}</div>
+                                </div>
 
                             </div>
                         </div>
-
-
-
-
                     </fieldset>
                     <button class="btn btn-info" style="margin-left:20px;" type="button" ng-click="saveServiceMetadata()">Save</button>
 
