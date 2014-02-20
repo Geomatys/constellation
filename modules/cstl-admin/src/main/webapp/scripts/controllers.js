@@ -745,9 +745,18 @@ cstlAdminApp.controller('WebServiceUtilsController', ['$scope', 'webService', '$
 cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 'webService', '$filter', '$location', '$growl',
     function ($scope, $routeParams, webService, $filter, $location, $growl) {
         $scope.type = $routeParams.type;
+        $scope.tonext = true;
         $scope.wmsVersion = [ { 'id': '1.1.1'}, { 'id': '1.3.0' }];
         $scope.metadata = {};
         $scope.metadata.keywords = [];
+
+        $scope.goToServiceContact = function() {
+            $scope.tonext = false;
+        };
+
+        $scope.goToServiceInfo = function() {
+            $scope.tonext = true;
+        };
 
         $scope.addTag = function() {
             if ($scope.tagText.length == 0) {
@@ -788,8 +797,7 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
         };
 
         $scope.saveServiceMetadata = function() {
-            webService.create({type: $scope.type},
-                              {name: $scope.metadata.name, identifier: $scope.metadata.identifier, description: $scope.metadata.description, versions: $scope.metadata.versions, keywords: $scope.metadata.keywords},
+            webService.create({type: $scope.type}, $scope.metadata,
                               function() { $growl('success','Success','Service '+ name +' successfully created');
                                            $location.path('/webservice'); },
                               function() { $growl('error','Error','Service '+ name +' creation failed'); }
