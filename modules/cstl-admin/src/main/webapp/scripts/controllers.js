@@ -119,8 +119,8 @@ cstlAdminApp.controller('LogsController', ['$scope', 'resolvedLogs', 'LogsServic
         };
     }]);
 
-cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 'dataListing', 'style', '$modal',
-    function ($scope, $location, $dashboard, dataListing, style, $modal) {
+cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 'dataListing', 'style', '$modal', '$growl',
+    function ($scope, $location, $dashboard, dataListing, style, $modal, $growl) {
 
         $scope.filtertype = "VECTOR";
 
@@ -140,9 +140,18 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
         };
 
         $scope.deleteData = function() {
-            var layerName = $scope.selected.Name;
-            var providerId = $scope.selected.Provider;
-            dataListing.deleteData({providerid: providerId, dataid: layerName});
+            if (confirm("Are you sure?")) {
+                var layerName = $scope.selected.Name;
+                var providerId = $scope.selected.Provider;
+                dataListing.deleteData({providerid: providerId, dataid: layerName}, {},
+                    function() { $growl('success','Success','Data '+ layerName +' successfully deleted');
+                        dataListing.listAll({}, function(response) {
+                            $scope.fullList = response;
+                        });
+                    },
+                    function() { $growl('error','Error','Data '+ layerName +' deletion failed'); }
+                );
+            }
         };
 
 
@@ -551,11 +560,17 @@ cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', '$
         });
 
         $scope.deleteStyle = function() {
-            var styleName = $scope.selected.Name;
-            var providerId = $scope.selected.Provider;
-            style.delete({providerid: providerId, name: styleName}, {},
-                function() { $growl('success','Success','Style '+ styleName +' successfully deleted'); },
-                function() { $growl('error','Error','Style '+ styleName +' deletion failed'); });
+            if (confirm("Are you sure?")) {
+                var styleName = $scope.selected.Name;
+                var providerId = $scope.selected.Provider;
+                style.delete({providerid: providerId, name: styleName}, {},
+                    function() { $growl('success','Success','Style '+ styleName +' successfully deleted');
+                        style.listAll({}, function(response) {
+                            $scope.fullList = response.styles;
+                        });
+                    },
+                    function() { $growl('error','Error','Style '+ styleName +' deletion failed'); });
+            }
         };
 
         $scope.editStyle = function() {
@@ -733,11 +748,13 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','data
         };
 
         $scope.deleteService = function(type, name) {
-            webService.delete({type: type, id: name}, {} ,
-                function() { $growl('success','Success','Service '+ name +' successfully deleted');
-                             $scope.services = webService.listAll(); },
-                function() { $growl('error','Error','Service '+ name +' deletion failed'); }
-            );
+            if (confirm("Are you sure?")) {
+                webService.delete({type: type, id: name}, {} ,
+                    function() { $growl('success','Success','Service '+ name +' successfully deleted');
+                                 $scope.services = webService.listAll(); },
+                    function() { $growl('error','Error','Service '+ name +' deletion failed'); }
+                );
+            }
         };
     }]);
 
@@ -976,7 +993,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
      };
 
      $scope.deleteLayer = function() {
-         if ($scope.selected != null) {
+         if ($scope.selected != null && confirm("Are you sure?")) {
              webService.deleteLayer({type: $scope.service.type, id: $scope.service.name, layerid: $scope.selected.Name}, {layernamespace: ''},
                  function() {$growl('success','Success','Layer '+ $scope.selected.Name +' successfully deleted from service '+ $scope.service.name);
                              $scope.layers = webService.layers({type: $routeParams.type, id:$routeParams.id}, {}, function(response) {
