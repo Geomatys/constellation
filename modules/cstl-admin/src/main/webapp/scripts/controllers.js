@@ -542,8 +542,8 @@ cstlAdminApp.controller('ServerFileModalController', ['$scope', '$dashboard', '$
         $scope.load($scope.currentPath);
     }]);
 
-cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style',
-    function ($scope, $dashboard, style) {
+cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', '$growl',
+    function ($scope, $dashboard, style, $growl) {
         $scope.filtertype = "";
 
         style.listAll({}, function(response) {
@@ -553,7 +553,15 @@ cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style',
         $scope.deleteStyle = function() {
             var styleName = $scope.selected.Name;
             var providerId = $scope.selected.Provider;
-            style.delete({providerid: providerId, name: styleName});
+            style.delete({providerid: providerId, name: styleName}, {},
+                function() { $growl('success','Success','Style '+ styleName +' successfully deleted'); },
+                function() { $growl('error','Error','Style '+ styleName +' deletion failed'); });
+        };
+
+        $scope.editStyle = function() {
+            var styleName = $scope.selected.Name;
+            var providerId = $scope.selected.Provider;
+
         };
 
         $scope.toggleUpDownSelected = function() {
