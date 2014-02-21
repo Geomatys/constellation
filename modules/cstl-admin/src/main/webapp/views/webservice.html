@@ -51,14 +51,14 @@
                             <ul class="dropdown-menu">
                                 <li><a href="#/webservice/{{service.type.toLocaleLowerCase()}}/{{service.name}}" translate="service.menu.edit.label">Edit</a></li>
                                 <li><a ng-click="showLogs(service.type, service.name)" translate="service.menu.log.label">View logs</a></li>
-                                <li><a ng-click="showCapa(service.type, service.name)" translate="service.menu.getcapabilities.label">GetCapabilities</a></li>
+                                <li><a ng-click="showCapa(service.type, service.name)" ng-disabled="service.status!=='WORKING'" translate="service.menu.getcapabilities.label">GetCapabilities</a></li>
                                 <li><a ng-click="deleteService(service.type, service.name)" translate="service.menu.delete.label">Delete</a></li>
                             </ul>
                         </div>
                         <a class="btn btn-default btn-info" ng-click="reload(service.type, service.name)">
                             <i class="icon-refresh"></i>
                         </a>
-                        <a class="btn btn-default" ng-class="{'started':service.status=='WORKING','stopped':service.status=='ERROR'}" ng-click="startOrStop(service.type, service.name, service.status)">
+                        <a class="btn btn-default" ng-class="{'started':service.status=='WORKING','stopped':service.status!='WORKING'}" ng-click="startOrStop(service.type, service.name, service.status)">
                             <i ng-class="{'icon-play':service.status!='WORKING','icon-stop':service.status=='WORKING'}"></i>
                         </a>
                     </div>

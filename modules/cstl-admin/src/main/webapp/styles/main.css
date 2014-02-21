@@ -43,6 +43,10 @@ body {
 .dropdown-menu {
     z-index: 2000;
 }
+.dropdown-menu li > a[disabled] {
+    color: #B7B7B7;
+    cursor: default;
+}
 .nav-frame {
     padding: 9px 0;
 }
