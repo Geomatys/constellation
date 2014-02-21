@@ -1359,7 +1359,7 @@ public class SOSworker extends AbstractWorker {
             ocResponse = normalizeDocument(currentVersion, ocResponse);
             response   = ocResponse;
         } else {
-            String sReponse = "";
+            final Object sReponse;
             if (localOmFilter instanceof ObservationFilterReader) {
                 sReponse = ((ObservationFilterReader)localOmFilter).getOutOfBandResults();
             } else {

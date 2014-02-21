@@ -154,14 +154,12 @@ public class SOService extends OGCWebService<SOSworker> {
                         outputFormat = MimeType.TEXT_PLAIN;
                     }
                 }
-                Object marshalled;
+                final Object marshalled;
                 if (response instanceof ObservationCollection) {
                     marshalled = new SOSResponseWrapper(response, currentVersion);
-                } else if (response instanceof String) {
-                    marshalled = (String) response;
                 } else {
-                    throw new IllegalArgumentException("Unexpected response type from SOSWorker.getObservation()");
-                }
+                    marshalled = response;
+                 }
                 return Response.ok(marshalled, outputFormat).build();
              }
              

@@ -64,7 +64,7 @@ public interface ObservationFilterReader extends ObservationFilter {
      * @return
      * @throws CstlServiceException
      */
-    String getOutOfBandResults() throws CstlServiceException;
+    Object getOutOfBandResults() throws CstlServiceException;
 
     /**
      * MIME type of the data that will be returned as the result of a GetObservation request.
