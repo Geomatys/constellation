@@ -878,6 +878,7 @@
   },
     "edit" : {
         "dashboard.title" : "Liste des couches",
+        "dashboard.data.title" : "Liste des données",
         "dashboard.header.title": "Titre",
         "dashboard.header.date": "Date",
         "dashboard.header.owner": "Propriétaire",
