@@ -55,7 +55,7 @@
                                 <li><a ng-click="deleteService(service.type, service.name)" translate="service.menu.delete.label">Delete</a></li>
                             </ul>
                         </div>
-                        <a class="btn btn-default btn-info" ng-click="reload(service.type, service.name)">
+                        <a style="margin-left: 5px;" class="btn btn-default btn-info" ng-click="reload(service.type, service.name)">
                             <i class="icon-refresh"></i>
                         </a>
                         <a class="btn btn-default" ng-class="{'started':service.status=='WORKING','stopped':service.status!='WORKING'}" ng-click="startOrStop(service.type, service.name, service.status)">
