@@ -245,7 +245,7 @@ cstlAdminApp.service('$dashboard', function($filter) {
             for (var i = 0; i < array.length; i++) {
                 var found = false;
                 for (var j = 0; j < $scope.exclude.length; j++) {
-                    if (angular.equals($scope.exclude[j], array[i])) {
+                    if ($scope.exclude[j].Name === array[i].Name) {
                         found = true;
                         break;
                     }

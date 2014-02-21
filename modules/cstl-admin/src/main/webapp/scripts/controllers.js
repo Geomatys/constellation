@@ -835,7 +835,6 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
         $dashboard($scope, response);
     });
 
-
     // static list version wms
     $scope.wmsVersion = [ { 'id': '1.1.1'}, { 'id': '1.3.0' }];
 
@@ -964,8 +963,8 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
              templateUrl: 'views/modalDataChoose.html',
              controller: 'DataModalController',
              resolve: {
+                 exclude: function() { return $scope.layers; },
                  service: function() { return $scope.service; }
-                 //exclude: function() { return $scope.selected.TargetStyle }
              }
          });
 
@@ -997,12 +996,19 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
          DataViewer.layers = [layerData, layerBackground];
          DataViewer.initMap('dataMap');
      };
+
+     $scope.toggleUpDownSelected = function() {
+         var $header = $('#serviceDashboard').find('.selected-item').find('.block-header');
+         $header.next().slideToggle(200);
+         $header.find('i').toggleClass('icon-chevron-down icon-chevron-up');
+     };
     }]);
 
-cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webService', '$dashboard', '$modalInstance', 'service', '$growl',
-    function ($scope, dataListing, webService, $dashboard, $modalInstance, service, $growl) {
+cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webService', '$dashboard', '$modalInstance', 'service', 'exclude', '$growl',
+    function ($scope, dataListing, webService, $dashboard, $modalInstance, service, exclude, $growl) {
         $scope.filtertype = "";
         $scope.nbbypage = 5;
+        $scope.exclude = exclude;
 
         dataListing.listAll({}, function(response) {
             $dashboard($scope, response);

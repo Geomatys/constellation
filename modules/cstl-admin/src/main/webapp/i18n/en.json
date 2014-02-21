@@ -442,6 +442,7 @@
         },
         "edit" : {
             "dashboard.title" : "Layers list",
+            "dashboard.data.title" : "Data list",
             "dashboard.header.title": "Title",
             "dashboard.header.date": "Date",
             "dashboard.header.owner": "Owner",
