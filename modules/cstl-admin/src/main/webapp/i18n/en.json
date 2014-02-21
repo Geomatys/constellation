@@ -464,10 +464,16 @@
            "url.label": "Service URL"
         }
     },
-     "style.listing.numberbypage": {
+     "style.listing": {
+      "numberbypage": {
         "10.label": "10 layers",
         "100.label": "100 layers",
         "20.label": "20 layers"
+      },
+      "selected": {
+          "delete.button": "Delete",
+          "edit.button": "Edit"
+      }
      },
      "webservicepage": {
         "button": {

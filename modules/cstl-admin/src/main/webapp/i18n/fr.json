@@ -361,6 +361,7 @@
 "label": {
  "add": "Ajouter",
  "add.data": "Ajouter une donnée",
+ "add.style": "Ajouter un style",
  "all": "Tous",
  "all_fem": "Toutes",
  "categories": "Catégories",
@@ -966,6 +967,10 @@
    "20": {
     "label": "20 styles"
     }
+   },
+   "selected": {
+    "delete.button": "Supprimer",
+    "edit.button": "Editer"
    }
   }
  },
