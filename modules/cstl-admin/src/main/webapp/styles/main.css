@@ -64,6 +64,12 @@ body {
     border-radius: 0;
     border-bottom: 1px solid #e3e3e3;
 }
+
+#rememberMe {
+    line-height: 34px;
+    margin-left: 10px;
+}
+
 .bg-white {
     background-color: white;
 }
