@@ -840,7 +840,7 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
 
 cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'webService', '$modal','textService', '$dashboard', '$growl', '$filter',
                                                  function ($scope, $routeParams , webService, $modal, textService, $dashboard, $growl, $filter) {
-
+    $scope.tagText = '';
 
     $scope.service = webService.get({type: $routeParams.type, id:$routeParams.id});
 
