@@ -40,11 +40,11 @@
   "legend": "Contraintes d'accès au service",
   "maxheight": {
    "label": "Hauteur maximale",
-   "tooltip": "Hauteur maximum qu'un client peut inclure dans une requête GetMap."
+   "tooltip": "Valeur d'hauteur maximale qu'un client peut spécifier dans une requête GetMap."
    },
   "maxwidth": {
    "label": "Largeur maximale",
-   "tooltip": "Largeur maximum qu'un client peut inclure dans un GetMap."
+   "tooltip": "Valeur de largeur maximale qu'un client peut spécifier dans un GetMap."
    }
   },
  "cancel": {

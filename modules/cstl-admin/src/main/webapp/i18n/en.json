@@ -34,11 +34,11 @@
             "legend": "Service Access constraint",
             "maxheight": {
                 "label": "Max height",
-                "tooltip": "Maximum height value that a client can include in a GetMap."
+                "tooltip": "Maximum height value that a client can give in a GetMap."
             },
             "maxwidth": {
                 "label": "Max width",
-                "tooltip": "Maximum width value that a client can include in GetMap."
+                "tooltip": "Maximum width value that a client can give in GetMap."
             }
         },
         "cancel.label": "Cancel",
