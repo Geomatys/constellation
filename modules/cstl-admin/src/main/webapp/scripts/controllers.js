@@ -744,10 +744,10 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','data
 cstlAdminApp.controller('WebServiceUtilsController', ['$scope', 'webService', '$modalInstance', 'details',
     function ($scope, webService, $modalInstance, details) {
         $scope.details = details.data;
-
-       $scope.close = function() {
+        $scope.close = function() {
             $modalInstance.dismiss('close');
         };
+
     }]);
 
 cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 'webService', '$filter', '$location', '$growl',
@@ -889,7 +889,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
             controller: 'WebServiceUtilsController',
             resolve: {
                 'details': function(textService){
-                    return textService.capa( type.toLowerCase(), name );
+                    return textService.capa( type.toLowerCase(), name);
                 }
             }
         });

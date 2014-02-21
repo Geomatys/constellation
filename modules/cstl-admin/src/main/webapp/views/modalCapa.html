@@ -4,11 +4,10 @@
             <button type="button" class="close" ng-click="close()">×</button>
             <h4 class="modal-title" translate="service.menu.getcapabilities.modal.title">GetCapabilities Details</h4>
         </div>
-        <div class="modal-body">
-            <pre style="background-color: #f8f8ff; height: 600px; overflow-y: scroll;">
-                <code class="xml" > {{details}} </code>
-            </pre>
+        <div class="modal-body" style="overflow-y: scroll;height: 600px">
+            <code hljs source="details"></code>
         </div>
+
         <div class="modal-footer">
 
             <button type="button" class="btn btn-primary"  ng-click="close();" translate="service.menu.getcapabilities.modal.close">Close</button>
