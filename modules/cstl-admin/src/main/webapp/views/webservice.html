@@ -66,8 +66,8 @@
                 <div class="row">
                     <div class="col-sm-8">
                         <p><strong><span translate="service.abstract.label">Service description</span></strong></p>
-                        <p ng-if="service._abstract !==''">{{service._abstract}}</p>
-                        <p ng-if="service._abstract ===''"> - </p>
+                        <p ng-if="service._abstract != null && service._abstract !==''">{{service._abstract}}</p>
+                        <p ng-if="service._abstract == null || service._abstract ===''"> - </p>
                         <p><strong><span translate="service.data.label">Published data on service</span></strong></p>
                         <p>{{service.layersNumber}}</p>
                     </div>
