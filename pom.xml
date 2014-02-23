@@ -159,7 +159,6 @@
         <!-- Define parent projects versions -->
         <shiro.version>1.2.1</shiro.version>
         <sis.version>0.4-jdk7-SNAPSHOT</sis.version>
-        <geoapi.version>3.1-SNAPSHOT</geoapi.version>
         <geotoolkit.version>4.x-SNAPSHOT</geotoolkit.version>
         <mdweb-meta.version>2.4-SNAPSHOT</mdweb-meta.version>
         <juzu.version>0.7.0-beta22</juzu.version>
@@ -338,11 +337,6 @@
                 <version>${jaxws.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.codehaus.woodstox</groupId>
-                <artifactId>woodstox-core-lgpl</artifactId>
-                <version>4.1.2</version> <!-- TODO: version mismatch with Geotk? -->
-            </dependency>
-            <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>3.1</version>
@@ -507,12 +501,6 @@
                <groupId>org.mdweb.metamodel</groupId>
                <artifactId>mdweb-metamodel-lib-auth</artifactId>
                <version>${mdweb-meta.version}</version>
-            </dependency>
-            <!-- GeoAPI -->
-            <dependency>
-                <groupId>org.opengis</groupId>
-                <artifactId>geoapi-pending</artifactId>
-                <version>${geoapi.version}</version>
             </dependency>
 
             <!-- Geotoolkit version -->
@@ -955,12 +943,6 @@
                 <artifactId>geotk-provided</artifactId>
                 <version>${geotoolkit.version}</version>
                 <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.10</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.geotoolkit</groupId>
