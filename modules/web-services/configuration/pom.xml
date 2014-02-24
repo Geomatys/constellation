@@ -96,6 +96,12 @@
       <version>${project.version}</version>
     </dependency>
 
+     <dependency>
+         <groupId>org.constellation.web-services</groupId>
+         <artifactId>cstl-web-ogc</artifactId>
+         <version>${project.version}</version>
+     </dependency>
+
       <!-- Needed for configuration loading from file. -->
       <dependency>
           <groupId>org.constellation.storage</groupId>

@@ -24,6 +24,8 @@ import org.constellation.configuration.AbstractConfigurer;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.process.service.RestartServiceDescriptor;
+import org.constellation.process.service.ServiceProcessCommon;
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.ProviderService;
@@ -32,11 +34,13 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
 import org.geotoolkit.parameter.ParametersExt;
+import org.geotoolkit.process.*;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.opengis.parameter.ParameterValueGroup;
 
 /**
  * @author Benjamin Garcia (Geomatys)
+ * @author Alexis Manin (Geomatys)
  */
 public class ConfigurationUtilities {
 
@@ -309,12 +313,6 @@ public class ConfigurationUtilities {
                             }
                         }
                     }
-
-                    // Brut force solution : we restart all providers, otherwise, Constellation seems in trouble to work with newly imported data.
-                    for (LayerProvider provider : LayerProviderProxy.getInstance().getProviders()) {
-                        provider.reload();
-                    }
-
                 } catch (Exception e) {
                     LOGGER.log(Level.FINE, "Following file cannot be read : " + providerFile.getName(), e);
                 } finally {
@@ -325,6 +323,23 @@ public class ConfigurationUtilities {
             }
         }
 
+        // Brut force solution : we reload all providers, otherwise, Constellation will have trouble to work with newly imported data.
+        layerProxy.reload();
+        for (LayerProvider provider : layerProxy.getProviders()) {
+            provider.reload();
+        }
+
+        RestartServiceDescriptor restartDesc = new RestartServiceDescriptor();
+        for (String serviceType : ServiceProcessCommon.servicesAvaible()) {
+            final ParameterValueGroup input = restartDesc.getInputDescriptor().createValue();
+            input.parameter(RestartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceType);
+            final org.geotoolkit.process.Process restarter = restartDesc.createProcess(input);
+            try {
+                restarter.call();
+            } catch (Exception e) {
+                LOGGER.log(Level.FINE, serviceType + " services cannot be restarted.", e);
+            }
+        }
         // Finally, get files at configuration root. Should get only scheduler.
         // TODO : Re-activate and complete when tasks will be ported into database configuration.
 //        final File[] others = configFolder.listFiles(new FileFilter() {

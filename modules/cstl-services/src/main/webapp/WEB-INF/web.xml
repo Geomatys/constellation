@@ -4,7 +4,6 @@
 
   <display-name>constellation</display-name>
 
-
   <listener>
     <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
   </listener>
@@ -13,15 +12,15 @@
     <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
   </listener>
 
+    <!-- Constellation initialisation, plus copy possible file-system configuration to database. -->
+    <listener>
+        <listener-class>org.constellation.setup.Installer</listener-class>
+    </listener>
+
   <context-param>
     <param-name>contextConfigLocation</param-name>
     <param-value>WEB-INF/applicationContext.xml</param-value>
   </context-param>
-
-  <!-- constellation installer -->
-  <listener>
-    <listener-class>org.constellation.Installer</listener-class>
-  </listener>
 
   <!-- Shiro filter handling security access -->
   <filter>
