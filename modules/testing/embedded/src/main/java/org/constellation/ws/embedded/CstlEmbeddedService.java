@@ -241,6 +241,7 @@ public class CstlEmbeddedService extends CommandLine {
                 final ResourceConfig config = ResourceConfig.forApplication(new CstlApplication());
                 config.addProperties(grizzlyWebContainerProperties);
                 ApplicationHandler handler = new ApplicationHandler(config);
+
                 threadSelector = GrizzlyHttpServerFactory.createHttpServer(currentUri, handler, true);
                 
             } catch (ProcessingException e) {

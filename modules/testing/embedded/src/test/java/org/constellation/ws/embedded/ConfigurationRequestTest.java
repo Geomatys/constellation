@@ -149,7 +149,7 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
         obj = unmarshallResponse(conec);
 
         assertTrue(obj instanceof AcknowlegementType);
-        AcknowlegementType expResult = new AcknowlegementType("Success",  "services succefully restarted");
+        AcknowlegementType expResult = new AcknowlegementType("Success",  "services successfully restarted");
         assertEquals(expResult, obj);
     }
 
