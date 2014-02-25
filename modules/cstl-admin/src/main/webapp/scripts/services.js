@@ -141,7 +141,7 @@ cstlAdminApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'aut
                     if(param.success){
                         param.success(data, status, headers, config);
                     }
-                    $http.defaults.headers.common.Authorization = 'Basic ' + $base64.encode(param.username+':'+param.password); //YWRtaW46YWRtaW4=
+                    $http.defaults.headers.common.Authorization = 'Basic YWRtaW46YWRtaW4=';// + $base64.encode(param.username+':'+param.password); //YWRtaW46YWRtaW4=
                 }).error(function (data, status, headers, config) {
                     console.log("auth error");
                     $rootScope.authenticationError = true;

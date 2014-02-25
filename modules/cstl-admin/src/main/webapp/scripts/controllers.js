@@ -937,7 +937,9 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
          if ($scope.tagText.length == 0) {
              return;
          }
-
+         if ($scope.metadata.keywords ==null){
+             $scope.metadata.keywords = [];
+         }
          $scope.metadata.keywords.push($scope.tagText);
          $scope.tagText = '';
      }

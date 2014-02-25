@@ -250,7 +250,7 @@
                         <div class="form-group">
                             <div class="control-label" translate="service.description.tab.description.tags">Tags</div>
                             <div class="tag-input-ctn">
-                                <div data-ng-repeat="(key, tag) in metadata.keywords" class="input-tag">
+                                <div data-ng-repeat="(key, tag) in metadata.keywords track by $index" class="input-tag">
                                     {{ tag }}
                                     <div class="delete-tag" data-ng-click="deleteTag(key)">&times;</div>
                                 </div>
