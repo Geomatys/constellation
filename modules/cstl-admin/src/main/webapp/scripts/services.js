@@ -7,11 +7,11 @@
 
 var context = findWebappContext();
 
-var cstlContext = context=="/cstl-admin"?"constellation/":"";
+var cstlContext = "/constellation/";
 
 cstlAdminApp.factory('Account', ['$resource',
     function ($resource) {
-        return $resource('app/rest/account', {}, {
+        return $resource(cstlContext + 'spring/account', {}, {
         });
     }]);
 
@@ -44,6 +44,10 @@ cstlAdminApp.factory('LogsService', ['$resource',
     }]);
 
 
+cstlAdminApp.factory('UserResource', ['$resource',
+   function ($resource) {
+        return $resource(cstlContext+'api/1/user/:id', {}, {});
+}]);
 
 cstlAdminApp.factory('webService', ['$resource',
                                      function ($resource) {
@@ -104,24 +108,24 @@ cstlAdminApp.factory('textService', ['$http',
     function ($http){
         return {
             logs : function(type, id){
-                return $http.get(cstlContext+'api/1/log/'+type+'/'+id)
+                return $http.get(cstlContext+'api/1/log/'+type+'/'+id);
 
             },
             capa : function(type, id){
-                return $http.get(cstlContext+'WS/'+type+'/'+id+'?REQUEST=GetCapabilities&SERVICE='+type)
+                return $http.get(cstlContext+'WS/'+type+'/'+id+'?REQUEST=GetCapabilities&SERVICE='+type);
 
             }
-        }
+        };
     }]);
 
-cstlAdminApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'authService',
-    function ($rootScope, $http, authService) {
+cstlAdminApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'authService', '$base64',
+    function ($rootScope, $http, authService, $base64) {
         return {
             authenticate: function() {
                 $http.get(context + '/app/rest/authenticate')
                     .success(function (data, status, headers, config) {
                         $rootScope.$broadcast('event:auth-authConfirmed');
-                        $http.defaults.headers.common.Authorization = 'Basic YWRtaW46YWRtaW4=';
+                        $http.defaults.headers.common.Authorization = 'Basic ' + $base64.encode(param.username+':'+param.password);
                     });
             },
             login: function (param) {
@@ -137,7 +141,7 @@ cstlAdminApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'aut
                     if(param.success){
                         param.success(data, status, headers, config);
                     }
-                    $http.defaults.headers.common.Authorization = 'Basic YWRtaW46YWRtaW4=';
+                    $http.defaults.headers.common.Authorization = 'Basic ' + $base64.encode(param.username+':'+param.password); //YWRtaW46YWRtaW4=
                 }).error(function (data, status, headers, config) {
                     console.log("auth error");
                     $rootScope.authenticationError = true;
@@ -148,6 +152,7 @@ cstlAdminApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'aut
             },
             logout: function () {
                 $rootScope.authenticationError = false;
+                $http.defaults.headers.common.Authorization = undefined;
                 $http.get(context + '/app/logout')
                     .success(function (data, status, headers, config) {
                         authService.loginCancelled();

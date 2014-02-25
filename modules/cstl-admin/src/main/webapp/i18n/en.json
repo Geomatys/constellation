@@ -504,7 +504,7 @@
             "viewer":"Map Viewer",
             "account": {
                 "main": "Account",
-                "settings": "Settings",
+                "users": "Users",
                 "password": "Password",
                 "sessions": "Sessions",
                 "metrics": "Metrics",
@@ -556,11 +556,14 @@
     "settings": {
         "title": "User settings for [<b>{{username}}</b>]",
         "form": {
+            "login": "Login",
+            "password": "Password",
             "firstname": "First Name",
             "firstname.placeholder": "Your first name",
             "lastname": "Last Name",
             "lastname.placeholder": "Your last name",
             "email": "E-mail",
+            "roles": "Roles",
             "email.placeholder": "Your e-mail",
             "button": "Save"
         },
@@ -583,6 +586,18 @@
                     "invalid": "Your e-mail is invalid.",
                     "minlength": "Your e-mail is required to be at least 1 character",
                     "maxlength": "Your e-mail cannot be longer than 50 characters"
+                },
+                "login": {
+                    "required": "Your login is required.",
+                    "invalid": "Your login is invalid.",
+                    "minlength": "Your login is required to be at least 3 character",
+                    "maxlength": "Your login cannot be longer than 16 characters"
+                },
+                "password": {
+                    "required": "Your password is required.",
+                    "invalid": "Your password is invalid.",
+                    "minlength": "Your password is required to be at least 6 character",
+                    "maxlength": "Your password cannot be longer than 62 characters"
                 }
             }
         }

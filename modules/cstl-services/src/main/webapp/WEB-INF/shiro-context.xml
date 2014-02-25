@@ -3,7 +3,7 @@
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 
-  <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+  <bean id="securityFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
     <property name="securityManager" ref="securityManager" />
     <!-- override these for application-specific URLs if you like: <property name="loginUrl" value="/login.jsp"/> <property 
       name="successUrl" value="/home.jsp"/> <property name="unauthorizedUrl" value="/unauthorized.jsp"/> -->

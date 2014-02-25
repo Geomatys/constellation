@@ -61,6 +61,74 @@ cstlAdminApp.controller('SettingsController', ['$scope', 'resolvedAccount', 'Acc
         };
     }]);
 
+cstlAdminApp.controller('UserController', ['$scope', 'UserResource', '$modal', 
+  function ($scope, UserResource, $modal) {
+    $scope.list = UserResource.query();
+    $scope.details = function(i) {
+        $modal.open({
+            templateUrl: 'views/user/details.html',
+            controller: 'UserDetailsController',
+            resolve: {
+                'user': function(){
+                    return angular.copy($scope.list[i]);
+                }
+            }
+        }).result.then(function(user){
+        	if(user != null)
+        	$scope.list[i] = user;
+        });
+    };
+    $scope.add = function(i) {
+        $modal.open({
+            templateUrl: 'views/user/add.html',
+            controller: 'UserDetailsController',
+            resolve: {
+                'user': function(){
+                    return {roles:[]};
+                }
+            }
+        }).result.then(function(user){
+        	if(user != null)
+        	$scope.list[$scope.list.length] = user;
+        });
+    };
+    $scope.delete = function(i){
+    	UserResource.delete({id: $scope.list[i].login});
+    	$scope.list.splice(i, 1);
+    };
+}]);
+
+cstlAdminApp.controller('UserDetailsController', ['$scope', '$modalInstance', 'user', 'UserResource',
+  function ($scope, $modalInstance, user, UserResource) {
+    $scope.user = user;
+
+    $scope.close = function() {
+        $modalInstance.dismiss('close');
+    };
+    $scope.deleteTag = function(role){
+        var newRoles = [];
+        for(var i=0; i<user.roles.length; i++)
+           if(user.roles[i] != role)
+               newRoles[newRoles.length] = user.roles[i];
+        user.roles = newRoles;
+    };
+    
+    $scope.addRole = function(role){
+    	for(var i=0; i < $scope.user.roles.length; i++)
+    	   if(role === $scope.user.roles[i])
+    		   return
+    	
+    	$scope.user.roles[$scope.user.roles.length]=role
+    };
+    
+    $scope.save = function(){
+    	var userResource = new UserResource($scope.user);
+    	userResource.$save();
+    	$modalInstance.close($scope.user);
+    }
+}]);
+
+
 cstlAdminApp.controller('PasswordController', ['$scope', 'Password',
     function ($scope, Password) {
         $scope.success = null;

@@ -8,7 +8,7 @@ import org.constellation.engine.register.User;
 public interface UserRepository {
 
     List<? extends User> findAll();
-
+    
     List<? extends User> all();
 
     void save(User user);

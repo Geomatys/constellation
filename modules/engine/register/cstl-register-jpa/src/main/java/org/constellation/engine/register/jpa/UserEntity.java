@@ -2,8 +2,11 @@ package org.constellation.engine.register.jpa;
 
 import java.util.List;
 
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -21,7 +24,7 @@ public class UserEntity implements User {
     @Column(name = "`login`")
     private String login;
 
-    @Column(name = "`password`")
+    @Column(name = "`password`", updatable=false)
     private String password;
 
     @Column(name = "`lastname`")
@@ -34,11 +37,10 @@ public class UserEntity implements User {
     private String email;
 
     
-    @ManyToMany(targetEntity = RoleEntity.class)
-    @JoinTable(schema="`admin`", name = "`user_x_role`", joinColumns = { @JoinColumn(name = "`login`", referencedColumnName = "`login`"),
-
-    }, inverseJoinColumns = { @JoinColumn(name = "`role`", referencedColumnName = "`name`") })
-    private List<Role> roles;
+    @ElementCollection(fetch=FetchType.EAGER)
+    @CollectionTable(schema="`admin`", name = "`user_x_role`", joinColumns = { @JoinColumn(name = "`login`", referencedColumnName = "`login`")})
+    @Column(name="`role`")
+    private List<String> roles;
 
     @Override
     public String getLogin() {
@@ -62,11 +64,11 @@ public class UserEntity implements User {
 
 
     @Override
-    public List<Role> getRoles() {
+    public List<String> getRoles() {
         return roles;
     }
 
-    public void setRoles(List<Role> roles) {
+    public void setRoles(List<String> roles) {
         this.roles = roles;
     }
 

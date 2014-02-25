@@ -1,0 +1,15 @@
+<div class="container">
+    <div class="row" ng-repeat="user in list">
+        <div class="col-sm-1">{{user.login}}</div>
+        <div class="col-sm-1">{{user.firstname}}</div>
+        <div class="col-sm-1">{{user.lastname}}</div>
+        <div class="col-sm-4" ng-click="details($index)">{{user.email}}</div>
+        <div class="col-sm-2">
+           <span ng-repeat="role in user.roles">{{role}}</span>
+        </div>
+        <div class="col-sm-1" ng-click="delete($index)">Delete</div>
+    </div>
+	<div>
+		<span ng-click="add()">Add</span>
+	</div>
+</div>

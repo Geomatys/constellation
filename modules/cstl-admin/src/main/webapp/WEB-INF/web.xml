@@ -15,11 +15,11 @@
     <listener-class>org.constellation.admin.conf.WebConfigurer</listener-class>
   </listener>
 
-  <servlet>
-    <servlet-name>constellation</servlet-name>
-    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
+<!--   <servlet> -->
+<!--     <servlet-name>constellation</servlet-name> -->
+<!--     <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class> -->
+<!--     <load-on-startup>1</load-on-startup> -->
+<!--   </servlet> -->
 
 
   <servlet>
@@ -27,10 +27,10 @@
     <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
     <load-on-startup>0</load-on-startup>
   </servlet>
-  <servlet-mapping>
-    <servlet-name>constellation</servlet-name>
-    <url-pattern>/constellation/*</url-pattern>
-  </servlet-mapping>
+<!--   <servlet-mapping> -->
+<!--     <servlet-name>constellation</servlet-name> -->
+<!--     <url-pattern>/constellation/*</url-pattern> -->
+<!--   </servlet-mapping> -->
   <servlet-mapping>
     <servlet-name>springmvc</servlet-name>
     <url-pattern>/mvc/*</url-pattern>

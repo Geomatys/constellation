@@ -24,6 +24,8 @@ public interface User {
 
     String getLogin();
 
-    List<? extends Role> getRoles();
+    List<String> getRoles();
+    
+    void setRoles(List<String> roles);
 
 }

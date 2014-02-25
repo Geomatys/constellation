@@ -12,7 +12,7 @@ function findWebappContext(){
 
 /* App Module */
 
-var cstlAdminApp = angular.module('cstlAdminApp', ['http-auth-interceptor', 'ngResource', 'ngRoute', 'ngCookies', 'pascalprecht.translate', 'uiModal', 'ajaxUpload', 'hljs']);
+var cstlAdminApp = angular.module('cstlAdminApp', ['http-auth-interceptor', 'ngResource', 'ngRoute', 'ngCookies', 'pascalprecht.translate', 'uiModal', 'ajaxUpload', 'hljs', 'base64']);
 
 cstlAdminApp
     .config(['$routeProvider', '$httpProvider', '$translateProvider',
@@ -93,7 +93,15 @@ cstlAdminApp
                 .otherwise({
                     templateUrl: 'views/main.html',
                     controller: 'MainController'
-                })
+                });
+            
+            $routeProvider
+            .when('/user', {
+                templateUrl: 'views/user/list.html',
+                controller: 'UserController'
+            });
+            
+            
 
             // Initialize angular-translate
             $translateProvider.useStaticFilesLoader({
@@ -110,6 +118,8 @@ cstlAdminApp
             function($rootScope, $location, AuthenticationSharedService, Account) {
             $rootScope.$on("$routeChangeStart", function(event, next, current) {
                 // Check if the status of the user. Is it authenticated or not?
+                if($rootScope.authenticated)
+                    return;
                 AuthenticationSharedService.authenticate({}, function() {
                     $rootScope.authenticated = true;
                 });

@@ -24,7 +24,7 @@
 
   <!-- Shiro filter handling security access -->
   <filter>
-    <filter-name>shiroFilter</filter-name>
+    <filter-name>securityFilter</filter-name>
     <!-- <filter-class>org.apache.shiro.web.servlet.IniShiroFilter</filter-class> -->
     <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
     <init-param>
@@ -33,7 +33,7 @@
     </init-param>
   </filter>
   <filter-mapping>
-    <filter-name>shiroFilter</filter-name>
+    <filter-name>securityFilter</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
   <filter>

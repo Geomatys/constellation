@@ -14,7 +14,7 @@ public class UserDTO implements User {
 
     private String password;
 
-    private List<RoleDTO> roles;;
+    private List<String> roles;;
     
     public String getLogin() {
         return login;
@@ -33,11 +33,11 @@ public class UserDTO implements User {
     }
 
     @Override
-    public List<RoleDTO> getRoles() {
+    public List<String> getRoles() {
         return roles;
     }
     
-    public void setRoles(List<RoleDTO> roles) {
+    public void setRoles(List<String> roles) {
         this.roles = roles;
     }
 
