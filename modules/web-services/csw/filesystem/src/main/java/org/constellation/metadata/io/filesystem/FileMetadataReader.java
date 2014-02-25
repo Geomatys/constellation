@@ -16,7 +16,6 @@
  */
 package org.constellation.metadata.io.filesystem;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -31,7 +30,6 @@ import java.util.logging.Level;
 // XML dependencies
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 
@@ -168,8 +166,6 @@ public class FileMetadataReader extends DomMetadataReader implements CSWMetadata
 
             final DocumentBuilder docBuilder;
             try {
-                final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-                dbf.setNamespaceAware(true);
                 docBuilder = dbf.newDocumentBuilder();
             } catch (ParserConfigurationException ex) {
                 throw new MetadataIoException(ex);

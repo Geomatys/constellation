@@ -134,7 +134,7 @@ public class NodeIndexer extends AbstractCSWIndexer<Node> {
         if ("unknow".equals(identifier)) {
             throw new IndexingException("unexpected metadata type.");
         }
-        doc.add(new Field("id", identifier,  ftna));
+        doc.add(new Field("id", identifier,  ID_TYPE));
     }
 
     /**

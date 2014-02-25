@@ -61,18 +61,22 @@ public abstract class DomMetadataReader extends AbstractMetadataReader {
         FORMATTER.setTimeZone(TimeZone.getTimeZone("GMT+2"));
     }
 
+    protected final DocumentBuilderFactory dbf;
+
+    protected final XMLInputFactory xif = XMLInputFactory.newFactory();
+
     public DomMetadataReader(final boolean isCacheEnabled, final boolean isThreadEnabled) {
         super(isCacheEnabled, isThreadEnabled);
+        dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
     }
 
     protected MetadataType getMetadataType(final InputStream metadataStream, final boolean reset) throws IOException, XMLStreamException {
-        final XMLInputFactory xif = XMLInputFactory.newFactory();
         final String rootName;
-
         if (reset){
             metadataStream.mark(0);
         }
-        XMLStreamReader xsr = xif.createXMLStreamReader(metadataStream);
+        final XMLStreamReader xsr = xif.createXMLStreamReader(metadataStream);
         xsr.nextTag();
         rootName = xsr.getLocalName();
         xsr.close();
@@ -104,10 +108,8 @@ public abstract class DomMetadataReader extends AbstractMetadataReader {
 
     protected Node getNodeFromFile(final File metadataFile) throws MetadataIoException {
         try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setNamespaceAware(true);
-            DocumentBuilder docBuilder = dbf.newDocumentBuilder();
-            Document document = docBuilder.parse(metadataFile);
+            final DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+            final Document document = docBuilder.parse(metadataFile);
             return document.getDocumentElement();
         } catch (ParserConfigurationException | SAXException | IOException ex) {
             throw new MetadataIoException("The metadata file : " + metadataFile.getName() + ".xml can not be read", ex, NO_APPLICABLE_CODE);
@@ -116,10 +118,8 @@ public abstract class DomMetadataReader extends AbstractMetadataReader {
 
     protected Node getNodeFromStream(final InputStream stream) throws MetadataIoException {
         try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setNamespaceAware(true);
-            DocumentBuilder docBuilder = dbf.newDocumentBuilder();
-            Document document = docBuilder.parse(stream);
+            final DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+            final Document document = docBuilder.parse(stream);
             return document.getDocumentElement();
         } catch (ParserConfigurationException | SAXException | IOException ex) {
             throw new MetadataIoException("unable to parse the metadata", ex, NO_APPLICABLE_CODE);
@@ -155,8 +155,6 @@ public abstract class DomMetadataReader extends AbstractMetadataReader {
     protected Node applyElementSetNode(final Node record, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
         final DocumentBuilder docBuilder;
         try {
-            final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setNamespaceAware(true);
             docBuilder = dbf.newDocumentBuilder();
         } catch (ParserConfigurationException ex) {
             throw new MetadataIoException(ex);

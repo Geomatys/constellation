@@ -145,6 +145,9 @@ public class NodeUtilities {
             }
 
             nodes = getNodes(propertyName, nodes, ordinal, false);
+            if (nodes.isEmpty()) {
+                return nodes;
+            }
 
             separator = xpath.indexOf('/');
             if (separator != -1) {

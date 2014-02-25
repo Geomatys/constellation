@@ -58,18 +58,32 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
 
     private final Map<String, List<String>> additionalQueryable;
 
-    protected static final FieldType ftna = new FieldType();
+    protected static final FieldType ID_TYPE = new FieldType();
     static {
-        ftna.setTokenized(false);
-        ftna.setStored(true);
-        ftna.setIndexed(true);
+        ID_TYPE.setTokenized(false);
+        ID_TYPE.setStored(true);
+        ID_TYPE.setIndexed(true);
     }
 
-    protected static final FieldType ft = new FieldType();
+    protected static final FieldType SORT_TYPE = new FieldType();
     static {
-        ft.setTokenized(true);
-        ft.setStored(true);
-        ft.setIndexed(true);
+        SORT_TYPE.setTokenized(false);
+        SORT_TYPE.setStored(false);
+        SORT_TYPE.setIndexed(true);
+    }
+
+    protected static final FieldType TEXT_TYPE = new FieldType();
+    static {
+        TEXT_TYPE.setTokenized(true);
+        TEXT_TYPE.setStored(true);
+        TEXT_TYPE.setIndexed(true);
+    }
+
+    protected static final FieldType SEARCH_TYPE = new FieldType();
+    static {
+        SEARCH_TYPE.setTokenized(true);
+        SEARCH_TYPE.setStored(false);
+        SEARCH_TYPE.setIndexed(true);
     }
 
     /**
@@ -115,7 +129,7 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
     protected Document createDocument(final A metadata, final int docId) throws IndexingException {
         // make a new, empty document
         final Document doc = new Document();
-        doc.add(new Field("docid", docId + "", ftna));
+        doc.add(new Field("docid", docId + "", ID_TYPE));
 
         indexSpecialField(metadata, doc);
 
@@ -130,22 +144,22 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
             //we add the geometry parts
             alreadySpatiallyIndexed = indexSpatialPart(doc, metadata, isoQueryable, 268435540);
             
-            doc.add(new Field("objectType", "MD_Metadata", ft));
+            doc.add(new Field("objectType", "MD_Metadata", SEARCH_TYPE));
 
         } else if (isEbrim30(metadata)) {
            // TODO
-            doc.add(new Field("objectType", "Ebrim", ft));
+            doc.add(new Field("objectType", "Ebrim", SEARCH_TYPE));
         } else if (isEbrim25(metadata)) {
             // TODO
-            doc.add(new Field("objectType", "Ebrim", ft));
+            doc.add(new Field("objectType", "Ebrim", SEARCH_TYPE));
         } else if (isFeatureCatalogue(metadata)) {
             final Map<String, List<String>> fcQueryable = removeOverridenField(ISO_FC_QUERYABLE);
             indexQueryableSet(doc, metadata, fcQueryable, anyText);
             
-            doc.add(new Field("objectType", "FC_FeatureCatalogue", ft));
+            doc.add(new Field("objectType", "FC_FeatureCatalogue", SEARCH_TYPE));
         } else if (isDublinCore(metadata)) {
             
-            doc.add(new Field("objectType", "Record", ft));
+            doc.add(new Field("objectType", "Record", SEARCH_TYPE));
         } else {
             LOGGER.log(Level.WARNING, "unknow Object classe unable to index: {0}", getType(metadata));
         }
@@ -164,10 +178,10 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
         indexQueryableSet(doc, metadata, additionalQueryable, anyText);
 
         // add a default meta field to make searching all documents easy
-        doc.add(new Field("metafile", "doc",ft));
+        doc.add(new Field("metafile", "doc",SEARCH_TYPE));
 
         //we add the anyText values
-        doc.add(new Field("AnyText", anyText.toString(),   ft));
+        doc.add(new Field("AnyText", anyText.toString(),   SEARCH_TYPE));
 
         return doc;
     }
@@ -217,8 +231,8 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
      * @param doc
      */
     protected void indexField(final String fieldName, final String stringValue, final StringBuilder anyText, final Document doc) {
-        final Field field        = new Field(fieldName, stringValue, ft);
-        final Field fieldSort    = new Field(fieldName + "_sort", stringValue, ftna);
+        final Field field        = new Field(fieldName, stringValue, SEARCH_TYPE);
+        final Field fieldSort    = new Field(fieldName + "_sort", stringValue, SORT_TYPE);
         if (!stringValue.equals(NULL_VALUE) && anyText.indexOf(stringValue) == -1) {
             anyText.append(stringValue).append(" ");
         }
@@ -239,24 +253,24 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
         final Field numSortField;
         final Character fieldType;
         if (numValue instanceof Integer) {
-            numField     = new IntField(fieldName,           (Integer) numValue, Field.Store.YES);
-            numSortField = new IntField(fieldName + "_sort", (Integer) numValue, Field.Store.YES);
+            numField     = new IntField(fieldName,           (Integer) numValue, Field.Store.NO);
+            numSortField = new IntField(fieldName + "_sort", (Integer) numValue, Field.Store.NO);
             fieldType = 'i';
         } else if (numValue instanceof Double) {
-            numField     = new DoubleField(fieldName,           (Double) numValue, Field.Store.YES);
-            numSortField = new DoubleField(fieldName + "_sort", (Double) numValue, Field.Store.YES);
+            numField     = new DoubleField(fieldName,           (Double) numValue, Field.Store.NO);
+            numSortField = new DoubleField(fieldName + "_sort", (Double) numValue, Field.Store.NO);
             fieldType = 'd';
         } else if (numValue instanceof Float) {
-            numField     = new FloatField(fieldName,           (Float) numValue, Field.Store.YES);
-            numSortField = new FloatField(fieldName + "_sort", (Float) numValue, Field.Store.YES);
+            numField     = new FloatField(fieldName,           (Float) numValue, Field.Store.NO);
+            numSortField = new FloatField(fieldName + "_sort", (Float) numValue, Field.Store.NO);
             fieldType = 'f';
         } else if (numValue instanceof Long) {
-            numField     = new LongField(fieldName,           (Long) numValue, Field.Store.YES);
-            numSortField = new LongField(fieldName + "_sort", (Long) numValue, Field.Store.YES);
+            numField     = new LongField(fieldName,           (Long) numValue, Field.Store.NO);
+            numSortField = new LongField(fieldName + "_sort", (Long) numValue, Field.Store.NO);
             fieldType = 'l';
         } else {
-            numField     = new StringField(fieldName,           numValue + "", Field.Store.YES);
-            numSortField = new StringField(fieldName + "_sort", numValue + "", Field.Store.YES);
+            numField     = new StringField(fieldName,           numValue + "", Field.Store.NO);
+            numSortField = new StringField(fieldName + "_sort", numValue + "", Field.Store.NO);
             fieldType = 'u';
             LOGGER.log(Level.WARNING, "Unexpected Number type:{0}", numValue.getClass().getName());
         }
