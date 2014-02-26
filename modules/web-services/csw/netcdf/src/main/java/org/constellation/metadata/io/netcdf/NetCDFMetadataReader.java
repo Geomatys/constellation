@@ -31,6 +31,7 @@ import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.TimeZone;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -731,6 +732,12 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
             LOGGER.log(Level.WARNING, "Unable to close the imageCoverageReader", ex);
         }
         return results;
+    }
+
+    @Override
+    public Iterator<String> getIdentifierIterator() throws MetadataIoException {
+        final List<String> results = getAllIdentifiers();
+        return results.iterator();
     }
 
     /**

@@ -59,8 +59,10 @@ import static org.geotoolkit.csw.xml.TypeNames.*;
 // Apache SIS dependencies
 import org.apache.sis.xml.Namespaces;
 import org.constellation.metadata.io.ElementSetType;
+import org.constellation.metadata.io.filesystem.sql.IdentifierIterator;
 import org.constellation.metadata.io.filesystem.sql.MetadataDatasource;
 import org.constellation.metadata.io.filesystem.sql.Session;
+import org.geotoolkit.util.collection.CloseableIterator;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -428,26 +430,26 @@ public class FileMetadataReader extends DomMetadataReader implements CSWMetadata
      */
     @Override
     public List<Node> getAllEntries() throws MetadataIoException {
-        return getAllEntries(dataDirectory);
-    }
-    
-    private List<Node> getAllEntries(final File directory) throws MetadataIoException {
         final List<Node> results = new ArrayList<>();
-        for (File f : directory.listFiles()) {
-            final String fileName = f.getName();
-            if (fileName.endsWith(XML_EXT)) {
-                //final String identifier = fileName.substring(0, fileName.lastIndexOf(XML_EXT));
-                results.add(getNodeFromFile(f));
-            } else if (f.isDirectory()) {
-                results.addAll(getAllEntries(f));
-            } else {
-                // throw or continue to the next file?
-                //throw new MetadataIoException(METAFILE_MSG + f.getPath() + " does not ands with .xml or is not a directory", INVALID_PARAMETER_VALUE);
-            }
+        final CloseableIterator<String> iterator = getIdentifierIterator();
+        while (iterator.hasNext()) {
+            final File f = getFileFromIdentifier(iterator.next());
+            results.add(getNodeFromFile(f));
         }
+        iterator.close();
         return results;
     }
 
+    @Override
+    public CloseableIterator<String> getIdentifierIterator() throws MetadataIoException {
+        try {
+            final Session session = MetadataDatasource.createSession(serviceID);
+            return new IdentifierIterator(session);
+        } catch (SQLException ex) {
+            throw new MetadataIoException("SQL Exception while building identifier iterator", ex, NO_APPLICABLE_CODE);
+        }
+    }
+    
     /**
      * {@inheritDoc}
      */

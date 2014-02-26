@@ -19,6 +19,7 @@
 package org.constellation.metadata.io;
 
 import java.net.URI;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -63,6 +64,8 @@ public interface MetadataReader {
      * @throws org.constellation.metadata.io.MetadataIoException
      */
     List<String> getAllIdentifiers() throws MetadataIoException;
+
+    Iterator<String> getIdentifierIterator() throws MetadataIoException;
     
     /**
      * Destroy all the resource used by this reader.

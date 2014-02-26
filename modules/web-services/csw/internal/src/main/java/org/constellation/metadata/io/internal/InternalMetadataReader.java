@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -412,6 +413,11 @@ public class InternalMetadataReader extends DomMetadataReader implements CSWMeta
     @Override
     public List<String> getAllIdentifiers() throws MetadataIoException {
         return ConfigurationEngine.getProviderIds(true);
+    }
+
+    @Override
+    public Iterator<String> getIdentifierIterator() throws MetadataIoException {
+        return ConfigurationEngine.getProviderIds(true).iterator();
     }
 
     /**

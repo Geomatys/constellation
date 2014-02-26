@@ -1248,6 +1248,8 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
     /**
      * {@inheritDoc }
+     *
+     * TODO use mdReader.getAllIdentifiers ?
      */
     @Override
     public List<String> getAllIdentifiers() throws MetadataIoException {
@@ -1262,6 +1264,15 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             throw new MetadataIoException("SQL Exception while getting all the entries: " +ex.getMessage());
         }
         return results;
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public Iterator<String> getIdentifierIterator() throws MetadataIoException {
+        final List<String> results = getAllIdentifiers();
+        return results.iterator();
     }
 
     /**

@@ -41,6 +41,7 @@ import org.constellation.generic.database.BDD;
 import org.constellation.metadata.index.AbstractCSWIndexer;
 
 import static org.constellation.metadata.CSWQueryable.*;
+import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.util.Util;
 import org.constellation.util.XpathUtils;
 
@@ -179,6 +180,15 @@ public class MDWebIndexer extends AbstractCSWIndexer<FullRecord> {
         } catch (MD_IOException ex) {
             throw new IndexingException("MD_IOException while reading all identifiers", ex);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Iterator<String> getIdentifierIterator() throws IndexingException {
+        final Collection<String> identifiers = getAllIdentifiers();
+        return identifiers.iterator();
     }
 
     /**

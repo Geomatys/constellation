@@ -139,6 +139,18 @@ public class Session implements Closeable {
         return results;
     }
 
+    public ResultSet getRecordIterator() {
+        try {
+            final PreparedStatement stmt = con.prepareStatement("SELECT \"identifier\" FROM \"csw\".\"records\"");
+            final ResultSet rs = stmt.executeQuery();
+            return rs;
+
+        } catch (SQLException unexpected) {
+            LOGGER.log(Level.WARNING, "Unexpected error occurred while reading in csw database schema.", unexpected);
+        }
+        return null;
+    }
+
     @Override
     public void close() {
         try {

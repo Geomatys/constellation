@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
@@ -131,6 +132,18 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
             return reader.getAllIdentifiers();
         } catch (MetadataIoException ex) {
             throw new IndexingException("Metadata_IOException while reading all identifiers", ex);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Iterator<String> getIdentifierIterator() throws IndexingException {
+        try {
+            return reader.getIdentifierIterator();
+        } catch (MetadataIoException ex) {
+            throw new IndexingException("Metadata_IOException while reading identifier iterator", ex);
         }
     }
 

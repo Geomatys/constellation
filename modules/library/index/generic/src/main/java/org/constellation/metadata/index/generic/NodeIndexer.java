@@ -20,6 +20,7 @@ package org.constellation.metadata.index.generic;
 // J2SE dependencies
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -110,6 +111,18 @@ public class NodeIndexer extends AbstractCSWIndexer<Node> {
             return reader.getAllIdentifiers();
         } catch (MetadataIoException ex) {
             throw new IndexingException("Metadata_IOException while reading all identifiers", ex);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Iterator<String> getIdentifierIterator() throws IndexingException {
+        try {
+            return reader.getIdentifierIterator();
+        } catch (MetadataIoException ex) {
+            throw new IndexingException("Metadata_IOException while reading identifier iterator", ex);
         }
     }
 
