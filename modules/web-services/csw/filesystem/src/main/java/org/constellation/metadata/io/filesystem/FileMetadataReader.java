@@ -19,6 +19,10 @@ package org.constellation.metadata.io.filesystem;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -502,7 +506,8 @@ public class FileMetadataReader extends DomMetadataReader implements CSWMetadata
                 if (session.needAnalyze()) {
                     LOGGER.info("Launching file system analyze");
                     final long start = System.currentTimeMillis();
-                    analyzeFileSystem(dataDirectory, session);
+                    final Path dataPath = Paths.get(dataDirectory.getPath());
+                    analyzeFileSystem(dataPath, session);
                     LOGGER.log(Level.INFO, "fileSystem analyze done in :{0} ms", (System.currentTimeMillis() - start));
                 }
             } catch (SQLException ex) {
@@ -515,20 +520,25 @@ public class FileMetadataReader extends DomMetadataReader implements CSWMetadata
         }
     }
     
-    private void analyzeFileSystem(final File directory, final Session session) throws SQLException, MetadataIoException {
-        for (File f : directory.listFiles()) {
-            final String fileName = f.getName();
-            if (fileName.endsWith(XML_EXT)) {
-                final Node metadata = getNodeFromFile(f);
-                final String identifier = getIdentifier(metadata);
-                session.putRecord(identifier, f.getPath());
+    private void analyzeFileSystem(final Path directory, final Session session) throws SQLException, MetadataIoException {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(directory)) {
+            for (Path f : stream) {
+                final String fileName = f.getFileName().toString();
+                if (fileName.endsWith(XML_EXT)) {
+                    final Node metadata = getNodeFromStream(Files.newInputStream(f));
+                    final String identifier = getIdentifier(metadata);
+                    session.putRecord(identifier, f.toString());
 
-            } else if (f.isDirectory()) {
-                analyzeFileSystem(f, session);
+                } else if (Files.isDirectory(f)) {
+                    analyzeFileSystem(f, session);
 
-            } else {
-                LOGGER.log(Level.FINER, "File {0} is not a valid", fileName);
+                } else {
+                    LOGGER.log(Level.FINER, "File {0} is not a valid", fileName);
+                }
             }
+
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Error while walking through file system", e);
         }
     }
 
