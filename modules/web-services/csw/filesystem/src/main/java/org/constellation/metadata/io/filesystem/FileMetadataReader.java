@@ -19,6 +19,7 @@ package org.constellation.metadata.io.filesystem;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -43,7 +44,6 @@ import org.constellation.metadata.io.DomMetadataReader;
 
 import static org.constellation.metadata.CSWQueryable.*;
 import static org.constellation.metadata.CSWConstants.*;
-import static org.constellation.metadata.io.filesystem.FileMetadataUtils.*;
 
 // Geotoolkit dependencies
 import org.geotoolkit.csw.xml.DomainValues;
@@ -59,6 +59,8 @@ import static org.geotoolkit.csw.xml.TypeNames.*;
 // Apache SIS dependencies
 import org.apache.sis.xml.Namespaces;
 import org.constellation.metadata.io.ElementSetType;
+import org.constellation.metadata.io.filesystem.sql.MetadataDatasource;
+import org.constellation.metadata.io.filesystem.sql.Session;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -78,20 +80,24 @@ public class FileMetadataReader extends DomMetadataReader implements CSWMetadata
      * The directory containing the data XML files.
      */
     private final File dataDirectory;
-    
+
+    private final String serviceID;
+
     /**
      * Build a new CSW File Reader.
      *
      * @param configuration A generic configuration object containing a directory path
      * in the configuration.dataDirectory field.
+     * @param serviceID
      *
      * @throws MetadataIoException If the configuration object does
      * not contains an existing directory path in the configuration.dataDirectory field.
      * If the creation of a MarshallerPool throw a JAXBException.
      */
-    public FileMetadataReader(final Automatic configuration) throws MetadataIoException {
+    public FileMetadataReader(final Automatic configuration, final String serviceID) throws MetadataIoException {
         super(true, false);
         dataDirectory = configuration.getDataDirectory();
+        this.serviceID = serviceID;
         if (dataDirectory == null) {
             throw new MetadataIoException("cause: unable to find the data directory", NO_APPLICABLE_CODE);
         } else if (!dataDirectory.exists()) {
@@ -111,6 +117,7 @@ public class FileMetadataReader extends DomMetadataReader implements CSWMetadata
             }
             setIsCacheEnabled(c);
         }
+        analyzeFileSystem();
     }
 
     /**
@@ -126,7 +133,7 @@ public class FileMetadataReader extends DomMetadataReader implements CSWMetadata
      */
     @Override
     public Node getMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
-        final File metadataFile = getFileFromIdentifier(identifier, dataDirectory);
+        final File metadataFile = getFileFromIdentifier(identifier);
         if (metadataFile != null) {
             final MetadataType metadataMode;
             try {
@@ -149,12 +156,21 @@ public class FileMetadataReader extends DomMetadataReader implements CSWMetadata
 
     @Override
     public boolean existMetadata(final String identifier) throws MetadataIoException {
-        final File metadataFile = getFileFromIdentifier(identifier, dataDirectory);
-        return metadataFile != null && metadataFile.exists();
+        Session session = null;
+        try {
+            session = MetadataDatasource.createSession(serviceID);
+            return session.existRecord(identifier);
+        } catch (SQLException ex) {
+            throw new MetadataIoException("SQL Exception while analyzing the file system", ex, NO_APPLICABLE_CODE);
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
     }
     
     private String getIdentifier(final Node metadata) throws MetadataIoException  {
-        final List<String> identifierValues = NodeUtilities.getValuesFromPaths(metadata, DUBLIN_CORE_QUERYABLE.get("Identifier"));
+        final List<String> identifierValues = NodeUtilities.getValuesFromPaths(metadata, DUBLIN_CORE_QUERYABLE.get("identifier"));
         if (!identifierValues.isEmpty()) {
             return identifierValues.get(0);
         }
@@ -396,7 +412,7 @@ public class FileMetadataReader extends DomMetadataReader implements CSWMetadata
      */
     @Override
     public void destroy() {
-        
+        MetadataDatasource.close(serviceID);
     }
 
     /**
@@ -437,34 +453,16 @@ public class FileMetadataReader extends DomMetadataReader implements CSWMetadata
      */
     @Override
     public List<String> getAllIdentifiers() throws MetadataIoException {
-        return getAllIdentifiers(dataDirectory);
-    }
-
-    
-    private List<String> getAllIdentifiers(final File directory) throws MetadataIoException {
         final List<String> results = new ArrayList<>();
-        if (directory != null) {
-            for (File f : directory.listFiles()) {
-                final String fileName = f.getName();
-                if (fileName.endsWith(XML_EXT)) {
-
-                    // for windows system the filename can be different from the real identifier (':' forbidden)
-                    final String identifier;
-                    if (System.getProperty("os.name", "").startsWith("Windows")) {
-                        final Node metadata = getNodeFromFile(f);
-                        identifier = getIdentifier(metadata);
-                    } else {
-                        identifier = fileName.substring(0, fileName.lastIndexOf(XML_EXT));
-                    }
-                    results.add(identifier);
-                } else if (f.isDirectory()){
-                    results.addAll(getAllIdentifiers(f));
-                } else if(fileName.startsWith(".")){
-                    // do nothing : metadata can't be in a file which begin with a dot.
-                    LOGGER.log(Level.FINER, "File "+fileName + " is not a valid");
-                } else {
-                    throw new MetadataIoException("The metadata file : " + f.getPath() + " does not ands with .xml or is not a directory", INVALID_PARAMETER_VALUE);
-                }
+        Session session = null;
+        try {
+            session = MetadataDatasource.createSession(serviceID);
+            results.addAll(session.getRecordList());
+        } catch (SQLException ex) {
+            throw new MetadataIoException("SQL Exception while analyzing the file system", ex, NO_APPLICABLE_CODE);
+        } finally {
+            if (session != null) {
+                session.close();
             }
         }
         return results;
@@ -492,6 +490,60 @@ public class FileMetadataReader extends DomMetadataReader implements CSWMetadata
     @Override
     public Map<String, List<String>> getAdditionalQueryablePathMap() {
         return new HashMap<>();
+    }
+
+    public final void analyzeFileSystem() throws MetadataIoException {
+        if (dataDirectory != null) {
+            Session session = null;
+            try {
+                session = MetadataDatasource.createSession(serviceID);
+                if (session.needAnalyze()) {
+                    LOGGER.info("Launching file system analyze");
+                    final long start = System.currentTimeMillis();
+                    analyzeFileSystem(dataDirectory, session);
+                    LOGGER.log(Level.INFO, "fileSystem analyze done in :{0} ms", (System.currentTimeMillis() - start));
+                }
+            } catch (SQLException ex) {
+                throw new MetadataIoException("SQL Exception while analyzing the file system", ex, NO_APPLICABLE_CODE);
+            } finally {
+                if (session != null) {
+                    session.close();
+                }
+            }
+        }
+    }
+    
+    private void analyzeFileSystem(final File directory, final Session session) throws SQLException, MetadataIoException {
+        for (File f : directory.listFiles()) {
+            final String fileName = f.getName();
+            if (fileName.endsWith(XML_EXT)) {
+                final Node metadata = getNodeFromFile(f);
+                final String identifier = getIdentifier(metadata);
+                session.putRecord(identifier, f.getPath());
+
+            } else if (f.isDirectory()) {
+                analyzeFileSystem(f, session);
+
+            } else {
+                LOGGER.log(Level.FINER, "File {0} is not a valid", fileName);
+            }
+        }
+    }
+
+    private File getFileFromIdentifier(final String identifier) throws MetadataIoException {
+        Session session = null;
+        try {
+            session = MetadataDatasource.createSession(serviceID);
+            final String path = session.getPathForRecord(identifier);
+
+            return new File(path);
+        } catch (SQLException ex) {
+            throw new MetadataIoException("SQL Exception while reading path for record", ex, NO_APPLICABLE_CODE);
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
     }
 }
 

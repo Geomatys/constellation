@@ -556,7 +556,7 @@ public class CSWConfigurationManager {
             final AbstractCSWFactory cswfactory = getCSWFactory(config.getType());
             try {
                 if (currentReader == null) {
-                    currentReader = cswfactory.getMetadataReader(config);
+                    currentReader = cswfactory.getMetadataReader(config, serviceID);
                 }
                 final AbstractIndexer indexer = cswfactory.getIndexer(config, currentReader, "", currentReader.getAdditionalQueryablePathMap());
                 if (indexer.needCreation()) {
@@ -586,7 +586,7 @@ public class CSWConfigurationManager {
         if (config != null) {
             final AbstractCSWFactory cswfactory = getCSWFactory(config.getType());
             try {
-                return cswfactory.getMetadataReader(config);
+                return cswfactory.getMetadataReader(config, serviceID);
 
             } catch (MetadataIoException ex) {
                 throw new ConfigurationException("JAXBException while initializing the reader!", ex);
@@ -612,7 +612,7 @@ public class CSWConfigurationManager {
         if (config != null) {
             final AbstractCSWFactory cswfactory = getCSWFactory(config.getType());
             try {
-                return cswfactory.getMetadataWriter(config, indexer);
+                return cswfactory.getMetadataWriter(config, indexer, serviceID);
 
             } catch (MetadataIoException ex) {
                 throw new ConfigurationException("JAXBException while initializing the writer!", ex);

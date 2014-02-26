@@ -72,7 +72,7 @@ public class NetCDFCSWFactory implements AbstractCSWFactory {
      * {@inheritDoc}
      */
     @Override
-    public CSWMetadataReader getMetadataReader(final Automatic configuration) throws MetadataIoException {
+    public CSWMetadataReader getMetadataReader(final Automatic configuration, final String serviceID) throws MetadataIoException {
         return new NetCDFMetadataReader(configuration);
     }
 
@@ -80,7 +80,7 @@ public class NetCDFCSWFactory implements AbstractCSWFactory {
      * {@inheritDoc}
      */
     @Override
-    public MetadataWriter getMetadataWriter(final Automatic configuration, final AbstractIndexer indexer) throws MetadataIoException {
+    public MetadataWriter getMetadataWriter(final Automatic configuration, final AbstractIndexer indexer, final String serviceID) throws MetadataIoException {
         return null;
     }
 

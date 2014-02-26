@@ -59,11 +59,12 @@ public interface AbstractCSWFactory {
      * Return a Metadata reader for the specified dataSource type.
      *
      * @param configuration A configuration object containing all the information to use the dataSource.
+     * @param serviceID
      *
      * @return a Metadata reader for the specified dataSource type.
      * @throws MetadataIoException
      */
-    CSWMetadataReader getMetadataReader(final Automatic configuration) throws MetadataIoException;
+    CSWMetadataReader getMetadataReader(final Automatic configuration, final String serviceID) throws MetadataIoException;
 
     /**
      * Return a Metadata Writer for the specified dataSource type.
@@ -74,7 +75,7 @@ public interface AbstractCSWFactory {
      * @return a Metadata Writer for the specified dataSource type.
      * @throws org.constellation.metadata.io.MetadataIoException
      */
-    MetadataWriter getMetadataWriter(final Automatic configuration, final AbstractIndexer indexer) throws MetadataIoException;
+    MetadataWriter getMetadataWriter(final Automatic configuration, final AbstractIndexer indexer, final String serviceID) throws MetadataIoException;
 
     /**
      * Return a Lucene indexer for the specified dataSource type.

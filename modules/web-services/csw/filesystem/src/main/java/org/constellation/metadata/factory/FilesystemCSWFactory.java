@@ -77,16 +77,16 @@ public class FilesystemCSWFactory implements AbstractCSWFactory {
      * {@inheritDoc}
      */
     @Override
-    public CSWMetadataReader getMetadataReader(final Automatic configuration) throws MetadataIoException {
-        return new FileMetadataReader(configuration);
+    public CSWMetadataReader getMetadataReader(final Automatic configuration, final String serviceID) throws MetadataIoException {
+        return new FileMetadataReader(configuration, serviceID);
     }
     
     /**
      * {@inheritDoc}
      */
     @Override
-    public MetadataWriter getMetadataWriter(final Automatic configuration, final AbstractIndexer indexer) throws MetadataIoException {
-        return new FileMetadataWriter(configuration, indexer);
+    public MetadataWriter getMetadataWriter(final Automatic configuration, final AbstractIndexer indexer, final String serviceID) throws MetadataIoException {
+        return new FileMetadataWriter(configuration, indexer, serviceID);
     }
     
     /**

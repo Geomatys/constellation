@@ -20,6 +20,7 @@ package org.constellation.metadata.io.filesystem;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +57,8 @@ import org.constellation.metadata.utils.Utils;
 import org.constellation.util.NodeUtilities;
 
 import static org.constellation.metadata.io.filesystem.FileMetadataUtils.*;
+import org.constellation.metadata.io.filesystem.sql.MetadataDatasource;
+import org.constellation.metadata.io.filesystem.sql.Session;
 
 
 /**
@@ -76,6 +79,8 @@ public class FileMetadataWriter extends AbstractMetadataWriter {
      */
     private final File dataDirectory;
 
+    private final String serviceID;
+    
     /**
      * Build a new File metadata writer, with the specified indexer.
      *
@@ -84,8 +89,9 @@ public class FileMetadataWriter extends AbstractMetadataWriter {
      *
      * @throws org.constellation.metadata.io.MetadataIoException
      */
-    public FileMetadataWriter(final Automatic configuration, final AbstractIndexer indexer) throws MetadataIoException {
+    public FileMetadataWriter(final Automatic configuration, final AbstractIndexer indexer, final String serviceID) throws MetadataIoException {
         this.indexer = indexer;
+        this.serviceID = serviceID;
         dataDirectory = configuration.getDataDirectory();
         if (dataDirectory == null || !dataDirectory.isDirectory()) {
             throw new MetadataIoException("Unable to find the data directory", NO_APPLICABLE_CODE);
@@ -119,6 +125,18 @@ public class FileMetadataWriter extends AbstractMetadataWriter {
             if (indexer != null) {
                 indexer.indexDocument(original);
             }
+
+            Session session = null;
+            try {
+                session = MetadataDatasource.createSession(serviceID);
+                session.putRecord(identifier, f.getPath());
+            } catch (SQLException ex) {
+                throw new MetadataIoException("SQL Exception while reading path for record", ex, NO_APPLICABLE_CODE);
+            } finally {
+                if (session != null) {
+                    session.close();
+                }
+            }
             
         } catch (IOException | TransformerException ex) {
             throw new MetadataIoException("Unable to write the file.", ex, NO_APPLICABLE_CODE);
@@ -147,13 +165,24 @@ public class FileMetadataWriter extends AbstractMetadataWriter {
      */
     @Override
     public boolean deleteMetadata(final String metadataID) throws MetadataIoException {
-        final File metadataFile = getFileFromIdentifier(metadataID, dataDirectory);
+        final File metadataFile = getFileFromIdentifier(metadataID);
         if (metadataFile.exists()) {
            final boolean suceed =  metadataFile.delete();
            if (suceed) {
                if (indexer != null) {
                    indexer.removeDocument(metadataID);
                }
+               Session session = null;
+                try {
+                    session = MetadataDatasource.createSession(serviceID);
+                    session.removeRecord(metadataID);
+                } catch (SQLException ex) {
+                    throw new MetadataIoException("SQL Exception while reading path for record", ex, NO_APPLICABLE_CODE);
+                } finally {
+                    if (session != null) {
+                        session.close();
+                    }
+                }
            } else {
                LOGGER.severe("unable to delete the matadata file");
            }
@@ -177,7 +206,7 @@ public class FileMetadataWriter extends AbstractMetadataWriter {
 
     @Override
     public boolean isAlreadyUsedIdentifier(String metadataID) throws MetadataIoException {
-        return getFileFromIdentifier(metadataID, dataDirectory) != null;
+        return getFileFromIdentifier(metadataID) != null;
     }
     
     /**
@@ -301,7 +330,7 @@ public class FileMetadataWriter extends AbstractMetadataWriter {
     }
 
     private Document getDocumentFromFile(String identifier) throws MetadataIoException {
-        final File metadataFile = getFileFromIdentifier(identifier, dataDirectory);
+        final File metadataFile = getFileFromIdentifier(identifier);
         if (metadataFile.exists()) {
             try {
                 DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -328,6 +357,22 @@ public class FileMetadataWriter extends AbstractMetadataWriter {
         return null;
     }
 
+    private File getFileFromIdentifier(final String identifier) throws MetadataIoException {
+        Session session = null;
+        try {
+            session = MetadataDatasource.createSession(serviceID);
+            final String path = session.getPathForRecord(identifier);
+
+            return new File(path);
+        } catch (SQLException ex) {
+            throw new MetadataIoException("SQL Exception while reading path for record", ex, NO_APPLICABLE_CODE);
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
+    
     /**
      * Destoy all the resource and close connection.
      */
@@ -336,5 +381,6 @@ public class FileMetadataWriter extends AbstractMetadataWriter {
         if (indexer != null) {
             indexer.destroy();
         }
+        MetadataDatasource.close(serviceID);
     }
 }

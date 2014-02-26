@@ -170,7 +170,7 @@ public class NodeUtilities {
             // verify type
             xpath = xpath.substring(xpath.indexOf(':') + 1);
             final String pathType = xpath.substring(0, xpath.indexOf('/'));
-            if (!pathType.equals(parent.getLocalName())) {
+            if (!pathType.equals("*") && !pathType.equals(parent.getLocalName())) {
                 continue;
             }
             
