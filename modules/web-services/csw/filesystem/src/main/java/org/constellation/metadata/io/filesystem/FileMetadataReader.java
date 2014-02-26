@@ -463,6 +463,7 @@ public class FileMetadataReader extends DomMetadataReader implements CSWMetadata
         Session session = null;
         try {
             session = MetadataDatasource.createSession(serviceID);
+            session.setReadOnly(true);
             results.addAll(session.getRecordList());
         } catch (SQLException ex) {
             throw new MetadataIoException("SQL Exception while analyzing the file system", ex, NO_APPLICABLE_CODE);
@@ -505,9 +506,11 @@ public class FileMetadataReader extends DomMetadataReader implements CSWMetadata
                 session = MetadataDatasource.createSession(serviceID);
                 if (session.needAnalyze()) {
                     LOGGER.info("Launching file system analyze");
+                    session.setAutoCommit(false);
                     final long start = System.currentTimeMillis();
                     final Path dataPath = Paths.get(dataDirectory.getPath());
                     analyzeFileSystem(dataPath, session);
+                    session.commit();
                     LOGGER.log(Level.INFO, "fileSystem analyze done in :{0} ms", (System.currentTimeMillis() - start));
                 }
             } catch (SQLException ex) {

@@ -63,6 +63,18 @@ public class Session implements Closeable {
         return result;
     }
 
+    public void setReadOnly(final boolean readOnly) throws SQLException {
+        con.setReadOnly(readOnly);
+    }
+
+    public void setAutoCommit(final boolean autoCommit) throws SQLException {
+        con.setAutoCommit(autoCommit);
+    }
+
+    public void commit() throws SQLException {
+        con.commit();
+    }
+
     public void putRecord(final String identifier, final String path) throws SQLException {
         try {
             if (insertStatement == null) {

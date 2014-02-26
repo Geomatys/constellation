@@ -40,6 +40,11 @@ public class IdentifierIterator implements CloseableIterator<String> {
 
     public IdentifierIterator(final Session session) {
         this.session = session;
+        try {
+            session.setReadOnly(true);
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "error whiel setting cconenction to read only", ex);
+        }
         this.rs = session.getRecordIterator();
     }
 
