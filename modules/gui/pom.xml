@@ -44,7 +44,7 @@
 
     <dependencies>
         <!-- Application dependencies-->
-        <dependency>
+        <!--dependency>
             <groupId>org.juzu</groupId>
             <artifactId>juzu-bom-core</artifactId>
         </dependency>
@@ -69,7 +69,7 @@
             <groupId>org.juzu</groupId>
             <artifactId>juzu-bom-arquillian-tomcat7</artifactId>
             <scope>test</scope>
-        </dependency>
+        </dependency-->
 
         <!-- Force artifact version to pass test correctly -->
         <dependency>
@@ -90,11 +90,11 @@
     <modules>
         <module>admin-swing</module>
         <module>administration</module>
-        <module>common</module>
+        <!--module>common</module-->
         <module>data</module>
-        <module>style</module>
+        <!--module>style</module-->
         <module>webservices</module>
-        <module>cstl-web-client</module>
+        <!--module>cstl-web-client</module-->
     </modules>
 
 </project>
