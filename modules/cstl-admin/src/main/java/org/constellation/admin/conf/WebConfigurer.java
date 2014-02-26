@@ -52,7 +52,7 @@ public class WebConfigurer implements ServletContextListener {
         EnumSet<DispatcherType> disps = EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD, DispatcherType.ASYNC);
 
         initSpring(servletContext, rootContext);
-        initSpringSecurity(servletContext, disps);
+       // initSpringSecurity(servletContext, disps);
         initMetrics(servletContext, disps);
         
 
@@ -155,7 +155,7 @@ public class WebConfigurer implements ServletContextListener {
     /**
      * Initializes Spring Security.
      */
-    private void initSpringSecurity(ServletContext servletContext, EnumSet<DispatcherType> disps) {
+    private void _initSpringSecurity(ServletContext servletContext, EnumSet<DispatcherType> disps) {
         log.debug("Registering Spring Security Filter");
         FilterRegistration.Dynamic springSecurityFilter = servletContext.addFilter("springSecurityFilterChain",
                 new DelegatingFilterProxy());

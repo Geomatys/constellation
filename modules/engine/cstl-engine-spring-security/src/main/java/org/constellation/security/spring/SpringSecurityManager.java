@@ -45,7 +45,16 @@ public class SpringSecurityManager implements SecurityManager {
     public boolean isAuthenticated() {
         Authentication authentication = SecurityContextHolder.getContext()
                 .getAuthentication();
-        return authentication != null && authentication.isAuthenticated();
+        if(authentication==null)
+        	return false;
+        if(!authentication.isAuthenticated())
+        	return false;
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        for (GrantedAuthority grantedAuthority : authorities) {
+			if(!grantedAuthority.getAuthority().equals("ROLE_ANONYMOUS"))
+				return true;
+		}
+        return false;
     }
 
     public boolean isAllowed(final String action) {

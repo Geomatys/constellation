@@ -17,6 +17,11 @@ var cstlAdminApp = angular.module('cstlAdminApp', ['http-auth-interceptor', 'ngR
 cstlAdminApp
     .config(['$routeProvider', '$httpProvider', '$translateProvider',
         function ($routeProvider, $httpProvider, $translateProvider) {
+    	 $httpProvider.defaults.useXDomain = true;
+    	 
+    	 $httpProvider.interceptors.push('AuthInterceptor');
+    	 
+    	 
             $routeProvider
                 .when('/login', {
                     templateUrl: 'views/login.html',

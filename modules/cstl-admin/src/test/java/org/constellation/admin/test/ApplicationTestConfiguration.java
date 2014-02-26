@@ -18,7 +18,6 @@ import java.io.IOException;
         "org.constellation.admin.service",
         "org.constellation.admin.security"})
 @Import(value = {
-        SecurityConfiguration.class,
         AsyncConfiguration.class,
         CacheConfiguration.class,
         DatabaseConfiguration.class,
