@@ -152,6 +152,7 @@ cstlAdminApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'aut
             },
             logout: function () {
                 $rootScope.authenticationError = false;
+                $http.get(cstlContext + "api/1/session/logout");
                 $http.defaults.headers.common.Authorization = undefined;
                 $http.get(context + '/app/logout')
                     .success(function (data, status, headers, config) {

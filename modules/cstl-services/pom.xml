@@ -650,8 +650,8 @@
 
     <dependency>
       <groupId>org.constellation.engine</groupId>
-      <!-- <artifactId>cstl-engine-spring-security</artifactId> -->
-      <artifactId>cstl-engine-shiro</artifactId>
+      <artifactId>cstl-engine-spring-security</artifactId>
+<!--       <artifactId>cstl-engine-shiro</artifactId> -->
       <version>${project.version}</version>
     </dependency>
 

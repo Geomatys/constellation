@@ -23,9 +23,10 @@
         /WS/wps/admin/** = authcBasic
         /WS/** = anon
         /sql.jsp = authcBasic
-        /api/** = authcBasic
+        /api/** = authcBasic, roles[cstl-admin]
       </value>
     </property>
+    
   </bean>
 
   <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
