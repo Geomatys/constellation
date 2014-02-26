@@ -20,6 +20,7 @@ package org.constellation.sos.io.lucene;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBElement;
@@ -96,6 +97,10 @@ public class LuceneObservationIndexer extends AbstractIndexer<Observation> {
         throw new UnsupportedOperationException("not used in this implementation");
     }
 
+    @Override
+    protected Iterator<String> getIdentifierIterator() throws IndexingException {
+        throw new UnsupportedOperationException("not used in this implementation");
+    }
     /**
      * {@inheritDoc}
      */
