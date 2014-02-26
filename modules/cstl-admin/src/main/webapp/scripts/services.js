@@ -2,12 +2,21 @@
 
 /* Services */
 
-
+cstlAdminApp.factory('AuthInterceptor', function($cookies) {
+    return {
+	    'request': function(config) {
+	    	if ($cookies.cstlSessionId) {
+	    	    config.url += ';jsessionid=' + $cookies.cstlSessionId;
+	    	}
+	        return config || $q.when(config);
+	    }
+	};
+});
 
 
 var context = findWebappContext();
 
-var cstlContext = "/constellation/";
+var cstlContext = "http://localhost:8180/constellation/";
 
 cstlAdminApp.factory('Account', ['$resource',
     function ($resource) {
@@ -44,9 +53,9 @@ cstlAdminApp.factory('LogsService', ['$resource',
     }]);
 
 
-cstlAdminApp.factory('UserResource', ['$resource',
-   function ($resource) {
-        return $resource(cstlContext+'api/1/user/:id', {}, {});
+cstlAdminApp.factory('UserResource', ['$resource', '$cookies',
+   function ($resource, $cookies) {
+        return $resource(cstlContext+'api/1/user/:id');
 }]);
 
 cstlAdminApp.factory('webService', ['$resource',
@@ -122,36 +131,15 @@ cstlAdminApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'aut
     function ($rootScope, $http, authService, $base64) {
         return {
             authenticate: function() {
-                $http.get(context + '/app/rest/authenticate')
+                $http.get(cstlContext + 'spring/login/status')
                     .success(function (data, status, headers, config) {
                         $rootScope.$broadcast('event:auth-authConfirmed');
-                        $http.defaults.headers.common.Authorization = 'Basic ' + $base64.encode(param.username+':'+param.password);
+                      //  $http.defaults.headers.common.Authorization = 'Basic ' + $base64.encode(param.username+':'+param.password);
                     });
-            },
-            login: function (param) {
-                var data ="j_username=" + param.username +"&j_password=" + param.password +"&_spring_security_remember_me=" + param.rememberMe +"&submit=Login";
-                $http.post(context + '/app/authentication', data, {
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded"
-                    },
-                    ignoreAuthModule: 'ignoreAuthModule'
-                }).success(function (data, status, headers, config) {
-                    $rootScope.authenticationError = false;
-                    authService.loginConfirmed();
-                    if(param.success){
-                        param.success(data, status, headers, config);
-                    }
-                    $http.defaults.headers.common.Authorization = 'Basic YWRtaW46YWRtaW4=';// + $base64.encode(param.username+':'+param.password); //YWRtaW46YWRtaW4=
-                }).error(function (data, status, headers, config) {
-                    console.log("auth error");
-                    $rootScope.authenticationError = true;
-                    if(param.error){
-                        param.error(data, status, headers, config);
-                    }
-                });
             },
             logout: function () {
                 $rootScope.authenticationError = false;
+                $http.get(cstlContext + "api/1/session/logout");
                 $http.defaults.headers.common.Authorization = undefined;
                 $http.get(context + '/app/logout')
                     .success(function (data, status, headers, config) {
