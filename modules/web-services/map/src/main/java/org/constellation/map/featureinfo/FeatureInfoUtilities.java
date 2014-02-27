@@ -20,6 +20,7 @@ import org.apache.sis.geometry.GeneralDirectPosition;
 import org.apache.sis.util.ArraysExt;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.geometry.GeneralEnvelope;
+import org.apache.sis.util.ArgumentChecks;
 
 import org.constellation.configuration.*;
 
@@ -37,7 +38,6 @@ import org.geotoolkit.lang.Static;
 import org.geotoolkit.map.CoverageMapLayer;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.crs.DefaultCompoundCRS;
-import org.geotoolkit.util.ArgumentChecks;
 
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.geometry.Envelope;
