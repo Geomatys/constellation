@@ -90,12 +90,12 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
     /**
      * Build a new CSW metadata indexer.
      *
-     * @param serviceID The identifier, if there is one, of the index/service.
+     * @param indexID The identifier, if there is one, of the index.
      * @param configDirectory The directory where the files of the index will be stored.
      * @param additionalQueryable A map of additional queryable elements.
      */
-    public AbstractCSWIndexer(String serviceID, File configDirectory, Map<String, List<String>> additionalQueryable) {
-        super(serviceID, configDirectory);
+    public AbstractCSWIndexer(final String indexID, final File configDirectory, final Map<String, List<String>> additionalQueryable) {
+        super(indexID, configDirectory);
         if (additionalQueryable != null) {
             this.additionalQueryable = additionalQueryable;
         } else {
@@ -106,13 +106,13 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
     /**
      * Build a new CSW metadata indexer, with the specified lucene analyzer.
      *
-     * @param serviceID The identifier, if there is one, of the index/service.
+     * @param indexID The identifier, if there is one, of the index.
      * @param configDirectory The directory where the files of the index will be stored.
      * @param analyzer A lucene analyzer used in text values indexation (default is ClassicAnalyzer).
      * @param additionalQueryable  A map of additional queryable elements.
      */
-    public AbstractCSWIndexer(String serviceID, File configDirectory, Analyzer analyzer, Map<String, List<String>> additionalQueryable) {
-        super(serviceID, configDirectory, analyzer);
+    public AbstractCSWIndexer(String indexID, File configDirectory, Analyzer analyzer, Map<String, List<String>> additionalQueryable) {
+        super(indexID, configDirectory, analyzer);
         if (additionalQueryable != null) {
             this.additionalQueryable = additionalQueryable;
         } else {
@@ -124,6 +124,7 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
     * Makes a document for a A Metadata Object.
     *
     * @param metadata The metadata to index.
+    * @param docId the document identifier.
     * @return A Lucene document.
     */
     @Override

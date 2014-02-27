@@ -82,12 +82,12 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      *
      * @param reader A generic reader to request the metadata dataSource.
      * @param configurationDirectory The directory where the index can write indexation file.
-     * @param serviceID The identifier, if there is one, of the index/service.
+     * @param indexID The identifier, if there is one, of the index.
      * @param additionalQueryable A map of additional queryable element.
      */
-    public GenericIndexer(final MetadataReader reader, final File configurationDirectory, final String serviceID, 
+    public GenericIndexer(final MetadataReader reader, final File configurationDirectory, final String indexID,
             final Map<String, List<String>> additionalQueryable, final boolean create) throws IndexingException {
-        super(serviceID, configurationDirectory, additionalQueryable);
+        super(indexID, configurationDirectory, additionalQueryable);
         this.reader = reader;
         if (create && needCreation()) {
             createIndex();
@@ -97,11 +97,19 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
     /**
      * Creates a new Lucene Index into the specified directory with the specified list of object to index.
      *
+     * @param toIndex A list of Object
+     * @param additionalQueryable A Map of additionable queryable to add to the index (name - List of Xpath)
      * @param configDirectory A directory where the index can write indexation file.
+     * @param indexID The identifier, if there is one, of the index.
+     * @param analyzer The lucene analyzer used.
+     * @param logLevel A log level for info information.
+     * @param create {@code true} if the index need to be created.
+     *
+     * @throws org.geotoolkit.lucene.IndexingException If an erro roccurs during the index creation.
      */
     public GenericIndexer(final List<Object> toIndex, final Map<String, List<String>> additionalQueryable, final File configDirectory,
-            final String serviceID, final Analyzer analyzer, final Level logLevel, final boolean create) throws IndexingException {
-        super(serviceID, configDirectory, analyzer, additionalQueryable);
+            final String indexID, final Analyzer analyzer, final Level logLevel, final boolean create) throws IndexingException {
+        super(indexID, configDirectory, analyzer, additionalQueryable);
         this.logLevel            = logLevel;
         this.reader              = null;
         if (create && needCreation()) {
@@ -112,11 +120,17 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
     /**
      * Creates a new Lucene Index into the specified directory with the specified list of object to index.
      *
+     * @param toIndex A list of Object
+     * @param additionalQueryable A Map of additionable queryable to add to the index (name - List of Xpath)
      * @param configDirectory A directory where the index can write indexation file.
+     * @param indexID The identifier, if there is one, of the index.
+     * @param create {@code true} if the index need to be created.
+     *
+     * @throws org.geotoolkit.lucene.IndexingException If an erro roccurs during the index creation.
      */
     public GenericIndexer(final List<Object> toIndex, final Map<String, List<String>> additionalQueryable, final File configDirectory,
-            final String serviceID, final boolean create) throws IndexingException {
-        super(serviceID, configDirectory, additionalQueryable);
+            final String indexID, final boolean create) throws IndexingException {
+        super(indexID, configDirectory, additionalQueryable);
         this.reader = null;
         if (create && needCreation()) {
             createIndex(toIndex);

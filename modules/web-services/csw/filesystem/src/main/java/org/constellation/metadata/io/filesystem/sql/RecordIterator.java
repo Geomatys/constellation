@@ -17,8 +17,10 @@
 
 package org.constellation.metadata.io.filesystem.sql;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -40,8 +42,7 @@ public class RecordIterator implements CloseableIterator<Node> {
 
     private static final Logger LOGGER = Logging.getLogger(IdentifierIterator.class);
 
-    private final DocumentBuilderFactory dbf;
-
+    private final DocumentBuilder docBuilder;
     private final Session session;
 
     private final ResultSet rs;
@@ -53,10 +54,18 @@ public class RecordIterator implements CloseableIterator<Node> {
         try {
             session.setReadOnly(true);
         } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, "error while setting cconenction to read only", ex);
+            LOGGER.log(Level.WARNING, "error while setting connection to read only", ex);
         }
-        dbf = DocumentBuilderFactory.newInstance();
+        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
+
+        DocumentBuilder candidate = null;
+        try {
+            candidate = dbf.newDocumentBuilder();
+        } catch (ParserConfigurationException ex) {
+            LOGGER.log(Level.WARNING, "error while building XML DocumentBuilder", ex);
+        }
+        docBuilder = candidate;
         this.rs = session.getPathIterator();
     }
 
@@ -79,7 +88,7 @@ public class RecordIterator implements CloseableIterator<Node> {
         try {
             if (rs.next()) {
                 final String path = rs.getString(1);
-                final File metadataFile = new File(path);
+                final Path metadataFile = Paths.get(path);
                 current = getNodeFromFile(metadataFile);
             }
         } catch (SQLException e) {
@@ -87,13 +96,12 @@ public class RecordIterator implements CloseableIterator<Node> {
         }
     }
 
-    private Node getNodeFromFile(final File metadataFile) throws SQLException {
+    private Node getNodeFromFile(final Path metadataFile) throws SQLException {
         try {
-            final DocumentBuilder docBuilder = dbf.newDocumentBuilder();
-            final Document document = docBuilder.parse(metadataFile);
+            final Document document = docBuilder.parse(Files.newInputStream(metadataFile));
             return document.getDocumentElement();
-        } catch (ParserConfigurationException | SAXException | IOException ex) {
-            throw new SQLException("The metadata file : " + metadataFile.getName() + ".xml can not be read", null, ex);
+        } catch (SAXException | IOException ex) {
+            throw new SQLException("The metadata file : " + metadataFile.getFileName() + " can not be read", null, ex);
         }
     }
 
