@@ -40,7 +40,10 @@ public class CorsFilter implements Filter {
 
     @Override
     public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException, ServletException {
-        ((HttpServletResponse) response).addHeader("Access-Control-Allow-Origin", "http://localhost:8080");
+    	((HttpServletResponse) response).addHeader("Access-Control-Allow-Origin", "*");
+    	((HttpServletResponse) response).addHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    	((HttpServletResponse) response).addHeader("Access-Control-Allow-Headers", "Content-Type");
+    	
         chain.doFilter(request, response);
     }
 
