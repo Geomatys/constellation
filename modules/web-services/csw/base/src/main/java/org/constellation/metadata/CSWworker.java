@@ -284,7 +284,7 @@ public class CSWworker extends AbstractWorker {
         LOGGER.log(Level.FINER, "CSW factory loaded:{0}", cswfactory.getClass().getName());
 
         //we initialize all the data retriever (reader/writer) and index worker
-        mdReader                      = cswfactory.getMetadataReader(configuration, serviceID);
+        mdReader                      = cswfactory.getMetadataReader(configuration, getId());
         profile                       = configuration.getProfile();
         final AbstractIndexer indexer = cswfactory.getIndexer(configuration, mdReader, serviceID, mdReader.getAdditionalQueryablePathMap());
         if (indexer.needCreation()) {
@@ -300,7 +300,7 @@ public class CSWworker extends AbstractWorker {
         sqlFilterParser               = cswfactory.getSQLFilterParser();
         securityFilter                = cswfactory.getSecurityFilter();
         if (profile == TRANSACTIONAL) {
-            mdWriter                  = cswfactory.getMetadataWriter(configuration, indexer, serviceID);
+            mdWriter                  = cswfactory.getMetadataWriter(configuration, indexer, getId());
             catalogueHarvester        = cswfactory.getCatalogueHarvester(configuration, mdWriter);
             harvestTaskSchreduler     = new HarvestTaskSchreduler(configDir, catalogueHarvester);
         } else {

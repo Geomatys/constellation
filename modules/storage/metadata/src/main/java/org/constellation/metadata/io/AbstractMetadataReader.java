@@ -20,6 +20,7 @@ package org.constellation.metadata.io;
 
 import java.net.URI;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -179,5 +180,15 @@ public abstract class AbstractMetadataReader implements MetadataReader {
     @Override
     public Map<String, URI> getConceptMap() {
         return new HashMap<>();
+    }
+
+    @Override
+    public Iterator<Node> getEntryIterator() throws MetadataIoException {
+        throw new UnsupportedOperationException("not supported by this implementation");
+    }
+
+    @Override
+    public boolean useEntryIterator() {
+        return false;
     }
 }

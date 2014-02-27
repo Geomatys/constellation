@@ -109,6 +109,16 @@ public class LuceneObservationIndexer extends AbstractIndexer<Observation> {
         throw new UnsupportedOperationException("not used in this implementation");
     }
 
+    @Override
+    protected Iterator<Observation> getEntryIterator() throws IndexingException {
+        throw new UnsupportedOperationException("not used in this implementation");
+    }
+
+    @Override
+    protected boolean useEntryIterator() {
+        return false;
+    }
+
      /**
      * {@inheritDoc}
      */

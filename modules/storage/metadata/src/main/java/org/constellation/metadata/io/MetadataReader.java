@@ -66,6 +66,10 @@ public interface MetadataReader {
     List<String> getAllIdentifiers() throws MetadataIoException;
 
     Iterator<String> getIdentifierIterator() throws MetadataIoException;
+
+    Iterator<? extends Object> getEntryIterator() throws MetadataIoException;
+
+    boolean useEntryIterator();
     
     /**
      * Destroy all the resource used by this reader.

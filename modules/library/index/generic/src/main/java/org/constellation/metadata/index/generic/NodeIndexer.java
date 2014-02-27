@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 // Apache Lucene dependencies
 import org.apache.lucene.analysis.Analyzer;
@@ -248,8 +249,8 @@ public class NodeIndexer extends AbstractCSWIndexer<Node> {
      * {@inheritDoc}
      */
     @Override
-    protected String getIdentifier(final Node obj) {
-        return Utils.findIdentifier(obj);
+    protected String getIdentifier(final Node metadata) {
+        return Utils.findIdentifier(metadata);
     }
 
     /**
@@ -268,6 +269,20 @@ public class NodeIndexer extends AbstractCSWIndexer<Node> {
             sb.delete(sb.length() - 1, sb.length());
         }
         return sb.toString();
+    }
+
+    @Override
+    protected Iterator<Node> getEntryIterator() throws IndexingException {
+        try {
+            return (Iterator<Node>) reader.getEntryIterator();
+        } catch (MetadataIoException ex) {
+            throw new IndexingException("Error while getting entry iterator", ex);
+        }
+    }
+
+    @Override
+    protected boolean useEntryIterator() {
+        return reader.useEntryIterator();
     }
 
     @Override

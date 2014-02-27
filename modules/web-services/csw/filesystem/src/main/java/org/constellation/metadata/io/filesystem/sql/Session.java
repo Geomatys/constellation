@@ -163,6 +163,18 @@ public class Session implements Closeable {
         return null;
     }
 
+    public ResultSet getPathIterator() {
+        try {
+            final PreparedStatement stmt = con.prepareStatement("SELECT \"path\" FROM \"csw\".\"records\"");
+            final ResultSet rs = stmt.executeQuery();
+            return rs;
+
+        } catch (SQLException unexpected) {
+            LOGGER.log(Level.WARNING, "Unexpected error occurred while reading in csw database schema.", unexpected);
+        }
+        return null;
+    }
+
     @Override
     public void close() {
         try {

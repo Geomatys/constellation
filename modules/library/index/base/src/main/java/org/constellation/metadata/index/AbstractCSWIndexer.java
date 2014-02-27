@@ -20,10 +20,9 @@ package org.constellation.metadata.index;
 // J2SE dependencies
 import java.util.Map.Entry;
 import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -49,6 +48,8 @@ import static org.constellation.metadata.CSWQueryable.*;
 /**
  *
  * @author Guilhem Legal (Geomatys)
+ * 
+ * @param <A> the type of indexed Object
  */
 public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
 
@@ -362,6 +363,16 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
             }
         }
         return coordinate;
+    }
+
+    @Override
+    protected Iterator<A> getEntryIterator() throws IndexingException {
+        throw new UnsupportedOperationException("Not supported by this implementation");
+    }
+
+    @Override
+    protected boolean useEntryIterator() {
+        return false;
     }
 
     /**

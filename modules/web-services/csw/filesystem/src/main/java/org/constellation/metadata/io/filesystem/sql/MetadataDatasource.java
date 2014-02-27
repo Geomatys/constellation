@@ -94,7 +94,9 @@ public class MetadataDatasource {
         }
 
         // Initialize data source.
-        final DataSource source = new DefaultDataSource("jdbc:derby:" + configDirectory.getPath() + "/csw-db;create=true;");
+        final String dbUrl = "jdbc:derby:" + configDirectory.getPath() + "/csw-db;create=true;";
+        LOGGER.log(Level.INFO, "connection to {0}", dbUrl);
+        final DataSource source = new DefaultDataSource(dbUrl);
 
         // Establish connection and create schema if does not exist.
         Connection con = null;

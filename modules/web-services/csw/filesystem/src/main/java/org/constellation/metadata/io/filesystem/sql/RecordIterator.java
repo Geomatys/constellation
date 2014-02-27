@@ -17,35 +17,47 @@
 
 package org.constellation.metadata.io.filesystem.sql;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.util.collection.CloseableIterator;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class IdentifierIterator implements CloseableIterator<String> {
+public class RecordIterator implements CloseableIterator<Node> {
 
     private static final Logger LOGGER = Logging.getLogger(IdentifierIterator.class);
+
+    private final DocumentBuilderFactory dbf;
 
     private final Session session;
 
     private final ResultSet rs;
 
-    private String current = null;
+    private Node current = null;
 
-    public IdentifierIterator(final Session session) {
+    public RecordIterator(final Session session) {
         this.session = session;
         try {
             session.setReadOnly(true);
         } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, "error whiel setting cconenction to read only", ex);
+            LOGGER.log(Level.WARNING, "error while setting cconenction to read only", ex);
         }
-        this.rs = session.getRecordIterator();
+        dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        this.rs = session.getPathIterator();
     }
 
     @Override
@@ -55,21 +67,33 @@ public class IdentifierIterator implements CloseableIterator<String> {
     }
 
     @Override
-    public String next() {
+    public Node next() {
        findNext();
-       final String id = current;
+       final Node entry = current;
        current = null;
-       return id;
+       return entry;
     }
 
     private void findNext(){
         if (current!=null) return;
         try {
             if (rs.next()) {
-                current = rs.getString(1);
+                final String path = rs.getString(1);
+                final File metadataFile = new File(path);
+                current = getNodeFromFile(metadataFile);
             }
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "error while iterating resultSet", e);
+        }
+    }
+
+    private Node getNodeFromFile(final File metadataFile) throws SQLException {
+        try {
+            final DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+            final Document document = docBuilder.parse(metadataFile);
+            return document.getDocumentElement();
+        } catch (ParserConfigurationException | SAXException | IOException ex) {
+            throw new SQLException("The metadata file : " + metadataFile.getName() + ".xml can not be read", null, ex);
         }
     }
 
@@ -77,7 +101,6 @@ public class IdentifierIterator implements CloseableIterator<String> {
     public void remove() {
         throw new UnsupportedOperationException("Not supported in this iterator.");
     }
-
 
     @Override
     public void close() {

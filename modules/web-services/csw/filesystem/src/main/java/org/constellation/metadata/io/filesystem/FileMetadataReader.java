@@ -69,6 +69,7 @@ import static org.geotoolkit.csw.xml.TypeNames.*;
 
 // Apache SIS dependencies
 import org.apache.sis.xml.Namespaces;
+import org.constellation.metadata.io.filesystem.sql.RecordIterator;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -447,7 +448,22 @@ public class FileMetadataReader extends DomMetadataReader implements CSWMetadata
             throw new MetadataIoException("SQL Exception while building identifier iterator", ex, NO_APPLICABLE_CODE);
         }
     }
-    
+
+    @Override
+    public CloseableIterator<Node> getEntryIterator() throws MetadataIoException {
+        try {
+            final Session session = MetadataDatasource.createSession(serviceID);
+            return new RecordIterator(session);
+        } catch (SQLException ex) {
+            throw new MetadataIoException("SQL Exception while building identifier iterator", ex, NO_APPLICABLE_CODE);
+        }
+    }
+
+    @Override
+    public boolean useEntryIterator() {
+        return true;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -523,7 +539,7 @@ public class FileMetadataReader extends DomMetadataReader implements CSWMetadata
                 final String fileName = f.getFileName().toString();
                 if (fileName.endsWith(XML_EXT)) {
                     //final Node metadata = getNodeFromStream(Files.newInputStream(f));
-                    final String identifier = getMetadataIdentifier(Files.newInputStream(f), false);
+                    final String identifier = getMetadataIdentifier(Files.newInputStream(f));
                     session.putRecord(identifier, f.toString());
 
                 } else if (Files.isDirectory(f)) {
@@ -555,7 +571,7 @@ public class FileMetadataReader extends DomMetadataReader implements CSWMetadata
         }
     }
 
-    private String getMetadataIdentifier(final InputStream metadataStream, final boolean reset) throws IOException, XMLStreamException {
+    private String getMetadataIdentifier(final InputStream metadataStream) throws IOException, XMLStreamException {
         final List<String> identifierPaths = DUBLIN_CORE_QUERYABLE.get("identifier");
         final List<String[]> paths = new ArrayList<>();
         for (String identifierPath : identifierPaths) {
@@ -569,40 +585,39 @@ public class FileMetadataReader extends DomMetadataReader implements CSWMetadata
             }
             paths.add(path);
         }
-
-        if (reset) {
-            metadataStream.mark(0);
-        }
-        final XMLStreamReader xsr = xif.createXMLStreamReader(metadataStream);
-        int i = 0;
-        while (xsr.hasNext()) {
-            xsr.next();
-            if (xsr.isStartElement()) {
-                String nodeName = xsr.getLocalName();
-                final List<String[]> toRemove = new ArrayList<>();
-                for (String [] path : paths) {
-                    String currentName = path[i];
-                    if (i == path.length -2 && path[i + 1].startsWith("@")) {
-                        final String value = xsr.getAttributeValue(null, path[i + 1].substring(1));
-                        if (value != null) {
-                            return value;
-                        } else {
+        XMLStreamReader xsr = null;
+        try {
+            xsr = xif.createXMLStreamReader(metadataStream);
+            int i = 0;
+            while (xsr.hasNext()) {
+                xsr.next();
+                if (xsr.isStartElement()) {
+                    String nodeName = xsr.getLocalName();
+                    final List<String[]> toRemove = new ArrayList<>();
+                    for (String [] path : paths) {
+                        String currentName = path[i];
+                        if (i == path.length -2 && path[i + 1].startsWith("@")) {
+                            final String value = xsr.getAttributeValue(null, path[i + 1].substring(1));
+                            if (value != null) {
+                                return value;
+                            } else {
+                                toRemove.add(path);
+                            }
+                        } else if (!currentName.equals("*") && !currentName.equals(nodeName)) {
                             toRemove.add(path);
+                        } else if (i  == path.length -1) {
+                            return xsr.getElementText();
                         }
-                    } else if (!currentName.equals("*") && !currentName.equals(nodeName)) {
-                        toRemove.add(path);
-                    } else if (i  == path.length -1) {
-                        return xsr.getElementText();
                     }
+                    paths.removeAll(toRemove);
+                    i++;
                 }
-                paths.removeAll(toRemove);
-                i++;
             }
-        }
-
-        xsr.close();
-        if (reset) {
-            metadataStream.reset();
+        } finally {
+            if (xsr != null) {
+                xsr.close();
+            }
+            metadataStream.close();
         }
         return null;
     }
