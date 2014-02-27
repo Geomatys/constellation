@@ -1,12 +1,15 @@
 'use strict';
 
 /* Services */
-
+function endsWith(str, suffix) {
+    return str.indexOf(suffix, str.length - suffix.length) !== -1;
+}
 cstlAdminApp.factory('AuthInterceptor', function($cookies) {
     return {
 	    'request': function(config) {
 	    	if ($cookies.cstlSessionId) {
-	    	    config.url += ';jsessionid=' + $cookies.cstlSessionId;
+	    		if(endsWith(config.url+'', ';jsessionid='))
+	    	    config.url += $cookies.cstlSessionId;
 	    	}
 	        return config || $q.when(config);
 	    }
@@ -20,7 +23,7 @@ var cstlContext = "http://localhost:8180/constellation/";
 
 cstlAdminApp.factory('Account', ['$resource',
     function ($resource) {
-        return $resource(cstlContext + 'spring/account', {}, {
+        return $resource(cstlContext + 'spring/account;jsessionid=', {}, {
         });
     }]);
 
@@ -55,42 +58,42 @@ cstlAdminApp.factory('LogsService', ['$resource',
 
 cstlAdminApp.factory('UserResource', ['$resource', '$cookies',
    function ($resource, $cookies) {
-        return $resource(cstlContext+'api/1/user/:id');
+        return $resource(cstlContext+'api/1/user/:id;jsessionid=');
 }]);
 
 cstlAdminApp.factory('webService', ['$resource',
                                      function ($resource) {
-                                         return $resource(cstlContext+'api/1/admin/instances', {}, {
+                                         return $resource(cstlContext+'api/1/admin/instances;jsessionid=', {}, {
                                              'listAll':      {method: 'GET', isArray: false},
-                                             'get':          {method: 'GET', url: cstlContext+'api/1/OGC/:type/:id'},
-                                             'create':       {method: 'PUT', url: cstlContext+'api/1/OGC/:type'},
-                                             'delete':       {method: 'DELETE', url: cstlContext+'api/1/OGC/:type/:id'},
-                                             'restart':      {method: 'POST', url: cstlContext+'api/1/OGC/:type/:id/restart'},
-                                             'start':        {method: 'POST', url: cstlContext+'api/1/OGC/:type/:id/start'},
-                                             'stop':         {method: 'POST', url: cstlContext+'api/1/OGC/:type/:id/stop'},
-                                             'metadata':     {method: 'GET', url: cstlContext+'api/1/OGC/:type/:id/metadata'},
-                                             'updateMd':     {method: 'POST', url: cstlContext+'api/1/OGC/:type/:id/metadata'},
-                                             'config':       {method: 'GET', url: cstlContext+'api/1/OGC/:type/:id/config'},
-                                             'logs':         {method: 'GET', url: cstlContext+'api/1/log/:type/:id'},
-                                             'capabilities': {method: 'GET', url: cstlContext+'WS/:type/:id?REQUEST=GetCapabilities&SERVICE=:type'},
-                                             'layers' :      {method: 'GET', url: cstlContext+'api/1/MAP/:type/:id/layersummary/all', isArray: true},
-                                             'addLayer':     {method: 'PUT', url: cstlContext+'api/1/MAP/:type/:id/layer'},
-                                             'deleteLayer':  {method: 'DELETE', url: cstlContext+'api/1/MAP/:type/:id/:layerid'}
+                                             'get':          {method: 'GET', url: cstlContext+'api/1/OGC/:type/:id;jsessionid='},
+                                             'create':       {method: 'PUT', url: cstlContext+'api/1/OGC/:type;jsessionid='},
+                                             'delete':       {method: 'DELETE', url: cstlContext+'api/1/OGC/:type/:id;jsessionid='},
+                                             'restart':      {method: 'POST', url: cstlContext+'api/1/OGC/:type/:id/restart;jsessionid='},
+                                             'start':        {method: 'POST', url: cstlContext+'api/1/OGC/:type/:id/start;jsessionid='},
+                                             'stop':         {method: 'POST', url: cstlContext+'api/1/OGC/:type/:id/stop;jsessionid='},
+                                             'metadata':     {method: 'GET', url: cstlContext+'api/1/OGC/:type/:id/metadata;jsessionid='},
+                                             'updateMd':     {method: 'POST', url: cstlContext+'api/1/OGC/:type/:id/metadata;jsessionid='},
+                                             'config':       {method: 'GET', url: cstlContext+'api/1/OGC/:type/:id/config;jsessionid='},
+                                             'logs':         {method: 'GET', url: cstlContext+'api/1/log/:type/:id;jsessionid='},
+                                             'capabilities': {method: 'GET', url: cstlContext+'WS/:type/:id;jsessionid=?REQUEST=GetCapabilities&SERVICE=:type'},
+                                             'layers' :      {method: 'GET', url: cstlContext+'api/1/MAP/:type/:id/layersummary/all;jsessionid=', isArray: true},
+                                             'addLayer':     {method: 'PUT', url: cstlContext+'api/1/MAP/:type/:id/layer;jsessionid='},
+                                             'deleteLayer':  {method: 'DELETE', url: cstlContext+'api/1/MAP/:type/:id/:layerid;jsessionid='}
                                          });
                                      }]);
 
 cstlAdminApp.factory('dataListing', ['$resource',
     function ($resource) {
-        return $resource(cstlContext+'api/1/data/list/:filter', {}, {
+        return $resource(cstlContext+'api/1/data/list/:filter;jsessionid=', {}, {
             'listAll':      {method: 'GET', isArray: true},
-            'listCoverage': {method: 'POST', url: cstlContext+'api/1/data/coverage/list/'},
-            'pyramidData':  {method: 'POST', url: cstlContext+'api/1/data/pyramid/:id'},
-            'dataFolder':   {method: 'POST', url: cstlContext+'api/1/data/datapath', isArray: true},
-            'loadData':     {method: 'POST', url: cstlContext+'api/1/data/load'},
-            'extension':    {method: 'POST', url: cstlContext+'api/1/data/testextension'},
-            'deleteData':   {method: 'DELETE', url: cstlContext+'api/1/data/:providerid/:dataid'},
-            'setMetadata':  {method: 'POST', url: cstlContext+'api/1/data/metadata'},
-            'codeLists':    {method: 'GET', url: cstlContext+'api/1/data/metadataCodeLists/:lang'}
+            'listCoverage': {method: 'POST', url: cstlContext+'api/1/data/coverage/list/;jsessionid='},
+            'pyramidData':  {method: 'POST', url: cstlContext+'api/1/data/pyramid/:id;jsessionid='},
+            'dataFolder':   {method: 'POST', url: cstlContext+'api/1/data/datapath;jsessionid=', isArray: true},
+            'loadData':     {method: 'POST', url: cstlContext+'api/1/data/load;jsessionid='},
+            'extension':    {method: 'POST', url: cstlContext+'api/1/data/testextension;jsessionid='},
+            'deleteData':   {method: 'DELETE', url: cstlContext+'api/1/data/:providerid/:dataid;jsessionid='},
+            'setMetadata':  {method: 'POST', url: cstlContext+'api/1/data/metadata;jsessionid='},
+            'codeLists':    {method: 'GET', url: cstlContext+'api/1/data/metadataCodeLists/:lang;jsessionid='}
         });
     }]);
 
@@ -98,17 +101,17 @@ cstlAdminApp.factory('style', ['$resource',
     function ($resource) {
         return $resource(cstlContext+'api/1/SP/all/style/available', {}, {
             'listAll': { method: 'GET', isArray: false },
-            'delete':  { method: 'DELETE', url: cstlContext+'api/1/SP/:provider/style/:name'},
-            'link':    { method: 'POST',   url: cstlContext+'api/1/SP/:provider/style/:name/linkData'},
-            'unlink':  { method: 'POST',   url: cstlContext+'api/1/SP/:provider/style/:name/unlinkData'}
+            'delete':  { method: 'DELETE', url: cstlContext+'api/1/SP/:provider/style/:name;jsessionid='},
+            'link':    { method: 'POST',   url: cstlContext+'api/1/SP/:provider/style/:name/linkData;jsessionid='},
+            'unlink':  { method: 'POST',   url: cstlContext+'api/1/SP/:provider/style/:name/unlinkData;jsessionid='}
         });
     }]);
 
 cstlAdminApp.factory('provider', ['$resource',
     function ($resource) {
         return $resource(cstlContext+'api/1/provider', {}, {
-            'create': {method: 'PUT', url: cstlContext+'api/1/provider/:id'},
-            'delete': {method: 'DELETE', url: cstlContext+'api/1/provider/:id'}
+            'create': {method: 'PUT', url: cstlContext+'api/1/provider/:id;jsessionid='},
+            'delete': {method: 'DELETE', url: cstlContext+'api/1/provider/:id;jsessionid='}
         });
     }]);
 
@@ -117,11 +120,11 @@ cstlAdminApp.factory('textService', ['$http',
     function ($http){
         return {
             logs : function(type, id){
-                return $http.get(cstlContext+'api/1/log/'+type+'/'+id);
+                return $http.get(cstlContext+'api/1/log/'+type+'/'+id+';jsessionid=');
 
             },
             capa : function(type, id){
-                return $http.get(cstlContext+'WS/'+type+'/'+id+'?REQUEST=GetCapabilities&SERVICE='+type);
+                return $http.get(cstlContext+'WS/'+type+'/'+id+';jsessionid=?REQUEST=GetCapabilities&SERVICE='+type);
 
             }
         };
@@ -131,7 +134,7 @@ cstlAdminApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'aut
     function ($rootScope, $http, authService, $base64) {
         return {
             authenticate: function() {
-                $http.get(cstlContext + 'spring/login/status')
+                $http.get(cstlContext + 'spring/login/status;jsessionid=')
                     .success(function (data, status, headers, config) {
                         $rootScope.$broadcast('event:auth-authConfirmed');
                       //  $http.defaults.headers.common.Authorization = 'Basic ' + $base64.encode(param.username+':'+param.password);
@@ -139,7 +142,7 @@ cstlAdminApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'aut
             },
             logout: function () {
                 $rootScope.authenticationError = false;
-                $http.get(cstlContext + "api/1/session/logout");
+                $http.get(cstlContext + "api/1/session/logout;jsessionid=");
                 $http.defaults.headers.common.Authorization = undefined;
                 $http.get(context + '/app/logout')
                     .success(function (data, status, headers, config) {
