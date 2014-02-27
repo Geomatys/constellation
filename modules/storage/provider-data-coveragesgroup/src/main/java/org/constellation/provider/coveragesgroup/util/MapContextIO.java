@@ -26,6 +26,10 @@ import java.io.IOException;
 import org.apache.sis.internal.jaxb.geometry.ObjectFactory;
 import org.apache.sis.xml.MarshallerPool;
 
+import org.constellation.provider.coveragesgroup.xml.DataReference;
+import org.constellation.provider.coveragesgroup.xml.MapLayer;
+import org.constellation.provider.coveragesgroup.xml.StyleReference;
+
 import org.geotoolkit.map.CoverageMapLayer;
 import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.map.MapContext;
@@ -52,28 +56,28 @@ public final class MapContextIO {
      */
     public static void writeGeotkMapContext(File destination, MapContext mapContext) throws JAXBException, IOException {
 
-        final org.geotoolkit.providers.xml.MapItem finalMapItem = new org.geotoolkit.providers.xml.MapItem(null);
-        final org.geotoolkit.providers.xml.MapContext finalMapContext = new org.geotoolkit.providers.xml.MapContext(finalMapItem, mapContext.getName());
+        final org.constellation.provider.coveragesgroup.xml.MapItem finalMapItem = new org.constellation.provider.coveragesgroup.xml.MapItem(null);
+        final org.constellation.provider.coveragesgroup.xml.MapContext finalMapContext = new org.constellation.provider.coveragesgroup.xml.MapContext(finalMapItem, mapContext.getName());
         if (destination != null) {
             for (final MapItem mapItem : mapContext.items()) {
                 if (mapItem instanceof FeatureMapLayer) {
                     final FeatureMapLayer fml = (FeatureMapLayer) mapItem;
                     final String id = fml.getCollection().getID();
                     final MutableStyle ms = fml.getStyle();
-                    final org.geotoolkit.providers.xml.StyleReference styleRef = (ms == null) ? null :
-                            new org.geotoolkit.providers.xml.StyleReference(ms.getName());
-                    final org.geotoolkit.providers.xml.MapLayer ml = new org.geotoolkit.providers.xml.MapLayer(
-                            new org.geotoolkit.providers.xml.DataReference(id), styleRef);
+                    final StyleReference styleRef = (ms == null) ? null :
+                            new StyleReference(ms.getName());
+                    final MapLayer ml = new MapLayer(
+                            new DataReference(id), styleRef);
                     ml.setOpacity(fml.getOpacity());
                     finalMapItem.getMapItems().add(ml);
                 } else if (mapItem instanceof CoverageMapLayer) {
                     final CoverageMapLayer cml = (CoverageMapLayer) mapItem;
                     final String id = cml.getCoverageReference().getName().getLocalPart();
                     final MutableStyle ms = cml.getStyle();
-                    final org.geotoolkit.providers.xml.StyleReference styleRef = (ms == null) ? null :
-                            new org.geotoolkit.providers.xml.StyleReference(ms.getName());
-                    final org.geotoolkit.providers.xml.MapLayer ml = new org.geotoolkit.providers.xml.MapLayer(
-                            new org.geotoolkit.providers.xml.DataReference(id), styleRef);
+                    final StyleReference styleRef = (ms == null) ? null :
+                            new StyleReference(ms.getName());
+                    final MapLayer ml = new MapLayer(
+                            new DataReference(id), styleRef);
                     ml.setOpacity(cml.getOpacity());
                     finalMapItem.getMapItems().add(ml);
                 } else {
@@ -94,10 +98,10 @@ public final class MapContextIO {
      * @throws JAXBException if marshalling fail.
      * @throws IOException if file can"t be created.
      */
-    public static void writeMapContext(File destination, org.geotoolkit.providers.xml.MapContext mapContext) throws JAXBException, IOException {
+    public static void writeMapContext(File destination, org.constellation.provider.coveragesgroup.xml.MapContext mapContext) throws JAXBException, IOException {
         // write finalMapContext
         if (destination != null) {
-            final MarshallerPool pool = new MarshallerPool(JAXBContext.newInstance(org.geotoolkit.providers.xml.MapContext.class, ObjectFactory.class), null);
+            final MarshallerPool pool = new MarshallerPool(JAXBContext.newInstance(org.constellation.provider.coveragesgroup.xml.MapContext.class, ObjectFactory.class), null);
             final Marshaller marshaller = pool.acquireMarshaller();
             if (!destination.exists()) {
                 destination.createNewFile();
@@ -113,28 +117,28 @@ public final class MapContextIO {
      * @param mapItemOrig
      * @param finalMapItem
      */
-    private static void visitMapItem(final MapItem mapItemOrig, final org.geotoolkit.providers.xml.MapItem finalMapItem) {
+    private static void visitMapItem(final MapItem mapItemOrig, final org.constellation.provider.coveragesgroup.xml.MapItem finalMapItem) {
         for (final MapItem mapItem : mapItemOrig.items()) {
             if (mapItem instanceof FeatureMapLayer) {
                 final FeatureMapLayer fml = (FeatureMapLayer) mapItem;
                 final String id = fml.getCollection().getID();
                 final MutableStyle ms = fml.getStyle();
-                final org.geotoolkit.providers.xml.StyleReference styleRef = (ms == null) ? null :
-                        new org.geotoolkit.providers.xml.StyleReference(ms.getName());
-                final org.geotoolkit.providers.xml.MapLayer ml = new org.geotoolkit.providers.xml.MapLayer(
-                        new org.geotoolkit.providers.xml.DataReference(id), styleRef);
+                final org.constellation.provider.coveragesgroup.xml.StyleReference styleRef = (ms == null) ? null :
+                        new org.constellation.provider.coveragesgroup.xml.StyleReference(ms.getName());
+                final org.constellation.provider.coveragesgroup.xml.MapLayer ml = new org.constellation.provider.coveragesgroup.xml.MapLayer(
+                        new org.constellation.provider.coveragesgroup.xml.DataReference(id), styleRef);
                 finalMapItem.getMapItems().add(ml);
             } else if (mapItem instanceof CoverageMapLayer) {
                 final CoverageMapLayer cml = (CoverageMapLayer) mapItem;
                 final String id = cml.getCoverageReference().getName().getLocalPart();
                 final MutableStyle ms = cml.getStyle();
-                final org.geotoolkit.providers.xml.StyleReference styleRef = (ms == null) ? null :
-                        new org.geotoolkit.providers.xml.StyleReference(ms.getName());
-                final org.geotoolkit.providers.xml.MapLayer ml = new org.geotoolkit.providers.xml.MapLayer(
-                        new org.geotoolkit.providers.xml.DataReference(id), styleRef);
+                final org.constellation.provider.coveragesgroup.xml.StyleReference styleRef = (ms == null) ? null :
+                        new org.constellation.provider.coveragesgroup.xml.StyleReference(ms.getName());
+                final org.constellation.provider.coveragesgroup.xml.MapLayer ml = new org.constellation.provider.coveragesgroup.xml.MapLayer(
+                        new org.constellation.provider.coveragesgroup.xml.DataReference(id), styleRef);
                 finalMapItem.getMapItems().add(ml);
             } else {
-                final org.geotoolkit.providers.xml.MapItem finalMapItemChild = new org.geotoolkit.providers.xml.MapItem(null);
+                final org.constellation.provider.coveragesgroup.xml.MapItem finalMapItemChild = new org.constellation.provider.coveragesgroup.xml.MapItem(null);
                 finalMapItem.getMapItems().add(finalMapItemChild);
                 visitMapItem(mapItem, finalMapItemChild);
             }
@@ -152,13 +156,30 @@ public final class MapContextIO {
      * @throws JAXBException
      */
     public static MapContext readMapContextFile(final File mapContextFile, final String login, final String password) throws JAXBException {
+
+        final org.constellation.provider.coveragesgroup.xml.MapContext xmlMapCtx = readRawMapContextFile(mapContextFile, login, password);
+        if (xmlMapCtx != null) {
+            return ConvertersJaxbToGeotk.convertsMapContext(xmlMapCtx,login, password);
+        }
+        return null;
+    }
+
+    /**
+     * Read a MapContext file and convert it into geotk MapContext object.
+     *
+     * @param mapContextFile
+     * @param login
+     * @param password
+     * @return geotk MapContext or null
+     * @throws JAXBException
+     */
+    public static org.constellation.provider.coveragesgroup.xml.MapContext readRawMapContextFile(final File mapContextFile, final String login, final String password) throws JAXBException {
         if (mapContextFile != null) {
-            final MarshallerPool pool = new MarshallerPool(JAXBContext.newInstance(org.geotoolkit.providers.xml.MapContext.class, ObjectFactory.class), null);
+            final MarshallerPool pool = new MarshallerPool(JAXBContext.newInstance(org.constellation.provider.coveragesgroup.xml.MapContext.class, ObjectFactory.class), null);
             final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
             Object result = unmarshaller.unmarshal(mapContextFile);
-            if (result != null && result instanceof org.geotoolkit.providers.xml.MapContext) {
-                final org.geotoolkit.providers.xml.MapContext xmlMapCtx = (org.geotoolkit.providers.xml.MapContext) result;
-                return ConvertersJaxbToGeotk.convertsMapContext(xmlMapCtx,login, password);
+            if (result != null && result instanceof org.constellation.provider.coveragesgroup.xml.MapContext) {
+                return (org.constellation.provider.coveragesgroup.xml.MapContext) result;
             }
         }
         return null;

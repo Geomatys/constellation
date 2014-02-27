@@ -71,14 +71,18 @@ import org.opengis.parameter.ParameterValueGroup;
 
 
 /**
+ * Allow to convert a {@linkplain org.constellation.provider.coveragesgroup.xml.MapContext mapContext} from the
+ * providers xml binding to a {@linkplain MapContext map context} from the map module.
  *
  * @author Cédric Briançon (Geomatys)
  * @author Quentin Boileau (Geomatys)
  */
 public final class ConvertersJaxbToGeotk {
-    private static final Logger LOGGER = Logging.getLogger(ConvertersJaxbToGeotk.class);
 
-    public static MapItem convertsMapLayer(final org.geotoolkit.providers.xml.MapLayer mapLayer, final String login, final String password) {
+    private static final Logger LOGGER = Logging.getLogger(ConvertersJaxbToGeotk.class);
+    public static final String ORIGINAL_CONFIG = "original_config";
+
+    public static MapItem convertsMapLayer(final org.constellation.provider.coveragesgroup.xml.MapLayer mapLayer, final String login, final String password) {
         ArgumentChecks.ensureNonNull("mapLayer", mapLayer);
         ArgumentChecks.ensureNonNull("dataReference", mapLayer.getDataReference());
 
@@ -126,13 +130,13 @@ public final class ConvertersJaxbToGeotk {
         return emptyLayer;
     }
 
-    public static MapItem convertsMapItem(final org.geotoolkit.providers.xml.MapItem mapItem, final String login, final String password) {
+    public static MapItem convertsMapItem(final org.constellation.provider.coveragesgroup.xml.MapItem mapItem, final String login, final String password) {
         final MapItem mi = MapBuilder.createItem();
-        for (org.geotoolkit.providers.xml.MapItem currentMapItem : mapItem.getMapItems()) {
-            if (currentMapItem instanceof org.geotoolkit.providers.xml.MapLayer) {
-                final MapItem layer = convertsMapLayer((org.geotoolkit.providers.xml.MapLayer)currentMapItem, login, password);
+        for (org.constellation.provider.coveragesgroup.xml.MapItem currentMapItem : mapItem.getMapItems()) {
+            if (currentMapItem instanceof org.constellation.provider.coveragesgroup.xml.MapLayer) {
+                final MapItem layer = convertsMapLayer((org.constellation.provider.coveragesgroup.xml.MapLayer)currentMapItem, login, password);
                 if (layer != null) {
-                    layer.setUserProperty("original_config", currentMapItem);
+                    layer.setUserProperty(ORIGINAL_CONFIG, currentMapItem);
                     mi.items().add(layer);
                 }
             } else {
@@ -142,7 +146,7 @@ public final class ConvertersJaxbToGeotk {
         return mi;
     }
 
-    public static MapContext convertsMapContext(final org.geotoolkit.providers.xml.MapContext mapContext, final String login, final String password) {
+    public static MapContext convertsMapContext(final org.constellation.provider.coveragesgroup.xml.MapContext mapContext, final String login, final String password) {
         final MapContext mc = MapBuilder.createContext();
         mc.setName(mapContext.getName());
         mc.items().add(convertsMapItem(mapContext.getMapItem(), login, password));
