@@ -19,6 +19,7 @@ package org.constellation.metadata.io.filesystem;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -37,6 +38,7 @@ import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 // constellation dependencies
 import org.constellation.generic.database.Automatic;
@@ -45,6 +47,10 @@ import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.metadata.io.MetadataType;
 import org.constellation.util.NodeUtilities;
 import org.constellation.metadata.io.DomMetadataReader;
+import org.constellation.metadata.io.ElementSetType;
+import org.constellation.metadata.io.filesystem.sql.IdentifierIterator;
+import org.constellation.metadata.io.filesystem.sql.MetadataDatasource;
+import org.constellation.metadata.io.filesystem.sql.Session;
 
 import static org.constellation.metadata.CSWQueryable.*;
 import static org.constellation.metadata.CSWConstants.*;
@@ -53,6 +59,7 @@ import static org.constellation.metadata.CSWConstants.*;
 import org.geotoolkit.csw.xml.DomainValues;
 import org.geotoolkit.csw.xml.v202.DomainValuesType;
 import org.geotoolkit.csw.xml.v202.ListOfValuesType;
+import org.geotoolkit.util.collection.CloseableIterator;
 
 import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -62,11 +69,6 @@ import static org.geotoolkit.csw.xml.TypeNames.*;
 
 // Apache SIS dependencies
 import org.apache.sis.xml.Namespaces;
-import org.constellation.metadata.io.ElementSetType;
-import org.constellation.metadata.io.filesystem.sql.IdentifierIterator;
-import org.constellation.metadata.io.filesystem.sql.MetadataDatasource;
-import org.constellation.metadata.io.filesystem.sql.Session;
-import org.geotoolkit.util.collection.CloseableIterator;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -175,14 +177,6 @@ public class FileMetadataReader extends DomMetadataReader implements CSWMetadata
         }
     }
     
-    private String getIdentifier(final Node metadata) throws MetadataIoException  {
-        final List<String> identifierValues = NodeUtilities.getValuesFromPaths(metadata, DUBLIN_CORE_QUERYABLE.get("identifier"));
-        if (!identifierValues.isEmpty()) {
-            return identifierValues.get(0);
-        }
-        return null;
-    }
-
     private Node translateISOtoDCNode(final Node metadata, final ElementSetType type, final List<QName> elementName) throws MetadataIoException  {
         if (metadata != null) {
 
@@ -528,8 +522,8 @@ public class FileMetadataReader extends DomMetadataReader implements CSWMetadata
             for (Path f : stream) {
                 final String fileName = f.getFileName().toString();
                 if (fileName.endsWith(XML_EXT)) {
-                    final Node metadata = getNodeFromStream(Files.newInputStream(f));
-                    final String identifier = getIdentifier(metadata);
+                    //final Node metadata = getNodeFromStream(Files.newInputStream(f));
+                    final String identifier = getMetadataIdentifier(Files.newInputStream(f), false);
                     session.putRecord(identifier, f.toString());
 
                 } else if (Files.isDirectory(f)) {
@@ -540,7 +534,7 @@ public class FileMetadataReader extends DomMetadataReader implements CSWMetadata
                 }
             }
 
-        } catch (IOException e) {
+        } catch (IOException | XMLStreamException e) {
             LOGGER.log(Level.WARNING, "Error while walking through file system", e);
         }
     }
@@ -559,6 +553,58 @@ public class FileMetadataReader extends DomMetadataReader implements CSWMetadata
                 session.close();
             }
         }
+    }
+
+    private String getMetadataIdentifier(final InputStream metadataStream, final boolean reset) throws IOException, XMLStreamException {
+        final List<String> identifierPaths = DUBLIN_CORE_QUERYABLE.get("identifier");
+        final List<String[]> paths = new ArrayList<>();
+        for (String identifierPath : identifierPaths) {
+            identifierPath = identifierPath.substring(1); // remove the first '/'
+            final String[] path = identifierPath.split("/");
+            for (int i = 0; i < path.length; i++) {
+                int sep = path[i].indexOf(':');
+                if (sep != -1) {
+                    path[i] = path[i].substring(sep + 1);
+                }
+            }
+            paths.add(path);
+        }
+
+        if (reset) {
+            metadataStream.mark(0);
+        }
+        final XMLStreamReader xsr = xif.createXMLStreamReader(metadataStream);
+        int i = 0;
+        while (xsr.hasNext()) {
+            xsr.next();
+            if (xsr.isStartElement()) {
+                String nodeName = xsr.getLocalName();
+                final List<String[]> toRemove = new ArrayList<>();
+                for (String [] path : paths) {
+                    String currentName = path[i];
+                    if (i == path.length -2 && path[i + 1].startsWith("@")) {
+                        final String value = xsr.getAttributeValue(null, path[i + 1].substring(1));
+                        if (value != null) {
+                            return value;
+                        } else {
+                            toRemove.add(path);
+                        }
+                    } else if (!currentName.equals("*") && !currentName.equals(nodeName)) {
+                        toRemove.add(path);
+                    } else if (i  == path.length -1) {
+                        return xsr.getElementText();
+                    }
+                }
+                paths.removeAll(toRemove);
+                i++;
+            }
+        }
+
+        xsr.close();
+        if (reset) {
+            metadataStream.reset();
+        }
+        return null;
     }
 }
 
