@@ -14,7 +14,7 @@
 		<intercept-url pattern="/api/**" access="ROLE_cstl-admin" />
         <intercept-url pattern="/spring/admin/**" access="ROLE_cstl-admin" />
 
-		<form-login default-target-url="/spring/login/loggedin" always-use-default-target="true" login-page="/login.html"/>
+		<form-login default-target-url="/spring/session/loggedin" always-use-default-target="true" login-page="/login.html"/>
 		
 		
 

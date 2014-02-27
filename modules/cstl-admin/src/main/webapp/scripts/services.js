@@ -134,7 +134,7 @@ cstlAdminApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'aut
     function ($rootScope, $http, authService, $base64) {
         return {
             authenticate: function() {
-                $http.get(cstlContext + 'spring/login/status;jsessionid=')
+                $http.get(cstlContext + 'spring/session/status;jsessionid=')
                     .success(function (data, status, headers, config) {
                         $rootScope.$broadcast('event:auth-authConfirmed');
                       //  $http.defaults.headers.common.Authorization = 'Basic ' + $base64.encode(param.username+':'+param.password);
@@ -142,7 +142,7 @@ cstlAdminApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'aut
             },
             logout: function () {
                 $rootScope.authenticationError = false;
-                $http.get(cstlContext + "api/1/session/logout;jsessionid=");
+                $http.get(cstlContext + "spring/session/logout;jsessionid=");
                 $http.defaults.headers.common.Authorization = undefined;
                 $http.get(context + '/app/logout')
                     .success(function (data, status, headers, config) {
