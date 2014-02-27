@@ -21,7 +21,6 @@ import java.awt.image.BufferedImage;
 import java.util.Map;
 
 //Constellation dependencies
-import org.constellation.map.visitor.GetFeatureInfoVisitor;
 import org.constellation.portrayal.internal.PortrayalResponse;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.Worker;
