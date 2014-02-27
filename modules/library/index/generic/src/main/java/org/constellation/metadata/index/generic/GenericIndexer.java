@@ -84,6 +84,9 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * @param configurationDirectory The directory where the index can write indexation file.
      * @param indexID The identifier, if there is one, of the index.
      * @param additionalQueryable A map of additional queryable element.
+     * @param create {@code true} if the index need to be created.
+     *
+     * @throws org.geotoolkit.lucene.IndexingException If an erro roccurs during the index creation.
      */
     public GenericIndexer(final MetadataReader reader, final File configurationDirectory, final String indexID,
             final Map<String, List<String>> additionalQueryable, final boolean create) throws IndexingException {
