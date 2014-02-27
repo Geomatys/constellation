@@ -19,13 +19,11 @@ package org.constellation.map.featureinfo;
 import com.vividsolutions.jts.geom.Geometry;
 import org.apache.sis.geometry.GeneralDirectPosition;
 import org.apache.sis.measure.MeasurementRange;
-import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
-import org.constellation.query.Query;
 import org.constellation.ws.MimeType;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.GridSampleDimension;
@@ -378,7 +376,7 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
                     LOGGER.log(Level.WARNING, "JAXB exception while marshalling the geometry", ex);
                 } finally {
                     if (m != null) {
-                        pool.release(m);
+                        pool.recycle(m);
                     }
                 }
                 builder.append("\n");

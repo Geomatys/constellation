@@ -7,10 +7,10 @@ import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.coveragesgroup.CoveragesGroupProvider;
 import org.constellation.provider.coveragesgroup.util.ConvertersJaxbToGeotk;
-import org.geotoolkit.display.canvas.GraphicVisitor;
+import org.geotoolkit.display2d.GraphicVisitor;
 import org.geotoolkit.display.canvas.RenderingContext;
-import org.geotoolkit.display.exception.PortrayalException;
-import org.geotoolkit.display.primitive.SearchArea;
+import org.geotoolkit.display.PortrayalException;
+import org.geotoolkit.display.SearchArea;
 import org.geotoolkit.display2d.primitive.ProjectedObject;
 import org.geotoolkit.display2d.service.*;
 import org.geotoolkit.map.MapContext;
@@ -18,7 +18,7 @@ import org.geotoolkit.map.MapItem;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.ows.xml.GetFeatureInfo;
 
-import org.geotoolkit.util.logging.Logging;
+import org.apache.sis.util.logging.Logging;
 import org.opengis.display.primitive.Graphic;
 import org.opengis.feature.type.Name;
 
@@ -204,7 +204,7 @@ public class AggregateFeatureInfoFormat extends AbstractFeatureInfoFormat {
         layersConfig = new HashMap<String, List<GetFeatureInfoCfg>>();
         final List<MapLayer> mapLayers = getMapLayers(mapContext);
         for (MapLayer layer : mapLayers) {
-            final Object original = layer.getUserPropertie(ConvertersJaxbToGeotk.ORIGINAL_CONFIG);
+            final Object original = layer.getUserProperty(ConvertersJaxbToGeotk.ORIGINAL_CONFIG);
             if (original instanceof org.constellation.provider.coveragesgroup.xml.MapLayer) {
                 final org.constellation.provider.coveragesgroup.xml.MapLayer cfg =
                         (org.constellation.provider.coveragesgroup.xml.MapLayer) original;
