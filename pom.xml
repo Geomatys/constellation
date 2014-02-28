@@ -130,7 +130,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>postgresql</groupId>
+            <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
         </dependency>
         <dependency>
@@ -909,9 +909,9 @@
         the 'runtime' scope is appropriate.
       -->
             <dependency>
-                <groupId>postgresql</groupId>
+                <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
-                <version>9.1-901-1.jdbc4</version>
+                <version>9.3-1101-jdbc41</version>
                 <scope>runtime</scope>
             </dependency>
             <dependency>
@@ -1006,15 +1006,7 @@
                 <enabled>false</enabled>
             </releases>
         </repository>
-        <repository>
-            <id>snapshots</id>
-            <name>geomatys repo snapshots</name>
-            <url>http://maven2.geomatys.com/repository/snapshots/</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-	    <repository>
+	<repository>
             <id>etrema</id>
             <url>http://milton.io/maven/</url>
             <snapshots>
@@ -1029,12 +1021,8 @@
             </snapshots>
         </repository>
         <repository>
-            <id>internal</id>
-            <name>geomatys repo internal</name>
-            <url>http://maven2.geomatys.com/repository/internal/</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
+            <id>jboss</id>
+            <url>https://repository.jboss.org/nexus/content/repositories/thirdparty-releases</url>
         </repository>
     </repositories>
     <pluginRepositories>
@@ -1045,22 +1033,6 @@
             <releases>
                 <enabled>false</enabled>
             </releases>
-        </pluginRepository>
-        <pluginRepository>
-            <id>internal</id>
-            <name>geomatys repo internal</name>
-            <url>http://maven2.geomatys.com/repository/internal/</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-        <pluginRepository>
-            <id>snapshots</id>
-            <name>geomatys repo snapshots</name>
-            <url>http://maven2.geomatys.com/repository/snapshots/</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
         </pluginRepository>
     </pluginRepositories>
 
