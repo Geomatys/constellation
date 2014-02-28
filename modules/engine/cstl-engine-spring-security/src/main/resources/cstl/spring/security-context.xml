@@ -6,26 +6,27 @@
 			http://www.springframework.org/schema/security/spring-security-3.2.xsd">
 
 
-    <beans:alias name="springSecurityFilterChain" alias="securityFilter"/>
+	<beans:alias name="springSecurityFilterChain" alias="securityFilter" />
 
-	<http  request-matcher="ant">
+	<http request-matcher="ant">
 		<intercept-url pattern="/WS/configuration/**" access="ROLE_cstl-admin" />
 		<intercept-url pattern="/WS/*/admin/**" access="ROLE_cstl-admin" />
 		<intercept-url pattern="/api/**" access="ROLE_cstl-admin" />
-        <intercept-url pattern="/spring/admin/**" access="ROLE_cstl-admin" />
+		<intercept-url pattern="/spring/admin/**" access="ROLE_cstl-admin" />
 
-		<form-login default-target-url="/spring/session/loggedin" always-use-default-target="true" login-page="/login.html"/>
-		
-		
+		<form-login default-target-url="/spring/session/loggedin"
+			always-use-default-target="true" login-page="/login.html" />
 
 	</http>
 
-	<authentication-manager>
-		<authentication-provider >
-			<user-service>
-				<user name="admin" password="admin" authorities="ROLE_USER, ROLE_cstl-admin" />
-				<user name="bob" password="bob" authorities="ROLE_cstl-user" />
-			</user-service>
+	<jdbc-user-service id="cstlUserService"
+		data-source-ref="dataSource"
+		users-by-username-query='select "login" as "username", "password" as "password", true as "enabled" from "admin"."user" where "login" = ?'
+		authorities-by-username-query='select "login" as "username", &apos;ROLE_&apos; || "role" as "authority" from "admin"."user_x_role" where "login" = ?' />
+
+	<authentication-manager alias="authenticationManager">
+		<authentication-provider user-service-ref="cstlUserService">
+			<password-encoder hash="md5" />
 		</authentication-provider>
 	</authentication-manager>
 </beans:beans>
