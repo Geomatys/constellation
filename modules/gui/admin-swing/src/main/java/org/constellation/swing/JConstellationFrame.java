@@ -87,6 +87,7 @@ public final class JConstellationFrame extends JFrame{
         Parameters.getOrCreate(ConstellationServerFactory.URL, param).setValue(new URL(url));
         Parameters.getOrCreate(ConstellationServerFactory.USER, param).setValue(login);
         Parameters.getOrCreate(ConstellationServerFactory.PASSWORD, param).setValue(password);
+        Parameters.getOrCreate(ConstellationServerFactory.SECURITY_TYPE, param).setValue("Form");
 
         // old API
         final ConstellationServer server   = new ConstellationServer(param);

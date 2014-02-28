@@ -51,6 +51,7 @@ import org.geotoolkit.client.AbstractClient;
 import org.geotoolkit.client.ClientFactory;
 import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.security.BasicAuthenticationSecurity;
+import org.geotoolkit.security.FormSecurity;
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
 import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
 import org.geotoolkit.sld.xml.StyleXmlIO;
@@ -92,6 +93,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.constellation.api.QueryConstants.*;
 
@@ -119,12 +122,15 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
     public final String currentUser;
 
+    private final String securityType;
+
     public ConstellationServer(final URL server, final String user, final String password) {
         super(create(ConstellationServerFactory.PARAMETERS, server, null));
         this.services = createServiceManager();
         this.providers = createProviderManager();
         this.csws = createCswManager();
         this.tasks = createTaskManager();
+        this.securityType = "Basic";
         Parameters.getOrCreate(ConstellationServerFactory.USER, parameters).setValue(user);
         Parameters.getOrCreate(ConstellationServerFactory.PASSWORD, parameters).setValue(password);
         Parameters.getOrCreate(ConstellationServerFactory.SECURITY, parameters).setValue(new BasicAuthenticationSecurity(user, password));
@@ -138,10 +144,17 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         this.csws = createCswManager();
         this.tasks = createTaskManager();
         this.currentUser = Parameters.value(ConstellationServerFactory.USER, parameters);
-        Parameters.getOrCreate(ConstellationServerFactory.SECURITY, parameters)
-                .setValue(new BasicAuthenticationSecurity(
-                        Parameters.value(ConstellationServerFactory.USER, params),
-                        Parameters.value(ConstellationServerFactory.PASSWORD, params)));
+        this.securityType = Parameters.value(ConstellationServerFactory.SECURITY_TYPE, params);
+        if ("Basic".equals(securityType)) {
+            Parameters.getOrCreate(ConstellationServerFactory.SECURITY, parameters)
+                    .setValue(new BasicAuthenticationSecurity(
+                            Parameters.value(ConstellationServerFactory.USER, params),
+                            Parameters.value(ConstellationServerFactory.PASSWORD, params)));
+        } else if ("Form".equals(securityType)) {
+             Parameters.getOrCreate(ConstellationServerFactory.SECURITY, parameters)
+                    .setValue(new FormSecurity());
+             authenticate();
+        }
     }
 
     @Override
@@ -206,30 +219,77 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
      * @return true if login/password are valid
      */
     protected boolean authenticate() {
-        final String str = this.getURLWithEndSlash() + "configuration?request=" + REQUEST_ACCESS;
-        InputStream stream = null;
-        HttpURLConnection cnx = null;
-        try {
-            final URL url = new URL(str);
-            cnx = (HttpURLConnection) url.openConnection();
-            getClientSecurity().secure(cnx);
-            stream = AbstractRequest.openRichException(cnx, getClientSecurity());
-        } catch (Exception ex) {
-            LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
-            return false;
-        } finally {
-            if (stream != null) {
-                try {
-                    stream.close();
-                } catch (IOException ex) {
-                    LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+        if ("Basic".equals(securityType)) {
+            final String str = this.getURLWithEndSlash() + "configuration?request=" + REQUEST_ACCESS;
+            InputStream stream = null;
+            HttpURLConnection cnx = null;
+            try {
+                final URL url = new URL(str);
+                cnx = (HttpURLConnection) url.openConnection();
+                getClientSecurity().secure(cnx);
+                stream = AbstractRequest.openRichException(cnx, getClientSecurity());
+            } catch (Exception ex) {
+                LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
+                return false;
+            } finally {
+                if (stream != null) {
+                    try {
+                        stream.close();
+                    } catch (IOException ex) {
+                        LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+                    }
+                }
+                if (cnx != null) {
+                    cnx.disconnect();
                 }
             }
-            if (cnx != null) {
-                cnx.disconnect();
+            return true;
+        } else if ("Form".equals(securityType)) {
+            final int index = getURLWithEndSlash().lastIndexOf("WS");
+            String str = getURLWithEndSlash().substring(0, index) + "j_spring_security_check?";
+            InputStream stream = null;
+            HttpURLConnection cnx = null;
+            try {
+                final URL url = new URL(str);
+                cnx = (HttpURLConnection) url.openConnection();
+                cnx.setDoOutput(true);
+                cnx.setInstanceFollowRedirects(false);
+
+                final OutputStream os = cnx.getOutputStream();
+                final String s = "j_username=" + currentUser + "&j_password=" + Parameters.value(ConstellationServerFactory.PASSWORD, parameters);
+                os.write(s.getBytes());
+
+                stream = AbstractRequest.openRichException(cnx, getClientSecurity());
+
+                String cookie = cnx.getHeaderField("Set-Cookie");
+                Pattern pattern = Pattern.compile("JSESSIONID=([^;]+);.*");
+                Matcher matcher = pattern.matcher(cookie);
+                if(matcher.matches()){
+                   cookie = matcher.group(1);
+                   ((FormSecurity)getClientSecurity()).setSessionID(cookie);
+                   return true;
+                }
+                return false;
+            } catch (Exception ex) {
+                LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
+                return false;
+            } finally {
+                if (stream != null) {
+                    try {
+                        stream.close();
+                    } catch (IOException ex) {
+                        LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+                    }
+                }
+                if (cnx != null) {
+                    cnx.disconnect();
+                }
             }
+
+        } else {
+            LOGGER.warning("Unexpected security type:" + securityType);
+            return false;
         }
-        return true;
     }
 
     /**

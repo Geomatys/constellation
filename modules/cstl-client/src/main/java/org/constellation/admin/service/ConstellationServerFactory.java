@@ -56,10 +56,12 @@ public class ConstellationServerFactory extends AbstractClientFactory{
             "User","User login",String.class,null,true);
     public static final ParameterDescriptor<String> PASSWORD = new DefaultParameterDescriptor(
             "Password","User password",String.class,null,true);
+    public static final ParameterDescriptor<String> SECURITY_TYPE = new DefaultParameterDescriptor(
+            "SecurityType","Security type",String.class,"Basic",true);
 
     public static final ParameterDescriptorGroup PARAMETERS =
             new DefaultParameterDescriptorGroup("CstlParameters",
-                    IDENTIFIER,URL,USER,PASSWORD,SECURITY);
+                    IDENTIFIER,URL,USER,PASSWORD,SECURITY_TYPE,SECURITY);
 
     @Override
     public Identification getIdentification() {
