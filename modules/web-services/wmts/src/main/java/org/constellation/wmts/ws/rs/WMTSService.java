@@ -19,6 +19,7 @@ package org.constellation.wmts.ws.rs;
 import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import javax.imageio.IIOException;
@@ -128,7 +129,12 @@ public class WMTSService extends GridWebService<WMTSWorker> {
             }
             if (request instanceof GetFeatureInfo) {
                 final GetFeatureInfo gf = (GetFeatureInfo) request;
-                return Response.ok(worker.getFeatureInfo(gf), MimeType.TEXT_XML).build();
+                final Map.Entry<String, Object> result = worker.getFeatureInfo(gf);
+                if (result != null) {
+                    return Response.ok(result.getValue(), result.getKey()).build();
+                }
+                //throw an exception if result of GetFeatureInfo visitor is null
+                throw new CstlServiceException("An error occurred during GetFeatureInfo response building.");
             }
 
             throw new CstlServiceException("The operation " + request.getClass().getName() +

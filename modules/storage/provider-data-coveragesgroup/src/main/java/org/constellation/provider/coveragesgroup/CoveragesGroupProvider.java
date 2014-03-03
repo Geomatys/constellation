@@ -99,6 +99,23 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
         return null;
     }
 
+    /**
+     *
+     * @param key layer name
+     * @param login used if one or more layer of MapContext come from secured map service
+     * @param password used if one or more layer of MapContext come from secured map service
+     * @return MapContext or null if layer name doesn't exist.
+     * @throws JAXBException
+     */
+    public MapContext getMapContext(final Name key, final String login, final String password) throws JAXBException {
+        if (index == null) {
+            visit();
+        }
+
+        final File mapContextFile = index.get(key);
+        return MapContextIO.readMapContextFile(mapContextFile, login, password);
+    }
+
     private static ParameterValueGroup getSourceConfiguration(final ParameterValueGroup params){
         final List<ParameterValueGroup> groups = params.groups(SOURCE_CONFIG_DESCRIPTOR.getName().getCode());
         if(!groups.isEmpty()){

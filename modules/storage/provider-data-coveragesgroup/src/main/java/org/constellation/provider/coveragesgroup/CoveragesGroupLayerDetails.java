@@ -93,13 +93,13 @@ public class CoveragesGroupLayerDetails extends AbstractLayerDetails {
     }
 
     private MapContext createMapContextForFile(final File file, final String login, final String password) throws JAXBException {
-        pool = new MarshallerPool(JAXBContext.newInstance(org.geotoolkit.providers.xml.MapContext.class, org.apache.sis.internal.jaxb.geometry.ObjectFactory.class), null);
+        pool = new MarshallerPool(JAXBContext.newInstance(org.constellation.provider.coveragesgroup.xml.MapContext.class, org.apache.sis.internal.jaxb.geometry.ObjectFactory.class), null);
         unmarshaller = pool.acquireUnmarshaller();
         final Object result = unmarshaller.unmarshal(file);
-        if (!(result instanceof org.geotoolkit.providers.xml.MapContext)) {
+        if (!(result instanceof org.constellation.provider.coveragesgroup.xml.MapContext)) {
             throw new JAXBException("Wrong response for the unmarshalling");
         }
-        final org.geotoolkit.providers.xml.MapContext mapContext = (org.geotoolkit.providers.xml.MapContext)result;
+        final org.constellation.provider.coveragesgroup.xml.MapContext mapContext = (org.constellation.provider.coveragesgroup.xml.MapContext)result;
         return ConvertersJaxbToGeotk.convertsMapContext(mapContext,login, password);
     }
 

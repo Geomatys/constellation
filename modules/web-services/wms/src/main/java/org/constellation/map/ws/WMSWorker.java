@@ -18,9 +18,9 @@ package org.constellation.map.ws;
 
 //J2SE dependencies
 import java.awt.image.BufferedImage;
+import java.util.Map;
 
 //Constellation dependencies
-import org.constellation.map.visitor.GetFeatureInfoVisitor;
 import org.constellation.portrayal.internal.PortrayalResponse;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.Worker;
@@ -62,12 +62,13 @@ public interface WMSWorker extends Worker{
     AbstractWMSCapabilities getCapabilities(final GetCapabilities getCapabilities) throws CstlServiceException;
 
     /**
-     * Returns a string, which will contain the result of a {@code GetFeatureInfo} request.
+     * Returns an Entry, which will contain the result of a {@code GetFeatureInfo} request and the requested mimeType.
      *
-     * @param getFeatureInfo The {@linkplain GetFeatureInfo get feature info} request done on this service.
+     * @param getFI The {@linkplain org.geotoolkit.wms.xml.GetFeatureInfo get feature info} request done on this service.
+     * @return Map.Entry with requested mimeType and getFeatureInfo result object.
      * @throws CstlServiceException
      */
-    GetFeatureInfoVisitor getFeatureInfo(final GetFeatureInfo getFeatureInfo) throws CstlServiceException;
+    Map.Entry<String, Object> getFeatureInfo(final GetFeatureInfo getFI) throws CstlServiceException;
 
     /**
      * Returns a {@link BufferedImage}, which is the result of a {@code GetLegendGraphic} request.

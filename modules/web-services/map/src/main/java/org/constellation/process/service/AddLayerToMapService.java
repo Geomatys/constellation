@@ -16,24 +16,17 @@
  */
 package org.constellation.process.service;
 
+import org.constellation.configuration.*;
 import org.geotoolkit.process.AbstractProcess;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 import static org.geotoolkit.parameter.Parameters.*;
 import static org.constellation.process.service.AddLayerToMapServiceDescriptor.*;
 import static org.constellation.process.service.WSProcessUtils.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Date;
-import java.util.Set;
+
+import java.util.*;
 import javax.xml.namespace.QName;
-import org.constellation.configuration.DimensionDefinition;
-import org.constellation.configuration.Layer;
-import org.constellation.configuration.LayerContext;
-import org.constellation.configuration.Source;
+
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
@@ -78,6 +71,7 @@ public class AddLayerToMapService extends AbstractProcess {
         final DataReference layerStyleRef   = value(LAYER_STYLE, inputParameters);
         final Filter layerFilter            = value(LAYER_FILTER, inputParameters);
         final String layerDimension         = value(LAYER_DIMENSION, inputParameters);
+        final GetFeatureInfoCfg[] customGFI = value(LAYER_CUSTOM_GFI, inputParameters);
         final String serviceType            = value(SERVICE_TYPE, inputParameters);
         final String serviceInstance        = value(SERVICE_INSTANCE, inputParameters);
 
@@ -105,7 +99,7 @@ public class AddLayerToMapService extends AbstractProcess {
         final Name layerName = layerRef.getLayerId();
         final QName layerQName = new QName(layerName.getNamespaceURI(), layerName.getLocalPart());
 
-        //create futur new layer
+        //create future new layer
         final Layer newLayer = new Layer(layerQName);
 
         //add filter if exist
@@ -141,6 +135,11 @@ public class AddLayerToMapService extends AbstractProcess {
         //forward data version if defined.
         if (dataVersion != null) {
             newLayer.setVersion(dataVersion.getTime());
+        }
+
+        //custom GetFeatureInfo
+        if (customGFI != null) {
+            newLayer.setGetFeatureInfoCfgs(Arrays.asList(customGFI));
         }
 
 

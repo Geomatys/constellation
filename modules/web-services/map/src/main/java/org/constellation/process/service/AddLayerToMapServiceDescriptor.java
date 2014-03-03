@@ -18,6 +18,7 @@ package org.constellation.process.service;
 
 import org.apache.sis.util.iso.ResourceInternationalString;
 import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.GetFeatureInfoCfg;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.util.DataReference;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
@@ -61,6 +62,7 @@ public class AddLayerToMapServiceDescriptor extends AbstractProcessDescriptor {
     private static final String LAYER_STYLE_PARAM_REMARKS_KEY       = "service.add_layer.layerStyleRef";
     private static final String LAYER_FILTER_PARAM_REMARKS_KEY      = "service.add_layer.layerFilter";
     private static final String LAYER_DIMENSION_PARAM_REMARKS_KEY   = "service.add_layer.layerDimension";
+    private static final String LAYER_CUSTOM_GFI_PARAM_REMARKS_KEY  = "service.add_layer.featureInfos";
     private static final String SERVICE_TYPE_PARAM_REMARKS_KEY      = "service.add_layer.serviceType";
     private static final String SERVICE_INSTANCE_PARAM_REMARKS_KEY  = "service.add_layer.serviceInstance";
     private static final String OUT_LAYER_CTX_PARAM_REMARKS_KEY     = "service.add_layer.outLayerContext";
@@ -109,6 +111,14 @@ public class AddLayerToMapServiceDescriptor extends AbstractProcessDescriptor {
             new DefaultParameterDescriptor(LAYER_DIMENSION_PARAM_NAME, LAYER_DIMENSION_PARAM_REMARKS, String.class, null, false);
 
     /*
+     * Custom GetFeatureInfo
+     */
+    public static final String LAYER_CUSTOM_GFI_PARAM_NAME = "layer_feature_infos";
+    public static final InternationalString LAYER_CUSTOM_GFI_PARAM_REMARKS = new ResourceInternationalString(BUNDLE, LAYER_CUSTOM_GFI_PARAM_REMARKS_KEY);
+    public static final ParameterDescriptor<GetFeatureInfoCfg[]> LAYER_CUSTOM_GFI =
+            new DefaultParameterDescriptor(LAYER_CUSTOM_GFI_PARAM_NAME, LAYER_CUSTOM_GFI_PARAM_REMARKS, GetFeatureInfoCfg[].class, null, false);
+
+    /*
      * Service Type
      */
     public static final String SERVICE_TYPE_PARAM_NAME = "service_type";
@@ -118,7 +128,7 @@ public class AddLayerToMapServiceDescriptor extends AbstractProcessDescriptor {
             new ExtendedParameterDescriptor<String>(SERVICE_TYPE_PARAM_NAME, SERVICE_TYPE_PARAM_REMARKS, String.class, SERVICE_TYPE_VALID_VALUES, "WMS", null, null, null, true, null);
 
     /*
-     * Service insance name
+     * Service instance name
      */
     public static final String SERVICE_INSTANCE_PARAM_NAME = "service_instance";
     public static final InternationalString SERVICE_INSTANCE_PARAM_REMARKS = new ResourceInternationalString(BUNDLE, SERVICE_INSTANCE_PARAM_REMARKS_KEY);
@@ -128,7 +138,7 @@ public class AddLayerToMapServiceDescriptor extends AbstractProcessDescriptor {
      /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC =
             new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{LAYER_REF, SERVICE_TYPE, SERVICE_INSTANCE, LAYER_ALIAS, LAYER_STYLE, LAYER_FILTER, LAYER_DIMENSION});
+            new GeneralParameterDescriptor[]{LAYER_REF, SERVICE_TYPE, SERVICE_INSTANCE, LAYER_ALIAS, LAYER_STYLE, LAYER_FILTER, LAYER_DIMENSION, LAYER_CUSTOM_GFI});
 
     /*
      * Output Layer context

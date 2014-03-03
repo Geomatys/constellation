@@ -22,8 +22,6 @@ import static org.constellation.map.ws.WMSConstant.EXCEPTION_111_BLANK;
 import static org.constellation.map.ws.WMSConstant.EXCEPTION_111_INIMAGE;
 import static org.constellation.map.ws.WMSConstant.EXCEPTION_130_BLANK;
 import static org.constellation.map.ws.WMSConstant.EXCEPTION_130_INIMAGE;
-import static org.constellation.query.Query.GML;
-import static org.constellation.query.Query.XML;
 import static org.constellation.query.wms.WMSQuery.KEY_BBOX;
 import static org.constellation.query.wms.WMSQuery.KEY_INFO_FORMAT;
 import static org.constellation.query.wms.WMSQuery.KEY_LAYER;
@@ -56,24 +54,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.imageio.spi.ServiceRegistry;
 import javax.inject.Named;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
@@ -93,16 +77,11 @@ import org.apache.sis.xml.MarshallerPool;
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
 import org.constellation.admin.ConfigurationEngine;
-import org.constellation.configuration.AttributionType;
-import org.constellation.configuration.DimensionDefinition;
-import org.constellation.configuration.FormatURL;
-import org.constellation.configuration.Layer;
-import org.constellation.configuration.Reference;
-import org.constellation.configuration.WMSPortrayal;
+import org.constellation.configuration.*;
 import org.constellation.converter.DataReferenceConverter;
 import org.constellation.dto.Service;
-import org.constellation.map.visitor.GetFeatureInfoVisitor;
-import org.constellation.map.visitor.WMSVisitorFactory;
+import org.constellation.map.featureinfo.FeatureInfoFormat;
+import org.constellation.map.featureinfo.FeatureInfoUtilities;
 import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.portrayal.internal.PortrayalResponse;
 import org.constellation.provider.CoverageLayerDetails;
@@ -122,7 +101,6 @@ import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.OutputDef;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
-import org.geotoolkit.display2d.service.VisitDef;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.inspire.xml.vs.ExtendedCapabilitiesType;
@@ -209,23 +187,8 @@ import org.springframework.context.annotation.Scope;
 @Scope("prototype")
 public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
-    private static final WMSVisitorFactory[] VISITOR_FACTORIES;
     private static final List<String> GFI_MIME_TYPES = new ArrayList<>();
 
-    static {
-        final List<WMSVisitorFactory> factories = new ArrayList<>();
-
-        final Iterator<WMSVisitorFactory> ite = ServiceRegistry.lookupProviders(WMSVisitorFactory.class);
-        while(ite.hasNext()){
-            final WMSVisitorFactory f = ite.next();
-            factories.add(f);
-            GFI_MIME_TYPES.addAll(Arrays.asList(f.getSupportedMimeTypes()));
-        }
-
-        VISITOR_FACTORIES = factories.toArray(new WMSVisitorFactory[factories.size()]);
-    }
-   
-    
     /**
      * AxisDirection name for Lat/Long, Elevation, temporal dimensions.
      */
@@ -250,6 +213,17 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     public DefaultWMSWorker(final String id) {
         super(id, ServiceDef.Specification.WMS);
         setSupportedVersion(ServiceDef.WMS_1_3_0_SLD, ServiceDef.WMS_1_1_1_SLD);
+
+        //get all supported GetFeatureInfo mimetypes
+        try {
+            GFI_MIME_TYPES.clear();
+            final LayerContext config = (LayerContext)getConfiguration();
+            GFI_MIME_TYPES.addAll(FeatureInfoUtilities.allSupportedMimeTypes(config));
+        } catch (ConfigurationException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+        } catch (ClassNotFoundException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+        }
 
         mapPortrayal = new WMSPortrayal();
         try {
@@ -974,11 +948,11 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
      * @throws CstlServiceException
      */
     @Override
-    public GetFeatureInfoVisitor getFeatureInfo(final GetFeatureInfo getFI) throws CstlServiceException {
+    public Map.Entry<String, Object> getFeatureInfo(final GetFeatureInfo getFI) throws CstlServiceException {
         isWorking();
-    	//
-    	// Note this is almost the same logic as in getMap
-    	//
+        //
+        // Note this is almost the same logic as in getMap
+        //
         // 1. SCENE
         //       -- get the List of layer references
         final String userLogin             = getUserLogin();
@@ -1031,7 +1005,12 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         }
         final double azimuth = getFI.getAzimuth();
         final ViewDef vdef   = new ViewDef(refEnv,azimuth);
-
+        try {
+            //force longitude first
+            vdef.setLongitudeFirst();
+        } catch (TransformException | FactoryException ex) {
+            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+        }
 
         // 3. CANVAS
         final Dimension canvasDimension = getFI.getSize();
@@ -1056,9 +1035,9 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             throw new CstlServiceException("The requested point has an invalid Y coordinate.", INVALID_POINT);
         }
         final Rectangle selectionArea = new Rectangle( getFI.getX()-pixelTolerance,
-        		                               getFI.getY()-pixelTolerance,
-        		                               pixelTolerance*2,
-        		                               pixelTolerance*2);
+                                               getFI.getY()-pixelTolerance,
+                                               pixelTolerance*2,
+                                               pixelTolerance*2);
 
         // 5. VISITOR
         String infoFormat = getFI.getInfoFormat();
@@ -1067,39 +1046,31 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             infoFormat = MimeType.TEXT_PLAIN;
         }
 
-        GetFeatureInfoVisitor visitor = null;
-        for(final WMSVisitorFactory vf : VISITOR_FACTORIES){
-            visitor = vf.createVisitor(getFI, layerRefs, infoFormat);
-            if(visitor != null) {break;}
+        //search custom FeatureInfoFormat
+        Layer config = null;
+        if (layerRefs.size() == 1) {
+            config = layerConfig.get(0);
         }
 
-        if(visitor == null) {
-            throw new CstlServiceException("MIME type " + infoFormat + " is not accepted by the service.\n" +
-                    "You have to choose between: "+ MimeType.TEXT_PLAIN +", "+ MimeType.TEXT_HTML +", "+ MimeType.APP_GML +", "+ GML +
-                    ", "+ MimeType.APP_XML +", "+ XML+", "+ MimeType.TEXT_XML,
-                    INVALID_FORMAT, KEY_INFO_FORMAT.toLowerCase());
-        }
-
-        final VisitDef visitDef = new VisitDef();
-        visitDef.setArea(selectionArea);
-        visitDef.setVisitor(visitor);
-
+        FeatureInfoFormat featureInfo = null;
         try {
-            //force longitude first
-            vdef.setLongitudeFirst();
-        } catch (TransformException | FactoryException ex) {
+            featureInfo = FeatureInfoUtilities.getFeatureInfoFormat(getConfiguration(), config, infoFormat);
+        } catch (ClassNotFoundException | ConfigurationException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
 
+        if (featureInfo == null) {
+            throw new CstlServiceException("INFO_FORMAT="+infoFormat+" not supported for layers : "+layerNames, NO_APPLICABLE_CODE);
+        }
 
-        // We now build the response, according to the format chosen.
         try {
-            Cstl.getPortrayalService().visit(sdef,vdef,cdef,visitDef);
+            //give the layerRef list used by some FIF
+            featureInfo.setLayersDetails(layerRefs);
+            final Object result = featureInfo.getFeatureInfo(sdef, vdef, cdef, selectionArea, getFI);
+            return new AbstractMap.SimpleEntry<>(infoFormat, result);
         } catch (PortrayalException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
-
-        return visitor;
     }
 
     /**
@@ -1117,7 +1088,8 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         isWorking();
         final String userLogin   = getUserLogin();
         final LayerDetails layer = getLayerReference(userLogin, getLegend.getLayer());
-        final String layerName   = layer.getName().toString();
+        final Layer layerConf = getConfigurationLayer(getLegend.getLayer(), userLogin);
+        final String layerName = layer.getName().toString();
         if (!layer.isQueryable(ServiceDef.Query.WMS_ALL)) {
             throw new CstlServiceException("You are not allowed to request the layer \""+
                     layerName +"\".", LAYER_NOT_QUERYABLE, KEY_LAYER.toLowerCase());
@@ -1177,9 +1149,8 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 }
             } else {
                 // No sld given, we use the style.
-                final Layer layerRef = getConfigurationLayer(layer.getName(), userLogin);
 
-                final List<DataReference> defaultStyleRefs = layerRef.getStyles();
+                final List<DataReference> defaultStyleRefs = layerConf.getStyles();
                 if (defaultStyleRefs != null && !defaultStyleRefs.isEmpty()) {
                     final DataReference styleRef = defaultStyleRefs.get(0);
                     ms = (styleRef.getLayerId() == null) ? null : getStyle(styleRef);

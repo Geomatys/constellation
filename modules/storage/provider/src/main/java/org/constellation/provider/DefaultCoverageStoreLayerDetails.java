@@ -243,7 +243,7 @@ public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails imple
 
         try {
             final GeneralGridGeometry generalGridGeom = reader.getGridGeometry(0);
-            if (generalGridGeom == null) {
+            if (generalGridGeom == null || generalGridGeom.getEnvelope() == null) {
                 LOGGER.log(Level.INFO, "The layer \"{0}\" does not contain a grid geometry information.", name);
                 return null;
             }

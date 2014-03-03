@@ -24,16 +24,14 @@ import java.util.logging.Level;
 import org.apache.sis.storage.DataStoreException;
 
 // Constellation dependencies
-import org.constellation.Cstl;
 import org.constellation.ServiceDef;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Layer;
+import org.constellation.map.featureinfo.FeatureInfoFormat;
+import org.constellation.map.featureinfo.FeatureInfoUtilities;
 import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.provider.LayerDetails;
 import org.constellation.util.DataReference;
-import org.constellation.wmts.visitor.CSVGraphicVisitor;
-import org.constellation.wmts.visitor.GMLGraphicVisitor;
-import org.constellation.wmts.visitor.HTMLGraphicVisitor;
-import org.constellation.wmts.visitor.TextGraphicVisitor;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.LayerWorker;
@@ -45,7 +43,6 @@ import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
-import org.geotoolkit.display2d.service.VisitDef;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
@@ -276,7 +273,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
      * {@inheritDoc}
      */
     @Override
-    public String getFeatureInfo(GetFeatureInfo request) throws CstlServiceException {
+    public Map.Entry<String, Object> getFeatureInfo(GetFeatureInfo request) throws CstlServiceException {
 
         //       -- get the List of layer references
         final GetTile getTile       = request.getGetTile();
@@ -301,7 +298,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                 try {
                     elevation = Double.parseDouble(dimension.getValue());
                 } catch (NumberFormatException ex) {
-                    throw new CstlServiceException("Unable to perse the elevation value", INVALID_PARAMETER_VALUE, "elevation");
+                    throw new CstlServiceException("Unable to parse the elevation value", INVALID_PARAMETER_VALUE, "elevation");
                 }
             }
             if (dimension.getName().equalsIgnoreCase("time")) {
@@ -357,39 +354,26 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
             //Should not happen since the info format parameter is mandatory for the GetFeatureInfo request.
             infoFormat = MimeType.TEXT_PLAIN;
         }
-        final TextGraphicVisitor visitor;
-        if (infoFormat.equalsIgnoreCase(MimeType.TEXT_PLAIN)) {
-            // TEXT / PLAIN
-            visitor = new CSVGraphicVisitor(request);
-        } else if (infoFormat.equalsIgnoreCase(MimeType.TEXT_HTML)) {
-            // TEXT / HTML
-            visitor = new HTMLGraphicVisitor(request, layerRef);
-        } else if (infoFormat.equalsIgnoreCase(MimeType.APP_GML) || infoFormat.equalsIgnoreCase(MimeType.TEXT_XML) ||
-                   infoFormat.equalsIgnoreCase(MimeType.APP_XML) || infoFormat.equalsIgnoreCase("xml") ||
-                   infoFormat.equalsIgnoreCase("gml"))
-        {
-            // GML
-            visitor = new GMLGraphicVisitor(request);
-        } else {
-            throw new CstlServiceException("MIME type " + infoFormat + " is not accepted by the service.\n" +
-                    "You have to choose between: "+ MimeType.TEXT_PLAIN +", "+ MimeType.TEXT_HTML +", "+ MimeType.APP_GML +", "+ "gml" +
-                    ", "+ MimeType.APP_XML +", "+ "xml"+", "+ MimeType.TEXT_XML,
-                    INVALID_FORMAT, "infoFormat");
-        }
 
-        final VisitDef visitDef = new VisitDef();
-        visitDef.setArea(selectionArea);
-        visitDef.setVisitor(visitor);
-
-
-        // We now build the response, according to the format chosen.
+        FeatureInfoFormat featureInfo = null;
         try {
-        	Cstl.getPortrayalService().visit(sdef,vdef,cdef,visitDef);
-        } catch (PortrayalException ex) {
+            featureInfo = FeatureInfoUtilities.getFeatureInfoFormat( getConfiguration(), configLayer, infoFormat);
+        } catch (ClassNotFoundException ex) {
+            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+        } catch (ConfigurationException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
 
-        return visitor.getResult();
+        if (featureInfo == null) {
+            throw new CstlServiceException("INFO_FORMAT="+infoFormat+" not supported for layers : "+layerName, NO_APPLICABLE_CODE);
+        }
+
+        try {
+            final Object result = featureInfo.getFeatureInfo(sdef, vdef, cdef, selectionArea, request);
+            return new AbstractMap.SimpleEntry<String, Object>(infoFormat, result);
+        } catch (PortrayalException ex) {
+            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+        }
     }
 
     /**

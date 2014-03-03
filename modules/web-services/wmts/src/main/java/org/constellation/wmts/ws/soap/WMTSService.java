@@ -19,6 +19,7 @@ package org.constellation.wmts.ws.soap;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Map;
 import java.util.logging.Level;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -133,7 +134,13 @@ public class WMTSService extends OGCWebService<WMTSWorker>{
             LOGGER.info("received SOAP getFeatureInfo request");
             final WMTSWorker worker = getCurrentWorker();
             worker.setServiceUrl(getServiceURL());
-            return worker.getFeatureInfo(requestFeatureInfo);
+            final Map.Entry<String, Object> result = worker.getFeatureInfo(requestFeatureInfo);
+            if (result != null && result.getValue() != null) {
+                return result.getValue().toString();
+            } else {
+                LOGGER.warning("Empty FeatureInfo for request request"+requestFeatureInfo);
+                return null;
+            }
 
         } catch (CstlServiceException ex) {
             throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),

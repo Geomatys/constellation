@@ -38,11 +38,8 @@ import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Source;
 import org.constellation.configuration.TargetNotFoundException;
-import org.constellation.dto.AddLayer;
-import org.constellation.dto.CoverageDataDescription;
-import org.constellation.dto.DataDescription;
-import org.constellation.dto.FeatureDataDescription;
-import org.constellation.dto.PropertyDescription;
+import org.constellation.dto.*;
+import org.constellation.map.featureinfo.FeatureInfoUtilities;
 import org.constellation.ogc.configuration.OGCConfigurer;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.provider.style.SetStyleToStyleProviderDescriptor;
@@ -243,7 +240,7 @@ public class MapConfigurer extends OGCConfigurer {
 
         // Extracts the layer list from service configuration.
         final LayerContext layerContext = (LayerContext) this.getInstanceConfiguration(identifier);
-        List<Layer> layers = MapUtilities.getConfigurationLayers(layerContext, null, null);;
+        List<Layer> layers = MapUtilities.getConfigurationLayers(layerContext, null, null);
 
         for (Layer layer : layers) {
             final LayerRecord record = ConfigurationEngine.getLayer(identifier, this.specification, layer.getName());
@@ -264,6 +261,20 @@ public class MapConfigurer extends OGCConfigurer {
         final Instance instance = super.getInstance(identifier);
         instance.setLayersNumber(getLayers(identifier).size());
         return instance;
+    }
+    /**
+     * {@inheritDoc}
+     * Add default FeatureInfoFormat for LayerContext configuration.
+     */
+    @Override
+    public void createInstance(String identifier, Service metadata, Object configuration) throws ConfigurationException {
+
+        if (configuration == null) {
+            configuration = new LayerContext();
+            ((LayerContext)configuration).setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
+        }
+
+        super.createInstance(identifier, metadata, configuration);
     }
 
     public void removeLayer(final String serviceId, final QName layerid) throws JAXBException {

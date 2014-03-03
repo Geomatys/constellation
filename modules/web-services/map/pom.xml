@@ -89,10 +89,21 @@
       <artifactId>cstl-engine-process-core</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-data-coveragesgroup</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Geotoolkit pending -->
     <dependency>
       <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-xml-sld</artifactId>
+    </dependency>
+
+      <!-- WMTS JAXB binding used for GetFeatureInfo -->
+    <dependency>
+      <groupId>org.geotoolkit</groupId>
+      <artifactId>geotk-xml-wmts</artifactId>
     </dependency>
     <dependency>
       <groupId>org.geotoolkit</groupId>

@@ -21,6 +21,7 @@ import java.util.List;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
+import org.constellation.map.featureinfo.FeatureInfoUtilities;
 import org.constellation.process.ConstellationProcessFactory;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
@@ -100,6 +101,7 @@ public abstract class CreateMapServiceTest extends AbstractMapServiceTest {
             sources.add(new Source("source1", Boolean.TRUE, null, null));
             final Layers layers = new Layers(sources);
             final LayerContext conf = new LayerContext(layers);
+            conf.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
             createCustomInstance("createInstance15", conf);
             //create
             ParameterValueGroup in = desc.getInputDescriptor().createValue();

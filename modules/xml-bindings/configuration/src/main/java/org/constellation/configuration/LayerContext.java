@@ -22,10 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.*;
+
 import org.geotoolkit.gui.swing.tree.Trees;
 import java.util.Objects;
 
@@ -48,6 +46,10 @@ public class LayerContext extends AbstractConfigurationObject {
     private Languages supportedLanguages;
 
     private final Map<String, String> customParameters = new HashMap<String, String>();
+
+    @XmlElementWrapper(name="featureInfos")
+    @XmlElement(name="FeatureInfo")
+    private List<GetFeatureInfoCfg> getFeatureInfoCfgs;
 
     public LayerContext() {
 
@@ -174,6 +176,18 @@ public class LayerContext extends AbstractConfigurationObject {
         this.implementation = implementation;
     }
 
+    /**
+     * Return custom getFeatureInfos
+     * @return a list with GetFeatureInfoCfg, can be null.
+     */
+    public List<GetFeatureInfoCfg> getGetFeatureInfoCfgs() {
+        return getFeatureInfoCfgs;
+    }
+
+    public void setGetFeatureInfoCfgs(final List<GetFeatureInfoCfg> getFeatureInfoCfgs) {
+        this.getFeatureInfoCfgs = getFeatureInfoCfgs;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
@@ -193,6 +207,12 @@ public class LayerContext extends AbstractConfigurationObject {
                 sb.append("key:").append(entry.getKey()).append(" value:").append(entry.getValue()).append('\n');
             }
         }
+        if (getFeatureInfoCfgs != null && !getFeatureInfoCfgs.isEmpty()) {
+            sb.append("featureInfos:\n").append(getFeatureInfoCfgs).append('\n');
+            for (final GetFeatureInfoCfg getFeatureInfoCfg : getFeatureInfoCfgs) {
+                sb.append("featureInfos:\n").append(getFeatureInfoCfg).append('\n');
+            }
+        }
         return sb.toString();
     }
 
@@ -203,7 +223,8 @@ public class LayerContext extends AbstractConfigurationObject {
             return Objects.equals(this.layers, that.layers) &&
                    Objects.equals(this.security, that.security) &&
                    Objects.equals(this.customParameters, that.customParameters) &&
-                   Objects.equals(this.supportedLanguages, that.supportedLanguages);
+                   Objects.equals(this.supportedLanguages, that.supportedLanguages)&&
+                   Objects.equals(this.getFeatureInfoCfgs, that.getFeatureInfoCfgs);
         }
         return false;
     }
@@ -215,6 +236,7 @@ public class LayerContext extends AbstractConfigurationObject {
         hash = 97 * hash + (this.security != null ? this.security.hashCode() : 0);
         hash = 97 * hash + (this.customParameters != null ? this.customParameters.hashCode() : 0);
         hash = 97 * hash + (this.supportedLanguages != null ? this.supportedLanguages.hashCode() : 0);
+        hash = 97 * hash + (this.getFeatureInfoCfgs != null ? this.getFeatureInfoCfgs.hashCode() : 0);
         return hash;
     }
 }

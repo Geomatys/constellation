@@ -19,7 +19,8 @@ package org.constellation.ws;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import org.constellation.configuration.Language;
+import org.constellation.configuration.*;
+import org.constellation.map.featureinfo.FeatureInfoUtilities;
 import org.constellation.ws.security.SimplePDP;
 import org.constellation.ServiceDef.Specification;
 
@@ -29,10 +30,7 @@ import java.util.logging.Level;
 import javax.imageio.spi.ServiceRegistry;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
-import org.constellation.configuration.DataSourceType;
-import org.constellation.configuration.Languages;
-import org.constellation.configuration.Layer;
-import org.constellation.configuration.LayerContext;
+
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.map.factory.MapFactory;
 import org.constellation.map.security.LayerSecurityFilter;
@@ -99,6 +97,10 @@ public abstract class LayerWorker extends AbstractWorker {
                 }
                 final MapFactory mapfactory = getMapFactory(candidate.getImplementation());
                 securityFilter = mapfactory.getSecurityFilter();
+
+                //Check  FeatureInfo configuration (if exist)
+                FeatureInfoUtilities.checkConfiguration(candidate);
+
             } else {
                 startError = "The layer context File does not contain a layerContext object";
                 isStarted  = false;
@@ -116,8 +118,12 @@ public abstract class LayerWorker extends AbstractWorker {
             startError = "The configuration file layerContext.xml has not been found";
             isStarted = false;
             LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, id);
+        } catch (ClassNotFoundException | ConfigurationException ex) {
+            startError = "Custom FeatureInfo configuration error : "+ex.getMessage();
+            isStarted  = false;
+            LOGGER.log(Level.WARNING, startError, ex);
         }
-        
+
 
         layerContext    = candidate;
         defaultLanguage = defaultLanguageCandidate;
