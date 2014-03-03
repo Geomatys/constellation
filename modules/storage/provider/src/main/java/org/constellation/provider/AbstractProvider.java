@@ -34,7 +34,7 @@ import static org.constellation.provider.configuration.ProviderParameters.*;
  */
 public abstract class AbstractProvider<K,V> implements Provider<K, V>{
 
-    private static final Logger LOGGER = Logging.getLogger("org.constellation.provider");
+    protected static final Logger LOGGER = Logging.getLogger("org.constellation.provider");
 
     private final PropertyChangeSupport listeners = new PropertyChangeSupport(this);
     private ParameterValueGroup source;

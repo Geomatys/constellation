@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.constellation.admin.dao.DataRecord;
 
 import static org.constellation.provider.configuration.ProviderParameters.LAYER_ELEVATION_MODEL_DESCRIPTOR;
@@ -44,6 +45,8 @@ import static org.constellation.provider.configuration.ProviderParameters.getLay
 import static org.constellation.provider.configuration.ProviderParameters.isLoadAll;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.COVERAGESQL_DESCRIPTOR;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.NAMESPACE_DESCRIPTOR;
+import org.geotoolkit.coverage.CoverageReference;
+import org.geotoolkit.coverage.DefaultCoverageReference;
 import static org.geotoolkit.parameter.Parameters.value;
 
 /**
@@ -217,7 +220,12 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
 
             final CoverageSQLLayerDetails pgld = (CoverageSQLLayerDetails) getByIdentifier(name);
             if(pgld != null){
-                return MapBuilder.createElevationModel(pgld.getReader());
+                final CoverageReference ref = new DefaultCoverageReference(pgld.getReader(), name);
+                try {
+                    return MapBuilder.createElevationModel(ref);
+                } catch (CoverageStoreException ex) {
+                    LOGGER.log(Level.WARNING, "error while creating elevation model", ex);
+                }
             }
         }
 

@@ -47,6 +47,8 @@ import static org.constellation.provider.configuration.ProviderParameters.getLay
 import static org.constellation.provider.configuration.ProviderParameters.getLayers;
 import static org.constellation.provider.coveragefile.CoverageMosaicProviderService.FOLDER_DESCRIPTOR;
 import static org.constellation.provider.coveragefile.CoverageMosaicProviderService.NAMESPACE_DESCRIPTOR;
+import org.geotoolkit.coverage.CoverageReference;
+import org.geotoolkit.coverage.DefaultCoverageReference;
 import static org.geotoolkit.parameter.Parameters.value;
 
 /**
@@ -215,7 +217,12 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
 
             final GridCoverageReaderLayerDetails pgld = (GridCoverageReaderLayerDetails) getByIdentifier(name);
             if(pgld != null){
-                return MapBuilder.createElevationModel(pgld.getReader());
+                final CoverageReference ref = new DefaultCoverageReference(pgld.getReader(), name);
+                try {
+                    return MapBuilder.createElevationModel(ref);
+                } catch (CoverageStoreException ex) {
+                    LOGGER.log(Level.WARNING, "error while creating elevation model", ex);
+                }
             }
         }
 

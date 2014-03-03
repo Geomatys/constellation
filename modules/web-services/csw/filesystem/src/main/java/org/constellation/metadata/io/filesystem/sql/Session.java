@@ -85,7 +85,7 @@ public class Session implements Closeable {
             insertStatement.executeUpdate();
 
         } catch (SQLException unexpected) {
-            LOGGER.log(Level.WARNING, "Unexpected error occurred while inserting in csw database schema.", unexpected);
+            LOGGER.log(Level.WARNING, "Unexpected error occurred while inserting in csw database schema(id=" + identifier + " path=" + path +")", unexpected);
         }
     }
 
