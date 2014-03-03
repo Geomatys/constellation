@@ -2,8 +2,15 @@
 
 /* Controllers */
 
-cstlAdminApp.controller('MainController', ['$scope',
-    function ($scope) {
+cstlAdminApp.controller('HeaderController', ['$scope','$http',
+                                           function ($scope, $http) {
+	                                         $http.get("app/conf").success(function(data){
+	                                    	   $scope.cstlUrl = data.cstl + "spring/login";
+	                                        });
+                                           }]);
+
+cstlAdminApp.controller('MainController', ['$scope','$location',
+    function ($scope, $location) {
     }]);
 
 cstlAdminApp.controller('LanguageController', ['$scope', '$translate',
@@ -13,9 +20,11 @@ cstlAdminApp.controller('LanguageController', ['$scope', '$translate',
         };
     }]);
 
-cstlAdminApp.controller('MenuController', ['$scope',
+cstlAdminApp.controller('MenuController', ['$scope', 
     function ($scope) {
-    }]);
+	
+
+}]);
 
 cstlAdminApp.controller('LoginController', ['$scope', '$location', 'AuthenticationSharedService',
     function ($scope, $location, AuthenticationSharedService) {

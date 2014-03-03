@@ -9,7 +9,7 @@
 <!--[if lt IE 10]>
 <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
 <![endif]-->
-<div class="header">
+<div class="header" ng-controller="HeaderController">
     <div class="row" style="margin:0;">
         <div class="col-sm-2">
             <a href="#" class="brand"
@@ -44,7 +44,7 @@
                 </li>
             </ul>
             <ul ng-hide="authenticated" class="nav nav-pills pull-right">
-                <li ng-hide="authenticated"><a href="#/login"><span
+                <li ng-hide="authenticated"><a href="{{cstlUrl}}" ><span
                         class="glyphicon glyphicon-log-in"></span> &nbsp;<span
                         translate="global.menu.account.login">Authenticate</span></a></li>
             </ul>
@@ -104,7 +104,9 @@
 
 
 
-<div class="container" style="box-sizing: border-box" ng-view=""></div>
+<div class="container" style="box-sizing: border-box" ng-view="">
+
+</div>
 
 
 
@@ -112,7 +114,7 @@
 
 
 
-
+<script type="text/javascript" src="cstl-config.js"></script>
 
 <!-- build:js scripts/scripts.js -->
 <script src="bower_components/modernizr/modernizr.js"></script>

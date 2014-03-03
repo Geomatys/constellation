@@ -1,17 +1,40 @@
-<html>
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
 <body>
+<!--[if lt IE 10]>
+<p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+<![endif]-->
+<div class="header">
+    <div class="row" style="margin:0;">
+        <div class="col-sm-2">
+            <a href="#" class="brand"
+               style="padding-bottom: 5px; padding-top: 5px"> <img id="brand"
+                                                                   src="images/constellation-menu.png" style="height: 20px; margin-bottom: 5px; margin-top: 10px;"
+                                                                   alt="constellation-logo" />
+            </a>
+        </div>
+        <div class="col-sm-10">
+        </div>
+    </div>
+</div>
 
-	<div>
+
+
+
+
+<div class="container" style="box-sizing: border-box" ng-view="">
+
+<div>
 		<div class="row">
 			<div class="col-md-4"></div>
 			<div class="col-md-4">
 				<h1 translate="login.title">Authentication</h1>
 
-				<div class="alert alert-danger" ng-show="authenticationError"
-					translate="login.messages.error.authentication">
-					<strong>Authentication failed!</strong> Please check your
-					credentials and try again.
-				</div>
 				<form class="form" role="form"
 					action="j_spring_security_check"
 					method="post">
@@ -19,22 +42,53 @@
 						<label for="username" translate="login.form.username">Login</label>
 						<input type="text" class="form-control" name="j_username"
 							id="username"
-							placeholder="{{'login.form.username.placeholder' | translate}}"
+							placeholder="login"
 							ng-model="username">
 					</div>
 					<div class="form-group">
 						<label for="password" translate="login.form.password">Password</label>
 						<input type="password" class="form-control" name="j_password"
 							id="password"
-							placeholder="{{'login.form.password.placeholder' | translate}}"
-							ng-model="password">
+							placeholder="password"
+							>
 					</div>
-					<button type="submit" class="btn btn-primary"
-						translate="login.form.button">Authenticate</button>
+					<button type="submit" class="btn btn-primary">Login</button>
 				</form>
 			</div>
 			<div class="col-md-4"></div>
 		</div>
 	</div>
+
+</div>
+
+
+
+
+
+
+
+<script type="text/javascript" src="cstl-config.js"></script>
+
+<!-- build:js scripts/scripts.js -->
+
+<!-- endbuild -->
 </body>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>cstl-admin</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <!-- build:css(.tmp) styles/main.css -->
+    <link rel="stylesheet" href="styles/bootstrap.css">
+    <link rel="stylesheet" href="styles/font-awesome.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/famfamfam-flags.css">
+    <link rel="stylesheet" href="styles/bootstrap-fileinput.min.css">
+    <link rel="stylesheet" href="styles/bootstrap-datepicker.css">
+    <link rel="stylesheet" href="styles/github.min.css">
+
+    <!-- endbuild -->
+</head>
 </html>

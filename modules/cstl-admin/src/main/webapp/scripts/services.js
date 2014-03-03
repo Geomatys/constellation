@@ -19,7 +19,8 @@ cstlAdminApp.factory('AuthInterceptor', function($cookies) {
 
 var context = findWebappContext();
 
-var cstlContext = "http://localhost:8180/constellation/";
+
+
 
 cstlAdminApp.factory('Account', ['$resource',
     function ($resource) {

@@ -7,7 +7,7 @@
             <div class="alert alert-danger" ng-show="authenticationError" translate="login.messages.error.authentication">
                 <strong>Authentication failed!</strong> Please check your credentials and try again.
             </div>
-            <form class="form" role="form" action="http://localhost:8180/constellation/j_spring_security_check" method="post">
+            <form class="form" role="form" action="{{cstlUrl}}" method="post">
                 <div class="form-group">
                     <label for="username" translate="login.form.username">Login</label>
                     <input type="text" class="form-control" name="j_username" id="username" placeholder="{{'login.form.username.placeholder' | translate}}" ng-model="username">
