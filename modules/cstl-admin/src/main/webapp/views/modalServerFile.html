@@ -2,7 +2,7 @@
     <div class="modal-content" ng-init="init()">
         <div class="modal-header">
             <button type="button" class="close" ng-click="close()">×</button>
-            <h4 class="modal-title" translate="">File Selection</h4>
+            <h4 class="modal-title" translate="data.server.modal.title">Server file</h4>
         </div>
         <div class="modal-body">
             <!-- Display coverage data -->
@@ -56,9 +56,9 @@
             </div>
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-default" ng-click="close()">Annuler</button>
-            <button type="button" class="btn btn-primary" ng-disabled="!hasSelectedSomething" ng-show="!finished" ng-click="ok()">Valider</button>
-            <button type="button" class="btn btn-primary" ng-show="chooseType" ng-click="userChooseType()">Choisir</button>
+            <button type="button" class="btn btn-default" ng-click="close()" translate="data.server.modal.cancel">Cancel</button>
+            <button type="button" class="btn btn-primary" ng-disabled="!hasSelectedSomething" ng-show="!finished" ng-click="ok()" translate="data.server.modal.validate">Validate</button>
+            <button type="button" class="btn btn-primary" ng-show="chooseType" ng-click="userChooseType()" translate="data.server.modal.choose">Choose</button>
         </div>
     </div>
 </div>

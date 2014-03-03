@@ -19,7 +19,7 @@
         "language": {
             "en": "Englisch",
             "fr": "Französisch",
-            "de": "Deutsch"            
+            "de": "Deutsch"
         }
     },
     "main": {
@@ -101,7 +101,7 @@
         "messages": {
             "error": {
                 "global": "<strong>Es ist ein Fehler aufgetreten!</strong> Das Passwort konnte nicht geändert werden.",
-                "dontmatch" : "Das bestätigte Passwort entspricht nicht dem neuen Passwort!"
+                "dontmatch": "Das bestätigte Passwort entspricht nicht dem neuen Passwort!"
             },
             "success": "<strong>Passwort wurde geändert!</strong>",
             "validate": {
