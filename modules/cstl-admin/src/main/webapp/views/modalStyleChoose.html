@@ -79,11 +79,8 @@
                     </div>
                 </div>
             </div>
-                <div class="col-sm-6">
-                    <button id="showData" class="btn btn-success" type="button" ng-click="showLayerWithStyle(style.Name)">
-                        <i class="icon-map-marker"></i> <span translate="layer.listing.selected.data.button">View</span>
-                    </button>
-                    <div class="col-sm-6" id="styledMapOL" style="height: 300px; width:300px; border: 1px;border-color: black;"></div>
+                <div class="col-sm-6" ng-show="StyleisSelected()">
+                    <div class="col-sm-6" id="styledMapOL" style="height: 500px; width:400px;"></div>
                 </div>
             </div>
         </div>

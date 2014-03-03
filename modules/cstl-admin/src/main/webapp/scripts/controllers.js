@@ -299,6 +299,16 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             DataViewer.initMap('styledMapOL');
         };
 
+        $scope.StyleisSelected =function(){
+            if ($scope.selected != null){
+                $scope.showLayerWithStyle($scope.selected.Name);
+                return true
+            } else {
+                return false
+            }
+
+        };
+
     }]);
 
 cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$modalInstance', '$ajaxUpload', '$growl', 'provider', 'dataListing', '$uploadFiles',
