@@ -69,8 +69,8 @@ import java.util.logging.Logger;
  * A generic FeatureInfoFormat that produce GML output for Features and Coverages.
  * Supported mimeTypes are :
  * <ul>
- *     <li>application/vnd.ogc.gml</li>
- *     <li>application/gml+xml</li>
+ *     <li>application/vnd.ogc.gml : will return msGMLOutput</li>
+ *     <li>application/gml+xml : will return OGC GML3</li>
  * </ul>
  *
  * @author Quentin Boileau (Geomatys)
@@ -298,16 +298,29 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
     @Override
     protected void nextProjectedFeature(ProjectedFeature graphic, RenderingContext2D context, SearchAreaJ2D queryArea) {
 
+        final StringBuilder builder   = new StringBuilder();
+        final FeatureMapLayer layer   = graphic.getLayer();
+        final Feature feature         = graphic.getCandidate();
+        final FeatureType featureType = feature.getType();
+        String margin                 = "\t";
+
         if (mode == 0) {
-            super.nextProjectedFeature(graphic, context, queryArea);
+
+            // featureType mark
+            if (featureType != null) {
+                final String ftLocal = featureType.getName().getLocalPart();
+                builder.append(margin).append("<").append(encodeXML(ftLocal)).append("_feature").append(">\n");
+
+                XMLFeatureInfoFormat.complexAttributetoXML(builder, feature, margin);
+
+                // end featureType mark
+                margin = margin.substring(1);
+                builder.append(margin).append("</").append(encodeXML(ftLocal)).append("_feature").append(">\n");
+            } else {
+                LOGGER.warning("The feature type is null");
+            }
+
         } else {
-
-            final StringBuilder builder   = new StringBuilder();
-            final FeatureMapLayer layer   = graphic.getLayer();
-            final Feature feature         = graphic.getCandidate();
-            final FeatureType featureType = feature.getType();
-            String margin                 = "\t";
-
             // feature member  mark
             builder.append(margin).append("<gml:featureMember>\n");
             margin += "\t";
@@ -333,16 +346,17 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
             margin = margin.substring(1);
             builder.append(margin).append("</gml:featureMember>\n");
 
-            final String result = builder.toString();
-            if (builder.length() > 0) {
-                final String layerName = layer.getName();
-                List<String> strs = features.get(layerName);
-                if (strs == null) {
-                    strs = new ArrayList<String>();
-                    features.put(layerName, strs);
-                }
-                strs.add(result.substring(0, result.length()));
+        }
+
+        final String result = builder.toString();
+        if (builder.length() > 0) {
+            final String layerName = layer.getName();
+            List<String> strs = features.get(layerName);
+            if (strs == null) {
+                strs = new ArrayList<String>();
+                features.put(layerName, strs);
             }
+            strs.add(result.substring(0, result.length()));
         }
     }
 
@@ -409,7 +423,11 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
 
         this.gfi = getFI;
         final StringBuilder builder = new StringBuilder();
-        mode = 1; //force to GML3
+        if ( getFI.getInfoFormat().equals(MimeType.APP_GML)) {
+            mode = 0;//msGMLOutput
+        } else {
+            mode = 1;//GML3
+        }
 
         //fill coverages and features maps
         getCandidates(sdef, vdef, cdef, searchArea, -1);
@@ -437,10 +455,20 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
         values.putAll(coverages);
 
         for (String layerName : values.keySet()) {
+
+            if (mode == 0) {
+                builder.append("<").append(encodeXML(layerName)).append("_layer").append(">\n");
+            }
+
             for (final String record : values.get(layerName)) {
                 builder.append(record);
             }
+
+            if (mode == 0) {
+                builder.append("</").append(encodeXML(layerName)).append("_layer").append(">\n");
+            }
         }
+
         if (mode == 0) {
             builder.append("</msGMLOutput>");
         } else {
@@ -459,9 +487,8 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
     @Override
     public List<String> getSupportedMimeTypes() {
         final List<String> mimes = new ArrayList<String>();
-        //will return GML 3
-        mimes.add(MimeType.APP_GML);
-        mimes.add(MimeType.APP_GML_XML);
+        mimes.add(MimeType.APP_GML);//will return map server GML
+        mimes.add(MimeType.APP_GML_XML);//will return GML 3
         return mimes;
     }
 

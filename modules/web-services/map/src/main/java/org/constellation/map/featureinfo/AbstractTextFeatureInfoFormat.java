@@ -137,5 +137,47 @@ public abstract class AbstractTextFeatureInfoFormat extends AbstractFeatureInfoF
             strs.add(result.substring(0, result.length() - 1));
         }
     }
-    
+
+    /**
+     * Escapes the characters in a String.
+     *
+     * @param str
+     * @return String
+     */
+    protected static String encodeXML(String str) {
+        if (str != null && !str.isEmpty()) {
+            str = str.trim();
+            final StringBuffer buf = new StringBuffer(str.length() * 2);
+            int i;
+            for (i = 0; i < str.length(); ++i) {
+                char ch = str.charAt(i);
+                int intValue = (int)ch;
+                String entityName = null;
+
+                switch (intValue) {
+                    case 34 : entityName = "quot"; break;
+                    case 39 : entityName = "apos"; break;
+                    case 38 : entityName = "amp"; break;
+                    case 60 : entityName = "lt"; break;
+                    case 62 : entityName = "gt"; break;
+                }
+
+                if (entityName == null) {
+                    if (ch > 0x7F) {
+                        buf.append("&#");
+                        buf.append(intValue);
+                        buf.append(';');
+                    } else {
+                        buf.append(ch);
+                    }
+                } else {
+                    buf.append('&');
+                    buf.append(entityName);
+                    buf.append(';');
+                }
+            }
+            return buf.toString();
+        }
+        return str;
+    }
 }

@@ -1,10 +1,14 @@
 package org.constellation.map.featureinfo;
 
 import com.vividsolutions.jts.geom.Geometry;
+import org.apache.sis.geometry.GeneralDirectPosition;
+import org.apache.sis.storage.DataStoreException;
+import org.apache.sis.util.logging.Logging;
 import org.constellation.provider.LayerDetails;
 import org.constellation.ws.MimeType;
+import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.GridSampleDimension;
-import org.geotoolkit.display.exception.PortrayalException;
+import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.display2d.canvas.RenderingContext2D;
 import org.geotoolkit.display2d.primitive.ProjectedCoverage;
 import org.geotoolkit.display2d.primitive.ProjectedFeature;
@@ -12,13 +16,10 @@ import org.geotoolkit.display2d.primitive.SearchAreaJ2D;
 import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
-import org.geotoolkit.geometry.GeneralDirectPosition;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.ows.xml.GetFeatureInfo;
-import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.util.DateRange;
-import org.geotoolkit.util.logging.Logging;
 import org.opengis.feature.ComplexAttribute;
 import org.opengis.feature.Feature;
 import org.opengis.feature.GeometryAttribute;
@@ -67,7 +68,8 @@ public class XMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
             return;
         }
 
-        final Name fullLayerName = coverage.getLayer().getCoverageName();
+        final CoverageReference ref = coverage.getLayer().getCoverageReference();
+        final Name fullLayerName = ref.getName();
         String layerName = fullLayerName.getLocalPart();
 
         StringBuilder builder = new StringBuilder();
@@ -77,7 +79,7 @@ public class XMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
         margin += "\t";
         builder.append(margin).append("<Layer>").append(encodeXML(layerName)).append("</Layer>\n");
 
-        builder.append(coverageToXML(coverage, results, margin));
+        builder.append(coverageToXML(coverage, results, margin, gfi, getLayersDetails()));
 
         margin = margin.substring(1);
         builder.append(margin).append("</Coverage>\n");
@@ -93,12 +95,13 @@ public class XMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
 
     }
 
-    private String coverageToXML(ProjectedCoverage coverage, List<Map.Entry<GridSampleDimension,Object>> results, String margin) {
+    protected static String coverageToXML(final ProjectedCoverage coverage, final List<Map.Entry<GridSampleDimension,Object>> results,
+                                          String margin, final GetFeatureInfo gfi, final List<LayerDetails> layerDetailsList) {
 
         StringBuilder builder = new StringBuilder();
-        final Name fullLayerName = coverage.getLayer().getCoverageName();
+        final CoverageReference ref = coverage.getLayer().getCoverageReference();
+        final Name fullLayerName = ref.getName();
 
-        final List<LayerDetails> layerDetailsList = getLayersDetails();
         LayerDetails layerPostgrid = null;
 
         for (LayerDetails layer : layerDetailsList) {
@@ -290,7 +293,7 @@ public class XMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
         }
     }
 
-    private void complexAttributetoXML(final StringBuilder builder, final ComplexAttribute complexAtt, String margin) {
+    protected static void complexAttributetoXML(final StringBuilder builder, final ComplexAttribute complexAtt, String margin) {
         for (final Property prop : complexAtt.getProperties()) {
             if (prop == null) {
                 continue;
@@ -360,49 +363,6 @@ public class XMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
         builder.append("</FeatureInfo>");
 
         return builder.toString();
-    }
-
-    /**
-     * Escapes the characters in a String.
-     *
-     * @param str
-     * @return String
-     */
-    private static String encodeXML(String str) {
-        if (str != null && !str.isEmpty()) {
-            str = str.trim();
-            final StringBuffer buf = new StringBuffer(str.length() * 2);
-            int i;
-            for (i = 0; i < str.length(); ++i) {
-                char ch = str.charAt(i);
-                int intValue = (int)ch;
-                String entityName = null;
-
-                switch (intValue) {
-                    case 34 : entityName = "quot"; break;
-                    case 39 : entityName = "apos"; break;
-                    case 38 : entityName = "amp"; break;
-                    case 60 : entityName = "lt"; break;
-                    case 62 : entityName = "gt"; break;
-                }
-
-                if (entityName == null) {
-                    if (ch > 0x7F) {
-                        buf.append("&#");
-                        buf.append(intValue);
-                        buf.append(';');
-                    } else {
-                        buf.append(ch);
-                    }
-                } else {
-                    buf.append('&');
-                    buf.append(entityName);
-                    buf.append(';');
-                }
-            }
-            return buf.toString();
-        }
-        return str;
     }
 
     /**
