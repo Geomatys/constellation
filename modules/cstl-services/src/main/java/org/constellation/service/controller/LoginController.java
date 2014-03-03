@@ -24,7 +24,7 @@ public class LoginController {
 		if (SecurityManagerHolder.getInstance().isAuthenticated())
 			response.setStatus(HttpServletResponse.SC_NO_CONTENT);
 		else
-			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 	}
 
 	@RequestMapping("/loggedin")
