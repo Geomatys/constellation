@@ -18,6 +18,7 @@
 package org.constellation.ws.rest;
 
 import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.PortrayalContext;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.LayerProviders;
@@ -30,6 +31,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBException;
 
 /**
  * RestFull API for provider data rendering/portraying.
@@ -62,6 +64,33 @@ public final class Portrayal {
             return Response.ok(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
         }
     }
+    
+    
+    
+    
+    /**
+     * @see LayerProviders#portray(String, String, String, String, int, int, String)
+     */
+    @GET
+    @Path("/portray/style")
+    public Response portray(@QueryParam("PROVIDER") final String providerId,
+                            @QueryParam("LAYERS") final String dataName,
+                            @QueryParam("BBOX") final String bbox,
+                            @QueryParam("CRS") final String crs,
+                            @QueryParam("WIDTH") final int width,
+                            @QueryParam("HEIGHT") final int height,
+                            @QueryParam("SLD_BODY") final String sldBody,
+                            @QueryParam("SLD_VERSION") final String sldVersion,
+                            @QueryParam("SLDPROVIDER") final String sldProvider,
+                            @QueryParam("SLDID") final String styleId) {
+                           
+        try {
+            return Response.ok(LayerProviders.portray(providerId, dataName, crs, bbox, width, height, sldBody, sldVersion,sldProvider,styleId )).build();
+        } catch (CstlServiceException | TargetNotFoundException | JAXBException ex) {
+            return Response.ok(new AcknowlegementType("Failure", ex.getLocalizedMessage()), MediaType.APPLICATION_XML).build();
+        }
+    }
+
 
     /**
      * @see LayerProviders#portray(PortrayalContext)

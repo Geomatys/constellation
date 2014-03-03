@@ -99,7 +99,7 @@ cstlAdminApp.factory('dataListing', ['$resource',
 
 cstlAdminApp.factory('style', ['$resource',
     function ($resource) {
-        return $resource(cstlContext+'api/1/SP/all/style/available', {}, {
+        return $resource(cstlContext+'api/1/SP/all/style/available;jsessionid=', {}, {
             'listAll': { method: 'GET', isArray: false },
             'delete':  { method: 'DELETE', url: cstlContext+'api/1/SP/:provider/style/:name;jsessionid='},
             'link':    { method: 'POST',   url: cstlContext+'api/1/SP/:provider/style/:name/linkData;jsessionid='},
@@ -152,6 +152,59 @@ cstlAdminApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'aut
         };
     }]);
 
+cstlAdminApp.factory('StyleSharedService', ['$modal', 'style' ,function ($modal, style) {
+        return {
+            showStyleList : function($scope) {
+                var modal = $modal.open({
+                    templateUrl: 'views/modalStyleChoose.html',
+                    controller: 'StyleModalController',
+                    resolve: {
+                        exclude: function() { return $scope.selected.TargetStyle },
+                        layerName: function() { return $scope.selected.Name },
+                        serviceName: function() { return $scope.service.name }
+
+                    }
+                });
+
+                modal.result.then(function(item) {
+                    if (item) {
+                        style.link({
+                            provider: item.Provider,
+                            name: item.Name
+                        }, {
+                            values: {
+                                dataProvider: $scope.selected.Provider,
+                                dataNamespace: "",
+                                dataId: $scope.selected.Name
+                            }
+                        }, function() {
+                            $scope.selected.TargetStyle.push(item);
+                        });
+                    }
+                });
+            },
+
+            unlinkStyle : function($scope,providerName, styleName, dataProvider, dataId, style) {
+                var res = style.unlink({provider: providerName, name: styleName},
+                    {values: {dataProvider: dataProvider, dataNamespace: "", dataId: dataId}});
+                if (res) {
+                    var index = -1;
+                    for (var i=0; i < $scope.selected.TargetStyle.length; i++) {
+                        var item = $scope.selected.TargetStyle[i];
+                        if (item.Provider === providerName && item.Name === styleName) {
+                            index = i;
+                            break;
+                        }
+                    }
+                    if (index >= 0) {
+                        $scope.selected.TargetStyle.splice(index,1);
+                    }
+                }
+            }
+
+        };
+
+    }]);
 
 cstlAdminApp.directive('pageSwitcher', function() {
     return {

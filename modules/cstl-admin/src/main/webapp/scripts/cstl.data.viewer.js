@@ -76,5 +76,30 @@ DataViewer = {
             }
         );
         return layer;
+    },
+
+    createLayerWMSWithStyle : function(layerName,instance, style){
+        var layer = new OpenLayers.Layer.WMS(layerName,
+            cstlContext+'WS/wms/'+ instance,
+            {
+                request:     'GetMap',
+                layers:      layerName,
+                version:     '1.3.0',
+                sld_version: '1.1.0',
+                format:      'image/png',
+                Styles: style
+            },
+            {
+                ratio: 1,
+                isBaseLayer: true,
+                singleTile: true,
+                transitionEffect: 'resize',
+                tileOptions: {
+                    maxGetUrlLength: 2048
+                }
+            }
+        );
+        return layer;
     }
+
 }

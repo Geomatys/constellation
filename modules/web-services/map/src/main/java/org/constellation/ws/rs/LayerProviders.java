@@ -18,17 +18,20 @@
 package org.constellation.ws.rs;
 
 import com.vividsolutions.jts.geom.Geometry;
+
 import org.apache.sis.geometry.Envelope2D;
 import org.apache.sis.geometry.GeneralEnvelope;
 import org.apache.sis.referencing.crs.DefaultGeographicCRS;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.Static;
+import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.BandDescription;
 import org.constellation.dto.CoverageDataDescription;
 import org.constellation.dto.DataDescription;
 import org.constellation.dto.FeatureDataDescription;
 import org.constellation.dto.PortrayalContext;
 import org.constellation.dto.PropertyDescription;
+import org.constellation.map.configuration.StyleProviderConfig;
 import org.constellation.portrayal.internal.PortrayalResponse;
 import org.constellation.provider.FeatureLayerDetails;
 import org.constellation.provider.LayerDetails;
@@ -58,6 +61,8 @@ import org.geotoolkit.map.MapItem;
 import org.geotoolkit.process.coverage.copy.StatisticOp;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.ReferencingUtilities;
+import org.geotoolkit.sld.DefaultSLDFactory;
+import org.geotoolkit.sld.MutableStyledLayerDescriptor;
 import org.geotoolkit.sld.xml.Specification;
 import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.style.MutableStyle;
@@ -76,6 +81,7 @@ import org.opengis.filter.expression.Literal;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.sld.SLDFactory;
 import org.opengis.style.ChannelSelection;
 import org.opengis.style.ColorMap;
 import org.opengis.style.ContrastEnhancement;
@@ -90,6 +96,7 @@ import org.opengis.util.FactoryException;
 import javax.measure.unit.NonSI;
 import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBException;
+
 import java.awt.*;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
@@ -261,6 +268,35 @@ public final class LayerProviders extends Static {
                 context.getHeight(),
                 context.getStyleBody(),
                 context.getSldVersion());
+    }
+    
+    
+    /**
+     * Produces a {@link PortlResponse} from the specified parameters.
+     * <p/>
+     * This method allows to perform data rendering without WMS layer.
+     *
+     * @param providerId the layer provider id
+     * @param layerName  the layer name
+     * @param crsCode    the projection code
+     * @param bbox       the bounding box
+     * @param width      the image width
+     * @param height     the image height
+     * @param sld	     the style to apply
+     * @return a {@link PortrayalResponse} instance
+     * @throws CstlServiceException if the {@link PortrayalResponse} can't be produced for
+     * any reason
+     * @throws TargetNotFoundException CstlServiceException
+     * @throws JAXBException 
+     */
+    public static PortrayalResponse portray(final String providerId, final String layerName, final String crsCode,
+                                            final String bbox, final int width, final int height, final String sldBody,
+                                            final String sldVersion, final String sldProvider, final String styleId) throws CstlServiceException, TargetNotFoundException, JAXBException {
+    	MutableStyle style = StyleProviderConfig.getStyle(sldProvider, styleId);
+    	StyleXmlIO styleXmlIO = new StyleXmlIO();
+    	StringBuilder sldBodyFromMutableStyle = new StringBuilder();
+    	styleXmlIO.writeStyle(sldBodyFromMutableStyle, style, Specification.StyledLayerDescriptor.V_1_1_0);
+    	return portray(providerId, layerName, crsCode, bbox, width, height, sldBodyFromMutableStyle.toString(),"1.1.0");
     }
 
     /**

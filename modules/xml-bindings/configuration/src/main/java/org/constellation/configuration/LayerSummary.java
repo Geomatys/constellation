@@ -3,7 +3,9 @@ package org.constellation.configuration;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author Cédric Briançon (Geomatys)
@@ -20,15 +22,21 @@ public class LayerSummary {
     private Date date;
     @XmlElement(name = "Owner")
     private String owner;
+    @XmlElement(name = "Provider")
+    private String provider;
+    @XmlElement(name = "TargetStyle")
+	private List<StyleBrief> targetStyle;
 
     public LayerSummary() {}
 
-    public LayerSummary(final Layer layer) {
+    public LayerSummary(final Layer layer, final DataBrief db) {
         this.name = layer.getName().getLocalPart();
         this.alias = layer.getAlias();
         this.type = layer.getProviderType();
         this.date = layer.getDate();
         this.owner = layer.getOwner();
+        this.provider = db.getProvider();
+        this.targetStyle = db.getTargetStyle();
     }
 
     public String getName() {
@@ -69,5 +77,13 @@ public class LayerSummary {
 
     public void setOwner(String owner) {
         this.owner = owner;
+    }
+
+    public String getProvider() {
+        return provider;
+    }
+
+    public void setProvider(String provider) {
+        this.provider = provider;
     }
 }

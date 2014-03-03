@@ -107,7 +107,6 @@
             "tab.missing.title": "Missing metadata"
         }
     },
-
     "edition.style": {
         "label": {
            "attribute": "Attribute",
@@ -168,8 +167,12 @@
             "type": "Type",
             "update": "Update",
             "validate":" Validate",
-            "viewer": "Viewer",
-            "width": "Width"
+            "viewer": "Style Selection",
+            "width": "Width",
+            "choice":{
+                "new": "Create new style",
+                "existing": "Use existing style"
+            }
            },
         "placeholder": {
             "name": "Type a name...",
@@ -442,6 +445,11 @@
         },
         "edit" : {
             "dashboard.title" : "Layers list",
+            "dashboard.tabs" :{
+                "data": "Data",
+                "description" : "Service Description",
+                "metadata" : "Service Metadata"
+            },
             "dashboard.data.title" : "Data list",
             "dashboard.header.title": "Title",
             "dashboard.header.date": "Date",

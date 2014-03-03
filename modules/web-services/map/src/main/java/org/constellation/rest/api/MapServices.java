@@ -18,12 +18,8 @@
 package org.constellation.rest.api;
 
 import org.constellation.ServiceDef.Specification;
-import org.constellation.configuration.AcknowlegementType;
-import org.constellation.configuration.Layer;
-import org.constellation.configuration.LayerList;
-import org.constellation.configuration.LayerSummary;
-import org.constellation.configuration.NotRunningServiceException;
-import org.constellation.configuration.ServiceConfigurer;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.*;
 import org.constellation.dto.AddLayer;
 import org.constellation.map.configuration.MapConfigurer;
 
@@ -73,7 +69,8 @@ public final class MapServices {
         final List<Layer> layers = getConfigurer(spec).getLayers(id);
         final List<LayerSummary> sumLayers = new ArrayList<>();
         for (final Layer lay : layers) {
-            sumLayers.add(new LayerSummary(lay));
+            final DataBrief db = ConfigurationEngine.getData(lay.getName(), lay.getProviderID());
+            sumLayers.add(new LayerSummary(lay,db));
         }
         return ok(sumLayers);
     }

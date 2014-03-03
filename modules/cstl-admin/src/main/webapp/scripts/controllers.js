@@ -187,8 +187,8 @@ cstlAdminApp.controller('LogsController', ['$scope', 'resolvedLogs', 'LogsServic
         };
     }]);
 
-cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 'dataListing', 'style', '$modal', '$growl',
-    function ($scope, $location, $dashboard, dataListing, style, $modal, $growl) {
+cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 'dataListing', 'style', '$modal', '$growl', 'StyleSharedService',
+    function ($scope, $location, $dashboard, dataListing, style, $modal, $growl, StyleSharedService) {
 
         $scope.filtertype = "VECTOR";
 
@@ -227,47 +227,11 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
 
         // Style methods
         $scope.showStyleList = function() {
-            var modal = $modal.open({
-                templateUrl: 'views/modalStyleChoose.html',
-                controller: 'StyleModalController',
-                resolve: {
-                    exclude: function() { return $scope.selected.TargetStyle }
-                }
-            });
-
-            modal.result.then(function(item) {
-                if (item) {
-                    style.link({
-                        provider: item.Provider,
-                        name: item.Name
-                    }, {
-                        values: {
-                            dataProvider: $scope.selected.Provider,
-                            dataNamespace: "", dataId: $scope.selected.Name
-                        }
-                    }, function() {
-                        $scope.selected.TargetStyle.push(item);
-                    });
-                }
-            });
+            StyleSharedService.showStyleList($scope);
         };
 
         $scope.unlinkStyle = function(providerName, styleName, dataProvider, dataId) {
-            var res = style.unlink({provider: providerName, name: styleName},
-                         {values: {dataProvider: dataProvider, dataNamespace: "", dataId: dataId}});
-            if (res) {
-                var index = -1;
-                for (var i=0; i < $scope.selected.TargetStyle.length; i++) {
-                    var item = $scope.selected.TargetStyle[i];
-                    if (item.Provider === providerName && item.Name === styleName) {
-                        index = i;
-                        break;
-                    }
-                }
-                if (index >= 0) {
-                    $scope.selected.TargetStyle.splice(index,1);
-                }
-            }
+            StyleSharedService.unlinkStyle($scope,providerName, styleName, dataProvider, dataId, style);
         };
 
         $scope.toggleUpDownSelected = function() {
@@ -296,10 +260,23 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
         };
     }]);
 
-cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modalInstance', 'style', 'exclude',
-    function ($scope, $dashboard, $modalInstance, style, exclude) {
+cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modalInstance', 'style', 'exclude','layerName','serviceName',
+    function ($scope, $dashboard, $modalInstance, style, exclude, layerName, serviceName) {
         $scope.exclude = exclude;
+        $scope.layerName = layerName;
+        $scope.serviceName = serviceName;
+
         $scope.filtertype = "";
+
+        $scope.stylechooser = 'new';
+
+        $scope.setStyleChooser = function(choice){
+            $scope.stylechooser = choice;
+        };
+
+        $scope.isSelected= function(choice) {
+            return choice === $scope.stylechooser;
+        };
 
         style.listAll({}, function(response) {
             $dashboard($scope, response.styles);
@@ -312,6 +289,16 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         $scope.close = function() {
             $modalInstance.dismiss('close');
         };
+
+        $scope.showLayerWithStyle = function(style) {
+
+            var layerName = $scope.layerName;
+            var layerData = DataViewer.createLayerWMSWithStyle(layerName, $scope.serviceName,$scope.selected.Name);
+            var layerBackground = DataViewer.createLayer("CNTR_BN_60M_2006", "generic_shp");
+            DataViewer.layers = [layerData, layerBackground];
+            DataViewer.initMap('styledMapOL');
+        };
+
     }]);
 
 cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$modalInstance', '$ajaxUpload', '$growl', 'provider', 'dataListing', '$uploadFiles',
@@ -759,7 +746,7 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','data
     }]);
 
 
-    cstlAdminApp.controller('WebServiceController', ['$scope', 'webService','$modal', 'textService', '$growl',
+cstlAdminApp.controller('WebServiceController', ['$scope', 'webService','$modal', 'textService', '$growl',
     function ($scope, webService, $modal, textService, $growl) {
 
        $scope.services = webService.listAll();
@@ -906,8 +893,8 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
         };
     }]);
 
-cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'webService', '$modal','textService', '$dashboard', '$growl', '$filter',
-                                                 function ($scope, $routeParams , webService, $modal, textService, $dashboard, $growl, $filter) {
+cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'webService', '$modal','textService', '$dashboard', '$growl', '$filter', 'StyleSharedService','style',
+                                                 function ($scope, $routeParams , webService, $modal, textService, $dashboard, $growl, $filter, StyleSharedService, style) {
     $scope.tagText = '';
 
     $scope.service = webService.get({type: $routeParams.type, id:$routeParams.id});
@@ -1088,6 +1075,15 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
          var $header = $('#serviceDashboard').find('.selected-item').find('.block-header');
          $header.next().slideToggle(200);
          $header.find('i').toggleClass('icon-chevron-down icon-chevron-up');
+     };
+
+     // Style methods
+     $scope.showStyleList = function() {
+         StyleSharedService.showStyleList($scope);
+     };
+
+     $scope.unlinkStyle = function(providerName, styleName, dataProvider, dataId) {
+         StyleSharedService.unlinkStyle($scope,providerName, styleName, dataProvider, dataId, style);
      };
     }]);
 

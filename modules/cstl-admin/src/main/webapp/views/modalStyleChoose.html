@@ -1,16 +1,25 @@
-<div class="modal-dialog">
+<div class="modal-dialog" style="width: 1024px">
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" ng-click="close()">×</button>
-            <h4 class="modal-title" translate="edition.style.label.viewer">Edit</h4>
+            <h4 class="modal-title" translate="edition.style.label.viewer">Style Selection</h4>
         </div>
         <div class="modal-body">
-            <div class="frame dashboard">
-                <div class="navbar title">
-                    <div class="navbar-inner">
-                        <a id="dataDashboardTitle" class="brand" href="#">Styles disponibles</a>
-                    </div>
-                </div>
+
+                <button type="button" class="btn btn-info" ng-click="setStyleChooser('new')"><span translate="edition.style.label.choice.new">Create new style</span></button>
+                <button type="button" class="btn btn-info" ng-click="setStyleChooser('existing')"><span translate="edition.style.label.choice.existing">Use existing style</span></button>
+
+
+            <div class="frame dashboard" ng-show="isSelected('new')">
+                new
+            </div>
+            <div class="row"  ng-show="isSelected('existing')">
+                <div class="frame dashboard col-sm-6">
+                <!--<div class="navbar title">-->
+                    <!--<div class="navbar-inner">-->
+                        <!--<a id="dataDashboardTitle" class="brand" href="#">Styles disponibles</a>-->
+                    <!--</div>-->
+                <!--</div>-->
                 <div class="navbar sort-navbar">
                     <div class="navbar-inner">
                         <ul class="nav">
@@ -68,6 +77,13 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+                <div class="col-sm-6">
+                    <button id="showData" class="btn btn-success" type="button" ng-click="showLayerWithStyle(style.Name)">
+                        <i class="icon-map-marker"></i> <span translate="layer.listing.selected.data.button">View</span>
+                    </button>
+                    <div class="col-sm-6" id="styledMapOL" style="height: 300px; width:300px; border: 1px;border-color: black;"></div>
                 </div>
             </div>
         </div>

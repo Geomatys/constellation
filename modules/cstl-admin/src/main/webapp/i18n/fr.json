@@ -225,8 +225,12 @@
    "type": "Type",
    "update": "Mettre à jour",
    "validate": "Valider",
-   "viewer": "Visualisateur",
-   "width": "Largeur"
+   "viewer": "Sélection du Style",
+   "width": "Largeur",
+   "choice":{
+        "new": "Creer un nouveau style",
+        "existing": "Utiliser un style existant"
+   }
    },
   "placeholder": {
    "name": "Entrez un nom...",
@@ -800,13 +804,13 @@
   }
  },
 "service": {
- "abstract": {
+    "abstract": {
   "label": "Description du service"
   },
- "config": {
+    "config": {
   "source": "Source"
   },
- "create": {
+    "create": {
   "end": {
    "addlayers": {
     "label": "Ajouter des couches au service"
@@ -837,10 +841,10 @@
     }
    }
   },
- "data": {
+    "data": {
   "label": "Données publiées sur le service"
   },
- "description": {
+    "description": {
   "getcapabilities": {
    "button": "GetCapabilities"
    },
@@ -878,6 +882,11 @@
   },
     "edit" : {
         "dashboard.title" : "Liste des couches",
+        "dashboard.tabs" :{
+            "data": "Données",
+            "description" : "Description du service",
+            "metadata" : "Métadonnées du service"
+        },
         "dashboard.data.title" : "Liste des données",
         "dashboard.header.title": "Titre",
         "dashboard.header.date": "Date",
