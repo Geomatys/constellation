@@ -267,12 +267,9 @@ public class XMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
 
             builder.append(margin).append("<Layer>").append(encodeXML(layer.getName())).append("</Layer>\n");
             builder.append(margin).append("<Name>").append(encodeXML(ftLocal)).append("</Name>\n");
+            builder.append(margin).append("<ID>").append(encodeXML(feature.getIdentifier().getID())).append("</ID>\n");
 
             complexAttributetoXML(builder, feature, margin);
-
-            // end featureType mark
-            margin = margin.substring(1);
-            builder.append(margin).append("</").append(ftLocal).append(">\n");
         } else {
             LOGGER.warning("The feature type is null");
         }

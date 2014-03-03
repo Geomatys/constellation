@@ -98,9 +98,9 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
     static {
         MarshallerPool candidate = null;
         try {
-            final Map<String, String> properties = new HashMap<String, String>();
-            properties.put(Marshaller.JAXB_FRAGMENT, "true");
-            properties.put(Marshaller.JAXB_FORMATTED_OUTPUT, "false");
+            final Map<String, Object> properties = new HashMap<>();
+            properties.put(Marshaller.JAXB_FRAGMENT, true);
+            properties.put(Marshaller.JAXB_FORMATTED_OUTPUT, false);
             candidate = new MarshallerPool(JAXBContext.newInstance(ObjectFactory.class), properties);
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, "JAXB Exception while initializing the marshaller pool", ex);
@@ -311,6 +311,8 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
                 final String ftLocal = featureType.getName().getLocalPart();
                 builder.append(margin).append("<").append(encodeXML(ftLocal)).append("_feature").append(">\n");
 
+                margin += "\t";
+                builder.append(margin).append("<ID>").append(encodeXML(feature.getIdentifier().getID())).append("</ID>\n");
                 XMLFeatureInfoFormat.complexAttributetoXML(builder, feature, margin);
 
                 // end featureType mark
