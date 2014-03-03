@@ -155,18 +155,18 @@
                 "title": "Information sur l'image"
             }
         },
-        "local.modal": {
+        "modal": {
             "cancel": "Annuler",
-            "data": "Données",
-            "end" : "Terminer",
-            "metadata": "Métadonnées",
-            "next" : "Suivant",
-            "title": "Fichier local"
-        },
-        "server.modal": {
-            "cancel": "Annuler",
+            "change": "Changer",
             "choose": "Choisir",
-            "title": "Fichier serveur",
+            "data": "Données",
+            "end": "Terminer",
+            "local.title": "Fichier local",
+            "metadata": "Métadonnées",
+            "next": "Suivant",
+            "remove": "Enlever",
+            "select": "Sélectionner",
+            "server.title": "Fichier serveur",
             "validate": "Valider"
         }
     },

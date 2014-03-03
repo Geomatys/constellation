@@ -61,7 +61,7 @@ cstlAdminApp.controller('SettingsController', ['$scope', 'resolvedAccount', 'Acc
         };
     }]);
 
-cstlAdminApp.controller('UserController', ['$scope', 'UserResource', '$modal', 
+cstlAdminApp.controller('UserController', ['$scope', 'UserResource', '$modal',
   function ($scope, UserResource, $modal) {
     $scope.list = UserResource.query();
     $scope.details = function(i) {
@@ -112,15 +112,15 @@ cstlAdminApp.controller('UserDetailsController', ['$scope', '$modalInstance', 'u
                newRoles[newRoles.length] = user.roles[i];
         user.roles = newRoles;
     };
-    
+
     $scope.addRole = function(role){
     	for(var i=0; i < $scope.user.roles.length; i++)
     	   if(role === $scope.user.roles[i])
     		   return
-    	
+
     	$scope.user.roles[$scope.user.roles.length]=role
     };
-    
+
     $scope.save = function(){
     	var userResource = new UserResource($scope.user);
     	userResource.$save();
@@ -345,32 +345,17 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
         $scope.verifyExtension = function() {
             var lastPointIndex = $scope.file.lastIndexOf(".");
             var extension = $scope.file.substring(lastPointIndex+1, $scope.file.length);
-            var simplevalue = new SimpleValue(extension);
-            $.ajax({
-                type  :   "POST",
-                url   :   cstlContext + "api/1/data/testextension/",
-                success : localFileSuccess,
-                dataType: "json",
-                contentType: "application/json; charset=utf-8",
-                data: JSON.stringify(simplevalue)
-            });
-        };
-
-        function SimpleValue(extension) {
-            this.value = extension;
-        };
-
-        function localFileSuccess(data){
-            $scope.$apply(function() {
-                if(data.dataType!=""){
-                    $scope.uploadType = data.dataType;
-                    $scope.allowNext = false;
-                    $scope.allowSubmit = true;
-                } else {
-                    $scope.allowNext = true;
-                    $scope.allowSubmit = false;
-                }
-            });
+            dataListing.extension({}, {value: extension},
+                function(response) {
+                    if(response.dataType!=""){
+                        $scope.uploadType = response.dataType;
+                        $scope.allowNext = false;
+                        $scope.allowSubmit = true;
+                    } else {
+                        $scope.allowNext = true;
+                        $scope.allowSubmit = false;
+                    }
+                });
         };
 
         $scope.upload = function() {

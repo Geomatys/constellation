@@ -3,12 +3,12 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" ng-click="close()">×</button>
-                <h4 class="modal-title" translate="data.local.modal.title">Local file</h4>
+                <h4 class="modal-title" translate="data.modal.local.title">Local file</h4>
             </div>
             <div class="modal-body">
                 <div id="part1" ng-show="$parent.step1">
                     <!-- Upload part -->
-                    <span translate="data.local.modal.data">Data</span>
+                    <span translate="data.modal.data">Data</span>
                     <div class="fileinput fileinput-new" data-provides="fileinput">
                         <div class="input-group">
                             <div class="form-control uneditable-input" data-trigger="fileinput">
@@ -16,13 +16,13 @@
                                 <span class="fileinput-filename"></span>
                             </div>
                             <span class="input-group-addon btn btn-default btn-file">
-                                <span class="fileinput-new">Select file</span>
-                                <span class="fileinput-exists">Change</span>
+                                <span class="fileinput-new" translate="data.modal.select">Select file</span>
+                                <span class="fileinput-exists" translate="data.modal.change">Change</span>
                                 <input type="file" name="file" ng-model="$parent.file" ng-change="verifyExtension()"></span>
-                            <a class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
+                            <a class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput" translate="data.modal.remove">Remove</a>
                         </div>
                     </div>
-                    <span translate="data.local.modal.metadata">Metadata</span>
+                    <span translate="data.modal.metadata">Metadata</span>
                     <div class="fileinput fileinput-new" data-provides="fileinput">
                         <div class="input-group">
                             <div class="form-control uneditable-input" data-trigger="fileinput">
@@ -30,10 +30,10 @@
                                 <span class="fileinput-filename"></span>
                             </div>
                             <span class="input-group-addon btn btn-default btn-file">
-                                <span class="fileinput-new">Select file</span>
-                                <span class="fileinput-exists">Change</span>
+                                <span class="fileinput-new" translate="data.modal.select">Select file</span>
+                                <span class="fileinput-exists" translate="data.modal.change">Change</span>
                                 <input type="file" name="metadatafile" ng-model="$parent.metadatafile"></span>
-                            <a class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
+                            <a class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput" translate="data.modal.remove">Remove</a>
                         </div>
                     </div>
                 </div>
@@ -76,9 +76,9 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" id="cancelButton" class="btn btn-default" ng-click="close()" translate="data.local.modal.cancel">Cancel</button>
-                <button ng-show="$parent.allowNext" type="button" id="nextButton" class="btn btn-primary" ng-click="next();" translate="data.local.modal.next">Next</button>
-                <button ng-show="$parent.allowSubmit" type="button" id="submitButton" class="btn btn-primary" ng-click="upload();" translate="data.local.modal.end">Finish</button>
+                <button type="button" id="cancelButton" class="btn btn-default" ng-click="close()" translate="data.modal.cancel">Cancel</button>
+                <button ng-show="$parent.allowNext" type="button" id="nextButton" class="btn btn-primary" ng-click="next();" translate="data.modal.next">Next</button>
+                <button ng-show="$parent.allowSubmit" type="button" id="submitButton" class="btn btn-primary" ng-click="upload();" translate="data.modal.end">Finish</button>
             </div>
         </div>
     </div>

@@ -106,18 +106,18 @@
             "tab.title": "Picture information",
             "tab.missing.title": "Missing metadata"
         },
-        "local.modal": {
+        "modal": {
             "cancel": "Cancel",
-            "data": "Data",
-            "end" : "Finish",
-            "metadata": "Metadata",
-            "next" : "Next",
-            "title": "Local file"
-        },
-        "server.modal": {
-            "cancel": "Cancel",
+            "change": "Change",
             "choose": "Choose",
-            "title": "Server file",
+            "data": "Data",
+            "end": "Finish",
+            "local.title": "Local file",
+            "metadata": "Metadata",
+            "next": "Next",
+            "remove": "Remove",
+            "select": "Select",
+            "server.title": "Server file",
             "validate": "Validate"
         }
     },
