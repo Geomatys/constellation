@@ -23,10 +23,6 @@ cstlAdminApp
 
 
             $routeProvider
-                .when('/login', {
-                    templateUrl: 'views/login.html',
-                    controller: 'LoginController'
-                })
                 .when('/settings', {
                     templateUrl: 'views/settings.html',
                     controller: 'SettingsController',
@@ -134,7 +130,7 @@ cstlAdminApp
             $rootScope.$on('event:auth-loginRequired', function(rejection) {
                 $rootScope.authenticated = false;
                 if ($location.path() !== "/" && $location.path() !== "") {
-                    $location.path('/login').replace();
+                    $location.path('/').replace();
                 }
             });
 
