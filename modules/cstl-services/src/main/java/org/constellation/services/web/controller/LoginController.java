@@ -1,4 +1,4 @@
-package org.constellation.service.controller;
+package org.constellation.services.web.controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

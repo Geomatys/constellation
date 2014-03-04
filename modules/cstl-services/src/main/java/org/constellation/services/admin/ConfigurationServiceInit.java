@@ -1,7 +1,8 @@
-package org.constellation.admin;
+package org.constellation.services.admin;
 
 import java.lang.invoke.MethodHandles;
 
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.engine.register.ConfigurationService;
 import org.constellation.security.SecurityManagerHolder;
 import org.constellation.util.ReflectionUtilities;

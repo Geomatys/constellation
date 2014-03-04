@@ -12,7 +12,7 @@ import org.constellation.engine.register.Property;
 public class PropertyEntity implements Property {
 
     @Id
-    @Column(name="`key")
+    @Column(name="`key`")
     private String key;
     
     @Column(name="`value`")

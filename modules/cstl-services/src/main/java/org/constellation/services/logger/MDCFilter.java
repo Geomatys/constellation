@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.service.logger;
+package org.constellation.services.logger;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;

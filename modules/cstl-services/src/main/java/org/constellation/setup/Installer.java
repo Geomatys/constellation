@@ -11,6 +11,9 @@ import org.geotoolkit.internal.io.Installation;
 import org.geotoolkit.lang.Setup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.health.HealthCheckRegistry;
@@ -122,6 +125,11 @@ public class Installer implements ServletContextListener {
     
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
+    	LOGGER.info("Destroying Web application");
+        WebApplicationContext ac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContextEvent.getServletContext());
+        AnnotationConfigWebApplicationContext gwac = (AnnotationConfigWebApplicationContext) ac;
+        gwac.close();
+        LOGGER.debug("Web application destroyed");
         LOGGER.info( "=== Stopping GeotoolKit ===");
         try{
             Setup.shutdown();

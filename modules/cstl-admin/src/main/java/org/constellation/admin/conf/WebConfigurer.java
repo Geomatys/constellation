@@ -53,7 +53,7 @@ public class WebConfigurer implements ServletContextListener {
 
         initSpring(servletContext, rootContext);
        // initSpringSecurity(servletContext, disps);
-        initMetrics(servletContext, disps);
+      
         
 
         if (WebApplicationContextUtils
@@ -164,33 +164,7 @@ public class WebConfigurer implements ServletContextListener {
         springSecurityFilter.setAsyncSupported(true);
     }
 
-    /**
-     * Initializes Metrics.
-     */
-    private void initMetrics(ServletContext servletContext, EnumSet<DispatcherType> disps) {
-        log.debug("Initializing Metrics registries");
-        servletContext.setAttribute(InstrumentedFilter.REGISTRY_ATTRIBUTE,
-                METRIC_REGISTRY);
-        servletContext.setAttribute(MetricsServlet.METRICS_REGISTRY,
-                METRIC_REGISTRY);
-        servletContext.setAttribute(HealthCheckServlet.HEALTH_CHECK_REGISTRY,
-                HEALTH_CHECK_REGISTRY);
-
-        log.debug("Registering Metrics Filter");
-        FilterRegistration.Dynamic metricsFilter = servletContext.addFilter("webappMetricsFilter",
-                new InstrumentedFilter());
-
-        metricsFilter.addMappingForUrlPatterns(disps, true, "/*");
-        metricsFilter.setAsyncSupported(true);
-
-        log.debug("Registering Metrics Admin Servlet");
-        ServletRegistration.Dynamic metricsAdminServlet =
-                servletContext.addServlet("metricsAdminServlet", new AdminServlet());
-
-        metricsAdminServlet.addMapping("/metrics/*");
-        metricsAdminServlet.setLoadOnStartup(2);
-    }
-
+   
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         log.info("Destroying Web application");

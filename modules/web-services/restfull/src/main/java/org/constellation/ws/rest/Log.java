@@ -105,7 +105,7 @@ public class Log {
                             do {
                                 nread = fc.read(copy);
                                 toread -= nread;
-                                if (copy.hasArray())
+                                if (nread > 0 && copy.hasArray())
                                     output.write(copy.array(), 0, nread);
                                 copy.rewind();
                             } while (nread > 0 && toread > 0);

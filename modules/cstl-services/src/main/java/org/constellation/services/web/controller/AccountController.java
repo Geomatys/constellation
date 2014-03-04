@@ -1,4 +1,4 @@
-package org.constellation.service.controller;
+package org.constellation.services.web.controller;
 
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.security.SecurityManagerHolder;

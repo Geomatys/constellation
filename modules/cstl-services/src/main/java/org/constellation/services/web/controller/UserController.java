@@ -1,4 +1,4 @@
-package org.constellation.service.controller;
+package org.constellation.services.web.controller;
 
 import java.util.List;
 

@@ -50,7 +50,7 @@ cstlAdminApp.factory('Metrics', ['$resource',
 
 cstlAdminApp.factory('LogsService', ['$resource',
     function ($resource) {
-        return $resource('app/rest/logs', {}, {
+        return $resource(cstlContext + 'spring/rest/logs', {}, {
             'findAll': { method: 'GET', isArray: true},
             'changeLevel':  { method: 'PUT'}
         });
