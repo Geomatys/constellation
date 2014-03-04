@@ -275,15 +275,17 @@ public class Data {
         final File choosingFile = new File(root, filePath);
 
         File choosingMetadataFile = null;
-        if (!metadataFilePath.isEmpty()) {
+        if (metadataFilePath != null && !metadataFilePath.isEmpty()) {
             choosingMetadataFile = new File(root.getAbsolutePath() + "/metadata/" + metadataFilePath);
         }
 
         if (choosingFile.exists()) {
             final DataInformation information = MetadataUtilities.generateMetadatasInformation(choosingFile, choosingMetadataFile, dataType);
-            final int extensionPoint = filePath.lastIndexOf('.');
-            final int lastSlash = filePath.lastIndexOf("/");
-            final String dataName = filePath.substring(lastSlash + 1, extensionPoint);
+            final String choosingName = choosingFile.getName();
+            String dataName = choosingName;
+            if (!choosingFile.isDirectory()) {
+                dataName = choosingName.substring(0, choosingName.lastIndexOf("."));
+            }
             information.setName(dataName);
             return Response.status(200).entity(information).build();
         }

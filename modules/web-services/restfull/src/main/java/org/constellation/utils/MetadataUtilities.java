@@ -106,12 +106,12 @@ public final class MetadataUtilities {
                 break;
             case "vector":
                 try {
-                    //unzip file
-                    String extension = Files.getFileExtension(file.getName());
-                    String fileName = Files.getNameWithoutExtension(file.getName());
-                    File parent = new File(file.getParent(), fileName);
+                    final String extension = Files.getFileExtension(file.getName());
+                    final String fileName = Files.getNameWithoutExtension(file.getName());
+                    final File parent = new File(file.getParent(), fileName);
                     ShapefileFeatureStore shapeStore = null;
                     if (extension.equalsIgnoreCase("zip")) {
+                        //unzip file
                         parent.mkdirs();
                         FileUtilities.unzip(file, parent, null);
                         final FileFilter shapeFilter = new SuffixFileFilter(".shp");
@@ -122,11 +122,16 @@ public final class MetadataUtilities {
                     }
 
                     String crsName = "";
-                    final CoordinateReferenceSystem crs = shapeStore.getFeatureType().getCoordinateReferenceSystem();
-                    if (crs != null) {
-                        crsName = crs.getName().toString();
+                    final DataInformation information;
+                    if (shapeStore != null) {
+                        final CoordinateReferenceSystem crs = shapeStore.getFeatureType().getCoordinateReferenceSystem();
+                        if (crs != null) {
+                            crsName = crs.getName().toString();
+                        }
+                        information = new DataInformation(shapeStore.getName().getLocalPart(), parent.getAbsolutePath(), dataType, crsName);
+                    } else {
+                        information = new DataInformation(fileName, parent.getAbsolutePath(), dataType, crsName);
                     }
-                    final DataInformation information = new DataInformation(shapeStore.getName().getLocalPart(), parent.getAbsolutePath(), dataType, crsName);
                     final ArrayList<SimplyMetadataTreeNode> metadataList = getVectorDataInformation(templateMetadata);
                     information.setFileMetadata(metadataList);
                     return information;
