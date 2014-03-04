@@ -1,11 +1,13 @@
 package org.constellation.admin.conf;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
+import java.util.Properties;
+
+import javax.inject.Inject;
+import javax.persistence.EntityManagerFactory;
+import javax.sql.DataSource;
 
 import liquibase.integration.spring.SpringLiquibase;
 
-import org.constellation.engine.register.repository.UserRepository;
 import org.hibernate.ejb.HibernatePersistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,11 +25,8 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import javax.inject.Inject;
-import javax.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
-
-import java.util.Properties;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
 @PropertySource({"classpath:/META-INF/cstl-admin/cstl-admin.properties"})
@@ -108,10 +107,6 @@ public class DatabaseConfiguration {
         liquibase.setContexts("development, production");
         return liquibase;
     }
-    
-    @Bean
-    public org.constellation.admin.repository.UserRepository userRepository() {
-        return new org.constellation.admin.repository.UserRepository();
-    }
+   
 }
 

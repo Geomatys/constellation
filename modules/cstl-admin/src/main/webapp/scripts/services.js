@@ -43,7 +43,7 @@ cstlAdminApp.factory('Sessions', ['$resource',
 
 cstlAdminApp.factory('Metrics', ['$resource',
     function ($resource) {
-        return $resource(context + '/metrics/metrics', {}, {
+        return $resource(cstlContext + '/metrics/metrics', {}, {
             'get': { method: 'GET'}
         });
     }]);

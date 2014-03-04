@@ -11,6 +11,7 @@
    <bean class="org.constellation.security.SecurityManagerHolder" factory-method="getInstance" />
   
    
+   <context:component-scan base-package="org.constellation.conf"  />
    <context:component-scan base-package="org.constellation.map.ws"  />
    
 
