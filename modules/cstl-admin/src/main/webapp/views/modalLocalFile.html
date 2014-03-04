@@ -1,4 +1,4 @@
-<form id="uploadForm" class="form-horizontal">
+<form id="uploadForm" class="form-horizontal" ng-submit="upload()">
     <div class="modal-dialog" ng-class="{mapview:step3}">
         <div class="modal-content">
             <div class="modal-header">
@@ -78,7 +78,7 @@
             <div class="modal-footer">
                 <button type="button" id="cancelButton" class="btn btn-default" ng-click="close()" translate="data.modal.cancel">Cancel</button>
                 <button ng-show="$parent.allowNext" type="button" id="nextButton" class="btn btn-primary" ng-click="next();" translate="data.modal.next">Next</button>
-                <button ng-show="$parent.allowSubmit" type="button" id="submitButton" class="btn btn-primary" ng-click="upload();" translate="data.modal.end">Finish</button>
+                <button ng-show="$parent.allowSubmit" type="submit" id="submitButton" class="btn btn-primary" translate="data.modal.end">Finish</button>
             </div>
         </div>
     </div>

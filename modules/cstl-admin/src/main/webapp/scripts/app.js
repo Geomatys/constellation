@@ -12,16 +12,16 @@ function findWebappContext(){
 
 /* App Module */
 
-var cstlAdminApp = angular.module('cstlAdminApp', ['http-auth-interceptor', 'ngResource', 'ngRoute', 'ngCookies', 'pascalprecht.translate', 'uiModal', 'ajaxUpload', 'hljs', 'base64']);
+var cstlAdminApp = angular.module('cstlAdminApp', ['http-auth-interceptor', 'ngResource', 'ngRoute', 'ngCookies', 'pascalprecht.translate', 'uiModal', 'hljs', 'base64']);
 
 cstlAdminApp
     .config(['$routeProvider', '$httpProvider', '$translateProvider',
         function ($routeProvider, $httpProvider, $translateProvider) {
     	 $httpProvider.defaults.useXDomain = true;
-    	 
+
     	 $httpProvider.interceptors.push('AuthInterceptor');
-    	 
-    	 
+
+
             $routeProvider
                 .when('/login', {
                     templateUrl: 'views/login.html',
@@ -99,14 +99,14 @@ cstlAdminApp
                     templateUrl: 'views/main.html',
                     controller: 'MainController'
                 });
-            
+
             $routeProvider
             .when('/user', {
                 templateUrl: 'views/user/list.html',
                 controller: 'UserController'
             });
-            
-            
+
+
 
             // Initialize angular-translate
             $translateProvider.useStaticFilesLoader({

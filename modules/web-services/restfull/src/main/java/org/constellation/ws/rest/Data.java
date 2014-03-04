@@ -253,7 +253,7 @@ public class Data {
         if (mdFile != null) {
             result += ","+ mdFile.getAbsolutePath();
         }
-        return Response.ok(result).header("X-Frame-Options", "SAMEORIGIN").build();
+        return Response.ok(result).build();
     }
 
     /**

@@ -20,9 +20,9 @@ cstlAdminApp.controller('LanguageController', ['$scope', '$translate',
         };
     }]);
 
-cstlAdminApp.controller('MenuController', ['$scope', 
+cstlAdminApp.controller('MenuController', ['$scope',
     function ($scope) {
-	
+
 
 }]);
 
@@ -320,8 +320,8 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
 
     }]);
 
-cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$modalInstance', '$ajaxUpload', '$growl', 'provider', 'dataListing', '$uploadFiles',
-    function ($scope, $dashboard, $modalInstance, $ajaxUpload, $growl, provider, dataListing, $uploadFiles) {
+cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$modalInstance', '$growl', 'provider', 'dataListing', '$uploadFiles', '$cookies',
+    function ($scope, $dashboard, $modalInstance, $growl, provider, dataListing, $uploadFiles, $cookies) {
         $scope.layer = null;
         $scope.file = null;
         $scope.providerId = null;
@@ -368,75 +368,87 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
         };
 
         $scope.upload = function() {
-            var form = $('#uploadForm');
-            $ajaxUpload(cstlContext + "api/1/data/upload", form, uploaded);
+            var $form = $('#uploadForm');
+
+            var formData = new FormData($form[0]);
+
+            $.ajax({
+                url: cstlContext + "api/1/data/upload;jsessionid="+ $cookies.cstlSessionId,
+                type: 'POST',
+                data: formData,
+                async: false,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (returndata) {
+                    uploaded(returndata);
+                }
+            });
         };
 
         function uploaded(message) {
-            $scope.$apply(function() {
-                if (message.indexOf('failed') === -1) {
-                    var files = message.split(',');
-                    var upFile = files[0];
-                    var upMdFile = null;
-                    if (files.length === 2) {
-                        upMdFile = files[1];
-                    }
+            if (message.indexOf('failed') === -1) {
+                var files = message.split(',');
+                var upFile = files[0];
+                var upMdFile = null;
+                if (files.length === 2) {
+                    upMdFile = files[1];
+                }
 
-                    // Stores uploaded files in session for further use
-                    var upFiles = $uploadFiles.files;
-                    upFiles.file = upFile;
-                    upFiles.mdFile = upMdFile;
+                // Stores uploaded files in session for further use
+                var upFiles = $uploadFiles.files;
+                upFiles.file = upFile;
+                upFiles.mdFile = upMdFile;
 
-                    var justFile = upFile.substring(upFile.lastIndexOf("/")+1);
-                    var fileName = justFile;
-                    var fileExtension;
-                    if (fileName.indexOf(".") !== -1) {
-                        fileName = fileName.substring(0, fileName.lastIndexOf("."));
-                        fileExtension = justFile.substring(justFile.lastIndexOf(".")+1);
-                    }
+                var justFile = upFile.substring(upFile.lastIndexOf("/")+1);
+                var fileName = justFile;
+                var fileExtension;
+                if (fileName.indexOf(".") !== -1) {
+                    fileName = fileName.substring(0, fileName.lastIndexOf("."));
+                    fileExtension = justFile.substring(justFile.lastIndexOf(".")+1);
+                }
 
-                    // Store the providerId for further calls
-                    $scope.providerId = fileName;
-                    if ($scope.uploadType === "vector") {
-                        provider.create({
-                            id: fileName
-                        }, {
-                            type: "feature-store",
-                            subType: "shapefile",
-                            parameters: {
-                                path: upFile
-                            }
-                        });
-                        $growl('success','Success','Shapefile data '+ fileName +' successfully added');
-                        $modalInstance.close({type: "vector", file: fileName, missing: $scope.metadatafile == null});
-                    } else if ($scope.uploadType === "raster") {
-                        provider.create({
-                            id: fileName
-                        }, {
-                            type: "coverage-store",
-                            subType: "coverage-file",
-                            parameters: {
-                                path: upFile
-                            }
-                        }, function() {
-                            if (!fileExtension || fileExtension !== "nc") {
-                                dataListing.pyramidData({id: fileName}, {value: upFile}, function() {
-                                    $growl('success','Success','Coverage data '+ fileName +' successfully added');
-                                    $modalInstance.close({type: "raster", file: fileName, missing: $scope.metadatafile == null});
-                                });
-                            } else {
-                                displayNetCDF(fileName);
-                            }
-                        });
-                    } else {
-                        $growl('warning','Warning','Not implemented choice');
-                        $modalInstance.close();
-                    }
+                // Store the providerId for further calls
+                $scope.providerId = fileName;
+                if ($scope.uploadType === "vector") {
+                    provider.create({
+                        id: fileName
+                    }, {
+                        type: "feature-store",
+                        subType: "shapefile",
+                        parameters: {
+                            path: upFile
+                        }
+                    });
+                    $growl('success','Success','Shapefile data '+ fileName +' successfully added');
+                    $modalInstance.close({type: "vector", file: fileName, missing: $scope.metadatafile == null});
+                } else if ($scope.uploadType === "raster") {
+                    provider.create({
+                        id: fileName
+                    }, {
+                        type: "coverage-store",
+                        subType: "coverage-file",
+                        parameters: {
+                            path: upFile
+                        }
+                    }, function() {
+                        if (!fileExtension || fileExtension !== "nc") {
+                            dataListing.pyramidData({id: fileName}, {value: upFile}, function() {
+                                $growl('success','Success','Coverage data '+ fileName +' successfully added');
+                                $modalInstance.close({type: "raster", file: fileName, missing: $scope.metadatafile == null});
+                            });
+                        } else {
+                            displayNetCDF(fileName);
+                        }
+                    });
                 } else {
-                    $growl('error','Error','Data import failed');
+                    $growl('warning','Warning','Not implemented choice');
                     $modalInstance.close();
                 }
-            });
+            } else {
+                $growl('error','Error','Data import failed');
+                $modalInstance.close();
+            }
         };
 
         function displayNetCDF(providerId) {

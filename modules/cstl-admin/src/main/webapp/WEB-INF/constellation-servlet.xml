@@ -39,6 +39,7 @@
         <value>POST</value>
         <value>PUT</value>
         <value>DELETE</value>
+        <value>OPTIONS</value>
       </list>
     </property>
   </bean>
