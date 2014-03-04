@@ -33,7 +33,7 @@ import javax.servlet.ServletRegistration;
 import java.util.EnumSet;
 
 /**
- * Use this installer to copy a file-system configuration into db config.
+ * Use this installer to initialize Geotk and copy a file-system configuration into db config.
  *
  * @author Alexis Manin (Geomatys)
  */
@@ -53,8 +53,7 @@ public class Installer implements ServletContextListener {
 
         LOGGER.info( "=== Starting GeotoolKit ===");
 
-        try{
-
+        try {
             ConfigurationEngine.setSecurityManager(new SecurityManagerAdapter() {
                 @Override
                 public String getCurrentUserLogin() {
@@ -66,12 +65,7 @@ public class Installer implements ServletContextListener {
 
             //Initialize geotoolkit
             Installation.allowSystemPreferences = false;
-            // A crappy hack to ensure setup system will initialize image readers before coverage providers. If not, file coverage provider could no list all managed formats.
             ImageIO.scanForPlugins();
-            new org.geotoolkit.internal.image.Setup().initialize(null, false);
-            new org.geotoolkit.internal.image.io.Setup().initialize(null, false);
-            new SetupGeoTiff().initialize(null, false);
-            new SetupBIL().initialize(null, false);
             Setup.initialize(null);
 
             try {

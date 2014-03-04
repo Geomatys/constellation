@@ -19,6 +19,10 @@
 		<listener-class>org.constellation.setup.Installer</listener-class>
 	</listener>
 
+    <listener>
+        <listener-class>org.constellation.map.setup.MapSetup</listener-class>
+    </listener>
+
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
 		<param-value>WEB-INF/applicationContext.xml</param-value>

@@ -19,13 +19,12 @@ package org.constellation.map.setup;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
-import javax.imageio.spi.ImageReaderSpi;
-import javax.imageio.spi.ImageWriterSpi;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
@@ -38,8 +37,6 @@ import org.constellation.provider.ProviderService;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviderProxy;
 
-import org.geotoolkit.image.jai.Registry;
-import org.geotoolkit.internal.SetupService;
 import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.lang.Setup;
 import org.geotoolkit.process.ProcessDescriptor;
@@ -50,7 +47,6 @@ import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.style.Symbolizer;
 import org.opengis.util.NoSuchIdentifierException;
 
 import static org.constellation.provider.configuration.ProviderParameters.SOURCE_DESCRIPTOR_NAME;
@@ -63,14 +59,14 @@ import static org.geotoolkit.style.StyleConstants.*;
  * specific setup for map service
  *
  * @author Guilhem Legal (Geomatys)
+ * @author Alexis Manin (Geomatys)
  */
-public class MapSetup implements SetupService {
+public class MapSetup implements ServletContextListener {
 
     private static final Logger LOGGER = Logging.getLogger(MapSetup.class);
 
     @Override
-    public void initialize(Properties properties, boolean reinit) {
-
+    public void contextInitialized(ServletContextEvent servletContextEvent) {
         LOGGER.log(Level.INFO, "=== Activating Native Codec ===");
 
         try {
@@ -80,24 +76,6 @@ public class MapSetup implements SetupService {
             LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
         }
 
-//        //reset values, only allow pure java readers
-//        for(String jn : ImageIO.getReaderFormatNames()){
-//            Registry.setNativeCodecAllowed(jn, ImageReaderSpi.class, false);
-//        }
-//
-//        for(String jn : ImageIO.getReaderFormatNames()){
-//            Registry.setNativeCodecAllowed(jn, ImageReaderSpi.class, false);
-//        }
-//
-//        //reset values, only allow pure java writers
-//        for(String jn : ImageIO.getWriterFormatNames()){
-//            Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, false);
-//        }
-//
-//        for(String jn : ImageIO.getWriterFormatNames()){
-//            Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, false);
-//        }
-
         ImageIO.scanForPlugins();
         Setup.initialize(null);
 
@@ -105,6 +83,15 @@ public class MapSetup implements SetupService {
 
         initializeDefaultVectorData();
         initializeDefaultRasterData();
+    }
+
+    /**
+     * Invoked when the module needs to be shutdown.
+     */
+    @Override
+    public void contextDestroyed(ServletContextEvent servletContextEvent) {
+        LayerProviderProxy.getInstance().dispose();
+        StyleProviderProxy.getInstance().dispose();
     }
 
     /**
@@ -312,12 +299,4 @@ public class MapSetup implements SetupService {
         }
     }
 
-    /**
-     * Invoked when the module needs to be shutdown.
-     */
-    @Override
-    public void shutdown() {
-        LayerProviderProxy.getInstance().dispose();
-        StyleProviderProxy.getInstance().dispose();
-    }
 }
