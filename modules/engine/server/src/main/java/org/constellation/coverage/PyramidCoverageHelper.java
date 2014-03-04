@@ -3,6 +3,7 @@ package org.constellation.coverage;
 import java.awt.Dimension;
 
 import org.apache.sis.storage.DataStoreException;
+import org.apache.sis.util.ArraysExt;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.coverage.CoverageStoreFinder;
@@ -32,6 +33,7 @@ import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +42,7 @@ import org.constellation.admin.ConfigurationEngine;
 
 /**
  * Helper class to ease the pyramid process.
- * 
+ *
  * @author olivier.nouguier@geomatys.com
  */
 public class PyramidCoverageHelper {
@@ -91,7 +93,7 @@ public class PyramidCoverageHelper {
 
     /**
      * Builder factory with a base name for coverage.
-     * 
+     *
      * @param name
      *            of coverage
      * @return Builder instance
@@ -107,7 +109,7 @@ public class PyramidCoverageHelper {
 
     /**
      * Build coverage list which can be pyramided
-     * 
+     *
      * @return a {@link org.geotoolkit.coverage.grid.GridCoverage2D}
      *         {@link java.util.List}
      * @throws CancellationException
@@ -165,7 +167,7 @@ public class PyramidCoverageHelper {
     /**
      * Build pyramid and give a {@link org.geotoolkit.process.ProcessListener}
      * to
-     * 
+     *
      * @param listener
      * @throws DataStoreException
      * @throws TransformException
@@ -176,8 +178,33 @@ public class PyramidCoverageHelper {
 
         List<GridCoverage2D> coverages = getCoveragesPyramid();
         int coverageCount = 1;
-        for (GridCoverage coverage : coverages) {
-            Map<Envelope, double[]> resolution_Per_Envelope = getResolutionPerEnvelope(coverage);
+        for (GridCoverage2D coverage : coverages) {
+            final Envelope env = coverage.getEnvelope();
+            final GridGeometry2D gg = coverage.getGridGeometry();
+            int gridspan = gg.getExtent2D().getSpan(0);
+
+            //calculate scales
+            final double spanX = env.getSpan(0);
+            final double baseScale = spanX / gridspan;
+            double scale = spanX / 256;
+            double[] scales = new double[0];
+            while (true) {
+                if (scale <= baseScale) {
+                    //fit to exact match to preserve base quality.
+                    scale = baseScale;
+                }
+                scales = ArraysExt.insert(scales, scales.length, 1);
+                scales[scales.length - 1] = scale;
+
+                if (scale <= baseScale) {
+                    break;
+                }
+                scale = scale / 2;
+            }
+
+
+            Map<Envelope, double[]> resolution_Per_Envelope = new HashMap<>();
+            resolution_Per_Envelope.put(env,scales);
             pyramidCoverageBuilder.create(coverage, getCoverageStore(),
                     coverageNamer.getName(baseCoverageName, coverageCount),
                     resolution_Per_Envelope, null, listener, null);
@@ -187,7 +214,7 @@ public class PyramidCoverageHelper {
 
     /**
      * Command that produce coverage names during the pyramid generation.
-     * 
+     *
      * @author olivier.nouguier@geomatys.com
      */
     public interface CoverageNamer {
@@ -201,7 +228,7 @@ public class PyramidCoverageHelper {
 
     /**
      * Exposed builder when output is set.
-     * 
+     *
      * @author olivier.nouguier@geomatys.com
      */
     public static interface WithOutput {
@@ -213,7 +240,7 @@ public class PyramidCoverageHelper {
 
     /**
      * Exposed when PGStorage is set.
-     * 
+     *
      * @author olivier.nouguier@geomatys.com
      */
     public interface WithPGOutput extends WithOutput {
@@ -237,7 +264,7 @@ public class PyramidCoverageHelper {
 
     /**
      * Non exposed builder.
-     * 
+     *
      * @author olivier.nouguier@geomatys.com
      */
     private static abstract class WithOutputImpl implements WithOutput {
@@ -266,7 +293,7 @@ public class PyramidCoverageHelper {
 
     /**
      * Only exposed to this classes.
-     * 
+     *
      * @author olivier.nouguier@geomatys.com
      */
     public static abstract class WithInputImpl implements WithInput {
@@ -311,7 +338,7 @@ public class PyramidCoverageHelper {
 
         /**
          * Inner builder when output is set to file.
-         * 
+         *
          * @author olivier.nouguier@geomatys.com
          */
         private static class WithFileOutput extends WithOutputImpl {
@@ -404,7 +431,7 @@ public class PyramidCoverageHelper {
 
     /**
      * Inner builder when input is set.
-     * 
+     *
      * @author olivier.nouguier@geomatys.com
      */
 
@@ -434,7 +461,7 @@ public class PyramidCoverageHelper {
 
     /**
      * External builder.
-     * 
+     *
      * @author Olivier NOUGUIER
      */
     public static class Builder implements IBuilder {
