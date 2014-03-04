@@ -405,13 +405,13 @@
       <artifactId>smiley-http-proxy-servlet</artifactId>
       <version>1.4</version>
     </dependency>
-    
+
     <dependency>
       <groupId>org.constellation.engine.register</groupId>
       <artifactId>cstl-register-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
+
       <dependency>
           <groupId>org.constellation.gui</groupId>
           <artifactId>style</artifactId>
@@ -551,7 +551,12 @@
           <systemProperties>
             <spring.profiles.active>${spring.profiles.active}</spring.profiles.active>
           </systemProperties>
-          
+          <extraResources>
+              <resource>
+                  <directory>src/main/webapp-filtered</directory>
+                  <filtering>true</filtering>
+              </resource>
+          </extraResources>
         </configuration>
       </plugin>
       <plugin>
