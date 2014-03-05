@@ -16,14 +16,19 @@
  */
 package org.constellation.security.spring;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.constellation.security.IncorrectCredentialsException;
 import org.constellation.security.NoSecurityManagerException;
 import org.constellation.security.SecurityManager;
 import org.constellation.security.UnknownAccountException;
+import org.springframework.security.access.intercept.RunAsUserToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
@@ -80,7 +85,22 @@ public class SpringSecurityManager implements SecurityManager {
         
     }
 
+    public void runAs(String login) {
+    	//FIXME add role from DB.
+    	Collection<SimpleGrantedAuthority> auths = new ArrayList<SimpleGrantedAuthority>();
+    	auths.add(new SimpleGrantedAuthority("cstl-admin"));
+    	Authentication authentication = new UsernamePasswordAuthenticationToken("admin", "admin", auths );
+		SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+    
+    
     public void logout() {
         
     }
+
+	@Override
+	public void reset() {
+		SecurityContextHolder.getContext().setAuthentication(null);
+		
+	}
 }

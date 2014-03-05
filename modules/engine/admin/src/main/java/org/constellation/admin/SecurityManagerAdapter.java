@@ -54,5 +54,14 @@ public abstract class SecurityManagerAdapter implements SecurityManager {
     public void logout() {
         //do nothing
     }
+    
+    @Override
+    public void runAs(String login) {
+    	
+    }
+    @Override
+    public void reset() {
+    	
+    }
 
 }

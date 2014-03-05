@@ -57,4 +57,8 @@ import org.constellation.security.UnknownAccountException;
         //do nothing
     }
 
+    public void runAs(String login){}
+
+    public void reset(){};
+
 }

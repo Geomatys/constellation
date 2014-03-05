@@ -70,4 +70,17 @@ public class ShiroSecurityManager implements SecurityManager {
     public void logout() {
         SecurityUtils.getSubject().logout();
     }
+
+	@Override
+	public void runAs(String login) {
+		
+		throw new RuntimeException("Not implemented");
+		
+	}
+
+	@Override
+	public void reset() {
+		// TODO Auto-generated method stub
+		
+	}
 }

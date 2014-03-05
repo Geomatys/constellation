@@ -17,6 +17,7 @@
 package org.constellation.security;
 
 
+
 /**
  *
  * @author Guilhem Legal (Geomatys)
@@ -29,15 +30,20 @@ public interface SecurityManager {
      * @return login as {@link String}
      * @throws NoSecurityManagerException if it don't exist SecurityManager (it's a {@link java.lang.RuntimeException})
      */
-    public String getCurrentUserLogin() throws NoSecurityManagerException;
+    String getCurrentUserLogin() throws NoSecurityManagerException;
 
-    public boolean isAuthenticated();
+    boolean isAuthenticated();
     
-    public boolean isAllowed(final String action);
+    boolean isAllowed(final String action);
 
-    public boolean hasRole(final String role);
+    boolean hasRole(final String role);
 
-    public void login(final String login, final String pass) throws UnknownAccountException, IncorrectCredentialsException;
+    void login(final String login, final String pass) throws UnknownAccountException, IncorrectCredentialsException;
 
-    public void logout();
+    void logout();
+    
+    void runAs(String login);
+    
+    void reset();
 }
+    
