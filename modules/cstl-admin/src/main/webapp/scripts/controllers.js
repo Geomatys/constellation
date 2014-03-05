@@ -768,62 +768,62 @@ cstlAdminApp.controller('WebServiceController', ['$scope', 'webService','$modal'
        $scope.services = webService.listAll();
 
         // Show Capa methods
-        $scope.showCapa = function(type, name) {
+        $scope.showCapa = function(service) {
             $modal.open({
                 templateUrl: 'views/modalCapa.html',
                 controller: 'WebServiceUtilsController',
                 resolve: {
                     'details': function(textService){
-                        return textService.capa(type.toLowerCase(),  name);
+                        return textService.capa(service.type.toLowerCase(), service.identifier);
                     }
                 }
             });
         };
 
         // Show Logs methods
-        $scope.showLogs = function(type, name) {
+        $scope.showLogs = function(service) {
 
             $modal.open({
                 templateUrl: 'views/modalLogs.html',
                 controller: 'WebServiceUtilsController',
                 resolve: {
                     'details': function(textService){
-                        return textService.logs(type.toLowerCase(), name );
+                        return textService.logs(service.type.toLowerCase(), service.identifier);
                     }
                 }
             });
         };
 
-        $scope.reload = function(type, name){
-            webService.restart({type: type, id: name}, {value: true},
-                function() { $growl('success','Success','Service '+ name +' successfully reloaded'); },
-                function() { $growl('error','Error','Service '+ name +' reload failed'); }
+        $scope.reload = function(service){
+            webService.restart({type: service.type, id: service.identifier}, {value: true},
+                function() { $growl('success','Success','Service '+ service.name +' successfully reloaded'); },
+                function() { $growl('error','Error','Service '+ service.name +' reload failed'); }
             );
         };
-        $scope.startOrStop = function(type, name, status){
-            if(status==='WORKING'){
-                webService.stop({type: type, id: name}, {}, function(response) {
+        $scope.startOrStop = function(service){
+            if(service.status==='WORKING'){
+                webService.stop({type: service.type, id: service.identifier}, {}, function(response) {
                     if (response.status==="Success") {
                         $scope.services = webService.listAll();
-                        $growl('success','Success','Service '+ name +' successfully stopped');
+                        $growl('success','Success','Service '+ service.name +' successfully stopped');
                     }
-                }, function() { $growl('error','Error','Service '+ name +' stop failed'); });
+                }, function() { $growl('error','Error','Service '+ service.name +' stop failed'); });
             }else{
-                webService.start({type: type, id: name}, {}, function(response) {
+                webService.start({type: service.type, id: service.identifier}, {}, function(response) {
                     if (response.status==="Success") {
                         $scope.services = webService.listAll();
-                        $growl('success','Success','Service '+ name +' successfully started');
+                        $growl('success','Success','Service '+ service.name +' successfully started');
                     }
-                }, function() { $growl('error','Error','Service '+ name +' start failed'); });
+                }, function() { $growl('error','Error','Service '+ service.name +' start failed'); });
             }
         };
 
-        $scope.deleteService = function(type, name) {
+        $scope.deleteService = function(service) {
             if (confirm("Are you sure?")) {
-                webService.delete({type: type, id: name}, {} ,
-                    function() { $growl('success','Success','Service '+ name +' successfully deleted');
+                webService.delete({type: service.type, id: service.identifier}, {} ,
+                    function() { $growl('success','Success','Service '+ service.name +' successfully deleted');
                                  $scope.services = webService.listAll(); },
-                    function() { $growl('error','Error','Service '+ name +' deletion failed'); }
+                    function() { $growl('error','Error','Service '+ service.name +' deletion failed'); }
                 );
             }
         };
@@ -842,9 +842,20 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
     function ($scope, $routeParams, webService, $filter, $location, $growl) {
         $scope.type = $routeParams.type;
         $scope.tonext = true;
-        $scope.wmsVersion = [ { 'id': '1.1.1'}, { 'id': '1.3.0' }];
         $scope.metadata = {};
         $scope.metadata.keywords = [];
+
+        $scope.getVersionsForType = function() {
+            if ($scope.type === 'wms') {
+                return [{ 'id': '1.1.1'}, { 'id': '1.3.0' }];
+            }
+            if ($scope.type === 'wfs') {
+                return [{ 'id': '1.1.0'}, { 'id': '2.0.0' }];
+            }
+            return [];
+        };
+        $scope.versions = $scope.getVersionsForType();
+
 
         $scope.goToServiceContact = function() {
             $scope.tonext = false;
@@ -875,7 +886,7 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
 
         // define which version to set
         $scope.selectedVersion = function (){
-            $scope.metadata.versions = $filter('filter')($scope.wmsVersion, {checked: true});
+            $scope.metadata.versions = $filter('filter')($scope.versions, {checked: true});
         };
 
         // define which version is Selected
@@ -912,29 +923,38 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
 cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'webService', '$modal','textService', '$dashboard', '$growl', '$filter', 'StyleSharedService','style',
                                                  function ($scope, $routeParams , webService, $modal, textService, $dashboard, $growl, $filter, StyleSharedService, style) {
     $scope.tagText = '';
+    $scope.type = $routeParams.type;
 
-    $scope.service = webService.get({type: $routeParams.type, id:$routeParams.id});
+    $scope.service = webService.get({type: $scope.type, id:$routeParams.id});
 
-    $scope.metadata = webService.metadata({type: $routeParams.type, id:$routeParams.id});
-    $scope.config = webService.config({type: $routeParams.type, id:$routeParams.id});
+    $scope.metadata = webService.metadata({type: $scope.type, id:$routeParams.id});
+    $scope.config = webService.config({type: $scope.type, id:$routeParams.id});
 
     $scope.filtertype = "";
-    $scope.layers = webService.layers({type: $routeParams.type, id:$routeParams.id}, {}, function(response) {
+    $scope.layers = webService.layers({type: $scope.type, id:$routeParams.id}, {}, function(response) {
         $dashboard($scope, response);
     });
 
-    // static list version wms
-    $scope.wmsVersion = [ { 'id': '1.1.1'}, { 'id': '1.3.0' }];
+    $scope.getVersionsForType = function() {
+        if ($scope.type === 'wms') {
+            return [{ 'id': '1.1.1'}, { 'id': '1.3.0' }];
+        }
+        if ($scope.type === 'wfs') {
+            return [{ 'id': '1.1.0'}, { 'id': '2.0.0' }];
+        }
+        return [];
+    };
+    $scope.versions = $scope.getVersionsForType();
 
     // define which version to set
     $scope.selectedVersion = function (){
-        $scope.metadata.versions = $filter('filter')($scope.wmsVersion, {checked: true});
+        $scope.metadata.versions = $filter('filter')($scope.versions, {checked: true});
     };
 
     // define which version is Selected
     $scope.versionIsSelected = function(currentVersion){
        return $.inArray(currentVersion, $scope.metadata.versions) > -1
-    }
+    };
 
      $scope.addTag = function() {
          if ($scope.tagText.length == 0) {
@@ -958,7 +978,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
      }
 
     $scope.saveServiceMetadata = function() {
-      webService.updateMd({type: $scope.service.type, id: $scope.service.name},$scope.metadata,
+      webService.updateMd({type: $scope.service.type, id: $scope.service.identifier},$scope.metadata,
           function(response) {
               if (response.status==="Success") {
                   $growl('success','Success','Service description successfully updated');
@@ -973,56 +993,56 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
     };
 
     // Show Capa methods
-    $scope.showCapa = function(type, name) {
+    $scope.showCapa = function(service) {
         $modal.open({
             templateUrl: 'views/modalCapa.html',
             controller: 'WebServiceUtilsController',
             resolve: {
                 'details': function(textService){
-                    return textService.capa( type.toLowerCase(), name);
+                    return textService.capa(service.type.toLowerCase(), service.identifier);
                 }
             }
         });
     };
 
      // Show Logs methods
-     $scope.showLogs = function(type, name) {
+     $scope.showLogs = function(service) {
 
          $modal.open({
              templateUrl: 'views/modalLogs.html',
              controller: 'WebServiceUtilsController',
              resolve: {
                  'details': function(textService){
-                     return textService.logs(type.toLowerCase(), name );
+                     return textService.logs(service.type.toLowerCase(), service.identifier);
                  }
              }
          });
      };
 
 
-     $scope.reload = function(type, name){
-        webService.restart({type: type, id: name}, {value: true},
-            function() { $growl('success','Success','Service '+ name +' successfully reloaded'); },
-            function() { $growl('error','Error','Service '+ name +' reload failed'); }
+     $scope.reload = function(service){
+        webService.restart({type: service.type, id: service.identifier}, {value: true},
+            function() { $growl('success','Success','Service '+ service.name +' successfully reloaded'); },
+            function() { $growl('error','Error','Service '+ service.name +' reload failed'); }
         );
      };
 
 
-     $scope.startOrStop = function(type, name, status){
-        if(status==='WORKING'){
-            webService.stop({type: type, id: name}, {}, function(response) {
+     $scope.startOrStop = function(service){
+        if(service.status==='WORKING'){
+            webService.stop({type: service.type, id: service.identifier}, {}, function(response) {
                 if (response.status==="Success") {
                     $scope.service.status = "NOT_STARTED";
-                    $growl('success','Success','Service '+ name +' successfully stopped');
+                    $growl('success','Success','Service '+ service.name +' successfully stopped');
                 }
-            }, function() { $growl('error','Error','Service '+ name +' stop failed'); });
+            }, function() { $growl('error','Error','Service '+ service.name +' stop failed'); });
         }else{
-            webService.start({type: type, id: name}, {}, function(response) {
+            webService.start({type: service.type, id: service.identifier}, {}, function(response) {
                 if (response.status==="Success") {
                     $scope.service.status = "WORKING";
-                    $growl('success','Success','Service '+ name +' successfully started');
+                    $growl('success','Success','Service '+ service.name +' successfully started');
                 }
-            }, function() { $growl('error','Error','Service '+ name +' start failed'); });
+            }, function() { $growl('error','Error','Service '+ service.name +' start failed'); });
         }
      };
 
@@ -1059,7 +1079,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
          });
 
          modal.result.then(function() {
-             $scope.layers = webService.layers({type: $routeParams.type, id:$routeParams.id}, {}, function(response) {
+             $scope.layers = webService.layers({type: $scope.type, id:$routeParams.id}, {}, function(response) {
                  $scope.fullList = response;
              });
          });
@@ -1067,9 +1087,9 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
 
      $scope.deleteLayer = function() {
          if ($scope.selected != null && confirm("Are you sure?")) {
-             webService.deleteLayer({type: $scope.service.type, id: $scope.service.name, layerid: $scope.selected.Name}, {layernamespace: ''},
+             webService.deleteLayer({type: $scope.service.type, id: $scope.service.identifier, layerid: $scope.selected.Name}, {layernamespace: ''},
                  function() {$growl('success','Success','Layer '+ $scope.selected.Name +' successfully deleted from service '+ $scope.service.name);
-                             $scope.layers = webService.layers({type: $routeParams.type, id:$routeParams.id}, {}, function(response) {
+                             $scope.layers = webService.layers({type: $scope.type, id:$routeParams.id}, {}, function(response) {
                                  $scope.fullList = response;
                              });
                  },
@@ -1081,7 +1101,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
      $scope.showLayer = function() {
          $('#viewerData').modal("show");
          var layerName = $scope.selected.Name;
-         var layerData = DataViewer.createLayerWMS(layerName, $scope.service.name);
+         var layerData = DataViewer.createLayerWMS(layerName, $scope.service.identifier);
          var layerBackground = DataViewer.createLayer("CNTR_BN_60M_2006", "generic_shp");
          DataViewer.layers = [layerData, layerBackground];
          DataViewer.initMap('dataMap');
@@ -1123,8 +1143,8 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
                 $modalInstance.dismiss('close');
             } else {
                 // Add chosen data to this service
-                webService.addLayer({type: service.type, id: service.name},
-                                    {layerAlias: data.Name, layerId: data.Name, serviceType: service.type, serviceId: service.name,  providerId: data.Provider},
+                webService.addLayer({type: service.type, id: service.identifier},
+                                    {layerAlias: data.Name, layerId: data.Name, serviceType: service.type, serviceId: service.identifier,  providerId: data.Provider},
                                     function() {$growl('success','Success','Layer '+ data.Name +' successfully added to service '+ service.name);
                                                 $modalInstance.close();},
                                     function() {$growl('error','Error','Layer '+ data.Name +' failed to be added to service '+ service.name);

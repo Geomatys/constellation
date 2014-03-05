@@ -9,11 +9,11 @@
             <a class="brand">{{service.name}}</a>
             <form class="navbar-form">
                 <div class="btn-group service-item pull-right">
-                    <button type="button" class="btn btn-default btn-sm" ng-click="showCapa(service.type, service.name)"
+                    <button type="button" class="btn btn-default btn-sm" ng-click="showCapa(service)"
                             ng-disabled="service.status!=='WORKING'">GetCapabilities</button>
-                    <button type="button" class="btn btn-default btn-sm"  ng-click="showLogs(service.type, service.name)">Logs</button>
-                    <button type="button" class="btn btn-default btn-sm btn-info" ng-click="reload(service.type, service.name)">Reload</button>
-                    <button type="button" class="btn btn-default btn-sm"  ng-class="{'started':service.status=='WORKING','stopped':service.status!='WORKING'}" ng-click="startOrStop(service.type, service.name, service.status)">
+                    <button type="button" class="btn btn-default btn-sm"  ng-click="showLogs(service)">Logs</button>
+                    <button type="button" class="btn btn-default btn-sm btn-info" ng-click="reload(service)">Reload</button>
+                    <button type="button" class="btn btn-default btn-sm"  ng-class="{'started':service.status=='WORKING','stopped':service.status!='WORKING'}" ng-click="startOrStop(service)">
                         <i ng-class="{'icon-play':service.status!='WORKING','icon-stop':service.status=='WORKING'}"></i>
                     </button>
                 </div>
@@ -266,7 +266,7 @@
                         <div class="form-group">
                             <div class="control-label" translate="service.description.tab.description.version" >Version</div>
                             <div id="versionsCheck">
-                                <div ng-repeat="version in wmsVersion" class="inline">
+                                <div ng-repeat="version in versions" class="inline">
                                     <div class="checkbox inline"><input type="checkbox"  id="{{version.id}}"  ng-model="version.checked" ng-change="selectedVersion()" ng-checked="versionIsSelected(version.id)"> {{version.id}}</div>
                                 </div>
 

@@ -12,6 +12,7 @@
             </a>
             <ul class="dropdown-menu">
                 <li><a href="#/webservice/wms" id="wmschoice" translate="webservicepage.button.dropdown.wms.label">Maps (WMS)</a></li>
+                <li><a href="#/webservice/wfs" id="wfschoice" translate="webservicepage.button.dropdown.wfs.label">Features (WFS)</a></li>
             </ul>
         </div>
     </div>
@@ -25,11 +26,11 @@
             <div class="collapse navbar-collapse">
                 <ul class="nav navbar-nav navbar-right">
                     <li ng-class="{active:typeFilter == null}"><a ng-click="typeFilter = null">Tous</a></li>
-                    <li ng-class="{active:typeFilter.type === 'CSW'}"><a ng-click="typeFilter = {type: 'CSW'}">CSW</a></li>
                     <li ng-class="{active:typeFilter.type === 'WMS'}"><a ng-click="typeFilter = {type: 'WMS'}">WMS</a></li>
-                    <li ng-class="{active:typeFilter.type === 'WMTS'}"><a ng-click="typeFilter = {type: 'WMTS'}">WMTS</a></li>
                     <li ng-class="{active:typeFilter.type === 'WFS'}"><a ng-click="typeFilter = {type: 'WFS'}">WFS</a></li>
                     <li ng-class="{active:typeFilter.type === 'WCS'}"><a ng-click="typeFilter = {type: 'WCS'}">WCS</a></li>
+                    <li ng-class="{active:typeFilter.type === 'WMTS'}"><a ng-click="typeFilter = {type: 'WMTS'}">WMTS</a></li>
+                    <li ng-class="{active:typeFilter.type === 'CSW'}"><a ng-click="typeFilter = {type: 'CSW'}">CSW</a></li>
                     <li ng-class="{active:typeFilter.type === 'SOS'}"><a ng-click="typeFilter = {type: 'SOS'}">SOS</a></li>
                     <li ng-class="{active:typeFilter.type === 'WPS'}"><a ng-click="typeFilter = {type: 'WPS'}">WPS</a></li>
                 </ul>
@@ -39,7 +40,7 @@
 
     <div class="row bg-white" id="list-services">
         <div class="col-sm-6 service-item" ng-repeat="service in services.instance | filter:typeFilter">
-            <a href="#/webservice/{{service.type.toLocaleLowerCase()}}/{{service.name}}"><h3 class="text-info">{{service.name}} ({{service.type}})</h3></a>
+            <a href="#/webservice/{{service.type.toLocaleLowerCase()}}/{{service.identifier}}"><h3 class="text-info">{{service.name}} ({{service.type}})</h3></a>
             <div class="well" ng-class="{'started':service.status=='WORKING','stopped':service.status=='ERROR','not-started':service.status=='NOT_STARTED'}" data-state="wms-test">
                 <div class="row">
                     <div class="col-sm-4 col-sm-offset-8">
@@ -49,16 +50,16 @@
                                 <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a href="#/webservice/{{service.type.toLocaleLowerCase()}}/{{service.name}}" translate="service.menu.edit.label">Edit</a></li>
-                                <li><a ng-click="showLogs(service.type, service.name)" translate="service.menu.log.label">View logs</a></li>
-                                <li><a ng-click="showCapa(service.type, service.name)" ng-disabled="service.status!=='WORKING'" translate="service.menu.getcapabilities.label">GetCapabilities</a></li>
-                                <li><a ng-click="deleteService(service.type, service.name)" translate="service.menu.delete.label">Delete</a></li>
+                                <li><a href="#/webservice/{{service.type.toLocaleLowerCase()}}/{{service.identifier}}" translate="service.menu.edit.label">Edit</a></li>
+                                <li><a ng-click="showLogs(service)" translate="service.menu.log.label">View logs</a></li>
+                                <li><a ng-click="showCapa(service)" ng-disabled="service.status!=='WORKING'" translate="service.menu.getcapabilities.label">GetCapabilities</a></li>
+                                <li><a ng-click="deleteService(service)" translate="service.menu.delete.label">Delete</a></li>
                             </ul>
                         </div>
-                        <a style="margin-left: 5px;" class="btn btn-default btn-info" ng-click="reload(service.type, service.name)">
+                        <a style="margin-left: 5px;" class="btn btn-default btn-info" ng-click="reload(service)">
                             <i class="icon-refresh"></i>
                         </a>
-                        <a class="btn btn-default" ng-class="{'started':service.status=='WORKING','stopped':service.status!='WORKING'}" ng-click="startOrStop(service.type, service.name, service.status)">
+                        <a class="btn btn-default" ng-class="{'started':service.status=='WORKING','stopped':service.status!='WORKING'}" ng-click="startOrStop(service)">
                             <i ng-class="{'icon-play':service.status!='WORKING','icon-stop':service.status=='WORKING'}"></i>
                         </a>
                     </div>

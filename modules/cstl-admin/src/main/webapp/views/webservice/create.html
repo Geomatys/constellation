@@ -75,8 +75,7 @@
             <div class="form-group">
                 <div class="control-label" translate="service.description.tab.description.version" >Version</div>
                 <div id="versionsCheck">
-                    <div ng-repeat="version in wmsVersion" class="inline">
-                        <!--input type="checkbox" name="{{song.url}}" id="{{song.name}}" ng-model="song.checked" ng-change="selectedSongs()"-->
+                    <div ng-repeat="version in versions" class="inline">
                         <div class="checkbox inline"><input type="checkbox" ng-model="version.checked" ng-change="selectedVersion()"> {{version.id}}</div>
                     </div>
                 </div>
