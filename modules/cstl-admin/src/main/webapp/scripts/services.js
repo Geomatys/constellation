@@ -28,6 +28,13 @@ cstlAdminApp.factory('Account', ['$resource',
         });
     }]);
 
+cstlAdminApp.factory('Contact', ['$resource',
+         function ($resource) {
+             return $resource(cstlContext + 'spring/admin/contact;jsessionid=', {}, {
+            	 save: {method:'PUT'}
+         });
+}]);
+
 cstlAdminApp.factory('Password', ['$resource',
     function ($resource) {
         return $resource('app/rest/account/change_password', {}, {

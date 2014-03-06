@@ -9,6 +9,7 @@ import org.constellation.engine.register.ConstellationPersistenceException;
 import org.constellation.engine.register.DTOMapper;
 import org.constellation.engine.register.Layer;
 import org.constellation.engine.register.LayerDTO;
+import org.constellation.engine.register.Property;
 import org.constellation.engine.register.Role;
 import org.constellation.engine.register.RoleDTO;
 import org.constellation.engine.register.User;
@@ -60,4 +61,13 @@ public class JpaDTOMapper implements DTOMapper {
         userDTO.setRoles(user.getRoles());
         return userDTO;
     }
+
+
+	@Override
+	public Property propertyEntity(String key, String value) {
+	   PropertyEntity propertyEntity = new PropertyEntity();
+	   propertyEntity.setKey(key);
+		propertyEntity.setValue(value);
+	return propertyEntity;
+	}
 }

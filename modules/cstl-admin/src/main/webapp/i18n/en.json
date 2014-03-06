@@ -1,4 +1,13 @@
 {
+	"city": "City",
+	"country": "Country",
+	"fax": "fax",
+	"name": "Name",
+	"organization": "Organization",
+	"phone": "Phone",
+	"position": "Position",
+	"zip": "ZIP",
+    "save": "Save",
     "adddata": {
         "popup": {
             "datalist": {
@@ -22,6 +31,7 @@
             "title": "Add data"
         }
     },
+    "admin.contact.title": "Contact",
     "confirm.delete.style": "Do you really want to delete this style?",
     "create": {
         "accessconstraint": {
@@ -528,7 +538,7 @@
                 "main": "Account",
                 "users": "Users",
                 "password": "Password",
-                "sessions": "Sessions",
+                "contact": "Contact",
                 "metrics": "Metrics",
                 "logs": "Logs",
                 "login": "Authenticate",

@@ -9,5 +9,6 @@ public interface DTOMapper {
     Layer layer(LayerDTO dto);
     List<RoleDTO> dtoToEntity(List<? extends Role> roles);
     UserDTO entityToDTO(User user);
+	Property propertyEntity(String key, String value);
     
 }

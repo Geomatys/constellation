@@ -101,6 +101,11 @@ cstlAdminApp
                 templateUrl: 'views/user/list.html',
                 controller: 'UserController'
             });
+            $routeProvider
+            .when('/contact', {
+                templateUrl: 'views/contact.html',
+                controller: 'ContactController'
+            });
 
 
 

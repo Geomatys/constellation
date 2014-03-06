@@ -50,6 +50,24 @@ cstlAdminApp.controller('LogoutController', ['$location', 'AuthenticationSharedS
         });
     }]);
 
+
+cstlAdminApp.controller('ContactController', ['$scope', 'Contact',
+                                               function ($scope, Contact) {
+	$scope.data = Contact.get();
+    $scope.save = function () {
+       Contact.save($scope.data,
+           function (value, responseHeaders) {
+              $scope.error = null;
+              $scope.success = 'OK';
+              $scope.data = Contact.get();
+           },
+       function (httpResponse) {
+           $scope.success = null;
+           $scope.error = "ERROR";
+       });
+    };
+}]);
+
 cstlAdminApp.controller('SettingsController', ['$scope', 'resolvedAccount', 'Account',
     function ($scope, resolvedAccount, Account) {
         $scope.success = null;
