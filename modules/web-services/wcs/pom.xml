@@ -80,6 +80,11 @@
         <scope>test</scope>
     </dependency>
     <dependency>
+       <groupId>org.apache.shiro</groupId>
+       <artifactId>shiro-spring</artifactId>
+       <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.constellation.storage</groupId>
       <artifactId>cstl-store-data-coveragesql</artifactId>
       <version>${project.version}</version>

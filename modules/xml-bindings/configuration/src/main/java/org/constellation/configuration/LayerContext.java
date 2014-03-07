@@ -181,6 +181,9 @@ public class LayerContext extends AbstractConfigurationObject {
      * @return a list with GetFeatureInfoCfg, can be null.
      */
     public List<GetFeatureInfoCfg> getGetFeatureInfoCfgs() {
+        if (getFeatureInfoCfgs == null) {
+            getFeatureInfoCfgs = new ArrayList<>();
+        }
         return getFeatureInfoCfgs;
     }
 

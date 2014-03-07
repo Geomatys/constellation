@@ -33,6 +33,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Map;
+import java.util.Map.Entry;
 import javax.imageio.ImageReader;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -253,6 +254,41 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
     protected static BufferedImage getImageFromURL(final URL url, final String mime) throws IOException {
         // Try to get the image from the url.
         final InputStream in = url.openStream();
+        final ImageReader reader = XImageIO.getReaderByMIMEType(mime, in, true, true);
+        final BufferedImage image = reader.read(0);
+        XImageIO.close(reader);
+        reader.dispose();
+        // For debugging, uncomment the JFrame creation and the Thread.sleep further,
+        // in order to see the image in a popup.
+//        javax.swing.JFrame frame = new javax.swing.JFrame();
+//        frame.setContentPane(new javax.swing.JLabel(new javax.swing.ImageIcon(image)));
+//        frame.setDefaultCloseOperation(javax.swing.JFrame.DISPOSE_ON_CLOSE);
+//        frame.pack();
+//        frame.setVisible(true);
+//        try {
+//            Thread.sleep(5 * 1000);
+//            frame.dispose();
+//        } catch (InterruptedException ex) {
+//            assumeNoException(ex);
+//        }
+        return image;
+    }
+
+    protected static BufferedImage getImageFromPostKvp(final URL url, final Map<String, String> parameters, final String mime) throws IOException {
+        final URLConnection conec = url.openConnection();
+        conec.setDoOutput(true);
+        conec.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+        final OutputStreamWriter wr = new OutputStreamWriter(conec.getOutputStream());
+        final StringBuilder sb = new StringBuilder();
+        for (Entry<String, String> entry : parameters.entrySet()) {
+            sb.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
+        }
+        sb.deleteCharAt(sb.length() -1);
+        wr.write(sb.toString());
+        wr.flush();
+
+        // Try to get the image from the url.
+        final InputStream in = conec.getInputStream();
         final ImageReader reader = XImageIO.getReaderByMIMEType(mime, in, true, true);
         final BufferedImage image = reader.read(0);
         XImageIO.close(reader);

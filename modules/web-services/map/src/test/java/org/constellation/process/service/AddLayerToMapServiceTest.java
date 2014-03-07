@@ -137,7 +137,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         assertNotNull(outputContext);
         assertFalse(outputContext.getLayers().isEmpty());
         assertTrue(outputContext.getLayers().size() == 1);
-        assertTrue(outputContext.getGetFeatureInfoCfgs().size() > 0); //default generic GetFeatureInfo
+        assertTrue(outputContext.getGetFeatureInfoCfgs().isEmpty()); //default generic GetFeatureInfo
 
         final Source outSource = outputContext.getLayers().get(0);
         assertEquals(COUNTRIES_DATA_REF.getProviderOrServiceId() ,outSource.getId());
@@ -186,7 +186,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         assertNotNull(outputContext);
         assertFalse(outputContext.getLayers().isEmpty());
         assertTrue(outputContext.getLayers().size() == 1);
-        assertTrue(outputContext.getGetFeatureInfoCfgs().size() > 0); //default generic GetFeatureInfo
+        assertTrue(outputContext.getGetFeatureInfoCfgs().isEmpty()); //default generic GetFeatureInfo
 
         final Source outSource = outputContext.getLayers().get(0);
         assertEquals(COUNTRIES_DATA_REF.getProviderOrServiceId() ,outSource.getId());
@@ -264,7 +264,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
 
         //init
         final LayerContext inputContext = new LayerContext();
-inputContext.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
+        inputContext.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
         final List<Layer> layers = new ArrayList<>();
         layers.add(new Layer(new QName(COUNTRIES_DATA_REF.getLayerId().getNamespaceURI(), COUNTRIES_DATA_REF.getLayerId().getLocalPart())));
         layers.add(new Layer(new QName(COUNTRIES_DATA_REF.getLayerId().getNamespaceURI(), "city")));
@@ -291,7 +291,7 @@ inputContext.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfigurati
         assertNotNull(outputContext);
         assertFalse(outputContext.getLayers().isEmpty());
         assertTrue(outputContext.getLayers().size() == 1);
-         assertTrue(outputContext.getGetFeatureInfoCfgs().size() > 0); //default generic GetFeatureInfo
+        assertTrue(outputContext.getGetFeatureInfoCfgs().size() > 0); //default generic GetFeatureInfo
 
         final Source outSource = outputContext.getLayers().get(0);
         assertEquals(COUNTRIES_DATA_REF.getProviderOrServiceId() ,outSource.getId());
@@ -333,7 +333,7 @@ inputContext.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfigurati
         assertNotNull(outputContext);
         assertFalse(outputContext.getLayers().isEmpty());
         assertTrue(outputContext.getLayers().size() == 1);
-        assertTrue(outputContext.getGetFeatureInfoCfgs().size() > 0); //default generic GetFeatureInfo
+        assertTrue(outputContext.getGetFeatureInfoCfgs().isEmpty()); //default generic GetFeatureInfo
 
         final Source outSource = outputContext.getLayers().get(0);
         assertEquals(COUNTRIES_DATA_REF.getProviderOrServiceId() ,outSource.getId());
@@ -378,7 +378,7 @@ inputContext.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfigurati
         assertNotNull(outputContext);
         assertFalse(outputContext.getLayers().isEmpty());
         assertTrue(outputContext.getLayers().size() == 1);
-        assertTrue(outputContext.getGetFeatureInfoCfgs().size() > 0); //default generic GetFeatureInfo
+        assertTrue(outputContext.getGetFeatureInfoCfgs().isEmpty()); //default generic GetFeatureInfo
 
         final Source outSource = outputContext.getLayers().get(0);
         assertEquals(COUNTRIES_DATA_REF.getProviderOrServiceId() ,outSource.getId());
@@ -389,7 +389,7 @@ inputContext.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfigurati
         assertEquals(COUNTRIES_DATA_REF.getLayerId().getLocalPart() ,outLayer.getName().getLocalPart());
         assertEquals("Europe-costlines" ,outLayer.getAlias());
         assertNotNull(outLayer.getFilter());
-        assertEquals(STYLE_DATA_REF.getReference(), outLayer.getStyles().get(0));
+        assertEquals(STYLE_DATA_REF, outLayer.getStyles().get(0));
         assertTrue(outLayer.getGetFeatureInfoCfgs().size() == 1);
 
         final GetFeatureInfoCfg outGFI = outLayer.getGetFeatureInfoCfgs().get(0);

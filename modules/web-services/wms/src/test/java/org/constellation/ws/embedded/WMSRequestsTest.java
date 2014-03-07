@@ -22,7 +22,9 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.ImageWriterSpi;
@@ -691,4 +693,37 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
         assertEquals(LAYER_TEST, name);
     }
 
+
+    @Test
+    @Order(order=13)
+    public void testWMSGetMapLakePostKvp() throws IOException {
+        // Creates a valid GetMap url.
+        final URL getMapUrl;
+        try {
+            getMapUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/default?");
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        final Map<String, String> parameters = new HashMap<>();
+        parameters.put("HeIgHt","100");
+        parameters.put("LaYeRs","Lakes");
+        parameters.put("FoRmAt","image/png");
+        parameters.put("ReQuEsT","GetMap");
+        parameters.put("StYlEs","");
+        parameters.put("CrS","CRS:84");
+        parameters.put("BbOx","-0.0025,-0.0025,0.0025,0.0025");
+        parameters.put("VeRsIoN","1.3.0");
+        parameters.put("WiDtH","100");
+
+        // Try to get a map from the url. The test is skipped in this method if it fails.
+        final BufferedImage image = getImageFromPostKvp(getMapUrl, parameters, "image/png");
+
+        // Test on the returned image.
+        assertTrue  (!(ImageTesting.isImageEmpty(image)));
+        assertEquals(100, image.getWidth());
+        assertEquals(100,  image.getHeight());
+        assertTrue  (ImageTesting.getNumColors(image) > 2);
+    }
 }

@@ -65,6 +65,7 @@ import org.geotoolkit.util.StringUtilities;
 // Apache SIS dependencies
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
+import org.glassfish.jersey.internal.util.collection.StringKeyIgnoreCaseMultivaluedMap;
 
 /**
  * Abstract parent of all REST facade classes for Constellation web services.
@@ -176,6 +177,17 @@ public abstract class WebService {
      */
     @Deprecated
     private boolean fullRequestLog = false;
+
+    /**
+     * The POST  kvp request parameters (one by thread)
+     */
+    private final ThreadLocal<MultivaluedMap<String, String>> postKvpParameters = new ThreadLocal<MultivaluedMap<String, String>>(){
+
+        @Override
+        protected MultivaluedMap initialValue() {
+            return new StringKeyIgnoreCaseMultivaluedMap();
+        }
+    };
 
     /**
      * A pool of JAXB unmarshaller used to create Java objects from XML files.
@@ -290,6 +302,7 @@ public abstract class WebService {
         final StringTokenizer tokens = new StringTokenizer(params, "&");
         final StringBuilder log = new StringBuilder("request POST kvp: ");
         log.append(params).append('\n');
+        final MultivaluedMap kvpMap = new StringKeyIgnoreCaseMultivaluedMap();
         while (tokens.hasMoreTokens()) {
             final String token = tokens.nextToken().trim();
             final int equalsIndex = token.indexOf('=');
@@ -302,8 +315,9 @@ public abstract class WebService {
                 return doPOSTXml(in);
             }
             log.append("put: ").append(paramName).append("=").append(paramValue).append('\n');
-            getUriContext().getQueryParameters().add(paramName, paramValue);
+            kvpMap.add(paramName, paramValue);
         }
+        postKvpParameters.set(kvpMap);
         LOGGER.info(log.toString());
         return treatIncomingRequest(null);
     }
@@ -454,17 +468,15 @@ public abstract class WebService {
             }
         }
 
-        // we look also in Path parameters
-        final MultivaluedMap<String,String> pathParameters = uriContext.getPathParameters();
-        values = pathParameters.get(parameterName);
-
+        // look in the POST kvp parameter
         if (values == null) {
-            for (final Entry<String,List<String>> entry : parameters.entrySet()) {
-                if (entry.getKey().equalsIgnoreCase(parameterName)) {
-                    values = entry.getValue();
-                    break;
-                }
-            }
+            values = postKvpParameters.get().get(parameterName);
+        }
+
+        // look in Path parameters
+        if (values == null) {
+            final MultivaluedMap<String,String> pathParameters = uriContext.getPathParameters();
+            values = pathParameters.get(parameterName);
         }
         return values;
     }
@@ -530,7 +542,18 @@ public abstract class WebService {
      * @return
      */
     public MultivaluedMap<String,String> getParameters(){
-        return uriContext.getQueryParameters();
+        final MultivaluedMap results = new StringKeyIgnoreCaseMultivaluedMap();
+
+        // GET parameters
+        for(final Entry<String, List<String>> entry : uriContext.getQueryParameters().entrySet()){
+            results.add(entry.getKey(), entry.getValue());
+        }
+
+        // POST kvp parameters
+        for(final Entry<String, List<String>> entry : postKvpParameters.get().entrySet()){
+            results.add(entry.getKey(), entry.getValue());
+        }
+        return results;
     }
 
     /**
@@ -579,21 +602,9 @@ public abstract class WebService {
      */
     protected Object getComplexParameter(final String parameterName, final boolean mandatory) throws CstlServiceException {
         try {
+            final String value = getParameter(parameterName, mandatory);
+            final StringReader sr = new StringReader(value);
             final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
-            final MultivaluedMap<String,String> parameters = getUriContext().getQueryParameters();
-            List<String> list = parameters.get(parameterName);
-            if (list == null) {
-                list = parameters.get(parameterName.toLowerCase());
-                if (list == null) {
-                    if (!mandatory) {
-                        return null;
-                    } else {
-                        throw new CstlServiceException("The parameter " + parameterName + " must be specified",
-                                       MISSING_PARAMETER_VALUE);
-                    }
-                }
-            }
-            final StringReader sr = new StringReader(list.get(0));
             Object result = unmarshaller.unmarshal(sr);
             marshallerPool.recycle(unmarshaller);
             if (result instanceof JAXBElement) {
