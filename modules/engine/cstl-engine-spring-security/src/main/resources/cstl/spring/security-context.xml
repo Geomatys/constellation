@@ -1,32 +1,72 @@
-<beans:beans xmlns="http://www.springframework.org/schema/security"
-	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+<beans:beans xmlns="http://www.springframework.org/schema/security" xmlns:beans="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans 
 	   		http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
 			http://www.springframework.org/schema/security 
 			http://www.springframework.org/schema/security/spring-security-3.2.xsd">
 
 
-	<beans:alias name="springSecurityFilterChain" alias="securityFilter" />
+  <beans:alias name="springSecurityFilterChain" alias="securityFilter" />
 
-	<http request-matcher="ant">
-		<intercept-url pattern="/WS/configuration/**" access="ROLE_cstl-admin" />
-		<intercept-url pattern="/WS/*/admin/**" access="ROLE_cstl-admin" />
-		<intercept-url pattern="/api/**" access="ROLE_cstl-admin" />
-		<intercept-url pattern="/spring/admin/**" access="ROLE_cstl-admin" />
 
-		<form-login default-target-url="/spring/session/loggedin"
-			always-use-default-target="true" login-page="/login.html" />
 
-	</http>
+  <beans:bean id="nop" class="org.constellation.security.spring.NOPAuthenticationEntryPoint" />
 
-	<jdbc-user-service id="cstlUserService"
-		data-source-ref="dataSource"
-		users-by-username-query='select "login" as "username", "password" as "password", true as "enabled" from "admin"."user" where "login" = ?'
-		authorities-by-username-query='select "login" as "username", &apos;ROLE_&apos; || "role" as "authority" from "admin"."user_x_role" where "login" = ?' />
+  <http pattern="/WS/**" request-matcher="ant" use-expressions="true" auto-config="false" entry-point-ref="nop">
+    <intercept-url pattern="/WS/configuration/**" access="hasRole('cstl-admin')" />
+    <intercept-url pattern="/WS/*/admin/**" access="hasRole('cstl-admin')" />
+  </http>
+  <http pattern="/api/**" request-matcher="ant" use-expressions="true" auto-config="false" entry-point-ref="nop">
+    <intercept-url pattern="/api/**" access="hasRole('cstl-admin')" />
+  </http>
+  <http pattern="/spring/admin/**" request-matcher="ant" use-expressions="true" auto-config="false" entry-point-ref="nop">
+    <intercept-url pattern="/spring/admin/**" access="hasRole('cstl-admin')" />
+    <session-management session-authentication-strategy-ref="sessionAuthenticationStrategy" />
+  </http>
 
-	<authentication-manager alias="authenticationManager">
-		<authentication-provider user-service-ref="cstlUserService">
-			<password-encoder hash="md5" />
-		</authentication-provider>
-	</authentication-manager>
+  <http request-matcher="ant" use-expressions="true">
+<!--     <custom-filter position="FORM_LOGIN_FILTER" ref="myAuthFilter"  /> -->
+<!--     <intercept-url pattern="/admin/log/**" access="isAuthenticated()" /> -->
+    <form-login  default-target-url="/spring/auth/loggedin" always-use-default-target="true" login-page="/login.html" />
+    <logout invalidate-session="true" delete-cookies="JSESSIONID" logout-url="/logout" logout-success-url="/spring/auth/loggedout" />
+    <session-management session-authentication-strategy-ref="sessionAuthenticationStrategy" />
+  </http>
+
+  <beans:bean id="sessionAuthenticationStrategy"
+    class="org.springframework.security.web.authentication.session.CompositeSessionAuthenticationStrategy">
+    <beans:constructor-arg>
+      <beans:list>
+        <beans:bean
+          class="org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy">
+          <beans:constructor-arg ref="sessionRegistry" />
+          <beans:property name="maximumSessions" value="-1" />
+          <beans:property name="exceptionIfMaximumExceeded" value="true" />
+        </beans:bean>
+        <beans:bean class="org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy">
+        </beans:bean>
+        <beans:bean class="org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy">
+          <beans:constructor-arg ref="sessionRegistry" />
+
+        </beans:bean>
+      </beans:list>
+    </beans:constructor-arg>
+  </beans:bean>
+
+  <beans:bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
+
+  <jdbc-user-service id="cstlUserService" data-source-ref="dataSource"
+    users-by-username-query='select "login" as "username", "password" as "password", true as "enabled" from "admin"."user" where "login" = ?'
+    authorities-by-username-query='select "login" as "username", "role" as "authority" from "admin"."user_x_role" where "login" = ?' />
+
+  <authentication-manager alias="authenticationManager">
+    <authentication-provider user-service-ref="cstlUserService">
+      <password-encoder hash="md5" />
+    </authentication-provider>
+  </authentication-manager>
+
+<!--   <beans:bean id="myAuthFilter" class="org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter"> -->
+<!--     <beans:property name="sessionAuthenticationStrategy" ref="sessionAuthenticationStrategy" /> -->
+<!--     <beans:property name="authenticationManager" ref="authenticationManager" /> -->
+<!--     <beans:property name=""></beans:property> -->
+<!--   </beans:bean> -->
 </beans:beans>

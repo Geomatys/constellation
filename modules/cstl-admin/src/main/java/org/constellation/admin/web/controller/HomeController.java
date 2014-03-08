@@ -31,7 +31,7 @@ public class HomeController {
     @RequestMapping(value = "/logout", method = RequestMethod.GET)
     public String logout(HttpServletRequest request, HttpServletResponse response) {
     	request.getSession().invalidate();
-    	Cookie cookie = new Cookie("cstlSessionId", null);
+    	Cookie cookie = new Cookie("cstlSessionId", "");
     	cookie.setPath("/cstl-admin");
 		response.addCookie(cookie);
         return "redirect:/";

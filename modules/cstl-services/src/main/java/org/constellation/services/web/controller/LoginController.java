@@ -1,5 +1,6 @@
 package org.constellation.services.web.controller;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -8,19 +9,49 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
-@RequestMapping("/login")
+@RequestMapping("/auth")
 public class LoginController {
 
-	@RequestMapping(method = RequestMethod.GET)
+	@RequestMapping(value="/form", method = RequestMethod.GET)
 	public String get(HttpServletRequest request, HttpServletResponse response) {
-		// String adminUrl = request.getParameter("adminUrl");
-		// if(adminUrl!=null) {
 		String adminUrl = request.getHeader("REFERER");
 		
+		Cookie cookie = new Cookie("cstlAdmin", adminUrl);
+    	cookie.setPath("/constellation/spring/auth/");
+		response.addCookie(cookie);
 
-		// }
-		request.getSession().setAttribute("adminUrl", adminUrl);
-		return "redirect:../login.html";
+		return "redirect:../../login.html";
+	}
+	
+
+	@RequestMapping("/loggedin")
+	public String loggedin(HttpServletRequest httpServletRequest) {
+		String sessionId = httpServletRequest.getSession().getId();
+		String adminUrl = (String) httpServletRequest.getSession()
+				.getAttribute("adminUrl");
+		if (adminUrl == null) {
+			adminUrl = "http://localhost:8080/cstl-admin/";
+		}
+		return "redirect:" + adminUrl + "app/cstl?cstlSessionId=" + sessionId;
+	}
+
+	@RequestMapping("/loggedout")
+	public String loggedout(HttpServletRequest httpServletRequest) {
+
+		Cookie[] cookies = httpServletRequest.getCookies();
+		String adminUrl = null;
+		if (cookies != null) {
+			for (int i = 0; i < cookies.length; i++) {
+				Cookie cookie = cookies[i];
+				if ("cstlAdmin".equals(cookie.getName())) {
+					adminUrl = cookie.getValue();
+				}
+			}
+		}
+		if (adminUrl == null)
+			adminUrl = "http://localhost:8080/cstl-admin/";
+
+		return "redirect:" + adminUrl;
 	}
 
 }

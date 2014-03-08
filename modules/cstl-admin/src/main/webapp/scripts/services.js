@@ -7,10 +7,13 @@ function endsWith(str, suffix) {
 cstlAdminApp.factory('AuthInterceptor', function($cookies) {
     return {
 	    'request': function(config) {
-	    	if ($cookies.cstlSessionId) {
-	    		if(endsWith(config.url+'', ';jsessionid='))
-	    	    config.url += $cookies.cstlSessionId;
-	    	}
+	    	var url = config.url+'';
+	    	if(endsWith(url, ';jsessionid='))
+    	    	if ($cookies.cstlSessionId) {
+    	    		config.url += $cookies.cstlSessionId;
+	        	}else{
+	        		config.url = url.substring(0, url.indexOf(';jsessionid=')) 
+	        	}
 	        return config || $q.when(config);
 	    }
 	};
@@ -138,24 +141,25 @@ cstlAdminApp.factory('textService', ['$http',
         };
     }]);
 
-cstlAdminApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'authService', '$base64',
-    function ($rootScope, $http, authService, $base64) {
+cstlAdminApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'authService', '$base64','$cookieStore',
+    function ($rootScope, $http, authService, $base64, $cookieStore) {
         return {
             authenticate: function() {
                 $http.get(cstlContext + 'spring/session/status;jsessionid=')
                     .success(function (data, status, headers, config) {
                         $rootScope.$broadcast('event:auth-authConfirmed');
-                      //  $http.defaults.headers.common.Authorization = 'Basic ' + $base64.encode(param.username+':'+param.password);
-                    });
+                    })
             },
             logout: function () {
                 $rootScope.authenticationError = false;
-                $http.get(cstlContext + "spring/session/logout;jsessionid=");
-                $http.defaults.headers.common.Authorization = undefined;
-                $http.get(context + '/app/logout')
-                    .success(function (data, status, headers, config) {
-                        authService.loginCancelled();
-                    });
+                $http.get(cstlContext + "spring/session/logout;jsessionid=").then(function(){
+                	$cookieStore.remove('cstlSessionId');
+                	$http.get(context + '/app/logout')
+                	.success(function (data, status, headers, config) {
+                		authService.loginCancelled();
+                	});
+                	
+                });
             }
         };
     }]);

@@ -68,6 +68,12 @@
 			<artifactId>spring-security-web</artifactId>
 			<version>3.2.0.RELEASE</version>
 		</dependency>
+    
+    
+        <dependency>
+          <groupId>javax.servlet</groupId>
+          <artifactId>javax.servlet-api</artifactId>
+        </dependency>
 
 
 	</dependencies>

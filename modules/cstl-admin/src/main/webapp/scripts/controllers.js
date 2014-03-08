@@ -5,7 +5,8 @@
 cstlAdminApp.controller('HeaderController', ['$scope','$http',
                                            function ($scope, $http) {
 	                                         $http.get("app/conf").success(function(data){
-	                                    	   $scope.cstlUrl = data.cstl + "spring/login";
+	                                        	 $scope.cstlLoginUrl = data.cstl + "spring/auth/form";
+	                                        	 $scope.cstlLogoutUrl = data.cstl + "logout";
 	                                        });
                                            }]);
 

@@ -44,7 +44,7 @@
                 </li>
             </ul>
             <ul ng-hide="authenticated" class="nav nav-pills pull-right">
-                <li ng-hide="authenticated"><a href="{{cstlUrl}}" id="authenticateLink"><span
+                <li ng-hide="authenticated"><a href="{{cstlLoginUrl}}" id="authenticateLink"><span
                         class="glyphicon glyphicon-log-in"></span> &nbsp;<span
                         translate="global.menu.account.login">Authenticate</span></a></li>
             </ul>
@@ -88,7 +88,7 @@
                         <li ng-show="authenticated"><a href="#/logs"><span
                                 class="glyphicon glyphicon-tasks"></span> &nbsp;<span
                                 translate="global.menu.account.logs">Logs</span></a></li>
-                        <li ng-show="authenticated"><a href="#/logout"><span
+                        <li ng-show="authenticated"><a href="{{cstlLogoutUrl}}"><span
                                 class="glyphicon glyphicon-log-out"></span> &nbsp;<span
                                 translate="global.menu.account.logout">Log out</span></a></li>
                         <li ng-hide="authenticated"><a href="#/login"><span

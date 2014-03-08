@@ -1,5 +1,9 @@
 package org.constellation.services.web.controller;
 
+import java.io.IOException;
+import java.util.Iterator;
+
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -27,25 +31,7 @@ public class SessionController {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 	}
 
-	@RequestMapping("/loggedin")
-	public String admin(HttpServletRequest httpServletRequest) {
-		String sessionId = httpServletRequest.getSession().getId();
-		String adminUrl = (String) httpServletRequest.getSession()
-				.getAttribute("adminUrl");
-		if(adminUrl==null) {
-			return "redirect:/";
-		}
-		return "redirect:" + adminUrl + "app/cstl?cstlSessionId=" + sessionId;
-	}
 
-	@RequestMapping("/logout")
-	public @ResponseBody
-	String logout(HttpServletRequest httpServletRequest) {
-		HttpSession session = httpServletRequest.getSession(false);
-		if (session == null)
-			return "NOK";
-		session.invalidate();
-		return "OK";
-	}
+	
 
 }

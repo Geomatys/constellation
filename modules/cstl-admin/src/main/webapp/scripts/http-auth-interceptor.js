@@ -8,7 +8,7 @@
 (function () {
     'use strict';
 
-    angular.module('http-auth-interceptor', ['http-auth-interceptor-buffer'])
+    angular.module('http-auth-interceptor', ['http-auth-interceptor-buffer','ngCookies'])
 
         .factory('authService', ['$rootScope','httpBuffer', function($rootScope, httpBuffer) {
             return {
@@ -44,7 +44,7 @@
      */
         .config(['$httpProvider', function($httpProvider) {
 
-            var interceptor = ['$rootScope', '$q', 'httpBuffer', function($rootScope, $q, httpBuffer) {
+            var interceptor = ['$rootScope', '$q', 'httpBuffer', '$cookieStore', function($rootScope, $q, httpBuffer,$cookieStore) {
                 function success(response) {
                     return response;
                 }
@@ -52,6 +52,7 @@
                 function error(response) {
                     if (response.status === 401 && !response.config.ignoreAuthModule) {
                         var deferred = $q.defer();
+                        $cookieStore.remove('cstlSessionId');
                         httpBuffer.append(response.config, deferred);
                         $rootScope.$broadcast('event:auth-loginRequired', response);
                         return deferred.promise;
