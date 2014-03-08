@@ -17,12 +17,6 @@
 
 package org.constellation.ws.rest;
 
-import org.constellation.configuration.AcknowlegementType;
-import org.constellation.configuration.TargetNotFoundException;
-import org.constellation.dto.PortrayalContext;
-import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.rs.LayerProviders;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -32,6 +26,12 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
+
+import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.TargetNotFoundException;
+import org.constellation.dto.PortrayalContext;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.rs.LayerProviders;
 
 /**
  * RestFull API for provider data rendering/portraying.

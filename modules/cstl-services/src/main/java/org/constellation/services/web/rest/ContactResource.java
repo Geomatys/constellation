@@ -1,6 +1,5 @@
 package org.constellation.services.web.rest;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +12,6 @@ import org.constellation.engine.register.DTOMapper;
 import org.constellation.engine.register.Property;
 import org.constellation.engine.register.repository.PropertyRepository;
 import org.constellation.utils.JSonUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;

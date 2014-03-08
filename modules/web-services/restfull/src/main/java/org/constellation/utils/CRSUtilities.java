@@ -1,15 +1,5 @@
 package org.constellation.utils;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Maps;
-import org.constellation.dto.CRSCoverageList;
-import org.geotoolkit.factory.AuthorityFactoryFinder;
-import org.geotoolkit.referencing.CRS;
-import org.opengis.referencing.IdentifiedObject;
-import org.opengis.referencing.crs.CRSAuthorityFactory;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.util.FactoryException;
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -17,6 +7,16 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.constellation.dto.CRSCoverageList;
+import org.geotoolkit.factory.AuthorityFactoryFinder;
+import org.opengis.referencing.IdentifiedObject;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.util.FactoryException;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Maps;
 
 /**
  * @author bgarcia

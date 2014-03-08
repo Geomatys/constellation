@@ -1,14 +1,11 @@
 package org.constellation.ws.rest;
 
 
-import org.apache.sis.storage.DataStoreException;
-import org.apache.sis.util.logging.Logging;
-import org.constellation.configuration.StringList;
-import org.constellation.dto.CRSCoverageList;
-import org.constellation.dto.ParameterValues;
-import org.constellation.utils.CRSUtilities;
-import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.rs.LayerProviders;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -18,13 +15,17 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.namespace.QName;
+
+import org.apache.sis.storage.DataStoreException;
+import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.StringList;
+import org.constellation.dto.CRSCoverageList;
+import org.constellation.dto.ParameterValues;
+import org.constellation.utils.CRSUtilities;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.rs.LayerProviders;
 
 
 /**

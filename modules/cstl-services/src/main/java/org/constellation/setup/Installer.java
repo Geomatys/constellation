@@ -1,28 +1,7 @@
 package org.constellation.setup;
 
 
-import org.constellation.admin.ConfigurationEngine;
-import org.constellation.admin.SecurityManagerAdapter;
-import org.constellation.configuration.ws.rs.ConfigurationUtilities;
-import org.geotoolkit.factory.Hints;
-import org.geotoolkit.internal.image.io.SetupBIL;
-import org.geotoolkit.internal.image.io.SetupGeoTiff;
-import org.geotoolkit.internal.io.Installation;
-import org.geotoolkit.lang.Setup;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
-import org.springframework.web.context.support.XmlWebApplicationContext;
-
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.health.HealthCheckRegistry;
-import com.codahale.metrics.servlet.InstrumentedFilter;
-import com.codahale.metrics.servlets.AdminServlet;
-import com.codahale.metrics.servlets.HealthCheckServlet;
-import com.codahale.metrics.servlets.MetricsServlet;
+import java.util.EnumSet;
 
 import javax.imageio.ImageIO;
 import javax.servlet.DispatcherType;
@@ -32,7 +11,24 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletRegistration;
 
-import java.util.EnumSet;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.SecurityManagerAdapter;
+import org.constellation.configuration.ws.rs.ConfigurationUtilities;
+import org.geotoolkit.factory.Hints;
+import org.geotoolkit.internal.io.Installation;
+import org.geotoolkit.lang.Setup;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.health.HealthCheckRegistry;
+import com.codahale.metrics.servlet.InstrumentedFilter;
+import com.codahale.metrics.servlets.AdminServlet;
+import com.codahale.metrics.servlets.HealthCheckServlet;
+import com.codahale.metrics.servlets.MetricsServlet;
 
 /**
  * Use this installer to initialize Geotk and copy a file-system configuration into db config.

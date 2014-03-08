@@ -6,15 +6,13 @@ import org.constellation.admin.ConfigurationEngine;
 import org.constellation.engine.register.ConfigurationService;
 import org.constellation.security.SecurityManagerHolder;
 import org.constellation.util.ReflectionUtilities;
+import org.constellation.ws.DIEnhancer;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
-import org.constellation.ws.DIEnhancer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 

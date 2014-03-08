@@ -1,6 +1,7 @@
 package org.constellation.services.web.rest.dto;
 
 import ch.qos.logback.classic.Logger;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 public class LoggerDTO {

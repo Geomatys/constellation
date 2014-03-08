@@ -25,15 +25,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.sis.util.logging.Logging;
-import org.constellation.configuration.AcknowlegementType;
-import org.constellation.configuration.ProviderConfiguration;
-import org.constellation.provider.LayerProvider;
-import org.constellation.provider.LayerProviderProxy;
-import org.constellation.provider.LayerProviderService;
-import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.rs.LayerProviders;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -45,9 +36,18 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
+
 import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.NotRunningServiceException;
+import org.constellation.configuration.ProviderConfiguration;
+import org.constellation.provider.LayerProvider;
+import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.LayerProviderService;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.rs.LayerProviders;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.feature.DefaultName;

@@ -1,6 +1,5 @@
 package org.constellation.engine.register;
 
-import java.util.List;
 import java.util.Set;
 
 

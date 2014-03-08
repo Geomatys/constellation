@@ -1,19 +1,11 @@
 package org.constellation.ws.rest;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -23,7 +15,6 @@ import org.constellation.engine.register.User;
 import org.constellation.engine.register.UserDTO;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.security.SecurityManagerHolder;
-import org.geotoolkit.util.StringUtilities;
 import org.springframework.util.StringUtils;
 
 /**
