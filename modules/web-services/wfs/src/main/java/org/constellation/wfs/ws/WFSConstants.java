@@ -109,7 +109,7 @@ public final class WFSConstants {
         geometryOperands[1] = GeometryOperand.Point;
         geometryOperands[2] = GeometryOperand.LineString;
         geometryOperands[3] = GeometryOperand.Polygon;
-        
+
         final SpatialOperator[] operatorList = new SpatialOperator[10];
         operatorList[0] = FilterXmlFactory.buildSpatialOperator("1.1.0", "DISJOINT", null);
         operatorList[1] = FilterXmlFactory.buildSpatialOperator("1.1.0", "EQUALS", null);
@@ -185,7 +185,7 @@ public final class WFSConstants {
 
         final ResourceIdentifierType iden = new ResourceIdentifierType(new QName("http://www.opengis.net/fes/2.0", "ResourceId"));
         final org.geotoolkit.ogc.xml.v200.IdCapabilitiesType idCapabilities = new org.geotoolkit.ogc.xml.v200.IdCapabilitiesType(iden);
-        
+
         final List<AbstractDomain> constraints = new ArrayList<>();
         constraints.add(WFSXmlFactory.buildDomainNoValues("2.0.0", "ImplementsQuery", "TRUE"));
         constraints.add(WFSXmlFactory.buildDomainNoValues("2.0.0", "ImplementsAdHocQuery",         "TRUE"));
@@ -265,7 +265,7 @@ public final class WFSConstants {
 
         final AbstractDomain serviceDomain = WFSXmlFactory.buildDomain("2.0.0", "Service", Arrays.asList("WFS"));
         final AbstractDomain versionDomain = WFSXmlFactory.buildDomain("2.0.0", "Version", Arrays.asList("2.0.0"));
-        
+
         final List<AbstractDomain> gcParameters = new ArrayList<>();
         gcParameters.add(WFSXmlFactory.buildDomain("2.0.0", "AcceptVersions", Arrays.asList("2.0.0", "1.1.0")));
         gcParameters.add(WFSXmlFactory.buildDomain("2.0.0", "AcceptFormats",  Arrays.asList("text/xml")));
@@ -299,31 +299,31 @@ public final class WFSConstants {
         tParameters.add(versionDomain);
         AbstractOperation Transaction =  WFSXmlFactory.buildOperation("2.0.0", dcps2, tParameters, null, "Transaction");
         operations.add(Transaction);
-        
+
         final List<AbstractDomain> lsqParameters = new ArrayList<>();
         lsqParameters.add(serviceDomain);
         lsqParameters.add(versionDomain);
         AbstractOperation listStoredQueries =  WFSXmlFactory.buildOperation("2.0.0", dcps, lsqParameters, null, "ListStoredQueries");
         operations.add(listStoredQueries);
-        
+
         final List<AbstractDomain> dsqParameters = new ArrayList<>();
         dsqParameters.add(serviceDomain);
         dsqParameters.add(versionDomain);
         AbstractOperation describeStoredQueries =  WFSXmlFactory.buildOperation("2.0.0", dcps, dsqParameters, null, "DescribeStoredQueries");
         operations.add(describeStoredQueries);
-        
+
         final List<AbstractDomain> gpvParameters = new ArrayList<>();
         gpvParameters.add(serviceDomain);
         gpvParameters.add(versionDomain);
         AbstractOperation getPropertyValue =  WFSXmlFactory.buildOperation("2.0.0", dcps, gpvParameters, null, "GetPropertyValue");
         operations.add(getPropertyValue);
-        
+
         final List<AbstractDomain> csqParameters = new ArrayList<>();
         csqParameters.add(serviceDomain);
         csqParameters.add(versionDomain);
         AbstractOperation createStoredQuery =  WFSXmlFactory.buildOperation("2.0.0", dcps, csqParameters, null, "CreateStoredQuery");
         operations.add(createStoredQuery);
-        
+
         final List<AbstractDomain> dsqParameters2 = new ArrayList<>();
         dsqParameters2.add(serviceDomain);
         dsqParameters2.add(versionDomain);
@@ -332,7 +332,7 @@ public final class WFSConstants {
 
         final List<AbstractDomain> parameters = new ArrayList<>();
         parameters.add(WFSXmlFactory.buildDomain("2.0.0", "version", Arrays.asList("2.0.0")));
-        
+
         final List<AbstractDomain> constraints = new ArrayList<>();
         constraints.add(WFSXmlFactory.buildDomainNoValues("2.0.0", "ImplementsSimpleWFS",          "TRUE"));
         constraints.add(WFSXmlFactory.buildDomainNoValues("2.0.0", "ImplementsBasicWFS",           "TRUE"));
@@ -386,30 +386,36 @@ public final class WFSConstants {
         final Contact currentContact = metadata.getServiceContact();
         final AccessConstraint constraint = metadata.getServiceConstraints();
 
-        final AbstractServiceIdentification servIdent = WFSXmlFactory.buildServiceIdentification(version,
-                                                                                                 metadata.getName(),
-                                                                                                 metadata.getDescription(),
-                                                                                                 metadata.getKeywords(),
-                                                                                                 "WFS",
-                                                                                                 metadata.getVersions(),
-                                                                                                 constraint.getFees(),
-                                                                                                 Arrays.asList(constraint.getAccessConstraint()));
+        final AbstractServiceIdentification servIdent;
+        if (constraint != null) {
+            servIdent = WFSXmlFactory.buildServiceIdentification(version, metadata.getName(), metadata.getDescription(),
+                                                                 metadata.getKeywords(), "WFS", metadata.getVersions(),
+                                                                 constraint.getFees(), Arrays.asList(constraint.getAccessConstraint()));
+        } else {
+            servIdent = WFSXmlFactory.buildServiceIdentification(version, metadata.getName(), metadata.getDescription(),
+                                                                 metadata.getKeywords(), "WFS", metadata.getVersions(),
+                                                                 null, new ArrayList<String>());
+        }
 
         // Create provider part.
-        final AbstractContact contact = WFSXmlFactory.buildContact(version, currentContact.getPhone(), currentContact.getFax(),
-                currentContact.getEmail(), currentContact.getAddress(), currentContact.getCity(), currentContact.getState(),
-                currentContact.getZipCode(), currentContact.getCountry(), currentContact.getHoursOfService(), currentContact.getContactInstructions());
+        final AbstractServiceProvider servProv;
+        if (currentContact != null) {
+            final AbstractContact contact = WFSXmlFactory.buildContact(version, currentContact.getPhone(), currentContact.getFax(),
+                    currentContact.getEmail(), currentContact.getAddress(), currentContact.getCity(), currentContact.getState(),
+                    currentContact.getZipCode(), currentContact.getCountry(), currentContact.getHoursOfService(), currentContact.getContactInstructions());
 
-        final AbstractResponsiblePartySubset responsible = WFSXmlFactory.buildResponsiblePartySubset(version, currentContact.getFullname(), currentContact.getPosition(), contact, null);
+            final AbstractResponsiblePartySubset responsible = WFSXmlFactory.buildResponsiblePartySubset(version, currentContact.getFullname(), currentContact.getPosition(), contact, null);
 
 
-        AbstractOnlineResourceType orgUrl = null;
-        if (currentContact.getUrl() != null) {
-            orgUrl = WFSXmlFactory.buildOnlineResource(version, currentContact.getUrl());
+            AbstractOnlineResourceType orgUrl = null;
+            if (currentContact.getUrl() != null) {
+                orgUrl = WFSXmlFactory.buildOnlineResource(version, currentContact.getUrl());
+            }
+
+            servProv = WFSXmlFactory.buildServiceProvider(version, currentContact.getOrganisation(), orgUrl, responsible);
+        } else {
+            servProv = WFSXmlFactory.buildServiceProvider(version, "", null, null);
         }
-        
-        final AbstractServiceProvider servProv = WFSXmlFactory.buildServiceProvider(version, currentContact.getOrganisation(), orgUrl, responsible);
-
 
         // Create capabilities base.
         return WFSXmlFactory.buildWFSCapabilities(version, servIdent, servProv, null, null, null);

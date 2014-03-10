@@ -159,7 +159,7 @@ public final class WCSConstant {
         SUPPORTED_FORMATS_100.add(new CodeListType("matrix"));
         SUPPORTED_FORMATS_100.add(new CodeListType("ascii-grid"));
     }
-     
+
      public static final List<String> SUPPORTED_FORMATS_111 = new ArrayList<>();
      static {
          SUPPORTED_FORMATS_111.add(MimeType.IMAGE_PNG);
@@ -169,7 +169,7 @@ public final class WCSConstant {
          SUPPORTED_FORMATS_111.add("matrix");
          SUPPORTED_FORMATS_111.add("ascii-grid");
     }
-     
+
     /**
      * A list of supported interpolation
      */
@@ -182,7 +182,7 @@ public final class WCSConstant {
     }
     public static final org.geotoolkit.wcs.xml.v100.SupportedInterpolationsType INTERPOLATION_V100 = new org.geotoolkit.wcs.xml.v100.SupportedInterpolationsType(
                     org.geotoolkit.wcs.xml.v100.InterpolationMethod.NEAREST_NEIGHBOR, SUPPORTED_INTERPOLATIONS_V100);
-    
+
     /**
      * A list of supported interpolation
      */
@@ -193,9 +193,9 @@ public final class WCSConstant {
             SUPPORTED_INTERPOLATIONS_V111.add(org.geotoolkit.wcs.xml.v111.InterpolationMethod.BICUBIC);
             SUPPORTED_INTERPOLATIONS_V111.add(org.geotoolkit.wcs.xml.v111.InterpolationMethod.NEAREST_NEIGHBOR);
     }
-    public static final org.geotoolkit.wcs.xml.v111.InterpolationMethods INTERPOLATION_V111 = 
+    public static final org.geotoolkit.wcs.xml.v111.InterpolationMethods INTERPOLATION_V111 =
             new org.geotoolkit.wcs.xml.v111.InterpolationMethods(SUPPORTED_INTERPOLATIONS_V111 , org.geotoolkit.wcs.xml.v111.InterpolationMethod.NEAREST_NEIGHBOR.value());
-    
+
     public static final WCSCapabilityType OPERATIONS_METADATA_100;
     static {
         final Get get         = new DCPTypeType.HTTP.Get(new OnlineResourceType("someurl"));
@@ -247,7 +247,7 @@ public final class WCSConstant {
 
         final List<AbstractDomain> constraints = new ArrayList<>();
         constraints.add(WCSXmlFactory.buildDomain("1.1.1", "PostEncoding", Arrays.asList("XML")));
-        
+
         OPERATIONS_METADATA_111 = OWSXmlFactory.buildOperationsMetadata("1.1.0", operations, null, constraints, null);
     }
 
@@ -274,29 +274,35 @@ public final class WCSConstant {
         final Contact currentContact = metadata.getServiceContact();
         final AccessConstraint constraint = metadata.getServiceConstraints();
 
-        final AbstractServiceIdentification servIdent = WCSXmlFactory.createServiceIdentification(version,
-                                                                                                 metadata.getName(),
-                                                                                                 metadata.getDescription(),
-                                                                                                 metadata.getKeywords(),
-                                                                                                 "WCS",
-                                                                                                 metadata.getVersions(),
-                                                                                                 constraint.getFees(),
-                                                                                                 Arrays.asList(constraint.getAccessConstraint()));
+        final AbstractServiceIdentification servIdent;
+        if (constraint != null) {
+            servIdent = WCSXmlFactory.createServiceIdentification(version, metadata.getName(), metadata.getDescription(),
+                    metadata.getKeywords(), "WCS", metadata.getVersions(),
+                    constraint.getFees(), Arrays.asList(constraint.getAccessConstraint()));
+        } else {
+            servIdent = WCSXmlFactory.createServiceIdentification(version, metadata.getName(), metadata.getDescription(),
+                    metadata.getKeywords(), "WCS", metadata.getVersions(),
+                    null, new ArrayList<String>());
+        }
 
         // Create provider part.
-        final AbstractContact contact = WCSXmlFactory.buildContact(version, currentContact.getPhone(), currentContact.getFax(),
-                currentContact.getEmail(), currentContact.getAddress(), currentContact.getCity(), currentContact.getState(),
-                currentContact.getZipCode(), currentContact.getCountry(), currentContact.getHoursOfService(), currentContact.getContactInstructions());
+        final AbstractServiceProvider servProv;
+        if (currentContact != null) {
+            final AbstractContact contact = WCSXmlFactory.buildContact(version, currentContact.getPhone(), currentContact.getFax(),
+                    currentContact.getEmail(), currentContact.getAddress(), currentContact.getCity(), currentContact.getState(),
+                    currentContact.getZipCode(), currentContact.getCountry(), currentContact.getHoursOfService(), currentContact.getContactInstructions());
 
-        final AbstractResponsiblePartySubset responsible = WCSXmlFactory.buildResponsiblePartySubset(version, currentContact.getFullname(), currentContact.getPosition(), contact, null);
+            final AbstractResponsiblePartySubset responsible = WCSXmlFactory.buildResponsiblePartySubset(version, currentContact.getFullname(), currentContact.getPosition(), contact, null);
 
-        // url
-        AbstractOnlineResourceType orgUrl = null;
-        if (currentContact.getUrl() != null) {
-            orgUrl = WCSXmlFactory.buildOnlineResource(version, currentContact.getUrl());
+            // url
+            AbstractOnlineResourceType orgUrl = null;
+            if (currentContact.getUrl() != null) {
+                orgUrl = WCSXmlFactory.buildOnlineResource(version, currentContact.getUrl());
+            }
+            servProv = WCSXmlFactory.buildServiceProvider(version, currentContact.getOrganisation(), orgUrl, responsible);
+        } else {
+            servProv = WCSXmlFactory.buildServiceProvider(version, "", null, null);
         }
-        final AbstractServiceProvider servProv = WCSXmlFactory.buildServiceProvider(version, currentContact.getOrganisation(), orgUrl, responsible);
-
 
         // Create capabilities base.
         return WCSXmlFactory.createCapabilitiesResponse(version, servIdent, servProv, null, null, null);
