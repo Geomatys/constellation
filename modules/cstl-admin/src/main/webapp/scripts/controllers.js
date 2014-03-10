@@ -871,6 +871,9 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
             if ($scope.type === 'wfs') {
                 return [{ 'id': '1.1.0'}, { 'id': '2.0.0' }];
             }
+            if ($scope.type === 'wcs') {
+                return [{ 'id': '1.0.0'}];
+            }
             return [];
         };
         $scope.versions = $scope.getVersionsForType();
@@ -960,6 +963,9 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
         }
         if ($scope.type === 'wfs') {
             return [{ 'id': '1.1.0'}, { 'id': '2.0.0' }];
+        }
+        if ($scope.type === 'wcs') {
+            return [{ 'id': '1.0.0'}];
         }
         return [];
     };
@@ -1144,7 +1150,19 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
 
 cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webService', '$dashboard', '$modalInstance', 'service', 'exclude', '$growl',
     function ($scope, dataListing, webService, $dashboard, $modalInstance, service, exclude, $growl) {
-        $scope.filtertype = "";
+        $scope.getDefaultFilter = function() {
+            if (service.type.toLowerCase() === 'wms') {
+                return '';
+            }
+            if (service.type.toLowerCase() === 'wcs') {
+                return 'coverage';
+            }
+            if (service.type.toLowerCase() === 'wfs') {
+                return 'vector';
+            }
+            return '';
+        };
+        $scope.filtertype = $scope.getDefaultFilter();
         $scope.nbbypage = 5;
         $scope.exclude = exclude;
 
