@@ -788,12 +788,29 @@ cstlAdminApp.controller('WebServiceController', ['$scope', 'webService','$modal'
 
         // Show Capa methods
         $scope.showCapa = function(service) {
+            if (service.versions.length > 1) {
+                var modal = $modal.open({
+                    templateUrl: 'views/modalChooseVersion.html',
+                    controller: 'WebServiceVersionsController',
+                    resolve: {
+                        service: function() { return service; }
+                    }
+                });
+                modal.result.then(function(result) {
+                    showModalCapa(service, result);
+                });
+            } else {
+                showModalCapa(service, service.versions[0].id);
+            }
+        };
+
+        function showModalCapa(service, version) {
             $modal.open({
                 templateUrl: 'views/modalCapa.html',
                 controller: 'WebServiceUtilsController',
                 resolve: {
                     'details': function(textService){
-                        return textService.capa(service.type.toLowerCase(), service.identifier);
+                        return textService.capa(service.type.toLowerCase(), service.identifier, version);
                     }
                 }
             });
@@ -857,6 +874,19 @@ cstlAdminApp.controller('WebServiceUtilsController', ['$scope', 'webService', '$
 
     }]);
 
+cstlAdminApp.controller('WebServiceVersionsController', ['$scope', 'webService', '$modalInstance', 'service',
+    function ($scope, webService, $modalInstance, service) {
+        $scope.service = service;
+        $scope.versions = service.versions;
+        $scope.close = function() {
+            $modalInstance.dismiss('close');
+        };
+
+        $scope.chooseVersion = function(version) {
+            $modalInstance.close(version);
+        };
+    }]);
+
 cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 'webService', '$filter', '$location', '$growl',
     function ($scope, $routeParams, webService, $filter, $location, $growl) {
         $scope.type = $routeParams.type;
@@ -908,7 +938,12 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
 
         // define which version to set
         $scope.selectedVersion = function (){
-            $scope.metadata.versions = $filter('filter')($scope.versions, {checked: true});
+            var selVersions = $filter('filter')($scope.versions, {checked: true});
+            var strVersions = [];
+            for(var i=0; i < selVersions.length; i++) {
+                strVersions.push(selVersions[i].id);
+            }
+            $scope.metadata.versions = strVersions;
         };
 
         // define which version is Selected
@@ -973,7 +1008,12 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
 
     // define which version to set
     $scope.selectedVersion = function (){
-        $scope.metadata.versions = $filter('filter')($scope.versions, {checked: true});
+        var selVersions = $filter('filter')($scope.versions, {checked: true});
+        var strVersions = [];
+        for(var i=0; i < selVersions.length; i++) {
+            strVersions.push(selVersions[i].id);
+        }
+        $scope.metadata.versions = strVersions;
     };
 
     // define which version is Selected
@@ -1019,12 +1059,29 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
 
     // Show Capa methods
     $scope.showCapa = function(service) {
+        if (service.versions.length > 1) {
+            var modal = $modal.open({
+                templateUrl: 'views/modalChooseVersion.html',
+                controller: 'WebServiceVersionsController',
+                resolve: {
+                    service: function() { return service; }
+                }
+            });
+            modal.result.then(function(result) {
+                showModalCapa(service, result);
+            });
+        } else {
+            showModalCapa(service, service.versions[0].id);
+        }
+    };
+
+    function showModalCapa(service, version) {
         $modal.open({
             templateUrl: 'views/modalCapa.html',
             controller: 'WebServiceUtilsController',
             resolve: {
                 'details': function(textService){
-                    return textService.capa(service.type.toLowerCase(), service.identifier);
+                    return textService.capa(service.type.toLowerCase(), service.identifier, version);
                 }
             }
         });

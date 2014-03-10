@@ -652,3 +652,7 @@ ul.unstyled {
 .tag-input-ctn .input-tag .delete-tag:hover {
     background-color: #96b4d2;
 }
+
+a.btn-push-right {
+    margin-right: 10px;
+}

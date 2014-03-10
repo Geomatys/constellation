@@ -1,0 +1,11 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" ng-click="close()">×</button>
+            <h4 class="modal-title" translate="webservicepage.button.modal.select.version">Select the version for this service</h4>
+        </div>
+        <div class="modal-body">
+            <a ng-repeat="v in versions" ng-click="chooseVersion(v)" class="btn btn-default btn-push-right">{{service.type}} {{v}}</a>
+        </div>
+    </div>
+</div>
