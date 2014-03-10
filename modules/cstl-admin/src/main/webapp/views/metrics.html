@@ -213,93 +213,16 @@
         </tr>
         </thead>
         <tbody>
-        <tr>
-            <td>AccountResource.changePassword</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.changePassword'].count}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.changePassword'].mean * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.changePassword'].min * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.changePassword'].p50 * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.changePassword'].p75 * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.changePassword'].p95 * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.changePassword'].p99 * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.changePassword'].max * 1000 | number:0}}</td>
-        </tr>
-        <tr>
-            <td>AccountResource.getAccount</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.getAccount'].count}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.getAccount'].mean * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.getAccount'].min * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.getAccount'].p50 * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.getAccount'].p75 * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.getAccount'].p95 * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.getAccount'].p99 * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.getAccount'].max * 1000 | number:0}}</td>
-        </tr>
-        <tr>
-            <td>AccountResource.getCurrentSessions</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.getCurrentSessions'].count}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.getCurrentSessions'].mean * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.getCurrentSessions'].min * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.getCurrentSessions'].p50 * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.getCurrentSessions'].p75 * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.getCurrentSessions'].p95 * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.getCurrentSessions'].p99 * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.getCurrentSessions'].max * 1000 | number:0}}</td>
-        </tr>
-        <tr>
-            <td>AccountResource.invalidateSession</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.invalidateSession'].count}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.invalidateSession'].mean * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.invalidateSession'].min * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.invalidateSession'].p50 * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.invalidateSession'].p75 * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.invalidateSession'].p95 * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.invalidateSession'].p99 * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.invalidateSession'].max * 1000 | number:0}}</td>
-        </tr>
-        <tr>
-            <td>AccountResource.saveAccount</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.saveAccount'].count}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.saveAccount'].mean * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.saveAccount'].min * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.saveAccount'].p50 * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.saveAccount'].p75 * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.saveAccount'].p95 * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.saveAccount'].p99 * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.AccountResource.saveAccount'].max * 1000 | number:0}}</td>
-        </tr>
-        <tr>
-            <td>UserResource.getUser</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.UserResource.getUser'].count}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.UserResource.getUser'].mean * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.UserResource.getUser'].min * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.UserResource.getUser'].p50 * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.UserResource.getUser'].p75 * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.UserResource.getUser'].p95 * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.UserResource.getUser'].p99 * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.UserResource.getUser'].max * 1000 | number:0}}</td>
-        </tr>
-        <tr>
-            <td>LogsResource.getList</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.LogsResource.getList'].count}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.LogsResource.getList'].mean * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.LogsResource.getList'].min * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.LogsResource.getList'].p50 * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.LogsResource.getList'].p75 * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.LogsResource.getList'].p95 * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.LogsResource.getList'].p99 * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.LogsResource.getList'].max * 1000 | number:0}}</td>
-        </tr>
-        <tr>
-            <td>LogsResource.changeLevel</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.LogsResource.changeLevel'].count}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.LogsResource.changeLevel'].mean * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.LogsResource.changeLevel'].min * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.LogsResource.changeLevel'].p50 * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.LogsResource.changeLevel'].p75 * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.LogsResource.changeLevel'].p95 * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.LogsResource.changeLevel'].p99 * 1000 | number:0}}</td>
-            <td>{{metrics.timers['org.constellation.admin.web.rest.LogsResource.changeLevel'].max * 1000 | number:0}}</td>
+        <tr ng-repeat="(clazz,timer) in metrics.timers">
+            <td>{{clazz | translate}}</td>
+            <td>{{timer.count}}</td>
+            <td>{{timer.mean * 1000 | number:0}}</td>
+            <td>{{timer.min * 1000 | number:0}}</td>
+            <td>{{timer.p50 * 1000 | number:0}}</td>
+            <td>{{timer.p75 * 1000 | number:0}}</td>
+            <td>{{timer.p95 * 1000 | number:0}}</td>
+            <td>{{timer.p99 * 1000 | number:0}}</td>
+            <td>{{timer.max * 1000 | number:0}}</td>
         </tr>
         </tbody>
     </table>

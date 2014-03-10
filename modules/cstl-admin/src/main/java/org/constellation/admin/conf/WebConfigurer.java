@@ -1,16 +1,19 @@
 package org.constellation.admin.conf;
 
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.health.HealthCheckRegistry;
-import com.codahale.metrics.servlet.InstrumentedFilter;
-import com.codahale.metrics.servlets.AdminServlet;
-import com.codahale.metrics.servlets.HealthCheckServlet;
-import com.codahale.metrics.servlets.MetricsServlet;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.DispatcherType;
+import javax.servlet.FilterRegistration;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import javax.servlet.ServletRegistration;
 
 import org.constellation.admin.web.filter.CachingHttpHeadersFilter;
 import org.constellation.admin.web.filter.StaticResourcesProductionFilter;
 import org.constellation.admin.web.filter.gzip.GZipServletFilter;
-import org.mitre.dsmiley.httpproxy.ProxyServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
@@ -20,12 +23,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.servlet.DispatcherServlet;
 
-import javax.servlet.*;
-
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Configuration of web application with Servlet 3.0 APIs.
  */
@@ -33,9 +30,6 @@ public class WebConfigurer implements ServletContextListener {
 
     private final Logger log = LoggerFactory.getLogger(WebConfigurer.class);
 
-    public static final MetricRegistry METRIC_REGISTRY = new MetricRegistry();
-
-    public static final HealthCheckRegistry HEALTH_CHECK_REGISTRY = new HealthCheckRegistry();
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {

@@ -21,8 +21,6 @@ import java.io.IOException;
 @Import(value = {
        
         AsyncConfiguration.class,
-        CacheConfiguration.class,
-        DatabaseConfiguration.class,
         MailConfiguration.class})
 public class ApplicationConfiguration {
 

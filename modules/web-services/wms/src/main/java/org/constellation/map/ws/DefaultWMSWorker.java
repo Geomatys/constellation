@@ -43,6 +43,7 @@ import static org.geotoolkit.wms.xml.WmsXmlFactory.createLegendURL;
 import static org.geotoolkit.wms.xml.WmsXmlFactory.createLogoURL;
 import static org.geotoolkit.wms.xml.WmsXmlFactory.createOnlineResource;
 import static org.geotoolkit.wms.xml.WmsXmlFactory.createStyle;
+import groovy.transform.TimedInterrupt;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -112,7 +113,6 @@ import org.geotoolkit.map.MapItem;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.referencing.ReferencingUtilities;
-
 import org.geotoolkit.referencing.crs.DefaultTemporalCRS;
 import org.geotoolkit.referencing.crs.DefaultVerticalCRS;
 import org.geotoolkit.referencing.cs.DefaultCoordinateSystemAxis;
@@ -165,6 +165,8 @@ import org.opengis.sld.StyledLayerDescriptor;
 import org.opengis.style.Style;
 import org.opengis.util.FactoryException;
 import org.springframework.context.annotation.Scope;
+
+import com.codahale.metrics.annotation.Timed;
 
 /**
  * A WMS worker for a local WMS service which handles requests from either REST
@@ -278,6 +280,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
      * @throws CstlServiceException
      */
     @Override
+    @Timed
     public AbstractWMSCapabilities getCapabilities(final GetCapabilities getCapab) throws CstlServiceException {
         isWorking();
         final String queryVersion      = getCapab.getVersion().toString();
@@ -1178,6 +1181,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
      * @throws CstlServiceException
      */
     @Override
+    @Timed
     public PortrayalResponse getMap(final GetMap getMap) throws CstlServiceException {
         isWorking();
         final String queryVersion = getMap.getVersion().toString();

@@ -780,5 +780,8 @@
                 "subtitle": "Show statistics"
             }
         }
-    }
+    },
+    "com.codahale.metrics.servlet.AbstractInstrumentedFilter.requests": "Metrics",
+    "org.constellation.map.ws.DefaultWMSWorker.getCapabilities": "WMS(getCapabilies)",
+    "org.constellation.map.ws.DefaultWMSWorker.getMap": "WMS(getMap)"
 }

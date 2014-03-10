@@ -14,5 +14,7 @@ public interface PropertyRepository {
 	
 	List<? extends Property> startWith(String string);
 
+	void delete(Property property);
+
 	
 }

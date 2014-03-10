@@ -1,6 +1,7 @@
 package org.constellation.services.web.rest;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -8,6 +9,7 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang.StringUtils;
 import org.constellation.engine.register.DTOMapper;
 import org.constellation.engine.register.Property;
 import org.constellation.engine.register.repository.PropertyRepository;
@@ -19,8 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.codahale.metrics.annotation.Timed;
 
 @RestController
 public class ContactResource {
@@ -34,10 +34,7 @@ public class ContactResource {
 	
 
 	@RequestMapping(value = "/admin/contact", method = RequestMethod.GET, produces = "application/json")
-	@Timed
 	public Map<String, Object> get() {
-			Map<String, String> contactDTO = new HashMap<String, String>();
-
 		List<? extends Property> properties = propertyRepository.startWith("contact.%");
 		Properties javaProperties = new Properties();
 		for (Property property : properties)
@@ -51,11 +48,22 @@ public class ContactResource {
 
 	@RequestMapping(value = "/admin/contact", method = RequestMethod.PUT)
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	@Timed
 	@Transactional
 	public void put(@RequestBody HashMap<String, Object> contact) {
 
 		Properties properties = JSonUtils.toProperties(contact);
+		
+		List<? extends Property> propertiesDB = propertyRepository.startWith("contact.%");
+		for (Iterator iterator = propertiesDB.iterator(); iterator.hasNext();) {
+			Property property = (Property) iterator.next();
+			String posted = properties.getProperty(property.getKey());
+			if(StringUtils.isNotBlank(posted)) {
+				property.setValue(posted);
+				properties.remove(property.getKey());
+			}else {
+				propertyRepository.delete(property);
+			}
+		}
 		
 		for (Entry<Object, Object> entry : properties.entrySet()) {
 			Property prop = dtoMapper.propertyEntity((String)entry.getKey(), (String)entry.getValue());
