@@ -800,7 +800,7 @@ cstlAdminApp.controller('WebServiceController', ['$scope', 'webService','$modal'
                     showModalCapa(service, result);
                 });
             } else {
-                showModalCapa(service, service.versions[0].id);
+                showModalCapa(service, service.versions[0]);
             }
         };
 
@@ -1071,7 +1071,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
                 showModalCapa(service, result);
             });
         } else {
-            showModalCapa(service, service.versions[0].id);
+            showModalCapa(service, service.versions[0]);
         }
     };
 
