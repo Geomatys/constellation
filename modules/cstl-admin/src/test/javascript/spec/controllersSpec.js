@@ -1,5 +1,7 @@
 'use strict';
 
+var cstlContext = "/"
+
 describe('Controllers Tests ', function () {
 
     beforeEach(module('cstlAdminApp'));
