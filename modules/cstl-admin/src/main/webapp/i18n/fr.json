@@ -1024,7 +1024,7 @@
                     "label": "Géotraitements (WPS)"
                 }
             },
-            "modal.select.version": "Select the version for this service"
+            "modal.select.version": "Sélectionner la version du service souhaitée"
         },
         "tab": {
             "all": "Tous"

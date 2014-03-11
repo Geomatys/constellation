@@ -520,7 +520,7 @@
                 "wmts.label": "Tiles maps (WMTS)",
                 "wps.label": "Geoprocessing (WPS)"
             },
-            "modal.select.version": "Select the version for this service"
+            "modal.select.version": "Select the service version you want"
         },
         "tab.all": "All",
         "title": "Available services"
