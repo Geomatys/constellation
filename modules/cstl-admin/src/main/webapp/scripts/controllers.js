@@ -904,6 +904,9 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
             if ($scope.type === 'wcs') {
                 return [{ 'id': '1.0.0'}];
             }
+            if ($scope.type === 'wmts') {
+                return [{ 'id': '1.0.0'}];
+            }
             return [];
         };
         $scope.versions = $scope.getVersionsForType();
@@ -1000,6 +1003,9 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
             return [{ 'id': '1.1.0'}, { 'id': '2.0.0' }];
         }
         if ($scope.type === 'wcs') {
+            return [{ 'id': '1.0.0'}];
+        }
+        if ($scope.type === 'wmts') {
             return [{ 'id': '1.0.0'}];
         }
         return [];
@@ -1214,7 +1220,7 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
             if (service.type.toLowerCase() === 'wms') {
                 return '';
             }
-            if (service.type.toLowerCase() === 'wcs') {
+            if (service.type.toLowerCase() === 'wcs' || service.type.toLowerCase() === 'wmts') {
                 return 'coverage';
             }
             if (service.type.toLowerCase() === 'wfs') {

@@ -45,7 +45,7 @@ import org.geotoolkit.wmts.xml.WMTSXmlFactory;
 public final class WMTSConstant {
 
     private WMTSConstant() {}
-    
+
     public static final AbstractOperationsMetadata OPERATIONS_METADATA;
     static {
         final List<AbstractDCP> getAndPost = new ArrayList<>();
@@ -84,28 +84,33 @@ public final class WMTSConstant {
         final Contact currentContact = metadata.getServiceContact();
         final AccessConstraint constraint = metadata.getServiceConstraints();
 
-        final AbstractServiceIdentification servIdent = OWSXmlFactory.buildServiceIdentification("1.1.0",
-                                                                                                 metadata.getName(),
-                                                                                                 metadata.getDescription(),
-                                                                                                 metadata.getKeywords(),
-                                                                                                 "WMTS",
-                                                                                                 metadata.getVersions(),
-                                                                                                 constraint.getFees(),
-                                                                                                 Arrays.asList(constraint.getAccessConstraint()));
+        final AbstractServiceIdentification servIdent;
+        if (constraint != null) {
+            servIdent = OWSXmlFactory.buildServiceIdentification("1.1.0", metadata.getName(), metadata.getDescription(),
+                        metadata.getKeywords(), "WMTS", metadata.getVersions(), constraint.getFees(),
+                        Arrays.asList(constraint.getAccessConstraint()));
+        } else {
+            servIdent = OWSXmlFactory.buildServiceIdentification("1.1.0", metadata.getName(), metadata.getDescription(),
+                    metadata.getKeywords(), "WMTS", metadata.getVersions(), null, new ArrayList<String>());
+        }
 
         // Create provider part.
-        final AbstractContact contact = OWSXmlFactory.buildContact("1.1.0", currentContact.getPhone(), currentContact.getFax(),
-                currentContact.getEmail(), currentContact.getAddress(), currentContact.getCity(), currentContact.getState(),
-                currentContact.getZipCode(), currentContact.getCountry(), currentContact.getHoursOfService(), currentContact.getContactInstructions());
+        final AbstractServiceProvider servProv;
+        if (currentContact != null) {
+            final AbstractContact contact = OWSXmlFactory.buildContact("1.1.0", currentContact.getPhone(), currentContact.getFax(),
+                    currentContact.getEmail(), currentContact.getAddress(), currentContact.getCity(), currentContact.getState(),
+                    currentContact.getZipCode(), currentContact.getCountry(), currentContact.getHoursOfService(), currentContact.getContactInstructions());
 
-        final AbstractResponsiblePartySubset responsible = OWSXmlFactory.buildResponsiblePartySubset("1.1.0", currentContact.getFullname(), currentContact.getPosition(), contact, null);
+            final AbstractResponsiblePartySubset responsible = OWSXmlFactory.buildResponsiblePartySubset("1.1.0", currentContact.getFullname(), currentContact.getPosition(), contact, null);
 
-        AbstractOnlineResourceType orgUrl = null;
-        if (currentContact.getUrl() != null) {
-            orgUrl = OWSXmlFactory.buildOnlineResource("1.1.0", currentContact.getUrl());
+            AbstractOnlineResourceType orgUrl = null;
+            if (currentContact.getUrl() != null) {
+                orgUrl = OWSXmlFactory.buildOnlineResource("1.1.0", currentContact.getUrl());
+            }
+            servProv = OWSXmlFactory.buildServiceProvider("1.1.0", currentContact.getOrganisation(), orgUrl, responsible);
+        } else {
+            servProv = OWSXmlFactory.buildServiceProvider("1.1.0", "", null, null);
         }
-        final AbstractServiceProvider servProv = OWSXmlFactory.buildServiceProvider("1.1.0", currentContact.getOrganisation(), orgUrl, responsible);
-
 
         // Create capabilities base.
         return WMTSXmlFactory.buildCapabilities(version, servIdent, servProv, null, null, null, null);

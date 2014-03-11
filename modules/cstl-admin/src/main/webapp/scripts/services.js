@@ -135,7 +135,7 @@ cstlAdminApp.factory('textService', ['$http',
 
             },
             capa : function(type, id, version){
-                return $http.get(cstlContext+'WS/'+type+'/'+id+';jsessionid=?REQUEST=GetCapabilities&SERVICE='+type+'&VERSION='+version);
+                return $http.get(cstlContext+'WS/'+type+'/'+id+';jsessionid=?REQUEST=GetCapabilities&SERVICE='+type.toUpperCase()+'&VERSION='+version);
 
             }
         };
