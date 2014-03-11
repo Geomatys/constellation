@@ -6,7 +6,7 @@
 <div id="serviceDashboard" class="row frame dashboard">
     <div class="navbar">
         <div class="navbar-inner">
-            <a class="brand">{{service.name}}</a>
+            <a class="brand">{{service.name}}</a><input  size="{{urlBoxSize}}"  value="{{url}}" readonly="readonly"/><span class="glyphicon glyphicon-book" id="copy-button" data-clipboard-text="{{url}}" title="Click to copy me."></span>  
             <form class="navbar-form">
                 <div class="btn-group service-item pull-right">
                     <button type="button" class="btn btn-default btn-sm" ng-click="showCapa(service)"
@@ -21,7 +21,7 @@
 
         </div>
     </div>
-
+   
     <div class="bg-white" style="padding-bottom:30px;">
         <div class="col-sm-12">
             <ul class="nav nav-tabs">

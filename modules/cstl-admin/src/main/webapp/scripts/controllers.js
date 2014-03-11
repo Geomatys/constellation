@@ -1,5 +1,9 @@
 'use strict';
 
+ZeroClipboard.config({
+	  moviePath: "scripts/zeroclipboard/ZeroClipboard.swf"
+	} );
+
 /* Controllers */
 
 cstlAdminApp.controller('HeaderController', ['$scope','$http',
@@ -984,7 +988,19 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
                                                  function ($scope, $routeParams , webService, $modal, textService, $dashboard, $growl, $filter, StyleSharedService, style) {
     $scope.tagText = '';
     $scope.type = $routeParams.type;
+    $scope.url = cstlContext + "WS/" + $routeParams.type + "/" + $routeParams.id;
+    $scope.urlBoxSize = Math.min($scope.url.length,100);
+    
+    var client = new ZeroClipboard( document.getElementById("copy-button") );
 
+  	client.on( "load", function(client) {
+  	  // alert( "movie is loaded" );
+  	  client.on( "complete", function(client, args) {
+  	    // `this` is the element that was clicked
+  		$growl('success','Success',"Copied text to clipboard: " + args.text );
+  	  } );
+  	} );
+    
     $scope.service = webService.get({type: $scope.type, id:$routeParams.id});
 
     $scope.metadata = webService.metadata({type: $scope.type, id:$routeParams.id});
