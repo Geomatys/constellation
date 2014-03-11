@@ -107,24 +107,24 @@
               </execution>
             </executions>
           </plugin>
-          <plugin>
-            <groupId>org.apache.tomcat.maven</groupId>
-            <artifactId>tomcat7-maven-plugin</artifactId>
-            <version>2.1</version>
-            <executions>
-              <execution>
-                <id>tomcat-run</id>
-                <goals>
-                  <goal>exec-war-only</goal>
-                </goals>
-                <phase>package</phase>
-                <configuration>
-                  <path>/cstl-admin</path>
-                  <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
+<!--           <plugin> -->
+<!--             <groupId>org.apache.tomcat.maven</groupId> -->
+<!--             <artifactId>tomcat7-maven-plugin</artifactId> -->
+<!--             <version>2.1</version> -->
+<!--             <executions> -->
+<!--               <execution> -->
+<!--                 <id>tomcat-run</id> -->
+<!--                 <goals> -->
+<!--                   <goal>exec-war-only</goal> -->
+<!--                 </goals> -->
+<!--                 <phase>package</phase> -->
+<!--                 <configuration> -->
+<!--                   <path>/cstl-admin</path> -->
+<!--                   <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol> -->
+<!--                 </configuration> -->
+<!--               </execution> -->
+<!--             </executions> -->
+<!--           </plugin> -->
         </plugins>
       </build>
     </profile>
