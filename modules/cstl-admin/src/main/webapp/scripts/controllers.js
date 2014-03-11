@@ -1183,7 +1183,10 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
      $scope.showLayer = function() {
          $('#viewerData').modal("show");
          var layerName = $scope.selected.Name;
-         var layerData = DataViewer.createLayerWMS(layerName, $scope.service.identifier);
+         var providerId = $scope.selected.Provider;
+         var layerData = ($scope.service.type === 'WMS') ?
+             DataViewer.createLayerWMS(layerName, $scope.service.identifier) :
+             DataViewer.createLayer(layerName, providerId);
          var layerBackground = DataViewer.createLayer("CNTR_BN_60M_2006", "generic_shp");
          DataViewer.layers = [layerData, layerBackground];
          DataViewer.initMap('dataMap');
