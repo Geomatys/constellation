@@ -27,17 +27,20 @@ public class LoginController {
 	@RequestMapping("/loggedin")
 	public String loggedin(HttpServletRequest httpServletRequest) {
 		String sessionId = httpServletRequest.getSession().getId();
-		String adminUrl = (String) httpServletRequest.getSession()
-				.getAttribute("adminUrl");
-		if (adminUrl == null) {
-			adminUrl = "http://localhost:8080/cstl-admin/";
-		}
+		String adminUrl = retrieveCstlAdmin(httpServletRequest);
 		return "redirect:" + adminUrl + "app/cstl?cstlSessionId=" + sessionId;
 	}
 
 	@RequestMapping("/loggedout")
 	public String loggedout(HttpServletRequest httpServletRequest) {
 
+		String adminUrl = retrieveCstlAdmin(httpServletRequest);
+
+		return "redirect:" + adminUrl;
+	}
+
+
+	private String retrieveCstlAdmin(HttpServletRequest httpServletRequest) {
 		Cookie[] cookies = httpServletRequest.getCookies();
 		String adminUrl = null;
 		if (cookies != null) {
@@ -50,8 +53,7 @@ public class LoginController {
 		}
 		if (adminUrl == null)
 			adminUrl = "http://localhost:8080/cstl-admin/";
-
-		return "redirect:" + adminUrl;
+		return adminUrl;
 	}
 
 }
