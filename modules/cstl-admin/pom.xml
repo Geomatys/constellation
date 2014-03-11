@@ -57,7 +57,7 @@
       <properties>
         <!-- Spring profile to use -->
         <spring.profiles.active>prod</spring.profiles.active>
-        <cstl.url>http://localhost:8080/constellation/</cstl.url>
+        <cstl.url>http://demo7.geomatys.com/constellation/</cstl.url>
         <!-- i18n resource files reloading -->
         <message.reloading.enabled>false</message.reloading.enabled>
         <!-- log configuration -->
