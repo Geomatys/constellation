@@ -20,7 +20,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.servlet.DispatcherServlet;
 
 /**
@@ -145,18 +144,7 @@ public class WebConfigurer implements ServletContextListener {
         return dispatcherServlet;
     }
 
-    
-    /**
-     * Initializes Spring Security.
-     */
-    private void _initSpringSecurity(ServletContext servletContext, EnumSet<DispatcherType> disps) {
-        log.debug("Registering Spring Security Filter");
-        FilterRegistration.Dynamic springSecurityFilter = servletContext.addFilter("springSecurityFilterChain",
-                new DelegatingFilterProxy());
-
-        springSecurityFilter.addMappingForUrlPatterns(disps, false, "/*");
-        springSecurityFilter.setAsyncSupported(true);
-    }
+  
 
    
     @Override

@@ -25,8 +25,6 @@
   </http>
 
   <http request-matcher="ant" use-expressions="true">
-<!--     <custom-filter position="FORM_LOGIN_FILTER" ref="myAuthFilter"  /> -->
-<!--     <intercept-url pattern="/admin/log/**" access="isAuthenticated()" /> -->
     <form-login  default-target-url="/spring/auth/loggedin" always-use-default-target="true" login-page="/login.html" />
     <logout invalidate-session="true" delete-cookies="JSESSIONID" logout-url="/logout" logout-success-url="/spring/auth/loggedout" />
     <session-management session-authentication-strategy-ref="sessionAuthenticationStrategy" />
@@ -36,17 +34,16 @@
     class="org.springframework.security.web.authentication.session.CompositeSessionAuthenticationStrategy">
     <beans:constructor-arg>
       <beans:list>
-        <beans:bean
-          class="org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy">
-          <beans:constructor-arg ref="sessionRegistry" />
-          <beans:property name="maximumSessions" value="-1" />
-          <beans:property name="exceptionIfMaximumExceeded" value="true" />
-        </beans:bean>
+<!--         <beans:bean -->
+<!--           class="org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy"> -->
+<!--           <beans:constructor-arg ref="sessionRegistry" /> -->
+<!--           <beans:property name="maximumSessions" value="-1" /> -->
+<!--           <beans:property name="exceptionIfMaximumExceeded" value="true" /> -->
+<!--         </beans:bean> -->
         <beans:bean class="org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy">
         </beans:bean>
         <beans:bean class="org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy">
           <beans:constructor-arg ref="sessionRegistry" />
-
         </beans:bean>
       </beans:list>
     </beans:constructor-arg>
