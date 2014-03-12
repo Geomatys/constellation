@@ -42,13 +42,13 @@ import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderService;
 import org.constellation.provider.configuration.Configurator;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
 import static org.constellation.provider.configuration.ProviderParameters.*;
-import org.constellation.provider.featurestore.FeatureStoreProviderService;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.TestRunner;
-import org.geotoolkit.data.shapefile.ShapefileFolderFeatureStoreFactory;
-import org.geotoolkit.parameter.Parameters;
+import static org.constellation.ws.embedded.AbstractGrizzlyServer.initDataDirectory;
+import static org.geotoolkit.parameter.ParametersExt.createGroup;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
 
 // JUnit dependencies
 import org.junit.*;
@@ -70,17 +70,14 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
     public static void start() throws JAXBException {
         ConfigurationEngine.setupTestEnvironement("AdminRequestTest");
 
-        final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null),
-                                                   new Source("shapeSrc", true, null, null));
+        final List<Source> sources = Arrays.asList(new Source("shapeSrc", true, null, null));
         final Layers layers = new Layers(sources);
         final LayerContext config = new LayerContext(layers);
         config.getCustomParameters().put("shiroAccessible", "false");
 
         ConfigurationEngine.storeConfiguration("WMS", "default", config);
 
-        final List<Source> sources2 = Arrays.asList(new Source("coverageTestSrc", true, null, Arrays.asList(new Layer(new QName("SST_tests")))),
-                                                    new Source("shapeSrc", false, Arrays.asList(new Layer(new QName("http://www.opengis.net/gml","Lakes"))), null),
-                                                    new Source("postgisSrc", true, null, null));
+        final List<Source> sources2 = Arrays.asList(new Source("shapeSrc", false, Arrays.asList(new Layer(new QName("http://www.opengis.net/gml","Lakes"))), null));
         final Layers layers2 = new Layers(sources2);
         final LayerContext config2 = new LayerContext(layers2);
         config2.setSupportedLanguages(new Languages(Arrays.asList(new Language("fre"), new Language("eng", true))));
@@ -104,40 +101,21 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
 
                 final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
-                if("coverage-sql".equals(service.getName())){
-                    // Defines a PostGrid data provider
-                    final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                    final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
-                    srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://flupke.geomatys.com/coverages-test");
-                    srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
-                    final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
-                    srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
-                    srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
-                    srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
-                    srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
-                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
-
-                }else if("shapefile".equals(service.getName())){
+                if("feature-store".equals(service.getName())){
                     try{
                         final File outputDir = initDataDirectory();
+                        final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
+                        getOrCreateValue(source, "id").setValue("shapeSrc");
+                        getOrCreateValue(source, "load_all").setValue(true);
 
-                        final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                        Parameters.getOrCreate(SOURCE_LOADALL_DESCRIPTOR, source).setValue(Boolean.TRUE);
-                        Parameters.getOrCreate(SOURCE_ID_DESCRIPTOR, source).setValue("shapeSrc");
-                        
-                        final String namespace = "http://www.opengis.net/gml";
-                        final URL url = new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles");
-                        
-                        final ParameterValueGroup choice = getOrCreate(FeatureStoreProviderService.SOURCE_CONFIG_DESCRIPTOR,source);
-                        final ParameterValueGroup shapefileConfig = ShapefileFolderFeatureStoreFactory.PARAMETERS_DESCRIPTOR.createValue();
-                        Parameters.getOrCreate(ShapefileFolderFeatureStoreFactory.URLFOLDER, shapefileConfig).setValue(url);
-                        Parameters.getOrCreate(ShapefileFolderFeatureStoreFactory.NAMESPACE, shapefileConfig).setValue(namespace);
-                        choice.values().add(shapefileConfig);
-                        
-                        ParameterValueGroup layer = source.addGroup(LAYER_DESCRIPTOR.getName().getCode());
-                        layer.parameter(LAYER_NAME_DESCRIPTOR.getName().getCode()).setValue("NamedPlaces");
-                        layer.parameter(LAYER_STYLE_DESCRIPTOR.getName().getCode()).setValue("cite_style_NamedPlaces");
+                        final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
+                        final ParameterValueGroup shpconfig = createGroup(choice, "ShapefileParametersFolder");
+                        getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
+                        getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");
+
+                        final ParameterValueGroup layer = getOrCreateGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("NamedPlaces");
+                        getOrCreateValue(layer, "style").setValue("cite_style_NamedPlaces");
 
                     }catch(Exception ex){
                         throw new RuntimeException(ex.getLocalizedMessage(),ex);
@@ -204,9 +182,9 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
 
         final List<Instance> instances = new ArrayList<>();
         final List<String> versions = Arrays.asList("1.1.1", "1.3.0");
-        instances.add(new Instance("default", "OGC:WMS", "Constellation Map Server", "WMS", versions, 1, ServiceStatus.WORKING));
-        instances.add(new Instance("wms1",    "OGC:WMS", "Constellation Map Server", "WMS", versions, 0, ServiceStatus.WORKING));
-        instances.add(new Instance("wms2",    "OGC:WMS", "Constellation Map Server", "WMS", versions, 0, ServiceStatus.NOT_STARTED));
+        instances.add(new Instance("default", "OGC:WMS", "Constellation Map Server", "WMS", versions, 12, ServiceStatus.WORKING));
+        instances.add(new Instance("wms1",    "OGC:WMS", "Constellation Map Server", "WMS", versions, 1,  ServiceStatus.WORKING));
+        instances.add(new Instance("wms2",    "OGC:WMS", "Constellation Map Server", "WMS", versions, 0,  ServiceStatus.NOT_STARTED));
         InstanceReport expResult2 = new InstanceReport(instances);
         assertEquals(expResult2, obj);
 
@@ -260,9 +238,9 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
 
         List<Instance> instances = new ArrayList<>();
         final List<String> versions = Arrays.asList("1.1.1", "1.3.0");
-        instances.add(new Instance("default", "OGC:WMS", "Constellation Map Server", "WMS", versions, 1, ServiceStatus.WORKING));
-        instances.add(new Instance("wms1", "OGC:WMS", "Constellation Map Server", "WMS", versions, 0, ServiceStatus.WORKING));
-        instances.add(new Instance("wms2", "OGC:WMS", "Constellation Map Server", "WMS", versions, 0, ServiceStatus.WORKING));
+        instances.add(new Instance("default", "OGC:WMS", "Constellation Map Server", "WMS", versions, 12, ServiceStatus.WORKING));
+        instances.add(new Instance("wms1",    "OGC:WMS", "Constellation Map Server", "WMS", versions, 1,  ServiceStatus.WORKING));
+        instances.add(new Instance("wms2",    "OGC:WMS", "Constellation Map Server", "WMS", versions, 0,  ServiceStatus.WORKING));
         InstanceReport expResult2 = new InstanceReport(instances);
         assertEquals(expResult2, obj);
 
@@ -356,9 +334,9 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
 
         final List<Instance> instances = new ArrayList<>();
         final List<String> versions = Arrays.asList("1.1.1", "1.3.0");
-        instances.add(new Instance("default", "OGC:WMS", "Constellation Map Server", "WMS", versions, 1, ServiceStatus.WORKING));
-        instances.add(new Instance("wms1", "OGC:WMS", "Constellation Map Server", "WMS", versions, 0, ServiceStatus.WORKING));
-        instances.add(new Instance("wms2", "OGC:WMS", "Constellation Map Server", "WMS", versions, 1, ServiceStatus.NOT_STARTED));
+        instances.add(new Instance("default", "OGC:WMS", "Constellation Map Server", "WMS", versions, 12, ServiceStatus.WORKING));
+        instances.add(new Instance("wms1",    "OGC:WMS", "Constellation Map Server", "WMS", versions, 1,  ServiceStatus.WORKING));
+        instances.add(new Instance("wms2",    "OGC:WMS", "Constellation Map Server", "WMS", versions, 12, ServiceStatus.NOT_STARTED));
         InstanceReport expResult2 = new InstanceReport(instances);
         assertEquals(expResult2, obj);
     }
@@ -397,8 +375,8 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
 
         final List<Instance> instances = new ArrayList<>();
         final List<String> versions = Arrays.asList("1.1.1", "1.3.0");
-        instances.add(new Instance("default", "OGC:WMS", "Constellation Map Server", "WMS", versions, 1, ServiceStatus.WORKING));
-        instances.add(new Instance("wms1", "OGC:WMS", "Constellation Map Server", "WMS", versions, 0, ServiceStatus.WORKING));
+        instances.add(new Instance("default", "OGC:WMS", "Constellation Map Server", "WMS", versions, 12, ServiceStatus.WORKING));
+        instances.add(new Instance("wms1",    "OGC:WMS", "Constellation Map Server", "WMS", versions, 1,  ServiceStatus.WORKING));
         InstanceReport expResult2 = new InstanceReport(instances);
         assertEquals(expResult2, obj);
     }

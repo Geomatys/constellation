@@ -225,7 +225,7 @@ public final class FeatureInfoUtilities extends Static {
      * @return a Set of all MimeType from generic list and from layers config without duplicates.
      */
     public static Set<String> allSupportedMimeTypes (final LayerContext config) throws ConfigurationException, ClassNotFoundException {
-        final Set<String> mimes = new HashSet<String>();
+        final Set<String> mimes = new HashSet<>();
         if (config != null) {
             final Set<GetFeatureInfoCfg> generics = getGenericFeatureInfos(config);
             for (GetFeatureInfoCfg infoConf : generics) {
@@ -267,7 +267,7 @@ public final class FeatureInfoUtilities extends Static {
      * @return a Set of GetFeatureInfoCfg
      */
     public static Set<GetFeatureInfoCfg> getGenericFeatureInfos (final LayerContext config) {
-        final Set<GetFeatureInfoCfg> fis = new HashSet<GetFeatureInfoCfg>();
+        final Set<GetFeatureInfoCfg> fis = new HashSet<>();
         if (config != null) {
             final List<GetFeatureInfoCfg> globalFI = config.getGetFeatureInfoCfgs();
             if (globalFI != null && !(globalFI.isEmpty())) {
@@ -288,7 +288,7 @@ public final class FeatureInfoUtilities extends Static {
      */
     public static List<GetFeatureInfoCfg> createGenericConfiguration () {
         //Default featureInfo configuration
-        final List<GetFeatureInfoCfg> featureInfos = new ArrayList<GetFeatureInfoCfg>();
+        final List<GetFeatureInfoCfg> featureInfos = new ArrayList<>();
 
         //HTML
         FeatureInfoFormat infoFormat = new HTMLFeatureInfoFormat();
@@ -414,7 +414,7 @@ public final class FeatureInfoUtilities extends Static {
             Arrays.fill(values, Float.NaN);
         }
 
-        final List<Map.Entry<GridSampleDimension,Object>> results = new ArrayList<Map.Entry<GridSampleDimension, Object>>();
+        final List<Map.Entry<GridSampleDimension,Object>> results = new ArrayList<>();
         for (int i=0; i<values.length; i++){
             final GridSampleDimension sample = coverage.getSampleDimension(i);
             results.add(new AbstractMap.SimpleImmutableEntry<GridSampleDimension, Object>(sample, values[i]));
