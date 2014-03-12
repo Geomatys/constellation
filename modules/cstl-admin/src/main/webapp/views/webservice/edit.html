@@ -6,22 +6,31 @@
 <div id="serviceDashboard" class="row frame dashboard">
     <div class="navbar">
         <div class="navbar-inner">
-            <a class="brand">{{service.name}}</a><input  size="{{urlBoxSize}}"  value="{{url}}" readonly="readonly"/><span class="glyphicon glyphicon-book" id="copy-button" data-clipboard-text="{{url}}" title="Click to copy me."></span>  
-            <form class="navbar-form">
-                <div class="btn-group service-item pull-right">
-                    <button type="button" class="btn btn-default btn-sm" ng-click="showCapa(service)"
-                            ng-disabled="service.status!=='WORKING'">GetCapabilities</button>
-                    <button type="button" class="btn btn-default btn-sm"  ng-click="showLogs(service)">Logs</button>
-                    <button type="button" class="btn btn-default btn-sm btn-info" ng-click="reload(service)">Reload</button>
-                    <button type="button" class="btn btn-default btn-sm"  ng-class="{'started':service.status=='WORKING','stopped':service.status!='WORKING'}" ng-click="startOrStop(service)">
-                        <i ng-class="{'icon-play':service.status!='WORKING','icon-stop':service.status=='WORKING'}"></i>
-                    </button>
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="brand">{{service.name}}</a>
                 </div>
-            </form>
 
+                <div class="navbar-left">
+                    <input class="form-control" style="width:auto;display:inline" size="{{urlBoxSize}}"  value="{{url}}" readonly="readonly"/>
+                    <span class="glyphicon glyphicon-edit" id="copy-button" data-clipboard-text="{{url}}" title="Click to copy me."></span>
+                </div>
+
+                <form class="navbar-form">
+                    <div class="btn-group service-item pull-right">
+                        <button type="button" class="btn btn-default btn-sm" ng-click="showCapa(service)"
+                                ng-disabled="service.status!=='WORKING'">GetCapabilities</button>
+                        <button type="button" class="btn btn-default btn-sm"  ng-click="showLogs(service)">Logs</button>
+                        <button type="button" class="btn btn-default btn-sm btn-info" ng-click="reload(service)">Reload</button>
+                        <button type="button" class="btn btn-default btn-sm"  ng-class="{'started':service.status=='WORKING','stopped':service.status!='WORKING'}" ng-click="startOrStop(service)">
+                            <i ng-class="{'icon-play':service.status!='WORKING','icon-stop':service.status=='WORKING'}"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-   
+
     <div class="bg-white" style="padding-bottom:30px;">
         <div class="col-sm-12">
             <ul class="nav nav-tabs">
