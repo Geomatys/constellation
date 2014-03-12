@@ -31,6 +31,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 import org.constellation.admin.ConfigurationEngine;
@@ -43,6 +44,8 @@ import org.constellation.sos.ws.soap.SOService;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.TestRunner;
 import org.constellation.util.Util;
+import org.geotoolkit.internal.sql.DefaultDataSource;
+import org.geotoolkit.internal.sql.ScriptRunner;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionType;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.geotoolkit.sampling.xml.v100.SamplingPointType;
@@ -77,6 +80,16 @@ public class SOSRequestTest extends AbstractGrizzlyServer {
     public static void initPool() throws Exception {
         final File configDirectory = ConfigurationEngine.setupTestEnvironement("SOSRequestTest");
 
+        final String url = "jdbc:derby:memory:TestOM2;create=true";
+        final DefaultDataSource ds = new DefaultDataSource(url);
+        Connection con = ds.getConnection();
+
+        final ScriptRunner exec = new ScriptRunner(con);
+        exec.run(Util.getResourceAsStream("org/constellation/data/om2/structure_observations.sql"));
+        exec.run(Util.getResourceAsStream("org/constellation/sql/sos-data-om2.sql"));
+        con.close();
+
+        
         final File dataDirectory = new File(configDirectory, "dataSos");
         dataDirectory.mkdir();
 
@@ -85,7 +98,7 @@ public class SOSRequestTest extends AbstractGrizzlyServer {
         writeDataFile(dataDirectory, "urn-ogc-object-sensor-SunSpot-2");
 
         final Automatic smlConfig = new Automatic(null, dataDirectory.getPath());
-        final Automatic omCOnfig = new Automatic(null, new BDD("org.postgresql.Driver", "jdbc:postgresql://flupke.geomatys.com:5432/observation", "test", "test"));
+        final Automatic omCOnfig = new Automatic(null, new BDD("org.postgresql.Driver", url, null, null));
         final SOSConfiguration sosconf = new SOSConfiguration(smlConfig, omCOnfig);
         sosconf.setObservationFilterType(DataSourceType.POSTGRID);
         sosconf.setObservationReaderType(DataSourceType.POSTGRID);

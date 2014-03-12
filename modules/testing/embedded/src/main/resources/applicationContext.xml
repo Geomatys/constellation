@@ -8,6 +8,6 @@
 
   <import resource="classpath:/spring/register-context.xml"/>
 
-  <import resource="classpath:/cstl/spring/security-context.xml"/>  
+  <!--import resource="classpath:/cstl/spring/security-context.xml"/-->
   
 </beans>

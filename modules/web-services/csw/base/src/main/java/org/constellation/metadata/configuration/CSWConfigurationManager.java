@@ -179,7 +179,7 @@ public class CSWConfigurationManager {
         }
 
         if (!asynchrone) {
-            synchroneIndexRefresh(cswInstanceDirectories);
+            synchroneIndexRefresh(cswInstanceDirectories, true);
         } else {
             asynchroneIndexRefresh(cswInstanceDirectories);
         }
@@ -207,7 +207,11 @@ public class CSWConfigurationManager {
             if (reader != null) {
                 try {
                     for (String identifier : identifiers) {
-                        objectToIndex.add(reader.getMetadata(identifier, MetadataType.NATIVE));
+                        final Object obj = reader.getMetadata(identifier, MetadataType.NATIVE);
+                        if (obj == null) {
+                            throw new ConfigurationException("Unable to find the metadata: " + identifier);
+                        }
+                        objectToIndex.add(obj);
                     }
                 } catch (MetadataIoException ex) {
                     throw new ConfigurationException(ex);
@@ -474,14 +478,19 @@ public class CSWConfigurationManager {
      *
      * @throws org.constellation.ws.CstlServiceException
      */
-    private void synchroneIndexRefresh(final List<File> cswInstanceDirectories) throws ConfigurationException {
+    private void synchroneIndexRefresh(final List<File> cswInstanceDirectories, final boolean deleteFileIndexDb) throws ConfigurationException {
         boolean deleted = false;
         for (File cswInstanceDirectory : cswInstanceDirectories) {
             //we delete each index directory
             for (File indexDir : cswInstanceDirectory.listFiles(new IndexDirectoryFilter(null))) {
                 deleted = true;
                 for (File f : indexDir.listFiles()) {
-                    final boolean sucess = f.delete();
+                    final boolean sucess;
+                    if (f.isDirectory()) {
+                        sucess = FileUtilities.deleteDirectory(f);
+                    } else {
+                        sucess = f.delete();
+                    }
                     if (!sucess) {
                         throw new ConfigurationException("The service can't delete the index file:" + f.getPath());
                     }
@@ -489,6 +498,11 @@ public class CSWConfigurationManager {
                 if (!indexDir.delete()) {
                     throw new ConfigurationException("The service can't delete the index folder.");
                 }
+            }
+            //hack for FS CSW
+            final File f = new File(cswInstanceDirectory, "csw-db");
+            if (f.isDirectory() && deleteFileIndexDb) {
+                FileUtilities.deleteDirectory(f);
             }
         }
 

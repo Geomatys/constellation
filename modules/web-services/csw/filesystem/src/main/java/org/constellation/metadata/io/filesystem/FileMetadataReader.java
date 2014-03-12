@@ -560,8 +560,9 @@ public class FileMetadataReader extends DomMetadataReader implements CSWMetadata
         try {
             session = MetadataDatasource.createSession(serviceID);
             final String path = session.getPathForRecord(identifier);
-
-            return new File(path);
+            if (path != null) {
+                return new File(path);
+            }
         } catch (SQLException ex) {
             throw new MetadataIoException("SQL Exception while reading path for record", ex, NO_APPLICABLE_CODE);
         } finally {
@@ -569,6 +570,7 @@ public class FileMetadataReader extends DomMetadataReader implements CSWMetadata
                 session.close();
             }
         }
+        return null;
     }
 
     private String getMetadataIdentifier(final InputStream metadataStream) throws IOException, XMLStreamException {

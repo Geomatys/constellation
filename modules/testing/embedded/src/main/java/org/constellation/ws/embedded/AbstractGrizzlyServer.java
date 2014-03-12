@@ -107,7 +107,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
         boolean ex = true;
         int cpt = 0;
         while (ex) {
-            Thread.sleep(1 * 1000);
+            Thread.sleep(1 * 2000);
             final URL u;
             final String suffix;
             if (grizzly.getUriSuffix() != null) {
@@ -127,7 +127,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
             } catch (IOException e) {
                 ex = true;
             }
-            if (cpt == 40) {
+            if (cpt == 80) {
                 throw new Exception("The grizzly server never start");
             }
             cpt++;

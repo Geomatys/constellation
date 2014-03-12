@@ -36,6 +36,8 @@ import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ServiceReport;
 import org.constellation.generic.database.Automatic;
+import org.constellation.metadata.io.filesystem.sql.MetadataDatasource;
+import org.constellation.metadata.io.filesystem.sql.Session;
 import org.constellation.sos.ws.soap.SOService;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.TestRunner;
@@ -287,6 +289,16 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer {
         record.setIdentifier(new SimpleLiteral("urn_test"));
         File f = new File(configDirectory, "dataCsw/urn_test.xml");
 
+        Session session = null;
+        try {
+            session = MetadataDatasource.createSession("default");
+            session.putRecord("urn_test", f.getPath());
+
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
         Marshaller m = pool.acquireMarshaller();
         m.marshal(record, f);
         pool.recycle(m);
