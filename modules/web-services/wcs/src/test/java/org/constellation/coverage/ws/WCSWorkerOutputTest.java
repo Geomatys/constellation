@@ -49,6 +49,7 @@ import org.geotoolkit.wcs.xml.v100.WCSCapabilitiesType;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
+import static org.junit.Assume.assumeTrue;
 
 
 /**
@@ -69,6 +70,8 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
      */
     @Test
     public void testGetCapabilities() throws JAXBException, CstlServiceException {
+        assumeTrue(hasLocalDatabase());
+
         GetCapabilities request = new GetCapabilitiesType("1.0.0", "WCS", null, null);
         GetCapabilitiesResponse response = WORKER.getCapabilities(request);
 
@@ -126,7 +129,8 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
      */
     @Test
     public void testDescribeCoverage() throws JAXBException, CstlServiceException {
-
+        assumeTrue(hasLocalDatabase());
+        
         final DescribeCoverage request = new DescribeCoverageType(LAYER_TEST);
         final DescribeCoverageResponse response = WORKER.describeCoverage(request);
         assertNotNull(response);
@@ -174,9 +178,10 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
      */
     @Test
     public void testGetCoverage() throws JAXBException, CstlServiceException {
+        assumeTrue(hasLocalDatabase());
 
         // Builds the GetCoverage request
-        final List<String> axis = new ArrayList<String>();
+        final List<String> axis = new ArrayList<>();
         axis.add("width");
         axis.add("height");
         final int[] low  = new int[2];
@@ -187,7 +192,7 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
         high[1] = 512;
         final GridLimitsType limits = new GridLimitsType(low, high);
         final GridType grid = new GridType(limits, axis);
-        final List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
+        final List<DirectPositionType> pos = new ArrayList<>();
         pos.add(new DirectPositionType(-180.0, -90.0));
         pos.add(new DirectPositionType(180.0, 90.0));
         final EnvelopeType envelope = new EnvelopeType(pos, "CRS:84");

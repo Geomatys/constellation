@@ -114,6 +114,10 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
 
     private static final String WCS_DESCRIBECOVERAGE ="request=DescribeCoverage&coverage=SST_tests&service=wcs&version=1.0.0";
 
+    public static boolean hasLocalDatabase() {
+        return false; // TODO
+    }
+
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
@@ -144,18 +148,21 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
                 final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
                 if("coverage-sql".equals(service.getName())){
-                    // Defines a PostGrid data provider
-                    final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                    final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
-                    srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://flupke.geomatys.com/coverages-test");
-                    srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
-                    final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
-                    srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
-                    srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
-                    srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
-                    srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
-                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
+
+                    if (hasLocalDatabase()) {
+                        // Defines a PostGrid data provider
+                        final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                        final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
+                        srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://flupke.geomatys.com/coverages-test");
+                        srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
+                        final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
+                        srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
+                        srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
+                        srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
+                        srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
+                        source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
+                    }
 
                 }
 
@@ -245,7 +252,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
     @Test
     @Order(order=2)
     public void testWCSGetCoverage() throws Exception {
-
+        assumeTrue(hasLocalDatabase());
         // Creates a valid GetCoverage url.
         final URL getCoverageUrl;
         try {
@@ -277,6 +284,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
     @Ignore
     @Order(order=3)
     public void testWCSGetCoverageMatrixFormat() throws IOException {
+        assumeTrue(hasLocalDatabase());
 
         // Creates a valid GetCoverage url.
         final URL getCovMatrixUrl;
@@ -298,7 +306,8 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
     @Test
     @Order(order=4)
     public void testWCSGetCapabilities() throws JAXBException, IOException {
-
+        assumeTrue(hasLocalDatabase());
+        
         // Creates a valid GetCapabilities url.
         URL getCapsUrl;
         try {
@@ -380,7 +389,8 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
     @Test
     @Order(order=5)
     public void testWCSDescribeCoverage() throws JAXBException, IOException {
-
+        assumeTrue(hasLocalDatabase());
+        
         // Creates a valid DescribeCoverage url.
         final URL getCapsUrl;
         try {

@@ -55,6 +55,10 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
 
     protected static WCSWorker WORKER;
 
+    public static boolean hasLocalDatabase() {
+        return false; // TODO
+    }
+
     /**
      * Initialisation of the worker and the PostGRID data provider before launching
      * the different tests.
@@ -79,18 +83,21 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
                 final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
                 if("coverage-sql".equals(service.getName())){
-                    // Defines a PostGrid data provider
-                    final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                    final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
-                    srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://flupke.geomatys.com/coverages-test");
-                    srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
-                    final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
-                    srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
-                    srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
-                    srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
-                    srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
-                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
+
+                    if (hasLocalDatabase()) {
+                        // Defines a PostGrid data provider
+                        final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                        final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
+                        srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://flupke.geomatys.com/coverages-test");
+                        srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
+                        final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
+                        srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
+                        srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
+                        srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
+                        srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
+                        source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
+                    }
                 }
 
                 return config;
