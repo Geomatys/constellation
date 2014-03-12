@@ -98,11 +98,11 @@ public class SOSRequestTest extends AbstractGrizzlyServer {
         writeDataFile(dataDirectory, "urn-ogc-object-sensor-SunSpot-2");
 
         final Automatic smlConfig = new Automatic(null, dataDirectory.getPath());
-        final Automatic omCOnfig = new Automatic(null, new BDD("org.postgresql.Driver", url, null, null));
+        final Automatic omCOnfig = new Automatic(null, new BDD("derby", url, null, null));
         final SOSConfiguration sosconf = new SOSConfiguration(smlConfig, omCOnfig);
-        sosconf.setObservationFilterType(DataSourceType.POSTGRID);
-        sosconf.setObservationReaderType(DataSourceType.POSTGRID);
-        sosconf.setObservationWriterType(DataSourceType.POSTGRID);
+        sosconf.setObservationFilterType(DataSourceType.OM2);
+        sosconf.setObservationReaderType(DataSourceType.OM2);
+        sosconf.setObservationWriterType(DataSourceType.OM2);
         sosconf.setSMLType(DataSourceType.FILESYSTEM);
         sosconf.setProfile("transactional");
         sosconf.setObservationIdBase("urn:ogc:object:observation:SunSpot:");
@@ -301,10 +301,10 @@ public class SOSRequestTest extends AbstractGrizzlyServer {
         URLConnection conec = getCapsUrl.openConnection();
 
         GetObservation request  = new GetObservation("1.0.0",
-                                      "offering-allSensor",
+                                      "offering-3",
                                       null,
-                                      Arrays.asList("urn:ogc:object:sensor:SunSpot:0014.4F01.0000.261A"),
-                                      Arrays.asList("urn:phenomenon:acceleration"),
+                                      Arrays.asList("urn:ogc:object:sensor:GEOM:3"),
+                                      Arrays.asList("urn:ogc:def:phenomenon:GEOM:depth"),
                                       null,
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
@@ -331,7 +331,7 @@ public class SOSRequestTest extends AbstractGrizzlyServer {
         // for a POST request
         URLConnection conec = getCapsUrl.openConnection();
 
-        GetFeatureOfInterest request = new GetFeatureOfInterest("1.0.0", "SOS", "sampling-point-001");
+        GetFeatureOfInterest request = new GetFeatureOfInterest("1.0.0", "SOS", "station-001");
 
         postRequestObject(conec, request);
         Object obj = unmarshallResponse(conec);
@@ -343,7 +343,7 @@ public class SOSRequestTest extends AbstractGrizzlyServer {
         assertTrue("expecting SamplingPointType but was: " + type, obj instanceof SamplingPointType);
 
         // Creates a valid GetFeatureFInterest url.
-        final URL getFoiUrl = new URL(getDefaultURL() + "request=GetFeatureOfInterest&service=SOS&version=1.0.0&FeatureOfInterestId=sampling-point-001");
+        final URL getFoiUrl = new URL(getDefaultURL() + "request=GetFeatureOfInterest&service=SOS&version=1.0.0&FeatureOfInterestId=station-001");
 
 
         // Try to marshall something from the response returned by the server.

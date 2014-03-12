@@ -103,7 +103,7 @@
     </dependency>
     <dependency>
       <groupId>org.constellation.web-services</groupId>
-      <artifactId>cstl-web-sos-postgrid</artifactId>
+      <artifactId>cstl-web-sos-om2</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
