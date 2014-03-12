@@ -12,9 +12,11 @@
   <listener>
     <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
   </listener>
-  <listener-class>
-    org.springframework.security.web.session.HttpSessionEventPublisher
-  </listener-class>
+  <listener>
+    <listener-class>
+      org.springframework.security.web.session.HttpSessionEventPublisher
+    </listener-class>
+  </listener>
   <!-- Constellation initialisation, plus copy possible file-system configuration 
     to database. -->
   <listener>
