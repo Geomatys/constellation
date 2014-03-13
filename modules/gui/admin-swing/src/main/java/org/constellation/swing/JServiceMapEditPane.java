@@ -50,6 +50,7 @@ public class JServiceMapEditPane extends JServiceEditionPane {
     private final String serviceType;
     private final LayerContext configuration;
     private List<LayerModel> layerModelList;
+    private List<SourceModel> sourceModelList;
     
     /**
      * Creates new form JServiceMapEditPane
@@ -103,21 +104,65 @@ public class JServiceMapEditPane extends JServiceEditionPane {
 
         guiLayerTable.setShowVerticalLines(false);
         guiLayerTable.setFillsViewportHeight(true);
+
+        guiSourceTable.setDefaultRenderer(SourceRowModel.EditSource.class, new ActionCell.Renderer(ICON_EDIT));
+        guiSourceTable.setDefaultEditor(SourceRowModel.EditSource.class, new ActionCell.Editor(ICON_EDIT) {
+            @Override
+            public void actionPerformed(final ActionEvent e, Object value) {
+                if(value instanceof DefaultMutableTreeNode){
+                    value = ((DefaultMutableTreeNode)value).getUserObject();
+                }
+
+                if (value instanceof SourceModel) {
+                    final SourceModel oldSourceModel = (SourceModel) value;
+                    final SourceModel updateSourceModel = JEditSourcePane.showDialog(server, serviceType, oldSourceModel);
+                    if (updateSourceModel != null) {
+                        final int pos = sourceModelList.indexOf(oldSourceModel);
+                        sourceModelList.remove(pos);
+                        sourceModelList.add(pos, updateSourceModel);
+                    }
+                    updateSourceTableModel();
+                }
+            }
+        });
+
+        guiSourceTable.setDefaultRenderer(SourceRowModel.DeleteSource.class, new ActionCell.Renderer(ICON_DELETE));
+        guiSourceTable.setDefaultEditor(SourceRowModel.DeleteSource.class, new ActionCell.Editor(ICON_DELETE) {
+            @Override
+            public void actionPerformed(final ActionEvent e, Object value) {
+                if(value instanceof DefaultMutableTreeNode){
+                    value = ((DefaultMutableTreeNode)value).getUserObject();
+                }
+
+                if (value instanceof SourceModel) {
+                    final SourceModel oldSourceModel = (SourceModel) value;
+                    sourceModelList.remove(oldSourceModel);
+                    updateSourceTableModel();
+                }
+            }
+        });
+
+        guiSourceTable.setShowVerticalLines(false);
+        guiSourceTable.setFillsViewportHeight(true);
         
-        initLayerList();
+        initLayerSourceList();
         
         updateLayerTableModel();
+        updateSourceTableModel();
     }
 
     /**
      * Create a list of layer model based on service configuration.
      */
-    private void initLayerList() {
-        layerModelList = new ArrayList<>();
+    private void initLayerSourceList() {
+        layerModelList  = new ArrayList<>();
+        sourceModelList = new ArrayList<>();
         final List<Source> sources = configuration.getLayers();
 
         for (final Source source : sources) {
             final String providerId = source.getId();
+
+            sourceModelList.add(new SourceModel(providerId, source.getLoadAll()));
 
             if (!source.getLoadAll()) {
                 final List<Layer> layers = source.getInclude();
@@ -126,7 +171,7 @@ public class JServiceMapEditPane extends JServiceEditionPane {
                 }
 
             } else {
-                //get all layer from provider exept exclude
+                //get all layer from provider except exclude
 
                 //Map providers and there layers
                 ProviderReport provider = null;
@@ -191,12 +236,55 @@ public class JServiceMapEditPane extends JServiceEditionPane {
         }.start();
 
     }
+
+    /**
+     * Update GUI Outline layer model using the list of LayerModel.
+     */
+    private void updateSourceTableModel() {
+
+        new Thread(){
+            @Override
+            public void run() {
+                guiLoadLabel.setText(LayerRowModel.BUNDLE.getString("downloadingLayer"));
+                guiLoadLabel.setIcon(IconBundle.getIcon("16_wait"));
+
+                try {
+                    final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
+                    final DefaultTreeModel treeModel = new org.geotoolkit.gui.swing.tree.DefaultTreeModel(root);
+                    final RowModel model = new SourceRowModel();
+
+                    for (final SourceModel sourceModel : sourceModelList) {
+                        root.add(new DefaultMutableTreeNode(sourceModel));
+                    }
+
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            guiSourceTable.setRootVisible(false);
+                            guiSourceTable.setModel(DefaultOutlineModel.createOutlineModel(treeModel, model));
+                        }
+                    });
+
+                } finally{
+                    guiSourceTable.repaint();
+                    guiLoadLabel.setText("");
+                    guiLoadLabel.setIcon(null);
+                }
+                guiSourceTable.setRenderDataProvider(new SourceRowRenderer());
+            }
+        }.start();
+
+    }
     
     /**
      * Update layer defined in configuration using layerModelList.
      */
     private void updateConfiguration() {
         final List<Source> sources = new ArrayList<>();
+
+        for (final SourceModel sourceModel : sourceModelList) {
+            sources.add(new Source(sourceModel.getProviderId(), sourceModel.isLoadAll(), new ArrayList<Layer>(), null));
+        }
         
         for (final LayerModel layerModel : layerModelList) {
             final String providerId = layerModel.getProviderId();
@@ -264,9 +352,13 @@ public class JServiceMapEditPane extends JServiceEditionPane {
         guiLoadLabel = new javax.swing.JLabel();
         guiLayerToolbar = new javax.swing.JToolBar();
         guiAddLayer = new javax.swing.JButton();
+        guiAddSource = new javax.swing.JButton();
         transactionnalBox = new javax.swing.JCheckBox();
+        jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         guiLayerTable = new org.netbeans.swing.outline.Outline();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        guiSourceTable = new org.netbeans.swing.outline.Outline();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -293,6 +385,17 @@ public class JServiceMapEditPane extends JServiceEditionPane {
         });
         guiLayerToolbar.add(guiAddLayer);
 
+        guiAddSource.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/constellation/swing/edit_add.png"))); // NOI18N
+        guiAddSource.setText(org.openide.util.NbBundle.getMessage(JProviderEditPane.class, "guiAddSourceBtn")); // NOI18N
+        guiAddSource.setFocusable(false);
+        guiAddSource.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        guiAddSource.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                guiAddSourceActionPerformed(evt);
+            }
+        });
+        guiLayerToolbar.add(guiAddSource);
+
         transactionnalBox.setText(org.openide.util.NbBundle.getMessage(JProviderMetadataPane.class, "transactionnal")); // NOI18N
         transactionnalBox.setFocusable(false);
         transactionnalBox.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -302,13 +405,20 @@ public class JServiceMapEditPane extends JServiceEditionPane {
 
         add(jPanel1, java.awt.BorderLayout.NORTH);
 
+        jPanel2.setLayout(new java.awt.GridLayout(2, 1, 5, 5));
+
         jScrollPane1.setViewportView(guiLayerTable);
 
-        add(jScrollPane1, java.awt.BorderLayout.CENTER);
+        jPanel2.add(jScrollPane1);
+
+        jScrollPane2.setViewportView(guiSourceTable);
+
+        jPanel2.add(jScrollPane2);
+
+        add(jPanel2, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     private void guiAddLayerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiAddLayerActionPerformed
-        
         final  LayerModel layerModel = JEditLayerPane.showDialog(server, serviceType, null);
         if (layerModel != null) {
             layerModelList.add(layerModel);
@@ -316,14 +426,26 @@ public class JServiceMapEditPane extends JServiceEditionPane {
         }
     }//GEN-LAST:event_guiAddLayerActionPerformed
 
+    private void guiAddSourceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiAddSourceActionPerformed
+        final  SourceModel sourceModel = JEditSourcePane.showDialog(server, serviceType, null);
+        if (sourceModel != null) {
+            sourceModelList.add(sourceModel);
+            updateSourceTableModel();
+        }
+    }//GEN-LAST:event_guiAddSourceActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton guiAddLayer;
+    private javax.swing.JButton guiAddSource;
     private org.netbeans.swing.outline.Outline guiLayerTable;
     private javax.swing.JToolBar guiLayerToolbar;
     private javax.swing.JToolBar guiLoadBar;
     private javax.swing.JLabel guiLoadLabel;
+    private org.netbeans.swing.outline.Outline guiSourceTable;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JCheckBox transactionnalBox;
     // End of variables declaration//GEN-END:variables
 
@@ -344,6 +466,49 @@ public class JServiceMapEditPane extends JServiceEditionPane {
                 } else {
                     return layer.getLayer().getName().getLocalPart();
                 }
+            }
+            return String.valueOf(o);
+        }
+
+         @Override
+        public boolean isHtmlDisplayName(Object o) {
+            return true;
+        }
+
+        @Override
+        public Color getBackground(Object o) {
+            return null;
+        }
+
+        @Override
+        public Color getForeground(Object o) {
+            return null;
+        }
+
+        @Override
+        public String getTooltipText(Object o) {
+            return null;
+        }
+
+        @Override
+        public Icon getIcon(Object o) {
+            return IconBundle.EMPTY_ICON_16;
+        }
+    }
+
+    /**
+     * Rendering of layer row in Outline table.
+     */
+    private static class SourceRowRenderer implements RenderDataProvider {
+
+        @Override
+        public String getDisplayName(Object o) {
+            if(o instanceof DefaultMutableTreeNode){
+                o = ((DefaultMutableTreeNode)o).getUserObject();
+            }
+            if (o instanceof SourceModel) {
+                final SourceModel source = (SourceModel) o;
+                return source.getProviderId();
             }
             return String.valueOf(o);
         }

@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2012, Geomatys
+ *    (C) 2014, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,45 +14,51 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
+
 package org.constellation.swing;
 
 import java.io.Serializable;
 import java.util.Objects;
-import org.constellation.configuration.Layer;
 
 /**
- * Class LayerModel extend Layer to add provider identifier from where layer is come from.
  *
- * @author Quentin Boileau (Geomatys)
+ * @author Guilhem Legal (Geomatys)
  */
-public class LayerModel implements Serializable {
-    
-    private String providerId;
-    private final Layer layer;
+public class SourceModel implements Serializable {
 
-    public LayerModel(final Layer layer, final String providerId) {
+    private String providerId;
+
+    private boolean loadAll;
+
+    public SourceModel() {
+
+    }
+    
+    public SourceModel(final String providerId, final boolean loadAll) {
         this.providerId = providerId;
-        this.layer = layer;
+        this.loadAll    = loadAll;
     }
 
     public String getProviderId() {
         return providerId;
     }
-    
+
     public void setProviderId(final String providerId) {
         this.providerId = providerId;
     }
 
-    public Layer getLayer() {
-        return layer;
+    /**
+     * @return the loadAll
+     */
+    public boolean isLoadAll() {
+        return loadAll;
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 5;
-        hash = 11 * hash + (this.providerId != null ? this.providerId.hashCode() : 0);
-        hash = 11 * hash + (this.layer != null ? this.layer.hashCode() : 0);
-        return hash;
+    /**
+     * @param loadAll the loadAll to set
+     */
+    public void setLoadAll(boolean loadAll) {
+        this.loadAll = loadAll;
     }
 
     @Override
@@ -60,17 +66,24 @@ public class LayerModel implements Serializable {
         if (this == obj) {
             return true;
         }
-        if (obj instanceof LayerModel) {
-            final LayerModel other = (LayerModel) obj;
+        if (obj instanceof SourceModel) {
+            final SourceModel other = (SourceModel) obj;
             return Objects.equals(this.providerId, other.providerId) &&
-                   Objects.equals(this.layer, other.layer);
+                   Objects.equals(this.loadAll,    other.loadAll);
         }
         return false;
     }
 
     @Override
-    public String toString() {
-        return "LayerModel{" + "providerId=" + providerId + ", layer=" + layer + '}';
+    public int hashCode() {
+        int hash = 7;
+        hash = 11 * hash + Objects.hashCode(this.providerId);
+        hash = 11 * hash + (this.loadAll ? 1 : 0);
+        return hash;
     }
 
+    @Override
+    public String toString() {
+        return "SourceModel {providerId=" + providerId + " loadAll="+  loadAll + '}';
+    }
 }
