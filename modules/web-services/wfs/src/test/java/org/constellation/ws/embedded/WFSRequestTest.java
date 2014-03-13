@@ -121,10 +121,14 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
             +                                           "&namespaces=xmlns(xml,http://www.w3.org/XML/1998/namespace),xmlns(tns,http://www.opengis.net/sampling/1.0),xmlns(wfs,http://www.opengis.net/wfs/2.0)"
             +                                           "&storedquery_id=urn:ogc:def:storedQuery:OGC-WFS::GetFeatureByType&version=2.0.0";
     
-     private static final String WFS_DESCRIBE_FEATURE_TYPE_URL = "request=DescribeFeatureType&service=WFS&version=1.1.0&outputformat=text%2Fxml%3B+subtype%3Dgml%2F3.1.1";
-     private static final String WFS_DESCRIBE_FEATURE_TYPE_URL_V2 = "request=DescribeFeatureType&service=WFS&version=2.0.0&outputformat=text%2Fxml%3B+subtype%3Dgml%2F3.2";
+    private static final String WFS_DESCRIBE_FEATURE_TYPE_URL = "request=DescribeFeatureType&service=WFS&version=1.1.0&outputformat=text%2Fxml%3B+subtype%3Dgml%2F3.1.1";
+    private static final String WFS_DESCRIBE_FEATURE_TYPE_URL_V2 = "request=DescribeFeatureType&service=WFS&version=2.0.0&outputformat=text%2Fxml%3B+subtype%3Dgml%2F3.2";
 
     private static String EPSG_VERSION;
+
+    public static boolean hasLocalDatabase() {
+        return false; // TODO
+    }
 
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
@@ -181,64 +185,67 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
                     try{ 
                         
                         {//OBSERVATION
-                        final String url = "jdbc:derby:memory:TesWFSRequestWorker";
-                        final DefaultDataSource ds = new DefaultDataSource(url + ";create=true");
-                        if (!datasourceCreated) {
-                            Connection con = ds.getConnection();
-                            DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
-                            sr.run(Util.getResourceAsStream("org/constellation/observation/structure_observations.sql"));
-                            sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
-                            con.close();
-                            datasourceCreated = true;
-                        }
-                        ds.shutdown();
-                        
-                        final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
-                        getOrCreateValue(source, "id").setValue("omSrc");
-                        getOrCreateValue(source, "load_all").setValue(true);    
-                        
-                        final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
-                        final ParameterValueGroup omconfig = createGroup(choice, "OMParameters");
-                        getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
-                        getOrCreateValue(omconfig, "derbyurl").setValue(url);
-                        }
-                        
-                        {//SHAPEFILE
-                        final File outputDir = initDataDirectory();
-                        final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
-                        getOrCreateValue(source, "id").setValue("shapeSrc");
-                        getOrCreateValue(source, "load_all").setValue(true);    
-                        
-                        final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
-                        final ParameterValueGroup shpconfig = createGroup(choice, "ShapefileParametersFolder");
-                        getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
-                        getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");        
-                        
-                        final ParameterValueGroup layer = getOrCreateGroup(source, "Layer");
-                        getOrCreateValue(layer, "name").setValue("NamedPlaces");
-                        getOrCreateValue(layer, "style").setValue("cite_style_NamedPlaces");     
-                        }
-                        
-                        {//POSTGIS
-                        final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
-                        getOrCreateValue(source, "id").setValue("postgisSrc");
-                        getOrCreateValue(source, "load_all").setValue(true);                        
-                        
-                        final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
-                        final ParameterValueGroup pgconfig = createGroup(choice, " PostgresParameters");
-                        getOrCreateValue(pgconfig,"host").setValue("flupke.geomatys.com");
-                        getOrCreateValue(pgconfig,"port").setValue(5432);
-                        getOrCreateValue(pgconfig,"database").setValue("cite-wfs");
-                        getOrCreateValue(pgconfig,"schema").setValue("public");
-                        getOrCreateValue(pgconfig,"user").setValue("test");
-                        getOrCreateValue(pgconfig,"password").setValue("test");
-                        getOrCreateValue(pgconfig,"namespace").setValue("no namespace");
+                            final String url = "jdbc:derby:memory:TesWFSRequestWorker";
+                            final DefaultDataSource ds = new DefaultDataSource(url + ";create=true");
+                            if (!datasourceCreated) {
+                                Connection con = ds.getConnection();
+                                DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
+                                sr.run(Util.getResourceAsStream("org/constellation/observation/structure_observations.sql"));
+                                sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
+                                con.close();
+                                datasourceCreated = true;
+                            }
+                            ds.shutdown();
 
-                        //add a custom sql query layer
-                        final ParameterValueGroup layer = getOrCreateGroup(source, "Layer");
-                        getOrCreateValue(layer, "name").setValue("CustomSQLQuery");
-                        getOrCreateValue(layer, "language").setValue("CUSTOM-SQL");
-                        getOrCreateValue(layer, "statement").setValue("SELECT name as nom, \"pointProperty\" as geom FROM \"PrimitiveGeoFeature\" ");                        
+                            final ParameterValueGroup source = createGroup(config, SOURCE_DESCRIPTOR_NAME);
+                            getOrCreateValue(source, "id").setValue("omSrc");
+                            getOrCreateValue(source, "load_all").setValue(true);
+
+                            final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
+                            final ParameterValueGroup omconfig = createGroup(choice, "OMParameters");
+                            getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
+                            getOrCreateValue(omconfig, "derbyurl").setValue(url);
+                        }
+
+                        {//SHAPEFILE
+                            final File outputDir = initDataDirectory();
+                            final ParameterValueGroup source = createGroup(config, SOURCE_DESCRIPTOR_NAME);
+                            getOrCreateValue(source, "id").setValue("shapeSrc");
+                            getOrCreateValue(source, "load_all").setValue(true);
+
+                            final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
+                            final ParameterValueGroup shpconfig = createGroup(choice, "ShapefileParametersFolder");
+                            getOrCreateValue(shpconfig, "url").setValue(new URL("file:" + outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
+                            getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");
+
+                            final ParameterValueGroup layer = getOrCreateGroup(source, "Layer");
+                            getOrCreateValue(layer, "name").setValue("NamedPlaces");
+                            getOrCreateValue(layer, "style").setValue("cite_style_NamedPlaces");
+                        }
+
+                        {//POSTGIS
+
+                            if (hasLocalDatabase()) {
+                                final ParameterValueGroup source = createGroup(config, SOURCE_DESCRIPTOR_NAME);
+                                getOrCreateValue(source, "id").setValue("postgisSrc");
+                                getOrCreateValue(source, "load_all").setValue(true);
+
+                                final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
+                                final ParameterValueGroup pgconfig = createGroup(choice, " PostgresParameters");
+                                getOrCreateValue(pgconfig, "host").setValue("flupke.geomatys.com");
+                                getOrCreateValue(pgconfig, "port").setValue(5432);
+                                getOrCreateValue(pgconfig, "database").setValue("cite-wfs");
+                                getOrCreateValue(pgconfig, "schema").setValue("public");
+                                getOrCreateValue(pgconfig, "user").setValue("test");
+                                getOrCreateValue(pgconfig, "password").setValue("test");
+                                getOrCreateValue(pgconfig, "namespace").setValue("no namespace");
+
+                                //add a custom sql query layer
+                                final ParameterValueGroup layer = getOrCreateGroup(source, "Layer");
+                                getOrCreateValue(layer, "name").setValue("CustomSQLQuery");
+                                getOrCreateValue(layer, "language").setValue("CUSTOM-SQL");
+                                getOrCreateValue(layer, "statement").setValue("SELECT name as nom, \"pointProperty\" as geom FROM \"PrimitiveGeoFeature\" ");
+                            }
                         }
                         
                     }catch(Exception ex){
@@ -464,7 +471,11 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
         assertTrue(obj instanceof Schema);
 
         Schema schema = (Schema) obj;
-        assertEquals(17, schema.getElements().size());
+        if (hasLocalDatabase()) {
+            assertEquals(17, schema.getElements().size());
+        } else {
+            assertEquals(13, schema.getElements().size());
+        }
 
         try {
             getfeatsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wfs/test?" + WFS_DESCRIBE_FEATURE_TYPE_URL_V2);
@@ -478,7 +489,11 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
         assertTrue("was:" + obj, obj instanceof Schema);
 
         schema = (Schema) obj;
-        assertEquals(17, schema.getElements().size());
+        if (hasLocalDatabase()) {
+            assertEquals(17, schema.getElements().size());
+        } else {
+            assertEquals(13, schema.getElements().size());
+        }
 
     }
 

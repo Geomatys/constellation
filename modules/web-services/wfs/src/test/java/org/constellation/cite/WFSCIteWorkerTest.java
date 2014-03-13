@@ -56,6 +56,7 @@ import static org.constellation.provider.configuration.ProviderParameters.*;
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.*;
 import org.geotoolkit.db.postgres.PostgresFeatureStoreFactory;
+import static org.junit.Assume.assumeTrue;
 
 
 /**
@@ -68,14 +69,15 @@ public class WFSCIteWorkerTest {
 
     private XmlFeatureWriter featureWriter;
 
+    public static boolean hasLocalDatabase() {
+        return false; // TODO
+    }
+    
     @BeforeClass
     public static void setUpClass() throws Exception {
         ConfigurationEngine.setupTestEnvironement("WFSCIteWorkerTest");
 
-        final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null),
-                                                   new Source("omSrc", true, null, null),
-                                                   new Source("shapeSrc", true, null, null),
-                                                   new Source("postgisSrc", true, null, null));
+        final List<Source> sources = Arrays.asList(new Source("postgisSrc", true, null, null));
         final Layers layers = new Layers(sources);
         final LayerContext config = new LayerContext(layers);
         config.getCustomParameters().put("shiroAccessible", "false");
@@ -110,6 +112,7 @@ public class WFSCIteWorkerTest {
      */
     @Test
     public void getFeatureShapeFileTest() throws Exception {
+        assumeTrue(hasLocalDatabase());
 
         /**
          * Test 1 : query on typeName aggragateGeofeature
@@ -187,20 +190,22 @@ public class WFSCIteWorkerTest {
                 final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
                 if("feature-store".equals(service.getName())){
-                    // Defines a PostGis data provider
-                    final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgisSrc");
-                    
-                    final ParameterValueGroup choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);                    
-                    final ParameterValueGroup pgconfig = getOrCreate(PostgresFeatureStoreFactory.PARAMETERS_DESCRIPTOR,source);
-                    pgconfig.parameter(DATABASE.getName().getCode()).setValue("cite-wfs");
-                    pgconfig.parameter(HOST.getName().getCode()).setValue("flupke.geomatys.com");
-                    pgconfig.parameter(SCHEMA.getName().getCode()).setValue("public");
-                    pgconfig.parameter(USER.getName().getCode()).setValue("test");
-                    pgconfig.parameter(PASSWORD.getName().getCode()).setValue("test");
-                    pgconfig.parameter(NAMESPACE.getName().getCode()).setValue("http://cite.opengeospatial.org/gmlsf");
-                    choice.values().add(pgconfig);
+                    if (hasLocalDatabase()) {
+                        // Defines a PostGis data provider
+                        final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                        source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgisSrc");
+
+                        final ParameterValueGroup choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
+                        final ParameterValueGroup pgconfig = getOrCreate(PostgresFeatureStoreFactory.PARAMETERS_DESCRIPTOR,source);
+                        pgconfig.parameter(DATABASE.getName().getCode()).setValue("cite-wfs");
+                        pgconfig.parameter(HOST.getName().getCode()).setValue("flupke.geomatys.com");
+                        pgconfig.parameter(SCHEMA.getName().getCode()).setValue("public");
+                        pgconfig.parameter(USER.getName().getCode()).setValue("test");
+                        pgconfig.parameter(PASSWORD.getName().getCode()).setValue("test");
+                        pgconfig.parameter(NAMESPACE.getName().getCode()).setValue("http://cite.opengeospatial.org/gmlsf");
+                        choice.values().add(pgconfig);
+                    }
                 }
 
                 return config;

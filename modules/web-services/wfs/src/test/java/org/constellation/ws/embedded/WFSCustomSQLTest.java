@@ -66,6 +66,10 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer {
              + "&TypeName=CustomSQLQuery";
 
 
+    public static boolean hasLocalDatabase() {
+        return false; // TODO
+    }
+
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
@@ -103,25 +107,27 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer {
                 final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
                 if("feature-store".equals(service.getName())){
-                    final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
-                    getOrCreateValue(source, "id").setValue("postgisSrc");
-                    getOrCreateValue(source, "load_all").setValue(true);                        
+                    if (hasLocalDatabase()) {
+                        final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
+                        getOrCreateValue(source, "id").setValue("postgisSrc");
+                        getOrCreateValue(source, "load_all").setValue(true);
 
-                    final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
-                    final ParameterValueGroup pgconfig = createGroup(choice, " PostgresParameters");
-                    getOrCreateValue(pgconfig,"host").setValue("flupke.geomatys.com");
-                    getOrCreateValue(pgconfig,"port").setValue(5432);
-                    getOrCreateValue(pgconfig,"database").setValue("cite-wfs");
-                    getOrCreateValue(pgconfig,"schema").setValue("public");
-                    getOrCreateValue(pgconfig,"user").setValue("test");
-                    getOrCreateValue(pgconfig,"password").setValue("test");
-                    getOrCreateValue(pgconfig,"namespace").setValue("no namespace");
+                        final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
+                        final ParameterValueGroup pgconfig = createGroup(choice, " PostgresParameters");
+                        getOrCreateValue(pgconfig,"host").setValue("flupke.geomatys.com");
+                        getOrCreateValue(pgconfig,"port").setValue(5432);
+                        getOrCreateValue(pgconfig,"database").setValue("cite-wfs");
+                        getOrCreateValue(pgconfig,"schema").setValue("public");
+                        getOrCreateValue(pgconfig,"user").setValue("test");
+                        getOrCreateValue(pgconfig,"password").setValue("test");
+                        getOrCreateValue(pgconfig,"namespace").setValue("no namespace");
 
-                    //add a custom sql query layer
-                    final ParameterValueGroup layer = getOrCreateGroup(source, "Layer");
-                    getOrCreateValue(layer, "name").setValue("CustomSQLQuery");
-                    getOrCreateValue(layer, "language").setValue("CUSTOM-SQL");
-                    getOrCreateValue(layer, "statement").setValue("SELECT name as nom, \"pointProperty\" as geom FROM \"PrimitiveGeoFeature\" ");            
+                        //add a custom sql query layer
+                        final ParameterValueGroup layer = getOrCreateGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("CustomSQLQuery");
+                        getOrCreateValue(layer, "language").setValue("CUSTOM-SQL");
+                        getOrCreateValue(layer, "statement").setValue("SELECT name as nom, \"pointProperty\" as geom FROM \"PrimitiveGeoFeature\" ");
+                    }
                 }
 
                 //empty configuration for others
@@ -151,6 +157,7 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer {
     @Test
     public void testWFSDescribeFeatureGET() throws Exception {
         waitForStart();
+        assumeTrue(hasLocalDatabase());
         
         final URL getfeatsUrl;
         try {
