@@ -1212,11 +1212,11 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
                  .success(function (data, status, headers, config) {
                      // Build map
                      var extent = "-5.740083333333334, 47.96008333333334, -4.332083333333334, 48.60008333333334";
-                     var OLExtent = new OpenLayers.Bounds.fromString(extent, false);
-                     WmtsViewer.initMap('dataMap', 7, OLExtent);
+                     var maxExtent = new OpenLayers.Bounds.fromString(extent, false);
+                     WmtsViewer.initMap('dataMap', maxExtent);
                      layerData = WmtsViewer.createLayer(layerName, $scope.service.identifier, data);
                      WmtsViewer.map.addLayer(layerData);
-                     WmtsViewer.map.zoomToExtent(OLExtent, true);
+                     WmtsViewer.map.zoomToExtent(maxExtent, true);
                  });
          } else {
              if ($scope.service.type === 'WMS') {

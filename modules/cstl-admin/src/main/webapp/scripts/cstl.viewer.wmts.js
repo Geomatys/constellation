@@ -18,7 +18,7 @@ WmtsViewer = {
 
     format : undefined,
 
-    initMap : function(mapId, numZoomLevels, extent){
+    initMap : function(mapId, maxExtent){
         if (WmtsViewer.map) {
             WmtsViewer.map.destroy();
         }
@@ -32,10 +32,9 @@ WmtsViewer = {
         WmtsViewer.map = new OpenLayers.Map(mapId, {
             controls: [new OpenLayers.Control.Navigation()],
             projection: new OpenLayers.Projection('EPSG:4326'),
-            maxExtent: new OpenLayers.Bounds(-180, -90, 180, 90),
-            numZoomLevels: numZoomLevels,
-            allOverlays:true,
-            restrictedExtent: extent
+            maxExtent: maxExtent,
+            allOverlays: true,
+            restrictedExtent: maxExtent
         });
     },
 
@@ -43,7 +42,7 @@ WmtsViewer = {
         var capabilities = WmtsViewer.format.read(xmlCaps);
         return WmtsViewer.format.createLayer(capabilities, {
             layer: layerName,
-            matrixSet: "EPSG%3A4326",
+            matrixSet: capabilities.contents.layers[0].tileMatrixSetLinks[0].tileMatrixSet,
             format: "image/png",
             style: "default"
         });
