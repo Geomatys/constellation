@@ -33,10 +33,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +44,7 @@ import static org.constellation.utils.RESTfulUtilities.ok;
  * RESTful API for map services configuration.
  *
  * @author Bernard Fabien (Geomatys)
+ * @author Cédric Briançon (Geomatys)
  * @version 0.9
  * @since 0.9
  */
@@ -85,9 +84,12 @@ public final class MapServices {
         return ok(AcknowlegementType.success("Layer \"" + layer.getLayerId() + "\" successfully added to " + spec + " service \"" + id + "\"."));
     }
 
+    /**
+     * @see org.constellation.map.configuration.MapConfigurer#removeLayer(String, javax.xml.namespace.QName)
+     */
     @DELETE
     @Path("{id}/{layerid}")
-    public Response deleteLayer(final @PathParam("spec") String spec, final @PathParam("id") String serviceId, final @PathParam("layerid") String layerid, @QueryParam("layernamespace") String layernmsp) throws NotRunningServiceException, JAXBException, UnsupportedEncodingException {
+    public Response deleteLayer(final @PathParam("spec") String spec, final @PathParam("id") String serviceId, final @PathParam("layerid") String layerid, @QueryParam("layernamespace") String layernmsp) throws Exception {
         getConfigurer(spec).removeLayer(serviceId, new QName(layernmsp, layerid));
         return Response.ok().build();
     }

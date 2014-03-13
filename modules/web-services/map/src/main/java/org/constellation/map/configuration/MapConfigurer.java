@@ -98,6 +98,7 @@ import static org.geotoolkit.style.StyleConstants.LITERAL_ONE_FLOAT;
  *
  * @author Fabien Bernard (Geomatys).
  * @author Benjamin Garcia (Geomatys).
+ * @author Cédric Briançon (Geomatys).
  * @version 0.9
  * @since 0.9
  */
@@ -277,7 +278,14 @@ public class MapConfigurer extends OGCConfigurer {
         super.createInstance(identifier, metadata, configuration);
     }
 
-    public void removeLayer(final String serviceId, final QName layerid) throws JAXBException {
+    /**
+     * Remove a layer from a service.
+     *
+     * @param serviceId the service identifier
+     * @param layerId the layer to remove
+     * @throws ConfigurationException
+     */
+    public void removeLayer(final String serviceId, final QName layerId) throws ConfigurationException {
         try {
             final LayerContext layerContext = (LayerContext) ConfigurationEngine.getConfiguration(specification.name(), serviceId);
             final List<Source> sources = layerContext.getLayers();
@@ -287,7 +295,7 @@ public class MapConfigurer extends OGCConfigurer {
             for (Source source : sources) {
                 List<Layer> layers = source.getInclude();
                 for (Layer layer : layers) {
-                    if(layer.getName().equals(layerid)){
+                    if(layer.getName().equals(layerId)){
                         name = layer.getName();
                         layers.remove(layer);
                         found = true;
@@ -302,10 +310,11 @@ public class MapConfigurer extends OGCConfigurer {
             if(found){
                 ConfigurationEngine.storeConfiguration(specification.name(), serviceId, layerContext);
                 ConfigurationEngine.deleteLayer(serviceId, specification, name);
+                restartInstance(serviceId, true);
             }
 
-        } catch (FileNotFoundException e) {
-            LOGGER.log(Level.WARNING, "", e);
+        } catch (Exception e) {
+            throw new ConfigurationException("Error when trying to remove a layer from the service "+ serviceId, e);
         }
     }
 }
