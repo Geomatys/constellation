@@ -218,9 +218,17 @@ cstlAdminApp.controller('SessionsController', ['$scope', 'resolvedSessions', 'Se
         };
     }]);
 
-cstlAdminApp.controller('MetricsController', ['$scope', 'resolvedMetrics',
-    function ($scope, resolvedMetrics) {
+cstlAdminApp.controller('MetricsController', ['$scope', 'resolvedMetrics','$window', '$http',
+    function ($scope, resolvedMetrics, $window, $http) {
         $scope.metrics = resolvedMetrics;
+        $scope.init = function(){
+        	$window.location.reload();
+        };
+        $scope.rungc = function(){
+        	$http.get(cstlContext + "spring/admin/jvm/rungc;jsessionid=").then(function(){
+        		$window.location.reload();
+        	});
+        };
     }]);
 
 cstlAdminApp.controller('LogsController', ['$scope', 'resolvedLogs', 'LogsService',

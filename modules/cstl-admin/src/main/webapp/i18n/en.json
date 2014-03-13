@@ -682,6 +682,7 @@
         "title": "Application Metrics",
         "refresh.button": "Refresh",
         "jvm": {
+            "rungc": "Run GC",
             "title": "JVM Metrics",
             "memory": {
                 "title": "Memory",
