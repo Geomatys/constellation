@@ -26,15 +26,11 @@ import org.constellation.configuration.ConfigDirectory;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.process.service.RestartServiceDescriptor;
 import org.constellation.process.service.ServiceProcessCommon;
-import org.constellation.provider.LayerProvider;
-import org.constellation.provider.LayerProviderProxy;
-import org.constellation.provider.ProviderService;
-import org.constellation.provider.StyleProviderProxy;
+import org.constellation.provider.*;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
 import org.geotoolkit.parameter.ParametersExt;
-import org.geotoolkit.process.*;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -326,6 +322,11 @@ public class ConfigurationUtilities {
         // Brut force solution : we reload all providers, otherwise, Constellation will have trouble to work with newly imported data.
         layerProxy.reload();
         for (LayerProvider provider : layerProxy.getProviders()) {
+            provider.reload();
+        }
+
+        styleProxy.reload();
+        for (StyleProvider provider : styleProxy.getProviders()) {
             provider.reload();
         }
 
