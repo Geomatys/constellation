@@ -45,7 +45,7 @@
                 <div class="col-sm-5">
                     <img src="images/data.png" style="display: block; margin: 0 auto;"/>
                     <p><h3 class="text-center"><span translate="main.menu.data.create.title">Données</span></h3></p>
-                    <a href="#/data" class="btn btn-default"  style="display: block; margin: 0 auto;"><span translate="main.menu.data.create.subtitle">Ajouter une donnée</span></a>
+                    <a ng-show="authenticated" href="#/data" class="btn btn-default"  style="display: block; margin: 0 auto;"><span translate="main.menu.data.create.subtitle">Ajouter une donnée</span></a>
                 </div>
                 <div class="col-sm-7" style="font-size:14px;vertical-align:middle;display:inline-block;"><span translate="main.menu.data.create.detail">
                     <p>Vous pouvez créer une nouvelle donnée.</p><p>Vous pourrez ensuite la publier dans un service web.</p></span>
@@ -97,7 +97,7 @@
                     <div class="col-sm-5">
                         <img src="images/stat.png" style="display: block; margin: 0 auto;"/>
                         <p><h3 class="text-center"><span translate="main.menu.stat.title">Statistiques du serveur</span></h3></p>
-                        <a href="#/metrics" class="btn btn-default" style="display: block; margin: 0 auto;"><span translate="main.menu.stat.subtitle">Voir les statistiques</span></a>
+                        <a ng-show="authenticated"  href="#/metrics" class="btn btn-default" style="display: block; margin: 0 auto;"><span translate="main.menu.stat.subtitle">Voir les statistiques</span></a>
                     </div>
                     <div class="col-sm-7" style="font-size:14px;">
                         <img src="images/stat_temp.png" style="display: block; margin: 0 auto;height:215px"/>
