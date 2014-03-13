@@ -264,6 +264,7 @@ public class SLDProvider extends AbstractStyleProvider{
 
             visit(folder);
         }
+        fireUpdateEvent();
     }
 
     /**

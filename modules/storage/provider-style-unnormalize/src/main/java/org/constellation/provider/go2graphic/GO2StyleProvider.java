@@ -69,6 +69,7 @@ public class GO2StyleProvider extends AbstractStyleProvider{
      */
     @Override
     public void reload() {
+        fireUpdateEvent();
     }
 
     /**

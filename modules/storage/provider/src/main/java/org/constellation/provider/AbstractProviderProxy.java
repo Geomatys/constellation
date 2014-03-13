@@ -266,6 +266,7 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
     public synchronized void reload() {
         dispose();
         getProviders(); //will load providers
+        fireUpdateEvent();
     }
 
     /**

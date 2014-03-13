@@ -135,6 +135,7 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
             }
             visit();
         }
+        fireUpdateEvent();
     }
 
     /**

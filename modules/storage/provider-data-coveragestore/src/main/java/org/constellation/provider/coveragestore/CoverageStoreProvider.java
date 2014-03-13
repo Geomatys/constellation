@@ -53,7 +53,6 @@ public class CoverageStoreProvider extends AbstractLayerProvider{
 
     @Override
     public synchronized void reload() {
-        super.reload();
         dispose();
 
         //parameter is a choice of different types
@@ -86,6 +85,7 @@ public class CoverageStoreProvider extends AbstractLayerProvider{
         }
 
         visit();
+        fireUpdateEvent();
     }
 
     @Override

@@ -122,6 +122,7 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
     public synchronized void reload() {
         dispose();
         visit();
+        fireUpdateEvent();
     }
 
     /**

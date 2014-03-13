@@ -145,6 +145,7 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
             index.clear();
             visit();
         }
+        fireUpdateEvent();
     }
 
     /**
