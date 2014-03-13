@@ -318,8 +318,12 @@ public abstract class WebService {
             kvpMap.add(paramName, paramValue);
         }
         postKvpParameters.set(kvpMap);
-        LOGGER.info(log.toString());
-        return treatIncomingRequest(null);
+        try {
+            LOGGER.info(log.toString());
+            return treatIncomingRequest(null);
+        } finally {
+            postKvpParameters.set(new StringKeyIgnoreCaseMultivaluedMap());
+        }
     }
 
     /**
