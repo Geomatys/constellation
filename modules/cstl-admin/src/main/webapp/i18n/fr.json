@@ -262,9 +262,9 @@
             "fr": "Français"
         },
         "menu": {
+            "account.login": "S'authentifier",
             "admin": {
                 "contact": "Contact",
-                "login": "S'authentifier",
                 "logout": "Déconnexion",
                 "logs": "Logs",
                 "main": "Administration",

@@ -535,6 +535,7 @@
             "style": "Styles",
             "map-composition": "Map Editor",
             "viewer": "Map Viewer",
+            "account.login": "Authenticate",
             "admin": {
                 "main": "Administration",
                 "users": "Users",
@@ -542,7 +543,6 @@
                 "contact": "Contact",
                 "metrics": "Metrics",
                 "logs": "Logs",
-                "login": "Authenticate",
                 "logout": "Log out"
             },
             "language": "Language"

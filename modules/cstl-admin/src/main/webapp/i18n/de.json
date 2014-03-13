@@ -4,6 +4,7 @@
         "browsehappy": "Sie benutzen einen <strong>veralteten</strong> Browser. Bitte <a href=\"http://browsehappy.com/\">aktualisieren Sie Ihren Browser</a>, um die Benutzerfreundlichkeit zu erhöhen.",
         "menu": {
             "home": "Startseite",
+            "account.login": "Anmelden",
             "admin": {
                 "main": "Administration",
                 "settings": "Einstellungen",
@@ -11,7 +12,6 @@
                 "sessions": "Sitzungen",
                 "metrics": "Metriken",
                 "logs": "Protokoll",
-                "login": "Anmelden",
                 "logout": "Abmelden"
             },
             "language": "Sprache"
