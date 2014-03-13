@@ -262,11 +262,11 @@
             "fr": "Français"
         },
         "menu": {
-            "account": {
+            "admin": {
                 "login": "S'authentifier",
                 "logout": "Déconnexion",
                 "logs": "Logs",
-                "main": "Compte",
+                "main": "Administration",
                 "metrics": "Métriques",
                 "password": "Mot de passe",
                 "sessions": "Sessions",

@@ -535,8 +535,8 @@
             "style": "Styles",
             "map-composition": "Map Editor",
             "viewer": "Map Viewer",
-            "account": {
-                "main": "Account",
+            "admin": {
+                "main": "Administration",
                 "users": "Users",
                 "password": "Password",
                 "contact": "Contact",
