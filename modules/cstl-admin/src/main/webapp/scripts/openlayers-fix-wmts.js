@@ -27,22 +27,22 @@
  * OpenLayers.Util.pagePosition is based on Yahoo's getXY method, which is
  * Copyright (c) 2006, Yahoo! Inc.
  * All rights reserved.
- * 
+ *
  * Redistribution and use of this software in source and binary forms, with or
  * without modification, are permitted provided that the following conditions
  * are met:
- * 
+ *
  * * Redistributions of source code must retain the above copyright notice,
  *   this list of conditions and the following disclaimer.
- * 
+ *
  * * Redistributions in binary form must reproduce the above copyright notice,
  *   this list of conditions and the following disclaimer in the documentation
  *   and/or other materials provided with the distribution.
- * 
+ *
  * * Neither the name of Yahoo! Inc. nor the names of its contributors may be
  *   used to endorse or promote products derived from this software without
  *   specific prior written permission of Yahoo! Inc.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -52,7 +52,7 @@
  * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
 var OpenLayers={VERSION_NUMBER:"Release 2.13.1",singleFile:!0,_getScriptLocation:function(){for(var a=/(^|(.*?\/))(OpenLayers[^\/]*?\.js)(\?|$)/,b=document.getElementsByTagName("script"),c,d="",e=0,f=b.length;e<f;e++)if(c=b[e].getAttribute("src"))if(c=c.match(a)){d=c[1];break}return function(){return d}}(),ImgPath:""};OpenLayers.Class=function(){var a=arguments.length,b=arguments[0],c=arguments[a-1],d="function"==typeof c.initialize?c.initialize:function(){b.prototype.initialize.apply(this,arguments)};1<a?(a=[d,b].concat(Array.prototype.slice.call(arguments).slice(1,a-1),c),OpenLayers.inherit.apply(null,a)):d.prototype=c;return d};
@@ -1073,7 +1073,7 @@ return a},invalidBounds:function(a){a||(a=this.getMapBounds());a=!this.bounds||!
 (this.layer.protocol.abort(this.response),this.layer.events.triggerEvent("loadend"));var b={filter:this.createFilter()};this.layer.events.triggerEvent("loadstart",b);this.response=this.layer.protocol.read(OpenLayers.Util.applyDefaults({filter:b.filter,callback:this.merge,scope:this},a))},createFilter:function(){var a=new OpenLayers.Filter.Spatial({type:OpenLayers.Filter.Spatial.BBOX,value:this.bounds,projection:this.layer.projection});this.layer.filter&&(a=new OpenLayers.Filter.Logical({type:OpenLayers.Filter.Logical.AND,
 filters:[this.layer.filter,a]}));return a},merge:function(a){this.layer.destroyFeatures();if(a.success()){var b=a.features;if(b&&0<b.length){var c=this.layer.projection,d=this.layer.map.getProjectionObject();if(!d.equals(c))for(var e,f=0,g=b.length;f<g;++f)(e=b[f].geometry)&&e.transform(c,d);this.layer.addFeatures(b)}}else this.bounds=null;this.response=null;this.layer.events.triggerEvent("loadend",{response:a})},CLASS_NAME:"OpenLayers.Strategy.BBOX"});OpenLayers.Layer.WorldWind=OpenLayers.Class(OpenLayers.Layer.Grid,{DEFAULT_PARAMS:{},isBaseLayer:!0,lzd:null,zoomLevels:null,initialize:function(a,b,c,d,e,f){this.lzd=c;this.zoomLevels=d;c=[];c.push(a,b,e,f);OpenLayers.Layer.Grid.prototype.initialize.apply(this,c);this.params=OpenLayers.Util.applyDefaults(this.params,this.DEFAULT_PARAMS)},getZoom:function(){var a=this.map.getZoom();this.map.getMaxExtent();return a-=Math.log(this.maxResolution/(this.lzd/512))/Math.log(2)},getURL:function(a){a=this.adjustBounds(a);
 var b=this.getZoom(),c=this.map.getMaxExtent(),d=this.lzd/Math.pow(2,this.getZoom()),e=Math.floor((a.left-c.left)/d);a=Math.floor((a.bottom-c.bottom)/d);return this.map.getResolution()<=this.lzd/512&&this.getZoom()<=this.zoomLevels?this.getFullRequestString({L:b,X:e,Y:a}):OpenLayers.Util.getImageLocation("blank.gif")},CLASS_NAME:"OpenLayers.Layer.WorldWind"});OpenLayers.Protocol.CSW=function(a){a=OpenLayers.Util.applyDefaults(a,OpenLayers.Protocol.CSW.DEFAULTS);var b=OpenLayers.Protocol.CSW["v"+a.version.replace(/\./g,"_")];if(!b)throw"Unsupported CSW version: "+a.version;return new b(a)};OpenLayers.Protocol.CSW.DEFAULTS={version:"2.0.2"};OpenLayers.Format.WMTSCapabilities=OpenLayers.Class(OpenLayers.Format.XML.VersionedOGC,{defaultVersion:"1.0.0",yx:{"urn:ogc:def:crs:EPSG::4326":!0},createLayer:function(a,b){if(!("layer"in b))throw Error("Missing property 'layer' in configuration.");for(var c=a.contents,d,e=0,f=c.layers.length;e<f;++e)if(c.layers[e].identifier===b.layer){d=c.layers[e];break}if(!d)throw Error("Layer not found");var g=b.format;!g&&(d.formats&&d.formats.length)&&(g=d.formats[0]);var h;b.matrixSet?h=c.tileMatrixSets[b.matrixSet]:
-1<=d.tileMatrixSetLinks.length&&(h=c.tileMatrixSets[d.tileMatrixSetLinks[0].tileMatrixSet]);if(!h)throw Error("matrixSet not found");for(var k,e=0,f=d.styles.length;e<f&&(k=d.styles[e],!k.isDefault);++e);c=b.requestEncoding;if(!c&&(c="KVP",a.operationsMetadata.GetTile.dcp.http)){var l=a.operationsMetadata.GetTile.dcp.http;l.get[0].constraints&&(l=l.get[0].constraints.GetEncoding.allowedValues,l.KVP||!l.REST&&!l.RESTful||(c="REST"))}var l=[],m=b.params||{};delete b.params;for(var n=0,p=d.dimensions.length;n<
+1<=d.tileMatrixSetLinks.length&&(h=c.tileMatrixSets[d.tileMatrixSetLinks[0].tileMatrixSet]);if(!h)throw Error("matrixSet not found");var k=b.style;if(!k){for(var e=0,f=d.styles.length;e<f&&(k=d.styles[e],!k.isDefault);++e);}c=b.requestEncoding;if(!c&&(c="KVP",a.operationsMetadata.GetTile.dcp.http)){var l=a.operationsMetadata.GetTile.dcp.http;l.get[0].constraints&&(l=l.get[0].constraints.GetEncoding.allowedValues,l.KVP||!l.REST&&!l.RESTful||(c="REST"))}var l=[],m=b.params||{};delete b.params;for(var n=0,p=d.dimensions.length;n<
 p;n++){var q=d.dimensions[n];l.push(q.identifier);m.hasOwnProperty(q.identifier)||(m[q.identifier]=q["default"])}var n=b.projection||h.supportedCRS.replace(/urn:ogc:def:crs:(\w+):(.*:)?(\w+)$/,"$1:$3"),p=b.units||("EPSG:4326"===n?"degrees":"m"),q=[],r;for(r in h.matrixIds)h.matrixIds.hasOwnProperty(r)&&q.push(2.8E-4*h.matrixIds[r].scaleDenominator/OpenLayers.METERS_PER_INCH/OpenLayers.INCHES_PER_UNIT[p]);if("REST"===c&&d.resourceUrls){r=[];for(var f=0,s=d.resourceUrls.length;f<s;++f)e=d.resourceUrls[f],
 e.format===g&&"tile"===e.resourceType&&r.push(e.template)}else{s=a.operationsMetadata.GetTile.dcp.http.get;r=[];for(var t,e=0,f=s.length;e<f;e++)t=s[e].constraints,(!t||t&&t.GetEncoding.allowedValues[c])&&r.push(s[e].url)}return new OpenLayers.Layer.WMTS(OpenLayers.Util.applyDefaults(b,{url:r,requestEncoding:c,name:d.title,style:k.identifier,format:g,matrixIds:h.matrixIds,matrixSet:h.identifier,projection:n,units:p,resolutions:!1===b.isBaseLayer?void 0:q,serverResolutions:q,tileFullExtent:h.bounds,
 dimensions:l,params:m}))},CLASS_NAME:"OpenLayers.Format.WMTSCapabilities"});OpenLayers.Layer.Google.v3={DEFAULTS:{sphericalMercator:!0,projection:"EPSG:900913"},animationEnabled:!0,loadMapObject:function(){this.type||(this.type=google.maps.MapTypeId.ROADMAP);var a,b=OpenLayers.Layer.Google.cache[this.map.id];b?(a=b.mapObject,++b.count):(a=this.map.getCenter(),b=document.createElement("div"),b.className="olForeignContainer",b.style.width="100%",b.style.height="100%",a=new google.maps.Map(b,{center:a?new google.maps.LatLng(a.lat,a.lon):new google.maps.LatLng(0,0),zoom:this.map.getZoom()||
@@ -1114,23 +1114,23 @@ a.DistributedSearch||this.DistributedSearch,b);var c=a.ResponseHandler||this.Res
 (a={});var b=this.createElementNSPlus("csw:Query",{attributes:{typeNames:a.typeNames||"csw:Record"}}),c=a.ElementName;if(OpenLayers.Util.isArray(c)&&0<c.length)for(var d=0,e=c.length;d<e;d++)this.writeNode("csw:ElementName",c[d],b);else this.writeNode("csw:ElementSetName",a.ElementSetName||{value:"summary"},b);a.Constraint&&this.writeNode("csw:Constraint",a.Constraint,b);a.SortBy&&this.writeNode("ogc:SortBy",a.SortBy,b);return b},ElementName:function(a){return this.createElementNSPlus("csw:ElementName",
 {value:a.value})},ElementSetName:function(a){return this.createElementNSPlus("csw:ElementSetName",{attributes:{typeNames:a.typeNames},value:a.value})},Constraint:function(a){var b=this.createElementNSPlus("csw:Constraint",{attributes:{version:a.version}});if(a.Filter){var c=new OpenLayers.Format.Filter({version:a.version});b.appendChild(c.write(a.Filter))}else a.CqlText&&(a=this.createElementNSPlus("CqlText",{value:a.CqlText.value}),b.appendChild(a));return b}},ogc:OpenLayers.Format.Filter.v1_1_0.prototype.writers.ogc},
 CLASS_NAME:"OpenLayers.Format.CSWGetRecords.v2_0_2"});/*
- Apache 2 
+ Apache 2
 
  Contains portions of Rico <http://openrico.org/>
 
- Copyright 2005 Sabre Airline Solutions  
+ Copyright 2005 Sabre Airline Solutions
 
  Licensed under the Apache License, Version 2.0 (the "License"); you
  may not use this file except in compliance with the License. You
  may obtain a copy of the License at
 
-     http://www.apache.org/licenses/LICENSE-2.0  
+     http://www.apache.org/licenses/LICENSE-2.0
 
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
  implied. See the License for the specific language governing
- permissions and limitations under the License. 
+ permissions and limitations under the License.
 */
 OpenLayers.Marker.Box=OpenLayers.Class(OpenLayers.Marker,{bounds:null,div:null,initialize:function(a,b,c){this.bounds=a;this.div=OpenLayers.Util.createDiv();this.div.style.overflow="hidden";this.events=new OpenLayers.Events(this,this.div);this.setBorder(b,c)},destroy:function(){this.div=this.bounds=null;OpenLayers.Marker.prototype.destroy.apply(this,arguments)},setBorder:function(a,b){a||(a="red");b||(b=2);this.div.style.border=b+"px solid "+a},draw:function(a,b){OpenLayers.Util.modifyDOMElement(this.div,
 null,a,b);return this.div},onScreen:function(){var a=!1;this.map&&(a=this.map.getExtent().containsBounds(this.bounds,!0,!0));return a},display:function(a){this.div.style.display=a?"":"none"},CLASS_NAME:"OpenLayers.Marker.Box"});OpenLayers.Format.Text=OpenLayers.Class(OpenLayers.Format,{defaultStyle:null,extractStyles:!0,initialize:function(a){a=a||{};!1!==a.extractStyles&&(a.defaultStyle={externalGraphic:OpenLayers.Util.getImageLocation("marker.png"),graphicWidth:21,graphicHeight:25,graphicXOffset:-10.5,graphicYOffset:-12.5});OpenLayers.Format.prototype.initialize.apply(this,[a])},read:function(a){a=a.split("\n");for(var b,c=[],d=0;d<a.length-1;d++){var e=a[d].replace(/^\s*/,"").replace(/\s*$/,"");if("#"!=e.charAt(0))if(b){for(var e=

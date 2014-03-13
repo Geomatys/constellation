@@ -86,7 +86,7 @@ cstlAdminApp.factory('webService', ['$resource',
                                              'updateMd':     {method: 'POST', url: cstlContext+'api/1/OGC/:type/:id/metadata;jsessionid='},
                                              'config':       {method: 'GET', url: cstlContext+'api/1/OGC/:type/:id/config;jsessionid='},
                                              'logs':         {method: 'GET', url: cstlContext+'api/1/log/:type/:id;jsessionid='},
-                                             'capabilities': {method: 'GET', url: cstlContext+'WS/:type/:id;jsessionid=?REQUEST=GetCapabilities&SERVICE=:type&VERSION=:version'},
+                                             'capabilities': {method: 'GET', url: cstlContext+'WS/:type/:id;jsessionid=?REQUEST=GetCapabilities&SERVICE=:typeUpper&VERSION=:version'},
                                              'layers' :      {method: 'GET', url: cstlContext+'api/1/MAP/:type/:id/layersummary/all;jsessionid=', isArray: true},
                                              'addLayer':     {method: 'PUT', url: cstlContext+'api/1/MAP/:type/:id/layer;jsessionid='},
                                              'deleteLayer':  {method: 'DELETE', url: cstlContext+'api/1/MAP/:type/:id/:layerid;jsessionid='}

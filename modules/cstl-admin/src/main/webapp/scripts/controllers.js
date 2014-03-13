@@ -990,7 +990,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
     $scope.type = $routeParams.type;
     $scope.url = cstlContext + "WS/" + $routeParams.type + "/" + $routeParams.id;
     $scope.urlBoxSize = Math.min($scope.url.length,100);
-    
+
     var client = new ZeroClipboard( document.getElementById("copy-button") );
 
   	client.on( "load", function(client) {
@@ -1000,7 +1000,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
   		$growl('success','Success',"Copied text to clipboard: " + args.text );
   	  } );
   	} );
-    
+
     $scope.service = webService.get({type: $scope.type, id:$routeParams.id});
 
     $scope.metadata = webService.metadata({type: $scope.type, id:$routeParams.id});
@@ -1205,13 +1205,31 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
      $scope.showLayer = function() {
          $('#viewerData').modal("show");
          var layerName = $scope.selected.Name;
-         var providerId = $scope.selected.Provider;
-         var layerData = ($scope.service.type === 'WMS') ?
-             DataViewer.createLayerWMS(layerName, $scope.service.identifier) :
-             DataViewer.createLayer(layerName, providerId);
-         var layerBackground = DataViewer.createLayer("CNTR_BN_60M_2006", "generic_shp");
-         DataViewer.layers = [layerData, layerBackground];
-         DataViewer.initMap('dataMap');
+         var layerData;
+         if ($scope.service.type === 'WMTS') {
+             // GetCaps
+             textService.capa($scope.service.type.toLowerCase(), $scope.service.identifier, $scope.service.versions[0])
+                 .success(function (data, status, headers, config) {
+                     // Build map
+                     var extent = "-5.740083333333334, 47.96008333333334, -4.332083333333334, 48.60008333333334";
+                     var OLExtent = new OpenLayers.Bounds.fromString(extent, false);
+                     WmtsViewer.initMap('dataMap', 7, OLExtent);
+                     layerData = WmtsViewer.createLayer(layerName, $scope.service.identifier, data);
+                     WmtsViewer.map.addLayer(layerData);
+                     WmtsViewer.map.zoomToExtent(OLExtent, true);
+                 });
+         } else {
+             if ($scope.service.type === 'WMS') {
+                 layerData = DataViewer.createLayerWMS(layerName, $scope.service.identifier);
+             } else {
+                 var providerId = $scope.selected.Provider;
+                 layerData = DataViewer.createLayer(layerName, providerId);
+             }
+
+             var layerBackground = DataViewer.createLayer("CNTR_BN_60M_2006", "generic_shp")
+             DataViewer.layers = [layerData, layerBackground];
+             DataViewer.initMap('dataMap');
+         }
      };
 
      $scope.toggleUpDownSelected = function() {
