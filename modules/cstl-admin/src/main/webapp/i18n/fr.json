@@ -263,6 +263,7 @@
         },
         "menu": {
             "admin": {
+                "contact": "Contact",
                 "login": "S'authentifier",
                 "logout": "Déconnexion",
                 "logs": "Logs",
