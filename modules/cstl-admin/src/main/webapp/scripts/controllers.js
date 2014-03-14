@@ -262,12 +262,10 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
             DataViewer.initMap('dataMap');
 
             provider.metadata({providerId: providerId}, {}, function(response) {
-                alert(response.data);
+                alert(response);
                 // Success getting the metadata, try to find the data extent
-                DataViewer.map.zoomToExtent(extent, true);
-            }, function(response) {
-                alert(response.data);
-            });
+                //DataViewer.map.zoomToExtent(extent, true);
+            }, function() { $growl('error','Error','Unable to get metadata for '+ layerName); });
         };
 
         $scope.deleteData = function() {
@@ -750,7 +748,7 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','data
         };
 
         $scope.addTag = function() {
-            if ($scope.tagText.length == 0) {
+            if (!$scope.tagText || $scope.tagText == '' || $scope.tagText.length == 0) {
                 return;
             }
 
@@ -981,7 +979,7 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
         };
 
         $scope.addTag = function() {
-            if ($scope.tagText.length == 0) {
+            if (!$scope.tagText || $scope.tagText == '' || $scope.tagText.length == 0) {
                 return;
             }
 
@@ -1091,7 +1089,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
     };
 
      $scope.addTag = function() {
-         if ($scope.tagText.length == 0) {
+         if (!$scope.tagText || $scope.tagText == '' || $scope.tagText.length == 0) {
              return;
          }
          if ($scope.metadata.keywords ==null){
