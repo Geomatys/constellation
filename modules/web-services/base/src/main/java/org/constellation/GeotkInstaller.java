@@ -31,9 +31,9 @@ import org.apache.sis.util.logging.Logging;
  *
  * @author Johann Sorel (Geomatys)
  */
-public final class Installer implements ServletContextListener{
+public final class GeotkInstaller implements ServletContextListener{
 
-    private static final Logger LOGGER = Logging.getLogger(Installer.class);
+    private static final Logger LOGGER = Logging.getLogger(GeotkInstaller.class);
 
     @Override
     public synchronized void contextInitialized(ServletContextEvent sce) {

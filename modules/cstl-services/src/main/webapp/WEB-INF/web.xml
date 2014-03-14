@@ -4,6 +4,11 @@
   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
   <display-name>constellation</display-name>
+    <!-- Constellation initialisation, plus copy possible file-system configuration
+      to database. -->
+    <listener>
+        <listener-class>org.constellation.GeotkInstaller</listener-class>
+    </listener>
 
   <listener>
     <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
@@ -17,16 +22,24 @@
       org.springframework.security.web.session.HttpSessionEventPublisher
     </listener-class>
   </listener>
+
   <!-- Constellation initialisation, plus copy possible file-system configuration 
     to database. -->
   <listener>
-    <listener-class>org.constellation.setup.Installer</listener-class>
+    <listener-class>org.constellation.setup.CstlInstaller</listener-class>
   </listener>
+
+    <listener>
+        <listener-class>org.constellation.management.SetupMBean</listener-class>
+    </listener>
 
   <listener>
     <listener-class>org.constellation.map.setup.MapSetup</listener-class>
   </listener>
 
+    <listener>
+        <listener-class>org.constellation.scheduler.CstlSchedulerSetup</listener-class>
+    </listener>
 
   <context-param>
     <param-name>contextConfigLocation</param-name>

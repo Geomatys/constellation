@@ -76,9 +76,6 @@ public class MapSetup implements ServletContextListener {
             LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
         }
 
-        ImageIO.scanForPlugins();
-        Setup.initialize(null);
-
         initializeDefaultStyles();
 
         initializeDefaultVectorData();

@@ -20,22 +20,22 @@ import java.util.Properties;
 
 import org.geotoolkit.internal.SetupService;
 
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class CstlSchedulerSetup implements SetupService {
-    
+public class CstlSchedulerSetup implements ServletContextListener {
+
     @Override
-    public void initialize(Properties properties, boolean reinit) {
+    public void contextInitialized(ServletContextEvent servletContextEvent) {
         CstlScheduler.getInstance();
     }
 
-    /**
-     * Invoked when the module needs to be shutdown.
-     */
     @Override
-    public void shutdown() {
+    public void contextDestroyed(ServletContextEvent servletContextEvent) {
         CstlScheduler.getInstance().stop();
     }
 }

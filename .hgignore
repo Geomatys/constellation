@@ -2,6 +2,11 @@
 # works better than glob with NetBeans.
 syntax: regexp
 
+# Files created for tests
+\.dat$
+\.lck$
+\.ctrl$
+
 \.svn$
 \.project$
 \.classpath$
@@ -21,3 +26,5 @@ syntax: glob
 modules/cstl-admin/node_modules
 modules/cstl-admin/src/main/webapp/dist
 modules/cstl-admin/.tmp
+
+

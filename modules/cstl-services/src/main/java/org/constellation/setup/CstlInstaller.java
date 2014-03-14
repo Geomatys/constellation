@@ -2,8 +2,9 @@ package org.constellation.setup;
 
 
 import java.util.EnumSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import javax.imageio.ImageIO;
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
@@ -11,14 +12,11 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletRegistration;
 
+import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.SecurityManagerAdapter;
 import org.constellation.configuration.ws.rs.ConfigurationUtilities;
 import org.geotoolkit.factory.Hints;
-import org.geotoolkit.internal.io.Installation;
-import org.geotoolkit.lang.Setup;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -35,9 +33,9 @@ import com.codahale.metrics.servlets.MetricsServlet;
  *
  * @author Alexis Manin (Geomatys)
  */
-public class Installer implements ServletContextListener {
+public class CstlInstaller implements ServletContextListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Installer.class);
+    private static final Logger LOGGER = Logging.getLogger(CstlInstaller.class);
 
     
     public static final MetricRegistry METRIC_REGISTRY = new MetricRegistry();
@@ -49,7 +47,7 @@ public class Installer implements ServletContextListener {
     public void contextInitialized(ServletContextEvent servletContextEvent) {
             Hints.putSystemDefault(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
 
-        LOGGER.info( "=== Starting GeotoolKit ===");
+        LOGGER.log(Level.INFO, "=== Configuring Constellation ===");
 
         try {
             ConfigurationEngine.setSecurityManager(new SecurityManagerAdapter() {
@@ -59,32 +57,16 @@ public class Installer implements ServletContextListener {
                 }
             });
 
-            Hints.putSystemDefault(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
-
-            //Initialize geotoolkit
-            Installation.allowSystemPreferences = false;
-            ImageIO.scanForPlugins();
-            Setup.initialize(null);
-
-            try {
-                Class.forName("javax.media.jai.JAI");
-            } catch (ClassNotFoundException ex) {
-                LOGGER.error("JAI libraries are not in the classpath. Please install it.\n "
-                        + ex.getLocalizedMessage(), ex);
-            }
-            LOGGER.info( "=== GeotoolKit successfully started ===");
-        } catch(Exception ex) {
-            LOGGER.info("=== GeotoolKit failed to start ===\n"+ex.getLocalizedMessage(), ex);
-        }
-
-        try {
             ConfigurationUtilities.FileToDBConfig(null);
+
         } catch (Exception e) {
             LOGGER.info( "Failed to copy file-system configuration. "+e.getLocalizedMessage());
         }
         EnumSet<DispatcherType> disps = EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD, DispatcherType.ASYNC);
 
         initMetrics(servletContextEvent.getServletContext(), disps);
+
+        LOGGER.log(Level.INFO, "=== Configuration ended ===");
     }
 
     
@@ -92,7 +74,7 @@ public class Installer implements ServletContextListener {
      * Initializes Metrics.
      */
     private void initMetrics(ServletContext servletContext, EnumSet<DispatcherType> disps) {
-    	LOGGER.debug("Initializing Metrics registries");
+    	LOGGER.log(Level.FINE, "Initializing Metrics registries");
         servletContext.setAttribute(InstrumentedFilter.REGISTRY_ATTRIBUTE,
                 METRIC_REGISTRY);
         servletContext.setAttribute(MetricsServlet.METRICS_REGISTRY,
@@ -100,14 +82,14 @@ public class Installer implements ServletContextListener {
         servletContext.setAttribute(HealthCheckServlet.HEALTH_CHECK_REGISTRY,
                 HEALTH_CHECK_REGISTRY);
 
-        LOGGER.debug("Registering Metrics Filter");
+        LOGGER.log(Level.FINE, "Registering Metrics Filter");
         FilterRegistration.Dynamic metricsFilter = servletContext.addFilter("webappMetricsFilter",
                 new InstrumentedFilter());
 
         metricsFilter.addMappingForUrlPatterns(disps, true, "/*");
         metricsFilter.setAsyncSupported(true);
 
-        LOGGER.debug("Registering Metrics Admin Servlet");
+        LOGGER.log(Level.FINE, "Registering Metrics Admin Servlet");
         ServletRegistration.Dynamic metricsAdminServlet =
                 servletContext.addServlet("metricsAdminServlet", new AdminServlet());
 
@@ -121,13 +103,6 @@ public class Installer implements ServletContextListener {
         WebApplicationContext ac = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContextEvent.getServletContext());
         ConfigurableApplicationContext gwac = (ConfigurableApplicationContext) ac;
         gwac.close();
-        LOGGER.debug("Web application destroyed");
-        LOGGER.info( "=== Stopping GeotoolKit ===");
-        try{
-            Setup.shutdown();
-            LOGGER.info("=== GeotoolKit successfully stopped ===");
-        }catch(Exception ex){
-            LOGGER.error("=== GeotoolKit failed to stop ===\n"+ex.getLocalizedMessage(), ex);
-        }
+        LOGGER.log(Level.FINE, "Web application destroyed");
     }
 }

@@ -29,6 +29,8 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 
 import org.geotoolkit.internal.SetupService;
 import org.apache.sis.util.logging.Logging;
@@ -38,13 +40,13 @@ import org.apache.sis.util.logging.Logging;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class SetupMBean implements SetupService{
+public class SetupMBean implements ServletContextListener {
 
     private static final Logger LOGGER = Logging.getLogger(SetupMBean.class);
     private static final AtomicBoolean REGISTERED = new AtomicBoolean(false);
 
     @Override
-    public synchronized void initialize(Properties properties, boolean reinit) {
+    public void contextInitialized(ServletContextEvent servletContextEvent) {
         if(REGISTERED.get()) return;
 
         final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
@@ -69,7 +71,7 @@ public class SetupMBean implements SetupService{
     }
 
     @Override
-    public synchronized void shutdown() {
+    public void contextDestroyed(ServletContextEvent servletContextEvent) {
         if(!REGISTERED.get()) return;
 
         final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
@@ -89,5 +91,4 @@ public class SetupMBean implements SetupService{
         //the container has been reconfigured and restarted.
         REGISTERED.set(false);
     }
-
 }

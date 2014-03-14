@@ -1,7 +1,7 @@
 package org.constellation.conf;
 
-import static org.constellation.setup.Installer.HEALTH_CHECK_REGISTRY;
-import static org.constellation.setup.Installer.METRIC_REGISTRY;
+import static org.constellation.setup.CstlInstaller.HEALTH_CHECK_REGISTRY;
+import static org.constellation.setup.CstlInstaller.METRIC_REGISTRY;
 
 import java.lang.management.ManagementFactory;
 import java.net.InetSocketAddress;
