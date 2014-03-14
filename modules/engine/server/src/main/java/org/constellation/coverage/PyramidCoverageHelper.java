@@ -9,7 +9,7 @@ import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.coverage.CoverageStoreFinder;
 import org.geotoolkit.coverage.PyramidCoverageBuilder;
 import org.geotoolkit.coverage.filestore.FileCoverageStoreFactory;
-import org.geotoolkit.coverage.filestore.XMLCoverageStoreFactory;
+import org.geotoolkit.coverage.xmlstore.XMLCoverageStoreFactory;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.grid.GridGeometry2D;
 import org.geotoolkit.coverage.io.GridCoverageReader;
