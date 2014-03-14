@@ -242,8 +242,8 @@ cstlAdminApp.controller('LogsController', ['$scope', 'resolvedLogs', 'LogsServic
         };
     }]);
 
-cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 'dataListing', 'style', '$modal', '$growl', 'StyleSharedService',
-    function ($scope, $location, $dashboard, dataListing, style, $modal, $growl, StyleSharedService) {
+cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 'dataListing', 'provider', 'style', '$modal', '$growl', 'StyleSharedService',
+    function ($scope, $location, $dashboard, dataListing, provider, style, $modal, $growl, StyleSharedService) {
 
         $scope.filtertype = "VECTOR";
 
@@ -260,6 +260,14 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
             var layerBackground = DataViewer.createLayer("CNTR_BN_60M_2006", "generic_shp");
             DataViewer.layers = [layerData, layerBackground];
             DataViewer.initMap('dataMap');
+
+            provider.metadata({providerId: providerId}, {}, function(response) {
+                alert(response.data);
+                // Success getting the metadata, try to find the data extent
+                DataViewer.map.zoomToExtent(extent, true);
+            }, function(response) {
+                alert(response.data);
+            });
         };
 
         $scope.deleteData = function() {
@@ -714,6 +722,9 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','data
         $scope.tabdesc = $scope.type==='vector' && !$scope.missing;
         $scope.tabimageinfo = $scope.type==='raster';
 
+        $scope.metadata = {};
+        $scope.metadata.keywords = [];
+
         $scope.selectTab = function(item) {
             if (item === 'tabiso') {
                 $scope.tabiso = true;
@@ -738,12 +749,31 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','data
             }
         };
 
+        $scope.addTag = function() {
+            if ($scope.tagText.length == 0) {
+                return;
+            }
+
+            $scope.metadata.keywords.push($scope.tagText);
+            $scope.tagText = '';
+        };
+
+        $scope.deleteTag = function(key) {
+            if ($scope.metadata.keywords.length > 0 &&
+                $scope.tagText.length == 0 &&
+                key === undefined) {
+                $scope.metadata.keywords.pop();
+            } else if (key != undefined) {
+                $scope.metadata.keywords.splice(key, 1);
+            }
+        };
+
         $scope.save = function() {
-            dataListing.setMetadata({},
-                {dataName:$scope.provider, dataPath:$uploadFiles.files.file, anAbstract:$scope.mdabstract, title:$scope.mdtitle, keywords:$scope.mdkeywords,
-                 username:$scope.mdusername, organisationName:$scope.mdorganisationName, role:$scope.mdrole, localeMetadata:$scope.mdlocaleData,
-                 topicCategory:$scope.mdtopicCategory, date:$scope.mddate,dateType:$scope.mddateType,type:$scope.type
-                },
+            $scope.metadata.dataName = $scope.provider;
+            $scope.metadata.dataPath = $uploadFiles.files.file;
+            $scope.metadata.type = $scope.type;
+
+            dataListing.setMetadata({}, $scope.metadata,
                 function() {
                     $location.path('/data');
                 }
@@ -756,10 +786,13 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','data
 
         $scope.createMetadataTree = function(parentDivId, isCoverageMetadata){
             var upFile = $uploadFiles.files.file;
-            upFile = upFile.substring(upFile.lastIndexOf("/")+1);
-            var upMdFile = $uploadFiles.files.mdFile;
-            if (upMdFile != null) {
-                upMdFile = upMdFile.substring(upMdFile.lastIndexOf("/")+1);
+            var upMdFile;
+            if (upFile) {
+                upFile = upFile.substring(upFile.lastIndexOf("/")+1);
+                upMdFile = $uploadFiles.files.mdFile;
+                if (upMdFile != null) {
+                    upMdFile = upMdFile.substring(upMdFile.lastIndexOf("/")+1);
+                }
             }
             dataListing.loadData({}, {values: {'filePath': upFile, 'metadataFilePath': upMdFile, dataType: $scope.type}}, function(response) {
                 if (isCoverageMetadata) {
@@ -979,15 +1012,6 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
         // define which version is Selected
         $scope.versionIsSelected = function(currentVersion){
             return $.inArray(currentVersion, $scope.metadata.versions) > -1
-        };
-
-        $scope.addTag = function() {
-            if ($scope.tagText.length == 0) {
-                return;
-            }
-
-            $scope.metadata.keywords.push($scope.tagText);
-            $scope.tagText = '';
         };
 
         $scope.saveServiceMetadata = function() {

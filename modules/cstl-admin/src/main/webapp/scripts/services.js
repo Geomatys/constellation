@@ -136,8 +136,9 @@ cstlAdminApp.factory('style', ['$resource',
 cstlAdminApp.factory('provider', ['$resource',
     function ($resource) {
         return $resource(cstlContext+'api/1/provider', {}, {
-            'create': {method: 'PUT', url: cstlContext+'api/1/provider/:id;jsessionid='},
-            'delete': {method: 'DELETE', url: cstlContext+'api/1/provider/:id;jsessionid='}
+            'create':   {method: 'PUT', url: cstlContext+'api/1/provider/:id;jsessionid='},
+            'delete':   {method: 'DELETE', url: cstlContext+'api/1/provider/:id;jsessionid='},
+            'metadata': {method: 'GET', url: cstlContext+'api/1/provider/metadata/:providerId;jsessionid='}
         });
     }]);
 

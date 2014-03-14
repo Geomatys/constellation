@@ -322,6 +322,7 @@ public class Data {
 
 
         //Save metadata
+        dm.prune();
         ConfigurationEngine.saveMetaData(dm, metadataToSave.getDataName(), CSWMarshallerPool.getInstance());
         return Response.status(200).build();
     }

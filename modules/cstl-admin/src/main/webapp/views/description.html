@@ -36,33 +36,40 @@
                         <div class="col-sm-6">
                             <div class="form-group">
                                 <div class="control-label" for="title" translate="md.iso.title">Title</div>
-                                <input type="text" class="form-control" ng-model="mdtitle" id="title" required/>
+                                <input type="text" class="form-control" ng-model="metadata.title" id="title" required/>
                             </div>
 
                             <div class="form-group">
                                 <div class="control-label" for="abstract" translate="md.iso.abstract">Abstract</div>
-                                <textarea class="form-control" ng-model="mdabstract" id="abstract" rows="5" required></textarea>
+                                <textarea class="form-control" ng-model="metadata.anAbstract" id="abstract" rows="5" required></textarea>
                             </div>
 
                             <div class="form-group">
                                 <div class="control-label" for="keywords" translate="md.iso.keywords">Keywords</div>
-                                <input type="text" class="form-control" ng-model="mdkeywords" id="keywords" />
+                                <div class="tag-input-ctn">
+                                    <div data-ng-repeat="(key, tag) in metadata.keywords" class="input-tag">
+                                        {{ tag }}
+                                        <div class="delete-tag" data-ng-click="deleteTag(key)">&times;</div>
+                                    </div>
+                                    <input type="text" data-tag-input="" data-ng-model="tagText" data-new-tag="addTag()" data-delete-tag="deleteTag()">
+                                </div>
+                                <!--input type="text" class="form-control" ng-model="mdkeywords" id="keywords" /-->
                             </div>
 
                             <div class="form-group">
                                 <div class="control-label" for="username" translate="md.iso.username">User name</div>
-                                <input type="text" class="form-control" ng-model="mdusername" id="username" required
+                                <input type="text" class="form-control" ng-model="metadata.username" id="username" required
                                            data-validation-matches-message="what?" aria-invalid="false"/>
                             </div>
 
                             <div class="form-group">
                                 <div class="control-label" for="organisationName" translate="md.iso.organization">Organization</div>
-                                <input type="text" class="form-control" ng-model="mdorganisationName" id="organisationName" required/>
+                                <input type="text" class="form-control" ng-model="metadata.organisationName" id="organisationName" required/>
                             </div>
 
                             <div class="form-group">
                                 <div class="control-label" for="roleCode" translate="md.iso.role">Role</div>
-                                <select ng-model="mdrole" class="form-control" id="roleCode" required>
+                                <select ng-model="metadata.role" class="form-control" id="roleCode" required>
                                     <option ng-repeat="role in codeLists.roles" value="{{role}}">{{role}}</option>
                                 </select>
                             </div>
@@ -72,26 +79,26 @@
                         <div class="col-sm-6">
                             <div class="form-group">
                                 <div class="control-label" for="topicCategory" translate="md.iso.topic.category">Topic category</div>
-                                <select ng-model="mdtopicCategory" class="form-control" id="topicCategory" required>
+                                <select ng-model="metadata.topicCategory" class="form-control" id="topicCategory" required>
                                     <option ng-repeat="topic in codeLists.categories" value="{{topic}}">{{topic}}</option>
                                 </select>
                             </div>
 
                             <div class="form-group">
                                 <div class="control-label" for="date" translate="md.iso.data.date">Data date</div>
-                                <input type="text" class="form-control" ng-model="mddate" id="date" datepicker="{language:getCurrentLang()}" required/>
+                                <input type="text" class="form-control" ng-model="metadata.date" id="date" datepicker="{language:getCurrentLang(),format:'yyyy-mm-dd'}" required/>
                             </div>
 
                             <div class="form-group">
                                 <div class="control-label" for="dateType" translate="md.iso.date.type">Date type</div>
-                                <select ng-model="mddateType" class="form-control" id="dateType" required>
+                                <select ng-model="metadata.dateType" class="form-control" id="dateType" required>
                                     <option ng-repeat="dateType in codeLists.dateTypes" value="{{dateType}}">{{dateType}}</option>
                                 </select>
                             </div>
 
                             <div class="form-group">
                                 <div class="control-label" for="localeData" translate="md.iso.locale.data">Locale data</div>
-                                <select ng-model="mdlocaleData" class="form-control" id="localeData" required>
+                                <select ng-model="metadata.localeData" class="form-control" id="localeData" required>
                                     <option ng-repeat="lang in codeLists.locales" value="{{lang}}">{{lang}}</option>
                                 </select>
                             </div>
