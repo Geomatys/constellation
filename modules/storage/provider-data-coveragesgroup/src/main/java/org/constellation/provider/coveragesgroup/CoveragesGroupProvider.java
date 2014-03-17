@@ -23,6 +23,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
 import java.util.logging.Level;
+import org.apache.sis.storage.DataStore;
 
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.ParameterValue;
@@ -56,6 +57,11 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
     public CoveragesGroupProvider(final ProviderService service, final ParameterValueGroup param) {
         super(service,param);
         this.visited = false;
+    }
+
+    @Override
+    public DataStore getMainStore() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     /**

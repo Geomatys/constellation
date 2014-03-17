@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2010, Geomatys
+ *    (C) 2007 - 2014, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -29,17 +29,13 @@ import org.constellation.ServiceDef;
 
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.display.PortrayalException;
-import org.geotoolkit.factory.FactoryFinder;
-import org.geotoolkit.factory.Hints;
 import org.geotoolkit.display2d.ext.legend.LegendTemplate;
 import org.geotoolkit.map.MapItem;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.style.MutableStyle;
-import org.geotoolkit.style.MutableStyleFactory;
 import org.geotoolkit.util.DateRange;
 import org.opengis.feature.type.Name;
 
-import org.opengis.filter.FilterFactory2;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.style.Style;

@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2012, Geomatys
+ *    (C) 2012-2014, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -35,7 +35,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.sis.storage.DataStore;
 import org.constellation.admin.dao.DataRecord.DataType;
 
 /**
@@ -52,6 +52,11 @@ public class CoverageStoreProvider extends AbstractLayerProvider{
         visit();
     }
 
+    @Override
+    public DataStore getMainStore() {
+        return store;
+    }
+    
     @Override
     public synchronized void reload() {
         dispose();

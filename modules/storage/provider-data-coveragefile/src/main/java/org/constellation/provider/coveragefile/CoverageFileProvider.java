@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+import org.apache.sis.storage.DataStore;
 import org.constellation.admin.dao.DataRecord;
 
 import static org.constellation.provider.configuration.ProviderParameters.LAYER_ELEVATION_MODEL_DESCRIPTOR;
@@ -120,6 +121,10 @@ public class CoverageFileProvider extends AbstractLayerProvider{
         return null;
     }
 
+    @Override
+    public DataStore getMainStore() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 
     /**
      * {@inheritDoc }

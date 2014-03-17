@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2011, Geomatys
+ *    (C) 2011-2014, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,6 @@ import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.admin.dao.DataRecord.DataType;
 
@@ -40,7 +39,6 @@ import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.memory.ExtendedFeatureStore;
 import org.geotoolkit.data.memory.MemoryFeatureStore;
 import static org.geotoolkit.parameter.Parameters.*;
-import org.opengis.parameter.ParameterValue;
 
 /**
  * Abstract provider which handle a Datastore.
@@ -64,7 +62,8 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
     /**
      * @return the datastore this provider encapsulate.
      */
-    public ExtendedFeatureStore getDataStore(){
+    @Override
+    public ExtendedFeatureStore getMainStore(){
         return store;
     }
 

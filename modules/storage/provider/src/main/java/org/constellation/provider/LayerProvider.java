@@ -20,6 +20,7 @@ import org.geotoolkit.map.ElevationModel;
 import org.opengis.feature.type.Name;
 
 import java.util.Date;
+import org.apache.sis.storage.DataStore;
 
 /**
  *
@@ -29,6 +30,12 @@ import java.util.Date;
  */
 public interface LayerProvider extends Provider<Name,LayerDetails>{
 
+    /**
+     * Original data store.
+     * @return 
+     */
+    DataStore getMainStore();
+    
     ElevationModel getElevationModel(Name name);
 
     /**

@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+import org.apache.sis.storage.DataStore;
 import org.constellation.admin.dao.DataRecord.DataType;
 
 import static org.constellation.provider.configuration.ProviderParameters.LAYER_ELEVATION_MODEL_DESCRIPTOR;
@@ -96,6 +97,11 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
             return groups.get(0);
         }
         return null;
+    }
+
+    @Override
+    public DataStore getMainStore() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     /**

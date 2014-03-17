@@ -36,6 +36,7 @@ import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.sis.storage.DataStore;
 import org.constellation.admin.dao.DataRecord;
 
 import static org.constellation.provider.configuration.ProviderParameters.LAYER_ELEVATION_MODEL_DESCRIPTOR;
@@ -67,6 +68,11 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
 
     private ParameterValueGroup getSourceConfiguration(){
         return ProviderParameters.getSourceConfiguration(getSource(), COVERAGESQL_DESCRIPTOR);
+    }
+
+    @Override
+    public DataStore getMainStore() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     /**

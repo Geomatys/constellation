@@ -19,6 +19,7 @@ package org.constellation.provider;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,10 +28,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.constellation.provider.configuration.Configurator;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.apache.sis.util.NullArgumentException;
+import org.apache.sis.util.logging.Logging;
+import static org.constellation.provider.Provider.RELOAD_TIME_PROPERTY;
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -41,16 +45,70 @@ import org.opengis.parameter.ParameterValueGroup;
  * @author Johann Sorel (Geomatys)
  */
 public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
-        extends ProviderService<K,V,P>> extends AbstractProvider<K, V> implements PropertyChangeListener{
+        extends ProviderService<K,V,P>> implements PropertyChangeListener{
 
+    protected static final Logger LOGGER = Logging.getLogger("org.constellation.provider");
+
+    private final PropertyChangeSupport listeners = new PropertyChangeSupport(this);
+    private long lastUpdateTime = System.currentTimeMillis();
+    protected final Class<K> keyClass;
+    protected final Class<V> valClass;
+    
     //all loaded providers
     private Collection<P> PROVIDERS = null;
     private Configurator configurator = Configurator.DEFAULT;
 
-    protected AbstractProviderProxy(){
-        super(null,null);
+    protected AbstractProviderProxy(Class<K> keyClass, Class<V> valClass){
+        this.keyClass = keyClass;
+        this.valClass = valClass;
     }
 
+    public static Logger getLogger() {
+        return LOGGER;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean contains(K key) {
+        return getKeys().contains(key);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void removeAll() {
+        for (K key : getKeys()) {
+            remove(key);
+        }
+    }
+
+    /**
+     * Empty implementation.
+     */
+    public void remove(K key) {
+    }
+
+    protected synchronized void fireUpdateEvent(){
+        final long oldTime = lastUpdateTime;
+        lastUpdateTime = System.currentTimeMillis();
+        listeners.firePropertyChange(RELOAD_TIME_PROPERTY, oldTime, lastUpdateTime);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void addPropertyListener(PropertyChangeListener listener) {
+        listeners.addPropertyChangeListener(listener);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void removePropertyListener(PropertyChangeListener listener) {
+        listeners.removePropertyChangeListener(listener);
+    }
+    
     @Override
     public void propertyChange(final PropertyChangeEvent evt) {
         //a provider has been updated
@@ -129,7 +187,6 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
     /**
      * {@inheritDoc }
      */
-    @Override
     public Set<K> getKeys() {
         return getKeys(null);
     }
@@ -137,7 +194,6 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
     /**
      * {@inheritDoc }
      */
-    @Override
     public Set<K> getKeys(final String sourceId) {
         final Set<K> keys = new HashSet<>();
         for(final Provider<K,V> provider : getProviders()){
@@ -150,7 +206,6 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
      * {@inheritDoc }
      * @deprecated use get(key, providerID) instead because two provider can have the same named layer
      */
-    @Override
     @Deprecated
     public V get(final K key) {
         final List<V> candidates = new ArrayList<>();
@@ -163,7 +218,7 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
         if(candidates.size() == 1){
             return candidates.get(0);
         }else if(candidates.size()>1){
-            if(LayerDetails.class.isAssignableFrom(getValueClass())){
+            if(LayerDetails.class.isAssignableFrom(valClass)){
                 //make a more accurate search testing both namespace and local part are the same.
                 final Name nk = (Name) key;
                 for(int i=0;i<candidates.size();i++){
@@ -262,7 +317,6 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
     /**
      * {@inheritDoc }
      */
-    @Override
     public synchronized void reload() {
         dispose();
         getProviders(); //will load providers
@@ -272,7 +326,6 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
     /**
      * {@inheritDoc }
      */
-    @Override
     public synchronized void dispose() {
         if(PROVIDERS == null){
             //services are not loaded

@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2010, Geomatys
+ *    (C) 2007 - 2014, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -21,8 +21,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.ServiceLoader;
-import org.constellation.admin.dao.DataRecord;
-import org.constellation.admin.dao.ProviderRecord.ProviderType;
 
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
@@ -39,7 +37,7 @@ import org.opengis.filter.FilterFactory2;
  * @author Johann Sorel (Geomatys)
  */
 public final class StyleProviderProxy extends AbstractProviderProxy
-        <String,MutableStyle,StyleProvider,StyleProviderService> implements StyleProvider{
+        <String,MutableStyle,StyleProvider,StyleProviderService> {
 
     public static final MutableStyleFactory STYLE_FACTORY = (MutableStyleFactory)
             FactoryFinder.getStyleFactory(new Hints(Hints.STYLE_FACTORY, MutableStyleFactory.class));
@@ -48,7 +46,7 @@ public final class StyleProviderProxy extends AbstractProviderProxy
 
     private static final Collection<StyleProviderService> SERVICES;
     static {
-        final List<StyleProviderService> cache = new ArrayList<StyleProviderService>();
+        final List<StyleProviderService> cache = new ArrayList<>();
         final ServiceLoader<StyleProviderService> loader = ServiceLoader.load(StyleProviderService.class);
         for(final StyleProviderService service : loader){
             cache.add(service);
@@ -58,40 +56,13 @@ public final class StyleProviderProxy extends AbstractProviderProxy
 
     private static final StyleProviderProxy INSTANCE = new StyleProviderProxy();
 
-    private StyleProviderProxy(){}
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public Class<String> getKeyClass() {
-        return String.class;
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public Class<MutableStyle> getValueClass() {
-        return MutableStyle.class;
-    }
-
-    @Override
-    public MutableStyle getByIdentifier(String key) {
-        return get(key);
+    private StyleProviderProxy(){
+        super(String.class, MutableStyle.class);
     }
 
     @Override
     public Collection<StyleProviderService> getServices() {
         return SERVICES;
-    }
-
-    /**
-     * @return null, this provider does not have a service.
-     */
-    @Override
-    public ProviderService<String, MutableStyle, Provider<String, MutableStyle>> getService() {
-        return null;
     }
 
     /**
@@ -101,28 +72,4 @@ public final class StyleProviderProxy extends AbstractProviderProxy
         return INSTANCE;
     }
 
-    @Override
-    public void set(String key, MutableStyle style) {
-        throw new UnsupportedOperationException("Not supported. Proxy class is immutable.");
-    }
-
-    @Override
-    public void rename(String key, String newName) {
-        throw new UnsupportedOperationException("Not supported yet. Proxy class is immutable.");
-    }
-
-    @Override
-    public void remove(String key) {
-        throw new UnsupportedOperationException("Not supported yet. Proxy class is immutable.");
-    }
-
-    @Override
-    public ProviderType getProviderType() {
-        return ProviderType.STYLE;
-    }
-
-    @Override
-    public DataRecord.DataType getDataType() {
-        throw new UnsupportedOperationException("Not supported for style provider.");
-    }
 }

@@ -37,6 +37,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 import java.util.logging.Level;
+import org.apache.sis.storage.DataStore;
 import org.constellation.admin.dao.DataRecord.DataType;
 
 /**
@@ -50,6 +51,11 @@ public class ServerStoreProvider extends AbstractLayerProvider{
 
     public ServerStoreProvider(ProviderService service, ParameterValueGroup param){
         super(service,param);
+    }
+
+    @Override
+    public DataStore getMainStore() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override

@@ -32,6 +32,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.apache.sis.storage.DataStore;
 import org.constellation.admin.dao.DataRecord.DataType;
 
 /**
@@ -82,6 +83,11 @@ public class MockLayerProviderService extends AbstractProviderService
 
         }
 
+        @Override
+        public DataStore getMainStore() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+        
         private ParameterValueGroup getConfig(){
             final ParameterValueGroup params = getSource();
 

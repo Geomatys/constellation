@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2010, Geomatys
+ *    (C) 2007 - 2014, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,14 +16,15 @@
  */
 package org.constellation.provider;
 
-import java.util.*;
-import org.constellation.admin.dao.DataRecord;
-import org.constellation.admin.dao.ProviderRecord.ProviderType;
-
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.ServiceLoader;
 import org.geotoolkit.feature.DefaultName;
-
 import org.geotoolkit.map.ElevationModel;
-
 import org.opengis.feature.type.Name;
 
 /**
@@ -34,8 +35,7 @@ import org.opengis.feature.type.Name;
  *
  * @author Johann Sorel (Geomatys)
  */
-public final class LayerProviderProxy extends AbstractProviderProxy<Name,LayerDetails,LayerProvider,LayerProviderService>
-        implements LayerProvider{
+public final class LayerProviderProxy extends AbstractProviderProxy<Name,LayerDetails,LayerProvider,LayerProviderService> {
 
     private static final LayerProviderProxy INSTANCE = new LayerProviderProxy();
     //all providers factories, unmodifiable
@@ -50,23 +50,13 @@ public final class LayerProviderProxy extends AbstractProviderProxy<Name,LayerDe
         SERVICES = Collections.unmodifiableCollection(cache);
     }
 
-
-    private LayerProviderProxy(){}
-
-    @Override
-    public Class<Name> getKeyClass() {
-        return Name.class;
-    }
-
-    @Override
-    public Class<LayerDetails> getValueClass() {
-        return LayerDetails.class;
+    private LayerProviderProxy(){
+        super(Name.class, LayerDetails.class);
     }
 
     /**
      * {@inheritDoc }
      */
-    @Override
     public ElevationModel getElevationModel(final Name name) {
         for(final LayerProvider provider : getProviders()){
             final ElevationModel model = provider.getElevationModel(name);
@@ -75,7 +65,6 @@ public final class LayerProviderProxy extends AbstractProviderProxy<Name,LayerDe
         return null;
     }
 
-    @Override
     public LayerDetails get(final Name key, final Date version) {
         final List<LayerDetails> candidates = new ArrayList<>();
 
@@ -89,7 +78,7 @@ public final class LayerProviderProxy extends AbstractProviderProxy<Name,LayerDe
         if(candidates.size() == 1){
             return candidates.get(0);
         }else if(candidates.size()>1){
-            if(LayerDetails.class.isAssignableFrom(getValueClass())){
+            if(LayerDetails.class.isAssignableFrom(valClass)){
                 //make a more accurate search testing both namespace and local part are the same.
                 final Name nk = (Name) key;
                 for(int i=0;i<candidates.size();i++){
@@ -135,7 +124,6 @@ public final class LayerProviderProxy extends AbstractProviderProxy<Name,LayerDe
         return null;
     }
 
-    @Override
     public LayerDetails getByIdentifier(Name key) {
         LayerDetails result = null;
         for(final Name n : getKeys()){
@@ -149,27 +137,10 @@ public final class LayerProviderProxy extends AbstractProviderProxy<Name,LayerDe
     }
 
     /**
-     * @return null, this provider does not have a service.
-     */
-    @Override
-    public ProviderService<Name, LayerDetails, Provider<Name, LayerDetails>> getService() {
-        return null;
-    }
-
-    /**
      * Returns the current instance of {@link LayerProviderProxy}.
      */
     public static LayerProviderProxy getInstance(){
         return INSTANCE;
     }
-
-    @Override
-    public ProviderType getProviderType() {
-        return ProviderType.LAYER;
-    }
-
-    @Override
-    public DataRecord.DataType getDataType() {
-        throw new UnsupportedOperationException("Not supported on proxy instance.");
-    }
+    
 }
