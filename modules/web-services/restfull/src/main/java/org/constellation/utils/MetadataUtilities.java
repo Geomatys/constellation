@@ -32,6 +32,9 @@ import javax.xml.bind.Unmarshaller;
 
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.metadata.iso.extent.DefaultExtent;
+import org.apache.sis.metadata.iso.extent.DefaultGeographicBoundingBox;
+import org.apache.sis.metadata.iso.identification.DefaultDataIdentification;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.collection.TreeTable;
 import org.constellation.dto.CoverageMetadataBean;
@@ -43,14 +46,21 @@ import org.geotoolkit.coverage.io.CoverageIO;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
+import org.geotoolkit.data.FeatureStore;
+import org.geotoolkit.data.FeatureStoreFinder;
+import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.data.shapefile.ShapefileFeatureStore;
+import org.geotoolkit.data.shapefile.ShapefileFeatureStoreFactory;
+import org.geotoolkit.data.shapefile.ShapefileFolderFeatureStoreFactory;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
+import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.process.metadata.MetadataProcessingRegistry;
 import org.geotoolkit.process.metadata.merge.MergeDescriptor;
 import org.geotoolkit.util.FileUtilities;
+import org.opengis.geometry.Envelope;
 import org.opengis.metadata.Metadata;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -257,6 +267,31 @@ public final class MetadataUtilities {
         }
         coverageReader.dispose();
         return null;
+    }
+
+    /**
+     * @param metadataToSave
+     * @return
+     * @throws CoverageStoreException
+     */
+    public static DefaultMetadata getVectorMetadata(final DataMetadata metadataToSave) throws DataStoreException, IOException {
+
+        final File dataFile = new File(metadataToSave.getDataPath());
+
+        final ParameterValueGroup parameters = ShapefileFolderFeatureStoreFactory.PARAMETERS_DESCRIPTOR.createValue();
+        Parameters.getOrCreate(ShapefileFolderFeatureStoreFactory.URLFOLDER, parameters).setValue(dataFile.toURI().toURL());
+        final FeatureStore shapeStore = FeatureStoreFinder.open(parameters);
+        final Envelope env = shapeStore.getEnvelope(QueryBuilder.all(shapeStore.getNames().iterator().next()));
+
+        final DefaultMetadata md = new DefaultMetadata();
+        final DefaultDataIdentification ident = new DefaultDataIdentification();
+        final DefaultGeographicBoundingBox bbox = new DefaultGeographicBoundingBox(
+                env.getMinimum(0), env.getMaximum(0), env.getMinimum(1), env.getMaximum(1)
+        );
+        final DefaultExtent extent = new DefaultExtent("", bbox, null, null);
+        ident.getExtents().add(extent);
+        md.getIdentificationInfo().add(ident);
+        return md;
     }
 
     /**

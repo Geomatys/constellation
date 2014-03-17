@@ -259,13 +259,24 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
             var layerData = DataViewer.createLayer(layerName, providerId);
             var layerBackground = DataViewer.createLayer("CNTR_BN_60M_2006", "generic_shp");
             DataViewer.layers = [layerData, layerBackground];
-            DataViewer.initMap('dataMap');
 
             provider.metadata({providerId: providerId}, {}, function(response) {
-                alert(response);
                 // Success getting the metadata, try to find the data extent
-                //DataViewer.map.zoomToExtent(extent, true);
-            }, function() { $growl('error','Error','Unable to get metadata for '+ layerName); });
+                DataViewer.initMap('dataMap');
+                var ident = response['gmd.MD_Metadata']['gmd.identificationInfo'];
+                if (ident) {
+                    var extentMD = ident['gmd.MD_DataIdentification']['gmd.extent'];
+                    if (extentMD) {
+                        var bbox = extentMD['gmd.EX_Extent']['gmd.geographicElement']['gmd.EX_GeographicBoundingBox'];
+                        var extent = new OpenLayers.Bounds(bbox['gmd.westBoundLongitude']['gco.Decimal'], bbox['gmd.southBoundLatitude']['gco.Decimal'],
+                                                           bbox['gmd.eastBoundLongitude']['gco.Decimal'], bbox['gmd.northBoundLatitude']['gco.Decimal']);
+                        DataViewer.map.zoomToExtent(extent, true);
+                    }
+                }
+            }, function() {
+                // failed to find a metadata, just load the full map
+                DataViewer.initMap('dataMap');
+            });
         };
 
         $scope.deleteData = function() {

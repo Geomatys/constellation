@@ -304,10 +304,15 @@ public class Data {
                 try {
                     dm = MetadataUtilities.getRasterMetadata(metadataToSave);
                 } catch (CoverageStoreException e) {
-                    LOGGER.log(Level.WARNING, "Error when try to access to metadata from data file", e);
+                    LOGGER.log(Level.WARNING, "Error when trying to get coverage metadata", e);
                 }
                 break;
             case "vector":
+                try {
+                    dm = MetadataUtilities.getVectorMetadata(metadataToSave);
+                } catch (Exception e) {
+                    LOGGER.log(Level.WARNING, "Error when trying to get metadata for a shape file", e);
+                }
                 break;
             default:
                 if (LOGGER.isLoggable(Level.INFO)) {

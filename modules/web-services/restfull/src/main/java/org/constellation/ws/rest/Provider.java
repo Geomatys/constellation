@@ -240,6 +240,7 @@ public final class Provider {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getMetadata(final @PathParam("providerId") String providerId) throws SQLException, NotRunningServiceException, CoverageStoreException, NoSuchIdentifierException, ProcessException, JAXBException {
         final DefaultMetadata metadata = ConfigurationEngine.loadProviderMetadata(providerId, CSWMarshallerPool.getInstance());
+        metadata.prune();
         return Response.ok(metadata).build();
     }
 
