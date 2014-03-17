@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.admin.dao.DataRecord.DataType;
 
@@ -131,7 +132,11 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
     @Override
     public synchronized void dispose() {
         if(store != null){
-            store.dispose();
+            try {
+                store.close();
+            } catch (DataStoreException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
         }
         index.clear();
     }

@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.constellation.admin.dao.DataRecord.DataType;
 
 /**
@@ -92,7 +93,11 @@ public class CoverageStoreProvider extends AbstractLayerProvider{
     public synchronized void dispose() {
         super.dispose();
         if(store != null){
-            store.dispose();
+            try {
+                store.close();
+            } catch (DataStoreException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
             store = null;
             names = null;
         }
