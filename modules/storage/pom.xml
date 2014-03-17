@@ -109,7 +109,6 @@
                 <module>provider-data-coveragestore</module>
                 <module>provider-data-serverstore</module>
                 <module>provider-style-sld</module>
-                <module>provider-style-unnormalize</module>
                 <module>provider-data-om2</module>
             </modules>
         </profile>
@@ -123,7 +122,6 @@
                 <module>provider-data-coveragestore</module>
                 <module>provider-data-featurestore</module>
                 <module>provider-style-sld</module>
-                <module>provider-style-unnormalize</module>
             </modules>
         </profile>
         <profile>
@@ -136,7 +134,6 @@
                 <module>provider-data-coveragestore</module>
                 <module>provider-data-featurestore</module>
                 <module>provider-style-sld</module>
-                <module>provider-style-unnormalize</module>
             </modules>
         </profile>
         <profile>
@@ -149,7 +146,6 @@
                 <module>provider-data-coveragestore</module>
                 <module>provider-data-featurestore</module>
                 <module>provider-style-sld</module>
-                <module>provider-style-unnormalize</module>
             </modules>
         </profile>
         <profile>

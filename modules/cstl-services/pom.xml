@@ -213,11 +213,6 @@
           <version>${project.version}</version>
         </dependency>
         <dependency>
-          <groupId>org.constellation.storage</groupId>
-          <artifactId>cstl-store-style-unnormalize</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
           <groupId>org.geotoolkit</groupId>
           <artifactId>geotk-coverage-netcdf</artifactId>
           <exclusions>
@@ -273,11 +268,6 @@
           <version>${project.version}</version>
         </dependency>
         <dependency>
-          <groupId>org.constellation.storage</groupId>
-          <artifactId>cstl-store-style-unnormalize</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
           <groupId>org.geotoolkit</groupId>
           <artifactId>geotk-coverage-netcdf</artifactId>
           <exclusions>
@@ -318,11 +308,6 @@
           <version>${project.version}</version>
         </dependency>
         <dependency>
-          <groupId>org.constellation.storage</groupId>
-          <artifactId>cstl-store-style-unnormalize</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
           <groupId>org.geotoolkit</groupId>
           <artifactId>geotk-coverage-netcdf</artifactId>
           <exclusions>
@@ -360,11 +345,6 @@
         <dependency>
           <groupId>org.constellation.storage</groupId>
           <artifactId>cstl-store-style-sld</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>org.constellation.storage</groupId>
-          <artifactId>cstl-store-style-unnormalize</artifactId>
           <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -421,11 +401,6 @@
         <dependency>
           <groupId>org.constellation.storage</groupId>
           <artifactId>cstl-store-style-sld</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>org.constellation.storage</groupId>
-          <artifactId>cstl-store-style-unnormalize</artifactId>
           <version>${project.version}</version>
         </dependency>
         <dependency>
