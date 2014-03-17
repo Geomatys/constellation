@@ -122,6 +122,12 @@ cstlAdminApp
                 controller: 'ContactController'
             });
 
+            //Process routes
+            $routeProvider
+            .when('/process', {
+                templateUrl: 'views/process/list.html',
+                controller: 'ProcessController'
+            });
 
 
             // Initialize angular-translate

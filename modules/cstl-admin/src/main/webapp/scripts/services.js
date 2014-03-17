@@ -19,13 +19,19 @@
 function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
+
+
+/*
+ * Injection of jessionid for csltSessionId cookie.
+ */
 cstlAdminApp.factory('AuthInterceptor', function($cookies) {
     return {
 	    'request': function(config) {
 	    	var url = config.url+'';
-	    	if(endsWith(url, ';jsessionid='))
+	    	var jsessionIdIndex = url.indexOf(";jsessionid=");
+	    	if(jsessionIdIndex != -1)
     	    	if ($cookies.cstlSessionId) {
-    	    		config.url += $cookies.cstlSessionId;
+    	    		config.url = url.replace(";jsessionid=", ";jsessionid=" + $cookies.cstlSessionId);
 	        	}else{
 	        		config.url = url.substring(0, url.indexOf(';jsessionid='))
 	        	}
@@ -53,11 +59,13 @@ cstlAdminApp.factory('Contact', ['$resource',
          });
 }]);
 
-cstlAdminApp.factory('Password', ['$resource',
-    function ($resource) {
-        return $resource('app/rest/account/change_password', {}, {
-        });
-    }]);
+cstlAdminApp.factory('ProcessService', ['$resource',
+   function($resource) {
+       	return $resource(cstlContext + 'spring/admin/process;jsessionid=', {}, {
+       		'get' : {method : 'GET',isArray : true}
+       	});
+} ]);
+
 
 cstlAdminApp.factory('Sessions', ['$resource',
     function ($resource) {

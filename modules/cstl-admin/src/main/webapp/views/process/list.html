@@ -1,0 +1,6 @@
+<div>
+		<ul close-others="oneAtATime" ng-repeat="registry in registries">
+		  {{registry.name}}
+		  <li ng-repeat="process in registry.processes">{{process.id}}</li>
+		 </ul>
+</div>

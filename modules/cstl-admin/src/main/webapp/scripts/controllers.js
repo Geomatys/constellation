@@ -176,28 +176,28 @@ cstlAdminApp.controller('UserDetailsController', ['$scope', '$modalInstance', 'u
 }]);
 
 
-cstlAdminApp.controller('PasswordController', ['$scope', 'Password',
-    function ($scope, Password) {
-        $scope.success = null;
-        $scope.error = null;
-        $scope.doNotMatch = null;
-        $scope.changePassword = function () {
-            if ($scope.password != $scope.confirmPassword) {
-                $scope.doNotMatch = "ERROR";
-            } else {
-                $scope.doNotMatch = null;
-                Password.save($scope.password,
-                    function (value, responseHeaders) {
-                        $scope.error = null;
-                        $scope.success = 'OK';
-                    },
-                    function (httpResponse) {
-                        $scope.success = null;
-                        $scope.error = "ERROR";
-                    });
-            }
-        };
-    }]);
+cstlAdminApp.controller('ProcessController', ['$scope', 'ProcessService',
+                                              function ($scope, Process) {
+                                         	   $scope.oneAtATime=true;
+                                                $scope.registries = Process.get();
+                                                $scope.groups = [
+                                                                 {
+                                                                   title: "Dynamic Group Header - 1",
+                                                                   content: "Dynamic Group Body - 1"
+                                                                 },
+                                                                 {
+                                                                   title: "Dynamic Group Header - 2",
+                                                                   content: "Dynamic Group Body - 2"
+                                                                 }
+                                                               ];
+
+                                                               $scope.items = ['Item 1', 'Item 2', 'Item 3'];
+
+                                                               $scope.addItem = function() {
+                                                                 var newItemNo = $scope.items.length + 1;
+                                                                 $scope.items.push('Item ' + newItemNo);
+                                                               };
+                                         }]);
 
 cstlAdminApp.controller('SessionsController', ['$scope', 'resolvedSessions', 'Sessions',
     function ($scope, resolvedSessions, Sessions) {
