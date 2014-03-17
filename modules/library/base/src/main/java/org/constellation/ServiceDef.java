@@ -33,42 +33,42 @@ import java.util.List;
 public enum ServiceDef {
     // WMS service definitions
 
-    WMS_1_0_0(Specification.WMS, Organization.OGC, "1.0.0", Profile.NONE, "1.1.0", false),
-    WMS_1_1_1(Specification.WMS, Organization.OGC, "1.1.1", Profile.NONE, "1.1.1", false),
-    WMS_1_3_0(Specification.WMS, Organization.OGC, "1.3.0", Profile.NONE, "1.3.0", false),
+    WMS_1_0_0(Specification.WMS, Organization.OGC, "1.0.0", Profile.NONE, "1.1.0", false, false),
+    WMS_1_1_1(Specification.WMS, Organization.OGC, "1.1.1", Profile.NONE, "1.1.1", false, true),
+    WMS_1_3_0(Specification.WMS, Organization.OGC, "1.3.0", Profile.NONE, "1.3.0", false, true),
     // WMS with SLD profiles definitions
-    WMS_1_0_0_SLD(Specification.WMS, Organization.OGC, "1.0.0", Profile.WMS_SLD, "1.1.0", false),
-    WMS_1_1_1_SLD(Specification.WMS, Organization.OGC, "1.1.1", Profile.WMS_SLD, "1.1.1", false),
-    WMS_1_3_0_SLD(Specification.WMS, Organization.OGC, "1.3.0", Profile.WMS_SLD, "1.3.0", false),
+    WMS_1_0_0_SLD(Specification.WMS, Organization.OGC, "1.0.0", Profile.WMS_SLD, "1.1.0", false, false),
+    WMS_1_1_1_SLD(Specification.WMS, Organization.OGC, "1.1.1", Profile.WMS_SLD, "1.1.1", false, true),
+    WMS_1_3_0_SLD(Specification.WMS, Organization.OGC, "1.3.0", Profile.WMS_SLD, "1.3.0", false, true),
     // WMTS service definition
-    WMTS_1_0_0(Specification.WMTS, Organization.OGC, "1.0.0", Profile.NONE, "1.1.0", true),
+    WMTS_1_0_0(Specification.WMTS, Organization.OGC, "1.0.0", Profile.NONE, "1.1.0", true, true),
     // WCS service definitions
-    WCS_1_0_0(Specification.WCS, Organization.OGC, "1.0.0", Profile.NONE, "1.2.0", false),
-    WCS_1_1_0(Specification.WCS, Organization.OGC, "1.1.0", Profile.NONE, "1.1.0", true),
-    WCS_1_1_1(Specification.WCS, Organization.OGC, "1.1.1", Profile.NONE, "1.1.0", true),
-    WCS_1_1_2(Specification.WCS, Organization.OGC, "1.1.2", Profile.NONE, "1.1.0", true),
+    WCS_1_0_0(Specification.WCS, Organization.OGC, "1.0.0", Profile.NONE, "1.2.0", false, true),
+    WCS_1_1_0(Specification.WCS, Organization.OGC, "1.1.0", Profile.NONE, "1.1.0", true, true),
+    WCS_1_1_1(Specification.WCS, Organization.OGC, "1.1.1", Profile.NONE, "1.1.0", true, true),
+    WCS_1_1_2(Specification.WCS, Organization.OGC, "1.1.2", Profile.NONE, "1.1.0", true, false),
     // WFS service definitions
-    //WFS_1_0_0(Specification.WFS, Organization.OGC, "1.0.0", Profile.NONE, "1.0.0", true),
-    WFS_1_1_0(Specification.WFS, Organization.OGC, "1.1.0", Profile.NONE, "1.0.0", true),
-    WFS_2_0_0(Specification.WFS, Organization.OGC, "2.0.0", Profile.NONE, "2.0.0", true),
+    WFS_1_0_0(Specification.WFS, Organization.OGC, "1.0.0", Profile.NONE, "1.0.0", true, false),
+    WFS_1_1_0(Specification.WFS, Organization.OGC, "1.1.0", Profile.NONE, "1.0.0", true, true),
+    WFS_2_0_0(Specification.WFS, Organization.OGC, "2.0.0", Profile.NONE, "2.0.0", true, true),
     // CSW service definition
-    CSW_2_0_0(Specification.CSW, Organization.OGC, "2.0.0", Profile.CSW_ISO, "1.2.0", true),
-    CSW_2_0_2(Specification.CSW, Organization.OGC, "2.0.2", Profile.CSW_ISO, "1.2.0", true),
+    CSW_2_0_0(Specification.CSW, Organization.OGC, "2.0.0", Profile.CSW_ISO, "1.2.0", true, false),
+    CSW_2_0_2(Specification.CSW, Organization.OGC, "2.0.2", Profile.CSW_ISO, "1.2.0", true, true),
     // Configuration service definition (custom service of Geomatys)
-    CONFIG(Specification.NONE, Organization.NONE, null, Profile.NONE, "1.0", false),
+    CONFIG(Specification.NONE, Organization.NONE, null, Profile.NONE, "1.0", false, true),
     // SOS service definition
-    SOS_1_0_0(Specification.SOS, Organization.OGC, "1.0.0", Profile.NONE, "1.1.0", true),
-    SOS_2_0_0(Specification.SOS, Organization.OGC, "2.0.0", Profile.NONE, "1.1.0", true),
+    SOS_1_0_0(Specification.SOS, Organization.OGC, "1.0.0", Profile.NONE, "1.1.0", true, true),
+    SOS_2_0_0(Specification.SOS, Organization.OGC, "2.0.0", Profile.NONE, "1.1.0", true, true),
     // Security services definitions
-    PEP(Specification.PEP, Organization.OASIS, null, Profile.NONE, null, false),
-    PDP(Specification.PDP, Organization.OASIS, null, Profile.NONE, null, false),
+    PEP(Specification.PEP, Organization.OASIS, null, Profile.NONE, null, false, true),
+    PDP(Specification.PDP, Organization.OASIS, null, Profile.NONE, null, false, true),
     // MDWeb services definitions
-    MDW(Specification.MDW, Organization.NONE, null, Profile.NONE, null, false),
+    MDW(Specification.MDW, Organization.NONE, null, Profile.NONE, null, false, true),
     // Thesaurus services definitions
-    THW(Specification.THW, Organization.NONE, null, Profile.NONE, null, false),
+    THW(Specification.THW, Organization.NONE, null, Profile.NONE, null, false, true),
 
     //WPS services definitions
-    WPS_1_0_0(Specification.WPS, Organization.OGC, "1.0.0", Profile.NONE, "1.1.0", true);
+    WPS_1_0_0(Specification.WPS, Organization.OGC, "1.0.0", Profile.NONE, "1.1.0", true, true);
 
 
     /**
@@ -98,6 +98,11 @@ public enum ServiceDef {
     public final boolean owsCompliant;
 
     /**
+     * {@code true} if the service is the service version in implemented in constellation.
+     */
+    public final boolean isImplemented;
+
+    /**
      * Defines a web service by its name, organization owner, profile, version and version
      * of the exception type returned.
      *
@@ -107,13 +112,14 @@ public enum ServiceDef {
      * @param prof      The profile of this service, or {@link Profile#NONE} if none.
      * @param excVerStr The version of the exception report, or {@link Profile#NONE} if none.
      */
-    private ServiceDef(Specification spec, Organization org, String verStr, Profile prof, String excVerStr, boolean ows) {
+    private ServiceDef(Specification spec, Organization org, String verStr, Profile prof, String excVerStr, boolean ows, boolean isImplemented) {
         specification = spec;
         organization = org;
         version = (verStr == null) ? null : new Version(verStr);
         profile = prof;
         exceptionVersion = (excVerStr == null) ? null : new Version(excVerStr);
         this.owsCompliant = ows;
+        this.isImplemented = isImplemented;
     }
 
     public static class Version extends org.apache.sis.util.Version {
@@ -179,7 +185,7 @@ public enum ServiceDef {
             if (service.version == null || service.specification == null) {
                 continue;
             }
-            if (service.specification.equals(spec)) {
+            if (service.specification.equals(spec) && service.isImplemented) {
                 results.add(service);
             }
         }

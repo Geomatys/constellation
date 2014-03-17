@@ -36,8 +36,10 @@ import org.geotoolkit.ows.xml.AbstractResponsiblePartySubset;
 import org.geotoolkit.ows.xml.AbstractServiceIdentification;
 import org.geotoolkit.ows.xml.AbstractServiceProvider;
 import org.geotoolkit.ows.xml.OWSXmlFactory;
+import org.geotoolkit.ows.xml.v110.CodeType;
 import org.geotoolkit.wmts.xml.WMTSResponse;
 import org.geotoolkit.wmts.xml.WMTSXmlFactory;
+import org.geotoolkit.wmts.xml.v100.Style;
 
 /**
  *  WMTS Constants
@@ -126,5 +128,15 @@ public final class WMTSConstant {
 
         // Create capabilities base.
         return WMTSXmlFactory.buildCapabilities(version, servIdent, servProv, null, null, null, null);
+    }
+
+    public static List<Style> DEFAULT_STYLES = new ArrayList<>();
+
+    static {
+        final Style defaultStyle = new Style();
+        defaultStyle.setIsDefault(Boolean.TRUE);
+        defaultStyle.setTitle("default");
+        defaultStyle.setIdentifier(new CodeType("default"));
+        DEFAULT_STYLES.add(defaultStyle);
     }
 }

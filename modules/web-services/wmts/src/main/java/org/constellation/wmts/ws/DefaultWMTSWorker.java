@@ -223,9 +223,21 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                         name,
                         name,
                         bbox,
-                        Collections.EMPTY_LIST,
+                        WMTSConstant.DEFAULT_STYLES,
                         dims);
 
+                final List<String> pformats = set.getFormats();
+                outputLayer.setFormat(pformats);
+
+                final List<URLTemplateType> resources = new ArrayList<>();
+                for (String pformat : pformats) {
+                    String url = getServiceUrl();
+                    url = url.substring(0, url.length() - 1) + "/" + name + "/{tileMatrixSet}/{tileMatrix}/{tileRow}/{tileCol}.{format}";
+                    final URLTemplateType tileURL = new URLTemplateType(pformat, "tile", url);
+                    resources.add(tileURL);
+                }
+                outputLayer.setResourceURL(resources);
+                
                 for(Pyramid pr : set.getPyramids()){
                     final TileMatrixSet tms = new TileMatrixSet();
                     tms.setIdentifier(new CodeType(pr.getId()));
@@ -369,7 +381,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
 
         try {
             final Object result = featureInfo.getFeatureInfo(sdef, vdef, cdef, selectionArea, request);
-            return new AbstractMap.SimpleEntry<String, Object>(infoFormat, result);
+            return new AbstractMap.SimpleEntry<>(infoFormat, result);
         } catch (PortrayalException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
