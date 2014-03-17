@@ -76,6 +76,9 @@ public class ConfigurationEngine {
 
     private static final Logger LOGGER = Logging.getLogger(ConfigurationEngine.class);
 
+    /**
+     * TODO Temporary hack to activate JPA daos.
+     */
     private final static boolean JPA = Boolean.getBoolean("cstlJPA");
 
     private static SecurityManager securityManager;

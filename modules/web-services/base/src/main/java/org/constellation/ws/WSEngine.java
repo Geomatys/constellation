@@ -33,6 +33,9 @@ public final class WSEngine {
     
     private static final Logger LOGGER = Logging.getLogger(WSEngine.class);
 
+    /**
+     * Default value, changes nothing, just using reflection to instantiate the worker.
+     */
     private static DIEnhancer workerFactory = new DIEnhancer() {
 
         @Override

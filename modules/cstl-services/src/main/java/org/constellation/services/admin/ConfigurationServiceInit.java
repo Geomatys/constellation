@@ -16,6 +16,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+/**
+ * This class wires spring managed beans with legacy code.
+ * {@link ConfigurationServiceInit#init()} method will inject a {@link DIEnhancer} to {@link WSEngine}
+ * to allow Spring instantiation of OGC Workers.
+ * 
+ * @author Olivier NOUGUIER
+ *
+ */
 public class ConfigurationServiceInit implements ApplicationContextAware {
     
     
@@ -23,6 +31,10 @@ public class ConfigurationServiceInit implements ApplicationContextAware {
 
     @Autowired
     private ConfigurationService configurationService;
+    
+    /**
+     * Spring applucation context.
+     */
     private ApplicationContext applicationContext;
 
     public void init() {
