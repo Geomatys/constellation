@@ -182,18 +182,6 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             LOGGER.log(Level.INFO, "WFS worker {0} running", id);
         }
 
-        final String multiVersProp = getProperty("multipleVersion");
-        if (multiVersProp != null) {
-            multipleVersionActivated = Boolean.parseBoolean(multiVersProp);
-            LOGGER.log(Level.INFO, "Multiple version activated:{0}", multipleVersionActivated);
-            if (multipleVersionActivated) {
-                setSupportedVersion(ServiceDef.WFS_2_0_0, ServiceDef.WFS_1_1_0);
-            } else {
-                setSupportedVersion(ServiceDef.WFS_1_1_0);
-            }
-        } else {
-            setSupportedVersion(ServiceDef.WFS_2_0_0, ServiceDef.WFS_1_1_0);
-        }
         final String isTransactionnalProp = getProperty("transactionnal");
         if (isTransactionnalProp != null) {
             isTransactionnal = Boolean.parseBoolean(isTransactionnalProp);
@@ -1654,12 +1642,8 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                                               MISSING_PARAMETER_VALUE, "service");
             }
             if (request.getVersion() != null) {
-                if (request.getVersion().toString().equals("1.1.0") || request.getVersion().toString().equals("1.1") ||
-                        request.getVersion().toString().isEmpty()  || request.getVersion().toString().equals("1.0.0") ) { // hack for openScale accept 1.0.0
-                    request.setVersion(ServiceDef.WFS_1_1_0.version.toString());
-                } else if (multipleVersionActivated && (request.getVersion().toString().equals("2.0.0") || request.getVersion().toString().equals("2.0"))) {
-                    request.setVersion(ServiceDef.WFS_2_0_0.version.toString());
-
+                if (isSupportedVersion(request.getVersion().toString())) {
+                    request.setVersion(request.getVersion().toString());
                 } else {
                     final CodeList code;
                     if (getCapabilities) {

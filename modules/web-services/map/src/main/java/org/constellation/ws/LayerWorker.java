@@ -52,7 +52,7 @@ import org.geotoolkit.style.MutableStyle;
  */
 public abstract class LayerWorker extends AbstractWorker {
 
-    private final LayerContext layerContext;
+    private LayerContext layerContext;
 
     protected final List<String> supportedLanguages = new ArrayList<>();
 
@@ -65,18 +65,17 @@ public abstract class LayerWorker extends AbstractWorker {
         isStarted = true;
 
         String defaultLanguageCandidate = null;
-        LayerContext candidate          = null;
         
         try {
             final Object obj = ConfigurationEngine.getConfiguration(specification.name(), id);
             if (obj instanceof LayerContext) {
-                candidate = (LayerContext) obj;
-                final String sec = candidate.getSecurity();
+                layerContext = (LayerContext) obj;
+                final String sec = layerContext.getSecurity();
                 // Instantiaties the PDP only if a rule has been discovered.
                 if (sec != null && !sec.isEmpty()) {
                     pdp = new SimplePDP(sec);
                 }
-                final Languages languages = candidate.getSupportedLanguages();
+                final Languages languages = layerContext.getSupportedLanguages();
                 if (languages != null) {
                     for (Language language : languages.getLanguages()) {
                         supportedLanguages.add(language.getLanguageCode());
@@ -86,21 +85,22 @@ public abstract class LayerWorker extends AbstractWorker {
                     }
                 }
                 // look for shiro accessibility
-                final String sa = candidate.getCustomParameters().get("shiroAccessible");
+                final String sa = getProperty("shiroAccessible");
                 if (sa != null && !sa.isEmpty()) {
                     shiroAccessible = Boolean.parseBoolean(sa);
                 }
                 // look for capabilities cache flag
-                final String cc = candidate.getCustomParameters().get("cacheCapabilities");
+                final String cc = getProperty("cacheCapabilities");
                 if (cc != null && !cc.isEmpty()) {
                     cacheCapabilities = Boolean.parseBoolean(cc);
                 }
-                final MapFactory mapfactory = getMapFactory(candidate.getImplementation());
+                final MapFactory mapfactory = getMapFactory(layerContext.getImplementation());
                 securityFilter = mapfactory.getSecurityFilter();
 
                 //Check  FeatureInfo configuration (if exist)
-                FeatureInfoUtilities.checkConfiguration(candidate);
+                FeatureInfoUtilities.checkConfiguration(layerContext);
 
+                applySupportedVersion();
             } else {
                 startError = "The layer context File does not contain a layerContext object";
                 isStarted  = false;
@@ -119,15 +119,17 @@ public abstract class LayerWorker extends AbstractWorker {
             isStarted = false;
             LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, id);
         } catch (ClassNotFoundException | ConfigurationException ex) {
-            startError = "Custom FeatureInfo configuration error : "+ex.getMessage();
+            startError = "Custom FeatureInfo configuration error : " + ex.getMessage();
+            isStarted  = false;
+            LOGGER.log(Level.WARNING, startError, ex);
+        } catch (CstlServiceException ex) {
+            startError = "Error applying supported versions : " + ex.getMessage();
             isStarted  = false;
             LOGGER.log(Level.WARNING, startError, ex);
         }
 
-
-        layerContext    = candidate;
         defaultLanguage = defaultLanguageCandidate;
-        
+
         //listen to changes on the providers to clear the getcapabilities cache
         LayerProviderProxy.getInstance().addPropertyListener(new PropertyChangeListener() {
             @Override
@@ -352,7 +354,7 @@ public abstract class LayerWorker extends AbstractWorker {
     }
 
     @Override
-    protected String getProperty(final String key) {
+    protected final String getProperty(final String key) {
         if (layerContext != null && layerContext.getCustomParameters() != null) {
             return layerContext.getCustomParameters().get(key);
         }

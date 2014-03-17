@@ -373,32 +373,7 @@ public class SOSworker extends AbstractWorker {
 
             alwaysFeatureCollection   = configuration.getBooleanParameter(OMFactory.ALWAYS_FEATURE_COLLECTION);
 
-            final String multiVersProp = getProperty("multipleVersion");
-            if (multiVersProp != null) {
-                multipleVersionActivated = Boolean.parseBoolean(multiVersProp);
-                LOGGER.log(Level.INFO, "Multiple version activated:{0}", multipleVersionActivated);
-                if (multipleVersionActivated) {
-                    setSupportedVersion(ServiceDef.SOS_2_0_0, ServiceDef.SOS_1_0_0);
-                } else {
-                    final String singleVersionNumber = getProperty("singleVersion");
-                    if (singleVersionNumber != null) {
-                        if (singleVersionNumber.equals("1.0.0")) {
-                            setSupportedVersion(ServiceDef.SOS_1_0_0);
-                        } else if (singleVersionNumber.equals("2.0.0")) {
-                            setSupportedVersion(ServiceDef.SOS_2_0_0);
-                        } else {
-                            startError("Multiple version deactived but invalid single version value:" + singleVersionNumber, null);
-                            return; 
-                        }
-                        LOGGER.log(Level.INFO, "single version activated:{0}", singleVersionNumber);
-                    } else {
-                        startError("Multiple version deactived but missing single version value.", null);
-                        return;
-                    }
-                }
-            } else {
-                setSupportedVersion(ServiceDef.SOS_2_0_0, ServiceDef.SOS_1_0_0);
-            }
+            applySupportedVersion();
 
             // we fill a map of properties to sent to the reader/writer/filter
             final Map<String, Object> properties = new HashMap<>();
@@ -2306,10 +2281,8 @@ public class SOSworker extends AbstractWorker {
             }
             if (request.getVersion()!= null && !request.getVersion().toString().isEmpty()) {
                 
-                if (request.getVersion().toString().equals("1.0.0") && isSupportedVersion("1.0.0")) {
-                    request.setVersion("1.0.0");
-                } else if (request.getVersion().toString().equals("2.0.0") && isSupportedVersion("2.0.0")) {
-                    request.setVersion("2.0.0");
+                if (isSupportedVersion(request.getVersion().toString())) {
+                    request.setVersion(request.getVersion().toString());
                 } else {
                     final CodeList code;
                     final String locator;

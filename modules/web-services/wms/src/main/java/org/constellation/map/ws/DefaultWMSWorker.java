@@ -214,7 +214,6 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
     public DefaultWMSWorker(final String id) {
         super(id, ServiceDef.Specification.WMS);
-        setSupportedVersion(ServiceDef.WMS_1_3_0_SLD, ServiceDef.WMS_1_1_1_SLD);
 
         //get all supported GetFeatureInfo mimetypes
         try {

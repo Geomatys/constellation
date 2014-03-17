@@ -163,14 +163,13 @@ public class WPSWorker extends AbstractWorker {
     /**
      * WPS context configuration.
      */
-    private final ProcessContext context;
+    private ProcessContext context;
 
     /**
      * List of process descriptors available.
      */
     private final List<ProcessDescriptor> processDescriptorList = new ArrayList<>();
 
-    private ProcessContext configuration;
     /**
      * Constructor.
      *
@@ -178,12 +177,11 @@ public class WPSWorker extends AbstractWorker {
      */
     public WPSWorker(final String id) {
         super(id, ServiceDef.Specification.WPS);
-        setSupportedVersion(ServiceDef.WPS_1_0_0);
-        ProcessContext candidate = null;
         try {
             final Object obj = ConfigurationEngine.getConfiguration("WPS", id);
             if (obj instanceof ProcessContext) {
-                candidate = (ProcessContext) obj;
+                context = (ProcessContext) obj;
+                applySupportedVersion();
                 isStarted = true;
             } else {
                 startError = "The process context File does not contain a ProcessContext object";
@@ -198,8 +196,11 @@ public class WPSWorker extends AbstractWorker {
             startError = "The configuration file processContext.xml has not been found";
             isStarted = false;
             LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, id);
+        } catch (CstlServiceException ex) {
+            startError = "Error applying supported versions : " + ex.getMessage();
+            isStarted = false;
+            LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, id);
         }
-        this.context = candidate;
 
         if (context != null && context.getWebdavDirectory() != null) {
             webdavFolderPath = context.getWebdavDirectory();
@@ -1620,8 +1621,8 @@ public class WPSWorker extends AbstractWorker {
     
     @Override
     protected String getProperty(final String key) {
-        if (configuration != null && configuration.getCustomParameters() != null) {
-            return configuration.getCustomParameters().get(key);
+        if (context != null && context.getCustomParameters() != null) {
+            return context.getCustomParameters().get(key);
         }
         return null;
     }

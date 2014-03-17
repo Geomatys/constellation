@@ -94,7 +94,6 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
      */
     public DefaultWMTSWorker(final String id) {
         super(id, ServiceDef.Specification.WMTS);
-        setSupportedVersion(ServiceDef.WMTS_1_0_0);
         if (isStarted) {
             LOGGER.log(Level.INFO, "WMTS worker {0} running", id);
         }

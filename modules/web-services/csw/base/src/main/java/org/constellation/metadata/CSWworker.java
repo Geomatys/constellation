@@ -202,7 +202,6 @@ public class CSWworker extends AbstractWorker {
      */
     public CSWworker(final String serviceID) {
         super(serviceID, ServiceDef.Specification.CSW);
-        setSupportedVersion(ServiceDef.CSW_2_0_2);
         isStarted = true;
         try {
             //we look if the configuration have been specified
@@ -229,6 +228,8 @@ public class CSWworker extends AbstractWorker {
             if (sa != null && !sa.isEmpty()) {
                 shiroAccessible = Boolean.parseBoolean(sa);
             }
+            applySupportedVersion();
+            
             LOGGER.info("CSW" + suffix + " worker (" + configuration.getFormat() + ") \"" + serviceID + "\" running\n");
 
         } catch (FactoryNotFoundException ex) {

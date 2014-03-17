@@ -146,6 +146,9 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
     private static final String WMS_GETMAP_BMP =
     "HeIgHt=100&LaYeRs=Lakes&FoRmAt=image/bmp&ReQuEsT=GetMap&StYlEs=&CrS=CRS:84&BbOx=-0.0025,-0.0025,0.0025,0.0025&VeRsIoN=1.3.0&WiDtH=100";
 
+    private static final String WMS_GETMAP_BMP_111 =
+    "HeIgHt=100&LaYeRs=Lakes&FoRmAt=image/bmp&ReQuEsT=GetMap&StYlEs=&SrS=CRS:84&BbOx=-0.0025,-0.0025,0.0025,0.0025&VeRsIoN=1.1.1&WiDtH=100";
+
     private static final String WMS_GETMAP_PPM =
     "HeIgHt=100&LaYeRs=Lakes&FoRmAt=image/x-portable-pixmap&ReQuEsT=GetMap&StYlEs=&CrS=CRS:84&BbOx=-0.0025,-0.0025,0.0025,0.0025&VeRsIoN=1.3.0&WiDtH=100";
 
@@ -182,6 +185,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
         final LayerContext config2 = new LayerContext(layers2);
         config2.setSupportedLanguages(new Languages(Arrays.asList(new Language("fre"), new Language("eng", true))));
         config2.getCustomParameters().put("shiroAccessible", "false");
+        config2.getCustomParameters().put("supported_versions", "1.1.1,1.3.0");
         config2.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
 
         ConfigurationEngine.storeConfiguration("WMS", "wms1", config2);
@@ -208,6 +212,16 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
         serviceFre.setVersions(Arrays.asList("1.1.1", "1.3.0"));
         ConfigurationEngine.writeServiceMetadata("wms1", "WMS", serviceFre, "fre");
 
+
+        final List<Source> sources3 = Arrays.asList(new Source("coverageTestSrc", true, null, null),
+                                                   new Source("shapeSrc", true, null, null));
+        final Layers layers3 = new Layers(sources3);
+        final LayerContext config3 = new LayerContext(layers3);
+        config3.getCustomParameters().put("shiroAccessible", "false");
+        config3.getCustomParameters().put("supported_versions", "1.3.0");
+        config3.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
+
+        ConfigurationEngine.storeConfiguration("WMS", "wms2", config3);
 
         initServer(new String[] {
             "org.constellation.map.ws.rs",
@@ -422,9 +436,9 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      */
     @Test
     @Order(order=6)
-    public void testWMSGetMapLakeBmp() throws IOException {
+    public void testWMSGetMapLakeBmp() throws Exception {
         // Creates a valid GetMap url.
-        final URL getMapUrl;
+        URL getMapUrl;
         try {
             getMapUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/default?" + WMS_GETMAP_BMP);
         } catch (MalformedURLException ex) {
@@ -440,6 +454,16 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
         assertEquals(100, image.getWidth());
         assertEquals(100,  image.getHeight());
         assertTrue  (ImageTesting.getNumColors(image) > 2);
+
+        // wms do not supported 1.1.1 request
+        try {
+            getMapUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/wms2?" + WMS_GETMAP_BMP_111);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+        Object obj = unmarshallResponse(getMapUrl);
+        assertTrue(obj instanceof ServiceExceptionReport);
     }
 
     /**
@@ -551,6 +575,29 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
 
         assertEquals("http://localhost:" + grizzly.getCurrentPort() + "/wms/default?", currentUrl);
 
+
+        // Creates a valid GetCapabilities url.
+        try {
+            getCapsUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/wms2?" + WMS_GETCAPABILITIES_WMS1_111);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+        //the service WMS2 does not support 1.1.0 version
+        obj = unmarshallResponse(getCapsUrl);
+        assertTrue(obj instanceof WMSCapabilities);
+
+         // Creates a valid GetCapabilities url.
+        try {
+            getCapsUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/wms2?" + WMS_GETCAPABILITIES_WMS1);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+        // Try to marshall something from the response returned by the server.
+        // The response should be a WMT_MS_Capabilities.
+        obj = unmarshallResponse(getCapsUrl);
+        assertTrue(obj instanceof WMSCapabilities);
     }
 
     @Test

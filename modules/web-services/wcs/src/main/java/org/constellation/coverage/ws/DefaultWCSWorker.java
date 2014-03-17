@@ -142,7 +142,6 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         if (isStarted) {
             LOGGER.log(Level.INFO, "WCS worker {0} running", id);
         }
-        setSupportedVersion(ServiceDef.WCS_1_1_1, ServiceDef.WCS_1_0_0);
     }
 
     /**

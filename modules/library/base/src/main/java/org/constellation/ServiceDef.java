@@ -16,6 +16,11 @@
  */
 package org.constellation;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 /**
  * All the services known by Constellation.
  * <p>
@@ -43,7 +48,7 @@ public enum ServiceDef {
     WCS_1_1_1(Specification.WCS, Organization.OGC, "1.1.1", Profile.NONE, "1.1.0", true),
     WCS_1_1_2(Specification.WCS, Organization.OGC, "1.1.2", Profile.NONE, "1.1.0", true),
     // WFS service definitions
-    WFS_1_0_0(Specification.WFS, Organization.OGC, "1.0.0", Profile.NONE, "1.0.0", true),
+    //WFS_1_0_0(Specification.WFS, Organization.OGC, "1.0.0", Profile.NONE, "1.0.0", true),
     WFS_1_1_0(Specification.WFS, Organization.OGC, "1.1.0", Profile.NONE, "1.0.0", true),
     WFS_2_0_0(Specification.WFS, Organization.OGC, "2.0.0", Profile.NONE, "2.0.0", true),
     // CSW service definition
@@ -153,6 +158,33 @@ public enum ServiceDef {
             }
         }
         return null;
+    }
+
+    public static ServiceDef getServiceDefinition(final Specification spec, final String version) {
+        for (ServiceDef service : values()) {
+            if (service.version == null || service.specification == null) {
+                continue;
+            }
+            if (service.version.toString().equalsIgnoreCase(version)
+                    && service.specification.equals(spec)) {
+                return service;
+            }
+        }
+        return null;
+    }
+    
+    public static List<ServiceDef> getAllSupportedVersionForSpecification(final Specification spec) {
+        final List<ServiceDef> results = new ArrayList<>();
+        for (ServiceDef service : values()) {
+            if (service.version == null || service.specification == null) {
+                continue;
+            }
+            if (service.specification.equals(spec)) {
+                results.add(service);
+            }
+        }
+        Collections.sort(results, new ServiceDefVersionComparator());
+        return results;
     }
 
     @Override
@@ -288,4 +320,13 @@ public enum ServiceDef {
         }
     }
 
+
+    private static class ServiceDefVersionComparator implements Comparator<ServiceDef> {
+
+        @Override
+        public int compare(ServiceDef o1, ServiceDef o2) {
+            return o2.version.toString().compareTo(o1.version.toString());
+        }
+
+    }
 }

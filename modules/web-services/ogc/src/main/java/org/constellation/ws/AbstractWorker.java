@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -73,8 +74,6 @@ public abstract class AbstractWorker implements Worker {
      * A flag indicating if the worker is correctly started.
      */
     protected boolean isStarted;
-
-    protected boolean multipleVersionActivated = true;
 
     /**
      * A message keeping the reason of the start error of the service
@@ -132,14 +131,36 @@ public abstract class AbstractWorker implements Worker {
 
     private long currentUpdateSequence = System.currentTimeMillis();
     
-    /**
-     * Security manager.
-     */
-    
 
     public AbstractWorker(final String id, final Specification specification) {
         this.id = id;
         this.specification = specification;
+    }
+
+    /**
+     * this method initialize the supproted version of the worker.
+     * Must be called after the configuration Object is set (need to call getProperty).
+     *
+     * @throws org.constellation.ws.CstlServiceException if a version in the property "supported_versions" is not supported.
+     */
+    protected void applySupportedVersion() throws CstlServiceException {
+        final String versions = getProperty("supported_versions");
+        if (versions != null) {
+            final List<ServiceDef> definitions = new ArrayList<>();
+            final StringTokenizer tokenizer = new StringTokenizer(versions, ",");
+            while (tokenizer.hasMoreTokens()) {
+                final String version = tokenizer.nextToken();
+                final ServiceDef def = ServiceDef.getServiceDefinition(specification, version);
+                if (def == null) {
+                    throw new CstlServiceException("Unable to find a service specification for:" + specification.name() + " version:" + version);
+                } else {
+                    definitions.add(def);
+                }
+            }
+            setSupportedVersion(definitions);
+        } else {
+            setSupportedVersion(ServiceDef.getAllSupportedVersionForSpecification(specification));
+        }
     }
 
     protected String getUserLogin() {
@@ -152,8 +173,8 @@ public abstract class AbstractWorker implements Worker {
         return userLogin;
     }
 
-    protected void setSupportedVersion(final ServiceDef... supportedVersions) {
-         this.supportedVersions = UnmodifiableArrayList.wrap(supportedVersions.clone());
+    private void setSupportedVersion(final List<ServiceDef> supportedVersions) {
+         this.supportedVersions = UnmodifiableArrayList.wrap(supportedVersions.toArray(new ServiceDef[supportedVersions.size()]));
     }
 
     protected boolean isSupportedVersion(final String version) {
