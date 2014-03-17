@@ -1129,7 +1129,7 @@ public final class Session implements Closeable {
                     try {
                         return createRecord(rs, type);
                     } catch (Exception ex) {
-                        LOGGER.log(Level.WARNING, "An error occurred while creating a " + type.getCanonicalName() + " instance from ResultSet.");
+                        LOGGER.log(Level.WARNING, "An error occurred while creating a " + type.getCanonicalName() + " instance from ResultSet.", ex);
                     }
                 }
             } finally {
@@ -1158,7 +1158,7 @@ public final class Session implements Closeable {
                     try {
                         list.add((T) createRecord(rs, type));
                     } catch (Exception ex) {
-                        LOGGER.log(Level.WARNING, "An error occurred while creating a " + type.getCanonicalName() + " instance from ResultSet.");
+                        LOGGER.log(Level.WARNING, "An error occurred while creating a " + type.getCanonicalName() + " instance from ResultSet.", ex);
                     }
                 }
             } finally {

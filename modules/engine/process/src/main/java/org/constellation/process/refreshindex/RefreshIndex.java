@@ -112,7 +112,7 @@ public class RefreshIndex extends AbstractCstlProcess {
             console(FOREGROUND_GREEN, "OK", FOREGROUND_DEFAULT, "\n");
         } catch (MalformedURLException ex) {
             console(FOREGROUND_RED, "FAILED(Invalid URL)", FOREGROUND_DEFAULT, "\n");
-            log(null, "Refresh index ...... FAILED(Invalid URL)");
+            log(ex, "Refresh index ...... FAILED(Invalid URL)");
         } catch (IOException ex) {
             console(FOREGROUND_RED, "FAILED", FOREGROUND_DEFAULT, "\n");
             log(ex, "Refresh index ...... FAILED");

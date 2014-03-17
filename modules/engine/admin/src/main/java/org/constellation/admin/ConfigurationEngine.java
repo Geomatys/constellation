@@ -85,7 +85,6 @@ public class ConfigurationEngine {
 
     private static ConfigurationService configurationService;
 
-    private static String userTest = null;
 
     public static void setConfigurationService(ConfigurationService configurationService) {
         ConfigurationEngine.configurationService = configurationService;
@@ -630,7 +629,7 @@ public class ConfigurationEngine {
             try {
                 login = securityManager.getCurrentUserLogin();
             } catch (NoSecurityManagerException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage());
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
 
             if (login == null) {
@@ -716,7 +715,7 @@ public class ConfigurationEngine {
             try {
                 login = securityManager.getCurrentUserLogin();
             } catch (NoSecurityManagerException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage());
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
 
             if (login == null) {
@@ -917,7 +916,7 @@ public class ConfigurationEngine {
             try {
                 login = securityManager.getCurrentUserLogin();
             } catch (NoSecurityManagerException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage());
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             if (login == null) {
                 login="admin";
