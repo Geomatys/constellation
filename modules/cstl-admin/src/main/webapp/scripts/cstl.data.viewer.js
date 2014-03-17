@@ -16,6 +16,8 @@
 DataViewer = {
     map : undefined,
 
+    format : new OpenLayers.Format.WMSCapabilities(),
+
     layers : undefined,
 
     initMap : function(mapId){

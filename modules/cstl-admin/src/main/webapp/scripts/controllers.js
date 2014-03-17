@@ -1040,8 +1040,8 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
         };
     }]);
 
-cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'webService', '$modal','textService', '$dashboard', '$growl', '$filter', 'StyleSharedService','style',
-                                                 function ($scope, $routeParams , webService, $modal, textService, $dashboard, $growl, $filter, StyleSharedService, style) {
+cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'webService', 'provider', '$modal','textService', '$dashboard', '$growl', '$filter', 'StyleSharedService','style',
+                                                 function ($scope, $routeParams , webService, provider, $modal, textService, $dashboard, $growl, $filter, StyleSharedService, style) {
     $scope.tagText = '';
     $scope.type = $routeParams.type;
     $scope.url = cstlContext + "WS/" + $routeParams.type + "/" + $routeParams.id;
@@ -1108,7 +1108,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
          }
          $scope.metadata.keywords.push($scope.tagText);
          $scope.tagText = '';
-     }
+     };
 
      $scope.deleteTag = function(key) {
          if ($scope.metadata.keywords.length > 0 &&
@@ -1118,7 +1118,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
          } else if (key != undefined) {
              $scope.metadata.keywords.splice(key, 1);
          }
-     }
+     };
 
     $scope.saveServiceMetadata = function() {
       webService.updateMd({type: $scope.service.type, id: $scope.service.identifier},$scope.metadata,
@@ -1261,7 +1261,6 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
      $scope.showLayer = function() {
          $('#viewerData').modal("show");
          var layerName = $scope.selected.Name;
-         var layerData;
          if ($scope.service.type === 'WMTS') {
              // GetCaps
              textService.capa($scope.service.type.toLowerCase(), $scope.service.identifier, $scope.service.versions[0])
@@ -1269,22 +1268,56 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
                      // Build map
                      var capabilities = WmtsViewer.format.read(data);
                      WmtsViewer.initMap('dataMap', capabilities);
-                     layerData = WmtsViewer.createLayer(layerName, $scope.service.identifier, capabilities);
+                     var layerData = WmtsViewer.createLayer(layerName, $scope.service.identifier, capabilities);
                      WmtsViewer.map.addLayer(layerData);
                      var maxExtent = capabilities.contents.layers[0].bounds;
                      WmtsViewer.map.zoomToExtent(maxExtent, true);
                  });
          } else {
+             var layerBackground = DataViewer.createLayer("CNTR_BN_60M_2006", "generic_shp");
+             var layerData;
              if ($scope.service.type === 'WMS') {
-                 layerData = DataViewer.createLayerWMS(layerName, $scope.service.identifier);
+                 textService.capa($scope.service.type.toLowerCase(), $scope.service.identifier, $scope.service.versions[0])
+                     .success(function (data, status, headers, config) {
+                         var capabilities = DataViewer.format.read(data);
+                         var layers = capabilities.capability.layers;
+                         var capsLayer;
+                         for(var i=0; i < layers.length; i++) {
+                             var l = layers[i];
+                             if (l.name === layerName) {
+                                 capsLayer = l;
+                                 break;
+                             }
+                         }
+                         var llbbox = capsLayer.llbbox;
+                         var extent = new OpenLayers.Bounds(llbbox[0], llbbox[1], llbbox[2], llbbox[3]);
+                         layerData = DataViewer.createLayerWMS(layerName, $scope.service.identifier);
+                         DataViewer.layers = [layerData, layerBackground];
+                         DataViewer.initMap('dataMap');
+                         DataViewer.map.zoomToExtent(extent, true);
+                     });
              } else {
                  var providerId = $scope.selected.Provider;
                  layerData = DataViewer.createLayer(layerName, providerId);
-             }
+                 DataViewer.layers = [layerData, layerBackground];
 
-             var layerBackground = DataViewer.createLayer("CNTR_BN_60M_2006", "generic_shp")
-             DataViewer.layers = [layerData, layerBackground];
-             DataViewer.initMap('dataMap');
+                 provider.metadata({providerId: providerId}, {}, function(response) {
+                     // Success getting the metadata, try to find the data extent
+                     var ident = response['gmd.MD_Metadata']['gmd.identificationInfo'];
+                     if (ident) {
+                         var extentMD = ident['gmd.MD_DataIdentification']['gmd.extent'];
+                         if (extentMD) {
+                             var bbox = extentMD['gmd.EX_Extent']['gmd.geographicElement']['gmd.EX_GeographicBoundingBox'];
+                             var extent = new OpenLayers.Bounds(bbox['gmd.westBoundLongitude']['gco.Decimal'], bbox['gmd.southBoundLatitude']['gco.Decimal'],
+                                 bbox['gmd.eastBoundLongitude']['gco.Decimal'], bbox['gmd.northBoundLatitude']['gco.Decimal']);
+                             DataViewer.initMap('dataMap');
+                             DataViewer.map.zoomToExtent(extent, true);
+                         }
+                     }
+                 }, function() {
+                     DataViewer.initMap('dataMap');
+                 });
+             }
          }
      };
 
