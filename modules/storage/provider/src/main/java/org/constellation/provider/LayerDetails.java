@@ -62,12 +62,6 @@ public interface LayerDetails {
 
     String KEY_EXTRA_PARAMETERS = "EXTRA";
 
-    MutableStyleFactory STYLE_FACTORY = (MutableStyleFactory)FactoryFinder.getStyleFactory(
-                            new Hints(Hints.STYLE_FACTORY, MutableStyleFactory.class));
-    FilterFactory2 FILTER_FACTORY = (FilterFactory2)FactoryFinder.getFilterFactory(
-                            new Hints(Hints.FILTER_FACTORY, FilterFactory2.class));
-    RandomStyleFactory RANDOM_FACTORY = new RandomStyleFactory();
-
     /**
      * Default legend size, if not specified in the {@code GetLegend} request.
      */

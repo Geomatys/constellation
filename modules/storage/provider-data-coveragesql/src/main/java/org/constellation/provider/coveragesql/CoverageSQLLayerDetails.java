@@ -56,6 +56,7 @@ import org.apache.sis.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.DateRange;
 import org.apache.sis.measure.MeasurementRange;
+import org.geotoolkit.style.RandomStyleBuilder;
 
 import org.opengis.feature.type.Name;
 import org.opengis.geometry.Envelope;
@@ -147,7 +148,7 @@ class CoverageSQLLayerDetails extends AbstractLayerDetails implements CoverageLa
                         if(dimRange != null){
                             //a dim range is define, it replace any given style.
                             final DimRangeSymbolizer symbol = new DimRangeSymbolizer(dimRange);
-                            style = STYLE_FACTORY.style(symbol);
+                            style = StyleProviderProxy.STYLE_FACTORY.style(symbol);
                             final DefaultCoverageReference reference = new DefaultCoverageReference(reader, getName());
                             return MapBuilder.createCoverageLayer(reference, style);
                         }
@@ -167,13 +168,13 @@ class CoverageSQLLayerDetails extends AbstractLayerDetails implements CoverageLa
 
         if(style == null){
             //no favorites defined, create a default one
-            style = RANDOM_FACTORY.createRasterStyle();
+            style = RandomStyleBuilder.createDefaultRasterStyle();
         }
 
         final String title = getName().getLocalPart();
         final DefaultCoverageReference reference = new DefaultCoverageReference(reader, getName());
         final CoverageMapLayer mapLayer = MapBuilder.createCoverageLayer(reference, style);
-        mapLayer.setDescription(STYLE_FACTORY.description(title,title));
+        mapLayer.setDescription(StyleProviderProxy.STYLE_FACTORY.description(title,title));
 
         //search if we need an elevationmodel for style
         search_loop:

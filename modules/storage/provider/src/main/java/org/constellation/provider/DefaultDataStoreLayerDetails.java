@@ -28,6 +28,7 @@ import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.style.MutableStyle;
+import org.geotoolkit.style.RandomStyleBuilder;
 
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
@@ -108,14 +109,14 @@ public class DefaultDataStoreLayerDetails extends AbstractFeatureLayerDetails {
         final FeatureType featureType = store.getFeatureType(name);
         if(style == null){
             //no favorites defined, create a default one
-            style = RANDOM_FACTORY.createDefaultVectorStyle(featureType);
+            style = RandomStyleBuilder.createDefaultVectorStyle(featureType);
         }
 
         final FeatureMapLayer layer = MapBuilder.createFeatureLayer((FeatureCollection)getOrigin(), style);
 
         final String title = getName().getLocalPart();
         layer.setName(title);
-        layer.setDescription(STYLE_FACTORY.description(title,title));
+        layer.setDescription(StyleProviderProxy.STYLE_FACTORY.description(title,title));
 
         return layer;
     }

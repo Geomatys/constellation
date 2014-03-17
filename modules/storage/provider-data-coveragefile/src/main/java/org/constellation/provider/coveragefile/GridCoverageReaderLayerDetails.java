@@ -45,6 +45,7 @@ import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.style.MutableStyle;
+import org.geotoolkit.style.RandomStyleBuilder;
 
 import org.opengis.feature.type.Name;
 import org.opengis.geometry.Envelope;
@@ -122,13 +123,13 @@ class GridCoverageReaderLayerDetails extends AbstractLayerDetails implements Cov
 
         if(style == null){
             //no favorites defined, create a default one
-            style = RANDOM_FACTORY.createRasterStyle();
+            style = RandomStyleBuilder.createDefaultRasterStyle();
         }
 
         final String title = getName().getLocalPart();
         final DefaultCoverageReference reference = new DefaultCoverageReference(reader, getName());
         final CoverageMapLayer mapLayer = MapBuilder.createCoverageLayer(reference, style);
-        mapLayer.setDescription(STYLE_FACTORY.description(title,title));
+        mapLayer.setDescription(StyleProviderProxy.STYLE_FACTORY.description(title,title));
 
         //search if we need an elevationmodel for style
         search_loop:

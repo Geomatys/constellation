@@ -28,6 +28,7 @@ import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.MutableStyleFactory;
+import org.opengis.filter.FilterFactory2;
 
 
 /**
@@ -42,8 +43,8 @@ public final class StyleProviderProxy extends AbstractProviderProxy
 
     public static final MutableStyleFactory STYLE_FACTORY = (MutableStyleFactory)
             FactoryFinder.getStyleFactory(new Hints(Hints.STYLE_FACTORY, MutableStyleFactory.class));
-
-    public static final RandomStyleFactory STYLE_RANDOM_FACTORY = new RandomStyleFactory();
+    public final FilterFactory2 FILTER_FACTORY = (FilterFactory2)FactoryFinder.getFilterFactory(
+                            new Hints(Hints.FILTER_FACTORY, FilterFactory2.class));
 
     private static final Collection<StyleProviderService> SERVICES;
     static {
