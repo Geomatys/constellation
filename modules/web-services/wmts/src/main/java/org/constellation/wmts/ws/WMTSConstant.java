@@ -27,9 +27,11 @@ import org.constellation.dto.Service;
 import org.geotoolkit.ows.xml.AbstractContact;
 import org.geotoolkit.ows.xml.AbstractDCP;
 import org.geotoolkit.ows.xml.AbstractDomain;
+import org.geotoolkit.ows.xml.AbstractHTTP;
 import org.geotoolkit.ows.xml.AbstractOnlineResourceType;
 import org.geotoolkit.ows.xml.AbstractOperation;
 import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
+import org.geotoolkit.ows.xml.AbstractRequestMethod;
 import org.geotoolkit.ows.xml.AbstractResponsiblePartySubset;
 import org.geotoolkit.ows.xml.AbstractServiceIdentification;
 import org.geotoolkit.ows.xml.AbstractServiceProvider;
@@ -48,18 +50,28 @@ public final class WMTSConstant {
 
     public static final AbstractOperationsMetadata OPERATIONS_METADATA;
     static {
-        final List<AbstractDCP> getAndPost = new ArrayList<>();
-        getAndPost.add(OWSXmlFactory.buildDCP("1.1.0", "someURL", "someURL"));
+        final AbstractDomain restFullConstraint = OWSXmlFactory.buildDomain("1.1.0", "GetEncoding", Arrays.asList("RESTful"));
+        final AbstractDomain kvpConstraint      = OWSXmlFactory.buildDomain("1.1.0", "GetEncoding", Arrays.asList("KVP"));
 
-        final List<AbstractDCP> onlyPost = new ArrayList<>();
-        onlyPost.add(OWSXmlFactory.buildDCP("1.1.0", null, "someURL"));
+        final AbstractRequestMethod getKVP      = OWSXmlFactory.buildRrequestMethod("1.1.0", "someURL", Arrays.asList(kvpConstraint));
+        final AbstractRequestMethod getRSF      = OWSXmlFactory.buildRrequestMethod("1.1.0", "someURL", Arrays.asList(restFullConstraint));
+        final AbstractRequestMethod post        = OWSXmlFactory.buildRrequestMethod("1.1.0", "someURL", null);
+
+        final AbstractHTTP httpFull             = OWSXmlFactory.buildHttp("1.1.0", Arrays.asList(getKVP, getRSF), Arrays.asList(post));
+        final AbstractHTTP httpGFI              = OWSXmlFactory.buildHttp("1.1.0", Arrays.asList(getKVP), Arrays.asList(post));
+
+        final List<AbstractDCP> getAndPostKR    = new ArrayList<>();
+        getAndPostKR.add(OWSXmlFactory.buildDCP("1.1.0",httpFull));
+
+        final List<AbstractDCP> getAndPost    = new ArrayList<>();
+        getAndPost.add(OWSXmlFactory.buildDCP("1.1.0", httpGFI));
 
         final List<AbstractOperation> operations = new ArrayList<>();
 
-        final AbstractOperation getCapabilities = OWSXmlFactory.buildOperation("1.1.0", getAndPost, null, null, "GetCapabilities");
+        final AbstractOperation getCapabilities = OWSXmlFactory.buildOperation("1.1.0", getAndPostKR, null, null, "GetCapabilities");
         operations.add(getCapabilities);
 
-        final AbstractOperation getTile = OWSXmlFactory.buildOperation("1.1.0", getAndPost, null, null, "GetTile");
+        final AbstractOperation getTile = OWSXmlFactory.buildOperation("1.1.0", getAndPostKR, null, null, "GetTile");
         operations.add(getTile);
 
         final AbstractOperation getFeatureInfo = OWSXmlFactory.buildOperation("1.1.0", getAndPost, null, null, "GetFeatureInfo");
