@@ -1,7 +1,7 @@
 package org.constellation.coverage;
 
 import org.constellation.admin.dao.TaskRecord;
-import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.DataProviders;
 import org.geotoolkit.parameter.ParameterGroup;
 import org.geotoolkit.process.ProcessEvent;
 import org.geotoolkit.process.ProcessListener;
@@ -81,7 +81,7 @@ public class PyramidCoverageProcessListener implements ProcessListener {
      *
      */
     private void updateProvider() {
-    	final ParameterValueGroup oldSource = LayerProviderProxy.getInstance().getProvider(identifier).getSource();
+    	final ParameterValueGroup oldSource = DataProviders.getInstance().getProvider(identifier).getSource();
         final ParameterDescriptorGroup descriptor = oldSource.getDescriptor();
         URL fileUrl = null;
         try {
@@ -99,7 +99,7 @@ public class PyramidCoverageProcessListener implements ProcessListener {
         xmlCoverageStoreParameters.parameter("identifier").setValue("coverage-xml-pyramid");
         xmlCoverageStoreParameters.parameter("path").setValue(fileUrl);
         xmlCoverageStoreParameters.parameter("namespace").setValue("no namespace");
-        LayerProviderProxy.getInstance().getProvider(identifier).updateSource(newSources);
+        DataProviders.getInstance().getProvider(identifier).updateSource(newSources);
     }
 
     @Override

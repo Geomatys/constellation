@@ -57,7 +57,7 @@ public class SetMapStyleTest extends AbstractMapStyleTest {
         desc.createProcess(in).call();
 
         Provider provider = null;
-        for (StyleProvider p : StyleProviderProxy.getInstance().getProviders()) {
+        for (StyleProvider p : StyleProviders.getInstance().getProviders()) {
             if ("createStyleProvider1".equals(p.getId())){
                 provider = p;
             }
@@ -92,7 +92,7 @@ public class SetMapStyleTest extends AbstractMapStyleTest {
         desc.createProcess(in).call();
         
         Provider provider = null;
-        for (StyleProvider p : StyleProviderProxy.getInstance().getProviders()) {
+        for (StyleProvider p : StyleProviders.getInstance().getProviders()) {
             if ("createStyleProvider3".equals(p.getId())){
                 provider = p;
             }

@@ -18,10 +18,10 @@ package org.constellation.process.provider;
 
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.provider.LayerProvider;
-import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.DataProviders;
 import org.constellation.provider.Provider;
 import org.constellation.provider.StyleProvider;
-import org.constellation.provider.StyleProviderProxy;
+import org.constellation.provider.StyleProviders;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
@@ -50,9 +50,9 @@ public final class DeleteProvider extends AbstractCstlProcess{
         final Boolean deleteData = value(DELETE_DATA, inputParameters); // optional
 
         // Retrieve or not the provider instance.
-        Provider provider = LayerProviderProxy.getInstance().getProvider(providerID);
+        Provider provider = DataProviders.getInstance().getProvider(providerID);
         if (provider == null) {
-            provider = StyleProviderProxy.getInstance().getProvider(providerID);
+            provider = StyleProviders.getInstance().getProvider(providerID);
         }
         if (provider == null) {
             throw new ProcessException("Unable to delete the provider with id \"" + providerID + "\". Not found.", this, null);
@@ -63,9 +63,9 @@ public final class DeleteProvider extends AbstractCstlProcess{
             if (deleteData != null && deleteData) {
                 provider.removeAll();
             }
-            LayerProviderProxy.getInstance().removeProvider((LayerProvider) provider);
+            DataProviders.getInstance().removeProvider((LayerProvider) provider);
         } else {
-            StyleProviderProxy.getInstance().removeProvider((StyleProvider) provider);
+            StyleProviders.getInstance().removeProvider((StyleProvider) provider);
         }
     }
 

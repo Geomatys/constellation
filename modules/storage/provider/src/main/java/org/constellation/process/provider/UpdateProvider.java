@@ -43,7 +43,7 @@ public class UpdateProvider extends AbstractCstlProcess{
 
         boolean updated = false;
 
-        Collection<? extends Provider> providers = LayerProviderProxy.getInstance().getProviders();
+        Collection<? extends Provider> providers = DataProviders.getInstance().getProviders();
         for (final Provider p : providers) {
             if (providerID.equals(p.getId())) {
                 p.updateSource(source);
@@ -52,7 +52,7 @@ public class UpdateProvider extends AbstractCstlProcess{
             }
         }
         if (!updated) {
-            providers = StyleProviderProxy.getInstance().getProviders();
+            providers = StyleProviders.getInstance().getProviders();
             for (final Provider p : providers) {
                 if (providerID.equals(p.getId())) {
                     p.updateSource(source);

@@ -24,7 +24,7 @@ import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
 import org.constellation.data.CoverageSQLTestCase;
-import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.DataProviders;
 import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderService;
 import org.constellation.provider.configuration.Configurator;
@@ -108,7 +108,7 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };
-        LayerProviderProxy.getInstance().setConfigurator(configurator);
+        DataProviders.getInstance().setConfigurator(configurator);
 
 
         WORKER = new DefaultWCSWorker("default");
@@ -120,7 +120,7 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
     @AfterClass
     public static void tearDownClass() throws Exception {
         ConfigurationEngine.shutdownTestEnvironement("WCSWorkerInit");
-        LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
+        DataProviders.getInstance().setConfigurator(Configurator.DEFAULT);
         File derbyLog = new File("derby.log");
         if (derbyLog.exists()) {
             derbyLog.delete();

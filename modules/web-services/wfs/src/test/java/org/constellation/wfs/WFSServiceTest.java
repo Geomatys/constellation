@@ -20,7 +20,7 @@ package org.constellation.wfs;
 import org.geotoolkit.internal.io.IOUtilities;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import java.io.IOException;
-import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.DataProviders;
 import org.constellation.util.Util;
 import java.sql.Connection;
 import javax.ws.rs.core.Response;
@@ -111,7 +111,7 @@ public class WFSServiceTest {
     public static void tearDownClass() throws Exception {
         ConfigurationEngine.shutdownTestEnvironement("WFSServiceTest");
         
-        LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
+        DataProviders.getInstance().setConfigurator(Configurator.DEFAULT);
         if (ds != null) {
             ds.shutdown();
         }
@@ -334,7 +334,7 @@ public class WFSServiceTest {
             }
         };
 
-        LayerProviderProxy.getInstance().setConfigurator(config);
+        DataProviders.getInstance().setConfigurator(config);
     }
 
     /**

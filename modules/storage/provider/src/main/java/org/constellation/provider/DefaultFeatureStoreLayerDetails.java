@@ -103,7 +103,7 @@ public class DefaultFeatureStoreLayerDetails extends AbstractFeatureLayerDetails
             //no style provided, try to get the favorite one
             //there are some favorites styles
             final String namedStyle = favorites.get(0);
-            style = StyleProviderProxy.getInstance().get(namedStyle);
+            style = StyleProviders.getInstance().get(namedStyle);
         }
 
         final FeatureType featureType = store.getFeatureType(name);
@@ -116,7 +116,7 @@ public class DefaultFeatureStoreLayerDetails extends AbstractFeatureLayerDetails
 
         final String title = getName().getLocalPart();
         layer.setName(title);
-        layer.setDescription(StyleProviderProxy.STYLE_FACTORY.description(title,title));
+        layer.setDescription(StyleProviders.STYLE_FACTORY.description(title,title));
 
         return layer;
     }

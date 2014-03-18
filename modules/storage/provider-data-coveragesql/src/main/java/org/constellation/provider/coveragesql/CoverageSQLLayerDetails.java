@@ -31,8 +31,8 @@ import java.util.logging.Level;
 import org.constellation.ServiceDef;
 import org.constellation.provider.AbstractLayerDetails;
 import org.constellation.provider.CoverageLayerDetails;
-import org.constellation.provider.LayerProviderProxy;
-import org.constellation.provider.StyleProviderProxy;
+import org.constellation.provider.DataProviders;
+import org.constellation.provider.StyleProviders;
 
 import org.geotoolkit.coverage.DefaultCoverageReference;
 import org.geotoolkit.coverage.grid.GeneralGridGeometry;
@@ -148,7 +148,7 @@ class CoverageSQLLayerDetails extends AbstractLayerDetails implements CoverageLa
                         if(dimRange != null){
                             //a dim range is define, it replace any given style.
                             final DimRangeSymbolizer symbol = new DimRangeSymbolizer(dimRange);
-                            style = StyleProviderProxy.STYLE_FACTORY.style(symbol);
+                            style = StyleProviders.STYLE_FACTORY.style(symbol);
                             final DefaultCoverageReference reference = new DefaultCoverageReference(reader, getName());
                             return MapBuilder.createCoverageLayer(reference, style);
                         }
@@ -163,7 +163,7 @@ class CoverageSQLLayerDetails extends AbstractLayerDetails implements CoverageLa
             //no style provided, try to get the favorite one
             //there are some favorites styles
             final String namedStyle = favorites.get(0);
-            style = StyleProviderProxy.getInstance().get(namedStyle);
+            style = StyleProviders.getInstance().get(namedStyle);
         }
 
         if(style == null){
@@ -174,7 +174,7 @@ class CoverageSQLLayerDetails extends AbstractLayerDetails implements CoverageLa
         final String title = getName().getLocalPart();
         final DefaultCoverageReference reference = new DefaultCoverageReference(reader, getName());
         final CoverageMapLayer mapLayer = MapBuilder.createCoverageLayer(reference, style);
-        mapLayer.setDescription(StyleProviderProxy.STYLE_FACTORY.description(title,title));
+        mapLayer.setDescription(StyleProviders.STYLE_FACTORY.description(title,title));
 
         //search if we need an elevationmodel for style
         search_loop:
@@ -185,7 +185,7 @@ class CoverageSQLLayerDetails extends AbstractLayerDetails implements CoverageLa
                         final RasterSymbolizer rs = (RasterSymbolizer) symbol;
                         final ShadedRelief sr     = rs.getShadedRelief();
                         if (sr.getReliefFactor().evaluate(null, Float.class) != 0 && elevationModel!=null){
-                            final ElevationModel model = LayerProviderProxy.getInstance().getElevationModel(elevationModel);
+                            final ElevationModel model = DataProviders.getInstance().getElevationModel(elevationModel);
                             if (model != null){
                                 mapLayer.setElevationModel(model);
                             }

@@ -19,9 +19,9 @@ package org.constellation.process.provider;
 import java.util.Collection;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.provider.LayerProvider;
-import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.DataProviders;
 import org.constellation.provider.StyleProvider;
-import org.constellation.provider.StyleProviderProxy;
+import org.constellation.provider.StyleProviders;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
@@ -48,7 +48,7 @@ public class RestartProvider extends AbstractCstlProcess {
 
         boolean reloaded = false;
 
-        final Collection<LayerProvider> layerProviders = LayerProviderProxy.getInstance().getProviders();
+        final Collection<LayerProvider> layerProviders = DataProviders.getInstance().getProviders();
         for (LayerProvider p : layerProviders) {
             if (p.getId().equals(providerId)) {
                 p.reload();
@@ -58,7 +58,7 @@ public class RestartProvider extends AbstractCstlProcess {
         }
 
         if (!reloaded) {
-            final Collection<StyleProvider> styleProviders = StyleProviderProxy.getInstance().getProviders();
+            final Collection<StyleProvider> styleProviders = StyleProviders.getInstance().getProviders();
             for (StyleProvider p : styleProviders) {
                 if (p.getId().equals(providerId)) {
                     p.reload();

@@ -44,7 +44,7 @@ import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.configuration.ProviderConfiguration;
 import org.constellation.provider.LayerProvider;
-import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.DataProviders;
 import org.constellation.provider.LayerProviderService;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.LayerProviders;
@@ -80,7 +80,7 @@ public final class Provider {
         final String subType = config.getSubType();
         final Map<String,String> inParams = config.getParameters();
 
-        final LayerProviderService providerService = LayerProviderProxy.getInstance().getService(type);
+        final LayerProviderService providerService = DataProviders.getInstance().getService(type);
         final ParameterDescriptorGroup serviceDesc = providerService.getServiceDescriptor();
         final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup) serviceDesc.descriptor("source");
         final ParameterValueGroup sources = sourceDesc.createValue();
@@ -170,12 +170,12 @@ public final class Provider {
                 }
         }
 
-        final LayerProvider old = LayerProviderProxy.getInstance().getProvider(id);
+        final LayerProvider old = DataProviders.getInstance().getProvider(id);
         if (old != null) {
             // Provider already exists, update config
             old.updateSource(sources);
         } else {
-            LayerProviderProxy.getInstance().createProvider(providerService, sources);
+            DataProviders.getInstance().createProvider(providerService, sources);
         }
         return Response.ok().build();
     }
@@ -186,7 +186,7 @@ public final class Provider {
     @DELETE
     @Path("{id}")
     public Response delete(final @PathParam("id") String id) {
-        LayerProviderProxy.getInstance().remove(new DefaultName(id));
+        DataProviders.getInstance().remove(new DefaultName(id));
         return Response.status(200).build();
     }
 

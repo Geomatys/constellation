@@ -42,7 +42,7 @@ import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
 import org.constellation.configuration.WMSPortrayal;
 import org.constellation.provider.LayerDetails;
-import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.DataProviders;
 import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderService;
 import org.constellation.provider.configuration.Configurator;
@@ -192,7 +192,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
             }
         };
 
-        LayerProviderProxy.getInstance().setConfigurator(configurator);
+        DataProviders.getInstance().setConfigurator(configurator);
 
 
         WorldFileImageReader.Spi.registerDefaults(null);
@@ -209,7 +209,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
         }
 
         // Get the list of layers
-        layers = LayerProviderProxy.getInstance().getAll();
+        layers = DataProviders.getInstance().getAll();
     }
 
     /**
@@ -217,7 +217,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
      */
     @AfterClass
     public static void shutDown() {
-        LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
+        DataProviders.getInstance().setConfigurator(Configurator.DEFAULT);
         layers = null;
         File f = new File("derby.log");
         if (f.exists()) {

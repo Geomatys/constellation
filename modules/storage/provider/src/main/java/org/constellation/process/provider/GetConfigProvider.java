@@ -44,7 +44,7 @@ public final class GetConfigProvider extends AbstractCstlProcess {
 
         ParameterValueGroup config = null;
 
-        Collection<? extends Provider> providers = LayerProviderProxy.getInstance().getProviders();
+        Collection<? extends Provider> providers = DataProviders.getInstance().getProviders();
         for (final Provider p : providers) {
             if (p.getId().equals(providerID)) {
                 config = p.getSource();
@@ -53,7 +53,7 @@ public final class GetConfigProvider extends AbstractCstlProcess {
         }
 
         if (config == null) {
-            providers = StyleProviderProxy.getInstance().getProviders();
+            providers = StyleProviders.getInstance().getProviders();
             for (final Provider p : providers) {
                 if (p.getId().equals(providerID)) {
                     config = p.getSource();

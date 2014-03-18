@@ -173,7 +173,7 @@ public final class ConvertersJaxbToGeotk {
             styleName = styleRefStr;
         }
 
-        final Collection<StyleProvider> providers = StyleProviderProxy.getInstance().getProviders();
+        final Collection<StyleProvider> providers = StyleProviders.getInstance().getProviders();
         for (StyleProvider provider : providers) {
             if (providerID != null) {
                 if (provider.getId().equals(providerID)) {
@@ -211,7 +211,7 @@ public final class ConvertersJaxbToGeotk {
             boolean providerLayerFound = false;
 
             //find provider
-            final Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
+            final Collection<LayerProvider> providers = DataProviders.getInstance().getProviders();
             for (LayerProvider provider : providers) {
                 if (provider.getId().equals(providerID)) {
                     providerFound = true;
@@ -351,7 +351,7 @@ public final class ConvertersJaxbToGeotk {
             boolean providerLayerFound = false;
 
             //find provider
-            final Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
+            final Collection<LayerProvider> providers = DataProviders.getInstance().getProviders();
             for (LayerProvider provider : providers) {
                 if (provider.getId().equals(providerID)) {
                     providerFound = true;

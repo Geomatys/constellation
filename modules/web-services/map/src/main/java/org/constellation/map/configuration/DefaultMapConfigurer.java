@@ -102,11 +102,11 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     }
     
     public DefaultMapConfigurer(final ProviderOperationListener providerListener) {
-        final Collection<LayerProviderService> availableLayerServices = LayerProviderProxy.getInstance().getServices();
+        final Collection<LayerProviderService> availableLayerServices = DataProviders.getInstance().getServices();
         for (LayerProviderService service: availableLayerServices) {
             this.services.put(service.getName(), service);
         }
-        final Collection<StyleProviderService> availableStyleServices = StyleProviderProxy.getInstance().getServices();
+        final Collection<StyleProviderService> availableStyleServices = StyleProviders.getInstance().getServices();
         for (StyleProviderService service: availableStyleServices) {
             this.services.put(service.getName(), service);
         }
@@ -223,17 +223,17 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      */
     @Override
     public void beforeRestart() {
-        StyleProviderProxy.getInstance().dispose();
-        LayerProviderProxy.getInstance().dispose();
+        StyleProviders.getInstance().dispose();
+        DataProviders.getInstance().dispose();
     }
 
     private AcknowlegementType restartLayerProviders(){
-        LayerProviderProxy.getInstance().reload();
+        DataProviders.getInstance().reload();
         return new AcknowlegementType("Success", "All layer providers have been restarted.");
     }
 
     private AcknowlegementType restartStyleProviders(){
-        StyleProviderProxy.getInstance().reload();
+        StyleProviders.getInstance().reload();
         return new AcknowlegementType("Success", "All style providers have been restarted.");
 
     }
@@ -492,7 +492,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             final ParameterValueGroup newLayer = (ParameterValueGroup) reader.read();
             reader.dispose();
 
-            final Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
+            final Collection<LayerProvider> providers = DataProviders.getInstance().getProviders();
             for (LayerProvider p : providers) {
                 if (p.getId().equals(sourceId)) {
                     p.getSource().values().add(newLayer);
@@ -550,7 +550,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         final String sourceId = getParameter("id", true, parameters);
         final String layerName = getParameter("layerName", true, parameters);
 
-        final Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
+        final Collection<LayerProvider> providers = DataProviders.getInstance().getProviders();
         for (LayerProvider p : providers) {
             if (p.getId().equals(sourceId)) {
                 for (GeneralParameterValue param : p.getSource().values()) {
@@ -615,7 +615,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             ParameterValueGroup newLayer = (ParameterValueGroup) reader.read();
             reader.dispose();
 
-            Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
+            Collection<LayerProvider> providers = DataProviders.getInstance().getProviders();
             for (LayerProvider p : providers) {
                 if (p.getId().equals(sourceId)) {
                     for (GeneralParameterValue param : p.getSource().values()) {
@@ -682,7 +682,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         final String id = getParameter("id", true, parameters);
         final String styleId = getParameter("styleName", true, parameters);
 
-        final Collection<StyleProvider> providers = StyleProviderProxy.getInstance().getProviders();
+        final Collection<StyleProvider> providers = StyleProviders.getInstance().getProviders();
         for (Provider p : providers) {
             if (p.getId().equals(id)) {
                 Object style = p.get(styleId);
@@ -872,8 +872,8 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     private ProvidersReport listProviderServices(){
         final List<ProviderServiceReport> providerServ = new ArrayList<>();
 
-        final Collection<LayerProvider> layerProviders = LayerProviderProxy.getInstance().getProviders();
-        final Collection<StyleProvider> styleProviders = StyleProviderProxy.getInstance().getProviders();
+        final Collection<LayerProvider> layerProviders = DataProviders.getInstance().getProviders();
+        final Collection<StyleProvider> styleProviders = StyleProviders.getInstance().getProviders();
         for (ProviderService service : services.values()) {
 
             final List<ProviderReport> providerReports = new ArrayList<>();

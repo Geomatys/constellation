@@ -32,10 +32,10 @@ import org.constellation.map.configuration.StyleProviderConfig;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.provider.CreateProviderDescriptor;
 import org.constellation.provider.LayerProvider;
-import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderService;
 import org.constellation.provider.StyleProvider;
-import org.constellation.provider.StyleProviderProxy;
+import org.constellation.provider.StyleProviders;
 
 import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.lang.Setup;
@@ -87,8 +87,8 @@ public class MapSetup implements ServletContextListener {
      */
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
-        LayerProviderProxy.getInstance().dispose();
-        StyleProviderProxy.getInstance().dispose();
+        DataProviders.getInstance().dispose();
+        StyleProviders.getInstance().dispose();
     }
 
     /**
@@ -96,12 +96,12 @@ public class MapSetup implements ServletContextListener {
      */
     private void initializeDefaultStyles() {
         // Create default SLD provider containing default styles.
-        StyleProvider provider = StyleProviderProxy.getInstance().getProvider("sld");
+        StyleProvider provider = StyleProviders.getInstance().getProvider("sld");
         final String sldPath = ConfigDirectory.getStyleDirectory().getPath();
         if (provider == null) {
             // Acquire SLD provider service instance.
             ProviderService sldService = null;
-            for (final ProviderService service : StyleProviderProxy.getInstance().getServices()) {
+            for (final ProviderService service : StyleProviders.getInstance().getServices()) {
                 if (service.getName().equals("sld")) {
                     sldService = service;
                     break;
@@ -134,7 +134,7 @@ public class MapSetup implements ServletContextListener {
             }
 
             // Retrieve created provider instance.
-            provider = StyleProviderProxy.getInstance().getProvider("sld");
+            provider = StyleProviders.getInstance().getProvider("sld");
         }
 
         // Fill default SLD provider.
@@ -188,11 +188,11 @@ public class MapSetup implements ServletContextListener {
 
             final String featureStoreStr = "feature-store";
             final String shpProvName = "generic_shp";
-            LayerProvider shpProvider = LayerProviderProxy.getInstance().getProvider(shpProvName);
+            LayerProvider shpProvider = DataProviders.getInstance().getProvider(shpProvName);
             if (shpProvider == null) {
                 // Acquire SHP provider service instance.
                 ProviderService shpService = null;
-                for (final ProviderService service : LayerProviderProxy.getInstance().getServices()) {
+                for (final ProviderService service : DataProviders.getInstance().getServices()) {
                     if (service.getName().equals(featureStoreStr)) {
                         shpService = service;
                         break;
@@ -251,11 +251,11 @@ public class MapSetup implements ServletContextListener {
 
             final String coverageFileStr = "coverage-store";
             final String tifProvName = "generic_world_tif";
-            LayerProvider tifProvider = LayerProviderProxy.getInstance().getProvider(tifProvName);
+            LayerProvider tifProvider = DataProviders.getInstance().getProvider(tifProvName);
             if (tifProvider == null) {
                 // Acquire TIFF provider service instance.
                 ProviderService tifService = null;
-                for (final ProviderService service : LayerProviderProxy.getInstance().getServices()) {
+                for (final ProviderService service : DataProviders.getInstance().getServices()) {
                     if (service.getName().equals(coverageFileStr)) {
                         tifService = service;
                         break;

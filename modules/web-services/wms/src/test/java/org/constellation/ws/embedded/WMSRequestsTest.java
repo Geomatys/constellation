@@ -44,7 +44,7 @@ import org.constellation.map.featureinfo.FeatureInfoUtilities;
 
 // Constellation dependencies
 import org.constellation.test.ImageTesting;
-import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.DataProviders;
 import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderService;
 import org.constellation.provider.configuration.Configurator;
@@ -283,7 +283,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
             }
         };
 
-        LayerProviderProxy.getInstance().setConfigurator(configurator);
+        DataProviders.getInstance().setConfigurator(configurator);
 
         WorldFileImageReader.Spi.registerDefaults(null);
         WMSPortrayal.setEmptyExtension(true);
@@ -301,7 +301,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
 
     @AfterClass
     public static void shutDown() throws JAXBException {
-        LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
+        DataProviders.getInstance().setConfigurator(Configurator.DEFAULT);
         ConfigurationEngine.shutdownTestEnvironement("WMSRequestTest");
         finish();
     }

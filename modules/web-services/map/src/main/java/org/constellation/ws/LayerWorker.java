@@ -35,8 +35,8 @@ import org.constellation.admin.ConfigurationEngine;
 import org.constellation.map.factory.MapFactory;
 import org.constellation.map.security.LayerSecurityFilter;
 import org.constellation.provider.LayerDetails;
-import org.constellation.provider.LayerProviderProxy;
-import org.constellation.provider.StyleProviderProxy;
+import org.constellation.provider.DataProviders;
+import org.constellation.provider.StyleProviders;
 import org.constellation.util.DataReference;
 import org.constellation.ws.rs.MapUtilities;
 import org.geotoolkit.factory.FactoryNotFoundException;
@@ -131,7 +131,7 @@ public abstract class LayerWorker extends AbstractWorker {
         defaultLanguage = defaultLanguageCandidate;
 
         //listen to changes on the providers to clear the getcapabilities cache
-        LayerProviderProxy.getInstance().addPropertyListener(new PropertyChangeListener() {
+        DataProviders.getInstance().addPropertyListener(new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 refreshUpdateSequence();
@@ -240,7 +240,7 @@ public abstract class LayerWorker extends AbstractWorker {
      */
     protected LayerDetails getLayerReference(final String login, final Name layerName) throws CstlServiceException {
         final LayerDetails layerRef;
-        final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
+        final DataProviders namedProxy = DataProviders.getInstance();
         final NameInProvider fullName = layersContainsKey(login, layerName);
         if (fullName != null) {
             if (fullName.dataVersion != null) {
@@ -315,7 +315,7 @@ public abstract class LayerWorker extends AbstractWorker {
         if (styleName != null) {
             //try to grab the style if provided
             //a style has been given for this layer, try to use it
-            style = StyleProviderProxy.getInstance().get(styleName.getLayerId().getLocalPart(), styleName.getProviderId());
+            style = StyleProviders.getInstance().get(styleName.getLayerId().getLocalPart(), styleName.getProviderId());
             if (style == null) {
                 throw new CstlServiceException("Style provided: " + styleName.getReference() + " not found.", STYLE_NOT_DEFINED);
             }
@@ -327,7 +327,7 @@ public abstract class LayerWorker extends AbstractWorker {
     }
 
     protected MutableStyle getLayerStyle(final String styleName) {
-        return StyleProviderProxy.getInstance().get(styleName);
+        return StyleProviders.getInstance().get(styleName);
     }
 
     protected Layer getMainLayer() {

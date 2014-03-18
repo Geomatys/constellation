@@ -48,11 +48,11 @@ public final class CreateProvider extends AbstractCstlProcess {
 
         //initialize list of avaible Povider services
         final Map<String, ProviderService> services = new HashMap<>();
-        final Collection<LayerProviderService> availableLayerServices = LayerProviderProxy.getInstance().getServices();
+        final Collection<LayerProviderService> availableLayerServices = DataProviders.getInstance().getServices();
         for (LayerProviderService service: availableLayerServices) {
             services.put(service.getName(), service);
         }
-        final Collection<StyleProviderService> availableStyleServices = StyleProviderProxy.getInstance().getServices();
+        final Collection<StyleProviderService> availableStyleServices = StyleProviders.getInstance().getServices();
         for (StyleProviderService service: availableStyleServices) {
             services.put(service.getName(), service);
         }
@@ -66,26 +66,26 @@ public final class CreateProvider extends AbstractCstlProcess {
             //LayerProvider case
             if (service instanceof LayerProviderService) {
 
-                final Collection<LayerProvider> layerProviders = LayerProviderProxy.getInstance().getProviders();
+                final Collection<LayerProvider> layerProviders = DataProviders.getInstance().getProviders();
                 for (final LayerProvider lp : layerProviders) {
                     if (id.equals(lp.getId())) {
                         throw new ProcessException("Provider ID is already used : " + id, this, null);
                     }
                 }
                 source.parameter("date").setValue(new Date());
-                LayerProviderProxy.getInstance().createProvider((LayerProviderService) service, source);
+                DataProviders.getInstance().createProvider((LayerProviderService) service, source);
             }
 
             //StyleProvider case
             if (service instanceof StyleProviderService) {
 
-                final Collection<StyleProvider> styleProviders = StyleProviderProxy.getInstance().getProviders();
+                final Collection<StyleProvider> styleProviders = StyleProviders.getInstance().getProviders();
                 for (final Provider sp : styleProviders) {
                     if (id.equals(sp.getId())) {
                         throw new ProcessException("Provider ID is already used : " + id, this, null);
                     }
                 }
-                StyleProviderProxy.getInstance().createProvider((StyleProviderService) service, source);
+                StyleProviders.getInstance().createProvider((StyleProviderService) service, source);
             }
         } else {
             throw new ProcessException("Provider type not found:" + providerType, this, null);

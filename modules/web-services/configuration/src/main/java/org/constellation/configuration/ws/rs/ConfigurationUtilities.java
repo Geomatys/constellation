@@ -242,8 +242,8 @@ public class ConfigurationUtilities {
 
         ParameterValueGroup sourceGroup;
         List<ParameterValueGroup> sources;
-        final LayerProviderProxy layerProxy = LayerProviderProxy.getInstance();
-        final StyleProviderProxy styleProxy = StyleProviderProxy.getInstance();
+        final DataProviders layerProxy = DataProviders.getInstance();
+        final StyleProviders styleProxy = StyleProviders.getInstance();
         for (File providerDir : providers) {
             LOGGER.log(Level.FINE, "Providers");
             for (File providerFile : providerDir.listFiles(XML_FILE_FILTER)) {

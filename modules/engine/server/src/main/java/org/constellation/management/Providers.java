@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.constellation.provider.LayerProviderProxy;
-import org.constellation.provider.StyleProviderProxy;
+import org.constellation.provider.DataProviders;
+import org.constellation.provider.StyleProviders;
 import org.geotoolkit.feature.DefaultName;
 import org.apache.sis.util.logging.Logging;
 
@@ -44,19 +44,19 @@ public final class Providers implements ProvidersMBean{
 
     @Override
     public synchronized void reloadLayerProviders() {
-        LayerProviderProxy.getInstance().reload();
+        DataProviders.getInstance().reload();
     }
 
     @Override
     public synchronized void reloadStyleProviders() {
-        StyleProviderProxy.getInstance().reload();
+        StyleProviders.getInstance().reload();
     }
 
     @Override
     public List<String> getLayerList() {
         final List<String> names = new ArrayList<String>();
         try {
-            for (Name n : LayerProviderProxy.getInstance().getKeys()) {
+            for (Name n : DataProviders.getInstance().getKeys()) {
                 names.add(DefaultName.toJCRExtendedForm(n));
             }
             Collections.sort(names);
@@ -70,7 +70,7 @@ public final class Providers implements ProvidersMBean{
     public List<String> getStyleList() {
         final List<String> names = new ArrayList<String>();
         try {
-            names.addAll(StyleProviderProxy.getInstance().getKeys());
+            names.addAll(StyleProviders.getInstance().getKeys());
             Collections.sort(names);
         } catch (IllegalStateException ex) {
             LOGGER.log(Level.SEVERE, "An error occurs while trying to load the style providers.",ex);

@@ -35,7 +35,7 @@ import org.constellation.configuration.Source;
 
 // Constellation dependencies
 import org.constellation.test.ImageTesting;
-import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.DataProviders;
 import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderService;
 import org.constellation.provider.configuration.Configurator;
@@ -176,7 +176,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
             }
         };
 
-        LayerProviderProxy.getInstance().setConfigurator(configurator);
+        DataProviders.getInstance().setConfigurator(configurator);
 
         WorldFileImageReader.Spi.registerDefaults(null);
 
@@ -193,7 +193,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
 
     @AfterClass
     public static void shutDown() throws JAXBException {
-        LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
+        DataProviders.getInstance().setConfigurator(Configurator.DEFAULT);
         ConfigurationEngine.shutdownTestEnvironement("WCSRequestsTest");
         finish();
     }

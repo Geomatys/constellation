@@ -29,7 +29,7 @@ import javax.xml.namespace.QName;
 
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.provider.LayerProvider;
-import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.DataProviders;
 import org.constellation.util.DataReference;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.parameter.Parameters;
@@ -246,7 +246,7 @@ public class AddLayerToMapService extends AbstractProcess {
 
         LayerProvider provider = null;
 
-        final Collection<LayerProvider> layerProviders = LayerProviderProxy.getInstance().getProviders();
+        final Collection<LayerProvider> layerProviders = DataProviders.getInstance().getProviders();
         for (final LayerProvider layerProvider : layerProviders) {
             if (layerProvider.getId().equals(providerID)) {
                provider = layerProvider;

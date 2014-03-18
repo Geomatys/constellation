@@ -18,7 +18,7 @@ package org.constellation.process.provider.style;
 
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.provider.StyleProvider;
-import org.constellation.provider.StyleProviderProxy;
+import org.constellation.provider.StyleProviders;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
@@ -52,7 +52,7 @@ public class DeleteStyleToStyleProvider extends AbstractCstlProcess {
         }
 
         // Retrieve or not the provider instance.
-        final StyleProvider provider = StyleProviderProxy.getInstance().getProvider(providerID);
+        final StyleProvider provider = StyleProviders.getInstance().getProvider(providerID);
         if (provider == null) {
             throw new ProcessException("Unable to delete the style named \"" + styleName + "\". Provider with id \"" + providerID + "\" not found.", this, null);
         }

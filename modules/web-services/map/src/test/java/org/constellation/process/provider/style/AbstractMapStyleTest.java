@@ -40,7 +40,7 @@ public abstract class AbstractMapStyleTest extends AbstractProcessTest {
     protected static ProviderService SLD_SERVICE;
 
     static {
-        final Collection<StyleProviderService> availableLayerServices = StyleProviderProxy.getInstance().getServices();
+        final Collection<StyleProviderService> availableLayerServices = StyleProviders.getInstance().getServices();
         for (StyleProviderService tmpService : availableLayerServices) {
             if ("sld".equals(tmpService.getName())) {
                 SLD_SERVICE = tmpService;
@@ -104,7 +104,7 @@ public abstract class AbstractMapStyleTest extends AbstractProcessTest {
      * @param providerSource
      */
     protected static void addProvider(ParameterValueGroup providerSource) {
-        StyleProviderProxy.getInstance().createProvider((StyleProviderService) SLD_SERVICE, providerSource);
+        StyleProviders.getInstance().createProvider((StyleProviderService) SLD_SERVICE, providerSource);
     }
 
     /**
@@ -114,11 +114,11 @@ public abstract class AbstractMapStyleTest extends AbstractProcessTest {
     protected static void removeProvider(String id) {
 
         StyleProvider provider = null;
-        for (StyleProvider p : StyleProviderProxy.getInstance().getProviders()) {
+        for (StyleProvider p : StyleProviders.getInstance().getProviders()) {
             if (p.getId().equals(id)) {
             }
         }
-        StyleProviderProxy.getInstance().removeProvider(provider);
+        StyleProviders.getInstance().removeProvider(provider);
     }
 
 }

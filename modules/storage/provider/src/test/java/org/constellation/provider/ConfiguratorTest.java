@@ -52,7 +52,7 @@ public class ConfiguratorTest {
      */
     @Test
     public void testServiceAvailable(){
-        final Collection<LayerProviderService> services = LayerProviderProxy.getInstance().getServices();
+        final Collection<LayerProviderService> services = DataProviders.getInstance().getServices();
         assertEquals(1, services.size());
         assertTrue(services.iterator().next() instanceof MockLayerProviderService);
     }
@@ -75,9 +75,9 @@ public class ConfiguratorTest {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };
-        LayerProviderProxy.getInstance().setConfigurator(config);
+        DataProviders.getInstance().setConfigurator(config);
 
-        assertEquals(0, LayerProviderProxy.getInstance().getProviders().size());
+        assertEquals(0, DataProviders.getInstance().getProviders().size());
     }
 
     /**
@@ -107,11 +107,11 @@ public class ConfiguratorTest {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };
-        LayerProviderProxy.getInstance().setConfigurator(config);
+        DataProviders.getInstance().setConfigurator(config);
 
-        final Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
+        final Collection<LayerProvider> providers = DataProviders.getInstance().getProviders();
         assertEquals(1, providers.size());
-        assertEquals(3, LayerProviderProxy.getInstance().getKeys().size());
+        assertEquals(3, DataProviders.getInstance().getKeys().size());
     }
 
     /**
@@ -151,14 +151,14 @@ public class ConfiguratorTest {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };
-        LayerProviderProxy.getInstance().setConfigurator(config);
+        DataProviders.getInstance().setConfigurator(config);
 
-        final Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
+        final Collection<LayerProvider> providers = DataProviders.getInstance().getProviders();
         assertEquals(3, providers.size());
-        assertEquals(9, LayerProviderProxy.getInstance().getKeys().size());
-        assertEquals(4, LayerProviderProxy.getInstance().getKeys("id-0").size());
-        assertEquals(2, LayerProviderProxy.getInstance().getKeys("id-1").size());
-        assertEquals(3, LayerProviderProxy.getInstance().getKeys("id-2").size());
+        assertEquals(9, DataProviders.getInstance().getKeys().size());
+        assertEquals(4, DataProviders.getInstance().getKeys("id-0").size());
+        assertEquals(2, DataProviders.getInstance().getKeys("id-1").size());
+        assertEquals(3, DataProviders.getInstance().getKeys("id-2").size());
     }
 
     /**
@@ -199,14 +199,14 @@ public class ConfiguratorTest {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };
-        LayerProviderProxy.getInstance().setConfigurator(config);
+        DataProviders.getInstance().setConfigurator(config);
 
-        final Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
+        final Collection<LayerProvider> providers = DataProviders.getInstance().getProviders();
         assertEquals(2, providers.size());
-        assertEquals(7, LayerProviderProxy.getInstance().getKeys().size());
-        assertEquals(4, LayerProviderProxy.getInstance().getKeys("id-0").size());
-        assertEquals(0, LayerProviderProxy.getInstance().getKeys("id-1").size());
-        assertEquals(3, LayerProviderProxy.getInstance().getKeys("id-2").size());
+        assertEquals(7, DataProviders.getInstance().getKeys().size());
+        assertEquals(4, DataProviders.getInstance().getKeys("id-0").size());
+        assertEquals(0, DataProviders.getInstance().getKeys("id-1").size());
+        assertEquals(3, DataProviders.getInstance().getKeys("id-2").size());
     }
 
     /**
@@ -247,20 +247,20 @@ public class ConfiguratorTest {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };
-        LayerProviderProxy.getInstance().setConfigurator(config);
+        DataProviders.getInstance().setConfigurator(config);
 
-        assertEquals(3, LayerProviderProxy.getInstance().getProviders().size());
+        assertEquals(3, DataProviders.getInstance().getProviders().size());
 
         //second provider will crash on dispose
-        LayerProviderProxy.getInstance().dispose();
+        DataProviders.getInstance().dispose();
 
         //ensure all providers even if it crashed before are properly reloaded
-        assertEquals(3, LayerProviderProxy.getInstance().getProviders().size());
-        assertEquals(9, LayerProviderProxy.getInstance().getKeys().size());
+        assertEquals(3, DataProviders.getInstance().getProviders().size());
+        assertEquals(9, DataProviders.getInstance().getKeys().size());
 
 
         //set an empty configuration and verify nothing remains
-        LayerProviderProxy.getInstance().setConfigurator(new Configurator() {
+        DataProviders.getInstance().setConfigurator(new Configurator() {
             @Override
             public ParameterValueGroup getConfiguration(final ProviderService service) {
                 return null;
@@ -272,8 +272,8 @@ public class ConfiguratorTest {
             }
         });
 
-        assertEquals(0, LayerProviderProxy.getInstance().getProviders().size());
-        assertEquals(0, LayerProviderProxy.getInstance().getKeys().size());
+        assertEquals(0, DataProviders.getInstance().getProviders().size());
+        assertEquals(0, DataProviders.getInstance().getKeys().size());
 
     }
 

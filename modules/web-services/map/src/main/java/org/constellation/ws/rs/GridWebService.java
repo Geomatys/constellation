@@ -19,8 +19,8 @@ package org.constellation.ws.rs;
 
 import org.constellation.ServiceDef.Specification;
 import org.constellation.map.configuration.MapConfigurer;
-import org.constellation.provider.LayerProviderProxy;
-import org.constellation.provider.StyleProviderProxy;
+import org.constellation.provider.DataProviders;
+import org.constellation.provider.StyleProviders;
 import org.constellation.ws.Worker;
 
 /**
@@ -47,8 +47,8 @@ public abstract class GridWebService<W extends Worker> extends OGCWebService<W> 
     protected void specificRestart(String identifier) {
         LOGGER.info("reloading provider");
         // clear style and layer caches.
-        StyleProviderProxy.getInstance().dispose();
-        LayerProviderProxy.getInstance().dispose();
+        StyleProviders.getInstance().dispose();
+        DataProviders.getInstance().dispose();
     }
 
     @Override

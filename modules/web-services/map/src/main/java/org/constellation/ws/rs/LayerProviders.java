@@ -36,7 +36,7 @@ import org.constellation.portrayal.internal.PortrayalResponse;
 import org.constellation.provider.FeatureLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProvider;
-import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.DataProviders;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.coverage.GridSampleDimension;
@@ -386,7 +386,7 @@ public final class LayerProviders extends Static {
      * @throws CstlServiceException if the provider does not exists
      */
     private static LayerProvider getProvider(final String providerId) throws CstlServiceException {
-        final LayerProvider provider = LayerProviderProxy.getInstance().getProvider(providerId);
+        final LayerProvider provider = DataProviders.getInstance().getProvider(providerId);
         if (provider == null) {
             throw new CstlServiceException("No layer provider for id \"" + providerId + "\".");
         }

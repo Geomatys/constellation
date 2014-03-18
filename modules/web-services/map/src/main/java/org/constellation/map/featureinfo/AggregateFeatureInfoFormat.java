@@ -4,7 +4,7 @@ import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.GFIParam;
 import org.constellation.configuration.GetFeatureInfoCfg;
 import org.constellation.provider.LayerProvider;
-import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.DataProviders;
 import org.constellation.provider.coveragesgroup.CoveragesGroupProvider;
 import org.constellation.provider.coveragesgroup.util.ConvertersJaxbToGeotk;
 import org.geotoolkit.display2d.GraphicVisitor;
@@ -174,7 +174,7 @@ public class AggregateFeatureInfoFormat extends AbstractFeatureInfoFormat {
             return false;
         }
 
-        final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
+        final DataProviders namedProxy = DataProviders.getInstance();
         final LayerProvider provider = namedProxy.getProvider(providerId);
         if (provider == null || !(provider instanceof CoveragesGroupProvider)) {
             throw new ConfigurationException("GetFeatureInfo configuration parameter "+PROVIDER_ID_PARAM

@@ -32,7 +32,7 @@ import java.util.logging.Level;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
-import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.DataProviders;
 import org.constellation.provider.configuration.Configurator;
 import static org.constellation.provider.configuration.ProviderParameters.*;
 import org.constellation.test.CstlDOMComparator;
@@ -1433,7 +1433,7 @@ public class WFSWorkerTest {
             }
         };
 
-        LayerProviderProxy.getInstance().setConfigurator(config);
+        DataProviders.getInstance().setConfigurator(config);
     }
     /**
      * Initialises the data directory in unzipping the jar containing the resources

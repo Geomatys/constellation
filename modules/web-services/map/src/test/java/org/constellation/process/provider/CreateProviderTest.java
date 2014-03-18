@@ -47,7 +47,7 @@ public class CreateProviderTest extends AbstractProviderTest {
     @Test
     public void testCreateProvider() throws ProcessException, NoSuchIdentifierException, MalformedURLException{
 
-        final int nbProvider = LayerProviderProxy.getInstance().getProviders().size();
+        final int nbProvider = DataProviders.getInstance().getProviders().size();
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateProviderDescriptor.NAME);
 
         final ParameterValueGroup parameters = buildCSVProvider(DATASTORE_SERVICE, "newProvider", false, EMPTY_CSV);
@@ -59,15 +59,15 @@ public class CreateProviderTest extends AbstractProviderTest {
         proc.call();
 
         LayerProvider provider = null;
-        for (LayerProvider p : LayerProviderProxy.getInstance().getProviders()) {
+        for (LayerProvider p : DataProviders.getInstance().getProviders()) {
             if ("newProvider".equals(p.getId())){
                 provider = p;
             }
         }
-        assertTrue(nbProvider+1 == LayerProviderProxy.getInstance().getProviders().size());
+        assertTrue(nbProvider+1 == DataProviders.getInstance().getProviders().size());
         assertNotNull(provider);
 
-        LayerProviderProxy.getInstance().removeProvider(provider);
+        DataProviders.getInstance().removeProvider(provider);
         removeProvider("newProvider");
 
     }

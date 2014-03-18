@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2010-2011, Geomatys
+ *    (C) 2007 - 2014, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,7 +14,6 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.constellation.provider;
 
 import java.beans.PropertyChangeEvent;
@@ -26,42 +25,45 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.constellation.provider.configuration.Configurator;
-import org.constellation.provider.configuration.ProviderParameters;
 import org.apache.sis.util.NullArgumentException;
 import org.apache.sis.util.logging.Logging;
 import static org.constellation.provider.Provider.RELOAD_TIME_PROPERTY;
+import org.constellation.provider.configuration.Configurator;
+import org.constellation.provider.configuration.ProviderParameters;
+
+import org.geotoolkit.factory.FactoryFinder;
+import org.geotoolkit.factory.Hints;
+import org.geotoolkit.style.MutableStyle;
+import org.geotoolkit.style.MutableStyleFactory;
 import org.opengis.feature.type.Name;
+import org.opengis.filter.FilterFactory2;
 import org.opengis.parameter.ParameterValueGroup;
 
+
 /**
- * Common base class for LayerProviderProxy and StyleProviderProxy.
- * Ensure correct thread-safe reloading of providers.
+ * Main Data provider for styles objects. This class act as a proxy for
+ * several SLD folder providers.
  *
+ * @version $Id$
  * @author Johann Sorel (Geomatys)
  */
-public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
-        extends ProviderService<K,V,P>> implements PropertyChangeListener{
+public final class StyleProviders implements PropertyChangeListener{
 
     protected static final Logger LOGGER = Logging.getLogger("org.constellation.provider");
 
     private final PropertyChangeSupport listeners = new PropertyChangeSupport(this);
     private long lastUpdateTime = System.currentTimeMillis();
-    protected final Class<K> keyClass;
-    protected final Class<V> valClass;
+    protected final Class<String> keyClass = String.class;
+    protected final Class<MutableStyle> valClass = MutableStyle.class;
     
     //all loaded providers
-    private Collection<P> PROVIDERS = null;
+    private Collection<StyleProvider> PROVIDERS = null;
     private Configurator configurator = Configurator.DEFAULT;
 
-    protected AbstractProviderProxy(Class<K> keyClass, Class<V> valClass){
-        this.keyClass = keyClass;
-        this.valClass = valClass;
-    }
 
     protected Logger getLogger() {
         return LOGGER;
@@ -70,14 +72,14 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
     /**
      * {@inheritDoc}
      */
-    public boolean contains(K key) {
+    public boolean contains(String key) {
         return getKeys().contains(key);
     }
 
     /**
      * Empty implementation.
      */
-    public void remove(K key) {
+    public void remove(String key) {
     }
 
     protected synchronized void fireUpdateEvent(){
@@ -107,7 +109,7 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
         if(source instanceof Provider){
             //save changed configuration
             final Provider provider = (Provider) source;
-            saveConfiguration((S) provider.getService());
+            saveConfiguration((StyleProviderService) provider.getService());
         }
         //forward events
         fireUpdateEvent();
@@ -136,9 +138,9 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
         return configurator;
     }
 
-    public P createProvider(final S service, final ParameterValueGroup params){
+    public StyleProvider createProvider(final StyleProviderService service, final ParameterValueGroup params){
         getProviders();
-        final P provider = service.createProvider(params);
+        final StyleProvider provider = service.createProvider(params);
 
         //add in the list our provider
         provider.addPropertyListener(this);
@@ -148,12 +150,12 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
         return provider;
     }
 
-    public P removeProvider(final P provider){
+    public StyleProvider removeProvider(final StyleProvider provider){
         final boolean b = PROVIDERS.remove(provider);
 
         if(b){
             provider.removePropertyListener(this);
-            saveConfiguration((S) provider.getService());
+            saveConfiguration(provider.getService());
             fireUpdateEvent();
         }
 
@@ -163,11 +165,11 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
     /**
      * Save configuration for the given provider service
      */
-    private void saveConfiguration(final S service){
+    private void saveConfiguration(final ProviderService service){
         getLogger().log(Level.INFO, "Saving configuration for service : {0}", service.getName());
         //save configuration
         final List<Provider> providers = new ArrayList<>();
-        for(P candidate : PROVIDERS){
+        for(StyleProvider candidate : PROVIDERS){
             if(candidate.getService().equals(service)){
                 providers.add(candidate);
             }
@@ -178,16 +180,16 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
     /**
      * {@inheritDoc }
      */
-    public Set<K> getKeys() {
+    public Set<String> getKeys() {
         return getKeys(null);
     }
 
     /**
      * {@inheritDoc }
      */
-    public Set<K> getKeys(final String sourceId) {
-        final Set<K> keys = new HashSet<>();
-        for(final Provider<K,V> provider : getProviders()){
+    public Set<String> getKeys(final String sourceId) {
+        final Set<String> keys = new HashSet<>();
+        for(final Provider<String,MutableStyle> provider : getProviders()){
             keys.addAll(provider.getKeys(sourceId));
         }
         return keys;
@@ -198,65 +200,46 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
      * @deprecated use get(key, providerID) instead because two provider can have the same named layer
      */
     @Deprecated
-    public V get(final K key) {
-        final List<V> candidates = new ArrayList<>();
+    public MutableStyle get(final String key) {
+        final List<MutableStyle> candidates = new ArrayList<>();
 
-        for(final Provider<K,V> provider : getProviders()){
-            final V layer = provider.get(key);
+        for(final Provider<String,MutableStyle> provider : getProviders()){
+            final MutableStyle layer = provider.get(key);
             if(layer != null) candidates.add(layer);
         }
 
-        if(candidates.size() == 1){
+        if(candidates.size() >= 1){
             return candidates.get(0);
-        }else if(candidates.size()>1){
-            if(LayerDetails.class.isAssignableFrom(valClass)){
-                //make a more accurate search testing both namespace and local part are the same.
-                final Name nk = (Name) key;
-                for(int i=0;i<candidates.size();i++){
-                    final LayerDetails ld = (LayerDetails) candidates.get(i);
-                    if(Objects.equals(ld.getName().getNamespaceURI(), nk.getNamespaceURI())
-                            && Objects.equals(ld.getName().getLocalPart(), nk.getLocalPart())) {
-                        return (V)ld;
-                    }
-                }
-
-                //we could not find one more accurate then another
-                return candidates.get(0);
-            }else{
-                return candidates.get(0);
-            }
         }
 
         return null;
     }
 
-    public V get(final K key, final String providerID) {
-        final Provider<K,V> provider = getProvider(providerID);
+    public MutableStyle get(final String key, final String providerID) {
+        final Provider<String,MutableStyle> provider = getProvider(providerID);
         if (provider == null) {
             return null;
         }
         return provider.get(key);
     }
 
-    public List<V> getAll() {
-        final List<V> values = new ArrayList<>();
-        for(Provider<K,V> provider : getProviders()){
-            for(K key : provider.getKeys()){
+    public List<MutableStyle> getAll() {
+        final List<MutableStyle> values = new ArrayList<>();
+        for(Provider<String,MutableStyle> provider : getProviders()){
+            for(String key : provider.getKeys()){
                 values.add(provider.get(key));
             }
         }
         return values;
     }
 
-    public abstract Collection<? extends S> getServices();
-
-    public synchronized Collection<P> getProviders(){
+    public synchronized Collection<StyleProvider> getProviders(){
         if(PROVIDERS != null){
             return Collections.unmodifiableCollection(PROVIDERS);
         }
 
         final Configurator configs = getConfigurator();
-        final List<P> cache = new ArrayList<>();
+        final List<StyleProvider> cache = new ArrayList<>();
         for(final ProviderService factory : getServices()){
             final String serviceName = factory.getName();
 
@@ -266,7 +249,7 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
                 if(config != null){
                     for(final ParameterValueGroup src : ProviderParameters.getSources(config)){
                         try{
-                            final P prov = (P) factory.createProvider(src);
+                            final StyleProvider prov = (StyleProvider) factory.createProvider(src);
                             if(prov != null){
                                 prov.addPropertyListener(this);
                                 cache.add(prov);
@@ -296,8 +279,8 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
         return Collections.unmodifiableCollection(PROVIDERS);
     }
 
-    public synchronized P getProvider(final String id){
-        for (P provider : getProviders()) {
+    public synchronized StyleProvider getProvider(final String id){
+        for (StyleProvider provider : getProviders()) {
             if (provider.getId().equals(id)) {
                 return provider;
             }
@@ -325,7 +308,7 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
 
         try{
             //services were loaded, dispose each of them
-            for(final Provider<K,V> provider : getProviders()){
+            for(final Provider<String,MutableStyle> provider : getProviders()){
                 try{
                     provider.removePropertyListener(this);
                     provider.dispose();
@@ -338,6 +321,34 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
             //there should not be an error, but in worse case ensure this is correctly set to null.
             PROVIDERS = null;
         }
+    }
+
+    public static final MutableStyleFactory STYLE_FACTORY = (MutableStyleFactory)
+            FactoryFinder.getStyleFactory(new Hints(Hints.STYLE_FACTORY, MutableStyleFactory.class));
+    public final FilterFactory2 FILTER_FACTORY = (FilterFactory2)FactoryFinder.getFilterFactory(
+                            new Hints(Hints.FILTER_FACTORY, FilterFactory2.class));
+
+    private static final Collection<StyleProviderService> SERVICES;
+    static {
+        final List<StyleProviderService> cache = new ArrayList<>();
+        final ServiceLoader<StyleProviderService> loader = ServiceLoader.load(StyleProviderService.class);
+        for(final StyleProviderService service : loader){
+            cache.add(service);
+        }
+        SERVICES = Collections.unmodifiableCollection(cache);
+    }
+
+    private static final StyleProviders INSTANCE = new StyleProviders();
+
+    public Collection<StyleProviderService> getServices() {
+        return SERVICES;
+    }
+
+    /**
+     * Returns the current instance of {@link StyleProviders}.
+     */
+    public static StyleProviders getInstance(){
+        return INSTANCE;
     }
 
 }

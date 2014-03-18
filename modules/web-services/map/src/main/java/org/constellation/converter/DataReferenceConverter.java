@@ -19,7 +19,7 @@ package org.constellation.converter;
 import java.util.Collection;
 import java.util.List;
 import org.constellation.provider.StyleProvider;
-import org.constellation.provider.StyleProviderProxy;
+import org.constellation.provider.StyleProviders;
 import org.constellation.util.DataReference;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
 import org.opengis.feature.type.Name;
@@ -61,7 +61,7 @@ public final class DataReferenceConverter {
             boolean providerFound = false;
 
             //find provider
-            final Collection<StyleProvider> providers = StyleProviderProxy.getInstance().getProviders();
+            final Collection<StyleProvider> providers = StyleProviders.getInstance().getProviders();
             for (StyleProvider provider : providers) {
                 if (provider.getId().equals(providerID)) {
 

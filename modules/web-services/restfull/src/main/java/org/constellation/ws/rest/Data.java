@@ -57,7 +57,7 @@ import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.FeatureLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProvider;
-import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.DataProviders;
 import org.constellation.provider.coveragestore.CoverageStoreProvider;
 import org.constellation.security.SecurityManagerHolder;
 import org.constellation.util.SimplyMetadataTreeNode;
@@ -410,7 +410,7 @@ public class Data {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getCoverageList(final SimpleValue value) {
-        final CoverageStoreProvider provider = (CoverageStoreProvider) LayerProviderProxy.getInstance().getProvider(value.getValue());
+        final CoverageStoreProvider provider = (CoverageStoreProvider) DataProviders.getInstance().getProvider(value.getValue());
         final Set<Name> nameSet = provider.getKeys();
         final List<String> names = new ArrayList<>();
         for (Name n : nameSet) {
@@ -457,7 +457,7 @@ public class Data {
     public Response getDataList(@PathParam("type") String type) {
         final List<DataBrief> briefs = new ArrayList<>();
 
-        final Collection<LayerProvider> providers = LayerProviderProxy.getInstance().getProviders();
+        final Collection<LayerProvider> providers = DataProviders.getInstance().getProviders();
         for (final LayerProvider p : providers) {
             if (type != null && !p.getDataType().equals(DataRecord.DataType.valueOf(type))) {
                 continue;
@@ -495,7 +495,7 @@ public class Data {
     public Response getMetadata(final @PathParam("providerId") String providerId, final @PathParam("dataId") String dataId) {
 
         //get reader
-        final LayerProvider provider = LayerProviderProxy.getInstance().getProvider(providerId);
+        final LayerProvider provider = DataProviders.getInstance().getProvider(providerId);
         final LayerDetails layer = provider.get(new DefaultName(dataId));
         final Object origin = layer.getOrigin();
         //generate DataInformation

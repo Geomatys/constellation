@@ -45,9 +45,9 @@ import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.provider.style.SetStyleToStyleProviderDescriptor;
 import org.constellation.process.service.AddLayerToMapServiceDescriptor;
 import org.constellation.provider.LayerProvider;
-import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.DataProviders;
 import org.constellation.provider.StyleProvider;
-import org.constellation.provider.StyleProviderProxy;
+import org.constellation.provider.StyleProviders;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.util.DataReference;
 import org.constellation.ws.CstlServiceException;
@@ -125,7 +125,7 @@ public class MapConfigurer extends OGCConfigurer {
     public void addLayer(final AddLayer addLayerData) throws ConfigurationException {
         this.ensureExistingInstance(addLayerData.getServiceId());
 
-        final LayerProvider provider = LayerProviderProxy.getInstance().getProvider(addLayerData.getProviderId());
+        final LayerProvider provider = DataProviders.getInstance().getProvider(addLayerData.getProviderId());
         final String namespace = ProviderParameters.getNamespace(provider);
         final String layerId = (namespace != null && !namespace.isEmpty()) ? "{" + namespace + "}" + addLayerData.getLayerId() : addLayerData.getLayerId();
 
@@ -220,7 +220,7 @@ public class MapConfigurer extends OGCConfigurer {
         style.setDefaultSpecification(symbol);
 
 
-        final StyleProvider provider = StyleProviderProxy.getInstance().getProvider("sld");
+        final StyleProvider provider = StyleProviders.getInstance().getProvider("sld");
         // Add style into provider.
         final String styleName = "default_"+ layerName;
         provider.set(styleName, style);

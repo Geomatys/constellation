@@ -34,7 +34,7 @@ import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.provider.style.DeleteStyleToStyleProviderDescriptor;
 import org.constellation.process.provider.style.SetStyleToStyleProviderDescriptor;
 import org.constellation.provider.StyleProvider;
-import org.constellation.provider.StyleProviderProxy;
+import org.constellation.provider.StyleProviders;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
@@ -79,7 +79,7 @@ public final class StyleProviderConfig extends Static {
      * @throws TargetNotFoundException if the style provider instance can't be found
      */
     private static void ensureExistingProvider(final String providerId) throws TargetNotFoundException {
-        if (StyleProviderProxy.getInstance().getProvider(providerId) == null) {
+        if (StyleProviders.getInstance().getProvider(providerId) == null) {
             throw new TargetNotFoundException("Style provider with identifier \"" + providerId + "\" does not exist.");
         }
     }
@@ -94,7 +94,7 @@ public final class StyleProviderConfig extends Static {
      */
     private static void ensureExistingStyle(final String providerId, final String styleId) throws TargetNotFoundException {
         ensureExistingProvider(providerId);
-        if (!StyleProviderProxy.getInstance().getProvider(providerId).contains(styleId)) {
+        if (!StyleProviders.getInstance().getProvider(providerId).contains(styleId)) {
             throw new TargetNotFoundException("Style provider with identifier \"" + providerId + "\" does not contain style named \"" + styleId + "\".");
         }
     }
@@ -138,7 +138,7 @@ public final class StyleProviderConfig extends Static {
      */
     public static List<StyleBrief> getAvailableStyles(final String category) {
         final List<StyleBrief> beans = new ArrayList<>();
-        for (final StyleProvider provider : StyleProviderProxy.getInstance().getProviders()) {
+        for (final StyleProvider provider : StyleProviders.getInstance().getProviders()) {
             if ("GO2".equals(provider.getId())) {
                 continue; // skip "GO2" provider
             }
@@ -159,7 +159,7 @@ public final class StyleProviderConfig extends Static {
      */
     public static List<StyleBrief> getAvailableStyles(final String providerId, final String category) throws TargetNotFoundException {
         ensureExistingProvider(providerId);
-        final StyleProvider provider = StyleProviderProxy.getInstance().getProvider(providerId);
+        final StyleProvider provider = StyleProviders.getInstance().getProvider(providerId);
         final List<StyleBrief> beans = new ArrayList<>();
         for (final String key : provider.getKeys()) {
             StyleRecord record = ConfigurationEngine.getStyle(key, providerId);
@@ -187,7 +187,7 @@ public final class StyleProviderConfig extends Static {
      */
     public static MutableStyle getStyle(final String providerId, final String styleId) throws TargetNotFoundException {
         ensureExistingStyle(providerId, styleId);
-        return StyleProviderProxy.getInstance().getProvider(providerId).get(styleId);
+        return StyleProviders.getInstance().getProvider(providerId).get(styleId);
     }
 
     /**

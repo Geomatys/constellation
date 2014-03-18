@@ -24,7 +24,7 @@ import java.util.Collection;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.process.AbstractProcessTest;
 import org.constellation.provider.LayerProvider;
-import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.DataProviders;
 import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.ProviderService;
 import org.junit.AfterClass;
@@ -41,7 +41,7 @@ public abstract class AbstractProviderTest extends AbstractProcessTest {
     // dataStore service
     protected static ProviderService DATASTORE_SERVICE;
     static {
-        final Collection<LayerProviderService> availableLayerServices = LayerProviderProxy.getInstance().getServices();
+        final Collection<LayerProviderService> availableLayerServices = DataProviders.getInstance().getServices();
         for (LayerProviderService tmpService: availableLayerServices) {
             if ("feature-store".equals(tmpService.getName())) {
                 DATASTORE_SERVICE = tmpService;
@@ -107,7 +107,7 @@ public abstract class AbstractProviderTest extends AbstractProcessTest {
      * @param providerSource
      */
     protected static void addProvider(ParameterValueGroup providerSource) {
-        LayerProviderProxy.getInstance().createProvider((LayerProviderService) DATASTORE_SERVICE, providerSource);
+        DataProviders.getInstance().createProvider((LayerProviderService) DATASTORE_SERVICE, providerSource);
     }
 
     /**
@@ -117,11 +117,11 @@ public abstract class AbstractProviderTest extends AbstractProcessTest {
     protected static void removeProvider(String id) {
 
         LayerProvider provider = null;
-        for (LayerProvider p : LayerProviderProxy.getInstance().getProviders()) {
+        for (LayerProvider p : DataProviders.getInstance().getProviders()) {
             if (p.getId().equals(id)) {
 
             }
         }
-        LayerProviderProxy.getInstance().removeProvider(provider);
+        DataProviders.getInstance().removeProvider(provider);
     }
 }

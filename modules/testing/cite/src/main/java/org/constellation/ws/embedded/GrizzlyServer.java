@@ -36,8 +36,8 @@ import javax.xml.namespace.QName;
 // Constellation dependencies
 import org.constellation.data.CoverageSQLTestCase;
 import org.constellation.configuration.WMSPortrayal;
-import org.constellation.provider.LayerProviderProxy;
-import org.constellation.provider.StyleProviderProxy;
+import org.constellation.provider.DataProviders;
+import org.constellation.provider.StyleProviders;
 import org.constellation.provider.configuration.Configurator;
 import org.constellation.provider.sld.SLDProviderService;
 
@@ -338,7 +338,7 @@ public final class GrizzlyServer {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };
-        LayerProviderProxy.getInstance().setConfigurator(layerConfig);
+        DataProviders.getInstance().setConfigurator(layerConfig);
 
         final Configurator styleconfig = new Configurator() {
             @Override
@@ -364,7 +364,7 @@ public final class GrizzlyServer {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };
-        StyleProviderProxy.getInstance().setConfigurator(styleconfig);
+        StyleProviders.getInstance().setConfigurator(styleconfig);
 
 
         //reset values, only allow pure java readers

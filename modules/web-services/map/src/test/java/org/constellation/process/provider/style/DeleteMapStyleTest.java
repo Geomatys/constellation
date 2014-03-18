@@ -49,7 +49,7 @@ public class DeleteMapStyleTest extends AbstractMapStyleTest {
         final MutableStyleFactory msf = new DefaultStyleFactory();
         final MutableStyle style = msf.style(StyleConstants.DEFAULT_LINE_SYMBOLIZER);
 
-        for (StyleProvider p : StyleProviderProxy.getInstance().getProviders()) {
+        for (StyleProvider p : StyleProviders.getInstance().getProviders()) {
             if (p.getId().equals("deleteStyleProvider1")) {
                 p.set("styleToDelete", style);
             }
@@ -62,7 +62,7 @@ public class DeleteMapStyleTest extends AbstractMapStyleTest {
         desc.createProcess(in).call();
 
         Provider provider = null;
-        for (StyleProvider p : StyleProviderProxy.getInstance().getProviders()) {
+        for (StyleProvider p : StyleProviders.getInstance().getProviders()) {
             if ("deleteStyleProvider1".equals(p.getId())){
                 provider = p;
             }

@@ -21,7 +21,7 @@ import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Source;
 import org.constellation.map.security.LayerSecurityFilter;
-import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.DataProviders;
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -43,7 +43,7 @@ public class MapUtilities {
         if (layerContext == null) {
             return new ArrayList<>();
         }
-        final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
+        final DataProviders namedProxy = DataProviders.getInstance();
         final List<Layer> layers = new ArrayList<>();
         /*
          * For each source declared in the layer context we search for layers informations.
@@ -64,7 +64,7 @@ public class MapUtilities {
                         if (layer == null) {
                             layer = new Layer(qn);
                         }
-                        final ParameterValueGroup provider = LayerProviderProxy.getInstance().getProvider(sourceID).getSource();
+                        final ParameterValueGroup provider = DataProviders.getInstance().getProvider(sourceID).getSource();
                         layer.setProviderType((String) provider.parameter("providerType").getValue());
                         layer.setProviderID(sourceID);
                         layers.add(layer);
@@ -83,7 +83,7 @@ public class MapUtilities {
                     if (!allLayer.isEmpty()) {
                         for (Layer layer : allLayer) {
                             layer.setProviderID(sourceID);
-                            final ParameterValueGroup provider = LayerProviderProxy.getInstance().getProvider(sourceID).getSource();
+                            final ParameterValueGroup provider = DataProviders.getInstance().getProvider(sourceID).getSource();
                             layer.setProviderType((String) provider.parameter("providerType").getValue());
                             layers.add(layer);
                         }

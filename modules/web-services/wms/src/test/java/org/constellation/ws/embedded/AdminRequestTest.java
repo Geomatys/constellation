@@ -38,7 +38,7 @@ import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.ServiceStatus;
 
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.DataProviders;
 import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderService;
 import org.constellation.provider.configuration.Configurator;
@@ -131,12 +131,12 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
             }
         };
 
-        LayerProviderProxy.getInstance().setConfigurator(configurator);
+        DataProviders.getInstance().setConfigurator(configurator);
     }
 
     @AfterClass
     public static void shutDown() {
-        LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
+        DataProviders.getInstance().setConfigurator(Configurator.DEFAULT);
         File f = new File("derby.log");
         if (f.exists()) {
             f.delete();

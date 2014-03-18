@@ -36,7 +36,7 @@ import org.constellation.admin.service.ConstellationClient;
 import org.constellation.configuration.Instance;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.DataProviders;
 import org.constellation.provider.LayerProviderService;
 import static org.constellation.provider.configuration.ProviderParameters.*;
 import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
@@ -136,7 +136,7 @@ public class OGCRestTest extends AbstractGrizzlyServer {
 
     public static void writeProvider(String resourceName, String identifier) throws Exception {
 
-        final LayerProviderService service = LayerProviderProxy.getInstance().getService("coverage-sql");
+        final LayerProviderService service = DataProviders.getInstance().getService("coverage-sql");
         final ParameterValueGroup config = service.getServiceDescriptor().createValue();
         final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
         final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);

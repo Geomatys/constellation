@@ -27,7 +27,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
 import org.apache.sis.test.XMLComparator;
-import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.DataProviders;
 import org.constellation.provider.configuration.Configurator;
 
 import static org.constellation.provider.configuration.ProviderParameters.*;
@@ -140,13 +140,13 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer {
             }
         };
 
-        LayerProviderProxy.getInstance().setConfigurator(configurator);
+        DataProviders.getInstance().setConfigurator(configurator);
     }
 
     @AfterClass
     public static void shutDown() {
         ConfigurationEngine.shutdownTestEnvironement("WFSCustomSQLTest");
-        LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
+        DataProviders.getInstance().setConfigurator(Configurator.DEFAULT);
         File f = new File("derby.log");
         if (f.exists()) {
             f.delete();

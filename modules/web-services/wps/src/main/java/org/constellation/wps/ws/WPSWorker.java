@@ -24,7 +24,7 @@ import org.constellation.configuration.Process;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.service.RestartServiceDescriptor;
 import org.constellation.provider.LayerProvider;
-import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.DataProviders;
 import org.constellation.wps.utils.WPSUtils;
 import org.constellation.wps.ws.rs.WPSService;
 import org.constellation.ws.AbstractWorker;
@@ -252,7 +252,7 @@ public class WPSWorker extends AbstractWorker {
                 this.wmsProviderId = context.getFileCoverageProviderId();
 
                 LayerProvider provider = null;
-                for (LayerProvider p : LayerProviderProxy.getInstance().getProviders()) {
+                for (LayerProvider p : DataProviders.getInstance().getProviders()) {
                     if (p.getId().equals(this.wmsProviderId)) {
                         provider = p;
                         break;
@@ -1499,7 +1499,7 @@ public class WPSWorker extends AbstractWorker {
         final String providerId = (String) parameters.get(WPSConvertersUtils.WMS_STORAGE_ID);
 
         //restart provider
-        final Collection<LayerProvider> layerProviders = LayerProviderProxy.getInstance().getProviders();
+        final Collection<LayerProvider> layerProviders = DataProviders.getInstance().getProviders();
         for (LayerProvider p : layerProviders) {
             if (p.getId().equals(providerId)) {
                 p.reload();

@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.logging.Level;
 import javax.xml.namespace.QName;
 
-import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.DataProviders;
 import org.constellation.provider.configuration.Configurator;
 import org.constellation.wfs.ws.WFSWorker;
 import org.constellation.wfs.ws.DefaultWFSWorker;
@@ -93,7 +93,7 @@ public class WFSCIteWorkerTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
+        DataProviders.getInstance().setConfigurator(Configurator.DEFAULT);
         ConfigurationEngine.shutdownTestEnvironement("WFSCIteWorkerTest");
     }
 
@@ -216,7 +216,7 @@ public class WFSCIteWorkerTest {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };
-        LayerProviderProxy.getInstance().setConfigurator(config);
+        DataProviders.getInstance().setConfigurator(config);
 
     }
 }

@@ -32,7 +32,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 // Constellation dependencies
-import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.DataProviders;
 import org.constellation.provider.configuration.Configurator;
 import org.constellation.util.Util;
 
@@ -263,13 +263,13 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
             }
         };
 
-        LayerProviderProxy.getInstance().setConfigurator(configurator);
+        DataProviders.getInstance().setConfigurator(configurator);
     }
 
     @AfterClass
     public static void shutDown() {
         ConfigurationEngine.shutdownTestEnvironement("WFSRequestTest");
-        LayerProviderProxy.getInstance().setConfigurator(Configurator.DEFAULT);
+        DataProviders.getInstance().setConfigurator(Configurator.DEFAULT);
         File f = new File("derby.log");
         if (f.exists()) {
             f.delete();

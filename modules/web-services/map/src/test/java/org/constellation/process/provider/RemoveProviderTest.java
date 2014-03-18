@@ -46,7 +46,7 @@ public class RemoveProviderTest extends AbstractProviderTest {
 
         addProvider(buildCSVProvider(DATASTORE_SERVICE, "removeProvider1", true, EMPTY_CSV));
 
-        final int nbProvider = LayerProviderProxy.getInstance().getProviders().size();
+        final int nbProvider = DataProviders.getInstance().getProviders().size();
 
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteProviderDescriptor.NAME);
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
@@ -56,12 +56,12 @@ public class RemoveProviderTest extends AbstractProviderTest {
         proc.call();
 
         Provider provider = null;
-        for (LayerProvider p : LayerProviderProxy.getInstance().getProviders()) {
+        for (LayerProvider p : DataProviders.getInstance().getProviders()) {
             if ("removeProvider1".equals(p.getId())){
                 provider = p;
             }
         }
-        assertTrue(nbProvider-1 == LayerProviderProxy.getInstance().getProviders().size());
+        assertTrue(nbProvider-1 == DataProviders.getInstance().getProviders().size());
         assertNull(provider);
 
         removeProvider("removeProvider1");

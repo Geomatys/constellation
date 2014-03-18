@@ -23,7 +23,7 @@ import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.provider.LayerDetails;
-import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.DataProviders;
 import org.constellation.ws.MimeType;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.GridSampleDimension;
@@ -79,7 +79,7 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
 
     private static final Logger LOGGER = Logging.getLogger(GMLFeatureInfoFormat.class);
 
-    private final LayerProviderProxy dp = LayerProviderProxy.getInstance();
+    private final DataProviders dp = DataProviders.getInstance();
 
     /**
      * GML version flag : 0 for mapserver output
