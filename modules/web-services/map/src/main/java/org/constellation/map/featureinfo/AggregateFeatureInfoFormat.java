@@ -3,7 +3,7 @@ package org.constellation.map.featureinfo;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.GFIParam;
 import org.constellation.configuration.GetFeatureInfoCfg;
-import org.constellation.provider.LayerProvider;
+import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.coveragesgroup.CoveragesGroupProvider;
 import org.constellation.provider.coveragesgroup.util.ConvertersJaxbToGeotk;
@@ -175,7 +175,7 @@ public class AggregateFeatureInfoFormat extends AbstractFeatureInfoFormat {
         }
 
         final DataProviders namedProxy = DataProviders.getInstance();
-        final LayerProvider provider = namedProxy.getProvider(providerId);
+        final DataProvider provider = namedProxy.getProvider(providerId);
         if (provider == null || !(provider instanceof CoveragesGroupProvider)) {
             throw new ConfigurationException("GetFeatureInfo configuration parameter "+PROVIDER_ID_PARAM
                     +" doesn't reference a CoverageGroup provider.");

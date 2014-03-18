@@ -17,7 +17,7 @@
 package org.constellation.provider.coveragesql;
 
 import org.constellation.provider.AbstractLayerProvider;
-import org.constellation.provider.LayerDetails;
+import org.constellation.provider.Data;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.sql.CoverageDatabase;
@@ -102,7 +102,7 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
      * {@inheritDoc }
      */
     @Override
-    public LayerDetails get(final Name key) {
+    public Data get(final Name key) {
         return get(key, null);
     }
 
@@ -110,7 +110,7 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
      * {@inheritDoc }
      */
     @Override
-    public LayerDetails get(final Name key, Date version) {
+    public Data get(final Name key, Date version) {
         // If the key is not present for this provider, it is not necessary to go further.
         // Without this test, an exception will be logged whose message is a warning about
         // the non presence of the requested key into the "Layers" table.

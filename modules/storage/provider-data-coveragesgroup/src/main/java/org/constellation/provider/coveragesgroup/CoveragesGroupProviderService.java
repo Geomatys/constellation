@@ -18,10 +18,10 @@ package org.constellation.provider.coveragesgroup;
 
 import java.net.URL;
 import java.util.logging.Level;
-import org.constellation.provider.AbstractProviderService;
-import org.constellation.provider.LayerDetails;
-import org.constellation.provider.LayerProvider;
-import org.constellation.provider.LayerProviderService;
+import org.constellation.provider.AbstractProviderFactory;
+import org.constellation.provider.Data;
+import org.constellation.provider.DataProvider;
+import org.constellation.provider.DataProviderFactory;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.opengis.feature.type.Name;
@@ -41,8 +41,8 @@ import static org.constellation.provider.coveragesgroup.CoveragesGroupProvider.*
  * @author Cédric Briançon (Geomatys)
  * @author Quentin Boileau (Geomatys)
  */
-public class CoveragesGroupProviderService extends AbstractProviderService
-        <Name,LayerDetails,LayerProvider> implements LayerProviderService {
+public class CoveragesGroupProviderService extends AbstractProviderFactory
+        <Name,Data,DataProvider> implements DataProviderFactory {
 
     public static final String NAME = "coverages-group";
 
@@ -70,7 +70,7 @@ public class CoveragesGroupProviderService extends AbstractProviderService
     }
 
     @Override
-    public LayerProvider createProvider(ParameterValueGroup ps) {
+    public DataProvider createProvider(ParameterValueGroup ps) {
         if (!canProcess(ps)) {
             return null;
         }

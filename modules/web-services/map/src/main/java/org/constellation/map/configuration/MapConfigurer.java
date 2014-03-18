@@ -44,7 +44,7 @@ import org.constellation.ogc.configuration.OGCConfigurer;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.provider.style.SetStyleToStyleProviderDescriptor;
 import org.constellation.process.service.AddLayerToMapServiceDescriptor;
-import org.constellation.provider.LayerProvider;
+import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviders;
@@ -125,7 +125,7 @@ public class MapConfigurer extends OGCConfigurer {
     public void addLayer(final AddLayer addLayerData) throws ConfigurationException {
         this.ensureExistingInstance(addLayerData.getServiceId());
 
-        final LayerProvider provider = DataProviders.getInstance().getProvider(addLayerData.getProviderId());
+        final DataProvider provider = DataProviders.getInstance().getProvider(addLayerData.getProviderId());
         final String namespace = ProviderParameters.getNamespace(provider);
         final String layerId = (namespace != null && !namespace.isEmpty()) ? "{" + namespace + "}" + addLayerData.getLayerId() : addLayerData.getLayerId();
 

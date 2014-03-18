@@ -31,13 +31,13 @@ import org.opengis.parameter.ParameterValueGroup;
  * @author Cédric Briançon (Geomatys)
  * @author Johann Sorel (Geomatys)
  */
-public abstract class AbstractProviderService<K,V,P extends Provider<K,V>> implements ProviderService<K,V,P> {
+public abstract class AbstractProviderFactory<K,V,P extends Provider<K,V>> implements ProviderService<K,V,P> {
    
     private static final Logger LOGGER = Logging.getLogger("org.constellation.provider");
 
     private final String name;
 
-    protected AbstractProviderService(String name){
+    protected AbstractProviderFactory(String name){
         this.name = name;
     }
 

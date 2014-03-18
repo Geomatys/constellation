@@ -43,9 +43,9 @@ import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.configuration.ProviderConfiguration;
-import org.constellation.provider.LayerProvider;
+import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
-import org.constellation.provider.LayerProviderService;
+import org.constellation.provider.DataProviderFactory;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.LayerProviders;
 import org.geotoolkit.coverage.io.CoverageStoreException;
@@ -80,7 +80,7 @@ public final class Provider {
         final String subType = config.getSubType();
         final Map<String,String> inParams = config.getParameters();
 
-        final LayerProviderService providerService = DataProviders.getInstance().getService(type);
+        final DataProviderFactory providerService = DataProviders.getInstance().getService(type);
         final ParameterDescriptorGroup serviceDesc = providerService.getServiceDescriptor();
         final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup) serviceDesc.descriptor("source");
         final ParameterValueGroup sources = sourceDesc.createValue();
@@ -170,7 +170,7 @@ public final class Provider {
                 }
         }
 
-        final LayerProvider old = DataProviders.getInstance().getProvider(id);
+        final DataProvider old = DataProviders.getInstance().getProvider(id);
         if (old != null) {
             // Provider already exists, update config
             old.updateSource(sources);

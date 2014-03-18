@@ -28,7 +28,7 @@ import java.util.*;
 import javax.xml.namespace.QName;
 
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.provider.LayerProvider;
+import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.util.DataReference;
 import org.geotoolkit.ogc.xml.v110.FilterType;
@@ -173,7 +173,7 @@ public class AddLayerToMapService extends AbstractProcess {
                     source.getExclude().remove(oldLayer);
                 }
 
-                final LayerProvider provider = findProvider(providerID);
+                final DataProvider provider = findProvider(providerID);
                 if (provider != null) {
                     final Set<Name> avaibleLayers = provider.getKeys();
                     if (avaibleLayers != null) {
@@ -242,12 +242,12 @@ public class AddLayerToMapService extends AbstractProcess {
      * @param providerID
      * @return LayerProvider found or null.
      */
-    private LayerProvider findProvider(final String providerID) {
+    private DataProvider findProvider(final String providerID) {
 
-        LayerProvider provider = null;
+        DataProvider provider = null;
 
-        final Collection<LayerProvider> layerProviders = DataProviders.getInstance().getProviders();
-        for (final LayerProvider layerProvider : layerProviders) {
+        final Collection<DataProvider> layerProviders = DataProviders.getInstance().getProviders();
+        for (final DataProvider layerProvider : layerProviders) {
             if (layerProvider.getId().equals(providerID)) {
                provider = layerProvider;
                break;

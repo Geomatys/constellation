@@ -22,7 +22,7 @@ import org.apache.sis.measure.MeasurementRange;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.provider.LayerDetails;
+import org.constellation.provider.Data;
 import org.constellation.provider.DataProviders;
 import org.constellation.ws.MimeType;
 import org.geotoolkit.coverage.CoverageReference;
@@ -172,11 +172,11 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
         builder.append("\t<").append(layerName).append("_layer").append(endMark)
                 .append("\t\t<").append(layerName).append("_feature").append(endMark);
 
-        final List<LayerDetails> layerDetailsList = getLayersDetails();
-        LayerDetails layerPostgrid = null;
+        final List<Data> layerDetailsList = getLayersDetails();
+        Data layerPostgrid = null;
 
-        for (LayerDetails layer : layerDetailsList) {
-            if (layer.getType().equals(LayerDetails.TYPE.COVERAGE) && layer.getName().equals(fullLayerName)) {
+        for (Data layer : layerDetailsList) {
+            if (layer.getType().equals(Data.TYPE.COVERAGE) && layer.getName().equals(fullLayerName)) {
                 layerPostgrid = layer;
             }
         }

@@ -211,8 +211,8 @@ public final class ConvertersJaxbToGeotk {
             boolean providerLayerFound = false;
 
             //find provider
-            final Collection<LayerProvider> providers = DataProviders.getInstance().getProviders();
-            for (LayerProvider provider : providers) {
+            final Collection<DataProvider> providers = DataProviders.getInstance().getProviders();
+            for (DataProvider provider : providers) {
                 if (provider.getId().equals(providerID)) {
                     providerFound = true;
 
@@ -351,15 +351,15 @@ public final class ConvertersJaxbToGeotk {
             boolean providerLayerFound = false;
 
             //find provider
-            final Collection<LayerProvider> providers = DataProviders.getInstance().getProviders();
-            for (LayerProvider provider : providers) {
+            final Collection<DataProvider> providers = DataProviders.getInstance().getProviders();
+            for (DataProvider provider : providers) {
                 if (provider.getId().equals(providerID)) {
                     providerFound = true;
 
-                    final LayerDetails layerDetails = provider.get(layerName);
-                    if (layerDetails != null && layerDetails instanceof FeatureLayerDetails) {
+                    final Data layerDetails = provider.get(layerName);
+                    if (layerDetails != null && layerDetails instanceof FeatureData) {
 
-                        final FeatureLayerDetails fLayerDetail = (FeatureLayerDetails) layerDetails;
+                        final FeatureData fLayerDetail = (FeatureData) layerDetails;
                         final FeatureStore store = fLayerDetail.getStore();
                         if (store != null) {
                             final Session session = store.createSession(true);

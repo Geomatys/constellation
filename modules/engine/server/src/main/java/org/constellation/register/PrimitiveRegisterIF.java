@@ -20,7 +20,7 @@ package org.constellation.register;
 import java.util.List;
 
 import org.constellation.ServiceDef;
-import org.constellation.provider.LayerDetails;
+import org.constellation.provider.Data;
 import org.opengis.feature.type.Name;
 
 /**
@@ -41,11 +41,11 @@ import org.opengis.feature.type.Name;
  */
 public interface PrimitiveRegisterIF {
 
-	List<LayerDetails> getAllLayerReferences(ServiceDef serviceDef) throws RegisterException ;
+	List<Data> getAllLayerReferences(ServiceDef serviceDef) throws RegisterException ;
 	
-	List<LayerDetails> getLayerReferences(ServiceDef serviceDef, List<Name> layerNames) throws RegisterException ;
+	List<Data> getLayerReferences(ServiceDef serviceDef, List<Name> layerNames) throws RegisterException ;
 	
-	LayerDetails getLayerReference(ServiceDef serviceDef, Name layerName) throws RegisterException ;
+	Data getLayerReference(ServiceDef serviceDef, Name layerName) throws RegisterException ;
 
         List<String> getRootDirectory() throws RegisterException;
 

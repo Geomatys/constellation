@@ -2,8 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2010, Geomatys
+ *    (C) 2011-2014, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -17,8 +16,8 @@
  */
 package org.constellation.provider;
 
-import com.vividsolutions.jts.geom.GeometryFactory;
 
+import com.vividsolutions.jts.geom.GeometryFactory;
 import java.awt.Dimension;
 import java.io.IOException;
 import java.util.Date;
@@ -27,26 +26,29 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
-
 import org.apache.sis.measure.MeasurementRange;
 import org.apache.sis.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.apache.sis.storage.DataStoreException;
-
+import static org.constellation.provider.AbstractData.LOGGER;
+import static org.constellation.provider.Data.KEY_EXTRA_PARAMETERS;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
+
 import org.geotoolkit.data.FeatureStore;
-import org.geotoolkit.data.query.Query;
-import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.FeatureIterator;
+import org.geotoolkit.data.query.Query;
 import org.geotoolkit.data.query.QueryBuilder;
+import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.map.FeatureMapLayer;
+import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.style.MutableStyle;
-
+import org.geotoolkit.style.RandomStyleBuilder;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.PropertyDescriptor;
@@ -57,15 +59,14 @@ import org.opengis.filter.expression.PropertyName;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
-
 /**
- * Abstract LayerDetail used by Feature providers.
+ * Default layer details for a datastore type.
  *
  * @author Johann Sorel (Geomatys)
- * @author Cédric Briançon (Geomatys)
  */
-public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails implements FeatureLayerDetails {
+public class DefaultFeatureData extends AbstractData implements FeatureData {
 
+    
     protected static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
     protected static final GeographicBoundingBox DUMMY_BBOX =
             new DefaultGeographicBoundingBox(-180, 180, -77, +77);
@@ -85,23 +86,62 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
      * Data version date. Use to query Features is input FeatureStore is versioned.
      */
     protected final Date versionDate;
-
-    protected AbstractFeatureLayerDetails(Name name, FeatureStore store, List<String> favorites){
-        this(name,store,favorites,null,null,null,null, null);
-
+    
+    /**
+     * Build a FeatureLayerDetails with layer name, store and favorite style names.
+     *
+     * @param name layer name
+     * @param store FeatureStore
+     * @param favorites style names
+     */
+    public DefaultFeatureData(Name name, FeatureStore store, List<String> favorites){
+        this(name,store,favorites,null,null,null,null,null);
     }
 
-    protected AbstractFeatureLayerDetails(Name name, FeatureStore store, List<String> favorites, Date versionDate){
+    /**
+     * Build a FeatureLayerDetails with layer name, store, favorite style names and data version date.
+     *
+     * @param name layer name
+     * @param store FeatureStore
+     * @param favorites style names
+     * @param versionDate data version date of the layer (can be null)
+     */
+    public DefaultFeatureData(Name name, FeatureStore store, List<String> favorites, Date versionDate){
         this(name,store,favorites,null,null,null,null, versionDate);
-
-    }
-    protected AbstractFeatureLayerDetails(Name name, FeatureStore store, List<String> favorites,
-                                          String dateStart, String dateEnd, String elevationStart, String elevationEnd){
-        this(name, store, favorites, dateStart, dateEnd, elevationStart, elevationEnd, null);
     }
 
-    protected AbstractFeatureLayerDetails(Name name, FeatureStore store, List<String> favorites,
-            String dateStart, String dateEnd, String elevationStart, String elevationEnd, Date versionDate){
+    /**
+     * Build a FeatureLayerDetails with layer name, store, favorite style names and temporal/elevation filters.
+     *
+     * @param name layer name
+     * @param store FeatureStore
+     * @param favorites style names
+     * @param dateStart temporal filter start
+     * @param dateEnd temporal filter end
+     * @param elevationStart elevation filter start
+     * @param elevationEnd elevation filter end
+     */
+    public DefaultFeatureData(Name name, FeatureStore store, List<String> favorites,
+            String dateStart, String dateEnd, String elevationStart, String elevationEnd){
+        this(name,store,favorites,dateStart,dateEnd,elevationStart,elevationEnd , null);
+    }
+
+    /**
+     * Build a FeatureLayerDetails with layer name, store, favorite style names, temporal/elevation filters and
+     * data version date.
+     *
+     * @param name layer name
+     * @param store FeatureStore
+     * @param favorites style names
+     * @param dateStart temporal filter start
+     * @param dateEnd temporal filter end
+     * @param elevationStart elevation filter start
+     * @param elevationEnd elevation filter end
+     * @param versionDate data version date of the layer (can be null)
+     */
+    public DefaultFeatureData(Name name, FeatureStore store, List<String> favorites,
+                                        String dateStart, String dateEnd, String elevationStart, String elevationEnd, Date versionDate){
+        
         super(name,favorites);
 
         if(store == null){
@@ -131,9 +171,33 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
 
         if(elevationEnd != null)        this.elevationEndField = ff.property(elevationEnd);
         else                            this.elevationEndField = null;
-
+        
     }
 
+    protected MapLayer createMapLayer(MutableStyle style, final Map<String, Object> params) throws DataStoreException {
+        if(style == null && favorites.size() > 0){
+            //no style provided, try to get the favorite one
+            //there are some favorites styles
+            final String namedStyle = favorites.get(0);
+            style = StyleProviders.getInstance().get(namedStyle);
+        }
+
+        final FeatureType featureType = store.getFeatureType(name);
+        if(style == null){
+            //no favorites defined, create a default one
+            style = RandomStyleBuilder.createDefaultVectorStyle(featureType);
+        }
+
+        final FeatureMapLayer layer = MapBuilder.createFeatureLayer((FeatureCollection)getOrigin(), style);
+
+        final String title = getName().getLocalPart();
+        layer.setName(title);
+        layer.setDescription(StyleProviders.STYLE_FACTORY.description(title,title));
+
+        return layer;
+    }
+
+    
     /**
      * {@inheritDoc}
      */
@@ -362,6 +426,5 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
         return TYPE.FEATURE;
     }
 
-    protected abstract MapLayer createMapLayer(MutableStyle style, final Map<String, Object> params) throws DataStoreException;
-
+    
 }

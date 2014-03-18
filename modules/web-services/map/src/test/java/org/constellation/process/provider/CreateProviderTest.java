@@ -58,8 +58,8 @@ public class CreateProviderTest extends AbstractProviderTest {
         final Process proc = desc.createProcess(in);
         proc.call();
 
-        LayerProvider provider = null;
-        for (LayerProvider p : DataProviders.getInstance().getProviders()) {
+        DataProvider provider = null;
+        for (DataProvider p : DataProviders.getInstance().getProviders()) {
             if ("newProvider".equals(p.getId())){
                 provider = p;
             }

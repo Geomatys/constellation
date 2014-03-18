@@ -18,9 +18,9 @@ package org.constellation.provider.serverstore;
 
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.provider.AbstractLayerProvider;
-import org.constellation.provider.DefaultCoverageStoreLayerDetails;
-import org.constellation.provider.DefaultFeatureStoreLayerDetails;
-import org.constellation.provider.LayerDetails;
+import org.constellation.provider.DefaultCoverageData;
+import org.constellation.provider.DefaultFeatureData;
+import org.constellation.provider.Data;
 import org.constellation.provider.ProviderService;
 import org.geotoolkit.client.Client;
 import org.geotoolkit.client.ClientFinder;
@@ -123,7 +123,7 @@ public class ServerStoreProvider extends AbstractLayerProvider{
      * {@inheritDoc }
      */
     @Override
-    public LayerDetails get(final Name key) {
+    public Data get(final Name key) {
         return get(key, null);
     }
 
@@ -131,7 +131,7 @@ public class ServerStoreProvider extends AbstractLayerProvider{
      * {@inheritDoc }
      */
     @Override
-    public LayerDetails get(Name key, Date version) {
+    public Data get(Name key, Date version) {
         key = fullyQualified(key);
         if(!contains(key)){
             return null;
@@ -139,7 +139,7 @@ public class ServerStoreProvider extends AbstractLayerProvider{
 
         if(server instanceof FeatureStore){
             final FeatureStore store = (FeatureStore) server;
-            return new DefaultFeatureStoreLayerDetails(key, store, null, version);
+            return new DefaultFeatureData(key, store, null, version);
         }else if(server instanceof CoverageStore){
 
             final CoverageStore store = (CoverageStore) server;
@@ -155,7 +155,7 @@ public class ServerStoreProvider extends AbstractLayerProvider{
                     if (coverageReference == null) {
                         coverageReference = store.getCoverageReference(key);
                     }
-                    return new DefaultCoverageStoreLayerDetails(key, coverageReference);
+                    return new DefaultCoverageData(key, coverageReference);
                 }
             } catch (DataStoreException ex) {
                 getLogger().log(Level.WARNING, ex.getMessage(), ex);

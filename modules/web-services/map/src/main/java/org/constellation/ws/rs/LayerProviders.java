@@ -33,9 +33,9 @@ import org.constellation.dto.PortrayalContext;
 import org.constellation.dto.PropertyDescription;
 import org.constellation.map.configuration.StyleProviderConfig;
 import org.constellation.portrayal.internal.PortrayalResponse;
-import org.constellation.provider.FeatureLayerDetails;
-import org.constellation.provider.LayerDetails;
-import org.constellation.provider.LayerProvider;
+import org.constellation.provider.FeatureData;
+import org.constellation.provider.Data;
+import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.ws.CstlServiceException;
@@ -154,12 +154,12 @@ public final class LayerProviders extends Static {
         ensureNonNull("layerName", layerName);
 
         // Get the layer.
-        final LayerDetails layer = getLayer(providerId, layerName);
+        final Data layer = getLayer(providerId, layerName);
 
         // Try to extract layer data info.
         try {
-            if (layer instanceof FeatureLayerDetails) {
-                return getFeatureDataDescription((FeatureLayerDetails) layer);
+            if (layer instanceof FeatureData) {
+                return getFeatureDataDescription((FeatureData) layer);
             } else {
                 return getCoverageDataDescription(layer);
             }
@@ -186,13 +186,13 @@ public final class LayerProviders extends Static {
         ensureNonNull("property", property);
 
         // Get the layer.
-        final LayerDetails layer = getLayer(providerId, layerName);
+        final Data layer = getLayer(providerId, layerName);
 
         // Try to extract attribute values.
-        if (layer instanceof FeatureLayerDetails) {
+        if (layer instanceof FeatureData) {
 
             // Open session.
-            final Session session = ((FeatureLayerDetails) layer).getStore().createSession(false);
+            final Session session = ((FeatureData) layer).getStore().createSession(false);
 
             // Get feature collection.
             final QueryBuilder qb = new QueryBuilder();
@@ -231,10 +231,10 @@ public final class LayerProviders extends Static {
         ensurePositive("bandIndex", bandIndex);
 
         // Get the layer.
-        final LayerDetails layer = getLayer(providerId, layerName);
+        final Data layer = getLayer(providerId, layerName);
 
         // Try to extract band values.
-        if (!(layer instanceof FeatureLayerDetails)) {
+        if (!(layer instanceof FeatureData)) {
             try {
                 final GridSampleDimension[] dims = layer.getCoverage(null, null, null, null).getSampleDimensions();
                 // TODO
@@ -323,7 +323,7 @@ public final class LayerProviders extends Static {
         ensureNonNull("layerName", layerName);
 
         // Get the layer (throws exception if doesn't exist).
-        final LayerDetails layer = getLayer(providerId, layerName);
+        final Data layer = getLayer(providerId, layerName);
 
         try {
             // Envelope.
@@ -347,7 +347,7 @@ public final class LayerProviders extends Static {
                 }
             } else {
                 // Fallback to a default/auto-generated style.
-                if (layer instanceof FeatureLayerDetails) {
+                if (layer instanceof FeatureData) {
                     style = null; // Let portrayal process apply is own style.
                 } else {
                     style = generateCoverageStyle(layer);
@@ -379,14 +379,14 @@ public final class LayerProviders extends Static {
      **************************************************************************/
 
     /**
-     * Gets a {@link LayerProvider} instance from its ID.
+     * Gets a {@link DataProvider} instance from its ID.
      *
      * @param providerId the layer provider id
-     * @return the {@link LayerProvider} instance
+     * @return the {@link DataProvider} instance
      * @throws CstlServiceException if the provider does not exists
      */
-    private static LayerProvider getProvider(final String providerId) throws CstlServiceException {
-        final LayerProvider provider = DataProviders.getInstance().getProvider(providerId);
+    private static DataProvider getProvider(final String providerId) throws CstlServiceException {
+        final DataProvider provider = DataProviders.getInstance().getProvider(providerId);
         if (provider == null) {
             throw new CstlServiceException("No layer provider for id \"" + providerId + "\".");
         }
@@ -394,16 +394,16 @@ public final class LayerProviders extends Static {
     }
 
     /**
-     * Gets a {@link LayerDetails} instance from its layer provider and its name.
+     * Gets a {@link Data} instance from its layer provider and its name.
      *
      * @param provider  the layer provider
      * @param layerName the layer name
-     * @return the {@link LayerDetails} instance
+     * @return the {@link Data} instance
      * @throws CstlServiceException if the layer does not exists
      */
-    private static LayerDetails getLayer(final LayerProvider provider, final String layerName) throws CstlServiceException {
+    private static Data getLayer(final DataProvider provider, final String layerName) throws CstlServiceException {
         final Name name = new DefaultName(ProviderParameters.getNamespace(provider), layerName);
-        final LayerDetails layer = provider.get(name);
+        final Data layer = provider.get(name);
         if (layer == null) {
             throw new CstlServiceException("No layer named \"" + layerName + "\" in provider with id \"" + provider.getId() + "\".");
         }
@@ -411,14 +411,14 @@ public final class LayerProviders extends Static {
     }
 
     /**
-     * Gets a {@link LayerDetails} instance from its layer provider ID and its name.
+     * Gets a {@link Data} instance from its layer provider ID and its name.
      *
      * @param providerId the layer provider id
      * @param layerName  the layer name
-     * @return the {@link LayerDetails} instance
+     * @return the {@link Data} instance
      * @throws CstlServiceException if the provider or the layer does not exists
      */
-    private static LayerDetails getLayer(final String providerId, final String layerName) throws CstlServiceException {
+    private static Data getLayer(final String providerId, final String layerName) throws CstlServiceException {
         return getLayer(getProvider(providerId), layerName);
     }
 
@@ -431,7 +431,7 @@ public final class LayerProviders extends Static {
      * @throws IOException        if an error occurred while trying to read the coverage
      * @throws DataStoreException if an error occurred during coverage store operations
      */
-    private static CoverageDataDescription getCoverageDataDescription(final LayerDetails layer) throws IOException, DataStoreException {
+    private static CoverageDataDescription getCoverageDataDescription(final Data layer) throws IOException, DataStoreException {
         final CoverageDataDescription description = new CoverageDataDescription();
 
         // Acquire coverage data.
@@ -465,7 +465,7 @@ public final class LayerProviders extends Static {
      * @return the {@link FeatureDataDescription} instance
      * @throws DataStoreException if an error occurred during feature store operations
      */
-    private static FeatureDataDescription getFeatureDataDescription(final FeatureLayerDetails layer) throws DataStoreException {
+    private static FeatureDataDescription getFeatureDataDescription(final FeatureData layer) throws DataStoreException {
         final FeatureDataDescription description = new FeatureDataDescription();
 
         // Acquire data feature type.
@@ -503,7 +503,7 @@ public final class LayerProviders extends Static {
      * @throws IOException if an error occurred while acquiring coverage statistics
      * @throws DataStoreException if an error occurred while acquiring coverage statistics
      */
-    private static MutableStyle generateCoverageStyle(final LayerDetails layer) throws DataStoreException, IOException {
+    private static MutableStyle generateCoverageStyle(final Data layer) throws DataStoreException, IOException {
         // Acquire coverage data.
         final GridCoverage2D coverage = layer.getCoverage(null, null, null, null);
 
@@ -586,7 +586,7 @@ public final class LayerProviders extends Static {
      */
     public static List<String> getCrs(final String providerId, final String layerName) throws CstlServiceException, IOException, DataStoreException {
         final List<String> crsListString = new ArrayList<>(0);
-        final LayerDetails layer = getLayer(getProvider(providerId), layerName);
+        final Data layer = getLayer(getProvider(providerId), layerName);
 
         // Acquire coverage data.
         GridCoverage2D coverage = layer.getCoverage(null, null, null, null);

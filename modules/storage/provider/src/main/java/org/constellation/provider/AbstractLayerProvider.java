@@ -40,7 +40,7 @@ import static org.geotoolkit.parameter.Parameters.*;
  *
  * @author Johann Sorel (Geomatys)
  */
-public abstract class AbstractLayerProvider extends AbstractProvider<Name,LayerDetails> implements LayerProvider{
+public abstract class AbstractLayerProvider extends AbstractProvider<Name,Data> implements DataProvider{
 
     protected static final String DEFAULT_NAMESPACE = "http://geotoolkit.org";
     protected static final String NO_NAMESPACE = "no namespace";
@@ -63,8 +63,8 @@ public abstract class AbstractLayerProvider extends AbstractProvider<Name,LayerD
      * {@inheritDoc }
      */
     @Override
-    public Class<LayerDetails> getValueClass() {
-        return LayerDetails.class;
+    public Class<Data> getValueClass() {
+        return Data.class;
     }
 
     @Override
@@ -93,7 +93,7 @@ public abstract class AbstractLayerProvider extends AbstractProvider<Name,LayerD
      * {@inheritDoc }
      */
     @Override
-    public LayerDetails getByIdentifier(final Name key) {
+    public Data getByIdentifier(final Name key) {
         for(final Name n : getKeys()){
             if(n.equals(key)){
                 return get(n);

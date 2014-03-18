@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 
-import org.constellation.provider.LayerProvider;
+import org.constellation.provider.DataProvider;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.apache.sis.util.ArgumentChecks;
@@ -181,7 +181,7 @@ public final class ProviderParameters {
         }
     }
 
-    public static String getNamespace(final LayerProvider provider) {
+    public static String getNamespace(final DataProvider provider) {
         ParameterValueGroup group = provider.getSource();
 
         // Get choice if exists.

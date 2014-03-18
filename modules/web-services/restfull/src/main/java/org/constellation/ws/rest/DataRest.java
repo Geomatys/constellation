@@ -53,10 +53,10 @@ import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.model.SelectedExtension;
-import org.constellation.provider.CoverageLayerDetails;
-import org.constellation.provider.FeatureLayerDetails;
-import org.constellation.provider.LayerDetails;
-import org.constellation.provider.LayerProvider;
+import org.constellation.provider.CoverageData;
+import org.constellation.provider.FeatureData;
+import org.constellation.provider.Data;
+import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.coveragestore.CoverageStoreProvider;
 import org.constellation.security.SecurityManagerHolder;
@@ -88,10 +88,10 @@ import org.opengis.util.InternationalString;
  * @author Benjamin Garcia (Geomatys)
  */
 @Path("/1/data/")
-public class Data {
+public class DataRest {
 
 
-    private static final Logger LOGGER = Logging.getLogger(Data.class);
+    private static final Logger LOGGER = Logging.getLogger(DataRest.class);
 
 
     /**
@@ -457,8 +457,8 @@ public class Data {
     public Response getDataList(@PathParam("type") String type) {
         final List<DataBrief> briefs = new ArrayList<>();
 
-        final Collection<LayerProvider> providers = DataProviders.getInstance().getProviders();
-        for (final LayerProvider p : providers) {
+        final Collection<DataProvider> providers = DataProviders.getInstance().getProviders();
+        for (final DataProvider p : providers) {
             if (type != null && !p.getDataType().equals(DataRecord.DataType.valueOf(type))) {
                 continue;
             }
@@ -495,17 +495,17 @@ public class Data {
     public Response getMetadata(final @PathParam("providerId") String providerId, final @PathParam("dataId") String dataId) {
 
         //get reader
-        final LayerProvider provider = DataProviders.getInstance().getProvider(providerId);
-        final LayerDetails layer = provider.get(new DefaultName(dataId));
+        final DataProvider provider = DataProviders.getInstance().getProvider(providerId);
+        final Data layer = provider.get(new DefaultName(dataId));
         final Object origin = layer.getOrigin();
         //generate DataInformation
 
         final DefaultMetadata metadata = ConfigurationEngine.loadProviderMetadata(providerId, CSWMarshallerPool.getInstance());
         DataInformation information = new DataInformation();
-        if (layer instanceof FeatureLayerDetails) {
+        if (layer instanceof FeatureData) {
             final ArrayList<SimplyMetadataTreeNode> meta = MetadataUtilities.getVectorDataInformation(metadata);
             information.setFileMetadata(meta);
-        } else if (layer instanceof CoverageLayerDetails) {
+        } else if (layer instanceof CoverageData) {
             final Map<String, CoverageMetadataBean> nameSpatialMetadataMap = new HashMap<>(0);
             final CoverageReference fcr = (CoverageReference) origin;
             try {

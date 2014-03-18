@@ -21,10 +21,10 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
-import org.constellation.provider.AbstractProviderService;
-import org.constellation.provider.LayerDetails;
-import org.constellation.provider.LayerProvider;
-import org.constellation.provider.LayerProviderService;
+import org.constellation.provider.AbstractProviderFactory;
+import org.constellation.provider.Data;
+import org.constellation.provider.DataProvider;
+import org.constellation.provider.DataProviderFactory;
 import static org.constellation.provider.configuration.ProviderParameters.createDescriptor;
 import org.geotoolkit.data.FeatureStoreFactory;
 import org.geotoolkit.data.FeatureStoreFinder;
@@ -40,8 +40,8 @@ import org.opengis.parameter.ParameterValueGroup;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class OM2ProviderService extends AbstractProviderService
-        <Name,LayerDetails,LayerProvider> implements LayerProviderService {
+public class OM2ProviderService extends AbstractProviderFactory
+        <Name,Data,DataProvider> implements DataProviderFactory {
 
     private static final String ERROR_MSG = "[PROVIDER]> Invalid OM2 store provider config";
     public static final ParameterDescriptorGroup SOURCE_CONFIG_DESCRIPTOR;
@@ -84,7 +84,7 @@ public class OM2ProviderService extends AbstractProviderService
     }
 
     @Override
-    public LayerProvider createProvider(ParameterValueGroup ps) {
+    public DataProvider createProvider(ParameterValueGroup ps) {
         if(!canProcess(ps)){
             return null;
         }

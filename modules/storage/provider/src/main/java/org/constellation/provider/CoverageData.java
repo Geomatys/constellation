@@ -20,7 +20,7 @@ import org.apache.sis.storage.DataStoreException;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
 
 /**
- * Coverage extension of a {@link LayerDetails}, which add some methods specific
+ * Coverage extension of a {@link Data}, which add some methods specific
  * for coverage layers.
  *
  * @version $Id$
@@ -28,7 +28,7 @@ import org.geotoolkit.image.io.metadata.SpatialMetadata;
  *
  * @since 0.4
  */
-public interface CoverageLayerDetails extends LayerDetails {
+public interface CoverageData extends Data {
     /**
      * @see Layer#getSeries
      */

@@ -4,7 +4,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import org.apache.sis.geometry.GeneralDirectPosition;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
-import org.constellation.provider.LayerDetails;
+import org.constellation.provider.Data;
 import org.constellation.ws.MimeType;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.GridSampleDimension;
@@ -96,16 +96,16 @@ public class XMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
     }
 
     protected static String coverageToXML(final ProjectedCoverage coverage, final List<Map.Entry<GridSampleDimension,Object>> results,
-                                          String margin, final GetFeatureInfo gfi, final List<LayerDetails> layerDetailsList) {
+                                          String margin, final GetFeatureInfo gfi, final List<Data> layerDetailsList) {
 
         StringBuilder builder = new StringBuilder();
         final CoverageReference ref = coverage.getLayer().getCoverageReference();
         final Name fullLayerName = ref.getName();
 
-        LayerDetails layerPostgrid = null;
+        Data layerPostgrid = null;
 
-        for (LayerDetails layer : layerDetailsList) {
-            if (layer.getType().equals(LayerDetails.TYPE.COVERAGE) && layer.getName().equals(fullLayerName)) {
+        for (Data layer : layerDetailsList) {
+            if (layer.getType().equals(Data.TYPE.COVERAGE) && layer.getName().equals(fullLayerName)) {
                 layerPostgrid = layer;
             }
         }

@@ -37,7 +37,7 @@ import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.admin.dao.StyleRecord;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.provider.LayerDetails;
+import org.constellation.provider.Data;
 import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderService;
 import org.constellation.util.MetadataMapBuilder;
@@ -141,7 +141,7 @@ public final class DefaultConfigurator implements Configurator {
                                 StringReader reader = new StringReader(writer.toString());
                                 record.setMetadata(reader);
                             } else {
-                                final LayerDetails layer = (LayerDetails) provider.get(new DefaultName(name));
+                                final Data layer = (Data) provider.get(new DefaultName(name));
                                 final Object origin = layer.getOrigin();
                                 if (origin instanceof CoverageReference) {
                                     final CoverageReference fcr = (CoverageReference) origin;

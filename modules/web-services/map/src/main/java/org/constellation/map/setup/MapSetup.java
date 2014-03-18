@@ -31,7 +31,7 @@ import org.constellation.configuration.ConfigurationException;
 import org.constellation.map.configuration.StyleProviderConfig;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.provider.CreateProviderDescriptor;
-import org.constellation.provider.LayerProvider;
+import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderService;
 import org.constellation.provider.StyleProvider;
@@ -188,7 +188,7 @@ public class MapSetup implements ServletContextListener {
 
             final String featureStoreStr = "feature-store";
             final String shpProvName = "generic_shp";
-            LayerProvider shpProvider = DataProviders.getInstance().getProvider(shpProvName);
+            DataProvider shpProvider = DataProviders.getInstance().getProvider(shpProvName);
             if (shpProvider == null) {
                 // Acquire SHP provider service instance.
                 ProviderService shpService = null;
@@ -251,7 +251,7 @@ public class MapSetup implements ServletContextListener {
 
             final String coverageFileStr = "coverage-store";
             final String tifProvName = "generic_world_tif";
-            LayerProvider tifProvider = DataProviders.getInstance().getProvider(tifProvName);
+            DataProvider tifProvider = DataProviders.getInstance().getProvider(tifProvName);
             if (tifProvider == null) {
                 // Acquire TIFF provider service instance.
                 ProviderService tifService = null;

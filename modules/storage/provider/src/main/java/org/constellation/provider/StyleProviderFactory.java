@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2014, Geomatys
+ *    (C) 2009-2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,11 +16,9 @@
  */
 package org.constellation.provider;
 
-import org.geotoolkit.map.ElevationModel;
-import org.opengis.feature.type.Name;
 
-import java.util.Date;
-import org.apache.sis.storage.DataStore;
+import org.geotoolkit.style.MutableStyle;
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
  *
@@ -28,20 +26,9 @@ import org.apache.sis.storage.DataStore;
  *
  * @author Johann Sorel (Geomatys)
  */
-public interface LayerProvider extends Provider<Name,LayerDetails>{
+public interface StyleProviderFactory extends ProviderService<String,MutableStyle,StyleProvider>{
 
-    /**
-     * Original data store.
-     * @return 
-     */
-    DataStore getMainStore();
-    
-    
-    ElevationModel getElevationModel(Name name);
+    @Override
+    StyleProvider createProvider(ParameterValueGroup config);
 
-    /**
-     * Get the data related to the given key in given version.
-     * @return LayerDetails if it is in the data provider, or null if not.
-     */
-    LayerDetails get(Name key, Date version);
 }

@@ -30,7 +30,7 @@ import org.constellation.configuration.Layer;
 import org.constellation.map.featureinfo.FeatureInfoFormat;
 import org.constellation.map.featureinfo.FeatureInfoUtilities;
 import org.constellation.portrayal.PortrayalUtil;
-import org.constellation.provider.LayerDetails;
+import org.constellation.provider.Data;
 import org.constellation.util.DataReference;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
@@ -183,7 +183,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         final List<Layer> declaredLayers = getConfigurationLayers(userLogin);
 
        for (final Layer configLayer : declaredLayers){
-            final LayerDetails details = getLayerReference(userLogin, configLayer.getName());
+            final Data details = getLayerReference(userLogin, configLayer.getName());
             final Object origin        = details.getOrigin();
             if(!(origin instanceof CoverageReference)){
                 //WMTS only handle CoverageReference object
@@ -290,7 +290,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         final GetTile getTile       = request.getGetTile();
         final String userLogin      = getUserLogin();
         final Name layerName        = Util.parseLayerName(getTile.getLayer());
-        final LayerDetails layerRef = getLayerReference(userLogin, layerName);
+        final Data layerRef = getLayerReference(userLogin, layerName);
         final Layer configLayer     = getConfigurationLayer(layerName, userLogin);
         
         // build an equivalent style List
@@ -440,7 +440,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
 
 
         try{
-            final LayerDetails details = getLayerReference(userLogin, layerName);
+            final Data details = getLayerReference(userLogin, layerName);
             if(details == null){
                 throw new CstlServiceException("No layer for name : " + layerName , INVALID_PARAMETER_VALUE, "layerName");
             }

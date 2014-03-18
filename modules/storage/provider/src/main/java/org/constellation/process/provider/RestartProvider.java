@@ -18,7 +18,7 @@ package org.constellation.process.provider;
 
 import java.util.Collection;
 import org.constellation.process.AbstractCstlProcess;
-import org.constellation.provider.LayerProvider;
+import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviders;
@@ -48,8 +48,8 @@ public class RestartProvider extends AbstractCstlProcess {
 
         boolean reloaded = false;
 
-        final Collection<LayerProvider> layerProviders = DataProviders.getInstance().getProviders();
-        for (LayerProvider p : layerProviders) {
+        final Collection<DataProvider> layerProviders = DataProviders.getInstance().getProviders();
+        for (DataProvider p : layerProviders) {
             if (p.getId().equals(providerId)) {
                 p.reload();
                 reloaded = true;

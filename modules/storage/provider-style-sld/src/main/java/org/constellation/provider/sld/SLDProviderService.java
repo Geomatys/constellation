@@ -19,9 +19,9 @@ package org.constellation.provider.sld;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import java.util.logging.Level;
 
-import org.constellation.provider.AbstractProviderService;
+import org.constellation.provider.AbstractProviderFactory;
 import org.constellation.provider.StyleProvider;
-import org.constellation.provider.StyleProviderService;
+import org.constellation.provider.StyleProviderFactory;
 import org.constellation.provider.configuration.ProviderParameters;
 
 import org.geotoolkit.style.MutableStyle;
@@ -40,8 +40,8 @@ import static org.geotoolkit.parameter.Parameters.*;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class SLDProviderService extends AbstractProviderService
-        <String,MutableStyle,StyleProvider> implements StyleProviderService {
+public class SLDProviderService extends AbstractProviderFactory
+        <String,MutableStyle,StyleProvider> implements StyleProviderFactory {
 
     /**
      * Service name

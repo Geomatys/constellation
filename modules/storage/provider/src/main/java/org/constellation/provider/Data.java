@@ -47,7 +47,7 @@ import org.opengis.style.Style;
  * @version $Id$
  * @author Cédric Briançon
  */
-public interface LayerDetails {
+public interface Data {
     /**
      * Defines the type of provider for a {@linkplain Layer layer}.
      */

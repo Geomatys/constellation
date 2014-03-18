@@ -59,9 +59,9 @@ import java.util.logging.Logger;
  * @author Johann Sorel (Geomatys)
  * @author Cédric Briançon (Geomatys)
  */
-public abstract class AbstractLayerDetails implements LayerDetails{
+public abstract class AbstractData implements Data{
 
-    protected static final Logger LOGGER = Logging.getLogger(AbstractLayerDetails.class);
+    protected static final Logger LOGGER = Logging.getLogger(AbstractData.class);
 
     /**
      * Favorites styles associated with this layer.
@@ -74,7 +74,7 @@ public abstract class AbstractLayerDetails implements LayerDetails{
      */
     protected final Name name;
 
-    public AbstractLayerDetails(Name name, List<String> favorites){
+    public AbstractData(Name name, List<String> favorites){
         this.name = name;
 
         if(favorites == null){

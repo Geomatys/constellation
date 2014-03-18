@@ -24,7 +24,7 @@ import java.util.logging.Level;
 
 import org.apache.sis.measure.MeasurementRange;
 import org.apache.sis.storage.DataStoreException;
-import static org.constellation.provider.AbstractLayerDetails.LOGGER;
+import static org.constellation.provider.AbstractData.LOGGER;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.grid.GeneralGridGeometry;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
@@ -58,14 +58,14 @@ import javax.measure.unit.Unit;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class DefaultCoverageStoreLayerDetails extends AbstractLayerDetails implements CoverageLayerDetails {
+public class DefaultCoverageData extends AbstractData implements CoverageData {
 
     private static final MutableStyle DEFAULT =
             new DefaultStyleFactory().style(StyleConstants.DEFAULT_RASTER_SYMBOLIZER);
 
     private final CoverageReference ref;
 
-    public DefaultCoverageStoreLayerDetails(final Name name, final CoverageReference ref){
+    public DefaultCoverageData(final Name name, final CoverageReference ref){
         super(name, Collections.EMPTY_LIST);
         this.ref = ref;
     }

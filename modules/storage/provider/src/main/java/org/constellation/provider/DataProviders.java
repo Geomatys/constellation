@@ -55,10 +55,10 @@ public final class DataProviders implements PropertyChangeListener {
     private final PropertyChangeSupport listeners = new PropertyChangeSupport(this);
     private long lastUpdateTime = System.currentTimeMillis();
     protected final Class<Name> keyClass = Name.class;
-    protected final Class<LayerDetails> valClass = LayerDetails.class;
+    protected final Class<Data> valClass = Data.class;
     
     //all loaded providers
-    private Collection<LayerProvider> PROVIDERS = null;
+    private Collection<DataProvider> PROVIDERS = null;
     private Configurator configurator = Configurator.DEFAULT;
 
     protected Logger getLogger() {
@@ -134,9 +134,9 @@ public final class DataProviders implements PropertyChangeListener {
         return configurator;
     }
 
-    public LayerProvider createProvider(final LayerProviderService service, final ParameterValueGroup params){
+    public DataProvider createProvider(final DataProviderFactory service, final ParameterValueGroup params){
         getProviders();
-        final LayerProvider provider = service.createProvider(params);
+        final DataProvider provider = service.createProvider(params);
 
         //add in the list our provider
         provider.addPropertyListener(this);
@@ -146,7 +146,7 @@ public final class DataProviders implements PropertyChangeListener {
         return provider;
     }
 
-    public LayerProvider removeProvider(final LayerProvider provider){
+    public DataProvider removeProvider(final DataProvider provider){
         final boolean b = PROVIDERS.remove(provider);
 
         if(b){
@@ -185,7 +185,7 @@ public final class DataProviders implements PropertyChangeListener {
      */
     public Set<Name> getKeys(final String sourceId) {
         final Set<Name> keys = new HashSet<>();
-        for(final LayerProvider provider : getProviders()){
+        for(final DataProvider provider : getProviders()){
             keys.addAll(provider.getKeys(sourceId));
         }
         return keys;
@@ -196,25 +196,25 @@ public final class DataProviders implements PropertyChangeListener {
      * @deprecated use get(key, providerID) instead because two provider can have the same named layer
      */
     @Deprecated
-    public LayerDetails get(final Name key) {
-        final List<LayerDetails> candidates = new ArrayList<>();
+    public Data get(final Name key) {
+        final List<Data> candidates = new ArrayList<>();
 
-        for(final Provider<Name,LayerDetails> provider : getProviders()){
-            final LayerDetails layer = provider.get(key);
+        for(final Provider<Name,Data> provider : getProviders()){
+            final Data layer = provider.get(key);
             if(layer != null) candidates.add(layer);
         }
 
         if(candidates.size() == 1){
             return candidates.get(0);
         }else if(candidates.size()>1){
-            if(LayerDetails.class.isAssignableFrom(valClass)){
+            if(Data.class.isAssignableFrom(valClass)){
                 //make a more accurate search testing both namespace and local part are the same.
                 final Name nk = (Name) key;
                 for(int i=0;i<candidates.size();i++){
-                    final LayerDetails ld = (LayerDetails) candidates.get(i);
+                    final Data ld = (Data) candidates.get(i);
                     if(Objects.equals(ld.getName().getNamespaceURI(), nk.getNamespaceURI())
                             && Objects.equals(ld.getName().getLocalPart(), nk.getLocalPart())) {
-                        return (LayerDetails)ld;
+                        return (Data)ld;
                     }
                 }
 
@@ -228,17 +228,17 @@ public final class DataProviders implements PropertyChangeListener {
         return null;
     }
 
-    public LayerDetails get(final Name key, final String providerID) {
-        final Provider<Name,LayerDetails> provider = getProvider(providerID);
+    public Data get(final Name key, final String providerID) {
+        final Provider<Name,Data> provider = getProvider(providerID);
         if (provider == null) {
             return null;
         }
         return provider.get(key);
     }
 
-    public List<LayerDetails> getAll() {
-        final List<LayerDetails> values = new ArrayList<>();
-        for(Provider<Name,LayerDetails> provider : getProviders()){
+    public List<Data> getAll() {
+        final List<Data> values = new ArrayList<>();
+        for(Provider<Name,Data> provider : getProviders()){
             for(Name key : provider.getKeys()){
                 values.add(provider.get(key));
             }
@@ -246,13 +246,13 @@ public final class DataProviders implements PropertyChangeListener {
         return values;
     }
 
-    public synchronized Collection<LayerProvider> getProviders(){
+    public synchronized Collection<DataProvider> getProviders(){
         if(PROVIDERS != null){
             return Collections.unmodifiableCollection(PROVIDERS);
         }
 
         final Configurator configs = getConfigurator();
-        final List<LayerProvider> cache = new ArrayList<>();
+        final List<DataProvider> cache = new ArrayList<>();
         for(final ProviderService factory : getServices()){
             final String serviceName = factory.getName();
 
@@ -262,7 +262,7 @@ public final class DataProviders implements PropertyChangeListener {
                 if(config != null){
                     for(final ParameterValueGroup src : ProviderParameters.getSources(config)){
                         try{
-                            final LayerProvider prov = (LayerProvider) factory.createProvider(src);
+                            final DataProvider prov = (DataProvider) factory.createProvider(src);
                             if(prov != null){
                                 prov.addPropertyListener(this);
                                 cache.add(prov);
@@ -292,8 +292,8 @@ public final class DataProviders implements PropertyChangeListener {
         return Collections.unmodifiableCollection(PROVIDERS);
     }
 
-    public synchronized LayerProvider getProvider(final String id){
-        for (LayerProvider provider : getProviders()) {
+    public synchronized DataProvider getProvider(final String id){
+        for (DataProvider provider : getProviders()) {
             if (provider.getId().equals(id)) {
                 return provider;
             }
@@ -321,7 +321,7 @@ public final class DataProviders implements PropertyChangeListener {
 
         try{
             //services were loaded, dispose each of them
-            for(final Provider<Name,LayerDetails> provider : getProviders()){
+            for(final Provider<Name,Data> provider : getProviders()){
                 try{
                     provider.removePropertyListener(this);
                     provider.dispose();
@@ -338,12 +338,12 @@ public final class DataProviders implements PropertyChangeListener {
     
     private static final DataProviders INSTANCE = new DataProviders();
     //all providers factories, unmodifiable
-    private static final Collection<LayerProviderService> SERVICES;
+    private static final Collection<DataProviderFactory> SERVICES;
 
     static {
-        final List<LayerProviderService> cache = new ArrayList<>();
-        final ServiceLoader<LayerProviderService> loader = ServiceLoader.load(LayerProviderService.class);
-        for(final LayerProviderService service : loader){
+        final List<DataProviderFactory> cache = new ArrayList<>();
+        final ServiceLoader<DataProviderFactory> loader = ServiceLoader.load(DataProviderFactory.class);
+        for(final DataProviderFactory service : loader){
             cache.add(service);
         }
         SERVICES = Collections.unmodifiableCollection(cache);
@@ -353,18 +353,18 @@ public final class DataProviders implements PropertyChangeListener {
      * {@inheritDoc }
      */
     public ElevationModel getElevationModel(final Name name) {
-        for(final LayerProvider provider : getProviders()){
+        for(final DataProvider provider : getProviders()){
             final ElevationModel model = provider.getElevationModel(name);
             if(model != null) return model;
         }
         return null;
     }
 
-    public LayerDetails get(final Name key, final Date version) {
-        final List<LayerDetails> candidates = new ArrayList<>();
+    public Data get(final Name key, final Date version) {
+        final List<Data> candidates = new ArrayList<>();
 
-        for(final LayerProvider provider : getProviders()){
-            final LayerDetails layer = provider.get(key, version);
+        for(final DataProvider provider : getProviders()){
+            final Data layer = provider.get(key, version);
             if(layer != null) {
                 candidates.add(layer);
             }
@@ -373,11 +373,11 @@ public final class DataProviders implements PropertyChangeListener {
         if(candidates.size() == 1){
             return candidates.get(0);
         }else if(candidates.size()>1){
-            if(LayerDetails.class.isAssignableFrom(valClass)){
+            if(Data.class.isAssignableFrom(valClass)){
                 //make a more accurate search testing both namespace and local part are the same.
                 final Name nk = (Name) key;
                 for(int i=0;i<candidates.size();i++){
-                    final LayerDetails ld = candidates.get(i);
+                    final Data ld = candidates.get(i);
                     if(Objects.equals(ld.getName().getNamespaceURI(), nk.getNamespaceURI())
                             && Objects.equals(ld.getName().getLocalPart(), nk.getLocalPart())){
                         return ld;
@@ -394,8 +394,8 @@ public final class DataProviders implements PropertyChangeListener {
         return null;
     }
 
-    public LayerDetails get(final Name key, final String providerID, final Date version) {
-        final LayerProvider provider = getProvider(providerID);
+    public Data get(final Name key, final String providerID, final Date version) {
+        final DataProvider provider = getProvider(providerID);
         if (provider == null) {
             return null;
         }
@@ -405,12 +405,12 @@ public final class DataProviders implements PropertyChangeListener {
         return provider.get(key);
     }
 
-    public Collection<LayerProviderService> getServices() {
+    public Collection<DataProviderFactory> getServices() {
         return SERVICES;
     }
 
-    public LayerProviderService getService(final String serviceID) {
-        for (LayerProviderService serv : SERVICES) {
+    public DataProviderFactory getService(final String serviceID) {
+        for (DataProviderFactory serv : SERVICES) {
             if (serv.getName().equals(serviceID)) {
                 return serv;
             }
@@ -418,8 +418,8 @@ public final class DataProviders implements PropertyChangeListener {
         return null;
     }
 
-    public LayerDetails getByIdentifier(Name key) {
-        LayerDetails result = null;
+    public Data getByIdentifier(Name key) {
+        Data result = null;
         for(final Name n : getKeys()){
             if(n.equals(key)){
                 return get(n);

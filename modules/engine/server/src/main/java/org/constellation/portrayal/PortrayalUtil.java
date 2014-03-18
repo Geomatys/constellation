@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.constellation.provider.LayerDetails;
+import org.constellation.provider.Data;
 
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.map.MapBuilder;
@@ -45,7 +45,7 @@ import org.geotoolkit.style.MutableStyle;
 public final class PortrayalUtil {
 
 
-    public static MapContext createContext(LayerDetails layerRef, MutableStyle styleRef,
+    public static MapContext createContext(Data layerRef, MutableStyle styleRef,
             Map<String,Object> renderingParameters) throws PortrayalException{
         return createContext(Collections.singletonList(layerRef),
                  Collections.singletonList(styleRef),
@@ -53,14 +53,14 @@ public final class PortrayalUtil {
 
     }
 
-    public static MapContext createContext(List<LayerDetails> layerRefs, List<MutableStyle> styleRefs,
+    public static MapContext createContext(List<Data> layerRefs, List<MutableStyle> styleRefs,
             Map<String,Object> renderingParameters ) throws PortrayalException {
 
     	assert ( layerRefs.size() == styleRefs.size() );
         final MapContext context = MapBuilder.createContext();
 
         for (int i = 0; i < layerRefs.size(); i++) {
-            final LayerDetails layerRef = layerRefs.get(i);
+            final Data layerRef = layerRefs.get(i);
             final MutableStyle style = styleRefs.get(i);
 
             assert (null != layerRef);

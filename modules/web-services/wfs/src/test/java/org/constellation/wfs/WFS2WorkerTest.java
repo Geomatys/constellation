@@ -33,7 +33,7 @@ import java.util.logging.Level;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
-import org.constellation.provider.FeatureLayerDetails;
+import org.constellation.provider.FeatureData;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.configuration.Configurator;
 import static org.constellation.provider.configuration.ProviderParameters.*;
@@ -1558,7 +1558,7 @@ public class WFS2WorkerTest {
          * Test 1 : transaction replace for Feature type NamedPlaces
          */
         final Name tName = new DefaultName("http://www.opengis.net/gml/3.2", "NamedPlaces");
-        final FeatureType ft = ((FeatureLayerDetails) DataProviders.getInstance().get(tName)).getStore().getFeatureType(tName);
+        final FeatureType ft = ((FeatureData) DataProviders.getInstance().get(tName)).getStore().getFeatureType(tName);
         final JAXPStreamFeatureReader fr = new JAXPStreamFeatureReader(ft);
         fr.getProperties().put(JAXPStreamFeatureReader.BINDING_PACKAGE, "GML");
         final Feature feature = (Feature) fr.read(FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlaces.xml"));

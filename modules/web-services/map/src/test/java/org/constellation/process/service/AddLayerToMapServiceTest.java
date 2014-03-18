@@ -33,9 +33,9 @@ import org.constellation.configuration.Source;
 import org.constellation.map.featureinfo.CSVFeatureInfoFormat;
 import org.constellation.map.featureinfo.FeatureInfoUtilities;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.provider.LayerProvider;
+import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
-import org.constellation.provider.LayerProviderService;
+import org.constellation.provider.DataProviderFactory;
 import org.constellation.provider.ProviderService;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.util.DataReference;
@@ -70,8 +70,8 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         
         ParameterDescriptorGroup sourceDesc = null;
         ProviderService service = null;
-        final Collection<LayerProviderService> availableLayerServices = DataProviders.getInstance().getServices();
-        for (LayerProviderService tmpService: availableLayerServices) {
+        final Collection<DataProviderFactory> availableLayerServices = DataProviders.getInstance().getServices();
+        for (DataProviderFactory tmpService: availableLayerServices) {
             if ("feature-store".equals(tmpService.getName())) {
                 service = tmpService;
             }
@@ -98,13 +98,13 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
             Logger.getLogger(AddLayerToMapServiceTest.class.getName()).log(Level.WARNING, null, ex);
         }         
         
-        DataProviders.getInstance().createProvider((LayerProviderService) service, sourceValue);
+        DataProviders.getInstance().createProvider((DataProviderFactory) service, sourceValue);
     }
     
     @AfterClass
     public static void destroyProvider() {
-        LayerProvider provider = null;
-        for (LayerProvider p : DataProviders.getInstance().getProviders()) {
+        DataProvider provider = null;
+        for (DataProvider p : DataProviders.getInstance().getProviders()) {
             if (p.getId().equals("shapeProvider")) {
                 provider = p;
             }

@@ -85,8 +85,8 @@ import org.constellation.map.featureinfo.FeatureInfoFormat;
 import org.constellation.map.featureinfo.FeatureInfoUtilities;
 import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.portrayal.internal.PortrayalResponse;
-import org.constellation.provider.CoverageLayerDetails;
-import org.constellation.provider.LayerDetails;
+import org.constellation.provider.CoverageData;
+import org.constellation.provider.Data;
 import org.constellation.query.wms.WMSQuery;
 import org.constellation.util.DataReference;
 import org.constellation.ws.CstlServiceException;
@@ -325,7 +325,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         final List<Layer> layers = getConfigurationLayers(userLogin);
 
        for (Layer configLayer : layers) {
-            final LayerDetails layer = getLayerReference(userLogin, configLayer.getName());
+            final Data layer = getLayerReference(userLogin, configLayer.getName());
 
             if (!layer.isQueryable(ServiceDef.Query.WMS_ALL)) {
                 continue;
@@ -587,8 +587,8 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             final String queryable      = (layer.isQueryable(ServiceDef.Query.WMS_GETINFO)) ? "1" : "0";
             final String _abstract;
             final String keyword;
-            if (layer instanceof CoverageLayerDetails) {
-                final CoverageLayerDetails coverageLayer = (CoverageLayerDetails)layer;
+            if (layer instanceof CoverageData) {
+                final CoverageData coverageLayer = (CoverageData)layer;
                 _abstract = StringUtilities.cleanSpecialCharacter(coverageLayer.getRemarks());
                 keyword   = StringUtilities.cleanSpecialCharacter(coverageLayer.getThematic());
             } else {
@@ -820,7 +820,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
      * @throws CstlServiceException
      */
     private AbstractLayer customizeLayer(final String version, final AbstractLayer outputLayer, final Layer configLayer,
-            final LayerDetails layerDetails, final String legendUrlPng, final String legendUrlGif) throws CstlServiceException
+            final Data layerDetails, final String legendUrlPng, final String legendUrlGif) throws CstlServiceException
     {
         if (configLayer == null) {
             return outputLayer;
@@ -912,7 +912,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
      * @param legendUrlGif
      * @return
      */
-    private org.geotoolkit.wms.xml.Style convertMutableStyleToWmsStyle(final String currentVersion, final MutableStyle ms, final LayerDetails layerDetails,
+    private org.geotoolkit.wms.xml.Style convertMutableStyleToWmsStyle(final String currentVersion, final MutableStyle ms, final Data layerDetails,
             final String legendUrlPng, final String legendUrlGif)
     {
         if (layerDetails == null) {
@@ -959,7 +959,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         //       -- get the List of layer references
         final String userLogin             = getUserLogin();
         final List<Name> layerNames        = getFI.getQueryLayers();
-        final List<LayerDetails> layerRefs;
+        final List<Data> layerRefs;
         final List<Layer> layerConfig;
         try{
             layerRefs = getLayerReferences(userLogin, layerNames);
@@ -968,7 +968,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             throw new CstlServiceException(ex, LAYER_NOT_DEFINED, KEY_LAYERS.toLowerCase());
         }
 
-        for (LayerDetails layer : layerRefs) {
+        for (Data layer : layerRefs) {
             if (!layer.isQueryable(ServiceDef.Query.WMS_GETINFO)) {
                 throw new CstlServiceException("You are not allowed to request the layer \""+
                         layer.getName() +"\".", LAYER_NOT_QUERYABLE, KEY_LAYERS.toLowerCase());
@@ -1089,7 +1089,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     public PortrayalResponse getLegendGraphic(final GetLegendGraphic getLegend) throws CstlServiceException {
         isWorking();
         final String userLogin   = getUserLogin();
-        final LayerDetails layer = getLayerReference(userLogin, getLegend.getLayer());
+        final Data layer = getLayerReference(userLogin, getLegend.getLayer());
         final Layer layerConf = getConfigurationLayer(getLegend.getLayer(), userLogin);
         final String layerName = layer.getName().toString();
         if (!layer.isQueryable(ServiceDef.Query.WMS_ALL)) {
@@ -1204,7 +1204,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         // 1. SCENE
         //       -- get the List of layer references
         final List<Name> layerNames = getMap.getLayers();
-        final List<LayerDetails> layerRefs;
+        final List<Data> layerRefs;
         final List<Layer> layerConfig;
         try{
             layerRefs = getLayerReferences(userLogin, layerNames);
@@ -1212,7 +1212,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         } catch (CstlServiceException ex) {
             return handleExceptions(getMap, errorInImage, errorBlank, ex, LAYER_NOT_DEFINED,  KEY_LAYERS.toLowerCase());
         }
-        for (LayerDetails layer : layerRefs) {
+        for (Data layer : layerRefs) {
             if (!layer.isQueryable(ServiceDef.Query.WMS_ALL)) {
                 throw new CstlServiceException("You are not allowed to request the layer \""+
                         layer.getName() +"\".", LAYER_NOT_QUERYABLE, KEY_LAYERS.toLowerCase());

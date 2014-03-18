@@ -60,7 +60,7 @@ public class UpdateProviderTest extends AbstractProviderTest {
         proc.call();
 
         Provider provider = null;
-        for (LayerProvider p : DataProviders.getInstance().getProviders()) {
+        for (DataProvider p : DataProviders.getInstance().getProviders()) {
             if ("updateProvider10".equals(p.getId())){
                 provider = p;
             }

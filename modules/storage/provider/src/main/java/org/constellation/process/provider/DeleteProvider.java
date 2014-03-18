@@ -17,7 +17,7 @@
 package org.constellation.process.provider;
 
 import org.constellation.process.AbstractCstlProcess;
-import org.constellation.provider.LayerProvider;
+import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.Provider;
 import org.constellation.provider.StyleProvider;
@@ -59,11 +59,11 @@ public final class DeleteProvider extends AbstractCstlProcess{
         }
 
         // Remove provider from its registry.
-        if (provider instanceof LayerProvider) {
+        if (provider instanceof DataProvider) {
             if (deleteData != null && deleteData) {
                 provider.removeAll();
             }
-            DataProviders.getInstance().removeProvider((LayerProvider) provider);
+            DataProviders.getInstance().removeProvider((DataProvider) provider);
         } else {
             StyleProviders.getInstance().removeProvider((StyleProvider) provider);
         }

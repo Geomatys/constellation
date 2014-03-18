@@ -14,21 +14,24 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
+
 package org.constellation.provider;
 
-import org.opengis.feature.type.Name;
-import org.opengis.parameter.ParameterValueGroup;
-
+import org.geotoolkit.data.FeatureStore;
 
 /**
- *
- * @version $Id$
- *
+ * Layer details for Feature sources.
+ * Provide extra methods to access the underlying datastore.
+ * 
  * @author Johann Sorel (Geomatys)
  */
-public interface LayerProviderService extends ProviderService<Name,LayerDetails,LayerProvider>{
+public interface FeatureData extends Data{
 
-    @Override
-    LayerProvider createProvider(ParameterValueGroup config);
+    /**
+     * Get the source of features used by this layer.
+     *
+     * @return FeatureSource<SimpleFeatureType,SimpleFeature>
+     */
+    FeatureStore getStore();
 
 }

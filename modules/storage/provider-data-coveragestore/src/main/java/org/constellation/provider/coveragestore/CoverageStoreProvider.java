@@ -18,8 +18,8 @@ package org.constellation.provider.coveragestore;
 
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.provider.AbstractLayerProvider;
-import org.constellation.provider.DefaultCoverageStoreLayerDetails;
-import org.constellation.provider.LayerDetails;
+import org.constellation.provider.DefaultCoverageData;
+import org.constellation.provider.Data;
 import org.constellation.provider.ProviderService;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
@@ -120,7 +120,7 @@ public class CoverageStoreProvider extends AbstractLayerProvider{
      * {@inheritDoc }
      */
     @Override
-    public LayerDetails get(final Name key) {
+    public Data get(final Name key) {
         return get(key, null);
     }
 
@@ -134,7 +134,7 @@ public class CoverageStoreProvider extends AbstractLayerProvider{
      * {@inheritDoc }
      */
     @Override
-    public LayerDetails get(Name key, Date version) {
+    public Data get(Name key, Date version) {
         key = fullyQualified(key);
         if(!contains(key)){
             return null;
@@ -151,7 +151,7 @@ public class CoverageStoreProvider extends AbstractLayerProvider{
                 if(coverageReference == null) {
                     coverageReference = store.getCoverageReference(key);
                 }
-                return new DefaultCoverageStoreLayerDetails(key, coverageReference);
+                return new DefaultCoverageData(key, coverageReference);
             }
         } catch (DataStoreException | VersioningException ex) {
             getLogger().log(Level.WARNING, ex.getMessage(), ex);

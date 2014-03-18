@@ -34,7 +34,7 @@ import javax.xml.namespace.QName;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.map.factory.MapFactory;
 import org.constellation.map.security.LayerSecurityFilter;
-import org.constellation.provider.LayerDetails;
+import org.constellation.provider.Data;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.StyleProviders;
 import org.constellation.util.DataReference;
@@ -219,15 +219,15 @@ public abstract class LayerWorker extends AbstractWorker {
      * @return a list of LayerDetails
      * @throws CstlServiceException
      */
-    protected List<LayerDetails> getLayerReferences(final String login, final Collection<Name> layerNames) throws CstlServiceException {
-        final List<LayerDetails> layerRefs = new ArrayList<>();
+    protected List<Data> getLayerReferences(final String login, final Collection<Name> layerNames) throws CstlServiceException {
+        final List<Data> layerRefs = new ArrayList<>();
         for (Name layerName : layerNames) {
             layerRefs.add(getLayerReference(login, layerName));
         }
         return layerRefs;
     }
 
-    protected LayerDetails getLayerReference(final String login, final QName layerName) throws CstlServiceException {
+    protected Data getLayerReference(final String login, final QName layerName) throws CstlServiceException {
         return getLayerReference(login, new DefaultName(layerName));
     }
     
@@ -238,8 +238,8 @@ public abstract class LayerWorker extends AbstractWorker {
      * @return a LayerDetails
      * @throws CstlServiceException
      */
-    protected LayerDetails getLayerReference(final String login, final Name layerName) throws CstlServiceException {
-        final LayerDetails layerRef;
+    protected Data getLayerReference(final String login, final Name layerName) throws CstlServiceException {
+        final Data layerRef;
         final DataProviders namedProxy = DataProviders.getInstance();
         final NameInProvider fullName = layersContainsKey(login, layerName);
         if (fullName != null) {

@@ -29,8 +29,8 @@ import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 
 import org.constellation.ServiceDef;
-import org.constellation.provider.AbstractLayerDetails;
-import org.constellation.provider.CoverageLayerDetails;
+import org.constellation.provider.AbstractData;
+import org.constellation.provider.CoverageData;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.StyleProviders;
 
@@ -75,7 +75,7 @@ import org.opengis.style.Symbolizer;
  *
  * @author Johann Sorel (Geomatys)
  */
-class CoverageSQLLayerDetails extends AbstractLayerDetails implements CoverageLayerDetails {
+class CoverageSQLLayerDetails extends AbstractData implements CoverageData {
 
     private final LayerCoverageReader reader;
 

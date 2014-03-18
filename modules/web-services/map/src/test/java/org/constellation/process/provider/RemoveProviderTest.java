@@ -56,7 +56,7 @@ public class RemoveProviderTest extends AbstractProviderTest {
         proc.call();
 
         Provider provider = null;
-        for (LayerProvider p : DataProviders.getInstance().getProviders()) {
+        for (DataProvider p : DataProviders.getInstance().getProviders()) {
             if ("removeProvider1".equals(p.getId())){
                 provider = p;
             }

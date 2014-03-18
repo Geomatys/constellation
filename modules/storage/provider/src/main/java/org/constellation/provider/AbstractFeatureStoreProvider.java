@@ -79,7 +79,7 @@ public abstract class AbstractFeatureStoreProvider extends AbstractLayerProvider
      * {@inheritDoc }
      */
     @Override
-    public LayerDetails get(final Name key) {
+    public Data get(final Name key) {
         return get(key, null);
     }
 
@@ -87,7 +87,7 @@ public abstract class AbstractFeatureStoreProvider extends AbstractLayerProvider
      * {@inheritDoc }
      */
     @Override
-    public LayerDetails get(final Name key, Date version) {
+    public Data get(final Name key, Date version) {
         Name goodKey;
         if (!index.contains(key)) {
             goodKey = containsOnlyLocalPart(index, key);
@@ -102,10 +102,10 @@ public abstract class AbstractFeatureStoreProvider extends AbstractLayerProvider
         }
         final ParameterValueGroup layer = getLayer(getSource(), goodKey.getLocalPart());
         if (layer == null) {
-            return new DefaultFeatureStoreLayerDetails(goodKey, store, null, null, null, null, null, version);
+            return new DefaultFeatureData(goodKey, store, null, null, null, null, null, version);
 
         } else {
-            return new DefaultFeatureStoreLayerDetails(
+            return new DefaultFeatureData(
                     goodKey, store, null,
                     value(LAYER_DATE_START_FIELD_DESCRIPTOR, layer),
                     value(LAYER_DATE_END_FIELD_DESCRIPTOR, layer),

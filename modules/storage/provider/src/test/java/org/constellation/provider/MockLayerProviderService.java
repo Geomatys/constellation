@@ -39,8 +39,8 @@ import org.constellation.admin.dao.DataRecord.DataType;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class MockLayerProviderService extends AbstractProviderService
-        <Name,LayerDetails,LayerProvider> implements LayerProviderService {
+public class MockLayerProviderService extends AbstractProviderFactory
+        <Name,Data,DataProvider> implements DataProviderFactory {
 
     public static final ParameterDescriptor<String> LAYERS =
              new DefaultParameterDescriptor<>("layers","", String.class, null, false);
@@ -63,7 +63,7 @@ public class MockLayerProviderService extends AbstractProviderService
     }
     
     @Override
-    public LayerProvider createProvider(ParameterValueGroup config) {
+    public DataProvider createProvider(ParameterValueGroup config) {
         return new MockLayerProvider(config);
     }
 
@@ -117,7 +117,7 @@ public class MockLayerProviderService extends AbstractProviderService
          * {@inheritDoc }
          */
         @Override
-        public LayerDetails get(final Name key) {
+        public Data get(final Name key) {
             return get(key, null);
         }
 
@@ -125,7 +125,7 @@ public class MockLayerProviderService extends AbstractProviderService
          * {@inheritDoc }
          */
         @Override
-        public LayerDetails get(final Name key, Date version) {
+        public Data get(final Name key, Date version) {
             throw new UnsupportedOperationException("Not supported.");
         }
 

@@ -20,10 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
-import org.constellation.provider.AbstractProviderService;
-import org.constellation.provider.LayerDetails;
-import org.constellation.provider.LayerProvider;
-import org.constellation.provider.LayerProviderService;
+import org.constellation.provider.AbstractProviderFactory;
+import org.constellation.provider.Data;
+import org.constellation.provider.DataProvider;
+import org.constellation.provider.DataProviderFactory;
 import org.constellation.provider.configuration.ProviderParameters;
 
 import org.geotoolkit.internal.sql.table.ConfigurationKey;
@@ -45,8 +45,8 @@ import org.opengis.parameter.ParameterValueGroup;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class CoverageSQLProviderService extends AbstractProviderService
-        <Name,LayerDetails,LayerProvider> implements LayerProviderService {
+public class CoverageSQLProviderService extends AbstractProviderFactory
+        <Name,Data,DataProvider> implements DataProviderFactory {
 
     private static final String ERROR_MSG = "[PROVIDER]> Invalid coverage-sql provider config";
 
@@ -91,7 +91,7 @@ public class CoverageSQLProviderService extends AbstractProviderService
     }
 
     @Override
-    public LayerProvider createProvider(ParameterValueGroup ps) {
+    public DataProvider createProvider(ParameterValueGroup ps) {
         if(!canProcess(ps)){
             return null;
         }

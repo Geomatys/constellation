@@ -52,7 +52,7 @@ public class ConfiguratorTest {
      */
     @Test
     public void testServiceAvailable(){
-        final Collection<LayerProviderService> services = DataProviders.getInstance().getServices();
+        final Collection<DataProviderFactory> services = DataProviders.getInstance().getServices();
         assertEquals(1, services.size());
         assertTrue(services.iterator().next() instanceof MockLayerProviderService);
     }
@@ -109,7 +109,7 @@ public class ConfiguratorTest {
         };
         DataProviders.getInstance().setConfigurator(config);
 
-        final Collection<LayerProvider> providers = DataProviders.getInstance().getProviders();
+        final Collection<DataProvider> providers = DataProviders.getInstance().getProviders();
         assertEquals(1, providers.size());
         assertEquals(3, DataProviders.getInstance().getKeys().size());
     }
@@ -153,7 +153,7 @@ public class ConfiguratorTest {
         };
         DataProviders.getInstance().setConfigurator(config);
 
-        final Collection<LayerProvider> providers = DataProviders.getInstance().getProviders();
+        final Collection<DataProvider> providers = DataProviders.getInstance().getProviders();
         assertEquals(3, providers.size());
         assertEquals(9, DataProviders.getInstance().getKeys().size());
         assertEquals(4, DataProviders.getInstance().getKeys("id-0").size());
@@ -201,7 +201,7 @@ public class ConfiguratorTest {
         };
         DataProviders.getInstance().setConfigurator(config);
 
-        final Collection<LayerProvider> providers = DataProviders.getInstance().getProviders();
+        final Collection<DataProvider> providers = DataProviders.getInstance().getProviders();
         assertEquals(2, providers.size());
         assertEquals(7, DataProviders.getInstance().getKeys().size());
         assertEquals(4, DataProviders.getInstance().getKeys("id-0").size());

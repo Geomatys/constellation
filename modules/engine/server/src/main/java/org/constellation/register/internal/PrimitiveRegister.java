@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.constellation.ServiceDef;
-import org.constellation.provider.LayerDetails;
-import org.constellation.provider.LayerProvider;
+import org.constellation.provider.Data;
+import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.register.PrimitiveRegisterIF;
 import org.constellation.register.RegisterException;
@@ -68,7 +68,7 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
 
     //TODO: only handling providers for now.
     @Override
-    public List<LayerDetails> getAllLayerReferences(ServiceDef serviceDef) throws RegisterException {
+    public List<Data> getAllLayerReferences(ServiceDef serviceDef) throws RegisterException {
 
         if (isServiceAllowed("read all files", serviceDef)) {
             return getAllLayerRefs(serviceDef);
@@ -79,7 +79,7 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
     }
 
     @Override
-    public List<LayerDetails> getLayerReferences(ServiceDef serviceDef,
+    public List<Data> getLayerReferences(ServiceDef serviceDef,
             List<Name> layerNames) throws RegisterException {
 
         if (isServiceAllowed("read all files", serviceDef)) {
@@ -92,7 +92,7 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
     }
 
     @Override
-    public LayerDetails getLayerReference(ServiceDef serviceDef, Name layerName) throws RegisterException {
+    public Data getLayerReference(ServiceDef serviceDef, Name layerName) throws RegisterException {
 
         if (isServiceAllowed("read all files", serviceDef)) {
             return getLayerRef(layerName);
@@ -103,12 +103,12 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
 
     }
 
-    private List<LayerDetails> getAllLayerRefs(ServiceDef serviceDef) throws RegisterException {
+    private List<Data> getAllLayerRefs(ServiceDef serviceDef) throws RegisterException {
 
-        final List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
+        final List<Data> layerRefs = new ArrayList<Data>();
         final Set<Name> layerNames = DataProviders.getInstance().getKeys(serviceDef.specification.name());
         for (Name layerName : layerNames) {
-            final LayerDetails layerRef = DataProviders.getInstance().get(layerName);
+            final Data layerRef = DataProviders.getInstance().get(layerName);
 
             if (null == layerRef) {
                 throw new RegisterException("Unknown layer " + layerName);
@@ -121,11 +121,11 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
 
     }
 
-    private List<LayerDetails> getLayerRefs(List<Name> layerNames) throws RegisterException {
+    private List<Data> getLayerRefs(List<Name> layerNames) throws RegisterException {
 
-        final List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
+        final List<Data> layerRefs = new ArrayList<Data>();
         for (Name layerName : layerNames) {
-            final LayerDetails layerRef = DataProviders.getInstance().getByIdentifier(layerName);
+            final Data layerRef = DataProviders.getInstance().getByIdentifier(layerName);
 
             if (null == layerRef) {
                 throw new RegisterException("Unknown layer " + layerName);
@@ -136,9 +136,9 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
         return layerRefs;
     }
 
-    private LayerDetails getLayerRef(Name layerName) throws RegisterException {
+    private Data getLayerRef(Name layerName) throws RegisterException {
 
-        final LayerDetails layerRef = DataProviders.getInstance().getByIdentifier(layerName);
+        final Data layerRef = DataProviders.getInstance().getByIdentifier(layerName);
 
         if (null == layerRef) {
             throw new RegisterException("Unknown layer " + layerName);
@@ -150,7 +150,7 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
     public List<String> getRootDirectory() throws RegisterException {
 
         final List<String> rootDirectories = new ArrayList<String>();
-        for (LayerProvider p : DataProviders.getInstance().getProviders()) {
+        for (DataProvider p : DataProviders.getInstance().getProviders()) {
             final String s = p.getSource().parameter("rootDirectory").stringValue();
             if (s != null) {
                rootDirectories.add(s);

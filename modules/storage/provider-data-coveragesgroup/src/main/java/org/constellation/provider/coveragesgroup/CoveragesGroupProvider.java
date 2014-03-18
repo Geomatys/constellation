@@ -34,7 +34,7 @@ import org.geotoolkit.map.MapContext;
 import org.geotoolkit.util.FileUtilities;
 
 import org.constellation.provider.AbstractLayerProvider;
-import org.constellation.provider.LayerDetails;
+import org.constellation.provider.Data;
 import org.constellation.provider.ProviderService;
 import org.constellation.provider.coveragesgroup.util.MapContextIO;
 import org.constellation.admin.dao.DataRecord.DataType;
@@ -79,7 +79,7 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
      * {@inheritDoc}
      */
     @Override
-    public LayerDetails get(final Name key) {
+    public Data get(final Name key) {
         return get(key, null);
     }
 
@@ -87,14 +87,14 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
      * {@inheritDoc}
      */
     @Override
-    public LayerDetails get(final Name key, Date version) {
+    public Data get(final Name key, Date version) {
         return get(key, null, null);
     }
 
     /**
      * hacked method to pass the login/pass to WebMapServer
      */
-    public LayerDetails get(final Name key, final String login, final String password) {
+    public Data get(final Name key, final String login, final String password) {
         if (index == null) {
             visit();
         }

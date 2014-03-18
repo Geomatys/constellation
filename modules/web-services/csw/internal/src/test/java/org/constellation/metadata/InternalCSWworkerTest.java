@@ -27,7 +27,7 @@ import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.generic.database.Automatic;
 import org.constellation.provider.DataProviders;
-import org.constellation.provider.LayerProviderService;
+import org.constellation.provider.DataProviderFactory;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.TestRunner;
 import org.constellation.util.Util;
@@ -207,7 +207,7 @@ public class InternalCSWworkerTest extends CSWworkerTest {
 
     public static void writeProvider(String resourceName, String identifier) throws Exception {
 
-        final LayerProviderService service = DataProviders.getInstance().getService("coverage-sql");
+        final DataProviderFactory service = DataProviders.getInstance().getService("coverage-sql");
         final ParameterValueGroup config = service.getServiceDescriptor().createValue();
         final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
         final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);

@@ -34,7 +34,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.constellation.ServiceDef.Query;
-import org.constellation.provider.AbstractLayerDetails;
+import org.constellation.provider.AbstractData;
 import org.constellation.provider.coveragesgroup.util.ConvertersJaxbToGeotk;
 
 import org.geotoolkit.coverage.grid.GridCoverage2D;
@@ -66,7 +66,7 @@ import org.opengis.geometry.Envelope;
  * @author Cédric Briançon (Geomatys)
  * @author Quentin Boileau (Geomatys)
  */
-public class CoveragesGroupLayerDetails extends AbstractLayerDetails {
+public class CoveragesGroupLayerDetails extends AbstractData {
     private static final Logger LOGGER = Logging.getLogger(CoveragesGroupLayerDetails.class);
 
     private MapContext ctxt;

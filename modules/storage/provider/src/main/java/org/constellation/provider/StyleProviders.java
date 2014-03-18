@@ -109,7 +109,7 @@ public final class StyleProviders implements PropertyChangeListener{
         if(source instanceof Provider){
             //save changed configuration
             final Provider provider = (Provider) source;
-            saveConfiguration((StyleProviderService) provider.getService());
+            saveConfiguration((StyleProviderFactory) provider.getService());
         }
         //forward events
         fireUpdateEvent();
@@ -138,7 +138,7 @@ public final class StyleProviders implements PropertyChangeListener{
         return configurator;
     }
 
-    public StyleProvider createProvider(final StyleProviderService service, final ParameterValueGroup params){
+    public StyleProvider createProvider(final StyleProviderFactory service, final ParameterValueGroup params){
         getProviders();
         final StyleProvider provider = service.createProvider(params);
 
@@ -328,11 +328,11 @@ public final class StyleProviders implements PropertyChangeListener{
     public final FilterFactory2 FILTER_FACTORY = (FilterFactory2)FactoryFinder.getFilterFactory(
                             new Hints(Hints.FILTER_FACTORY, FilterFactory2.class));
 
-    private static final Collection<StyleProviderService> SERVICES;
+    private static final Collection<StyleProviderFactory> SERVICES;
     static {
-        final List<StyleProviderService> cache = new ArrayList<>();
-        final ServiceLoader<StyleProviderService> loader = ServiceLoader.load(StyleProviderService.class);
-        for(final StyleProviderService service : loader){
+        final List<StyleProviderFactory> cache = new ArrayList<>();
+        final ServiceLoader<StyleProviderFactory> loader = ServiceLoader.load(StyleProviderFactory.class);
+        for(final StyleProviderFactory service : loader){
             cache.add(service);
         }
         SERVICES = Collections.unmodifiableCollection(cache);
@@ -340,7 +340,7 @@ public final class StyleProviders implements PropertyChangeListener{
 
     private static final StyleProviders INSTANCE = new StyleProviders();
 
-    public Collection<StyleProviderService> getServices() {
+    public Collection<StyleProviderFactory> getServices() {
         return SERVICES;
     }
 

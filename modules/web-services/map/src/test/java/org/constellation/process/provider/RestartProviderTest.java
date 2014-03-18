@@ -20,7 +20,7 @@ import java.net.MalformedURLException;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.provider.AbstractProviderTest;
 import org.constellation.process.provider.RestartProviderDescriptor;
-import org.constellation.provider.LayerProvider;
+import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.Provider;
 import org.geotoolkit.process.ProcessDescriptor;
@@ -55,7 +55,7 @@ public class RestartProviderTest extends AbstractProviderTest {
         proc.call();
 
         Provider provider = null;
-        for (LayerProvider p : DataProviders.getInstance().getProviders()) {
+        for (DataProvider p : DataProviders.getInstance().getProviders()) {
             if ("restartProvider1".equals(p.getId())){
                 provider = p;
             }

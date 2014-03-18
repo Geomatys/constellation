@@ -38,8 +38,8 @@ import org.apache.sis.storage.DataStoreException;
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
 import org.constellation.portrayal.PortrayalUtil;
-import org.constellation.provider.CoverageLayerDetails;
-import org.constellation.provider.LayerDetails;
+import org.constellation.provider.CoverageData;
+import org.constellation.provider.Data;
 import org.constellation.util.WCSUtils;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
@@ -184,18 +184,18 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         for (String coverage : request.getIdentifier()) {
             
             final Name tmpName = parseCoverageName(coverage);
-            final LayerDetails layerRef = getLayerReference(userLogin, tmpName);
-            if (layerRef.getType().equals(LayerDetails.TYPE.FEATURE)) {
+            final Data layerRef = getLayerReference(userLogin, tmpName);
+            if (layerRef.getType().equals(Data.TYPE.FEATURE)) {
                 throw new CstlServiceException("The requested layer is vectorial. WCS is not able to handle it.",
                         LAYER_NOT_DEFINED, KEY_COVERAGE.toLowerCase());
             }
-            if (!(layerRef instanceof CoverageLayerDetails)) {
+            if (!(layerRef instanceof CoverageData)) {
                 // Should not occurs, since we have previously verified the type of layer.
                 throw new CstlServiceException("The requested layer is not a coverage. WCS is not able to handle it.",
                         LAYER_NOT_DEFINED, KEY_COVERAGE.toLowerCase());
             }
             
-            final CoverageLayerDetails coverageRef = (CoverageLayerDetails) layerRef;
+            final CoverageData coverageRef = (CoverageData) layerRef;
             if (!coverageRef.isQueryable(ServiceDef.Query.WCS_ALL)) {
                 throw new CstlServiceException("You are not allowed to request the layer \"" +
                         coverage + "\".", LAYER_NOT_QUERYABLE, KEY_COVERAGE.toLowerCase());
@@ -234,7 +234,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
      *
      * @throws CstlServiceException
      */
-    private  CoverageInfo describeCoverage100(final String coverageName, final CoverageLayerDetails coverageRef) throws CstlServiceException {
+    private  CoverageInfo describeCoverage100(final String coverageName, final CoverageData coverageRef) throws CstlServiceException {
 
         try {
             final GeographicBoundingBox inputGeoBox = coverageRef.getGeographicBoundingBox();
@@ -325,7 +325,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
      *
      * @throws CstlServiceException
      */
-    private  CoverageInfo describeCoverage111(final String coverageName, final CoverageLayerDetails coverageRef) throws CstlServiceException {
+    private  CoverageInfo describeCoverage111(final String coverageName, final CoverageData coverageRef) throws CstlServiceException {
         try {
             final GeographicBoundingBox inputGeoBox = coverageRef.getGeographicBoundingBox();
         
@@ -451,9 +451,9 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         final List<Layer> layers = getConfigurationLayers(userLogin);
         try {
             for (Layer configLayer : layers) {
-                final LayerDetails layer = getLayerReference(userLogin, configLayer.getName());
+                final Data layer = getLayerReference(userLogin, configLayer.getName());
 
-                if (layer.getType().equals(LayerDetails.TYPE.FEATURE)) {
+                if (layer.getType().equals(Data.TYPE.FEATURE)) {
                     continue;
                 }
                 if (!layer.isQueryable(ServiceDef.Query.WCS_ALL)) {
@@ -510,7 +510,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
      * @throws CstlServiceException
      * @throws JAXBException when unmarshalling the default GetCapabilities file.
      */
-    private CoverageInfo getCoverageInfo100(final LayerDetails layer, final Layer configLayer) throws DataStoreException {
+    private CoverageInfo getCoverageInfo100(final Data layer, final Layer configLayer) throws DataStoreException {
         
         final Name fullLayerName = layer.getName();
         final String layerName;
@@ -554,9 +554,9 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
      *
      * @throws CstlServiceException
      */
-    private CoverageInfo getCoverageInfo111(final LayerDetails layer, final Layer configLayer) throws DataStoreException {
+    private CoverageInfo getCoverageInfo111(final Data layer, final Layer configLayer) throws DataStoreException {
        
-        final CoverageLayerDetails coverageLayer = (CoverageLayerDetails)layer;
+        final CoverageData coverageLayer = (CoverageData)layer;
         final String identifier;
         if (configLayer.getAlias() != null && !configLayer.getAlias().isEmpty()) {
             identifier = configLayer.getAlias().trim().replaceAll(" ", "_");
@@ -612,17 +612,17 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                     KEY_COVERAGE.toLowerCase());
         }
         final Name tmpName = parseCoverageName(request.getCoverage());
-        final LayerDetails tmplayerRef = getLayerReference(userLogin, tmpName);
-        if (!tmplayerRef.isQueryable(ServiceDef.Query.WCS_ALL) || tmplayerRef.getType().equals(LayerDetails.TYPE.FEATURE)) {
+        final Data tmplayerRef = getLayerReference(userLogin, tmpName);
+        if (!tmplayerRef.isQueryable(ServiceDef.Query.WCS_ALL) || tmplayerRef.getType().equals(Data.TYPE.FEATURE)) {
             throw new CstlServiceException("You are not allowed to request the layer \"" +
                     tmplayerRef.getName() + "\".", INVALID_PARAMETER_VALUE, KEY_COVERAGE.toLowerCase());
         }
-        if (!(tmplayerRef instanceof CoverageLayerDetails)) {
+        if (!(tmplayerRef instanceof CoverageData)) {
                 // Should not occurs, since we have previously verified the type of layer.
                 throw new CstlServiceException("The requested layer is not a coverage. WCS is not able to handle it.",
                         LAYER_NOT_DEFINED, KEY_COVERAGE.toLowerCase());
         }
-        final CoverageLayerDetails layerRef = (CoverageLayerDetails) tmplayerRef;
+        final CoverageData layerRef = (CoverageData) tmplayerRef;
         final Layer configLayer = getConfigurationLayer(tmpName, userLogin);
 
         // we verify the interpolation method even if we don't use it

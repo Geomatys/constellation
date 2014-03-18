@@ -41,7 +41,7 @@ import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
 import org.constellation.configuration.WMSPortrayal;
-import org.constellation.provider.LayerDetails;
+import org.constellation.provider.Data;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderService;
@@ -87,7 +87,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
     /**
      * A list of available layers to be requested in WMS.
      */
-    private static List<LayerDetails> layers;
+    private static List<Data> layers;
 
     /**
      * Checksum value on the returned image expressed in a geographic CRS for the SST_tests layer.
@@ -233,7 +233,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
      * in WMS.
      */
     private static boolean containsTestLayer() {
-        for (LayerDetails layer : layers) {
+        for (Data layer : layers) {
             if (layer.getName().equals(LAYER_TEST)) {
                 return true;
             }
