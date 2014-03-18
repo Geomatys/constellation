@@ -386,57 +386,70 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
 cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$modalInstance', '$growl', 'provider', 'dataListing', '$uploadFiles', '$cookies',
     function ($scope, $dashboard, $modalInstance, $growl, provider, dataListing, $uploadFiles, $cookies) {
         $scope.layer = null;
-        $scope.file = null;
+        $scope.data = null;
         $scope.providerId = null;
-        $scope.metadatafile = null;
-        $scope.uploadType = '';
+        $scope.metadata = null;
+        $scope.uploadType = null;
 
         // Handle upload workflow
-        $scope.step1 = true;
+        $scope.step1A = true;
+        $scope.step1B = false;
         $scope.step2 = false;
         $scope.step3 = false;
         $scope.allowSubmit = false;
         $scope.allowNext = false;
 
+        $scope.dataPath = null;
+
         $scope.next = function() {
-            $scope.step1 = false;
-            $scope.step2 = true;
-            $scope.step3 = false;
-            $scope.allowNext = false;
-            $scope.allowSubmit = true;
+            if ($scope.step1A === true) {
+                $scope.uploadData();
+                $scope.step1B = true;
+                $scope.allowNext = true;
+                $scope.step1A = false;
+            } else {
+                if ($scope.metadata) {
+                    $scope.uploadMetadata();
+                }
+                $scope.step1B = false;
+                $scope.allowNext = false;
+
+                if ($scope.uploadType == null) {
+                    $scope.step2 = true;
+                    $scope.allowSubmit = true;
+                } else {
+                    $scope.uploaded();
+                }
+            }
         };
 
         $scope.close = function() {
             if ($scope.step3) {
-                $modalInstance.close({type: $scope.uploadType, file: $scope.providerId, missing: $scope.metadatafile == null});
+                $modalInstance.close({type: $scope.uploadType, file: $scope.providerId, missing: $scope.metadata == null});
             } else {
                 $modalInstance.dismiss('close');
             }
         };
 
         $scope.verifyExtension = function() {
-            var lastPointIndex = $scope.file.lastIndexOf(".");
-            var extension = $scope.file.substring(lastPointIndex+1, $scope.file.length);
+            var lastPointIndex = $scope.data.lastIndexOf(".");
+            var extension = $scope.data.substring(lastPointIndex+1, $scope.data.length);
             dataListing.extension({}, {value: extension},
                 function(response) {
-                    if(response.dataType!=""){
+                    if (response.dataType!="") {
                         $scope.uploadType = response.dataType;
-                        $scope.allowNext = false;
-                        $scope.allowSubmit = true;
-                    } else {
-                        $scope.allowNext = true;
-                        $scope.allowSubmit = false;
                     }
+                    $scope.allowNext = true;
                 });
         };
 
-        $scope.upload = function() {
-            var $form = $('#uploadForm');
+        $scope.uploadData = function() {
+            var $form = $('#uploadDataForm');
 
             var formData = new FormData($form[0]);
 
             $.ajax({
-                url: cstlContext + "api/1/data/upload;jsessionid="+ $cookies.cstlSessionId,
+                url: cstlContext + "api/1/data/upload/data;jsessionid="+ $cookies.cstlSessionId,
                 type: 'POST',
                 data: formData,
                 async: false,
@@ -444,12 +457,30 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                 contentType: false,
                 processData: false,
                 success: function (returndata) {
-                    uploaded(returndata);
+                    $scope.dataPath = returndata;
+                    $scope.allowNext = true;
                 }
             });
         };
 
-        function uploaded(message) {
+        $scope.uploadMetadata = function() {
+            var $form = $('#uploadMetadataForm');
+
+            var formData = new FormData($form[0]);
+
+            $.ajax({
+                url: cstlContext + "api/1/data/upload/metadata;jsessionid="+ $cookies.cstlSessionId,
+                type: 'POST',
+                data: formData,
+                async: false,
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        };
+
+        $scope.uploaded = function() {
+            var message = $scope.dataPath;
             if (message.indexOf('failed') === -1) {
                 var files = message.split(',');
                 var upFile = files[0];
@@ -484,7 +515,7 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                         }
                     });
                     $growl('success','Success','Shapefile data '+ fileName +' successfully added');
-                    $modalInstance.close({type: "vector", file: fileName, missing: $scope.metadatafile == null});
+                    $modalInstance.close({type: "vector", file: fileName, missing: $scope.metadata == null});
                 } else if ($scope.uploadType === "raster") {
                     provider.create({
                         id: fileName
@@ -495,12 +526,15 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                             path: upFile
                         }
                     }, function() {
-                        if (!fileExtension || fileExtension !== "nc") {
-                            dataListing.pyramidData({id: fileName}, {value: upFile}, function() {
-                                $growl('success','Success','Coverage data '+ fileName +' successfully added');
-                                $modalInstance.close({type: "raster", file: fileName, missing: $scope.metadatafile == null});
-                            });
-                        } else {
+//                        if (!fileExtension || fileExtension !== "nc") {
+//                            dataListing.pyramidData({id: fileName}, {value: upFile}, function() {
+//                                $growl('success','Success','Coverage data '+ fileName +' successfully added');
+//                                $modalInstance.close({type: "raster", file: fileName, missing: $scope.metadata == null});
+//                            });
+//                        } else {
+//                            displayNetCDF(fileName);
+//                        }
+                        if (fileExtension === "nc") {
                             displayNetCDF(fileName);
                         }
                     });
@@ -515,7 +549,8 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
         };
 
         function displayNetCDF(providerId) {
-            $scope.step1 = false;
+            $scope.step1A = false;
+            $scope.step1B = false;
             $scope.step2 = false;
             $scope.step3 = true;
             $scope.allowNext = false;

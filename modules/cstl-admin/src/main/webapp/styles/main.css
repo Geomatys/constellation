@@ -656,3 +656,7 @@ ul.unstyled {
 a.btn-push-right {
     margin-right: 10px;
 }
+
+.modal-body .fileinput {
+    width: 100%;
+}
