@@ -33,6 +33,10 @@
             <artifactId>cstl-xml-configuration</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+			<groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+        </dependency>
         <!-- for provider config -->
         <dependency>
             <groupId>org.geotoolkit</groupId>
