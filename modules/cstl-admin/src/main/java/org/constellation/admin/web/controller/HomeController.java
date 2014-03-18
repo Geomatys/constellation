@@ -25,7 +25,7 @@ public class HomeController {
     	Cookie cookie = new Cookie("cstlSessionId", csltSessionId);
     	cookie.setPath("/cstl-admin");
 		response.addCookie(cookie);
-        return "redirect:/";
+        return "redirect:/admin.html";
     }
     
     @RequestMapping(value = "/logout", method = RequestMethod.GET)

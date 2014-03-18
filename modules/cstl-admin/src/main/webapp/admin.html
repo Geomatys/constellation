@@ -5,7 +5,7 @@
 <!--[if gt IE 8]><!-->
 <html class="no-js">
 <!--<![endif]-->
-<body ng-app="cstlIndexApp">
+<body ng-app="cstlAdminApp">
 <!--[if lt IE 10]>
 <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
 <![endif]-->
@@ -44,7 +44,7 @@
                 </li>
             </ul>
             <ul ng-hide="authenticated" class="nav nav-pills pull-right">
-                <li ng-hide="authenticated"><a href="{{cstlLoginUrl}}" id="authenticateLink"><span
+                <li ng-hide="authenticated"><a href="/cstl-admin/" id="authenticateLink"><span
                         class="glyphicon glyphicon-log-in"></span> &nbsp;<span
                         translate="global.menu.account.login">Authenticate</span></a></li>
             </ul>
@@ -97,9 +97,19 @@
     </div>
 </div>
 
+
+
+
+
 <div class="container" style="box-sizing: border-box" ng-view="">
 
 </div>
+
+
+
+
+
+
 
 <script type="text/javascript" src="cstl-config.js"></script>
 
@@ -118,16 +128,16 @@
         src="bower_components/angular-translate-loader-static-files/angular-translate-loader-static-files.js"></script>
 <script src="scripts/zeroclipboard/ZeroClipboard.min.js"></script>
 <script src="scripts/http-auth-interceptor.js"></script>
-<script src="scripts/index.js"></script>
+<script src="scripts/app.js"></script>
 <script src="scripts/ui-modal.js"></script>
 <script src="scripts/jquery.growl.js"></script>
 <script src="scripts/jquery.iframe-transport.js"></script>
 <script src="scripts/jquery.ui.widget.js"></script>
 <script src="scripts/jquery.fileupload.js"></script>
 <!--<script src="scripts/ajax-upload.js"></script>-->
-<script src="scripts/index/controllers.js"></script>
-<script src="scripts/index/services.js"></script>
-<script src="scripts/index/directives.js"></script>
+<script src="scripts/controllers.js"></script>
+<script src="scripts/services.js"></script>
+<script src="scripts/directives.js"></script>
 <script src="scripts/openlayers-fix-wmts.js"></script>
 <script src="scripts/openlayers-ext.js"></script>
 <script src="scripts/cstl.data.viewer.js"></script>

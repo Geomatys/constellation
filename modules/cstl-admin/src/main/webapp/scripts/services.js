@@ -19,7 +19,10 @@
 function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
-
+/*
+ * URL starting with this prefix will be rewriten to constellation backend.
+ */
+var cstlUrlPrefix = "@cstl/";
 
 /*
  * Injection of jessionid for csltSessionId cookie.
@@ -28,13 +31,19 @@ cstlAdminApp.factory('AuthInterceptor', function($cookies) {
     return {
 	    'request': function(config) {
 	    	var url = config.url+'';
+	    	if(url.indexOf(cstlUrlPrefix) == 0){
+	    	  url = $cookies.cstlUrl + url.substring(cstlUrlPrefix.length);
+	    	  
+	    	}
 	    	var jsessionIdIndex = url.indexOf(";jsessionid=");
-	    	if(jsessionIdIndex != -1)
-    	    	if ($cookies.cstlSessionId) {
-    	    		config.url = url.replace(";jsessionid=", ";jsessionid=" + $cookies.cstlSessionId);
+	    	if(jsessionIdIndex != -1){
+	    	  var cstlSessionId=$cookies.cstlSessionId;
+    	    	if (cstlSessionId) {
+    	    		config.url = url.replace(";jsessionid=", ";jsessionid=" + cstlSessionId);
 	        	}else{
 	        		config.url = url.substring(0, url.indexOf(';jsessionid='))
 	        	}
+	    	}
 	        return config || $q.when(config);
 	    }
 	};
@@ -54,14 +63,14 @@ cstlAdminApp.factory('Account', ['$resource',
 
 cstlAdminApp.factory('Contact', ['$resource',
          function ($resource) {
-             return $resource(cstlContext + 'spring/admin/contact;jsessionid=', {}, {
+             return $resource( '@cstl/spring/admin/contact;jsessionid=', {}, {
             	 save: {method:'PUT'}
          });
 }]);
 
-cstlAdminApp.factory('ProcessService', ['$resource',
-   function($resource) {
-       	return $resource(cstlContext + 'spring/admin/process;jsessionid=', {}, {
+cstlAdminApp.factory('ProcessService', ['$resource', '$cookies',
+   function($resource, $cookies) {
+       	return $resource('@cstl/spring/admin/process;jsessionid=', {}, {
        		'get' : {method : 'GET',isArray : true}
        	});
 } ]);
@@ -76,14 +85,14 @@ cstlAdminApp.factory('Sessions', ['$resource',
 
 cstlAdminApp.factory('Metrics', ['$resource',
     function ($resource) {
-        return $resource(cstlContext + '/metrics/metrics', {}, {
+        return $resource('@cstl/metrics/metrics;jsessionid=', {}, {
             'get': { method: 'GET'}
         });
     }]);
 
 cstlAdminApp.factory('LogsService', ['$resource',
     function ($resource) {
-        return $resource(cstlContext + 'spring/rest/logs', {}, {
+        return $resource('@cstl/spring/rest/logs;jsessionid=', {}, {
             'findAll': { method: 'GET', isArray: true},
             'changeLevel':  { method: 'PUT'}
         });
@@ -92,7 +101,7 @@ cstlAdminApp.factory('LogsService', ['$resource',
 
 cstlAdminApp.factory('UserResource', ['$resource', '$cookies',
    function ($resource, $cookies) {
-        return $resource(cstlContext+'api/1/user/:id;jsessionid=');
+        return $resource('@cstl/api/1/user/:id;jsessionid=');
 }]);
 
 cstlAdminApp.factory('webService', ['$resource',
