@@ -17,25 +17,17 @@
  */
 package org.constellation.ws.rs;
 
-import java.beans.Transient;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.lang.reflect.Proxy;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
-
-
-
-
 import javax.inject.Inject;
+
 // Jersey dependencies
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -58,14 +50,15 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.validation.Schema;
 
-import org.constellation.engine.register.DTOMapper;
-import org.constellation.engine.register.Property;
-import org.constellation.engine.register.repository.PropertyRepository;
 // Constellation dependencies
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.WebServiceUtilities;
 import org.constellation.xml.PrefixMappingInvocationHandler;
+import org.constellation.engine.register.Property;
+import org.constellation.engine.register.repository.PropertyRepository;
+
 
 import static org.constellation.ws.ExceptionCode.*;
 
@@ -138,6 +131,17 @@ public abstract class WebService {
      * The default debugging logger for all web services.
      */
     protected static final Logger LOGGER = Logging.getLogger(WebService.class);
+
+    public static final String SERVICES_URL_KEY = "services.url";
+    private static final String PROPERTIES_URL;
+    static {
+        final Properties prop = ConfigDirectory.getConstellationProperties();
+        if (prop != null) {
+            PROPERTIES_URL = prop.getProperty(SERVICES_URL_KEY);
+        } else {
+            PROPERTIES_URL = null;
+        }
+    }
 
     /**
      * Automatically set by Jersey.
@@ -641,19 +645,21 @@ public abstract class WebService {
     @Inject
     private PropertyRepository propertyRepository;
     
-    @Inject
-    private DTOMapper dtoMapper;
-    
     protected String getServiceURL() {
-    	
-//    	Property prop = dtoMapper.propertyEntity("maprop", "mavalue");
-//    	
-//		propertyRepository.save(prop);
-
-		Property service = propertyRepository.findOne("service.url");
-
-    	
-        return getUriContext().getBaseUri().toString();
+        String result;
+        Property service = propertyRepository.findOne(SERVICES_URL_KEY);
+        if (service != null && (result = service.getValue()) != null && !result.isEmpty()) {
+        } else if (PROPERTIES_URL != null && !PROPERTIES_URL.isEmpty()) {
+            result = PROPERTIES_URL;
+        /*
+         * TODO : Reactivate the following line ? If Constellation is redirected, there's no way the last condition can
+         * give us the right URI, but does the referer really provide WS URL ?
+         */
+//        } else if (httpHeaders != null && (result = httpHeaders.getHeaderString(com.google.common.net.HttpHeaders.REFERER)) != null && !result.isEmpty()) {
+        } else {
+            result = getUriContext().getBaseUri().toString();
+        }
+        return result;
     }
 
     /**

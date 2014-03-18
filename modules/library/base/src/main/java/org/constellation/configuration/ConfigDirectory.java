@@ -116,6 +116,22 @@ public final class ConfigDirectory {
     }
 
     /**
+     * Try to get properties defined in constellation.properties file, which should be located into the web-inf directory.
+     * @return {@link java.util.Properties} contained in the constellation.properties file, or null if we cannot get it.
+     */
+    public static Properties getConstellationProperties() {
+        final File propertiesFile = new File(getWebInfDiretory(), "constellation.properties");
+        if (propertiesFile.exists()) {
+            try {
+                return FileUtilities.getPropertiesFromFile(propertiesFile);
+            } catch (IOException ex) {
+                LOGGER.warning("IOException while reading the constellation properties file");
+            }
+        }
+        return null;
+    }
+
+    /**
      * Give a data directory {@link java.io.File} defined on constellation.properties or
      * by default on .constellation-data from user home directory
      *
