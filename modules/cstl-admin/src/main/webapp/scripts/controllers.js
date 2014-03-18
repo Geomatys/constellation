@@ -225,7 +225,7 @@ cstlAdminApp.controller('MetricsController', ['$scope', 'resolvedMetrics','Metri
         	$scope.metrics= Metrics.get()
         };
         $scope.rungc = function(){
-        	$http.get(cstlContext + "spring/admin/jvm/rungc;jsessionid=").then(function(){
+        	$http.get("@cstl/spring/admin/jvm/rungc;jsessionid=").then(function(){
         		$scope.metrics= Metrics.get()
         	});
         };
@@ -449,7 +449,7 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
             var formData = new FormData($form[0]);
 
             $.ajax({
-                url: cstlContext + "api/1/data/upload/data;jsessionid="+ $cookies.cstlSessionId,
+                url: $cookies.cstlUrl + "api/1/data/upload/data;jsessionid="+ $cookies.cstlSessionId,
                 type: 'POST',
                 data: formData,
                 async: false,
@@ -469,7 +469,7 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
             var formData = new FormData($form[0]);
 
             $.ajax({
-                url: cstlContext + "api/1/data/upload/metadata;jsessionid="+ $cookies.cstlSessionId,
+                url: $cookies.cstlUrl + "api/1/data/upload/metadata;jsessionid="+ $cookies.cstlSessionId,
                 type: 'POST',
                 data: formData,
                 async: false,
@@ -1075,11 +1075,11 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
         };
     }]);
 
-cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'webService', 'provider', '$modal','textService', '$dashboard', '$growl', '$filter', 'StyleSharedService','style',
-                                                 function ($scope, $routeParams , webService, provider, $modal, textService, $dashboard, $growl, $filter, StyleSharedService, style) {
+cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'webService', 'provider', '$modal','textService', '$dashboard', '$growl', '$filter', 'StyleSharedService','style','$cookies',
+                                                 function ($scope, $routeParams , webService, provider, $modal, textService, $dashboard, $growl, $filter, StyleSharedService, style, $cookies) {
     $scope.tagText = '';
     $scope.type = $routeParams.type;
-    $scope.url = cstlContext + "WS/" + $routeParams.type + "/" + $routeParams.id;
+    $scope.url = $cookies.cstlUrl + "WS/" + $routeParams.type + "/" + $routeParams.id;
     $scope.urlBoxSize = Math.min($scope.url.length,100);
 
     var client = new ZeroClipboard( document.getElementById("copy-button") );
