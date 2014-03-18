@@ -63,7 +63,7 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
         this.valClass = valClass;
     }
 
-    public static Logger getLogger() {
+    protected Logger getLogger() {
         return LOGGER;
     }
 
@@ -72,15 +72,6 @@ public abstract class AbstractProviderProxy<K,V,P extends Provider<K,V>, S
      */
     public boolean contains(K key) {
         return getKeys().contains(key);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void removeAll() {
-        for (K key : getKeys()) {
-            remove(key);
-        }
     }
 
     /**

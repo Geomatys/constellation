@@ -184,11 +184,6 @@
         </dependency>
         <dependency>
           <groupId>org.constellation.storage</groupId>
-          <artifactId>cstl-store-data-coveragefile</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>org.constellation.storage</groupId>
           <artifactId>cstl-store-data-coveragesql</artifactId>
           <version>${project.version}</version>
         </dependency>
@@ -249,11 +244,6 @@
         </dependency>
         <dependency>
           <groupId>org.constellation.storage</groupId>
-          <artifactId>cstl-store-data-coveragefile</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>org.constellation.storage</groupId>
           <artifactId>cstl-store-data-coveragesql</artifactId>
           <version>${project.version}</version>
         </dependency>
@@ -289,11 +279,6 @@
         </dependency>
         <dependency>
           <groupId>org.constellation.storage</groupId>
-          <artifactId>cstl-store-data-coveragefile</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>org.constellation.storage</groupId>
           <artifactId>cstl-store-data-coveragesql</artifactId>
           <version>${project.version}</version>
         </dependency>
@@ -325,11 +310,6 @@
         <dependency>
           <groupId>org.constellation.web-services</groupId>
           <artifactId>cstl-web-wcs</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>org.constellation.storage</groupId>
-          <artifactId>cstl-store-data-coveragefile</artifactId>
           <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -381,11 +361,6 @@
         <dependency>
           <groupId>org.constellation.storage</groupId>
           <artifactId>cstl-store-data-featurestore</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>org.constellation.storage</groupId>
-          <artifactId>cstl-store-data-coveragefile</artifactId>
           <version>${project.version}</version>
         </dependency>
         <dependency>
