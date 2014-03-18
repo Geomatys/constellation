@@ -68,6 +68,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.OPERATION_NOT_SUPPORTED;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.STYLE_NOT_DEFINED;
 
+
 //J2SE dependencies
 import java.awt.Color;
 import java.awt.Dimension;
@@ -85,6 +86,7 @@ import java.util.Map;
 import java.util.logging.Level;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
@@ -144,9 +146,9 @@ import org.opengis.util.FactoryException;
  * @author Benjain Garcia (Geomatys)
  * @since 0.1
  */
-@Named
+//@Named
 @Path("wms/{serviceId}")
-//@Singleton
+@Singleton
 public class WMSService extends GridWebService<WMSWorker> {
 
     public static boolean writeDTD = true;

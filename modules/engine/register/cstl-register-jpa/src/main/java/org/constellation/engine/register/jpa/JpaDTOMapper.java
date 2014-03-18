@@ -67,7 +67,7 @@ public class JpaDTOMapper implements DTOMapper {
 	public Property propertyEntity(String key, String value) {
 	   PropertyEntity propertyEntity = new PropertyEntity();
 	   propertyEntity.setKey(key);
-		propertyEntity.setValue(value);
+	   propertyEntity.setValue(value);
 	return propertyEntity;
 	}
 }

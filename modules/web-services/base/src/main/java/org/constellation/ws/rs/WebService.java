@@ -17,6 +17,7 @@
  */
 package org.constellation.ws.rs;
 
+import java.beans.Transient;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -29,6 +30,12 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+
+
+
+
+
+import javax.inject.Inject;
 // Jersey dependencies
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -51,6 +58,9 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.validation.Schema;
 
+import org.constellation.engine.register.DTOMapper;
+import org.constellation.engine.register.Property;
+import org.constellation.engine.register.repository.PropertyRepository;
 // Constellation dependencies
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
@@ -627,7 +637,22 @@ public abstract class WebService {
      *
      * @return the service uURL.
      */
+    
+    @Inject
+    private PropertyRepository propertyRepository;
+    
+    @Inject
+    private DTOMapper dtoMapper;
+    
     protected String getServiceURL() {
+    	
+//    	Property prop = dtoMapper.propertyEntity("maprop", "mavalue");
+//    	
+//		propertyRepository.save(prop);
+
+		Property service = propertyRepository.findOne("service.url");
+
+    	
         return getUriContext().getBaseUri().toString();
     }
 

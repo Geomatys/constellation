@@ -111,6 +111,11 @@
             <artifactId>cstl-lib-base</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+          <groupId>org.constellation.engine.register</groupId>
+          <artifactId>cstl-register-api</artifactId>
+          <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>
