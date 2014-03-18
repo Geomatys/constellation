@@ -45,13 +45,13 @@ import static org.geotoolkit.parameter.Parameters.*;
  *
  * @author Johann Sorel (Geomatys)
  */
-public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
+public abstract class AbstractFeatureStoreProvider extends AbstractLayerProvider{
 
 
     private final Set<Name> index = new LinkedHashSet<>();
     private ExtendedFeatureStore store;
 
-    public AbstractDataStoreProvider(final ProviderService service,
+    public AbstractFeatureStoreProvider(final ProviderService service,
             final ParameterValueGroup config) throws DataStoreException {
         super(service,config);
         visit();
@@ -102,10 +102,10 @@ public abstract class AbstractDataStoreProvider extends AbstractLayerProvider{
         }
         final ParameterValueGroup layer = getLayer(getSource(), goodKey.getLocalPart());
         if (layer == null) {
-            return new DefaultDataStoreLayerDetails(goodKey, store, null, null, null, null, null, version);
+            return new DefaultFeatureStoreLayerDetails(goodKey, store, null, null, null, null, null, version);
 
         } else {
-            return new DefaultDataStoreLayerDetails(
+            return new DefaultFeatureStoreLayerDetails(
                     goodKey, store, null,
                     value(LAYER_DATE_START_FIELD_DESCRIPTOR, layer),
                     value(LAYER_DATE_END_FIELD_DESCRIPTOR, layer),

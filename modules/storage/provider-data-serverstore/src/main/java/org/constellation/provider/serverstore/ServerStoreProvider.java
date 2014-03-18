@@ -19,7 +19,7 @@ package org.constellation.provider.serverstore;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.DefaultCoverageStoreLayerDetails;
-import org.constellation.provider.DefaultDataStoreLayerDetails;
+import org.constellation.provider.DefaultFeatureStoreLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.ProviderService;
 import org.geotoolkit.client.Client;
@@ -139,7 +139,7 @@ public class ServerStoreProvider extends AbstractLayerProvider{
 
         if(server instanceof FeatureStore){
             final FeatureStore store = (FeatureStore) server;
-            return new DefaultDataStoreLayerDetails(key, store, null, version);
+            return new DefaultFeatureStoreLayerDetails(key, store, null, version);
         }else if(server instanceof CoverageStore){
 
             final CoverageStore store = (CoverageStore) server;

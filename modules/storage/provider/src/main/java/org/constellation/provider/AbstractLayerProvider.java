@@ -55,7 +55,7 @@ public abstract class AbstractLayerProvider extends AbstractProvider<Name,LayerD
      * {@inheritDoc }
      */
     @Override
-    public Class<Name> getKeyClass() {
+    public Class<Name> getKeyClass() {   
         return Name.class;
     }
 

@@ -38,7 +38,7 @@ import org.opengis.feature.type.Name;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class DefaultDataStoreLayerDetails extends AbstractFeatureLayerDetails {
+public class DefaultFeatureStoreLayerDetails extends AbstractFeatureLayerDetails {
 
     /**
      * Build a FeatureLayerDetails with layer name, store and favorite style names.
@@ -47,7 +47,7 @@ public class DefaultDataStoreLayerDetails extends AbstractFeatureLayerDetails {
      * @param store FeatureStore
      * @param favorites style names
      */
-    public DefaultDataStoreLayerDetails(Name name, FeatureStore store, List<String> favorites){
+    public DefaultFeatureStoreLayerDetails(Name name, FeatureStore store, List<String> favorites){
         this(name,store,favorites,null,null,null,null,null);
     }
 
@@ -59,7 +59,7 @@ public class DefaultDataStoreLayerDetails extends AbstractFeatureLayerDetails {
      * @param favorites style names
      * @param versionDate data version date of the layer (can be null)
      */
-    public DefaultDataStoreLayerDetails(Name name, FeatureStore store, List<String> favorites, Date versionDate){
+    public DefaultFeatureStoreLayerDetails(Name name, FeatureStore store, List<String> favorites, Date versionDate){
         this(name,store,favorites,null,null,null,null, versionDate);
     }
 
@@ -74,7 +74,7 @@ public class DefaultDataStoreLayerDetails extends AbstractFeatureLayerDetails {
      * @param elevationStart elevation filter start
      * @param elevationEnd elevation filter end
      */
-    public DefaultDataStoreLayerDetails(Name name, FeatureStore store, List<String> favorites,
+    public DefaultFeatureStoreLayerDetails(Name name, FeatureStore store, List<String> favorites,
             String dateStart, String dateEnd, String elevationStart, String elevationEnd){
         this(name,store,favorites,dateStart,dateEnd,elevationStart,elevationEnd , null);
     }
@@ -92,7 +92,7 @@ public class DefaultDataStoreLayerDetails extends AbstractFeatureLayerDetails {
      * @param elevationEnd elevation filter end
      * @param versionDate data version date of the layer (can be null)
      */
-    public DefaultDataStoreLayerDetails(Name name, FeatureStore store, List<String> favorites,
+    public DefaultFeatureStoreLayerDetails(Name name, FeatureStore store, List<String> favorites,
                                         String dateStart, String dateEnd, String elevationStart, String elevationEnd, Date versionDate){
         super(name,store,favorites,dateStart,dateEnd,elevationStart,elevationEnd, versionDate);
     }
