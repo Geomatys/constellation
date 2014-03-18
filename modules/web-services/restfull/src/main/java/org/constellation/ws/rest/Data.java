@@ -20,6 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.CRC32;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -28,6 +29,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
@@ -203,30 +205,55 @@ public class Data {
      * @return A {@link Response} with 200 code if upload work, 500 if not work.
      */
     @POST
-    @Path("upload")
+    @Path("upload/data")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response uploadFile(@FormDataParam("file") InputStream fileIs,
-                               @FormDataParam("file") FormDataContentDisposition fileDetail,
-                               @FormDataParam("metadatafile") InputStream mdFileIs,
-                               @FormDataParam("metadatafile") FormDataContentDisposition mdFileDetail) {
-
-        final File dataDirectory = ConfigDirectory.getDataDirectory();
-        File newFile = new File(dataDirectory, fileDetail.getFileName());
-        File mdFile = null;
+    public Response uploadData(@FormDataParam("data") InputStream fileIs,
+                               @FormDataParam("data") FormDataContentDisposition fileDetail,
+                               @Context HttpServletRequest request) {
+    	final String sessionId = request.getSession().getId();
+    	final File uploadDirectory = ConfigDirectory.getUploadDirectory(sessionId);
+        
+        File newFile = new File(uploadDirectory, fileDetail.getFileName());
         try {
             if (fileIs != null && fileDetail != null) {
                 Files.copy(fileIs, newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 fileIs.close();
                 if (newFile.getName().endsWith(".zip")) {
                     final String fileNameWithoutExt = newFile.getName().substring(0, newFile.getName().indexOf("."));
-                    final File zipDir = new File(dataDirectory, fileNameWithoutExt);
+                    final File zipDir = new File(uploadDirectory, fileNameWithoutExt);
                     FileUtilities.unzip(newFile, zipDir, new CRC32());
                     newFile = zipDir;
                 }
             }
 
+            
+        } catch (IOException ex) {
+            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+            return Response.status(500).entity("failed").build();
+        }
+
+        String result = newFile.getAbsolutePath();
+        return Response.ok(result).build();
+    }
+    
+    /**
+     * Receive a {@link MultiPart} which contain a file need to be save on server to create data on provider
+     *
+     * @return A {@link Response} with 200 code if upload work, 500 if not work.
+     */
+    @POST
+    @Path("upload/metadata")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Response uploadMetadata(@FormDataParam("metadata") InputStream mdFileIs,
+                               @FormDataParam("metadata") FormDataContentDisposition mdFileDetail,
+                               @Context HttpServletRequest request) {
+    	final String sessionId = request.getSession().getId();
+        final File uploadDirectory = ConfigDirectory.getUploadDirectory(sessionId);
+       
+        File mdFile = null;
+        try {
             if (mdFileIs != null && mdFileDetail != null && !mdFileDetail.getFileName().isEmpty()) {
-                final File mdFolder = new File(dataDirectory, "metadata");
+                final File mdFolder = new File(uploadDirectory, "metadata");
                 if (mdFolder.exists() && mdFolder.isFile()) {
                     // Ensures we do not have a file named "metadata" in this folder
                     mdFolder.delete();
@@ -243,10 +270,7 @@ public class Data {
             return Response.status(500).entity("failed").build();
         }
 
-        String result = newFile.getAbsolutePath();
-        if (mdFile != null) {
-            result += ","+ mdFile.getAbsolutePath();
-        }
+        String result = ","+ mdFile.getAbsolutePath();
         return Response.ok(result).build();
     }
 
@@ -260,17 +284,17 @@ public class Data {
     @Path("load")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response loadData(final ParameterValues values) {
+    public Response loadData(final ParameterValues values, @Context HttpServletRequest request) {
         final String filePath = values.getValues().get("filePath");
         final String metadataFilePath = values.getValues().get("metadataFilePath");
         final String dataType = values.getValues().get("dataType");
 
-        final File root = ConfigDirectory.getDataDirectory();
-        final File choosingFile = new File(root, filePath);
+        final File uploadDirectory = ConfigDirectory.getUploadDirectory(request.getSession().getId());
+        final File choosingFile = new File(uploadDirectory, filePath);
 
         File choosingMetadataFile = null;
         if (metadataFilePath != null && !metadataFilePath.isEmpty()) {
-            choosingMetadataFile = new File(root.getAbsolutePath() + "/metadata/" + metadataFilePath);
+            choosingMetadataFile = new File(uploadDirectory.getAbsolutePath() + "/metadata/" + metadataFilePath);
         }
 
         if (choosingFile.exists()) {

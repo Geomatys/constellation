@@ -23,6 +23,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.RefAddr;
 import javax.naming.Reference;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -75,6 +76,7 @@ public final class ConfigDirectory {
 
                 USER_DIRECTORY    = prop.getProperty("configuration_directory");
                 DATA_DIRECTORY    = prop.getProperty("data_directory");
+                UPLOAD_DIRECTORY    = prop.getProperty("upload_directory");
                 METADATA_DIRECTORY= prop.getProperty("metadata_directory");
             } catch (IOException ex) {
                 LOGGER.warning("IOException while reading the constellation properties file");
@@ -88,6 +90,7 @@ public final class ConfigDirectory {
      */
     public static String USER_DIRECTORY = null;
     public static String DATA_DIRECTORY = null;
+    public static String UPLOAD_DIRECTORY = null;
     public static String METADATA_DIRECTORY = null;
     public static String STYLE_DIRECTORY = null;
     /**
@@ -136,6 +139,98 @@ public final class ConfigDirectory {
         }
         return constellationDataDirectory;
     }
+    
+    public static File removeUploadDirectory(String sessionId) {
+    	File constellationDataDirectory;
+    	File constellationUploadDirectory;
+    	File sessionUploadDirectory;
+    	
+    	if (DATA_DIRECTORY != null && !DATA_DIRECTORY.isEmpty()) {
+            constellationDataDirectory = new File(DATA_DIRECTORY);
+            if (!constellationDataDirectory.exists()) {
+                LOGGER.log(Level.INFO, "The configuration directory {0} does not exist", DATA_DIRECTORY);
+            } else if (!constellationDataDirectory.isDirectory()) {
+                LOGGER.log(Level.INFO, "The configuration path {0} is not a directory", DATA_DIRECTORY);
+            }
+        } else {
+            constellationDataDirectory = new File(System.getProperty("user.home"), ".constellation-data");
+        }
+       
+        if (UPLOAD_DIRECTORY != null && !UPLOAD_DIRECTORY.isEmpty()) {
+        	constellationUploadDirectory = new File(UPLOAD_DIRECTORY);
+            if (!constellationUploadDirectory.exists()) {
+                LOGGER.log(Level.INFO, "The configuration directory {0} does not exist", UPLOAD_DIRECTORY);
+            } else if (!constellationUploadDirectory.isDirectory()) {
+                LOGGER.log(Level.INFO, "The configuration path {0} is not a directory", UPLOAD_DIRECTORY);
+            }
+        } else {
+        	constellationUploadDirectory = new File(constellationDataDirectory, "upload");
+            
+        }
+        sessionUploadDirectory = new File(constellationUploadDirectory, sessionId);
+        if (sessionUploadDirectory.exists()) {
+        	deleteFolder(sessionUploadDirectory);
+        }
+        
+        return sessionUploadDirectory;
+	}
+    
+    
+    private static void deleteFolder(File folder) {
+        File[] files = folder.listFiles();
+        if(files!=null) { //some JVMs return null for empty dirs
+            for(File f: files) {
+                if(f.isDirectory()) {
+                    deleteFolder(f);
+                } else {
+                    f.delete();
+                }
+            }
+        }
+        folder.delete();
+    }
+    
+    public static File getUploadDirectory(String sessionId) {
+    	File constellationDataDirectory;
+    	File constellationUploadDirectory;
+    	File sessionUploadDirectory;
+
+        if (DATA_DIRECTORY != null && !DATA_DIRECTORY.isEmpty()) {
+            constellationDataDirectory = new File(DATA_DIRECTORY);
+            if (!constellationDataDirectory.exists()) {
+                LOGGER.log(Level.INFO, "The configuration directory {0} does not exist", DATA_DIRECTORY);
+            } else if (!constellationDataDirectory.isDirectory()) {
+                LOGGER.log(Level.INFO, "The configuration path {0} is not a directory", DATA_DIRECTORY);
+            }
+        } else {
+            constellationDataDirectory = new File(System.getProperty("user.home"), ".constellation-data");
+            if (!constellationDataDirectory.exists()) {
+                constellationDataDirectory.mkdir();
+            }
+        }
+        
+        if (UPLOAD_DIRECTORY != null && !UPLOAD_DIRECTORY.isEmpty()) {
+        	constellationUploadDirectory = new File(UPLOAD_DIRECTORY);
+            if (!constellationUploadDirectory.exists()) {
+                LOGGER.log(Level.INFO, "The configuration directory {0} does not exist", UPLOAD_DIRECTORY);
+            } else if (!constellationUploadDirectory.isDirectory()) {
+                LOGGER.log(Level.INFO, "The configuration path {0} is not a directory", UPLOAD_DIRECTORY);
+            }
+        } else {
+        	constellationUploadDirectory = new File(constellationDataDirectory, "upload");
+            if (!constellationUploadDirectory.exists()) {
+            	constellationUploadDirectory.mkdir();
+            }
+        }
+        sessionUploadDirectory = new File(constellationUploadDirectory, sessionId);
+        if (!sessionUploadDirectory.exists()) {
+        	sessionUploadDirectory.mkdir();
+        }
+        
+        return sessionUploadDirectory;
+	}
+    
+    
 
     /**
      * Give Metadata directory {@link java.io.File} defined on constellaiton.properties or
@@ -429,5 +524,7 @@ public final class ConfigDirectory {
 
         return value;
     }
+
+	
 
 }
