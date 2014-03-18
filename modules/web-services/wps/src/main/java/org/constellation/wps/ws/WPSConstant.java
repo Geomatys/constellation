@@ -94,21 +94,21 @@ public final class WPSConstant {
         final List<AbstractOperation> operations = new ArrayList<>();
 
         final List<AbstractDomain> gcParameters = new ArrayList<>();
-        gcParameters.add(OWSXmlFactory.buildDomain("1.1.0", "service", Arrays.asList("WPS")));
-        gcParameters.add(OWSXmlFactory.buildDomain("1.1.0", "Acceptversions", Arrays.asList("1.0.0")));
+        gcParameters.add(OWSXmlFactory.buildDomain("1.1.0", "service", Arrays.asList(WPS_SERVICE)));
+        gcParameters.add(OWSXmlFactory.buildDomain("1.1.0", "Acceptversions", Arrays.asList(WPS_1_0_0)));
         gcParameters.add(OWSXmlFactory.buildDomain("1.1.0", "AcceptFormats", Arrays.asList("text/xml")));
         final AbstractOperation getCapabilities = OWSXmlFactory.buildOperation("1.1.0", getAndPost, gcParameters, null, "GetCapabilities");
         operations.add(getCapabilities);
 
         final List<AbstractDomain> dpParameters = new ArrayList<>();
-        dpParameters.add(OWSXmlFactory.buildDomain("1.1.0", "service", Arrays.asList("WPS")));
-        dpParameters.add(OWSXmlFactory.buildDomain("1.1.0", "version", Arrays.asList("1.0.0")));
+        dpParameters.add(OWSXmlFactory.buildDomain("1.1.0", "service", Arrays.asList(WPS_SERVICE)));
+        dpParameters.add(OWSXmlFactory.buildDomain("1.1.0", "version", Arrays.asList(WPS_1_0_0)));
         final AbstractOperation describeProcess = OWSXmlFactory.buildOperation("1.1.0", getAndPost, dpParameters, null, "DescribeProcess");
         operations.add(describeProcess);
 
         final List<AbstractDomain> eParameters = new ArrayList<>();
-        eParameters.add(OWSXmlFactory.buildDomain("1.1.0", "service", Arrays.asList("WPS")));
-        eParameters.add(OWSXmlFactory.buildDomain("1.1.0", "version", Arrays.asList("1.0.0")));
+        eParameters.add(OWSXmlFactory.buildDomain("1.1.0", "service", Arrays.asList(WPS_SERVICE)));
+        eParameters.add(OWSXmlFactory.buildDomain("1.1.0", "version", Arrays.asList(WPS_1_0_0)));
         final AbstractOperation execute = OWSXmlFactory.buildOperation("1.1.0", onlyPost, eParameters, null, "Execute");
         operations.add(execute);
 
@@ -135,7 +135,7 @@ public final class WPSConstant {
                                                                                                  metadata.getName(),
                                                                                                  metadata.getDescription(),
                                                                                                  metadata.getKeywords(),
-                                                                                                 "WFS",
+                                                                                                 WPS_SERVICE,
                                                                                                  metadata.getVersions(),
                                                                                                  constraint.getFees(),
                                                                                                  Arrays.asList(constraint.getAccessConstraint()));
