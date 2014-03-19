@@ -19,7 +19,7 @@ package org.constellation.provider.configuration;
 
 import org.apache.sis.util.logging.Logging;
 import org.constellation.provider.Provider;
-import org.constellation.provider.ProviderService;
+import org.constellation.provider.ProviderFactory;
 import org.opengis.parameter.ParameterValueGroup;
 import java.util.List;
 import java.util.logging.Logger;
@@ -33,8 +33,8 @@ public interface Configurator {
 
     public static final Configurator DEFAULT = new DefaultConfigurator();
 
-    ParameterValueGroup getConfiguration(final ProviderService service);
+    ParameterValueGroup getConfiguration(final ProviderFactory service);
 
-    void saveConfiguration(final ProviderService service, final List<Provider> providers);
+    void saveConfiguration(final ProviderFactory service, final List<Provider> providers);
 
 }

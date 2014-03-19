@@ -26,7 +26,7 @@ import org.opengis.parameter.ParameterValueGroup;
  *
  * @author Johann Sorel (Geomatys)
  */
-public interface StyleProviderFactory extends ProviderService<String,MutableStyle,StyleProvider>{
+public interface StyleProviderFactory extends ProviderFactory<String,MutableStyle,StyleProvider>{
 
     @Override
     StyleProvider createProvider(ParameterValueGroup config);

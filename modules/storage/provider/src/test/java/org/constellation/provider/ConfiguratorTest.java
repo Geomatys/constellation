@@ -52,7 +52,7 @@ public class ConfiguratorTest {
      */
     @Test
     public void testServiceAvailable(){
-        final Collection<DataProviderFactory> services = DataProviders.getInstance().getServices();
+        final Collection<DataProviderFactory> services = DataProviders.getInstance().getFactories();
         assertEquals(1, services.size());
         assertTrue(services.iterator().next() instanceof MockLayerProviderService);
     }
@@ -66,12 +66,12 @@ public class ConfiguratorTest {
         final Configurator config = new Configurator() {
 
             @Override
-            public ParameterValueGroup getConfiguration(final ProviderService service) {
+            public ParameterValueGroup getConfiguration(final ProviderFactory service) {
                 return service.getServiceDescriptor().createValue();
             }
 
             @Override
-            public void saveConfiguration(ProviderService service, List<Provider> providers) {
+            public void saveConfiguration(ProviderFactory service, List<Provider> providers) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };
@@ -89,7 +89,7 @@ public class ConfiguratorTest {
         final Configurator config = new Configurator() {
 
             @Override
-            public ParameterValueGroup getConfiguration(final ProviderService service) {
+            public ParameterValueGroup getConfiguration(final ProviderFactory service) {
                 final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
                 if(service.getName().equals("mock")){
@@ -103,7 +103,7 @@ public class ConfiguratorTest {
             }
 
             @Override
-            public void saveConfiguration(ProviderService service, List<Provider> providers) {
+            public void saveConfiguration(ProviderFactory service, List<Provider> providers) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };
@@ -123,7 +123,7 @@ public class ConfiguratorTest {
         final Configurator config = new Configurator() {
 
             @Override
-            public ParameterValueGroup getConfiguration(final ProviderService service) {
+            public ParameterValueGroup getConfiguration(final ProviderFactory service) {
                 final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
                 if(service.getName().equals("mock")){
@@ -147,7 +147,7 @@ public class ConfiguratorTest {
             }
 
             @Override
-            public void saveConfiguration(ProviderService service, List<Provider> providers) {
+            public void saveConfiguration(ProviderFactory service, List<Provider> providers) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };
@@ -170,7 +170,7 @@ public class ConfiguratorTest {
 
         final Configurator config = new Configurator() {
             @Override
-            public ParameterValueGroup getConfiguration(final ProviderService service) {
+            public ParameterValueGroup getConfiguration(final ProviderFactory service) {
                 final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
                 if(service.getName().equals("mock")){
@@ -195,7 +195,7 @@ public class ConfiguratorTest {
             }
 
             @Override
-            public void saveConfiguration(ProviderService service, List<Provider> providers) {
+            public void saveConfiguration(ProviderFactory service, List<Provider> providers) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };
@@ -218,7 +218,7 @@ public class ConfiguratorTest {
 
         final Configurator config = new Configurator() {
             @Override
-            public ParameterValueGroup getConfiguration(final ProviderService service) {
+            public ParameterValueGroup getConfiguration(final ProviderFactory service) {
                 final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
                 if(service.getName().equals("mock")){
@@ -243,7 +243,7 @@ public class ConfiguratorTest {
             }
 
             @Override
-            public void saveConfiguration(ProviderService service, List<Provider> providers) {
+            public void saveConfiguration(ProviderFactory service, List<Provider> providers) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };
@@ -262,12 +262,12 @@ public class ConfiguratorTest {
         //set an empty configuration and verify nothing remains
         DataProviders.getInstance().setConfigurator(new Configurator() {
             @Override
-            public ParameterValueGroup getConfiguration(final ProviderService service) {
+            public ParameterValueGroup getConfiguration(final ProviderFactory service) {
                 return null;
             }
 
             @Override
-            public void saveConfiguration(ProviderService service, List<Provider> providers) {
+            public void saveConfiguration(ProviderFactory service, List<Provider> providers) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         });

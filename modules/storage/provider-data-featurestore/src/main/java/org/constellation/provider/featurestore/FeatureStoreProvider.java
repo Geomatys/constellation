@@ -18,7 +18,7 @@ package org.constellation.provider.featurestore;
 
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.provider.AbstractFeatureStoreProvider;
-import org.constellation.provider.ProviderService;
+import org.constellation.provider.ProviderFactory;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.FeatureStoreFinder;
 import org.geotoolkit.db.postgres.PostgresFeatureStore;
@@ -33,7 +33,7 @@ import java.util.logging.Level;
  */
 public class FeatureStoreProvider extends AbstractFeatureStoreProvider{
 
-    public FeatureStoreProvider(ProviderService service, ParameterValueGroup param) throws DataStoreException{
+    public FeatureStoreProvider(ProviderFactory service, ParameterValueGroup param) throws DataStoreException{
         super(service,param);
     }
 

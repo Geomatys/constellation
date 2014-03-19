@@ -37,7 +37,7 @@ import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
 import org.constellation.provider.Provider;
-import org.constellation.provider.ProviderService;
+import org.constellation.provider.ProviderFactory;
 import org.geotoolkit.gml.xml.v311.MultiPointType;
 import org.geotoolkit.gml.xml.v311.PointPropertyType;
 import org.geotoolkit.gml.xml.v311.PointType;
@@ -186,7 +186,7 @@ public class WFSCIteWorkerTest {
         final Configurator config = new Configurator() {
 
             @Override
-            public ParameterValueGroup getConfiguration(final ProviderService service) {
+            public ParameterValueGroup getConfiguration(final ProviderFactory service) {
                 final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
                 if("feature-store".equals(service.getName())){
@@ -212,7 +212,7 @@ public class WFSCIteWorkerTest {
             }
 
             @Override
-            public void saveConfiguration(ProviderService service, List<Provider> providers) {
+            public void saveConfiguration(ProviderFactory service, List<Provider> providers) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };

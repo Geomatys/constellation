@@ -39,7 +39,7 @@ import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.provider.Data;
 import org.constellation.provider.Provider;
-import org.constellation.provider.ProviderService;
+import org.constellation.provider.ProviderFactory;
 import org.constellation.util.MetadataMapBuilder;
 import org.constellation.util.SimplyMetadataTreeNode;
 import org.geotoolkit.coverage.CoverageReference;
@@ -58,7 +58,7 @@ import org.w3c.dom.Node;
 
 /**
  *
- * @author husky
+ * @author Johann Sorel (Geomatys)
  */
 public final class DefaultConfigurator implements Configurator {
 
@@ -66,12 +66,12 @@ public final class DefaultConfigurator implements Configurator {
     }
 
     @Override
-    public ParameterValueGroup getConfiguration(final ProviderService service) {
+    public ParameterValueGroup getConfiguration(final ProviderFactory service) {
         return ConfigurationEngine.getProviderConfiguration(service.getName(), service.getServiceDescriptor());
     }
 
     @Override
-    public synchronized void saveConfiguration(final ProviderService service, final List<Provider> providers) {
+    public synchronized void saveConfiguration(final ProviderFactory service, final List<Provider> providers) {
         final ParameterValueGroup params = service.getServiceDescriptor().createValue();
         final String serviceName = service.getName();
         // Update administration database.

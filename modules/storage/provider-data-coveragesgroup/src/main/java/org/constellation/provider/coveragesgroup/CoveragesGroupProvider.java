@@ -33,9 +33,9 @@ import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.util.FileUtilities;
 
-import org.constellation.provider.AbstractLayerProvider;
+import org.constellation.provider.AbstractDataProvider;
 import org.constellation.provider.Data;
-import org.constellation.provider.ProviderService;
+import org.constellation.provider.ProviderFactory;
 import org.constellation.provider.coveragesgroup.util.MapContextIO;
 import org.constellation.admin.dao.DataRecord.DataType;
 
@@ -46,7 +46,7 @@ import static org.constellation.provider.coveragesgroup.CoveragesGroupProviderSe
  * @author Cédric Briançon (Geomatys)
  * @author Quentin Boileau (Geomatys)
  */
-public class CoveragesGroupProvider extends AbstractLayerProvider {
+public class CoveragesGroupProvider extends AbstractDataProvider {
 
     public static final String KEY_PATH = "path";
 
@@ -54,7 +54,7 @@ public class CoveragesGroupProvider extends AbstractLayerProvider {
     private boolean visited;
     private File path;
 
-    public CoveragesGroupProvider(final ProviderService service, final ParameterValueGroup param) {
+    public CoveragesGroupProvider(final ProviderFactory service, final ParameterValueGroup param) {
         super(service,param);
         this.visited = false;
     }

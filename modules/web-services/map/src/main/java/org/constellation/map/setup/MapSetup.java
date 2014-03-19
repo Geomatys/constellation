@@ -22,7 +22,6 @@ import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.imageio.ImageIO;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -33,12 +32,11 @@ import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.provider.CreateProviderDescriptor;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
-import org.constellation.provider.ProviderService;
+import org.constellation.provider.ProviderFactory;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviders;
 
 import org.apache.sis.util.logging.Logging;
-import org.geotoolkit.lang.Setup;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
@@ -100,8 +98,8 @@ public class MapSetup implements ServletContextListener {
         final String sldPath = ConfigDirectory.getStyleDirectory().getPath();
         if (provider == null) {
             // Acquire SLD provider service instance.
-            ProviderService sldService = null;
-            for (final ProviderService service : StyleProviders.getInstance().getServices()) {
+            ProviderFactory sldService = null;
+            for (final ProviderFactory service : StyleProviders.getInstance().getFactories()) {
                 if (service.getName().equals("sld")) {
                     sldService = service;
                     break;
@@ -191,8 +189,8 @@ public class MapSetup implements ServletContextListener {
             DataProvider shpProvider = DataProviders.getInstance().getProvider(shpProvName);
             if (shpProvider == null) {
                 // Acquire SHP provider service instance.
-                ProviderService shpService = null;
-                for (final ProviderService service : DataProviders.getInstance().getServices()) {
+                ProviderFactory shpService = null;
+                for (final ProviderFactory service : DataProviders.getInstance().getFactories()) {
                     if (service.getName().equals(featureStoreStr)) {
                         shpService = service;
                         break;
@@ -254,8 +252,8 @@ public class MapSetup implements ServletContextListener {
             DataProvider tifProvider = DataProviders.getInstance().getProvider(tifProvName);
             if (tifProvider == null) {
                 // Acquire TIFF provider service instance.
-                ProviderService tifService = null;
-                for (final ProviderService service : DataProviders.getInstance().getServices()) {
+                ProviderFactory tifService = null;
+                for (final ProviderFactory service : DataProviders.getInstance().getFactories()) {
                     if (service.getName().equals(coverageFileStr)) {
                         tifService = service;
                         break;

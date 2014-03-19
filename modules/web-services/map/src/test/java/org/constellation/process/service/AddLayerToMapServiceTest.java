@@ -36,7 +36,7 @@ import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.DataProviderFactory;
-import org.constellation.provider.ProviderService;
+import org.constellation.provider.ProviderFactory;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.util.DataReference;
 import org.geotoolkit.factory.FactoryFinder;
@@ -69,8 +69,8 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
     public static void createProvider(){
         
         ParameterDescriptorGroup sourceDesc = null;
-        ProviderService service = null;
-        final Collection<DataProviderFactory> availableLayerServices = DataProviders.getInstance().getServices();
+        ProviderFactory service = null;
+        final Collection<DataProviderFactory> availableLayerServices = DataProviders.getInstance().getFactories();
         for (DataProviderFactory tmpService: availableLayerServices) {
             if ("feature-store".equals(tmpService.getName())) {
                 service = tmpService;

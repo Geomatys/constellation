@@ -26,7 +26,7 @@ import org.opengis.parameter.ParameterValueGroup;
  *
  * @author Johann Sorel (Geomatys)
  */
-public interface DataProviderFactory extends ProviderService<Name,Data,DataProvider>{
+public interface DataProviderFactory extends ProviderFactory<Name,Data,DataProvider>{
 
     @Override
     DataProvider createProvider(ParameterValueGroup config);

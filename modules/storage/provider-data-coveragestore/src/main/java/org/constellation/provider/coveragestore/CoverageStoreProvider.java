@@ -17,10 +17,10 @@
 package org.constellation.provider.coveragestore;
 
 import org.apache.sis.storage.DataStoreException;
-import org.constellation.provider.AbstractLayerProvider;
+import org.constellation.provider.AbstractDataProvider;
 import org.constellation.provider.DefaultCoverageData;
 import org.constellation.provider.Data;
-import org.constellation.provider.ProviderService;
+import org.constellation.provider.ProviderFactory;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.coverage.CoverageStoreFinder;
@@ -42,12 +42,12 @@ import org.constellation.admin.dao.DataRecord.DataType;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class CoverageStoreProvider extends AbstractLayerProvider{
+public class CoverageStoreProvider extends AbstractDataProvider{
 
     private CoverageStore store;
     private Set<Name> names;
 
-    public CoverageStoreProvider(ProviderService service, ParameterValueGroup param){
+    public CoverageStoreProvider(ProviderFactory service, ParameterValueGroup param){
         super(service,param);
         visit();
     }

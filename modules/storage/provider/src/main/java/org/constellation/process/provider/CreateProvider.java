@@ -47,17 +47,17 @@ public final class CreateProvider extends AbstractCstlProcess {
         final ParameterValueGroup source = value(SOURCE, inputParameters);
 
         //initialize list of avaible Povider services
-        final Map<String, ProviderService> services = new HashMap<>();
-        final Collection<DataProviderFactory> availableLayerServices = DataProviders.getInstance().getServices();
+        final Map<String, ProviderFactory> services = new HashMap<>();
+        final Collection<DataProviderFactory> availableLayerServices = DataProviders.getInstance().getFactories();
         for (DataProviderFactory service: availableLayerServices) {
             services.put(service.getName(), service);
         }
-        final Collection<StyleProviderFactory> availableStyleServices = StyleProviders.getInstance().getServices();
+        final Collection<StyleProviderFactory> availableStyleServices = StyleProviders.getInstance().getFactories();
         for (StyleProviderFactory service: availableStyleServices) {
             services.put(service.getName(), service);
         }
 
-        final ProviderService service = services.get(providerType);
+        final ProviderFactory service = services.get(providerType);
         if (service != null) {
 
             //check no other provider with this id exist

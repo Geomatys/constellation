@@ -207,7 +207,7 @@ public class InternalCSWworkerTest extends CSWworkerTest {
 
     public static void writeProvider(String resourceName, String identifier) throws Exception {
 
-        final DataProviderFactory service = DataProviders.getInstance().getService("coverage-sql");
+        final DataProviderFactory service = DataProviders.getInstance().getFactory("coverage-sql");
         final ParameterValueGroup config = service.getServiceDescriptor().createValue();
         final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
         final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);

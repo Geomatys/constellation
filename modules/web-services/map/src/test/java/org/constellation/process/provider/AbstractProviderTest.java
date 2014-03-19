@@ -26,7 +26,7 @@ import org.constellation.process.AbstractProcessTest;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.DataProviderFactory;
-import org.constellation.provider.ProviderService;
+import org.constellation.provider.ProviderFactory;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -39,9 +39,9 @@ public abstract class AbstractProviderTest extends AbstractProcessTest {
 
     protected static URL EMPTY_CSV;
     // dataStore service
-    protected static ProviderService DATASTORE_SERVICE;
+    protected static ProviderFactory DATASTORE_SERVICE;
     static {
-        final Collection<DataProviderFactory> availableLayerServices = DataProviders.getInstance().getServices();
+        final Collection<DataProviderFactory> availableLayerServices = DataProviders.getInstance().getFactories();
         for (DataProviderFactory tmpService: availableLayerServices) {
             if ("feature-store".equals(tmpService.getName())) {
                 DATASTORE_SERVICE = tmpService;
@@ -77,7 +77,7 @@ public abstract class AbstractProviderTest extends AbstractProcessTest {
      * @return
      * @throws MalformedURLException
      */
-    protected static ParameterValueGroup buildCSVProvider(final ProviderService sercice, final String providerID, final boolean loadAll,
+    protected static ParameterValueGroup buildCSVProvider(final ProviderFactory sercice, final String providerID, final boolean loadAll,
             final URL url) throws MalformedURLException {
 
         ParameterDescriptorGroup desc = sercice.getServiceDescriptor();

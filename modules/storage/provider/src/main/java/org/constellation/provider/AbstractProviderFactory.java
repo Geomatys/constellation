@@ -31,7 +31,7 @@ import org.opengis.parameter.ParameterValueGroup;
  * @author Cédric Briançon (Geomatys)
  * @author Johann Sorel (Geomatys)
  */
-public abstract class AbstractProviderFactory<K,V,P extends Provider<K,V>> implements ProviderService<K,V,P> {
+public abstract class AbstractProviderFactory<K,V,P extends Provider<K,V>> implements ProviderFactory<K,V,P> {
    
     private static final Logger LOGGER = Logging.getLogger("org.constellation.provider");
 
@@ -60,9 +60,4 @@ public abstract class AbstractProviderFactory<K,V,P extends Provider<K,V>> imple
         return (result != null) && Boolean.TRUE.equals(result.pass());
     }
     
-    @Override
-    public Collection<? extends P> getAdditionalProviders() {
-        return Collections.emptyList();
-    }
-
 }

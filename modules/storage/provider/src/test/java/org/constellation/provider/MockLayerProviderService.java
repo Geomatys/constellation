@@ -72,7 +72,7 @@ public class MockLayerProviderService extends AbstractProviderFactory
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    private static class MockLayerProvider extends AbstractLayerProvider{
+    private static class MockLayerProvider extends AbstractDataProvider{
 
         public MockLayerProvider(final ParameterValueGroup config){
             super(null,config);

@@ -44,7 +44,7 @@ import org.constellation.configuration.WMSPortrayal;
 import org.constellation.provider.Data;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.Provider;
-import org.constellation.provider.ProviderService;
+import org.constellation.provider.ProviderFactory;
 import org.constellation.provider.configuration.Configurator;
 import org.constellation.register.RegisterException;
 import org.constellation.test.ImageTesting;
@@ -160,7 +160,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
 
         final Configurator configurator = new Configurator() {
             @Override
-            public ParameterValueGroup getConfiguration(final ProviderService service) {
+            public ParameterValueGroup getConfiguration(final ProviderFactory service) {
 
                 final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
@@ -187,7 +187,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
             }
 
             @Override
-            public void saveConfiguration(ProviderService service, List<Provider> providers) {
+            public void saveConfiguration(ProviderFactory service, List<Provider> providers) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };

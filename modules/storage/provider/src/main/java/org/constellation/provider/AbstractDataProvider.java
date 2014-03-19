@@ -40,13 +40,13 @@ import static org.geotoolkit.parameter.Parameters.*;
  *
  * @author Johann Sorel (Geomatys)
  */
-public abstract class AbstractLayerProvider extends AbstractProvider<Name,Data> implements DataProvider{
+public abstract class AbstractDataProvider extends AbstractProvider<Name,Data> implements DataProvider{
 
     protected static final String DEFAULT_NAMESPACE = "http://geotoolkit.org";
     protected static final String NO_NAMESPACE = "no namespace";
 
 
-    protected AbstractLayerProvider(final ProviderService service,
+    protected AbstractDataProvider(final ProviderFactory service,
             final ParameterValueGroup config){
         super(service,config);
     }

@@ -19,7 +19,6 @@ package org.constellation.ws.embedded;
 
 import java.net.MalformedURLException;
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.sql.Connection;
@@ -51,7 +50,7 @@ import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
 import org.constellation.provider.Provider;
-import org.constellation.provider.ProviderService;
+import org.constellation.provider.ProviderFactory;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.ogc.xml.v110.FeatureIdType;
 import org.geotoolkit.sampling.xml.v100.SamplingPointType;
@@ -177,7 +176,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
 
        final Configurator configurator = new Configurator() {
             @Override
-            public ParameterValueGroup getConfiguration(final ProviderService service) {
+            public ParameterValueGroup getConfiguration(final ProviderFactory service) {
 
                 final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
@@ -258,7 +257,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
             }
 
             @Override
-            public void saveConfiguration(ProviderService service, List<Provider> providers) {
+            public void saveConfiguration(ProviderFactory service, List<Provider> providers) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };

@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.logging.Level;
@@ -39,7 +38,6 @@ import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.MutableStyleFactory;
-import org.opengis.feature.type.Name;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -109,7 +107,7 @@ public final class StyleProviders implements PropertyChangeListener{
         if(source instanceof Provider){
             //save changed configuration
             final Provider provider = (Provider) source;
-            saveConfiguration((StyleProviderFactory) provider.getService());
+            saveConfiguration((StyleProviderFactory) provider.getFactory());
         }
         //forward events
         fireUpdateEvent();
@@ -138,14 +136,14 @@ public final class StyleProviders implements PropertyChangeListener{
         return configurator;
     }
 
-    public StyleProvider createProvider(final StyleProviderFactory service, final ParameterValueGroup params){
+    public StyleProvider createProvider(final StyleProviderFactory factory, final ParameterValueGroup params){
         getProviders();
-        final StyleProvider provider = service.createProvider(params);
+        final StyleProvider provider = factory.createProvider(params);
 
         //add in the list our provider
         provider.addPropertyListener(this);
         PROVIDERS.add(provider);
-        saveConfiguration(service);
+        saveConfiguration(factory);
         fireUpdateEvent();
         return provider;
     }
@@ -155,7 +153,7 @@ public final class StyleProviders implements PropertyChangeListener{
 
         if(b){
             provider.removePropertyListener(this);
-            saveConfiguration(provider.getService());
+            saveConfiguration(provider.getFactory());
             fireUpdateEvent();
         }
 
@@ -163,18 +161,18 @@ public final class StyleProviders implements PropertyChangeListener{
     }
 
     /**
-     * Save configuration for the given provider service
+     * Save configuration for the given provider factory
      */
-    private void saveConfiguration(final ProviderService service){
-        getLogger().log(Level.INFO, "Saving configuration for service : {0}", service.getName());
+    private void saveConfiguration(final ProviderFactory factory){
+        getLogger().log(Level.INFO, "Saving configuration for factory : {0}", factory.getName());
         //save configuration
         final List<Provider> providers = new ArrayList<>();
         for(StyleProvider candidate : PROVIDERS){
-            if(candidate.getService().equals(service)){
+            if(candidate.getFactory().equals(factory)){
                 providers.add(candidate);
             }
         }
-        getConfigurator().saveConfiguration(service, providers);
+        getConfigurator().saveConfiguration(factory, providers);
     }
 
     /**
@@ -240,8 +238,8 @@ public final class StyleProviders implements PropertyChangeListener{
 
         final Configurator configs = getConfigurator();
         final List<StyleProvider> cache = new ArrayList<>();
-        for(final ProviderService factory : getServices()){
-            final String serviceName = factory.getName();
+        for(final ProviderFactory factory : getFactories()){
+            final String factoryName = factory.getName();
 
             //load configurable sources
             try{
@@ -256,22 +254,15 @@ public final class StyleProviders implements PropertyChangeListener{
                             }
                         }catch(Exception ex){
                             //we must not fail here in any case
-                            getLogger().log(Level.SEVERE, "Service "+serviceName+" failed to create a provider.",ex);
+                            getLogger().log(Level.SEVERE, "Factory "+factoryName+" failed to create a provider.",ex);
                         }
                     }
                 }
             }catch(Exception ex){
                 //we must not fail here in any case
-                getLogger().log(Level.SEVERE, "Configurator failed to provide configuration for service : " + serviceName,ex);
+                getLogger().log(Level.SEVERE, "Configurator failed to provide configuration for factory : " + factoryName,ex);
             }
 
-            //load hard coded sources
-            try{
-                cache.addAll(factory.getAdditionalProviders());
-            }catch(Exception ex){
-                //we must not fail here in any case
-                getLogger().log(Level.SEVERE, "Service "+serviceName+" failed to create additional providers.",ex);
-            }
         }
 
         PROVIDERS = cache;
@@ -302,12 +293,12 @@ public final class StyleProviders implements PropertyChangeListener{
      */
     public synchronized void dispose() {
         if(PROVIDERS == null){
-            //services are not loaded
+            //providers are not loaded
             return;
         }
 
         try{
-            //services were loaded, dispose each of them
+            //providers were loaded, dispose each of them
             for(final Provider<String,MutableStyle> provider : getProviders()){
                 try{
                     provider.removePropertyListener(this);
@@ -328,20 +319,20 @@ public final class StyleProviders implements PropertyChangeListener{
     public final FilterFactory2 FILTER_FACTORY = (FilterFactory2)FactoryFinder.getFilterFactory(
                             new Hints(Hints.FILTER_FACTORY, FilterFactory2.class));
 
-    private static final Collection<StyleProviderFactory> SERVICES;
+    private static final Collection<StyleProviderFactory> FACTORIES;
     static {
         final List<StyleProviderFactory> cache = new ArrayList<>();
         final ServiceLoader<StyleProviderFactory> loader = ServiceLoader.load(StyleProviderFactory.class);
-        for(final StyleProviderFactory service : loader){
-            cache.add(service);
+        for(final StyleProviderFactory factory : loader){
+            cache.add(factory);
         }
-        SERVICES = Collections.unmodifiableCollection(cache);
+        FACTORIES = Collections.unmodifiableCollection(cache);
     }
 
     private static final StyleProviders INSTANCE = new StyleProviders();
 
-    public Collection<StyleProviderFactory> getServices() {
-        return SERVICES;
+    public Collection<StyleProviderFactory> getFactories() {
+        return FACTORIES;
     }
 
     /**

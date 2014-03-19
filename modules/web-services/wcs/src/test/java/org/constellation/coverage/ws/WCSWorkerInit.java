@@ -26,7 +26,7 @@ import org.constellation.configuration.Source;
 import org.constellation.data.CoverageSQLTestCase;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.Provider;
-import org.constellation.provider.ProviderService;
+import org.constellation.provider.ProviderFactory;
 import org.constellation.provider.configuration.Configurator;
 
 import org.junit.AfterClass;
@@ -79,7 +79,7 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
         final Configurator configurator = new Configurator() {
 
             @Override
-            public ParameterValueGroup getConfiguration(final ProviderService service) {
+            public ParameterValueGroup getConfiguration(final ProviderFactory service) {
                 final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
                 if("coverage-sql".equals(service.getName())){
@@ -104,7 +104,7 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
             }
 
             @Override
-            public void saveConfiguration(ProviderService service, List<Provider> providers) {
+            public void saveConfiguration(ProviderFactory service, List<Provider> providers) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };

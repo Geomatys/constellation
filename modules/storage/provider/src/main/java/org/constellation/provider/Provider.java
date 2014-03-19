@@ -38,9 +38,9 @@ public interface Provider<K,V> {
     String getId();
             
     /**
-     * @return the service which created this provider.
+     * @return the factory which created this provider.
      */
-    ProviderService<K, V, Provider<K, V>> getService();
+    ProviderFactory<K, V, Provider<K, V>> getFactory();
 
     /**
      * @return the Key class

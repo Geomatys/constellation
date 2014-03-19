@@ -18,7 +18,7 @@ package org.constellation.provider.om2;
 
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.provider.AbstractFeatureStoreProvider;
-import org.constellation.provider.ProviderService;
+import org.constellation.provider.ProviderFactory;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.FeatureStoreFinder;
 import org.opengis.parameter.GeneralParameterValue;
@@ -32,7 +32,7 @@ import java.util.logging.Level;
  */
 public class OM2StoreProvider extends AbstractFeatureStoreProvider{
 
-    public OM2StoreProvider(ProviderService service, ParameterValueGroup param) throws DataStoreException{
+    public OM2StoreProvider(ProviderFactory service, ParameterValueGroup param) throws DataStoreException{
         super(service,param);
     }
 

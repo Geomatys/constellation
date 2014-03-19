@@ -38,10 +38,10 @@ public abstract class AbstractProvider<K,V> implements Provider<K, V>{
 
     private final PropertyChangeSupport listeners = new PropertyChangeSupport(this);
     private ParameterValueGroup source;
-    protected final ProviderService<K, V, Provider<K, V>> service;
+    protected final ProviderFactory<K, V, Provider<K, V>> service;
     private long lastUpdateTime = System.currentTimeMillis();
 
-    public AbstractProvider(final ProviderService<K, V, Provider<K, V>> service, final ParameterValueGroup source){
+    public AbstractProvider(final ProviderFactory<K, V, Provider<K, V>> service, final ParameterValueGroup source){
         this.source = source;
         this.service = service;
     }
@@ -61,7 +61,7 @@ public abstract class AbstractProvider<K,V> implements Provider<K, V>{
      * {@inheritDoc}
      */
     @Override
-    public ProviderService<K, V, Provider<K, V>> getService() {
+    public ProviderFactory<K, V, Provider<K, V>> getFactory() {
         return service;
     }
 

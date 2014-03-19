@@ -246,7 +246,7 @@ public class SLDProvider extends AbstractStyleProvider{
             cache.clear();
 
             final ParameterValueGroup srcConfig = getSource().groups(
-                    getService().getSourceDescriptor().getName().getCode()).get(0);
+                    getFactory().getSourceDescriptor().getName().getCode()).get(0);
 
             final ParameterValue param = srcConfig.parameter(FOLDER_DESCRIPTOR.getName().getCode());
 

@@ -27,7 +27,7 @@ import org.opengis.parameter.ParameterValueGroup;
  *
  * @author Johann Sorel (Geomatys)
  */
-public interface ProviderService<K,V,P extends Provider<K,V>> {
+public interface ProviderFactory<K,V,P extends Provider<K,V>> {
 
     String getName();
 
@@ -58,12 +58,5 @@ public interface ProviderService<K,V,P extends Provider<K,V>> {
      * @return Provider<K,V>
      */
     P createProvider(ParameterValueGroup config);
-
-    /**
-     * Special sources might provide hard coded providers.
-     * If they are some, they should be returned by this method.
-     * @return never null but can be empty.
-     */
-    Collection<? extends P> getAdditionalProviders();
 
 }

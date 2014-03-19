@@ -93,7 +93,7 @@ import org.opengis.parameter.InvalidParameterValueException;
  */
 public class DefaultMapConfigurer extends AbstractConfigurer {
 
-    private final Map<String, ProviderService> services = new HashMap<>();
+    private final Map<String, ProviderFactory> services = new HashMap<>();
 
     private ProviderOperationListener providerListener;
     
@@ -102,11 +102,11 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     }
     
     public DefaultMapConfigurer(final ProviderOperationListener providerListener) {
-        final Collection<DataProviderFactory> availableLayerServices = DataProviders.getInstance().getServices();
+        final Collection<DataProviderFactory> availableLayerServices = DataProviders.getInstance().getFactories();
         for (DataProviderFactory service: availableLayerServices) {
             this.services.put(service.getName(), service);
         }
-        final Collection<StyleProviderFactory> availableStyleServices = StyleProviders.getInstance().getServices();
+        final Collection<StyleProviderFactory> availableStyleServices = StyleProviders.getInstance().getFactories();
         for (StyleProviderFactory service: availableStyleServices) {
             this.services.put(service.getName(), service);
         }
@@ -251,7 +251,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     private AcknowlegementType createProvider(final MultivaluedMap<String, String> parameters,
             final Object objectRequest) throws CstlServiceException{
         final String serviceName = getParameter("serviceName", true, parameters);
-        final ProviderService service = this.services.get(serviceName);
+        final ProviderFactory service = this.services.get(serviceName);
         if (service != null) {
 
             final ParameterValueReader reader = new ParameterValueReader(
@@ -302,7 +302,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             final Object objectRequest) throws CstlServiceException{
         final String serviceName = getParameter("serviceName", true, parameters);
         final String currentId = getParameter("id", true, parameters);
-        final ProviderService service = services.get(serviceName);
+        final ProviderFactory service = services.get(serviceName);
         if (service != null) {
 
             ParameterDescriptorGroup desc = service.getServiceDescriptor();
@@ -840,7 +840,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      */
     private ParameterDescriptorGroup getServiceDescriptor(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
         final String serviceName = getParameter("serviceName", true, parameters);
-        final ProviderService service = services.get(serviceName);
+        final ProviderFactory service = services.get(serviceName);
         if (service != null) {
             return service.getServiceDescriptor();
         }
@@ -857,7 +857,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      */
     private GeneralParameterDescriptor getSourceDescriptor(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
         final String serviceName = getParameter("serviceName", true, parameters);
-        final ProviderService service = services.get(serviceName);
+        final ProviderFactory service = services.get(serviceName);
         if (service != null) {
             return service.getSourceDescriptor();
         }
@@ -874,11 +874,11 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
 
         final Collection<DataProvider> layerProviders = DataProviders.getInstance().getProviders();
         final Collection<StyleProvider> styleProviders = StyleProviders.getInstance().getProviders();
-        for (ProviderService service : services.values()) {
+        for (ProviderFactory service : services.values()) {
 
             final List<ProviderReport> providerReports = new ArrayList<>();
             for (final DataProvider p : layerProviders) {
-                if (p.getService().equals(service)) {
+                if (p.getFactory().equals(service)) {
                     final List<DataBrief> keys = new ArrayList<>();
                     for(Name n : p.getKeys()){
                         final QName name = new QName(n.getNamespaceURI(), n.getLocalPart());
@@ -891,7 +891,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
                 }
             }
             for (final StyleProvider p : styleProviders) {
-                if (p.getService().equals(service)) {
+                if (p.getFactory().equals(service)) {
                     final List<DataBrief> keys = new ArrayList<>();
                     for(String n : p.getKeys()){
                         final DataBrief db = new DataBrief();

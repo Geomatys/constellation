@@ -16,7 +16,7 @@
  */
 package org.constellation.provider.coveragesql;
 
-import org.constellation.provider.AbstractLayerProvider;
+import org.constellation.provider.AbstractDataProvider;
 import org.constellation.provider.Data;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.geotoolkit.coverage.io.CoverageStoreException;
@@ -54,7 +54,7 @@ import static org.geotoolkit.parameter.Parameters.value;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class CoverageSQLProvider extends AbstractLayerProvider{
+public class CoverageSQLProvider extends AbstractDataProvider{
 
     private CoverageDatabase database;
 

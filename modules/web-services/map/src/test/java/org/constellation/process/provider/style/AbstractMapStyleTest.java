@@ -37,10 +37,10 @@ public abstract class AbstractMapStyleTest extends AbstractProcessTest {
     protected static File configDirectory;
     protected static URL EMPTY_CSV;
     // dataStore service
-    protected static ProviderService SLD_SERVICE;
+    protected static ProviderFactory SLD_SERVICE;
 
     static {
-        final Collection<StyleProviderFactory> availableLayerServices = StyleProviders.getInstance().getServices();
+        final Collection<StyleProviderFactory> availableLayerServices = StyleProviders.getInstance().getFactories();
         for (StyleProviderFactory tmpService : availableLayerServices) {
             if ("sld".equals(tmpService.getName())) {
                 SLD_SERVICE = tmpService;

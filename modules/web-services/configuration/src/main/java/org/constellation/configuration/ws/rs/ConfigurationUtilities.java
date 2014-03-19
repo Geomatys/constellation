@@ -254,9 +254,9 @@ public class ConfigurationUtilities {
                 try {
                     // Style configuration file
                     if (providerFile.getName().toLowerCase().contains(SLD_PROVIDER_NAME)) {
-                        for (final ProviderService service : styleProxy.getServices()) {
+                        for (final ProviderFactory factory : styleProxy.getFactories()) {
                             try {
-                                paramReader = new ParameterValueReader(service.getServiceDescriptor());
+                                paramReader = new ParameterValueReader(factory.getServiceDescriptor());
                                 paramReader.setInput(providerFile);
                                 sourceGroup = (ParameterValueGroup) paramReader.read();
                                 sources = ParametersExt.getGroups(sourceGroup, SOURCE_DESCRIPTOR_NAME);
@@ -264,9 +264,9 @@ public class ConfigurationUtilities {
                                     try {
                                         final String sourceName = (String) source.parameter(SOURCE_ID_DESCRIPTOR_NAME).getValue();
                                         LOGGER.log(Level.FINE, "\t\tProvider type : {0} | Service name : {1} \n\t\t {2}",
-                                                new String[]{ProviderRecord.ProviderType.STYLE.name(), service.getName(), source.toString()});
+                                                new String[]{ProviderRecord.ProviderType.STYLE.name(), factory.getName(), source.toString()});
                                         if (ConfigurationEngine.getProvider(sourceName) == null) {
-                                            ConfigurationEngine.writeProvider(sourceName, ProviderRecord.ProviderType.STYLE, service.getName(), source);
+                                            ConfigurationEngine.writeProvider(sourceName, ProviderRecord.ProviderType.STYLE, factory.getName(), source);
                                         } else {
                                             LOGGER.log(Level.FINE, "Provider cannot be imported. A provider with the same name already exists : " + sourceName);
                                         }
@@ -282,19 +282,19 @@ public class ConfigurationUtilities {
                         }
                     } else {
                         // Try to get a valid layer configuration
-                        for (final ProviderService service : layerProxy.getServices()) {
+                        for (final ProviderFactory factory : layerProxy.getFactories()) {
                             try {
-                                paramReader = new ParameterValueReader(service.getServiceDescriptor());
+                                paramReader = new ParameterValueReader(factory.getServiceDescriptor());
                                 paramReader.setInput(providerFile);
                                 sourceGroup = (ParameterValueGroup) paramReader.read();
                                 sources = ParametersExt.getGroups(sourceGroup, SOURCE_DESCRIPTOR_NAME);
                                 for (ParameterValueGroup source : sources) {
                                     try {
                                         LOGGER.log(Level.FINE, "\t\tProvider type : {0} | Service name : {1} \n\t\t {2}",
-                                                new String[]{ProviderRecord.ProviderType.LAYER.name(), service.getName(), source.toString()});
+                                                new String[]{ProviderRecord.ProviderType.LAYER.name(), factory.getName(), source.toString()});
                                         final String sourceName = (String) source.parameter(SOURCE_ID_DESCRIPTOR_NAME).getValue();
                                         if (ConfigurationEngine.getProvider(sourceName) == null) {
-                                            ConfigurationEngine.writeProvider(sourceName, ProviderRecord.ProviderType.LAYER, service.getName(), source);
+                                            ConfigurationEngine.writeProvider(sourceName, ProviderRecord.ProviderType.LAYER, factory.getName(), source);
                                         } else {
                                             LOGGER.log(Level.FINE, "Provider cannot be imported. A provider with the same name already exists : " + sourceName);
                                         }

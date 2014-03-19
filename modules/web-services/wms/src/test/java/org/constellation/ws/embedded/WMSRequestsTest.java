@@ -46,7 +46,7 @@ import org.constellation.map.featureinfo.FeatureInfoUtilities;
 import org.constellation.test.ImageTesting;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.Provider;
-import org.constellation.provider.ProviderService;
+import org.constellation.provider.ProviderFactory;
 import org.constellation.provider.configuration.Configurator;
 
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
@@ -233,7 +233,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
 
         final Configurator configurator = new Configurator() {
             @Override
-            public ParameterValueGroup getConfiguration(final ProviderService service) {
+            public ParameterValueGroup getConfiguration(final ProviderFactory service) {
 
                 final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
@@ -278,7 +278,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
             }
 
             @Override
-            public void saveConfiguration(ProviderService service, List<Provider> providers) {
+            public void saveConfiguration(ProviderFactory service, List<Provider> providers) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
         };

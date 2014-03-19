@@ -92,7 +92,7 @@ import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
 import org.constellation.provider.Provider;
-import org.constellation.provider.ProviderService;
+import org.constellation.provider.ProviderFactory;
 import org.geotoolkit.wfs.xml.StoredQueries;
 import org.geotoolkit.wfs.xml.StoredQueryDescription;
 import org.geotoolkit.xsd.xml.v2001.Schema;
@@ -2111,7 +2111,7 @@ public class WFS2WorkerTest {
          final Configurator config = new Configurator() {
 
             @Override
-            public ParameterValueGroup getConfiguration(final ProviderService service) {
+            public ParameterValueGroup getConfiguration(final ProviderFactory service) {
                 final ParameterValueGroup config = service.getServiceDescriptor().createValue();
 
                 if("feature-store".equals(service.getName())){
@@ -2221,7 +2221,7 @@ public class WFS2WorkerTest {
             }
 
             @Override
-            public void saveConfiguration(ProviderService service, List<Provider> providers) {
+            public void saveConfiguration(ProviderFactory service, List<Provider> providers) {
                 //throw new UnsupportedOperationException("Not supported yet.");
             }
         };

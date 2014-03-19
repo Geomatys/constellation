@@ -105,7 +105,7 @@ public final class DataProviders implements PropertyChangeListener {
         if(source instanceof Provider){
             //save changed configuration
             final Provider provider = (Provider) source;
-            saveConfiguration(provider.getService());
+            saveConfiguration(provider.getFactory());
         }
         //forward events
         fireUpdateEvent();
@@ -134,14 +134,14 @@ public final class DataProviders implements PropertyChangeListener {
         return configurator;
     }
 
-    public DataProvider createProvider(final DataProviderFactory service, final ParameterValueGroup params){
+    public DataProvider createProvider(final DataProviderFactory factory, final ParameterValueGroup params){
         getProviders();
-        final DataProvider provider = service.createProvider(params);
+        final DataProvider provider = factory.createProvider(params);
 
         //add in the list our provider
         provider.addPropertyListener(this);
         PROVIDERS.add(provider);
-        saveConfiguration(service);
+        saveConfiguration(factory);
         fireUpdateEvent();
         return provider;
     }
@@ -151,7 +151,7 @@ public final class DataProviders implements PropertyChangeListener {
 
         if(b){
             provider.removePropertyListener(this);
-            saveConfiguration(provider.getService());
+            saveConfiguration(provider.getFactory());
             fireUpdateEvent();
         }
 
@@ -159,18 +159,18 @@ public final class DataProviders implements PropertyChangeListener {
     }
 
     /**
-     * Save configuration for the given provider service
+     * Save configuration for the given provider factory
      */
-    private void saveConfiguration(final ProviderService service){
-        getLogger().log(Level.INFO, "Saving configuration for service : {0}", service.getName());
+    private void saveConfiguration(final ProviderFactory factory){
+        getLogger().log(Level.INFO, "Saving configuration for factory : {0}", factory.getName());
         //save configuration
         final List<Provider> providers = new ArrayList<>();
         for(Provider candidate : PROVIDERS){
-            if(candidate.getService().equals(service)){
+            if(candidate.getFactory().equals(factory)){
                 providers.add(candidate);
             }
         }
-        getConfigurator().saveConfiguration(service, providers);
+        getConfigurator().saveConfiguration(factory, providers);
     }
 
     /**
@@ -253,8 +253,8 @@ public final class DataProviders implements PropertyChangeListener {
 
         final Configurator configs = getConfigurator();
         final List<DataProvider> cache = new ArrayList<>();
-        for(final ProviderService factory : getServices()){
-            final String serviceName = factory.getName();
+        for(final ProviderFactory factory : getFactories()){
+            final String factoryName = factory.getName();
 
             //load configurable sources
             try{
@@ -269,22 +269,15 @@ public final class DataProviders implements PropertyChangeListener {
                             }
                         }catch(Exception ex){
                             //we must not fail here in any case
-                            getLogger().log(Level.SEVERE, "Service "+serviceName+" failed to create a provider.",ex);
+                            getLogger().log(Level.SEVERE, "Factory "+factoryName+" failed to create a provider.",ex);
                         }
                     }
                 }
             }catch(Exception ex){
                 //we must not fail here in any case
-                getLogger().log(Level.SEVERE, "Configurator failed to provide configuration for service : " + serviceName,ex);
+                getLogger().log(Level.SEVERE, "Configurator failed to provide configuration for factory : " + factoryName,ex);
             }
 
-            //load hard coded sources
-            try{
-                cache.addAll(factory.getAdditionalProviders());
-            }catch(Exception ex){
-                //we must not fail here in any case
-                getLogger().log(Level.SEVERE, "Service "+serviceName+" failed to create additional providers.",ex);
-            }
         }
 
         PROVIDERS = cache;
@@ -315,12 +308,12 @@ public final class DataProviders implements PropertyChangeListener {
      */
     public synchronized void dispose() {
         if(PROVIDERS == null){
-            //services are not loaded
+            //providers are not loaded
             return;
         }
 
         try{
-            //services were loaded, dispose each of them
+            //sproviders were loaded, dispose each of them
             for(final Provider<Name,Data> provider : getProviders()){
                 try{
                     provider.removePropertyListener(this);
@@ -338,15 +331,15 @@ public final class DataProviders implements PropertyChangeListener {
     
     private static final DataProviders INSTANCE = new DataProviders();
     //all providers factories, unmodifiable
-    private static final Collection<DataProviderFactory> SERVICES;
+    private static final Collection<DataProviderFactory> FACTORIES;
 
     static {
         final List<DataProviderFactory> cache = new ArrayList<>();
         final ServiceLoader<DataProviderFactory> loader = ServiceLoader.load(DataProviderFactory.class);
-        for(final DataProviderFactory service : loader){
-            cache.add(service);
+        for(final DataProviderFactory factory : loader){
+            cache.add(factory);
         }
-        SERVICES = Collections.unmodifiableCollection(cache);
+        FACTORIES = Collections.unmodifiableCollection(cache);
     }
 
     /**
@@ -405,13 +398,13 @@ public final class DataProviders implements PropertyChangeListener {
         return provider.get(key);
     }
 
-    public Collection<DataProviderFactory> getServices() {
-        return SERVICES;
+    public Collection<DataProviderFactory> getFactories() {
+        return FACTORIES;
     }
 
-    public DataProviderFactory getService(final String serviceID) {
-        for (DataProviderFactory serv : SERVICES) {
-            if (serv.getName().equals(serviceID)) {
+    public DataProviderFactory getFactory(final String factoryID) {
+        for (DataProviderFactory serv : FACTORIES) {
+            if (serv.getName().equals(factoryID)) {
                 return serv;
             }
         }
