@@ -242,8 +242,8 @@ cstlAdminApp.controller('LogsController', ['$scope', 'resolvedLogs', 'LogsServic
         };
     }]);
 
-cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 'dataListing', 'provider', 'style', '$modal', '$growl', 'StyleSharedService',
-    function ($scope, $location, $dashboard, dataListing, provider, style, $modal, $growl, StyleSharedService) {
+cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 'dataListing', 'provider', 'style', '$modal', '$growl', 'StyleSharedService', '$cookies',
+    function ($scope, $location, $dashboard, dataListing, provider, style, $modal, $growl, StyleSharedService, $cookies) {
 
         $scope.filtertype = "VECTOR";
 
@@ -256,8 +256,8 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
             $('#viewerData').modal("show");
             var layerName = $scope.selected.Name;
             var providerId = $scope.selected.Provider;
-            var layerData = DataViewer.createLayer(layerName, providerId);
-            var layerBackground = DataViewer.createLayer("CNTR_BN_60M_2006", "generic_shp");
+            var layerData = DataViewer.createLayer($cookies.cstlUrl, layerName, providerId);
+            var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
             DataViewer.layers = [layerData, layerBackground];
 
             provider.metadata({providerId: providerId}, {}, function(response) {
@@ -332,8 +332,8 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
         };
     }]);
 
-cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modalInstance', 'style', 'exclude','layerName','serviceName',
-    function ($scope, $dashboard, $modalInstance, style, exclude, layerName, serviceName) {
+cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modalInstance', 'style', 'exclude','layerName','serviceName', '$cookies',
+    function ($scope, $dashboard, $modalInstance, style, exclude, layerName, serviceName, $cookies) {
         $scope.exclude = exclude;
         $scope.layerName = layerName;
         $scope.serviceName = serviceName;
@@ -365,8 +365,8 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         $scope.showLayerWithStyle = function(style) {
 
             var layerName = $scope.layerName;
-            var layerData = DataViewer.createLayerWMSWithStyle(layerName, $scope.serviceName,$scope.selected.Name);
-            var layerBackground = DataViewer.createLayer("CNTR_BN_60M_2006", "generic_shp");
+            var layerData = DataViewer.createLayerWMSWithStyle($cookies.cstlUrl, layerName, $scope.serviceName,$scope.selected.Name);
+            var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
             DataViewer.layers = [layerData, layerBackground];
             DataViewer.initMap('styledMapOL');
         };
@@ -566,15 +566,15 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
 
         $scope.displayLayer = function(layer) {
             $scope.layer = layer;
-            var layerData = DataViewer.createLayer(layer, $scope.providerId);
-            var layerBackground = DataViewer.createLayer("CNTR_BN_60M_2006", "generic_shp");
+            var layerData = DataViewer.createLayer($cookies.cstlUrl, layer, $scope.providerId);
+            var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
             DataViewer.layers = [layerData, layerBackground];
             DataViewer.initMap('dataPreviewMap');
         };
     }]);
 
-cstlAdminApp.controller('ServerFileModalController', ['$scope', '$dashboard', '$modalInstance', '$growl', 'dataListing', 'provider',
-    function ($scope, $dashboard, $modalInstance, $growl, dataListing, provider) {
+cstlAdminApp.controller('ServerFileModalController', ['$scope', '$dashboard', '$modalInstance', '$growl', 'dataListing', 'provider', '$cookies',
+    function ($scope, $dashboard, $modalInstance, $growl, dataListing, provider, $cookies) {
         $scope.columns = [];
         // current path chosen in server data dir
         $scope.currentPath = '/';
@@ -711,8 +711,8 @@ cstlAdminApp.controller('ServerFileModalController', ['$scope', '$dashboard', '$
 
         $scope.displayLayer = function(layer) {
             $scope.layer = layer;
-            var layerData = DataViewer.createLayer(layer, $scope.providerId);
-            var layerBackground = DataViewer.createLayer("CNTR_BN_60M_2006", "generic_shp");
+            var layerData = DataViewer.createLayer($cookies.cstlUrl, layer, $scope.providerId);
+            var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
             DataViewer.layers = [layerData, layerBackground];
             DataViewer.initMap('dataServerMap');
         };
@@ -1309,7 +1309,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
                      WmtsViewer.map.zoomToExtent(maxExtent, true);
                  });
          } else {
-             var layerBackground = DataViewer.createLayer("CNTR_BN_60M_2006", "generic_shp");
+             var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
              var layerData;
              if ($scope.service.type === 'WMS') {
                  textService.capa($scope.service.type.toLowerCase(), $scope.service.identifier, $scope.service.versions[0])
@@ -1326,14 +1326,14 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
                          }
                          var llbbox = capsLayer.llbbox;
                          var extent = new OpenLayers.Bounds(llbbox[0], llbbox[1], llbbox[2], llbbox[3]);
-                         layerData = DataViewer.createLayerWMS(layerName, $scope.service.identifier);
+                         layerData = DataViewer.createLayerWMS($cookies.cstlUrl, layerName, $scope.service.identifier);
                          DataViewer.layers = [layerData, layerBackground];
                          DataViewer.initMap('dataMap');
                          DataViewer.map.zoomToExtent(extent, true);
                      });
              } else {
                  var providerId = $scope.selected.Provider;
-                 layerData = DataViewer.createLayer(layerName, providerId);
+                 layerData = DataViewer.createLayer($cookies.cstlUrl, layerName, providerId);
                  DataViewer.layers = [layerData, layerBackground];
 
                  provider.metadata({providerId: providerId}, {}, function(response) {
