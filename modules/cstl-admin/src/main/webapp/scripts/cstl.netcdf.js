@@ -63,7 +63,7 @@ Netcdf = {
      */
     createLayer : function (layerName, providerId){
         var layer = new OpenLayers.Layer.WMS('portray',
-            cstlContext+'api/1/portrayal/portray',
+            '@cstl/api/1/portrayal/portray',
             {
                 request:    'Portray',
                 layers:     layerName,

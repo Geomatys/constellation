@@ -33,15 +33,17 @@ cstlAdminApp.factory('AuthInterceptor', function($cookies) {
 	    	var url = config.url+'';
 	    	if(url.indexOf(cstlUrlPrefix) == 0){
 	    	  url = $cookies.cstlUrl + url.substring(cstlUrlPrefix.length);
-	    	}
-	    	var jsessionIdIndex = url.indexOf(";jsessionid=");
-	    	if(jsessionIdIndex != -1){
-	    	  var cstlSessionId=$cookies.cstlSessionId;
+	    	  var jsessionIdIndex = url.indexOf(";jsessionid=");
+	    	  if(jsessionIdIndex != -1){
+	    	    var cstlSessionId=$cookies.cstlSessionId;
     	    	if (cstlSessionId) {
     	    		config.url = url.replace(";jsessionid=", ";jsessionid=" + cstlSessionId);
 	        	}else{
 	        		config.url = url.substring(0, url.indexOf(';jsessionid='))
 	        	}
+   	    	}else{
+   	    	 config.url = url;
+   	    	}
 	    	}
 	        return config || $q.when(config);
 	    }
@@ -184,7 +186,7 @@ cstlAdminApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'aut
             },
             logout: function () {
                 $rootScope.authenticationError = false;
-                $http.get(cstlContext + "spring/session/logout;jsessionid=").then(function(){
+                $http.get("@cstl/spring/session/logout;jsessionid=").then(function(){
                 	$cookieStore.remove('cstlSessionId');
                 	$http.get(context + '/app/logout')
                 	.success(function (data, status, headers, config) {

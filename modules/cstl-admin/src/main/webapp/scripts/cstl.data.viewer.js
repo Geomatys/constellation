@@ -39,7 +39,7 @@ DataViewer = {
 
     createLayer : function(layerName, providerId){
         var layer = new OpenLayers.Layer.WMS(layerName,
-            cstlContext+'api/1/portrayal/portray',
+           '@cstl/api/1/portrayal/portray',
             {
                 layers:      layerName,
                 provider:    providerId,
@@ -59,7 +59,7 @@ DataViewer = {
 
     createLayerWMS : function(layerName, instance){
         var layer = new OpenLayers.Layer.WMS(layerName,
-            cstlContext+'WS/wms/'+ instance,
+            '@cstl/WS/wms/'+ instance,
             {
                 request:     'GetMap',
                 layers:      layerName,
@@ -82,7 +82,7 @@ DataViewer = {
 
     createLayerWMSWithStyle : function(layerName,instance, style){
         var layer = new OpenLayers.Layer.WMS(layerName,
-            cstlContext+'WS/wms/'+ instance,
+            '@cstl/WS/wms/'+ instance,
             {
                 request:     'GetMap',
                 layers:      layerName,

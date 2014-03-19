@@ -46,31 +46,16 @@ var context = findWebappContext();
 
 
 
-cstlIndexApp.factory('Account', ['$resource',
-    function ($resource) {
-        return $resource(cstlContext + 'spring/account;jsessionid=', {}, {
-        });
-    }]);
+
 
 cstlIndexApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'authService', '$base64','$cookieStore',
     function ($rootScope, $http, authService, $base64, $cookieStore) {
         return {
             authenticate: function() {
-                $http.get(cstlContext + 'spring/session/status;jsessionid=')
-                    .success(function (data, status, headers, config) {
-                        $rootScope.$broadcast('event:auth-authConfirmed');
-                    })
+               
             },
             logout: function () {
-                $rootScope.authenticationError = false;
-                $http.get(cstlContext + "spring/session/logout;jsessionid=").then(function(){
-                	$cookieStore.remove('cstlSessionId');
-                	$http.get(context + '/app/logout')
-                	.success(function (data, status, headers, config) {
-                		authService.loginCancelled();
-                	});
-
-                });
+               
             }
         };
     }]);
