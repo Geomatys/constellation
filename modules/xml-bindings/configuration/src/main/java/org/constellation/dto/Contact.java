@@ -17,7 +17,7 @@
 
 package org.constellation.dto;
 
-import juzu.Mapped;
+//import juzu.Mapped;
 
 /**
  * Contact part on getCapabilities service section.
@@ -28,7 +28,7 @@ import juzu.Mapped;
  * @since 0.9
  *
  */
-@Mapped
+//@Mapped
 public class Contact {
 
     private String firstname;

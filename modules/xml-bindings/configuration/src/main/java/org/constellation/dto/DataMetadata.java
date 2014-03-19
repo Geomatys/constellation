@@ -1,7 +1,7 @@
 package org.constellation.dto;
 
 
-import juzu.Mapped;
+//import juzu.Mapped;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Date;
@@ -14,7 +14,7 @@ import java.util.List;
  * @version 0.9
  * @since 0.9
  */
-@Mapped
+//@Mapped
 @XmlRootElement
 public class DataMetadata {
 

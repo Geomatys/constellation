@@ -17,7 +17,7 @@
 
 package org.constellation.dto;
 
-import juzu.Mapped;
+//import juzu.Mapped;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
@@ -32,7 +32,7 @@ import java.util.List;
  * @since 0.9
  *
  */
-@Mapped
+//@Mapped
 @XmlRootElement
 public class Service {
 

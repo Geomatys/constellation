@@ -116,11 +116,11 @@
             <artifactId>cstl-lib-base</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.juzu</groupId>
-            <artifactId>juzu-core</artifactId>
-            <scope>provided</scope>
-        </dependency>
+<!--         <dependency> -->
+<!--             <groupId>org.juzu</groupId> -->
+<!--             <artifactId>juzu-core</artifactId> -->
+<!--             <scope>provided</scope> -->
+<!--         </dependency> -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>

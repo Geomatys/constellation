@@ -19,7 +19,7 @@ package org.constellation.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import juzu.Mapped;
+//import juzu.Mapped;
 
 /**
  * Access constraint part on getCapabilities service section.
@@ -30,7 +30,7 @@ import juzu.Mapped;
  * @since 0.9
  *
  */
-@Mapped
+//@Mapped
 public class AccessConstraint {
 
     private String fees;

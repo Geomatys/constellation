@@ -17,7 +17,7 @@
 
 package org.constellation.configuration;
 
-import juzu.Mapped;
+//import juzu.Mapped;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -35,7 +35,7 @@ import java.util.List;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-@Mapped
+//@Mapped
 public final class StyleBrief implements Serializable {
 
     @XmlElement(name="Name")

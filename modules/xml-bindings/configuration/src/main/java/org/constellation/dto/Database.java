@@ -1,13 +1,13 @@
 package org.constellation.dto;
 
-import juzu.Mapped;
+//import juzu.Mapped;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Benjamin Garcia (Geomatys)
  */
-@Mapped
+//@Mapped
 @XmlRootElement
 public class Database {
 

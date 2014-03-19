@@ -1,6 +1,6 @@
 package org.constellation.dto;
 
-import juzu.Mapped;
+//import juzu.Mapped;
 import org.constellation.util.SimplyMetadataTreeNode;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -17,7 +17,7 @@ import java.util.Map;
  * @since 0.9
  */
 @XmlRootElement
-@Mapped
+//@Mapped
 public class DataInformation {
 
     private String name;
