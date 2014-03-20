@@ -1097,8 +1097,8 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
         };
     }]);
 
-cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routeParams', 'webService', '$growl',
-    function ($scope, $routeParams , webService, $growl) {
+cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routeParams', 'webService', '$growl', '$location',
+    function ($scope, $routeParams , webService, $growl, $location) {
         $scope.type = $routeParams.type;
         $scope.id = $routeParams.id;
 
@@ -1106,7 +1106,8 @@ cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routePar
 
         $scope.saveServiceSource = function() {
             webService.setConfig({type: $scope.type, id: $scope.id}, $scope.source, function() {
-                $growl('success','Success','Service configuration successfully updated');
+                $growl('success','Success','Service '+ $scope.id +' successfully updated');
+                $location.path('/webservice');
             }, function() {
                 $growl('error','Error','Service configuration update error');
             });
