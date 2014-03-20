@@ -217,6 +217,7 @@ public class DataRest {
     	final File uploadDirectory = ConfigDirectory.getUploadDirectory(sessionId);
         
         File newFile = new File(uploadDirectory, fileDetail.getFileName());
+        File OriginalFile = new File(uploadDirectory, fileDetail.getFileName());
         try {
             if (fileIs != null && fileDetail != null) {
                 Files.copy(fileIs, newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -233,6 +234,8 @@ public class DataRest {
         } catch (IOException ex) {
             LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             return Response.status(500).entity("failed").build();
+        } finally {
+        	OriginalFile.delete();
         }
 
         String result = newFile.getAbsolutePath();
@@ -272,7 +275,6 @@ public class DataRest {
             LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             return Response.status(500).entity("failed").build();
         }
-
         String result = ","+ mdFile.getAbsolutePath();
         return Response.ok(result).build();
     }
@@ -311,6 +313,8 @@ public class DataRest {
             if (metadataFilePath!= null){
             	importedData.setMetadataFile(new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(metadataFilePath).getName()).getAbsolutePath());
             }
+            
+            
             
         	return Response.ok(importedData).build();
         } catch (IOException e) {

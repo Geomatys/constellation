@@ -531,17 +531,21 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                                 path: importedData
                             }
                         }, function() {
-//                        if (!fileExtension || fileExtension !== "nc") {
-//                            dataListing.pyramidData({id: fileName}, {value: upFile}, function() {
-//                                $growl('success','Success','Coverage data '+ fileName +' successfully added');
-//                                $modalInstance.close({type: "raster", file: fileName, missing: $scope.metadata == null});
-//                            });
-//                        } else {
-//                            displayNetCDF(fileName);
-//                        }
-                            if (fileExtension === "nc") {
+                            if (!fileExtension || fileExtension !== "nc") {
+                                dataListing.pyramidData({id: fileName}, {value: upFile}, function() {
+                                    $growl('success','Success','Coverage data '+ fileName +' successfully added');
+                                    $modalInstance.close({type: "raster", file: fileName, missing: $scope.metadata == null});
+                                });
+                            } else {
                                 displayNetCDF(fileName);
                             }
+//                            if (fileExtension === "nc") {
+//                                displayNetCDF(fileName);
+//                            }
+//                            if (fileExtention === "tif"){
+//                                $growl('success','Success','Geotiff data '+ fileName +' successfully added');
+//                                $modalInstance.close({type: "raster", file: fileName, missing: $scope.metadata == null});
+//                            }
                         });
                     } else {
                         $growl('warning','Warning','Not implemented choice');
