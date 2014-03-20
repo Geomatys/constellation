@@ -502,30 +502,35 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                     fileExtension = justFile.substring(justFile.lastIndexOf(".")+1);
                 }
 
-                // Store the providerId for further calls
-                $scope.providerId = fileName;
-                if ($scope.uploadType === "vector") {
-                    provider.create({
-                        id: fileName
-                    }, {
-                        type: "feature-store",
-                        subType: "shapefile",
-                        parameters: {
-                            path: upFile
-                        }
-                    });
-                    $growl('success','Success','Shapefile data '+ fileName +' successfully added');
-                    $modalInstance.close({type: "vector", file: fileName, missing: $scope.metadata == null});
-                } else if ($scope.uploadType === "raster") {
-                    provider.create({
-                        id: fileName
-                    }, {
-                        type: "coverage-store",
-                        subType: "coverage-file",
-                        parameters: {
-                            path: upFile
-                        }
-                    }, function() {
+                dataListing.importData({values: {'filePath': upFiles.file, 'metadataFilePath': upFiles.mdFile, dataType: $scope.type}}, function(response) {
+
+                    var importedData = response.dataFile;
+                    var importedMetaData = response.metadataFile;
+
+                    // Store the providerId for further calls
+                    $scope.providerId = fileName;
+                    if ($scope.uploadType === "vector") {
+                        provider.create({
+                            id: fileName
+                        }, {
+                            type: "feature-store",
+                            subType: "shapefile",
+                            parameters: {
+                                path: importedData
+                            }
+                        });
+                        $growl('success','Success','Shapefile data '+ fileName +' successfully added');
+                        $modalInstance.close({type: "vector", file: fileName, missing: $scope.metadata == null});
+                    } else if ($scope.uploadType === "raster") {
+                        provider.create({
+                            id: fileName
+                        }, {
+                            type: "coverage-store",
+                            subType: "coverage-file",
+                            parameters: {
+                                path: importedData
+                            }
+                        }, function() {
 //                        if (!fileExtension || fileExtension !== "nc") {
 //                            dataListing.pyramidData({id: fileName}, {value: upFile}, function() {
 //                                $growl('success','Success','Coverage data '+ fileName +' successfully added');
@@ -534,14 +539,17 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
 //                        } else {
 //                            displayNetCDF(fileName);
 //                        }
-                        if (fileExtension === "nc") {
-                            displayNetCDF(fileName);
-                        }
-                    });
-                } else {
-                    $growl('warning','Warning','Not implemented choice');
-                    $modalInstance.close();
-                }
+                            if (fileExtension === "nc") {
+                                displayNetCDF(fileName);
+                            }
+                        });
+                    } else {
+                        $growl('warning','Warning','Not implemented choice');
+                        $modalInstance.close();
+                    }
+
+                });
+
             } else {
                 $growl('error','Error','Data import failed');
                 $modalInstance.close();

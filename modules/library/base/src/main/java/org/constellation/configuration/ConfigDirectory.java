@@ -76,6 +76,7 @@ public final class ConfigDirectory {
 
                 USER_DIRECTORY    = prop.getProperty("configuration_directory");
                 DATA_DIRECTORY    = prop.getProperty("data_directory");
+                DATA_INTEGRATED_DIRECTORY    = prop.getProperty("integrated_directory");
                 UPLOAD_DIRECTORY    = prop.getProperty("upload_directory");
                 METADATA_DIRECTORY= prop.getProperty("metadata_directory");
             } catch (IOException ex) {
@@ -90,6 +91,7 @@ public final class ConfigDirectory {
      */
     public static String USER_DIRECTORY = null;
     public static String DATA_DIRECTORY = null;
+    public static String DATA_INTEGRATED_DIRECTORY = null;
     public static String UPLOAD_DIRECTORY = null;
     public static String METADATA_DIRECTORY = null;
     public static String STYLE_DIRECTORY = null;
@@ -156,7 +158,42 @@ public final class ConfigDirectory {
         return constellationDataDirectory;
     }
     
-    public static File removeUploadDirectory(String sessionId) {
+    
+    /**
+     * Give a integrated data directory {@link java.io.File} defined on constellation.properties or
+     * by default on .constellation-data/integrated/ from user home directory
+     *
+     * @return providers directory as {@link java.io.File}
+     */
+    public static File getDataIntegratedDirectory() {
+    	
+        File constellationDataIntegratedDirectory;
+        File constellationDataDirectory = getDataDirectory();
+
+        if (DATA_INTEGRATED_DIRECTORY != null && !DATA_INTEGRATED_DIRECTORY.isEmpty()) {
+        	constellationDataIntegratedDirectory = new File(UPLOAD_DIRECTORY);
+            if (!constellationDataIntegratedDirectory.exists()) {
+                LOGGER.log(Level.INFO, "The configuration directory {0} does not exist", UPLOAD_DIRECTORY);
+            } else if (!constellationDataIntegratedDirectory.isDirectory()) {
+                LOGGER.log(Level.INFO, "The configuration path {0} is not a directory", UPLOAD_DIRECTORY);
+            }
+        } else {
+        	constellationDataIntegratedDirectory = new File(constellationDataDirectory, "integrated");
+            if (!constellationDataIntegratedDirectory.exists()) {
+            	constellationDataIntegratedDirectory.mkdir();
+            }
+        }
+       
+        return constellationDataIntegratedDirectory;
+    }
+    
+    /**
+     * remove upload directory for the sessionId {@link java.io.File} 
+     * by default on .constellation-data/upload/<sessionId> from user home directory
+     * 
+     * @param sessionId 
+     */
+    public static void removeUploadDirectory(String sessionId) {
     	File constellationDataDirectory;
     	File constellationUploadDirectory;
     	File sessionUploadDirectory;
@@ -188,10 +225,8 @@ public final class ConfigDirectory {
         	deleteFolder(sessionUploadDirectory);
         }
         
-        return sessionUploadDirectory;
 	}
-    
-    
+
     private static void deleteFolder(File folder) {
         File[] files = folder.listFiles();
         if(files!=null) { //some JVMs return null for empty dirs
@@ -205,25 +240,20 @@ public final class ConfigDirectory {
         }
         folder.delete();
     }
-    
+
+    /**
+     * Give a upload directory {@link java.io.File} defined on constellation.properties or
+     * by default on .constellation-data/upload/<sessionId> from user home directory
+     * 
+     * @param sessionId 
+     *
+     * @return providers directory as {@link java.io.File}
+     */
     public static File getUploadDirectory(String sessionId) {
-    	File constellationDataDirectory;
+
+    	File constellationDataDirectory = getDataDirectory();
     	File constellationUploadDirectory;
     	File sessionUploadDirectory;
-
-        if (DATA_DIRECTORY != null && !DATA_DIRECTORY.isEmpty()) {
-            constellationDataDirectory = new File(DATA_DIRECTORY);
-            if (!constellationDataDirectory.exists()) {
-                LOGGER.log(Level.INFO, "The configuration directory {0} does not exist", DATA_DIRECTORY);
-            } else if (!constellationDataDirectory.isDirectory()) {
-                LOGGER.log(Level.INFO, "The configuration path {0} is not a directory", DATA_DIRECTORY);
-            }
-        } else {
-            constellationDataDirectory = new File(System.getProperty("user.home"), ".constellation-data");
-            if (!constellationDataDirectory.exists()) {
-                constellationDataDirectory.mkdir();
-            }
-        }
         
         if (UPLOAD_DIRECTORY != null && !UPLOAD_DIRECTORY.isEmpty()) {
         	constellationUploadDirectory = new File(UPLOAD_DIRECTORY);
@@ -246,8 +276,6 @@ public final class ConfigDirectory {
         return sessionUploadDirectory;
 	}
     
-    
-
     /**
      * Give Metadata directory {@link java.io.File} defined on constellaiton.properties or
      * by default on .constellation-data/metadata from user home directory

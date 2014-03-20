@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,6 +42,7 @@ import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.dao.DataRecord;
 import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataBrief;
 import org.constellation.coverage.PyramidCoverageHelper;
 import org.constellation.coverage.PyramidCoverageProcessListener;
@@ -48,6 +50,7 @@ import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.DataInformation;
 import org.constellation.dto.DataMetadata;
 import org.constellation.dto.FileBean;
+import org.constellation.dto.ImportedData;
 import org.constellation.dto.MetadataLists;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
@@ -210,7 +213,7 @@ public class DataRest {
     public Response uploadData(@FormDataParam("data") InputStream fileIs,
                                @FormDataParam("data") FormDataContentDisposition fileDetail,
                                @Context HttpServletRequest request) {
-    	final String sessionId = request.getSession().getId();
+    	final String sessionId = request.getSession(false).getId();
     	final File uploadDirectory = ConfigDirectory.getUploadDirectory(sessionId);
         
         File newFile = new File(uploadDirectory, fileDetail.getFileName());
@@ -247,7 +250,7 @@ public class DataRest {
     public Response uploadMetadata(@FormDataParam("metadata") InputStream mdFileIs,
                                @FormDataParam("metadata") FormDataContentDisposition mdFileDetail,
                                @Context HttpServletRequest request) {
-    	final String sessionId = request.getSession().getId();
+    	final String sessionId = request.getSession(false).getId();
         final File uploadDirectory = ConfigDirectory.getUploadDirectory(sessionId);
        
         File mdFile = null;
@@ -274,8 +277,55 @@ public class DataRest {
         return Response.ok(result).build();
     }
 
+
     /**
-     * Load data from file selected
+     * Import data from upload Directory to integrated directory 
+     * - change file location from upload to integrated
+     *
+     * @param values {@link org.constellation.dto.ParameterValues} containing file path & data type
+     * @return a {@link javax.ws.rs.core.Response}
+     */
+    @POST
+    @Path("import")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response importData(final ParameterValues values, @Context HttpServletRequest request) {
+        final String filePath = values.getValues().get("filePath");
+        final String metadataFilePath = values.getValues().get("metadataFilePath");
+        final String dataType = values.getValues().get("dataType");
+
+        
+        try{
+        	File dataIntegratedDirectory = ConfigDirectory.getDataIntegratedDirectory();
+        	if (filePath!= null){
+        		Files.move(Paths.get(filePath), Paths.get(new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(filePath).getName()).getAbsolutePath()),StandardCopyOption.REPLACE_EXISTING);
+        	}
+        	if (metadataFilePath!= null){
+        		Files.move(Paths.get(metadataFilePath), Paths.get(new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(metadataFilePath).getName()).getAbsolutePath()),StandardCopyOption.REPLACE_EXISTING);
+        	}
+
+        	ImportedData importedData = new ImportedData();
+        	if (filePath!= null){
+        		importedData.setDataFile(new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(filePath).getName()).getAbsolutePath());
+        	}
+            if (metadataFilePath!= null){
+            	importedData.setMetadataFile(new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(metadataFilePath).getName()).getAbsolutePath());
+            }
+            
+        	return Response.ok(importedData).build();
+        } catch (IOException e) {
+        	LOGGER.log(Level.SEVERE, "Bad configuration for data Integrated directory", e);
+        	return Response.status(500).entity("failed").build();
+		}
+    }
+    
+    
+    
+    
+    
+    /**
+     * Load data from file selected 
+     
      *
      * @param values {@link org.constellation.dto.ParameterValues} containing file path & data type
      * @return a {@link javax.ws.rs.core.Response} with a {@link org.constellation.dto.DataInformation}
@@ -284,18 +334,20 @@ public class DataRest {
     @Path("load")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response loadData(final ParameterValues values, @Context HttpServletRequest request) {
+    public Response loadData(final ParameterValues values) {
         final String filePath = values.getValues().get("filePath");
         final String metadataFilePath = values.getValues().get("metadataFilePath");
         final String dataType = values.getValues().get("dataType");
 
-        final File uploadDirectory = ConfigDirectory.getUploadDirectory(request.getSession().getId());
-        final File choosingFile = new File(uploadDirectory, filePath);
+        File dataIntegratedDirectory = ConfigDirectory.getDataIntegratedDirectory();
+        final File choosingFile = new File(dataIntegratedDirectory, filePath);
 
         File choosingMetadataFile = null;
         if (metadataFilePath != null && !metadataFilePath.isEmpty()) {
-            choosingMetadataFile = new File(uploadDirectory.getAbsolutePath() + "/metadata/" + metadataFilePath);
+            choosingMetadataFile = new File(dataIntegratedDirectory.getAbsolutePath() + "/metadata/" + metadataFilePath);
         }
+        
+
 
         if (choosingFile.exists()) {
             final DataInformation information = MetadataUtilities.generateMetadatasInformation(choosingFile, choosingMetadataFile, dataType);
@@ -310,7 +362,10 @@ public class DataRest {
         return Response.status(418).build();
     }
 
-    /**
+    
+
+
+	/**
      * Save metadata with merge from ISO19115 form
      *
      * @param metadataToSave {@link org.constellation.dto.DataMetadata} which contains new information for metadata.
