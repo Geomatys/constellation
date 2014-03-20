@@ -1,4 +1,4 @@
-package org.constellation.gui.admin.conf;
+package org.constellation.admin.conf;
 
 public class CstlConfig {
 

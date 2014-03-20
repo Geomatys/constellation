@@ -131,11 +131,7 @@
       <artifactId>cstl-store-style-sld</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.constellation.storage</groupId>
-      <artifactId>cstl-store-style-unnormalize</artifactId>
-      <version>${project.version}</version>
-    </dependency>
+
     <!--  For the embedded service. -->
     <dependency>
       <groupId>org.glassfish.jersey.containers</groupId>

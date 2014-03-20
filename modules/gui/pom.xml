@@ -93,7 +93,7 @@
         <!--module>common</module-->
         <module>data</module>
         <!--module>style</module-->
-        <module>webservices</module>
+        <!--module>webservices</module-->
         <!--module>cstl-web-client</module-->
     </modules>
 

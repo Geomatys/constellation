@@ -5,7 +5,7 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 
-import org.constellation.gui.admin.conf.CstlConfig;
+import org.constellation.admin.conf.CstlConfig;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

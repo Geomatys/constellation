@@ -1,6 +1,6 @@
 package org.constellation.admin.conf;
 
-import org.constellation.gui.admin.conf.CstlConfig;
+import org.constellation.admin.conf.CstlConfig;
 import org.geotoolkit.util.StringUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -17,6 +17,7 @@ target$
 derby.log$ 
 modules/testing/cite/engine/components/*
 
+/nb-configuration\.xml$
 # Intellij files
 \.iml$
 \.ipr$
