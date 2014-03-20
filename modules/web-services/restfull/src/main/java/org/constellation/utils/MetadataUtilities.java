@@ -35,13 +35,17 @@ import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.metadata.iso.extent.DefaultExtent;
 import org.apache.sis.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.apache.sis.metadata.iso.identification.DefaultDataIdentification;
+import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.collection.TreeTable;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.DataInformation;
 import org.constellation.dto.DataMetadata;
+import org.constellation.provider.DataProvider;
 import org.constellation.util.MetadataMapBuilder;
 import org.constellation.util.SimplyMetadataTreeNode;
+import org.geotoolkit.coverage.CoverageReference;
+import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.coverage.io.CoverageIO;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
@@ -60,6 +64,7 @@ import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.process.metadata.MetadataProcessingRegistry;
 import org.geotoolkit.process.metadata.merge.MergeDescriptor;
 import org.geotoolkit.util.FileUtilities;
+import org.opengis.feature.type.Name;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.Metadata;
 import org.opengis.parameter.ParameterValueGroup;
@@ -256,16 +261,21 @@ public final class MetadataUtilities {
     /**
      * @param metadataToSave
      * @return
-     * @throws CoverageStoreException
+     * @throws DataStoreException 
      */
-    public static DefaultMetadata getRasterMetadata(final DataMetadata metadataToSave) throws CoverageStoreException {
+    public static DefaultMetadata getRasterMetadata(final DataProvider dataProvider) throws DataStoreException {
 
-        final File dataFile = new File(metadataToSave.getDataPath());
-        GridCoverageReader coverageReader = CoverageIO.createSimpleReader(dataFile);
+    	final DataStore dataStore = dataProvider.getMainStore();
+    	final CoverageStore coverageStore =(CoverageStore)dataStore;
+    	final Name name = coverageStore.getNames().iterator().next();
+    	final CoverageReference coverageReference = coverageStore.getCoverageReference(name);
+    	
+        
+        GridCoverageReader coverageReader = coverageReference.acquireReader();
         if (!(coverageReader.getGridGeometry(0).getCoordinateReferenceSystem() instanceof ImageCRS)) {
             return (DefaultMetadata) coverageReader.getMetadata();
         }
-        coverageReader.dispose();
+        coverageReference.recycle(coverageReader);
         return null;
     }
 
@@ -274,14 +284,12 @@ public final class MetadataUtilities {
      * @return
      * @throws CoverageStoreException
      */
-    public static DefaultMetadata getVectorMetadata(final DataMetadata metadataToSave) throws DataStoreException, IOException {
-
-        final File dataFile = new File(metadataToSave.getDataPath());
-
-        final ParameterValueGroup parameters = ShapefileFolderFeatureStoreFactory.PARAMETERS_DESCRIPTOR.createValue();
-        Parameters.getOrCreate(ShapefileFolderFeatureStoreFactory.URLFOLDER, parameters).setValue(dataFile.toURI().toURL());
-        final FeatureStore shapeStore = FeatureStoreFinder.open(parameters);
-        final Envelope env = shapeStore.getEnvelope(QueryBuilder.all(shapeStore.getNames().iterator().next()));
+    public static DefaultMetadata getVectorMetadata(final DataProvider dataProvider) throws DataStoreException{
+    	
+    	final DataStore dataStore = dataProvider.getMainStore();
+    	final FeatureStore featureStore =(FeatureStore)dataStore;
+    	
+        final Envelope env = featureStore.getEnvelope(QueryBuilder.all(featureStore.getNames().iterator().next()));
 
         final DefaultMetadata md = new DefaultMetadata();
         final DefaultDataIdentification ident = new DefaultDataIdentification();

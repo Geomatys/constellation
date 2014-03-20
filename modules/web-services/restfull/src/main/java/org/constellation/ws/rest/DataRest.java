@@ -378,18 +378,22 @@ public class DataRest {
     public Response saveMetadata(final DataMetadata metadataToSave) {
         //Recover metadatapyram
         DefaultMetadata dm = new DefaultMetadata();
+        String dataPath;
+        DataProvider dataProvider = DataProviders.getInstance().getProvider(metadataToSave.getDataName());
+        
+        
         switch (metadataToSave.getType()) {
             case "raster":
                 try {
-                    dm = MetadataUtilities.getRasterMetadata(metadataToSave);
-                } catch (CoverageStoreException e) {
+                    dm = MetadataUtilities.getRasterMetadata(dataProvider);
+                } catch (DataStoreException e) {
                     LOGGER.log(Level.WARNING, "Error when trying to get coverage metadata", e);
                 }
                 break;
             case "vector":
-                try {
-                    dm = MetadataUtilities.getVectorMetadata(metadataToSave);
-                } catch (Exception e) {
+                try {                
+                    dm = MetadataUtilities.getVectorMetadata(dataProvider);
+                } catch (DataStoreException e) {
                     LOGGER.log(Level.WARNING, "Error when trying to get metadata for a shape file", e);
                 }
                 break;

@@ -822,7 +822,7 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','data
 
         $scope.save = function() {
             $scope.metadata.dataName = $scope.provider;
-            $scope.metadata.dataPath = $uploadFiles.files.file;
+//            $scope.metadata.dataPath = $uploadFiles.files.file;
             $scope.metadata.type = $scope.type;
 
             dataListing.setMetadata({}, $scope.metadata,

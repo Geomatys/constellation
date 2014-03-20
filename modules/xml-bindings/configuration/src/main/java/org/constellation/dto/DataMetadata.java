@@ -19,7 +19,6 @@ import java.util.List;
 public class DataMetadata {
 
     private String          dataName;
-    private String          dataPath;
     private String          title;
     private String          anAbstract;
     private List<String>    keywords;
@@ -39,14 +38,6 @@ public class DataMetadata {
 
     public void setDataName(final String dataName) {
         this.dataName = dataName;
-    }
-
-    public String getDataPath() {
-        return dataPath;
-    }
-
-    public void setDataPath(final String dataPath) {
-        this.dataPath = dataPath;
     }
 
     public String getTitle() {
