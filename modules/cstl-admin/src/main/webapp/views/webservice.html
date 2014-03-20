@@ -15,6 +15,7 @@
                 <li><a href="#/webservice/wfs" id="wfschoice" translate="webservicepage.button.dropdown.wfs.label">Features (WFS)</a></li>
                 <li><a href="#/webservice/wcs" id="wcschoice" translate="webservicepage.button.dropdown.wcs.label">Coverages (WCS)</a></li>
                 <li><a href="#/webservice/wmts" id="wmtschoice" translate="webservicepage.button.dropdown.wmts.label">Tiles maps (WMTS)</a></li>
+                <li><a href="#/webservice/csw" id="cswchoice" translate="webservicepage.button.dropdown.csw.label">Catalogs (CSW)</a></li>
             </ul>
         </div>
     </div>
@@ -72,7 +73,8 @@
                         <p ng-if="service._abstract != null && service._abstract !==''">{{service._abstract}}</p>
                         <p ng-if="service._abstract == null || service._abstract ===''"> - </p>
                         <p><strong><span translate="service.data.label">Published data on service</span></strong></p>
-                        <p>{{service.layersNumber}}</p>
+                        <p ng-if="service.layersNumber != null">{{service.layersNumber}}</p>
+                        <p ng-if="service.layersNumber == null">0</p>
                     </div>
                 </div>
             </div>

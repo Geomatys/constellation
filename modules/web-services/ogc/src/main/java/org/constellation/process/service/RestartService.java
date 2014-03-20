@@ -62,8 +62,10 @@ public final class RestartService extends AbstractCstlProcess {
                     input.parameter(StartServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
 
                     startDesc.createProcess(input).call(); // try to start
-                } catch (NoSuchIdentifierException | ProcessException ex) {
+                } catch (NoSuchIdentifierException ex) {
                     throw new ProcessException("There is no instance of " + identifier, this, null);
+                } catch (ProcessException ex) {
+                    throw new ProcessException(ex.getLocalizedMessage(), this, ex);
                 }
             }
         }

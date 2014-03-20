@@ -1023,6 +1023,9 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
             if ($scope.type === 'wmts') {
                 return [{ 'id': '1.0.0'}];
             }
+            if ($scope.type === 'csw') {
+                return [{ 'id': '2.0.0'}, { 'id': '2.0.2'}];
+            }
             return [];
         };
         $scope.versions = $scope.getVersionsForType();
@@ -1080,10 +1083,33 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
             }
 
             webService.create({type: $scope.type}, $scope.metadata,
-                              function() { $growl('success','Success','Service '+ name +' successfully created');
-                                           $location.path('/webservice'); },
-                              function() { $growl('error','Error','Service '+ name +' creation failed'); }
+                              function() {
+                                  $growl('success', 'Success', 'Service ' + $scope.metadata.name + ' successfully created');
+                                  if ($scope.type == 'csw') {
+                                      $location.path('/webservice/csw/'+ $scope.metadata.name +'/source');
+                                  } else {
+                                      $location.path('/webservice');
+                                  }
+                              },
+
+                              function() { $growl('error','Error','Service '+ $scope.metadata.name +' creation failed'); }
             );
+        };
+    }]);
+
+cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routeParams', 'webService', '$growl',
+    function ($scope, $routeParams , webService, $growl) {
+        $scope.type = $routeParams.type;
+        $scope.id = $routeParams.id;
+
+        $scope.source = {'automatic' : {'format': 'mdweb', 'bdd': {}}};
+
+        $scope.saveServiceSource = function() {
+            webService.setConfig({type: $scope.type, id: $scope.id}, $scope.source, function() {
+                $growl('success','Success','Service configuration successfully updated');
+            }, function() {
+                $growl('error','Error','Service configuration update error');
+            });
         };
     }]);
 
@@ -1126,6 +1152,9 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
         }
         if ($scope.type === 'wmts') {
             return [{ 'id': '1.0.0'}];
+        }
+        if ($scope.type === 'csw') {
+            return [{ 'id': '2.0.0'}, { 'id': '2.0.2'}];
         }
         return [];
     };

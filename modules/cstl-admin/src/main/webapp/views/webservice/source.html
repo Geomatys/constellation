@@ -1,0 +1,60 @@
+<div class="logo-wrapper row">
+    <div class="col-sm-3">
+        <a href="#"><img src="images/constellation.png"></a>
+    </div>
+</div>
+
+<div id="description" class="row bg-white">
+    <div class="navbar">
+        <div class="navbar-inner">
+            <a class="brand" translate="service.config.source.choose">Choose source</a>
+        </div>
+    </div>
+</div>
+
+<!-- main part -->
+<div class="row bg-white">
+    <div class="col-sm-3">
+        <div class="well">
+            <p><b translate="service.config.source.database.title">Database (SGBDR)</b></p>
+            <p translate="service.config.source.database.description">Database which contains metadata records</p>
+        </div>
+    </div>
+    <div class="col-sm-6">
+        <form id="uploadDataForm">
+            <fieldset>
+                <div class="form-group">
+                    <div class="control-label" translate="service.config.source.database.type">Database type</div>
+                    <select id="selectType" ng-model="source.automatic.bdd.className">
+                        <option value="org.postgresql.Driver" selected="selected">PostgreSQL</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <div class="control-label" translate="service.config.source.database.url">Database URL</div>
+                    <input type="text" class="form-control" ng-model="source.automatic.bdd.connectURL">
+                </div>
+                <div class="form-group">
+                    <div class="control-label" translate="service.config.source.database.username">User name</div>
+                    <input type="text" class="form-control" ng-model="source.automatic.bdd.user">
+                </div>
+                <div class="form-group">
+                    <div class="control-label" translate="service.config.source.database.password">Password</div>
+                    <input type="password" class="form-control" ng-model="source.automatic.bdd.password">
+                </div>
+                <div class="form-group">
+                    <div class="control-label" translate="service.config.source.database.shared">Shared connection</div>
+                    <div class="checkbox inline">
+                        <input type="checkbox" ng-model="source.automatic.bdd.sharedConnection">
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+</div>
+
+
+<div class="row bg-white">
+    <div class="pull-right" style="margin: 20px 30px;">
+        <button class="btn btn-info" type="button" ng-click="saveServiceSource()" translate="label.save">Save</button>
+    </div>
+</div>

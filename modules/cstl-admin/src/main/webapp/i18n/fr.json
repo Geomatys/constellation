@@ -824,7 +824,21 @@
             "label": "Description du service"
         },
         "config": {
-            "source": "Source"
+            "source": "Source",
+            "source.choose": "Choisir la source",
+            "source.database": "Base de données",
+            "source.database.title": "Base de données (SGBDR)",
+            "source.database.description": "Base de données qui contient des métadonnées",
+            "source.database.type": "Type de base de données",
+            "source.database.url": "URL de la base de données",
+            "source.database.username": "Nom d'utilisateur",
+            "source.database.password": "Mot de passe",
+            "source.database.shared": "Connexion partagée",
+            "source.file": "Système de fichier",
+            "source.file.title": "Système de fichier",
+            "source.file.path": "Chemin du dossier",
+            "source.internal": "Interne",
+            "source.internal.title": "Interne (SGBDR)"
         },
         "create": {
             "end": {

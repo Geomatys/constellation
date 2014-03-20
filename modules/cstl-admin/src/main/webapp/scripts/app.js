@@ -90,6 +90,10 @@ cstlAdminApp
                     templateUrl: 'views/webservice/edit.html',
                     controller: 'WebServiceEditController'
                 })
+                .when('/webservice/:type/:id/source', {
+                    templateUrl: 'views/webservice/source.html',
+                    controller: 'WebServiceChooseSourceController'
+                })
                 .when('/webservice/:type', {
                     templateUrl: 'views/webservice/create.html',
                     controller: 'WebServiceCreateController'

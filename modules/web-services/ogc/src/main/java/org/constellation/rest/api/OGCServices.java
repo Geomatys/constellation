@@ -18,15 +18,16 @@
 package org.constellation.rest.api;
 
 import org.constellation.ServiceDef.Specification;
-import org.constellation.configuration.AbstractConfigurationObject;
-import org.constellation.configuration.AcknowlegementType;
-import org.constellation.configuration.InstanceReport;
-import org.constellation.configuration.NotRunningServiceException;
-import org.constellation.configuration.ServiceConfigurer;
+import org.constellation.configuration.*;
 import org.constellation.dto.Service;
 import org.constellation.dto.SimpleValue;
+import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.ogc.configuration.OGCConfigurer;
+import org.geotoolkit.util.FileUtilities;
+import org.glassfish.jersey.jettison.JettisonConfig;
+import org.glassfish.jersey.jettison.JettisonJaxbContext;
+import org.glassfish.jersey.jettison.JettisonUnmarshaller;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -41,6 +42,9 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.Unmarshaller;
 
 import java.io.InputStream;
+import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.constellation.utils.RESTfulUtilities.created;
 import static org.constellation.utils.RESTfulUtilities.ok;
@@ -148,12 +152,50 @@ public final class OGCServices {
      * @see OGCConfigurer#setInstanceConfiguration(String, Object)
      */
     @POST
+    @Consumes(MediaType.APPLICATION_XML)
     @Path("{id}/config")
     public Response setConfiguration(final @PathParam("spec") String spec, final @PathParam("id") String id, final InputStream is) throws Exception {
         final Unmarshaller um = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
         final Object config = um.unmarshal(is);
         GenericDatabaseMarshallerPool.getInstance().recycle(um);
         getConfigurer(spec).setInstanceConfiguration(id, config);
+        return ok(AcknowlegementType.success(spec.toUpperCase() + " service \"" + id + "\" configuration successfully updated."));
+    }
+
+    /**
+     * @see OGCConfigurer#setInstanceConfiguration(String, Object)
+     */
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("{id}/config")
+    public Response setConfigurationJson(final @PathParam("spec") String spec, final @PathParam("id") String id, final InputStream is) throws Exception {
+        final Map<String, String> nSMap = new HashMap<>(0);
+        nSMap.put("http://www.constellation.org/config", "constellation-config");
+        final JettisonConfig config = JettisonConfig.mappedJettison().xml2JsonNs(nSMap).build();
+        final JettisonJaxbContext cxtx = new JettisonJaxbContext(config, "org.constellation.configuration:" +
+                "org.constellation.generic.database:" +
+                "org.geotoolkit.ogc.xml.v110:" +
+                "org.apache.sis.internal.jaxb.geometry:" +
+                "org.geotoolkit.gml.xml.v311");
+        final JettisonUnmarshaller jsonUnmarshaller = cxtx.createJsonUnmarshaller();
+
+        final Class c;
+        final String json = FileUtilities.getStringFromStream(is);
+        if (json.startsWith("{\"automatic\"")) {
+            c = Automatic.class;
+        } else if (json.startsWith("{\"layercontext\"")) {
+            c = LayerContext.class;
+        } else if (json.startsWith("{\"processcontext\"")) {
+            c = ProcessContext.class;
+        } else if (json.startsWith("{\"sosconfiguration\"")) {
+            c = SOSConfiguration.class;
+        } else if (json.startsWith("{\"webdavcontext\"")) {
+            c = WebdavContext.class;
+        } else {
+            return ok(AcknowlegementType.failure("Unknown configuration object given, unable to update service configuration"));
+        }
+        final Object configObj = jsonUnmarshaller.unmarshalFromJSON(new StringReader(json), c);
+        getConfigurer(spec).setInstanceConfiguration(id, configObj);
         return ok(AcknowlegementType.success(spec.toUpperCase() + " service \"" + id + "\" configuration successfully updated."));
     }
 

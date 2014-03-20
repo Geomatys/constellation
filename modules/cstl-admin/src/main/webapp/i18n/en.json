@@ -428,6 +428,7 @@
             "source.choose": "Choose source",
             "source.database": "Database",
             "source.database.title": "Database (SGBDR)",
+            "source.database.description": "Database which contains metadata records",
             "source.database.type": "Database type",
             "source.database.url": "Database URL",
             "source.database.username": "User name",
