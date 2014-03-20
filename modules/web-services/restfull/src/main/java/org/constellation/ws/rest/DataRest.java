@@ -169,7 +169,7 @@ public class DataRest {
         File[] children;
         final Set<String> extensions = GeotoolkitFileExtensionAvailable.getAvailableFileExtension().keySet();
 
-        final File root = ConfigDirectory.getDataDirectory();
+        final File root = ConfigDirectory.getUserHomeDirectory();
         if ("root".equalsIgnoreCase(path)) {
             path = "";
             children = root.listFiles();

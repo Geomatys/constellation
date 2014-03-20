@@ -102,6 +102,11 @@ public final class ConfigDirectory {
 
     private ConfigDirectory() {
     }
+    
+    public static File getUserHomeDirectory(){
+    	final String home = System.getProperty("user.home");
+    	return new File(home);
+    }
 
     private static File getWebInfDiretory() {
         final URL url = baseClassLoader.getResource("org/constellation/configuration/ConfigDirectory.class");
