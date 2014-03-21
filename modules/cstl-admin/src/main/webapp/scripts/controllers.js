@@ -532,10 +532,10 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                             }
                         }, function() {
                             if (!fileExtension || fileExtension !== "nc") {
-                                dataListing.pyramidData({id: fileName}, {value: upFile}, function() {
+                                //dataListing.pyramidData({id: fileName}, {value: upFile}, function() {
                                     $growl('success','Success','Coverage data '+ fileName +' successfully added');
                                     $modalInstance.close({type: "raster", file: fileName, missing: $scope.metadata == null});
-                                });
+                                //});
                             } else {
                                 displayNetCDF(fileName);
                             }
