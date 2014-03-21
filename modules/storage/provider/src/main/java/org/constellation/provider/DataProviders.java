@@ -29,9 +29,6 @@ import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.apache.sis.util.NullArgumentException;
-import org.apache.sis.util.logging.Logging;
 import static org.constellation.provider.Provider.RELOAD_TIME_PROPERTY;
 import org.constellation.provider.configuration.Configurator;
 import org.constellation.provider.configuration.ProviderParameters;
@@ -48,9 +45,7 @@ import org.opengis.parameter.ParameterValueGroup;
  *
  * @author Johann Sorel (Geomatys)
  */
-public final class DataProviders implements PropertyChangeListener {
-
-    protected static final Logger LOGGER = Logging.getLogger("org.constellation.provider");
+public final class DataProviders extends Providers implements PropertyChangeListener {
 
     private final PropertyChangeSupport listeners = new PropertyChangeSupport(this);
     private long lastUpdateTime = System.currentTimeMillis();
@@ -59,11 +54,6 @@ public final class DataProviders implements PropertyChangeListener {
     
     //all loaded providers
     private Collection<DataProvider> PROVIDERS = null;
-    private Configurator configurator = Configurator.DEFAULT;
-
-    protected Logger getLogger() {
-        return LOGGER;
-    }
 
     /**
      * {@inheritDoc}
@@ -111,29 +101,6 @@ public final class DataProviders implements PropertyChangeListener {
         fireUpdateEvent();
     }
 
-    /**
-     * Set the object responsible to create Provider configurations.
-     * @param configurator
-     */
-    public synchronized void setConfigurator(Configurator configurator) {
-        if(configurator == null){
-            throw new NullArgumentException("Configurator can not be null.");
-        }
-
-        if(this.configurator.equals(configurator)){
-            //same configuration
-            return;
-        }
-
-        //clear cache
-        dispose();
-        this.configurator = configurator;
-    }
-
-    public synchronized Configurator getConfigurator() {
-        return configurator;
-    }
-
     public DataProvider createProvider(final DataProviderFactory factory, final ParameterValueGroup params){
         getProviders();
         final DataProvider provider = factory.createProvider(params);
@@ -162,7 +129,7 @@ public final class DataProviders implements PropertyChangeListener {
      * Save configuration for the given provider factory
      */
     private void saveConfiguration(final ProviderFactory factory){
-        getLogger().log(Level.INFO, "Saving configuration for factory : {0}", factory.getName());
+        LOGGER.log(Level.INFO, "Saving configuration for factory : {0}", factory.getName());
         //save configuration
         final List<Provider> providers = new ArrayList<>();
         for(Provider candidate : PROVIDERS){
@@ -269,13 +236,13 @@ public final class DataProviders implements PropertyChangeListener {
                             }
                         }catch(Exception ex){
                             //we must not fail here in any case
-                            getLogger().log(Level.SEVERE, "Factory "+factoryName+" failed to create a provider.",ex);
+                            LOGGER.log(Level.SEVERE, "Factory "+factoryName+" failed to create a provider.",ex);
                         }
                     }
                 }
             }catch(Exception ex){
                 //we must not fail here in any case
-                getLogger().log(Level.SEVERE, "Configurator failed to provide configuration for factory : " + factoryName,ex);
+                LOGGER.log(Level.SEVERE, "Configurator failed to provide configuration for factory : " + factoryName,ex);
             }
 
         }
@@ -320,7 +287,7 @@ public final class DataProviders implements PropertyChangeListener {
                     provider.dispose();
                 }catch(Exception ex){
                     //we must not fail here in any case
-                    getLogger().log(Level.SEVERE, "Failed to dispose provider : " + provider.toString(),ex);
+                    LOGGER.log(Level.SEVERE, "Failed to dispose provider : " + provider.toString(),ex);
                 }
             }
         }finally{

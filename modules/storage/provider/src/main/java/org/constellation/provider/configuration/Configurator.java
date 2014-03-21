@@ -17,12 +17,14 @@
 
 package org.constellation.provider.configuration;
 
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.logging.Logger;
 import org.apache.sis.util.logging.Logging;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderFactory;
 import org.opengis.parameter.ParameterValueGroup;
-import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * @author Johann Sorel (Geomatys)
@@ -37,4 +39,41 @@ public interface Configurator {
 
     void saveConfiguration(final ProviderFactory service, final List<Provider> providers);
 
+    //-------------------------------------
+    
+//    /**
+//     * Get a list of all provider configurations.
+//     * @return List of entry<providerId,parameters>
+//     */
+//    List<Entry<String,ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException;
+//    
+//    /**
+//     * Get configuration for one provider.
+//     * @param providerId 
+//     * @return Configuration or null
+//     */
+//    ParameterValueGroup getProviderConfiguration(String providerId) throws ConfigurationException;
+//    
+//    /**
+//     * Store a new provider configuration.
+//     * @param config
+//     * @return created provider id
+//     */
+//    String addProviderConfiguration(ParameterValueGroup config) throws ConfigurationException;
+//    
+//    /**
+//     * Save an existing provider updated configuration.
+//     * @param providerId
+//     * @param config
+//     * @throws ConfigurationException 
+//     */
+//    void updateProviderConfiguration(String providerId, ParameterValueGroup config) throws ConfigurationException;
+//    
+//    /**
+//     * Remove a provider configuration.
+//     * @param providerId
+//     * @throws ConfigurationException 
+//     */
+//    void removeProviderConfiguration(String providerId) throws ConfigurationException;
+    
 }
