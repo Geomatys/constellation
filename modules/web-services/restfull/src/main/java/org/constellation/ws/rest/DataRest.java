@@ -215,7 +215,7 @@ public class DataRest {
                                @Context HttpServletRequest request) {
     	final String sessionId = request.getSession(false).getId();
     	final File uploadDirectory = ConfigDirectory.getUploadDirectory(sessionId);
-        
+    	boolean isArchive =false;
         File newFile = new File(uploadDirectory, fileDetail.getFileName());
         File OriginalFile = new File(uploadDirectory, fileDetail.getFileName());
         try {
@@ -227,6 +227,7 @@ public class DataRest {
                     final File zipDir = new File(uploadDirectory, fileNameWithoutExt);
                     FileUtilities.unzip(newFile, zipDir, new CRC32());
                     newFile = zipDir;
+                    isArchive = true;
                 }
             }
 
@@ -235,7 +236,9 @@ public class DataRest {
             LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             return Response.status(500).entity("failed").build();
         } finally {
-        	OriginalFile.delete();
+        	if (isArchive){
+        		OriginalFile.delete();
+        	}
         }
 
         String result = newFile.getAbsolutePath();
@@ -300,6 +303,7 @@ public class DataRest {
         try{
         	File dataIntegratedDirectory = ConfigDirectory.getDataIntegratedDirectory();
         	if (filePath!= null){
+        		recursiveDelete(new File(new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(filePath).getName()).getAbsolutePath()));
         		Files.move(Paths.get(filePath), Paths.get(new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(filePath).getName()).getAbsolutePath()),StandardCopyOption.REPLACE_EXISTING);
         	}
         	if (metadataFilePath!= null){
@@ -324,7 +328,21 @@ public class DataRest {
     }
     
     
-    
+    private static void recursiveDelete(File file) {
+        //to end the recursive loop
+        if (!file.exists())
+            return;
+         
+        //if directory, go inside and call recursively
+        if (file.isDirectory()) {
+            for (File f : file.listFiles()) {
+                //call recursively
+                recursiveDelete(f);
+            }
+        }
+        //call delete to delete files and empty directory
+        file.delete();
+    }
     
     
     /**
