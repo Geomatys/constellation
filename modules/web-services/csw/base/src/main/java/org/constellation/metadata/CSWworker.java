@@ -33,6 +33,7 @@ import java.util.logging.Level;
 
 // JAXB dependencies
 import javax.imageio.spi.ServiceRegistry;
+import javax.inject.Named;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
@@ -40,6 +41,7 @@ import javax.xml.namespace.QName;
 
 
 // Apache Lucene dependencies
+import com.codahale.metrics.annotation.Timed;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 
@@ -112,6 +114,7 @@ import org.geotoolkit.feature.catalog.FeatureCatalogueImpl;
 import org.opengis.filter.sort.SortOrder;
 import org.opengis.filter.capability.FilterCapabilities;
 import org.opengis.util.CodeList;
+import org.springframework.context.annotation.Scope;
 import org.w3c.dom.Node;
 
 
@@ -120,6 +123,8 @@ import org.w3c.dom.Node;
  *
  * @author Guilhem Legal (Geomatys)
  */
+@Named
+@Scope("prototype")
 public class CSWworker extends AbstractWorker {
 
     /**
@@ -455,6 +460,7 @@ public class CSWworker extends AbstractWorker {
      * @return the capabilities document
      * @throws CstlServiceException
      */
+    @Timed
     public AbstractCapabilities getCapabilities(final GetCapabilities requestCapabilities) throws CstlServiceException {
         isWorking();
         LOGGER.log(logLevel, "getCapabilities request processing\n");
@@ -1709,7 +1715,7 @@ public class CSWworker extends AbstractWorker {
      * {@inheritDoc }
      */
     @Override
-    public final void setLogLevel(Level logLevel) {
+    public void setLogLevel(Level logLevel) {
         this.logLevel = logLevel;
         if (indexSearcher != null) {
             indexSearcher.setLogLevel(logLevel);

@@ -157,6 +157,11 @@
       <artifactId>spring-context</artifactId>
       <version>${spring.version}</version>
     </dependency>
+      <dependency>
+          <groupId>com.codahale.metrics</groupId>
+          <artifactId>metrics-annotation</artifactId>
+          <version>3.0.1</version>
+      </dependency>
 
   </dependencies>
 
