@@ -24,6 +24,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -45,7 +46,14 @@ public class CorsFilter implements Filter {
     	httpServletResponse.addHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
     	httpServletResponse.addHeader("Access-Control-Allow-Headers", "Content-Type");
     	
-        chain.doFilter(request, response);
+    	HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+    	if("OPTIONS".equals(httpServletRequest.getMethod()))
+    	    httpServletResponse.setStatus(HttpServletResponse.SC_NO_CONTENT);
+    	else
+    	    chain.doFilter(request, response);
+    	    
+    	
+    	
     }
 
     @Override
