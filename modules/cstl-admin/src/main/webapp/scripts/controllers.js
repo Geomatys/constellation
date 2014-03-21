@@ -1102,7 +1102,7 @@ cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routePar
         $scope.type = $routeParams.type;
         $scope.id = $routeParams.id;
 
-        $scope.source = {'automatic' : {'format': 'mdweb', 'bdd': {}}};
+        $scope.source = {'automatic' : {'@format': 'mdweb', 'bdd': {}}};
 
         $scope.saveServiceSource = function() {
             webService.setConfig({type: $scope.type, id: $scope.id}, $scope.source, function() {
