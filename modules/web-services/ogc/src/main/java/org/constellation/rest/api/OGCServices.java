@@ -17,6 +17,7 @@
 
 package org.constellation.rest.api;
 
+import org.apache.sis.util.logging.Logging;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.*;
 import org.constellation.dto.Service;
@@ -39,12 +40,16 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.constellation.utils.RESTfulUtilities.created;
 import static org.constellation.utils.RESTfulUtilities.ok;
@@ -60,6 +65,7 @@ import static org.constellation.utils.RESTfulUtilities.ok;
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public final class OGCServices {
+    private static final Logger LOGGER = Logging.getLogger(OGCServices.class);
 
     /**
      * @see OGCConfigurer#getInstance(String)
@@ -67,7 +73,12 @@ public final class OGCServices {
     @GET
     @Path("{id}")
     public Response getInstance(final @PathParam("spec") String spec, final @PathParam("id") String id) throws Exception {
-        return ok(getConfigurer(spec).getInstance(id));
+        try {
+            return ok(getConfigurer(spec).getInstance(id));
+        } catch (ConfigurationException e) {
+            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+            throw e;
+        }
     }
 
     /**
@@ -76,7 +87,12 @@ public final class OGCServices {
     @GET
     @Path("all")
     public Response getInstances(final @PathParam("spec") String spec) throws Exception {
-        return ok(new InstanceReport(getConfigurer(spec).getInstances()));
+        try {
+            return ok(new InstanceReport(getConfigurer(spec).getInstances()));
+        } catch (ConfigurationException e) {
+            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+            throw e;
+        }
     }
 
     /**
@@ -85,7 +101,12 @@ public final class OGCServices {
     @PUT
     @Path("/")
     public Response addInstance(final @PathParam("spec") String spec, final Service metadata) throws Exception {
-        getConfigurer(spec).createInstance(metadata.getIdentifier(), metadata, null);
+        try {
+            getConfigurer(spec).createInstance(metadata.getIdentifier(), metadata, null);
+        } catch (ConfigurationException e) {
+            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+            throw e;
+        }
         return created(AcknowlegementType.success(spec.toUpperCase() + " service \"" + metadata.getIdentifier() + "\" successfully created."));
     }
 
@@ -95,7 +116,12 @@ public final class OGCServices {
     @POST
     @Path("{id}/start")
     public Response start(final @PathParam("spec") String spec, final @PathParam("id") String id) throws Exception {
-        getConfigurer(spec).startInstance(id);
+        try {
+            getConfigurer(spec).startInstance(id);
+        } catch (ConfigurationException e) {
+            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+            throw e;
+        }
         return ok(AcknowlegementType.success(spec.toUpperCase() + " service \"" + id + "\" successfully started."));
     }
 
@@ -105,7 +131,12 @@ public final class OGCServices {
     @POST
     @Path("{id}/stop")
     public Response stop(final @PathParam("spec") String spec, final @PathParam("id") String id) throws Exception {
-        getConfigurer(spec).stopInstance(id);
+        try {
+            getConfigurer(spec).stopInstance(id);
+        } catch (ConfigurationException e) {
+            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+            throw e;
+        }
         return ok(AcknowlegementType.success(spec.toUpperCase() + " service \"" + id + "\" successfully stopped."));
     }
 
@@ -115,7 +146,12 @@ public final class OGCServices {
     @POST
     @Path("{id}/restart")
     public Response restart(final @PathParam("spec") String spec, final @PathParam("id") String id, final SimpleValue stopFirst) throws Exception {
-        getConfigurer(spec).restartInstance(id, stopFirst.getAsBoolean());
+        try {
+            getConfigurer(spec).restartInstance(id, stopFirst.getAsBoolean());
+        } catch (ConfigurationException e) {
+            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+            throw e;
+        }
         return ok(AcknowlegementType.success(spec.toUpperCase() + " service \"" + id + "\" successfully restarted."));
     }
 
@@ -125,7 +161,12 @@ public final class OGCServices {
     @POST
     @Path("{id}/rename")
     public Response rename(final @PathParam("spec") String spec, final @PathParam("id") String id, final SimpleValue newId) throws Exception {
-        getConfigurer(spec).renameInstance(id, newId.getValue());
+        try {
+            getConfigurer(spec).renameInstance(id, newId.getValue());
+        } catch (ConfigurationException e) {
+            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+            throw e;
+        }
         return ok(AcknowlegementType.success(spec.toUpperCase() + " service \"" + id + "\" successfully renamed."));
     }
 
@@ -135,7 +176,12 @@ public final class OGCServices {
     @DELETE
     @Path("{id}")
     public Response delete(final @PathParam("spec") String spec, final @PathParam("id") String id) throws Exception {
-        getConfigurer(spec).deleteInstance(id);
+        try {
+            getConfigurer(spec).deleteInstance(id);
+        } catch (ConfigurationException e) {
+            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+            throw e;
+        }
         return ok(AcknowlegementType.success(spec.toUpperCase() + " service \"" + id + "\" successfully deleted."));
     }
 
@@ -145,7 +191,12 @@ public final class OGCServices {
     @GET
     @Path("{id}/config")
     public Response getConfiguration(final @PathParam("spec") String spec, final @PathParam("id") String id) throws Exception {
-        return ok(getConfigurer(spec).getInstanceConfiguration(id));
+        try {
+            return ok(getConfigurer(spec).getInstanceConfiguration(id));
+        } catch (ConfigurationException e) {
+            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+            throw e;
+        }
     }
 
     /**
@@ -155,10 +206,15 @@ public final class OGCServices {
     @Consumes(MediaType.APPLICATION_XML)
     @Path("{id}/config")
     public Response setConfiguration(final @PathParam("spec") String spec, final @PathParam("id") String id, final InputStream is) throws Exception {
-        final Unmarshaller um = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-        final Object config = um.unmarshal(is);
-        GenericDatabaseMarshallerPool.getInstance().recycle(um);
-        getConfigurer(spec).setInstanceConfiguration(id, config);
+        try {
+            final Unmarshaller um = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+            final Object config = um.unmarshal(is);
+            GenericDatabaseMarshallerPool.getInstance().recycle(um);
+            getConfigurer(spec).setInstanceConfiguration(id, config);
+        } catch (ConfigurationException | JAXBException e) {
+            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+            throw e;
+        }
         return ok(AcknowlegementType.success(spec.toUpperCase() + " service \"" + id + "\" configuration successfully updated."));
     }
 
@@ -172,30 +228,35 @@ public final class OGCServices {
         final Map<String, String> nSMap = new HashMap<>(0);
         nSMap.put("http://www.constellation.org/config", "constellation-config");
         final JettisonConfig config = JettisonConfig.mappedJettison().xml2JsonNs(nSMap).build();
-        final JettisonJaxbContext cxtx = new JettisonJaxbContext(config, "org.constellation.configuration:" +
-                "org.constellation.generic.database:" +
-                "org.geotoolkit.ogc.xml.v110:" +
-                "org.apache.sis.internal.jaxb.geometry:" +
-                "org.geotoolkit.gml.xml.v311");
-        final JettisonUnmarshaller jsonUnmarshaller = cxtx.createJsonUnmarshaller();
+        try {
+            final JettisonJaxbContext cxtx = new JettisonJaxbContext(config, "org.constellation.configuration:" +
+                    "org.constellation.generic.database:" +
+                    "org.geotoolkit.ogc.xml.v110:" +
+                    "org.apache.sis.internal.jaxb.geometry:" +
+                    "org.geotoolkit.gml.xml.v311");
+            final JettisonUnmarshaller jsonUnmarshaller = cxtx.createJsonUnmarshaller();
 
-        final Class c;
-        final String json = FileUtilities.getStringFromStream(is);
-        if (json.startsWith("{\"automatic\"")) {
-            c = Automatic.class;
-        } else if (json.startsWith("{\"layercontext\"")) {
-            c = LayerContext.class;
-        } else if (json.startsWith("{\"processcontext\"")) {
-            c = ProcessContext.class;
-        } else if (json.startsWith("{\"sosconfiguration\"")) {
-            c = SOSConfiguration.class;
-        } else if (json.startsWith("{\"webdavcontext\"")) {
-            c = WebdavContext.class;
-        } else {
-            return ok(AcknowlegementType.failure("Unknown configuration object given, unable to update service configuration"));
+            final Class c;
+            final String json = FileUtilities.getStringFromStream(is);
+            if (json.startsWith("{\"automatic\"")) {
+                c = Automatic.class;
+            } else if (json.startsWith("{\"layercontext\"")) {
+                c = LayerContext.class;
+            } else if (json.startsWith("{\"processcontext\"")) {
+                c = ProcessContext.class;
+            } else if (json.startsWith("{\"sosconfiguration\"")) {
+                c = SOSConfiguration.class;
+            } else if (json.startsWith("{\"webdavcontext\"")) {
+                c = WebdavContext.class;
+            } else {
+                return ok(AcknowlegementType.failure("Unknown configuration object given, unable to update service configuration"));
+            }
+            final Object configObj = jsonUnmarshaller.unmarshalFromJSON(new StringReader(json), c);
+            getConfigurer(spec).setInstanceConfiguration(id, configObj);
+        } catch (ConfigurationException | JAXBException | IOException e) {
+            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+            throw e;
         }
-        final Object configObj = jsonUnmarshaller.unmarshalFromJSON(new StringReader(json), c);
-        getConfigurer(spec).setInstanceConfiguration(id, configObj);
         return ok(AcknowlegementType.success(spec.toUpperCase() + " service \"" + id + "\" configuration successfully updated."));
     }
 
@@ -205,7 +266,12 @@ public final class OGCServices {
     @GET
     @Path("{id}/metadata")
     public Response getMetadata(final @PathParam("spec") String spec, final @PathParam("id") String id) throws Exception {
-        return ok(getConfigurer(spec).getInstanceMetadata(id));
+        try {
+            return ok(getConfigurer(spec).getInstanceMetadata(id));
+        } catch (ConfigurationException e) {
+            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+            throw e;
+        }
     }
 
     /**
@@ -214,7 +280,12 @@ public final class OGCServices {
     @POST
     @Path("{id}/metadata")
     public Response setMetadata(final @PathParam("spec") String spec, final @PathParam("id") String id, final Service metadata) throws Exception {
-        getConfigurer(spec).setInstanceMetadata(id, metadata);
+        try {
+            getConfigurer(spec).setInstanceMetadata(id, metadata);
+        } catch (ConfigurationException e) {
+            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+            throw e;
+        }
         return ok(AcknowlegementType.success(spec.toUpperCase() + " service \"" + id + "\" metadata successfully updated."));
     }
 

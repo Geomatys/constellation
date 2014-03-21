@@ -17,6 +17,7 @@
 
 package org.constellation.rest.api;
 
+import org.apache.sis.util.logging.Logging;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.*;
@@ -37,6 +38,8 @@ import javax.xml.namespace.QName;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.constellation.utils.RESTfulUtilities.ok;
 
@@ -52,6 +55,7 @@ import static org.constellation.utils.RESTfulUtilities.ok;
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public final class MapServices {
+    private static final Logger LOGGER = Logging.getLogger(MapServices.class);
 
     /**
      * @see MapConfigurer#getLayers(String)
@@ -59,13 +63,24 @@ public final class MapServices {
     @GET
     @Path("{id}/layer/all")
     public Response getLayers(final @PathParam("spec") String spec, final @PathParam("id") String id) throws Exception {
-        return ok(new LayerList(getConfigurer(spec).getLayers(id)));
+        try {
+            return ok(new LayerList(getConfigurer(spec).getLayers(id)));
+        } catch (ConfigurationException e) {
+            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+            throw e;
+        }
     }
 
     @GET
     @Path("{id}/layersummary/all")
     public Response getLayersSummary(final @PathParam("spec") String spec, final @PathParam("id") String id) throws Exception {
-        final List<Layer> layers = getConfigurer(spec).getLayers(id);
+        final List<Layer> layers;
+        try {
+            layers = getConfigurer(spec).getLayers(id);
+        } catch (ConfigurationException e) {
+            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+            throw e;
+        }
         final List<LayerSummary> sumLayers = new ArrayList<>();
         for (final Layer lay : layers) {
             final DataBrief db = ConfigurationEngine.getData(lay.getName(), lay.getProviderID());
@@ -80,7 +95,12 @@ public final class MapServices {
     @PUT
     @Path("{id}/layer")
     public Response addLayer(final @PathParam("spec") String spec, final @PathParam("id") String id, final AddLayer layer) throws Exception {
-        getConfigurer(spec).addLayer(layer);
+        try {
+            getConfigurer(spec).addLayer(layer);
+        } catch (ConfigurationException e) {
+            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+            throw e;
+        }
         return ok(AcknowlegementType.success("Layer \"" + layer.getLayerId() + "\" successfully added to " + spec + " service \"" + id + "\"."));
     }
 
@@ -90,7 +110,12 @@ public final class MapServices {
     @DELETE
     @Path("{id}/{layerid}")
     public Response deleteLayer(final @PathParam("spec") String spec, final @PathParam("id") String serviceId, final @PathParam("layerid") String layerid, @QueryParam("layernamespace") String layernmsp) throws Exception {
-        getConfigurer(spec).removeLayer(serviceId, new QName(layernmsp, layerid));
+        try {
+            getConfigurer(spec).removeLayer(serviceId, new QName(layernmsp, layerid));
+        } catch (ConfigurationException e) {
+            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+            throw e;
+        }
         return Response.ok().build();
     }
 
