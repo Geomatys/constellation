@@ -481,6 +481,26 @@ public class DataRest {
 
 
     /**
+     * Generates a pyramid on a data in the given provider, create and return this new provider.
+     *
+     * @param providerId Provider identifier of the data to tile.
+     * @param dataId Data identifier
+     * @return
+     */
+    @GET
+    @Path("coverage/{providerId}/")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response createTiledProvider(@PathParam("providerId") final String providerId, @PathParam("dataId") final String dataId) {
+        final DataProvider provider = DataProviders.getInstance().getProvider(providerId);
+        // TODO: pyramid the data
+
+        // TODO: return the tiled provider in the response
+        // return Response.ok(tiledProvider).build();
+        return Response.ok().build();
+    }
+
+    /**
      * Send an ArrayList which contains coverage list from a file
      *
      * @param value
