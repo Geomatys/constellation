@@ -37,6 +37,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import org.apache.sis.storage.DataStore;
 import org.constellation.admin.dao.DataRecord.DataType;
+import org.geotoolkit.parameter.ParametersExt;
 
 /**
  *
@@ -64,7 +65,7 @@ public class CoverageStoreProvider extends AbstractDataProvider{
         //parameter is a choice of different types
         //extract the first one
         ParameterValueGroup param = getSource();
-        param = param.groups("choice").get(0);
+        param = ParametersExt.getOrCreateGroup(param, "choice");
         ParameterValueGroup factoryconfig = null;
         for(GeneralParameterValue val : param.values()){
             if(val instanceof ParameterValueGroup){
