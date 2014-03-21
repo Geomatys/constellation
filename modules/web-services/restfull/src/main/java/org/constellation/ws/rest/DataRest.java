@@ -488,7 +488,7 @@ public class DataRest {
      * @return
      */
     @GET
-    @Path("coverage/{providerId}/")
+    @Path("pyramid/{providerId}/{dataId}")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
     public Response createTiledProvider(@PathParam("providerId") final String providerId, @PathParam("dataId") final String dataId) {
