@@ -17,30 +17,34 @@
 package org.constellation.ws.embedded;
 
 
-import org.constellation.configuration.Source;
-import org.constellation.configuration.Layers;
-import org.constellation.configuration.Instance;
-import java.util.List;
-import java.util.ArrayList;
-import java.net.URLConnection;
-import java.net.URL;
 import java.io.File;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.Language;
 import org.constellation.configuration.Languages;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.Layers;
 import org.constellation.configuration.ServiceStatus;
-
+import org.constellation.configuration.Source;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderFactory;
+import org.constellation.provider.Providers;
+import org.constellation.provider.configuration.AbstractConfigurator;
 import org.constellation.provider.configuration.Configurator;
 import static org.constellation.provider.configuration.ProviderParameters.*;
 import org.constellation.test.utils.Order;
@@ -95,16 +99,17 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
         // Get the list of layers
         pool = GenericDatabaseMarshallerPool.getInstance();
 
-        final Configurator configurator = new Configurator() {
+        final Configurator configurator = new AbstractConfigurator() {
             @Override
-            public ParameterValueGroup getConfiguration(final ProviderFactory service) {
+            public List<Map.Entry<String, ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException {
 
-                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
-
-                if("feature-store".equals(service.getName())){
-                    try{
+                final ArrayList<Map.Entry<String, ParameterValueGroup>> lst = new ArrayList<>();
+                final ProviderFactory factory = DataProviders.getInstance().getFactory("feature-store");
+                
+                try{ 
+                    {//SHAPEFILE
                         final File outputDir = initDataDirectory();
-                        final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
+                        final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
                         getOrCreateValue(source, "id").setValue("shapeSrc");
                         getOrCreateValue(source, "load_all").setValue(true);
 
@@ -116,18 +121,14 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
                         final ParameterValueGroup layer = getOrCreateGroup(source, "Layer");
                         getOrCreateValue(layer, "name").setValue("NamedPlaces");
                         getOrCreateValue(layer, "style").setValue("cite_style_NamedPlaces");
-
-                    }catch(Exception ex){
-                        throw new RuntimeException(ex.getLocalizedMessage(),ex);
+                        lst.add(new AbstractMap.SimpleImmutableEntry<>("shapeSrc",source));
                     }
-                }
-                //empty configuration for others
-                return config;
-            }
 
-            @Override
-            public void saveConfiguration(ProviderFactory service, List<Provider> providers) {
-                throw new UnsupportedOperationException("Not supported yet.");
+                }catch(Exception ex){
+                    throw new RuntimeException(ex.getLocalizedMessage(),ex);
+                }
+                
+                return lst;
             }
         };
 
@@ -136,7 +137,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
 
     @AfterClass
     public static void shutDown() {
-        DataProviders.getInstance().setConfigurator(Configurator.DEFAULT);
+        DataProviders.getInstance().setConfigurator(Providers.DEFAULT_CONFIGURATOR);
         File f = new File("derby.log");
         if (f.exists()) {
             f.delete();

@@ -47,7 +47,6 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.NoSuchIdentifierException;
 
-import static org.constellation.provider.configuration.ProviderParameters.SOURCE_DESCRIPTOR_NAME;
 import static org.geotoolkit.parameter.ParametersExt.createGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
@@ -111,8 +110,7 @@ public class MapSetup implements ServletContextListener {
             }
 
             // Prepare create provider process inputs.
-            final ParameterDescriptorGroup serviceDesc = sldService.getServiceDescriptor();
-            final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup) serviceDesc.descriptor("source");
+            final ParameterDescriptorGroup sourceDesc = sldService.getProviderDescriptor();
             final ParameterValueGroup source = sourceDesc.createValue();
             source.parameter("id").setValue("sld");
             source.parameter("providerType").setValue("sld");
@@ -201,8 +199,7 @@ public class MapSetup implements ServletContextListener {
                     return;
                 }
 
-                final ParameterValueGroup config = shpService.getServiceDescriptor().createValue();
-                final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
+                final ParameterValueGroup source = shpService.getProviderDescriptor().createValue();
                 getOrCreateValue(source, "id").setValue(shpProvName);
                 getOrCreateValue(source, "load_all").setValue(true);
                 getOrCreateValue(source, "providerType").setValue("vector");
@@ -264,8 +261,7 @@ public class MapSetup implements ServletContextListener {
                     return;
                 }
 
-                final ParameterValueGroup config = tifService.getServiceDescriptor().createValue();
-                final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
+                final ParameterValueGroup source = tifService.getProviderDescriptor().createValue();
                 getOrCreateValue(source, "id").setValue(tifProvName);
                 getOrCreateValue(source, "load_all").setValue(true);
                 getOrCreateValue(source, "providerType").setValue("raster");

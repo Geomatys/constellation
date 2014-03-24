@@ -18,6 +18,7 @@ package org.constellation.process.provider;
 
 import org.constellation.process.provider.UpdateProviderDescriptor;
 import java.net.MalformedURLException;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.process.provider.AbstractProviderTest;
 
 import org.constellation.process.ConstellationProcessFactory;
@@ -45,9 +46,9 @@ public class UpdateProviderTest extends AbstractProviderTest {
     }
 
     @Test
-    public void testUpdateProvider() throws ProcessException, NoSuchIdentifierException, MalformedURLException{
+    public void testUpdateProvider() throws ProcessException, NoSuchIdentifierException, MalformedURLException, ConfigurationException{
 
-        addProvider(buildCSVProvider(DATASTORE_SERVICE, "updateProvider10", true, EMPTY_CSV));
+        addProvider("updateProvider10",buildCSVProvider(DATASTORE_SERVICE, "updateProvider10", true, EMPTY_CSV));
 
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateProviderDescriptor.NAME);
 

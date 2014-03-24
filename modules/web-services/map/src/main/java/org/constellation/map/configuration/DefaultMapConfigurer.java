@@ -255,7 +255,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         if (service != null) {
 
             final ParameterValueReader reader = new ParameterValueReader(
-                    service.getServiceDescriptor().descriptor(ProviderParameters.SOURCE_DESCRIPTOR_NAME));
+                    service.getProviderDescriptor().descriptor(ProviderParameters.SOURCE_DESCRIPTOR_NAME));
 
             try {
                 // we read the source parameter to add
@@ -305,7 +305,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         final ProviderFactory service = services.get(serviceName);
         if (service != null) {
 
-            ParameterDescriptorGroup desc = service.getServiceDescriptor();
+            ParameterDescriptorGroup desc = service.getProviderDescriptor();
             desc = (ParameterDescriptorGroup) desc.descriptor("source");
             final ParameterValueReader reader = new ParameterValueReader(desc);
 
@@ -842,7 +842,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         final String serviceName = getParameter("serviceName", true, parameters);
         final ProviderFactory service = services.get(serviceName);
         if (service != null) {
-            return service.getServiceDescriptor();
+            return service.getProviderDescriptor();
         }
         throw new CstlServiceException("No provider service for: " + serviceName + " has been found", INVALID_PARAMETER_VALUE);
     }
@@ -859,7 +859,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         final String serviceName = getParameter("serviceName", true, parameters);
         final ProviderFactory service = services.get(serviceName);
         if (service != null) {
-            return service.getSourceDescriptor();
+            return service.getStoreDescriptor();
         }
         throw new CstlServiceException("No provider service for: " + serviceName + " has been found", INVALID_PARAMETER_VALUE);
     }

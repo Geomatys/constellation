@@ -39,7 +39,7 @@ import org.constellation.admin.dao.DataRecord.DataType;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class MockLayerProviderService extends AbstractProviderFactory
+public class MockLayerProviderFactory extends AbstractProviderFactory
         <Name,Data,DataProvider> implements DataProviderFactory {
 
     public static final ParameterDescriptor<String> LAYERS =
@@ -53,29 +53,29 @@ public class MockLayerProviderService extends AbstractProviderFactory
     private static final ParameterDescriptorGroup SERVICE_CONFIG_DESCRIPTOR =
             ProviderParameters.createDescriptor(PARAMETERS_DESCRIPTOR);
 
-    public MockLayerProviderService(){
+    public MockLayerProviderFactory(){
         super("mock");
     }
 
     @Override
-    public ParameterDescriptorGroup getServiceDescriptor() {
+    public ParameterDescriptorGroup getProviderDescriptor() {
         return SERVICE_CONFIG_DESCRIPTOR;
     }
     
     @Override
-    public DataProvider createProvider(ParameterValueGroup config) {
-        return new MockLayerProvider(config);
+    public DataProvider createProvider(String id,ParameterValueGroup config) {
+        return new MockLayerProvider(id,config);
     }
 
     @Override
-    public ParameterDescriptorGroup getSourceDescriptor() {
+    public ParameterDescriptorGroup getStoreDescriptor() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     private static class MockLayerProvider extends AbstractDataProvider{
 
-        public MockLayerProvider(final ParameterValueGroup config){
-            super(null,config);
+        public MockLayerProvider(String id,final ParameterValueGroup config){
+            super(id,null,config);
 
             if(Boolean.TRUE.equals(Parameters.value(CRASH_CREATE, getConfig()))){
                 throw new RuntimeException("Some error while loading.");

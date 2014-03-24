@@ -137,8 +137,7 @@ public class OGCRestTest extends AbstractGrizzlyServer {
     public static void writeProvider(String resourceName, String identifier) throws Exception {
 
         final DataProviderFactory service = DataProviders.getInstance().getFactory("coverage-sql");
-        final ParameterValueGroup config = service.getServiceDescriptor().createValue();
-        final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+        final ParameterValueGroup source = service.getProviderDescriptor().createValue();
         final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
         srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://flupke.geomatys.com/coverages-test");
         srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");

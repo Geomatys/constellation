@@ -73,22 +73,22 @@ public class ServerStoreProviderService extends AbstractProviderFactory
     }
 
     @Override
-    public ParameterDescriptorGroup getServiceDescriptor() {
+    public ParameterDescriptorGroup getProviderDescriptor() {
         return SERVICE_CONFIG_DESCRIPTOR;
     }
 
     @Override
-    public ParameterDescriptorGroup getSourceDescriptor() {
+    public ParameterDescriptorGroup getStoreDescriptor() {
         return SOURCE_CONFIG_DESCRIPTOR;
     }
 
     @Override
-    public DataProvider createProvider(ParameterValueGroup ps) {
+    public DataProvider createProvider(String providerId, ParameterValueGroup ps) {
         if(!canProcess(ps)){
             return null;
         }
 
-        final ServerStoreProvider provider = new ServerStoreProvider(this,ps);
+        final ServerStoreProvider provider = new ServerStoreProvider(providerId,this,ps);
         getLogger().log(Level.INFO, "[PROVIDER]> server-store provider created.");
         return provider;
     }

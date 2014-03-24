@@ -20,6 +20,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import javax.xml.namespace.QName;
 
@@ -33,11 +34,14 @@ import org.geotoolkit.feature.xml.XmlFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.apache.sis.geometry.GeneralDirectPosition;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
 import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderFactory;
+import org.constellation.provider.Providers;
+import org.constellation.provider.configuration.AbstractConfigurator;
 import org.geotoolkit.gml.xml.v311.MultiPointType;
 import org.geotoolkit.gml.xml.v311.PointPropertyType;
 import org.geotoolkit.gml.xml.v311.PointType;
@@ -93,7 +97,7 @@ public class WFSCIteWorkerTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        DataProviders.getInstance().setConfigurator(Configurator.DEFAULT);
+        DataProviders.getInstance().setConfigurator(Providers.DEFAULT_CONFIGURATOR);
         ConfigurationEngine.shutdownTestEnvironement("WFSCIteWorkerTest");
     }
 
@@ -183,37 +187,31 @@ public class WFSCIteWorkerTest {
          *                                      *
          ****************************************/
 
-        final Configurator config = new Configurator() {
+        final Configurator config = new AbstractConfigurator() {
 
             @Override
-            public ParameterValueGroup getConfiguration(final ProviderFactory service) {
-                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
+            public List<Map.Entry<String, ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException {
+                final ArrayList<Map.Entry<String, ParameterValueGroup>> lst = new ArrayList<>();
+                
+                final ProviderFactory factory = DataProviders.getInstance().getFactory("feature-store");
+                
+                if (hasLocalDatabase()) {
+                    // Defines a PostGis data provider
+                    final ParameterValueGroup source = factory.getProviderDescriptor().createValue();;
+                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgisSrc");
 
-                if("feature-store".equals(service.getName())){
-                    if (hasLocalDatabase()) {
-                        // Defines a PostGis data provider
-                        final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                        source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgisSrc");
-
-                        final ParameterValueGroup choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
-                        final ParameterValueGroup pgconfig = getOrCreate(PostgresFeatureStoreFactory.PARAMETERS_DESCRIPTOR,source);
-                        pgconfig.parameter(DATABASE.getName().getCode()).setValue("cite-wfs");
-                        pgconfig.parameter(HOST.getName().getCode()).setValue("flupke.geomatys.com");
-                        pgconfig.parameter(SCHEMA.getName().getCode()).setValue("public");
-                        pgconfig.parameter(USER.getName().getCode()).setValue("test");
-                        pgconfig.parameter(PASSWORD.getName().getCode()).setValue("test");
-                        pgconfig.parameter(NAMESPACE.getName().getCode()).setValue("http://cite.opengeospatial.org/gmlsf");
-                        choice.values().add(pgconfig);
-                    }
+                    final ParameterValueGroup choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
+                    final ParameterValueGroup pgconfig = getOrCreate(PostgresFeatureStoreFactory.PARAMETERS_DESCRIPTOR,source);
+                    pgconfig.parameter(DATABASE.getName().getCode()).setValue("cite-wfs");
+                    pgconfig.parameter(HOST.getName().getCode()).setValue("flupke.geomatys.com");
+                    pgconfig.parameter(SCHEMA.getName().getCode()).setValue("public");
+                    pgconfig.parameter(USER.getName().getCode()).setValue("test");
+                    pgconfig.parameter(PASSWORD.getName().getCode()).setValue("test");
+                    pgconfig.parameter(NAMESPACE.getName().getCode()).setValue("http://cite.opengeospatial.org/gmlsf");
+                    choice.values().add(pgconfig);
                 }
-
-                return config;
-            }
-
-            @Override
-            public void saveConfiguration(ProviderFactory service, List<Provider> providers) {
-                throw new UnsupportedOperationException("Not supported yet.");
+                return lst;
             }
         };
         DataProviders.getInstance().setConfigurator(config);

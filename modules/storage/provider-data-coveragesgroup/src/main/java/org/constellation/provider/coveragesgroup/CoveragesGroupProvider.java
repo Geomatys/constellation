@@ -54,8 +54,8 @@ public class CoveragesGroupProvider extends AbstractDataProvider {
     private boolean visited;
     private File path;
 
-    public CoveragesGroupProvider(final ProviderFactory service, final ParameterValueGroup param) {
-        super(service,param);
+    public CoveragesGroupProvider(String providerId, final ProviderFactory service, final ParameterValueGroup param) {
+        super(providerId, service,param);
         this.visited = false;
     }
 

@@ -51,9 +51,9 @@ public abstract class AbstractFeatureStoreProvider extends AbstractDataProvider{
     private final Set<Name> index = new LinkedHashSet<>();
     private ExtendedFeatureStore store;
 
-    public AbstractFeatureStoreProvider(final ProviderFactory service,
+    public AbstractFeatureStoreProvider(final String id, final ProviderFactory service,
             final ParameterValueGroup config) throws DataStoreException {
-        super(service,config);
+        super(id, service,config);
         visit();
     }
 

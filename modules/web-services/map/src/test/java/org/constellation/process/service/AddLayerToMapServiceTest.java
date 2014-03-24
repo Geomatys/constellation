@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
+import org.constellation.configuration.ConfigurationException;
 
 import org.constellation.configuration.GetFeatureInfoCfg;
 import org.constellation.configuration.Layer;
@@ -66,7 +67,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
     private static final FilterFactory FF = FactoryFinder.getFilterFactory(null);
     
     @BeforeClass
-    public static void createProvider(){
+    public static void createProvider() throws ConfigurationException{
         
         ParameterDescriptorGroup sourceDesc = null;
         ProviderFactory service = null;
@@ -76,7 +77,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
                 service = tmpService;
             }
         }
-        sourceDesc = (ParameterDescriptorGroup) service.getServiceDescriptor().descriptor(ProviderParameters.SOURCE_DESCRIPTOR_NAME);
+        sourceDesc = (ParameterDescriptorGroup) service.getProviderDescriptor();
 
 
         final ParameterValueGroup sourceValue = sourceDesc.createValue();
@@ -98,11 +99,11 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
             Logger.getLogger(AddLayerToMapServiceTest.class.getName()).log(Level.WARNING, null, ex);
         }         
         
-        DataProviders.getInstance().createProvider((DataProviderFactory) service, sourceValue);
+        DataProviders.getInstance().createProvider("shapeProvider",(DataProviderFactory) service, sourceValue);
     }
     
     @AfterClass
-    public static void destroyProvider() {
+    public static void destroyProvider() throws ConfigurationException {
         DataProvider provider = null;
         for (DataProvider p : DataProviders.getInstance().getProviders()) {
             if (p.getId().equals("shapeProvider")) {

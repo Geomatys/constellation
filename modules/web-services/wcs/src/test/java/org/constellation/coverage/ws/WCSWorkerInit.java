@@ -17,9 +17,13 @@
 package org.constellation.coverage.ws;
 
 import java.io.File;
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
@@ -27,6 +31,8 @@ import org.constellation.data.CoverageSQLTestCase;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderFactory;
+import org.constellation.provider.Providers;
+import org.constellation.provider.configuration.AbstractConfigurator;
 import org.constellation.provider.configuration.Configurator;
 
 import org.junit.AfterClass;
@@ -76,36 +82,31 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
         ConfigurationEngine.storeConfiguration("WCS", "default", config);
         ConfigurationEngine.storeConfiguration("WCS", "test", config);
 
-        final Configurator configurator = new Configurator() {
+        final Configurator configurator = new AbstractConfigurator() {
 
             @Override
-            public ParameterValueGroup getConfiguration(final ProviderFactory service) {
-                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
-
-                if("coverage-sql".equals(service.getName())){
-
-                    if (hasLocalDatabase()) {
-                        // Defines a PostGrid data provider
-                        final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                        final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
-                        srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://flupke.geomatys.com/coverages-test");
-                        srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
-                        final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
-                        srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
-                        srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
-                        srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
-                        srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
-                        source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
-                    }
+            public List<Map.Entry<String, ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException {
+                final ArrayList<Map.Entry<String, ParameterValueGroup>> lst = new ArrayList<>();
+                
+                final ProviderFactory factory = DataProviders.getInstance().getFactory("coverage-sql");
+                
+                if (hasLocalDatabase()) {
+                    final ParameterValueGroup config = factory.getProviderDescriptor().createValue();
+                    // Defines a PostGrid data provider
+                    final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                    final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
+                    srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://flupke.geomatys.com/coverages-test");
+                    srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
+                    final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
+                    srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
+                    srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
+                    srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
+                    srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
+                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
+                    lst.add(new AbstractMap.SimpleImmutableEntry<>("coverageTestSrc",config));
                 }
-
-                return config;
-            }
-
-            @Override
-            public void saveConfiguration(ProviderFactory service, List<Provider> providers) {
-                throw new UnsupportedOperationException("Not supported yet.");
+                return lst;
             }
         };
         DataProviders.getInstance().setConfigurator(configurator);
@@ -120,7 +121,7 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
     @AfterClass
     public static void tearDownClass() throws Exception {
         ConfigurationEngine.shutdownTestEnvironement("WCSWorkerInit");
-        DataProviders.getInstance().setConfigurator(Configurator.DEFAULT);
+        DataProviders.getInstance().setConfigurator(Providers.DEFAULT_CONFIGURATOR);
         File derbyLog = new File("derby.log");
         if (derbyLog.exists()) {
             derbyLog.delete();

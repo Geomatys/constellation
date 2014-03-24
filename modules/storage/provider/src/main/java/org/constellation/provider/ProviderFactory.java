@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2009, Geomatys
+ *    (C) 2009-2014, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,32 +16,36 @@
  */
 package org.constellation.provider;
 
-import java.util.Collection;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 /**
- *
+ * Creates new providers of a specific type.
+ * 
  * @version $Id$
  *
  * @author Johann Sorel (Geomatys)
  */
 public interface ProviderFactory<K,V,P extends Provider<K,V>> {
 
-    String getName();
-
     /**
-     * Description of the complete service parameters.
-     * @return 
+     * Factory format name.
+     * @return String , never null
      */
-    ParameterDescriptorGroup getServiceDescriptor();
+    String getName();
     
     /**
-     * Description of the single source in the service parameters.
+     * Description of a provider parameters.
      * @return 
      */
-    GeneralParameterDescriptor getSourceDescriptor();
+    ParameterDescriptorGroup getProviderDescriptor();
+    
+    /**
+     * Description of the datasource in the provider parameters.
+     * @return ParameterDescriptorGroup , never null
+     */
+    GeneralParameterDescriptor getStoreDescriptor();
     
     /**
      * Check if the given parameter can be handle
@@ -54,9 +58,10 @@ public interface ProviderFactory<K,V,P extends Provider<K,V>> {
     /**
      * Create a provider for the given configuration.
      *
+     * @param id
      * @param config
      * @return Provider<K,V>
      */
-    P createProvider(ParameterValueGroup config);
+    P createProvider(String id, ParameterValueGroup config);
 
 }

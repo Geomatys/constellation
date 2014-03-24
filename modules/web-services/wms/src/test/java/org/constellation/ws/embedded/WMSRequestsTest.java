@@ -17,11 +17,13 @@
 package org.constellation.ws.embedded;
 
 // J2SE dependencies
-import java.util.Arrays;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +33,7 @@ import javax.imageio.spi.ImageWriterSpi;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Language;
 import org.constellation.configuration.Languages;
 import org.constellation.configuration.LayerContext;
@@ -41,39 +44,37 @@ import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
 import org.constellation.dto.Service;
 import org.constellation.map.featureinfo.FeatureInfoUtilities;
-
-// Constellation dependencies
-import org.constellation.test.ImageTesting;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderFactory;
+import org.constellation.provider.Providers;
+import org.constellation.provider.configuration.AbstractConfigurator;
 import org.constellation.provider.configuration.Configurator;
-
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
 import static org.constellation.provider.configuration.ProviderParameters.*;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
+import org.constellation.test.ImageTesting;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.TestRunner;
 import static org.constellation.ws.embedded.AbstractGrizzlyServer.initDataDirectory;
-
-// Geotoolkit dependencies
-import org.geotoolkit.wms.xml.WMSMarshallerPool;
+import static org.constellation.ws.embedded.WMSAxesOrderTest.hasLocalDatabase;
+import org.geotoolkit.feature.DefaultName;
+import org.geotoolkit.image.io.plugin.WorldFileImageReader;
+import org.geotoolkit.image.jai.Registry;
+import org.geotoolkit.inspire.xml.vs.ExtendedCapabilitiesType;
+import org.geotoolkit.inspire.xml.vs.LanguageType;
+import org.geotoolkit.inspire.xml.vs.LanguagesType;
+import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
+import static org.geotoolkit.parameter.ParametersExt.createGroup;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
 import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
 import org.geotoolkit.sld.xml.v110.LayerDescriptionType;
 import org.geotoolkit.sld.xml.v110.TypeNameType;
+import org.geotoolkit.wms.xml.WMSMarshallerPool;
 import org.geotoolkit.wms.xml.v111.LatLonBoundingBox;
 import org.geotoolkit.wms.xml.v111.Layer;
 import org.geotoolkit.wms.xml.v111.WMT_MS_Capabilities;
 import org.geotoolkit.wms.xml.v130.WMSCapabilities;
-import org.geotoolkit.inspire.xml.vs.ExtendedCapabilitiesType;
-import org.geotoolkit.inspire.xml.vs.LanguagesType;
-import org.geotoolkit.inspire.xml.vs.LanguageType;
-import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
-import org.geotoolkit.feature.DefaultName;
-import org.geotoolkit.image.io.plugin.WorldFileImageReader;
-import org.geotoolkit.image.jai.Registry;
-import static org.geotoolkit.parameter.ParametersExt.createGroup;
-import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
-import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
 
 // JUnit dependencies
 
@@ -81,7 +82,6 @@ import org.junit.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
 import org.junit.runner.RunWith;
-
 import org.opengis.parameter.ParameterValueGroup;
 
 
@@ -231,56 +231,54 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
 
         pool = WMSMarshallerPool.getInstance();
 
-        final Configurator configurator = new Configurator() {
+        final Configurator configurator = new AbstractConfigurator() {
             @Override
-            public ParameterValueGroup getConfiguration(final ProviderFactory service) {
+            public List<Map.Entry<String, ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException {
 
-                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
-
-                if("coverage-sql".equals(service.getName())){
-                    if (hasLocalDatabase()) {
-                        // Defines a PostGrid data provider
-                        final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                        final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
-                        srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://flupke.geomatys.com/coverages-test");
-                        srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
-                        final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
-                        srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
-                        srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
-                        srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
-                        srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
-                        source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
-                    }
-
-                }else if("feature-store".equals(service.getName())){
-                    try{
-                        final File outputDir = initDataDirectory();
-                        final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
-                        getOrCreateValue(source, "id").setValue("shapeSrc");
-                        getOrCreateValue(source, "load_all").setValue(true);
-
-                        final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
-                        final ParameterValueGroup shpconfig = createGroup(choice, "ShapefileParametersFolder");
-                        getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
-                        getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");
-
-                        final ParameterValueGroup layer = getOrCreateGroup(source, "Layer");
-                        getOrCreateValue(layer, "name").setValue("NamedPlaces");
-                        getOrCreateValue(layer, "style").setValue("cite_style_NamedPlaces");
-
-                    }catch(Exception ex){
-                        throw new RuntimeException(ex.getLocalizedMessage(),ex);
-                    }
+                final ArrayList<Map.Entry<String, ParameterValueGroup>> lst = new ArrayList<>();
+                
+                final ProviderFactory factorycsql = DataProviders.getInstance().getFactory("coverage-sql");
+                if (hasLocalDatabase()) {
+                    // Defines a PostGrid data provider
+                    final ParameterValueGroup source = factorycsql.getProviderDescriptor().createValue();
+                    final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
+                    srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://flupke.geomatys.com/coverages-test");
+                    srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
+                    final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
+                    srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
+                    srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
+                    srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
+                    srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
+                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
+                    
+                    lst.add(new AbstractMap.SimpleImmutableEntry<>("coverageTestSrc",source));
                 }
-                //empty configuration for others
-                return config;
+                
+                try{
+                    final ProviderFactory factory = DataProviders.getInstance().getFactory("feature-store");
+                    final File outputDir = initDataDirectory();
+                    final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                    getOrCreateValue(source, "id").setValue("shapeSrc");
+                    getOrCreateValue(source, "load_all").setValue(true);
+
+                    final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
+                    final ParameterValueGroup shpconfig = createGroup(choice, "ShapefileParametersFolder");
+                    getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
+                    getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");
+
+                    final ParameterValueGroup layer = getOrCreateGroup(source, "Layer");
+                    getOrCreateValue(layer, "name").setValue("NamedPlaces");
+                    getOrCreateValue(layer, "style").setValue("cite_style_NamedPlaces");
+
+                    lst.add(new AbstractMap.SimpleImmutableEntry<>("shapeSrc",source));
+                }catch(Exception ex){
+                    throw new RuntimeException(ex.getLocalizedMessage(),ex);
+                }
+                
+                return lst;
             }
 
-            @Override
-            public void saveConfiguration(ProviderFactory service, List<Provider> providers) {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
         };
 
         DataProviders.getInstance().setConfigurator(configurator);
@@ -301,7 +299,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
 
     @AfterClass
     public static void shutDown() throws JAXBException {
-        DataProviders.getInstance().setConfigurator(Configurator.DEFAULT);
+        DataProviders.getInstance().setConfigurator(Providers.DEFAULT_CONFIGURATOR);
         ConfigurationEngine.shutdownTestEnvironement("WMSRequestTest");
         finish();
     }

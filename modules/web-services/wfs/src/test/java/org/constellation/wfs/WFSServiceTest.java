@@ -17,48 +17,51 @@
 
 package org.constellation.wfs;
 
-import org.geotoolkit.internal.io.IOUtilities;
-import org.geotoolkit.internal.sql.DefaultDataSource;
-import java.io.IOException;
-import org.constellation.provider.DataProviders;
-import org.constellation.util.Util;
-import java.sql.Connection;
-import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.FileInputStream;
-import java.lang.reflect.Field;
+import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.net.URL;
+import java.sql.Connection;
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
+import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
+import org.constellation.provider.DataProviders;
 import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderFactory;
-
-import org.constellation.ws.rs.WebService;
-import org.constellation.wfs.ws.rs.WFSService;
-import org.constellation.test.utils.BasicMultiValueMap;
-import org.constellation.test.utils.BasicUriInfo;
+import org.constellation.provider.Providers;
+import org.constellation.provider.configuration.AbstractConfigurator;
 import org.constellation.provider.configuration.Configurator;
-import org.geotoolkit.data.FeatureCollection;
 
 import static org.constellation.provider.configuration.ProviderParameters.*;
+import org.constellation.test.utils.BasicMultiValueMap;
+import org.constellation.test.utils.BasicUriInfo;
+import org.constellation.util.Util;
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
+import org.constellation.wfs.ws.rs.WFSService;
+import org.constellation.ws.rs.WebService;
+import org.geotoolkit.data.FeatureCollection;
+import org.geotoolkit.internal.io.IOUtilities;
+import org.geotoolkit.internal.sql.DefaultDataSource;
 
 import static org.geotoolkit.parameter.ParametersExt.*;
-import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.geotoolkit.util.FileUtilities;
-
-import org.opengis.parameter.ParameterValueGroup;
+import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 
 // JUnit dependencies
 import org.junit.*;
 import static org.junit.Assert.*;
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
  *
@@ -111,7 +114,7 @@ public class WFSServiceTest {
     public static void tearDownClass() throws Exception {
         ConfigurationEngine.shutdownTestEnvironement("WFSServiceTest");
         
-        DataProviders.getInstance().setConfigurator(Configurator.DEFAULT);
+        DataProviders.getInstance().setConfigurator(Providers.DEFAULT_CONFIGURATOR);
         if (ds != null) {
             ds.shutdown();
         }
@@ -216,16 +219,18 @@ public class WFSServiceTest {
     private static void initFeatureSource() throws Exception {
          final File outputDir = initDataDirectory();
 
-         final Configurator config = new Configurator() {
+         final Configurator config = new AbstractConfigurator() {
 
-            @Override
-            public ParameterValueGroup getConfiguration(final ProviderFactory service) {
-                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
-
-                if("feature-store".equals(service.getName())){
-                    try{ 
-                        
-                        {//OBSERVATION
+             @Override
+             public List<Map.Entry<String, ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException {
+                 
+                 final ArrayList<Map.Entry<String, ParameterValueGroup>> lst = new ArrayList<>();
+                
+                final ProviderFactory factory = DataProviders.getInstance().getFactory("feature-store");
+                
+                try{ 
+                    
+                    {//OBSERVATION
                         final String url = "jdbc:derby:memory:TestWFSServiceOM";
                         final DefaultDataSource ds = new DefaultDataSource(url + ";create=true");
                         Connection con = ds.getConnection();
@@ -235,7 +240,7 @@ public class WFSServiceTest {
                         con.close();
                         ds.shutdown();
                         
-                        final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
+                        final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
                         getOrCreateValue(source, "id").setValue("omSrc");
                         getOrCreateValue(source, "load_all").setValue(true);    
                         
@@ -243,11 +248,12 @@ public class WFSServiceTest {
                         final ParameterValueGroup omconfig = createGroup(choice, "OMParameters");
                         getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
                         getOrCreateValue(omconfig, "derbyurl").setValue(url);
-                        }
-                        
-                        {//SHAPEFILE
+                        lst.add(new AbstractMap.SimpleImmutableEntry<>("omSrc",source));
+                    }
+
+                    {//SHAPEFILE
                         final File outputDir = initDataDirectory();
-                        final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
+                        final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
                         getOrCreateValue(source, "id").setValue("shapeSrc");
                         getOrCreateValue(source, "load_all").setValue(true);    
                         
@@ -291,11 +297,12 @@ public class WFSServiceTest {
                         getOrCreateValue(layer, "style").setValue("cite_style_RoadSegments");
                         layer = createGroup(source, "Layer");
                         getOrCreateValue(layer, "name").setValue("Streams");
-                        getOrCreateValue(layer, "style").setValue("cite_style_Streams");                        
+                        getOrCreateValue(layer, "style").setValue("cite_style_Streams");  
                         
-                        }
-                        
-                        {//SENSORML
+                        lst.add(new AbstractMap.SimpleImmutableEntry<>("shapeSrc",source));
+                    }
+
+                    {//SENSORML
                         final String url2 = "jdbc:derby:memory:TestWFSServiceSMl";
                         ds2 = new DefaultDataSource(url2 + ";create=true");
                         Connection con = ds2.getConnection();
@@ -310,28 +317,25 @@ public class WFSServiceTest {
                         sr.run(Util.getResourceAsStream("org/constellation/sql/sml-data.sql"));
                         con.close();
                             
-                        final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
+                        final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
                         getOrCreateValue(source, "id").setValue("smlSrc");
                         getOrCreateValue(source, "load_all").setValue(true);             
                         
                         final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
                         final ParameterValueGroup omconfig = createGroup(choice, "SMLParameters");
                         getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
-                        getOrCreateValue(omconfig, "derbyurl").setValue(url2);                      
-                        }
+                        getOrCreateValue(omconfig, "derbyurl").setValue(url2);                
                         
-                    }catch(Exception ex){
-                        throw new RuntimeException(ex.getLocalizedMessage(),ex);
+                        lst.add(new AbstractMap.SimpleImmutableEntry<>("smlSrc",source));                   
                     }
+
+                }catch(Exception ex){
+                    throw new RuntimeException(ex.getLocalizedMessage(),ex);
                 }
+                
+                return lst;
+             }
 
-                return config;
-            }
-
-            @Override
-            public void saveConfiguration(ProviderFactory service, List<Provider> providers) {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
         };
 
         DataProviders.getInstance().setConfigurator(config);

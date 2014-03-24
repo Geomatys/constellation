@@ -19,6 +19,7 @@ package org.constellation.provider;
 import java.util.logging.Logger;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.provider.configuration.Configurator;
+import org.constellation.provider.configuration.DefaultConfigurator;
 
 /**
  * Common informations for providers.
@@ -31,8 +32,9 @@ public abstract class Providers {
      * Logger used by all providers.
      */
     public static final Logger LOGGER = Logging.getLogger("org.constellation.provider");
-
-    protected static Configurator CONFIGURATOR = Configurator.DEFAULT;
+    public static final Configurator DEFAULT_CONFIGURATOR = new DefaultConfigurator();
+    
+    protected static Configurator CONFIGURATOR = DEFAULT_CONFIGURATOR;
 
     public static Configurator getConfigurator() {
         return CONFIGURATOR;

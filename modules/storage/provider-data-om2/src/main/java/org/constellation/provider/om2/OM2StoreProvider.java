@@ -32,8 +32,8 @@ import java.util.logging.Level;
  */
 public class OM2StoreProvider extends AbstractFeatureStoreProvider{
 
-    public OM2StoreProvider(ProviderFactory service, ParameterValueGroup param) throws DataStoreException{
-        super(service,param);
+    public OM2StoreProvider(String providerId,ProviderFactory service, ParameterValueGroup param) throws DataStoreException{
+        super(providerId,service,param);
     }
 
     @Override

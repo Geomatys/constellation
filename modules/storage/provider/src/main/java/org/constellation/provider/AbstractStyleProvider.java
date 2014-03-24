@@ -30,9 +30,9 @@ import org.opengis.parameter.ParameterValueGroup;
  */
 public abstract class AbstractStyleProvider extends AbstractProvider<String,MutableStyle> implements StyleProvider{
 
-    protected AbstractStyleProvider(final ProviderFactory service, 
+    protected AbstractStyleProvider(final String id, final ProviderFactory service, 
             final ParameterValueGroup source){
-        super(service, source);
+        super(id, service, source);
     }
 
     /**

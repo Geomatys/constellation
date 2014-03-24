@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.URL;
 import java.sql.Connection;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -85,11 +86,13 @@ import org.geotoolkit.wfs.xml.v110.UpdateElementType;
 import org.geotoolkit.wfs.xml.v110.ValueType;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
 import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderFactory;
+import org.constellation.provider.configuration.AbstractConfigurator;
 import org.geotoolkit.wfs.xml.StoredQueries;
 import org.geotoolkit.wfs.xml.StoredQueryDescription;
 import org.geotoolkit.wfs.xml.v200.ObjectFactory;
@@ -1315,16 +1318,18 @@ public class WFSWorkerTest {
     private static void initFeatureSource() throws Exception {
          final File outputDir = initDataDirectory();
 
-         final Configurator config = new Configurator() {
+         final Configurator config = new AbstractConfigurator() {
 
-            @Override
-            public ParameterValueGroup getConfiguration(final ProviderFactory service) {
-                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
-
-                if("feature-store".equals(service.getName())){
-                    try{ 
-                        
-                        {//OBSERVATION
+             @Override
+             public List<Map.Entry<String, ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException {
+                 
+                 final ArrayList<Map.Entry<String, ParameterValueGroup>> lst = new ArrayList<>();
+                
+                final ProviderFactory factory = DataProviders.getInstance().getFactory("feature-store");
+                
+                try{ 
+                    
+                    {//OBSERVATION
                         final String url = "jdbc:derby:memory:TestWFSWorkerOM";
                         ds = new DefaultDataSource(url + ";create=true");
                         Connection con = ds.getConnection();
@@ -1334,7 +1339,7 @@ public class WFSWorkerTest {
                         con.close();
                         ds.shutdown();
                         
-                        final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
+                        final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
                         getOrCreateValue(source, "id").setValue("omSrc");
                         getOrCreateValue(source, "load_all").setValue(true);    
                         
@@ -1342,11 +1347,12 @@ public class WFSWorkerTest {
                         final ParameterValueGroup omconfig = createGroup(choice, "OMParameters");
                         getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
                         getOrCreateValue(omconfig, "derbyurl").setValue(url);
-                        }
-                        
-                        {//SHAPEFILE
+                        lst.add(new AbstractMap.SimpleImmutableEntry<>("omSrc",source));
+                    }
+
+                    {//SHAPEFILE
                         final File outputDir = initDataDirectory();
-                        final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
+                        final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
                         getOrCreateValue(source, "id").setValue("shapeSrc");
                         getOrCreateValue(source, "load_all").setValue(true);    
                         
@@ -1390,11 +1396,12 @@ public class WFSWorkerTest {
                         getOrCreateValue(layer, "style").setValue("cite_style_RoadSegments");
                         layer = createGroup(source, "Layer");
                         getOrCreateValue(layer, "name").setValue("Streams");
-                        getOrCreateValue(layer, "style").setValue("cite_style_Streams");                        
+                        getOrCreateValue(layer, "style").setValue("cite_style_Streams"); 
                         
-                        }
-                        
-                        {//SENSORML
+                        lst.add(new AbstractMap.SimpleImmutableEntry<>("shapeSrc",source));
+                    }
+
+                    {//SENSORML
                         final String url2 = "jdbc:derby:memory:TestWFSWorkerSMl";
                         ds2 = new DefaultDataSource(url2 + ";create=true");
                         Connection con = ds2.getConnection();
@@ -1409,7 +1416,7 @@ public class WFSWorkerTest {
                         sr.run(Util.getResourceAsStream("org/constellation/sql/sml-data.sql"));
                         con.close();
                             
-                        final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
+                        final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
                         getOrCreateValue(source, "id").setValue("smlSrc");
                         getOrCreateValue(source, "load_all").setValue(true);             
                         
@@ -1417,20 +1424,17 @@ public class WFSWorkerTest {
                         final ParameterValueGroup omconfig = createGroup(choice, "SMLParameters");
                         getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
                         getOrCreateValue(omconfig, "derbyurl").setValue(url2);                      
-                        }
                         
-                    }catch(Exception ex){
-                        throw new RuntimeException(ex.getLocalizedMessage(),ex);
+                        lst.add(new AbstractMap.SimpleImmutableEntry<>("smlSrc",source));                   
                     }
+
+                }catch(Exception ex){
+                    throw new RuntimeException(ex.getLocalizedMessage(),ex);
                 }
                 
-                return config;
+                return lst;
             }
 
-            @Override
-            public void saveConfiguration(ProviderFactory service, List<Provider> providers) {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
         };
 
         DataProviders.getInstance().setConfigurator(config);

@@ -81,22 +81,22 @@ public class CoverageSQLProviderService extends AbstractProviderFactory
     }
 
     @Override
-    public ParameterDescriptorGroup getServiceDescriptor() {
+    public ParameterDescriptorGroup getProviderDescriptor() {
         return SERVICE_CONFIG_DESCRIPTOR;
     }
 
     @Override
-    public ParameterDescriptorGroup getSourceDescriptor() {
+    public ParameterDescriptorGroup getStoreDescriptor() {
         return COVERAGESQL_DESCRIPTOR;
     }
 
     @Override
-    public DataProvider createProvider(ParameterValueGroup ps) {
+    public DataProvider createProvider(String providerId, ParameterValueGroup ps) {
         if(!canProcess(ps)){
             return null;
         }
         
-        final CoverageSQLProvider provider = new CoverageSQLProvider(this,ps);
+        final CoverageSQLProvider provider = new CoverageSQLProvider(providerId,this,ps);
         ps = ProviderParameters.getOrCreate(COVERAGESQL_DESCRIPTOR, ps);
         final ParameterValue<?> val = ps.parameter(ConfigurationKey.URL.name());
         getLogger().log(Level.INFO, "[PROVIDER]> coverage-sql provider created : {0}"

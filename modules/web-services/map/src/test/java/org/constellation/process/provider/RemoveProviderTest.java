@@ -16,11 +16,9 @@
  */
 package org.constellation.process.provider;
 
-import java.io.File;
 import java.net.MalformedURLException;
-import org.constellation.process.provider.AbstractProviderTest;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.provider.DeleteProviderDescriptor;
 import org.constellation.provider.*;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
@@ -42,9 +40,9 @@ public class RemoveProviderTest extends AbstractProviderTest {
     }
 
     @Test
-    public void testRemoveProvider() throws ProcessException, NoSuchIdentifierException, MalformedURLException{
+    public void testRemoveProvider() throws ProcessException, NoSuchIdentifierException, MalformedURLException, ConfigurationException{
 
-        addProvider(buildCSVProvider(DATASTORE_SERVICE, "removeProvider1", true, EMPTY_CSV));
+        addProvider("removeProvider1",buildCSVProvider(DATASTORE_SERVICE, "removeProvider1", true, EMPTY_CSV));
 
         final int nbProvider = DataProviders.getInstance().getProviders().size();
 

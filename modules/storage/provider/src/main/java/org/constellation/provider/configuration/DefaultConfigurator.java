@@ -22,10 +22,13 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.sql.SQLException;
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
@@ -35,11 +38,14 @@ import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.dao.DataRecord;
 import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.admin.dao.StyleRecord;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.provider.Data;
+import org.constellation.provider.DataProviders;
 import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderFactory;
+import org.constellation.provider.StyleProviders;
 import org.constellation.util.MetadataMapBuilder;
 import org.constellation.util.SimplyMetadataTreeNode;
 import org.geotoolkit.coverage.CoverageReference;
@@ -58,157 +64,185 @@ import org.w3c.dom.Node;
 
 /**
  *
+ * @author Ghuillem Legal (Geomatys)
  * @author Johann Sorel (Geomatys)
  */
 public final class DefaultConfigurator implements Configurator {
 
-    DefaultConfigurator() {
+    public DefaultConfigurator() {
     }
 
     @Override
-    public ParameterValueGroup getConfiguration(final ProviderFactory service) {
-        return ConfigurationEngine.getProviderConfiguration(service.getName(), service.getServiceDescriptor());
+    public List<Map.Entry<String, ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException {
+        final List<String> ids = ConfigurationEngine.getProviderIds();
+        final List<Map.Entry<String,ParameterValueGroup>> entries = new ArrayList<>();
+        for(String id : ids){
+            ParameterValueGroup param = getProviderConfiguration(id);
+            if(param!=null){
+                entries.add(new AbstractMap.SimpleImmutableEntry<>(id, param));
+            }
+        }
+        return entries;
     }
-
+    
     @Override
-    public synchronized void saveConfiguration(final ProviderFactory service, final List<Provider> providers) {
-        final ParameterValueGroup params = service.getServiceDescriptor().createValue();
-        final String serviceName = service.getName();
-        // Update administration database.
+    public ParameterValueGroup getProviderConfiguration(String providerId) throws ConfigurationException {
+        final ProviderRecord record = ConfigurationEngine.getProvider(providerId);
+        final String impl = record.getImpl();
+        ProviderFactory factory = DataProviders.getInstance().getFactory(impl);
+        if(factory==null) factory = StyleProviders.getInstance().getFactory(impl);
+        if(factory==null) return null;
         try {
-            // look for deleted providers
-            final List<ProviderRecord> records = ConfigurationEngine.getProviders(serviceName);
-            for (ProviderRecord record : records) {
-                boolean remove = true;
-                for (Provider provider : providers) {
-                    if (record.getIdentifier().equals(provider.getId())) {
-                        remove = false;
+            ParameterValueGroup params = (ParameterValueGroup)record.getConfig(factory.getProviderDescriptor());
+            return params;
+        } catch (SQLException | IOException ex) {
+            throw new ConfigurationException(ex);
+        }
+    }
+
+    @Override
+    public void addProviderConfiguration(String providerId, ParameterValueGroup config) throws ConfigurationException {
+        
+        Provider provider = DataProviders.getInstance().getProvider(providerId);
+        if(provider==null) provider = StyleProviders.getInstance().getProvider(providerId);
+        final ProviderRecord.ProviderType type = provider.getProviderType();
+        final String factoryName = provider.getFactory().getName();
+        
+        final ProviderRecord pr = ConfigurationEngine.writeProvider(providerId, type, factoryName, config);
+        try {
+            checkDataUpdate(pr);
+        } catch (SQLException | IOException ex) {
+            throw new ConfigurationException(ex);
+        }
+    }
+
+    private void checkDataUpdate(final ProviderRecord pr) throws SQLException, IOException{
+        
+        final List<DataRecord> list = pr.getData();
+        final ProviderRecord.ProviderType type = pr.getType();
+        if (type == ProviderRecord.ProviderType.LAYER) {
+            final Provider provider = DataProviders.getInstance().getProvider(pr.getIdentifier());
+            
+            // Remove no longer existing layer.
+            final Map<String, InputStream> metadata = new HashMap<>(0);
+            for (final DataRecord data : list) {
+                boolean found = false;
+                for (final Object keyObj : provider.getKeys()) {
+                    final Name key = (Name) keyObj;
+                    if (data.getName().equals(key.getLocalPart())) {
+                        found = true;
+                        break;
+                    } else if (key.getLocalPart().contains(data.getName()) && data.getProvider().getIdentifier().equalsIgnoreCase(provider.getId())) {
+                        //save metadata
+                        metadata.put(key.getLocalPart(), data.getMetadata());
+                    }
+                }
+                if (!found) {
+                    ConfigurationEngine.deleteData(data.getCompleteName(), provider.getId());
+                }
+            }
+            // Add new layer.
+            for (final Object keyObj : provider.getKeys()) {
+                final Name key = (Name) keyObj;
+                final QName name = new QName(key.getNamespaceURI(), key.getLocalPart());
+                boolean found = false;
+                for (final DataRecord data : list) {
+                    if (name.equals(data.getCompleteName())) {
+                        found = true;
                         break;
                     }
                 }
-                if (remove) {
-                    ConfigurationEngine.deleteProvider(record.getIdentifier());
-                }
-            }
-            // look for new / updated providers
-            for (Provider provider : providers) {
-                params.values().add(provider.getSource());
-                final ProviderRecord.ProviderType type = provider.getProviderType();
-                ProviderRecord pr = ConfigurationEngine.getProvider(provider.getId());
-                if (pr == null) {
-                    pr = ConfigurationEngine.writeProvider(provider.getId(), type, serviceName, provider.getSource());
-                } else {
-                    // update
-                    pr.setConfig(provider.getSource());
-                }
-                final List<DataRecord> list = pr.getData();
-                if (type == ProviderRecord.ProviderType.LAYER) {
-                    // Remove no longer existing layer.
-                    final Map<String, InputStream> metadata = new HashMap<>(0);
-                    for (final DataRecord data : list) {
-                        boolean found = false;
-                        for (final Object keyObj : provider.getKeys()) {
-                            final Name key = (Name) keyObj;
-                            if (data.getName().equals(key.getLocalPart())) {
-                                found = true;
-                                break;
-                            } else if (key.getLocalPart().contains(data.getName()) && data.getProvider().getIdentifier().equalsIgnoreCase(provider.getId())) {
-                                //save metadata
-                                metadata.put(key.getLocalPart(), data.getMetadata());
-                            }
-                        }
-                        if (!found) {
-                            ConfigurationEngine.deleteData(data.getCompleteName(), provider.getId());
-                        }
-                    }
-                    // Add new layer.
-                    for (final Object keyObj : provider.getKeys()) {
-                        final Name key = (Name) keyObj;
-                        final QName name = new QName(key.getNamespaceURI(), key.getLocalPart());
-                        boolean found = false;
-                        for (final DataRecord data : list) {
-                            if (name.equals(data.getCompleteName())) {
-                                found = true;
-                                break;
-                            }
-                        }
-                        if (!found) {
-                            DataRecord record = ConfigurationEngine.writeData(name, pr, provider.getDataType());
-                            final InputStream currentMetadata = metadata.get(record.getName());
-                            if (currentMetadata != null) {
-                                StringWriter writer = new StringWriter();
-                                IOUtils.copy(currentMetadata, writer);
-                                StringReader reader = new StringReader(writer.toString());
-                                record.setMetadata(reader);
-                            } else {
-                                final Data layer = (Data) provider.get(new DefaultName(name));
-                                final Object origin = layer.getOrigin();
-                                if (origin instanceof CoverageReference) {
-                                    final CoverageReference fcr = (CoverageReference) origin;
-                                    try {
-                                        int i = fcr.getImageIndex();
-                                        final GridCoverageReader reader = fcr.acquireReader();
-                                        final SpatialMetadata sm = reader.getCoverageMetadata(i);
-                                        if (sm != null) {
-                                            final String rootNodeName = sm.getNativeMetadataFormatName();
-                                            final Node coverageRootNode = sm.getAsTree(rootNodeName);
-                                            MetadataMapBuilder.setCounter(0);
-                                            final List<SimplyMetadataTreeNode> coverageMetadataList = MetadataMapBuilder.createSpatialMetadataList(coverageRootNode, null, 11, i);
-                                            final CoverageMetadataBean coverageMetadataBean = new CoverageMetadataBean(coverageMetadataList);
-                                            final MarshallerPool mp = GenericDatabaseMarshallerPool.getInstance();
-                                            final Marshaller marshaller = mp.acquireMarshaller();
-                                            final StringWriter sw = new StringWriter();
-                                            marshaller.marshal(coverageMetadataBean, sw);
-                                            mp.recycle(marshaller);
-                                            final StringReader sr = new StringReader(sw.toString());
-                                            record.setMetadata(sr);
-                                        }
-                                    } catch (CoverageStoreException | JAXBException e) {
-                                        LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
-                                    }
+                if (!found) {
+                    DataRecord record = ConfigurationEngine.writeData(name, pr, provider.getDataType());
+                    final InputStream currentMetadata = metadata.get(record.getName());
+                    if (currentMetadata != null) {
+                        StringWriter writer = new StringWriter();
+                        IOUtils.copy(currentMetadata, writer);
+                        StringReader reader = new StringReader(writer.toString());
+                        record.setMetadata(reader);
+                    } else {
+                        final Data layer = (Data) provider.get(new DefaultName(name));
+                        final Object origin = layer.getOrigin();
+                        if (origin instanceof CoverageReference) {
+                            final CoverageReference fcr = (CoverageReference) origin;
+                            try {
+                                int i = fcr.getImageIndex();
+                                final GridCoverageReader reader = fcr.acquireReader();
+                                final SpatialMetadata sm = reader.getCoverageMetadata(i);
+                                if (sm != null) {
+                                    final String rootNodeName = sm.getNativeMetadataFormatName();
+                                    final Node coverageRootNode = sm.getAsTree(rootNodeName);
+                                    MetadataMapBuilder.setCounter(0);
+                                    final List<SimplyMetadataTreeNode> coverageMetadataList = MetadataMapBuilder.createSpatialMetadataList(coverageRootNode, null, 11, i);
+                                    final CoverageMetadataBean coverageMetadataBean = new CoverageMetadataBean(coverageMetadataList);
+                                    final MarshallerPool mp = GenericDatabaseMarshallerPool.getInstance();
+                                    final Marshaller marshaller = mp.acquireMarshaller();
+                                    final StringWriter sw = new StringWriter();
+                                    marshaller.marshal(coverageMetadataBean, sw);
+                                    mp.recycle(marshaller);
+                                    final StringReader sr = new StringReader(sw.toString());
+                                    record.setMetadata(sr);
                                 }
+                            } catch (CoverageStoreException | JAXBException e) {
+                                LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
                             }
-                        }
-                    }
-                } else {
-                    final List<StyleRecord> styles = pr.getStyles();
-                    // Remove no longer existing style.
-                    for (final StyleRecord style : styles) {
-                        if (provider.get(style.getName()) == null) {
-                            ConfigurationEngine.deleteStyle(style.getName(), provider.getId());
-                        }
-                    }
-                    // Add not registered new data.
-                    for (final Object key : provider.getKeys()) {
-                        boolean found = false;
-                        for (final StyleRecord style : styles) {
-                            if (key.equals(style.getName())) {
-                                found = true;
-                                break;
-                            }
-                        }
-                        if (!found) {
-                            StyleRecord.StyleType styleType = StyleRecord.StyleType.VECTOR;
-                            MutableStyle style = (MutableStyle) provider.get(key);
-                            fts:
-                            for (MutableFeatureTypeStyle mutableFeatureTypeStyle : style.featureTypeStyles()) {
-                                for (MutableRule mutableRule : mutableFeatureTypeStyle.rules()) {
-                                    for (Symbolizer symbolizer : mutableRule.symbolizers()) {
-                                        if (symbolizer instanceof RasterSymbolizer) {
-                                            styleType = StyleRecord.StyleType.COVERAGE;
-                                            break fts;
-                                        }
-                                    }
-                                }
-                            }
-                            ConfigurationEngine.writeStyle((String) key, pr, styleType, style);
                         }
                     }
                 }
             }
-        } catch (IOException | SQLException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred while updating provider database", ex);
+        } else {
+            final Provider provider = StyleProviders.getInstance().getProvider(pr.getIdentifier());
+            
+            final List<StyleRecord> styles = pr.getStyles();
+            // Remove no longer existing style.
+            for (final StyleRecord style : styles) {
+                if (provider.get(style.getName()) == null) {
+                    ConfigurationEngine.deleteStyle(style.getName(), provider.getId());
+                }
+            }
+            // Add not registered new data.
+            for (final Object key : provider.getKeys()) {
+                boolean found = false;
+                for (final StyleRecord style : styles) {
+                    if (key.equals(style.getName())) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    StyleRecord.StyleType styleType = StyleRecord.StyleType.VECTOR;
+                    MutableStyle style = (MutableStyle) provider.get(key);
+                    fts:
+                    for (MutableFeatureTypeStyle mutableFeatureTypeStyle : style.featureTypeStyles()) {
+                        for (MutableRule mutableRule : mutableFeatureTypeStyle.rules()) {
+                            for (Symbolizer symbolizer : mutableRule.symbolizers()) {
+                                if (symbolizer instanceof RasterSymbolizer) {
+                                    styleType = StyleRecord.StyleType.COVERAGE;
+                                    break fts;
+                                }
+                            }
+                        }
+                    }
+                    ConfigurationEngine.writeStyle((String) key, pr, styleType, style);
+                }
+            }
         }
     }
     
+    @Override
+    public void updateProviderConfiguration(String providerId, ParameterValueGroup config) throws ConfigurationException {
+        final ProviderRecord pr = ConfigurationEngine.getProvider(providerId);
+        try {
+            pr.setConfig(config);
+            checkDataUpdate(pr);
+        } catch (SQLException | IOException ex) {
+            throw new ConfigurationException(ex);
+        }
+    }
+
+    @Override
+    public void removeProviderConfiguration(String providerId) throws ConfigurationException {
+        ConfigurationEngine.deleteProvider(providerId);
+    }
+        
 }

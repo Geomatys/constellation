@@ -18,37 +18,41 @@
 package org.constellation.ws.embedded;
 
 
-import java.net.MalformedURLException;
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-
 import org.apache.sis.test.XMLComparator;
+import org.apache.sis.xml.MarshallerPool;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.Layers;
+import org.constellation.configuration.Source;
 import org.constellation.provider.DataProviders;
+import org.constellation.provider.Provider;
+import org.constellation.provider.ProviderFactory;
+import org.constellation.provider.Providers;
+import org.constellation.provider.configuration.AbstractConfigurator;
 import org.constellation.provider.configuration.Configurator;
 
 import static org.constellation.provider.configuration.ProviderParameters.*;
 
-import org.geotoolkit.xsd.xml.v2001.Schema;
-import org.apache.sis.xml.MarshallerPool;
-import org.constellation.admin.ConfigurationEngine;
-import org.constellation.configuration.LayerContext;
-import org.constellation.configuration.Layers;
-import org.constellation.configuration.Source;
-import org.constellation.provider.Provider;
-import org.constellation.provider.ProviderFactory;
-
 import static org.geotoolkit.parameter.ParametersExt.createGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
+import org.geotoolkit.xsd.xml.v2001.Schema;
 
 // JUnit dependencies
 import org.junit.*;
-import static org.junit.Assume.*;
 import static org.junit.Assert.*;
+import static org.junit.Assume.*;
 import org.opengis.parameter.ParameterValueGroup;
 
 /**
@@ -100,44 +104,42 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer {
                           ":org.geotoolkit.sampling.xml.v100" +
                          ":org.apache.sis.internal.jaxb.geometry"), null);
 
-        final Configurator configurator = new Configurator() {
+        final Configurator configurator = new AbstractConfigurator() {
             @Override
-            public ParameterValueGroup getConfiguration(final ProviderFactory service) {
+            public List<Map.Entry<String, ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException {
 
-                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
+                final ArrayList<Map.Entry<String, ParameterValueGroup>> lst = new ArrayList<>();
+                
+                final ProviderFactory factory = DataProviders.getInstance().getFactory("feature-store");
+                
+                if (hasLocalDatabase()) {
+                    final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                    getOrCreateValue(source, "id").setValue("postgisSrc");
+                    getOrCreateValue(source, "load_all").setValue(true);
 
-                if("feature-store".equals(service.getName())){
-                    if (hasLocalDatabase()) {
-                        final ParameterValueGroup source = createGroup(config,SOURCE_DESCRIPTOR_NAME);
-                        getOrCreateValue(source, "id").setValue("postgisSrc");
-                        getOrCreateValue(source, "load_all").setValue(true);
+                    final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
+                    final ParameterValueGroup pgconfig = createGroup(choice, " PostgresParameters");
+                    getOrCreateValue(pgconfig,"host").setValue("flupke.geomatys.com");
+                    getOrCreateValue(pgconfig,"port").setValue(5432);
+                    getOrCreateValue(pgconfig,"database").setValue("cite-wfs");
+                    getOrCreateValue(pgconfig,"schema").setValue("public");
+                    getOrCreateValue(pgconfig,"user").setValue("test");
+                    getOrCreateValue(pgconfig,"password").setValue("test");
+                    getOrCreateValue(pgconfig,"namespace").setValue("no namespace");
 
-                        final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
-                        final ParameterValueGroup pgconfig = createGroup(choice, " PostgresParameters");
-                        getOrCreateValue(pgconfig,"host").setValue("flupke.geomatys.com");
-                        getOrCreateValue(pgconfig,"port").setValue(5432);
-                        getOrCreateValue(pgconfig,"database").setValue("cite-wfs");
-                        getOrCreateValue(pgconfig,"schema").setValue("public");
-                        getOrCreateValue(pgconfig,"user").setValue("test");
-                        getOrCreateValue(pgconfig,"password").setValue("test");
-                        getOrCreateValue(pgconfig,"namespace").setValue("no namespace");
-
-                        //add a custom sql query layer
-                        final ParameterValueGroup layer = getOrCreateGroup(source, "Layer");
-                        getOrCreateValue(layer, "name").setValue("CustomSQLQuery");
-                        getOrCreateValue(layer, "language").setValue("CUSTOM-SQL");
-                        getOrCreateValue(layer, "statement").setValue("SELECT name as nom, \"pointProperty\" as geom FROM \"PrimitiveGeoFeature\" ");
-                    }
+                    //add a custom sql query layer
+                    final ParameterValueGroup layer = getOrCreateGroup(source, "Layer");
+                    getOrCreateValue(layer, "name").setValue("CustomSQLQuery");
+                    getOrCreateValue(layer, "language").setValue("CUSTOM-SQL");
+                    getOrCreateValue(layer, "statement").setValue("SELECT name as nom, \"pointProperty\" as geom FROM \"PrimitiveGeoFeature\" ");
+                    
+                    lst.add(new AbstractMap.SimpleImmutableEntry<>("postgisSrc",source));
                 }
-
-                //empty configuration for others
-                return config;
+                
+                return lst;
+                
             }
 
-            @Override
-            public void saveConfiguration(ProviderFactory service, List<Provider> providers) {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
         };
 
         DataProviders.getInstance().setConfigurator(configurator);
@@ -146,7 +148,7 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer {
     @AfterClass
     public static void shutDown() {
         ConfigurationEngine.shutdownTestEnvironement("WFSCustomSQLTest");
-        DataProviders.getInstance().setConfigurator(Configurator.DEFAULT);
+        DataProviders.getInstance().setConfigurator(Providers.DEFAULT_CONFIGURATOR);
         File f = new File("derby.log");
         if (f.exists()) {
             f.delete();

@@ -17,8 +17,13 @@
 
 package org.constellation.provider;
 
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import org.constellation.configuration.ConfigurationException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -27,7 +32,8 @@ import org.constellation.provider.configuration.Configurator;
 import org.opengis.parameter.ParameterValueGroup;
 
 import static org.junit.Assert.*;
-import static org.constellation.provider.MockLayerProviderService.*;
+import static org.constellation.provider.MockLayerProviderFactory.*;
+import org.constellation.provider.configuration.AbstractConfigurator;
 import static org.constellation.provider.configuration.ProviderParameters.*;
 
 /**
@@ -54,7 +60,7 @@ public class ConfiguratorTest {
     public void testServiceAvailable(){
         final Collection<DataProviderFactory> services = DataProviders.getInstance().getFactories();
         assertEquals(1, services.size());
-        assertTrue(services.iterator().next() instanceof MockLayerProviderService);
+        assertTrue(services.iterator().next() instanceof MockLayerProviderFactory);
     }
 
     /**
@@ -63,19 +69,13 @@ public class ConfiguratorTest {
     @Test
     public void testEmptyConfig(){
 
-        final Configurator config = new Configurator() {
-
+        final Configurator config = new AbstractConfigurator() {
             @Override
-            public ParameterValueGroup getConfiguration(final ProviderFactory service) {
-                return service.getServiceDescriptor().createValue();
-            }
-
-            @Override
-            public void saveConfiguration(ProviderFactory service, List<Provider> providers) {
-                throw new UnsupportedOperationException("Not supported yet.");
+            public List<Map.Entry<String, ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException {
+                return Collections.EMPTY_LIST;
             }
         };
-        DataProviders.getInstance().setConfigurator(config);
+        Providers.setConfigurator(config);
 
         assertEquals(0, DataProviders.getInstance().getProviders().size());
     }
@@ -86,28 +86,22 @@ public class ConfiguratorTest {
     @Test
     public void testLayerConfig(){
 
-        final Configurator config = new Configurator() {
-
+        final Configurator config = new AbstractConfigurator() {
             @Override
-            public ParameterValueGroup getConfiguration(final ProviderFactory service) {
-                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
-
-                if(service.getName().equals("mock")){
-                    ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                    ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
-                    srcconfig.parameter(LAYERS.getName().getCode()).setValue("A,B,C");
-                    System.out.println(config);
-                }
-
-                return config;
-            }
-
-            @Override
-            public void saveConfiguration(ProviderFactory service, List<Provider> providers) {
-                throw new UnsupportedOperationException("Not supported yet.");
+            public List<Map.Entry<String, ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException {
+                final ArrayList<Map.Entry<String, ParameterValueGroup>> lst = new ArrayList<>();
+                
+                final ProviderFactory factory = DataProviders.getInstance().getFactory("mock");
+                final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("mock");
+                ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                srcconfig.parameter(LAYERS.getName().getCode()).setValue("A,B,C");
+                lst.add(new AbstractMap.SimpleImmutableEntry<>("mock",source));
+                
+                return lst;
             }
         };
-        DataProviders.getInstance().setConfigurator(config);
+        Providers.setConfigurator(config);
 
         final Collection<DataProvider> providers = DataProviders.getInstance().getProviders();
         assertEquals(1, providers.size());
@@ -120,38 +114,37 @@ public class ConfiguratorTest {
     @Test
     public void testLayersConfig(){
 
-        final Configurator config = new Configurator() {
+        final Configurator config = new AbstractConfigurator() {
 
             @Override
-            public ParameterValueGroup getConfiguration(final ProviderFactory service) {
-                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
-
-                if(service.getName().equals("mock")){
-                    ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                    ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
-                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-0");
-                    srcconfig.parameter(LAYERS.getName().getCode()).setValue("A,B,C,D");
-
-                    source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                    srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
-                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-1");
-                    srcconfig.parameter(LAYERS.getName().getCode()).setValue("E,F");
-
-                    source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                    srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
-                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-2");
-                    srcconfig.parameter(LAYERS.getName().getCode()).setValue("G,H,I");
-                }
-
-                return config;
+            public List<Map.Entry<String, ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException {
+                final ArrayList<Map.Entry<String, ParameterValueGroup>> lst = new ArrayList<>();
+                
+                final ProviderFactory factory = DataProviders.getInstance().getFactory("mock");
+                
+                {final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-0");
+                ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                srcconfig.parameter(LAYERS.getName().getCode()).setValue("A,B,C,D");
+                lst.add(new AbstractMap.SimpleImmutableEntry<>("id-0",source));}
+                
+                {final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-1");
+                ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                srcconfig.parameter(LAYERS.getName().getCode()).setValue("E,F");
+                lst.add(new AbstractMap.SimpleImmutableEntry<>("id-1",source));}
+                
+                {final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-2");
+                ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                srcconfig.parameter(LAYERS.getName().getCode()).setValue("G,H,I");
+                lst.add(new AbstractMap.SimpleImmutableEntry<>("id-2",source));}
+                
+                return lst;
             }
 
-            @Override
-            public void saveConfiguration(ProviderFactory service, List<Provider> providers) {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
         };
-        DataProviders.getInstance().setConfigurator(config);
+        Providers.setConfigurator(config);
 
         final Collection<DataProvider> providers = DataProviders.getInstance().getProviders();
         assertEquals(3, providers.size());
@@ -168,38 +161,37 @@ public class ConfiguratorTest {
     @Test
     public void testLoadingCrashConfig(){
 
-        final Configurator config = new Configurator() {
-            @Override
-            public ParameterValueGroup getConfiguration(final ProviderFactory service) {
-                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
-
-                if(service.getName().equals("mock")){
-                    ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                    ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
-                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-0");
-                    srcconfig.parameter(LAYERS.getName().getCode()).setValue("A,B,C,D");
-
-                    source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                    srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
-                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-1");
-                    srcconfig.parameter(LAYERS.getName().getCode()).setValue("E,F");
-                    srcconfig.parameter(CRASH_CREATE.getName().getCode()).setValue(true);
-
-                    source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                    srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
-                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-2");
-                    srcconfig.parameter(LAYERS.getName().getCode()).setValue("G,H,I");
-                }
-
-                return config;
-            }
+        final Configurator config = new AbstractConfigurator() {
 
             @Override
-            public void saveConfiguration(ProviderFactory service, List<Provider> providers) {
-                throw new UnsupportedOperationException("Not supported yet.");
+            public List<Map.Entry<String, ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException {
+                final ArrayList<Map.Entry<String, ParameterValueGroup>> lst = new ArrayList<>();
+                
+                final ProviderFactory factory = DataProviders.getInstance().getFactory("mock");
+                
+                {final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-0");
+                ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                srcconfig.parameter(LAYERS.getName().getCode()).setValue("A,B,C,D");
+                lst.add(new AbstractMap.SimpleImmutableEntry<>("id-0",source));}
+                
+                {final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-1");
+                ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                srcconfig.parameter(LAYERS.getName().getCode()).setValue("E,F");
+                srcconfig.parameter(CRASH_CREATE.getName().getCode()).setValue(true);
+                lst.add(new AbstractMap.SimpleImmutableEntry<>("id-1",source));}
+                
+                {final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-2");
+                ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                srcconfig.parameter(LAYERS.getName().getCode()).setValue("G,H,I");
+                lst.add(new AbstractMap.SimpleImmutableEntry<>("id-2",source));}
+                
+                return lst;
             }
         };
-        DataProviders.getInstance().setConfigurator(config);
+        Providers.setConfigurator(config);
 
         final Collection<DataProvider> providers = DataProviders.getInstance().getProviders();
         assertEquals(2, providers.size());
@@ -216,38 +208,37 @@ public class ConfiguratorTest {
     @Test
     public void testDisposeCrashConfig(){
 
-        final Configurator config = new Configurator() {
-            @Override
-            public ParameterValueGroup getConfiguration(final ProviderFactory service) {
-                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
-
-                if(service.getName().equals("mock")){
-                    ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                    ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
-                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-0");
-                    srcconfig.parameter(LAYERS.getName().getCode()).setValue("A,B,C,D");
-
-                    source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                    srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
-                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-1");
-                    srcconfig.parameter(LAYERS.getName().getCode()).setValue("E,F");
-                    srcconfig.parameter(CRASH_DISPOSE.getName().getCode()).setValue(true);
-
-                    source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                    srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
-                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-2");
-                    srcconfig.parameter(LAYERS.getName().getCode()).setValue("G,H,I");
-                }
-
-                return config;
-            }
+        final Configurator config = new AbstractConfigurator() {
 
             @Override
-            public void saveConfiguration(ProviderFactory service, List<Provider> providers) {
-                throw new UnsupportedOperationException("Not supported yet.");
+            public List<Map.Entry<String, ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException {
+                final ArrayList<Map.Entry<String, ParameterValueGroup>> lst = new ArrayList<>();
+                
+                final ProviderFactory factory = DataProviders.getInstance().getFactory("mock");
+                
+                {final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-0");
+                ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                srcconfig.parameter(LAYERS.getName().getCode()).setValue("A,B,C,D");
+                lst.add(new AbstractMap.SimpleImmutableEntry<>("id-0",source));}
+                
+                {final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-1");
+                ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                srcconfig.parameter(LAYERS.getName().getCode()).setValue("E,F");
+                srcconfig.parameter(CRASH_DISPOSE.getName().getCode()).setValue(true);
+                lst.add(new AbstractMap.SimpleImmutableEntry<>("id-1",source));}
+                
+                {final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-2");
+                ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                srcconfig.parameter(LAYERS.getName().getCode()).setValue("G,H,I");
+                lst.add(new AbstractMap.SimpleImmutableEntry<>("id-2",source));}
+                
+                return lst;
             }
         };
-        DataProviders.getInstance().setConfigurator(config);
+        Providers.setConfigurator(config);
 
         assertEquals(3, DataProviders.getInstance().getProviders().size());
 
@@ -260,15 +251,10 @@ public class ConfiguratorTest {
 
 
         //set an empty configuration and verify nothing remains
-        DataProviders.getInstance().setConfigurator(new Configurator() {
+        Providers.setConfigurator(new AbstractConfigurator() {
             @Override
-            public ParameterValueGroup getConfiguration(final ProviderFactory service) {
-                return null;
-            }
-
-            @Override
-            public void saveConfiguration(ProviderFactory service, List<Provider> providers) {
-                throw new UnsupportedOperationException("Not supported yet.");
+            public List<Map.Entry<String, ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException {
+                return Collections.EMPTY_LIST;
             }
         });
 

@@ -25,13 +25,13 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.logging.Level;
+import org.constellation.configuration.ConfigurationException;
 import static org.constellation.provider.Provider.RELOAD_TIME_PROPERTY;
-import org.constellation.provider.configuration.Configurator;
-import org.constellation.provider.configuration.ProviderParameters;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.map.ElevationModel;
 import org.opengis.feature.type.Name;
@@ -95,49 +95,41 @@ public final class DataProviders extends Providers implements PropertyChangeList
         if(source instanceof Provider){
             //save changed configuration
             final Provider provider = (Provider) source;
-            saveConfiguration(provider.getFactory());
+            try {
+                getConfigurator().updateProviderConfiguration(provider.getId(), provider.getSource());
+            } catch (ConfigurationException ex) {
+                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            }
         }
         //forward events
         fireUpdateEvent();
     }
 
-    public DataProvider createProvider(final DataProviderFactory factory, final ParameterValueGroup params){
+    public DataProvider createProvider(String id, final DataProviderFactory factory, 
+            final ParameterValueGroup params) throws ConfigurationException{
         getProviders();
-        final DataProvider provider = factory.createProvider(params);
-
+        
+        final DataProvider provider = factory.createProvider(id,params);
         //add in the list our provider
         provider.addPropertyListener(this);
         PROVIDERS.add(provider);
-        saveConfiguration(factory);
+        //save the configuration
+        getConfigurator().addProviderConfiguration(id,params);
         fireUpdateEvent();
         return provider;
     }
 
-    public DataProvider removeProvider(final DataProvider provider){
+    public DataProvider removeProvider(final DataProvider provider) throws ConfigurationException{
+        if(provider==null) return null;
+        getConfigurator().removeProviderConfiguration(provider.getId());
+        
         final boolean b = PROVIDERS.remove(provider);
-
         if(b){
             provider.removePropertyListener(this);
-            saveConfiguration(provider.getFactory());
             fireUpdateEvent();
         }
 
         return provider;
-    }
-
-    /**
-     * Save configuration for the given provider factory
-     */
-    private void saveConfiguration(final ProviderFactory factory){
-        LOGGER.log(Level.INFO, "Saving configuration for factory : {0}", factory.getName());
-        //save configuration
-        final List<Provider> providers = new ArrayList<>();
-        for(Provider candidate : PROVIDERS){
-            if(candidate.getFactory().equals(factory)){
-                providers.add(candidate);
-            }
-        }
-        getConfigurator().saveConfiguration(factory, providers);
     }
 
     /**
@@ -218,34 +210,38 @@ public final class DataProviders extends Providers implements PropertyChangeList
             return Collections.unmodifiableCollection(PROVIDERS);
         }
 
-        final Configurator configs = getConfigurator();
+        final List<Entry<String,ParameterValueGroup>> configs;
+        try {
+            configs = getConfigurator().getProviderConfigurations();
+        } catch (ConfigurationException ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            return Collections.EMPTY_LIST;
+        }
+        
         final List<DataProvider> cache = new ArrayList<>();
-        for(final ProviderFactory factory : getFactories()){
-            final String factoryName = factory.getName();
-
-            //load configurable sources
-            try{
-                final ParameterValueGroup config = configs.getConfiguration(factory);
-                if(config != null){
-                    for(final ParameterValueGroup src : ProviderParameters.getSources(config)){
-                        try{
-                            final DataProvider prov = (DataProvider) factory.createProvider(src);
-                            if(prov != null){
-                                prov.addPropertyListener(this);
-                                cache.add(prov);
-                            }
-                        }catch(Exception ex){
-                            //we must not fail here in any case
-                            LOGGER.log(Level.SEVERE, "Factory "+factoryName+" failed to create a provider.",ex);
+        
+        //rebuild providers
+        for(Entry<String,ParameterValueGroup> entry : configs){
+            final String providerId = entry.getKey();
+            final ParameterValueGroup params = entry.getValue();
+                
+            for(final ProviderFactory factory : getFactories()){
+                //check if config can be used by this factory
+                if(factory.canProcess(params)){
+                    try{
+                        final DataProvider prov = (DataProvider)factory.createProvider(providerId, params);
+                        if(prov != null){
+                            prov.addPropertyListener(this);
+                            cache.add(prov);
                         }
+                    }catch(Exception ex){
+                        //we must not fail here in any case
+                        LOGGER.log(Level.SEVERE, "Factory "+factory.getName()+" failed to create a provider.",ex);
                     }
                 }
-            }catch(Exception ex){
-                //we must not fail here in any case
-                LOGGER.log(Level.SEVERE, "Configurator failed to provide configuration for factory : " + factoryName,ex);
             }
-
         }
+        
 
         PROVIDERS = cache;
         fireUpdateEvent();

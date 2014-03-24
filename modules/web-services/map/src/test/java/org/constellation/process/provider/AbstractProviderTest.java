@@ -22,6 +22,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.process.AbstractProcessTest;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
@@ -31,6 +32,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
+
 /**
  *
  * @author Quentin Boileau (Geomatys).
@@ -80,10 +82,10 @@ public abstract class AbstractProviderTest extends AbstractProcessTest {
     protected static ParameterValueGroup buildCSVProvider(final ProviderFactory sercice, final String providerID, final boolean loadAll,
             final URL url) throws MalformedURLException {
 
-        ParameterDescriptorGroup desc = sercice.getServiceDescriptor();
+        ParameterDescriptorGroup desc = sercice.getProviderDescriptor();
 
         if (desc != null) {
-            final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup) desc.descriptor("source");
+            final ParameterDescriptorGroup sourceDesc = desc;
             final ParameterValueGroup sourceValue = sourceDesc.createValue();
             sourceValue.parameter("id").setValue(providerID);
             sourceValue.parameter("load_all").setValue(loadAll);
@@ -106,20 +108,20 @@ public abstract class AbstractProviderTest extends AbstractProcessTest {
      * Register a provider.
      * @param providerSource
      */
-    protected static void addProvider(ParameterValueGroup providerSource) {
-        DataProviders.getInstance().createProvider((DataProviderFactory) DATASTORE_SERVICE, providerSource);
+    protected static void addProvider(String id,ParameterValueGroup providerSource) throws ConfigurationException {
+        DataProviders.getInstance().createProvider(id, (DataProviderFactory) DATASTORE_SERVICE, providerSource);
     }
 
     /**
      * Un-register a provider
      * @param id
      */
-    protected static void removeProvider(String id) {
+    protected static void removeProvider(String id) throws ConfigurationException {
 
         DataProvider provider = null;
         for (DataProvider p : DataProviders.getInstance().getProviders()) {
             if (p.getId().equals(id)) {
-
+                provider = p;
             }
         }
         DataProviders.getInstance().removeProvider(provider);

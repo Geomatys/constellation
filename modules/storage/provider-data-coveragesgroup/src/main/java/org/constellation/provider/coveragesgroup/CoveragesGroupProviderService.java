@@ -60,22 +60,22 @@ public class CoveragesGroupProviderService extends AbstractProviderFactory
     }
 
     @Override
-    public ParameterDescriptorGroup getServiceDescriptor() {
+    public ParameterDescriptorGroup getProviderDescriptor() {
         return SERVICE_CONFIG_DESCRIPTOR;
     }
 
     @Override
-    public GeneralParameterDescriptor getSourceDescriptor() {
+    public GeneralParameterDescriptor getStoreDescriptor() {
         return SOURCE_CONFIG_DESCRIPTOR;
     }
 
     @Override
-    public DataProvider createProvider(ParameterValueGroup ps) {
+    public DataProvider createProvider(String providerId, ParameterValueGroup ps) {
         if (!canProcess(ps)) {
             return null;
         }
 
-        final CoveragesGroupProvider provider = new CoveragesGroupProvider(this, ps);
+        final CoveragesGroupProvider provider = new CoveragesGroupProvider(providerId, this, ps);
         ps = getOrCreate(SOURCE_CONFIG_DESCRIPTOR, ps);
         getLogger().log(Level.INFO, "[PROVIDER]> Coverages group provider created : {0}",
                 value(URL, ps));

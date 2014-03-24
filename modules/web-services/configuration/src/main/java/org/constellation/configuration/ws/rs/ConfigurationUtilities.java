@@ -256,7 +256,7 @@ public class ConfigurationUtilities {
                     if (providerFile.getName().toLowerCase().contains(SLD_PROVIDER_NAME)) {
                         for (final ProviderFactory factory : styleProxy.getFactories()) {
                             try {
-                                paramReader = new ParameterValueReader(factory.getServiceDescriptor());
+                                paramReader = new ParameterValueReader(factory.getProviderDescriptor());
                                 paramReader.setInput(providerFile);
                                 sourceGroup = (ParameterValueGroup) paramReader.read();
                                 sources = ParametersExt.getGroups(sourceGroup, SOURCE_DESCRIPTOR_NAME);
@@ -284,7 +284,7 @@ public class ConfigurationUtilities {
                         // Try to get a valid layer configuration
                         for (final ProviderFactory factory : layerProxy.getFactories()) {
                             try {
-                                paramReader = new ParameterValueReader(factory.getServiceDescriptor());
+                                paramReader = new ParameterValueReader(factory.getProviderDescriptor());
                                 paramReader.setInput(providerFile);
                                 sourceGroup = (ParameterValueGroup) paramReader.read();
                                 sources = ParametersExt.getGroups(sourceGroup, SOURCE_DESCRIPTOR_NAME);

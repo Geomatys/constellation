@@ -41,6 +41,7 @@ import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.configuration.ProviderConfiguration;
 import org.constellation.provider.DataProvider;
@@ -81,7 +82,7 @@ public final class Provider {
         final Map<String,String> inParams = config.getParameters();
 
         final DataProviderFactory providerService = DataProviders.getInstance().getFactory(type);
-        final ParameterDescriptorGroup serviceDesc = providerService.getServiceDescriptor();
+        final ParameterDescriptorGroup serviceDesc = providerService.getProviderDescriptor();
         final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup) serviceDesc.descriptor("source");
         final ParameterValueGroup sources = sourceDesc.createValue();
         sources.parameter("id").setValue(id);
@@ -175,7 +176,11 @@ public final class Provider {
             // Provider already exists, update config
             old.updateSource(sources);
         } else {
-            DataProviders.getInstance().createProvider(providerService, sources);
+            try {
+                DataProviders.getInstance().createProvider(id, providerService, sources);
+            } catch (ConfigurationException ex) {
+                LOGGER.log(Level.SEVERE, null, ex);
+            }
         }
         return Response.ok().build();
     }

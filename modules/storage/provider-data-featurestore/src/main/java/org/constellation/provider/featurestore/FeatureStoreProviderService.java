@@ -78,23 +78,23 @@ public class FeatureStoreProviderService extends AbstractProviderFactory
     }
 
     @Override
-    public ParameterDescriptorGroup getServiceDescriptor() {
+    public ParameterDescriptorGroup getProviderDescriptor() {
         return SERVICE_CONFIG_DESCRIPTOR;
     }
 
     @Override
-    public ParameterDescriptorGroup getSourceDescriptor() {
+    public ParameterDescriptorGroup getStoreDescriptor() {
         return SOURCE_CONFIG_DESCRIPTOR;
     }
 
     @Override
-    public DataProvider createProvider(ParameterValueGroup ps) {
+    public DataProvider createProvider(String providerId, ParameterValueGroup ps) {
         if(!canProcess(ps)){
             return null;
         }
 
         try {
-            final FeatureStoreProvider provider = new FeatureStoreProvider(this,ps);
+            final FeatureStoreProvider provider = new FeatureStoreProvider(providerId,this,ps);
             getLogger().log(Level.INFO, "[PROVIDER]> feature-store provider created.");
             return provider;
         } catch (Exception ex) {

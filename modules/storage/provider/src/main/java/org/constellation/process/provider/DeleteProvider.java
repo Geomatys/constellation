@@ -16,6 +16,7 @@
  */
 package org.constellation.process.provider;
 
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
@@ -63,9 +64,17 @@ public final class DeleteProvider extends AbstractCstlProcess{
             if (deleteData != null && deleteData) {
                 provider.removeAll();
             }
-            DataProviders.getInstance().removeProvider((DataProvider) provider);
+            try {
+                DataProviders.getInstance().removeProvider((DataProvider) provider);
+            } catch (ConfigurationException ex) {
+                throw new ProcessException("Failed to delete provider : " + providerID+"  "+ex.getMessage(), this, ex);
+            }
         } else {
-            StyleProviders.getInstance().removeProvider((StyleProvider) provider);
+            try {
+                StyleProviders.getInstance().removeProvider((StyleProvider) provider);
+            } catch (ConfigurationException ex) {
+                throw new ProcessException("Failed to delete provider : " + providerID+"  "+ex.getMessage(), this, ex);
+            }
         }
     }
 

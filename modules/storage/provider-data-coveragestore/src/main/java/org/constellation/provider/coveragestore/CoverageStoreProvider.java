@@ -48,8 +48,8 @@ public class CoverageStoreProvider extends AbstractDataProvider{
     private CoverageStore store;
     private Set<Name> names;
 
-    public CoverageStoreProvider(ProviderFactory service, ParameterValueGroup param){
-        super(service,param);
+    public CoverageStoreProvider(String providerId,ProviderFactory service, ParameterValueGroup param){
+        super(providerId,service,param);
         visit();
     }
 

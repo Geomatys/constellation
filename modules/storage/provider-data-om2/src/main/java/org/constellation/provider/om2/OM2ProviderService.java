@@ -74,23 +74,23 @@ public class OM2ProviderService extends AbstractProviderFactory
     }
 
     @Override
-    public ParameterDescriptorGroup getServiceDescriptor() {
+    public ParameterDescriptorGroup getProviderDescriptor() {
         return SERVICE_CONFIG_DESCRIPTOR;
     }
 
     @Override
-    public ParameterDescriptorGroup getSourceDescriptor() {
+    public ParameterDescriptorGroup getStoreDescriptor() {
         return SOURCE_CONFIG_DESCRIPTOR;
     }
 
     @Override
-    public DataProvider createProvider(ParameterValueGroup ps) {
+    public DataProvider createProvider(String providerId, ParameterValueGroup ps) {
         if(!canProcess(ps)){
             return null;
         }
 
         try {
-            final OM2StoreProvider provider = new OM2StoreProvider(this,ps);
+            final OM2StoreProvider provider = new OM2StoreProvider(providerId,this,ps);
             getLogger().log(Level.INFO, "[PROVIDER]> om2-store provider created.");
             return provider;
         } catch (Exception ex) {

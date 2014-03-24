@@ -46,9 +46,9 @@ public abstract class AbstractDataProvider extends AbstractProvider<Name,Data> i
     protected static final String NO_NAMESPACE = "no namespace";
 
 
-    protected AbstractDataProvider(final ProviderFactory service,
+    protected AbstractDataProvider(final String id, final ProviderFactory service,
             final ParameterValueGroup config){
-        super(service,config);
+        super(id, service,config);
     }
 
     /**
@@ -134,7 +134,7 @@ public abstract class AbstractDataProvider extends AbstractProvider<Name,Data> i
         if(!missingLayers.isEmpty()){
             //log list of missing layers
             final StringBuilder sb = new StringBuilder("Provider ");
-            sb.append(getSourceId(getSource())).append(" declares layers missing in the source\n");
+            sb.append(getId()).append(" declares layers missing in the source\n");
             sb.append(Trees.toString("", missingLayers));
             getLogger().log(Level.WARNING, sb.toString());
         }

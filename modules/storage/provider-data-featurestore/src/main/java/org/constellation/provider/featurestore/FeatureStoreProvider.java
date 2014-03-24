@@ -33,8 +33,8 @@ import java.util.logging.Level;
  */
 public class FeatureStoreProvider extends AbstractFeatureStoreProvider{
 
-    public FeatureStoreProvider(ProviderFactory service, ParameterValueGroup param) throws DataStoreException{
-        super(service,param);
+    public FeatureStoreProvider(String providerId,ProviderFactory service, ParameterValueGroup param) throws DataStoreException{
+        super(providerId,service,param);
     }
 
     @Override

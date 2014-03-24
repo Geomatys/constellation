@@ -43,12 +43,11 @@ import static org.geotoolkit.parameter.Parameters.*;
  */
 public final class ProviderParameters {
 
-    public static final String CONFIG_DESCRIPTOR_NAME = "config";
-
     ////////////////////////////////////////////////////////////////////////////
     // Source parameters ///////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     public static final String SOURCE_DESCRIPTOR_NAME = "source";
+    //TODO remove this parameter, duplicates argument in factory createProvider method.
     public static final ParameterDescriptor<String> SOURCE_ID_DESCRIPTOR =
              new DefaultParameterDescriptor<>("id","source id",String.class,null,true);
     public static final ParameterDescriptor<Boolean> SOURCE_LOADALL_DESCRIPTOR =
@@ -102,24 +101,16 @@ public final class ProviderParameters {
 
     /**
      * Create a descriptor composed of the given source configuration.
-     * Config
-     *  -> Source
-     *    -> sourceConfig
-     *    -> layers
+     * Source
+     *  -> config
+     *  -> layers
      */
     public static ParameterDescriptorGroup createDescriptor(final GeneralParameterDescriptor sourceConfigDescriptor){
         final ParameterDescriptorGroup sourceDescriptor = new DefaultParameterDescriptorGroup(
-            Collections.singletonMap("name", SOURCE_DESCRIPTOR_NAME),
-            0, Integer.MAX_VALUE,SOURCE_ID_DESCRIPTOR,SOURCE_LOADALL_DESCRIPTOR,SOURCE_DATE_DESCRIPTOR,SOURCE_TYPE_DESCRIPTOR,
-            sourceConfigDescriptor,LAYER_DESCRIPTOR);
-        final ParameterDescriptorGroup configDescriptor =
-            new DefaultParameterDescriptorGroup(CONFIG_DESCRIPTOR_NAME,sourceDescriptor);
-
-        return configDescriptor;
-    }
-
-    public static String getSourceId(final ParameterValueGroup source){
-        return stringValue(SOURCE_ID_DESCRIPTOR,source);
+                Collections.singletonMap("name", SOURCE_DESCRIPTOR_NAME),1, 1,
+                SOURCE_ID_DESCRIPTOR,SOURCE_LOADALL_DESCRIPTOR,SOURCE_DATE_DESCRIPTOR,SOURCE_TYPE_DESCRIPTOR,
+                 sourceConfigDescriptor,LAYER_DESCRIPTOR);
+        return sourceDescriptor;
     }
 
     public static boolean isLoadAll(final ParameterValueGroup source){

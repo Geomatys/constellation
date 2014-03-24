@@ -17,6 +17,7 @@
 package org.constellation.process.provider;
 
 import java.net.MalformedURLException;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.provider.AbstractProviderTest;
 import org.constellation.process.provider.RestartProviderDescriptor;
@@ -42,9 +43,9 @@ public class RestartProviderTest extends AbstractProviderTest {
     }
 
     @Test
-    public void testRestartProvider() throws ProcessException, NoSuchIdentifierException, MalformedURLException{
+    public void testRestartProvider() throws ProcessException, NoSuchIdentifierException, MalformedURLException, ConfigurationException{
 
-        addProvider(buildCSVProvider(DATASTORE_SERVICE, "restartProvider1", true, EMPTY_CSV));
+        addProvider("restartProvider1",buildCSVProvider(DATASTORE_SERVICE, "restartProvider1", true, EMPTY_CSV));
 
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartProviderDescriptor.NAME);
 
@@ -67,9 +68,9 @@ public class RestartProviderTest extends AbstractProviderTest {
     }
 
     @Test
-    public void testRestartProviderFail() throws ProcessException, NoSuchIdentifierException, MalformedURLException{
+    public void testRestartProviderFail() throws ProcessException, NoSuchIdentifierException, MalformedURLException, ConfigurationException{
 
-        addProvider(buildCSVProvider(DATASTORE_SERVICE, "restartProvider2", true, EMPTY_CSV));
+        addProvider("restartProvider2",buildCSVProvider(DATASTORE_SERVICE, "restartProvider2", true, EMPTY_CSV));
 
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartProviderDescriptor.NAME);
 
@@ -88,9 +89,9 @@ public class RestartProviderTest extends AbstractProviderTest {
     }
 
     @Test
-    public void testRestartProviderFail2() throws ProcessException, NoSuchIdentifierException, MalformedURLException{
+    public void testRestartProviderFail2() throws ProcessException, NoSuchIdentifierException, MalformedURLException, ConfigurationException{
 
-        addProvider(buildCSVProvider(DATASTORE_SERVICE, "restartProvider3", true, EMPTY_CSV));
+        addProvider("restartProvider3",buildCSVProvider(DATASTORE_SERVICE, "restartProvider3", true, EMPTY_CSV));
 
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartProviderDescriptor.NAME);
 

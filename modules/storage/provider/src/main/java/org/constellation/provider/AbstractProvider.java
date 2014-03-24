@@ -22,8 +22,6 @@ import java.beans.PropertyChangeSupport;
 import java.util.Collections;
 import java.util.Set;
 import java.util.logging.Logger;
-import org.constellation.provider.configuration.ProviderParameters;
-import org.apache.sis.util.logging.Logging;
 import org.opengis.parameter.ParameterValueGroup;
 
 import static org.constellation.provider.configuration.ProviderParameters.*;
@@ -34,14 +32,19 @@ import static org.constellation.provider.configuration.ProviderParameters.*;
  */
 public abstract class AbstractProvider<K,V> implements Provider<K, V>{
 
-    protected static final Logger LOGGER = Logging.getLogger("org.constellation.provider");
+    protected static final Logger LOGGER = Providers.LOGGER;
 
-    private final PropertyChangeSupport listeners = new PropertyChangeSupport(this);
-    private ParameterValueGroup source;
+    //configuration
     protected final ProviderFactory<K, V, Provider<K, V>> service;
+    protected final String id;
+    private ParameterValueGroup source;
+    
+    //listeners
+    private final PropertyChangeSupport listeners = new PropertyChangeSupport(this);
     private long lastUpdateTime = System.currentTimeMillis();
 
-    public AbstractProvider(final ProviderFactory<K, V, Provider<K, V>> service, final ParameterValueGroup source){
+    public AbstractProvider(final String id, final ProviderFactory<K, V, Provider<K, V>> service, final ParameterValueGroup source){
+        this.id = id;
         this.source = source;
         this.service = service;
     }
@@ -51,10 +54,7 @@ public abstract class AbstractProvider<K,V> implements Provider<K, V>{
      */
     @Override
     public String getId(){
-        if(source == null){
-            return null;
-        }
-        return ProviderParameters.getSourceId(source);
+        return id;
     }
 
     /**
@@ -98,7 +98,7 @@ public abstract class AbstractProvider<K,V> implements Provider<K, V>{
     @Override
     public Set<K> getKeys(String sourceId) {
         if(sourceId != null && source != null){
-            if(sourceId.equals(getSourceId(source))){
+            if(sourceId.equals(getId())){
                 return getKeys();
             }else{
                 return Collections.emptySet();

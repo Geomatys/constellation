@@ -17,10 +17,9 @@
 package org.constellation.process.provider;
 
 import java.net.MalformedURLException;
-import org.constellation.process.provider.AbstractProviderTest;
+import org.constellation.configuration.ConfigurationException;
 
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.provider.CreateProviderDescriptor;
 import org.constellation.provider.*;
 
 import org.geotoolkit.process.Process;
@@ -45,7 +44,7 @@ public class CreateProviderTest extends AbstractProviderTest {
     }
 
     @Test
-    public void testCreateProvider() throws ProcessException, NoSuchIdentifierException, MalformedURLException{
+    public void testCreateProvider() throws ProcessException, NoSuchIdentifierException, MalformedURLException, ConfigurationException{
 
         final int nbProvider = DataProviders.getInstance().getProviders().size();
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateProviderDescriptor.NAME);

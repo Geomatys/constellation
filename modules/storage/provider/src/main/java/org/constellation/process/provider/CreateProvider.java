@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import org.constellation.configuration.ConfigurationException;
 
 import static org.constellation.process.provider.CreateProviderDescriptor.PROVIDER_TYPE;
 import static org.constellation.process.provider.CreateProviderDescriptor.SOURCE;
@@ -73,7 +74,11 @@ public final class CreateProvider extends AbstractCstlProcess {
                     }
                 }
                 source.parameter("date").setValue(new Date());
-                DataProviders.getInstance().createProvider((DataProviderFactory) service, source);
+                try {
+                    DataProviders.getInstance().createProvider(id, (DataProviderFactory) service, source);
+                } catch (ConfigurationException ex) {
+                    throw new ProcessException("Failed to create provider : " + id+"  "+ex.getMessage(), this, ex);
+                }
             }
 
             //StyleProvider case
@@ -85,7 +90,11 @@ public final class CreateProvider extends AbstractCstlProcess {
                         throw new ProcessException("Provider ID is already used : " + id, this, null);
                     }
                 }
-                StyleProviders.getInstance().createProvider((StyleProviderFactory) service, source);
+                try {
+                    StyleProviders.getInstance().createProvider(id, (StyleProviderFactory) service, source);
+                } catch (ConfigurationException ex) {
+                    throw new ProcessException("Failed to create provider : " + id+"  "+ex.getMessage(), this, ex);
+                }
             }
         } else {
             throw new ProcessException("Provider type not found:" + providerType, this, null);

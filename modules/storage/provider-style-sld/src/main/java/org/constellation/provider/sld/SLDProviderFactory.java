@@ -32,15 +32,13 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.parameter.ParameterDescriptor;
 
-import static org.geotoolkit.parameter.Parameters.*;
-
 /**
  *
  * @version $Id$
  *
  * @author Johann Sorel (Geomatys)
  */
-public class SLDProviderService extends AbstractProviderFactory
+public class SLDProviderFactory extends AbstractProviderFactory
         <String,MutableStyle,StyleProvider> implements StyleProviderFactory {
 
     /**
@@ -50,38 +48,35 @@ public class SLDProviderService extends AbstractProviderFactory
     private static final String ERROR_MSG = "[PROVIDER]> Invalid SLD provider config";
 
     public static final ParameterDescriptor<String> FOLDER_DESCRIPTOR =
-             new DefaultParameterDescriptor<String>("path","Folder where style files can be found",String.class,null,true);
+             new DefaultParameterDescriptor<>("path","Folder where style files can be found",String.class,null,true);
     
     public static final ParameterDescriptorGroup SOURCE_CONFIG_DESCRIPTOR = 
             new DefaultParameterDescriptorGroup("sldFolder",FOLDER_DESCRIPTOR);
-    public static final ParameterDescriptorGroup SERVICE_CONFIG_DESCRIPTOR =
+    public static final ParameterDescriptorGroup SOURCE_DESCRIPTOR = 
             ProviderParameters.createDescriptor(SOURCE_CONFIG_DESCRIPTOR);
-    public static final ParameterDescriptorGroup SOURCE_DESCRIPTOR = (ParameterDescriptorGroup) 
-            SERVICE_CONFIG_DESCRIPTOR.descriptor(ProviderParameters.SOURCE_DESCRIPTOR_NAME);
-
 
     @Override
-    public ParameterDescriptorGroup getServiceDescriptor() {
-        return SERVICE_CONFIG_DESCRIPTOR;
+    public ParameterDescriptorGroup getProviderDescriptor() {
+        return SOURCE_DESCRIPTOR;
     }
 
     @Override
-    public GeneralParameterDescriptor getSourceDescriptor() {
+    public GeneralParameterDescriptor getStoreDescriptor() {
         return SOURCE_CONFIG_DESCRIPTOR;
     }
 
-    public SLDProviderService(){
+    public SLDProviderFactory(){
         super(NAME);
     }
 
     @Override
-    public StyleProvider createProvider(final ParameterValueGroup ps) {
+    public StyleProvider createProvider(String providerId, final ParameterValueGroup ps) {
         if(!canProcess(ps)){
             return null;
         }
         
         try {
-            final SLDProvider provider = new SLDProvider(this,ps);
+            final SLDProvider provider = new SLDProvider(providerId,this,ps);
             getLogger().log(Level.INFO, "[PROVIDER]> SLD provider created : {0}", 
                     (provider.getFolder()==null) ? "no path" : provider.getFolder().getAbsolutePath());
             return provider;

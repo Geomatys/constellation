@@ -29,6 +29,6 @@ import org.opengis.parameter.ParameterValueGroup;
 public interface StyleProviderFactory extends ProviderFactory<String,MutableStyle,StyleProvider>{
 
     @Override
-    StyleProvider createProvider(ParameterValueGroup config);
+    StyleProvider createProvider(String providerId, ParameterValueGroup config);
 
 }

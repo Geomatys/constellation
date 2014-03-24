@@ -60,9 +60,9 @@ public class CoverageSQLProvider extends AbstractDataProvider{
 
     private final Set<Name> index = new HashSet<>();
 
-    protected CoverageSQLProvider(final CoverageSQLProviderService service,
+    protected CoverageSQLProvider(String providerId, final CoverageSQLProviderService service,
             final ParameterValueGroup source) {
-        super(service,source);
+        super(providerId,service,source);
         visit();
     }
 

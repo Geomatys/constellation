@@ -48,7 +48,7 @@ import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.FactoryException;
 
-import static org.constellation.provider.sld.SLDProviderService.*;
+import static org.constellation.provider.sld.SLDProviderFactory.*;
 
 /**
  * Style provider. index and cache MutableStyle within the given folder.
@@ -75,8 +75,8 @@ public class SLDProvider extends AbstractStyleProvider{
     private final Cache<String,MutableStyle> cache = new Cache<>(20, 20, true);
 
 
-    protected SLDProvider(final SLDProviderService service, final ParameterValueGroup source){
-        super(service,source);
+    protected SLDProvider(String providerId,final SLDProviderFactory service, final ParameterValueGroup source){
+        super(providerId,service,source);
         reload();
     }
 
@@ -246,7 +246,7 @@ public class SLDProvider extends AbstractStyleProvider{
             cache.clear();
 
             final ParameterValueGroup srcConfig = getSource().groups(
-                    getFactory().getSourceDescriptor().getName().getCode()).get(0);
+                    getFactory().getStoreDescriptor().getName().getCode()).get(0);
 
             final ParameterValue param = srcConfig.parameter(FOLDER_DESCRIPTOR.getName().getCode());
 

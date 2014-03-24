@@ -16,12 +16,9 @@
  */
 package org.constellation.process.provider;
 
-import org.constellation.process.provider.GetConfigProviderDescriptor;
-import java.io.File;
 import java.net.MalformedURLException;
-import org.constellation.process.provider.AbstractProviderTest;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.provider.*;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
@@ -42,10 +39,10 @@ public class GetConfigProviderTest extends AbstractProviderTest {
     }
 
     @Test
-    public void testGetConfigProvider() throws ProcessException, NoSuchIdentifierException, MalformedURLException{
+    public void testGetConfigProvider() throws ProcessException, NoSuchIdentifierException, MalformedURLException, ConfigurationException{
 
         final ParameterValueGroup parameters = buildCSVProvider(DATASTORE_SERVICE, "getConfigProvider1", false, EMPTY_CSV);
-        addProvider(parameters);
+        addProvider("getConfigProvider1",parameters);
 
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, GetConfigProviderDescriptor.NAME);
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();

@@ -49,8 +49,8 @@ public class ServerStoreProvider extends AbstractDataProvider{
     private Client server;
     private Set<Name> names;
 
-    public ServerStoreProvider(ProviderFactory service, ParameterValueGroup param){
-        super(service,param);
+    public ServerStoreProvider(String providerId,ProviderFactory service, ParameterValueGroup param){
+        super(providerId,service,param);
     }
 
     @Override

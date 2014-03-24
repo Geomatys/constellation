@@ -16,8 +16,6 @@
  */
 package org.constellation.provider;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.logging.Logger;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.geotoolkit.parameter.Parameters;
@@ -55,8 +53,7 @@ public abstract class AbstractProviderFactory<K,V,P extends Provider<K,V>> imple
 
     @Override
     public boolean canProcess(final ParameterValueGroup params) {
-        final ConformanceResult result = Parameters.isValid(params, 
-                getServiceDescriptor().descriptor(ProviderParameters.SOURCE_DESCRIPTOR_NAME));
+        final ConformanceResult result = Parameters.isValid(params, getProviderDescriptor());
         return (result != null) && Boolean.TRUE.equals(result.pass());
     }
     

@@ -29,6 +29,6 @@ import org.opengis.parameter.ParameterValueGroup;
 public interface DataProviderFactory extends ProviderFactory<Name,Data,DataProvider>{
 
     @Override
-    DataProvider createProvider(ParameterValueGroup config);
+    DataProvider createProvider(String providerId, ParameterValueGroup config);
 
 }

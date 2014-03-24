@@ -18,6 +18,7 @@ package org.constellation.process.provider.style;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.provider.*;
 import org.geotoolkit.process.ProcessDescriptor;
@@ -40,9 +41,9 @@ public class SetMapStyleTest extends AbstractMapStyleTest {
     }
 
     @Test
-    public void testCreateStyle() throws ProcessException, NoSuchIdentifierException, MalformedURLException {
+    public void testCreateStyle() throws ProcessException, NoSuchIdentifierException, MalformedURLException, ConfigurationException {
 
-        addProvider(buildProvider("createStyleProvider1", true));
+        addProvider("createStyleProvider1",buildProvider("createStyleProvider1", true));
 
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, SetStyleToStyleProviderDescriptor.NAME);
 
@@ -75,9 +76,9 @@ public class SetMapStyleTest extends AbstractMapStyleTest {
      * Empty style name
      */
     @Test
-    public void testCreateStyle2() throws ProcessException, NoSuchIdentifierException, MalformedURLException {
+    public void testCreateStyle2() throws ProcessException, NoSuchIdentifierException, MalformedURLException, ConfigurationException {
 
-        addProvider(buildProvider("createStyleProvider3", true));
+        addProvider("createStyleProvider3",buildProvider("createStyleProvider3", true));
 
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, SetStyleToStyleProviderDescriptor.NAME);
 

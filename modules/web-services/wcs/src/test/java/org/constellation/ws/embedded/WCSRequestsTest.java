@@ -21,50 +21,51 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.ImageWriterSpi;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
-
-// Constellation dependencies
-import org.constellation.test.ImageTesting;
+import static org.constellation.coverage.ws.WCSWorkerInit.hasLocalDatabase;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderFactory;
+import org.constellation.provider.Providers;
+import org.constellation.provider.configuration.AbstractConfigurator;
 import org.constellation.provider.configuration.Configurator;
-
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
 import static org.constellation.provider.configuration.ProviderParameters.*;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
+import org.constellation.test.ImageTesting;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.TestRunner;
-
-// Geotoolkit dependencies
-import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.image.jai.Registry;
+import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
+import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.geotoolkit.wcs.xml.WCSMarshallerPool;
 import org.geotoolkit.wcs.xml.v100.CoverageDescription;
 import org.geotoolkit.wcs.xml.v100.CoverageOfferingBriefType;
 import org.geotoolkit.wcs.xml.v100.CoverageOfferingType;
+import org.geotoolkit.wcs.xml.v100.DCPTypeType.HTTP.Get;
 import org.geotoolkit.wcs.xml.v100.LonLatEnvelopeType;
 import org.geotoolkit.wcs.xml.v100.WCSCapabilitiesType;
-import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
-import org.geotoolkit.wcs.xml.v100.DCPTypeType.HTTP.Get;
 
 // JUnit dependencies
 import org.junit.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
 import org.junit.runner.RunWith;
-
 import org.opengis.parameter.ParameterValueGroup;
 
 /**
@@ -141,38 +142,31 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
 
         pool = WCSMarshallerPool.getInstance();
 
-        final Configurator configurator = new Configurator() {
+        final Configurator configurator = new AbstractConfigurator() {
+
             @Override
-            public ParameterValueGroup getConfiguration(final ProviderFactory service) {
-
-                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
-
-                if("coverage-sql".equals(service.getName())){
-
-                    if (hasLocalDatabase()) {
-                        // Defines a PostGrid data provider
-                        final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                        final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
-                        srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://flupke.geomatys.com/coverages-test");
-                        srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
-                        final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
-                        srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
-                        srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
-                        srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
-                        srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
-                        source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
-                    }
-
+            public List<Map.Entry<String, ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException {
+                final ArrayList<Map.Entry<String, ParameterValueGroup>> lst = new ArrayList<>();
+                
+                final ProviderFactory factory = DataProviders.getInstance().getFactory("coverage-sql");
+                
+                if (hasLocalDatabase()) {
+                    final ParameterValueGroup config = factory.getProviderDescriptor().createValue();
+                    // Defines a PostGrid data provider
+                    final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                    final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
+                    srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://flupke.geomatys.com/coverages-test");
+                    srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
+                    final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
+                    srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
+                    srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
+                    srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
+                    srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
+                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
+                    lst.add(new AbstractMap.SimpleImmutableEntry<>("coverageTestSrc",config));
                 }
-
-                //empty configuration for others
-                return config;
-            }
-
-            @Override
-            public void saveConfiguration(ProviderFactory service, List<Provider> providers) {
-                throw new UnsupportedOperationException("Not supported yet.");
+                return lst;
             }
         };
 
@@ -193,7 +187,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
 
     @AfterClass
     public static void shutDown() throws JAXBException {
-        DataProviders.getInstance().setConfigurator(Configurator.DEFAULT);
+        DataProviders.getInstance().setConfigurator(Providers.DEFAULT_CONFIGURATOR);
         ConfigurationEngine.shutdownTestEnvironement("WCSRequestsTest");
         finish();
     }

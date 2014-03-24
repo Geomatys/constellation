@@ -18,6 +18,7 @@ package org.constellation.process.provider.style;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.provider.*;
 import org.geotoolkit.process.ProcessDescriptor;
@@ -40,9 +41,9 @@ public class DeleteMapStyleTest extends AbstractMapStyleTest {
     }
 
     @Test
-    public void testDeleteStyle() throws ProcessException, NoSuchIdentifierException, MalformedURLException {
+    public void testDeleteStyle() throws ProcessException, NoSuchIdentifierException, MalformedURLException, ConfigurationException {
 
-        addProvider(buildProvider("deleteStyleProvider1", true));
+        addProvider("deleteStyleProvider1",buildProvider("deleteStyleProvider1", true));
 
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteStyleToStyleProviderDescriptor.NAME);
 
@@ -119,9 +120,9 @@ public class DeleteMapStyleTest extends AbstractMapStyleTest {
      * Empty style name
      */
     @Test
-    public void testFailDeleteStyle3() throws ProcessException, NoSuchIdentifierException, MalformedURLException {
+    public void testFailDeleteStyle3() throws ProcessException, NoSuchIdentifierException, MalformedURLException, ConfigurationException {
 
-        addProvider(buildProvider("deleteStyleProvider3", true));
+        addProvider("deleteStyleProvider3",buildProvider("deleteStyleProvider3", true));
 
         final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteStyleToStyleProviderDescriptor.NAME);
 

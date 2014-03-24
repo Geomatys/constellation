@@ -22,9 +22,11 @@ import java.io.File;
 import java.net.URL;
 import java.net.URLConnection;
 import java.sql.Connection;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -46,11 +48,14 @@ import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.referencing.CRS;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
 import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderFactory;
+import org.constellation.provider.Providers;
+import org.constellation.provider.configuration.AbstractConfigurator;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.ogc.xml.v110.FeatureIdType;
 import org.geotoolkit.sampling.xml.v100.SamplingPointType;
@@ -174,92 +179,92 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
                          ":org.apache.sis.internal.jaxb.geometry"), null);
 
 
-       final Configurator configurator = new Configurator() {
+       final Configurator configurator = new AbstractConfigurator() {
+           
             @Override
-            public ParameterValueGroup getConfiguration(final ProviderFactory service) {
-
-                final ParameterValueGroup config = service.getServiceDescriptor().createValue();
-
-                if("feature-store".equals(service.getName())){
-                    try{ 
-                        
-                        {//OBSERVATION
-                            final String url = "jdbc:derby:memory:TesWFSRequestWorker";
-                            final DefaultDataSource ds = new DefaultDataSource(url + ";create=true");
-                            if (!datasourceCreated) {
-                                Connection con = ds.getConnection();
-                                DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
-                                sr.run(Util.getResourceAsStream("org/constellation/observation/structure_observations.sql"));
-                                sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
-                                con.close();
-                                datasourceCreated = true;
-                            }
-                            ds.shutdown();
-
-                            final ParameterValueGroup source = createGroup(config, SOURCE_DESCRIPTOR_NAME);
-                            getOrCreateValue(source, "id").setValue("omSrc");
-                            getOrCreateValue(source, "load_all").setValue(true);
-
-                            final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
-                            final ParameterValueGroup omconfig = createGroup(choice, "OMParameters");
-                            getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
-                            getOrCreateValue(omconfig, "derbyurl").setValue(url);
+            public List<Map.Entry<String, ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException {
+                
+                 final ArrayList<Map.Entry<String, ParameterValueGroup>> lst = new ArrayList<>();
+                
+                final ProviderFactory factory = DataProviders.getInstance().getFactory("feature-store");
+                
+                try{ 
+                    
+                    {//OBSERVATION
+                        final String url = "jdbc:derby:memory:TesWFSRequestWorker";
+                        final DefaultDataSource ds = new DefaultDataSource(url + ";create=true");
+                        if (!datasourceCreated) {
+                            Connection con = ds.getConnection();
+                            DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
+                            sr.run(Util.getResourceAsStream("org/constellation/observation/structure_observations.sql"));
+                            sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
+                            con.close();
+                            datasourceCreated = true;
                         }
+                        ds.shutdown();
 
-                        {//SHAPEFILE
-                            final File outputDir = initDataDirectory();
-                            final ParameterValueGroup source = createGroup(config, SOURCE_DESCRIPTOR_NAME);
-                            getOrCreateValue(source, "id").setValue("shapeSrc");
-                            getOrCreateValue(source, "load_all").setValue(true);
+                        final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                        getOrCreateValue(source, "id").setValue("omSrc");
+                        getOrCreateValue(source, "load_all").setValue(true);
 
-                            final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
-                            final ParameterValueGroup shpconfig = createGroup(choice, "ShapefileParametersFolder");
-                            getOrCreateValue(shpconfig, "url").setValue(new URL("file:" + outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
-                            getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");
-
-                            final ParameterValueGroup layer = getOrCreateGroup(source, "Layer");
-                            getOrCreateValue(layer, "name").setValue("NamedPlaces");
-                            getOrCreateValue(layer, "style").setValue("cite_style_NamedPlaces");
-                        }
-
-                        {//POSTGIS
-
-                            if (hasLocalDatabase()) {
-                                final ParameterValueGroup source = createGroup(config, SOURCE_DESCRIPTOR_NAME);
-                                getOrCreateValue(source, "id").setValue("postgisSrc");
-                                getOrCreateValue(source, "load_all").setValue(true);
-
-                                final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
-                                final ParameterValueGroup pgconfig = createGroup(choice, " PostgresParameters");
-                                getOrCreateValue(pgconfig, "host").setValue("flupke.geomatys.com");
-                                getOrCreateValue(pgconfig, "port").setValue(5432);
-                                getOrCreateValue(pgconfig, "database").setValue("cite-wfs");
-                                getOrCreateValue(pgconfig, "schema").setValue("public");
-                                getOrCreateValue(pgconfig, "user").setValue("test");
-                                getOrCreateValue(pgconfig, "password").setValue("test");
-                                getOrCreateValue(pgconfig, "namespace").setValue("no namespace");
-
-                                //add a custom sql query layer
-                                final ParameterValueGroup layer = getOrCreateGroup(source, "Layer");
-                                getOrCreateValue(layer, "name").setValue("CustomSQLQuery");
-                                getOrCreateValue(layer, "language").setValue("CUSTOM-SQL");
-                                getOrCreateValue(layer, "statement").setValue("SELECT name as nom, \"pointProperty\" as geom FROM \"PrimitiveGeoFeature\" ");
-                            }
-                        }
-                        
-                    }catch(Exception ex){
-                        throw new RuntimeException(ex.getLocalizedMessage(),ex);
+                        final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
+                        final ParameterValueGroup omconfig = createGroup(choice, "OMParameters");
+                        getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
+                        getOrCreateValue(omconfig, "derbyurl").setValue(url);
+                        lst.add(new AbstractMap.SimpleImmutableEntry<>("omSrc",source));
                     }
+
+                    {//SHAPEFILE
+                        final File outputDir = initDataDirectory();
+                        final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                        getOrCreateValue(source, "id").setValue("shapeSrc");
+                        getOrCreateValue(source, "load_all").setValue(true);
+
+                        final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
+                        final ParameterValueGroup shpconfig = createGroup(choice, "ShapefileParametersFolder");
+                        getOrCreateValue(shpconfig, "url").setValue(new URL("file:" + outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
+                        getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");
+
+                        final ParameterValueGroup layer = getOrCreateGroup(source, "Layer");
+                        getOrCreateValue(layer, "name").setValue("NamedPlaces");
+                        getOrCreateValue(layer, "style").setValue("cite_style_NamedPlaces");
+                        
+                        lst.add(new AbstractMap.SimpleImmutableEntry<>("shapeSrc",source));
+                    }
+
+                    {//POSTGIS
+                        if (hasLocalDatabase()) {
+                            final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                            getOrCreateValue(source, "id").setValue("postgisSrc");
+                            getOrCreateValue(source, "load_all").setValue(true);
+
+                            final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
+                            final ParameterValueGroup pgconfig = createGroup(choice, " PostgresParameters");
+                            getOrCreateValue(pgconfig, "host").setValue("flupke.geomatys.com");
+                            getOrCreateValue(pgconfig, "port").setValue(5432);
+                            getOrCreateValue(pgconfig, "database").setValue("cite-wfs");
+                            getOrCreateValue(pgconfig, "schema").setValue("public");
+                            getOrCreateValue(pgconfig, "user").setValue("test");
+                            getOrCreateValue(pgconfig, "password").setValue("test");
+                            getOrCreateValue(pgconfig, "namespace").setValue("no namespace");
+
+                            //add a custom sql query layer
+                            final ParameterValueGroup layer = getOrCreateGroup(source, "Layer");
+                            getOrCreateValue(layer, "name").setValue("CustomSQLQuery");
+                            getOrCreateValue(layer, "language").setValue("CUSTOM-SQL");
+                            getOrCreateValue(layer, "statement").setValue("SELECT name as nom, \"pointProperty\" as geom FROM \"PrimitiveGeoFeature\" ");
+                            
+                            lst.add(new AbstractMap.SimpleImmutableEntry<>("postgisSrc",source));                
+                        }
+                    }
+
+                }catch(Exception ex){
+                    throw new RuntimeException(ex.getLocalizedMessage(),ex);
                 }
                 
-                //empty configuration for others
-                return config;
+                return lst;
             }
 
-            @Override
-            public void saveConfiguration(ProviderFactory service, List<Provider> providers) {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
         };
 
         DataProviders.getInstance().setConfigurator(configurator);
@@ -268,7 +273,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
     @AfterClass
     public static void shutDown() {
         ConfigurationEngine.shutdownTestEnvironement("WFSRequestTest");
-        DataProviders.getInstance().setConfigurator(Configurator.DEFAULT);
+        DataProviders.getInstance().setConfigurator(Providers.DEFAULT_CONFIGURATOR);
         File f = new File("derby.log");
         if (f.exists()) {
             f.delete();

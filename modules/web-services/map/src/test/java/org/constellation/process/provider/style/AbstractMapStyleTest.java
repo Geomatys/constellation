@@ -21,6 +21,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.process.AbstractProcessTest;
 import org.constellation.provider.*;
 import org.junit.AfterClass;
@@ -80,10 +81,10 @@ public abstract class AbstractMapStyleTest extends AbstractProcessTest {
      */
     protected static ParameterValueGroup buildProvider(final String providerID, final boolean loadAll) throws MalformedURLException {
 
-        ParameterDescriptorGroup desc = SLD_SERVICE.getServiceDescriptor();
+        ParameterDescriptorGroup desc = SLD_SERVICE.getProviderDescriptor();
 
         if (desc != null) {
-            final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup) desc.descriptor("source");
+            final ParameterDescriptorGroup sourceDesc = desc;
             final ParameterValueGroup sourceValue = sourceDesc.createValue();
             sourceValue.parameter("id").setValue(providerID);
             sourceValue.parameter("load_all").setValue(loadAll);
@@ -103,19 +104,20 @@ public abstract class AbstractMapStyleTest extends AbstractProcessTest {
      * Register a provider.
      * @param providerSource
      */
-    protected static void addProvider(ParameterValueGroup providerSource) {
-        StyleProviders.getInstance().createProvider((StyleProviderFactory) SLD_SERVICE, providerSource);
+    protected static void addProvider(String id,ParameterValueGroup providerSource) throws ConfigurationException {
+        StyleProviders.getInstance().createProvider(id, (StyleProviderFactory) SLD_SERVICE, providerSource);
     }
 
     /**
      * Un-register a provider
      * @param id
      */
-    protected static void removeProvider(String id) {
+    protected static void removeProvider(String id) throws ConfigurationException {
 
         StyleProvider provider = null;
         for (StyleProvider p : StyleProviders.getInstance().getProviders()) {
             if (p.getId().equals(id)) {
+                provider = p;
             }
         }
         StyleProviders.getInstance().removeProvider(provider);

@@ -24,18 +24,19 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.logging.Level;
+import org.constellation.configuration.ConfigurationException;
 import static org.constellation.provider.Provider.RELOAD_TIME_PROPERTY;
-import org.constellation.provider.configuration.Configurator;
-import org.constellation.provider.configuration.ProviderParameters;
-
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
+import org.geotoolkit.parameter.ParametersExt;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.MutableStyleFactory;
 import org.opengis.filter.FilterFactory2;
+import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 
 
@@ -96,49 +97,41 @@ public final class StyleProviders extends Providers implements PropertyChangeLis
         if(source instanceof Provider){
             //save changed configuration
             final Provider provider = (Provider) source;
-            saveConfiguration((StyleProviderFactory) provider.getFactory());
+            try {
+                getConfigurator().updateProviderConfiguration(provider.getId(), provider.getSource());
+            } catch (ConfigurationException ex) {
+                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            }
         }
         //forward events
         fireUpdateEvent();
     }
 
-    public StyleProvider createProvider(final StyleProviderFactory factory, final ParameterValueGroup params){
+    public StyleProvider createProvider(final String providerId, final StyleProviderFactory factory, 
+            final ParameterValueGroup params) throws ConfigurationException{
         getProviders();
-        final StyleProvider provider = factory.createProvider(params);
+        final StyleProvider provider = factory.createProvider(providerId,params);
 
         //add in the list our provider
         provider.addPropertyListener(this);
         PROVIDERS.add(provider);
-        saveConfiguration(factory);
+        //save the configuration
+        getConfigurator().addProviderConfiguration(providerId,params);
         fireUpdateEvent();
         return provider;
     }
 
-    public StyleProvider removeProvider(final StyleProvider provider){
+    public StyleProvider removeProvider(final StyleProvider provider) throws ConfigurationException{
+        getConfigurator().removeProviderConfiguration(provider.getId());
+        
         final boolean b = PROVIDERS.remove(provider);
 
         if(b){
             provider.removePropertyListener(this);
-            saveConfiguration(provider.getFactory());
             fireUpdateEvent();
         }
 
         return provider;
-    }
-
-    /**
-     * Save configuration for the given provider factory
-     */
-    private void saveConfiguration(final ProviderFactory factory){
-        LOGGER.log(Level.INFO, "Saving configuration for factory : {0}", factory.getName());
-        //save configuration
-        final List<Provider> providers = new ArrayList<>();
-        for(StyleProvider candidate : PROVIDERS){
-            if(candidate.getFactory().equals(factory)){
-                providers.add(candidate);
-            }
-        }
-        getConfigurator().saveConfiguration(factory, providers);
     }
 
     /**
@@ -202,35 +195,40 @@ public final class StyleProviders extends Providers implements PropertyChangeLis
             return Collections.unmodifiableCollection(PROVIDERS);
         }
 
-        final Configurator configs = getConfigurator();
+        final List<Entry<String,ParameterValueGroup>> configs;
+        try {
+            configs = getConfigurator().getProviderConfigurations();
+        } catch (ConfigurationException ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            return Collections.EMPTY_LIST;
+        }
+        
         final List<StyleProvider> cache = new ArrayList<>();
-        for(final ProviderFactory factory : getFactories()){
-            final String factoryName = factory.getName();
-
-            //load configurable sources
-            try{
-                final ParameterValueGroup config = configs.getConfiguration(factory);
-                if(config != null){
-                    for(final ParameterValueGroup src : ProviderParameters.getSources(config)){
-                        try{
-                            final StyleProvider prov = (StyleProvider) factory.createProvider(src);
-                            if(prov != null){
-                                prov.addPropertyListener(this);
-                                cache.add(prov);
-                            }
-                        }catch(Exception ex){
-                            //we must not fail here in any case
-                            LOGGER.log(Level.SEVERE, "Factory "+factoryName+" failed to create a provider.",ex);
+        
+        //rebuild providers
+        for(Entry<String,ParameterValueGroup> entry : configs){
+            final String providerId = entry.getKey();
+            final ParameterValueGroup params = entry.getValue();
+                
+            for(final ProviderFactory factory : getFactories()){
+                //check if config can be used by this factory
+                final String paramName = factory.getStoreDescriptor().getName().getCode();
+                final GeneralParameterValue param = ParametersExt.getParameter(params, paramName);
+                if(param!=null){
+                    try{
+                        final StyleProvider prov = (StyleProvider)factory.createProvider(providerId, params);
+                        if(prov != null){
+                            prov.addPropertyListener(this);
+                            cache.add(prov);
                         }
+                    }catch(Exception ex){
+                        //we must not fail here in any case
+                        LOGGER.log(Level.SEVERE, "Factory "+factory.getName()+" failed to create a provider.",ex);
                     }
                 }
-            }catch(Exception ex){
-                //we must not fail here in any case
-                LOGGER.log(Level.SEVERE, "Configurator failed to provide configuration for factory : " + factoryName,ex);
             }
-
         }
-
+                
         PROVIDERS = cache;
         fireUpdateEvent();
         return Collections.unmodifiableCollection(PROVIDERS);
@@ -301,6 +299,14 @@ public final class StyleProviders extends Providers implements PropertyChangeLis
         return FACTORIES;
     }
 
+    public StyleProviderFactory getFactory(final String factoryID) {
+        for (StyleProviderFactory serv : FACTORIES) {
+            if (serv.getName().equals(factoryID)) {
+                return serv;
+            }
+        }
+        return null;
+    }
     /**
      * Returns the current instance of {@link StyleProviders}.
      */
