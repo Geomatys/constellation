@@ -41,6 +41,7 @@ import org.apache.sis.util.iso.Types;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.dao.DataRecord;
+import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataBrief;
@@ -53,6 +54,7 @@ import org.constellation.dto.FileBean;
 import org.constellation.dto.ImportedData;
 import org.constellation.dto.MetadataLists;
 import org.constellation.dto.ParameterValues;
+import org.constellation.dto.ProviderData;
 import org.constellation.dto.SimpleValue;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.model.SelectedExtension;
@@ -487,17 +489,30 @@ public class DataRest {
      * @param dataId Data identifier
      * @return
      */
-    @GET
-    @Path("pyramid/{providerId}/{dataId}")
+    @POST
+    @Path("pyramid/create/{providerId}/{dataId}")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
-    public Response createTiledProvider(@PathParam("providerId") final String providerId, @PathParam("dataId") final String dataId) {
+    public Response createTiledProvider(
+            @PathParam("providerId") final String providerId, @PathParam("dataId") final String dataId,
+            final String tileFormat, final String crs, final double[] scales, 
+            final Double upperCornerX, final Double upperCornerY) {
+        
         final DataProvider provider = DataProviders.getInstance().getProvider(providerId);
-        // TODO: pyramid the data
-
-        // TODO: return the tiled provider in the response
-        // return Response.ok(tiledProvider).build();
-        return Response.ok().build();
+        if(provider==null){
+            return Response.ok("Provider "+providerId+" does not exist").status(400).build();
+        }
+        final Data data = provider.get(new DefaultName(dataId));
+        if(data==null){
+            return Response.ok("Data "+dataId+" does not exist in provider "+providerId).status(400).build();
+        }
+        
+        //TODO
+        
+        final String tileProviderId = "";
+        final String tileDataId = "";
+        final ProviderData ref = new ProviderData(tileProviderId, tileDataId);
+        return Response.ok(ref).status(202).build();
     }
 
     /**
