@@ -1265,6 +1265,24 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         }
         return results;
     }
+    
+    /**
+     * TODO add a proper count methode in mdreader.
+     * 
+     * @return the number of record in the database.
+     * 
+     * @throws MetadataIoException 
+     */
+    @Override
+    public int getEntryCount() throws MetadataIoException {
+        try {
+            final List<RecordSet> recordSets   = mdReader.getRecordSets();
+            final Collection<FullRecord> records = mdReader.getAllRecord(recordSets);
+            return records.size();
+        } catch (MD_IOException ex) {
+            throw new MetadataIoException("SQL Exception while getting all the entries: " +ex.getMessage());
+        }
+    }
 
     /**
      * {@inheritDoc }

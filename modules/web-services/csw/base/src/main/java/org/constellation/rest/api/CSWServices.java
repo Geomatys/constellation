@@ -37,7 +37,7 @@ import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.configuration.ServiceConfigurer;
 import org.constellation.dto.ParameterValues;
 import org.constellation.metadata.configuration.CSWConfigurer;
-import org.w3c.dom.Node;
+import org.constellation.dto.SimpleValue;
 
 import static org.constellation.utils.RESTfulUtilities.ok;
 
@@ -108,6 +108,12 @@ public class CSWServices {
     @Path("{id}/record/{metaID}")
     public Response getMetadata(final @PathParam("id") String id, final @PathParam("metaID") String metaID) throws Exception {
         return ok(getConfigurer().getMetadata(id, metaID));
+    }
+    
+    @GET
+    @Path("{id}/records/count")
+    public Response getMetadataCount(final @PathParam("id") String id) throws Exception {
+        return ok(new SimpleValue(getConfigurer().getMetadataCount(id)));
     }
 
     @GET

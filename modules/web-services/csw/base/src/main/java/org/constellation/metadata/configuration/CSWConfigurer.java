@@ -94,6 +94,10 @@ public class CSWConfigurer extends OGCConfigurer {
     public Node getMetadata(final String id, final String identifier) throws ConfigurationException {
         return CSWConfigurationManager.getInstance().getMetadata(id, identifier);
     }
+    
+    public int getMetadataCount(final String id) throws ConfigurationException {
+        return CSWConfigurationManager.getInstance().getMetadataCount(id);
+    }
 
     public StringList getAvailableCSWDataSourceType() {
         return CSWConfigurationManager.getInstance().getAvailableCSWDataSourceType();

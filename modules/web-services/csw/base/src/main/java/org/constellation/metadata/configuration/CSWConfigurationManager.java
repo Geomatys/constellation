@@ -378,6 +378,15 @@ public class CSWConfigurationManager {
             throw new ConfigurationException(ex);
         }
     }
+    
+    public int getMetadataCount(final String id) throws ConfigurationException {
+        final CSWMetadataReader reader = getReader(id);
+        try {
+            return reader.getEntryCount();
+        } catch (MetadataIoException ex) {
+            throw new ConfigurationException(ex);
+        }
+    }
 
     public AcknowlegementType deleteMetadata(final String id, final String metadataName) throws ConfigurationException {
         final AbstractIndexer indexer = getIndexer(id, null);

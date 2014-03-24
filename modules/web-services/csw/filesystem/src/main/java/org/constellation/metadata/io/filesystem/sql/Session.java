@@ -100,6 +100,22 @@ public class Session implements Closeable {
             LOGGER.log(Level.WARNING, "Unexpected error occurred while inserting in csw database schema.", unexpected);
         }
     }
+    
+    public int getCount() throws SQLException {
+        int count = 0;
+        try {
+            final PreparedStatement stmt = con.prepareStatement("SELECT COUNT() FROM \"csw\".\"records\"");
+            final ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+            rs.close();
+            stmt.close();
+        } catch (SQLException unexpected) {
+            LOGGER.log(Level.WARNING, "Unexpected error occurred while looking for metadata count.", unexpected);
+        }
+        return count;
+    }
 
     public String getPathForRecord(final String identifier) throws SQLException {
         String result  = null;

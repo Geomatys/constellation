@@ -572,6 +572,22 @@ public class FileMetadataReader extends DomMetadataReader implements CSWMetadata
         }
         return null;
     }
+    
+    @Override
+    public int getEntryCount() throws MetadataIoException {
+        Session session = null;
+        try {
+            session = MetadataDatasource.createSession(serviceID);
+            return session.getCount();
+            
+        } catch (SQLException ex) {
+            throw new MetadataIoException("SQL Exception while getting records count", ex, NO_APPLICABLE_CODE);
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
 
     private String getMetadataIdentifier(final InputStream metadataStream) throws IOException, XMLStreamException {
         final List<String> identifierPaths = DUBLIN_CORE_QUERYABLE.get("identifier");

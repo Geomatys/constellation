@@ -53,6 +53,14 @@ public interface MetadataReader {
     boolean existMetadata(final String identifier) throws MetadataIoException;
     
     /**
+     * Return the number of metadata in the datasource.
+     * 
+     * @return the number of metadata in the datasource.
+     * @throws MetadataIoException 
+     */
+    int getEntryCount() throws MetadataIoException;
+    
+    /**
      * @return all the entries from the database
      * @throws MetadataIoException
      */

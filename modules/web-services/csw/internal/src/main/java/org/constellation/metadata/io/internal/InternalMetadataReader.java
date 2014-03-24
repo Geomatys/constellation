@@ -405,7 +405,10 @@ public class InternalMetadataReader extends DomMetadataReader implements CSWMeta
         return result;
     }
     
-   
+   @Override
+    public int getEntryCount() throws MetadataIoException {
+        return ConfigurationEngine.getProviderIds(true).size();
+    }
 
     /**
      * {@inheritDoc}

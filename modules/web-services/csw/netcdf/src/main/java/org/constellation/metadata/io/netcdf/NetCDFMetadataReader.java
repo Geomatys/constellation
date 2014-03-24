@@ -747,6 +747,11 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
     public List<String> getAllIdentifiers() throws MetadataIoException {
         return getAllIdentifiers(dataDirectory, null);
     }
+    
+    @Override
+    public int getEntryCount() throws MetadataIoException {
+        return getAllIdentifiers(dataDirectory, null).size();
+    }
 
     /**
      * find recursively the files names used as record identifier.
