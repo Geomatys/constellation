@@ -266,7 +266,7 @@ public class ConfigurationUtilities {
                                         LOGGER.log(Level.FINE, "\t\tProvider type : {0} | Service name : {1} \n\t\t {2}",
                                                 new String[]{ProviderRecord.ProviderType.STYLE.name(), factory.getName(), source.toString()});
                                         if (ConfigurationEngine.getProvider(sourceName) == null) {
-                                            ConfigurationEngine.writeProvider(sourceName, ProviderRecord.ProviderType.STYLE, factory.getName(), source);
+                                            ConfigurationEngine.writeProvider(sourceName, null, ProviderRecord.ProviderType.STYLE, factory.getName(), source);
                                         } else {
                                             LOGGER.log(Level.FINE, "Provider cannot be imported. A provider with the same name already exists : " + sourceName);
                                         }
@@ -294,7 +294,7 @@ public class ConfigurationUtilities {
                                                 new String[]{ProviderRecord.ProviderType.LAYER.name(), factory.getName(), source.toString()});
                                         final String sourceName = (String) source.parameter(SOURCE_ID_DESCRIPTOR_NAME).getValue();
                                         if (ConfigurationEngine.getProvider(sourceName) == null) {
-                                            ConfigurationEngine.writeProvider(sourceName, ProviderRecord.ProviderType.LAYER, factory.getName(), source);
+                                            ConfigurationEngine.writeProvider(sourceName, null, ProviderRecord.ProviderType.LAYER, factory.getName(), source);
                                         } else {
                                             LOGGER.log(Level.FINE, "Provider cannot be imported. A provider with the same name already exists : " + sourceName);
                                         }

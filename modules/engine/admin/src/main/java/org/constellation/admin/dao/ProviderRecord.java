@@ -27,6 +27,7 @@ import java.io.StringReader;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import org.constellation.admin.ConfigurationEngine;
 import org.opengis.parameter.GeneralParameterDescriptor;
 
 /**
@@ -45,15 +46,18 @@ public final class ProviderRecord extends Record {
 
     final int id;
     private String identifier;
+    //identifier of parent provider
+    private String parent;
     private ProviderType type;
     private String impl;
     private String owner;
 
-    ProviderRecord(final Session session, final int id, final String identifier, final ProviderType type,
-                   final String impl, final String owner) {
+    ProviderRecord(final Session session, final int id, final String identifier, final String parent,
+            final ProviderType type, final String impl, final String owner) {
         this.session    = session;
         this.id         = id;
         this.identifier = identifier;
+        this.parent     = parent;
         this.type       = type;
         this.impl       = impl;
         this.owner      = owner;
@@ -62,9 +66,10 @@ public final class ProviderRecord extends Record {
     public ProviderRecord(final Session s, final ResultSet rs) throws SQLException {
         this(s, rs.getInt(1),
                 rs.getString(2),
-                ProviderType.valueOf(rs.getString(3)),
-                rs.getString(4),
-                rs.getString(5));
+                rs.getString(3),
+                ProviderType.valueOf(rs.getString(4)),
+                rs.getString(5),
+                rs.getString(6));
     }
 
     /**
@@ -83,9 +88,28 @@ public final class ProviderRecord extends Record {
     public void setIdentifier(final String identifier) throws SQLException {
         this.identifier = identifier;
         ensureConnectionNotClosed();
-        session.updateProvider(id, identifier, type, impl, owner);
+        session.updateProvider(id, identifier, parent, type, impl, owner);
     }
 
+    public String getParentIdentifier() {
+        return parent;
+    }
+
+    public void setParentIdentifier(String parent) {
+        this.parent = parent;
+    }
+
+    public ProviderRecord getParentProvider(){
+        if(parent==null || parent.isEmpty()){
+            return null;
+        }
+        return ConfigurationEngine.getProvider(parent);
+    }
+    
+    public List<ProviderRecord> getChildrenProviders(){
+        return ConfigurationEngine.getProvidersFromParent(identifier);
+    }
+    
     public ProviderType getType() {
         return type;
     }
@@ -93,7 +117,7 @@ public final class ProviderRecord extends Record {
     public void setType(final ProviderType type) throws SQLException {
         this.type = type;
         ensureConnectionNotClosed();
-        session.updateProvider(id, identifier, type, impl, owner);
+        session.updateProvider(id, identifier, parent, type, impl, owner);
     }
 
     public String getImpl() {
@@ -103,7 +127,7 @@ public final class ProviderRecord extends Record {
     public void setImpl(final String impl) throws SQLException {
         this.impl = impl;
         ensureConnectionNotClosed();
-        session.updateProvider(id, identifier, type, impl, owner);
+        session.updateProvider(id, identifier, parent, type, impl, owner);
     }
 
     public GeneralParameterValue getConfig(final GeneralParameterDescriptor descriptor) throws SQLException, IOException {
@@ -119,8 +143,6 @@ public final class ProviderRecord extends Record {
     public String getOwnerLogin() {
         return owner;
     }
-
-  
 
     public InputStream getMetadata() throws IOException, SQLException {
         ensureConnectionNotClosed();

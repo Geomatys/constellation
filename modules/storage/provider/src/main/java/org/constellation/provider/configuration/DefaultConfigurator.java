@@ -108,7 +108,7 @@ public final class DefaultConfigurator implements Configurator {
         final ProviderRecord.ProviderType type = provider.getProviderType();
         final String factoryName = provider.getFactory().getName();
         
-        final ProviderRecord pr = ConfigurationEngine.writeProvider(providerId, type, factoryName, config);
+        final ProviderRecord pr = ConfigurationEngine.writeProvider(providerId, null, type, factoryName, config);
         try {
             checkDataUpdate(pr);
         } catch (SQLException | IOException ex) {

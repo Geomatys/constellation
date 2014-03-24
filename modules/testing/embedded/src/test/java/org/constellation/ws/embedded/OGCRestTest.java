@@ -154,7 +154,7 @@ public class OGCRestTest extends AbstractGrizzlyServer {
         Object meta = u.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/" + resourceName));
         CSWMarshallerPool.getInstance().recycle(u);
 
-        ConfigurationEngine.writeProvider(identifier, ProviderRecord.ProviderType.LAYER, service.getName(), source);
+        ConfigurationEngine.writeProvider(identifier, null, ProviderRecord.ProviderType.LAYER, service.getName(), source);
         ConfigurationEngine.saveMetaData(meta, identifier, CSWMarshallerPool.getInstance());
     }
 

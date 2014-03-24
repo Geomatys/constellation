@@ -589,6 +589,20 @@ public class ConfigurationEngine {
         }
         return new ArrayList<ProviderRecord>();
     }
+    
+    public static List<ProviderRecord> getProvidersFromParent(final String parentIdentifier) {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            return session.readProvidersFromParent(parentIdentifier);
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+        return new ArrayList<ProviderRecord>();
+    }
 
     public static ProviderRecord getProvider(final String providerID) {
         Session session = null;
@@ -619,8 +633,8 @@ public class ConfigurationEngine {
         }
     }
 
-    public static ProviderRecord writeProvider(final String identifier, final ProviderRecord.ProviderType type,
-            final String serviceName, final GeneralParameterValue config) {
+    public static ProviderRecord writeProvider(final String identifier, final String parent, 
+            final ProviderRecord.ProviderType type, final String serviceName, final GeneralParameterValue config) {
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
@@ -636,7 +650,7 @@ public class ConfigurationEngine {
                 // FIXME Wahhhhhhhhh !
                 login = "admin";
             }
-            return session.writeProvider(identifier, type, serviceName, config, login);
+            return session.writeProvider(identifier, parent, type, serviceName, config, login);
 
         } catch (SQLException | IOException ex) {
             LOGGER.log(Level.WARNING, "An error occurred while writing provider in database", ex);

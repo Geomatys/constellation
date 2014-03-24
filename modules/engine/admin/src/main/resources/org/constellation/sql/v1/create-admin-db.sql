@@ -46,6 +46,7 @@ ALTER TABLE "admin"."user_x_role" ADD CONSTRAINT user_x_role_role_fk FOREIGN KEY
 CREATE TABLE "admin"."provider"(
   "id"          INTEGER     NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0, INCREMENT BY 1),
   "identifier"  VARCHAR(128) NOT NULL UNIQUE,
+  "parent"      VARCHAR(128) NOT NULL,
   "type"        VARCHAR(8)  NOT NULL,
   "impl"        VARCHAR(32) NOT NULL,
   "config"      CLOB        NOT NULL,

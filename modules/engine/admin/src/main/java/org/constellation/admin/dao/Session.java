@@ -20,7 +20,6 @@ package org.constellation.admin.dao;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.dao.DataRecord.DataType;
@@ -29,7 +28,6 @@ import org.constellation.admin.dao.StyleRecord.StyleType;
 import org.constellation.admin.dao.TaskRecord.TaskState;
 import org.constellation.admin.util.IOUtilities;
 import org.geotoolkit.style.MutableStyle;
-import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
@@ -51,7 +49,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -113,6 +110,7 @@ public final class Session implements Closeable {
     private static final String LIST_PROVIDERS              = "provider.list";
     private static final String LIST_PROVIDERS_FROM_TYPE    = "provider.list.from.type";
     private static final String LIST_PROVIDERS_FROM_IMPL    = "provider.list.from.impl";
+    private static final String LIST_PROVIDERS_FROM_PARENT  = "provider.list.from.parent";
     private static final String WRITE_PROVIDER              = "provider.write";
     private static final String UPDATE_PROVIDER             = "provider.update";
     private static final String UPDATE_PROVIDER_CONFIG      = "provider.update.config";
@@ -463,11 +461,24 @@ public final class Session implements Closeable {
         ensureNonNull("implementation", implementation);
         return new Query(LIST_PROVIDERS_FROM_IMPL).with(implementation).select().getAll(ProviderRecord.class);
     }
+    
+    /**
+     * Queries the list of registered providers for the specified parent provider.
+     *
+     * @param parentIdentifier the provider parent identifier
+     * @return a {@link List} of {@link ProviderRecord}s
+     * @throws SQLException if a database access error occurs
+     */
+    public List<ProviderRecord> readProvidersFromParent(final String parentIdentifier) throws SQLException {
+        ensureNonNull("parentIdentifier", parentIdentifier);
+        return new Query(LIST_PROVIDERS_FROM_PARENT).with(parentIdentifier).select().getAll(ProviderRecord.class);
+    }
 
     /**
      * Inserts a new provider.
      *
      * @param identifier the provider identifier
+     * @param parent the provider parent identifier, can be null
      * @param type       the provider type
      * @param impl       the provider implementation (coverage-file, feature-store...)
      * @param config     the provider configuration
@@ -476,21 +487,24 @@ public final class Session implements Closeable {
      * @throws SQLException if a database access error occurs
      * @throws IOException if the configuration cannot be written
      */
-    public ProviderRecord writeProvider(final String identifier, final ProviderType type, final String impl, final GeneralParameterValue config, final String owner) throws SQLException, IOException {
+    public ProviderRecord writeProvider(final String identifier, String parent, 
+            final ProviderType type, final String impl, final GeneralParameterValue config, 
+            final String owner) throws SQLException, IOException {
         ensureNonNull("identifier", identifier);
         ensureNonNull("type",       type);
         ensureNonNull("impl",       impl);
         ensureNonNull("config",     config);
+        if(parent==null) parent="";
 
         // Prepare insertion.
         final StringReader reader = new StringReader(IOUtilities.writeParameter(config));
         final String login        = owner;
 
         // Proceed to insertion.
-        final int id = new Query(WRITE_PROVIDER).with(identifier, type.name(), impl, reader, login).insert();
+        final int id = new Query(WRITE_PROVIDER).with(identifier, parent, type.name(), impl, reader, login).insert();
 
         // Return inserted line.
-        return new ProviderRecord(this, id, identifier, type, impl, login);
+        return new ProviderRecord(this, id, identifier, parent, type, impl, login);
     }
 
     /**
@@ -503,8 +517,10 @@ public final class Session implements Closeable {
      * @param newOwner      the new provider owner
      * @throws SQLException
      */
-    /* internal */ void updateProvider(final int generatedId, final String newIdentifier, final ProviderType newType, final String newImpl, final String newOwner) throws SQLException {
-        new Query(UPDATE_PROVIDER).with(newIdentifier, newType.name(), newImpl, newOwner, generatedId).update();
+    /* internal */ void updateProvider(final int generatedId, final String newIdentifier, String parent,
+            final ProviderType newType, final String newImpl, final String newOwner) throws SQLException {
+        if(parent==null) parent="";
+        new Query(UPDATE_PROVIDER).with(newIdentifier, parent, newType.name(), newImpl, newOwner, generatedId).update();
     }
 
     /**
