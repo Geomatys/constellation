@@ -47,15 +47,7 @@ import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataBrief;
 import org.constellation.coverage.PyramidCoverageHelper;
 import org.constellation.coverage.PyramidCoverageProcessListener;
-import org.constellation.dto.CoverageMetadataBean;
-import org.constellation.dto.DataInformation;
-import org.constellation.dto.DataMetadata;
-import org.constellation.dto.FileBean;
-import org.constellation.dto.ImportedData;
-import org.constellation.dto.MetadataLists;
-import org.constellation.dto.ParameterValues;
-import org.constellation.dto.ProviderData;
-import org.constellation.dto.SimpleValue;
+import org.constellation.dto.*;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.model.SelectedExtension;
 import org.constellation.provider.CoverageData;
@@ -494,10 +486,8 @@ public class DataRest {
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
     public Response createTiledProvider(
-            @PathParam("providerId") final String providerId, @PathParam("dataId") final String dataId,
-            final String tileFormat, final String crs, final double[] scales, 
-            final Double upperCornerX, final Double upperCornerY) {
-        
+            @PathParam("providerId") final String providerId, @PathParam("dataId") final String dataId, final PyramidParams params) {
+
         final DataProvider provider = DataProviders.getInstance().getProvider(providerId);
         if(provider==null){
             return Response.ok("Provider "+providerId+" does not exist").status(400).build();
@@ -506,7 +496,13 @@ public class DataRest {
         if(data==null){
             return Response.ok("Data "+dataId+" does not exist in provider "+providerId).status(400).build();
         }
-        
+
+        final String tileFormat = params.getTileFormat();
+        final String crs = params.getCrs();
+        final double[] scales = params.getScales();
+        final Double upperCornerX = params.getUpperCornerX();
+        final Double upperCornerY = params.getUpperCornerY();
+
         //TODO
         
         final String tileProviderId = "";
