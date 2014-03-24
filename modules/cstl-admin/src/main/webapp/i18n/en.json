@@ -786,5 +786,11 @@
     },
     "com.codahale.metrics.servlet.AbstractInstrumentedFilter.requests": "Metrics",
     "org.constellation.map.ws.DefaultWMSWorker.getCapabilities": "WMS(getCapabilies)",
-    "org.constellation.map.ws.DefaultWMSWorker.getMap": "WMS(getMap)"
+    "org.constellation.map.ws.DefaultWMSWorker.getMap": "WMS(getMap)",
+    "users": {
+      "add": "Add",
+      "title": "Users",
+      "count": "There are {{ total }} users.",
+      "filter": "User filter: "
+    }
 }

@@ -1,15 +1,58 @@
-<div class="container">
-    <div class="row" ng-repeat="user in list">
-        <div class="col-sm-1">{{user.login}}</div>
-        <div class="col-sm-1">{{user.firstname}}</div>
-        <div class="col-sm-1">{{user.lastname}}</div>
-        <div class="col-sm-4" ng-click="details($index)">{{user.email}}</div>
-        <div class="col-sm-2">
-           <span ng-repeat="role in user.roles">{{role}}</span>
-        </div>
-        <div class="col-sm-1" ng-click="delete($index)">Delete</div>
+<div class="logo-wrapper row">
+    <div class="col-sm-3">
+        <a href="#"><img src="images/constellation.png"></a>
     </div>
-	<div>
-		<span ng-click="add()">Add</span>
-	</div>
+    <!-- Menu to create services -->
+    <div class="col-sm-3 col-sm-offset-6">
+        <div ng-click="add()" class="dropdown pull-right">
+            <a  data-toggle="dropdown" class="btn btn-info btn-lg" style="margin-top:8px;padding:15px 19px;">
+                <span class="icon-plus icon-white" style="margin-right:5px;"></span>
+                <span translate="users.add">Ajouter une donnée</span>
+                <span class="caret"></span>
+            </a>
+          
+        </div>
+    </div>
+</div>
+
+<div class="container">
+	<h2 translate="users.title">Users</h2>
+
+	<p translate="users.count"
+		translate-values="{total: '{{ list.length }}'}">There are {{
+		list.length }} users.</p>
+
+	{{'users.filter' | translate}} <input type="text" ng-model="filter"
+		class="form-control" maxlength="10" >
+
+	<table
+		class="table table-condensed table-striped table-bordered table-responsive">
+		<thead>
+			<tr title="click to order">
+				<td ng-click="predicate = 'login'; reverse=!reverse"
+					translate="settings.form.login">Name</td>
+				<td ng-click="predicate = 'firstname'; reverse=!reverse"
+					translate="settings.form.firstname">Name</td>
+				<td ng-click="predicate = 'lastname'; reverse=!reverse"
+					translate="settings.form.lastname">Name</td>
+				<td ng-click="predicate = 'email'; reverse=!reverse"
+					translate="settings.form.email">Name</td>
+				<td ng-click="predicate = 'roles'; reverse=!reverse"
+					translate="settings.form.roles">Name</td>
+			</tr>
+		</thead>
+
+		<tr ng-click="details($index)" style='cursor:pointer'
+			ng-repeat="user in list | filter:filter | orderBy:predicate:reverse">
+			<td>{{user.login}}</td>
+			<td>{{user.firstname}}</td>
+			<td>{{user.lastname}}</td>
+			<td>{{user.email}}</td>
+			<td><span ng-repeat="role in user.roles">{{role}}</span>
+			</td>
+			<td ng-click="delete($index)">Delete</td>
+
+		</tr>
+	</table>
+
 </div>
