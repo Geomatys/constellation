@@ -162,6 +162,14 @@ cstlAdminApp.factory('provider', ['$resource',
         });
     }]);
 
+cstlAdminApp.factory('csw', ['$resource',
+    function ($resource) {
+        return $resource('@cstl/api/1/CSW', {}, {
+            'count':      {method: 'GET',  url: '@cstl/api/1/CSW/:id/records/count;jsessionid='},
+            'getRecords': {method: 'GET',  url: '@cstl/api/1/CSW/:id/records/:count-:startIndex;jsessionid='},
+            'refresh':    {method: 'POST', url: '@cstl/api/1/CSW/:id/index/refresh;jsessionid='}
+        });
+    }]);
 
 cstlAdminApp.factory('textService', ['$http',
     function ($http){
@@ -319,7 +327,7 @@ cstlAdminApp.directive('pageSwitcher', function() {
 });
 
 cstlAdminApp.service('$dashboard', function($filter) {
-    return function($scope, fullList) {
+    return function($scope, fullList, filterOnType) {
 
         $scope.fullList = fullList || [];
         $scope.dataList = $scope.dataList || [];
@@ -335,7 +343,12 @@ cstlAdminApp.service('$dashboard', function($filter) {
 
         // Dashboard methods
         $scope.displayPage = function(page) {
-            var array = $filter('filter')($scope.fullList, {'Type':$scope.filtertype, '$': $scope.filtertext});
+            var array;
+            if (filterOnType) {
+                array = $filter('filter')($scope.fullList, {'Type':$scope.filtertype, '$': $scope.filtertext});
+            } else {
+                array = $filter('filter')($scope.fullList, {'$': $scope.filtertext});
+            }
             array = $filter('orderBy')(array, $scope.ordertype, $scope.orderreverse);
 
             var list = [];

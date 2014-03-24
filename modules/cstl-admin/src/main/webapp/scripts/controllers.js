@@ -248,7 +248,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
         $scope.filtertype = "VECTOR";
 
         dataListing.listAll({}, function(response) {
-            $dashboard($scope, response);
+            $dashboard($scope, response, true);
         });
 
         // Map methods
@@ -351,7 +351,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         };
 
         style.listAll({}, function(response) {
-            $dashboard($scope, response.styles);
+            $dashboard($scope, response.styles, false);
         });
 
         $scope.ok = function() {
@@ -737,7 +737,7 @@ cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', '$
         $scope.filtertype = "";
 
         style.listAll({}, function(response) {
-            $dashboard($scope, response.styles);
+            $dashboard($scope, response.styles, false);
         });
 
         $scope.deleteStyle = function() {
@@ -897,8 +897,8 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','data
     }]);
 
 
-cstlAdminApp.controller('WebServiceController', ['$scope', 'webService','$modal', 'textService', '$growl',
-    function ($scope, webService, $modal, textService, $growl) {
+cstlAdminApp.controller('WebServiceController', ['$scope', 'webService', 'csw', '$modal', 'textService', '$growl',
+    function ($scope, webService, csw, $modal, textService, $growl) {
 
        $scope.services = webService.listAll();
 
@@ -978,6 +978,13 @@ cstlAdminApp.controller('WebServiceController', ['$scope', 'webService','$modal'
                     function() { $growl('error','Error','Service '+ service.name +' deletion failed'); }
                 );
             }
+        };
+
+        $scope.refreshIndex = function(service) {
+            csw.refresh({id: service.identifier}, {},
+                function() { $growl('success','Success','Search index for the service '+ service.name +' successfully refreshed'); },
+                function() { $growl('error','Error','Search index for the service '+ service.name +' failed to be updated'); }
+            );
         };
     }]);
 
@@ -1114,8 +1121,8 @@ cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routePar
         };
     }]);
 
-cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'webService', 'provider', '$modal','textService', '$dashboard', '$growl', '$filter', 'StyleSharedService','style','$cookies',
-                                                 function ($scope, $routeParams , webService, provider, $modal, textService, $dashboard, $growl, $filter, StyleSharedService, style, $cookies) {
+cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'webService', 'provider', 'csw', '$modal','textService', '$dashboard', '$growl', '$filter', 'StyleSharedService','style','$cookies',
+                                                 function ($scope, $routeParams , webService, provider, csw, $modal, textService, $dashboard, $growl, $filter, StyleSharedService, style, $cookies) {
     $scope.tagText = '';
     $scope.type = $routeParams.type;
     $scope.url = $cookies.cstlUrl + "WS/" + $routeParams.type + "/" + $routeParams.id;
@@ -1132,14 +1139,44 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
   	} );
 
     $scope.service = webService.get({type: $scope.type, id:$routeParams.id});
-
     $scope.metadata = webService.metadata({type: $scope.type, id:$routeParams.id});
-    $scope.config = webService.config({type: $scope.type, id:$routeParams.id});
 
     $scope.filtertype = "";
-    $scope.layers = webService.layers({type: $scope.type, id:$routeParams.id}, {}, function(response) {
-        $dashboard($scope, response);
-    });
+
+    $scope.tabdata = true;
+    $scope.tabdesc = false;
+    $scope.tabmetadata = false;
+
+    $scope.selectTab = function(item) {
+        if (item === 'tabdata') {
+            $scope.tabdata = true;
+            $scope.tabdesc = false;
+            $scope.tabmetadata = false;
+        } else if (item === 'tabdesc') {
+            $scope.tabdata = false;
+            $scope.tabdesc = true;
+            $scope.tabmetadata = false;
+        } else {
+            $scope.tabdata = false;
+            $scope.tabdesc = false;
+            $scope.tabmetadata = true;
+        }
+    };
+
+    $scope.initScope = function() {
+        if ($scope.type === 'csw') {
+            csw.count({id: $routeParams.id}, {}, function(max) {
+                csw.getRecords({id: $routeParams.id, count: max.asInt, startIndex: 0}, {}, function(response) {
+                    $dashboard($scope, response.BriefNode, false);
+                });
+            });
+        } else {
+            $scope.config = webService.config({type: $scope.type, id:$routeParams.id});
+            $scope.layers = webService.layers({type: $scope.type, id:$routeParams.id}, {}, function(response) {
+                $dashboard($scope, response, true);
+            });
+        }
+    };
 
     $scope.getVersionsForType = function() {
         if ($scope.type === 'wms') {
@@ -1283,27 +1320,6 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
         }
      };
 
-
-     $scope.tabdata = true;
-     $scope.tabdesc = false;
-     $scope.tabmetadata = false;
-
-     $scope.selectTab = function(item) {
-         if (item === 'tabdata') {
-             $scope.tabdata = true;
-             $scope.tabdesc = false;
-             $scope.tabmetadata = false;
-         } else if (item === 'tabdesc') {
-             $scope.tabdata = false;
-             $scope.tabdesc = true;
-             $scope.tabmetadata = false;
-         } else {
-             $scope.tabdata = false;
-             $scope.tabdesc = false;
-             $scope.tabmetadata = true;
-         }
-     };
-
      // Allow to choose data to add for this service
      $scope.showDataToAdd = function() {
          var modal = $modal.open({
@@ -1433,7 +1449,7 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
         $scope.exclude = exclude;
 
         dataListing.listAll({}, function(response) {
-            $dashboard($scope, response);
+            $dashboard($scope, response, true);
         });
 
         $scope.close = function() {

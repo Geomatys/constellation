@@ -469,7 +469,8 @@
             "tab.metadata.title": "Service metadata"
         },
         "edit": {
-            "dashboard.title": "Layers list",
+            "dashboard.layer.title": "Layers list",
+            "dashboard.metadata.title": "Layers list",
             "dashboard.tabs": {
                 "data": "Data",
                 "description": "Service Description",

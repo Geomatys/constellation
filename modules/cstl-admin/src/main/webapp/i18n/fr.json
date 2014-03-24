@@ -911,7 +911,8 @@
             }
         },
         "edit": {
-            "dashboard.title": "Liste des couches",
+            "dashboard.layer.title": "Liste des couches",
+            "dashboard.metadata.title": "Liste des métadonnées",
             "dashboard.tabs": {
                 "data": "Données",
                 "description": "Description du service",

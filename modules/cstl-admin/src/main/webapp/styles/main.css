@@ -411,6 +411,12 @@ ul.unstyled {
 .dashboard .item-list .item.style-vector.selected{
     background: transparent url('../images/style-vector-selected.png') right center no-repeat;
 }
+.dashboard .item-list .item.metadata {
+    background: transparent url('../images/metadata.png') right center no-repeat;
+}
+.dashboard .item-list .item.metadata.selected {
+    background: transparent url('../images/metadata-selected.png') right center no-repeat;
+}
 .dashboard .item-list .item {
     border: 1px solid white;
     opacity: 0.8;
