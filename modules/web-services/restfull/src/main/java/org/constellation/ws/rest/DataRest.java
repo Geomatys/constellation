@@ -56,6 +56,7 @@ import org.constellation.provider.DataProviderFactory;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.FeatureData;
 import org.constellation.provider.Providers;
+import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.provider.coveragestore.CoverageStoreProvider;
 import org.constellation.security.SecurityManagerHolder;
 import org.constellation.util.SimplyMetadataTreeNode;
@@ -577,6 +578,7 @@ public class DataRest {
         try {
             final DataProviderFactory factory = DataProviders.getInstance().getFactory("coverage-store");
             final ParameterValueGroup pparams = factory.getProviderDescriptor().createValue();
+            ParametersExt.getOrCreateValue(pparams, ProviderParameters.SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue(pyramidProviderId);
             final ParameterValueGroup choiceparams = ParametersExt.getOrCreateGroup(pparams, factory.getStoreDescriptor().getName().getCode());
             final ParameterValueGroup xmlpyramidparams = ParametersExt.getOrCreateGroup(choiceparams, XMLCoverageStoreFactory.PARAMETERS_DESCRIPTOR.getName().getCode());
             ParametersExt.getOrCreateValue(xmlpyramidparams, XMLCoverageStoreFactory.PATH.getName().getCode()).setValue(pyramidDirectory.toURL());

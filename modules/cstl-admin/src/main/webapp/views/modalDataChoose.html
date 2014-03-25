@@ -76,23 +76,23 @@
             <div ng-show="wmtsParams">
                 <div class="form-group">
                     <div class="control-label" for="tileFormat">Tile format</div>
-                    <input type="text" class="form-control" ng-model="tileFormat" id="tileFormat"/>
+                    <input type="text" class="form-control" ng-model="$parent.tileFormat" id="tileFormat"/>
                 </div>
                 <div class="form-group">
                     <div class="control-label" for="crs">CRS</div>
-                    <input type="text" class="form-control" ng-model="crs" id="crs"/>
+                    <input type="text" class="form-control" ng-model="$parent.crs" id="crs"/>
                 </div>
                 <div class="form-group">
                     <div class="control-label" for="scales">Scales</div>
-                    <input type="text" class="form-control" ng-model="scales" id="scales" required/>
+                    <input type="text" class="form-control" ng-model="$parent.scales" id="scales" ng-list required/>
                 </div>
                 <div class="form-group">
                     <div class="control-label" for="upperCornerX">UpperCornerX</div>
-                    <input type="text" class="form-control" ng-model="upperCornerX" id="upperCornerX"/>
+                    <input type="text" class="form-control" ng-model="$parent.upperCornerX" id="upperCornerX"/>
                 </div>
                 <div class="form-group">
                     <div class="control-label" for="upperCornerY">upperCornerY</div>
-                    <input type="text" class="form-control" ng-model="upperCornerY" id="upperCornerY"/>
+                    <input type="text" class="form-control" ng-model="$parent.upperCornerY" id="upperCornerY"/>
                 </div>
             </div>
         </div>

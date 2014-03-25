@@ -1453,7 +1453,7 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
         $scope.data = undefined;
         $scope.tileFormat = undefined;
         $scope.crs = undefined;
-        $scope.scales = undefined;
+        $scope.scales = [];
         $scope.upperCornerX = undefined;
         $scope.upperCornerY = undefined;
 
@@ -1494,18 +1494,18 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
                     dataListing.pyramidData({providerId: $scope.data.Provider, dataId: $scope.data.Name},
                                             {tileFormat: $scope.tileFormat, crs: $scope.crs, scales: $scope.scales, upperCornerX: $scope.upperCornerX, upperCornerY: $scope.upperCornerY},
                                             function(respProvider) {
-                                            // Add the tiled provider to the service
-                                            webService.addLayer({type: service.type, id: service.identifier},
-                                                {layerAlias: respProvider.dataId, layerId: respProvider.dataId, serviceType: service.type, serviceId: service.identifier, providerId: respProvider.providerId},
-                                                function () {
-                                                    $growl('success', 'Success', 'Layer ' + respProvider.dataId + ' successfully added to service ' + service.name);
-                                                    $modalInstance.close();
-                                                },
-                                                function () {
-                                                    $growl('error', 'Error', 'Layer ' + respProvider.dataId + ' failed to be added to service ' + service.name);
-                                                    $modalInstance.dismiss('close');
-                                                }
-                                            );
+                                                // Add the tiled provider to the service
+                                                webService.addLayer({type: service.type, id: service.identifier},
+                                                    {layerAlias: respProvider.dataId, layerId: respProvider.dataId, serviceType: service.type, serviceId: service.identifier, providerId: respProvider.providerId},
+                                                    function () {
+                                                        $growl('success', 'Success', 'Layer ' + respProvider.dataId + ' successfully added to service ' + service.name);
+                                                        $modalInstance.close();
+                                                    },
+                                                    function () {
+                                                        $growl('error', 'Error', 'Layer ' + respProvider.dataId + ' failed to be added to service ' + service.name);
+                                                        $modalInstance.dismiss('close');
+                                                    }
+                                                );
                                             }, function() { $growl('error', 'Error', 'Pyramid process failed for ' + $scope.data.Name); });
                 }
             }
