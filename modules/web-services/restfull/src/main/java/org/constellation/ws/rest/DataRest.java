@@ -85,6 +85,7 @@ import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.process.ProcessListener;
 import org.geotoolkit.process.ProcessListenerAdapter;
 import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.referencing.ReferencingUtilities;
 import org.geotoolkit.util.FileUtilities;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -539,13 +540,25 @@ public class DataRest {
             tileFormat = "PNG";
         }
         
-        //get pyramid CRS 
+        //get pyramid CRS, we force longiude first on the pyramids
+        // WMTS is made for display like WMS, so longitude is expected to be on the X axis.
+        // Note : this is not writen in the spec.
         final CoordinateReferenceSystem coordsys;
         if(crs == null || crs.isEmpty()){
-            coordsys = dataEnv.getCoordinateReferenceSystem();
+            try {
+                coordsys = ReferencingUtilities.setLongitudeFirst(dataEnv.getCoordinateReferenceSystem());
+            } catch (FactoryException ex) {
+                return Response.ok("Failed to invert axes (longitude first) on CRS : "+ex.getMessage()).status(500).build();
+            }
+            try {
+                //reproject data envelope
+                dataEnv = CRS.transform(dataEnv, coordsys);
+            } catch (TransformException ex) {
+                return Response.ok("Could not transform data envelope to crs "+crs).status(400).build();
+            }
         }else{
             try {
-                coordsys = CRS.decode(crs);
+                coordsys = CRS.decode(crs,true);
             } catch (FactoryException ex) {
                 return Response.ok("Invalid CRS code : "+crs).status(400).build();
             }

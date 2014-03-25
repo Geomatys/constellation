@@ -505,27 +505,25 @@ public final class LayerProviders extends Static {
      */
     private static MutableStyle generateCoverageStyle(final Data layer) throws DataStoreException, IOException {
         // Acquire coverage data.
-        final GridCoverage2D coverage = layer.getCoverage(null, null, null, null);
+        final CoverageReference ref = (CoverageReference) layer.getOrigin();
+        final GridCoverageReader reader = ref.acquireReader();
+        final List<GridSampleDimension> dims = reader.getSampleDimensions(ref.getImageIndex());
+        ref.recycle(reader);
 
         // Determine if we should apply this palette (should be applied only for geophysics data!)
         // HACK: normally we should test if the view types set contains photographic, but this is not working here
         // because all coverage readers seems to have it ... so just test the number of sample dimensions.
         // It won't work for all cases ...
         // TODO: fix netcdf reader, should not add photographic in the view types possibilities
-        if (coverage.getSampleDimensions()== null || coverage.getSampleDimensions().length== 0 
-          ||coverage.getSampleDimensions().length == 3 || coverage.getSampleDimensions().length == 4) {
-        //if (coverage.getViewTypes().contains(ViewType.PHOTOGRAPHIC)) {
+        final int nbSamples = (dims==null) ? 0 : dims.size();
+        if (nbSamples==0 || nbSamples==3 || nbSamples==4) {
             // should be RGB, no need to apply a palette, let the renderer display this image unchanged
             return null;
         }
 
-        final RenderedImage ri = coverage.view(ViewType.GEOPHYSICS).getRenderedImage();
-        //coverage.getSampleDimensions()[0].getSampleToGeophysics() == null => RGB
-
         // Extract first band statistics.
-        final Map<String, Object> map = StatisticOp.analyze(ri);
-        double min = ((double[]) map.get("min"))[0];
-        double max = ((double[]) map.get("max"))[0];
+        double min = dims.get(0).getMinimumValue();
+        double max = dims.get(0).getMaximumValue();
         double average = (max + min) / 2;
 
         // Generate a color map from band statistics.
