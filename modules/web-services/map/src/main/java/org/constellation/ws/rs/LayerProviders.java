@@ -512,7 +512,8 @@ public final class LayerProviders extends Static {
         // because all coverage readers seems to have it ... so just test the number of sample dimensions.
         // It won't work for all cases ...
         // TODO: fix netcdf reader, should not add photographic in the view types possibilities
-        if (coverage.getSampleDimensions().length == 3 || coverage.getSampleDimensions().length == 4) {
+        if (coverage.getSampleDimensions()== null || coverage.getSampleDimensions().length== 0 
+          ||coverage.getSampleDimensions().length == 3 || coverage.getSampleDimensions().length == 4) {
         //if (coverage.getViewTypes().contains(ViewType.PHOTOGRAPHIC)) {
             // should be RGB, no need to apply a palette, let the renderer display this image unchanged
             return null;

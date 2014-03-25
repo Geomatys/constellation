@@ -189,7 +189,7 @@ public class MapConfigurer extends OGCConfigurer {
         // because all coverage readers seems to have it ... so just test the number of sample dimensions.
         // It won't work for all cases ...
         // TODO: fix netcdf reader, should not add photographic in the view types possibilities
-        if (covDesc.getBands().size() == 3 || covDesc.getBands().size()  == 4) {
+        if (covDesc.getBands().isEmpty() || covDesc.getBands().size() == 3 || covDesc.getBands().size()  == 4) {
         //if (coverage.getViewTypes().contains(ViewType.PHOTOGRAPHIC)) {
             // should be RGB, no need to apply a palette, let the renderer display this image unchanged
         	 return DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, "sld", "default-raster");
