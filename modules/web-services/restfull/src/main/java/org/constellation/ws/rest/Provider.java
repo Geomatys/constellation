@@ -82,8 +82,7 @@ public final class Provider {
         final Map<String,String> inParams = config.getParameters();
 
         final DataProviderFactory providerService = DataProviders.getInstance().getFactory(type);
-        final ParameterDescriptorGroup serviceDesc = providerService.getProviderDescriptor();
-        final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup) serviceDesc.descriptor("source");
+        final ParameterDescriptorGroup sourceDesc = providerService.getProviderDescriptor();
         final ParameterValueGroup sources = sourceDesc.createValue();
         sources.parameter("id").setValue(id);
         sources.parameter("providerType").setValue(type);

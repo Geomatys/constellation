@@ -865,6 +865,9 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','data
             });
 
             function generateMetadataTags(metadataList, parentDivId) {
+                if (metadataList == null) {
+                    return;
+                }
                 for(var i=0; i<metadataList.length; i++){
                     var key = metadataList[i];
                     var name = key.name;
