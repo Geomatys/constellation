@@ -1,5 +1,6 @@
 package org.constellation.ws.rest;
 
+import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,6 +8,7 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -17,10 +19,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.CRC32;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -34,16 +36,13 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
-
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.iso.Types;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.dao.DataRecord;
-import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataBrief;
 import org.constellation.coverage.PyramidCoverageHelper;
 import org.constellation.coverage.PyramidCoverageProcessListener;
@@ -51,10 +50,12 @@ import org.constellation.dto.*;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.model.SelectedExtension;
 import org.constellation.provider.CoverageData;
-import org.constellation.provider.FeatureData;
 import org.constellation.provider.Data;
 import org.constellation.provider.DataProvider;
+import org.constellation.provider.DataProviderFactory;
 import org.constellation.provider.DataProviders;
+import org.constellation.provider.FeatureData;
+import org.constellation.provider.Providers;
 import org.constellation.provider.coveragestore.CoverageStoreProvider;
 import org.constellation.security.SecurityManagerHolder;
 import org.constellation.util.SimplyMetadataTreeNode;
@@ -62,22 +63,40 @@ import org.constellation.utils.GeotoolkitFileExtensionAvailable;
 import org.constellation.utils.MetadataFeeder;
 import org.constellation.utils.MetadataUtilities;
 import org.geotoolkit.coverage.CoverageReference;
-import org.geotoolkit.coverage.io.CoverageStoreException;
+import org.geotoolkit.coverage.CoverageStore;
+import org.geotoolkit.coverage.PyramidalCoverageReference;
+import org.geotoolkit.coverage.grid.ViewType;
 import org.geotoolkit.coverage.io.GridCoverageReader;
+import org.geotoolkit.coverage.xmlstore.XMLCoverageStoreFactory;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
+import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.feature.DefaultName;
+import org.geotoolkit.map.MapBuilder;
+import org.geotoolkit.map.MapContext;
+import org.geotoolkit.parameter.ParametersExt;
+import org.geotoolkit.process.AbstractProcess;
+import org.geotoolkit.process.ProcessDescriptor;
+import org.geotoolkit.process.ProcessEvent;
+import org.geotoolkit.process.ProcessException;
+import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.process.ProcessListener;
+import org.geotoolkit.process.ProcessListenerAdapter;
+import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.util.FileUtilities;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.glassfish.jersey.media.multipart.MultiPart;
 import org.opengis.feature.type.Name;
+import org.opengis.geometry.Envelope;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.Role;
 import org.opengis.metadata.identification.TopicCategory;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
 import org.opengis.util.InternationalString;
+import org.opengis.util.NoSuchIdentifierException;
 
 /**
  * Manage data sending
@@ -487,27 +506,164 @@ public class DataRest {
     @Consumes({MediaType.APPLICATION_JSON})
     public Response createTiledProvider(
             @PathParam("providerId") final String providerId, @PathParam("dataId") final String dataId, final PyramidParams params) {
-
-        final DataProvider provider = DataProviders.getInstance().getProvider(providerId);
-        if(provider==null){
+        
+        String tileFormat = params.getTileFormat();
+        String crs = params.getCrs();
+        double[] scales = params.getScales();
+        Double upperCornerX = params.getUpperCornerX();
+        Double upperCornerY = params.getUpperCornerY();
+        
+        //get data
+        final DataProvider inProvider = DataProviders.getInstance().getProvider(providerId);
+        if(inProvider==null){
             return Response.ok("Provider "+providerId+" does not exist").status(400).build();
         }
-        final Data data = provider.get(new DefaultName(dataId));
-        if(data==null){
+        final Data inData = inProvider.get(new DefaultName(dataId));
+        if(inData==null){
             return Response.ok("Data "+dataId+" does not exist in provider "+providerId).status(400).build();
         }
-
-        final String tileFormat = params.getTileFormat();
-        final String crs = params.getCrs();
-        final double[] scales = params.getScales();
-        final Double upperCornerX = params.getUpperCornerX();
-        final Double upperCornerY = params.getUpperCornerY();
-
-        //TODO
         
-        final String tileProviderId = "";
-        final String tileDataId = "";
-        final ProviderData ref = new ProviderData(tileProviderId, tileDataId);
+        Envelope dataEnv;
+        try {
+            //use data crs
+            dataEnv = inData.getEnvelope();
+        } catch (DataStoreException ex) {
+            return Response.ok("Failed to extract envelope for data "+dataId).status(500).build();
+        }
+        
+        //get tile format 
+        if(tileFormat==null || tileFormat.isEmpty()){
+            tileFormat = "image/png";
+        }
+        
+        //get pyramid CRS 
+        final CoordinateReferenceSystem coordsys;
+        if(crs == null || crs.isEmpty()){
+            coordsys = dataEnv.getCoordinateReferenceSystem();
+        }else{
+            try {
+                coordsys = CRS.decode(crs);
+            } catch (FactoryException ex) {
+                return Response.ok("Invalid CRS code : "+crs).status(400).build();
+            }
+            try {
+                //reproject data envelope
+                dataEnv = CRS.transform(dataEnv, coordsys);
+            } catch (TransformException ex) {
+                return Response.ok("Could not transform data envelope to crs "+crs).status(400).build();
+            }
+        }
+        
+        //get pyramid scale levels
+        if(scales==null || scales.length==0){
+            //TODO a way to work on all cases, a defualt values ?
+            return Response.ok("Scale values missing").status(400).build();
+        }
+        
+        //get upper corner 
+        if(upperCornerX==null || upperCornerY==null){
+            upperCornerX = dataEnv.getMinimum(0);
+            upperCornerY = dataEnv.getMaximum(1);
+        }
+        
+        //create the output folder for pyramid 
+        final String pyramidProviderId = UUID.randomUUID().toString();
+        final File providerDirectory = ConfigDirectory.getDataIntegratedDirectory(providerId);
+        final File pyramidDirectory = new File(providerDirectory, pyramidProviderId);
+        pyramidDirectory.mkdirs();
+        
+        //create the output provider
+        final DataProvider outProvider;
+        try {
+            final DataProviderFactory factory = DataProviders.getInstance().getFactory("coverage-store");
+            final ParameterValueGroup pparams = factory.getProviderDescriptor().createValue();
+            final ParameterValueGroup choiceparams = ParametersExt.getOrCreateGroup(pparams, factory.getStoreDescriptor().getName().getCode());
+            final ParameterValueGroup xmlpyramidparams = ParametersExt.getOrCreateGroup(choiceparams, XMLCoverageStoreFactory.PARAMETERS_DESCRIPTOR.getName().getCode());
+            ParametersExt.getOrCreateValue(xmlpyramidparams, XMLCoverageStoreFactory.PATH.getName().getCode()).setValue(pyramidDirectory.toURL());
+            outProvider = DataProviders.getInstance().createProvider(pyramidProviderId, factory, pparams);
+        } catch (Exception ex) {
+            Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            return Response.ok("Failed to create pyramid provider "+ex.getMessage()).status(500).build();
+        }
+        
+        //create the output pyramid coverage reference
+        final CoverageStore pyramidStore = (CoverageStore) outProvider.getMainStore();
+        final PyramidalCoverageReference outputRef;
+        Name name = new DefaultName(pyramidProviderId);
+        try{
+            outputRef = (PyramidalCoverageReference) pyramidStore.create(name);
+            name = outputRef.getName();
+            outputRef.setPackMode(ViewType.RENDERED);
+        }catch(DataStoreException ex){
+            Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            return Response.ok("Failed to create pyramid layer "+ex.getMessage()).status(500).build();
+        }
+        
+        //update the DataRecord objects
+        //this produces an update event which will create the DataRecord
+        outProvider.reload();
+        final DataRecord outData;
+        try {
+            outData = ConfigurationEngine.getProvider(pyramidProviderId).getData().get(0);
+        } catch (SQLException ex) {
+            Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            return Response.ok("Failed to get ouput data record "+ex.getMessage()).status(500).build();
+        }
+        
+        
+        //get the rendering process
+        final int tileSize = 256;
+        final MapContext context = MapBuilder.createContext();
+        try {
+            context.items().add(inData.getMapLayer(null, null));
+        } catch (PortrayalException ex) {
+            Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            return Response.ok("Failed to create map context layer for data "+ex.getMessage()).status(500).build();
+        }
+        final ProcessDescriptor desc;
+        try {
+            desc = ProcessFinder.getProcessDescriptor("engine2d", "mapcontextpyramid");
+        } catch (NoSuchIdentifierException ex) {
+            Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            return Response.ok("Process engine2d.mapcontextpyramid not found "+ex.getMessage()).status(500).build();
+        }
+        final ParameterValueGroup input = desc.getInputDescriptor().createValue();
+        input.parameter("context").setValue(context);
+        input.parameter("extent").setValue(dataEnv);
+        input.parameter("tilesize").setValue(new Dimension(tileSize, tileSize));
+        input.parameter("scales").setValue(scales);
+        input.parameter("container").setValue(outputRef);
+        final org.geotoolkit.process.Process p = desc.createProcess(input);
+
+
+        new Thread(){
+            public void run() {
+                try {
+                    p.call();
+                } catch (ProcessException ex) {
+                    Logger.getLogger(DataRest.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }.start();
+        
+//        //get the result
+//        p.addListener(new ProcessListenerAdapter() {
+//            @Override
+//            public void progressing(ProcessEvent event) {
+//                def.guiProgressBar.setValue((int) event.getProgress());
+//                InternationalString task = event.getTask();
+//                if (task != null) {
+//                    def.guiProgressBar.setString(task.toString());
+//                }
+//
+//                if (tileMonitor.isCanceled()) {
+//                    ((AbstractProcess)p).cancelProcess();
+//                }
+//            }
+//        });
+//        p.call();
+                
+        final ProviderData ref = new ProviderData(outProvider.getId(), outData.getName());
         return Response.ok(ref).status(202).build();
     }
 

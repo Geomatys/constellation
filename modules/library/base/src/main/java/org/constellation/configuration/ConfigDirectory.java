@@ -193,6 +193,21 @@ public final class ConfigDirectory {
     }
     
     /**
+     * Give a integrated data directory {@link java.io.File} defined on constellation.properties or
+     * by default on .constellation-data/integrated/ from user home directory
+     * for given provider.
+     *
+     * @return providers directory as {@link java.io.File}
+     */
+    public static File getDataIntegratedDirectory(String providerId) {
+    	final File rootFolder = getDataIntegratedDirectory();
+        final File f = new File(rootFolder, providerId);
+        f.mkdirs();
+        return f;
+    }
+    
+    
+    /**
      * remove upload directory for the sessionId {@link java.io.File} 
      * by default on .constellation-data/upload/<sessionId> from user home directory
      * 
