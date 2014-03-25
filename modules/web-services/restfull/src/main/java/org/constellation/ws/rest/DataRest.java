@@ -65,9 +65,11 @@ import org.constellation.utils.MetadataFeeder;
 import org.constellation.utils.MetadataUtilities;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
+import org.geotoolkit.coverage.CoverageUtilities;
 import org.geotoolkit.coverage.PyramidalCoverageReference;
 import org.geotoolkit.coverage.grid.ViewType;
 import org.geotoolkit.coverage.io.GridCoverageReader;
+import org.geotoolkit.coverage.xmlstore.XMLCoverageReference;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageStoreFactory;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.display.PortrayalException;
@@ -534,7 +536,7 @@ public class DataRest {
         
         //get tile format 
         if(tileFormat==null || tileFormat.isEmpty()){
-            tileFormat = "image/png";
+            tileFormat = "PNG";
         }
         
         //get pyramid CRS 
@@ -590,15 +592,26 @@ public class DataRest {
         
         //create the output pyramid coverage reference
         final CoverageStore pyramidStore = (CoverageStore) outProvider.getMainStore();
-        final PyramidalCoverageReference outputRef;
+        final XMLCoverageReference outputRef;
         Name name = new DefaultName(pyramidProviderId);
         try{
-            outputRef = (PyramidalCoverageReference) pyramidStore.create(name);
+            outputRef = (XMLCoverageReference) pyramidStore.create(name);
             name = outputRef.getName();
             outputRef.setPackMode(ViewType.RENDERED);
+            outputRef.setPreferredFormat(tileFormat);
         }catch(DataStoreException ex){
             Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             return Response.ok("Failed to create pyramid layer "+ex.getMessage()).status(500).build();
+        }
+        
+        //prepare the pyramid and mosaics
+        final int tileSize = 256;
+        final Dimension tileDim = new Dimension(tileSize, tileSize);
+        try {
+            CoverageUtilities.getOrCreatePyramid(outputRef, dataEnv, tileDim, scales);
+        } catch (DataStoreException ex) {
+            Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            return Response.ok("Failed to create pyramid and mosaics in store "+ex.getMessage()).status(500).build();
         }
         
         //update the DataRecord objects
@@ -614,7 +627,6 @@ public class DataRest {
         
         
         //get the rendering process
-        final int tileSize = 256;
         final MapContext context = MapBuilder.createContext();
         try {
             context.items().add(inData.getMapLayer(null, null));
@@ -632,7 +644,7 @@ public class DataRest {
         final ParameterValueGroup input = desc.getInputDescriptor().createValue();
         input.parameter("context").setValue(context);
         input.parameter("extent").setValue(dataEnv);
-        input.parameter("tilesize").setValue(new Dimension(tileSize, tileSize));
+        input.parameter("tilesize").setValue(tileDim);
         input.parameter("scales").setValue(scales);
         input.parameter("container").setValue(outputRef);
         final org.geotoolkit.process.Process p = desc.createProcess(input);
