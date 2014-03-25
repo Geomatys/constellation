@@ -19,9 +19,7 @@ package org.constellation.ws.rs;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-import org.apache.sis.geometry.Envelope2D;
 import org.apache.sis.geometry.GeneralEnvelope;
-import org.apache.sis.referencing.crs.DefaultGeographicCRS;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.Static;
 import org.constellation.configuration.TargetNotFoundException;
@@ -39,9 +37,11 @@ import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.GridSampleDimension;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.grid.ViewType;
+import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.query.QueryBuilder;
@@ -61,8 +61,6 @@ import org.geotoolkit.map.MapItem;
 import org.geotoolkit.process.coverage.copy.StatisticOp;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.ReferencingUtilities;
-import org.geotoolkit.sld.DefaultSLDFactory;
-import org.geotoolkit.sld.MutableStyledLayerDescriptor;
 import org.geotoolkit.sld.xml.Specification;
 import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.style.MutableStyle;
@@ -70,18 +68,14 @@ import org.geotoolkit.style.MutableStyleFactory;
 import org.geotoolkit.style.function.InterpolationPoint;
 import org.geotoolkit.style.function.Method;
 import org.geotoolkit.style.function.Mode;
-import org.opengis.coverage.Coverage;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Function;
-import org.opengis.filter.expression.Literal;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.TransformException;
-import org.opengis.sld.SLDFactory;
 import org.opengis.style.ChannelSelection;
 import org.opengis.style.ColorMap;
 import org.opengis.style.ContrastEnhancement;
@@ -434,34 +428,40 @@ public final class LayerProviders extends Static {
     private static CoverageDataDescription getCoverageDataDescription(final Data layer) throws IOException, DataStoreException {
         final CoverageDataDescription description = new CoverageDataDescription();
 
-        // Acquire coverage data.
-        GridCoverage2D coverage = layer.getCoverage(null, null, null, null);
-
-        coverage = coverage.view(ViewType.GEOPHYSICS);
-        RenderedImage ri = coverage.getRenderedImage();
-
-        Map<String, Object> map = StatisticOp.analyze(ri);
-        double[] min = (double[]) map.get("min");
-        double[] max = (double[]) map.get("max");
+        final CoverageReference ref = (CoverageReference)layer.getOrigin();
+        final GridCoverageReader reader = ref.acquireReader();
+        final List<GridSampleDimension> dims = reader.getSampleDimensions(ref.getImageIndex());
+//
+//        // Acquire coverage data.
+//        GridCoverage2D coverage = layer.getCoverage(null, null, null, null);
+//
+//        coverage = coverage.view(ViewType.GEOPHYSICS);
+//        RenderedImage ri = coverage.getRenderedImage();
+//
+//        Map<String, Object> map = StatisticOp.analyze(ri);
+//        double[] min = (double[]) map.get("min");
+//        double[] max = (double[]) map.get("max");
 
         // Bands description.
-        final GridSampleDimension[] dims = coverage.getSampleDimensions();
-        for (int i = 0; i < dims.length; i++) {
-            description.getBands().add(new BandDescription(min[i], max[i], dims[i].getNoDataValues()));
+        if (dims != null) {
+            for (final GridSampleDimension dim : dims) {
+                description.getBands().add(new BandDescription(dim.getMinimumValue(), dim.getMaximumValue(), dim.getNoDataValues()));
+            }
         }
 
         // Geographic extent description.
-        final Envelope envelope = coverage.getEnvelope();
+        final Envelope envelope = reader.getGridGeometry(ref.getImageIndex()).getEnvelope();
         fillGeographicDescription(envelope, description);
 
+        ref.recycle(reader);
         return description;
     }
 
     /**
-     * Gives a {@link CoverageDataDescription} instance describing the coverage layer
+     * Gives a {@link FeatureDataDescription} instance describing the feature layer
      * data source.
      *
-     * @param layer the layer to visitmvncis
+     * @param layer the layer to visit
      * @return the {@link FeatureDataDescription} instance
      * @throws DataStoreException if an error occurred during feature store operations
      */
