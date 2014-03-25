@@ -28,7 +28,7 @@ module.exports = function (config) {
             'src/main/webapp/bower_components/angular-base64/angular-base64.js',
             'src/main/webapp/bower_components/angular-translate-storage-cookie/angular-translate-storage-cookie.js',
             'src/main/webapp/bower_components/angular-translate-loader-static-files/angular-translate-loader-static-files.js',
-            'src/main/webapp/scripts/openlayers.js',
+            'src/main/webapp/scripts/openlayers-fix-wmts.js',
             'src/main/webapp/scripts/bootstrap-datepicker.js',
             'src/main/webapp/scripts/*.js',
             'src/main/webapp/scripts/**/*.js',
