@@ -5,7 +5,7 @@
             <h4 class="modal-title" translate="service.edit.dashboard.action.add.data">Add data</h4>
         </div>
         <div class="modal-body" style="height: 575px;overflow-y: auto;">
-            <div class="dashboard">
+            <div class="dashboard" ng-hide="wmtsParams">
                 <div class="navbar title">
                     <div class="navbar-inner">
                         <div class="brand" translate="service.edit.dashboard.data.title">Data List</div>
@@ -71,6 +71,28 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div ng-show="wmtsParams">
+                <div class="form-group">
+                    <div class="control-label" for="tileFormat">Tile format</div>
+                    <input type="text" class="form-control" ng-model="tileFormat" id="tileFormat"/>
+                </div>
+                <div class="form-group">
+                    <div class="control-label" for="crs">CRS</div>
+                    <input type="text" class="form-control" ng-model="crs" id="crs"/>
+                </div>
+                <div class="form-group">
+                    <div class="control-label" for="scales">Scales</div>
+                    <input type="text" class="form-control" ng-model="scales" id="scales" required/>
+                </div>
+                <div class="form-group">
+                    <div class="control-label" for="upperCornerX">UpperCornerX</div>
+                    <input type="text" class="form-control" ng-model="upperCornerX" id="upperCornerX"/>
+                </div>
+                <div class="form-group">
+                    <div class="control-label" for="upperCornerY">upperCornerY</div>
+                    <input type="text" class="form-control" ng-model="upperCornerY" id="upperCornerY"/>
                 </div>
             </div>
         </div>

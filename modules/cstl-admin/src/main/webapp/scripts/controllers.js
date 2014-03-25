@@ -1436,7 +1436,7 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
             if (service.type.toLowerCase() === 'wms') {
                 return '';
             }
-            if (service.type.toLowerCase() === 'wcs' || service.type.toLowerCase() === 'wmts') {
+            if (service.type.toLowerCase() === 'wcs') {
                 return 'coverage';
             }
             if (service.type.toLowerCase() === 'wfs') {
@@ -1447,6 +1447,15 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
         $scope.filtertype = $scope.getDefaultFilter();
         $scope.nbbypage = 5;
         $scope.exclude = exclude;
+
+        // WMTS params in the last form before closing the popup
+        $scope.wmtsParams = false;
+        $scope.data = undefined;
+        $scope.tileFormat = undefined;
+        $scope.crs = undefined;
+        $scope.scales = undefined;
+        $scope.upperCornerX = undefined;
+        $scope.upperCornerY = undefined;
 
         dataListing.listAll({}, function(response) {
             $dashboard($scope, response, true);
@@ -1461,15 +1470,44 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
                 $growl('warning','Warning','No layer selected');
                 $modalInstance.dismiss('close');
             } else {
-                // Add chosen data to this service
-                webService.addLayer({type: service.type, id: service.identifier},
-                                    {layerAlias: data.Name, layerId: data.Name, serviceType: service.type, serviceId: service.identifier,  providerId: data.Provider},
-                                    function() {$growl('success','Success','Layer '+ data.Name +' successfully added to service '+ service.name);
-                                                $modalInstance.close();},
-                                    function() {$growl('error','Error','Layer '+ data.Name +' failed to be added to service '+ service.name);
-                                                $modalInstance.dismiss('close');}
-                );
-
+                if ($scope.wmtsParams === false) {
+                    if (service.type.toLowerCase() !== 'wmts') {
+                        // just add the data if we are not in the case of the wmts service
+                        webService.addLayer({type: service.type, id: service.identifier},
+                            {layerAlias: data.dataId, layerId: data.dataId, serviceType: service.type, serviceId: service.identifier, providerId: data.providerId},
+                            function () {
+                                $growl('success', 'Success', 'Layer ' + data.dataId + ' successfully added to service ' + service.name);
+                                $modalInstance.close();
+                            },
+                            function () {
+                                $growl('error', 'Error', 'Layer ' + data.dataId + ' failed to be added to service ' + service.name);
+                                $modalInstance.dismiss('close');
+                            }
+                        );
+                        return;
+                    }
+                    $scope.wmtsParams = true;
+                    // Stores the data for further click on the same choose button in the next form
+                    $scope.data = data;
+                } else {
+                    // Pyramid the data to get the new provider to add
+                    dataListing.pyramidData({providerId: $scope.data.Provider, dataId: $scope.data.Name},
+                                            {tileFormat: $scope.tileFormat, crs: $scope.crs, scales: $scope.scales, upperCornerX: $scope.upperCornerX, upperCornerY: $scope.upperCornerY},
+                                            function(respProvider) {
+                                            // Add the tiled provider to the service
+                                            webService.addLayer({type: service.type, id: service.identifier},
+                                                {layerAlias: respProvider.dataId, layerId: respProvider.dataId, serviceType: service.type, serviceId: service.identifier, providerId: respProvider.providerId},
+                                                function () {
+                                                    $growl('success', 'Success', 'Layer ' + respProvider.dataId + ' successfully added to service ' + service.name);
+                                                    $modalInstance.close();
+                                                },
+                                                function () {
+                                                    $growl('error', 'Error', 'Layer ' + respProvider.dataId + ' failed to be added to service ' + service.name);
+                                                    $modalInstance.dismiss('close');
+                                                }
+                                            );
+                                            }, function() { $growl('error', 'Error', 'Pyramid process failed for ' + $scope.data.Name); });
+                }
             }
         };
     }]);
