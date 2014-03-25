@@ -70,6 +70,7 @@ public final class JConstellationFrame extends JFrame{
     
     public static void show(String login, String password, String url, boolean showLoginDialog) throws MalformedURLException{
         
+        String authType = "Form";
         if(showLoginDialog){
             final JConstellationLoginDialog dialog = new JConstellationLoginDialog(null, true);
             dialog.setLogin(login);
@@ -81,13 +82,14 @@ public final class JConstellationFrame extends JFrame{
             login = dialog.getLogin();
             password = dialog.getPassword();
             url = dialog.getURL();
+            authType = dialog.getAuthType();
         }
                 
         final ParameterValueGroup param = ConstellationServerFactory.PARAMETERS.createValue();
         Parameters.getOrCreate(ConstellationServerFactory.URL, param).setValue(new URL(url));
         Parameters.getOrCreate(ConstellationServerFactory.USER, param).setValue(login);
         Parameters.getOrCreate(ConstellationServerFactory.PASSWORD, param).setValue(password);
-        Parameters.getOrCreate(ConstellationServerFactory.SECURITY_TYPE, param).setValue("Form");
+        Parameters.getOrCreate(ConstellationServerFactory.SECURITY_TYPE, param).setValue(authType);
 
         // old API
         final ConstellationServer server   = new ConstellationServer(param);

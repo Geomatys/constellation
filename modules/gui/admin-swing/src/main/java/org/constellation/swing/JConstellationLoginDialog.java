@@ -54,6 +54,9 @@ public class JConstellationLoginDialog extends javax.swing.JDialog {
         return guiURL.getText();
     }
     
+    public String getAuthType(){
+        return (String) guiAuthType.getSelectedItem();
+    }
     
     
     /**
@@ -73,6 +76,9 @@ public class JConstellationLoginDialog extends javax.swing.JDialog {
         guiURL = new javax.swing.JTextField();
         guiConnect = new javax.swing.JButton();
 
+        guiAuthType = new javax.swing.JComboBox();
+        guiAuthType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Form", "Basic" }));
+        
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         jLabel1.setText("Login");
@@ -108,8 +114,9 @@ public class JConstellationLoginDialog extends javax.swing.JDialog {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(guiPassword))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(guiAuthType))
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(guiConnect)))
+                        .addComponent(guiConnect))
                 .addContainerGap())
         );
 
@@ -131,6 +138,8 @@ public class JConstellationLoginDialog extends javax.swing.JDialog {
                     .addComponent(jLabel3)
                     .addComponent(guiURL, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(guiAuthType)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(guiConnect)
                 .addContainerGap())
         );
@@ -151,5 +160,7 @@ public class JConstellationLoginDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JComboBox guiAuthType;
+    
     // End of variables declaration//GEN-END:variables
 }
