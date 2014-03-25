@@ -332,7 +332,7 @@ cstlAdminApp.service('$dashboard', function($filter) {
         $scope.fullList = fullList || [];
         $scope.dataList = $scope.dataList || [];
         $scope.filtertext = $scope.filtertext || "";
-        $scope.filtertype = $scope.filtertype || "";
+        $scope.filtertype = $scope.filtertype || undefined;
         $scope.ordertype = $scope.ordertype || "Name";
         $scope.orderreverse = $scope.orderreverse || false;
         $scope.countdata = $scope.countdata || 0;

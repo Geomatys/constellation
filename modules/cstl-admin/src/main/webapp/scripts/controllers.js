@@ -1477,13 +1477,13 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
                     if (service.type.toLowerCase() !== 'wmts') {
                         // just add the data if we are not in the case of the wmts service
                         webService.addLayer({type: service.type, id: service.identifier},
-                            {layerAlias: data.dataId, layerId: data.dataId, serviceType: service.type, serviceId: service.identifier, providerId: data.providerId},
+                            {layerAlias: data.Name, layerId: data.Name, serviceType: service.type, serviceId: service.identifier, providerId: data.Provider},
                             function () {
-                                $growl('success', 'Success', 'Layer ' + data.dataId + ' successfully added to service ' + service.name);
+                                $growl('success', 'Success', 'Layer ' + data.Name + ' successfully added to service ' + service.name);
                                 $modalInstance.close();
                             },
                             function () {
-                                $growl('error', 'Error', 'Layer ' + data.dataId + ' failed to be added to service ' + service.name);
+                                $growl('error', 'Error', 'Layer ' + data.Name + ' failed to be added to service ' + service.name);
                                 $modalInstance.dismiss('close');
                             }
                         );
