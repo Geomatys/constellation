@@ -48,6 +48,7 @@ import org.constellation.admin.dao.DataRecord;
 import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.DataBrief;
+import org.constellation.configuration.StringList;
 import org.constellation.coverage.PyramidCoverageHelper;
 import org.constellation.coverage.PyramidCoverageProcessListener;
 import org.constellation.dto.*;
@@ -85,6 +86,7 @@ import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageReference;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageStoreFactory;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
+import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.image.interpolation.InterpolationCase;
@@ -101,6 +103,7 @@ import org.geotoolkit.process.ProcessListenerAdapter;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.ReferencingUtilities;
 import org.geotoolkit.util.FileUtilities;
+import org.geotoolkit.util.StringUtilities;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.glassfish.jersey.media.multipart.MultiPart;
@@ -111,6 +114,7 @@ import org.opengis.metadata.citation.Role;
 import org.opengis.metadata.identification.TopicCategory;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.GeographicCRS;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
 import org.opengis.util.InternationalString;
@@ -866,6 +870,121 @@ public class DataRest {
         return Response.ok(ref).status(202).build();
     }
 
+    @POST
+    @Path("crs/isgeographic/{epsgCode}")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response isGeographic(@PathParam("epsgCode") final String epsgCode){
+        
+        CoordinateReferenceSystem crs;
+        try {
+            crs = CRS.decode(epsgCode);
+        } catch (FactoryException ex) {
+            LOGGER.log(Level.WARNING, null, ex);
+            crs = null;
+        }
+        return Response.ok(crs instanceof GeographicCRS).build();
+    }
+    
+    @GET
+    @Path("pyramid/bestscales/{providerId}/{dataId}")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response findBestScales(
+            @PathParam("providerId") final String providerId, @PathParam("dataId") final String dataId){
+        
+        //get data
+        final DataProvider inProvider = DataProviders.getInstance().getProvider(providerId);
+        if(inProvider==null){
+            return Response.ok("Provider "+providerId+" does not exist").status(400).build();
+        }
+        final Data inData = inProvider.get(new DefaultName(dataId));
+        if(inData==null){
+            return Response.ok("Data "+dataId+" does not exist in provider "+providerId).status(400).build();
+        }
+        
+        Envelope dataEnv;
+        try {
+            //use data crs
+            dataEnv = inData.getEnvelope();
+        } catch (DataStoreException ex) {
+            return Response.ok("Failed to extract envelope for data "+dataId).status(500).build();
+        }
+        
+        final CoordinateReferenceSystem objCRS = dataEnv.getCoordinateReferenceSystem();
+        final Object origin = inData.getOrigin();
+        
+        final Object[] scales;
+        if(origin instanceof CoverageReference){
+            //calculate pyramid scale levels
+            final CoverageReference inRef = (CoverageReference) inData.getOrigin();
+            final GeneralGridGeometry gg;
+            try{
+                final GridCoverageReader reader = inRef.acquireReader();
+                gg = reader.getGridGeometry(inRef.getImageIndex());
+
+            }catch(DataStoreException ex){
+                Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+                return Response.ok("Failed to extract grid geometry for data "+dataId+". "+ex.getMessage()).status(500).build();
+            }
+
+            final double geospanX = dataEnv.getSpan(0);
+            final double baseScale = geospanX / gg.getExtent().getSpan(0);
+            final int tileSize = 256;
+            double scale = geospanX / tileSize;
+            final GeneralDirectPosition ul = new GeneralDirectPosition(dataEnv.getCoordinateReferenceSystem());
+            ul.setOrdinate(0, dataEnv.getMinimum(0));
+            ul.setOrdinate(1, dataEnv.getMaximum(1));
+            final List<Double> scalesList = new ArrayList<>();
+            while (true) {
+                if (scale <= baseScale) {
+                    //fit to exact match to preserve base quality.
+                    scale = baseScale;
+                }
+                scalesList.add(scale);
+                if (scale <= baseScale) {
+                    break;
+                }
+                scale = scale / 2;
+            }
+            scales = new Object[scalesList.size()];
+            for(int i=0;i<scales.length;i++) scales[i] = scalesList.get(i);
+
+        }else{
+            //featurecollection or anything else, scales can not be defined accurately.
+            //vectors have virtually an unlimited resolution
+            //we build scales, to obtain 18 levels, this should be more then enough
+            final double geospanX = dataEnv.getSpan(0);
+            final int tileSize = 256;
+            scales = new Object[18];
+            scales[0] = geospanX / tileSize;
+            for(int i=1;i<scales.length;i++){
+                scales[i] = ((Double)scales[i-2]) / 2.0;
+            }
+            
+        }
+        
+        final String scalesStr = StringUtilities.toCommaSeparatedValues(scales);
+        
+        return Response.ok(new StringList(Collections.singleton(scalesStr))).build();
+        
+//        /**
+//         * Used in SLD/SE to calculate scale for degree CRSs.
+//         * We should use this to calculate a more friendly scale value.
+//         * TODO : move this algo in Javascript, we should see 2 columns : real crs scale + map scale.
+//         */
+//        final double SE_DEGREE_TO_METERS = 6378137.0 * 2.0 * Math.PI / 360;
+//        final double DEFAULT_DPI = 90; // ~ 0.28 * 0.28mm
+//        final double PIXEL_SIZE = 0.0254;
+//    
+//        if(objCRS instanceof GeographicCRS) {
+//            return (dataEnv.getSpan(0) * SE_DEGREE_TO_METERS) / (width / DEFAULT_DPI*PIXEL_SIZE);
+//        } else {
+//            return dataEnv.getSpan(0) / (width / DEFAULT_DPI*PIXEL_SIZE);
+//        }
+        
+    }
+    
     /**
      * Send an ArrayList which contains coverage list from a file
      *

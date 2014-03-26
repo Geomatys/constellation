@@ -1474,6 +1474,11 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
                 $modalInstance.dismiss('close');
             } else {
                 if ($scope.wmtsParams === false) {
+                    dataListing.pyramidScales({providerId: data.Provider, dataId: data.Name}, function(response) {
+                        $scope.scales = response.Entry[0].split(',');
+                    }, function () {
+                        $growl('error', 'Error', 'Unable to pyramid data ' + data.Name);
+                    });
                     if (service.type.toLowerCase() !== 'wmts') {
                         // just add the data if we are not in the case of the wmts service
                         webService.addLayer({type: service.type, id: service.identifier},
