@@ -71,7 +71,7 @@ public class JServiceCswEditPane extends JServiceEditionPane {
         if (this.configuration != null) {
             if (this.configuration.getFormat().equals("mdweb")) {
                 specificPane = new JCswMdwEditPane(this.configuration);
-                specificPane.setSize(562, 278);
+                specificPane.setSize(562, 298);
                 centerPane.add(BorderLayout.CENTER, specificPane);
             } else if (this.configuration.getFormat().equals("filesystem")) {
                 specificPane = new JCswFsEditPane(this.configuration);
@@ -108,6 +108,8 @@ public class JServiceCswEditPane extends JServiceEditionPane {
         logLevelCombo = new JComboBox();
         purgeDbButton = new JButton();
 
+        setPreferredSize(new Dimension(642, 395));
+
         ResourceBundle bundle = ResourceBundle.getBundle("org/constellation/swing/Bundle"); // NOI18N
         jLabel1.setText(bundle.getString("sourceType")); // NOI18N
 
@@ -118,7 +120,7 @@ public class JServiceCswEditPane extends JServiceEditionPane {
             }
         });
 
-        centerPane.setPreferredSize(new Dimension(236, 236));
+        centerPane.setPreferredSize(new Dimension(236, 256));
 
         GroupLayout centerPaneLayout = new GroupLayout(centerPane);
         centerPane.setLayout(centerPaneLayout);
@@ -168,7 +170,7 @@ public class JServiceCswEditPane extends JServiceEditionPane {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(guiDataSourceCombo, 0, 488, Short.MAX_VALUE)))
+                        .addComponent(guiDataSourceCombo, 0, 491, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -179,7 +181,7 @@ public class JServiceCswEditPane extends JServiceEditionPane {
                     .addComponent(jLabel1)
                     .addComponent(guiDataSourceCombo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(centerPane, GroupLayout.DEFAULT_SIZE, 271, Short.MAX_VALUE)
+                .addComponent(centerPane, GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                     .addComponent(refreshIndexButton)

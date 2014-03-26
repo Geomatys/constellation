@@ -17,17 +17,28 @@
 package org.constellation.swing;
 
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
+import org.mdweb.sql.DatabaseCreator;
+import org.mdweb.sql.DatabaseUpdater;
+import org.mdweb.sql.DefaultDatabaseUpdater;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -102,13 +113,18 @@ public class JCswMdwEditPane extends JServiceEditionPane {
         guiIndexInterCheck = new JCheckBox();
         jLabel7 = new JLabel();
         guiProfileCombo = new JComboBox();
+        dbCreateButton = new JButton();
 
         setMinimumSize(new Dimension(562, 278));
 
         ResourceBundle bundle = ResourceBundle.getBundle("org/constellation/swing/Bundle"); // NOI18N
         jLabel1.setText(bundle.getString("driverClass")); // NOI18N
 
+        guiDriver.setText("org.postgresql.Driver");
+
         jLabel2.setText(bundle.getString("dbUrl")); // NOI18N
+
+        guiDbURL.setText("jdbc:postgresql://<host>:5432/<database name>");
 
         jLabel3.setText(bundle.getString("dbUser")); // NOI18N
 
@@ -122,6 +138,13 @@ public class JCswMdwEditPane extends JServiceEditionPane {
 
         guiProfileCombo.setModel(new DefaultComboBoxModel(new String[] { "discovery", "transactional" }));
 
+        dbCreateButton.setText(NbBundle.getMessage(JCswMdwEditPane.class, "installMDWDatabase")); // NOI18N
+        dbCreateButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                dbCreateButtonActionPerformed(evt);
+            }
+        });
+
         GroupLayout layout = new GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -129,25 +152,30 @@ public class JCswMdwEditPane extends JServiceEditionPane {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel4)
-                    .addComponent(jLabel5)
-                    .addComponent(jLabel6)
-                    .addComponent(jLabel7))
-                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addComponent(guiDriver, GroupLayout.DEFAULT_SIZE, 315, Short.MAX_VALUE)
-                    .addComponent(guiDbURL)
-                    .addComponent(guiUser)
-                    .addComponent(guiPwd)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                            .addComponent(guiIndexInterCheck)
-                            .addComponent(guiIndexPubCheck))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(guiProfileCombo, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel5)
+                            .addComponent(jLabel6)
+                            .addComponent(jLabel7))
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                            .addComponent(guiDriver, GroupLayout.DEFAULT_SIZE, 315, Short.MAX_VALUE)
+                            .addComponent(guiDbURL)
+                            .addComponent(guiUser)
+                            .addComponent(guiPwd)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                    .addComponent(guiIndexInterCheck)
+                                    .addComponent(guiIndexPubCheck))
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(guiProfileCombo, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(dbCreateButton)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -181,11 +209,61 @@ public class JCswMdwEditPane extends JServiceEditionPane {
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel7)
                     .addComponent(guiProfileCombo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(dbCreateButton)
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void dbCreateButtonActionPerformed(ActionEvent evt) {//GEN-FIRST:event_dbCreateButtonActionPerformed
+        final String className  = guiDriver.getText();
+        final String connectURL = guiDbURL.getText();
+        final String user       = guiUser.getText();
+        final String password   = new String(guiPwd.getPassword());
+        final BDD bdd           = new BDD(className, connectURL, user, password);
+        if (className.isEmpty()  ||
+            connectURL.isEmpty() ||
+            user.isEmpty()       ||
+            password.isEmpty()) {
+            JOptionPane.showMessageDialog(null, LayerRowModel.BUNDLE.getString("missingParameter"), 
+                        LayerRowModel.BUNDLE.getString("missingParameterTitle"), JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        // try to connect first
+        try {
+            final Connection c = bdd.getFreshConnection();
+            c.close();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, LayerRowModel.BUNDLE.getString("invalidConnection"), 
+                        LayerRowModel.BUNDLE.getString("invalidConnectionTitle"), JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        // look for existing database
+        boolean exist = true;
+        try {
+            final DatabaseUpdater updater = new DefaultDatabaseUpdater(bdd.getDataSource(), true);
+            updater.isToUpgradeDatabase();
+        } catch (SQLException ex) {
+            exist = false;
+        }
+        
+        // build the database if not exist
+        if (!exist) {
+            try {            
+                DatabaseCreator creator = new DatabaseCreator(bdd.getDataSource(), true);
+                creator.createMetadataDatabase(true);
+            } catch (SQLException ex) {
+                LOGGER.log(Level.WARNING, "Unable to create the mdweb database", ex);
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, LayerRowModel.BUNDLE.getString("alreadyExistingDatabase"), 
+                        LayerRowModel.BUNDLE.getString("alreadyExistingDatabaseTitle"), JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_dbCreateButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private JButton dbCreateButton;
     private JTextField guiDbURL;
     private JTextField guiDriver;
     private JCheckBox guiIndexInterCheck;

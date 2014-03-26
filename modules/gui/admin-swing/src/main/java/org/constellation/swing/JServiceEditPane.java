@@ -87,6 +87,8 @@ public class JServiceEditPane extends javax.swing.JPanel {
         guiName = new javax.swing.JTextField();
         guiInternalPane = new javax.swing.JPanel();
 
+        setPreferredSize(new java.awt.Dimension(610, 452));
+
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/constellation/swing/Bundle"); // NOI18N
         jLabel1.setText(bundle.getString("name")); // NOI18N
 
@@ -125,7 +127,7 @@ public class JServiceEditPane extends javax.swing.JPanel {
                     .addComponent(guiInternalPane, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(guiDelete)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 466, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 487, Short.MAX_VALUE)
                         .addComponent(guiSave))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
@@ -144,7 +146,7 @@ public class JServiceEditPane extends javax.swing.JPanel {
                     .addComponent(jLabel1)
                     .addComponent(guiName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(guiInternalPane, javax.swing.GroupLayout.DEFAULT_SIZE, 312, Short.MAX_VALUE)
+                .addComponent(guiInternalPane, javax.swing.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(guiDelete)
