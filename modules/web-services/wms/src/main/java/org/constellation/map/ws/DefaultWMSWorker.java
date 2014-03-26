@@ -189,7 +189,6 @@ import com.codahale.metrics.annotation.Timed;
 @Scope("prototype")
 public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
-    private static final List<String> GFI_MIME_TYPES = new ArrayList<>();
 
     /**
      * AxisDirection name for Lat/Long, Elevation, temporal dimensions.
@@ -203,6 +202,11 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
      * Only Elevation dimension.
      */
     private static final List<String> VERTICAL_DIM = UnmodifiableArrayList.wrap(new String[] {"UP", "DOWN"});
+
+    /**
+     * List of FeatureInfo mimeTypes
+     */
+    private final List<String> GFI_MIME_TYPES = new ArrayList<String>();
 
     private WMSPortrayal mapPortrayal;
     
