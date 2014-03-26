@@ -320,9 +320,8 @@ module.exports = function (grunt) {
     'clean:server',
     'concurrent:test',
     'autoprefixer',
-    'connect:test',
-    'karma'
-  ]);
+    'connect:test'
+    ]);
 
   grunt.registerTask('build', [
     'clean:dist',
