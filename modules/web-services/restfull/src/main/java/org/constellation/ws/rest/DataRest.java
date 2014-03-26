@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -20,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.CRC32;
@@ -36,6 +38,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
+import org.apache.sis.geometry.GeneralDirectPosition;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.iso.Types;
@@ -64,10 +67,19 @@ import org.constellation.util.SimplyMetadataTreeNode;
 import org.constellation.utils.GeotoolkitFileExtensionAvailable;
 import org.constellation.utils.MetadataFeeder;
 import org.constellation.utils.MetadataUtilities;
+import org.geotoolkit.coverage.AbstractGridMosaic;
 import org.geotoolkit.coverage.CoverageReference;
+import org.geotoolkit.coverage.CoverageReferenceRenderedImage;
 import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.coverage.CoverageUtilities;
+import org.geotoolkit.coverage.GridMosaic;
+import org.geotoolkit.coverage.GridMosaicCoverage2D;
+import org.geotoolkit.coverage.GridSampleDimension;
+import org.geotoolkit.coverage.Pyramid;
 import org.geotoolkit.coverage.PyramidalCoverageReference;
+import org.geotoolkit.coverage.TileReference;
+import org.geotoolkit.coverage.grid.GeneralGridGeometry;
+import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.grid.ViewType;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageReference;
@@ -75,6 +87,7 @@ import org.geotoolkit.coverage.xmlstore.XMLCoverageStoreFactory;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.feature.DefaultName;
+import org.geotoolkit.image.interpolation.InterpolationCase;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.parameter.ParametersExt;
@@ -497,12 +510,181 @@ public class DataRest {
         return Response.status(200).build();
     }
 
+    /**
+     * Generates a pyramid on a data in the given provider, create and return this new provider.
+     *
+     * @param providerId Provider identifier of the data to tile.
+     * @param dataId Data identifier 
+     * @return
+     */
+    @POST
+    @Path("pyramid/createconform/{providerId}/{dataId}")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response createTiledProvider(
+            @PathParam("providerId") final String providerId, @PathParam("dataId") final String dataId) {
+        
+        //get data
+        final DataProvider inProvider = DataProviders.getInstance().getProvider(providerId);
+        if(inProvider==null){
+            return Response.ok("Provider "+providerId+" does not exist").status(400).build();
+        }
+        final Data inData = inProvider.get(new DefaultName(dataId));
+        if(inData==null){
+            return Response.ok("Data "+dataId+" does not exist in provider "+providerId).status(400).build();
+        }
+        
+        Envelope dataEnv;
+        try {
+            //use data crs
+            dataEnv = inData.getEnvelope();
+        } catch (DataStoreException ex) {
+            Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            return Response.ok("Failed to extract envelope for data "+dataId+". "+ex.getMessage()).status(500).build();
+        }
+        
+        //calculate pyramid scale levels
+        final CoverageReference inRef = (CoverageReference) inData.getOrigin();
+        final GeneralGridGeometry gg;
+        try{
+            final GridCoverageReader reader = inRef.acquireReader();
+            gg = reader.getGridGeometry(inRef.getImageIndex());
+            
+        }catch(DataStoreException ex){
+            Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            return Response.ok("Failed to extract grid geometry for data "+dataId+". "+ex.getMessage()).status(500).build();
+        }
+                        
+        //create the output folder for pyramid 
+        final String pyramidProviderId = UUID.randomUUID().toString();
+        final File providerDirectory = ConfigDirectory.getDataIntegratedDirectory(providerId);
+        final File pyramidDirectory = new File(providerDirectory, pyramidProviderId);
+        pyramidDirectory.mkdirs();
+        
+        //create the output provider
+        final DataProvider outProvider;
+        try {
+            final DataProviderFactory factory = DataProviders.getInstance().getFactory("coverage-store");
+            final ParameterValueGroup pparams = factory.getProviderDescriptor().createValue();
+            ParametersExt.getOrCreateValue(pparams, ProviderParameters.SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue(pyramidProviderId);
+            final ParameterValueGroup choiceparams = ParametersExt.getOrCreateGroup(pparams, factory.getStoreDescriptor().getName().getCode());
+            final ParameterValueGroup xmlpyramidparams = ParametersExt.getOrCreateGroup(choiceparams, XMLCoverageStoreFactory.PARAMETERS_DESCRIPTOR.getName().getCode());
+            ParametersExt.getOrCreateValue(xmlpyramidparams, XMLCoverageStoreFactory.PATH.getName().getCode()).setValue(pyramidDirectory.toURL());
+            ParametersExt.getOrCreateValue(xmlpyramidparams, XMLCoverageStoreFactory.NAMESPACE.getName().getCode()).setValue("no namespace");
+            outProvider = DataProviders.getInstance().createProvider(pyramidProviderId, factory, pparams);
+        } catch (Exception ex) {
+            Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            return Response.ok("Failed to create pyramid provider "+ex.getMessage()).status(500).build();
+        }
+        
+        //create the output pyramid coverage reference
+        final CoverageStore pyramidStore = (CoverageStore) outProvider.getMainStore();
+        final XMLCoverageReference outputRef;
+        Name name = new DefaultName(pyramidProviderId);
+        try{
+            outputRef = (XMLCoverageReference) pyramidStore.create(name);
+            name = outputRef.getName();
+        }catch(DataStoreException ex){
+            Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            return Response.ok("Failed to create pyramid layer "+ex.getMessage()).status(500).build();
+        }
+        
+        
+        //update the DataRecord objects
+        //this produces an update event which will create the DataRecord
+        outProvider.reload();
+        final DataRecord outData;
+        try {
+            outData = ConfigurationEngine.getProvider(pyramidProviderId).getData().get(0);
+        } catch (SQLException ex) {
+            Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            return Response.ok("Failed to get ouput data record "+ex.getMessage()).status(500).build();
+        }
+        
+        //get the fill value for no data
+        double[] fillValue = null;
+        try{
+            final GridCoverageReader reader = inRef.acquireReader();
+            final List<GridSampleDimension> sampleDimensions = reader.getSampleDimensions(inRef.getImageIndex());
+            final int nbBand = sampleDimensions.size();
+            fillValue = new double[nbBand];
+            Arrays.fill(fillValue,Double.NaN);
+            for(int i=0;i<nbBand;i++){
+                final double[] nodata = sampleDimensions.get(i).geophysics(true).getNoDataValues();
+                if(nodata!=null && nodata.length>0){
+                    fillValue[i] = nodata[0];
+                }
+            }
+        }catch(DataStoreException ex){
+            Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            return Response.ok("Failed to extract no-data values for resampling "+ex.getMessage()).status(500).build();
+        }
+        
+        //calculate scales
+        final Map<Envelope, double[]> resolutionPerEnvelope = new HashMap<>();
+        final double geospanX = dataEnv.getSpan(0);
+        final double geospanY = dataEnv.getSpan(1);
+        final double baseScale = geospanX / gg.getExtent().getSpan(0);
+        final int tileSize = 256;
+        double scale = geospanX / tileSize;
+        final GeneralDirectPosition ul = new GeneralDirectPosition(dataEnv.getCoordinateReferenceSystem());
+        ul.setOrdinate(0, dataEnv.getMinimum(0));
+        ul.setOrdinate(1, dataEnv.getMaximum(1));
+        final List<Double> scalesList = new ArrayList<>();
+        while (true) {
+            if (scale <= baseScale) {
+                //fit to exact match to preserve base quality.
+                scale = baseScale;
+            }
+            scalesList.add(scale);
+            if (scale <= baseScale) {
+                break;
+            }
+            scale = scale / 2;
+        }
+        final double[] scales = new double[scalesList.size()];
+        for(int i=0;i<scales.length;i++) scales[i] = scalesList.get(i);
+        resolutionPerEnvelope.put(dataEnv, scales);
+        
+        
+        //prepare process
+        final ProcessDescriptor desc;
+        try {
+            desc = ProcessFinder.getProcessDescriptor("coverage", "coveragepyramid");
+        } catch (NoSuchIdentifierException ex) {
+            Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            return Response.ok("Process engine2d.mapcontextpyramid not found "+ex.getMessage()).status(500).build();
+        }
+        final ParameterValueGroup input = desc.getInputDescriptor().createValue();
+        input.parameter("coverageref").setValue(inRef);
+        input.parameter("in_coverage_store").setValue(outputRef);
+        input.parameter("tile_size").setValue(new Dimension(tileSize, tileSize));
+        input.parameter("pyramid_name").setValue(providerId);
+        input.parameter("interpolation_type").setValue(InterpolationCase.NEIGHBOR);
+        input.parameter("resolution_per_envelope").setValue(resolutionPerEnvelope);
+        final org.geotoolkit.process.Process p = desc.createProcess(input);
+
+        new Thread(){
+            public void run() {
+                try {
+                    p.call();
+                } catch (ProcessException ex) {
+                    Logger.getLogger(DataRest.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }.start();
+        
+                        
+        final ProviderData ref = new ProviderData(outProvider.getId(), outData.getName());
+        return Response.ok(ref).status(202).build();
+    }
 
     /**
      * Generates a pyramid on a data in the given provider, create and return this new provider.
      *
      * @param providerId Provider identifier of the data to tile.
      * @param dataId Data identifier
+     * @param params PyramidParams
      * @return
      */
     @POST
@@ -670,7 +852,6 @@ public class DataRest {
         input.parameter("container").setValue(outputRef);
         final org.geotoolkit.process.Process p = desc.createProcess(input);
 
-
         new Thread(){
             public void run() {
                 try {
@@ -680,24 +861,7 @@ public class DataRest {
                 }
             }
         }.start();
-        
-//        //get the result
-//        p.addListener(new ProcessListenerAdapter() {
-//            @Override
-//            public void progressing(ProcessEvent event) {
-//                def.guiProgressBar.setValue((int) event.getProgress());
-//                InternationalString task = event.getTask();
-//                if (task != null) {
-//                    def.guiProgressBar.setString(task.toString());
-//                }
-//
-//                if (tileMonitor.isCanceled()) {
-//                    ((AbstractProcess)p).cancelProcess();
-//                }
-//            }
-//        });
-//        p.call();
-                
+                        
         final ProviderData ref = new ProviderData(outProvider.getId(), outData.getName());
         return Response.ok(ref).status(202).build();
     }
