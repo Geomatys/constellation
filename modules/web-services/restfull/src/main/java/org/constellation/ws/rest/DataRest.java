@@ -959,7 +959,7 @@ public class DataRest {
             scales = new Object[18];
             scales[0] = geospanX / tileSize;
             for(int i=1;i<scales.length;i++){
-                scales[i] = ((Double)scales[i-2]) / 2.0;
+                scales[i] = ((Double)scales[i-1]) / 2.0;
             }
             
         }
