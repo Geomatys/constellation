@@ -45,6 +45,9 @@ public final class DataBrief implements Serializable {
     @XmlElement(name="Provider")
     private String provider;
 
+    @XmlElement(name="Parent")
+    private String parent;
+
     @XmlElement(name="Title")
     private String title;
 
@@ -85,6 +88,14 @@ public final class DataBrief implements Serializable {
 
     public void setProvider(final String provider) {
         this.provider = provider;
+    }
+
+    public String getParent() {
+        return parent;
+    }
+
+    public void setParent(final String parent) {
+        this.parent = parent;
     }
 
     public String getTitle() {
@@ -141,6 +152,7 @@ public final class DataBrief implements Serializable {
                 "name='" + name + '\'' +
                 ", namespace='" + namespace + '\'' +
                 ", provider='" + provider + '\'' +
+                ", parent='" + parent + '\'' +
                 ", title='" + title + '\'' +
                 ", date=" + date +
                 ", type='" + type + '\'' +

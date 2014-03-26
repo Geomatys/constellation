@@ -22,6 +22,10 @@ public interface Data {
 
     public void setProvider(Provider provider);
 
+    public Provider getParent();
+
+    public void setParent(Provider parent);
+
     public String getType();
 
     public void setType(String type);

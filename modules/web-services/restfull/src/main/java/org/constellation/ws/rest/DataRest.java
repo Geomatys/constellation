@@ -800,7 +800,7 @@ public class DataRest {
         //create the output pyramid coverage reference
         final CoverageStore pyramidStore = (CoverageStore) outProvider.getMainStore();
         final XMLCoverageReference outputRef;
-        Name name = new DefaultName(pyramidProviderId);
+        Name name = new DefaultName(dataId);
         try{
             outputRef = (XMLCoverageReference) pyramidStore.create(name);
             name = outputRef.getName();
@@ -1051,6 +1051,50 @@ public class DataRest {
             for(Name n : p.getKeys()){
                 final QName name = new QName(n.getNamespaceURI(), n.getLocalPart());
                 final DataBrief db = ConfigurationEngine.getData(name, p.getId());
+                briefs.add(db);
+            }
+        }
+
+        return Response.ok(briefs).build();
+    }
+
+    @GET
+    @Path("list/top")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response getTopDataList() {
+        return getTopDataList(null);
+    }
+
+    @GET
+    @Path("list/top/{type}")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response getTopDataList(@PathParam("type") String type) {
+        final List<DataBrief> briefs = new ArrayList<>();
+
+        final List<String> providerIds = ConfigurationEngine.getProviderIds();
+        for (final String providerId : providerIds) {
+            final ProviderRecord provider = ConfigurationEngine.getProvider(providerId);
+            final String parent = provider.getParentIdentifier();
+            if (parent != null && !parent.isEmpty()) {
+                // Remove all providers that have a parent
+                continue;
+            }
+            final List<DataRecord> datas;
+            try {
+                datas = provider.getData();
+            } catch (SQLException ex) {
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+                return Response.status(500).entity("failed").build();
+            }
+            for (final DataRecord data : datas) {
+                if (type != null && !data.getType().equals(DataRecord.DataType.valueOf(type))) {
+                    continue;
+                }
+
+                final QName name = new QName(data.getNamespace(), data.getName());
+                final DataBrief db = ConfigurationEngine.getData(name, providerId);
                 briefs.add(db);
             }
         }

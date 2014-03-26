@@ -37,6 +37,10 @@ public class DataEntity implements Data {
     @JoinColumn(name = "`provider`")
     private Provider provider;
 
+    @ManyToOne(targetEntity=ProviderEntity.class)
+    @JoinColumn(name = "`parent`")
+    private Provider parent;
+
     @Column(name = "`type`")
     private String type;
 
@@ -92,6 +96,14 @@ public class DataEntity implements Data {
 
     public void setProvider(Provider provider) {
         this.provider = provider;
+    }
+
+    public Provider getParent() {
+        return parent;
+    }
+
+    public void setParent(Provider parent) {
+        this.parent = parent;
     }
 
     public String getType() {
@@ -152,7 +164,7 @@ public class DataEntity implements Data {
 
     @Override
     public String toString() {
-        return "Data [id=" + id + ", name=" + name + ", namespace=" + namespace + ", provider=" + provider + ", type="
+        return "Data [id=" + id + ", name=" + name + ", namespace=" + namespace + ", provider=" + provider + ", parent=" + parent +", type="
                 + type + ", date=" + date + ", title=" + title + ", description=" + description + ", owner=" + owner
                 + ", styles=" + styles + ", metadata="+metadata+"]";
     }
