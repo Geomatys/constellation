@@ -524,6 +524,17 @@ public final class Session implements Closeable {
     }
 
     /**
+     * Updates an existing provider using the new given one.
+     *
+     * @param updatedProvider An existing provider which contains updated fields.
+     * @throws SQLException
+     */
+    public void updateProvider(final ProviderRecord updatedProvider) throws SQLException {
+        new Query(UPDATE_PROVIDER).with(updatedProvider.getIdentifier(), updatedProvider.getParentIdentifier(), updatedProvider.getType().name(),
+                updatedProvider.getImpl(), updatedProvider.getOwnerLogin(), updatedProvider.id).update();
+    }
+
+    /**
      * Updates the configuration of the provider with the specified {@code generatedId}.
      *
      * @param generatedId the provider auto-generated id

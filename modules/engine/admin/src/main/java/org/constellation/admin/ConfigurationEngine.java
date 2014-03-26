@@ -661,6 +661,20 @@ public class ConfigurationEngine {
         return null;
     }
 
+    public static void updateProvider(final ProviderRecord updatedProvider) {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            session.updateProvider(updatedProvider);
+
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+    }
+
     /**
      * Load a metadata for a provider.
      * 

@@ -42,6 +42,7 @@ import org.apache.sis.util.iso.Types;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.dao.DataRecord;
+import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.DataBrief;
 import org.constellation.coverage.PyramidCoverageHelper;
@@ -604,7 +605,12 @@ public class DataRest {
             Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             return Response.ok("Failed to create pyramid provider "+ex.getMessage()).status(500).build();
         }
-        
+
+        // Update the parent attribute of the created provider
+        final ProviderRecord updatedProvider = ConfigurationEngine.getProvider(outProvider.getId());
+        updatedProvider.setParentIdentifier(providerId);
+        ConfigurationEngine.updateProvider(updatedProvider);
+
         //create the output pyramid coverage reference
         final CoverageStore pyramidStore = (CoverageStore) outProvider.getMainStore();
         final XMLCoverageReference outputRef;
