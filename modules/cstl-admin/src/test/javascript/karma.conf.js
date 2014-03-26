@@ -31,9 +31,7 @@ module.exports = function (config) {
             'src/main/webapp/scripts/openlayers-fix-wmts.js',
             'src/main/webapp/scripts/bootstrap-datepicker.js',
             'src/main/webapp/scripts/*.js',
-            'src/main/webapp/scripts/**/*.js',
-            'src/test/javascript/spec/**/*.js'
-            
+            'src/main/webapp/scripts/**/*.js'
         ],
 
         // list of files / patterns to exclude
