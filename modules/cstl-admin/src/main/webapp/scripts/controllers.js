@@ -1022,19 +1022,19 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
 
         $scope.getVersionsForType = function() {
             if ($scope.type === 'wms') {
-                return [{ 'id': '1.1.1'}, { 'id': '1.3.0' }];
+                return [{ 'id': '1.1.1'}, { 'id': '1.3.0', 'checked': true }];
             }
             if ($scope.type === 'wfs') {
-                return [{ 'id': '1.1.0'}, { 'id': '2.0.0' }];
+                return [{ 'id': '1.1.0', 'checked': true}, { 'id': '2.0.0' }];
             }
             if ($scope.type === 'wcs') {
-                return [{ 'id': '1.0.0'}];
+                return [{ 'id': '1.0.0', 'checked': true}];
             }
             if ($scope.type === 'wmts') {
-                return [{ 'id': '1.0.0'}];
+                return [{ 'id': '1.0.0', 'checked': true}];
             }
             if ($scope.type === 'csw') {
-                return [{ 'id': '2.0.0'}, { 'id': '2.0.2'}];
+                return [{ 'id': '2.0.0'}, { 'id': '2.0.2', 'checked': true}];
             }
             return [];
         };
