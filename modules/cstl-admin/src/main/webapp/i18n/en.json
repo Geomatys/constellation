@@ -120,6 +120,7 @@
             "cancel": "Cancel",
             "change": "Change",
             "choose": "Choose",
+            "choose.pyramid.conform": "Generate a pyramid on data",
             "choose.scales": "Scales",
             "choose.tile.format": "Tile format",
             "choose.uppercornerx": "Upper corner X",

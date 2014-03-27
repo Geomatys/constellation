@@ -159,6 +159,7 @@
             "cancel": "Annuler",
             "change": "Changer",
             "choose": "Choisir",
+            "choose.pyramid.conform": "Génèrer une pyramide sur la donnée",
             "choose.scales": "Echelles",
             "choose.tile.format": "Fomat de sortie du tuilage",
             "choose.uppercornerx": "Coin haut X",
