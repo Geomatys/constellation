@@ -74,7 +74,7 @@
 
             <div class="form-group">
                 <div class="control-label" translate="service.description.tab.description.version" >Version</div>
-                <div id="versionsCheck">
+                <div id="versionsCheck" ng-init="selectedVersion()">
                     <div ng-repeat="version in versions" class="inline">
                         <div class="checkbox inline"><input type="checkbox" ng-model="version.checked" ng-change="selectedVersion()"> {{version.id}}</div>
                     </div>
