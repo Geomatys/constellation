@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="SldEditor">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="../../assets/ico/favicon.ico">
+
+    <title>Starter Template for Bootstrap</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/style-sld.css" rel="stylesheet">
+    <link href="css/spectrum.css" rel="stylesheet">
+
+    <!-- Just for debugging purposes. Don't actually copy this line! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+    <div class="navbar navbar-inverse" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">SLD Editor</a>
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="index.html">Choix type</a></li>
+            <li><a href="polygone.html">Polygone</a></li>
+            <li><a href="ligne.html">Ligne</a></li>
+            <li><a href="point.html">Point</a></li>
+            <li><a href="texte.html">Texte</a></li>
+            <li><a href="raster.html">Raster</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+
+    <div class="container">
+      <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" ng-click="close()">×</button>
+                <ol class="breadcrumb">
+                  <li><a href="index.html">Choix du type</a></li>
+                  <li class="active">Edition du style</li>
+                </ol>
+            </div>
+            <div class="modal-body modal_polygone">
+                <!-- Tab nav -->
+                <ul class="nav nav-tabs">
+                  <li class="active"><a href="#editeurSimple" data-toggle="tab">Editeur simple</a></li>
+                  <li><a href="#editeurAvancé" data-toggle="tab">Editeur avancé</a></li>
+                  <li><a href="#classification" data-toggle="tab">Classification</a></li>
+                  <li class="navbar-right"><a href="#xml" data-toggle="tab">Editeur XML</a></li>
+                </ul>
+
+                <!-- Tab panes -->
+                <div class="tab-content">
+                  <div class="tab-pane active" id="editeurSimple">
+                    <div class="row">
+                      <div class="col-xs-12 col-sm-6 col-md-8">
+                        <h2>Edition du style</h2>
+                        <div class="style_bloc">
+                          <form class="form-horizontal" role="form">
+                            <div class="form-group">
+                              <label for="contourColor" class="col-sm-3 col-md-2 control-label">Couleur</label>
+                              <div class="col-sm-9 col-md-10">
+                                <input type='text' name="picker" class="picker" />
+                              </div>
+                            </div>
+                            <div class="form-group">
+                              <label for="contourSize" class="col-sm-3 col-md-2 control-label">Taille</label>
+                              <div class="col-sm-9 col-md-4">
+                                <input type="number" class="form-control" value=1 id="contourSize">
+                              </div>
+                            </div>
+                            <div class="form-group">
+                              <label for="contourType" class="col-sm-3 col-md-2 control-label">Type</label>
+                              <div class="col-sm-9 col-md-4">
+                                <select ng-model="traitType" class="form-control">
+                                  <option>Plein</option>
+                                  <option value="pointille">Pointillé</option>
+                                  <option value="stroke">Graphic stroke</option>
+                                </select>
+                              </div>
+                              <div class="col-sm-12 col-md-6" ng-show=" traitType=='pointille' ">
+                                <div class="row">
+                                  <div class="col-sm-3 col-md-4 col-xs-12"><label for="backgroundColor2" class="control-label">Format de pointillés</label></div>
+                                  <div class="col-sm-4 col-xs-6"><input type="number" class="form-control" value=1 id="contourSize"></div>
+                                  <div class="col-sm-4 col-xs-6"><input type="text" ctype="number" class="form-control" value=1 id="contourSize"></div>
+                                </div>
+                              </div>
+                              <div class="col-sm-12 col-md-6" ng-show=" traitType=='stroke' ">
+
+                                    <div class="input-group">
+                                      <input type="text" class="form-control">
+                                      <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button">Parcourir</button>
+                                      </span>
+                                    </div><!-- /input-group -->
+
+                              </div>
+                            </div>
+                            <div class="row">
+                              <div class="col-sm-10 col-sm-offset-2">
+                                <button type="button" ng-click="display = !display" class="btn btn-sm btn-primary">
+                                  <span class="glyphicon glyphicon-plus"></span>
+                                </button>
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+
+                        <div ng-show="display" class="style_bloc">
+                          <form class="form-horizontal" role="form">
+                            <div class="form-group">
+                              <label for="contourType" class="col-xs-12 col-sm-4 col-md-2 control-label">Angles</label>
+                              <div class="col-sm-8 btn-group">
+                                <button type="button" class="btn btn-default"><img src="img/jointure2.png"></button>
+                                <button type="button" class="btn btn-default"><img src="img/jointure3.png"></button>
+                                <button type="button" class="btn btn-default"><img src="img/jointure1.png"></button>
+                              </div>
+                            </div>
+                            <div class="form-group">
+                              <label for="contourType" class="col-xs-12 col-sm-4 col-md-2 control-label">Jointures</label>
+                              <div class="col-sm-8 btn-group">
+                                <button type="button" class="btn btn-default" ng-model="radioModel" btn-radio="'Left'"><img src="img/angle1.png"></button>
+                                <button type="button" class="btn btn-default" ng-model="radioModel" btn-radio="'Middle'"><img src="img/angle2.png"></button>
+                                <button type="button" class="btn btn-default" ng-model="radioModel" btn-radio="'Right'"><img src="img/angle3.png"></button>
+                              </div>
+                            </div>
+                            <div class="form-group">
+                              <label for="contourSize" class="col-sm-4 col-md-2 control-label">Décalage x</label>
+                              <div class="col-sm-4">
+                                <input type="number" class="form-control" value=0 id="contourSize">
+                              </div>
+                            </div>
+                            <div class="form-group">
+                              <label for="contourType" class="col-sm-4  col-md-2 control-label">Décalage y</label>
+                              <div class="col-sm-4">
+                                <input type="number" class="form-control" value=0 id="contourType">
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+
+
+                      </div>
+                      <div class="col-xs-12 col-sm-6 col-md-4">
+                        <h2>Aperçu du style</h2>
+                        <div class="bloc_apercu"></div>
+                        <button type="button" class="btn-apercu col-xs-12 btn btn-primary">Aperçu de la donnée</button>
+                      </div>
+                    </div> 
+                  </div>
+
+                  <div class="tab-pane" id="editeurAvancé">
+                    <div class="row">
+                      <div class="col-xs-12 col-sm-6 col-md-8">
+                        <div class="row">
+                          <div class="col-xs-7 col-md-8"><h2>Edition du style</h2></div>
+                          <div class="col-xs-5 col-md-4">
+                            <button type="button" class="btn-apercu btn-block btn-sm btn btn-default">Ajouter un filtre</button>
+                          </div>
+                        </div>
+
+                          <div class="style_bloc">
+                            <div class="row">
+                              <div class="col-xs-10">
+                                <h3>Filtre 1</h3>
+                              </div>
+                              <div class="col-xs-2">                                  
+                                <button type="button" class="btn btn-default btn-xs btn-remove">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                  </button>
+                              </div>
+                            </div>
+                            <div class="row">
+                              <div class="col-sm-12 col-md-8">
+                                <form class="form-horizontal" role="form">
+                                  <div class="form-group">
+                                    <label for="minScale" class="col-sm-5 col-md-4 control-label">Echelle min.</label>
+                                    <div class="col-sm-7 col-md-8">
+                                      <input type="number" class="form-control" id="minScale">
+                                    </div>
+                                  </div>
+                                  <div class="form-group">
+                                    <label for="maxScale" class="col-sm-5 col-md-4 control-label">Echelle max.</label>
+                                    <div class="col-sm-7 col-md-8">
+                                      <input type="number" class="form-control" id="maxScale">
+                                    </div>
+                                  </div>
+                                  <div class="form-group">
+                                    <div class="col-sm-5 col-md-4">
+                                    <button type="button" class="btn btn-default btn-md btn-editer">
+                                        <span class="glyphicon glyphicon-pencil"></span> Editer
+                                    </button>
+                                    </div>
+                                    <div class="col-sm-7 col-md-8">
+                                      <textarea class="form-control" rows="3"></textarea>
+                                    </div>
+                                  </div>
+                                </form>
+                              </div>
+                              <div class="symboles_bloc_div col-sm-12 col-md-4">
+                                <div class="symboles_bloc">
+                                  <h3>Symboles</h3>
+                                  <table class="table">
+                                    <tr>
+                                      <td><img src="img/ligne_mini.png"></td>
+                                      <td><input type='text' class="text_transparent" value='Ligne' /></td>
+                                      <td>
+                                        <button ng-click="symbole_ligne='ligne'" type="button" class="btn btn-default btn-xs btn-remove">
+                                          <span class="glyphicon glyphicon-pencil"></span>
+                                        </button>
+                                      </td>
+                                      <td>
+                                        <button type="button" class="btn btn-default btn-xs btn-remove">
+                                          <span class="glyphicon glyphicon-remove"></span>
+                                        </button></span>
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td><img src="img/texte_mini.png"></td>
+                                      <td><input type='text' class="text_transparent" value='Texte' /></td>
+                                      <td>
+                                        <button  ng-click="symbole_ligne='texte'" type="button" class="btn btn-default btn-xs btn-remove">
+                                          <span class="glyphicon glyphicon-pencil"></span>
+                                        </button>
+                                      </td>
+                                      <td>
+                                        <button type="button" class="btn btn-default btn-xs btn-remove">
+                                          <span class="glyphicon glyphicon-remove"></span>
+                                        </button></span>
+                                      </td>
+                                    </tr>
+                                  </table>
+                                  <button type="button" class="btn-apercu btn-block btn-sm btn btn-default">Ajouter un symbole</button>
+                                </div>
+                              </div>
+                            </div>
+
+                        </div>
+
+                      </div>
+                      <div class="col-xs-12 col-sm-6 col-md-4">
+                        <h2>Aperçu du style</h2>
+                        <div ng-show=" symbole_ligne=='ligne' " class="row">
+                        <div class="style_bloc">
+                          <form class="form-horizontal" role="form">
+                            <div class="form-group">
+                                <label for="fontWidth" class="col-sm-4 control-label">Libellé</label>
+                                <div class="col-sm-8">
+                                  <input type="text" class="form-control" value="Ligne" id="fontWidth">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                              <label for="contourColor" class="col-sm-4 control-label">Couleur</label>
+                              <div class="col-sm-8">
+                                <input type='text' name="picker" class="picker" />
+                              </div>
+                            </div>
+                            <div class="form-group">
+                              <label for="contourSize" class="col-sm-4 control-label">Taille</label>
+                              <div class="col-sm-8">
+                                <input type="number" class="form-control" value=1 id="contourSize">
+                              </div>
+                            </div>
+                            <div class="form-group">
+                              <label for="contourType" class="col-sm-4 control-label">Type</label>
+                              <div class="col-sm-8">
+                                <select ng-model="traitType" class="form-control">
+                                  <option>Plein</option>
+                                  <option value="pointille">Pointillés</option>
+                                  <option value="stroke">Graphic stroke</option>
+                                </select>
+                              </div>
+                              <div class="col-sm-12" ng-show=" traitType=='pointille' ">
+                                <br/>
+                                <div class="row">
+                                  <div class="col-sm-4  col-xs-12"><label for="backgroundColor2" class="control-label">Format de pointillés</label></div>
+                                  <div class="col-sm-4  col-xs-6"><input type="number" class="form-control" value=1 id="contourSize"></div>
+                                  <div class="col-sm-4 col-xs-6"><input type="text" ctype="number" class="form-control" value=1 id="contourSize"></div>
+                                </div>
+                              </div>
+                              <div class="col-sm-12" ng-show=" traitType=='stroke' ">
+                                    <br/>
+                                    <div class="input-group">
+                                      <input type="text" class="form-control">
+                                      <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button">Parcourir</button>
+                                      </span>
+                                    </div><!-- /input-group -->
+
+                              </div>
+                            </div>
+                            <div class="row">
+                              <div class="col-sm-10 col-sm-offset-2">
+                                <button type="button" ng-click="display = !display" class="btn btn-sm btn-primary">
+                                  <span class="glyphicon glyphicon-plus"></span>
+                                </button>
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+
+                         <div ng-show="display" class="style_bloc">
+                          <form class="form-horizontal" role="form">
+                            <div class="form-group">
+                              <label for="contourType" class="col-sm-4 control-label">Angles</label>
+                              <div class="col-sm-8 btn-group">
+                                <button type="button" class="btn btn-default"><img src="img/jointure2.png"></button>
+                                <button type="button" class="btn btn-default"><img src="img/jointure3.png"></button>
+                                <button type="button" class="btn btn-default"><img src="img/jointure1.png"></button>
+                              </div>
+                            </div>
+                            <div class="form-group">
+                              <label for="contourType" class="col-sm-4 control-label">Jointures</label>
+                              <div class="col-sm-8 btn-group">
+                                <button type="button" class="btn btn-default" ng-model="radioModel" btn-radio="'Left'"><img src="img/angle1.png"></button>
+                                <button type="button" class="btn btn-default" ng-model="radioModel" btn-radio="'Middle'"><img src="img/angle2.png"></button>
+                                <button type="button" class="btn btn-default" ng-model="radioModel" btn-radio="'Right'"><img src="img/angle3.png"></button>
+                              </div>
+                            </div>
+                            <div class="form-group">
+                              <label for="contourSize" class="col-sm-4 control-label">Décalage x</label>
+                              <div class="col-sm-8">
+                                <input type="number" class="form-control" value=0 id="contourSize">
+                              </div>
+                            </div>
+                            <div class="form-group">
+                              <label for="contourType" class="col-sm-4 control-label">Décalage y</label>
+                              <div class="col-sm-8">
+                                <input type="number" class="form-control" value=0 id="contourType">
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+                        </div>
+
+
+                        <div ng-show=" symbole_ligne=='texte' " class="row">
+                          <div class="style_bloc">
+                            <form class="form-horizontal" role="form">
+                              <div class="form-group">
+                                <label for="fontWidth" class="col-sm-4 control-label">Libellé</label>
+                                <div class="col-sm-8">
+                                  <input type="text" class="form-control" value="Texte" id="fontWidth">
+                                </div>
+                              </div>
+                              <div class="form-group">
+                                <label for="font" class="col-sm-4 control-label">Police</label>
+                                <div class="col-sm-8">
+                                  <select class="form-control">
+                                    <option>Arial</option>
+                                    <option>Calibri</option>
+                                    <option>Time New Roman</option>
+                                    <option>Cambera</option>
+                                    <option>Times</option>
+                                  </select>
+                                </div>
+                              </div>
+                              <div class="form-group">
+                                <label for="fontWidth" class="col-sm-4 control-label">Taille</label>
+                                <div class="col-sm-8">
+                                  <input type="number" class="form-control" value=15 id="fontWidth">
+                                </div>
+                              </div>
+                              <div class="form-group">
+                                <label for="fontStyle" class="col-sm-4 control-label">Style</label>
+                                <div class="col-sm-8">
+                                  <div class="btn-group">
+                                    <button type="button" class="btn btn-default">B</button>
+                                    <button type="button" class="btn btn-default">I</button>
+                                    <button type="button" class="btn btn-default">U</button>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="form-group">
+                              <label for="contourColor" class="col-sm-4 control-label">Couleur</label>
+                              <div class="col-sm-8">
+                                <input type='text' name="picker" class="picker" />
+                              </div>
+                            </div>
+
+
+                            </form>
+                          </div>
+                        </div>
+
+                        <button type="button" class="btn-apercu btn-block btn btn-primary">Aperçu de la donnée</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="tab-pane" id="classification" ng-init="apercu_ligne=1">
+                    <div class="row">
+                      <div class="col-xs-12 col-sm-6 col-md-8">
+                        <h2>Edition du style</h2>
+                        <div class="style_bloc">
+                          <div class="btn-group">
+                            <button ng-click="classification_ligne='unique'" type="button" class="btn btn-default">Valeur unique</button>
+                            <button ng-click="classification_ligne='intervalle'" type="button" class="btn btn-default">Intervalle de valeurs</button>
+                          </div>
+                          <div ng-show="classification_ligne=='unique'">
+                            <form class="form_classification form-horizontal" role="form">
+                             <div class="form-group">
+                                <label for="palette" class="col-sm-3 col-md-2 control-label">Palette</label>
+                                <div class="col-sm-9 col-md-10">
+                                  <select class="form-control">
+                                    <option>1</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                    <option>4</option>
+                                    <option>5</option>
+                                  </select>
+                                </div>
+                              </div>
+                              <div class="form-group">
+                                <label for="attribut" class="col-sm-3 col-md-2 control-label">Attriut</label>
+                                <div class="col-sm-9 col-md-10">
+                                  <select class="form-control">
+                                    <option>Attribut 1</option>
+                                    <option>Attribut 2</option>
+                                    <option>Attribut 3</option>
+                                    <option>Attribut 4</option>
+                                    <option>Attribut 5</option>
+                                  </select>
+                                </div>
+                              </div>
+                            </form>
+                          </div>
+
+                          <div ng-show="classification_ligne=='intervalle'">
+                            <form class="form_classification form-horizontal" role="form">
+                              <div class="form-group">
+                                <label for="palette" class="col-sm-3 col-md-2 control-label">Palette</label>
+                                <div class="col-sm-9 col-md-10">
+                                  <select class="form-control">
+                                    <option>1</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                    <option>4</option>
+                                    <option>5</option>
+                                  </select>
+                                </div>
+                              </div>
+                              <div class="form-group">
+                                <label for="attribut" class="col-sm-3 col-md-2 control-label">Attriut</label>
+                                <div class="col-sm-9 col-md-10">
+                                  <select class="form-control">
+                                    <option>Attribut 1</option>
+                                    <option>Attribut 2</option>
+                                    <option>Attribut 3</option>
+                                    <option>Attribut 4</option>
+                                    <option>Attribut 5</option>
+                                  </select>
+                                </div>
+                              </div>
+                              <div class="form-group">
+                                <label for="methode" class="col-sm-3 col-md-2 control-label">Méthode</label>
+                                <div class="col-sm-9 col-md-10">
+                                  <select class="form-control">
+                                    <option>Quantile</option>
+                                    <option>EL</option>
+                                  </select>
+                                </div>
+                              </div>
+                              <div class="form-group">
+                                <label for="intervalles" class="col-sm-3 col-md-2 control-label">Intervalles</label>
+                                <div class="col-xs-4">
+                                  <input type="number" class="form-control" value=1 id="intervalles">
+                                </div>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                        <button type="button" ng-show="classification_ligne=='unique'" ng-click="palette_ligne=1" class="btn btn-generer btn-default">Générer la palette</button>
+                        <button type="button" ng-show="classification_ligne=='intervalle'" ng-click="palette_ligne=2" class="btn btn-generer btn-default">Générer la palette</button>
+                      </div>
+                      <div class="col-xs-12 col-sm-6 col-md-4">
+                          <div class="row div-apercu">
+                        <div class="btn-group col-xs-12">
+                            <button ng-click="apercu_ligne=1" type="button" class="col-xs-8 btn btn-apercu btn-default">Apercu du style</button>
+                            <button ng-click="apercu_ligne=2" type="button" class="col-xs-4 btn btn-apercu btn-default">Modèle</button>
+                          </div>
+                              </div>
+                        <div class="row div-apercu">
+                            <div class="bloc_apercu">
+                                <div ng-class="{'sous_bloc_apercu': apercu_ligne==1, 'sous_bloc_apercu_grand': apercu_ligne==2}" class="sous_bloc_apercu">
+                                    <table ng-show="palette_ligne==1 && apercu_ligne==1" class="table">
+                                    <tr>
+                                      <td><img src="img/polygone_mini.png"></td>
+                                      <td><input type='text' class="text_transparent" value='valeur 1' /></td>
+                                      <td>
+                                        <button type="button" class="btn btn-default btn-xs btn-remove">
+                                          <span class="glyphicon glyphicon-remove"></span>
+                                        </button></span>
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td><img src="img/polygone_mini.png"></td>
+                                      <td><input type='text' class="text_transparent" value='valeur 2' /></td>
+                                      <td>
+                                        <button type="button" class="btn btn-default btn-xs btn-remove">
+                                          <span class="glyphicon glyphicon-remove"></span>
+                                        </button></span>
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td><img src="img/polygone_mini.png"></td>
+                                      <td><input type='text' class="text_transparent" value='valeur 3' /></td>
+                                      <td>
+                                        <button type="button" class="btn btn-default btn-xs btn-remove">
+                                          <span class="glyphicon glyphicon-remove"></span>
+                                        </button></span>
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td><img src="img/polygone_mini.png"></td>
+                                      <td><input type='text' class="text_transparent" value='valeur 4' /></td>
+                                      <td>
+                                        <button type="button" class="btn btn-default btn-xs btn-remove">
+                                          <span class="glyphicon glyphicon-remove"></span>
+                                        </button></span>
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td><img src="img/polygone_mini.png"></td>
+                                      <td><input type='text' class="text_transparent" value='valeur 5' /></td>
+                                      <td>
+                                        <button type="button" class="btn btn-default btn-xs btn-remove">
+                                          <span class="glyphicon glyphicon-remove"></span>
+                                        </button></span>
+                                      </td>
+                                    </tr>
+                                  </table>
+                                    
+                                    <table ng-show="palette_ligne==2 && apercu_ligne==1" class="table">
+                                    <tr>
+                                      <td><img src="img/polygone_mini.png"></td>
+                                      <td><input type='text' class="text_transparent" value='0  >  100     ' /></td>
+                                      <td>
+                                        <button type="button" class="btn btn-default btn-xs btn-remove">
+                                          <span class="glyphicon glyphicon-remove"></span>
+                                        </button></span>
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td><img src="img/polygone_mini.png"></td>
+                                      <td><input type='text' class="text_transparent" value='100  >  200' /></td>
+                                      <td>
+                                        <button type="button" class="btn btn-default btn-xs btn-remove">
+                                          <span class="glyphicon glyphicon-remove"></span>
+                                        </button></span>
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td><img src="img/polygone_mini.png"></td>
+                                      <td><input type='text' class="text_transparent" value='200  >  300' /></td>
+                                      <td>
+                                        <button type="button" class="btn btn-default btn-xs btn-remove">
+                                          <span class="glyphicon glyphicon-remove"></span>
+                                        </button></span>
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td><img src="img/polygone_mini.png"></td>
+                                      <td><input type='text' class="text_transparent" value='300  >  400' /></td>
+                                      <td>
+                                        <button type="button" class="btn btn-default btn-xs btn-remove">
+                                          <span class="glyphicon glyphicon-remove"></span>
+                                        </button></span>
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td><img src="img/polygone_mini.png"></td>
+                                      <td><input type='text' class="text_transparent" value='400  >  500' /></td>
+                                      <td>
+                                        <button type="button" class="btn btn-default btn-xs btn-remove">
+                                          <span class="glyphicon glyphicon-remove"></span>
+                                        </button></span>
+                                      </td>
+                                    </tr>
+                                  </table>
+                                 <form ng-show="apercu_ligne==2" class="form_classification form-horizontal" role="form">
+                                            <div class="form-group">
+                                              <label for="contourColor" class="col-sm-4 control-label">Contour</label>
+                                              <div class="col-sm-8">
+                                                <input type='text' name="picker" class="picker" />
+                                              </div>
+                                            </div>
+                                            <div class="form-group">
+                                              <label for="contourSize" class="col-sm-4 control-label">Taille</label>
+                                              <div class="col-sm-8">
+                                                <input type="number" class="form-control" value=1 id="contourSize">
+                                              </div>
+                                            </div>
+                                            <div class="form-group">
+                                              <label for="contourType" class="col-sm-4 control-label">Type</label>
+                                              <div class="col-sm-8">
+                                                <select ng-model="traitType" class="form-control">
+                                                  <option>Plein</option>
+                                                  <option value="pointille">Pointillés</option>
+                                                  <option value="stroke">Graphic stroke</option>
+                                                </select>
+                                              </div>
+                                              <div class="col-sm-12" ng-show=" traitType=='pointille' ">
+                                                <div class="row">
+                                                  <br/>
+                                                  <div class="col-sm-12  col-xs-12"><label for="backgroundColor2" class="control-label">Format de pointillés</label></div>
+                                                  <div class="col-sm-6  col-xs-6"><input type="number" class="form-control" value=1 id="contourSize"></div>
+                                                  <div class="col-sm-6 col-xs-6"><input type="text" ctype="number" class="form-control" value=1 id="contourSize"></div>
+                                                </div>
+                                              </div>
+                                              <div class="col-sm-12" ng-show=" traitType=='stroke' ">
+                                                    <br/>
+                                                    <div class="input-group">
+                                                      <input type="text" class="form-control">
+                                                      <span class="input-group-btn">
+                                                        <button class="btn btn-default" type="button">Parcourir</button>
+                                                      </span>
+                                                    </div><!-- /input-group -->
+
+                                              </div>
+                                            </div>
+                                     <div class="center">
+                                         <button type="button" class="btn btn-default" >Supprimer le modèle</button>
+                                         <button type="button" class="btn btn-primary">Appliquer</button>
+                                     </div>
+                                    </form>
+
+                                </div>
+                                <div ng-show="apercu_ligne==1" class="col-xs-12 div-btn-add">
+                                    <button type="button" class="btn-apercu btn btn-default">Ajouter une valeur</button>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-apercu col-xs-12 btn btn-primary">Aperçu de la donnée</button>
+                      </div>
+                    </div>
+                    </div>
+                  </div>
+
+                  <div class="tab-pane" id="xml">
+                    <h2>Editeur XML</h2>
+                  </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" ng-click="close()">Annuler</button>
+                <button type="button" class="btn btn-primary" ng-disabled="!selected" ng-click="ok();">Valider</button>
+            </div>
+        </div>
+    </div>
+
+    </div><!-- /.container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="js/sldEditor.js"></script>
+    <script src="js/spectrum.js"></script>
+    <script>
+      $(".picker").spectrum({
+          color: tinycolor,
+          showInput: true,
+          allowEmpty: true,
+          showAlpha: true,
+          preferredFormat: "hex",
+          showButtons: false
+      });
+</script>
+  </body>
+</html>

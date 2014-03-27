@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="SldEditor">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="../../assets/ico/favicon.ico">
+
+    <title>Starter Template for Bootstrap</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/style-sld.css" rel="stylesheet">
+
+    <!-- Just for debugging purposes. Don't actually copy this line! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+    <div class="navbar navbar-inverse" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">SLD Editor</a>
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="index.html">Choix type</a></li>
+            <li><a href="polygone.html">Polygone</a></li>
+            <li><a href="ligne.html">Ligne</a></li>
+            <li><a href="point.html">Point</a></li>
+            <li><a href="texte.html">Texte</a></li>
+            <li><a href="raster.html">Raster</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+
+    <div class="container">
+      <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" ng-click="close()">×</button>
+                <ol class="breadcrumb">
+                  <li class="active">Choix du type</li>
+                  <li><a href="#">Edition du style</a></li>
+                </ol>
+            </div>
+            <div class="modal-body modal_polygone">
+                <div class="row">
+                  <div class="col-xs-6 col-sm-4">
+                    <a ng-class="{type_actif: choixType=='polygone'}" ng-click="choixType='polygone'" class="choix_type"><img src="img/polygone.png"><h2>Polygone</h2></a>
+                  </div>
+                  <div class="col-xs-6 col-sm-4">
+                    <a ng-class="{type_actif: choixType=='ligne'}" ng-click="choixType='ligne'" class="choix_type"><img src="img/ligne.png"><h2>Ligne</h2></a>
+                  </div>
+                  <div class="col-xs-6 col-sm-4">
+                    <a ng-class="{type_actif: choixType=='point'}" ng-click="choixType='point'" class="choix_type"><img src="img/point.png"><h2>Point</h2></a>
+                  </div>
+                  <div class="col-xs-6 col-sm-4 col-sm-offset-2">
+                    <a ng-class="{type_actif: choixType=='texte'}" ng-click="choixType='texte'" class="choix_type"><img src="img/texte.png"><h2>Texte</h2></a>
+                  </div>
+                  <div class="col-xs-6 col-xs-offset-3 col-sm-offset-0 col-sm-4">
+                    <a ng-class="{type_actif: choixType=='raster'}" ng-click="choixType='raster'" class="choix_type"><img src="img/raster.png"><h2>Raster</h2></a>
+                  </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" ng-click="close()">Annuler</button>
+                <button type="button" class="btn btn-primary" ng-disabled="!selected" ng-click="ok();">Continuer</button>
+            </div>
+        </div>
+    </div>
+
+    </div><!-- /.container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="js/sldEditor.js"></script>
+  </body>
+</html>
