@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2013, Geomatys
+ *    (C) 2013 - 2014, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -20,10 +20,7 @@ package org.constellation.metadata.configuration;
 import java.io.File;
 import java.util.List;
 import org.constellation.ServiceDef.Specification;
-import org.constellation.configuration.AcknowlegementType;
-import org.constellation.configuration.BriefNode;
-import org.constellation.configuration.ConfigurationException;
-import org.constellation.configuration.StringList;
+import org.constellation.configuration.*;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
@@ -36,6 +33,7 @@ import org.w3c.dom.Node;
  * TODO: implement specific configuration methods
  *
  * @author Fabien Bernard (Geomatys).
+ * @author Cédric Briançon (Geomatys)
  * @version 0.9
  * @since 0.9
  */
@@ -101,5 +99,15 @@ public class CSWConfigurer extends OGCConfigurer {
 
     public StringList getAvailableCSWDataSourceType() {
         return CSWConfigurationManager.getInstance().getAvailableCSWDataSourceType();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Instance getInstance(String identifier) throws ConfigurationException {
+        final Instance instance = super.getInstance(identifier);
+        instance.setLayersNumber(getMetadataCount(identifier));
+        return instance;
     }
 }

@@ -21,7 +21,7 @@
                         <button type="button" class="btn btn-default btn-sm" ng-click="showCapa(service)"
                                 ng-disabled="service.status!=='WORKING'">GetCapabilities</button>
                         <button type="button" class="btn btn-default btn-sm"  ng-click="showLogs(service)">Logs</button>
-                        <button type="button" class="btn btn-default btn-sm btn-info" ng-click="reload(service)">Reload</button>
+                        <button type="button" class="btn btn-default btn-sm btn-info" ng-click="reload(service)" translate="service.description.reload.button">Reload</button>
                         <button type="button" class="btn btn-default btn-sm"  ng-class="{'started':service.status=='WORKING','stopped':service.status!='WORKING'}" ng-click="startOrStop(service)">
                             <i ng-class="{'icon-play':service.status!='WORKING','icon-stop':service.status=='WORKING'}"></i>
                         </button>

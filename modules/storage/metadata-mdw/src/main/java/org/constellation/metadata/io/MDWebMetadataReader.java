@@ -1276,8 +1276,8 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     @Override
     public int getEntryCount() throws MetadataIoException {
         try {
-            final List<RecordSet> recordSets   = mdReader.getRecordSets();
-            final Collection<FullRecord> records = mdReader.getAllRecord(recordSets);
+            final List<RecordSet> recordSets = mdReader.getRecordSets();
+            final Collection<String> records = mdReader.getAllIdentifiers(recordSets, true);
             return records.size();
         } catch (MD_IOException ex) {
             throw new MetadataIoException("SQL Exception while getting all the entries: " +ex.getMessage());
