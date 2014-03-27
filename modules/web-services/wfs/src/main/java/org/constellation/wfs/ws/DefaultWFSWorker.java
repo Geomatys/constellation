@@ -579,7 +579,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 prefix = "ns1";
             }
             final String url    = getServiceUrl();
-            if (getServiceUrl() != null) {
+            if (url != null) {
                 String describeRequest = url + "request=DescribeFeatureType&version=" + version + "&service=WFS";
                 describeRequest        = describeRequest + "&namespace=xmlns(" + prefix + "=" + namespace + ")";
                 final String tnParameter;

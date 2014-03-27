@@ -500,7 +500,11 @@ public abstract class AbstractWorker implements Worker {
      */
     protected AbstractCapabilitiesCore getCapabilitiesFromCache(final String version, final String language) {
         final String keyCache = specification.name() + '-' + id + '-' + version + '-' + language;
-        return CAPS_RESPONSE.get(keyCache);
+        AbstractCapabilitiesCore cachedCapabilities = CAPS_RESPONSE.get(keyCache);
+        if (cachedCapabilities != null) {
+            cachedCapabilities.updateURL(getServiceUrl());
+        }
+        return cachedCapabilities;
     }
 
     /**
