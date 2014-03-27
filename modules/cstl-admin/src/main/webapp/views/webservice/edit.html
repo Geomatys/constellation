@@ -167,7 +167,7 @@
                                         <p translate="msg.no.selected.data">Click on a data to display more information</p>
                                     </div>
                                     <div class="selected-item" id="selected-item" ng-hide="selected == null">
-                                        <div ng-if="selected.type.toLowerCase() === 'csw'">
+                                        <div ng-if="service.type.toLowerCase() !== 'csw'">
                                             <div class="block-header" ng-click="toggleUpDownSelected()">
                                                 <strong>{{selected.Name}}</strong><i class="icon-chevron-up pull-right"></i>
                                             </div>
@@ -255,8 +255,8 @@
                                             <div class="block-action">
                                                 <div class="row">
                                                     <div class="col-sm-6">
-                                                        <button id="exportMD" class="btn btn-success" type="button" ng-click="exportMetadata()">
-                                                            <i class="icon-map-marker"></i> <span translate="layer.listing.selected.export.button">Export</span>
+                                                        <button id="exportMD" class="btn btn-info" type="button" ng-click="exportMetadata()">
+                                                            <i class="icon-download-alt"></i> <span translate="layer.listing.selected.export.button">Export</span>
                                                         </button>
                                                     </div>
                                                     <div class="col-sm-6">
