@@ -588,18 +588,15 @@ public class DataRest {
         ConfigurationEngine.updateProvider(updatedProvider);
 
         //create the output pyramid coverage reference
-        final CoverageStore pyramidStore = (CoverageStore) outProvider.getMainStore();
-        final XMLCoverageReference outputRef;
+        CoverageStore outStore = (CoverageStore) outProvider.getMainStore();
         Name name = new DefaultName(dataId);
         try{
-            outputRef = (XMLCoverageReference) pyramidStore.create(name);
-            name = outputRef.getName();
+            name = ((XMLCoverageReference) outStore.create(name)).getName();
         }catch(DataStoreException ex){
             Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             return Response.ok("Failed to create pyramid layer "+ex.getMessage()).status(500).build();
         }
-        
-        
+                
         //update the DataRecord objects
         //this produces an update event which will create the DataRecord
         outProvider.reload();
@@ -611,18 +608,31 @@ public class DataRest {
             return Response.ok("Failed to get ouput data record "+ex.getMessage()).status(500).build();
         }
         
+        //get the coverage reference after reload, otherwise this won't be the same reference
+        outStore = (CoverageStore) outProvider.getMainStore();
+        final XMLCoverageReference outputRef;
+        try{
+            outputRef = (XMLCoverageReference) outStore.getCoverageReference(name);
+        }catch(DataStoreException ex){
+            Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            return Response.ok("Failed to create pyramid layer "+ex.getMessage()).status(500).build();
+        }
+        
+        
         //get the fill value for no data
         double[] fillValue = null;
         try{
             final GridCoverageReader reader = inRef.acquireReader();
             final List<GridSampleDimension> sampleDimensions = reader.getSampleDimensions(inRef.getImageIndex());
-            final int nbBand = sampleDimensions.size();
-            fillValue = new double[nbBand];
-            Arrays.fill(fillValue,Double.NaN);
-            for(int i=0;i<nbBand;i++){
-                final double[] nodata = sampleDimensions.get(i).geophysics(true).getNoDataValues();
-                if(nodata!=null && nodata.length>0){
-                    fillValue[i] = nodata[0];
+            if(sampleDimensions!=null){
+                final int nbBand = sampleDimensions.size();
+                fillValue = new double[nbBand];
+                Arrays.fill(fillValue,Double.NaN);
+                for(int i=0;i<nbBand;i++){
+                    final double[] nodata = sampleDimensions.get(i).geophysics(true).getNoDataValues();
+                    if(nodata!=null && nodata.length>0){
+                        fillValue[i] = nodata[0];
+                    }
                 }
             }
         }catch(DataStoreException ex){
@@ -667,9 +677,9 @@ public class DataRest {
         }
         final ParameterValueGroup input = desc.getInputDescriptor().createValue();
         input.parameter("coverageref").setValue(inRef);
-        input.parameter("in_coverage_store").setValue(outputRef);
+        input.parameter("in_coverage_store").setValue(outStore);
         input.parameter("tile_size").setValue(new Dimension(tileSize, tileSize));
-        input.parameter("pyramid_name").setValue(providerId);
+        input.parameter("pyramid_name").setValue(outputRef.getName().getLocalPart());
         input.parameter("interpolation_type").setValue(InterpolationCase.NEIGHBOR);
         input.parameter("resolution_per_envelope").setValue(resolutionPerEnvelope);
         final org.geotoolkit.process.Process p = desc.createProcess(input);
@@ -804,8 +814,8 @@ public class DataRest {
         ConfigurationEngine.updateProvider(updatedProvider);
 
         //create the output pyramid coverage reference
-        final CoverageStore pyramidStore = (CoverageStore) outProvider.getMainStore();
-        final XMLCoverageReference outputRef;
+        CoverageStore pyramidStore = (CoverageStore) outProvider.getMainStore();
+        XMLCoverageReference outputRef;
         Name name = new DefaultName(dataId);
         try{
             outputRef = (XMLCoverageReference) pyramidStore.create(name);
@@ -838,6 +848,14 @@ public class DataRest {
             return Response.ok("Failed to get ouput data record "+ex.getMessage()).status(500).build();
         }
         
+        //get the coverage reference after reload, otherwise this won't be the same reference
+        pyramidStore = (CoverageStore) outProvider.getMainStore();
+        try{
+            outputRef = (XMLCoverageReference) pyramidStore.getCoverageReference(name);
+        }catch(DataStoreException ex){
+            Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            return Response.ok("Failed to create pyramid layer "+ex.getMessage()).status(500).build();
+        }
         
         //get the rendering process
         final MapContext context = MapBuilder.createContext();
