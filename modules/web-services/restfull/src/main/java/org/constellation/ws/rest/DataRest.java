@@ -560,7 +560,7 @@ public class DataRest {
         }
                         
         //create the output folder for pyramid 
-        final String pyramidProviderId = UUID.randomUUID().toString();
+        final String pyramidProviderId = "conform_"+ UUID.randomUUID().toString();
         final File providerDirectory = ConfigDirectory.getDataIntegratedDirectory(providerId);
         final File pyramidDirectory = new File(providerDirectory, pyramidProviderId);
         pyramidDirectory.mkdirs();
@@ -580,11 +580,16 @@ public class DataRest {
             Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             return Response.ok("Failed to create pyramid provider "+ex.getMessage()).status(500).build();
         }
-        
+
+        // Update the parent attribute of the created provider
+        final ProviderRecord updatedProvider = ConfigurationEngine.getProvider(outProvider.getId());
+        updatedProvider.setParentIdentifier(providerId);
+        ConfigurationEngine.updateProvider(updatedProvider);
+
         //create the output pyramid coverage reference
         final CoverageStore pyramidStore = (CoverageStore) outProvider.getMainStore();
         final XMLCoverageReference outputRef;
-        Name name = new DefaultName(pyramidProviderId);
+        Name name = new DefaultName(dataId);
         try{
             outputRef = (XMLCoverageReference) pyramidStore.create(name);
             name = outputRef.getName();

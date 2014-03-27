@@ -1435,6 +1435,8 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
 
 cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webService', '$dashboard', '$modalInstance', 'service', 'exclude', '$growl',
     function ($scope, dataListing, webService, $dashboard, $modalInstance, service, exclude, $growl) {
+        $scope.service = service;
+
         $scope.getDefaultFilter = function() {
             if (service.type.toLowerCase() === 'wms') {
                 return '';
@@ -1459,6 +1461,7 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
         $scope.scales = [];
         $scope.upperCornerX = undefined;
         $scope.upperCornerY = undefined;
+        $scope.conformPyramid = undefined;
 
         dataListing.listAll({}, function(response) {
             $dashboard($scope, response, true);
@@ -1474,30 +1477,55 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
                 $modalInstance.dismiss('close');
             } else {
                 if ($scope.wmtsParams === false) {
+                    // just add the data if we are not in the case of the wmts service
+                    if (service.type.toLowerCase() !== 'wmts') {
+                        if (service.type.toLowerCase() === 'wms' && $scope.conformPyramid) {
+                            // In the case of a wms service and user asked to pyramid the data
+                            dataListing.pyramidConform({providerId: data.Provider, dataId: data.Name}, {}, function(tiledProvider) {
+                                webService.addLayer({type: service.type, id: service.identifier},
+                                    {layerAlias: tiledProvider.dataId, layerId: tiledProvider.dataId, serviceType: service.type, serviceId: service.identifier, providerId: tiledProvider.providerId},
+                                    function () {
+                                        $growl('success', 'Success', 'Layer ' + tiledProvider.dataId + ' successfully added to service ' + service.name);
+                                        $modalInstance.close();
+                                    },
+                                    function () {
+                                        $growl('error', 'Error', 'Layer ' + tiledProvider.dataId + ' failed to be added to service ' + service.name);
+                                        $modalInstance.dismiss('close');
+                                    }
+                                );
+                            } , function() {
+                                $growl('error', 'Error', 'Failed to generate conform pyramid for ' + data.Name);
+                                $modalInstance.dismiss('close');
+                            });
+                        } else {
+                            // Not in WMTS and no pyramid requested
+                            webService.addLayer({type: service.type, id: service.identifier},
+                                {layerAlias: data.Name, layerId: data.Name, serviceType: service.type, serviceId: service.identifier, providerId: data.Provider},
+                                function () {
+                                    $growl('success', 'Success', 'Layer ' + data.Name + ' successfully added to service ' + service.name);
+                                    $modalInstance.close();
+                                },
+                                function () {
+                                    $growl('error', 'Error', 'Layer ' + data.Name + ' failed to be added to service ' + service.name);
+                                    $modalInstance.dismiss('close');
+                                }
+                            );
+                        }
+                        return;
+                    }
+
+                    // WMTS here, prepare form
                     dataListing.pyramidScales({providerId: data.Provider, dataId: data.Name}, function(response) {
                         $scope.scales = response.Entry[0].split(',');
                     }, function () {
                         $growl('error', 'Error', 'Unable to pyramid data ' + data.Name);
                     });
-                    if (service.type.toLowerCase() !== 'wmts') {
-                        // just add the data if we are not in the case of the wmts service
-                        webService.addLayer({type: service.type, id: service.identifier},
-                            {layerAlias: data.Name, layerId: data.Name, serviceType: service.type, serviceId: service.identifier, providerId: data.Provider},
-                            function () {
-                                $growl('success', 'Success', 'Layer ' + data.Name + ' successfully added to service ' + service.name);
-                                $modalInstance.close();
-                            },
-                            function () {
-                                $growl('error', 'Error', 'Layer ' + data.Name + ' failed to be added to service ' + service.name);
-                                $modalInstance.dismiss('close');
-                            }
-                        );
-                        return;
-                    }
+
                     $scope.wmtsParams = true;
                     // Stores the data for further click on the same choose button in the next form
                     $scope.data = data;
                 } else {
+                    // Finish the WMTS publish process
                     // Pyramid the data to get the new provider to add
                     dataListing.pyramidData({providerId: $scope.data.Provider, dataId: $scope.data.Name},
                                             {tileFormat: $scope.tileFormat, crs: $scope.crs, scales: $scope.scales, upperCornerX: $scope.upperCornerX, upperCornerY: $scope.upperCornerY},

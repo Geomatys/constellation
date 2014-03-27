@@ -169,5 +169,14 @@ public final class ProviderRecord extends Record {
         return session.readData(this);
     }
 
-
+    /**
+     * If this provider points on a pyramid which contains conform tiles compared to the
+     * original data, then returns {@code true}.
+     *
+     * @return {@code True} if the tiles pointed by this provider are conform compared to
+     * the original data, {@code false} otherwise.
+     */
+    public boolean isPyramidConformProvider() {
+        return identifier.startsWith("conform_");
+    }
 }
