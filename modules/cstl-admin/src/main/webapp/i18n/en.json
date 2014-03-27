@@ -475,7 +475,7 @@
         },
         "edit": {
             "dashboard.layer.title": "Layers list",
-            "dashboard.metadata.title": "Layers list",
+            "dashboard.metadata.title": "Metadata list",
             "dashboard.tabs": {
                 "data": "Data",
                 "description": "Service Description",
