@@ -822,7 +822,7 @@ public class DataRest {
         final Dimension tileDim = new Dimension(tileSize, tileSize);
         try {
             CoverageUtilities.getOrCreatePyramid(outputRef, dataEnv, tileDim, scales);
-        } catch (DataStoreException ex) {
+        } catch (Exception ex) {
             Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             return Response.ok("Failed to create pyramid and mosaics in store "+ex.getMessage()).status(500).build();
         }
@@ -959,10 +959,10 @@ public class DataRest {
         }else{
             //featurecollection or anything else, scales can not be defined accurately.
             //vectors have virtually an unlimited resolution
-            //we build scales, to obtain 18 levels, this should be more then enough
+            //we build scales, to obtain 8 levels, this should be enough for a default case
             final double geospanX = dataEnv.getSpan(0);
             final int tileSize = 256;
-            scales = new Object[18];
+            scales = new Object[8];
             scales[0] = geospanX / tileSize;
             for(int i=1;i<scales.length;i++){
                 scales[i] = ((Double)scales[i-1]) / 2.0;
