@@ -39,6 +39,7 @@ import static org.constellation.wps.ws.WPSConstant.*;
 import static org.constellation.api.CommonConstants.DEFAULT_CRS;
 import static org.constellation.api.QueryConstants.*;
 
+import org.constellation.ws.Worker;
 import org.geotoolkit.geometry.isoonjts.GeometryUtils;
 import org.geotoolkit.gml.JTStoGeometry;
 import org.geotoolkit.ows.xml.v110.*;
@@ -202,13 +203,12 @@ public class WPSWorker extends AbstractWorker {
             LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, id);
         }
 
+        webdavName = "wps-"+ id;
         if (context != null && context.getWebdavDirectory() != null) {
             webdavFolderPath = context.getWebdavDirectory();
-            webdavName = id;
             isTmpWebDav = false;
         } else {
             isTmpWebDav = true;
-            webdavName = "wps"+ System.currentTimeMillis();
             final File tmpFolder = new File(System.getProperty("java.io.tmpdir"), webdavName);
             if (!tmpFolder.isDirectory()) {
                 final boolean created = tmpFolder.mkdirs();
@@ -444,8 +444,10 @@ public class WPSWorker extends AbstractWorker {
                     } finally {
                         ConfigurationEngine.setSecurityManager(SecurityManagerHolder.getInstance());
                     }
-                    
                 }
+                // /!\ CASE SENSITIVE /!\
+                final Worker worker = WSEngine.buildWorker("WEBDAV", webdavName);
+                WSEngine.addServiceInstance("WEBDAV", webdavName, worker);
             } catch (JAXBException | IOException ex) {
                 LOGGER.log(Level.WARNING, "Error during WebDav configuration", ex);
                 return false;

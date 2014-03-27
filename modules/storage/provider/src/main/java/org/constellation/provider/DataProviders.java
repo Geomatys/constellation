@@ -248,6 +248,11 @@ public final class DataProviders extends Providers implements PropertyChangeList
         return Collections.unmodifiableCollection(PROVIDERS);
     }
 
+    /**
+     * Get the provider identified by given name.
+     * @param id The identifier of the data provider to find.
+     * @return Provider found for requestde name, or null if we cannot find it.
+     */
     public synchronized DataProvider getProvider(final String id){
         for (DataProvider provider : getProviders()) {
             if (provider.getId().equals(id)) {

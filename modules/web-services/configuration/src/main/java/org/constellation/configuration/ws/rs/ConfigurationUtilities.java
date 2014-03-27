@@ -144,8 +144,6 @@ public class ConfigurationUtilities {
         return false;
     }
 
-
-
     /**
      * Read constellation configuration from given directory, to re-write it into data-base configuration.
      *
