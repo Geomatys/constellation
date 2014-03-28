@@ -23,9 +23,9 @@ import java.util.List;
 import java.util.ArrayList;
 
 
+import org.apache.sis.parameter.DefaultParameterDescriptorGroup;
 import org.constellation.provider.DataProvider;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
-import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.apache.sis.util.ArgumentChecks;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
@@ -48,6 +48,8 @@ public final class ProviderParameters {
     ////////////////////////////////////////////////////////////////////////////
     public static final String SOURCE_DESCRIPTOR_NAME = "source";
     //TODO remove this parameter, duplicates argument in factory createProvider method.
+    /** /!\ NO ! Keep ALL the arguments, because we need them for old configuration import.
+     */
     public static final ParameterDescriptor<String> SOURCE_ID_DESCRIPTOR =
              new DefaultParameterDescriptor<>("id","source id",String.class,null,true);
     public static final ParameterDescriptor<Boolean> SOURCE_LOADALL_DESCRIPTOR =
@@ -106,8 +108,8 @@ public final class ProviderParameters {
      *  -> layers
      */
     public static ParameterDescriptorGroup createDescriptor(final GeneralParameterDescriptor sourceConfigDescriptor){
-        final ParameterDescriptorGroup sourceDescriptor = new DefaultParameterDescriptorGroup(
-                Collections.singletonMap("name", SOURCE_DESCRIPTOR_NAME),1, 1,
+        final ParameterDescriptorGroup sourceDescriptor = new org.apache.sis.parameter.DefaultParameterDescriptorGroup(
+                Collections.singletonMap("name", SOURCE_DESCRIPTOR_NAME),1, Integer.MAX_VALUE,
                 SOURCE_ID_DESCRIPTOR,SOURCE_LOADALL_DESCRIPTOR,SOURCE_DATE_DESCRIPTOR,SOURCE_TYPE_DESCRIPTOR,
                  sourceConfigDescriptor,LAYER_DESCRIPTOR);
         return sourceDescriptor;

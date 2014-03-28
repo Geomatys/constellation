@@ -16,6 +16,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamException;
 
+import org.apache.sis.parameter.ParameterBuilder;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
@@ -32,6 +33,8 @@ import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
 import org.geotoolkit.parameter.ParametersExt;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
+import org.opengis.parameter.GeneralParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 /**
@@ -267,6 +270,7 @@ public class ConfigurationUtilities {
                                             ConfigurationEngine.writeProvider(sourceName, null, ProviderRecord.ProviderType.STYLE, factory.getName(), source);
                                         } else {
                                             LOGGER.log(Level.FINE, "Provider cannot be imported. A provider with the same name already exists : " + sourceName);
+                                            break;
                                         }
                                     } catch (Exception e) {
                                         // A problem occured while creating the provider, check the next one.
@@ -282,7 +286,8 @@ public class ConfigurationUtilities {
                         // Try to get a valid layer configuration
                         for (final ProviderFactory factory : layerProxy.getFactories()) {
                             try {
-                                paramReader = new ParameterValueReader(factory.getProviderDescriptor());
+                                // UGLY HACK : As provider API has been modified, we must wrap factory descriptors to have the <config> root.
+                                paramReader = new ParameterValueReader(wrapSourceDescriptor(factory.getProviderDescriptor()));
                                 paramReader.setInput(providerFile);
                                 sourceGroup = (ParameterValueGroup) paramReader.read();
                                 sources = ParametersExt.getGroups(sourceGroup, SOURCE_DESCRIPTOR_NAME);
@@ -295,6 +300,7 @@ public class ConfigurationUtilities {
                                             ConfigurationEngine.writeProvider(sourceName, null, ProviderRecord.ProviderType.LAYER, factory.getName(), source);
                                         } else {
                                             LOGGER.log(Level.FINE, "Provider cannot be imported. A provider with the same name already exists : " + sourceName);
+                                            break;
                                         }
                                     } catch (Exception e) {
                                         // A problem occured while creating the provider, check the next one.
@@ -358,6 +364,15 @@ public class ConfigurationUtilities {
 //                LOGGER.log(Level.INFO, "Following file cannot be read : " + other.getName());
 //            }
 //        }
+    }
+
+    /**
+     * Simply embed the source parameter group into a bigger one named config. Used for old configuration import.
+     * @param providerDescriptor The descriptor group to wrap.
+     * @return the wrapped provider.
+     */
+    public static GeneralParameterDescriptor wrapSourceDescriptor(ParameterDescriptorGroup providerDescriptor) {
+        return new ParameterBuilder().addName("config").createGroup(providerDescriptor);
     }
 
 }

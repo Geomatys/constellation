@@ -45,7 +45,6 @@ public class CstlInstaller implements ServletContextListener {
     
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
-            Hints.putSystemDefault(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
 
         LOGGER.log(Level.INFO, "=== Configuring Constellation ===");
 
