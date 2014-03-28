@@ -57,6 +57,7 @@ import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.MutableStyleFactory;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 
 /**
@@ -92,7 +93,13 @@ public class JProviderEditPane extends javax.swing.JPanel {
         this.providerReport = providerReport;
 
         configDesc = (ParameterDescriptorGroup) server.providers.getServiceDescriptor(providerType);
-        sourceDesc = (ParameterDescriptorGroup) configDesc.descriptor("source");
+        ParameterDescriptorGroup sourceCandidate = null; 
+        try {
+            sourceCandidate = (ParameterDescriptorGroup) configDesc.descriptor("source");
+        } catch (ParameterNotFoundException ex) {
+            sourceCandidate = configDesc;
+        }
+        sourceDesc = sourceCandidate;
         sourceParam = (ParameterValueGroup) server.providers.getProviderConfiguration(providerReport.getId(), sourceDesc);
         dataDesc = (ParameterDescriptorGroup) server.providers.getSourceDescriptor(providerType);
         final List<ParameterValueGroup> dataGroups = sourceParam.groups(dataDesc.getName().getCode());
