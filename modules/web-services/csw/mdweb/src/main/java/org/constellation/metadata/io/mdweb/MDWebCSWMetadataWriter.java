@@ -244,5 +244,11 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter {
         }
     }
 
-
+    @Override
+    public void destroy() {
+        super.destroy();
+        if (indexer != null) {
+            indexer.destroy();
+        }
+    }
 }
