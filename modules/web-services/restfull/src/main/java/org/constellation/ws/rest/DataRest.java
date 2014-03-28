@@ -271,9 +271,9 @@ public class DataRest {
             LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             return Response.status(500).entity("failed").build();
         } finally {
-        	if (isArchive){
-        		OriginalFile.delete();
-        	}
+            if (isArchive){
+                OriginalFile.delete();
+            }
         }
 
         String result = newFile.getAbsolutePath();
@@ -334,32 +334,28 @@ public class DataRest {
         final String metadataFilePath = values.getValues().get("metadataFilePath");
         final String dataType = values.getValues().get("dataType");
 
-        
         try{
-        	File dataIntegratedDirectory = ConfigDirectory.getDataIntegratedDirectory();
-        	if (filePath!= null){
-        		recursiveDelete(new File(new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(filePath).getName()).getAbsolutePath()));
-        		Files.move(Paths.get(filePath), Paths.get(new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(filePath).getName()).getAbsolutePath()),StandardCopyOption.REPLACE_EXISTING);
-        	}
-        	if (metadataFilePath!= null){
-        		Files.move(Paths.get(metadataFilePath), Paths.get(new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(metadataFilePath).getName()).getAbsolutePath()),StandardCopyOption.REPLACE_EXISTING);
-        	}
-
-        	ImportedData importedData = new ImportedData();
-        	if (filePath!= null){
-        		importedData.setDataFile(new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(filePath).getName()).getAbsolutePath());
-        	}
-            if (metadataFilePath!= null){
-            	importedData.setMetadataFile(new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(metadataFilePath).getName()).getAbsolutePath());
+            File dataIntegratedDirectory = ConfigDirectory.getDataIntegratedDirectory();
+            if (filePath!= null){
+                recursiveDelete(new File(new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(filePath).getName()).getAbsolutePath()));
+                Files.move(Paths.get(filePath), Paths.get(new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(filePath).getName()).getAbsolutePath()),StandardCopyOption.REPLACE_EXISTING);
             }
-            
-            
-            
-        	return Response.ok(importedData).build();
+            if (metadataFilePath!= null){
+                Files.move(Paths.get(metadataFilePath), Paths.get(new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(metadataFilePath).getName()).getAbsolutePath()),StandardCopyOption.REPLACE_EXISTING);
+            }
+            ImportedData importedData = new ImportedData();
+            if (filePath != null) {
+                importedData.setDataFile(new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(filePath).getName()).getAbsolutePath());
+            }
+            if (metadataFilePath != null) {
+                importedData.setMetadataFile(new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(metadataFilePath).getName()).getAbsolutePath());
+            }
+
+            return Response.ok(importedData).build();
         } catch (IOException e) {
-        	LOGGER.log(Level.SEVERE, "Bad configuration for data Integrated directory", e);
-        	return Response.status(500).entity("failed").build();
-		}
+            LOGGER.log(Level.SEVERE, "Bad configuration for data Integrated directory", e);
+            return Response.status(500).entity("failed").build();
+        }
     }
     
     

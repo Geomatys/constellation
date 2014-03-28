@@ -17,14 +17,15 @@
 
 package org.constellation.ws.rest;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -36,7 +37,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
-
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ConfigurationEngine;
@@ -45,15 +45,20 @@ import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.configuration.ProviderConfiguration;
 import org.constellation.provider.DataProvider;
-import org.constellation.provider.DataProviders;
 import org.constellation.provider.DataProviderFactory;
+import org.constellation.provider.DataProviders;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.LayerProviders;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
+import org.geotoolkit.data.FeatureStoreFactory;
+import org.geotoolkit.data.FeatureStoreFinder;
+import org.geotoolkit.data.FileFeatureStoreFactory;
 import org.geotoolkit.feature.DefaultName;
+import org.geotoolkit.parameter.ParametersExt;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.NoSuchIdentifierException;
 
@@ -86,37 +91,106 @@ public final class Provider {
         final ParameterValueGroup sources = sourceDesc.createValue();
         sources.parameter("id").setValue(id);
         sources.parameter("providerType").setValue(type);
-        String folderPath;
 
         switch (type) {
             case "sld":
                 final String sldPath = inParams.get("path");
-                folderPath = sldPath.substring(0, sldPath.lastIndexOf('/'));
+                String folderPath = sldPath.substring(0, sldPath.lastIndexOf('/'));
                 sources.groups("sldFolder").get(0).parameter("path").setValue(folderPath);
                 break;
             case "feature-store":
-                switch (subType) {
-                    case "shapefile":
-                        try {
-                            final String shpPath = inParams.get("path");
-                            final URL url = new URL("file:" + shpPath);
-                            final ParameterValueGroup shpFolderParams = sources.groups("choice").get(0).addGroup("ShapeFileParametersFolder");
-                            shpFolderParams.parameter("url").setValue(url);
-                            shpFolderParams.parameter("namespace").setValue("no namespace");
-                        } catch (MalformedURLException e) {
-                            LOGGER.log(Level.WARNING, "unable to create url from path", e);
+                
+                boolean foundProvider = false;
+                try {
+                    final String filePath = inParams.get("path");
+                    final URL url = new URL("file:" + filePath);
+                    final File folder = new File(filePath);
+                    
+                    final File[] candidates;
+                    if(folder.isDirectory()){
+                        candidates = folder.listFiles();
+                    }else{
+                        candidates = new File[]{folder};
+                    }
+                    
+                    search:
+                    for(File candidate : candidates){
+                        final String candidateName = candidate.getName().toLowerCase();
+
+                        //loop on features file factories
+                        final Iterator<FeatureStoreFactory> ite = FeatureStoreFinder.getAllFactories(null).iterator();
+                        while (ite.hasNext()) {
+                            final FeatureStoreFactory factory = ite.next();
+                            if(factory instanceof FileFeatureStoreFactory){
+                                final FileFeatureStoreFactory fileFactory = (FileFeatureStoreFactory) factory;
+                                for (String tempExtension : fileFactory.getFileExtensions()) {
+                                    //we do not want shapefiles or dbf types, a folder provider will be created in those cases
+                                    if (candidateName.endsWith(tempExtension) && !tempExtension.endsWith("shp") && !tempExtension.endsWith("dbf")) {
+                                        //found a factory which can handle it
+                                        final ParameterValueGroup params = sources.groups("choice").get(0).addGroup(
+                                                factory.getParametersDescriptor().getName().getCode());
+                                        params.parameter("url").setValue(url);
+                                        params.parameter("namespace").setValue("no namespace");
+                                        foundProvider = true;
+                                        //TODO we should add all files which define a possible feature-store
+                                        //but the web interfaces do not handle that yet, so we limit to one for now.
+                                        break search;
+                                    }
+                                }
+                            }else{
+                                final ParameterValueGroup testParams = factory.getParametersDescriptor().createValue();
+                                try{
+                                    testParams.parameter("namespace").setValue("no namespace");
+                                    final ParameterValue pv = ParametersExt.getOrCreateValue(testParams, "url");
+                                    pv.setValue(url);
+                                    
+                                    if(factory.canProcess(testParams)){
+                                        final ParameterValueGroup params = sources.groups("choice").get(0).addGroup(
+                                                factory.getParametersDescriptor().getName().getCode());
+                                        params.parameter("url").setValue(url);
+                                        params.parameter("namespace").setValue("no namespace");
+                                        foundProvider = true;
+                                        //TODO we should add all files which define a possible feature-store
+                                        //but the web interfaces do not handle that yet, so we limit to one for now.
+                                        break search;
+                                    }
+                                    
+                                }catch(Exception ex){
+                                    //parameter might not exist
+                                }
+                                
+                            }
                         }
-                        break;
-                    default:
-                        final ParameterValueGroup pgParams = sources.groups("choice").get(0).addGroup("PostgresParameters");
-                        final int port = Integer.parseInt(inParams.get("port"));
-                        pgParams.parameter("identifier").setValue("postgresql");
-                        pgParams.parameter("host").setValue(inParams.get("host"));
-                        pgParams.parameter("port").setValue(port);
-                        pgParams.parameter("user").setValue(inParams.get("user"));
-                        pgParams.parameter("password").setValue(inParams.get("password"));
-                        pgParams.parameter("database").setValue(inParams.get("database"));
-                        pgParams.parameter("simple types").setValue(true);
+                    }
+                    
+                } catch (MalformedURLException e) {
+                    LOGGER.log(Level.WARNING, "unable to create url from path", e);
+                }
+                
+                if(!foundProvider){
+                    switch (subType) {
+                        case "shapefile":
+                            try {
+                                final String shpPath = inParams.get("path");
+                                final URL url = new URL("file:" + shpPath);
+                                final ParameterValueGroup shpFolderParams = sources.groups("choice").get(0).addGroup("ShapeFileParametersFolder");
+                                shpFolderParams.parameter("url").setValue(url);
+                                shpFolderParams.parameter("namespace").setValue("no namespace");
+                            } catch (MalformedURLException e) {
+                                LOGGER.log(Level.WARNING, "unable to create url from path", e);
+                            }
+                            break;
+                        default:
+                            final ParameterValueGroup pgParams = sources.groups("choice").get(0).addGroup("PostgresParameters");
+                            final int port = Integer.parseInt(inParams.get("port"));
+                            pgParams.parameter("identifier").setValue("postgresql");
+                            pgParams.parameter("host").setValue(inParams.get("host"));
+                            pgParams.parameter("port").setValue(port);
+                            pgParams.parameter("user").setValue(inParams.get("user"));
+                            pgParams.parameter("password").setValue(inParams.get("password"));
+                            pgParams.parameter("database").setValue(inParams.get("database"));
+                            pgParams.parameter("simple types").setValue(true);
+                    }
                 }
                 break;
             case "coverage-store":
