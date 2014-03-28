@@ -458,24 +458,19 @@ public class CSWConfigurationManager {
      */
     protected Automatic getServiceConfiguration(final String id) throws ConfigurationException {
         final File instanceDirectory = ConfigDirectory.getInstanceDirectory("CSW", id);
-        if (instanceDirectory.isDirectory()) {
-            try {
-                // we get the CSW configuration file
-                final Automatic config = (Automatic) ConfigurationEngine.getConfiguration("CSW", id);
-                config.setConfigurationDirectory(instanceDirectory);
-                return config;
+        try {
+            // we get the CSW configuration file
+            final Automatic config = (Automatic) ConfigurationEngine.getConfiguration("CSW", id);
+            config.setConfigurationDirectory(instanceDirectory);
+            return config;
 
-            } catch (JAXBException ex) {
-                throw new ConfigurationException("JAXBexception while getting the CSW configuration for:" + id, ex.getMessage());
-            } catch (IllegalArgumentException ex) {
-                throw new ConfigurationException("IllegalArgumentException: " + ex.getMessage());
-            } catch (FileNotFoundException ex) {
-                throw new ConfigurationException("Unable to find the configuration file");
-            }
-        } else {
-            LOGGER.log(Level.WARNING, "No CSW configuration directory for instance:{0}", id);
+        } catch (JAXBException ex) {
+            throw new ConfigurationException("JAXBexception while getting the CSW configuration for:" + id, ex.getMessage());
+        } catch (IllegalArgumentException ex) {
+            throw new ConfigurationException("IllegalArgumentException: " + ex.getMessage());
+        } catch (FileNotFoundException ex) {
+            throw new ConfigurationException("Unable to find the configuration file");
         }
-        return null;
     }
 
     /**
@@ -612,7 +607,7 @@ public class CSWConfigurationManager {
                 return cswfactory.getMetadataReader(config, serviceID);
 
             } catch (MetadataIoException ex) {
-                throw new ConfigurationException("JAXBException while initializing the reader!", ex);
+                throw new ConfigurationException("MetadataIoException while initializing the reader:" + ex.getMessage(), ex);
             }
         } else {
             throw new ConfigurationException("there is no configuration file correspounding to this ID:" + serviceID);

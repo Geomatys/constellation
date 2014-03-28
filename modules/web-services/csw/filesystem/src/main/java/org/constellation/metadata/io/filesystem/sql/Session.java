@@ -104,7 +104,7 @@ public class Session implements Closeable {
     public int getCount() throws SQLException {
         int count = 0;
         try {
-            final PreparedStatement stmt = con.prepareStatement("SELECT COUNT() FROM \"csw\".\"records\"");
+            final PreparedStatement stmt = con.prepareStatement("SELECT COUNT(*) FROM \"csw\".\"records\"");
             final ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 count = rs.getInt(1);

@@ -19,6 +19,9 @@ package org.constellation.metadata.configuration;
 
 import java.io.File;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.*;
 import org.constellation.dto.Service;
@@ -39,6 +42,8 @@ import org.w3c.dom.Node;
  */
 public class CSWConfigurer extends OGCConfigurer {
 
+    private static final Logger LOGGER = Logging.getLogger(CSWConfigurer.class);
+    
     /**
      * Create a new {@link CSWConfigurer} instance.
      */
@@ -105,9 +110,13 @@ public class CSWConfigurer extends OGCConfigurer {
      * {@inheritDoc}
      */
     @Override
-    public Instance getInstance(String identifier) throws ConfigurationException {
+    public Instance getInstance(final String identifier) throws ConfigurationException {
         final Instance instance = super.getInstance(identifier);
-        instance.setLayersNumber(getMetadataCount(identifier));
+        try {
+            instance.setLayersNumber(getMetadataCount(identifier));
+        } catch (ConfigurationException ex) {
+            LOGGER.log(Level.WARNING, "Error while getting metadata count on CSW instance:" + identifier, ex);
+        }
         return instance;
     }
 }
