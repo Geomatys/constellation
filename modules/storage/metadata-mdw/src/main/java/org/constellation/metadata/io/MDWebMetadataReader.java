@@ -178,6 +178,8 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
     private static final TimeZone tz = TimeZone.getTimeZone("GMT+2:00");
     
+    private final boolean indexOnlyPublished;
+    
     /**
      * Build a new metadata Reader.
      *
@@ -246,6 +248,8 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             }
             storeMapping = m;
         }
+        
+        this.indexOnlyPublished = configuration.getIndexOnlyPublishedMetadata();
 
         initPackage();
         this.classBinding       = initClassBinding(configuration.getConfigurationDirectory());
@@ -263,6 +267,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         initPackage();
         this.classBinding       = new HashMap<>();
         this.alreadyRead        = new HashMap<>();
+        this.indexOnlyPublished = true;
     }
 
     /**
@@ -1249,17 +1254,14 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     /**
      * {@inheritDoc }
      *
-     * TODO use mdReader.getAllIdentifiers ?
      */
     @Override
     public List<String> getAllIdentifiers() throws MetadataIoException {
         final List<String> results = new ArrayList<>();
         try {
             final List<RecordSet> recordSets   = mdReader.getRecordSets();
-            final Collection<FullRecord> records = mdReader.getAllRecord(recordSets);
-            for (FullRecord f: records) {
-                results.add(f.getIdentifier());
-            }
+            final Collection<String> ids = mdReader.getAllIdentifiers(recordSets, indexOnlyPublished);
+            results.addAll(ids);
         } catch (MD_IOException ex) {
             throw new MetadataIoException("SQL Exception while getting all the entries: " +ex.getMessage());
         }
@@ -1277,7 +1279,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     public int getEntryCount() throws MetadataIoException {
         try {
             final List<RecordSet> recordSets = mdReader.getRecordSets();
-            final Collection<String> records = mdReader.getAllIdentifiers(recordSets, true);
+            final Collection<String> records = mdReader.getAllIdentifiers(recordSets, indexOnlyPublished);
             return records.size();
         } catch (MD_IOException ex) {
             throw new MetadataIoException("SQL Exception while getting all the entries: " +ex.getMessage());

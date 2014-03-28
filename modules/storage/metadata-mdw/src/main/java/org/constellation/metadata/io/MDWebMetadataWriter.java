@@ -64,6 +64,7 @@ import org.apache.sis.xml.XLink.Type;
 import org.apache.sis.internal.jaxb.LegacyNamespaces;
 import org.apache.sis.referencing.NamedIdentifier;
 import org.apache.sis.xml.XML;
+import org.constellation.jaxb.MarshallWarnings;
 
 // MDWeb dependencies
 import org.mdweb.model.profiles.Profile;
@@ -1399,8 +1400,10 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         try {
             final boolean replace = mode == MetadataType.ISO_19115;
             final Unmarshaller um = EBRIMMarshallerPool.getInstance().acquireUnmarshaller();
+            final MarshallWarnings warnings = new MarshallWarnings();
             um.setProperty(LegacyNamespaces.APPLY_NAMESPACE_REPLACEMENTS, replace);
             um.setProperty(XML.TIMEZONE, tz);
+            um.setProperty(XML.CONVERTER, warnings);
             final String xml = getStringFromNode(n);
             Object obj = um.unmarshal(new StringReader(xml));
             EBRIMMarshallerPool.getInstance().recycle(um);

@@ -17,30 +17,24 @@
 package org.constellation.metadata.harvest;
 
 // J2SE dependencies
-import java.util.logging.Level;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
-
-// JAXB dependencies
 import javax.xml.bind.JAXBException;
-
-// Constellation dependencies
 import javax.xml.bind.Unmarshaller;
-import org.constellation.metadata.DistributedResults;
-import org.constellation.metadata.io.MetadataWriter;
-import org.constellation.ws.CstlServiceException;
-import org.constellation.metadata.io.MetadataIoException;
-
-// Geotoolkit dependencies
-import org.geotoolkit.csw.xml.GetRecordsRequest;
-import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
+import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.apache.sis.xml.Namespaces;
-import org.apache.sis.util.logging.Logging;
+import org.constellation.metadata.DistributedResults;
+import org.constellation.metadata.io.MetadataIoException;
+import org.constellation.metadata.io.MetadataWriter;
+import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.csw.xml.CSWMarshallerPool;
+import org.geotoolkit.csw.xml.GetRecordsRequest;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.w3c.dom.Node;
@@ -72,7 +66,7 @@ public abstract class CatalogueHarvester {
      * @param metadataWriter A writer to store metadata in the dataSource.
      */
     public CatalogueHarvester(final MetadataWriter metadataWriter) {
-        this.marshallerPool = EBRIMMarshallerPool.getInstance();
+        this.marshallerPool = CSWMarshallerPool.getInstanceCswOnly();
         this.metadataWriter = metadataWriter;
     }
     
