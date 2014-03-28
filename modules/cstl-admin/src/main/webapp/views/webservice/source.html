@@ -16,7 +16,7 @@
     <div class="col-sm-offset-3 col-sm-9">
         <div class="form-group">
             <div class="control-label" translate="service.config.source">Source</div>
-            <select id="sourceType" ng-model="source['@format']">
+            <select id="sourceType" ng-model="source['automatic']['@format']">
                 <option value="mdweb" translate="service.config.source.database">Database</option>
                 <option value="internal" translate="service.config.source.internal">Internal</option>
                 <option value="filesystem" translate="service.config.source.file">File system</option>
@@ -30,7 +30,7 @@
 </div>
 
 <!-- MDWeb database -->
-<div class="row bg-white" ng-if="source['@format'] === 'mdweb'">
+<div class="row bg-white" ng-if="source['automatic']['@format'] === 'mdweb'">
     <div class="col-sm-3">
         <div class="well">
             <p><b translate="service.config.source.database.title">Database (SGBDR)</b></p>
@@ -71,7 +71,7 @@
 </div>
 
 <!-- Internal database -->
-<div class="row bg-white" ng-if="source['@format'] === 'internal'">
+<div class="row bg-white" ng-if="source['automatic']['@format'] === 'internal'">
     <div class="col-sm-3">
         <div class="well">
             <p><b translate="service.config.source.internal.title">Internal (SGBDR)</b></p>
@@ -83,7 +83,7 @@
 </div>
 
 <!-- File system -->
-<div class="row bg-white" ng-if="source['@format'] === 'filesystem'">
+<div class="row bg-white" ng-if="source['automatic']['@format'] === 'filesystem'">
     <div class="col-sm-3">
         <div class="well">
             <p><b translate="service.config.source.file.title">File system</b></p>
@@ -102,7 +102,7 @@
     </div>
 </div>
 
-<div ng-if="!source['@format']">
+<div ng-if="!source['automatic']['@format']">
     <div class="row bg-white">
         <div class="col-sm-12">
             <div class="well">
@@ -131,7 +131,7 @@
     </div>
 </div>
 
-<div ng-if="source['@format']">
+<div ng-if="source['automatic']['@format']">
 
     <div class="row bg-white">
         <div class="form-separator"></div>

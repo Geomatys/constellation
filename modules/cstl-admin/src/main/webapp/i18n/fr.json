@@ -840,9 +840,9 @@
             "source.database.username": "Nom d'utilisateur",
             "source.database.password": "Mot de passe",
             "source.database.shared": "Connexion partagée",
-            "source.file": "Système de fichier",
-            "source.file.description": "Jeu de métadonnées stocké dans le système de fichier local",
-            "source.file.title": "Système de fichier",
+            "source.file": "Système de fichiers",
+            "source.file.description": "Jeu de métadonnées stocké dans le système de fichiers local",
+            "source.file.title": "Système de fichiers",
             "source.file.path": "Chemin du dossier",
             "source.internal": "Interne",
             "source.internal.description": "Base de données des métadonnées de Constellation, décrivant les données publiées par les services",
@@ -952,6 +952,7 @@
             },
             "log.modal.title": "Détails de la log ",
             "log.modal.close": "Fermer",
+            "refresh.label": "Rafraîchir",
             "show": {
                 "label": "Visualiser"
             },

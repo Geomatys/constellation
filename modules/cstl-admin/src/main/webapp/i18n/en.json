@@ -503,6 +503,7 @@
             "log.label": "Service log",
             "log.modal.title": "Log Details",
             "log.modal.close": "Close",
+            "refresh.label": "Refresh",
             "show.label": "Show",
             "url.label": "Service URL"
         }

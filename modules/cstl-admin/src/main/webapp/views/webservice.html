@@ -57,7 +57,7 @@
                                 <li><a ng-click="showLogs(service)" translate="service.menu.log.label">View logs</a></li>
                                 <li><a ng-click="showCapa(service)" ng-disabled="service.status!=='WORKING'" translate="service.menu.getcapabilities.label">GetCapabilities</a></li>
                                 <li><a ng-click="deleteService(service)" translate="service.menu.delete.label">Delete</a></li>
-                                <li ng-if="service.type.toLowerCase() === 'csw'"><a ng-click="refreshIndex(service)">Refresh</a></li>
+                                <li ng-if="service.type.toLowerCase() === 'csw'"><a ng-click="refreshIndex(service)" translate="service.menu.refresh.label">Refresh</a></li>
                             </ul>
                         </div>
                         <a style="margin-left: 5px;" class="btn btn-default btn-info" ng-click="reload(service)">
