@@ -123,7 +123,9 @@ cstlAdminApp.factory('webService', ['$resource',
                                              'capabilities': {method: 'GET', url: '@cstl/WS/:type/:id;jsessionid=?REQUEST=GetCapabilities&SERVICE=:typeUpper&VERSION=:version'},
                                              'layers' :      {method: 'GET', url: '@cstl/api/1/MAP/:type/:id/layersummary/all;jsessionid=', isArray: true},
                                              'addLayer':     {method: 'PUT', url: '@cstl/api/1/MAP/:type/:id/layer;jsessionid='},
-                                             'deleteLayer':  {method: 'DELETE', url: '@cstl/api/1/MAP/:type/:id/:layerid;jsessionid='}
+                                             'deleteLayer':  {method: 'DELETE', url: '@cstl/api/1/MAP/:type/:id/:layerid;jsessionid='},
+                                             'updateLayerStyle': {method: 'POST', url: '@cstl/api/1/MAP/:type/:id/updatestyle;jsessionid='},
+                                             'removeLayerStyle': {method: 'POST', url: '@cstl/api/1/MAP/:type/:id/removestyle;jsessionid='}
                                          });
                                      }]);
 
@@ -210,7 +212,29 @@ cstlAdminApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'aut
         };
     }]);
 
-cstlAdminApp.factory('StyleSharedService', ['$modal', 'style' ,function ($modal, style) {
+cstlAdminApp.service('$growl', function() {
+    /**
+     * Displays a notification with the specified title and text.
+     *
+     * @param type  - {string} the notification type (info|error|success|warning)
+     * @param title - {string} the notification title
+     * @param msg   - {string} the notification message
+     */
+    return function(type, title, msg) {
+        if (type === 'info') {
+            $.growl({title: title, message: msg});
+        } else if (type === 'error') {
+            $.growl.error({title: title, message: msg});
+        } else if (type === 'success') {
+            $.growl.notice({title: title, message: msg});
+        } else if (type === 'warning') {
+            $.growl.warning({title: title, message: msg});
+        }
+    };
+});
+
+cstlAdminApp.factory('StyleSharedService', ['$modal', 'style', 'webService', '$growl',
+    function ($modal, style, webService, $growl) {
         return {
             showStyleList : function($scope) {
                 var modal = $modal.open({
@@ -226,36 +250,61 @@ cstlAdminApp.factory('StyleSharedService', ['$modal', 'style' ,function ($modal,
 
                 modal.result.then(function(item) {
                     if (item) {
-                        style.link({
-                            provider: item.Provider,
-                            name: item.Name
-                        }, {
-                            values: {
-                                dataProvider: $scope.selected.Provider,
-                                dataNamespace: "",
-                                dataId: $scope.selected.Name
-                            }
-                        }, function() {
-                            $scope.selected.TargetStyle.push(item);
-                        });
+                        if ($scope.service) {
+                            webService.updateLayerStyle({type: $scope.service.type, id: $scope.service.identifier},
+                                {values: {layerId: $scope.selected.Name, spId: 'sld', styleName: item.Name}},
+                                function() {
+                                    $scope.selected.TargetStyle.push(item);
+                                    $growl('success','Success','Style updated for layer '+ $scope.selected.Name);
+                                }, function() { $growl('error','Error','Unable to update style for layer '+ $scope.selected.Name); }
+                            );
+                        } else {
+                            style.link({
+                                provider: item.Provider,
+                                name: item.Name
+                            }, {
+                                values: {
+                                    dataProvider: $scope.selected.Provider,
+                                    dataNamespace: "",
+                                    dataId: $scope.selected.Name
+                                }
+                            }, function () {
+                                $scope.selected.TargetStyle.push(item);
+                            });
+                        }
                     }
                 });
             },
 
             unlinkStyle : function($scope,providerName, styleName, dataProvider, dataId, style) {
-                var res = style.unlink({provider: providerName, name: styleName},
-                    {values: {dataProvider: dataProvider, dataNamespace: "", dataId: dataId}});
-                if (res) {
-                    var index = -1;
-                    for (var i=0; i < $scope.selected.TargetStyle.length; i++) {
-                        var item = $scope.selected.TargetStyle[i];
-                        if (item.Provider === providerName && item.Name === styleName) {
-                            index = i;
-                            break;
+                if ($scope.service) {
+                    webService.removeLayerStyle({type: $scope.service.type, id: $scope.service.identifier},
+                        {values: {layerId: $scope.selected.Name, spId: 'sld', styleName: styleName}},
+                        function() {
+                            for (var i=0; i<$scope.selected.TargetStyle.length; i++) {
+                                var s = $scope.selected.TargetStyle[i];
+                                if (s.Name === styleName) {
+                                    $scope.selected.TargetStyle.splice(i, 1);
+                                    break;
+                                }
+                            }
+                        }, function() { $growl('error','Error','Unable to update style for layer '+ $scope.selected.Name); }
+                    );
+                } else {
+                    var res = style.unlink({provider: providerName, name: styleName},
+                        {values: {dataProvider: dataProvider, dataNamespace: "", dataId: dataId}});
+                    if (res) {
+                        var index = -1;
+                        for (var i = 0; i < $scope.selected.TargetStyle.length; i++) {
+                            var item = $scope.selected.TargetStyle[i];
+                            if (item.Provider === providerName && item.Name === styleName) {
+                                index = i;
+                                break;
+                            }
                         }
-                    }
-                    if (index >= 0) {
-                        $scope.selected.TargetStyle.splice(index,1);
+                        if (index >= 0) {
+                            $scope.selected.TargetStyle.splice(index, 1);
+                        }
                     }
                 }
             }
@@ -397,27 +446,6 @@ cstlAdminApp.service('$dashboard', function($filter) {
         $scope.$watch('orderreverse', function() {
             $scope.displayPage($scope.currentpage);
         });
-    };
-});
-
-cstlAdminApp.service('$growl', function() {
-    /**
-     * Displays a notification with the specified title and text.
-     *
-     * @param type  - {string} the notification type (info|error|success|warning)
-     * @param title - {string} the notification title
-     * @param msg   - {string} the notification message
-     */
-    return function(type, title, msg) {
-        if (type === 'info') {
-            $.growl({title: title, message: msg});
-        } else if (type === 'error') {
-            $.growl.error({title: title, message: msg});
-        } else if (type === 'success') {
-            $.growl.notice({title: title, message: msg});
-        } else if (type === 'warning') {
-            $.growl.warning({title: title, message: msg});
-        }
     };
 });
 

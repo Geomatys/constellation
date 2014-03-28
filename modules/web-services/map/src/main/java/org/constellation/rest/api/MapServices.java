@@ -22,16 +22,10 @@ import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.*;
 import org.constellation.dto.AddLayer;
+import org.constellation.dto.ParameterValues;
 import org.constellation.map.configuration.MapConfigurer;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
@@ -112,6 +106,30 @@ public final class MapServices {
     public Response deleteLayer(final @PathParam("spec") String spec, final @PathParam("id") String serviceId, final @PathParam("layerid") String layerid, @QueryParam("layernamespace") String layernmsp) throws Exception {
         try {
             getConfigurer(spec).removeLayer(serviceId, new QName(layernmsp, layerid));
+        } catch (ConfigurationException e) {
+            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+            throw e;
+        }
+        return Response.ok().build();
+    }
+
+    @POST
+    @Path("{id}/updatestyle")
+    public Response updateLayerStyleForService(final @PathParam("spec") String spec, final @PathParam("id") String serviceId, final ParameterValues params) throws Exception {
+        try {
+            getConfigurer(spec).updateLayerStyle(serviceId, params.get("layerId"), params.get("spId"), params.get("styleName"));
+        } catch (ConfigurationException e) {
+            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+            throw e;
+        }
+        return Response.ok().build();
+    }
+
+    @POST
+    @Path("{id}/removestyle")
+    public Response removeLayerStyleForService(final @PathParam("spec") String spec, final @PathParam("id") String serviceId, final ParameterValues params) throws Exception {
+        try {
+            getConfigurer(spec).removeLayerStyle(serviceId, params.get("layerId"), params.get("spId"), params.get("styleName"));
         } catch (ConfigurationException e) {
             LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
             throw e;

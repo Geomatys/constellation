@@ -1,9 +1,12 @@
 package org.constellation.configuration;
 
+import org.constellation.util.DataReference;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -36,7 +39,22 @@ public class LayerSummary {
         this.date = layer.getDate();
         this.owner = layer.getOwner();
         this.provider = db.getProvider();
-        this.targetStyle = db.getTargetStyle();
+        this.targetStyle = convertIntoStylesBrief(layer.getStyles());
+    }
+
+    private final List<StyleBrief> convertIntoStylesBrief(final List<DataReference> refs) {
+        final List<StyleBrief> briefs = new ArrayList<>();
+        if (refs != null) {
+            for (final DataReference ref: refs) {
+                final StyleBrief styleToAdd = new StyleBrief();
+                styleToAdd.setProvider(ref.getProviderId());
+                final String styleName = ref.getLayerId().getLocalPart();
+                styleToAdd.setName(styleName);
+                styleToAdd.setTitle(styleName);
+                briefs.add(styleToAdd);
+            }
+        }
+        return briefs;
     }
 
     public String getName() {
