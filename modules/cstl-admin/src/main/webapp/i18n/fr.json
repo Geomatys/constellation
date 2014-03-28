@@ -24,7 +24,7 @@
     },
     "confirm": {
         "delete": {
-            "style": "Voulez-vous réellement supprimer ce style?"
+            "style": "Voulez-vous réellement supprimer ce style ?"
         }
     },
     "create": {
@@ -44,7 +44,7 @@
             },
             "maxwidth": {
                 "label": "Largeur maximale",
-                "tooltip": "Valeur de largeur maximale qu'un client peut spécifier dans un GetMap."
+                "tooltip": "Valeur de largeur maximale qu'un client peut spécifier dans une requête GetMap."
             }
         },
         "cancel": {
@@ -96,7 +96,7 @@
         "description": {
             "metadata": {
                 "subtitle": "Service en création:",
-                "title": "Service metadata"
+                "title": "Métadonnées de service"
             },
             "next": {
                 "label": "Suivant"
@@ -135,7 +135,7 @@
                 "wps": "WPS (Web Processing Service) permet d'exposer des modèles de géotraitement en tant que services Web."
             },
             "title": {
-                "label": "Designing service"
+                "label": "Configurer le service"
             },
             "transactional": "Transactionnel",
             "version": {
@@ -159,7 +159,7 @@
             "cancel": "Annuler",
             "change": "Changer",
             "choose": "Choisir",
-            "choose.pyramid.conform": "Génèrer une pyramide sur la donnée",
+            "choose.pyramid.conform": "Générer une pyramide sur la donnée",
             "choose.scales": "Echelles",
             "choose.tile.format": "Fomat de sortie du tuilage",
             "choose.uppercornerx": "Coin haut X",
@@ -202,7 +202,7 @@
                 "fill": "Remplissage",
                 "filters": "Filtres",
                 "font": "Police",
-                "general": "General",
+                "general": "Général",
                 "grey": {
                     "scale": "Niveaux de gris"
                 },
@@ -703,9 +703,9 @@
             "http": {
                 "active": "Requêtes actives :",
                 "code": {
-                    "notfound": "Not found",
+                    "notfound": "Non trouvé",
                     "ok": "Ok",
-                    "servererror": "Server Error"
+                    "servererror": "Erreur serveur"
                 },
                 "table": {
                     "average": "Moyenne",
@@ -840,9 +840,11 @@
             "source.database.password": "Mot de passe",
             "source.database.shared": "Connexion partagée",
             "source.file": "Système de fichier",
+            "source.file.description": "Jeu de métadonnées dans le système de fichier",
             "source.file.title": "Système de fichier",
             "source.file.path": "Chemin du dossier",
             "source.internal": "Interne",
+            "source.internal.description": "Base de données des métadonnées de Constellation",
             "source.internal.title": "Interne (SGBDR)"
         },
         "create": {
@@ -890,10 +892,10 @@
                 "button": "Recharger"
             },
             "start": {
-                "button": "Start"
+                "button": "Démarrer"
             },
             "stop": {
-                "button": "Stop"
+                "button": "Arrêter"
             },
             "tab": {
                 "data": {

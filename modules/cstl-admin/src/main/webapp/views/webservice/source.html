@@ -12,8 +12,25 @@
     </div>
 </div>
 
-<!-- main part -->
 <div class="row bg-white">
+    <div class="col-sm-offset-3 col-sm-9">
+        <div class="form-group">
+            <div class="control-label" translate="service.config.source">Source</div>
+            <select id="sourceType" ng-model="source['@format']">
+                <option value="mdweb" selected="selected" translate="service.config.source.database">Database</option>
+                <option value="internal" translate="service.config.source.internal">Internal</option>
+                <option value="filesystem" translate="service.config.source.file">File system</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="row bg-white">
+    <div class="form-separator"></div>
+</div>
+
+<!-- MDWEB DATABASE -->
+<div class="row bg-white" ng-if="source['@format'] === 'mdweb'">
     <div class="col-sm-3">
         <div class="well">
             <p><b translate="service.config.source.database.title">Database (SGBDR)</b></p>
@@ -21,7 +38,7 @@
         </div>
     </div>
     <div class="col-sm-6">
-        <form id="uploadDataForm">
+        <form id="dbSourceForm">
             <fieldset>
                 <div class="form-group">
                     <div class="control-label" translate="service.config.source.database.type">Database type</div>
@@ -46,6 +63,38 @@
                     <div class="checkbox inline">
                         <input type="checkbox" ng-model="source.automatic.bdd.sharedConnection">
                     </div>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+</div>
+
+<!-- Internal DATABASE -->
+<div class="row bg-white" ng-if="source['@format'] === 'internal'">
+    <div class="col-sm-3">
+        <div class="well">
+            <p><b translate="service.config.source.internal.title">Internal (SGBDR)</b></p>
+            <p translate="service.config.source.internal.description">Constellation metadata database</p>
+        </div>
+    </div>
+    <div class="col-sm-6">
+    </div>
+</div>
+
+<!-- Internal DATABASE -->
+<div class="row bg-white" ng-if="source['@format'] === 'filesystem'">
+    <div class="col-sm-3">
+        <div class="well">
+            <p><b translate="service.config.source.file.title">File system</b></p>
+            <p translate="service.config.source.file.description">Sets of metadata records in file system</p>
+        </div>
+    </div>
+    <div class="col-sm-6">
+        <form id="fsSourceForm">
+            <fieldset>
+                <div class="form-group">
+                    <div class="control-label" translate="service.config.source.file.path">Folder path</div>
+                    <input type="text" class="form-control" ng-model="source.automatic.path">
                 </div>
             </fieldset>
         </form>

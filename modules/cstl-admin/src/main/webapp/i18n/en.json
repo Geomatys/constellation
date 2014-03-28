@@ -440,9 +440,11 @@
             "source.database.password": "Password",
             "source.database.shared": "Shared connection",
             "source.file": "File system",
+            "source.file.description": "Sets of metadata records in file system",
             "source.file.title": "File system",
             "source.file.path": "Folder path",
             "source.internal": "Internal",
+            "source.internal.description": "Constellation metadata database",
             "source.internal.title": "Internal (SGBDR)"
         },
         "create.end": {

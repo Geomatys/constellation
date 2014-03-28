@@ -666,3 +666,8 @@ a.btn-push-right {
 .modal-body .fileinput {
     width: 100%;
 }
+
+.row .form-separator {
+    border-top: 1px solid #eeeeee;
+    padding-bottom: 20px;
+}

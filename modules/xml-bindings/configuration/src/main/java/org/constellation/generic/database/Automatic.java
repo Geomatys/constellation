@@ -74,6 +74,8 @@ public class Automatic extends AbstractConfigurationObject {
      * The specific type of implementation.
      * could be one of the static flag declared up there.
      * DEFAULT, CSR, MDWEB, FILESYSTEM, PRODLINE, ....
+     *
+     * @see org.constellation.configuration.DataSourceType#VALUES
      */
     @XmlAttribute
     private String format;
