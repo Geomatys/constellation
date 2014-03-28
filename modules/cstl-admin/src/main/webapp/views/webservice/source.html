@@ -17,7 +17,7 @@
         <div class="form-group">
             <div class="control-label" translate="service.config.source">Source</div>
             <select id="sourceType" ng-model="source['@format']">
-                <option value="mdweb" selected="selected" translate="service.config.source.database">Database</option>
+                <option value="mdweb" translate="service.config.source.database">Database</option>
                 <option value="internal" translate="service.config.source.internal">Internal</option>
                 <option value="filesystem" translate="service.config.source.file">File system</option>
             </select>
@@ -29,7 +29,7 @@
     <div class="form-separator"></div>
 </div>
 
-<!-- MDWEB DATABASE -->
+<!-- MDWeb database -->
 <div class="row bg-white" ng-if="source['@format'] === 'mdweb'">
     <div class="col-sm-3">
         <div class="well">
@@ -43,7 +43,8 @@
                 <div class="form-group">
                     <div class="control-label" translate="service.config.source.database.type">Database type</div>
                     <select id="selectType" ng-model="source.automatic.bdd.className">
-                        <option value="org.postgresql.Driver" selected="selected">PostgreSQL</option>
+                        <option value="org.postgresql.Driver">PostgreSQL</option>
+                        <option value="com.mysql.jdbc.Driver">MySQL</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -69,7 +70,7 @@
     </div>
 </div>
 
-<!-- Internal DATABASE -->
+<!-- Internal database -->
 <div class="row bg-white" ng-if="source['@format'] === 'internal'">
     <div class="col-sm-3">
         <div class="well">
@@ -81,7 +82,7 @@
     </div>
 </div>
 
-<!-- Internal DATABASE -->
+<!-- File system -->
 <div class="row bg-white" ng-if="source['@format'] === 'filesystem'">
     <div class="col-sm-3">
         <div class="well">
@@ -94,16 +95,51 @@
             <fieldset>
                 <div class="form-group">
                     <div class="control-label" translate="service.config.source.file.path">Folder path</div>
-                    <input type="text" class="form-control" ng-model="source.automatic.path">
+                    <input type="text" class="form-control" ng-model="source.automatic.dataDirectory">
                 </div>
             </fieldset>
         </form>
     </div>
 </div>
 
+<div ng-if="!source['@format']">
+    <div class="row bg-white">
+        <div class="col-sm-12">
+            <div class="well">
+                <div class="row" style="padding-bottom: 20px;">
+                    <div class="col-sm-12">
+                        <h4 translate="service.config.source.csw.title">Catalogs service (CSW)</h4>
+                    </div>
+                </div>
 
-<div class="row bg-white">
-    <div class="pull-right" style="margin: 20px 30px;">
-        <button class="btn btn-info" type="button" ng-click="saveServiceSource()" translate="label.save">Save</button>
+                <div class="row">
+                    <div class="col-sm-3">
+                        <b><p translate="service.config.source.database">Database</p></b>
+                        <p translate="service.config.source.database.description">Database which contains metadata records</p>
+                    </div>
+                    <div class="col-sm-3 col-sm-offset-1">
+                        <b><p translate="service.config.source.internal">Internal></p></b>
+                        <p translate="service.config.source.internal.description">Constellation metadata database</p>
+                    </div>
+                    <div class="col-sm-3 col-sm-offset-1">
+                        <b><p translate="service.config.source.file">File system</p></b>
+                        <p translate="service.config.source.file.description">Sets of metadata records in file system</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div ng-if="source['@format']">
+
+    <div class="row bg-white">
+        <div class="form-separator"></div>
+    </div>
+
+    <div class="row bg-white">
+        <div class="pull-right" style="margin: 20px 30px;">
+            <button class="btn btn-info" type="button" ng-click="saveServiceSource()" translate="label.save">Save</button>
+        </div>
     </div>
 </div>
