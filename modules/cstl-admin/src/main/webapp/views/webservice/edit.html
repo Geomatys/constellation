@@ -183,22 +183,25 @@
                                                 <h6 translate="label.type">Type</h6>
                                                 <span>{{selected.Type==='coverage-store'?'raster':selected.Type==='feature-store'?'vector':selected.Type}}</span>
 
-                                                <div class="separator"></div>
-                                                <h6>
-                                                    <span translate="label.related.style">Related styles</span>
-                                                    <button type="button" ng-click="showStyleList();"
-                                                            class="btn btn-sm pull-right">
-                                                        <i class="icon-plus"></i></button>
-                                                </h6>
+                                                <div ng-if="service.type.toLowerCase() === 'wms'">
+                                                    <div class="separator"></div>
+                                                    <h6>
+                                                        <span translate="label.related.style">Related styles</span>
+                                                        <button type="button" ng-click="showStyleList();"
+                                                                class="btn btn-sm pull-right">
+                                                            <i class="icon-plus"></i></button>
+                                                    </h6>
 
-                                                <div id="linkedList">
-                                                    <span ng-show="selected.TargetStyle.length == 0" translate="label.no.association">No association</span>
-                                                    <div ng-show="selected.TargetStyle.length > 0" class="style" ng-repeat="style in selected.TargetStyle">
-                                                        <button type="button" ng-click="unlinkStyle(style.Provider, style.Name, selected.Provider, selected.Name);"
-                                                                class="btn btn-small"><i class="icon-minus"></i></button>
-                                                        {{style.Name}}
+                                                    <div id="linkedList">
+                                                        <span ng-show="selected.TargetStyle.length == 0" translate="label.no.association">No association</span>
+                                                        <div ng-show="selected.TargetStyle.length > 0" class="style" ng-repeat="style in selected.TargetStyle">
+                                                            <button type="button" ng-click="unlinkStyle(style.Provider, style.Name, selected.Provider, selected.Name);"
+                                                                    class="btn btn-small"><i class="icon-minus"></i></button>
+                                                            {{style.Name}}
+                                                        </div>
                                                     </div>
                                                 </div>
+
                                                 <div class="separator"></div>
                                                 <h6 style="margin-bottom:12px;" translate="label.related.service"></h6>
                                                 <div id="linkedServiceList">
