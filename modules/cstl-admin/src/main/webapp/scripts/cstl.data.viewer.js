@@ -57,6 +57,28 @@ DataViewer = {
         return layer;
     },
 
+    createLayerWithStyle : function(cstlUrlPrefix, layerName, providerId, style){
+        var layer = new OpenLayers.Layer.WMS(layerName,
+                cstlUrlPrefix +'api/1/portrayal/portray/style',
+            {
+                layers:      layerName,
+                provider:    providerId,
+                version:     '1.3.0',
+                sld_version: '1.1.0',
+                format:      'image/png',
+                SLDID:        style,
+                SLDPROVIDER:  "sld"
+            },
+            {
+                ratio: 1,
+                isBaseLayer: true,
+                singleTile: true,
+                transitionEffect: 'resize'
+            }
+        );
+        return layer;
+    },
+
     createLayerWMS : function(cstlUrlPrefix, layerName, instance){
         var layer = new OpenLayers.Layer.WMS(layerName,
             cstlUrlPrefix +'WS/wms/'+ instance,
@@ -80,7 +102,7 @@ DataViewer = {
         return layer;
     },
 
-    createLayerWMSWithStyle : function(cstlUrlPrefix, layerName,instance, style){
+    createLayerWMSWithStyle : function(cstlUrlPrefix, layerName, instance, style){
         var layer = new OpenLayers.Layer.WMS(layerName,
             cstlUrlPrefix +'WS/wms/'+ instance,
             {

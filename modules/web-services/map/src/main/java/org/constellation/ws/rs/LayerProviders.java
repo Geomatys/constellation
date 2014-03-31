@@ -95,6 +95,7 @@ import java.awt.*;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -288,9 +289,9 @@ public final class LayerProviders extends Static {
                                             final String sldVersion, final String sldProvider, final String styleId) throws CstlServiceException, TargetNotFoundException, JAXBException {
     	MutableStyle style = StyleProviderConfig.getStyle(sldProvider, styleId);
     	StyleXmlIO styleXmlIO = new StyleXmlIO();
-    	StringBuilder sldBodyFromMutableStyle = new StringBuilder();
-    	styleXmlIO.writeStyle(sldBodyFromMutableStyle, style, Specification.StyledLayerDescriptor.V_1_1_0);
-    	return portray(providerId, layerName, crsCode, bbox, width, height, sldBodyFromMutableStyle.toString(),"1.1.0");
+    	final StringWriter sw = new StringWriter();
+    	styleXmlIO.writeStyle(sw, style, Specification.StyledLayerDescriptor.V_1_1_0);
+    	return portray(providerId, layerName, crsCode, bbox, width, height, sw.toString(),"1.1.0");
     }
 
     /**

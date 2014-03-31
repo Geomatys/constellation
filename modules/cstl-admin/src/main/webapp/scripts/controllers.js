@@ -256,7 +256,12 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
             $('#viewerData').modal("show");
             var layerName = $scope.selected.Name;
             var providerId = $scope.selected.Provider;
-            var layerData = DataViewer.createLayer($cookies.cstlUrl, layerName, providerId);
+            var layerData;
+            if ($scope.selected.TargetStyle && $scope.selected.TargetStyle.length > 0) {
+                layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, layerName, providerId, $scope.selected.TargetStyle[0].Name);
+            } else {
+                layerData = DataViewer.createLayer($cookies.cstlUrl, layerName, providerId);
+            }
             var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
             DataViewer.layers = [layerData, layerBackground];
 
@@ -332,10 +337,11 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
         };
     }]);
 
-cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modalInstance', 'style', 'exclude','layerName','serviceName', '$cookies',
-    function ($scope, $dashboard, $modalInstance, style, exclude, layerName, serviceName, $cookies) {
+cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modalInstance', 'style', 'exclude', 'layerName', 'providerId', 'serviceName', '$cookies',
+    function ($scope, $dashboard, $modalInstance, style, exclude, layerName, providerId, serviceName, $cookies) {
         $scope.exclude = exclude;
         $scope.layerName = layerName;
+        $scope.providerId = providerId;
         $scope.serviceName = serviceName;
 
         $scope.filtertype = "";
@@ -365,7 +371,12 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         $scope.showLayerWithStyle = function(style) {
 
             var layerName = $scope.layerName;
-            var layerData = DataViewer.createLayerWMSWithStyle($cookies.cstlUrl, layerName, $scope.serviceName,$scope.selected.Name);
+            var layerData;
+            if (serviceName) {
+                layerData = DataViewer.createLayerWMSWithStyle($cookies.cstlUrl, layerName, $scope.serviceName, $scope.selected.Name);
+            } else {
+                layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, layerName, providerId, $scope.selected.Name);
+            }
             var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
             DataViewer.layers = [layerData, layerBackground];
             DataViewer.initMap('styledMapOL');

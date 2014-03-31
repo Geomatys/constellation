@@ -243,8 +243,15 @@ cstlAdminApp.factory('StyleSharedService', ['$modal', 'style', 'webService', '$g
                     resolve: {
                         exclude: function() { return $scope.selected.TargetStyle },
                         layerName: function() { return $scope.selected.Name },
-                        serviceName: function() { return $scope.service.name }
-
+                        providerId: function() { return $scope.selected.Provider },
+                        serviceName: function() {
+                            if ($scope.service) {
+                                // In WMS mode
+                                return $scope.service.name;
+                            }
+                            // For portraying
+                            return null;
+                        }
                     }
                 });
 
