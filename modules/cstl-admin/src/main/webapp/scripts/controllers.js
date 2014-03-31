@@ -1365,6 +1365,21 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
          }
      };
 
+     $scope.deleteMetadata = function() {
+         if ($scope.selected != null && confirm("Are you sure?")) {
+             csw.delete({id: $scope.service.identifier, metaId: $scope.selected.identifier}, {},
+                 function() {
+                     $growl('success','Success','Metadata deleted');
+                     csw.count({id: $routeParams.id}, {}, function(max) {
+                         csw.getRecords({id: $routeParams.id, count: max.asInt, startIndex: 0}, {}, function(response) {
+                             $dashboard($scope, response.BriefNode, false);
+                         });
+                     });
+                 }, function() { $growl('error','Error','Failed to delete metadata'); }
+             );
+         }
+     };
+
      $scope.showLayer = function() {
          $('#viewerData').modal("show");
          var layerName = $scope.selected.Name;
