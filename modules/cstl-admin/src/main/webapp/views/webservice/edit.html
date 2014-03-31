@@ -126,7 +126,7 @@
                                             <div ng-if="type === 'csw'">
                                                 <div class="item metadata" ng-repeat="cswdata in dataList" ng-class="{selected:cswdata==selected}" ng-click="select(cswdata)">
                                                     <div class="top">
-                                                        <span class="item-title">{{cswdata.title}}</span>
+                                                        <span class="item-title">{{cswdata.title ? cswdata.title : cswdata.identifier}}</span>
                                                         <span class="pull-right text-right" translate="md.listing.metadata.type">METADATA</span>
                                                     </div>
                                                     <div class="bottom">
@@ -245,7 +245,7 @@
                                         </div>
                                         <div ng-if="service.type.toLowerCase() === 'csw'">
                                             <div class="block-header" ng-click="toggleUpDownSelected()">
-                                                <strong>{{selected.title}}</strong><i class="icon-chevron-up pull-right"></i>
+                                                <strong>{{selected.title ? selected.title : selected.identifier}}</strong><i class="icon-chevron-up pull-right"></i>
                                             </div>
                                             <div class="block-content">
                                                 <h6 translate="label.owner">Owner</h6>
