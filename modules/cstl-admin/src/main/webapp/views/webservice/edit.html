@@ -258,9 +258,9 @@
                                             <div class="block-action">
                                                 <div class="row">
                                                     <div class="col-sm-6">
-                                                        <button id="exportMD" class="btn btn-info" type="button" ng-click="exportMetadata()">
+                                                        <a id="exportMD" class="btn btn-info" ng-href="{{cstlUrl}}api/1/CSW/{{service.identifier}}/record/download/{{selected.identifier}};jsessionid={{cstlSessionId}}">
                                                             <i class="icon-download-alt"></i> <span translate="layer.listing.selected.export.button">Export</span>
-                                                        </button>
+                                                        </a>
                                                     </div>
                                                     <div class="col-sm-6">
                                                         <button type="button" id="deleteMetadata" class="btn btn-danger" ng-click="deleteMetadata();">

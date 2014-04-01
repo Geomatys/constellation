@@ -171,6 +171,8 @@ cstlAdminApp.factory('csw', ['$resource',
         return $resource('@cstl/api/1/CSW', {}, {
             'count':      {method: 'GET',  url: '@cstl/api/1/CSW/:id/records/count;jsessionid='},
             'getRecords': {method: 'GET',  url: '@cstl/api/1/CSW/:id/records/:count-:startIndex;jsessionid='},
+            'getRecord':  {method: 'GET',  url: '@cstl/api/1/CSW/:id/record/:metaId;jsessionid='},
+            'downloadMd': {method: 'GET',  url: '@cstl/api/1/CSW/:id/record/download/:metaId;jsessionid='},
             'refresh':    {method: 'POST', url: '@cstl/api/1/CSW/:id/index/refresh;jsessionid='},
             'delete':     {method: 'DELETE', url: '@cstl/api/1/CSW/:id/record/:metaId;jsessionid='}
         });

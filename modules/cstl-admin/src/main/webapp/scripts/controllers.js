@@ -1140,6 +1140,8 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
     $scope.tagText = '';
     $scope.type = $routeParams.type;
     $scope.url = $cookies.cstlUrl + "WS/" + $routeParams.type + "/" + $routeParams.id;
+    $scope.cstlUrl = $cookies.cstlUrl;
+    $scope.cstlSessionId = $cookies.cstlSessionId;
     $scope.urlBoxSize = Math.min($scope.url.length,100);
 
     var client = new ZeroClipboard( document.getElementById("copy-button") );
@@ -1379,6 +1381,8 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
              );
          }
      };
+
+     $scope.urlExport = "@cstl/api/1/CSW/";
 
      $scope.showLayer = function() {
          $('#viewerData').modal("show");

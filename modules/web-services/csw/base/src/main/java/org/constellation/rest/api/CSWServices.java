@@ -29,6 +29,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.BriefNode;
@@ -38,6 +39,7 @@ import org.constellation.configuration.ServiceConfigurer;
 import org.constellation.dto.ParameterValues;
 import org.constellation.metadata.configuration.CSWConfigurer;
 import org.constellation.dto.SimpleValue;
+import org.w3c.dom.Node;
 
 import static org.constellation.utils.RESTfulUtilities.ok;
 
@@ -109,7 +111,15 @@ public class CSWServices {
     public Response getMetadata(final @PathParam("id") String id, final @PathParam("metaID") String metaID) throws Exception {
         return ok(getConfigurer().getMetadata(id, metaID));
     }
-    
+
+    @GET
+    @Path("{id}/record/download/{metaID}")
+    @Produces("application/xml")
+    public Response downloadMetadata(final @PathParam("id") String id, final @PathParam("metaID") String metaID) throws Exception {
+        final Node md = getConfigurer().getMetadata(id, metaID);
+        return Response.ok(md, MediaType.APPLICATION_XML_TYPE).header("Content-Disposition", "attachment; filename=\"" + metaID + ".xml\"").build();
+    }
+
     @GET
     @Path("{id}/records/count")
     public Response getMetadataCount(final @PathParam("id") String id) throws Exception {
