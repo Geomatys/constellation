@@ -338,6 +338,7 @@ public class DataRest {
             File dataIntegratedDirectory = ConfigDirectory.getDataIntegratedDirectory();
             if (filePath!= null){
                 recursiveDelete(new File(new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(filePath).getName()).getAbsolutePath()));
+                truncateZipFolder(filePath);
                 Files.move(Paths.get(filePath), Paths.get(new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(filePath).getName()).getAbsolutePath()),StandardCopyOption.REPLACE_EXISTING);
             }
             if (metadataFilePath!= null){
@@ -357,7 +358,20 @@ public class DataRest {
             return Response.status(500).entity("failed").build();
         }
     }
-    
+
+    private static void truncateZipFolder(String filePath) throws IOException {
+        File file = new File(filePath);
+        if (file.isDirectory()){
+            if (file.listFiles().length==1 && file.listFiles()[0].isDirectory()){
+                File directoryToDelete = file.listFiles()[0];
+                File[] filesToMove = directoryToDelete.listFiles();
+                for (int i = 0 ; i < filesToMove.length;i++){
+                    Files.move(Paths.get(filesToMove[i].getPath()) ,Paths.get(file.getPath() + File.separator + filesToMove[i].getName()));
+                }
+                directoryToDelete.delete();
+            }
+        }
+    }
     
     private static void recursiveDelete(File file) {
         //to end the recursive loop
