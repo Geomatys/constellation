@@ -375,6 +375,9 @@ ul.unstyled {
 /*
  * Dashboard item list.
  */
+.dashboard .item-list {
+    margin-bottom: 10px;
+}
 .dashboard .item-list .item.coverage {
     background: transparent url('../images/raster.png') right center no-repeat;
 }
@@ -422,10 +425,14 @@ ul.unstyled {
     opacity: 0.8;
     filter: alpha(opacity=80);
     text-shadow: 0 1px 1px white;
-    margin-bottom: 10px;
+    margin-top: 10px;
     height: 68px;
     max-height: 68px;
     cursor: pointer;
+}
+.dashboard .item-list .item.data {
+    margin-left: 30px;
+    margin-top: 0px;
 }
 .dashboard .item-list .item .top {
     border-bottom: 1px solid #f5f5f5;
@@ -441,6 +448,7 @@ ul.unstyled {
     text-transform: uppercase;
 }
 .dashboard .item-list .item .bottom {
+    height: 32px;
     line-height: 32px;
 }
 .dashboard .item-list .item .bottom .block {

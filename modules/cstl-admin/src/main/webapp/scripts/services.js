@@ -133,6 +133,7 @@ cstlAdminApp.factory('dataListing', ['$resource',
     function ($resource) {
         return $resource('@cstl/api/1/data/list/top/:filter;jsessionid=', {}, {
             'listAll':      {method: 'GET', isArray: true},
+            'listData': {method: 'GET', url: '@cstl/api/1/data/list/provider;jsessionid='},
             'listCoverage': {method: 'POST', url: '@cstl/api/1/data/coverage/list/;jsessionid='},
             'pyramidData':  {method: 'POST', url: '@cstl/api/1/data/pyramid/create/:providerId/:dataId;jsessionid='},
             'pyramidConform': {method: 'POST', url: '@cstl/api/1/data/pyramid/createconform/:providerId/:dataId;jsessionid='},

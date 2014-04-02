@@ -1135,8 +1135,8 @@ cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routePar
         };
     }]);
 
-cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'webService', 'provider', 'csw', '$modal','textService', '$dashboard', '$growl', '$filter', 'StyleSharedService','style','$cookies',
-                                                 function ($scope, $routeParams , webService, provider, csw, $modal, textService, $dashboard, $growl, $filter, StyleSharedService, style, $cookies) {
+cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'webService', 'dataListing', 'provider', 'csw', '$modal','textService', '$dashboard', '$growl', '$filter', 'StyleSharedService','style','$cookies',
+                                                 function ($scope, $routeParams , webService, dataListing, provider, csw, $modal, textService, $dashboard, $growl, $filter, StyleSharedService, style, $cookies) {
     $scope.tagText = '';
     $scope.type = $routeParams.type;
     $scope.url = $cookies.cstlUrl + "WS/" + $routeParams.type + "/" + $routeParams.id;
@@ -1184,6 +1184,9 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
             csw.count({id: $routeParams.id}, {}, function(max) {
                 csw.getRecords({id: $routeParams.id, count: max.asInt, startIndex: 0}, {}, function(response) {
                     $dashboard($scope, response.BriefNode, false);
+                    dataListing.listData({}, function(response) {
+                        $scope.relatedDatas = response;
+                    }), function() { $growl('error','Error','Unable to get related data for providers'); };
                 });
             });
         } else {
@@ -1381,8 +1384,6 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
              );
          }
      };
-
-     $scope.urlExport = "@cstl/api/1/CSW/";
 
      $scope.showLayer = function() {
          $('#viewerData').modal("show");

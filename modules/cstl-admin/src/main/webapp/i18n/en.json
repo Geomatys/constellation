@@ -382,7 +382,9 @@
             "username": "User name"
         },
         "listing": {
+            "data.associated": "associated data",
             "metadata.type": "METADATA",
+            "no.data": "No",
             "selected": {
                 "delete.button": "Delete",
                 "duplicate.button": "Duplicate",

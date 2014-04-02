@@ -1093,6 +1093,27 @@ public class DataRest {
     }
 
     @GET
+    @Path("list/provider")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response getDataListsForProviders() {
+        final Map<String, List<DataBrief>> all = new HashMap<>();
+
+        final Collection<DataProvider> providers = DataProviders.getInstance().getProviders();
+        for (final DataProvider p : providers) {
+            final List<DataBrief> briefs = new ArrayList<>();
+            for (Name n : p.getKeys()) {
+                final QName name = new QName(n.getNamespaceURI(), n.getLocalPart());
+                final DataBrief db = ConfigurationEngine.getData(name, p.getId());
+                briefs.add(db);
+            }
+            all.put(p.getId(), briefs);
+        }
+
+        return Response.ok(all).build();
+    }
+
+    @GET
     @Path("list/top")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})

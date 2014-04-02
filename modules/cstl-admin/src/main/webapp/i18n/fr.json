@@ -635,9 +635,11 @@
             "username": "Nom de l'utilisateur"
         },
         "listing": {
+            "data.associated": "donnée(s) associée(s)",
             "metadata": {
                 "type": "METADONNEES"
             },
+            "no.data": "Pas de",
             "no": {
                 "available": {
                     "md": "Pas de métadonnées disponibles"
