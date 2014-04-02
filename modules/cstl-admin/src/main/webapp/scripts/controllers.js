@@ -337,63 +337,6 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
         };
     }]);
 
-cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modalInstance', 'style', 'exclude', 'layerName', 'providerId', 'serviceName', '$cookies',
-    function ($scope, $dashboard, $modalInstance, style, exclude, layerName, providerId, serviceName, $cookies) {
-        $scope.exclude = exclude;
-        $scope.layerName = layerName;
-        $scope.providerId = providerId;
-        $scope.serviceName = serviceName;
-
-        $scope.filtertype = "";
-
-        $scope.stylechooser = 'new';
-
-        $scope.setStyleChooser = function(choice){
-            $scope.stylechooser = choice;
-        };
-
-        $scope.isSelected= function(choice) {
-            return choice === $scope.stylechooser;
-        };
-
-        style.listAll({}, function(response) {
-            $dashboard($scope, response.styles, false);
-        });
-
-        $scope.ok = function() {
-            $modalInstance.close($scope.selected);
-        };
-
-        $scope.close = function() {
-            $modalInstance.dismiss('close');
-        };
-
-        $scope.showLayerWithStyle = function(style) {
-
-            var layerName = $scope.layerName;
-            var layerData;
-            if (serviceName) {
-                layerData = DataViewer.createLayerWMSWithStyle($cookies.cstlUrl, layerName, $scope.serviceName, $scope.selected.Name);
-            } else {
-                layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, layerName, providerId, $scope.selected.Name);
-            }
-            var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
-            DataViewer.layers = [layerData, layerBackground];
-            DataViewer.initMap('styledMapOL');
-        };
-
-        $scope.StyleisSelected =function(){
-            if ($scope.selected != null){
-                $scope.showLayerWithStyle($scope.selected.Name);
-                return true
-            } else {
-                return false
-            }
-
-        };
-
-    }]);
-
 cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$modalInstance', '$growl', 'provider', 'dataListing', '$uploadFiles', '$cookies',
     function ($scope, $dashboard, $modalInstance, $growl, provider, dataListing, $uploadFiles, $cookies) {
         $scope.layer = null;
@@ -741,41 +684,6 @@ cstlAdminApp.controller('ServerFileModalController', ['$scope', '$dashboard', '$
         };
 
         $scope.load($scope.currentPath);
-    }]);
-
-cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', '$growl',
-    function ($scope, $dashboard, style, $growl) {
-        $scope.filtertype = "";
-
-        style.listAll({}, function(response) {
-            $dashboard($scope, response.styles, false);
-        });
-
-        $scope.deleteStyle = function() {
-            if (confirm("Are you sure?")) {
-                var styleName = $scope.selected.Name;
-                var providerId = $scope.selected.Provider;
-                style.delete({providerid: providerId, name: styleName}, {},
-                    function() { $growl('success','Success','Style '+ styleName +' successfully deleted');
-                        style.listAll({}, function(response) {
-                            $scope.fullList = response.styles;
-                        });
-                    },
-                    function() { $growl('error','Error','Style '+ styleName +' deletion failed'); });
-            }
-        };
-
-        $scope.editStyle = function() {
-            var styleName = $scope.selected.Name;
-            var providerId = $scope.selected.Provider;
-
-        };
-
-        $scope.toggleUpDownSelected = function() {
-            var $header = $('#stylesDashboard').find('.selected-item').find('.block-header');
-            $header.next().slideToggle(200);
-            $header.find('i').toggleClass('icon-chevron-down icon-chevron-up');
-        };
     }]);
 
 cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','dataListing','$location', '$translate', '$uploadFiles',
@@ -1578,6 +1486,3 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
             }
         };
     }]);
-
-
-
