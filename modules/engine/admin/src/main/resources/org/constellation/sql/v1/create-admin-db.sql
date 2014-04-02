@@ -45,8 +45,8 @@ ALTER TABLE "admin"."user_x_role" ADD CONSTRAINT user_x_role_role_fk FOREIGN KEY
 
 CREATE TABLE "admin"."provider"(
   "id"          INTEGER     NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0, INCREMENT BY 1),
-  "identifier"  VARCHAR(128) NOT NULL UNIQUE,
-  "parent"      VARCHAR(128) NOT NULL,
+  "identifier"  VARCHAR(512) NOT NULL UNIQUE,
+  "parent"      VARCHAR(512) NOT NULL,
   "type"        VARCHAR(8)  NOT NULL,
   "impl"        VARCHAR(32) NOT NULL,
   "config"      CLOB        NOT NULL,
@@ -62,9 +62,9 @@ ALTER TABLE "admin"."provider" ADD CONSTRAINT provider_owner_fk FOREIGN KEY ("ow
 
 CREATE TABLE "admin"."style"(
   "id"          INTEGER     NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0, INCREMENT BY 1),
-  "name"        VARCHAR(64) NOT NULL,
+  "name"        VARCHAR(512) NOT NULL,
   "provider"    INTEGER     NOT NULL,
-  "type"        VARCHAR(16) NOT NULL,
+  "type"        VARCHAR(32) NOT NULL,
   "date"        BIGINT      NOT NULL,
   "title"       INTEGER     NOT NULL,
   "description" INTEGER     NOT NULL,
@@ -78,10 +78,10 @@ ALTER TABLE "admin"."style" ADD CONSTRAINT style_provider_fk FOREIGN KEY ("provi
 
 CREATE TABLE "admin"."data"(
   "id"          INTEGER     NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0, INCREMENT BY 1),
-  "name"        VARCHAR(64) NOT NULL,
+  "name"        VARCHAR(512) NOT NULL,
   "namespace"   VARCHAR(256)NOT NULL,
   "provider"    INTEGER     NOT NULL,
-  "type"        VARCHAR(16) NOT NULL,
+  "type"        VARCHAR(32) NOT NULL,
   "date"        BIGINT      NOT NULL,
   "title"       INTEGER     NOT NULL,
   "description" INTEGER     NOT NULL,
@@ -116,8 +116,8 @@ ALTER TABLE "admin"."styled_data" ADD CONSTRAINT data_fk       FOREIGN KEY ("dat
 
 CREATE TABLE "admin"."service"(
   "id"          INTEGER     NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0, INCREMENT BY 1),
-  "identifier"  VARCHAR(32) NOT NULL,
-  "type"        VARCHAR(8)  NOT NULL,
+  "identifier"  VARCHAR(512) NOT NULL,
+  "type"        VARCHAR(32)  NOT NULL,
   "date"        BIGINT      NOT NULL,
   "title"       INTEGER     NOT NULL,
   "description" INTEGER     NOT NULL,
@@ -152,9 +152,9 @@ ALTER TABLE "admin"."service_metadata" ADD CONSTRAINT service_metadata_service_f
 
 CREATE TABLE "admin"."layer"(
   "id"           INTEGER     NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0, INCREMENT BY 1),
-  "name"         VARCHAR(64) NOT NULL,
+  "name"         VARCHAR(512) NOT NULL,
   "namespace"    VARCHAR(256)NOT NULL,
-  "alias"        VARCHAR(64),
+  "alias"        VARCHAR(512),
   "service"      INTEGER     NOT NULL,
   "data"         INTEGER     NOT NULL,
   "date"         BIGINT      NOT NULL,
@@ -174,7 +174,7 @@ ALTER TABLE "admin"."layer" ADD CONSTRAINT layer_owner_fk   FOREIGN KEY ("owner"
 -- tasks
 
 CREATE TABLE "admin"."task"(
-  "identifier"  VARCHAR(64) NOT NULL,
+  "identifier"  VARCHAR(512) NOT NULL,
   "state"       VARCHAR(32) NOT NULL,
   "type"        VARCHAR(32) NOT NULL,
   "title"       INTEGER     NOT NULL,
