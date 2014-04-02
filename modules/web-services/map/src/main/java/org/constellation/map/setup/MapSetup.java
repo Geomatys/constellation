@@ -206,7 +206,7 @@ public class MapSetup implements ServletContextListener {
 
                 final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
                 final ParameterValueGroup shpConfig = createGroup(choice, "ShapefileParametersFolder");
-                getOrCreateValue(shpConfig, "url").setValue(new URL("file:"+ dst.getAbsolutePath()));
+                getOrCreateValue(shpConfig, "url").setValue(dst.toURI().toURL());
                 getOrCreateValue(shpConfig, "namespace").setValue("no namespace");
 
                 // Create SHP Folder provider.
@@ -269,7 +269,7 @@ public class MapSetup implements ServletContextListener {
                 final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
                 final ParameterValueGroup tifConfig = createGroup(choice, "FileCoverageStoreParameters");
                 final File dstTif = new File(dst, "cloudsgrey.tiff");
-                getOrCreateValue(tifConfig, "path").setValue(new URL("file:"+ dstTif.getAbsolutePath()));
+                getOrCreateValue(tifConfig, "path").setValue(dstTif.toURI().toURL());
                 getOrCreateValue(tifConfig, "namespace").setValue("no namespace");
 
                 // Create SHP Folder provider.
