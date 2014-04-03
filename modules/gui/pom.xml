@@ -77,11 +77,11 @@
             <artifactId>commons-lang3</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-            <version>1.7.6</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.codehaus.groovy</groupId>-->
+            <!--<artifactId>groovy-all</artifactId>-->
+            <!--<version>1.7.6</version>-->
+        <!--</dependency>-->
     </dependencies>
 
     <!-- =========================================================== -->
