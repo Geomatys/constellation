@@ -131,6 +131,7 @@
     <module>testing</module>
     <module>admin</module>
     <module>register</module>
+    <module>template</module>
   </modules>
 
 </project>

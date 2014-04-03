@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Configuration of the "testing" engine module from Constellation project.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.constellation</groupId>
+        <artifactId>engine</artifactId>
+        <version>0.9-SNAPSHOT</version>
+    </parent>
+
+
+
+    <!--  Module description.  -->
+    <groupId>org.constellation.engine</groupId>
+    <artifactId>cstl-engine-templating</artifactId>
+    <packaging>jar</packaging>
+    <name>Constellation Templating Engine</name>
+    <description>
+        The templating Engine of the Constellation server.
+    </description>
+
+
+
+    <!--  Developers and contributors.  -->
+    <developers>
+        <developer>
+            <id>mackristof</id>
+            <name>Christophe Mourette</name>
+            <email>christophe.mourette@geomatys.com</email>
+            <organization>Geomatys</organization>
+            <organizationUrl>http://www.geomatys.com/</organizationUrl>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>2.2.2</version>
+        </dependency>
+    </dependencies>
+</project>

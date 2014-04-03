@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gmd:MD_Metadata xmlns:gco="http://www.isotc211.org/2005/gco"
+                 xmlns:gmd="http://www.isotc211.org/2005/gmd" 
+                 xmlns:gml="http://www.opengis.net/gml/3.2">
+    <gmd:fileIdentifier>
+        <gco:CharacterString>{fileId}</gco:CharacterString>
+    </gmd:fileIdentifier>
+    <gmd:language>
+        <gco:CharacterString>eng</gco:CharacterString>
+    </gmd:language>
+    <gmd:characterSet>
+        <gmd:MD_CharacterSetCode codeListValue="utf8" codeList="codelist">utf8</gmd:MD_CharacterSetCode>
+    </gmd:characterSet>
+    <gmd:parentIdentifier>
+        <gco:CharacterString>${param.parentId}</gco:CharacterString>
+    </gmd:parentIdentifier>
+	<gmd:contact>
+		<gmd:CI_ResponsibleParty>
+			<gmd:individualName>
+				<gco:CharacterString>{contactName}</gco:CharacterString>
+			</gmd:individualName>
+			<gmd:organisationName>
+				<gco:CharacterString>{organisationName}</gco:CharacterString>
+			</gmd:organisationName>
+			<gmd:positionName>
+				<gco:CharacterString>{position}</gco:CharacterString>
+			</gmd:positionName>
+			<gmd:contactInfo>
+				<gmd:CI_Contact>
+					<gmd:phone>
+						<gmd:CI_Telephone>
+							<gmd:voice>
+								<gco:CharacterString>{phone}</gco:CharacterString>
+							</gmd:voice>
+							<gmd:facsimile>
+							 <gco:CharacterString>{fax}</gco:CharacterString>
+							</gmd:facsimile>
+						</gmd:CI_Telephone>
+					</gmd:phone>
+					<gmd:address>
+						<gmd:CI_Address>
+							<gmd:deliveryPoint>
+								<gco:CharacterString>{address}</gco:CharacterString>
+							</gmd:deliveryPoint>
+							<gmd:city>
+								<gco:CharacterString>{city}</gco:CharacterString>
+							</gmd:city>
+							<gmd:postalCode>
+								 <gco:CharacterString>{postalCode}</gco:CharacterString>
+							</gmd:postalCode>
+							<gmd:country>
+								<gco:CharacterString>{country}</gco:CharacterString>
+							</gmd:country>
+						</gmd:CI_Address>
+					</gmd:address>
+				</gmd:CI_Contact>
+			</gmd:contactInfo>
+			<gmd:role>
+				<gmd:CI_RoleCode codeList="roleList" codeListValue="{role}">{role}</gmd:CI_RoleCode>
+			</gmd:role>
+		</gmd:CI_ResponsibleParty>
+	</gmd:contact>
+    <gmd:dateStamp gco:nilReason="unknown">
+        <gco:DateTime>{isoCreationDate}</gco:DateTime>
+    </gmd:dateStamp>
+    <gmd:metadataStandardName>
+        <gco:CharacterString>ISO19115</gco:CharacterString>
+    </gmd:metadataStandardName>
+    <gmd:metadataStandardVersion>
+        <gco:CharacterString>2003/Cor.1:2006</gco:CharacterString>
+    </gmd:metadataStandardVersion>
+
+    <% if (param.srs!= null){%>
+    <gmd:referenceSystemInfo>
+        <gmd:MD_ReferenceSystem>
+            <gmd:referenceSystemIdentifier>
+                <gmd:RS_Identifier>
+                     <gmd:code>
+                        <gco:CharacterString>${param.srs}</gco:CharacterString>
+                    </gmd:code>
+                </gmd:RS_Identifier>
+             </gmd:referenceSystemIdentifier>
+        </gmd:MD_ReferenceSystem>
+    </gmd:referenceSystemInfo>
+    <%} else {%>
+    <gmd:referenceSystemInfo gco:nilReason="unknown" />
+    <%}%>
+    
+    <gmd:identificationInfo>
+        <gmd:MD_DataIdentification>
+            <gmd:citation>
+                <gmd:CI_Citation>
+                    <gmd:title>                    
+                        <gco:CharacterString>{dataName}</gco:CharacterString>
+                    </gmd:title>
+                    <gmd:alternateTitle>
+                        <gco:CharacterString>{dataTitle}</gco:CharacterString>
+                    </gmd:alternateTitle>
+					<!-- TODO: As publicationDate, creationDate, revisionDate are not available
+					the dummy date elment had to be added for ISO compliance. This MUST BE REMOVED-->
+                    <gmd:date>
+                        <gmd:CI_Date>
+                            <gmd:date>
+                                <gco:DateTime>{isoCreationDate}</gco:DateTime>
+                            </gmd:date>
+                            <gmd:dateType>
+                                <gmd:CI_DateTypeCode codeListValue="dummy" codeList="DateType">dummy</gmd:CI_DateTypeCode>
+                            </gmd:dateType>
+                        </gmd:CI_Date>
+                    </gmd:date>
+                    {!?publicationDate isdefined}
+                    <gmd:date>
+                        <gmd:CI_Date>
+                            <gmd:date>
+                                <gco:DateTime>{publicationDate}</gco:DateTime>
+                            </gmd:date>
+                            <gmd:dateType>
+                                <gmd:CI_DateTypeCode codeListValue="publication" codeList="DateType">publication</gmd:CI_DateTypeCode>
+                            </gmd:dateType>
+                        </gmd:CI_Date>
+                    </gmd:date>
+                    {!?}
+                    {!?creationDate isdefined}
+                    <gmd:date>
+                        <gmd:CI_Date>
+                            <gmd:date>
+                                <gco:DateTime>{creationDate}</gco:DateTime>
+                            </gmd:date>
+                            <gmd:dateType>
+                                <gmd:CI_DateTypeCode codeListValue="creation" codeList="DateType">creation</gmd:CI_DateTypeCode>
+                            </gmd:dateType>
+                        </gmd:CI_Date>
+                    </gmd:date>
+                    {!?}
+                    {!?revisionDate isdefined}
+                    <gmd:date>
+                        <gmd:CI_Date>
+                            <gmd:date>
+                                <gco:DateTime>{revisionDate}</gco:DateTime>
+                            </gmd:date>
+                            <gmd:dateType>
+                                <gmd:CI_DateTypeCode codeListValue="revision" codeList="DateType">revision</gmd:CI_DateTypeCode>
+                            </gmd:dateType>
+                        </gmd:CI_Date>
+                    </gmd:date>
+                    {!?}
+            </gmd:CI_Citation>
+            </gmd:citation>
+           <gmd:abstract>
+               <gco:CharacterString>{dataAbstract}</gco:CharacterString>
+           </gmd:abstract>
+           <gmd:resourceMaintenance>
+               <gmd:MD_MaintenanceInformation>
+                   <gmd:maintenanceAndUpdateFrequency gco:nilReason="unknown"/>
+                   <gmd:maintenanceNote>
+                       <gco:CharacterString>further update is anticipated</gco:CharacterString>
+                       </gmd:maintenanceNote>
+                   <gmd:maintenanceNote>
+                       <gco:CharacterString>reprocessed</gco:CharacterString>
+                   </gmd:maintenanceNote>
+               </gmd:MD_MaintenanceInformation>
+           </gmd:resourceMaintenance>
+            <gmd:descriptiveKeywords >
+                <gmd:MD_Keywords>
+                    {!!defineKeywords}
+                    #
+                    <gmd:keyword>
+                        <gco:CharacterString>{name}</gco:CharacterString>
+                    </gmd:keyword>
+                    #
+              </gmd:MD_Keywords>
+            </gmd:descriptiveKeywords>
+            {!?groundResolution isdefined}
+            <gmd:spatialResolution>
+                <gmd:MD_Resolution>
+                    <gmd:equivalentScale>
+                        <gmd:MD_RepresentativeFraction>
+                            <gmd:denominator>
+                                <gco:Integer>{groundResolution}</gco:Integer>
+                            </gmd:denominator>
+                        </gmd:MD_RepresentativeFraction>
+                    </gmd:equivalentScale>
+                </gmd:MD_Resolution>
+            </gmd:spatialResolution>
+            {!?}
+			<gmd:language>
+				<gco:CharacterString>English</gco:CharacterString>
+			</gmd:language>
+            <gmd:topicCategory>
+                <gmd:MD_TopicCategoryCode>imageryBaseMapsEarthCover</gmd:MD_TopicCategoryCode>
+            </gmd:topicCategory>
+             <gmd:extent>
+                <gmd:EX_Extent>
+                    {!?longitudeMin isdefined}
+                    <gmd:geographicElement>
+                        <gmd:EX_GeographicBoundingBox>
+                            <gmd:westBoundLongitude>
+                                <gco:Decimal>{longitudeMin}</gco:Decimal>
+                            </gmd:westBoundLongitude>
+                            <gmd:eastBoundLongitude>
+                                <gco:Decimal>{longitudeMax}</gco:Decimal>
+                            </gmd:eastBoundLongitude>
+                            <gmd:southBoundLatitude>
+                                <gco:Decimal>{latitudeMin}</gco:Decimal>
+                            </gmd:southBoundLatitude>
+                            <gmd:northBoundLatitude>
+                                <gco:Decimal>{latitudeMax}</gco:Decimal>
+                            </gmd:northBoundLatitude>
+                        </gmd:EX_GeographicBoundingBox>
+                    </gmd:geographicElement>
+                    {!?}
+                    {!?longitudeMin isnotdefined}
+                    <gmd:geographicElement gco:nilReason="unknown" />
+                    {!?}
+                    {!?temporalBegin isdefined}
+                    <gmd:temporalElement>
+                        <gmd:EX_TemporalExtent>
+                            <gmd:extent>                                     
+                                <gml:TimePeriod>
+                                    <gml:beginPosition>{temporalBegin}</gml:beginPosition>
+                                    <gml:endPosition>{temporalEnd}</gml:endPosition>
+                                </gml:TimePeriod>
+                            </gmd:extent>
+                        </gmd:EX_TemporalExtent>
+                    </gmd:temporalElement>
+                    {!?}
+                    {!?temporalBegin isnotdefined}
+                    <gmd:temporalElement gco:nilReason="unknown" />
+                    {!?}
+                 </gmd:EX_Extent>
+            </gmd:extent>
+        </gmd:MD_DataIdentification>
+    </gmd:identificationInfo>
+    
+    <gmd:contentInfo>
+        <gmd:MD_CoverageDescription>
+            <gmd:attributeDescription>
+                <gco:RecordType>{measureName}</gco:RecordType>
+            </gmd:attributeDescription>
+            <gmd:contentType gco:nilReason="unknown"/>
+        </gmd:MD_CoverageDescription>
+    </gmd:contentInfo>
+ 
+    <gmd:distributionInfo>
+        <gmd:MD_Distribution>
+            <gmd:distributionFormat>
+                <gmd:MD_Format>
+                    <gmd:name><gco:CharacterString>{distributionFormat}</gco:CharacterString></gmd:name>
+                    <gmd:version></gmd:version>
+                </gmd:MD_Format>
+            </gmd:distributionFormat>
+            <gmd:distributor>
+                <gmd:MD_Distributor>
+                    <gmd:distributorContact>
+                        <gmd:CI_ResponsibleParty>
+                            <gmd:individualName>
+                                <gco:CharacterString>{contactName}</gco:CharacterString>
+                                </gmd:individualName>
+                            <gmd:organisationName>
+                                <gco:CharacterString>{organisationName}</gco:CharacterString>
+                            </gmd:organisationName>
+                            <gmd:positionName>
+                                <gco:CharacterString>{position}</gco:CharacterString>
+                            </gmd:positionName>
+                            <gmd:contactInfo>
+                                <gmd:CI_Contact>
+                                    <gmd:phone>
+                                        <gmd:CI_Telephone>
+                                            <gmd:voice>
+                                                <gco:CharacterString>{phone}</gco:CharacterString>
+                                            </gmd:voice>
+                                            <gmd:facsimile>
+                                             <gco:CharacterString>{fax}</gco:CharacterString>
+                                            </gmd:facsimile>
+                                        </gmd:CI_Telephone>
+                                    </gmd:phone>
+                                    <gmd:address>
+                                        <gmd:CI_Address>
+                                            <gmd:deliveryPoint>
+                                                <gco:CharacterString>{address}</gco:CharacterString>
+                                            </gmd:deliveryPoint>
+                                            <gmd:city>
+                                                <gco:CharacterString>{city}</gco:CharacterString>
+                                            </gmd:city>
+                                            <gmd:postalCode>
+                                                 <gco:CharacterString>{postalCode}</gco:CharacterString>
+                                            </gmd:postalCode>
+                                            <gmd:country>
+                                                <gco:CharacterString>{country}</gco:CharacterString>
+                                            </gmd:country>
+                                        </gmd:CI_Address>
+                                    </gmd:address>
+                                </gmd:CI_Contact>
+                        </gmd:contactInfo>
+                        <gmd:role>
+                            <gmd:CI_RoleCode codeList="roleList" codeListValue="{role}">{role}</gmd:CI_RoleCode>
+                        </gmd:role>
+                    </gmd:CI_ResponsibleParty>
+                    </gmd:distributorContact>
+                </gmd:MD_Distributor>
+            </gmd:distributor>
+        </gmd:MD_Distribution>
+    </gmd:distributionInfo>
+
+    <gmd:dataQualityInfo>
+        <gmd:DQ_DataQuality>
+            <gmd:scope>
+				<gmd:DQ_Scope>
+					<gmd:level>
+						<gmd:MD_ScopeCode codeList="../ISO19139/resources/codeList.xml?MD_ScopeCode" codeListValue="dataset">dataset</gmd:MD_ScopeCode>
+					</gmd:level>
+				</gmd:DQ_Scope>
+			</gmd:scope>
+			{!?acquisitionQualityValue isdefined}
+            <gmd:report>
+                <gmd:DQ_CompletenessCommission>
+                    <gmd:nameOfMeasure>
+                        <gco:CharacterString>Quality percent value</gco:CharacterString>
+                    </gmd:nameOfMeasure>
+                    <gmd:measureDescription>
+                        <gco:CharacterString>Overall quality of the data </gco:CharacterString>
+                    </gmd:measureDescription>
+                    <gmd:result>
+                        <gmd:DQ_QuantitativeResult>
+                            <gmd:valueUnit gco:nilReason="unknown" />
+                            <gmd:value>
+                                <gco:Record>{acquisitionQualityValue}%</gco:Record>
+                            </gmd:value>
+                        </gmd:DQ_QuantitativeResult>
+                    </gmd:result>
+                </gmd:DQ_CompletenessCommission>
+			</gmd:report>
+			{!?}
+			{!?percentCloudCover isdefined}
+            <gmd:report>
+                <gmd:DQ_CompletenessCommission>
+                    <gmd:nameOfMeasure>
+                        <gco:CharacterString>{measureName}</gco:CharacterString>
+                    </gmd:nameOfMeasure>
+                    <gmd:measureDescription>
+                        <gco:CharacterString>Percent of Missing Data (Cloud Coverage)</gco:CharacterString>
+                    </gmd:measureDescription>
+                    <gmd:result>
+                        <gmd:DQ_QuantitativeResult>
+                            <gmd:valueUnit gco:nilReason="unknown" />
+                            <gmd:value>
+                                <gco:Record>{percentCloudCover}%</gco:Record>
+                            </gmd:value>
+                        </gmd:DQ_QuantitativeResult>
+                    </gmd:result>
+                </gmd:DQ_CompletenessCommission>
+            </gmd:report>
+			{!?}
+        </gmd:DQ_DataQuality>
+    </gmd:dataQualityInfo>
+</gmd:MD_Metadata>
