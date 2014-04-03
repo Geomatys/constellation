@@ -65,7 +65,7 @@ public class MDCFilter implements Filter {
     }
 
     /**
-     * Init filter configuratin to match the proper URL (/WS/* by default).
+     * Init filter configuration to match the proper URL (/WS/* by default).
      */
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -84,7 +84,7 @@ public class MDCFilter implements Filter {
 
     /**
      * Put ogc service type (wms, wmts ...) and service id in {@link MDC}. <br >
-     * This information can be used afterward in logger.
+     * This information can be used afterward in logger configuration.
      */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
@@ -95,12 +95,18 @@ public class MDCFilter implements Filter {
             String requestURI = httpServletRequest.getRequestURI();
             if (requestURI.startsWith(servletPath)) {
                 String path = requestURI.substring(servletPath.length());
+                //Remove jsessionid
+                int jsessionid = path.indexOf(";jsessionid=");
+                if(jsessionid!=-1) {
+                    path = path.substring(0, jsessionid);
+                }
                 String[] split = path.split("/");
                 if (split.length > 1) {
                     try {
                         MDC.put(OGC, "true");
                         String serviceType = split[0];
                         String serviceName = split[1];
+                       
                         String log = serviceType;
                         if("admin".equals(serviceName)) {
                             //This is not a service call, but a admin console
