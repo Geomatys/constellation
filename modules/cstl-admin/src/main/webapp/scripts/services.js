@@ -39,7 +39,9 @@ cstlAdminApp.factory('AuthInterceptor', function($cookies) {
     	    	if (cstlSessionId) {
     	    		config.url = url.replace(";jsessionid=", ";jsessionid=" + cstlSessionId);
 	        	}else{
-	        		config.url = url.substring(0, url.indexOf(';jsessionid='))
+	        	  var i = url.indexOf(';jsessionid=');
+	        	  var l = ';jsessionid='.length;
+	        		config.url = url.substring(0, i) + url.substring(i+l)
 	        	}
    	    	}else{
    	    	 config.url = url;

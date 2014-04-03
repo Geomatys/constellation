@@ -21,9 +21,9 @@ public class HomeController {
     }
     
     @RequestMapping(value = "/cstl", method = RequestMethod.GET)
-    public String cstl(HttpServletResponse response, @RequestParam("cstlSessionId") String csltSessionId) {
+    public String cstl(HttpServletRequest request, HttpServletResponse response, @RequestParam("cstlSessionId") String csltSessionId) {
     	Cookie cookie = new Cookie("cstlSessionId", csltSessionId);
-    	cookie.setPath("/cstl-admin");
+    	cookie.setPath(request.getContextPath());
 		response.addCookie(cookie);
         return "redirect:/admin.html";
     }
