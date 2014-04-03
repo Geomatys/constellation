@@ -3,16 +3,16 @@
     <li class="active">Edition du style</li>
 </ol>
 
-<ul class="nav nav-tabs">
-  <li class="active"><a href="#editeurSimple" data-toggle="tab">Editeur simple</a></li>
-  <li><a href="#editeurAvancé" data-toggle="tab">Editeur avancé</a></li>
-  <li><a href="#classification" data-toggle="tab">Classification</a></li>
-  <li class="navbar-right"><a href="#xml" data-toggle="tab">Editeur XML</a></li>
+<ul class="nav nav-tabs" ng-init="chosenTab = 'simple'">
+    <li ng-class="{active: chosenTab==='simple'}"><a ng-click="chosenTab = 'simple'" data-toggle="tab">Editeur simple</a></li>
+    <li ng-class="{active: chosenTab==='advanced'}"><a ng-click="chosenTab = 'advanced'" data-toggle="tab">Editeur avancé</a></li>
+    <li ng-class="{active: chosenTab==='classif'}"><a ng-click="chosenTab = 'classif'" data-toggle="tab">Classification</a></li>
+    <li ng-class="{active: chosenTab==='xml'}" class="navbar-right"><a ng-click="chosenTab = 'xml'" data-toggle="tab">Editeur XML</a></li>
 </ul>
 
 <!-- Tab panes -->
 <div class="tab-content">
-  <div class="tab-pane active" id="editeurSimple">
+  <div class="tab-pane" ng-class="{active:chosenTab==='simple'}">
     <div class="row">
       <div class="col-xs-12 col-sm-6 col-md-8">
         <h2>Edition du style</h2>
@@ -137,7 +137,7 @@
     </div>
   </div>
 
-  <div class="tab-pane" id="editeurAvancé">
+  <div class="tab-pane" ng-class="{active:chosenTab==='advanced'}">
     <div class="row">
       <div class="col-xs-12 col-sm-6 col-md-8">
         <div class="row">
@@ -409,7 +409,7 @@
     </div>
   </div>
 
-  <div class="tab-pane" id="classification" ng-init="apercu_poly=1">
+  <div class="tab-pane" ng-class="{active:chosenTab==='classif'}" ng-init="apercu_poly=1">
     <div class="row">
       <div class="col-xs-12 col-sm-6 col-md-8">
         <h2>Edition du style</h2>
@@ -658,7 +658,7 @@
     </div>
   </div>
 
-  <div class="tab-pane" id="xml">
+  <div class="tab-pane" ng-class="{active:chosenTab==='xml'}">
     <h2>Editeur XML</h2>
   </div>
 </div>
