@@ -1,3 +1,20 @@
+/*
+ * Constellation - An open source and standard compliant SDI
+ * http://www.constellation-sdi.org
+ *
+ * (C) 2011, Geomatys
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ */
+
 package org.constellation.engine.template;
 
 import org.junit.Test;
@@ -11,26 +28,23 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.hamcrest.CoreMatchers.*;
 
-/**
- * Created by christophem on 02/04/14.
+/** Test Class GroovyTemplateEngine
+ * Created by christophe mourette on 02/04/14 for Geomatys.
  */
 public class TemplateEngineTest  {
 
 
     @Test
-    public void testGroovyTemplateEngine() throws TemplateEngineException {
-
-        TemplateEngine templateEngine = TemplateEngineFactory.getInstance(TemplateEngineFactory.GROOVY_TEMPLATE_ENGINE);
-        templateEngine.printTest("pattern");
-    }
-
-    @Test
-    public void testGroovyTemplateEngineException()  {
+    public void testGroovyTemplateEngineException() throws URISyntaxException {
 
         try {
             TemplateEngine ifc = TemplateEngineFactory.getInstance("unknown");
+            URL templateUrl = TemplateEngineFactory.class.getResource("/org/constellation/engine/template/mdTemplDataset.xml");
+            Properties prop = new Properties();
+            prop.put("parentId", "testParentId");
+            prop.put("srs", "toto");
             fail("Should have raised a TemplateEngineException");
-            ifc.printTest("nothing");
+            ifc.apply(new File(templateUrl.toURI()), prop);
         } catch (TemplateEngineException e) {
             System.out.println(e.getMessage());
         }
@@ -45,7 +59,6 @@ public class TemplateEngineTest  {
         prop.put("parentId", "testParentId");
         prop.put("srs", "toto");
         String templateApplied = templateEngine.apply(new File(templateUrl.toURI()), prop);
-        System.out.println(templateApplied);
         assertThat(templateApplied, containsString("testParentId"));
         assertThat(templateApplied, containsString("toto"));
     }
