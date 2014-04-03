@@ -55,6 +55,17 @@
       </roles>
       <timezone>+1</timezone>
     </developer>
+    <developer>
+      <id>cedricbr</id>
+      <name>Cédric Briançon</name>
+      <email>cedric.briancon@geomatys.com</email>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.com/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
   </developers>
 
 
@@ -92,6 +103,11 @@
     <dependency>
       <groupId>org.constellation.storage</groupId>
       <artifactId>cstl-store-data-coveragesgroup</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.json-bindings</groupId>
+      <artifactId>cstl-json-style</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- Geotoolkit pending -->

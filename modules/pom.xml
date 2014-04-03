@@ -80,6 +80,7 @@
     <modules>
         <module>library</module>
         <module>xml-bindings</module>
+        <module>json-bindings</module>
         <module>storage</module>
         <module>engine</module>
         <module>web-services</module>
