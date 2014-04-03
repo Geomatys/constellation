@@ -321,8 +321,21 @@ cstlAdminApp.factory('StyleSharedService', ['$modal', 'style', 'webService', '$g
                         }
                     }
                 }
-            }
+            },
 
+            showStyleCreate : function() {
+                var modal = $modal.open({
+                    templateUrl: 'views/modalStyleCreate.html',
+                    controller: 'StyleModalController',
+                    resolve: {
+                        exclude: function() { return null },
+                        layerName: function() { return null },
+                        providerId: function() { return null },
+                        dataType: function() { return null},
+                        serviceName: function() { return null}
+                    }
+                });
+            }
         };
 
     }]);

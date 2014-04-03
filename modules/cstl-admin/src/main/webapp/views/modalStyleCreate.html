@@ -2,41 +2,37 @@
 <link rel='stylesheet' href='styles/spectrum.css' />
 <script src="scripts/spectrum.js"></script>
 
-<div class="modal-dialog" style="width: 1024px" ng-init="initScopeStyle()">
+<div class="modal-dialog" ng-init="initScopeData(); chooseData=true">
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" ng-click="close()">×</button>
             <h4 class="modal-title" translate="edition.style.label.viewer">Style Selection</h4>
         </div>
         <div class="modal-body">
+            <div class="dashboard" ng-show="chooseData===true">
+                <div class="navbar title">
+                    <div class="navbar-inner">
+                        <div class="brand" translate="service.edit.dashboard.data.title">Data List</div>
 
-                <button type="button" class="btn btn-info" ng-click="setStyleChooser('new')"><span translate="edition.style.label.choice.new">Create new style</span></button>
-                <button type="button" class="btn btn-info" ng-click="setStyleChooser('existing')"><span translate="edition.style.label.choice.existing">Use existing style</span></button>
-
-
-            <div class="frame dashboard" ng-show="isSelected('new')">
-                <div ng-include="pageSld"/>
-            </div>
-            <div class="row"  ng-show="isSelected('existing')">
-                <div class="frame dashboard col-sm-6">
-                <!--<div class="navbar title">-->
-                    <!--<div class="navbar-inner">-->
-                        <!--<a id="dataDashboardTitle" class="brand" href="#">Styles disponibles</a>-->
-                    <!--</div>-->
-                <!--</div>-->
+                    </div>
+                </div>
                 <div class="navbar sort-navbar">
                     <div class="navbar-inner">
                         <ul class="nav">
-                            <li ng-click="$parent.ordertype='Name';$parent.orderreverse=false"><a translate="label.title">
-                                Titre<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
+                            <li ng-click="$parent.ordertype='Name';$parent.orderreverse=false"><a translate="service.edit.dashboard.header.title">
+                                Title<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
                             </a></li>
                             <li class="divider-vertical"></li>
-                            <li ng-click="$parent.ordertype='Date';$parent.orderreverse=true"><a translate="label.date">
+                            <li ng-click="$parent.ordertype='Date';$parent.orderreverse=true"><a translate="service.edit.dashboard.header.date">
                                 Date<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
                             </a></li>
                             <li class="divider-vertical"></li>
-                            <li ng-click="$parent.ordertype='Owner';$parent.orderreverse=false"><a translate="label.owner">
-                                Propriétaire<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
+                            <li ng-click="$parent.ordertype='Owner';$parent.orderreverse=false"><a translate="service.edit.dashboard.header.owner">
+                                Owner<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
+                            </a></li>
+                            <li class="divider-vertical"></li>
+                            <li ng-click="$parent.ordertype='Owner';$parent.orderreverse=false"><a translate="service.edit.dashboard.header.type">
+                                Type<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
                             </a></li>
                             <li class="divider-vertical"></li>
                         </ul>
@@ -49,7 +45,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="dash-inner">
+                <div class="dash-inner row dashboard">
                     <div id="list" data-role="list">
                         <div class="pagination-wrapper">
                             <span class="nb-results pull-left"><strong>{{countdata}}</strong></span>
@@ -60,22 +56,20 @@
                                 <option value="50">50</option>
                                 <option value="100">100</option>
                             </select>
-                            <div class="pull-right" page-switcher="{page:$parent.currentpage,size:$parent.nbbypage,count:$parent.countdata}" on-select-page="displayPage(page)"></div>
+                            <div class="pull-right" page-switcher="{page:currentpage,size:nbbypage,count:countdata}" on-select-page="displayPage(page)"></div>
                         </div>
                         <div class="item-list">
-                            <div class="item style-{{style.Type | lowercase}}" ng-repeat="style in dataList" ng-class="{selected:style==selected}" ng-click="select(style)">
+                            <div class="item coverage" ng-repeat="data in dataList" ng-class="{selected:data==selected}" ng-click="select(data)">
                                 <div class="top">
-                                    <span class="item-title">{{style.Name}}</span>
+                                    <span class="item-title">{{data.Name}}</span>
+                                    <span class="pull-right text-right">{{data.Type}}</span>
                                 </div>
                                 <div class="bottom">
                                     <div class="block">
-                                        <i class="icon-calendar"></i>{{style.Date | date:'yyyy-MM-dd HH:mm:ss'}}
+                                        <i class="icon-calendar"></i>{{data.Date | date:'yyyy-MM-dd HH:mm:ss'}}
                                     </div>
                                     <div class="block">
-                                        <i class="icon-user"></i>{{style.Owner}}
-                                    </div>
-                                    <div class="block">
-                                        <i class="icon-folder-close-alt"></i>{{style.Type}}
+                                        <i class="icon-user"></i>{{data.Owner}}
                                     </div>
                                 </div>
                             </div>
@@ -83,14 +77,13 @@
                     </div>
                 </div>
             </div>
-                <div class="col-sm-6" ng-show="StyleisSelected()">
-                    <div class="col-sm-6" id="styledMapOL" style="height: 500px; width:400px;"></div>
-                </div>
-            </div>
+
+            <div ng-show="chooseData===false" ng-include="pageSld"/>
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-default" ng-click="close()">Annuler</button>
-            <button type="button" class="btn btn-primary" ng-disabled="!selected" ng-click="ok();">Valider</button>
+            <button type="button" ng-show="chooseData===true" ng-disabled="!selected" class="btn btn-primary" ng-click="chooseDataClicked(selected); chooseData=false">Choisir</button>
+            <button type="button" ng-show="chooseData===false" class="btn btn-primary" ng-click="ok();">Créer</button>
         </div>
     </div>
 </div>

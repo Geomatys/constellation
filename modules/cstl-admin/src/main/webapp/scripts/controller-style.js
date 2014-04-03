@@ -16,8 +16,8 @@
 'use strict';
 
 
-cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', '$growl',
-    function ($scope, $dashboard, style, $growl) {
+cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', '$growl', 'StyleSharedService',
+    function ($scope, $dashboard, style, $growl, StyleSharedService) {
         $scope.filtertype = "";
 
         style.listAll({}, function(response) {
@@ -49,10 +49,15 @@ cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', '$
             $header.next().slideToggle(200);
             $header.find('i').toggleClass('icon-chevron-down icon-chevron-up');
         };
+
+        // Style methods
+        $scope.showStyleCreate = function() {
+            StyleSharedService.showStyleCreate($scope);
+        };
     }]);
 
-cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modalInstance', 'style', 'exclude', 'layerName', 'providerId', 'serviceName', 'dataType', '$cookies',
-    function ($scope, $dashboard, $modalInstance, style, exclude, layerName, providerId, serviceName, dataType, $cookies) {
+cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modalInstance', 'style', 'exclude', 'layerName', 'providerId', 'serviceName', 'dataType', '$cookies', 'dataListing',
+    function ($scope, $dashboard, $modalInstance, style, exclude, layerName, providerId, serviceName, dataType, $cookies, dataListing) {
         $scope.exclude = exclude;
         $scope.layerName = layerName;
         $scope.providerId = providerId;
@@ -73,9 +78,17 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             return choice === $scope.stylechooser;
         };
 
-        style.listAll({}, function(response) {
-            $dashboard($scope, response.styles, false);
-        });
+        $scope.initScopeStyle = function() {
+            style.listAll({}, function(response) {
+                $dashboard($scope, response.styles, false);
+            });
+        };
+
+        $scope.initScopeData = function() {
+            dataListing.listAll({}, function(response) {
+                $dashboard($scope, response, true);
+            });
+        };
 
         $scope.ok = function() {
             $modalInstance.close($scope.selected);
@@ -85,21 +98,28 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             $modalInstance.dismiss('close');
         };
 
+        $scope.chooseDataClicked = function(data) {
+            $scope.layerName = data.Name;
+            $scope.providerId = data.Provider;
+            $scope.dataType = data.Type;
+            $scope.pageSld = ($scope.dataType === 'VECTOR' || $scope.dataType === 'feature-store') ? "views/style/vectors.html" : "views/style/raster.html";
+        };
+
         $scope.showLayerWithStyle = function(style) {
 
             var layerName = $scope.layerName;
             var layerData;
             if (serviceName) {
-                layerData = DataViewer.createLayerWMSWithStyle($cookies.cstlUrl, layerName, $scope.serviceName, $scope.selected.Name);
+                layerData = DataViewer.createLayerWMSWithStyle($cookies.cstlUrl, layerName, $scope.serviceName, style);
             } else {
-                layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, layerName, providerId, $scope.selected.Name);
+                layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, layerName, providerId, style);
             }
             var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
             DataViewer.layers = [layerData, layerBackground];
             DataViewer.initMap('styledMapOL');
         };
 
-        $scope.StyleisSelected =function(){
+        $scope.StyleisSelected = function(){
             if ($scope.selected != null){
                 $scope.showLayerWithStyle($scope.selected.Name);
                 return true
