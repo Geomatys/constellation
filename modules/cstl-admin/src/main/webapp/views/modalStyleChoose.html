@@ -90,7 +90,8 @@
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-default" ng-click="close()">Annuler</button>
-            <button type="button" class="btn btn-primary" ng-disabled="!selected" ng-click="ok();">Valider</button>
+            <button type="button" class="btn btn-primary" ng-show="isSelected('existing')" ng-disabled="!selected && isSelected('existing')" ng-click="ok();">Valider</button>
+            <button type="button" class="btn btn-primary" ng-show="isSelected('new')" ng-click="createStyle();">Créer</button>
         </div>
     </div>
 </div>

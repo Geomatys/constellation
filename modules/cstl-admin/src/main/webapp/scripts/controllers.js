@@ -1092,9 +1092,10 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
             csw.count({id: $routeParams.id}, {}, function(max) {
                 csw.getRecords({id: $routeParams.id, count: max.asInt, startIndex: 0}, {}, function(response) {
                     $dashboard($scope, response.BriefNode, false);
-                    dataListing.listData({}, function(response) {
-                        $scope.relatedDatas = response;
-                    }), function() { $growl('error','Error','Unable to get related data for providers'); };
+                    dataListing.listData({},
+                        function(response) { $scope.relatedDatas = response; },
+                        function() { $growl('error','Error','Unable to get related data for providers'); }
+                    );
                 });
             });
         } else {

@@ -94,6 +94,11 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             $modalInstance.close($scope.selected);
         };
 
+        $scope.createStyle = function() {
+            style.create({provider: 'sld'}, {});
+            $modalInstance.close();
+        };
+
         $scope.close = function() {
             $modalInstance.dismiss('close');
         };
