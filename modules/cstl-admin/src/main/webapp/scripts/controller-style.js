@@ -51,16 +51,17 @@ cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', '$
         };
     }]);
 
-cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modalInstance', 'style', 'exclude', 'layerName', 'providerId', 'serviceName', '$cookies',
-    function ($scope, $dashboard, $modalInstance, style, exclude, layerName, providerId, serviceName, $cookies) {
+cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modalInstance', 'style', 'exclude', 'layerName', 'providerId', 'serviceName', 'dataType', '$cookies',
+    function ($scope, $dashboard, $modalInstance, style, exclude, layerName, providerId, serviceName, dataType, $cookies) {
         $scope.exclude = exclude;
         $scope.layerName = layerName;
         $scope.providerId = providerId;
         $scope.serviceName = serviceName;
+        $scope.dataType = dataType;
 
         $scope.filtertype = "";
         // Page to include
-        $scope.pageSld = "views/style/vectors.html";
+        $scope.pageSld = ($scope.dataType === 'VECTOR' || $scope.dataType === 'feature-store') ? "views/style/vectors.html" : "views/style/raster.html";
 
         $scope.stylechooser = 'new';
 

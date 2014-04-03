@@ -250,6 +250,7 @@ cstlAdminApp.factory('StyleSharedService', ['$modal', 'style', 'webService', '$g
                         exclude: function() { return $scope.selected.TargetStyle },
                         layerName: function() { return $scope.selected.Name },
                         providerId: function() { return $scope.selected.Provider },
+                        dataType: function() { return $scope.selected.Type},
                         serviceName: function() {
                             if ($scope.service) {
                                 // In WMS mode
