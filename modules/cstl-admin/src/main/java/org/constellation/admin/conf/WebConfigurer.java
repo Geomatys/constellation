@@ -18,8 +18,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.AbstractRefreshableWebApplicationContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.context.support.XmlWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
 /**
@@ -36,11 +38,22 @@ public class WebConfigurer implements ServletContextListener {
         log.info("Web application configuration");
 
         log.debug("Configuring Spring root application context");
-        AnnotationConfigWebApplicationContext rootContext = new AnnotationConfigWebApplicationContext();
-        rootContext.register(ApplicationConfiguration.class);
-        rootContext.refresh();
+        
+        
+        Object rootContextObject = servletContext.getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
+        AbstractRefreshableWebApplicationContext rootContext;
+        if(rootContextObject==null) {
+            AnnotationConfigWebApplicationContext annotationRootContext = new AnnotationConfigWebApplicationContext();
+            annotationRootContext.register(ApplicationConfiguration.class);
+            annotationRootContext.refresh();
+            servletContext.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, annotationRootContext);
+            rootContext = annotationRootContext;
+            
+        }else {
+            rootContext = (AbstractRefreshableWebApplicationContext) rootContextObject;
+        }
+        
 
-        servletContext.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, rootContext);
 
         EnumSet<DispatcherType> disps = EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD, DispatcherType.ASYNC);
 
@@ -129,7 +142,7 @@ public class WebConfigurer implements ServletContextListener {
     /**
      * Initializes Spring and Spring MVC.
      */
-    private ServletRegistration.Dynamic initSpring(ServletContext servletContext, AnnotationConfigWebApplicationContext rootContext) {
+    private ServletRegistration.Dynamic initSpring(ServletContext servletContext, AbstractRefreshableWebApplicationContext rootContext) {
         log.debug("Configuring Spring Web application context");
         AnnotationConfigWebApplicationContext dispatcherServletConfiguration = new AnnotationConfigWebApplicationContext();
         dispatcherServletConfiguration.setParent(rootContext);
@@ -151,7 +164,7 @@ public class WebConfigurer implements ServletContextListener {
     public void contextDestroyed(ServletContextEvent sce) {
         log.info("Destroying Web application");
         WebApplicationContext ac = WebApplicationContextUtils.getRequiredWebApplicationContext(sce.getServletContext());
-        AnnotationConfigWebApplicationContext gwac = (AnnotationConfigWebApplicationContext) ac;
+        AbstractRefreshableWebApplicationContext gwac = (AbstractRefreshableWebApplicationContext) ac;
         gwac.close();
         log.debug("Web application destroyed");
     }
