@@ -72,6 +72,7 @@ public final class Style implements StyleElement<MutableStyle> {
     @Override
     public MutableStyle toType() {
         final MutableStyle style = SF.style();
+        style.setName(name);
         style.featureTypeStyles().add(SF.featureTypeStyle());
         style.featureTypeStyles().get(0).rules().addAll(listType(rules));
         return style;

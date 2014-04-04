@@ -11,7 +11,7 @@
 </ul>
 
 <!-- Tab panes -->
-<div class="tab-content">
+<div class="tab-content" ng-init="$parent.newStyle.rules[0].symbolizers[0]['@symbol'] = 'line'">
   <div class="tab-pane" ng-class="{active:chosenTab==='simple'}">
     <div class="row">
       <div class="col-xs-12 col-sm-6 col-md-8">
@@ -21,13 +21,13 @@
             <div class="form-group">
               <label class="col-sm-3 col-md-2 control-label">Couleur</label>
               <div class="col-sm-9 col-md-10">
-                <input type='text' name="picker" class="picker" />
+                <input type='text' name="picker" class="picker" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.color"/>
               </div>
             </div>
             <div class="form-group">
               <label class="col-sm-3 col-md-2 control-label">Taille</label>
               <div class="col-sm-9 col-md-4">
-                <input type="number" class="form-control" value=1 >
+                <input type="number" class="form-control" value=1 ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.width">
               </div>
             </div>
             <div class="form-group">

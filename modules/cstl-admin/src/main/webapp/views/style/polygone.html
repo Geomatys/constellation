@@ -11,7 +11,7 @@
 </ul>
 
 <!-- Tab panes -->
-<div class="tab-content">
+<div class="tab-content" ng-init="$parent.newStyle.rules[0].symbolizers[0]['@symbol'] = 'polygon'">
   <div class="tab-pane" ng-class="{active:chosenTab==='simple'}">
     <div class="row">
       <div class="col-xs-12 col-sm-6 col-md-8">
@@ -22,7 +22,7 @@
             <div class="form-group">
               <label class="col-sm-3 col-md-2 control-label">Couleur</label>
               <div class="col-sm-9 col-md-10">
-                <input type='text' name="picker" class="picker" />
+                <input type='text' name="picker" class="picker" ng-model="$parent.newStyle.rules[0].symbolizers[0].fill.color"/>
               </div>
             </div>
             <div class="form-group">
@@ -49,13 +49,13 @@
             <div class="form-group">
               <label class="col-sm-3 col-md-2 control-label">Couleur</label>
               <div class="col-sm-9 col-md-10">
-                <input type='text' name="picker" class="picker" />
+                <input type='text' name="picker" class="picker" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.color"/>
               </div>
             </div>
             <div class="form-group">
               <label class="col-sm-3 col-md-2 control-label">Taille</label>
               <div class="col-sm-9 col-md-4">
-                <input type="number" class="form-control" value=1>
+                <input type="number" class="form-control" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.width">
               </div>
             </div>
             <div class="form-group">
@@ -87,7 +87,7 @@
             <div class="row">
               <div class="col-sm-10 col-sm-offset-2">
                 <button type="button" ng-click="display = !display" class="btn btn-sm btn-primary">
-                  <span class="glyphicon glyphicon-plus"></span>
+                  <span class="glyphicon" ng-class="{'glyphicon-plus': !display, 'glyphicon-minus': display}"></span>
                 </button>
               </div>
             </div>
@@ -98,18 +98,36 @@
           <form class="form-horizontal" role="form">
             <div class="form-group">
               <label  class="col-xs-3 col-md-2 control-label">Angles</label>
-              <div class="col-sm-9 col-md-10 btn-group">
-                <button type="button" class="btn btn-default"><img src="images/jointure2.png"></button>
-                <button type="button" class="btn btn-default"><img src="images/jointure3.png"></button>
-                <button type="button" class="btn btn-default"><img src="images/jointure1.png"></button>
+              <div class="col-sm-9 col-md-10 btn-group" data-toggle="buttons">
+                <label class="btn btn-default">
+                    <input type="radio" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.lineCap"
+                            value="square"><img src="images/jointure2.png">
+                </label>
+                <label class="btn btn-default">
+                    <input type="radio" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.lineCap"
+                            value="round"><img src="images/jointure3.png">
+                </label>
+                <label class="btn btn-default">
+                    <input type="radio" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.lineCap"
+                            value="butt"><img src="images/jointure1.png">
+                </label>
               </div>
             </div>
             <div class="form-group">
               <label  class="col-xs-3 col-md-2 control-label">Jointures</label>
-              <div class="col-sm-9 col-md-10 btn-group">
-                <button type="button" class="btn btn-default" ng-model="radioModel" btn-radio="'Left'"><img src="images/angle1.png"></button>
-                <button type="button" class="btn btn-default" ng-model="radioModel" btn-radio="'Middle'"><img src="images/angle2.png"></button>
-                <button type="button" class="btn btn-default" ng-model="radioModel" btn-radio="'Right'"><img src="images/angle3.png"></button>
+              <div class="col-sm-9 col-md-10 btn-group" data-toggle="buttons">
+                <label class="btn btn-default">
+                    <input type="radio" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.lineJoin"
+                            value="miter"><img src="images/angle1.png">
+                </label>
+                <label class="btn btn-default">
+                    <input type="radio" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.lineJoin"
+                            value="round"><img src="images/angle2.png">
+                </label>
+                <label class="btn btn-default">
+                    <input type="radio" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.lineJoin"
+                            value="bevel"><img src="images/angle3.png">
+                </label>
               </div>
             </div>
             <div class="form-group">
@@ -143,14 +161,14 @@
         <div class="row">
           <div class="col-xs-7 col-md-8"><h2>Edition du style</h2></div>
           <div class="col-xs-5 col-md-4">
-            <button type="button" class="btn-apercu btn-block btn-sm btn btn-default">Ajouter un filtre</button>
+            <button type="button" class="btn-apercu btn-block btn-sm btn btn-default">Ajouter une règle</button>
           </div>
         </div>
 
           <div class="style_bloc">
             <div class="row">
               <div class="col-xs-10">
-                <h3>Filtre 1</h3>
+                <h3>Règle 1</h3>
               </div>
               <div class="col-xs-2">
                 <button type="button" class="btn btn-default btn-xs btn-remove">
@@ -164,13 +182,13 @@
                   <div class="form-group">
                     <label for="minScale" class="col-sm-5 col-md-4 control-label">Echelle min.</label>
                     <div class="col-sm-7 col-md-8">
-                      <input type="number" class="form-control" id="minScale">
+                      <input type="number" class="form-control" id="minScale" ng-model="$parent.newStyle.rules[0].minScale">
                     </div>
                   </div>
                   <div class="form-group">
                     <label for="maxScale" class="col-sm-5 col-md-4 control-label">Echelle max.</label>
                     <div class="col-sm-7 col-md-8">
-                      <input type="number" class="form-control" id="maxScale">
+                      <input type="number" class="form-control" id="maxScale" ng-model="$parent.newStyle.rules[0].maxScale">
                     </div>
                   </div>
                   <div class="form-group">
@@ -180,7 +198,7 @@
                     </button>
                     </div>
                     <div class="col-sm-7 col-md-8">
-                      <textarea class="form-control" rows="3"></textarea>
+                      <textarea class="form-control" rows="3" ng-model="$parent.newStyle.rules[0].description"></textarea>
                     </div>
                   </div>
                 </form>
@@ -194,20 +212,6 @@
                       <td><input type='text' class="text_transparent" value='Polygone' /></td>
                       <td>
                         <button ng-click="symbole_poly='polygone'" type="button" class="btn btn-default btn-xs btn-remove">
-                          <span class="glyphicon glyphicon-pencil"></span>
-                        </button>
-                      </td>
-                      <td>
-                        <button type="button" class="btn btn-default btn-xs btn-remove">
-                          <span class="glyphicon glyphicon-remove"></span>
-                        </button></span>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><img src="images/texte_mini.png"></td>
-                      <td><input type='text' class="text_transparent" value='Texte' /></td>
-                      <td>
-                        <button  ng-click="symbole_poly='texte'" type="button" class="btn btn-default btn-xs btn-remove">
                           <span class="glyphicon glyphicon-pencil"></span>
                         </button>
                       </td>
@@ -234,7 +238,7 @@
             <div class="form-group">
                 <label class="col-sm-4 control-label">Libellé</label>
                 <div class="col-sm-8">
-                  <input type="text" class="form-control" value="Polygone">
+                  <input type="text" class="form-control" ng-model="$parent.newStyle.rules[0].symbolizers[0].name">
                 </div>
               </div>
               </form>
@@ -245,7 +249,7 @@
             <div class="form-group">
               <label class="col-sm-4 control-label">Couleur</label>
               <div class="col-sm-8">
-                <input type='text' name="picker" class="picker" />
+                <input type='text' name="picker" class="picker" ng-model="$parent.newStyle.rules[0].symbolizers[0].fill.color" />
               </div>
             </div>
             <div class="form-group">
@@ -273,7 +277,7 @@
             <div class="form-group">
               <label class="col-sm-4 control-label">Couleur</label>
               <div class="col-sm-8">
-                <input type='text' name="picker" class="picker" />
+                <input type='text' name="picker" class="picker" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.color" />
               </div>
             </div>
             <div class="form-group">
@@ -313,7 +317,7 @@
             <div class="row">
               <div class="col-sm-10 col-sm-offset-2">
                 <button type="button" ng-click="display = !display" class="btn btn-sm btn-primary">
-                  <span class="glyphicon glyphicon-plus"></span>
+                  <span class="glyphicon" ng-class="{'glyphicon-plus': !display, 'glyphicon-minus': display}"></span>
                 </button>
               </div>
             </div>
@@ -322,22 +326,40 @@
 
          <div ng-show="display" class="style_bloc">
           <form class="form-horizontal" role="form">
-            <div class="form-group">
-              <label  class="col-sm-4 control-label">Angles</label>
-              <div class="col-sm-8 btn-group">
-                <button type="button" class="btn btn-default"><img src="images/jointure2.png"></button>
-                <button type="button" class="btn btn-default"><img src="images/jointure3.png"></button>
-                <button type="button" class="btn btn-default"><img src="images/jointure1.png"></button>
+              <div class="form-group">
+                  <label  class="col-xs-3 col-md-2 control-label">Angles</label>
+                  <div class="col-sm-9 col-md-10 btn-group" data-toggle="buttons">
+                      <label class="btn btn-default">
+                          <input type="radio" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.lineCap"
+                                 value="square"><img src="images/jointure2.png">
+                      </label>
+                      <label class="btn btn-default">
+                          <input type="radio" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.lineCap"
+                                 value="round"><img src="images/jointure3.png">
+                      </label>
+                      <label class="btn btn-default">
+                          <input type="radio" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.lineCap"
+                                 value="butt"><img src="images/jointure1.png">
+                      </label>
+                  </div>
               </div>
-            </div>
-            <div class="form-group">
-              <label  class="col-sm-4 control-label">Jointures</label>
-              <div class="col-sm-8 btn-group">
-                <button type="button" class="btn btn-default" ng-model="radioModel" btn-radio="'Left'"><img src="images/angle1.png"></button>
-                <button type="button" class="btn btn-default" ng-model="radioModel" btn-radio="'Middle'"><img src="images/angle2.png"></button>
-                <button type="button" class="btn btn-default" ng-model="radioModel" btn-radio="'Right'"><img src="images/angle3.png"></button>
+              <div class="form-group">
+                  <label  class="col-xs-3 col-md-2 control-label">Jointures</label>
+                  <div class="col-sm-9 col-md-10 btn-group" data-toggle="buttons">
+                      <label class="btn btn-default">
+                          <input type="radio" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.lineJoin"
+                                 value="miter"><img src="images/angle1.png">
+                      </label>
+                      <label class="btn btn-default">
+                          <input type="radio" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.lineJoin"
+                                 value="round"><img src="images/angle2.png">
+                      </label>
+                      <label class="btn btn-default">
+                          <input type="radio" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.lineJoin"
+                                 value="bevel"><img src="images/angle3.png">
+                      </label>
+                  </div>
               </div>
-            </div>
             <div class="form-group">
               <label class="col-sm-4 control-label">Décalage x</label>
               <div class="col-sm-8">
@@ -352,56 +374,6 @@
             </div>
           </form>
         </div>
-        </div>
-
-
-        <div ng-show=" symbole_poly=='texte' " class="row">
-          <div class="style_bloc">
-            <form class="form-horizontal" role="form">
-                <div class="form-group">
-                <label class="col-sm-4 control-label">Libellé</label>
-                <div class="col-sm-8">
-                  <input type="text" class="form-control" value="Texte">
-                </div>
-              </div>
-              <div class="form-group">
-                <label class="col-sm-4 control-label">Police</label>
-                <div class="col-sm-8">
-                  <select class="form-control">
-                    <option>Arial</option>
-                    <option>Calibri</option>
-                    <option>Time New Roman</option>
-                    <option>Cambera</option>
-                    <option>Times</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-group">
-                <label class="col-sm-4 control-label">Taille</label>
-                <div class="col-sm-8">
-                  <input type="number" class="form-control" value=15>
-                </div>
-              </div>
-              <div class="form-group">
-                <label class="col-sm-4 control-label">Style</label>
-                <div class="col-sm-8">
-                  <div class="btn-group">
-                    <button type="button" class="btn btn-default">B</button>
-                    <button type="button" class="btn btn-default">I</button>
-                    <button type="button" class="btn btn-default">U</button>
-                  </div>
-                </div>
-              </div>
-              <div class="form-group">
-              <label class="col-sm-4 control-label">Couleur</label>
-              <div class="col-sm-8">
-                <input type='text' name="picker" class="picker" />
-              </div>
-            </div>
-
-
-            </form>
-          </div>
         </div>
 
         <button type="button" class="btn-apercu btn-block btn btn-primary">Aperçu de la donnée</button>

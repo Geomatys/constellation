@@ -28,7 +28,7 @@ import static org.constellation.json.util.StyleUtilities.type;
  * @since 0.9
  */
 public final class TextSymbolizer implements Symbolizer {
-
+    private String name;
     private String label = null;
     private Font font    = new Font();
     private Fill fill    = new Fill();
@@ -38,6 +38,7 @@ public final class TextSymbolizer implements Symbolizer {
 
     public TextSymbolizer(final org.opengis.style.TextSymbolizer symbolizer) {
         ensureNonNull("symbolizer", symbolizer);
+        name = symbolizer.getName();
         if (symbolizer.getLabel() != null) {
             this.label = symbolizer.getLabel().toString();
         }
@@ -47,6 +48,14 @@ public final class TextSymbolizer implements Symbolizer {
         if (symbolizer.getFill() != null) {
             this.fill = new Fill(symbolizer.getFill());
         }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getLabel() {
@@ -75,12 +84,6 @@ public final class TextSymbolizer implements Symbolizer {
 
     @Override
     public org.opengis.style.Symbolizer toType() {
-        return SF.textSymbolizer(
-                type(fill),
-                type(font),
-                null,
-                expression(label),
-                null,
-                null);
+        return SF.textSymbolizer(name, (String)null, null, null, expression(label), type(font), null, null, type(fill));
     }
 }

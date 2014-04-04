@@ -27,6 +27,7 @@ import static org.constellation.json.util.StyleUtilities.type;
  * @since 0.9
  */
 public final class PointSymbolizer implements Symbolizer {
+    private String name;
 
     private Graphic graphic = new Graphic();
 
@@ -35,9 +36,18 @@ public final class PointSymbolizer implements Symbolizer {
 
     public PointSymbolizer(org.opengis.style.PointSymbolizer symbolizer) {
         ensureNonNull("symbolizer", symbolizer);
+        name = symbolizer.getName();
         if (symbolizer.getGraphic() != null) {
             graphic = new Graphic(symbolizer.getGraphic());
         }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Graphic getGraphic() {
@@ -50,6 +60,6 @@ public final class PointSymbolizer implements Symbolizer {
 
     @Override
     public org.opengis.style.Symbolizer toType() {
-        return SF.pointSymbolizer(type(graphic), null);
+        return SF.pointSymbolizer(name, (String)null, null, null, type(graphic));
     }
 }

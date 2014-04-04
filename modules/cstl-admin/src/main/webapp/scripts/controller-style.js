@@ -56,8 +56,8 @@ cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', '$
         };
     }]);
 
-cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modalInstance', 'style', 'exclude', 'layerName', 'providerId', 'serviceName', 'dataType', '$cookies', 'dataListing',
-    function ($scope, $dashboard, $modalInstance, style, exclude, layerName, providerId, serviceName, dataType, $cookies, dataListing) {
+cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modalInstance', 'style', 'exclude', 'layerName', 'providerId', 'serviceName', 'dataType', '$cookies', 'dataListing', '$growl',
+    function ($scope, $dashboard, $modalInstance, style, exclude, layerName, providerId, serviceName, dataType, $cookies, dataListing, $growl) {
         $scope.exclude = exclude;
         $scope.layerName = layerName;
         $scope.providerId = providerId;
@@ -69,6 +69,14 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         $scope.pageSld = ($scope.dataType === 'VECTOR' || $scope.dataType === 'feature-store') ? "views/style/vectors.html" : "views/style/raster.html";
 
         $scope.stylechooser = 'new';
+
+        // TODO: add field to handle style name
+        $scope.newStyle = { "name": $scope.layerName +"-sld",
+                            "rules": [{
+                                "symbolizers": [{}],
+                                "filter": null
+                            }]
+                          };
 
         $scope.setStyleChooser = function(choice){
             $scope.stylechooser = choice;
@@ -95,8 +103,13 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         };
 
         $scope.createStyle = function() {
-            style.create({provider: 'sld'}, {});
-            $modalInstance.close();
+            style.create({provider: 'sld'}, $scope.newStyle, function() {
+                $growl('success','Success','Style '+ $scope.newStyle.name +' successfully created');
+                $modalInstance.close({"Provider": "sld", "Name": $scope.newStyle.name});
+            }, function() {
+                $growl('error','Error','Unable to create style '+ $scope.newStyle.name);
+                $modalInstance.close();
+            });
         };
 
         $scope.close = function() {

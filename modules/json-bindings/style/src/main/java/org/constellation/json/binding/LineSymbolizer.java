@@ -28,6 +28,7 @@ import static org.constellation.json.util.StyleUtilities.type;
  */
 public final class LineSymbolizer implements Symbolizer {
 
+    private String name;
     private Stroke stroke = new Stroke();
 
     public LineSymbolizer() {
@@ -35,9 +36,18 @@ public final class LineSymbolizer implements Symbolizer {
 
     public LineSymbolizer(final org.opengis.style.LineSymbolizer symbolizer) {
         ensureNonNull("symbolizer", symbolizer);
+        name = symbolizer.getName();
         if (symbolizer.getStroke() != null) {
             stroke = new Stroke(symbolizer.getStroke());
         }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Stroke getStroke() {
@@ -50,6 +60,6 @@ public final class LineSymbolizer implements Symbolizer {
 
     @Override
     public org.opengis.style.Symbolizer toType() {
-        return SF.lineSymbolizer(type(stroke), null);
+        return SF.lineSymbolizer(name, (String)null, null, null, type(stroke), null);
     }
 }

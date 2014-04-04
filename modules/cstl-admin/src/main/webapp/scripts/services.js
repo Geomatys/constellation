@@ -154,7 +154,7 @@ cstlAdminApp.factory('style', ['$resource',
     function ($resource) {
         return $resource('@cstl/api/1/SP/all/style/available;jsessionid=', {}, {
             'listAll': { method: 'GET',    isArray: false },
-            'create':  { method: 'PUT',    url: '@cstl/api/1/SP/:provider/style;jsessionid='},
+            'create':  { method: 'PUT',    url: '@cstl/api/1/SP/:provider/style/create;jsessionid='},
             'delete':  { method: 'DELETE', url: '@cstl/api/1/SP/:provider/style/:name;jsessionid='},
             'link':    { method: 'POST',   url: '@cstl/api/1/SP/:provider/style/:name/linkData;jsessionid='},
             'unlink':  { method: 'POST',   url: '@cstl/api/1/SP/:provider/style/:name/unlinkData;jsessionid='}

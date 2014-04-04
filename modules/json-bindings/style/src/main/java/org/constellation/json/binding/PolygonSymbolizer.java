@@ -27,7 +27,7 @@ import static org.constellation.json.util.StyleUtilities.type;
  * @since 0.9
  */
 public final class PolygonSymbolizer implements Symbolizer {
-
+    private String name;
     private Stroke stroke = new Stroke();
     private Fill fill     = new Fill();
 
@@ -36,12 +36,21 @@ public final class PolygonSymbolizer implements Symbolizer {
 
     public PolygonSymbolizer(final org.opengis.style.PolygonSymbolizer symbolizer) {
         ensureNonNull("symbolizer", symbolizer);
+        name = symbolizer.getName();
         if (symbolizer.getStroke() != null) {
             stroke = new Stroke(symbolizer.getStroke());
         }
         if (symbolizer.getFill() != null) {
             fill = new Fill(symbolizer.getFill());
         }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Stroke getStroke() {
@@ -62,6 +71,6 @@ public final class PolygonSymbolizer implements Symbolizer {
 
     @Override
     public org.opengis.style.Symbolizer toType() {
-        return SF.polygonSymbolizer(type(stroke), type(fill), null);
+        return SF.polygonSymbolizer(name, (String)null, null, null, type(stroke), type(fill), null, null);
     }
 }

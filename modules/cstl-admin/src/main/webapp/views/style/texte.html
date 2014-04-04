@@ -10,7 +10,7 @@
 </ul>
 
 <!-- Tab panes -->
-<div class="tab-content">
+<div class="tab-content" ng-init="$parent.newStyle.rules[0].symbolizers[0]['@symbol'] = 'text'">
   <div class="tab-pane" ng-class="{active:chosenTab==='simple'}">
     <div class="row">
       <div class="col-xs-12 col-sm-6 col-md-8">

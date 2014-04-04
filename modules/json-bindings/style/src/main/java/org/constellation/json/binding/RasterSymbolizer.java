@@ -29,6 +29,7 @@ import static org.constellation.json.util.StyleUtilities.type;
  */
 public final class RasterSymbolizer implements Symbolizer {
 
+    private String name;
     private double opacity                          = 1.0;
     private ChannelSelection channelSelection       = null;
     private ColorMap colorMap                       = null;
@@ -38,6 +39,7 @@ public final class RasterSymbolizer implements Symbolizer {
 
     public RasterSymbolizer(final org.opengis.style.RasterSymbolizer symbolizer) {
         ensureNonNull("symbolizer", symbolizer);
+        name = symbolizer.getName();
         opacity = Double.parseDouble(symbolizer.getOpacity().toString());
         if (symbolizer.getChannelSelection() != null) {
             this.channelSelection = new ChannelSelection(symbolizer.getChannelSelection());
@@ -45,6 +47,14 @@ public final class RasterSymbolizer implements Symbolizer {
         if (symbolizer.getColorMap() != null) {
             this.colorMap = new ColorMap(symbolizer.getColorMap());
         }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public double getOpacity() {
@@ -74,7 +84,7 @@ public final class RasterSymbolizer implements Symbolizer {
     @Override
     public org.opengis.style.Symbolizer toType() {
         return SF.rasterSymbolizer(
-                null,
+                name,
                 literal(opacity),
                 type(channelSelection),
                 null,
