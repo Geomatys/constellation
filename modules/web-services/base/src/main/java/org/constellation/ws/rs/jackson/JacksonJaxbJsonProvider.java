@@ -28,10 +28,13 @@ import org.codehaus.jackson.map.ObjectMapper;
  * Complete the {@link org.constellation.ws.rs.jackson.JacksonJaxbJsonProvider} with some
  * untouchables classes, in order to let other providers handle them.
  *
+ * @deprecated No more usefull, switching to jackson version > 2 fix the problem of writing metadata
+ *
  * @author Guilhem Legal (Geomatys)
  * @author Cédric Briançon (Geomatys)
  * @since 0.9
  */
+@Deprecated
 @Provider
 @Consumes({MediaType.APPLICATION_JSON, "text/json"})
 @Produces({MediaType.APPLICATION_JSON, "text/json"})
