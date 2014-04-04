@@ -1,14 +1,15 @@
 .header {
     color: white;
     background-color: #313131;
-    background-image: -moz-linear-gradient(top, #515151, #000000);
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#515151), to(#000000));
-    background-image: -webkit-linear-gradient(top, #515151, #000000);
-    background-image: -o-linear-gradient(top, #515151, #000000);
-    background-image: linear-gradient(to bottom, #515151, #000000);
+    background-image: -moz-linear-gradient(top, #6f6f6f, #303030);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#6f6f6f), to(#303030));
+    background-image: -webkit-linear-gradient(top, #6f6f6f, #303030);
+    background-image: -o-linear-gradient(top, #6f6f6f, #303030);
+    background-image: linear-gradient(to bottom, #6f6f6f, #303030);
     background-repeat: repeat-x;
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff515151', endColorstr='#ff000000', GradientType=0);
     border-color: #252525;
+    height:60px;
 }
 li>a {
     cursor: pointer;
@@ -167,7 +168,12 @@ ul.unstyled {
     text-shadow: 0 1px 0 #ffffff;
     line-height: 20px;
 }
-
+#brand{
+    height: 46px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    margin-left: 20px;
+}
 .navbar .nav {
     position: relative;
     left: 0;

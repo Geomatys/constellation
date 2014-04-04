@@ -114,7 +114,8 @@
         "information": {
             "page.title": "Information about data",
             "tab.title": "Picture information",
-            "tab.missing.title": "Missing metadata"
+            "tab.missing.title": "Missing metadata",
+            "title":"Available data"
         },
         "modal": {
             "cancel": "Cancel",
@@ -327,7 +328,9 @@
         "type": "Type",
         "unknown": "Unknown",
         "validate": "Validate",
-        "vector": "Vector"
+        "vector": "Vector",
+        "count.data": "available data",
+        "count.style": "available style(s)"
     },
     "layer.listing": {
         "data": {
@@ -521,6 +524,7 @@
             "edit.button": "Edit"
         }
     },
+    "style.information.title":"Available styles",
     "webservicepage": {
         "button": {
             "create.label": "Create a service",
@@ -795,6 +799,11 @@
                 "subtitle": "Show statistics"
             }
         }
+    },    
+    "page.header.title":{
+        "webservices":"Services Dashboard",
+        "data":"Data Dashboard",
+        "style":"Styles Dashboard"
     },
     "com.codahale.metrics.servlet.AbstractInstrumentedFilter.requests": "Metrics",
     "org.constellation.map.ws.DefaultWMSWorker.getCapabilities": "WMS(getCapabilies)",

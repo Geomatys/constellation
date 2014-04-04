@@ -153,7 +153,8 @@
                     "title": "Métadonnées manquantes"
                 },
                 "title": "Information sur l'image"
-            }
+            },
+            "title": "Données disponibles"
         },
         "modal": {
             "cancel": "Annuler",
@@ -461,7 +462,9 @@
         "type": "Type",
         "unknown": "Inconnu",
         "validate": "Valider",
-        "vector": "Vecteur"
+        "vector": "Vecteur",
+        "count.data":"donnée(s) disponible(s)",
+        "count.style": "styles(s) disponible(s)"
     },
     "layer": {
         "listing": {
@@ -1058,5 +1061,11 @@
             "all": "Tous"
         },
         "title": "Services disponibles"
-    }
+    },
+    "page.header.title":{
+        "webservices":"Dashboard de gestion des services",
+        "data":"Dashboard de gestion des données",
+        "style":"Dashboard de gestion des styles"
+    },
+    "style.information.title":"Styles sisponibles"
 }

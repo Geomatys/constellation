@@ -1,19 +1,34 @@
 .header {
     color: white;
     background-color: #313131;
-    background-image: -moz-linear-gradient(top, #515151, #000000);
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#515151), to(#000000));
-    background-image: -webkit-linear-gradient(top, #515151, #000000);
-    background-image: -o-linear-gradient(top, #515151, #000000);
-    background-image: linear-gradient(to bottom, #515151, #000000);
+    background-image: -moz-linear-gradient(top, #6f6f6f, #303030);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#6f6f6f), to(#303030));
+    background-image: -webkit-linear-gradient(top, #6f6f6f, #303030);
+    background-image: -o-linear-gradient(top, #6f6f6f, #303030);
+    background-image: linear-gradient(to bottom, #6f6f6f, #303030);
     background-repeat: repeat-x;
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff515151', endColorstr='#ff000000', GradientType=0);
     border-color: #252525;
+    height:60px;
 }
 li>a {
     cursor: pointer;
 }
-
+.header .nav>li>a {
+    color:#e3e3e3;
+    margin-top: 8px;
+}
+.header .nav>li>a:hover, .header .nav>li>a:focus, .header .nav>li.open>a {
+    color:#6f6f6f;
+}
+.header .nav>li>a .caret{
+    border-top-color: #e3e3e3;
+    border-bottom-color: #e3e3e3;
+}
+.header .nav>li>a:hover .caret, .header .nav>li>a:focus .caret, .header .nav>li.open>a .caret{
+    border-top-color: #6f6f6f;
+    border-bottom-color: #6f6f6f;
+}
 body {
     background-color: #f2f2f2;
 }
@@ -52,11 +67,13 @@ body {
 }
 
 .frame {
-    -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    -moz-box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    -webkit-box-shadow: 0 0 10px rgba(150,150,150,0.1);
+    -moz-box-shadow: 0 0 10px rgba(150,150,150,0.1);
+    box-shadow: 0 0 10px rgba(150,150,150,0.1);
     background-color: white;
     margin-bottom: 20px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
 }
 
 .frame>.navbar .navbar-inner {
@@ -113,7 +130,9 @@ ul.unstyled {
 .block-folders {
     margin: 0 5px;
 }
-
+.header-title{
+    color:#5e5e5e;
+}
 /*
  * Service
  */
@@ -155,6 +174,7 @@ ul.unstyled {
 }
 .dash-inner #list, .dash-inner #selection {
     padding: 0 10px;
+    margin-bottom:10px;
 }
 .navbar .brand {
     float: left;
@@ -167,7 +187,12 @@ ul.unstyled {
     text-shadow: 0 1px 0 #ffffff;
     line-height: 20px;
 }
-
+#brand{
+    height: 46px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    margin-left: 20px;
+}
 .navbar .nav {
     position: relative;
     left: 0;
@@ -678,4 +703,9 @@ a.btn-push-right {
 .row .form-separator {
     border-top: 1px solid #eeeeee;
     padding-bottom: 20px;
+}
+@media (max-width: 991px)  {
+    .service-button{
+        margin-bottom: 10px;
+    }
 }

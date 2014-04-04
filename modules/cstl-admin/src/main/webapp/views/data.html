@@ -1,46 +1,45 @@
 <div class="logo-wrapper row">
-    <div class="col-sm-3">
-        <a href="#"><img src="images/constellation.png"></a>
+    <div class="col-sm-9">
+        <h3 class="header-title" translate="page.header.title.data">Data Dashboard</h3>
     </div>
     <!-- Menu to create services -->
-    <div class="col-sm-3 col-sm-offset-6">
+    <div class="col-sm-3">
         <div class="dropdown pull-right">
             <a data-toggle="dropdown" class="btn btn-info btn-lg dropdown-toggle" style="margin-top:8px;padding:15px 19px;">
                 <span class="icon-plus icon-white" style="margin-right:5px;"></span>
-                <span translate="label.add.data">Ajouter une donnée</span>
+                <span translate="label.add.data">Add data</span>
                 <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-                <li><a id="uploadchoice" ng-click="showLocalFilePopup()" translate="label.file.local">Fichier local</a></li>
-                <li><a id="filesystemchoice" ng-click="showServerFilePopup()" translate="label.file.server">Fichier serveur</a></li>
+                <li><a id="uploadchoice" ng-click="showLocalFilePopup()" translate="label.file.local">Local file</a></li>
+                <li><a id="filesystemchoice" ng-click="showServerFilePopup()" translate="label.file.server">Server file</a></li>
             </ul>
         </div>
     </div>
 </div>
 <div id="dataDashboard" class="row">
-    <div class="col-sm-3">
-        <div class="well nav-frame">
-            <ul id="dataTypesNav" class="nav nav-list">
-                <li ng-class="{active:filtertype=='VECTOR'}" ng-click="filtertype='VECTOR'"><a translate="label.vector">Vecteur</a></li>
-                <li ng-class="{active:filtertype=='COVERAGE'}" ng-click="filtertype='COVERAGE'"><a translate="label.raster">Raster</a></li>
-                <li ng-class="{active:filtertype=='SENSOR'}" ng-click="filtertype='SENSOR'"><a translate="label.sensor">Capteur</a></li>
-            </ul>
-        </div>
-    </div>
-    <div class="col-sm-9">
+    <div class="col-sm-12">
         <div class="frame dashboard">
-            <div class="navbar title">
-                <div class="navbar-inner">
-                    <div ng-show="filtertype=='VECTOR'" class="brand" translate="label.data.vector">Données vectorielles</div>
-                    <div ng-show="filtertype=='COVERAGE'" class="brand" translate="label.data.raster">Données raster</div>
-                    <div ng-show="filtertype=='SENSOR'" class="brand" translate="label.data.sensor">Données capteurs</div>
+            <div class="navbar navbar-default" style="margin-bottom: 0px;">
+                <div class="navbar-header">
+                <a class="navbar-brand" translate="data.information.title">Available data</a>
+            </div>
+                <div class="collapse navbar-collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li ng-class="{active:filtertype == ''}" ng-click="filtertype = ''"><a translate="label.all">Tous</a></li>
+                        <li ng-class="{active:filtertype=='VECTOR'}" ng-click="filtertype='VECTOR'"><a translate="label.vector">Vector</a></li>
+                        <li ng-class="{active:filtertype=='COVERAGE'}" ng-click="filtertype='COVERAGE'"><a translate="label.raster">Raster</a></li>
+                        <li ng-class="{active:filtertype=='SENSOR'}" ng-click="filtertype='SENSOR'"><a translate="label.sensor">Sensor</a></li>
+                    </ul>
                 </div>
             </div>
+
+
             <div class="navbar sort-navbar">
                 <div class="navbar-inner">
                     <ul class="nav">
                         <li ng-click="ordertype='Name';orderreverse=false"><a translate="label.title">
-                            Titre<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
+                            Title<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
                         </a></li>
                         <li class="divider-vertical"></li>
                         <li ng-click="ordertype='Date';orderreverse=true"><a translate="label.date">
@@ -48,7 +47,7 @@
                         </a></li>
                         <li class="divider-vertical"></li>
                         <li ng-click="ordertype='Owner';orderreverse=false"><a translate="label.owner">
-                            Propriétaire<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
+                            Owner<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
                         </a></li>
                         <li class="divider-vertical"></li>
                     </ul>
@@ -56,7 +55,7 @@
                     <div class="pull-right">
                         <div style="position:relative;">
                             <div class="ajax-loader" style="right:0;position:absolute;"></div>
-                            <input type="text" ng-model="filtertext" class="searchbox search-query form-control" placeholder="..." />
+                            <input type="text" ng-model="filtertext" class="searchbox search-query form-control" placeholder="Search" />
                         </div>
                     </div>
                 </div>
@@ -65,7 +64,7 @@
                 <div class="pull-left" style="width: 60%;">
                     <div id="list" data-role="list">
                         <div class="pagination-wrapper">
-                            <span class="nb-results pull-left"><strong>{{countdata}}</strong></span>
+                            <strong><span class="nb-results pull-left"><strong>{{countdata}}&nbsp;</span><span class="nb-results" translate="label.count.data">available data</span></strong>
                             <select class="nb-per-page input-small form-control pull-right" ng-model="nbbypage">
                                 <option value="5">5</option>
                                 <option value="10">10</option>
@@ -82,7 +81,7 @@
                                 </div>
                                 <div class="bottom">
                                     <div class="block">
-                                        <i class="icon-calendar"></i>{{service.Date | date:'yyyy-MM-dd HH:mm:ss'}}
+                                        <i class="icon-calendar"></i>{{service.Date | date:'yyyy-MM-dd'}}
                                     </div>
                                     <div class="block">
                                         <i class="icon-user"></i>{{service.Owner}}

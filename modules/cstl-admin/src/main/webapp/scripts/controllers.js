@@ -245,7 +245,7 @@ cstlAdminApp.controller('LogsController', ['$scope', 'resolvedLogs', 'LogsServic
 cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 'dataListing', 'provider', 'style', '$modal', '$growl', 'StyleSharedService', '$cookies',
     function ($scope, $location, $dashboard, dataListing, provider, style, $modal, $growl, StyleSharedService, $cookies) {
 
-        $scope.filtertype = "VECTOR";
+        $scope.filtertype = "";
 
         dataListing.listAll({}, function(response) {
             $dashboard($scope, response, true);
