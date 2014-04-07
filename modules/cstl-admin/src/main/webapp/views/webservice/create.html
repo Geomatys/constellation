@@ -1,201 +1,222 @@
 <div class="logo-wrapper row">
-    <div class="col-sm-3">
-        <a href="#"><img src="images/constellation.png"></a>
+    <div class="col-sm-12">
+        <h3 class="header-title" translate="page.header.title.create.service">New service</h3>
     </div>
 </div>
-
-<div id="description" class="row bg-white">
-    <div class="navbar">
-        <div class="navbar-inner">
-            <a class="brand" translate="create.description.title.label">Create a service</a>
-        </div>
-    </div>
-</div>
-
-<!-- main part -->
-<div class="row bg-white" ng-show="tonext">
-    <div class="col-sm-3">
-        <div class="well">
-            <div ng-if="type === 'wms'">
-                <p><h4>WMS</h4></p>
-                <p><span translate="create.description.text.wms"></span></p>
-            </div>
-            <div ng-if="type === 'wfs'">
-                <p><h4>WFS</h4></p>
-                <p><span translate="create.description.text.wfs"></span></p>
-            </div>
-            <div ng-if="type === 'wmts'">
-                <p><h4>WMTS</h4></p>
-                <p><span translate="create.description.text.wmts"></span></p>
-            </div>
-            <div ng-if="type === 'wcs'">
-                <p><h4>WCS</h4></p>
-                <p><span translate="create.description.text.wcs"></span></p>
-            </div>
-            <div ng-if="type === 'wps'">
-                <p><h4>WPS</h4></p>
-                <p><span translate="create.description.text.wps"></span></p>
-            </div>
-            <div ng-if="type === 'sos'">
-                <p><h4>SOS</h4></p>
-                <p><span translate="create.description.text.sos"></span></p>
-            </div>
-            <div ng-if="type === 'csw'">
-                <p><h4>CSW</h4></p>
-                <p><span translate="create.description.text.csw"></span></p>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-9">
-        <fieldset style="padding-left:20px;">
-            <legend><span translate="service.description.tab.description.title">Service description</span></legend>
-            <div class="form-group">
-                <div class="control-label" translate="service.description.tab.description.name">Name</div>
-                <input type="text" class="form-control" id="name" ng-model="metadata.name" value="">
-            </div>
-            <div class="form-group">
-                <div class="control-label" translate="service.description.tab.description.identifier">Identifier</div>
-                <input type="text" class="form-control" id="identifier" ng-model="metadata.identifier" value="">
-            </div>
-            <div class="form-group">
-                <div class="control-label" translate="service.description.tab.description.tags">Tags</div>
-                <div class="tag-input-ctn">
-                    <div data-ng-repeat="(key, tag) in metadata.keywords" class="input-tag">
-                        {{ tag }}
-                        <div class="delete-tag" data-ng-click="deleteTag(key)">&times;</div>
-                    </div>
-                    <input type="text" data-tag-input="" data-ng-model="tagText" data-new-tag="addTag()" data-delete-tag="deleteTag()">
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="control-label" translate="service.description.tab.description.description" >Description</div>
-                <textarea rows="5" id="inputDescription" class="form-control" ng-model="metadata.description"></textarea>
-            </div>
-
-            <div class="form-group">
-                <div class="control-label" translate="service.description.tab.description.version" >Version</div>
-                <div id="versionsCheck" ng-init="selectedVersion()">
-                    <div ng-repeat="version in versions" class="inline">
-                        <div class="checkbox inline"><input type="checkbox" ng-model="version.checked" ng-change="selectedVersion()"> {{version.id}}</div>
+<div class="col-sm-12">
+    <div class="frame dashboard">
+        <div id="description" class="row bg-white">
+            <div class="frame dashboard">
+                <div class="navbar navbar-default" style="margin-bottom: 0px;">
+                    <div class="navbar-header">
+                        <a class="navbar-brand" translate="create.description.title.label">Create a service</a>
                     </div>
                 </div>
             </div>
-        </fieldset>
-    </div>
-</div>
-<div ng-hide="tonext">
-    <div class="row bg-white">
-        <div class="col-sm-6">
-            <!-- contact part -->
-            <fieldset>
-                <legend translate="create.contact.legend">Contact information</legend>
-
-                <div class="control-group">
-                    <div class="control-label" for="contactFirstName" translate="create.contact.firstname.label">First name</div>
-                    <input type="text" class="form-control" id="contactFirstName" ng-model="metadata.serviceContact.firstname"/>
-                </div>
-
-                <div class="control-group">
-                    <div class="control-label" for="contactLastName" translate="create.contact.lastname.label">Last name</div>
-                    <input type="text" class="form-control" id="contactLastName" ng-model="metadata.serviceContact.lastname"/>
-                </div>
-
-                <div class="control-group">
-                    <div class="control-label" for="contactOrganisation" translate="create.contact.organisation.label">Organisation</div>
-                    <input type="text" class="form-control" id="contactOrganisation" ng-model="metadata.serviceContact.organisation"/>
-                </div>
-
-                <div class="control-group">
-                    <div class="control-label" for="contactPosition" translate="create.contact.position.label">Position</div>
-                    <input type="text" class="form-control" id="contactPosition" ng-model="metadata.serviceContact.position"/>
-                </div>
-
-                <div class="control-group">
-                    <div class="control-label" for="contactPhone" translate="create.contact.phone.label">Phone</div>
-                    <input type="text" class="form-control" id="contactPhone" ng-model="metadata.serviceContact.phone"/>
-                </div>
-                <div class="control-group">
-                    <div class="control-label" for="contactFax" translate="create.contact.fax.label">Fax</div>
-                    <input type="text" class="form-control" id="contactFax" ng-model="metadata.serviceContact.fax"/>
-                </div>
-                <div class="control-group">
-                    <div class="control-label" for="contactemail" translate="create.contact.email.label">Email</div>
-                    <input type="text" class="form-control" id="contactEmail" ng-model="metadata.serviceContact.email"/>
-                </div>
-            </fieldset>
         </div>
-        <div class="col-sm-6">
-            <!-- address part -->
-            <fieldset>
-                <legend translate="create.contact.address.legend">Contact address</legend>
 
-                <div class="control-group">
-                    <div class="control-label" for="contactAddress" translate="create.contact.address.label">Address</div>
-                    <input type="text" class="form-control" id="contactAddress" ng-model="metadata.serviceContact.address"/>
-                </div>
 
-                <div class="control-group">
-                    <div class="control-label" for="contactCity" translate="create.contact.address.city.label">City</div>
-                    <input type="text" class="form-control" id="contactCity" ng-model="metadata.serviceContact.city"/>
+        <!-- main part -->
+        <div class="row bg-white" ng-show="tonext">
+            <div class="col-sm-3">
+                <div class="well">
+                    <div ng-if="type === 'wms'">
+                        <p><h4>WMS</h4></p>
+                        <p><span translate="create.description.text.wms"></span></p>
+                    </div>
+                    <div ng-if="type === 'wfs'">
+                        <p><h4>WFS</h4></p>
+                        <p><span translate="create.description.text.wfs"></span></p>
+                    </div>
+                    <div ng-if="type === 'wmts'">
+                        <p><h4>WMTS</h4></p>
+                        <p><span translate="create.description.text.wmts"></span></p>
+                    </div>
+                    <div ng-if="type === 'wcs'">
+                        <p><h4>WCS</h4></p>
+                        <p><span translate="create.description.text.wcs"></span></p>
+                    </div>
+                    <div ng-if="type === 'wps'">
+                        <p><h4>WPS</h4></p>
+                        <p><span translate="create.description.text.wps"></span></p>
+                    </div>
+                    <div ng-if="type === 'sos'">
+                        <p><h4>SOS</h4></p>
+                        <p><span translate="create.description.text.sos"></span></p>
+                    </div>
+                    <div ng-if="type === 'csw'">
+                        <p><h4>CSW</h4></p>
+                        <p><span translate="create.description.text.csw"></span></p>
+                    </div>
                 </div>
+            </div>
+            <div class="col-sm-9">
+                <fieldset style="padding-left:20px;">
+                    <legend><span translate="service.description.tab.description.title">Service description</span></legend>
+                    <form role="form-horizontal" role="form">
+                        <div class="form-group row">
+                            <label class="control-label col-sm-2 new-service-form-label" translate="service.description.tab.description.name">Name</label>
+                            <div class="col-sm-8 col-md-6">
+                                <input type="text" class="form-control" id="name" ng-model="metadata.name" value="">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-sm-2 new-service-form-label" translate="service.description.tab.description.identifier">Identifier</label>
+                            <div class="col-sm-8 col-md-6">
+                                <input type="text" class="form-control" id="identifier" ng-model="metadata.identifier" value="">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-sm-2 new-service-form-label" translate="service.description.tab.description.tags">Tags</label>
+                            <div class="col-sm-8 col-md-6">
+                                <div class="tag-input-ctn">
+                                    <div data-ng-repeat="(key, tag) in metadata.keywords" class="input-tag">
+                                        {{ tag }}
+                                        <div class="delete-tag" data-ng-click="deleteTag(key)">&times;</div>
+                                    </div>
+                                    <input type="text" data-tag-input="" data-ng-model="tagText" data-new-tag="addTag()" data-delete-tag="deleteTag()">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label col-sm-2 new-service-form-label" translate="service.description.tab.description.description" >Description</label>
+                            <div class="col-sm-8 col-md-6">
+                                <textarea rows="5" id="inputDescription" class="form-control" ng-model="metadata.description"></textarea>
+                            </div>
+                        </div>
 
-                <div class="control-group">
-                    <div class="control-label" for="contactState" translate="create.contact.address.state.label">State</div>
-                    <input type="text" class="form-control" id="contactState" ng-model="metadata.serviceContact.state"/>
-                </div>
-
-                <div class="control-group">
-                    <div class="control-label" for="contactPostcode" translate="create.contact.address.postcode.label">Zip code</div>
-                    <input type="text" class="form-control" id="contactPostcode" ng-model="metadata.serviceContact.zipCode"/>
-                </div>
-
-                <div class="control-group">
-                    <div class="control-label" for="contactCountry" translate="create.contact.address.country.label">Country</div>
-                    <input type="text" class="form-control" id="contactCountry" ng-model="metadata.serviceContact.country"/>
-                </div>
-            </fieldset>
+                        <div class="form-group row">
+                            <label class="control-label col-sm-2 new-service-form-label" translate="service.description.tab.description.version" >Version</label>
+                            <div class="col-sm-8 col-md-6">
+                                <div id="versionsCheck" ng-init="selectedVersion()">
+                                    <div ng-repeat="version in versions" class="inline">
+                                        <div class="checkbox inline"><input type="checkbox" ng-model="version.checked" ng-change="selectedVersion()"> {{version.id}}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </fieldset>
+            </div>
         </div>
-    </div>
-    <div class="row bg-white" style="padding-top: 20px;">
-        <div class="col-sm-6">
-            <!-- access constraints part -->
-            <fieldset>
-                <legend translate="create.accessconstraint.legend">Access constraints</legend>
+        <div ng-hide="tonext">
+            <div class="row bg-white">
+                <div class="col-sm-6">
+                    <!-- contact part -->
+                    <fieldset>
+                        <legend translate="create.contact.legend">Contact information</legend>
+                        <form role="form-horizontal" role="form">
+                            <div class="control-group">
+                                <label class="control-label new-service-form-label" for="contactFirstName" translate="create.contact.firstname.label">First name</label>
+                                <input type="text" class="form-control" id="contactFirstName" ng-model="metadata.serviceContact.firstname"/>
+                            </div>
 
-                <div class="control-group">
-                    <div class="control-label" for="fees" translate="create.accessconstraint.fees.label">Fees</div>
-                    <input id="fees" class="form-control" type="text" ng-model="metadata.serviceConstraints.fees"/>
+                            <div class="control-group">
+                                <label class="control-label new-service-form-label" for="contactLastName" translate="create.contact.lastname.label">Last name</label>
+                                <input type="text" class="form-control" id="contactLastName" ng-model="metadata.serviceContact.lastname"/>
+                            </div>
+
+                            <div class="control-group">
+                                <label class="control-label new-service-form-label" for="contactOrganisation" translate="create.contact.organisation.label">Organisation</label>
+                                <input type="text" class="form-control" id="contactOrganisation" ng-model="metadata.serviceContact.organisation"/>
+                            </div>
+
+                            <div class="control-group">
+                                <label class="control-label new-service-form-label" for="contactPosition" translate="create.contact.position.label">Position</label>
+                                <input type="text" class="form-control" id="contactPosition" ng-model="metadata.serviceContact.position"/>
+                            </div>
+
+                            <div class="control-group">
+                                <label class="control-label new-service-form-label" for="contactPhone" translate="create.contact.phone.label">Phone</label>
+                                <input type="text" class="form-control" id="contactPhone" ng-model="metadata.serviceContact.phone"/>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label new-service-form-label" for="contactFax" translate="create.contact.fax.label">Fax</label>
+                                <input type="text" class="form-control" id="contactFax" ng-model="metadata.serviceContact.fax"/>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label new-service-form-label" for="contactemail" translate="create.contact.email.label">Email</label>
+                                <input type="text" class="form-control" id="contactEmail" ng-model="metadata.serviceContact.email"/>
+                            </div>
+                        </form>
+                    </fieldset>
                 </div>
+                <div class="col-sm-6">
+                    <!-- address part -->
+                    <fieldset>
+                        <legend translate="create.contact.address.legend">Contact address</legend>
+                        <form role="form-horizontal" role="form">
+                            <div class="control-group">
+                                <label class="control-label new-service-form-label" for="contactAddress" translate="create.contact.address.label">Address</label>
+                                <input type="text" class="form-control" id="contactAddress" ng-model="metadata.serviceContact.address"/>
+                            </div>
 
-                <div class="control-group">
-                    <div class="control-label" for="accessConstraints" translate="create.accessconstraint.label">Access constraints</div>
-                    <textarea rows="5" id="accessConstraints" class="form-control" ng-model="metadata.serviceConstraints.accessConstraint"></textarea>
+                            <div class="control-group">
+                                <label class="control-label new-service-form-label" for="contactCity" translate="create.contact.address.city.label">City</label>
+                                <input type="text" class="form-control" id="contactCity" ng-model="metadata.serviceContact.city"/>
+                            </div>
+
+                            <div class="control-group">
+                                <label class="control-label new-service-form-label" for="contactState" translate="create.contact.address.state.label">State</label>
+                                <input type="text" class="form-control" id="contactState" ng-model="metadata.serviceContact.state"/>
+                            </div>
+
+                            <div class="control-group">
+                                <label class="control-label new-service-form-label" for="contactPostcode" translate="create.contact.address.postcode.label">Zip code</label>
+                                <input type="text" class="form-control" id="contactPostcode" ng-model="metadata.serviceContact.zipCode"/>
+                            </div>
+
+                            <div class="control-group">
+                                <label class="control-label new-service-form-label" for="contactCountry" translate="create.contact.address.country.label">Country</label>
+                                <input type="text" class="form-control" id="contactCountry" ng-model="metadata.serviceContact.country"/>
+                            </div>
+                        </form>
+                    </fieldset>
                 </div>
+            </div>
+            <div class="row bg-white" style="padding-top: 20px;">
+                <div class="col-sm-6">
+                    <!-- access constraints part -->
+                    <fieldset>
+                        <legend translate="create.accessconstraint.legend">Access constraints</legend>
+                        <form role="form-horizontal" role="form">
+                            <div class="control-group">
+                                <label class="control-label new-service-form-label" for="fees" translate="create.accessconstraint.fees.label">Fees</label>
+                                <input id="fees" class="form-control" type="text" ng-model="metadata.serviceConstraints.fees"/>
+                            </div>
 
-                <div class="control-group" data-toggle="tooltip" title="{{'create.accessconstraint.layerlimit.tooltip' | translate }}" id="layerlimitGroup">
-                    <div class="control-label" for="layerLimit" translate="create.accessconstraint.layerlimit.label">Layer limit</div>
-                    <input type="text" id="layerLimit" class="form-control" ng-model="metadata.serviceConstraints.layerLimit"/>
+                            <div class="control-group">
+                                <label class="control-label new-service-form-label" for="accessConstraints" translate="create.accessconstraint.label">Access constraints</label>
+                                <textarea rows="5" id="accessConstraints" class="form-control" ng-model="metadata.serviceConstraints.accessConstraint"></textarea>
+                            </div>
+
+                            <div class="control-group" data-toggle="tooltip" title="{{'create.accessconstraint.layerlimit.tooltip' | translate }}" id="layerlimitGroup">
+                                <label class="control-label new-service-form-label" for="layerLimit" translate="create.accessconstraint.layerlimit.label">Layer limit</label>
+                                <input type="text" id="layerLimit" class="form-control" ng-model="metadata.serviceConstraints.layerLimit"/>
+                            </div>
+
+                            <div class="control-group" data-toggle="tooltip" title="{{'create.accessconstraint.maxwidth.tooltip' | translate }}" id="maxWidthGroup">
+                                <label class="control-label new-service-form-label" for="maxWidth" translate="create.accessconstraint.maxwidth.label">Max width</label>
+                                <input type="text" id="maxWidth" class="form-control" ng-model="metadata.serviceConstraints.maxWidth"/>
+                            </div>
+
+
+                            <div class="control-group" data-toggle="tooltip" title="{{'create.accessconstraint.maxheight.tooltip' | translate }}" id="maxHeightGroup">
+                                <label class="control-label new-service-form-label" for="maxHeight" translate="create.accessconstraint.maxheight.label">Max height</label>
+                                <input type="text" id="maxHeight" class="form-control" ng-model="metadata.serviceConstraints.maxHeight"/>
+                            </div>
+                        </form>
+                    </fieldset>
                 </div>
-
-                <div class="control-group" data-toggle="tooltip" title="{{'create.accessconstraint.maxwidth.tooltip' | translate }}" id="maxWidthGroup">
-                    <div class="control-label" for="maxWidth" translate="create.accessconstraint.maxwidth.label">Max width</div>
-                    <input type="text" id="maxWidth" class="form-control" ng-model="metadata.serviceConstraints.maxWidth"/>
-                </div>
-
-
-                <div class="control-group" data-toggle="tooltip" title="{{'create.accessconstraint.maxheight.tooltip' | translate }}" id="maxHeightGroup">
-                    <div class="control-label" for="maxHeight" translate="create.accessconstraint.maxheight.label">Max height</div>
-                    <input type="text" id="maxHeight" class="form-control" ng-model="metadata.serviceConstraints.maxHeight"/>
-                </div>
-            </fieldset>
+            </div>
         </div>
-    </div>
-</div>
 
-<div class="row bg-white">
-    <div class="pull-right" style="margin: 20px 30px;">
-        <button ng-show="tonext" class="btn btn-info" type="button" ng-click="goToServiceContact()" translate="create.description.next.label">Next</button>
-        <button ng-hide="tonext" class="btn btn-default" type="button" ng-click="goToServiceInfo()" translate="create.description.previous.label">Previous</button>
-        <button ng-hide="tonext" class="btn btn-info" type="button" ng-click="saveServiceMetadata()" translate="label.save">Save</button>
+        <div class="row bg-white">
+            <div class="pull-right" style="margin: 20px 30px;">
+                <button ng-show="tonext" class="btn btn-info" type="button" ng-click="goToServiceContact()" translate="create.description.next.label">Next</button>
+                <button ng-hide="tonext" class="btn btn-default" type="button" ng-click="goToServiceInfo()" translate="create.description.previous.label">Previous</button>
+                <button ng-hide="tonext" class="btn btn-info" type="button" ng-click="saveServiceMetadata()" translate="label.save">Save</button>
+            </div>
+        </div>
     </div>
 </div>

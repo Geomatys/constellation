@@ -1075,7 +1075,10 @@
         "webservices":"Dashboard de gestion des services",
         "data":"Dashboard de gestion des données",
         "style":"Dashboard de gestion des styles",
-        "contact": "Contact"
+        "contact": "Contact",
+        "create.service":"Nouveau service",
+        "create.service.source":"Source",
+        "edit.service":"Edition du service"
     },
     "style.information.title":"Styles sisponibles",
     "users": {

@@ -808,7 +808,10 @@
         "webservices":"Services Dashboard",
         "data":"Data Dashboard",
         "style":"Styles Dashboard",
-        "contact": "Contact"
+        "contact": "Contact",
+        "create.service":"New service",
+        "create.service.source":"Source",
+        "edit.service":"Edit Service"
     },
     "com.codahale.metrics.servlet.AbstractInstrumentedFilter.requests": "Metrics",
     "org.constellation.map.ws.DefaultWMSWorker.getCapabilities": "WMS(getCapabilies)",

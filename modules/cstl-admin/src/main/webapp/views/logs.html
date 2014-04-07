@@ -1,11 +1,20 @@
 <div>
-    <h2 translate="logs.title">Logs</h2>
+    <div class="logo-wrapper row">
+        <div class="col-sm-12">
+            <h3 class="header-title" translate="logs.title">Logs</h3>
+        </div>
+    </div>
 
-    <p translate="logs.nbloggers" translate-values="{total: '{{ loggers.length }}'}">There are {{ loggers.length }} loggers.</p>
+    <div class="row">
+        <div class="col-sm-6 col-md-5 col-lg-4 user-count-bloc">
+            <p translate="logs.nbloggers" translate-values="{total: '{{ loggers.length }}'}">There are {{ loggers.length }} loggers.</p>
+            {{'logs.filter' | translate}} <input type="text" ng-model="filter" class="form-control">
+        </div>
+    </div>
 
-    {{'logs.filter' | translate}} <input type="text" ng-model="filter" class="form-control">
 
-    <table class="table table-condensed table-striped table-bordered table-responsive">
+
+    <table class="table table-condensed table-striped table-bordered table-responsive user-table">
         <thead>
         <tr title="click to order">
             <td ng-click="predicate = 'name'; reverse=!reverse" translate="logs.table.name">Name</td>

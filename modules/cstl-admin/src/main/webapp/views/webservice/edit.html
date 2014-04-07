@@ -1,10 +1,10 @@
 <div class="logo-wrapper row">
-    <div class="col-sm-3">
-        <a href="#"><img src="images/constellation.png"></a>
+    <div class="col-sm-12">
+        <h3 class="header-title" translate="page.header.title.edit.service">Edit Service</h3>
     </div>
 </div>
 <div id="serviceDashboard" class="row frame dashboard">
-    <div class="navbar">
+    <div class="navbar  navbar-default">
         <div class="navbar-inner">
             <div class="container-fluid">
                 <div class="navbar-header">
@@ -96,7 +96,7 @@
                                 <div class="dash-inner row dashboard">
                                     <div id="list" data-role="list">
                                         <div class="pagination-wrapper">
-                                            <span class="nb-results pull-left"><strong>{{countdata}}</strong></span>
+                                            <strong><span class="nb-results pull-left"><strong>{{countdata}}&nbsp;</span><span class="nb-results" translate="label.count.data">available data</span></strong>
                                             <select class="nb-per-page input-small form-control pull-right" ng-model="nbbypage">
                                                 <option value="5">5</option>
                                                 <option value="10">10</option>
@@ -115,7 +115,7 @@
                                                     </div>
                                                     <div class="bottom">
                                                         <div class="block">
-                                                            <i class="icon-calendar"></i>{{layer.Date | date:'yyyy-MM-dd HH:mm:ss'}}
+                                                            <i class="icon-calendar"></i>{{layer.Date | date:'yyyy-MM-dd'}}
                                                         </div>
                                                         <div class="block">
                                                             <i class="icon-user"></i>{{layer.Owner}}
@@ -132,7 +132,7 @@
                                                         </div>
                                                         <div class="bottom">
                                                             <div class="block">
-                                                                <i class="icon-calendar"></i>{{cswdata.createDate | date:'yyyy-MM-dd HH:mm:ss'}}
+                                                                <i class="icon-calendar"></i>{{cswdata.createDate | date:'yyyy-MM-dd'}}
                                                             </div>
                                                             <div class="block">
                                                                 <i class="icon-user"></i>{{cswdata.creator}}
@@ -150,7 +150,7 @@
                                                         </div>
                                                         <div class="bottom">
                                                             <div class="block">
-                                                                <i class="icon-calendar"></i>{{relatedData.Date | date:'yyyy-MM-dd HH:mm:ss'}}
+                                                                <i class="icon-calendar"></i>{{relatedData.Date | date:'yyyy-MM-dd'}}
                                                             </div>
                                                             <div class="block">
                                                                 <i class="icon-user"></i>{{relatedData.Owner}}
@@ -197,7 +197,7 @@
 
                                                 <div class="separator"></div>
                                                 <h6 translate="label.date">Date</h6>
-                                                <span>{{selected.Date | date:'yyyy-MM-dd HH:mm:ss'}}</span>
+                                                <span>{{selected.Date | date:'yyyy-MM-dd'}}</span>
 
                                                 <div class="separator"></div>
                                                 <h6 translate="label.type">Type</h6>
@@ -273,7 +273,7 @@
 
                                                 <div class="separator"></div>
                                                 <h6 translate="label.date">Date</h6>
-                                                <span>{{selected.createDate | date:'yyyy-MM-dd HH:mm:ss'}}</span>
+                                                <span>{{selected.createDate | date:'yyyy-MM-dd'}}</span>
                                             </div>
                                             <div class="block-action">
                                                 <div class="row">
@@ -304,44 +304,59 @@
                 <div class="tab-pane" ng-class="{active:tabdesc}" ng-show="tabdesc">
 
                     <!-- Description Service Tab -->
-
-                    <fieldset style="padding-left:20px;">
-                        <legend><span translate="service.description.tab.description.title">Service description</span></legend>
-                        <div class="form-group">
-                            <div class="control-label" translate="service.description.tab.description.name">Name</div>
-                            <input type="text" id="name" class="form-control" ng-model="metadata.name" value="">
-                        </div>
-                        <div class="form-group">
-                            <div class="control-label" translate="service.description.tab.description.identifier">Identifier</div>
-                            <input type="text" readonly="" id="identifier" class="form-control" ng-model="metadata.identifier" value="">
-                        </div>
-                        <div class="form-group">
-                            <div class="control-label" translate="service.description.tab.description.tags">Tags</div>
-                            <div class="tag-input-ctn">
-                                <div data-ng-repeat="(key, tag) in metadata.keywords track by $index" class="input-tag">
-                                    {{ tag }}
-                                    <div class="delete-tag" data-ng-click="deleteTag(key)">&times;</div>
+                    <div class="col-sm-12">
+                        <fieldset style="padding-left:20px;">
+                            <legend><span translate="service.description.tab.description.title">Service description</span></legend>
+                            <form role="form-horizontal" role="form">
+                                <div class="form-group row">
+                                    <label class="control-label col-sm-2 new-service-form-label" translate="service.description.tab.description.name">Name</label>
+                                    <div class="col-sm-8 col-md-6">
+                                        <input type="text" id="name" class="form-control" ng-model="metadata.name" value="">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="control-label col-sm-2 new-service-form-label" translate="service.description.tab.description.identifier">Identifier</label>
+                                    <div class="col-sm-8 col-md-6">
+                                        <input type="text" readonly="" id="identifier" class="form-control" ng-model="metadata.identifier" value="">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="control-label col-sm-2 new-service-form-label" translate="service.description.tab.description.tags">Tags</label>
+                                    <div class="col-sm-8 col-md-6">
+                                        <div class="tag-input-ctn">
+                                            <div data-ng-repeat="(key, tag) in metadata.keywords track by $index" class="input-tag">
+                                                {{ tag }}
+                                                <div class="delete-tag" data-ng-click="deleteTag(key)">&times;</div>
+                                            </div>
+                                            <input type="text" data-tag-input="" data-ng-model="tagText" data-new-tag="addTag()" data-delete-tag="deleteTag()">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="control-label col-sm-2 new-service-form-label" translate="service.description.tab.description.description">Description</label>
+                                    <div class="col-sm-8 col-md-6">
+                                        <textarea id="inputDescription" class="input-xxlarge form-control" rows="5" ng-model="metadata.description"></textarea>
+                                    </div>
                                 </div>
 
-                                <input type="text" data-tag-input="" data-ng-model="tagText" data-new-tag="addTag()" data-delete-tag="deleteTag()">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="control-label" translate="service.description.tab.description.description">Description</div>
-                            <textarea id="inputDescription" class="input-xxlarge form-control" rows="5" ng-model="metadata.description"></textarea>
-                        </div>
+                                <div class="form-group row">
+                                    <label class="control-label col-sm-2 new-service-form-label" translate="service.description.tab.description.version" >Version</label>
+                                    <div id="versionsCheck">
+                                        <div ng-repeat="version in versions" class="inline">
+                                            <div class="checkbox inline">
+                                            <div class="col-sm-8 col-md-6">
+                                                <input type="checkbox"  id="{{version.id}}"  ng-model="version.checked" ng-change="selectedVersion()" ng-checked="versionIsSelected(version.id)"> {{version.id}}</div>
+                                            </div>
+                                        </div>
 
-                        <div class="form-group">
-                            <div class="control-label" translate="service.description.tab.description.version" >Version</div>
-                            <div id="versionsCheck">
-                                <div ng-repeat="version in versions" class="inline">
-                                    <div class="checkbox inline"><input type="checkbox"  id="{{version.id}}"  ng-model="version.checked" ng-change="selectedVersion()" ng-checked="versionIsSelected(version.id)"> {{version.id}}</div>
+                                    </div>
                                 </div>
-
-                            </div>
-                        </div>
-                    </fieldset>
-                    <button class="btn btn-info" style="margin-left:20px;" type="button" ng-click="saveServiceMetadata()" translate="label.save">Save</button>
+                            </form>
+                        </fieldset>
+                    </div>
+                    <div class="pull-right" style="margin: 20px;">
+                        <button class="btn btn-info" style="margin-left:20px;" type="button" ng-click="saveServiceMetadata()" translate="label.save">Save</button>
+                    </div>
 
                     <!-- END Description Service Tab -->
 
@@ -352,70 +367,68 @@
                             <!-- contact part -->
                             <fieldset>
                                 <legend translate="create.contact.legend">Contact information</legend>
+                                <form role="form-horizontal" role="form">
+                                    <div class="control-group">
+                                        <label class="control-label new-service-form-label" for="contactFirstName" translate="create.contact.firstname.label">First name</label>
+                                        <input type="text" class="form-control" id="contactFirstName" ng-model="metadata.serviceContact.firstname"/>
+                                    </div>
 
-                                <div class="control-group">
-                                    <div class="control-label" for="contactFirstName" translate="create.contact.firstname.label">First name</div>
-                                    <input type="text" class="form-control" id="contactFirstName" ng-model="metadata.serviceContact.firstname"/>
-                                </div>
+                                    <div class="control-group">
+                                        <label class="control-label new-service-form-label" for="contactLastName" translate="create.contact.lastname.label">Last name</label>
+                                        <input type="text" class="form-control" id="contactLastName" ng-model="metadata.serviceContact.lastname"/>
+                                    </div>
 
-                                <div class="control-group">
-                                    <div class="control-label" for="contactLastName" translate="create.contact.lastname.label">Last name</div>
-                                    <input type="text" class="form-control" id="contactLastName" ng-model="metadata.serviceContact.lastname"/>
-                                </div>
+                                    <div class="control-group">
+                                        <label class="control-label new-service-form-label" for="contactOrganisation" translate="create.contact.organisation.label">Organisation</label>
+                                        <input type="text" class="form-control" id="contactOrganisation" ng-model="metadata.serviceContact.organisation"/>
+                                    </div>
 
-                                <div class="control-group">
-                                    <div class="control-label" for="contactOrganisation" translate="create.contact.organisation.label">Organisation</div>
-                                    <input type="text" class="form-control" id="contactOrganisation" ng-model="metadata.serviceContact.organisation"/>
-                                </div>
+                                    <div class="control-group">
+                                        <label class="control-label new-service-form-label" for="contactPosition" translate="create.contact.position.label">Position</label>
+                                        <input type="text" class="form-control" id="contactPosition" ng-model="metadata.serviceContact.position"/>
+                                    </div>
 
-                                <div class="control-group">
-                                    <div class="control-label" for="contactPosition" translate="create.contact.position.label">Position</div>
-                                    <input type="text" class="form-control" id="contactPosition" ng-model="metadata.serviceContact.position"/>
-                                </div>
-
-                                <div class="control-group">
-                                    <div class="control-label" for="contactPhone" translate="create.contact.phone.label">Phone</div>
-                                    <input type="text" class="form-control" id="contactPhone" ng-model="metadata.serviceContact.phone"/>
-                                </div>
-                                <div class="control-group">
-                                    <div class="control-label" for="contactFax" translate="create.contact.fax.label">Fax</div>
-                                    <input type="text" class="form-control" id="contactFax" ng-model="metadata.serviceContact.fax"/>
-                                </div>
-                                <div class="control-group">
-                                    <div class="control-label" for="contactemail" translate="create.contact.email.label">Email</div>
-                                    <input type="text" class="form-control" id="contactEmail" ng-model="metadata.serviceContact.email"/>
-                                </div>
+                                    <div class="control-group">
+                                        <label class="control-label new-service-form-label" for="contactPhone" translate="create.contact.phone.label">Phone</label>
+                                        <input type="text" class="form-control" id="contactPhone" ng-model="metadata.serviceContact.phone"/>
+                                    </div>
+                                    <div class="control-group">
+                                        <label class="control-label new-service-form-label" for="contactFax" translate="create.contact.fax.label">Fax</label>
+                                        <input type="text" class="form-control" id="contactFax" ng-model="metadata.serviceContact.fax"/>
+                                    </div>
+                                    <div class="control-group">
+                                        <label class="control-label new-service-form-label" for="contactemail" translate="create.contact.email.label">Email</label>
+                                        <input type="text" class="form-control" id="contactEmail" ng-model="metadata.serviceContact.email"/>
+                                    </div>
+                                </form>
                             </fieldset>
                         </div>
                         <div class="col-sm-6">
                             <!-- address part -->
                             <fieldset>
                                 <legend translate="create.contact.address.legend">Contact address</legend>
-
-                                <div class="control-group">
-                                    <div class="control-label" for="contactAddress" translate="create.contact.address.label">Address</div>
-                                    <input type="text" class="form-control" id="contactAddress" ng-model="metadata.serviceContact.address"/>
-                                </div>
-
-                                <div class="control-group">
-                                    <div class="control-label" for="contactCity" translate="create.contact.address.city.label">City</div>
-                                    <input type="text" class="form-control" id="contactCity" ng-model="metadata.serviceContact.city"/>
-                                </div>
-
-                                <div class="control-group">
-                                    <div class="control-label" for="contactState" translate="create.contact.address.state.label">State</div>
-                                    <input type="text" class="form-control" id="contactState" ng-model="metadata.serviceContact.state"/>
-                                </div>
-
-                                <div class="control-group">
-                                    <div class="control-label" for="contactPostcode" translate="create.contact.address.postcode.label">Zip code</div>
-                                    <input type="text" class="form-control" id="contactPostcode" ng-model="metadata.serviceContact.zipCode"/>
-                                </div>
-
-                                <div class="control-group">
-                                    <div class="control-label" for="contactCountry" translate="create.contact.address.country.label">Country</div>
-                                    <input type="text" class="form-control" id="contactCountry" ng-model="metadata.serviceContact.country"/>
-                                </div>
+                                <form role="form-horizontal" role="form">
+                                    <div class="control-group">
+                                        <label class="control-label new-service-form-label" for="contactAddress" translate="create.contact.address.label">Address</label>
+                                        <input type="text" class="form-control" id="contactAddress" ng-model="metadata.serviceContact.address"/>
+                                    </div>
+                                    <div class="control-group">
+                                        <label class="control-label new-service-form-label" for="contactCity" translate="create.contact.address.city.label">City</label>
+                                        <input type="text" class="form-control" id="contactCity" ng-model="metadata.serviceContact.city"/>
+                                    </div>
+                                    <div class="control-group">
+                                        <label class="control-label new-service-form-label" for="contactState" translate="create.contact.address.state.label">State</label>
+                                        <input type="text" class="form-control" id="contactState" ng-model="metadata.serviceContact.state"/>
+                                    </div>
+                                    <div class="control-group">
+                                        <label class="control-label new-service-form-label" for="contactPostcode" translate="create.contact.address.postcode.label">Zip code</label>
+                                        <input type="text" class="form-control" id="contactPostcode" ng-model="metadata.serviceContact.zipCode"/>
+                                    </div>
+                                    <div class="control-group">
+                                        <label class="control-label new-service-form-label" for="contactCountry" translate="create.contact.address.country.label">Country</label>
+                                        <input type="text" class="form-control" id="contactCountry" ng-model="metadata.serviceContact.country"/>
+                                    </div>
+                                </form>
                             </fieldset>
                         </div>
                     </div>
@@ -424,32 +437,28 @@
                             <!-- access constraints part -->
                             <fieldset>
                                 <legend translate="create.accessconstraint.legend">Access constraints</legend>
-
-                                <div class="control-group">
-                                    <div class="control-label" for="fees" translate="create.accessconstraint.fees.label">Fees</div>
-                                    <input id="fees" class="form-control" type="text" ng-model="metadata.serviceConstraints.fees"/>
-                                </div>
-
-                                <div class="control-group">
-                                    <div class="control-label" for="accessConstraints" translate="create.accessconstraint.label">Access constraints</div>
-                                    <textarea rows="5" id="accessConstraints" class="form-control" ng-model="metadata.serviceConstraints.accessConstraint"></textarea>
-                                </div>
-
-                                <div class="control-group" data-toggle="tooltip" title="{{'create.accessconstraint.layerlimit.tooltip' | translate }}" id="layerlimitGroup">
-                                    <div class="control-label" for="layerLimit" translate="create.accessconstraint.layerlimit.label">Layer limit</div>
-                                    <input type="text" id="layerLimit" class="form-control" ng-model="metadata.serviceConstraints.layerLimit"/>
-                                </div>
-
-                                <div class="control-group" data-toggle="tooltip" title="{{'create.accessconstraint.maxwidth.tooltip' | translate }}" id="maxWidthGroup">
-                                    <div class="control-label" for="maxWidth" translate="create.accessconstraint.maxwidth.label">Max width</div>
-                                    <input type="text" id="maxWidth" class="form-control" ng-model="metadata.serviceConstraints.maxWidth"/>
-                                </div>
-
-
-                                <div class="control-group" data-toggle="tooltip" title="{{'create.accessconstraint.maxheight.tooltip' | translate }}" id="maxHeightGroup">
-                                    <div class="control-label" for="maxHeight" translate="create.accessconstraint.maxheight.label">Max height</div>
-                                    <input type="text" id="maxHeight" class="form-control" ng-model="metadata.serviceConstraints.maxHeight"/>
-                                </div>
+                                <form role="form-horizontal" role="form">
+                                    <div class="control-group">
+                                        <label class="control-label new-service-form-label" for="fees" translate="create.accessconstraint.fees.label">Fees</label>
+                                        <input id="fees" class="form-control" type="text" ng-model="metadata.serviceConstraints.fees"/>
+                                    </div>
+                                    <div class="control-group">
+                                        <label class="control-label new-service-form-label" for="accessConstraints" translate="create.accessconstraint.label">Access constraints</label>
+                                        <textarea rows="5" id="accessConstraints" class="form-control" ng-model="metadata.serviceConstraints.accessConstraint"></textarea>
+                                    </div>
+                                    <div class="control-group" data-toggle="tooltip" title="{{'create.accessconstraint.layerlimit.tooltip' | translate }}" id="layerlimitGroup">
+                                        <label class="control-label new-service-form-label" for="layerLimit" translate="create.accessconstraint.layerlimit.label">Layer limit</label>
+                                        <input type="text" id="layerLimit" class="form-control" ng-model="metadata.serviceConstraints.layerLimit"/>
+                                    </div>
+                                    <div class="control-group" data-toggle="tooltip" title="{{'create.accessconstraint.maxwidth.tooltip' | translate }}" id="maxWidthGroup">
+                                        <label class="control-label new-service-form-label" for="maxWidth" translate="create.accessconstraint.maxwidth.label">Max width</label>
+                                        <input type="text" id="maxWidth" class="form-control" ng-model="metadata.serviceConstraints.maxWidth"/>
+                                    </div>
+                                    <div class="control-group" data-toggle="tooltip" title="{{'create.accessconstraint.maxheight.tooltip' | translate }}" id="maxHeightGroup">
+                                        <label class="control-label new-service-form-label" for="maxHeight" translate="create.accessconstraint.maxheight.label">Max height</label>
+                                        <input type="text" id="maxHeight" class="form-control" ng-model="metadata.serviceConstraints.maxHeight"/>
+                                    </div>
+                                </form>
                             </fieldset>
                         </div>
                     </div>

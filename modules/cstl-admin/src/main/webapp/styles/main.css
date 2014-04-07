@@ -165,7 +165,12 @@ ul.unstyled {
     padding-top:30px;
     padding-bottom:30px;
 }
-
+@media (max-width: 991px){
+    .service-item{
+        float: none !important;
+        margin-top: 10px;
+    }
+}
 .navbar {
     min-height: 0;
     border: 0;
@@ -215,13 +220,7 @@ ul.unstyled {
     min-height: 40px;
     padding-left: 20px;
     padding-right: 20px;
-    background-color: #fafafa;
-    background-image: -moz-linear-gradient(top, #ffffff, #f2f2f2);
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#f2f2f2));
-    background-image: -webkit-linear-gradient(top, #ffffff, #f2f2f2);
-    background-image: -o-linear-gradient(top, #ffffff, #f2f2f2);
-    background-image: linear-gradient(to bottom, #ffffff, #f2f2f2);
-    background-repeat: repeat-x;
+    background-color: #f8f8f8;
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#fff2f2f2', GradientType=0);
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
@@ -240,8 +239,8 @@ ul.unstyled {
     border-color: #eeeeee #eeeeee #dddddd;
 }
 .nav-tabs>li>a {
-    background-color: #E4E4E4;
-    color: #555555;
+    background-color: transparent;
+    color: #428bca;
     padding-top: 8px;
     padding-bottom: 8px;
     line-height: 20px;
@@ -250,12 +249,16 @@ ul.unstyled {
     -moz-border-radius: 4px 4px 0 0;
     border-radius: 4px 4px 0 0;
 }
-.nav-tabs>li.active>a, .nav-tabs>li.active>a:hover, .nav-tabs>li.active>a:focus {
-    color: #5bc0de;
-    background-color: #f2f2f2;
-    border-bottom: 1px solid #ddd;
-    border-top: #5bc0de 2px solid;
+.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+    color: #555;
     cursor: default;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-bottom-color: transparent;
+    font-weight: bold;
+}
+.new-service-form-label{
+    margin-top:8px;
 }
 
 /*
@@ -648,9 +651,11 @@ ul.unstyled {
     border: 1px solid #ccc;
     padding: 2px 3px;
     display: inline-block;
-    width: 500px;
     border-radius: 3px;
     box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.075);
+    width:100%;
+    height:34px;
+    padding: 6px 12px;
 }
 
 .tag-input-ctn input {

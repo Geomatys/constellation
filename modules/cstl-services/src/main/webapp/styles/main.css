@@ -9,7 +9,7 @@
     background-repeat: repeat-x;
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff515151', endColorstr='#ff000000', GradientType=0);
     border-color: #252525;
-    height:60px;
+    height:47px;
 }
 li>a {
     cursor: pointer;
@@ -169,7 +169,7 @@ ul.unstyled {
     line-height: 20px;
 }
 #brand{
-    height: 46px;
+    height: 33px;
     margin-bottom: 5px;
     margin-top: 5px;
     margin-left: 20px;
