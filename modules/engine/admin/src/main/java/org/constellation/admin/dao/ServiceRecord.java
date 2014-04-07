@@ -17,6 +17,7 @@
 
 package org.constellation.admin.dao;
 
+import java.io.IOException;
 import java.io.InputStream;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.EmbeddedDatabase;
@@ -148,15 +149,25 @@ public final class ServiceRecord extends Record {
         ensureConnectionNotClosed();
         return session.readServiceMetadata(id, lang);
     }
+    
+    public InputStream getIsoMetadata(final String lang) throws SQLException {
+        ensureConnectionNotClosed();
+        return session.readServiceIsoMetadata(id, lang);
+    }
 
-    public void setMetadata(final String lang, final StringReader metadata) throws SQLException {
+    public void setMetadata(final String lang, final StringReader metadata, final StringReader isoMetadata) throws SQLException {
         ensureConnectionNotClosed();
         final InputStream is = session.readServiceMetadata(id, lang);
         if (is == null) {
-            session.writeServiceMetadata(identifier, type, metadata, lang);
+            session.writeServiceMetadata(identifier, type, metadata, isoMetadata, lang);
         } else {
-            session.updateServiceMetadata(id, lang, metadata);
+            session.updateServiceMetadata(id, lang, metadata, isoMetadata);
         }
+    }
+    
+    public boolean hasIsoMetadata() throws IOException, SQLException {
+        ensureConnectionNotClosed();
+        return session.hasServiceIsoMetadata(id);
     }
 
     public String getOwnerLogin() {

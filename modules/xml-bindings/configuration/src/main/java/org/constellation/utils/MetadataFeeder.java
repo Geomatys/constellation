@@ -1,30 +1,48 @@
 package org.constellation.utils;
 
-import org.apache.sis.metadata.iso.DefaultMetadata;
-import org.apache.sis.metadata.iso.citation.DefaultCitation;
-import org.apache.sis.metadata.iso.citation.DefaultCitationDate;
-import org.apache.sis.metadata.iso.citation.DefaultResponsibleParty;
-import org.apache.sis.metadata.iso.identification.AbstractIdentification;
-import org.apache.sis.metadata.iso.identification.DefaultDataIdentification;
-import org.apache.sis.metadata.iso.identification.DefaultKeywords;
-import org.apache.sis.util.iso.DefaultInternationalString;
-import org.apache.sis.util.iso.SimpleInternationalString;
-import org.constellation.dto.DataMetadata;
-import org.opengis.metadata.citation.CitationDate;
-import org.opengis.metadata.citation.DateType;
-import org.opengis.metadata.citation.Role;
-import org.opengis.metadata.identification.Identification;
-import org.opengis.metadata.identification.Keywords;
-import org.opengis.metadata.identification.TopicCategory;
-import org.opengis.util.InternationalString;
-
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.sis.metadata.iso.DefaultIdentifier;
+import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.metadata.iso.citation.DefaultCitation;
+import org.apache.sis.metadata.iso.citation.DefaultCitationDate;
+import org.apache.sis.metadata.iso.citation.DefaultOnlineResource;
+import org.apache.sis.metadata.iso.citation.DefaultResponsibleParty;
+import org.apache.sis.metadata.iso.distribution.DefaultDigitalTransferOptions;
+import org.apache.sis.metadata.iso.distribution.DefaultDistribution;
+import org.apache.sis.metadata.iso.identification.AbstractIdentification;
+import org.apache.sis.metadata.iso.identification.DefaultDataIdentification;
+import org.apache.sis.metadata.iso.identification.DefaultKeywords;
+import org.apache.sis.util.iso.DefaultInternationalString;
+import org.apache.sis.util.iso.DefaultNameFactory;
+import org.apache.sis.util.iso.SimpleInternationalString;
+import org.apache.sis.util.logging.Logging;
+import org.constellation.dto.DataMetadata;
+import org.geotoolkit.service.OperationMetadataImpl;
+import org.geotoolkit.service.ServiceIdentificationImpl;
+import org.opengis.metadata.citation.Citation;
+import org.opengis.metadata.citation.CitationDate;
+import org.opengis.metadata.citation.DateType;
+import org.opengis.metadata.citation.OnlineResource;
+import org.opengis.metadata.citation.Role;
+import org.opengis.metadata.distribution.Distribution;
+import org.opengis.metadata.identification.Identification;
+import org.opengis.metadata.identification.Keywords;
+import org.opengis.metadata.identification.TopicCategory;
+import org.opengis.service.CouplingType;
+import org.opengis.service.DCPList;
+import org.opengis.service.OperationMetadata;
+import org.opengis.util.InternationalString;
+import org.opengis.util.NameFactory;
 
 /**
  * Class which add some part on a metadata using {@link org.constellation.dto.DataMetadata}.
@@ -35,6 +53,8 @@ import java.util.UUID;
  */
 public class MetadataFeeder {
 
+    private static final Logger LOGGER = Logging.getLogger(MetadataFeeder.class);
+    
     /**
      * metadata target
      */
@@ -69,11 +89,11 @@ public class MetadataFeeder {
             addMetadataLocale(metadataLocale);
         }
 
-        addTitle(feeded.getTitle());
+        setTitle(feeded.getTitle());
         addAbstract(feeded.getAnAbstract());
         addContact(feeded.getUsername(), feeded.getOrganisationName(), feeded.getRole());
 
-        addFileIdentifier(feeded.getDataName());
+        setIdentifier(CstlMetadatas.getMetadataIdForData(feeded.getDataName()));
 
         final String localeData = feeded.getLocaleData();
         if (localeData != null) {
@@ -106,13 +126,25 @@ public class MetadataFeeder {
 
         return metadata.getIdentificationInfo().iterator().next();
     }
+    
+     private Identification getServiceIdentification(DefaultMetadata metadata) {
+        if (metadata.getIdentificationInfo().isEmpty()) {
+            metadata.getIdentificationInfo().add(new ServiceIdentificationImpl());
+        }
+
+        return metadata.getIdentificationInfo().iterator().next();
+    }
+     
+    public Identification getServiceIdentification() {
+        return getServiceIdentification(eater);
+    }
 
     /**
      * Add title on metadata
      *
      * @param title title  we want add
      */
-    private void addTitle(final String title) {
+    public void setTitle(final String title) {
         final AbstractIdentification identification = (AbstractIdentification) getIdentification(eater);
         final InternationalString internationalizeTitle = new DefaultInternationalString(title);
         if (identification.getCitation() == null) {
@@ -124,14 +156,14 @@ public class MetadataFeeder {
             citation.setTitle(internationalizeTitle);
         }
     }
-
+    
     /**
      * Add data date on metadata
      *
      * @param date     {@link java.util.Date} need to be inserted
      * @param dateType {@link org.opengis.metadata.citation.DateType} to define the type of the date inserted
      */
-    private void addCitationDate(final Date date, final DateType dateType) {
+    private void setCitationDate(final Date date, final DateType dateType) {
         final AbstractIdentification identification = (AbstractIdentification) getIdentification(eater);
         final DefaultCitationDate citDate = new DefaultCitationDate(date, dateType);
         if (identification.getCitation() == null) {
@@ -147,6 +179,39 @@ public class MetadataFeeder {
         }
         dates.add(citDate);
         citation.setDates(dates);
+    }
+    
+    public void setCreationDate(final Date date) {
+        final DefaultCitationDate creationDate = new DefaultCitationDate(date, DateType.CREATION);
+        final AbstractIdentification ident = (AbstractIdentification)getIdentification(eater);
+        DefaultCitation citation = (DefaultCitation) ident.getCitation();
+        if (citation == null) {
+            citation = new DefaultCitation();
+            citation.setDates(Collections.singletonList(creationDate));
+            ident.setCitation(citation);
+            return;
+        }
+        //remove old creationDate
+        final List<CitationDate> dates = new ArrayList<>();
+        for (CitationDate cd : citation.getDates()) {
+            if (DateType.CREATION.equals(cd.getDateType())) {
+                dates.add(cd);
+            }
+        }
+        citation.getDates().removeAll(dates);
+        //add the new creation date
+        citation.getDates().add(creationDate);
+    }
+    
+    public void setCitationIdentifier(final String fileIdentifier) {
+        final Identification id = getIdentification(eater);
+        DefaultCitation citation = (DefaultCitation) id.getCitation();
+        if (citation == null) {
+            citation = new DefaultCitation();
+            citation.setIdentifiers(Collections.singleton(new DefaultIdentifier(fileIdentifier)));
+            return;
+        }
+        citation.setIdentifiers(Collections.singleton(new DefaultIdentifier(fileIdentifier)));
     }
 
     /**
@@ -227,8 +292,12 @@ public class MetadataFeeder {
      *
      * @param identifier the fileIdentifier
      */
-    private void addFileIdentifier(final String identifier) {
+    private void setIdentifier(final String identifier) {
         eater.setFileIdentifier(identifier);
+    }
+    
+    public String getIdentifier() {
+        return eater.getFileIdentifier();
     }
 
     /**
@@ -267,5 +336,165 @@ public class MetadataFeeder {
         newContact.setRole(currentRole);
         eater.getContacts().add(newContact);
     }
+    
+    public String getServiceType() {
+        final Collection<Identification> idents = eater.getIdentificationInfo();
+        ServiceIdentificationImpl servIdent = null;
+        for (Identification ident : idents) {
+            if (ident instanceof ServiceIdentificationImpl) {
+                servIdent = (ServiceIdentificationImpl) ident;
+            }
+        }
+        if (servIdent != null && servIdent.getServiceType() != null) {
+            return servIdent.getServiceType().toString();
+        }
+        return null;
+    }
 
+    public String getServiceInstanceName() {
+        final Identification servIdent = getIdentification(eater);
+        if (servIdent != null) {
+            final Citation cit = servIdent.getCitation();
+            if (cit != null && cit.getOtherCitationDetails() != null) {
+                return cit.getOtherCitationDetails().toString();
+            }
+        }
+        return null;
+    }
+
+    public void setServiceInstanceName(final String serviceInstance) {
+        final Identification servIdent = getServiceIdentification();
+        if (servIdent != null) {
+           DefaultCitation cit = (DefaultCitation) servIdent.getCitation();
+           if (cit != null) {
+               cit.setOtherCitationDetails(new SimpleInternationalString(serviceInstance));
+           } else {
+               cit = new DefaultCitation();
+               cit.setOtherCitationDetails(new SimpleInternationalString(serviceInstance));
+               ((AbstractIdentification)servIdent).setCitation(cit);
+           }
+        } else {
+            final ServiceIdentificationImpl ident = new ServiceIdentificationImpl();
+            final DefaultCitation cit = new DefaultCitation();
+            cit.setOtherCitationDetails(new SimpleInternationalString(serviceInstance));
+            ident.setCitation(cit);
+            eater.setIdentificationInfo(Collections.singletonList(ident));
+        }
+
+    }
+
+    public void addServiceInformation(final String serviceType, final String url) {
+        final Collection<Identification> idents = eater.getIdentificationInfo();
+        ServiceIdentificationImpl servIdent = null;
+        for (Identification ident : idents) {
+            if (ident instanceof ServiceIdentificationImpl) {
+                servIdent = (ServiceIdentificationImpl) ident;
+            }
+        }
+        if (servIdent == null) {
+            servIdent = new ServiceIdentificationImpl();
+            eater.getIdentificationInfo().add(servIdent);
+        }
+        final NameFactory nameFacto = new DefaultNameFactory();
+        servIdent.setCouplingType(CouplingType.LOOSE);
+        servIdent.setServiceType(nameFacto.createLocalName(null, serviceType));
+        servIdent.setContainsOperations(getOperation(serviceType, url));
+        
+        try {
+            Distribution dist = eater.getDistributionInfo();
+            if (dist == null) {
+                dist = new DefaultDistribution();
+                eater.setDistributionInfo(dist);
+            }
+
+            DefaultDigitalTransferOptions dto = new DefaultDigitalTransferOptions();
+            dto.setOnLines(Collections.singleton(new DefaultOnlineResource(new URI(url))));
+            addWithoutDoublon(dist.getTransferOptions(), Collections.singleton(dto));
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+        }
+    }
+    
+    private List<OperationMetadata> getOperation(final String serviceType, final String url) {
+        final List<OperationMetadata> operations = new ArrayList<>();
+        operations.add(buildOperation("GetCapabilities", url));
+
+        switch (serviceType) {
+            case "WMS":
+                operations.add(buildOperation("GetMap", url));
+                operations.add(buildOperation("GetFeatureInfo", url));
+                operations.add(buildOperation("DescribeLayer", url));
+                operations.add(buildOperation("GetLegendGraphic", url));
+                break;
+            case "WFS":
+                operations.add(buildOperation("GetFeature", url));
+                operations.add(buildOperation("DescribeFeatureType", url));
+                operations.add(buildOperation("Transaction", url));
+                break;
+            case "WCS":
+                operations.add(buildOperation("DescribeCoverage", url));
+                operations.add(buildOperation("GetCoverage", url));
+                break;
+            case "WMTS":
+                operations.add(buildOperation("GetTile", url));
+                operations.add(buildOperation("GetFeatureInfo", url));
+                break;
+            case "CSW":
+                operations.add(buildOperation("GetRecords", url));
+                operations.add(buildOperation("GetRecordById", url));
+                operations.add(buildOperation("DescribeRecord", url));
+                operations.add(buildOperation("GetDomain", url));
+                operations.add(buildOperation("Transaction", url));
+                operations.add(buildOperation("Harvest", url));
+                break;
+            case "SOS":
+                operations.add(buildOperation("GetObservation", url));
+                operations.add(buildOperation("GetObservationById", url));
+                operations.add(buildOperation("DescribeSensor", url));
+                operations.add(buildOperation("GetFeatureOfInterest", url));
+                operations.add(buildOperation("InsertObservation", url));
+                operations.add(buildOperation("InsertSensor", url));
+                operations.add(buildOperation("DeleteSensor", url));
+                operations.add(buildOperation("InsertResult", url));
+                operations.add(buildOperation("InsertResultTemplate", url));
+                operations.add(buildOperation("GetResultTemplate", url));
+                operations.add(buildOperation("GetFeatureOfInterestTime", url));
+                break;
+        }
+        // TODO other service
+        return operations;
+    }
+    
+    private OperationMetadata buildOperation(final String operationName, final String url) {
+        final OperationMetadataImpl op = new OperationMetadataImpl(operationName);
+        op.setDCP(DCPList.WEBSERVICES);
+        try {
+            op.setConnectPoint(Arrays.asList((OnlineResource)new DefaultOnlineResource(new URI(url))));
+        } catch (URISyntaxException ex) {
+            LOGGER.log(Level.WARNING, "unvalid URL:" + url, ex);
+        }
+        return op;
+    }
+    
+    /**
+     * Copy the elements of a source into a destination collection, without adding the elements
+     * which are already present in the destination collection.
+     * @param destination The collection to copy data to.
+     * @param source The collection to get data from.
+     */
+    public static void addWithoutDoublon(Collection destination, Collection source) {
+        if (source == null || source.isEmpty()) {
+            return;
+        }
+       
+        if (destination.isEmpty()) {
+            destination.addAll(source);
+        } else {
+            for (Object object : source) {
+                if (!destination.contains(object)) {
+                    destination.add(object);
+                }
+            }
+        }
+    }
 }

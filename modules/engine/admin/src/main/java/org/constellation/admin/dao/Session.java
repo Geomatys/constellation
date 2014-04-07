@@ -130,7 +130,7 @@ public final class Session implements Closeable {
 
     private static final String READ_DATA                   = "data.read";
     private static final String READ_DATA_NMSP              = "data.read.nmsp";
-    private static final String READ_DATA_METADATA              = "data.read.metadata";
+    private static final String READ_DATA_METADATA          = "data.read.metadata";
     private static final String READ_DATA_FROM_ID           = "data.read.from.id";
     private static final String READ_DATA_FROM_LAYER        = "data.read.from.layer";
     private static final String LIST_DATA                   = "data.list";
@@ -138,7 +138,7 @@ public final class Session implements Closeable {
     private static final String LIST_DATA_FROM_PROVIDER     = "data.list.from.provider";
     private static final String WRITE_DATA                  = "data.write";
     private static final String UPDATE_DATA                 = "data.update";
-    private static final String UPDATE_DATA_METADATA                 = "data.update.metadata";
+    private static final String UPDATE_DATA_METADATA        = "data.update.metadata";
     private static final String DELETE_DATA                 = "data.delete";
     private static final String DELETE_DATA_NMSP            = "data.delete.nmsp";
 
@@ -150,6 +150,7 @@ public final class Session implements Closeable {
     private static final String READ_SERVICES_CONFIG        = "service.read.config";
     private static final String READ_SERVICES_EXTRA_CONFIG  = "service.read.extra.config";
     private static final String READ_SERVICES_METADATA      = "service.read.metadata";
+    private static final String READ_SERVICES_ISO_METADATA  = "service.read.iso_metadata";
     private static final String LIST_SERVICES               = "service.list";
     private static final String LIST_SERVICES_FROM_TYPE     = "service.list.from.type";
     private static final String LIST_SERVICES_FROM_DATA     = "service.list.from.data";
@@ -872,6 +873,10 @@ public final class Session implements Closeable {
     /* internal */ InputStream readServiceMetadata(final int generatedId, final String lang) throws SQLException {
         return new Query(READ_SERVICES_METADATA).with(generatedId, lang).select().getClob();
     }
+    
+    /* internal */ InputStream readServiceIsoMetadata(final int generatedId, final String lang) throws SQLException {
+        return new Query(READ_SERVICES_ISO_METADATA).with(generatedId, lang).select().getClob();
+    }
 
     public List<ServiceRecord> readServices() throws SQLException {
         return new Query(LIST_SERVICES).select().getAll(ServiceRecord.class);
@@ -911,14 +916,14 @@ public final class Session implements Closeable {
         new Query(WRITE_SERVICE_EXTRA_CONFIG).with(record.id, fileName, config).insert();
     }
 
-    public void writeServiceMetadata(final String identifier, final Specification spec, final StringReader metadata, final String lang) throws SQLException {
+    public void writeServiceMetadata(final String identifier, final Specification spec, final StringReader metadata, final StringReader isoMetadata, final String lang) throws SQLException {
         ensureNonNull("identifier", identifier);
         ensureNonNull("spec",       spec);
 
         final ServiceRecord record = readService(identifier, spec);
 
         // Proceed to insertion.
-        new Query(WRITE_SERVICE_METADATA).with(record.id, lang, metadata).insert();
+        new Query(WRITE_SERVICE_METADATA).with(record.id, lang, metadata, isoMetadata).insert();
     }
 
     /* internal */ void updateService(final int generatedId, final String newIdentifier, final Specification newType, final String newOwner) throws SQLException {
@@ -933,8 +938,8 @@ public final class Session implements Closeable {
         new Query(UPDATE_SERVICE_EXTRA_CONFIG).with(newConfig, generatedId, fileName).update();
     }
 
-    /* internal */ void updateServiceMetadata(final int generatedId, final String lang, final StringReader newMetadata) throws SQLException {
-        new Query(UPDATE_SERVICE_METADATA).with(newMetadata, generatedId, lang).update();
+    /* internal */ void updateServiceMetadata(final int generatedId, final String lang, final StringReader newMetadata, final StringReader newIsoMetadata) throws SQLException {
+        new Query(UPDATE_SERVICE_METADATA).with(newMetadata, newIsoMetadata, generatedId, lang).update();
     }
 
     public void deleteService(final String identifier, final Specification spec) throws SQLException {
@@ -948,6 +953,17 @@ public final class Session implements Closeable {
         }
     }
 
+    /**
+     * look for existence of the service metadata with the specified {@code generatedId}.
+     *
+     * @param generatedId the service auto-generated id
+     * @return true if an iso metadata exist for this service.
+     * @throws SQLException if a database access error occurs
+     * @throws IOException if the configuration cannot be read
+     */
+    /* internal */ boolean hasServiceIsoMetadata(final int generatedId) throws SQLException, IOException {
+        return readServiceIsoMetadata(generatedId, "eng") != null;
+    }
 
     /**************************************************************************
      *                           layer table queries                          *

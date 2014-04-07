@@ -115,7 +115,7 @@ public class InternalMetadataReader extends DomMetadataReader implements CSWMeta
      */
     @Override
     public Node getMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
-        final InputStream metadataStream = ConfigurationEngine.loadProviderMetadata(identifier);
+        final InputStream metadataStream = ConfigurationEngine.loadIsoMetadata(identifier);
         if (metadataStream != null) {
             final MetadataType metadataMode;
             try {
@@ -138,7 +138,7 @@ public class InternalMetadataReader extends DomMetadataReader implements CSWMeta
 
     @Override
     public boolean existMetadata(final String identifier) throws MetadataIoException {
-        return ConfigurationEngine.providerHasMetadata(identifier);
+        return ConfigurationEngine.existInternalMetadata(identifier);
     }
     
     private Node translateISOtoDCNode(final Node metadata, final ElementSetType type, final List<QName> elementName) throws MetadataIoException  {
@@ -397,9 +397,9 @@ public class InternalMetadataReader extends DomMetadataReader implements CSWMeta
     @Override
     public List<Node> getAllEntries() throws MetadataIoException {
         final List<Node> result = new ArrayList<>();
-        final List<String> providerIds = ConfigurationEngine.getProviderIds(true);
-        for (String providerID : providerIds) {
-            final InputStream stream = ConfigurationEngine.loadProviderMetadata(providerID);
+        final List<String> metadataIds = ConfigurationEngine.getInternalMetadataIds();
+        for (String metadataID : metadataIds) {
+            final InputStream stream = ConfigurationEngine.loadIsoMetadata(metadataID);
             result.add(getNodeFromStream(stream));
         }
         return result;
@@ -407,7 +407,7 @@ public class InternalMetadataReader extends DomMetadataReader implements CSWMeta
     
    @Override
     public int getEntryCount() throws MetadataIoException {
-        return ConfigurationEngine.getProviderIds(true).size();
+        return ConfigurationEngine.getInternalMetadataIds().size();
     }
 
     /**
@@ -415,12 +415,12 @@ public class InternalMetadataReader extends DomMetadataReader implements CSWMeta
      */
     @Override
     public List<String> getAllIdentifiers() throws MetadataIoException {
-        return ConfigurationEngine.getProviderIds(true);
+        return ConfigurationEngine.getInternalMetadataIds();
     }
 
     @Override
     public Iterator<String> getIdentifierIterator() throws MetadataIoException {
-        return ConfigurationEngine.getProviderIds(true).iterator();
+        return ConfigurationEngine.getInternalMetadataIds().iterator();
     }
 
     /**

@@ -141,7 +141,8 @@ ALTER TABLE "admin"."service_extra_config" ADD CONSTRAINT service_extra_config_s
 CREATE TABLE "admin"."service_metadata"(
   "id"          INTEGER     NOT NULL,
   "lang"        VARCHAR(3) NOT NULL,
-  "content"     CLOB
+  "content"     CLOB,
+  "iso_content" CLOB
 );
 
 ALTER TABLE "admin"."service_metadata" ADD CONSTRAINT service_metadata_pk  PRIMARY KEY ("id", "lang");

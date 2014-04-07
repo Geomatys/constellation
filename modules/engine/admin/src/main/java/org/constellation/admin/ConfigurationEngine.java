@@ -17,8 +17,6 @@
 
 package org.constellation.admin;
 
-import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -31,13 +29,12 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
-
 import org.apache.sis.metadata.iso.DefaultMetadata;
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.apache.sis.xml.XML;
@@ -63,6 +60,9 @@ import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.security.NoSecurityManagerException;
 import org.constellation.security.SecurityManager;
 import org.constellation.util.Util;
+import org.constellation.utils.CstlMetadataTemplate;
+import org.constellation.utils.CstlMetadatas;
+import org.constellation.utils.ISOMarshallerPool;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.parameter.GeneralParameterValue;
@@ -340,14 +340,24 @@ public class ConfigurationEngine {
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
-            final StringWriter sw = new StringWriter();
-            final Marshaller m = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-            m.marshal(metadata, sw);
-            GenericDatabaseMarshallerPool.getInstance().recycle(m);
-            final StringReader sr = new StringReader(sw.toString());
             final ServiceRecord service = session.readService(identifier, spec);
             if (service != null) {
-                service.setMetadata(language, sr);
+                final StringWriter sw = new StringWriter();
+                final Marshaller m = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+                m.marshal(metadata, sw);
+                GenericDatabaseMarshallerPool.getInstance().recycle(m);
+                final StringReader sr = new StringReader(sw.toString());
+                
+                // ISO metadata
+                String url = null; // TODO
+                final DefaultMetadata isoMetadata = CstlMetadatas.defaultServiceMetadata(identifier, serviceType, url, metadata);
+                final StringWriter swIso = new StringWriter();
+                final Marshaller mi = ISOMarshallerPool.getInstance().acquireMarshaller();
+                mi.marshal(isoMetadata, swIso);
+                ISOMarshallerPool.getInstance().recycle(mi);
+                final StringReader srIso = new StringReader(swIso.toString());
+                
+                service.setMetadata(language, sr, srIso);
             }
 
         } catch (SQLException ex) {
@@ -513,8 +523,22 @@ public class ConfigurationEngine {
         }
         return null;
     }
+    
+    public static InputStream loadIsoMetadata(final String metadataID) {
+        final CstlMetadataTemplate type = CstlMetadataTemplate.valueForPrefix(metadataID);
+        if (type != null) {
+            final String id = CstlMetadatas.getIdentifier(type, metadataID);
+            if (type == CstlMetadataTemplate.DATA) {
+               return loadProviderMetadata(id);
+            } else if (type == CstlMetadataTemplate.SERVICE) {
+                final ServiceDef.Specification spec = CstlMetadatas.getSpecification(metadataID);
+                return loadServiceMetadata(id, spec);
+            }
+        }
+        return null;
+    }
 
-    public static InputStream loadProviderMetadata(final String providerId) {
+    private static InputStream loadProviderMetadata(final String providerId) {
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
@@ -523,7 +547,7 @@ public class ConfigurationEngine {
                 return provider.getMetadata();
             }
         } catch (SQLException | IOException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
+            LOGGER.log(Level.WARNING, "An error occurred while reading provider metadata", ex);
         } finally {
             if (session != null)
                 session.close();
@@ -531,19 +555,58 @@ public class ConfigurationEngine {
         return null;
     }
 
-    public static boolean providerHasMetadata(final String providerID) {
+    private static InputStream loadServiceMetadata(final String serviceId, final ServiceDef.Specification spec) {
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
-            final ProviderRecord data = session.readProvider(providerID);
-            if (data != null) {
-                return data.hasMetadata();
+            final ServiceRecord serv = session.readService(serviceId, spec);
+            if (serv != null) {
+                return serv.getIsoMetadata("eng");
             }
-        } catch (SQLException | IOException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred while looking for provider metadata existance", ex);
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while reading service iso metadata", ex);
         } finally {
             if (session != null)
                 session.close();
+        }
+        return null;
+    }
+
+    
+    public static boolean existInternalMetadata(final String metadataID) {
+        final CstlMetadataTemplate type = CstlMetadataTemplate.valueForPrefix(metadataID);
+        if (type != null) {
+            final String id = CstlMetadatas.getIdentifier(type, metadataID);
+            if (type == CstlMetadataTemplate.DATA) {
+                Session session = null;
+                try {
+                    session = EmbeddedDatabase.createSession();
+                    final ProviderRecord data = session.readProvider(id);
+                    if (data != null) {
+                        return data.hasMetadata();
+                    }
+                } catch (SQLException | IOException ex) {
+                    LOGGER.log(Level.WARNING, "An error occurred while looking for provider metadata existance", ex);
+                } finally {
+                    if (session != null)
+                        session.close();
+                }
+            } else if (type == CstlMetadataTemplate.SERVICE) {
+                final ServiceDef.Specification spec = CstlMetadatas.getSpecification(metadataID);
+                Session session = null;
+                try {
+                    session = EmbeddedDatabase.createSession();
+                    final ServiceRecord serv = session.readService(id, spec);
+                    if (serv != null) {
+                        return serv.hasIsoMetadata();
+                    }
+                } catch (SQLException | IOException ex) {
+                    LOGGER.log(Level.WARNING, "An error occurred while looking for provider metadata existance", ex);
+                } finally {
+                    if (session != null)
+                        session.close();
+                }
+            }
         }
         return false;
     }
@@ -565,6 +628,32 @@ public class ConfigurationEngine {
                     }
                 } else {
                     results.add(record.getIdentifier());
+                }
+            }
+        } catch (SQLException | IOException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+        return results;
+    }
+    
+    public static List<String> getInternalMetadataIds() {
+        final List<String> results = new ArrayList<>();
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            final List<ProviderRecord> providers = session.readProviders();
+            for (ProviderRecord record : providers) {
+                if (record.hasMetadata()) {
+                    results.add(CstlMetadatas.getMetadataIdForData(record.getIdentifier()));
+                }
+            }
+            final List<ServiceRecord> services = session.readServices();
+            for (ServiceRecord record : services) {
+                if (record.hasIsoMetadata()) {
+                    results.add(CstlMetadatas.getMetadataIdForService(record.getIdentifier(), record.getType().name()));
                 }
             }
         } catch (SQLException | IOException ex) {
