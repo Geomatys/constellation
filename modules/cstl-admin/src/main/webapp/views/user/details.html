@@ -78,10 +78,9 @@
 							<input type="text" data-tag-input="" data-ng-model="tagText"
 								data-new-tag="addTag()" data-delete-tag="deleteTag()">
 						</div>
-						<div ng-click="addRole('cstl-admin')">Add admin role</div>					</div>
-
-
-
+						<div ng-click="addRole('cstl-admin')">Add admin role</div>					
+					</div>
+					
 					<button type="submit" ng-disabled="form.$invalid"
 						class="btn btn-primary" translate="settings.form.button">Save</button>
 				</form>
@@ -92,8 +91,7 @@
 			</div>
 		</div>
 		<div class="modal-footer">
-			<button type="button" id="cancelButton" class="btn btn-default"
-				ng-click="close()">Close</button>
+			<button type="button" id="cancelButton" class="btn btn-default" translate="settings.form.button.close" ng-click="close()">Close</button>
 			<button ng-show="$parent.allowNext" type="button" id="nextButton"
 				class="btn btn-primary" ng-click="next();">Next</button>
 			<button ng-show="$parent.allowSubmit" type="button" id="submitButton"

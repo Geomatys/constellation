@@ -984,7 +984,16 @@
             "button": "Sauvegarder",
             "email": "Email",
             "firstname": "Prénom",
-            "lastname": "Nom"
+            "lastname": "Nom",
+            "login":"Identifiant",
+            "roles":"Rôles",
+            "login.placeholder": "Votre identifiant",
+            "password.placeholder": "Votre mot de passe",
+            "firstname.placeholder": "Votre prénom",
+            "lastname.placeholder": "Votre Nom",
+            "email.placeholder": "Votre e-mail",
+            "button.close":"Annuler",
+            "modal.title": "Nouvel utilisateur"
         },
         "messages": {
             "error": "<strong>Une erreur est survenue !</strong> Votre profil ne peut pas être sauvegardé.",
@@ -1065,7 +1074,14 @@
     "page.header.title":{
         "webservices":"Dashboard de gestion des services",
         "data":"Dashboard de gestion des données",
-        "style":"Dashboard de gestion des styles"
+        "style":"Dashboard de gestion des styles",
+        "contact": "Contact"
     },
-    "style.information.title":"Styles sisponibles"
+    "style.information.title":"Styles sisponibles",
+    "users": {
+      "add": "Ajouter un utilisateur",
+      "title": "Gestion des utilisateurs",
+      "count": "Il y a {{ total }} Utilisateurs.",
+      "filter": "Filtrer: "
+    }
 }

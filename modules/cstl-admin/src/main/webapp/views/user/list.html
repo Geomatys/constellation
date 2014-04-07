@@ -1,14 +1,13 @@
 <div class="logo-wrapper row">
-    <div class="col-sm-3">
-        <a href="#"><img src="images/constellation.png"></a>
+    <div class="col-sm-9">
+        <h3 class="header-title" translate="users.title">Users</h3>
     </div>
     <!-- Menu to create services -->
-    <div class="col-sm-3 col-sm-offset-6">
+    <div class="col-sm-3">
         <div ng-click="add()" class="dropdown pull-right">
             <a  data-toggle="dropdown" class="btn btn-info btn-lg" style="margin-top:8px;padding:15px 19px;">
                 <span class="icon-plus icon-white" style="margin-right:5px;"></span>
-                <span translate="users.add">Ajouter une donnée</span>
-                <span class="caret"></span>
+                <span translate="users.add">Add user</span>
             </a>
           
         </div>
@@ -16,43 +15,40 @@
 </div>
 
 <div class="container">
-	<h2 translate="users.title">Users</h2>
+	<div class="row">
+		<div class="col-sm-6 col-md-5 col-lg-4 user-count-bloc">
+			<p translate="users.count" translate-values="{total: '{{ list.length }}'}">There are {{list.length }} users.</p>
+			{{'users.filter' | translate}} <input type="text" ng-model="filter" class="form-control" maxlength="10" >
+		</div>
+	</div>
+	<div class="row">
+		<table class="table table-condensed table-striped table-bordered table-responsive user-table">
+			<thead>
+				<tr title="click to order">
+					<td ng-click="predicate = 'login'; reverse=!reverse"
+						translate="settings.form.login">Login</td>
+					<td ng-click="predicate = 'firstname'; reverse=!reverse"
+						translate="settings.form.firstname">First name</td>
+					<td ng-click="predicate = 'lastname'; reverse=!reverse"
+						translate="settings.form.lastname">Last name</td>
+					<td ng-click="predicate = 'email'; reverse=!reverse"
+						translate="settings.form.email">E-mail</td>
+					<td ng-click="predicate = 'roles'; reverse=!reverse"
+						translate="settings.form.roles">Roels</td>
+				</tr>
+			</thead>
 
-	<p translate="users.count"
-		translate-values="{total: '{{ list.length }}'}">There are {{
-		list.length }} users.</p>
+			<tr ng-click="details($index)" style='cursor:pointer'
+				ng-repeat="user in list | filter:filter | orderBy:predicate:reverse">
+				<td>{{user.login}}</td>
+				<td>{{user.firstname}}</td>
+				<td>{{user.lastname}}</td>
+				<td>{{user.email}}</td>
+				<td><span ng-repeat="role in user.roles">{{role}}</span>
+				</td>
+				<td class="user-delete" ng-click="delete($index)"><span class="glyphicon glyphicon-trash"></span></td>
 
-	{{'users.filter' | translate}} <input type="text" ng-model="filter"
-		class="form-control" maxlength="10" >
-
-	<table
-		class="table table-condensed table-striped table-bordered table-responsive">
-		<thead>
-			<tr title="click to order">
-				<td ng-click="predicate = 'login'; reverse=!reverse"
-					translate="settings.form.login">Name</td>
-				<td ng-click="predicate = 'firstname'; reverse=!reverse"
-					translate="settings.form.firstname">Name</td>
-				<td ng-click="predicate = 'lastname'; reverse=!reverse"
-					translate="settings.form.lastname">Name</td>
-				<td ng-click="predicate = 'email'; reverse=!reverse"
-					translate="settings.form.email">Name</td>
-				<td ng-click="predicate = 'roles'; reverse=!reverse"
-					translate="settings.form.roles">Name</td>
 			</tr>
-		</thead>
-
-		<tr ng-click="details($index)" style='cursor:pointer'
-			ng-repeat="user in list | filter:filter | orderBy:predicate:reverse">
-			<td>{{user.login}}</td>
-			<td>{{user.firstname}}</td>
-			<td>{{user.lastname}}</td>
-			<td>{{user.email}}</td>
-			<td><span ng-repeat="role in user.roles">{{role}}</span>
-			</td>
-			<td ng-click="delete($index)">Delete</td>
-
-		</tr>
-	</table>
-
+		</table>
+	</div>
 </div>

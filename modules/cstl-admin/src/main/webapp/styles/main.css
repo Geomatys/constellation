@@ -9,14 +9,14 @@
     background-repeat: repeat-x;
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff515151', endColorstr='#ff000000', GradientType=0);
     border-color: #252525;
-    height:60px;
+    height:47px;
 }
 li>a {
     cursor: pointer;
 }
 .header .nav>li>a {
     color:#e3e3e3;
-    margin-top: 8px;
+    margin-top: 3px;
 }
 .header .nav>li>a:hover, .header .nav>li>a:focus, .header .nav>li.open>a {
     color:#6f6f6f;
@@ -132,6 +132,7 @@ ul.unstyled {
 }
 .header-title{
     color:#5e5e5e;
+    margin-left: 20px;
 }
 /*
  * Service
@@ -188,7 +189,7 @@ ul.unstyled {
     line-height: 20px;
 }
 #brand{
-    height: 46px;
+    height: 33px;
     margin-bottom: 5px;
     margin-top: 5px;
     margin-left: 20px;
@@ -703,6 +704,46 @@ a.btn-push-right {
 .row .form-separator {
     border-top: 1px solid #eeeeee;
     padding-bottom: 20px;
+}
+/*
+Users
+*/
+.user-count-bloc{
+    background-color: #e3e3e3;
+    padding: 10px 20px;
+    border-radius: 5px;
+    margin-bottom:20px;
+    border: solid 2px #dddddd;
+}
+table.user-table{
+    border:none;
+}
+table.user-table tr{
+    height: 40px;
+}
+table.user-table thead tr td {
+    font-weight: bold;
+    border: none;
+    border-bottom: solid 2px #dddddd;
+}
+table.user-table tr>td{
+    padding-top:10px;
+    padding-left:15px;
+}
+table.user-table tbody>tr>td.user-delete{
+    background-color: transparent;
+    border: none;
+}
+.modal-header{
+    min-height: 56px;
+}
+/*contact*/
+.contact-form{
+    background-color: #e3e3e3;
+    padding: 20px;
+    border-radius: 5px;
+    margin-bottom:20px;
+    border: solid 2px #dddddd;
 }
 @media (max-width: 991px)  {
     .service-button{

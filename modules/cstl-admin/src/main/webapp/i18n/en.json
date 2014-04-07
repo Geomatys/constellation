@@ -615,7 +615,11 @@
             "email": "E-mail",
             "roles": "Roles",
             "email.placeholder": "Your e-mail",
-            "button": "Save"
+            "button": "Save",
+            "login.placeholder": "Your login",
+            "password.placeholder": "Your password",
+            "button.close":"Cancel",
+            "modal.title": "New User"
         },
         "messages": {
             "error": "<strong>An error has occured!</strong> Settings could not be saved.",
@@ -803,14 +807,15 @@
     "page.header.title":{
         "webservices":"Services Dashboard",
         "data":"Data Dashboard",
-        "style":"Styles Dashboard"
+        "style":"Styles Dashboard",
+        "contact": "Contact"
     },
     "com.codahale.metrics.servlet.AbstractInstrumentedFilter.requests": "Metrics",
     "org.constellation.map.ws.DefaultWMSWorker.getCapabilities": "WMS(getCapabilies)",
     "org.constellation.map.ws.DefaultWMSWorker.getMap": "WMS(getMap)",
     "users": {
-      "add": "Add",
-      "title": "Users",
+      "add": "Add user",
+      "title": "Users Dashboard",
       "count": "There are {{ total }} users.",
       "filter": "User filter: "
     }
