@@ -60,7 +60,7 @@
             <div class="row">
               <div class="col-sm-10 col-sm-offset-2">
                 <button type="button" ng-click="display = !display" class="btn btn-sm btn-primary">
-                  <span class="glyphicon glyphicon-plus"></span>
+                  <span class="glyphicon" ng-class="{'glyphicon-plus': !display, 'glyphicon-minus': display}"></span>
                 </button>
               </div>
             </div>
@@ -71,18 +71,30 @@
           <form class="form-horizontal" role="form">
             <div class="form-group">
               <label class="col-xs-12 col-sm-4 col-md-2 control-label">Angles</label>
-              <div class="col-sm-8 btn-group">
-                <button type="button" class="btn btn-default"><img src="images/jointure2.png"></button>
-                <button type="button" class="btn btn-default"><img src="images/jointure3.png"></button>
-                <button type="button" class="btn btn-default"><img src="images/jointure1.png"></button>
+              <div class="col-sm-8 btn-group" data-toggle="buttons">
+                <label class="btn btn-default">
+                  <input type="radio" class="btn btn-default"><img src="images/jointure2.png">
+                </label>
+                <label class="btn btn-default">
+                  <input type="radio" class="btn btn-default"><img src="images/jointure3.png">
+                </label>
+                <label class="btn btn-default">
+                  <input type="radio" class="btn btn-default"><img src="images/jointure1.png">
+                </label>
               </div>
             </div>
             <div class="form-group">
               <label class="col-xs-12 col-sm-4 col-md-2 control-label">Jointures</label>
-              <div class="col-sm-8 btn-group">
-                <button type="button" class="btn btn-default" ng-model="radioModel" btn-radio="'Left'"><img src="images/angle1.png"></button>
-                <button type="button" class="btn btn-default" ng-model="radioModel" btn-radio="'Middle'"><img src="images/angle2.png"></button>
-                <button type="button" class="btn btn-default" ng-model="radioModel" btn-radio="'Right'"><img src="images/angle3.png"></button>
+              <div class="col-sm-8 btn-group" data-toggle="buttons">
+                <label class="btn btn-default">
+                  <input type="radio" class="btn btn-default" ng-model="radioModel" btn-radio="'Left'"><img src="images/angle1.png">
+                </label>
+                <label class="btn btn-default">
+                  <input type="radio" class="btn btn-default" ng-model="radioModel" btn-radio="'Middle'"><img src="images/angle2.png">
+                </label>
+                <label class="btn btn-default">
+                  <input type="radio" class="btn btn-default" ng-model="radioModel" btn-radio="'Right'"><img src="images/angle3.png">
+                </label>
               </div>
             </div>
             <div class="form-group">

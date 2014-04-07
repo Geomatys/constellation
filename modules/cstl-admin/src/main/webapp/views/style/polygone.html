@@ -27,15 +27,17 @@
             </div>
             <div class="form-group">
               <label class="col-sm-3 col-md-2 control-label">Type</label>
-              <div class="col-sm-9 col-md-4">
-                <select ng-model="bgType" class="form-control">
-                  <option>Plein</option>
-                  <option value="pattern">Pattern 1</option>
-                  <option value="pattern">Pattern 2</option>
-                  <option value="pattern">Pattern 3</option>
-                  <option value="pattern">Pattern 4</option>
+              <div class="col-sm-3 col-md-2">
+                <select ng-model="bgType" class="form-control" id="select" onchange="change();">
+                  <option style="active background-image:url('images/pattern-plein.png'); no-repeat; width:60px; height:30px;"></option>
+                  <option value="pattern" style="background-image:url('images/pattern-rayures-horiz.png'); no-repeat; width:60px; height:30px;"></option>
+                  <option value="pattern" style="background-image:url('images/pattern-rayures-vert.png'); no-repeat; width:60px; height:30px;"></option>
+                  <option value="pattern" style="background-image:url('images/pattern-rayures-diago.png'); no-repeat; width:60px; height:30px;"></option>
+                  <option value="pattern" style="background-image:url('images/pattern-carreaux.png'); no-repeat; width:60px; height:30px;"></option>
+                  <option value="pattern" style="background-image:url('images/pattern-cases.png'); no-repeat; width:60px; height:30px;"></option>
                 </select>
               </div>
+
               <div class="col-sm-6" ng-show=" bgType=='pattern' ">
                 <label class="control-label">Couleur du pattern</label>
                 <input type='text' name="picker" class="picker" />
@@ -644,4 +646,41 @@
         preferredFormat: "hex",
         showButtons: false
     });
+
+    function change() {
+ 
+select = document.getElementById("select");
+select_s = select.style;
+ 
+switch(select.selectedIndex) {
+ 
+case 0 :
+select_s.background = "url('images/pattern-plein.png') no-repeat";
+break;
+ 
+case 1 :
+select_s.background = "url('images/pattern-rayures-horiz.png') no-repeat";
+break;
+ 
+case 2 :
+select_s.background = "url('images/pattern-rayures-vert.png') no-repeat";
+break;
+ 
+case 3 :
+select_s.background = "url('images/pattern-rayures-diago.png') no-repeat";
+break;
+
+case 4 :
+select_s.background = "url('images/pattern-carreaux.png') no-repeat";
+break;
+ 
+case 5 :
+select_s.background = "url('images/pattern-cases.png') no-repeat";
+break;
+
+default:
+select_s.background = "url('images/pattern-plein.png') no-repeat";
+break;
+}
+}
 </script>

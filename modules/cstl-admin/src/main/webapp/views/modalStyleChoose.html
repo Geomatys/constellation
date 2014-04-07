@@ -2,19 +2,20 @@
 <link rel='stylesheet' href='styles/spectrum.css' />
 <script src="scripts/spectrum.js"></script>
 
-<div class="modal-dialog" style="width: 1024px" ng-init="initScopeStyle()">
+<div class="modal-dialog modal-dialog-sld" ng-init="initScopeStyle()">
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" ng-click="close()">×</button>
-            <h4 class="modal-title" translate="edition.style.label.viewer">Style Selection</h4>
+            <h4 class="modal-title col-xs-3 col-md-5 col-lg-6" style="font-size:16px;"translate="edition.style.label.viewer">Style Selection</h4>
+            <div class="pull-right col-xs-8 col-md-6 col-lg-5" style="margin-top:-5px;">
+            <button type="button" class="btn btn-info" ng-click="setStyleChooser('new')"><span translate="edition.style.label.choice.new">Create new style</span></button>
+                <button type="button" class="btn btn-info" ng-click="setStyleChooser('existing')"><span translate="edition.style.label.choice.existing">Use existing style</span></button>
         </div>
+        </div>
+        
         <div class="modal-body">
 
-                <button type="button" class="btn btn-info" ng-click="setStyleChooser('new')"><span translate="edition.style.label.choice.new">Create new style</span></button>
-                <button type="button" class="btn btn-info" ng-click="setStyleChooser('existing')"><span translate="edition.style.label.choice.existing">Use existing style</span></button>
-
-
-            <div class="frame dashboard" ng-show="isSelected('new')">
+            <div class="frame dashboard frame-sldEditor" ng-show="isSelected('new')">
                 <div ng-include="pageSld"/>
             </div>
             <div class="row"  ng-show="isSelected('existing')">

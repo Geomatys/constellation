@@ -8,7 +8,7 @@ body{
 	background-color: transparent;
 	font-size: 18px;
 	margin-bottom:0;
-    margin-top: 30px;
+    margin-top: 0;
 }
 .breadcrumb > li.active{
 	color:#222;
@@ -24,7 +24,9 @@ h3{
 	font-size: 15px;
 	font-weight: bold;
 }
-
+.frame-sldEditor{
+    box-shadow: none;
+}
 /*choix type*/
 .choix_type{
 	height: 150px;
@@ -101,6 +103,10 @@ a.choix_type:hover{
 	background-color: transparent;
 	border: none;
 }
+.slider{
+	width: 100%;
+	margin-top: 9px;
+}
 /*raster*/
 .bande_rouge{
     background-color: rgba(221, 81, 81, 0.5) ;
@@ -161,16 +167,13 @@ a.choix_type:hover{
 }
 
 /* Small devices (tablets, 768px and up) */
-@media (min-width: 768px) { 
+@media (min-width: 768px) and (max-width: 991px) { 
 	/*choix type*/
-	.modal-dialog{
+	.modal-dialog-sld{
 		width:700px;
 	}
 	.btn-editer{
 		float: right;
-	}
-	.slider{
-		margin-top:8px;
 	}
     .pointille{
         margin-top:20px;   
@@ -184,9 +187,9 @@ a.choix_type:hover{
 }
 
 /* Medium devices (desktops, 992px and up) */
-@media (min-width: 992px) { 
+@media (min-width: 992px)  and (max-width: 1199px) { 
 	/*choix type*/
-	.modal-dialog{
+	.modal-dialog-sld{
 		width:950px;
 	}
 	.text_transparent{
@@ -204,9 +207,9 @@ a.choix_type:hover{
 }
 
 /* Large devices (large desktops, 1200px and up) */
-@media (min-width: 1200) { 
+@media (min-width: 1200px) { 
 	/*choix type*/
-	.modal-dialog{
+	.modal-dialog-sld{
 		width:1024px;
 	}
  }
