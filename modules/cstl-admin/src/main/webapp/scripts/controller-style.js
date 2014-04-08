@@ -137,6 +137,15 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             DataViewer.initMap('styledMapOL');
         };
 
+        $scope.displayCurrentStyle = function() {
+            style.create({provider: 'sld'}, $scope.newStyle, function() {
+                var layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName, $scope.providerId, $scope.newStyle.name);
+                var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
+                DataViewer.layers = [layerData, layerBackground];
+                DataViewer.initMap('styledMapOL');
+            });
+        };
+
         $scope.StyleisSelected = function(){
             if ($scope.selected != null){
                 $scope.showLayerWithStyle($scope.selected.Name);
