@@ -165,7 +165,48 @@ a.choix_type:hover{
 .center button{
     margin-top: 2px;
 }
-
+.bouton-choix-style{
+	margin-top:-5px;
+}
+.bouton-choix-style-normal{
+	background-color: #ffffff;
+	border-color: #cccccc;
+	color:#000000;
+}
+.bouton-choix-style-normal:hover, .bouton-choix-style-normal:focus{
+	background-color: #ebebeb;
+	border-color: #adadad;
+	color:#000000;
+}
+.bouton-choix-style-selected{
+	background-color: #428bcc;
+	border-color: #357ebd;
+	color:white;
+}
+.bouton-choix-style-selected:hover, .bouton-choix-style-selected:focus{
+	background-color: #3276b1;
+	border-color: #285e8e;
+	color:white;
+}
+img.remplissage_type{
+	width:30px;
+	height: 20px;
+}
+img.img_icone{
+	width:16px;
+	height: 16px;
+}
+img.img_palette{
+	width: 117px;
+	height: 20px;
+}
+ul.dropdown-images li{
+	padding: 5px 0;
+	text-align: center;
+}
+ul.dropdown-images li a:hover{
+	background-color: #428bcc;
+}
 /* Small devices (tablets, 768px and up) */
 @media (min-width: 768px) and (max-width: 991px) { 
 	/*choix type*/
@@ -182,8 +223,15 @@ a.choix_type:hover{
         width:16px;
     }
     .sous_bloc_apercu_grand{
-    min-height:300px;
-}
+	    min-height:300px;
+	}
+	.bouton-choix-style{
+		padding-left:140px;
+	}
+	img.img_palette{
+		width: 117px;
+		height: 20px;
+	}
 }
 
 /* Medium devices (desktops, 992px and up) */
@@ -204,6 +252,12 @@ a.choix_type:hover{
     .symboles_bloc_div{
 	padding-left: 0;
 	}
+	.bouton-choix-style{
+		padding-left:160px;
+	}
+	img.img_palette{
+		width: 368px;
+	}
 }
 
 /* Large devices (large desktops, 1200px and up) */
@@ -211,5 +265,11 @@ a.choix_type:hover{
 	/*choix type*/
 	.modal-dialog-sld{
 		width:1024px;
+	}
+	.bouton-choix-style{
+		padding-left:115px;
+	}
+	img.img_palette{
+		width: 410px;
 	}
  }

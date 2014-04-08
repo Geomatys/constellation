@@ -2,7 +2,14 @@
     <li><a ng-click="$parent.pageSld = 'views/style/vectors.html'">Choix du type</a></li>
     <li class="active">Edition du style</li>
 </ol>
-
+<div class="style_bloc">
+  <div class="form-group col-xs-12" style="margin: 6px 0; height:35px;">
+    <label class="col-sm-3 col-md-2 control-label" style="margin-top: 8px;">Nom du style</label>
+    <div class="col-sm-9 col-md-4">
+        <input type="text" class="form-control" >
+    </div>
+  </div>
+</div>
 <ul class="nav nav-tabs" ng-init="chosenTab = 'simple'">
     <li ng-class="{active: chosenTab==='simple'}"><a ng-click="chosenTab = 'simple'" data-toggle="tab">Editeur simple</a></li>
     <li ng-class="{active: chosenTab==='advanced'}"><a ng-click="chosenTab = 'advanced'" data-toggle="tab">Editeur avancé</a></li>

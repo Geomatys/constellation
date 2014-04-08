@@ -2,7 +2,14 @@
     <li><a ng-click="$parent.pageSld = 'views/style/vectors.html'">Choix du type</a></li>
     <li class="active">Edition du style</li>
 </ol>
-
+<div class="style_bloc">
+  <div class="form-group col-xs-12" style="margin: 6px 0; height:35px;">
+    <label class="col-sm-3 col-md-2 control-label" style="margin-top: 8px;">Nom du style</label>
+    <div class="col-sm-9 col-md-4">
+        <input type="text" class="form-control" >
+    </div>
+  </div>
+</div>
 <ul class="nav nav-tabs" ng-init="chosenTab = 'simple'">
     <li ng-class="{active: chosenTab==='simple'}"><a ng-click="chosenTab = 'simple'" data-toggle="tab">Editeur simple</a></li>
     <li ng-class="{active: chosenTab==='advanced'}"><a ng-click="chosenTab = 'advanced'" data-toggle="tab">Editeur avancé</a></li>
@@ -365,14 +372,16 @@
     <div class="row">
       <div class="col-xs-12 col-sm-6 col-md-8">
         <h2>Edition du style</h2>
-        <div class="style_bloc">
-          <div class="btn-group">
-            <button ng-click="classification_ligne='unique'" type="button" class="btn btn-default">Valeur unique</button>
-            <button ng-click="classification_ligne='intervalle'" type="button" class="btn btn-default">Intervalle de valeurs</button>
-          </div>
+        <div class="style_bloc" style="min-height:60px;">
+                <div class="col-sm-9 col-md-10 btn-group" style="margin-bottom:20px;" ng-init="classification_ligne='unique'" data-toggle="buttons">
+                    <label ng-class="{active: classification_ligne==='unique'}" ng-click="classification_ligne='unique'" type="button" class="btn btn-default"><input type="radio" value="unique">Valeur unique</label>
+                    <label ng-class="{active: classification_ligne==='intervalle'}" ng-click="classification_ligne='intervalle'" type="button" class="btn btn-default"><input type="radio" value="intervalle">Intervalle de valeurs</label>
+                </div>
+
+
           <div ng-show="classification_ligne=='unique'">
             <form class="form_classification form-horizontal" role="form">
-             <div class="form-group">
+             <div class="form-group col-xs-12">
                 <label class="col-sm-3 col-md-2 control-label">Palette</label>
                 <div class="col-sm-9 col-md-10">
                   <select class="form-control">
@@ -384,7 +393,7 @@
                   </select>
                 </div>
               </div>
-              <div class="form-group">
+              <div class="form-group col-xs-12">
                 <label class="col-sm-3 col-md-2 control-label">Attriut</label>
                 <div class="col-sm-9 col-md-10">
                   <select class="form-control">
@@ -401,7 +410,7 @@
 
           <div ng-show="classification_ligne=='intervalle'">
             <form class="form_classification form-horizontal" role="form">
-              <div class="form-group">
+              <div class="form-group col-xs-12">
                 <label class="col-sm-3 col-md-2 control-label">Palette</label>
                 <div class="col-sm-9 col-md-10">
                   <select class="form-control">
@@ -413,7 +422,7 @@
                   </select>
                 </div>
               </div>
-              <div class="form-group">
+              <div class="form-group col-xs-12">
                 <label class="col-sm-3 col-md-2 control-label">Attriut</label>
                 <div class="col-sm-9 col-md-10">
                   <select class="form-control">
@@ -425,16 +434,14 @@
                   </select>
                 </div>
               </div>
-              <div class="form-group">
+              <div class="form-group col-xs-12">
                 <label class="col-sm-3 col-md-2 control-label">Méthode</label>
-                <div class="col-sm-9 col-md-10">
-                  <select class="form-control">
-                    <option>Quantile</option>
-                    <option>EL</option>
-                  </select>
+                <div class="col-sm-9 col-md-10 btn-group" data-toggle="buttons">
+                    <label class="btn btn-default"><input type="radio" value="quantile">Quantile</label>
+                    <label class="btn btn-default"><input type="radio" value="el">EL</label>
                 </div>
               </div>
-              <div class="form-group">
+              <div class="form-group col-xs-12">
                 <label for="intervalles" class="col-sm-3 col-md-2 control-label">Intervalles</label>
                 <div class="col-xs-4">
                   <input type="number" class="form-control" value=1 id="intervalles">
@@ -448,11 +455,13 @@
       </div>
       <div class="col-xs-12 col-sm-6 col-md-4">
           <div class="row div-apercu">
-        <div class="btn-group col-xs-12">
-            <button ng-click="apercu_ligne=1" type="button" class="col-xs-8 btn btn-apercu btn-default">Apercu du style</button>
-            <button ng-click="apercu_ligne=2" type="button" class="col-xs-4 btn btn-apercu btn-default">Modèle</button>
-          </div>
-              </div>
+            <div class="col-xs-12">
+              <div class="col-sm-9 col-md-10 btn-group" data-toggle="buttons" ng-init="apercu_ligne=1">
+                <label ng-class="{active: apercu_ligne===1}" ng-click="apercu_ligne=1" type="button" class="col-xs-8 btn btn-apercu btn-default"><input type="radio" value="unique">Apercu du style</label>
+                <label ng-class="{active: apercu_ligne===2}" ng-click="apercu_ligne=2" type="button" class="col-xs-4 btn btn-apercu btn-default"><input type="radio" value="intervalle">Modèle</label>
+              </div> 
+            </div>
+           </div>
         <div class="row div-apercu">
             <div class="bloc_apercu">
                 <div ng-class="{'sous_bloc_apercu': apercu_ligne==1, 'sous_bloc_apercu_grand': apercu_ligne==2}" class="sous_bloc_apercu">
