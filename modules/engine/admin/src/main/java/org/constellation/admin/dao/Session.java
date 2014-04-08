@@ -161,6 +161,7 @@ public final class Session implements Closeable {
     private static final String UPDATE_SERVICE_CONFIG       = "service.update.config";
     private static final String UPDATE_SERVICE_EXTRA_CONFIG = "service.update.extra.config";
     private static final String UPDATE_SERVICE_METADATA     = "service.update.metadata";
+    private static final String UPDATE_SERVICE_ISO_METADATA = "service.update.iso_metadata";
     private static final String DELETE_SERVICE              = "service.delete";
     private static final String DELETE_SERVICE_METADATA     = "service.delete.metadata";
     private static final String DELETE_SERVICE_EXTRA_CONFIG = "service.delete.extra.config";
@@ -925,6 +926,15 @@ public final class Session implements Closeable {
 
         // Proceed to insertion.
         new Query(WRITE_SERVICE_METADATA).with(record.id, lang, metadata, isoMetadata).insert();
+    }
+    
+    public void writeServiceIsoMetadata(final String identifier, final Specification spec, final StringReader isoMetadata, final String lang) throws SQLException {
+        ensureNonNull("identifier", identifier);
+        ensureNonNull("spec",       spec);
+
+        final ServiceRecord record = readService(identifier, spec);
+
+        new Query(UPDATE_SERVICE_ISO_METADATA).with(isoMetadata, record.id, lang).update();
     }
 
     /* internal */ void updateService(final int generatedId, final String newIdentifier, final Specification newType, final String newOwner) throws SQLException {

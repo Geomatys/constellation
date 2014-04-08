@@ -42,6 +42,7 @@ import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.OnlineResource;
 import org.opengis.metadata.citation.Role;
 import org.opengis.metadata.constraint.LegalConstraints;
+import org.opengis.metadata.distribution.DigitalTransferOptions;
 import org.opengis.metadata.distribution.Distribution;
 import org.opengis.metadata.identification.Identification;
 import org.opengis.metadata.identification.Keywords;
@@ -537,8 +538,43 @@ public class MetadataFeeder {
             DefaultDigitalTransferOptions dto = new DefaultDigitalTransferOptions();
             dto.setOnLines(Collections.singleton(new DefaultOnlineResource(new URI(url))));
             addWithoutDoublon(dist.getTransferOptions(), Collections.singleton(dto));
-        } catch (Exception e) {
+        } catch (URISyntaxException e) {
             LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+        }
+    }
+    
+    public void updateServiceURL(final String url) {
+        final Collection<Identification> idents = eater.getIdentificationInfo();
+        ServiceIdentificationImpl servIdent = null;
+        for (Identification ident : idents) {
+            if (ident instanceof ServiceIdentificationImpl) {
+                servIdent = (ServiceIdentificationImpl) ident;
+            }
+        }
+        if (servIdent != null) {
+            for (OperationMetadata om : servIdent.getContainsOperations()) {
+                for (OnlineResource or : om.getConnectPoint()) {
+                    final DefaultOnlineResource resource = (DefaultOnlineResource) or;
+                    try {
+                        resource.setLinkage(new URI(url));
+                    } catch (URISyntaxException ex) {
+                        LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+                    }
+                }
+            }
+        }
+        Distribution dist = eater.getDistributionInfo();
+        if (dist != null) {
+            for (DigitalTransferOptions dto : dist.getTransferOptions()) {
+                for (OnlineResource or : dto.getOnLines()) {
+                    final DefaultOnlineResource resource = (DefaultOnlineResource) or;
+                    try {
+                        resource.setLinkage(new URI(url));
+                    } catch (URISyntaxException ex) {
+                        LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+                    }
+                }
+            }
         }
     }
     

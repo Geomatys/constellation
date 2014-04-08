@@ -41,8 +41,7 @@ public class CstlMetadatas {
      * 
      * @return DefaultMetadata a new metadata for the service with given identifier.
      */
-    public static DefaultMetadata defaultServiceMetadata(final String serviceIdentifier, final String serviceType, final String cstlURL, final Service serviceInfo)
-    {
+    public static DefaultMetadata defaultServiceMetadata(final String serviceIdentifier, final String serviceType, final String cstlURL, final Service serviceInfo) {
         final String serviceID = getMetadataIdForService(serviceIdentifier, serviceType);
         final DefaultMetadata metadata = defaultServiceMetadata(serviceID, serviceInfo);
         
@@ -55,6 +54,11 @@ public class CstlMetadatas {
         return metadata;
     }
     
+    public static void updateServiceMetadata(final String serviceIdentifier, final String serviceType, final String cstlURL, final DefaultMetadata metadata) {
+        final MetadataFeeder feeder = new MetadataFeeder(metadata);
+        final String serviceURL = cstlURL + "/WS/" + serviceType.toLowerCase() + '/' + serviceIdentifier;
+        feeder.updateServiceURL(serviceURL);
+    }
     
     public static String getMetadataIdForService(final String serviceName, final String serviceType){
         ArgumentChecks.ensureNonNull("serviceName", serviceName);

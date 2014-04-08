@@ -63,6 +63,7 @@ import org.constellation.util.Util;
 import org.constellation.utils.CstlMetadataTemplate;
 import org.constellation.utils.CstlMetadatas;
 import org.constellation.utils.ISOMarshallerPool;
+import org.constellation.utils.MetadataFeeder;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.parameter.GeneralParameterValue;
@@ -455,11 +456,44 @@ public class ConfigurationEngine {
                 session.updateProperty(key, value);
             }
             
+            // update metadata when service URL key is updated
+            if (SERVICES_URL_KEY.equals(key)) {
+                updateServiceUrlForMetadata(value);
+            }
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, "An error occurred getting constellation property", ex);
         } finally {
-            if (session != null)
+            if (session != null) {
                 session.close();
+            }
+        }
+    }
+    
+    private static void updateServiceUrlForMetadata(final String url) {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            final List<ServiceRecord> records = session.readServices();
+            for (ServiceRecord record : records) {
+                if (record.hasIsoMetadata()) {
+                    final Unmarshaller um = ISOMarshallerPool.getInstance().acquireUnmarshaller();
+                    final DefaultMetadata servMeta = (DefaultMetadata) um.unmarshal(record.getIsoMetadata("eng"));
+                    ISOMarshallerPool.getInstance().recycle(um);
+                    CstlMetadatas.updateServiceMetadata(record.getIdentifier(), record.getType().name(), url, servMeta);
+                    
+                    final StringWriter swIso = new StringWriter();
+                    final Marshaller mi = ISOMarshallerPool.getInstance().acquireMarshaller();
+                    mi.marshal(servMeta, swIso);
+                    ISOMarshallerPool.getInstance().recycle(mi);
+                    record.setIsoMetadata("eng", new StringReader(swIso.toString()));
+                }
+            }
+        } catch (SQLException | JAXBException | IOException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred updating service URL", ex);
+        } finally {
+            if (session != null) {
+                session.close();
+            }
         }
     }
 
