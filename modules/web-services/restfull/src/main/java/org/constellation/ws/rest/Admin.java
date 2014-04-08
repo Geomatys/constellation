@@ -8,11 +8,13 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.constellation.ServiceDef.Specification;
+import org.constellation.api.CommonConstants;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
@@ -21,6 +23,7 @@ import org.constellation.configuration.ServiceConfigurer;
 import org.constellation.configuration.ServiceReport;
 import org.constellation.configuration.ws.rs.ConfigurationUtilities;
 import org.constellation.dto.Configuration;
+import org.constellation.dto.SimpleValue;
 import org.constellation.ogc.configuration.OGCConfigurer;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.WSEngine;
@@ -70,6 +73,30 @@ public class Admin {
     @Path("configurationLocation")
     public Response configurationPath(final Configuration configuration) throws CstlServiceException {
         return Response.ok(ConfigurationUtilities.setConfigPath(configuration.getPath())).build();
+    }
+    
+    /**
+     *
+     * @return the value of the constellation property
+     * @throws CstlServiceException
+     */
+    @GET
+    @Path("property/{key}")
+    public Response getKey(@PathParam("key") String key) throws CstlServiceException {
+        return Response.ok(new SimpleValue(ConfigurationUtilities.getProperty(key))).build();
+    }
+
+    /**
+     * Set a constellation property
+     * 
+     * @return an {@link AcknowlegementType} on {@link Response} to know operation state
+     * @throws CstlServiceException
+     */
+    @POST
+    @Path("property/{key}")
+    public Response setKey(@PathParam("key") String key, final SimpleValue value) throws CstlServiceException {
+        ConfigurationUtilities.setProperty(key, value.getValue());
+        return Response.ok(new AcknowlegementType(CommonConstants.SUCCESS, "the key have been set")).build();
     }
 
     /**

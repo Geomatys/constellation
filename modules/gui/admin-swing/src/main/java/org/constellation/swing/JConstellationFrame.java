@@ -67,6 +67,7 @@ public final class JConstellationFrame extends JFrame{
                 new ProviderDeleteAction()));
         pane.add("Utils", new JUtilsPane(
                 server,
+                serverV2,
                 (FrameDisplayer)null));
         setContentPane(pane);
     }

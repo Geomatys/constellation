@@ -18,24 +18,32 @@
 package org.constellation.admin.service;
 
 
-import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
-import static org.apache.sis.util.ArgumentChecks.ensureStrictlyPositive;
-
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.ClientRequestContext;
+import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import static org.apache.sis.util.ArgumentChecks.ensureStrictlyPositive;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.AcknowlegementType;
 import org.glassfish.jersey.client.ClientConfig;
@@ -84,6 +92,11 @@ public final class ConstellationClient {
      * API methods related to csw administration.
      */
     public final CswAPI csw;
+    
+    /**
+     * API methods related to constellation administration.
+     */
+    public final AdminAPI admin;
 
     /**
      * Creates a new client instance ready to communicate with the Constellation server.
@@ -117,6 +130,7 @@ public final class ConstellationClient {
         this.services   = new ServicesAPI(this);
         this.providers  = new ProvidersAPI(this);
         this.csw        = new CswAPI(this);
+        this.admin      = new AdminAPI(this);
     }
 
     public String getUrl() {
@@ -130,11 +144,63 @@ public final class ConstellationClient {
      * @param password the user password
      * @return the {@link ConstellationClient} instance
      */
-    public ConstellationClient auth(final String login, final String password) {
+    public ConstellationClient basicAuth(final String login, final String password) {
         ensureNonNull("login",    login);
         ensureNonNull("password", password);
         this.client.register(new HttpBasicAuthFilter(login, password));
         return this;
+    }
+    
+    public ConstellationClient auth(final String login, final String password) {
+
+        String str = url + "j_spring_security_check?";
+        InputStream stream = null;
+        HttpURLConnection cnx = null;
+        try {
+            final URL url = new URL(str);
+            cnx = (HttpURLConnection) url.openConnection();
+            cnx.setDoOutput(true);
+            cnx.setInstanceFollowRedirects(false);
+
+            final OutputStream os = cnx.getOutputStream();
+            final String s = "j_username=" + login + "&j_password=" + password;
+            os.write(s.getBytes());
+
+            stream = cnx.getInputStream();
+
+            String cookie = cnx.getHeaderField("Set-Cookie");
+            Pattern pattern = Pattern.compile("JSESSIONID=([^;]+);.*");
+            Matcher matcher = pattern.matcher(cookie);
+            if(matcher.matches()){
+               final String cookieValue = "JSESSIONID=" + matcher.group(1);
+               System.out.println("cookie=" + cookieValue);
+               this.client.register(new ClientRequestFilter() {
+                    private List<Object> cookies = Arrays.asList((Object)cookieValue);
+
+                    @Override
+                    public void filter(ClientRequestContext request) throws IOException {
+                        if (cookies != null) {
+                            request.getHeaders().put("Cookie", cookies);
+                        }
+                    }
+                });
+               return this;
+            }
+        } catch (Exception ex) {
+            LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
+        } finally {
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException ex) {
+                    LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+                }
+            }
+            if (cnx != null) {
+                cnx.disconnect();
+            }
+        }
+        return null;
     }
 
     /**

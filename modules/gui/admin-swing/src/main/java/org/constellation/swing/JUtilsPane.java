@@ -1,12 +1,26 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ *    Constellation - An open source and standard compliant SDI
+ *    http://www.constellation-sdi.org
+ *
+ *    (C) 2014, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
  */
 
 package org.constellation.swing;
 
+import java.io.IOException;
+import org.constellation.admin.service.ConstellationClient;
 import org.constellation.admin.service.ConstellationServer;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -16,20 +30,31 @@ public class JUtilsPane extends javax.swing.JPanel {
 
     private final FrameDisplayer displayer;
     private final ConstellationServer cstl;
+    private final ConstellationClient cstlv2;
     
     /**
      * Creates new form JUtilsPane
      * @param cstl
      * @param displayer
      */
-    public JUtilsPane(final ConstellationServer cstl, final FrameDisplayer displayer) {
+    public JUtilsPane(final ConstellationServer cstl, final ConstellationClient cstlv2, final FrameDisplayer displayer) {
         initComponents();
-        if(displayer == null){
+        if (displayer == null) {
             this.displayer = new DefaultFrameDisplayer();
         } else {
             this.displayer = displayer;
         }
         this.cstl = cstl;
+        this.cstlv2 = cstlv2;
+
+        try {
+            final String currentURL = cstlv2.admin.getProperty("services.url");
+            if (currentURL != null) {
+                this.URLField.setText(currentURL);
+            }
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
     }
 
     /**
@@ -42,6 +67,9 @@ public class JUtilsPane extends javax.swing.JPanel {
     private void initComponents() {
 
         epsgDbButton = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        URLField = new javax.swing.JTextField();
+        updatePropButton = new javax.swing.JButton();
 
         org.openide.awt.Mnemonics.setLocalizedText(epsgDbButton, org.openide.util.NbBundle.getMessage(JUtilsPane.class, "buildEpsgDatabase")); // NOI18N
         epsgDbButton.addActionListener(new java.awt.event.ActionListener() {
@@ -50,13 +78,31 @@ public class JUtilsPane extends javax.swing.JPanel {
             }
         });
 
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(JUtilsPane.class, "urlProperties")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(updatePropButton, org.openide.util.NbBundle.getMessage(JUtilsPane.class, "updateProperties")); // NOI18N
+        updatePropButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                updatePropButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(235, Short.MAX_VALUE)
-                .addComponent(epsgDbButton)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(URLField))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 223, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(epsgDbButton, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(updatePropButton, javax.swing.GroupLayout.Alignment.TRAILING))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -64,7 +110,13 @@ public class JUtilsPane extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(epsgDbButton)
-                .addContainerGap(259, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(URLField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(updatePropButton)
+                .addContainerGap(185, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -72,8 +124,22 @@ public class JUtilsPane extends javax.swing.JPanel {
         displayer.display(new JEpsgDbCreationPane());
     }//GEN-LAST:event_epsgDbButtonActionPerformed
 
+    private void updatePropButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updatePropButtonActionPerformed
+        final String currentURL = URLField.getText();
+        if (!currentURL.isEmpty()) {
+            try {
+                cstlv2.admin.setProperty("services.url", currentURL);
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        }
+    }//GEN-LAST:event_updatePropButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField URLField;
     private javax.swing.JButton epsgDbButton;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JButton updatePropButton;
     // End of variables declaration//GEN-END:variables
 }

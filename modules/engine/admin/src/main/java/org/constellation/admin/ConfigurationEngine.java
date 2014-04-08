@@ -76,6 +76,8 @@ public class ConfigurationEngine {
 
     private static final Logger LOGGER = Logging.getLogger(ConfigurationEngine.class);
 
+    public static final String SERVICES_URL_KEY = "services.url";
+    
     /**
      * TODO Temporary hack to activate JPA daos.
      */
@@ -349,7 +351,7 @@ public class ConfigurationEngine {
                 final StringReader sr = new StringReader(sw.toString());
                 
                 // ISO metadata
-                String url = null; // TODO
+                String url = getConstellationProperty(SERVICES_URL_KEY, null);
                 final DefaultMetadata isoMetadata = CstlMetadatas.defaultServiceMetadata(identifier, serviceType, url, metadata);
                 final StringWriter swIso = new StringWriter();
                 final Marshaller mi = ISOMarshallerPool.getInstance().acquireMarshaller();
@@ -440,24 +442,25 @@ public class ConfigurationEngine {
     }
 
     public static String getConstellationProperty(final String key, final String defaultValue) {
-        if (JPA)
-            return configurationService.getProperty(key, defaultValue);
-
+       return configurationService.getProperty(key, defaultValue);
+    }
+    
+    public static void setConstellationProperty(final String key, final String value) {
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
-            final String value = session.readProperty(key);
-            if (value == null) {
-                return defaultValue;
+            if (session.readProperty(key) == null) {
+                session.writeProperty(key, value);
+            } else {
+                session.updateProperty(key, value);
             }
-            return value;
+            
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, "An error occurred getting constellation property", ex);
         } finally {
             if (session != null)
                 session.close();
         }
-        return defaultValue;
     }
 
     /**

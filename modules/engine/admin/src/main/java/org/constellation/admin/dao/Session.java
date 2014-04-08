@@ -186,6 +186,7 @@ public final class Session implements Closeable {
 
     private static final String READ_PROPERTY               = "properties.read";
     private static final String WRITE_PROPERTY              = "properties.write";
+    private static final String UPDATE_PROPERTY             = "properties.update";
 
     private static final String READ_CRS                    = "crs.read";
     private static final String LIST_CRS                    = "crs.list";
@@ -1090,6 +1091,13 @@ public final class Session implements Closeable {
 
         // Proceed to insertion.
         new Query(WRITE_PROPERTY).with(key, value).insert();
+    }
+    
+    public void updateProperty(final String key, final String value) throws SQLException {
+        ensureNonNull("key", key);
+
+        // Proceed to insertion.
+        new Query(UPDATE_PROPERTY).with(value, key).update();
     }
 
 

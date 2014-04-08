@@ -375,4 +375,12 @@ public class ConfigurationUtilities {
         return new ParameterBuilder().addName("config").createGroup(providerDescriptor);
     }
 
+    public static String getProperty(final String key) {
+        return ConfigurationEngine.getConstellationProperty(key, null);
+    }
+    
+    public static void setProperty(final String key, final String value) {
+        ConfigurationEngine.setConstellationProperty(key, value);
+    }
+
 }
