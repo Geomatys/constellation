@@ -49,6 +49,7 @@ public class CstlMetadatas {
         // add specific service part
         final MetadataFeeder feeder = new MetadataFeeder(metadata);
         final String serviceURL = cstlURL + "/WS/" + serviceType.toLowerCase() + '/' + serviceIdentifier;
+        feeder.feedService(serviceInfo);
         feeder.addServiceInformation(serviceType, serviceURL);
         feeder.setServiceInstanceName(serviceIdentifier);
         return metadata;

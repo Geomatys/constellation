@@ -13,10 +13,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.sis.metadata.iso.DefaultIdentifier;
 import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.metadata.iso.citation.DefaultAddress;
 import org.apache.sis.metadata.iso.citation.DefaultCitation;
 import org.apache.sis.metadata.iso.citation.DefaultCitationDate;
+import org.apache.sis.metadata.iso.citation.DefaultContact;
 import org.apache.sis.metadata.iso.citation.DefaultOnlineResource;
 import org.apache.sis.metadata.iso.citation.DefaultResponsibleParty;
+import org.apache.sis.metadata.iso.citation.DefaultTelephone;
+import org.apache.sis.metadata.iso.constraint.DefaultLegalConstraints;
 import org.apache.sis.metadata.iso.distribution.DefaultDigitalTransferOptions;
 import org.apache.sis.metadata.iso.distribution.DefaultDistribution;
 import org.apache.sis.metadata.iso.identification.AbstractIdentification;
@@ -26,7 +30,10 @@ import org.apache.sis.util.iso.DefaultInternationalString;
 import org.apache.sis.util.iso.DefaultNameFactory;
 import org.apache.sis.util.iso.SimpleInternationalString;
 import org.apache.sis.util.logging.Logging;
+import org.constellation.dto.AccessConstraint;
+import org.constellation.dto.Contact;
 import org.constellation.dto.DataMetadata;
+import org.constellation.dto.Service;
 import org.geotoolkit.service.OperationMetadataImpl;
 import org.geotoolkit.service.ServiceIdentificationImpl;
 import org.opengis.metadata.citation.Citation;
@@ -34,6 +41,7 @@ import org.opengis.metadata.citation.CitationDate;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.OnlineResource;
 import org.opengis.metadata.citation.Role;
+import org.opengis.metadata.constraint.LegalConstraints;
 import org.opengis.metadata.distribution.Distribution;
 import org.opengis.metadata.identification.Identification;
 import org.opengis.metadata.identification.Keywords;
@@ -90,7 +98,7 @@ public class MetadataFeeder {
         }
 
         setTitle(feeded.getTitle());
-        addAbstract(feeded.getAnAbstract());
+        setAbstract(feeded.getAnAbstract());
         addContact(feeded.getUsername(), feeded.getOrganisationName(), feeded.getRole());
 
         setIdentifier(CstlMetadatas.getMetadataIdForData(feeded.getDataName()));
@@ -111,7 +119,121 @@ public class MetadataFeeder {
         addKeywords(feeded.getKeywords());
         addTopicCategory(feeded.getTopicCategory());
     }
+    
+    public void feedService(Service serviceInfo) {
+        setAbstract(serviceInfo.getDescription());
+        setTitle(serviceInfo.getName());
+        addKeywords(serviceInfo.getKeywords());
+        feedServiceContraint(serviceInfo.getServiceConstraints());
+        feedServiceContact(serviceInfo.getServiceContact());
+        
+    }
 
+    private void feedServiceContraint(final AccessConstraint constraint) {
+        if (constraint != null) {
+            final AbstractIdentification identification = (AbstractIdentification) getIdentification(eater);
+            final DefaultLegalConstraints legalConstraint = new DefaultLegalConstraints();
+            if (constraint.getAccessConstraint() != null && !constraint.getAccessConstraint().isEmpty()) {
+                final SimpleInternationalString useLim = new SimpleInternationalString(constraint.getAccessConstraint());
+                legalConstraint.setUseLimitations(Arrays.asList(useLim));
+            }
+            if (constraint.getFees() != null && !constraint.getFees().isEmpty()) {
+                final SimpleInternationalString fees = new SimpleInternationalString("Fees:" + constraint.getFees());
+                legalConstraint.setOtherConstraints(Arrays.asList(fees));
+            }
+            identification.setResourceConstraints(Arrays.asList(legalConstraint));
+        }
+    }
+    
+    private void feedServiceContact(final Contact contact) {
+        if (contact != null) {
+            final AbstractIdentification identification = (AbstractIdentification) getIdentification(eater);
+            final DefaultResponsibleParty ct = new DefaultResponsibleParty(Role.POINT_OF_CONTACT);
+            final DefaultContact cont = new DefaultContact();
+            
+            boolean hasAddress = false;
+            final DefaultAddress adr = new DefaultAddress();
+            if (contact.getAddress() != null && !contact.getAddress().isEmpty()) {
+                adr.setDeliveryPoints(Arrays.asList(contact.getAddress()));
+                hasAddress = true;
+            }
+            if (contact.getCity()!= null && !contact.getCity().isEmpty()) {
+                adr.setCity(new SimpleInternationalString(contact.getCity()));
+                hasAddress = true;
+            }
+            if (contact.getCountry()!= null && !contact.getCountry().isEmpty()) {
+                adr.setCountry(new SimpleInternationalString(contact.getCountry()));
+                hasAddress = true;
+            }
+            if (contact.getState()!= null && !contact.getState().isEmpty()) {
+                adr.setAdministrativeArea(new SimpleInternationalString(contact.getState()));
+                hasAddress = true;
+            }
+            if (contact.getZipCode()!= null && !contact.getZipCode().isEmpty()) {
+                adr.setPostalCode(contact.getZipCode());
+                hasAddress = true;
+            }
+            if (contact.getEmail()!= null && !contact.getEmail().isEmpty()) {
+                adr.setElectronicMailAddresses(Arrays.asList(contact.getEmail()));
+                hasAddress = true;
+            }
+            if (hasAddress) {
+                cont.setAddress(adr);
+            }
+            
+            if (contact.getContactInstructions() != null && !contact.getContactInstructions().isEmpty()) {
+                cont.setContactInstructions(new SimpleInternationalString(contact.getContactInstructions()));
+            }
+            if (contact.getHoursOfService() != null && !contact.getHoursOfService().isEmpty()) {
+                cont.setHoursOfService(new SimpleInternationalString(contact.getHoursOfService()));
+            }
+            
+            final DefaultTelephone phone = new DefaultTelephone();
+            boolean hasPhone = false;
+            if (contact.getPhone() != null && !contact.getPhone().isEmpty()) {
+                phone.setVoices(Arrays.asList(contact.getPhone()));
+                hasPhone = true;
+            }
+            if (contact.getFax() != null && !contact.getFax().isEmpty()) {
+                phone.setFacsimiles(Arrays.asList(contact.getFax()));
+                hasPhone = true;
+            }
+            if (hasPhone) {
+                cont.setPhone(phone);
+            }
+            
+            if (contact.getUrl() != null && !contact.getUrl().isEmpty()) {
+                try {
+                    final DefaultOnlineResource or = new DefaultOnlineResource(new URI(contact.getUrl()));
+                    cont.setOnlineResource(or);
+                } catch (URISyntaxException ex) {
+                    LOGGER.log(Level.WARNING, "unvalid URL in service contact", ex);
+                }
+            }
+            ct.setContactInfo(cont);
+            String fullName = "";
+            if (contact.getFirstname()!= null && !contact.getFirstname().isEmpty()) {
+                fullName = contact.getFirstname();
+            }
+            
+            if (contact.getLastname()!= null && !contact.getLastname().isEmpty()) {
+                fullName = fullName + " " + contact.getLastname();
+            }
+            
+            if (!fullName.isEmpty()) {
+                ct.setIndividualName(fullName);
+            }
+            
+            if (contact.getOrganisation()!= null && !contact.getOrganisation().isEmpty()) {
+                ct.setOrganisationName(new SimpleInternationalString(contact.getOrganisation()));
+            }
+            if (contact.getPosition()!= null && !contact.getPosition().isEmpty()) {
+                ct.setPositionName(new SimpleInternationalString(contact.getPosition()));
+            }
+            
+            identification.setPointOfContacts(Arrays.asList(ct));
+        }
+    }
 
     /**
      * Get IdentifiationInformation from metadata
@@ -219,9 +341,14 @@ public class MetadataFeeder {
      *
      * @param _abstract abstract we want add.
      */
-    private void addAbstract(String _abstract) {
+    private void setAbstract(String _abstract) {
         final AbstractIdentification identification = (AbstractIdentification) getIdentification(eater);
-        final InternationalString internationalizeAbstract = new DefaultInternationalString(_abstract);
+        final InternationalString internationalizeAbstract;
+        if (_abstract != null) {
+            internationalizeAbstract = new DefaultInternationalString(_abstract);
+        } else {
+            internationalizeAbstract = null;
+        }
         identification.setAbstract(internationalizeAbstract);
     }
 
