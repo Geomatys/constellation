@@ -119,6 +119,26 @@ angular.module('cstlAdminApp')
                 });
             }
         }
+    })
+
+    .directive('spectrum', function() {
+        return {
+            restrict: 'A',
+            link: function(scope, $element, attrs) {
+                $element.spectrum({
+                    color: tinycolor,
+                    showInput: true,
+                    allowEmpty: true,
+                    showAlpha: true,
+                    preferredFormat: "hex",
+                    showButtons: false
+                });
+
+                $element.on('$destroy', function() {
+                    $element.spectrum('destroy');
+                });
+            }
+        };
     });
 
 
