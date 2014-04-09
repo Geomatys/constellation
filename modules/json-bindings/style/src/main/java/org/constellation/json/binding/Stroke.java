@@ -37,6 +37,8 @@ public final class Stroke implements StyleElement<org.opengis.style.Stroke> {
     private boolean dashed = false;
     private String lineJoin = "round";
     private String lineCap = "round";
+    private float[] dashArray;
+    private String dashOffset;
 
     public Stroke() {
     }
@@ -50,6 +52,8 @@ public final class Stroke implements StyleElement<org.opengis.style.Stroke> {
         dashed  = (stroke.getDashArray() != null);
         lineJoin = stroke.getLineJoin().evaluate(null, String.class);
         lineCap = stroke.getLineCap().evaluate(null, String.class);
+        dashArray = stroke.getDashArray();
+        dashOffset = stroke.getDashOffset().evaluate(null, String.class);
     }
 
     public String getColor() {
@@ -80,6 +84,22 @@ public final class Stroke implements StyleElement<org.opengis.style.Stroke> {
         this.dashed = dashed;
     }
 
+    public float[] getDashArray() {
+        return dashArray;
+    }
+
+    public void setDashArray(float[] dashArray) {
+        this.dashArray = dashArray;
+    }
+
+    public String getDashOffset() {
+        return dashOffset;
+    }
+
+    public void setDashOffset(String dashOffset) {
+        this.dashOffset = dashOffset;
+    }
+
     public String getLineJoin() {
         return lineJoin;
     }
@@ -104,7 +124,7 @@ public final class Stroke implements StyleElement<org.opengis.style.Stroke> {
                 literal(this.width),
                 literal(this.lineJoin),
                 literal(this.lineCap),
-                dashed ? new float[]{(float) this.width * 2, (float) this.width * 2, (float) this.width * 2} : null,
-                null);
+                dashArray,
+                literal(this.dashOffset));
     }
 }

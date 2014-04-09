@@ -6,7 +6,7 @@
   <div class="form-group col-xs-12" style="margin: 6px 0; height:35px;">
     <label class="col-sm-3 col-md-2 control-label" style="margin-top: 8px;">Nom du style</label>
     <div class="col-sm-9 col-md-4">
-        <input type="text" class="form-control" >
+        <input type="text" class="form-control" ng-model="$parent.newStyle.name">
     </div>
   </div>
 </div>
@@ -31,7 +31,7 @@
                 <input type='text' name="picker" class="picker" spectrum ng-model="$parent.newStyle.rules[0].symbolizers[0].fill.color"/>
               </div>
             </div>
-            <div class="form-group">
+            <!--<div class="form-group">
               <label class="col-sm-3 col-md-2 control-label">Type</label>
               <div class="col-sm-3 col-md-2">
                 <div class="btn-group select select-block">
@@ -62,7 +62,11 @@
                   </ul>
                 </div>
               </div>
-            </div>
+              <div class="col-sm-6" ng-show=" bgType=='pattern' ">
+                <label class="control-label">Couleur du pattern</label>
+                <input type='text' name="picker" class="picker" spectrum />
+              </div>
+            </div>-->
           </form>
         </div>
         <div class="style_bloc">
@@ -83,20 +87,20 @@
             <div class="form-group">
               <label  class="col-sm-3 col-md-2 control-label">Type</label>
               <div class="col-sm-9 col-md-4">
-                <select ng-model="traitType" class="form-control">
-                  <option>Plein</option>
+                <select ng-model="traitType" class="form-control" ng-change="$parent.addStrokeDashArray(traitType)">
+                  <option value="">Plein</option>
                   <option value="pointille">Pointillé</option>
-                  <option value="stroke">Graphic stroke</option>
+                  <option value="graphic">Graphic stroke</option>
                 </select>
               </div>
               <div class="col-sm-12 col-md-6 pointille" ng-show=" traitType=='pointille' ">
                 <div class="row">
                   <div class="col-md-4 col-sm-3 col-xs-12"><label class="control-label">Format de pointillés</label></div>
-                  <div class="col-md-4 col-sm-3 col-xs-6"><input type="number" class="form-control" value=1></div>
-                  <div class="col-md-4 col-sm-3 col-xs-6"><input type="text" ctype="number" class="form-control" value=1></div>
+                  <div class="col-md-4 col-sm-3 col-xs-6"><input type="number" class="form-control" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.dashArray[0]"></div>
+                  <div class="col-md-4 col-sm-3 col-xs-6"><input type="number" class="form-control" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.dashArray[1]"></div>
                 </div>
               </div>
-              <div class="col-sm-12 col-md-6" ng-show=" traitType=='stroke' ">
+              <div class="col-sm-12 col-md-6" ng-show=" traitType=='graphic' ">
 
                     <div class="input-group">
                       <input type="text" class="form-control">
@@ -153,15 +157,9 @@
                   </div>
               </div>
             <div class="form-group">
-              <label class="col-sm-3 col-md-2 control-label">Décalage x</label>
+              <label class="col-sm-3 col-md-2 control-label">Décalage</label>
               <div class="col-sm-9 col-md-4">
-                <input type="number" class="form-control" value=0 >
-              </div>
-            </div>
-            <div class="form-group">
-              <label  class="col-sm-3 col-md-2 control-label">Décalage y</label>
-              <div class="col-sm-9 col-md-4">
-                <input type="number" class="form-control" value=0 >
+                <input type="number" class="form-control" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.dashOffset">
               </div>
             </div>
           </form>

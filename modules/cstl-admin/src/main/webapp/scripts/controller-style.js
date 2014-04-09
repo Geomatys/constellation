@@ -89,6 +89,17 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                             }]
                           };
 
+        $scope.addStrokeDashArray = function(traitType) {
+            if (traitType === 'pointille') {
+                if ($scope.newStyle.rules[0].symbolizers[0].stroke == undefined) {
+                    $scope.newStyle.rules[0].symbolizers[0].stroke = {};
+                }
+                $scope.newStyle.rules[0].symbolizers[0].stroke.dashArray = [1, 1];
+            } else {
+                $scope.newStyle.rules[0].symbolizers[0].stroke.dashArray = null;
+            }
+        };
+
         $scope.setStyleChooser = function(choice){
             $scope.stylechooser = choice;
         };
