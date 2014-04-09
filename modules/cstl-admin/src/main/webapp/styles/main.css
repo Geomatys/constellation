@@ -255,11 +255,27 @@ ul.unstyled {
     background-color: #fff;
     border: 1px solid #ddd;
     border-bottom-color: transparent;
-    font-weight: bold;
 }
-.new-service-form-label{
-    margin-top:8px;
+@media (max-width: 767px){
+    .new-service-form-label{
+        margin-top:7px;
+    }
+    .navbar-toggle .icon-bar {
+        background-color: #fff;
+    }
+    .nav-header{
+        text-align: center;
+        background-color: #3C3C3C;
+        margin-top: -3px;
+    }
 }
+@media (min-width:768px) and (max-width: 900px){
+    .nav-header-mob>li>a{
+        padding: 10px;
+        font-size:13px;
+    }
+}
+
 
 /*
  * Dashboards

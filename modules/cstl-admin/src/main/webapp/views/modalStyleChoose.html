@@ -7,7 +7,7 @@
         <div class="modal-header">
             <button type="button" class="close" ng-click="close()">×</button>
             <h4 class="modal-title col-xs-3 col-md-5 col-lg-6" style="font-size:16px;"translate="edition.style.label.viewer">Style Selection</h4>
-            <div class="pull-right col-xs-8 col-md-6 col-lg-5 bouton-choix-style">
+            <div class="pull-right col-xs-10 col-md-8 col-lg-6 bouton-choix-style">
             <button type="button" class="btn btn-info " ng-class="{'bouton-choix-style-selected': isSelected('new'), 'bouton-choix-style-normal':isSelected('existing')}" ng-click="setStyleChooser('new')"><span translate="edition.style.label.choice.new" >Create new style</span></button>
                 <button type="button" class="btn btn-info" ng-class="{'bouton-choix-style-normal': isSelected('new'), 'bouton-choix-style-selected':isSelected('existing')}" ng-click="setStyleChooser('existing')"><span translate="edition.style.label.choice.existing">Use existing style</span></button>
         </div>

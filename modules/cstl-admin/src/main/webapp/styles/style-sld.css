@@ -165,9 +165,6 @@ a.choix_type:hover{
 .center button{
     margin-top: 2px;
 }
-.bouton-choix-style{
-	margin-top:-5px;
-}
 .bouton-choix-style-normal{
 	background-color: #ffffff;
 	border-color: #cccccc;
@@ -207,6 +204,9 @@ ul.dropdown-images li{
 ul.dropdown-images li a:hover{
 	background-color: #428bcc;
 }
+.close{
+	z-index:999;
+}
 /* Small devices (tablets, 768px and up) */
 @media (min-width: 768px) and (max-width: 991px) { 
 	/*choix type*/
@@ -226,7 +226,10 @@ ul.dropdown-images li a:hover{
 	    min-height:300px;
 	}
 	.bouton-choix-style{
-		padding-left:140px;
+		padding-left: 180px;
+		margin-top: -27px;
+		padding-right: 0;
+		margin-right: 15px;
 	}
 	img.img_palette{
 		width: 117px;
@@ -253,7 +256,10 @@ ul.dropdown-images li a:hover{
 	padding-left: 0;
 	}
 	.bouton-choix-style{
-		padding-left:160px;
+		padding-left: 240px;
+		margin-top: -27px;
+		padding-right: 0;
+		margin-right: 15px;
 	}
 	img.img_palette{
 		width: 368px;
@@ -267,7 +273,10 @@ ul.dropdown-images li a:hover{
 		width:1024px;
 	}
 	.bouton-choix-style{
-		padding-left:115px;
+		padding-left: 125px;
+		margin-top: -27px;
+		padding-right: 0;
+		margin-right: 15px;
 	}
 	img.img_palette{
 		width: 410px;

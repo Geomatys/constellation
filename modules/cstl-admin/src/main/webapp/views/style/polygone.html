@@ -41,31 +41,26 @@
                   </button>
                   <span class="dropdown-arrow dropdown-arrow-inverse"></span>
                   <ul class="dropdown-menu dropdown-inverse dropdown-images" role="menu" style="overflow-y: auto; min-width:70px; min-height: 108px;">
-                    <li ng-click="img_remplissage='images/pattern-plein.png'; bgType='full'">
+                    <li ng-click="img_remplissage='images/pattern-plein.png'">
                         <a><img class="remplissage_type" src="images/pattern-plein.png"></a>
                     </li>
-                    <li ng-click="img_remplissage='images/pattern-rayures-horiz.png'; bgType='pattern'">
+                    <li ng-click="img_remplissage='images/pattern-rayures-horiz.png'">
                       <a><img class="remplissage_type" src="images/pattern-rayures-horiz.png"></a>
                     </li>
-                    <li ng-click="img_remplissage='images/pattern-rayures-vert.png'; bgType='pattern'">
+                    <li ng-click="img_remplissage='images/pattern-rayures-vert.png'">
                       <a><img class="remplissage_type" src="images/pattern-rayures-vert.png"></a>
                     </li>
-                    <li ng-click="img_remplissage='images/pattern-rayures-diago.png'; bgType='pattern'">
+                    <li ng-click="img_remplissage='images/pattern-rayures-diago.png'">
                       <a><img class="remplissage_type" src="images/pattern-rayures-diago.png"></a>
                     </li>
-                    <li ng-click="img_remplissage='images/pattern-carreaux.png'; bgType='pattern'">
+                    <li ng-click="img_remplissage='images/pattern-carreaux.png'">
                       <a><img class="remplissage_type" src="images/pattern-carreaux.png"></a>
                     </li>
-                    <li ng-click="img_remplissage='images/pattern-cases.png'; bgType='pattern'">
+                    <li ng-click="img_remplissage='images/pattern-cases.png'">
                       <a><img class="remplissage_type" src="images/pattern-cases.png"></a>
                     </li>
                   </ul>
                 </div>
-              </div>
-
-              <div class="col-sm-6" ng-show=" bgType=='pattern' ">
-                <label class="control-label">Couleur du pattern</label>
-                <input type='text' name="picker" class="picker" spectrum />
               </div>
             </div>
           </form>
@@ -284,16 +279,11 @@
               <div class="col-sm-8">
                 <select ng-model="bgType" class="form-control">
                   <option>Plein</option>
-                  <option value="pattern">Pattern 1</option>
-                  <option value="pattern">Pattern 2</option>
-                  <option value="pattern">Pattern 3</option>
-                  <option value="pattern">Pattern 4</option>
+                  <option>Pattern 1</option>
+                  <option>Pattern 2</option>
+                  <option>Pattern 3</option>
+                  <option>Pattern 4</option>
                 </select>
-              </div>
-              <div class="col-sm-12" ng-show=" bgType=='pattern' ">
-                  <br/>
-                <label class="control-label ">Couleur du pattern</label>
-                <input type='text' name="picker" class="picker" spectrum />
               </div>
             </div>
           </form>

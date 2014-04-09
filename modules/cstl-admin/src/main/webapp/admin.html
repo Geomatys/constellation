@@ -11,15 +11,24 @@
 <![endif]-->
 <div class="header" ng-controller="HeaderController">
     <div class="row" style="margin:0;">
-        <div class="col-sm-2">
+        <div class="col-xs-2">
             <a href="#" class="brand"
                style="padding-bottom: 5px; padding-top: 5px"> <img id="brand"
                                                                    src="images/constellation-menu.png"
                                                                    alt="constellation-logo" />
             </a>
         </div>
-        <div class="col-sm-10">
-            <ul class="nav nav-pills pull-right">
+        <div class="col-xs-10">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+            </div>
+            <div class="collapse navbar-collapse nav-header">
+            <ul class="nav nav-pills nav-header-mob pull-right">
                 <li class="dropdown pointer" ng-controller="LanguageController">
                     <a class="dropdown-toggle" data-toggle="dropdown"> <span>
                                 <span class="glyphicon glyphicon-flag"></span> <span
@@ -44,7 +53,7 @@
                         class="glyphicon glyphicon-log-in"></span> &nbsp;<span
                         translate="global.menu.account.login">Authenticate</span></a></li>
             </ul>
-            <ul ng-show="authenticated" class="nav nav-pills pull-right">
+            <ul ng-show="authenticated" class="nav nav-pills nav-header-mob pull-right">
                 <li><a href="#"> <span class="glyphicon glyphicon-home"></span>
                     <span translate="global.menu.home">Accueil</span>
                 </a></li>
@@ -90,6 +99,7 @@
                     </ul></li>
             </ul>
         </div>
+    </div>
     </div>
 </div>
 
