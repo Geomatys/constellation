@@ -42,8 +42,10 @@ import org.constellation.ServiceDef;
 import org.constellation.admin.dao.DataRecord;
 import org.constellation.admin.dao.LayerRecord;
 import org.constellation.admin.dao.ProviderRecord;
+import org.constellation.admin.dao.Record;
 import org.constellation.admin.dao.ServiceRecord;
 import org.constellation.admin.dao.Session;
+import org.constellation.admin.dao.Session.DataObjectIdentifier;
 import org.constellation.admin.dao.StyleRecord;
 import org.constellation.admin.dao.TaskRecord;
 import org.constellation.configuration.ConfigDirectory;
@@ -249,7 +251,7 @@ public class ConfigurationEngine {
                     final DefaultMetadata servMeta = unmarshallMetadata(service.getIsoMetadata());
                     CstlMetadatas.updateServiceMetadataLayer(servMeta, layerIds);
                     final StringReader srm = marshallMetadata(servMeta);
-                    service.setIsoMetadata(srm);
+                    service.setIsoMetadata(servMeta.getFileIdentifier(), srm);
                 }
             }
 
@@ -376,7 +378,7 @@ public class ConfigurationEngine {
                 final DefaultMetadata isoMetadata = CstlMetadatas.defaultServiceMetadata(identifier, serviceType, url, metadata);
                 final StringReader srIso = marshallMetadata(isoMetadata);
                 
-                service.setIsoMetadata(srIso);
+                service.setIsoMetadata(isoMetadata.getFileIdentifier(), srIso);
             }
 
         } catch (SQLException ex) {
@@ -495,7 +497,7 @@ public class ConfigurationEngine {
                     final DefaultMetadata servMeta = unmarshallMetadata(record.getIsoMetadata());
                     CstlMetadatas.updateServiceMetadataURL(record.getIdentifier(), record.getType().name(), url, servMeta);
                     final StringReader sr = marshallMetadata(servMeta);
-                    record.setIsoMetadata(sr);
+                    record.setIsoMetadata(servMeta.getFileIdentifier(), sr);
                 }
             }
         } catch (SQLException | JAXBException | IOException ex) {
@@ -566,27 +568,24 @@ public class ConfigurationEngine {
     }
     
     public static InputStream loadIsoMetadata(final String metadataID) {
-        final CstlMetadataTemplate type = CstlMetadataTemplate.valueForPrefix(metadataID);
-        if (type != null) {
-            final String id = CstlMetadatas.getIdentifier(type, metadataID);
-            if (type == CstlMetadataTemplate.DATA) {
-               return loadProviderMetadata(id);
-            } else if (type == CstlMetadataTemplate.SERVICE) {
-                final ServiceDef.Specification spec = CstlMetadatas.getSpecification(metadataID);
-                return loadServiceMetadata(id, spec);
-            }
-        }
-        return null;
-    }
-
-    private static InputStream loadProviderMetadata(final String providerId) {
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
-            final ProviderRecord provider = session.readProvider(providerId);
-            if (provider != null) {
-                return provider.getMetadata();
+            
+            final Record record = session.searchMetadata(metadataID);
+            if (record instanceof ProviderRecord) {
+               final ProviderRecord provider = (ProviderRecord)record;
+               return provider.getMetadata();
+                
+            } else if (record instanceof ServiceRecord) {
+                final ServiceRecord serv = (ServiceRecord)record;
+                return serv.getIsoMetadata();
+                
+            } else if (record instanceof DataRecord) {
+                final DataRecord data = (DataRecord) record;
+                return data.getMetadata();
             }
+            
         } catch (SQLException | IOException ex) {
             LOGGER.log(Level.WARNING, "An error occurred while reading provider metadata", ex);
         } finally {
@@ -596,24 +595,6 @@ public class ConfigurationEngine {
         return null;
     }
 
-    private static InputStream loadServiceMetadata(final String serviceId, final ServiceDef.Specification spec) {
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            final ServiceRecord serv = session.readService(serviceId, spec);
-            if (serv != null) {
-                return serv.getIsoMetadata();
-            }
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred while reading service iso metadata", ex);
-        } finally {
-            if (session != null)
-                session.close();
-        }
-        return null;
-    }
-
-    
     public static boolean existInternalMetadata(final String metadataID) {
         final CstlMetadataTemplate type = CstlMetadataTemplate.valueForPrefix(metadataID);
         if (type != null) {

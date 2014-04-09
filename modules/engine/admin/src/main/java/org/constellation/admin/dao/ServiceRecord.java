@@ -165,9 +165,9 @@ public final class ServiceRecord extends Record {
         }
     }
     
-    public void setIsoMetadata(final StringReader isoMetadata) throws SQLException {
+    public void setIsoMetadata(final String metadataId, final StringReader isoMetadata) throws SQLException {
         ensureConnectionNotClosed();
-        session.writeServiceIsoMetadata(identifier, type, isoMetadata);
+        session.writeServiceIsoMetadata(identifier, type, metadataId, isoMetadata);
     }
     
     public boolean hasIsoMetadata() throws IOException, SQLException {

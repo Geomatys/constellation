@@ -126,6 +126,7 @@ CREATE TABLE "admin"."service"(
   "description" INTEGER     NOT NULL,
   "config"      CLOB,
   "owner"       VARCHAR(32),
+  "metadata_id" VARCHAR(512),
   "metadata"    CLOB
 );
 

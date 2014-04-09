@@ -55,6 +55,7 @@ import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import org.constellation.utils.CstlMetadataTemplate;
 import org.opengis.parameter.GeneralParameterDescriptor;
 
 /**
@@ -107,6 +108,7 @@ public final class Session implements Closeable {
     private static final String READ_PROVIDER_CONFIG        = "provider.read.config";
     private static final String READ_PROVIDER_METADATA      = "provider.read.metadata";
     private static final String EXIST_PROVIDER_METADATA     = "provider.exist.metadata";
+    private static final String SEARCH_PROVIDER_METADATA    = "provider.search.metadata";
     private static final String LIST_PROVIDERS              = "provider.list";
     private static final String LIST_PROVIDERS_FROM_TYPE    = "provider.list.from.type";
     private static final String LIST_PROVIDERS_FROM_IMPL    = "provider.list.from.impl";
@@ -143,6 +145,7 @@ public final class Session implements Closeable {
     private static final String UPDATE_DATA_ISO_METADATA    = "data.update.iso_metadata";
     private static final String DELETE_DATA                 = "data.delete";
     private static final String DELETE_DATA_NMSP            = "data.delete.nmsp";
+    private static final String SEARCH_DATA_ISO_METADATA    = "data.search.iso_metadata";
 
     private static final String WRITE_STYLED_DATA           = "styled_data.write";
     private static final String DELETE_STYLED_DATA          = "styled_data.delete";
@@ -167,6 +170,7 @@ public final class Session implements Closeable {
     private static final String DELETE_SERVICE              = "service.delete";
     private static final String DELETE_SERVICE_METADATA     = "service.delete.metadata";
     private static final String DELETE_SERVICE_EXTRA_CONFIG = "service.delete.extra.config";
+    private static final String SEARCH_SERVICE_ISO_METADATA = "service.search.iso_metadata";
 
     private static final String READ_LAYER                  = "layer.read";
     private static final String READ_LAYER_FROM_ID          = "layer.read.from.id";
@@ -349,12 +353,27 @@ public final class Session implements Closeable {
         new Query(DELETE_I18N).with(id).update();
     }
 
+    public Record searchMetadata(final String metadataId) throws SQLException {
+        final Result rs = new Query(SEARCH_PROVIDER_METADATA).with(metadataId).select();
+        if (rs.rs.next()) {
+            final int id = rs.rs.getInt(1);
+            return readProvider(id);
+        }
+        
+        final Result rs2 = new Query(SEARCH_DATA_ISO_METADATA).with(metadataId).select();
+        if (rs2.rs.next()) {
+            final int id = rs2.rs.getInt(1);
+            return readData(id);
+        }
+        
+        final Result rs3 = new Query(SEARCH_SERVICE_ISO_METADATA).with(metadataId).select();
+        if (rs3.rs.next()) {
+            final int id = rs3.rs.getInt(1);
+            return readService(id);
+        }
+        return null;
+    }
 
-  
-
-
-
-   
     /**
      * Updates the user with specified {@code login}.
      *
@@ -939,13 +958,13 @@ public final class Session implements Closeable {
         new Query(WRITE_SERVICE_METADATA).with(record.id, lang, metadata).insert();
     }
     
-    public void writeServiceIsoMetadata(final String identifier, final Specification spec, final StringReader isoMetadata) throws SQLException {
+    public void writeServiceIsoMetadata(final String identifier, final Specification spec, final String metadataId, final StringReader isoMetadata) throws SQLException {
         ensureNonNull("identifier", identifier);
         ensureNonNull("spec",       spec);
 
         final ServiceRecord record = readService(identifier, spec);
 
-        new Query(UPDATE_SERVICE_ISO_METADATA).with(isoMetadata, record.id).update();
+        new Query(UPDATE_SERVICE_ISO_METADATA).with(metadataId, isoMetadata, record.id).update();
     }
 
     /* internal */ void updateService(final int generatedId, final String newIdentifier, final Specification newType, final String newOwner) throws SQLException {
@@ -1281,5 +1300,30 @@ public final class Session implements Closeable {
     @SuppressWarnings("unchecked")
     private <T> T createRecord(final ResultSet rs, final Class<? extends Record> type) throws Exception {
         return (T) type.getConstructor(Session.class, ResultSet.class).newInstance(this, rs);
+    }
+    
+    public static class DataObjectIdentifier {
+        public CstlMetadataTemplate template;
+        public String providerId;
+        public String serviceId;
+        public QName dataName;
+        public Specification specification;
+        
+        public DataObjectIdentifier(final String providerId) {
+            template = CstlMetadataTemplate.DATA;
+            this.providerId = providerId;
+        }
+        
+        public DataObjectIdentifier(final String providerId, final QName dataName) {
+            template = CstlMetadataTemplate.LAYER;
+            this.providerId = providerId;
+            this.dataName = dataName;
+        }
+        
+        public DataObjectIdentifier(final String serviceId, final String serviceType) {
+            template = CstlMetadataTemplate.SERVICE;
+            this.serviceId = serviceId;
+            this.specification = Specification.valueOf(serviceType);
+        }
     }
 }
