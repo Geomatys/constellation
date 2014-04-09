@@ -51,6 +51,7 @@ CREATE TABLE "admin"."provider"(
   "impl"        VARCHAR(32) NOT NULL,
   "config"      CLOB        NOT NULL,
   "owner"       VARCHAR(32),
+  "metadata_id" VARCHAR(512),
   "metadata"    CLOB
 );
 
@@ -87,6 +88,7 @@ CREATE TABLE "admin"."data"(
   "description"   INTEGER     NOT NULL,
   "owner"         VARCHAR(32),
   "metadata"      CLOB,
+  "metadata_id"   VARCHAR(512),
   "iso_metadata"  CLOB
 );
 

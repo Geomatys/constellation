@@ -135,8 +135,7 @@ public class DataRest {
         MetadataLists mdList = new MetadataLists();
 
         HashMap<String, String> roles = new HashMap<>(0);
-        for (int i = 0; i < Role.values().length; i++) {
-            Role role = Role.values()[i];
+        for (Role role : Role.values()) {
             InternationalString is = Types.getCodeTitle(role);
             roles.put(role.name(), is.toString(userLocale));
         }
@@ -150,23 +149,20 @@ public class DataRest {
             }
         };
         TreeMap<String, String> locales = new TreeMap<>(comparator);
-        for (int i = 0; i < Locale.getAvailableLocales().length; i++) {
-            Locale locale = Locale.getAvailableLocales()[i];
+        for (Locale locale : Locale.getAvailableLocales()) {
             locales.put(locale.toString(), locale.getDisplayName(userLocale));
         }
         mdList.setLocales(locales);
 
         HashMap<String, String> topics = new HashMap<>(0);
-        for (int i = 0; i < TopicCategory.values().length; i++) {
-            TopicCategory topicCategory = TopicCategory.values()[i];
+        for (TopicCategory topicCategory : TopicCategory.values()) {
             InternationalString is = Types.getCodeTitle(topicCategory);
             topics.put(topicCategory.name(), is.toString(userLocale));
         }
         mdList.setCategories(topics);
 
         HashMap<String, String> dateTypes = new HashMap<>(0);
-        for (int i = 0; i < DateType.values().length; i++) {
-            DateType dateType = DateType.values()[i];
+        for (DateType dateType : DateType.values()) {
             InternationalString is = Types.getCodeTitle(dateType);
             dateTypes.put(dateType.name(), is.toString(userLocale));
         }
@@ -463,7 +459,7 @@ public class DataRest {
 
         //Save metadata
         dm.prune();
-        ConfigurationEngine.saveMetaData(dm, metadataToSave.getDataName(), CSWMarshallerPool.getInstance());
+        ConfigurationEngine.saveMetaData(dm, metadataToSave.getDataName());
         return Response.status(200).build();
     }
 

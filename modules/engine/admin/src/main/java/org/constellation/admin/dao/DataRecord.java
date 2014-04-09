@@ -201,8 +201,8 @@ public final class DataRecord extends Record {
         return session.readDataIsoMetadata(id);
     }
 
-    public void setIsoMetadata(final StringReader metadata) throws IOException, SQLException {
+    public void setIsoMetadata(final String metadataId, final StringReader metadata) throws IOException, SQLException {
         ensureConnectionNotClosed();
-        session.updateDataIsoMetadata(id, metadata);
+        session.updateDataIsoMetadata(id, metadataId, metadata);
     }
 }

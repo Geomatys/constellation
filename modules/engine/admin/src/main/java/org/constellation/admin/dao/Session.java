@@ -560,8 +560,8 @@ public final class Session implements Closeable {
      * @throws SQLException if a database access error occurs
      * @throws IOException if the configuration cannot be written
      */
-    /* internal */ void updateProviderMetadata(final int generatedId, final StringReader metadata) throws SQLException, IOException {
-        new Query(UPDATE_PROVIDER_METADATA).with(metadata, generatedId).update();
+    /* internal */ void updateProviderMetadata(final int generatedId, final String metadataId, final StringReader metadata) throws SQLException, IOException {
+        new Query(UPDATE_PROVIDER_METADATA).with(metadataId, metadata, generatedId).update();
     }
 
 
@@ -801,8 +801,8 @@ public final class Session implements Closeable {
         new Query(UPDATE_DATA_METADATA).with(metadata, dataId).update();
     }
     
-    /* internal */ void updateDataIsoMetadata(final int dataId, final StringReader metadata) throws SQLException {
-        new Query(UPDATE_DATA_ISO_METADATA).with(metadata, dataId).update();
+    /* internal */ void updateDataIsoMetadata(final int dataId, final String metadataId, final StringReader metadata) throws SQLException {
+        new Query(UPDATE_DATA_ISO_METADATA).with(metadataId, metadata, dataId).update();
     }
 
     public void deleteData(final QName name, final String providerId) throws SQLException {

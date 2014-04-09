@@ -28,6 +28,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.xml.XML;
 import org.constellation.ServiceDef;
 import org.constellation.admin.ConfigurationEngine;
@@ -36,8 +37,8 @@ import org.constellation.admin.service.ConstellationClient;
 import org.constellation.configuration.Instance;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.provider.DataProviders;
 import org.constellation.provider.DataProviderFactory;
+import org.constellation.provider.DataProviders;
 import static org.constellation.provider.configuration.ProviderParameters.*;
 import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
@@ -151,11 +152,11 @@ public class OGCRestTest extends AbstractGrizzlyServer {
 
         Unmarshaller u = CSWMarshallerPool.getInstance().acquireUnmarshaller();
         u.setProperty(XML.TIMEZONE, TimeZone.getTimeZone("GMT+2:00"));
-        Object meta = u.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/" + resourceName));
+        DefaultMetadata meta = (DefaultMetadata) u.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/" + resourceName));
         CSWMarshallerPool.getInstance().recycle(u);
 
         ConfigurationEngine.writeProvider(identifier, null, ProviderRecord.ProviderType.LAYER, service.getName(), source);
-        ConfigurationEngine.saveMetaData(meta, identifier, CSWMarshallerPool.getInstance());
+        ConfigurationEngine.saveMetaData(meta, identifier);
     }
 
     /**

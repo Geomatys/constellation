@@ -22,19 +22,20 @@ import java.io.File;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import javax.xml.bind.Unmarshaller;
+import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.xml.XML;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.generic.database.Automatic;
-import org.constellation.provider.DataProviders;
 import org.constellation.provider.DataProviderFactory;
+import org.constellation.provider.DataProviders;
+import static org.constellation.provider.configuration.ProviderParameters.*;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.TestRunner;
 import org.constellation.util.Util;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
-import static org.constellation.provider.configuration.ProviderParameters.*;
 
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -222,11 +223,11 @@ public class InternalCSWworkerTest extends CSWworkerTest {
 
         Unmarshaller u = pool.acquireUnmarshaller();
         u.setProperty(XML.TIMEZONE, TimeZone.getTimeZone("GMT+2:00"));
-        Object meta = u.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/" + resourceName));
+        DefaultMetadata meta = (DefaultMetadata) u.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/" + resourceName));
         pool.recycle(u);
 
         ConfigurationEngine.writeProvider(identifier, null, ProviderRecord.ProviderType.LAYER, service.getName(), source);
-        ConfigurationEngine.saveMetaData(meta, identifier, pool);
+        ConfigurationEngine.saveMetaData(meta, identifier);
 
     }
 }

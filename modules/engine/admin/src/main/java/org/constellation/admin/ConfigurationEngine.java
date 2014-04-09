@@ -510,26 +510,20 @@ public class ConfigurationEngine {
     /**
      * Save metadata on specific folder
      * 
-     * @param fileMetadata
+     * @param metadata
      * @param dataName
-     * @param pool
      */
-    public static void saveMetaData(final Object fileMetadata, final String dataName, final MarshallerPool pool) {
-        ensureNonNull("metadata", fileMetadata);
+    public static void saveMetaData(final DefaultMetadata metadata, final String dataName) {
+        ensureNonNull("metadata", metadata);
 
         // save in database
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
-            final StringWriter sw = new StringWriter();
-            final Marshaller m = pool.acquireMarshaller();
-            m.setProperty(XML.TIMEZONE, TimeZone.getTimeZone("GMT+2:00"));
-            m.marshal(fileMetadata, sw);
-            pool.recycle(m);
-            final StringReader sr = new StringReader(sw.toString());
+            final StringReader sr = marshallMetadata(metadata);
             final ProviderRecord provider = session.readProvider(dataName);
             if (provider != null) {
-                provider.setMetadata(sr);
+                provider.setMetadata(metadata.getFileIdentifier(), sr);
             }
 
         } catch (SQLException | IOException | JAXBException ex) {
@@ -1190,6 +1184,7 @@ public class ConfigurationEngine {
     private static StringReader marshallMetadata(final DefaultMetadata meta) throws JAXBException {
         final StringWriter swIso = new StringWriter();
         final Marshaller mi = ISOMarshallerPool.getInstance().acquireMarshaller();
+        mi.setProperty(XML.TIMEZONE, TimeZone.getTimeZone("GMT+2:00"));
         mi.marshal(meta, swIso);
         ISOMarshallerPool.getInstance().recycle(mi);
         return new StringReader(swIso.toString());

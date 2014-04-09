@@ -327,7 +327,7 @@ public final class Provider {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response setMetadata(final @PathParam("providerId") String providerId, final DefaultMetadata metadata) throws SQLException, NotRunningServiceException, CoverageStoreException, NoSuchIdentifierException, ProcessException, JAXBException {
-        ConfigurationEngine.saveMetaData(metadata, providerId, CSWMarshallerPool.getInstance());
+        ConfigurationEngine.saveMetaData(metadata, providerId);
         return Response.status(200).build();
     }
 }

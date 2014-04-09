@@ -154,9 +154,9 @@ public final class ProviderRecord extends Record {
         return session.hasProviderMetadata(id);
     }
 
-    public void setMetadata(final StringReader metadata) throws IOException, SQLException {
+    public void setMetadata(final String metadataId, final StringReader metadata) throws IOException, SQLException {
         ensureConnectionNotClosed();
-        session.updateProviderMetadata(id, metadata);
+        session.updateProviderMetadata(id, metadataId, metadata);
     }
 
     public List<StyleRecord> getStyles() throws SQLException {
