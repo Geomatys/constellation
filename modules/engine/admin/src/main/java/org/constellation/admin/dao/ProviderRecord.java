@@ -51,9 +51,10 @@ public final class ProviderRecord extends Record {
     private ProviderType type;
     private String impl;
     private String owner;
+    private String metadataId;
 
     ProviderRecord(final Session session, final int id, final String identifier, final String parent,
-            final ProviderType type, final String impl, final String owner) {
+            final ProviderType type, final String impl, final String owner, final String metadataId) {
         this.session    = session;
         this.id         = id;
         this.identifier = identifier;
@@ -61,6 +62,7 @@ public final class ProviderRecord extends Record {
         this.type       = type;
         this.impl       = impl;
         this.owner      = owner;
+        this.metadataId  = metadataId;
     }
 
     public ProviderRecord(final Session s, final ResultSet rs) throws SQLException {
@@ -69,7 +71,8 @@ public final class ProviderRecord extends Record {
                 rs.getString(3),
                 ProviderType.valueOf(rs.getString(4)),
                 rs.getString(5),
-                rs.getString(6));
+                rs.getString(6),
+                rs.getString(7));
     }
 
     /**
@@ -156,6 +159,7 @@ public final class ProviderRecord extends Record {
 
     public void setMetadata(final String metadataId, final StringReader metadata) throws IOException, SQLException {
         ensureConnectionNotClosed();
+        this.metadataId = metadataId;
         session.updateProviderMetadata(id, metadataId, metadata);
     }
 
@@ -178,5 +182,9 @@ public final class ProviderRecord extends Record {
      */
     public boolean isPyramidConformProvider() {
         return identifier.startsWith("conform_");
+    }
+    
+    public String getMetadataId() {
+        return metadataId;
     }
 }

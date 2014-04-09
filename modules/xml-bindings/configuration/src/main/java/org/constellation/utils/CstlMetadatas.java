@@ -25,6 +25,7 @@ import org.constellation.ServiceDef;
 import org.constellation.dto.DataMetadata;
 import org.constellation.dto.Service;
 import static org.constellation.utils.CstlMetadataTemplate.*;
+import org.opengis.feature.type.Name;
 
 /**
  *
@@ -72,20 +73,26 @@ public class CstlMetadatas {
         return SERVICE.getPrefix()+ '_' + serviceType + "_" + serviceName;
     }
     
-    public static String getMetadataIdForData(final String dataName){
+    public static String getMetadataIdForProvider(final String providerId){
+        ArgumentChecks.ensureNonNull("providerId", providerId);
+        return PROVIDER.getPrefix()+ '_' + providerId;
+    }
+    
+    public static String getMetadataIdForData(final String providerId, final Name dataName){
         ArgumentChecks.ensureNonNull("dataName", dataName);
-        return DATA.getPrefix()+ '_' + dataName;
+        ArgumentChecks.ensureNonNull("providerId", providerId);
+        return DATA.getPrefix()+ '_' + providerId + '_' + dataName.getLocalPart(); // TODO namespace?
     }
     
     public static String getMetadataIdForLayer(final String dataName){
         ArgumentChecks.ensureNonNull("dataName", dataName);
-        return LAYER.getPrefix()+ '_' + dataName;
+        return DATA.getPrefix()+ '_' + dataName;
     }
     
-    public static void feedMetadata(final DefaultMetadata metadata, final DataMetadata datam) {
+    public static void feedMetadata(final DefaultMetadata metadata, final DataMetadata datam, final Name dataName) {
         ArgumentChecks.ensureNonNull("datam", datam);
         final MetadataFeeder feeder = new MetadataFeeder(metadata);
-        feeder.feed(datam);
+        feeder.feed(datam, dataName);
     }
     
     /**
@@ -115,20 +122,6 @@ public class CstlMetadatas {
         metadata.setDateStamp(creationDate);
 
         return metadata;
-    }
-    
-    public static String getIdentifier(final CstlMetadataTemplate type, final String metadataID) {
-        if (type == DATA) {
-            return metadataID.substring(type.getPrefix().length() + 1);
-        } else if (type == SERVICE) {
-            // remove prefix
-            String tmp = metadataID.substring(type.getPrefix().length() + 1);
-            // remove specification
-            final int index = tmp.indexOf('_');
-            tmp = tmp.substring(index + 1);
-            return tmp;
-        }
-        return metadataID;
     }
     
     public static ServiceDef.Specification getSpecification(final String metadataID) {

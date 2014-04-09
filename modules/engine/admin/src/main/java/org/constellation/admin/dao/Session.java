@@ -55,7 +55,6 @@ import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
-import org.constellation.utils.CstlMetadataTemplate;
 import org.opengis.parameter.GeneralParameterDescriptor;
 
 /**
@@ -528,7 +527,7 @@ public final class Session implements Closeable {
         final int id = new Query(WRITE_PROVIDER).with(identifier, parent, type.name(), impl, reader, login).insert();
 
         // Return inserted line.
-        return new ProviderRecord(this, id, identifier, parent, type, impl, login);
+        return new ProviderRecord(this, id, identifier, parent, type, impl, login, null);
     }
 
     /**
@@ -809,7 +808,7 @@ public final class Session implements Closeable {
         final int id = new Query(WRITE_DATA).with(name.getLocalPart(), name.getNamespaceURI(), provider.id, type.name(), date.getTime(), title, description, login).insert();
 
         // Return inserted line.
-        return new DataRecord(this, id, name.getLocalPart(), name.getNamespaceURI(), provider.id, type, date, title, description, login);
+        return new DataRecord(this, id, name.getLocalPart(), name.getNamespaceURI(), provider.id, type, date, title, description, login, null);
     }
 
     /* internal */ void updateData(final int generatedId, final String newName, final String newNamespace, final int newProvider, final DataType newType, final String newOwner) throws SQLException {
@@ -832,6 +831,18 @@ public final class Session implements Closeable {
         } else {
             new Query(DELETE_DATA).with(name.getLocalPart(), providerId).update();
         }
+    }
+    
+    /**
+     * look for existence of the data metadata with the specified {@code generatedId}.
+     *
+     * @param generatedId the data auto-generated id
+     * @return true if an iso metadata exist for this service.
+     * @throws SQLException if a database access error occurs
+     * @throws IOException if the configuration cannot be read
+     */
+    /* internal */ boolean hasDataIsoMetadata(final int generatedId) throws SQLException, IOException {
+        return readDataIsoMetadata(generatedId) != null;
     }
 
 
@@ -935,7 +946,7 @@ public final class Session implements Closeable {
         final int id = new Query(WRITE_SERVICE).with(identifier, spec.name(), date.getTime(), title, description, config, login).insert();
 
         // Return inserted line.
-        return new ServiceRecord(this, id, identifier, spec, date, title, description, login);
+        return new ServiceRecord(this, id, identifier, spec, date, title, description, login, null);
     }
 
     public void writeServiceExtraConfig(final String identifier, final Specification spec, final StringReader config, final String fileName) throws SQLException {
@@ -1118,7 +1129,7 @@ public final class Session implements Closeable {
     }
 
     /**************************************************************************
-     *                          properties table queries                            *
+     *                          properties table queries                      *
      **************************************************************************/
 
     public String readProperty(final String key) throws SQLException {
@@ -1300,30 +1311,5 @@ public final class Session implements Closeable {
     @SuppressWarnings("unchecked")
     private <T> T createRecord(final ResultSet rs, final Class<? extends Record> type) throws Exception {
         return (T) type.getConstructor(Session.class, ResultSet.class).newInstance(this, rs);
-    }
-    
-    public static class DataObjectIdentifier {
-        public CstlMetadataTemplate template;
-        public String providerId;
-        public String serviceId;
-        public QName dataName;
-        public Specification specification;
-        
-        public DataObjectIdentifier(final String providerId) {
-            template = CstlMetadataTemplate.DATA;
-            this.providerId = providerId;
-        }
-        
-        public DataObjectIdentifier(final String providerId, final QName dataName) {
-            template = CstlMetadataTemplate.LAYER;
-            this.providerId = providerId;
-            this.dataName = dataName;
-        }
-        
-        public DataObjectIdentifier(final String serviceId, final String serviceType) {
-            template = CstlMetadataTemplate.SERVICE;
-            this.serviceId = serviceId;
-            this.specification = Specification.valueOf(serviceType);
-        }
     }
 }

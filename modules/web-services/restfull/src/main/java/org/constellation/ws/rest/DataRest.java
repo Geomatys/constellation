@@ -73,12 +73,14 @@ import org.geotoolkit.coverage.CoverageUtilities;
 import org.geotoolkit.coverage.GridSampleDimension;
 import org.geotoolkit.coverage.grid.GeneralGridGeometry;
 import org.geotoolkit.coverage.grid.ViewType;
+import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageReference;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageStoreFactory;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.feature.DefaultName;
+import org.geotoolkit.feature.xml.Utils;
 import org.geotoolkit.image.interpolation.InterpolationCase;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
@@ -199,9 +201,8 @@ public class DataRest {
 
         //loop on subfiles/folders to create bean
         if (children != null) {
-            for (int i = 0; i < children.length; i++) {
-                File child = children[i];
-
+            for (File child : children) {
+                
                 if (child.isFile()) {
                     int lastIndexPoint = child.getName().lastIndexOf('.');
                     String extension = child.getName().substring(lastIndexPoint + 1);
@@ -223,6 +224,9 @@ public class DataRest {
     /**
      * Receive a {@link MultiPart} which contain a file need to be save on server to create data on provider
      *
+     * @param fileIs
+     * @param fileDetail
+     * @param request
      * @return A {@link Response} with 200 code if upload work, 500 if not work.
      */
     @POST
@@ -237,7 +241,7 @@ public class DataRest {
         File newFile = new File(uploadDirectory, fileDetail.getFileName());
         File OriginalFile = new File(uploadDirectory, fileDetail.getFileName());
         try {
-            if (fileIs != null && fileDetail != null) {
+            if (fileIs != null) {
                 Files.copy(fileIs, newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 fileIs.close();
                 if (newFile.getName().endsWith(".zip")) {
@@ -266,6 +270,9 @@ public class DataRest {
     /**
      * Receive a {@link MultiPart} which contain a file need to be save on server to create data on provider
      *
+     * @param mdFileIs
+     * @param mdFileDetail
+     * @param request
      * @return A {@link Response} with 200 code if upload work, 500 if not work.
      */
     @POST
@@ -306,6 +313,7 @@ public class DataRest {
      * - change file location from upload to integrated
      *
      * @param values {@link org.constellation.dto.ParameterValues} containing file path & data type
+     * @param request
      * @return a {@link javax.ws.rs.core.Response}
      */
     @POST
@@ -426,40 +434,42 @@ public class DataRest {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response saveMetadata(final DataMetadata metadataToSave) {
-        //Recover metadatapyram
-        DefaultMetadata dm = new DefaultMetadata();
-        String dataPath;
-        DataProvider dataProvider = DataProviders.getInstance().getProvider(metadataToSave.getDataName());
+        final String providerID         = metadataToSave.getDataName();
+        final DataProvider dataProvider = DataProviders.getInstance().getProvider(providerID);
         
-        
-        switch (metadataToSave.getType()) {
-            case "raster":
-                try {
-                    dm = MetadataUtilities.getRasterMetadata(dataProvider);
-                } catch (DataStoreException e) {
-                    LOGGER.log(Level.WARNING, "Error when trying to get coverage metadata", e);
-                }
-                break;
-            case "vector":
-                try {                
-                    dm = MetadataUtilities.getVectorMetadata(dataProvider);
-                } catch (DataStoreException e) {
-                    LOGGER.log(Level.WARNING, "Error when trying to get metadata for a shape file", e);
-                }
-                break;
-            default:
-                if (LOGGER.isLoggable(Level.INFO)) {
-                    LOGGER.log(Level.INFO, "Type unknown");
-                    Response.status(200).build();
-                }
+        for (Name dataName : dataProvider.getKeys()) {
+            
+            DefaultMetadata dm = new DefaultMetadata();
+            switch (metadataToSave.getType()) {
+                case "raster":
+                    try {
+                        dm = MetadataUtilities.getRasterMetadata(dataProvider, dataName);
+                    } catch (DataStoreException e) {
+                        LOGGER.log(Level.WARNING, "Error when trying to get coverage metadata", e);
+                    }
+                    break;
+                case "vector":
+                    try {                
+                        dm = MetadataUtilities.getVectorMetadata(dataProvider, dataName);
+                    } catch (DataStoreException e) {
+                        LOGGER.log(Level.WARNING, "Error when trying to get metadata for a shape file", e);
+                    }
+                    break;
+                default:
+                    if (LOGGER.isLoggable(Level.INFO)) {
+                        LOGGER.log(Level.INFO, "Type unknown");
+                        Response.status(200).build();
+                    }
+            }
+            //Update metadata
+            CstlMetadatas.feedMetadata(dm, metadataToSave, dataName);
+            dm.prune();
+            
+            //Save metadata
+            final QName name = Utils.getQnameFromName(dataName);
+            ConfigurationEngine.saveDataMetadata(dm, name, providerID);
         }
 
-        //Update metadata
-        CstlMetadatas.feedMetadata(dm, metadataToSave);
-
-        //Save metadata
-        dm.prune();
-        ConfigurationEngine.saveMetaData(dm, metadataToSave.getDataName());
         return Response.status(200).build();
     }
 
@@ -545,7 +555,7 @@ public class DataRest {
             final GridCoverageReader reader = inRef.acquireReader();
             gg = reader.getGridGeometry(inRef.getImageIndex());
             
-        }catch(DataStoreException ex){
+        } catch(CoverageStoreException ex){
             Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             return Response.ok("Failed to extract grid geometry for data "+dataId+". "+ex.getMessage()).status(500).build();
         }
@@ -611,13 +621,12 @@ public class DataRest {
         
         
         //get the fill value for no data
-        double[] fillValue = null;
         try{
             final GridCoverageReader reader = inRef.acquireReader();
             final List<GridSampleDimension> sampleDimensions = reader.getSampleDimensions(inRef.getImageIndex());
             if(sampleDimensions!=null){
                 final int nbBand = sampleDimensions.size();
-                fillValue = new double[nbBand];
+                double[] fillValue = new double[nbBand];
                 Arrays.fill(fillValue,Double.NaN);
                 for(int i=0;i<nbBand;i++){
                     final double[] nodata = sampleDimensions.get(i).geophysics(true).getNoDataValues();
@@ -626,7 +635,7 @@ public class DataRest {
                     }
                 }
             }
-        }catch(DataStoreException ex){
+        } catch(CoverageStoreException ex) {
             Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             return Response.ok("Failed to extract no-data values for resampling "+ex.getMessage()).status(500).build();
         }
@@ -676,11 +685,12 @@ public class DataRest {
         final org.geotoolkit.process.Process p = desc.createProcess(input);
 
         new Thread(){
+            @Override
             public void run() {
                 try {
                     p.call();
                 } catch (ProcessException ex) {
-                    Logger.getLogger(DataRest.class.getName()).log(Level.SEVERE, null, ex);
+                    LOGGER.log(Level.WARNING, null, ex);
                 }
             }
         }.start();
@@ -872,6 +882,7 @@ public class DataRest {
         final org.geotoolkit.process.Process p = desc.createProcess(input);
 
         new Thread(){
+            @Override
             public void run() {
                 try {
                     p.call();
@@ -938,7 +949,7 @@ public class DataRest {
                 final GridCoverageReader reader = inRef.acquireReader();
                 gg = reader.getGridGeometry(inRef.getImageIndex());
 
-            }catch(DataStoreException ex){
+            } catch(CoverageStoreException ex) {
                 Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
                 return Response.ok("Failed to extract grid geometry for data "+dataId+". "+ex.getMessage()).status(500).build();
             }

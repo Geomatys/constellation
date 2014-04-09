@@ -37,6 +37,7 @@ import org.constellation.dto.DataMetadata;
 import org.constellation.dto.Service;
 import org.geotoolkit.service.OperationMetadataImpl;
 import org.geotoolkit.service.ServiceIdentificationImpl;
+import org.opengis.feature.type.Name;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.citation.CitationDate;
 import org.opengis.metadata.citation.DateType;
@@ -83,8 +84,9 @@ public class MetadataFeeder {
      * merge {@link org.constellation.dto.DataMetadata} feeded on {@link org.apache.sis.metadata.iso.DefaultMetadata} eater
      *
      * @param feeded : {@link org.constellation.dto.DataMetadata} need to be merge on metadata
+     * @param dataName
      */
-    public void feed(final DataMetadata feeded) {
+    public void feed(final DataMetadata feeded, final Name dataName) {
         addDateStamp(new Date());
 
         final Locale metadataLocale;
@@ -103,7 +105,7 @@ public class MetadataFeeder {
         setAbstract(feeded.getAnAbstract());
         addContact(feeded.getUsername(), feeded.getOrganisationName(), feeded.getRole());
 
-        setIdentifier(CstlMetadatas.getMetadataIdForData(feeded.getDataName()));
+        setIdentifier(CstlMetadatas.getMetadataIdForData(feeded.getDataName(), dataName));
 
         final String localeData = feeded.getLocaleData();
         if (localeData != null) {
@@ -656,7 +658,7 @@ public class MetadataFeeder {
         final List<DataIdentification> resources = new ArrayList<>();
         for (String layerId : layerIds) {
             final DefaultDataIdentification dataIdent = new DefaultDataIdentification();
-            final String mdDataId = CstlMetadatas.getMetadataIdForData(layerId);
+            final String mdDataId = CstlMetadatas.getMetadataIdForProvider(layerId);
             dataIdent.getIdentifierMap().put(IdentifierSpace.HREF, mdDataId);
             resources.add(dataIdent);
         }

@@ -227,7 +227,7 @@ public class InternalCSWworkerTest extends CSWworkerTest {
         pool.recycle(u);
 
         ConfigurationEngine.writeProvider(identifier, null, ProviderRecord.ProviderType.LAYER, service.getName(), source);
-        ConfigurationEngine.saveMetaData(meta, identifier);
+        ConfigurationEngine.saveProviderMetadata(meta, identifier);
 
     }
 }

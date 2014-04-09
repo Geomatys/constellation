@@ -40,7 +40,6 @@ import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.collection.TreeTable;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.DataInformation;
-import org.constellation.dto.DataMetadata;
 import org.constellation.provider.DataProvider;
 import org.constellation.util.MetadataMapBuilder;
 import org.constellation.util.SimplyMetadataTreeNode;
@@ -51,13 +50,9 @@ import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.data.FeatureStore;
-import org.geotoolkit.data.FeatureStoreFinder;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.data.shapefile.ShapefileFeatureStore;
-import org.geotoolkit.data.shapefile.ShapefileFeatureStoreFactory;
-import org.geotoolkit.data.shapefile.ShapefileFolderFeatureStoreFactory;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
-import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
@@ -167,6 +162,7 @@ public final class MetadataUtilities {
 
 
     /**
+     * @param coverageReader
      * @param metadata
      * @param dataType (raster, vector, ...)  @return a {@link org.constellation.dto.DataInformation} from data file
      * @throws CoverageStoreException
@@ -259,37 +255,38 @@ public final class MetadataUtilities {
     }
 
     /**
-     * @param metadataToSave
+     * @param dataProvider
+     * @param dataName
      * @return
      * @throws DataStoreException 
      */
-    public static DefaultMetadata getRasterMetadata(final DataProvider dataProvider) throws DataStoreException {
+    public static DefaultMetadata getRasterMetadata(final DataProvider dataProvider, final Name dataName) throws DataStoreException {
 
     	final DataStore dataStore = dataProvider.getMainStore();
     	final CoverageStore coverageStore =(CoverageStore)dataStore;
-    	final Name name = coverageStore.getNames().iterator().next();
-    	final CoverageReference coverageReference = coverageStore.getCoverageReference(name);
-    	
-        
-        GridCoverageReader coverageReader = coverageReference.acquireReader();
-        if (!(coverageReader.getGridGeometry(0).getCoordinateReferenceSystem() instanceof ImageCRS)) {
-            return (DefaultMetadata) coverageReader.getMetadata();
+    	final CoverageReference coverageReference = coverageStore.getCoverageReference(dataName);
+        if (coverageReference != null) {
+            GridCoverageReader coverageReader = coverageReference.acquireReader();
+            if (!(coverageReader.getGridGeometry(0).getCoordinateReferenceSystem() instanceof ImageCRS)) {
+                return (DefaultMetadata) coverageReader.getMetadata();
+            }
+            coverageReference.recycle(coverageReader);
         }
-        coverageReference.recycle(coverageReader);
         return null;
     }
 
     /**
-     * @param metadataToSave
+     * @param dataProvider
+     * @param dataName
      * @return
      * @throws CoverageStoreException
      */
-    public static DefaultMetadata getVectorMetadata(final DataProvider dataProvider) throws DataStoreException{
+    public static DefaultMetadata getVectorMetadata(final DataProvider dataProvider, final Name dataName) throws DataStoreException{
     	
     	final DataStore dataStore = dataProvider.getMainStore();
     	final FeatureStore featureStore =(FeatureStore)dataStore;
     	
-        final Envelope env = featureStore.getEnvelope(QueryBuilder.all(featureStore.getNames().iterator().next()));
+        final Envelope env = featureStore.getEnvelope(QueryBuilder.all(dataName));
 
         final DefaultMetadata md = new DefaultMetadata();
         final DefaultDataIdentification ident = new DefaultDataIdentification();
@@ -322,7 +319,6 @@ public final class MetadataUtilities {
         final ParameterValueGroup resultParameters = mergeProcess.call();
 
         resultMetadata = (DefaultMetadata) resultParameters.parameter(MergeDescriptor.RESULT_OUT_NAME).getValue();
-        ;
         return resultMetadata;
     }
 }

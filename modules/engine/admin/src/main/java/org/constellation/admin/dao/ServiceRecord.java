@@ -44,9 +44,10 @@ public final class ServiceRecord extends Record {
     private final int title;
     private final int description;
     private String owner;
+    private String metadataId;
 
     ServiceRecord(final Session session, final int id, final String identifier, final Specification type,
-                  final Date date, final int title, final int description, final String owner) {
+                  final Date date, final int title, final int description, final String owner, final String metadataId) {
         this.session     = session;
         this.id          = id;
         this.identifier  = identifier;
@@ -55,6 +56,7 @@ public final class ServiceRecord extends Record {
         this.title       = title;
         this.description = description;
         this.owner       = owner;
+        this.metadataId  = metadataId;
     }
 
     public ServiceRecord(final Session s, final ResultSet rs) throws SQLException {
@@ -64,7 +66,8 @@ public final class ServiceRecord extends Record {
                 new Date(rs.getLong(4)),
                 rs.getInt(5),
                 rs.getInt(6),
-                rs.getString(7));
+                rs.getString(7),
+                rs.getString(8));
     }
 
     /**
@@ -167,6 +170,7 @@ public final class ServiceRecord extends Record {
     
     public void setIsoMetadata(final String metadataId, final StringReader isoMetadata) throws SQLException {
         ensureConnectionNotClosed();
+        this.metadataId = metadataId;
         session.writeServiceIsoMetadata(identifier, type, metadataId, isoMetadata);
     }
     
@@ -179,5 +183,7 @@ public final class ServiceRecord extends Record {
         return owner;
     }
 
- 
+    public String getMetadataId() {
+        return metadataId;
+    }
 }

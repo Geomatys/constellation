@@ -53,9 +53,10 @@ public final class DataRecord extends Record {
     private final int title;
     private final int description;
     private String owner;
+    private String metadataId;
 
     DataRecord(final Session session, final int id, final String name, final String namespace, final int provider, final DataType type,
-               final Date date, final int title, final int description, final String owner) {
+               final Date date, final int title, final int description, final String owner, final String metadataId) {
         this.session     = session;
         this.id          = id;
         this.name        = name;
@@ -66,6 +67,7 @@ public final class DataRecord extends Record {
         this.title       = title;
         this.description = description;
         this.owner       = owner;
+        this.metadataId  = metadataId;
     }
 
     public DataRecord(final Session s, final ResultSet rs) throws SQLException {
@@ -77,7 +79,8 @@ public final class DataRecord extends Record {
                 new Date(rs.getLong(6)),
                 rs.getInt(7),
                 rs.getInt(8),
-                rs.getString(9));
+                rs.getString(9),
+                rs.getString(10));
     }
 
     /**
@@ -203,6 +206,16 @@ public final class DataRecord extends Record {
 
     public void setIsoMetadata(final String metadataId, final StringReader metadata) throws IOException, SQLException {
         ensureConnectionNotClosed();
+        this.metadataId = metadataId;
         session.updateDataIsoMetadata(id, metadataId, metadata);
+    }
+    
+    public boolean hasIsoMetadata() throws IOException, SQLException {
+        ensureConnectionNotClosed();
+        return session.hasDataIsoMetadata(id);
+    }
+    
+    public String getMetadataId() {
+        return metadataId;
     }
 }
