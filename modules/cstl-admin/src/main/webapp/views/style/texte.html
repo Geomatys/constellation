@@ -26,7 +26,7 @@
               <div class="form-group">
                 <label class="col-sm-3 col-md-2 control-label">Police</label>
                 <div class="col-sm-9 col-md-4">
-                  <select class="form-control">
+                  <select class="form-control" ng-change="$parent.addFontFamilies(family)" ng-model="family">
                     <option>Arial</option>
                     <option>Calibri</option>
                     <option>Time New Roman</option>
@@ -38,31 +38,40 @@
               <div class="form-group">
                 <label class="col-sm-3 col-md-2 control-label">Taille</label>
                 <div class="col-sm-4">
-                  <input type="number" class="form-control" value=15>
+                  <input type="number" class="form-control" ng-model="$parent.newStyle.rules[0].symbolizers[0].font.size">
                 </div>
               </div>
               <div class="form-group">
                 <label class="col-sm-3 col-md-2 control-label">Style</label>
                 <div class="col-sm-8 btn-group" data-toggle="buttons">
-
-                    <label class="btn btn-default">
-                      <input type="radio" class="btn btn-default">B
+                    <label class="btn btn-default" ng-click="$parent.newStyle.rules[0].symbolizers[0].font.bold = true">
+                      <input type="checkbox" class="btn btn-default" ng-checked="$parent.newStyle.rules[0].symbolizers[0].font.bold"><b>B</b>
                     </label>
-                    <label class="btn btn-default">
-                      <input type="radio" class="btn btn-default">I
+                    <label class="btn btn-default" ng-click="$parent.newStyle.rules[0].symbolizers[0].font.italic = true">
+                      <input type="checkbox" class="btn btn-default" ng-checked="$parent.newStyle.rules[0].symbolizers[0].font.italic"><i>I</i>
                     </label>
-                    <label class="btn btn-default">
-                      <input type="radio" class="btn btn-default">U
-                    </label>
-
                 </div>
               </div>
               <div class="form-group">
               <label class="col-sm-3 col-md-2 control-label">Couleur</label>
               <div class="col-sm-8">
-                <input type='text' name="picker" class="picker" spectrum />
+                <input type='text' name="picker" class="picker" spectrum ng-model="$parent.newStyle.rules[0].symbolizers[0].fill.color"/>
               </div>
             </div>
+               <div class="form-group">
+                   <label class="col-sm-3 col-md-2 control-label">Libellé</label>
+                   <div class="col-sm-4">
+                       <input type="text" class="form-control" ng-model="$parent.newStyle.rules[0].symbolizers[0].label">
+                   </div>
+                   <div class="col-sm-1">
+                        <button type="button" class="btn btn-default icon-link" ng-click="dispPropNames = true"></button>
+                   </div>
+                   <div class="col-sm-4" ng-show="dispPropNames">
+                       <select class="form-control" ng-model="$parent.newStyle.rules[0].symbolizers[0].label" ng-init="$parent.initDataProperties()">
+                           <option ng-value="'{'+dp.name+'}'" ng-repeat="dp in $parent.dataProperties">{{dp.name}}</option>
+                       </select>
+                   </div>
+               </div>
             </form>
         </div>
 

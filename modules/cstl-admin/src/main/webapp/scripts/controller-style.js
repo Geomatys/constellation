@@ -56,8 +56,8 @@ cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', '$
         };
     }]);
 
-cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modalInstance', 'style', 'exclude', 'layerName', 'providerId', 'serviceName', 'dataType', '$cookies', 'dataListing', '$growl',
-    function ($scope, $dashboard, $modalInstance, style, exclude, layerName, providerId, serviceName, dataType, $cookies, dataListing, $growl) {
+cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modalInstance', 'style', 'exclude', 'layerName', 'providerId', 'serviceName', 'dataType', '$cookies', 'dataListing', 'provider', '$growl',
+    function ($scope, $dashboard, $modalInstance, style, exclude, layerName, providerId, serviceName, dataType, $cookies, dataListing, provider, $growl) {
         $scope.exclude = exclude;
         $scope.layerName = layerName;
         $scope.providerId = providerId;
@@ -98,6 +98,24 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             } else {
                 $scope.newStyle.rules[0].symbolizers[0].stroke.dashArray = null;
             }
+        };
+
+        $scope.addFontFamilies = function(font) {
+            if ($scope.newStyle.rules[0].symbolizers[0].font == undefined) {
+                $scope.newStyle.rules[0].symbolizers[0].font = {};
+            }
+            $scope.newStyle.rules[0].symbolizers[0].font.family = [];
+            $scope.newStyle.rules[0].symbolizers[0].font.family[0] = font;
+        };
+
+        $scope.dataProperties = null;
+
+        $scope.initDataProperties = function() {
+            provider.dataDesc({providerId: $scope.providerId, dataId: $scope.layerName}, function(response) {
+                $scope.dataProperties = response.properties;
+            }, function() {
+                $growl('error','Error','Unable to get data description');
+            });
         };
 
         $scope.setStyleChooser = function(choice){
