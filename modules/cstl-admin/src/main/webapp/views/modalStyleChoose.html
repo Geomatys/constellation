@@ -53,7 +53,7 @@
                 <div class="dash-inner">
                     <div id="list" data-role="list">
                         <div class="pagination-wrapper">
-                            <span class="nb-results pull-left"><strong>{{countdata}}</strong></span>
+                            <strong><span class="nb-results pull-left"><strong>{{countdata}}&nbsp;</span><span class="nb-results" translate="label.count.data">available data</span></strong>
                             <select class="nb-per-page input-small form-control pull-right" ng-model="$parent.nbbypage">
                                 <option value="5">5</option>
                                 <option value="10">10</option>
@@ -70,7 +70,7 @@
                                 </div>
                                 <div class="bottom">
                                     <div class="block">
-                                        <i class="icon-calendar"></i>{{style.Date | date:'yyyy-MM-dd HH:mm:ss'}}
+                                        <i class="icon-calendar"></i>{{style.Date | date:'yyyy-MM-dd'}}
                                     </div>
                                     <div class="block">
                                         <i class="icon-user"></i>{{style.Owner}}

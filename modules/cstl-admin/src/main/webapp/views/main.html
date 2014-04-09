@@ -1,110 +1,132 @@
-<div class="row" style="margin-bottom: 20px; margin-top: 20px;">
-    <div class="col-sm-4">
+<div class="row" style="margin-bottom: 20px; margin-top: 50px;">
+    <div class="col-sm-6 col-md-5 col-md-offset-1 accueil_logo">
         <img src="images/constellation.png"/>
     </div>
-    <div class="col-sm-6 col-sm-offset-1">
-        <h2><span translate="homepage.title">Welcome on Constellation!</span></h2>
+    <div class="col-sm-6 accueil_text_welcome">
+        <h2>
+            <span translate="homepage.title">Welcome on Constellation!</span>
+        </h2>
     </div>
 </div>
-
 
 <div class="row">
     <!-- Service block -->
-    <div class="col-sm-6">
-        <div class="well">
-            <div class="row">
-                <div class="col-sm-5">
-                    <img src="images/services.png" style="display: block; margin: 0 auto;"/>
-                    <p><h3 class="text-center"><span translate="main.menu.ws.create.title">Services web</span></h3></p>
-                    <a ng-show="authenticated" id="buttonWS" href="#/webservice" class="btn btn-default" style="display: block; margin: 0 auto;"><span translate="main.menu.ws.create.subtitle">Créer un service web</span></a>
-                </div>
-                <div class="col-sm-7" style="font-size:14px"><span translate="main.menu.ws.create.detail">
-                    <p>Vous pouvez créer un nouveau service pour ensuite y ajouter des données.</p><p>Services gérés par Constellation :</p></span>
-<!--                     <div class="col-sm-3"> -->
-<!--                         CSW <br/>SOS -->
-<!--                     </div> -->
-                    <div class="col-sm-3">
-                        WFS <br/>WCS
+    <div class="col-sm-6"  >
+        <div class="well accueil-well">
+            <div class="row" style="padding: 37px 27px;">
+                <div class="col-sm-12">
+                    <p class="accueil_bloc_text">
+                        <b>Constellation-SDI</b> permet de créer et de gérer simplement une Infrastructure de Données Spatiales complète.
+                    </p>
+                    <div class="row accueil_bloc_images">
+                        <div class="col-xs-12 col-md-3">
+                            <img style="margin-top: 15px; " src="images/services.png">
+                        </div> 
+                        <div class="col-xs-12 col-md-8">
+                            <p class="accueil_bloc_text">
+                                Vous pouvez créer des <b>services web</b> pour ensuite y ajouter des données 
+                            </p>
+                        </div>
                     </div>
-                    <div class="col-sm-3">
-<!--                         WPS <br/> -->
-                        WMS
+                    <div class="row accueil_bloc_images">
+                        <div class="col-xs-12 col-md-3">
+                            <img src="images/data.png">
+                        </div> 
+                        <div class="col-xs-12 col-md-8">
+                            <p class="accueil_bloc_text">
+                                Vous pouvez gérer vos <b>données</b> 
+                            </p>
+                        </div>
                     </div>
-                    <div class="col-sm-2">
-                         WMTS
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- data block -->
-    <div class="col-sm-6">
-        <div class="well">
-            <div class="row">
-                <div class="col-sm-5">
-                    <img src="images/data.png" style="display: block; margin: 0 auto;"/>
-                    <p><h3 class="text-center"><span translate="main.menu.data.create.title">Données</span></h3></p>
-                    <a ng-show="authenticated" href="#/data" class="btn btn-default"  style="display: block; margin: 0 auto;"><span translate="main.menu.data.create.subtitle">Ajouter une donnée</span></a>
-                </div>
-                <div class="col-sm-7" style="font-size:14px;vertical-align:middle;display:inline-block;"><span translate="main.menu.data.create.detail">
-                    <p>Vous pouvez créer une nouvelle donnée.</p><p>Vous pourrez ensuite la publier dans un service web.</p></span>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="row">
-    <!-- mapcontext block -->
-<!--     <div class="col-sm-6"> -->
-<!--         <div class="well"> -->
-<!--             <div class="row"> -->
-<!--                 <div class="col-sm-4"> -->
-<!--                     <img src="images/mapcontext.png" style="display: block; margin: 0 auto;"/> -->
-<!--                     <p><h3 class="text-center"><span translate="main.menu.map-composition.create.title">Compositions cartographiques</span></h3></p> -->
-<!--                     <a href="cstl-client/createmapcontext" class="btn btn-default"  style="display: block; margin: 0 auto;"><span translate="main.menu.map-composition.create.subtitle">Créer une composition</span></a> -->
-<!--                 </div> -->
-<!--                 <div class="col-sm-7 col-sm-offset-1" style="font-size:14px"><span translate="main.menu.map-composition.create.detail"> -->
-<!--                     <p>Vous pouvez assembler plusieurs données, leur donner un style et ainsi créer vos propres compositions cartographiques.</p></span> -->
-<!--                 </div> -->
-<!--             </div> -->
-<!--         </div> -->
-<!--     </div> -->
-
-    <!-- geoviewer block -->
-<!--     <div class="col-sm-6"> -->
-<!--         <div class="well"> -->
-<!--             <div class="row"> -->
-<!--                 <div class="col-sm-4"> -->
-<!--                     <img src="images/geoviewer.png" style="display: block; margin: 0 auto;"/> -->
-<!--                     <p><h3 class="text-center"><span translate="main.menu.viewer.create.title">Visualisation de couches</span></h3></p> -->
-<!--                     <a href="cstl-client/showgeoviewer" class="btn btn-default"  style="display: block; margin: 0 auto;"><span translate="main.menu.viewer.create.subtitle">Visualiser les couches</span></a> -->
-<!--                 </div> -->
-<!--                 <div class="col-sm-7 col-sm-offset-1" style="font-size:14px;"><span translate="main.menu.viewer.create.detail"> -->
-<!--                     <p>Vous pouvez visualiser les couches disponibles sur les différents services.</p></span> -->
-<!--                 </div> -->
-<!--             </div> -->
-<!--         </div> -->
-<!--     </div> -->
-</div>
-
-<div class="row">
-    <!-- statistic block -->
-    <div class="col-sm-12">
-        <div class="well">
-            <div class="row">
-                <div style="display: table;width: 100%;">
-                    <div class="col-sm-5">
-                        <img src="images/stat.png" style="display: block; margin: 0 auto;"/>
-                        <p><h3 class="text-center"><span translate="main.menu.stat.title">Statistiques du serveur</span></h3></p>
-                        <a ng-show="authenticated"  href="#/metrics" class="btn btn-default" style="display: block; margin: 0 auto;"><span translate="main.menu.stat.subtitle">Voir les statistiques</span></a>
-                    </div>
-                    <div class="col-sm-7" style="font-size:14px;">
-                        <img src="images/stat_temp.png" style="display: block; margin: 0 auto;height:215px"/>
-                    </div>
+                    <div class="row accueil_bloc_images">
+                        <div class="col-xs-12 col-md-3">
+                            <img src="images/stat.png">
+                        </div> 
+                        <div class="col-xs-12 col-md-8">
+                            <p class="accueil_bloc_text">
+                                Vous pouvez visualiser les <b>statistiques</b> de votre serveur 
+                            </p>
+                        </div>
+                    </div>                                                                    
                 </div>
             </div>
         </div>
     </div>
 
+
+
+
+
+    <!-- Formulaire d'authentification
+    <div class="col-sm-6" ng-hide="authenticated" >
+        <div class="well" style="padding-bottom: 0px; padding-top: 0px; margin-top: 170px;">
+            <div class="row" style="padding: 0px 27px 27px 27px;">
+                <div class="col-sm-12">
+                    <div class="row">
+                        <h1 style="font-size:20px; color:#5e5e5e; margin-bottom:20px;" translate="login.title">Authentication</h1>
+                        <form class="form" role="form" action="j_spring_security_check" method="post">
+                            <div class="form-group">
+                                <label for="username" translate="login.form.username">Login</label>
+                                <input type="text" class="form-control" name="j_username"
+                            id="username"
+                            placeholder="login"
+                            ng-model="username">
+                            </div>
+                            <div class="form-group">
+                                <label for="password" translate="login.form.password">Password</label>
+                                <input type="password" class="form-control" name="j_password"
+                            id="password"
+                            placeholder="password"
+                            >
+                            </div>
+                            <button type="submit" class="btn btn-primary">Login</button>
+                        </form>
+                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    -->
+
+
+    <div class="col-sm-6" ng-show="authenticated">
+        <div class="well" style="padding-bottom: 0px; padding-top: 0px; margin-top: 170px;">
+            <div class="row" style="padding: 0px 27px 27px 27px;">
+                <div class="col-sm-12">
+                    <div class="row">
+                        <h1 style="font-size:20px; color:#5e5e5e; margin-bottom:20px;" translate="">Informations</h1>
+                        <div class="row">
+                            <div class="col-xs-6">
+                                <div style="background-color:#eaeaea; padding:10px; border-radius:5px; text-align:center; background-image:url('images/index-img-services.png'); background-repeat:no-repeat; background-position:3% 80%;">
+                                    <p class="col-xs-12"><strong>Services actifs</strong></p>
+                                    <p class="col-xs-12" style="font-size:30px; font-weight:bold;">25</p>
+                                </div>
+                            </div>
+                            <div class="col-xs-6" >
+                                <div style="background-color:#eaeaea; padding:10px; border-radius:5px; text-align:center; background-image:url('images/index-img-data.png'); background-repeat:no-repeat; background-position:5% 80%;">
+                                    <p class="col-xs-12"><strong>Données intégrées</strong></p>
+                                    <p class="col-xs-12" style="font-size:30px; font-weight:bold;">112</p>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <div class="row" style="margin-top:20px;">
+                            <div class="col-xs-6" >
+                                <div style="background-color:#eaeaea; padding:10px; border-radius:5px; text-align:center; background-image:url('images/index-img-user.png'); background-repeat:no-repeat; background-position:3% 100%;">
+                                    <p class="col-xs-12"><strong>Utilisateurs créés</strong></p>
+                                    <p class="col-xs-12" style="font-size:30px; font-weight:bold;">14</p>
+                                </div>
+                            </div>
+                            <div class="col-xs-6" >
+                                <div style="background-color:#eaeaea; padding:10px; border-radius:5px; text-align:center; background-image:url('images/index-img-process.png'); background-repeat:no-repeat; background-position:3% 90%;">
+                                    <p class="col-xs-12"><strong>Process</strong></p>
+                                    <p class="col-xs-12" style="font-size:30px; font-weight:bold;">244</p>
+                                </div>
+                            </div>
+                        </div>
+                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

@@ -135,6 +135,54 @@ ul.unstyled {
     margin-left: 20px;
 }
 /*
+ * Accueil
+ */
+.accueil_logo{
+    margin-top: 20px;
+}
+.accueil_text_welcome{
+    margin-top: 50px; 
+    text-align: center;
+}
+.accueil_text_welcome h2{
+    font-size: 40px; 
+    font-family: arial; 
+    font-weight: bold; 
+    color: #5E5E5E;
+    line-height:40px;
+}
+.accueil-well{
+    padding-bottom: 0px; 
+    padding-top: 0px; 
+    margin-top: 80px;
+}
+.accueil_bloc_text{
+    line-height: 31px; 
+    font-size: 20px; 
+    font-family: calibri;
+}
+.accueil_bloc_images{
+        margin-top: 0; 
+        margin-left: 0;
+        text-align: center;
+    }
+@media (min-width:991px){
+.accueil_bloc_images{
+    margin-top: 30px; 
+    margin-left: 15px;
+    text-align: left;
+}
+}
+
+@media (max-width: 991px){
+    .accueil_bloc_text{
+        margin-top: 15px; 
+    }
+    .accueil_text_welcome h2{
+        font-size: 35px;
+    }
+}
+/*
  * Service
  */
 .service-item .well.started {
