@@ -268,8 +268,20 @@
             "button.label": "Create web service",
             "summary": "<p>You can create a new service and after, add data on it.</p><p>Constellation managed services : </p>",
             "title.label": "Web services"
+        },
+        "satistics" :{
+            "title":"Statistics",
+            "services":"Active Services",
+            "data":"Integrated Data",
+            "users": "Created Users",
+            "process": "Process"
+        },
+        "text":{
+            "intro":"<b>Constellation-SDI</b> is the perfect solution to easily set up your Spatial Data Infrastructure.",
+            "services":"You can create a <b>new service</b> and after, add data on it",
+            "data":"You can create new <b>data</b>",
+            "stat":"You can view the <b>statistics</b> of your server"
         }
-
     },
     "label": {
         "add": "Add",

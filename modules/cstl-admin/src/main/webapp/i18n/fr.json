@@ -381,6 +381,19 @@
             "title": {
                 "label": "Services web"
             }
+        },
+        "satistics" :{
+            "title":"Statistiques",
+            "services":"Services Actifs",
+            "data":"Données intégrées",
+            "users": "Utilisateurs créés",
+            "process": "Process"
+        },
+        "text":{
+            "intro":"<b>Constellation-SDI</b> permet de créer et de gérer simplement une Infrastructure de Données Spatiales complète.",
+            "services":"Vous pouvez créer des <b>services web</b> pour ensuite y ajouter des données",
+            "data":"Vous pouvez gérer vos <b>données</b>",
+            "stat":"Vous pouvez visualiser les <b>statistiques</b> de votre serveur"
         }
     },
     "label": {
