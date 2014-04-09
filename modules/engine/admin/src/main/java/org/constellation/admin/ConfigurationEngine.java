@@ -243,8 +243,10 @@ public class ConfigurationEngine {
                         // TODO
                     } else {
                         for (Layer layer : src.getInclude()) {
-                            final Name dataName = new DefaultName(layer.getName());
-                            layerIds.add(CstlMetadatas.getMetadataIdForData(src.getId(), dataName));
+                            final DataRecord record = session.readData(layer.getName(), src.getId());
+                            if (record != null && record.hasIsoMetadata()) {
+                                layerIds.add(record.getMetadataId());
+                            }
                         }
                     }
                 }
@@ -252,7 +254,7 @@ public class ConfigurationEngine {
                     final DefaultMetadata servMeta = unmarshallMetadata(service.getIsoMetadata());
                     CstlMetadatas.updateServiceMetadataLayer(servMeta, layerIds);
                     final StringReader srm = marshallMetadata(servMeta);
-                        service.setIsoMetadata(servMeta.getFileIdentifier(), srm);
+                    service.setIsoMetadata(servMeta.getFileIdentifier(), srm);
                 }
             }
 

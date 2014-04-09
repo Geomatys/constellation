@@ -658,8 +658,7 @@ public class MetadataFeeder {
         final List<DataIdentification> resources = new ArrayList<>();
         for (String layerId : layerIds) {
             final DefaultDataIdentification dataIdent = new DefaultDataIdentification();
-            final String mdDataId = CstlMetadatas.getMetadataIdForProvider(layerId);
-            dataIdent.getIdentifierMap().put(IdentifierSpace.HREF, mdDataId);
+            dataIdent.getIdentifierMap().put(IdentifierSpace.HREF, layerId);
             resources.add(dataIdent);
         }
         servIdent.setOperatesOn(resources);
