@@ -64,7 +64,18 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         $scope.serviceName = serviceName;
         $scope.dataType = dataType;
 
-        $scope.filtertype = "";
+        $scope.initFilterType = function() {
+            if (dataType.toLowerCase() === 'vector' || dataType.toLowerCase() === 'feature-store') {
+                return 'vector';
+            }
+            if (dataType.toLowerCase() === 'coverage' || dataType.toLowerCase() === 'raster') {
+                return 'coverage';
+            }
+            return '';
+        };
+
+        $scope.filtertype = $scope.initFilterType();
+
         // Page to include
         $scope.pageSld = ($scope.dataType === 'VECTOR' || $scope.dataType === 'feature-store') ? "views/style/vectors.html" : "views/style/raster.html";
 
@@ -88,7 +99,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
 
         $scope.initScopeStyle = function() {
             style.listAll({}, function(response) {
-                $dashboard($scope, response.styles, false);
+                $dashboard($scope, response.styles, true);
             });
         };
 
