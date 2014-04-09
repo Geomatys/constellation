@@ -70,8 +70,7 @@ public class SessionTest {
             sw = new StringWriter();
             m.marshal(serv, sw);
             sr = new StringReader(sw.toString());
-            final StringReader srIso = new StringReader("<gmd:MD_Metadata xmlns:gmd=\"http://www.isotc211.org/2005/gmd\"/>");
-            session.writeServiceMetadata("serv1", ServiceDef.Specification.WFS, sr, srIso, "fre");
+            session.writeServiceMetadata("serv1", ServiceDef.Specification.WFS, sr, "fre");
 
             GenericDatabaseMarshallerPool.getInstance().recycle(m);
 

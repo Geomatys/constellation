@@ -246,10 +246,10 @@ public class ConfigurationEngine {
                     }
                 }
                 if (service.hasIsoMetadata()) {
-                    final DefaultMetadata servMeta = unmarshallMetadata(service.getIsoMetadata("eng"));
+                    final DefaultMetadata servMeta = unmarshallMetadata(service.getIsoMetadata());
                     CstlMetadatas.updateServiceMetadataLayer(servMeta, layerIds);
                     final StringReader srm = marshallMetadata(servMeta);
-                    service.setIsoMetadata("eng", srm);
+                    service.setIsoMetadata(srm);
                 }
             }
 
@@ -369,17 +369,14 @@ public class ConfigurationEngine {
                 m.marshal(metadata, sw);
                 GenericDatabaseMarshallerPool.getInstance().recycle(m);
                 final StringReader sr = new StringReader(sw.toString());
+                service.setMetadata(language, sr);
                 
                 // ISO metadata
                 String url = getConstellationProperty(SERVICES_URL_KEY, null);
                 final DefaultMetadata isoMetadata = CstlMetadatas.defaultServiceMetadata(identifier, serviceType, url, metadata);
-                final StringWriter swIso = new StringWriter();
-                final Marshaller mi = ISOMarshallerPool.getInstance().acquireMarshaller();
-                mi.marshal(isoMetadata, swIso);
-                ISOMarshallerPool.getInstance().recycle(mi);
-                final StringReader srIso = new StringReader(swIso.toString());
+                final StringReader srIso = marshallMetadata(isoMetadata);
                 
-                service.setMetadata(language, sr, srIso);
+                service.setIsoMetadata(srIso);
             }
 
         } catch (SQLException ex) {
@@ -495,10 +492,10 @@ public class ConfigurationEngine {
             final List<ServiceRecord> records = session.readServices();
             for (ServiceRecord record : records) {
                 if (record.hasIsoMetadata()) {
-                    final DefaultMetadata servMeta = unmarshallMetadata(record.getIsoMetadata("eng"));
+                    final DefaultMetadata servMeta = unmarshallMetadata(record.getIsoMetadata());
                     CstlMetadatas.updateServiceMetadataURL(record.getIdentifier(), record.getType().name(), url, servMeta);
                     final StringReader sr = marshallMetadata(servMeta);
-                    record.setIsoMetadata("eng", sr);
+                    record.setIsoMetadata(sr);
                 }
             }
         } catch (SQLException | JAXBException | IOException ex) {
@@ -611,7 +608,7 @@ public class ConfigurationEngine {
             session = EmbeddedDatabase.createSession();
             final ServiceRecord serv = session.readService(serviceId, spec);
             if (serv != null) {
-                return serv.getIsoMetadata("eng");
+                return serv.getIsoMetadata();
             }
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, "An error occurred while reading service iso metadata", ex);

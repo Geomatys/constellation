@@ -195,4 +195,14 @@ public final class DataRecord extends Record {
         ensureConnectionNotClosed();
         session.updateDataMetadata(id, metadata);
     }
+    
+    public InputStream getIsoMetadata() throws IOException, SQLException {
+        ensureConnectionNotClosed();
+        return session.readDataIsoMetadata(id);
+    }
+
+    public void setIsoMetadata(final StringReader metadata) throws IOException, SQLException {
+        ensureConnectionNotClosed();
+        session.updateDataIsoMetadata(id, metadata);
+    }
 }

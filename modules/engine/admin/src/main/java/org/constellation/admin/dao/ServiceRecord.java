@@ -150,24 +150,24 @@ public final class ServiceRecord extends Record {
         return session.readServiceMetadata(id, lang);
     }
     
-    public InputStream getIsoMetadata(final String lang) throws SQLException {
+    public InputStream getIsoMetadata() throws SQLException {
         ensureConnectionNotClosed();
-        return session.readServiceIsoMetadata(id, lang);
+        return session.readServiceIsoMetadata(id);
     }
 
-    public void setMetadata(final String lang, final StringReader metadata, final StringReader isoMetadata) throws SQLException {
+    public void setMetadata(final String lang, final StringReader metadata) throws SQLException {
         ensureConnectionNotClosed();
         final InputStream is = session.readServiceMetadata(id, lang);
         if (is == null) {
-            session.writeServiceMetadata(identifier, type, metadata, isoMetadata, lang);
+            session.writeServiceMetadata(identifier, type, metadata, lang);
         } else {
-            session.updateServiceMetadata(id, lang, metadata, isoMetadata);
+            session.updateServiceMetadata(id, lang, metadata);
         }
     }
     
-    public void setIsoMetadata(final String lang, final StringReader isoMetadata) throws SQLException {
+    public void setIsoMetadata(final StringReader isoMetadata) throws SQLException {
         ensureConnectionNotClosed();
-        session.writeServiceIsoMetadata(identifier, type, isoMetadata, lang);
+        session.writeServiceIsoMetadata(identifier, type, isoMetadata);
     }
     
     public boolean hasIsoMetadata() throws IOException, SQLException {

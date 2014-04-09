@@ -143,15 +143,9 @@ public class WCSService extends GridWebService<WCSWorker> {
      */
     @Override
     public Response treatIncomingRequest(Object objectRequest, final WCSWorker worker) {
-        final UriInfo uriContext = getUriContext();
-
         ServiceDef serviceDef = null;
 
         try {
-            // Handle an empty request by sending a basic web page.
-            if ((null == objectRequest) && (0 == uriContext.getQueryParameters().size())) {
-                return Response.ok(getIndexPage(worker.getId()), MimeType.TEXT_HTML).build();
-            }
 
             String request = "";
             // if the request is not an xml request we fill the request parameter.
@@ -679,27 +673,5 @@ public class WCSService extends GridWebService<WCSWorker> {
                 new org.geotoolkit.wcs.xml.v111.OutputType(grid, getParameter(KEY_FORMAT, true));
 
         return WCSXmlFactory.createGetCoverage("1.1.1", getParameter(KEY_IDENTIFIER, true), domain, range, null, output);
-    }
-
-    /**
-     * Get an html page for the root resource.
-     */
-    private String getIndexPage(final String instance){
-    	return  "<html>\n" +
-    		"  <title>Constellation WCS</title>\n" +
-    		"  <body>\n" +
-    		"    <h1><i>Constellation:</i></h1>\n" +
-    		"    <h1>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Web Coverage Service</h1>\n" +
-    		"    <p>\n" +
-    		"      In order to access this service, you must form a valid request.\n" +
-    		"    </p\n" +
-    		"    <p>\n" +
-    		"      Try using a <a href=\"" + getUriContext().getBaseUri() + "wcs/" + instance
-    		                             + "?service=WCS&version=1.0.0&request=GetCapabilities&version=1.0.0\""
-    		                             + ">Get Capabilities</a> request to obtain the 'Capabilities'<br>\n" +
-    		"      document which describes the resources available on this server.\n" +
-    		"    </p>\n" +
-    		"  </body>\n" +
-    		"</html>\n";
     }
 }

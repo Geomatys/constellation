@@ -77,16 +77,17 @@ ALTER TABLE "admin"."style" ADD CONSTRAINT style_owner_fk    FOREIGN KEY ("owner
 ALTER TABLE "admin"."style" ADD CONSTRAINT style_provider_fk FOREIGN KEY ("provider") REFERENCES "admin"."provider"("id") ON DELETE CASCADE;
 
 CREATE TABLE "admin"."data"(
-  "id"          INTEGER     NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0, INCREMENT BY 1),
-  "name"        VARCHAR(512) NOT NULL,
-  "namespace"   VARCHAR(256)NOT NULL,
-  "provider"    INTEGER     NOT NULL,
-  "type"        VARCHAR(32) NOT NULL,
-  "date"        BIGINT      NOT NULL,
-  "title"       INTEGER     NOT NULL,
-  "description" INTEGER     NOT NULL,
-  "owner"       VARCHAR(32),
-  "metadata"  CLOB
+  "id"            INTEGER     NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0, INCREMENT BY 1),
+  "name"          VARCHAR(512) NOT NULL,
+  "namespace"     VARCHAR(256)NOT NULL,
+  "provider"      INTEGER     NOT NULL,
+  "type"          VARCHAR(32) NOT NULL,
+  "date"          BIGINT      NOT NULL,
+  "title"         INTEGER     NOT NULL,
+  "description"   INTEGER     NOT NULL,
+  "owner"         VARCHAR(32),
+  "metadata"      CLOB,
+  "iso_metadata"  CLOB
 );
 
 ALTER TABLE "admin"."data" ADD CONSTRAINT data_pk          PRIMARY KEY ("id");
@@ -122,7 +123,8 @@ CREATE TABLE "admin"."service"(
   "title"       INTEGER     NOT NULL,
   "description" INTEGER     NOT NULL,
   "config"      CLOB,
-  "owner"       VARCHAR(32)
+  "owner"       VARCHAR(32),
+  "metadata"    CLOB
 );
 
 ALTER TABLE "admin"."service" ADD CONSTRAINT service_pk       PRIMARY KEY ("id");
@@ -141,8 +143,7 @@ ALTER TABLE "admin"."service_extra_config" ADD CONSTRAINT service_extra_config_s
 CREATE TABLE "admin"."service_metadata"(
   "id"          INTEGER     NOT NULL,
   "lang"        VARCHAR(3) NOT NULL,
-  "content"     CLOB,
-  "iso_content" CLOB
+  "content"     CLOB
 );
 
 ALTER TABLE "admin"."service_metadata" ADD CONSTRAINT service_metadata_pk  PRIMARY KEY ("id", "lang");

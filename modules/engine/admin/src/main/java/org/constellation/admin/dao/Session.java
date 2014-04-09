@@ -131,6 +131,7 @@ public final class Session implements Closeable {
     private static final String READ_DATA                   = "data.read";
     private static final String READ_DATA_NMSP              = "data.read.nmsp";
     private static final String READ_DATA_METADATA          = "data.read.metadata";
+    private static final String READ_DATA_ISO_METADATA      = "data.read.iso_metadata";
     private static final String READ_DATA_FROM_ID           = "data.read.from.id";
     private static final String READ_DATA_FROM_LAYER        = "data.read.from.layer";
     private static final String LIST_DATA                   = "data.list";
@@ -139,6 +140,7 @@ public final class Session implements Closeable {
     private static final String WRITE_DATA                  = "data.write";
     private static final String UPDATE_DATA                 = "data.update";
     private static final String UPDATE_DATA_METADATA        = "data.update.metadata";
+    private static final String UPDATE_DATA_ISO_METADATA    = "data.update.iso_metadata";
     private static final String DELETE_DATA                 = "data.delete";
     private static final String DELETE_DATA_NMSP            = "data.delete.nmsp";
 
@@ -768,6 +770,11 @@ public final class Session implements Closeable {
         final InputStream stream = new Query(READ_DATA_METADATA).with(dataid).select().getClob();
         return stream;
     }
+    
+    /* internal */ InputStream readDataIsoMetadata(final int dataid) throws SQLException, IOException {
+        final InputStream stream = new Query(READ_DATA_ISO_METADATA).with(dataid).select().getClob();
+        return stream;
+    }
 
     public DataRecord writeData(final QName name, final ProviderRecord provider, final DataType type, final String owner) throws SQLException {
         ensureNonNull("name",     name);
@@ -792,6 +799,10 @@ public final class Session implements Closeable {
 
     /* internal */ void updateDataMetadata(final int dataId, final StringReader metadata) throws SQLException {
         new Query(UPDATE_DATA_METADATA).with(metadata, dataId).update();
+    }
+    
+    /* internal */ void updateDataIsoMetadata(final int dataId, final StringReader metadata) throws SQLException {
+        new Query(UPDATE_DATA_ISO_METADATA).with(metadata, dataId).update();
     }
 
     public void deleteData(final QName name, final String providerId) throws SQLException {
@@ -876,8 +887,8 @@ public final class Session implements Closeable {
         return new Query(READ_SERVICES_METADATA).with(generatedId, lang).select().getClob();
     }
     
-    /* internal */ InputStream readServiceIsoMetadata(final int generatedId, final String lang) throws SQLException {
-        return new Query(READ_SERVICES_ISO_METADATA).with(generatedId, lang).select().getClob();
+    /* internal */ InputStream readServiceIsoMetadata(final int generatedId) throws SQLException {
+        return new Query(READ_SERVICES_ISO_METADATA).with(generatedId).select().getClob();
     }
 
     public List<ServiceRecord> readServices() throws SQLException {
@@ -918,23 +929,23 @@ public final class Session implements Closeable {
         new Query(WRITE_SERVICE_EXTRA_CONFIG).with(record.id, fileName, config).insert();
     }
 
-    public void writeServiceMetadata(final String identifier, final Specification spec, final StringReader metadata, final StringReader isoMetadata, final String lang) throws SQLException {
+    public void writeServiceMetadata(final String identifier, final Specification spec, final StringReader metadata, final String lang) throws SQLException {
         ensureNonNull("identifier", identifier);
         ensureNonNull("spec",       spec);
 
         final ServiceRecord record = readService(identifier, spec);
 
         // Proceed to insertion.
-        new Query(WRITE_SERVICE_METADATA).with(record.id, lang, metadata, isoMetadata).insert();
+        new Query(WRITE_SERVICE_METADATA).with(record.id, lang, metadata).insert();
     }
     
-    public void writeServiceIsoMetadata(final String identifier, final Specification spec, final StringReader isoMetadata, final String lang) throws SQLException {
+    public void writeServiceIsoMetadata(final String identifier, final Specification spec, final StringReader isoMetadata) throws SQLException {
         ensureNonNull("identifier", identifier);
         ensureNonNull("spec",       spec);
 
         final ServiceRecord record = readService(identifier, spec);
 
-        new Query(UPDATE_SERVICE_ISO_METADATA).with(isoMetadata, record.id, lang).update();
+        new Query(UPDATE_SERVICE_ISO_METADATA).with(isoMetadata, record.id).update();
     }
 
     /* internal */ void updateService(final int generatedId, final String newIdentifier, final Specification newType, final String newOwner) throws SQLException {
@@ -949,8 +960,8 @@ public final class Session implements Closeable {
         new Query(UPDATE_SERVICE_EXTRA_CONFIG).with(newConfig, generatedId, fileName).update();
     }
 
-    /* internal */ void updateServiceMetadata(final int generatedId, final String lang, final StringReader newMetadata, final StringReader newIsoMetadata) throws SQLException {
-        new Query(UPDATE_SERVICE_METADATA).with(newMetadata, newIsoMetadata, generatedId, lang).update();
+    /* internal */ void updateServiceMetadata(final int generatedId, final String lang, final StringReader newMetadata) throws SQLException {
+        new Query(UPDATE_SERVICE_METADATA).with(newMetadata, generatedId, lang).update();
     }
 
     public void deleteService(final String identifier, final Specification spec) throws SQLException {
@@ -973,7 +984,7 @@ public final class Session implements Closeable {
      * @throws IOException if the configuration cannot be read
      */
     /* internal */ boolean hasServiceIsoMetadata(final int generatedId) throws SQLException, IOException {
-        return readServiceIsoMetadata(generatedId, "eng") != null;
+        return readServiceIsoMetadata(generatedId) != null;
     }
 
     /**************************************************************************
