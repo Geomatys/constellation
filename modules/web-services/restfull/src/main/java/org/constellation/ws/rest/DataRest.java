@@ -64,8 +64,8 @@ import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.provider.coveragestore.CoverageStoreProvider;
 import org.constellation.security.SecurityManagerHolder;
 import org.constellation.util.SimplyMetadataTreeNode;
+import org.constellation.utils.CstlMetadatas;
 import org.constellation.utils.GeotoolkitFileExtensionAvailable;
-import org.constellation.utils.MetadataFeeder;
 import org.constellation.utils.MetadataUtilities;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
@@ -419,7 +419,7 @@ public class DataRest {
     
 
 
-	/**
+    /**
      * Save metadata with merge from ISO19115 form
      *
      * @param metadataToSave {@link org.constellation.dto.DataMetadata} which contains new information for metadata.
@@ -459,9 +459,7 @@ public class DataRest {
         }
 
         //Update metadata
-        MetadataFeeder mf = new MetadataFeeder(dm);
-        mf.feed(metadataToSave);
-
+        CstlMetadatas.feedMetadata(dm, metadataToSave);
 
         //Save metadata
         dm.prune();

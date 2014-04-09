@@ -30,6 +30,7 @@ import org.apache.sis.util.iso.DefaultInternationalString;
 import org.apache.sis.util.iso.DefaultNameFactory;
 import org.apache.sis.util.iso.SimpleInternationalString;
 import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.IdentifierSpace;
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
 import org.constellation.dto.DataMetadata;
@@ -41,9 +42,9 @@ import org.opengis.metadata.citation.CitationDate;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.OnlineResource;
 import org.opengis.metadata.citation.Role;
-import org.opengis.metadata.constraint.LegalConstraints;
 import org.opengis.metadata.distribution.DigitalTransferOptions;
 import org.opengis.metadata.distribution.Distribution;
+import org.opengis.metadata.identification.DataIdentification;
 import org.opengis.metadata.identification.Identification;
 import org.opengis.metadata.identification.Keywords;
 import org.opengis.metadata.identification.TopicCategory;
@@ -637,6 +638,29 @@ public class MetadataFeeder {
             LOGGER.log(Level.WARNING, "unvalid URL:" + url, ex);
         }
         return op;
+    }
+    
+    public void setServiceMetadataIdForData(final List<String> layerIds) {
+        final Collection<Identification> idents = eater.getIdentificationInfo();
+        ServiceIdentificationImpl servIdent = null;
+        for (Identification ident : idents) {
+            if (ident instanceof ServiceIdentificationImpl) {
+                servIdent = (ServiceIdentificationImpl) ident;
+            }
+        }
+        if (servIdent == null) {
+            servIdent = new ServiceIdentificationImpl();
+            eater.getIdentificationInfo().add(servIdent);
+        }
+
+        final List<DataIdentification> resources = new ArrayList<>();
+        for (String layerId : layerIds) {
+            final DefaultDataIdentification dataIdent = new DefaultDataIdentification();
+            final String mdDataId = CstlMetadatas.getMetadataIdForData(layerId);
+            dataIdent.getIdentifierMap().put(IdentifierSpace.HREF, mdDataId);
+            resources.add(dataIdent);
+        }
+        servIdent.setOperatesOn(resources);
     }
     
     /**

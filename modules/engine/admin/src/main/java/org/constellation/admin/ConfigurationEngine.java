@@ -63,7 +63,6 @@ import org.constellation.util.Util;
 import org.constellation.utils.CstlMetadataTemplate;
 import org.constellation.utils.CstlMetadatas;
 import org.constellation.utils.ISOMarshallerPool;
-import org.constellation.utils.MetadataFeeder;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.parameter.GeneralParameterValue;
@@ -204,12 +203,11 @@ public class ConfigurationEngine {
                 sr = null;
             }
 
-            String login = securityManager.getCurrentUserLogin();
-            final ServiceRecord service = session.readService(serviceID, spec);
+            final String login = securityManager.getCurrentUserLogin();
+            ServiceRecord service = session.readService(serviceID, spec);
             if (service == null) {
                 if (fileName == null) {
-
-                    session.writeService(serviceID, spec, sr, login);
+                    service = session.writeService(serviceID, spec, sr, login);
                 } else {
                     session.writeServiceExtraConfig(serviceID, spec, sr, fileName);
                 }
@@ -233,8 +231,29 @@ public class ConfigurationEngine {
                     service.setExtraFile(fileName, sr);
                 }
             }
+            
+            // update service metadata for a WxS
+            if (obj instanceof LayerContext) {
+                final LayerContext context = (LayerContext) obj;
+                final List<String> layerIds = new ArrayList<>();
+                for (Source src : context.getLayers()) {
+                    if (src.getLoadAll()) {
+                        // TODO
+                    } else {
+                        for (Layer layer : src.getInclude()) {
+                            layerIds.add(CstlMetadatas.getMetadataIdForLayer(layer.getName().getLocalPart()));
+                        }
+                    }
+                }
+                if (service.hasIsoMetadata()) {
+                    final DefaultMetadata servMeta = unmarshallMetadata(service.getIsoMetadata("eng"));
+                    CstlMetadatas.updateServiceMetadataLayer(servMeta, layerIds);
+                    final StringReader srm = marshallMetadata(servMeta);
+                    service.setIsoMetadata("eng", srm);
+                }
+            }
 
-        } catch (SQLException ex) {
+        } catch (SQLException | IOException ex) {
             LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
         } finally {
             if (session != null)
@@ -476,16 +495,10 @@ public class ConfigurationEngine {
             final List<ServiceRecord> records = session.readServices();
             for (ServiceRecord record : records) {
                 if (record.hasIsoMetadata()) {
-                    final Unmarshaller um = ISOMarshallerPool.getInstance().acquireUnmarshaller();
-                    final DefaultMetadata servMeta = (DefaultMetadata) um.unmarshal(record.getIsoMetadata("eng"));
-                    ISOMarshallerPool.getInstance().recycle(um);
-                    CstlMetadatas.updateServiceMetadata(record.getIdentifier(), record.getType().name(), url, servMeta);
-                    
-                    final StringWriter swIso = new StringWriter();
-                    final Marshaller mi = ISOMarshallerPool.getInstance().acquireMarshaller();
-                    mi.marshal(servMeta, swIso);
-                    ISOMarshallerPool.getInstance().recycle(mi);
-                    record.setIsoMetadata("eng", new StringReader(swIso.toString()));
+                    final DefaultMetadata servMeta = unmarshallMetadata(record.getIsoMetadata("eng"));
+                    CstlMetadatas.updateServiceMetadataURL(record.getIdentifier(), record.getType().name(), url, servMeta);
+                    final StringReader sr = marshallMetadata(servMeta);
+                    record.setIsoMetadata("eng", sr);
                 }
             }
         } catch (SQLException | JAXBException | IOException ex) {
@@ -1168,5 +1181,20 @@ public class ConfigurationEngine {
             if (session != null)
                 session.close();
         }
+    }
+    
+    private static DefaultMetadata unmarshallMetadata(final InputStream stream) throws JAXBException {
+        final Unmarshaller um = ISOMarshallerPool.getInstance().acquireUnmarshaller();
+        final DefaultMetadata meta = (DefaultMetadata) um.unmarshal(stream);
+        ISOMarshallerPool.getInstance().recycle(um);
+        return meta;
+    }
+    
+    private static StringReader marshallMetadata(final DefaultMetadata meta) throws JAXBException {
+        final StringWriter swIso = new StringWriter();
+        final Marshaller mi = ISOMarshallerPool.getInstance().acquireMarshaller();
+        mi.marshal(meta, swIso);
+        ISOMarshallerPool.getInstance().recycle(mi);
+        return new StringReader(swIso.toString());
     }
 }

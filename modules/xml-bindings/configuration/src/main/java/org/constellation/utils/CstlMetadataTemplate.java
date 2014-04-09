@@ -25,7 +25,8 @@ import org.apache.sis.metadata.iso.DefaultMetadata;
  * @author Guilhem Legal (Geomatys)
  */
 public enum CstlMetadataTemplate {
-    DATA("data"),
+    DATA("data"), // provider
+    LAYER("layer"), // data/layer
     SERVICE("serv");
 
     private final String prefix;
@@ -52,6 +53,9 @@ public enum CstlMetadataTemplate {
         if (metadataId.startsWith(SERVICE.getPrefix())) {
             return SERVICE;
         }
+        if (metadataId.startsWith(LAYER.getPrefix())) {
+            return LAYER;
+        }
         return null;
     }
 
@@ -67,12 +71,10 @@ public enum CstlMetadataTemplate {
         if (metadata == null) {
             return null;
         }
-        final MetadataFeeder feeder =new MetadataFeeder(metadata);
-        final String ident = feeder.getIdentifier();
+        final String ident = metadata.getFileIdentifier();
         if (ident == null || ident.isEmpty()) {
             return null;
         }
-
         return valueForPrefix(ident);
     }
 }

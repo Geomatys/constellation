@@ -18,12 +18,13 @@
 package org.constellation.utils;
 
 import java.util.Date;
+import java.util.List;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.ArgumentChecks;
 import org.constellation.ServiceDef;
+import org.constellation.dto.DataMetadata;
 import org.constellation.dto.Service;
-import static org.constellation.utils.CstlMetadataTemplate.DATA;
-import static org.constellation.utils.CstlMetadataTemplate.SERVICE;
+import static org.constellation.utils.CstlMetadataTemplate.*;
 
 /**
  *
@@ -54,10 +55,15 @@ public class CstlMetadatas {
         return metadata;
     }
     
-    public static void updateServiceMetadata(final String serviceIdentifier, final String serviceType, final String cstlURL, final DefaultMetadata metadata) {
+    public static void updateServiceMetadataURL(final String serviceIdentifier, final String serviceType, final String cstlURL, final DefaultMetadata metadata) {
         final MetadataFeeder feeder = new MetadataFeeder(metadata);
         final String serviceURL = cstlURL + "/WS/" + serviceType.toLowerCase() + '/' + serviceIdentifier;
         feeder.updateServiceURL(serviceURL);
+    }
+    
+    public static void updateServiceMetadataLayer(final DefaultMetadata metadata, final List<String> layerIds) {
+        final MetadataFeeder feeder = new MetadataFeeder(metadata);
+        feeder.setServiceMetadataIdForData(layerIds);
     }
     
     public static String getMetadataIdForService(final String serviceName, final String serviceType){
@@ -69,6 +75,17 @@ public class CstlMetadatas {
     public static String getMetadataIdForData(final String dataName){
         ArgumentChecks.ensureNonNull("dataName", dataName);
         return DATA.getPrefix()+ '_' + dataName;
+    }
+    
+    public static String getMetadataIdForLayer(final String dataName){
+        ArgumentChecks.ensureNonNull("dataName", dataName);
+        return LAYER.getPrefix()+ '_' + dataName;
+    }
+    
+    public static void feedMetadata(final DefaultMetadata metadata, final DataMetadata datam) {
+        ArgumentChecks.ensureNonNull("datam", datam);
+        final MetadataFeeder feeder = new MetadataFeeder(metadata);
+        feeder.feed(datam);
     }
     
     /**
