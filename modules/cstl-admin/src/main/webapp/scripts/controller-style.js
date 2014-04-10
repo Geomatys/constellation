@@ -77,7 +77,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         $scope.filtertype = $scope.initFilterType();
 
         // Page to include
-        $scope.pageSld = ($scope.dataType === 'VECTOR' || $scope.dataType === 'feature-store') ? "views/style/vectors.html" : "views/style/raster.html";
+        $scope.pageSld = ($scope.dataType.toLowerCase() === 'vector' || $scope.dataType === 'feature-store') ? "views/style/vectors.html" : "views/style/raster.html";
 
         $scope.stylechooser = 'new';
 
@@ -279,7 +279,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             $scope.layerName = data.Name;
             $scope.providerId = data.Provider;
             $scope.dataType = data.Type;
-            $scope.pageSld = ($scope.dataType === 'VECTOR' || $scope.dataType === 'feature-store') ? "views/style/vectors.html" : "views/style/raster.html";
+            $scope.pageSld = ($scope.dataType.toLowerCase() === 'vector' || $scope.dataType === 'feature-store') ? "views/style/vectors.html" : "views/style/raster.html";
         };
 
         $scope.showLayerWithStyle = function(style) {
