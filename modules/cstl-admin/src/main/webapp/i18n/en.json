@@ -833,5 +833,43 @@
       "title": "Users Dashboard",
       "count": "There are {{ total }} users.",
       "filter": "User filter: "
+    },
+    "sldeditor":{
+        "vector":{
+            "polygon":"Polygon",
+            "line":"Line",
+            "point":"Point",
+            "text":"Text"
+        },
+        "breadcrumb":{
+            "type":"Type selection",
+            "edition":"Style edition"
+        },
+        "name":"Style name",
+        "tab":{
+            "simple":"Simple editor",
+            "xml":"XML editor"
+        },
+        "apercu":{
+            "titre": "Style preview",
+            "data":"Data preview"
+        },
+        "edition":{
+            "fill": "Fill",
+            "color": "Color",
+            "stroke":"Stroke",
+            "size":"Size",
+            "stipple":"Stipple",
+            "full":"Full",
+            "line": "Line",
+            "space":"Space",
+            "join":"Join",
+            "cap":"Cap",
+            "offset":"Offset",
+            "icon":"Icon",
+            "opacity":"Opacity",
+            "font":"Font",
+            "label":"Label"
+        }
     }
 }

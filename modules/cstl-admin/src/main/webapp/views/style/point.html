@@ -1,10 +1,10 @@
 <ol class="breadcrumb">
-  <li><a ng-click="$parent.pageSld = 'views/style/vectors.html'">Choix du type</a></li>
-  <li class="active">Edition du style</li>
+  <li><a ng-click="$parent.pageSld = 'views/style/vectors.html'"><span translate="sldeditor.breadcrumb.type">Type selection</span></a></li>
+  <li class="active"><span translate="sldeditor.breadcrumb.edition">Style Edition</span></li>
 </ol>
 <div class="style_bloc">
   <div class="form-group col-xs-12" style="margin: 6px 0; height:35px;">
-    <label class="col-sm-3 col-md-2 control-label" style="margin-top: 8px;">Nom du style</label>
+    <label class="col-sm-3 col-md-2 control-label" style="margin-top: 8px;"  translate="sldeditor.name">Style name</label>
     <div class="col-sm-9 col-md-4">
         <input type="text" class="form-control" ng-model="$parent.newStyle.name">
     </div>
@@ -12,8 +12,8 @@
 </div>
 <!-- Tab nav -->
 <ul class="nav nav-tabs" ng-init="chosenTab = 'simple'">
-    <li ng-class="{active: chosenTab==='simple'}"><a ng-click="chosenTab = 'simple'" data-toggle="tab">Editeur simple</a></li>
-    <li ng-class="{active: chosenTab==='xml'}"><a ng-click="chosenTab = 'xml'" data-toggle="tab">Editeur XML</a></li>
+    <li ng-class="{active: chosenTab==='simple'}"><a ng-click="chosenTab = 'simple'" data-toggle="tab"><span translate="sldeditor.tab.simple" >Simple editor</span></a></li>
+    <li ng-class="{active: chosenTab==='xml'}"><a ng-click="chosenTab = 'xml'" data-toggle="tab"><span translate="sldeditor.tab.xml" >XML Editor</span></a></li>
 </ul>
 
 <!-- Tab panes -->
@@ -21,11 +21,11 @@
   <div class="tab-pane" ng-class="{active:chosenTab==='simple'}">
     <div class="row">
       <div class="col-xs-12 col-sm-6 col-md-8">
-        <h2>Edition du style</h2>
+        <h2 translate="sldeditor.breadcrumb.edition">Style Edition</h2>
         <div class="style_bloc">
           <form class="form-horizontal" role="form">
             <div class="form-group">
-              <label class="col-sm-3 col-md-2 control-label">Icône</label>
+              <label class="col-sm-3 col-md-2 control-label" translate="sldeditor.edition.icon">Icon</label>
               <div class="col-sm-2">
                 <div class="btn-group select select-block">
                   <button class="btn dropdown-toggle btn-default" data-toggle="dropdown" ng-init="img_icone='images/icone_circle.png'">
@@ -57,13 +57,13 @@
               </div>
             </div>
             <div class="form-group">
-              <label class="col-sm-3 col-md-2 control-label">Remplissage</label>
+              <label class="col-sm-3 col-md-2 control-label" translate="sldeditor.edition.fill">Fill</label>
               <div class="col-sm-8">
                 <input type='text' name="picker" class="picker" spectrum ng-model="$parent.newStyle.rules[0].symbolizers[0].graphic.mark.fill.color" />
               </div>
             </div>
             <div class="form-group">
-              <label class="col-sm-3 col-md-2 control-label">Contour</label>
+              <label class="col-sm-3 col-md-2 control-label" translate="sldeditor.edition.stroke">Stroke</label>
               <div class="col-sm-8">
                 <input type='text' name="picker" class="picker" spectrum ng-model="$parent.newStyle.rules[0].symbolizers[0].graphic.mark.stroke.color" />
               </div>
@@ -73,7 +73,7 @@
         <div class="style_bloc">
           <form class="form-horizontal" role="form">
             <div class="form-group">
-              <label class="col-sm-3 col-md-2 control-label">Taille</label>
+              <label class="col-sm-3 col-md-2 control-label" translate="sldeditor.edition.size">Size</label>
               <div class="col-sm-6">
                 <input class="slider" type="range" ng-init="$parent.newStyle.rules[0].symbolizers[0].graphic.size = 15"
                        ng-model="$parent.newStyle.rules[0].symbolizers[0].graphic.size" max="100" min="0" step="1">
@@ -93,7 +93,7 @@
               </div>
             </div>
             <div class="form-group">
-              <label class="col-sm-3 col-md-2 control-label">Opacité</label>
+              <label class="col-sm-3 col-md-2 control-label" translate="sldeditor.edition.opacity">Opacity</label>
               <div class="col-sm-6">
                 <input class="slider" ng-init="$parent.newStyle.rules[0].symbolizers[0].graphic.opacity = 100"
                        ng-model="$parent.newStyle.rules[0].symbolizers[0].graphic.opacity" type="range" max="100" min="0" step="1">
@@ -107,9 +107,9 @@
 
       </div>
       <div class="col-xs-12 col-sm-6 col-md-4">
-        <h2>Aperçu du style</h2>
+        <h2 translate="sldeditor.apercu.titre">Style preview</h2>
         <div class="bloc_apercu" id="styledMapOL" style="width: 299px; height: 299px;"></div>
-        <button type="button" class="btn-apercu col-xs-12 btn btn-primary" ng-click="displayCurrentStyle()">Aperçu de la donnée</button>
+        <button type="button" class="btn-apercu col-xs-12 btn btn-primary" ng-click="displayCurrentStyle()"><span translate="sldeditor.apercu.data">Data preview</span></button>
       </div>
     </div>
   </div>
@@ -118,7 +118,7 @@
     <div class="row">
       <div class="col-xs-12 col-sm-6 col-md-8">
         <div class="row">
-          <div class="col-xs-7 col-md-8"><h2>Edition du style</h2></div>
+          <div class="col-xs-7 col-md-8"><h2 translate="sldeditor.breadcrumb.edition">Style Edition</h2></div>
           <div class="col-xs-5 col-md-4">
             <button type="button" class="btn-apercu btn-block btn-sm btn btn-default">Ajouter un filtre</button>
           </div>
@@ -204,12 +204,12 @@
 
       </div>
       <div class="col-xs-12 col-sm-6 col-md-4">
-        <h2>Aperçu du style</h2>
+        <h2 translate="sldeditor.apercu.titre">Style preview</h2>
         <div ng-show=" symbole_point=='point' " class="row">
           <div class="style_bloc">
           <form class="form-horizontal" role="form">
             <div class="form-group">
-              <label class="col-sm-4 control-label">Icône</label>
+              <label class="col-sm-4 control-label" translate="sldeditor.edition.icon">Icon</label>
               <div class="col-xs-8 col-sm-8 col-md-4">
                 <select class="form-control">
                   <option>Rond</option>
@@ -223,13 +223,13 @@
               </div>
             </div>
             <div class="form-group">
-              <label class="col-sm-4 control-label">Remplissage</label>
+              <label class="col-sm-4 control-label" translate="sldeditor.edition.fill">Fill</label>
               <div class="col-sm-8">
                 <input type='text' name="picker" class="picker" spectrum />
               </div>
             </div>
             <div class="form-group">
-              <label class="col-sm-4 control-label">Contour</label>
+              <label class="col-sm-4 control-label" translate="sldeditor.edition.stroke">Stroke</label>
               <div class="col-sm-8">
                 <input type='text' name="picker" class="picker" spectrum />
               </div>
@@ -239,7 +239,7 @@
         <div class="style_bloc">
           <form class="form-horizontal" role="form">
             <div class="form-group">
-              <label class="col-sm-4 control-label">Taille</label>
+              <label class="col-sm-4 control-label" translate="sldeditor.edition.size">Size</label>
               <div class="col-md-5 col-sm-8">
                 <input class="slider" type="range" ng-model="i" ng-init="i=15" max="100" min="0" step="1">
               </div>
@@ -257,7 +257,7 @@
               </div>
             </div>
             <div class="form-group">
-              <label class="col-sm-4 control-label">Opacité</label>
+              <label class="col-sm-4 control-label" translate="sldeditor.edition.opacity">Opacity</label>
               <div class="col-md-5 col-sm-8">
                 <input class="slider" ng-model="k" type="range" ng-init="k=0" max="100" min="0" step="1">
               </div>
@@ -274,7 +274,7 @@
           <div class="style_bloc">
             <form class="form-horizontal" role="form">
               <div class="form-group">
-                <label class="col-sm-4 control-label">Police</label>
+                <label class="col-sm-4 control-label" translate="sldeditor.edition.font">Font</label>
                 <div class="col-sm-8">
                   <select class="form-control">
                     <option>Arial</option>
@@ -286,7 +286,7 @@
                 </div>
               </div>
               <div class="form-group">
-                <label for="fontWidth" class="col-sm-4 control-label">Taille</label>
+                <label for="fontWidth" class="col-sm-4 control-label" translate="sldeditor.edition.size">Size</label>
                 <div class="col-sm-8">
                   <input type="number" class="form-control" value=15>
                 </div>
@@ -302,7 +302,7 @@
                 </div>
               </div>
               <div class="form-group">
-              <label class="col-sm-4 control-label">Couleur</label>
+              <label class="col-sm-4 control-label" translate="sldeditor.edition.color">Color</label>
               <div class="col-sm-8">
                 <input type='text' name="picker" class="picker" spectrum />
               </div>
@@ -313,7 +313,7 @@
           </div>
         </div>
 
-        <button type="button" class="btn-apercu btn-block btn btn-primary">Aperçu de la donnée</button>
+        <button type="button" class="btn-apercu btn-block btn btn-primary"><span translate="sldeditor.apercu.data">Data preview</span></button>
       </div>
     </div>
   </div>
@@ -321,7 +321,7 @@
   <div class="tab-pane" ng-class="{active:chosenTab==='classif'}" ng-init="apercu_point=1">
     <div class="row">
       <div class="col-xs-12 col-sm-6 col-md-8">
-        <h2>Edition du style</h2>
+        <h2 translate="sldeditor.breadcrumb.edition">Style Edition</h2>
         <div class="style_bloc" style="min-height:60px;">
                 <div class="col-sm-9 col-md-10 btn-group" style="margin-bottom:20px;" ng-init="classification_point='unique'" data-toggle="buttons">
                     <label ng-class="{active: classification_point==='unique'}" ng-click="classification_point='unique'" type="button" class="btn btn-default"><input type="radio" value="unique">Valeur unique</label>
@@ -511,7 +511,7 @@
                   </table>
                  <form ng-show="apercu_point==2" class="form_classification form-horizontal" role="form">
                     <div class="form-group">
-                          <label class="col-sm-4 control-label">Icône</label>
+                          <label class="col-sm-4 control-label" translate="sldeditor.edition.icon">Icon</label>
                           <div class="col-xs-8 col-sm-8 col-md-4">
                             <select class="form-control">
                               <option>Rond</option>
@@ -525,13 +525,13 @@
                           </div>
                         </div>
                         <div class="form-group">
-                          <label class="col-sm-4 control-label">Contour</label>
+                          <label class="col-sm-4 control-label" translate="sldeditor.edition.stroke">Stroke</label>
                           <div class="col-sm-8">
                             <input type='text' name="picker" class="picker" spectrum />
                           </div>
                         </div>
                         <div class="form-group">
-                            <label for="fontWidth" class="col-sm-4 control-label">Taille</label>
+                            <label for="fontWidth" class="col-sm-4 control-label" translate="sldeditor.edition.size">Size</label>
                             <div class="col-sm-8">
                               <input type="number" class="form-control" value=15 id="fontWidth">
                             </div>
@@ -548,13 +548,13 @@
                     <button type="button" class="btn-apercu btn btn-default">Ajouter une valeur</button>
                 </div>
             </div>
-            <button type="button" class="btn-apercu col-xs-12 btn btn-primary">Aperçu de la donnée</button>
+            <button type="button" class="btn-apercu col-xs-12 btn btn-primary"><span translate="sldeditor.apercu.data">Data preview</span></button>
         </div>
       </div>
     </div>
   </div>
 
   <div class="tab-pane" ng-class="{active:chosenTab==='xml'}">
-    <h2>Editeur XML</h2>
+    <h2 translate="sldeditor.tab.xml" >XML Editor</h2>
   </div>
 </div>

@@ -1099,5 +1099,43 @@
       "title": "Gestion des utilisateurs",
       "count": "Il y a {{ total }} Utilisateurs.",
       "filter": "Filtrer: "
+    },
+     "sldeditor":{
+        "vector":{
+            "polygon":"Polygone",
+            "line":"Ligne",
+            "point":"Point",
+            "text":"Texte"
+        },
+        "breadcrumb":{
+            "type":"Choix du type",
+            "edition":"Edition du style"
+        },
+        "name":"Nom du style",
+        "tab":{
+            "simple":"Editeur simple",
+            "xml":"Editeur XML"
+        },
+        "apercu":{
+            "titre": "Aperçu du style",
+            "data":"Aperçu de la donnée"
+        },
+        "edition":{
+            "fill": "Remplissage",
+            "color": "Couleur",
+            "stroke":"Contour",
+            "size":"Size",
+            "stipple":"Pointillés",
+            "full":"Plein",
+            "line": "Trait",
+            "space":"Espace",
+            "join":"Angle",
+            "cap":"Extrémité",
+            "offset":"Décalage",
+            "icon":"Icône",
+            "opacity":"Opacité",
+            "font":"Police",
+            "label":"Libellé"
+        }
     }
 }
