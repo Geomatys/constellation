@@ -110,7 +110,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
 
         $scope.palette = {
             index : undefined,
-            img_palette : 'images/palette1.png',
+            img_palette : undefined,
             rasterMinValue : undefined,
             rasterMaxValue : undefined,
             intervalles : 1,
