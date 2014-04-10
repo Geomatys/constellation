@@ -10,10 +10,10 @@
   </div>
 </div>
 <!-- Tab nav -->
-<ul class="nav nav-tabs" ng-init="chosenTab = 'simple'">
-    <li ng-class="{active: chosenTab==='simple'}"><a ng-click="chosenTab = 'simple'" data-toggle="tab"><span translate="sldeditor.tab.simple" >Simple editor</span></a></li>
+<ul class="nav nav-tabs" ng-init="chosenTab = 'colorMap'">
+    <!--<li ng-class="{active: chosenTab==='simple'}"><a ng-click="chosenTab = 'simple'" data-toggle="tab"><span translate="sldeditor.tab.simple" >Simple editor</span></a></li>-->
     <li ng-class="{active: chosenTab==='colorMap'}"><a ng-click="chosenTab = 'colorMap'" data-toggle="tab">ColorMap</a></li>
-    <li ng-class="{active: chosenTab==='xml'}" class="navbar-right"><a ng-click="chosenTab = 'xml'" data-toggle="tab"><span translate="sldeditor.tab.xml" >XML Editor</span></a></li>
+    <li ng-class="{active: chosenTab==='xml'}"><a ng-click="chosenTab = 'xml'" data-toggle="tab"><span translate="sldeditor.tab.xml" >XML Editor</span></a></li>
 </ul>
 
 <!-- Tab panes -->
@@ -129,14 +129,15 @@
                   </ul>
                 </div>
                 </div>
-              </div>
+            </div>
+            <div class="checkbox" style="margin-bottom:20px; padding-top:0;">  
               <div class="checkbox col-sm-offset-3 col-md-offset-2">
                   <label>
-                      <input type="checkbox" ng-model="palette.inverse"> Inverser les couleurs
+                      <input type="checkbox" ng-model="palette.inverse" translate="sldeditor.edition.reversecolors"> Reverse colors
                   </label>
               </div>
-
-              <div class="form-group col-xs-12">
+            </div>
+            <div class="form-group col-xs-12">
                   <label class="col-sm-3 col-md-2 control-label">Min.</label>
                   <div class="col-sm-9 col-md-4">
                     <input type="number" class="form-control" ng-model="palette.rasterMinValue">
@@ -145,19 +146,24 @@
                   <div class="col-sm-9 col-md-4">
                     <input type="number" class="form-control" ng-model="palette.rasterMaxValue">
                   </div>
-              </div>
+            </div>
               <!--<div class="form-group col-xs-12">-->
                   <!--<label class="col-sm-3 col-md-2 control-label">Intervalles</label>-->
                   <!--<div class="col-sm-9 col-md-4">-->
                     <!--<input type="number" class="form-control" ng-model="palette.intervalles">-->
                   <!--</div>-->
               <!--</div>-->
-              <div class="checkbox col-sm-offset-3 col-md-offset-2">
+            <div class="checkbox" style="margin-bottom:20px; padding-top:0;">  
+              <div class="checkbox col-sm-offset-3 col-md-offset-2 col-xs-1">
                 <label>
                   <input type="checkbox" ng-model="palette.nan"> NaN
                 </label>
               </div>
-            </form>
+              <div class="col-xs-5" ng-if="palette.nan">
+                <input type='text' name="picker" class="picker" spectrum ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.color"/>
+              </div>
+            </div>
+          </form>
 
         </div>
 

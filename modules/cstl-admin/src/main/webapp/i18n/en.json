@@ -869,7 +869,13 @@
             "icon":"Icon",
             "opacity":"Opacity",
             "font":"Font",
-            "label":"Label"
+            "label":"Label",
+            "reversecolors":"Reverse colors"
+        },
+        "button":{
+            "cancel":"Cancel",
+            "validate":"Validate",
+            "create":"Create"
         }
     }
 }

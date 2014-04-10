@@ -1135,7 +1135,13 @@
             "icon":"Icône",
             "opacity":"Opacité",
             "font":"Police",
-            "label":"Libellé"
+            "label":"Libellé",
+            "reversecolors":"Inverser les couleurs"
+        },
+        "button":{
+            "cancel":"Annuler",
+            "validate":"Valider",
+            "create":"Créer"
         }
     }
 }
