@@ -252,7 +252,8 @@ public final class Provider {
             try {
                 DataProviders.getInstance().createProvider(id, providerService, sources);
             } catch (ConfigurationException ex) {
-                LOGGER.log(Level.SEVERE, null, ex);
+                LOGGER.log(Level.WARNING, null, ex);
+                return Response.status(500).build();
             }
         }
         return Response.ok().build();
@@ -264,7 +265,13 @@ public final class Provider {
     @DELETE
     @Path("{id}")
     public Response delete(final @PathParam("id") String id) {
-        DataProviders.getInstance().remove(new DefaultName(id));
+        final DataProvider old = DataProviders.getInstance().getProvider(id);
+        try {
+            DataProviders.getInstance().removeProvider(old);
+        } catch (ConfigurationException ex) {
+            LOGGER.log(Level.WARNING, null, ex);
+            return Response.status(500).build();
+        }
         return Response.status(200).build();
     }
 

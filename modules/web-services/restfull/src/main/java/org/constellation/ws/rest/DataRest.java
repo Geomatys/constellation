@@ -1124,6 +1124,28 @@ public class DataRest {
     }
 
     @GET
+    @Path("list/provider/{providerId}")
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response getDataListsForProviders(@PathParam("providerId") final String providerId) {
+        final ProviderRecord prov = ConfigurationEngine.getProvider(providerId);
+        final List<DataBrief> briefs = new ArrayList<>();
+        final List<DataRecord> datas;
+        try {
+            datas = prov.getData();
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+            return Response.status(500).entity("failed").build();
+        }
+        for (final DataRecord data : datas) {
+            final QName name = new QName(data.getNamespace(), data.getName());
+            final DataBrief db = ConfigurationEngine.getData(name, providerId);
+            briefs.add(db);
+        }
+        return Response.ok(briefs).build();
+    }
+
+    @GET
     @Path("list/top")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})

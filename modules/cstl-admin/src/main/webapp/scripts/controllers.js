@@ -290,8 +290,18 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
                 var providerId = $scope.selected.Provider;
                 dataListing.deleteData({providerid: providerId, dataid: layerName}, {},
                     function() { $growl('success','Success','Data '+ layerName +' successfully deleted');
-                        dataListing.listAll({}, function(response) {
-                            $scope.fullList = response;
+                        dataListing.listDataForProv({providerId: providerId}, function(response) {
+                            if (response.length == 0) {
+                                provider.delete({id: providerId}, function() {
+                                    dataListing.listAll({}, function(response) {
+                                        $scope.fullList = response;
+                                    });
+                                });
+                            } else {
+                                dataListing.listAll({}, function(response) {
+                                    $scope.fullList = response;
+                                });
+                            }
                         });
                     },
                     function() { $growl('error','Error','Data '+ layerName +' deletion failed'); }
