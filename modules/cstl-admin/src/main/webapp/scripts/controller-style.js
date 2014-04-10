@@ -108,6 +108,52 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             $scope.newStyle.rules[0].symbolizers[0].font.family[0] = font;
         };
 
+        $scope.palette = {
+            index : undefined,
+            img_palette : 'images/palette1.png',
+            rasterMinValue : undefined,
+            rasterMaxValue : undefined,
+            intervalles : 1,
+            nan : false,
+            inverse : false
+        };
+
+        $scope.choosePalette = function(index) {
+            $scope.palette.img_palette = 'images/palette'+ index +'.png';
+            $scope.palette.index = index;
+        };
+
+        $scope.addPalette = function() {
+            if ($scope.palette.index == undefined) {
+                return;
+            }
+
+            if ($scope.newStyle.rules[0].symbolizers[0].colorMap == undefined) {
+                $scope.newStyle.rules[0].symbolizers[0].colorMap = {'function': {'@function' : 'interpolate'}};
+            }
+            switch ($scope.palette.index) {
+                case 1:
+                    $scope.newStyle.rules[0].symbolizers[0].colorMap.function.points = [{}, {}, {}, {}];
+                    break;
+                case 2:
+                    $scope.newStyle.rules[0].symbolizers[0].colorMap.function.points =
+                        [{data: $scope.palette.rasterMinValue, color: '#3F3460'}, {data: $scope.palette.rasterMaxValue, color: '#EC1876'}];
+                    break;
+                case 3:
+                    $scope.newStyle.rules[0].symbolizers[0].colorMap.function.points =
+                        [{data: $scope.palette.rasterMinValue, color: '#036531'}, {data: $scope.palette.rasterMaxValue, color: '#FDF01A'}];
+                    break;
+                case 4:
+                    $scope.newStyle.rules[0].symbolizers[0].colorMap.function.points = [{}, {}, {}, {}];
+                    break;
+                case 5:
+                    $scope.newStyle.rules[0].symbolizers[0].colorMap.function.points =
+                        [{data: $scope.palette.rasterMinValue, color:'#000000'}, {data: $scope.palette.rasterMaxValue, color:'#FFFFFF'}];
+                    break;
+                default: break;
+            }
+        };
+
         $scope.dataProperties = null;
 
         $scope.initDataProperties = function() {
@@ -143,6 +189,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         };
 
         $scope.createStyle = function() {
+            $scope.addPalette();
             style.create({provider: 'sld'}, $scope.newStyle, function() {
                 $growl('success','Success','Style '+ $scope.newStyle.name +' successfully created');
                 $modalInstance.close({"Provider": "sld", "Name": $scope.newStyle.name});
@@ -178,6 +225,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         };
 
         $scope.displayCurrentStyle = function() {
+            $scope.addPalette();
             style.create({provider: 'sld'}, $scope.newStyle, function() {
                 var layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName, $scope.providerId, $scope.newStyle.name);
                 var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
