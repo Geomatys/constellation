@@ -23,12 +23,16 @@
                 <gco:CharacterString>${param.contactName}</gco:CharacterString>
             </gmd:individualName>
             <%}%>
+            <% if (param.organisationName != null){%>
             <gmd:organisationName>
                 <gco:CharacterString>${param.organisationName}</gco:CharacterString>
             </gmd:organisationName>
+            <%}%>
+            <% if (param.position != null){%>
             <gmd:positionName>
                 <gco:CharacterString>${param.position}</gco:CharacterString>
             </gmd:positionName>
+            <%}%>
             <gmd:contactInfo>
                 <gmd:CI_Contact>
                     <% if (param.phone != null || param.fax != null){%>
@@ -73,9 +77,11 @@
                     </gmd:address>
                 </gmd:CI_Contact>
             </gmd:contactInfo>
+            <% if (param.role != null){%>
             <gmd:role>
                 <gmd:CI_RoleCode codeList="roleList" codeListValue="${param.role}">${param.role}</gmd:CI_RoleCode>
             </gmd:role>
+            <%}%>
         </gmd:CI_ResponsibleParty>
     </gmd:contact>
     <gmd:dateStamp>
@@ -109,12 +115,8 @@
             <gmd:citation>
                 <gmd:CI_Citation>
                     <gmd:title>                    
-                        <gco:CharacterString>${param.dataName}</gco:CharacterString>
-                    </gmd:title>
-                    <gmd:alternateTitle>
                         <gco:CharacterString>${param.dataTitle}</gco:CharacterString>
-                    </gmd:alternateTitle>
-
+                    </gmd:title>
                     <% if (param.publicationDate!= null){%>
                     <gmd:date>
                         <gmd:CI_Date>
@@ -135,6 +137,18 @@
                             </gmd:date>
                             <gmd:dateType>
                                 <gmd:CI_DateTypeCode codeListValue="creation" codeList="DateType">creation</gmd:CI_DateTypeCode>
+                            </gmd:dateType>
+                        </gmd:CI_Date>
+                    </gmd:date>
+                    <%}%>
+                    <% if (param.revisionDate!= null){%>
+                    <gmd:date>
+                        <gmd:CI_Date>
+                            <gmd:date>
+                                <gco:DateTime>${param.revisionDate}</gco:DateTime>
+                            </gmd:date>
+                            <gmd:dateType>
+                                <gmd:CI_DateTypeCode codeListValue="revision" codeList="DateType">revision</gmd:CI_DateTypeCode>
                             </gmd:dateType>
                         </gmd:CI_Date>
                     </gmd:date>
@@ -167,7 +181,7 @@
             </gmd:spatialResolution>
             <%}%>
             <gmd:language>
-                <gco:CharacterString>eng</gco:CharacterString>
+                <gco:CharacterString>${param.dataLocale}</gco:CharacterString>
             </gmd:language>
             <% if (param.topicCategory!= null){%>
             <gmd:topicCategory>
@@ -195,12 +209,16 @@
                                 <gco:CharacterString>${param.contactName}</gco:CharacterString>
                             </gmd:individualName>
                             <%}%>
+                            <% if (param.organisationName != null){%>
                             <gmd:organisationName>
                                 <gco:CharacterString>${param.organisationName}</gco:CharacterString>
                             </gmd:organisationName>
+                            <%}%>
+                            <% if (param.position != null){%>
                             <gmd:positionName>
                                 <gco:CharacterString>${param.position}</gco:CharacterString>
                             </gmd:positionName>
+                            <%}%>
                             <gmd:contactInfo>
                                 <gmd:CI_Contact>
                                    <% if (param.phone != null || param.fax != null){%>

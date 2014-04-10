@@ -443,40 +443,39 @@ public class DataRest {
         
         for (Name dataName : dataProvider.getKeys()) {
             
-            DefaultMetadata dm = new DefaultMetadata();
+            DefaultMetadata extractedMetadata = null;
             switch (overridenValue.getType()) {
                 case "raster":
                     try {
-                        dm = MetadataUtilities.getRasterMetadata(dataProvider, dataName);
+                        extractedMetadata = MetadataUtilities.getRasterMetadata(dataProvider, dataName);
                     } catch (DataStoreException e) {
                         LOGGER.log(Level.WARNING, "Error when trying to get coverage metadata", e);
+                        extractedMetadata = new DefaultMetadata();
                     }
                     break;
                 case "vector":
                     try {                
-                        dm = MetadataUtilities.getVectorMetadata(dataProvider, dataName);
+                        extractedMetadata = MetadataUtilities.getVectorMetadata(dataProvider, dataName);
                     } catch (DataStoreException e) {
                         LOGGER.log(Level.WARNING, "Error when trying to get metadata for a shape file", e);
+                        extractedMetadata = new DefaultMetadata();
                     }
                     break;
                 default:
-                    if (LOGGER.isLoggable(Level.INFO)) {
-                        LOGGER.log(Level.INFO, "Type unknown");
-                        Response.status(200).build();
-                    }
+                    extractedMetadata = new DefaultMetadata();
             }
             //Update metadata
             final Properties prop = ConfigurationEngine.getMetadataTemplateProperties();
+            MetadataUtilities.overrideProperties(prop, overridenValue, dataName, "TODO");
             final DefaultMetadata templateMetadata = MetadataUtilities.getTemplateMetadata(prop);
             
             DefaultMetadata mergedMetadata = new DefaultMetadata();
             try {
-                mergedMetadata = MetadataUtilities.mergeTemplate(templateMetadata, dm);
+                mergedMetadata = MetadataUtilities.mergeTemplate(templateMetadata, extractedMetadata);
             } catch (NoSuchIdentifierException | ProcessException ex) {
                 LOGGER.log(Level.WARNING, "error while merging metadata", ex);
             }
-            CstlMetadatas.feedMetadata(mergedMetadata, overridenValue, dataName);
-            dm.prune();
+            mergedMetadata.prune();
             
             //Save metadata
             final QName name = Utils.getQnameFromName(dataName);

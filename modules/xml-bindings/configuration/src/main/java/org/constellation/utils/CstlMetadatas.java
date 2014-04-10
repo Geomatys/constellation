@@ -89,12 +89,6 @@ public class CstlMetadatas {
         return DATA.getPrefix()+ '_' + dataName;
     }
     
-    public static void feedMetadata(final DefaultMetadata metadata, final DataMetadata datam, final Name dataName) {
-        ArgumentChecks.ensureNonNull("datam", datam);
-        final MetadataFeeder feeder = new MetadataFeeder(metadata);
-        feeder.feed(datam, dataName);
-    }
-    
     /**
      * Create a default metadata for the given data.
      *

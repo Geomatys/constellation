@@ -33,11 +33,9 @@ import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.IdentifierSpace;
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
-import org.constellation.dto.DataMetadata;
 import org.constellation.dto.Service;
 import org.geotoolkit.service.OperationMetadataImpl;
 import org.geotoolkit.service.ServiceIdentificationImpl;
-import org.opengis.feature.type.Name;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.citation.CitationDate;
 import org.opengis.metadata.citation.DateType;
@@ -80,50 +78,6 @@ public class MetadataFeeder {
         this.eater = eater;
     }
 
-    /**
-     * merge {@link org.constellation.dto.DataMetadata} feeded on {@link org.apache.sis.metadata.iso.DefaultMetadata} eater
-     *
-     * @param feeded : {@link org.constellation.dto.DataMetadata} need to be merge on metadata
-     * @param dataName
-     */
-    public void feed(final DataMetadata feeded, final Name dataName) {
-        addDateStamp(new Date());
-
-        final Locale metadataLocale;
-        final String localeMd = feeded.getLocaleMetadata();
-        if (localeMd != null) {
-            final String[] localeAndCountry = localeMd.split("_");
-            if (localeAndCountry.length == 2) {
-                metadataLocale = new Locale(localeAndCountry[0], localeAndCountry[1]);
-            }else{
-                metadataLocale = new Locale(localeAndCountry[0]);
-            }
-            addMetadataLocale(metadataLocale);
-        }
-
-        setTitle(feeded.getTitle());
-        setAbstract(feeded.getAnAbstract());
-        addContact(feeded.getUsername(), feeded.getOrganisationName(), feeded.getRole());
-
-        setIdentifier(CstlMetadatas.getMetadataIdForData(feeded.getDataName(), dataName));
-
-        final String localeData = feeded.getLocaleData();
-        if (localeData != null) {
-            final String[] localeAndCountry = localeData.split("_");
-            Locale dataLocale;
-            if(localeAndCountry.length==2){
-                dataLocale = new Locale(localeAndCountry[0], localeAndCountry[1]);
-            }else{
-                dataLocale = new Locale(localeAndCountry[0]);
-            }
-
-            addDataLanguage(dataLocale);
-        }
-
-        addKeywords(feeded.getKeywords());
-        addTopicCategory(feeded.getTopicCategory());
-    }
-    
     public void feedService(Service serviceInfo) {
         setAbstract(serviceInfo.getDescription());
         setTitle(serviceInfo.getName());

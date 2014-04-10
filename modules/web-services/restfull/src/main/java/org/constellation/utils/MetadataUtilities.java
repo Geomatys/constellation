@@ -23,16 +23,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.MalformedURLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.MissingResourceException;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.metadata.iso.extent.DefaultExtent;
 import org.apache.sis.metadata.iso.extent.DefaultGeographicBoundingBox;
@@ -42,6 +48,7 @@ import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.collection.TreeTable;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.DataInformation;
+import org.constellation.dto.DataMetadata;
 import org.constellation.engine.template.TemplateEngine;
 import org.constellation.engine.template.TemplateEngineException;
 import org.constellation.engine.template.TemplateEngineFactory;
@@ -86,6 +93,7 @@ public final class MetadataUtilities {
 
     private static final Logger LOGGER = Logger.getLogger(MetadataUtilities.class.getName());
 
+    private static final DateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
     /**
      * Generate {@link org.constellation.dto.DataInformation} for require file data
      *
@@ -346,5 +354,92 @@ public final class MetadataUtilities {
            LOGGER.log(Level.WARNING, null, ex);
         }
         return null;
+    }
+    
+    public static void overrideProperties(final Properties prop, final DataMetadata overridenValue, final Name dataName, final String formatName) {
+        final String metadataId = CstlMetadatas.getMetadataIdForData(overridenValue.getDataName(), dataName);
+        prop.put("fileId", metadataId);
+        if (overridenValue.getAnAbstract() != null) {
+            prop.put("dataAbstract", overridenValue.getAnAbstract());
+        } else if (prop.get("dataAbstract") == null) {
+            prop.put("dataAbstract", metadataId);
+        }
+        final String currentDate;
+        synchronized (FORMAT){
+            currentDate = FORMAT.format(new Date(System.currentTimeMillis()));
+        }
+        
+        final Date overridingDate = overridenValue.getDate();
+        if (overridingDate != null) {
+            final String date;
+            synchronized (FORMAT){
+                date = FORMAT.format(overridingDate);
+            }
+            final String dateType = overridenValue.getDateType();
+            if (dateType != null) {
+                switch (dateType) {
+                    case "Creation"    : prop.put("creationDate", date);break;
+                    case "Revision"    : prop.put("revisionDate", date);break;
+                    case "Publication" : prop.put("publicationDate", date);break;
+                }
+            } else {
+                prop.put("creationDate", date);
+            }
+        } else {
+            prop.put("publicationDate", currentDate);
+        }
+        
+        prop.put("isoCreationDate", currentDate);
+        prop.put("distributionFormat", formatName);
+        
+        if (overridenValue.getKeywords() != null) {
+            prop.put("keywords", overridenValue.getKeywords());
+        }
+        
+        final String localeData = overridenValue.getLocaleData();
+        if (localeData != null) {
+            try {
+                final String[] localeAndCountry = localeData.split("_");
+                Locale dataLocale;
+                if (localeAndCountry.length == 2) {
+                    dataLocale = new Locale(localeAndCountry[0], localeAndCountry[1]);
+                } else {
+                    dataLocale = new Locale(localeAndCountry[0]);
+                }
+                prop.put("dataLocale", dataLocale.getISO3Language());
+            } catch (MissingResourceException ex) {
+                LOGGER.warning(ex.getMessage());
+                prop.put("dataLocale", "eng");
+            }
+        } else {
+            prop.put("dataLocale", "eng");
+        }
+        if (overridenValue.getOrganisationName() != null) {
+            prop.put("organisationName", overridenValue.getOrganisationName());
+        }
+        if (overridenValue.getRole() != null) {
+            prop.put("role", buildProperCode(overridenValue.getRole()));
+        }
+        if (overridenValue.getTitle() != null) {
+            prop.put("dataTitle", overridenValue.getTitle());
+        } else if (prop.get("dataTitle") == null) {
+            prop.put("dataTitle", metadataId);
+        }
+        final String topic = overridenValue.getTopicCategory(); 
+        if (topic != null) {
+            prop.put("topicCategory", buildProperCode(topic));
+        }
+        if (overridenValue.getUsername() != null) {
+            prop.put("contactName", overridenValue.getUsername());
+        }
+    }
+    
+    private static String buildProperCode(final String codeValue) {
+        final String[] parts = codeValue.split(" ");
+        final StringBuilder sb = new StringBuilder();
+        for (String s : parts) {
+            sb.append(StringUtils.capitalize(s));
+        }
+        return sb.toString();
     }
 }
