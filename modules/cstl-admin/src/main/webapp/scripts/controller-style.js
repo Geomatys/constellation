@@ -133,22 +133,91 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             }
             switch ($scope.palette.index) {
                 case 1:
-                    $scope.newStyle.rules[0].symbolizers[0].colorMap.function.points = [{}, {}, {}, {}];
+                    var delta = $scope.palette.rasterMaxValue - $scope.palette.rasterMinValue;
+                    if (!$scope.palette.inverse) {
+                        $scope.newStyle.rules[0].symbolizers[0].colorMap.function.points =
+                            [
+                                {data: $scope.palette.rasterMinValue, color: '#e52520'},
+                                {data: delta * 0.25 + $scope.palette.rasterMinValue, color: '#ffde00'},
+                                {data: delta * 0.5 + $scope.palette.rasterMinValue, color: '#95c11f'},
+                                {data: delta * 0.75 + $scope.palette.rasterMinValue, color: '#1d71b8'},
+                                {data: $scope.palette.rasterMinValue, color: '#662483'}
+                            ];
+                    } else {
+                        $scope.newStyle.rules[0].symbolizers[0].colorMap.function.points =
+                            [
+                                {data: $scope.palette.rasterMinValue, color: '#662483'},
+                                {data: delta * 0.25 + $scope.palette.rasterMinValue, color: '#1d71b8'},
+                                {data: delta * 0.5 + $scope.palette.rasterMinValue, color: '#95c11f'},
+                                {data: delta * 0.75 + $scope.palette.rasterMinValue, color: '#ffde00'},
+                                {data: $scope.palette.rasterMinValue, color: '#e52520'}
+                            ];
+                    }
                     break;
                 case 2:
-                    $scope.newStyle.rules[0].symbolizers[0].colorMap.function.points =
-                        [{data: $scope.palette.rasterMinValue, color: '#3F3460'}, {data: $scope.palette.rasterMaxValue, color: '#EC1876'}];
+                    if (!$scope.palette.inverse) {
+                        $scope.newStyle.rules[0].symbolizers[0].colorMap.function.points =
+                            [
+                                {data: $scope.palette.rasterMinValue, color: '#3F3460'},
+                                {data: $scope.palette.rasterMaxValue, color: '#EC1876'}
+                            ];
+                    } else {
+                        $scope.newStyle.rules[0].symbolizers[0].colorMap.function.points =
+                            [
+                                {data: $scope.palette.rasterMinValue, color: '#EC1876'},
+                                {data: $scope.palette.rasterMaxValue, color: '#3F3460'}
+                            ];
+                    }
                     break;
                 case 3:
-                    $scope.newStyle.rules[0].symbolizers[0].colorMap.function.points =
-                        [{data: $scope.palette.rasterMinValue, color: '#036531'}, {data: $scope.palette.rasterMaxValue, color: '#FDF01A'}];
+                    if (!$scope.palette.inverse) {
+                        $scope.newStyle.rules[0].symbolizers[0].colorMap.function.points =
+                            [
+                                {data: $scope.palette.rasterMinValue, color: '#036531'},
+                                {data: $scope.palette.rasterMaxValue, color: '#FDF01A'}
+                            ];
+                    } else {
+                        $scope.newStyle.rules[0].symbolizers[0].colorMap.function.points =
+                            [
+                                {data: $scope.palette.rasterMinValue, color: '#FDF01A'},
+                                {data: $scope.palette.rasterMaxValue, color: '#036531'}
+                            ];
+                    }
                     break;
                 case 4:
-                    $scope.newStyle.rules[0].symbolizers[0].colorMap.function.points = [{}, {}, {}, {}];
+                    var delta = $scope.palette.rasterMaxValue - $scope.palette.rasterMinValue;
+                    if (!$scope.palette.inverse) {
+                        $scope.newStyle.rules[0].symbolizers[0].colorMap.function.points =
+                            [
+                                {data: $scope.palette.rasterMinValue, color: '#2d2e83'},
+                                {data: delta * 0.25 + $scope.palette.rasterMinValue, color: '#1d71b8'},
+                                {data: delta * 0.5 + $scope.palette.rasterMinValue, color: '#ffde00'},
+                                {data: $scope.palette.rasterMinValue, color: '#e52520'}
+                            ];
+                    } else {
+                        $scope.newStyle.rules[0].symbolizers[0].colorMap.function.points =
+                            [
+                                {data: $scope.palette.rasterMinValue, color: '#e52520'},
+                                {data: delta * 0.5 + $scope.palette.rasterMinValue, color: '#ffde00'},
+                                {data: delta * 0.75 + $scope.palette.rasterMinValue, color: '#1d71b8'},
+                                {data: $scope.palette.rasterMinValue, color: '#2d2e83'}
+                            ];
+                    }
                     break;
                 case 5:
-                    $scope.newStyle.rules[0].symbolizers[0].colorMap.function.points =
-                        [{data: $scope.palette.rasterMinValue, color:'#000000'}, {data: $scope.palette.rasterMaxValue, color:'#FFFFFF'}];
+                    if (!$scope.palette.inverse) {
+                        $scope.newStyle.rules[0].symbolizers[0].colorMap.function.points =
+                            [
+                                {data: $scope.palette.rasterMinValue, color: '#000000'},
+                                {data: $scope.palette.rasterMaxValue, color: '#FFFFFF'}
+                            ];
+                    } else {
+                        $scope.newStyle.rules[0].symbolizers[0].colorMap.function.points =
+                            [
+                                {data: $scope.palette.rasterMinValue, color: '#FFFFFF'},
+                                {data: $scope.palette.rasterMaxValue, color: '#000000'}
+                            ];
+                    }
                     break;
                 default: break;
             }
