@@ -50,6 +50,7 @@ import org.constellation.admin.dao.DataRecord;
 import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.DataBrief;
+import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.configuration.StringList;
 import org.constellation.coverage.PyramidCoverageHelper;
 import org.constellation.coverage.PyramidCoverageProcessListener;
@@ -1202,6 +1203,16 @@ public class DataRest {
     public Response getLayerSummary(@PathParam("providerid") String providerid, @PathParam("layerAlias") String layerAlias) {
         final DataBrief db = ConfigurationEngine.getDataLayer(layerAlias, providerid);
         return Response.ok(db).build();
+    }
+
+    @GET
+    @Path("metadata/iso/{providerId}/{dataId}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getIsoMetadata(final @PathParam("providerId") String providerId, final @PathParam("dataId") String dataId) {
+        final DefaultMetadata metadata = ConfigurationEngine.loadIsoDataMetadata(providerId, new QName("", dataId), CSWMarshallerPool.getInstance());
+        metadata.prune();
+        return Response.ok(metadata).build();
     }
 
     @GET

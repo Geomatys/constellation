@@ -610,7 +610,38 @@ public class ConfigurationEngine {
         }
         return null;
     }
-    
+
+    /**
+     * Load a metadata for a provider.
+     *
+     * @param providerId
+     * @param pool
+     * @return
+     */
+    public static DefaultMetadata loadIsoDataMetadata(final String providerId, final QName dataId, final MarshallerPool pool) {
+        Session session = null;
+        DefaultMetadata metadata = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            final DataRecord dr = session.readData(dataId, providerId);
+            if (dr != null) {
+                final InputStream sr = dr.getIsoMetadata();
+                final Unmarshaller m = pool.acquireUnmarshaller();
+                if (sr != null) {
+                    metadata = (DefaultMetadata) m.unmarshal(sr);
+                }
+                pool.recycle(m);
+                return metadata;
+            }
+        } catch (SQLException | IOException | JAXBException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+        return null;
+    }
+
     public static InputStream loadIsoMetadata(final String metadataID) {
         Session session = null;
         try {

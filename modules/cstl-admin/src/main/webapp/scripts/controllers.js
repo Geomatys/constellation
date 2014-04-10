@@ -265,7 +265,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
             var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
             DataViewer.layers = [layerData, layerBackground];
 
-            provider.metadata({providerId: providerId}, {}, function(response) {
+            dataListing.metadata({providerId: providerId, dataId: layerName}, {}, function(response) {
                 // Success getting the metadata, try to find the data extent
                 DataViewer.initMap('dataMap');
                 var ident = response['gmd.MD_Metadata']['gmd.identificationInfo'];
@@ -1347,7 +1347,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
                  layerData = DataViewer.createLayer($cookies.cstlUrl, layerName, providerId);
                  DataViewer.layers = [layerData, layerBackground];
 
-                 provider.metadata({providerId: providerId}, {}, function(response) {
+                 dataListing.metadata({providerId: providerId, dataId: layerName}, {}, function(response) {
                      // Success getting the metadata, try to find the data extent
                      var ident = response['gmd.MD_Metadata']['gmd.identificationInfo'];
                      if (ident) {
