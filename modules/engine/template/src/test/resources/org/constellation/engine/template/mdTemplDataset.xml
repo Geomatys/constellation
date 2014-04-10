@@ -167,7 +167,7 @@
             </gmd:spatialResolution>
             <%}%>
             <gmd:language>
-                <gco:CharacterString>English</gco:CharacterString>
+                <gco:CharacterString>eng</gco:CharacterString>
             </gmd:language>
             <% if (param.topicCategory!= null){%>
             <gmd:topicCategory>

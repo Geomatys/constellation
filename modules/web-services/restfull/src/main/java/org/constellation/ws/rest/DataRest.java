@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -36,6 +37,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
 import org.apache.sis.geometry.GeneralDirectPosition;
 import org.apache.sis.metadata.iso.DefaultMetadata;
@@ -66,6 +69,7 @@ import org.constellation.security.SecurityManagerHolder;
 import org.constellation.util.SimplyMetadataTreeNode;
 import org.constellation.utils.CstlMetadatas;
 import org.constellation.utils.GeotoolkitFileExtensionAvailable;
+import org.constellation.utils.ISOMarshallerPool;
 import org.constellation.utils.MetadataUtilities;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
@@ -426,21 +430,21 @@ public class DataRest {
     /**
      * Save metadata with merge from ISO19115 form
      *
-     * @param metadataToSave {@link org.constellation.dto.DataMetadata} which contains new information for metadata.
+     * @param overridenValue {@link org.constellation.dto.DataMetadata} which contains new information for metadata.
      * @return {@link javax.ws.rs.core.Response} with code 200.
      */
     @POST
     @Path("metadata")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response saveMetadata(final DataMetadata metadataToSave) {
-        final String providerID         = metadataToSave.getDataName();
+    public Response saveMetadata(final DataMetadata overridenValue) {
+        final String providerID         = overridenValue.getDataName();
         final DataProvider dataProvider = DataProviders.getInstance().getProvider(providerID);
         
         for (Name dataName : dataProvider.getKeys()) {
             
             DefaultMetadata dm = new DefaultMetadata();
-            switch (metadataToSave.getType()) {
+            switch (overridenValue.getType()) {
                 case "raster":
                     try {
                         dm = MetadataUtilities.getRasterMetadata(dataProvider, dataName);
@@ -462,17 +466,31 @@ public class DataRest {
                     }
             }
             //Update metadata
-            CstlMetadatas.feedMetadata(dm, metadataToSave, dataName);
+            final Properties prop = ConfigurationEngine.getMetadataTemplateProperties();
+            final DefaultMetadata templateMetadata = MetadataUtilities.getTemplateMetadata(prop);
+            
+            DefaultMetadata mergedMetadata = new DefaultMetadata();
+            try {
+                mergedMetadata = MetadataUtilities.mergeTemplate(templateMetadata, dm);
+            } catch (NoSuchIdentifierException | ProcessException ex) {
+                LOGGER.log(Level.WARNING, "error while merging metadata", ex);
+            }
+            CstlMetadatas.feedMetadata(mergedMetadata, overridenValue, dataName);
             dm.prune();
             
             //Save metadata
             final QName name = Utils.getQnameFromName(dataName);
-            ConfigurationEngine.saveDataMetadata(dm, name, providerID);
+            ConfigurationEngine.saveDataMetadata(mergedMetadata, name, providerID);
         }
-
         return Response.status(200).build();
     }
 
+    private static void printXml(final DefaultMetadata meta) throws JAXBException {
+        final Marshaller m = ISOMarshallerPool.getInstance().acquireMarshaller();
+        m.marshal(meta, System.out);
+        ISOMarshallerPool.getInstance().recycle(m);
+    }
+    
     @POST
     @Path("pyramid/{id}/")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})

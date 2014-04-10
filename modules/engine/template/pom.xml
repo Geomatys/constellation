@@ -47,5 +47,14 @@
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-utility-pending</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.library</groupId>
+            <artifactId>cstl-lib-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 </project>

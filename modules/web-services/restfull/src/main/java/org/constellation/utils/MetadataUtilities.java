@@ -16,20 +16,22 @@
 
 package org.constellation.utils;
 
+import com.google.common.io.Files;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.metadata.iso.extent.DefaultExtent;
@@ -40,9 +42,13 @@ import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.collection.TreeTable;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.DataInformation;
+import org.constellation.engine.template.TemplateEngine;
+import org.constellation.engine.template.TemplateEngineException;
+import org.constellation.engine.template.TemplateEngineFactory;
 import org.constellation.provider.DataProvider;
 import org.constellation.util.MetadataMapBuilder;
 import org.constellation.util.SimplyMetadataTreeNode;
+import org.constellation.util.Util;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.coverage.io.CoverageIO;
@@ -61,15 +67,12 @@ import org.geotoolkit.process.metadata.merge.MergeDescriptor;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.feature.type.Name;
 import org.opengis.geometry.Envelope;
-import org.opengis.metadata.Metadata;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.ImageCRS;
 import org.opengis.util.GenericName;
 import org.opengis.util.NoSuchIdentifierException;
 import org.w3c.dom.Node;
-
-import com.google.common.io.Files;
 
 
 /**
@@ -167,6 +170,9 @@ public final class MetadataUtilities {
      * @param dataType (raster, vector, ...)  
      * @return a {@link org.constellation.dto.DataInformation} from data file
      * @throws CoverageStoreException
+     * @throws org.opengis.util.NoSuchIdentifierException
+     * @throws org.geotoolkit.process.ProcessException
+     * @throws javax.xml.bind.JAXBException
      */
     public static DataInformation getRasterDataInformation(final GridCoverageReader coverageReader, final DefaultMetadata metadata, final String dataType) throws CoverageStoreException, NoSuchIdentifierException, ProcessException, JAXBException {
 
@@ -304,11 +310,10 @@ public final class MetadataUtilities {
      * @param fileMetadata
      * @param metadataToMerge 
      * 
-     * @throws javax.xml.bind.JAXBException 
      * @throws NoSuchIdentifierException
      * @throws ProcessException
      */
-    public static Metadata mergeTemplate(final DefaultMetadata fileMetadata, final DefaultMetadata metadataToMerge) throws JAXBException, NoSuchIdentifierException, ProcessException {
+    public static DefaultMetadata mergeTemplate(final DefaultMetadata fileMetadata, final DefaultMetadata metadataToMerge) throws NoSuchIdentifierException, ProcessException {
         // unmarshall metadataFile Template
 
         // call Merge Process
@@ -322,5 +327,24 @@ public final class MetadataUtilities {
 
         resultMetadata = (DefaultMetadata) resultParameters.parameter(MergeDescriptor.RESULT_OUT_NAME).getValue();
         return resultMetadata;
+    }
+    
+    public static DefaultMetadata getTemplateMetadata(final Properties prop) {
+        try {
+            final TemplateEngine templateEngine = TemplateEngineFactory.getInstance(TemplateEngineFactory.GROOVY_TEMPLATE_ENGINE);
+            final InputStream stream = Util.getResourceAsStream("org/constellation/engine/template/mdTemplDataset.xml");
+            final File templateFile = File.createTempFile("mdTemplDataset", ".xml");
+            FileUtilities.buildFileFromStream(stream, templateFile);
+            final String templateApplied = templateEngine.apply(templateFile, prop);
+            
+            //unmarshall the template
+            final Unmarshaller um = ISOMarshallerPool.getInstance().acquireUnmarshaller();
+            final DefaultMetadata meta = (DefaultMetadata) um.unmarshal(new StringReader(templateApplied));
+            ISOMarshallerPool.getInstance().recycle(um);
+            return meta;
+        } catch (TemplateEngineException | IOException | JAXBException ex) {
+           LOGGER.log(Level.WARNING, null, ex);
+        }
+        return null;
     }
 }

@@ -19,9 +19,11 @@
 package org.constellation.engine.template;
 
 import groovy.lang.GroovyClassLoader;
-
 import java.io.File;
+import java.io.InputStream;
 import java.net.URL;
+import org.constellation.util.Util;
+import org.geotoolkit.util.FileUtilities;
 
 /** Factory for TemplateEngine
  * Created by christophem on 02/04/14.
@@ -33,11 +35,13 @@ public class TemplateEngineFactory {
         try {
             switch (templateEngineType) {
                 case GROOVY_TEMPLATE_ENGINE :
-                    URL url = TemplateEngineFactory.class.getResource("/org/constellation/engine/template/TemplateEngine.groovy");
-                    GroovyClassLoader gcl = new GroovyClassLoader();
-                    Class clazz = gcl.parseClass(new File(url.toURI()));
-                    Object aScript = clazz.newInstance();
-                    TemplateEngine templateEngine = (TemplateEngine) aScript;
+                    final InputStream stream = Util.getResourceAsStream("org/constellation/engine/template/TemplateEngine.groovy");
+                    final File templateFile = File.createTempFile("TemplateEngine", ".groovy");
+                    FileUtilities.buildFileFromStream(stream, templateFile);
+                    final GroovyClassLoader gcl = new GroovyClassLoader();
+                    final Class clazz = gcl.parseClass(templateFile);
+                    final Object aScript = clazz.newInstance();
+                    final TemplateEngine templateEngine = (TemplateEngine) aScript;
                     return templateEngine;
                 default:
                     throw new IllegalArgumentException( "templateEngineType "+ templateEngineType + " undefined." );
