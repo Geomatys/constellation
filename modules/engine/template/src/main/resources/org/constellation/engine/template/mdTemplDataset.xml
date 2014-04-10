@@ -103,7 +103,6 @@
     <%} else {%>
     <gmd:referenceSystemInfo gco:nilReason="unknown" />
     <%}%>
-    
     <gmd:identificationInfo>
         <gmd:MD_DataIdentification>
             <gmd:citation>
@@ -114,7 +113,6 @@
                     <gmd:alternateTitle>
                         <gco:CharacterString>${param.dataTitle}</gco:CharacterString>
                     </gmd:alternateTitle>
-
                     <% if (param.publicationDate!= null){%>
                     <gmd:date>
                         <gmd:CI_Date>

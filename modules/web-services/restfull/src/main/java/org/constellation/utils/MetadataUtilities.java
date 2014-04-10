@@ -164,7 +164,8 @@ public final class MetadataUtilities {
     /**
      * @param coverageReader
      * @param metadata
-     * @param dataType (raster, vector, ...)  @return a {@link org.constellation.dto.DataInformation} from data file
+     * @param dataType (raster, vector, ...)  
+     * @return a {@link org.constellation.dto.DataInformation} from data file
      * @throws CoverageStoreException
      */
     public static DataInformation getRasterDataInformation(final GridCoverageReader coverageReader, final DefaultMetadata metadata, final String dataType) throws CoverageStoreException, NoSuchIdentifierException, ProcessException, JAXBException {
@@ -182,7 +183,7 @@ public final class MetadataUtilities {
             // get Metadata as a List
             final DefaultMetadata fileMetadata = (DefaultMetadata) coverageReader.getMetadata();
             DefaultMetadata finalMetadata = null;
-            //mergeTemplate(fileMetadata);
+            
             if (metadata != null) {
                 finalMetadata = (DefaultMetadata) mergeTemplate(fileMetadata, metadata);
             }
@@ -301,8 +302,9 @@ public final class MetadataUtilities {
 
     /**
      * @param fileMetadata
-     * @return
-     * @throws JAXBException
+     * @param metadataToMerge 
+     * 
+     * @throws javax.xml.bind.JAXBException 
      * @throws NoSuchIdentifierException
      * @throws ProcessException
      */

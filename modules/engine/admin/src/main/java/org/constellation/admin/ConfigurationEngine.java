@@ -19,6 +19,7 @@ package org.constellation.admin;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -26,6 +27,7 @@ import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -63,10 +65,8 @@ import org.constellation.security.SecurityManager;
 import org.constellation.util.Util;
 import org.constellation.utils.CstlMetadatas;
 import org.constellation.utils.ISOMarshallerPool;
-import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.FileUtilities;
-import org.opengis.feature.type.Name;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
@@ -488,6 +488,20 @@ public class ConfigurationEngine {
                 session.close();
             }
         }
+    }
+    
+    public static Properties getMetadataTemplateProperties() {
+        final File cstlDir = ConfigDirectory.getConfigDirectory();
+        final File propFile = new File(cstlDir, "metadataTemplate.properties");
+        final Properties prop = new Properties();
+        if (propFile.exists()) {
+            try {
+                prop.load(new FileReader(propFile));
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, "IOException while loading metadata template properties file", ex);
+            }
+        } 
+        return prop;
     }
     
     private static void updateServiceUrlForMetadata(final String url) {

@@ -22,6 +22,7 @@ import org.junit.Test;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Properties;
 
 import static org.junit.Assert.assertThat;
@@ -58,6 +59,7 @@ public class TemplateEngineTest  {
         Properties prop = new Properties();
         prop.put("parentId", "testParentId");
         prop.put("srs", "toto");
+        prop.put("keywords", Arrays.asList("kw1","kw2"));
         String templateApplied = templateEngine.apply(new File(templateUrl.toURI()), prop);
         assertThat(templateApplied, containsString("testParentId"));
         assertThat(templateApplied, containsString("toto"));
