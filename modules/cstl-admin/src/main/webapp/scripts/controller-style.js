@@ -114,6 +114,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             rasterMinValue : undefined,
             rasterMaxValue : undefined,
             intervalles : 1,
+            channelSelection : undefined,
             nan : false,
             inverse : false
         };
@@ -224,10 +225,12 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         };
 
         $scope.dataProperties = null;
+        $scope.dataBands = null;
 
         $scope.initDataProperties = function() {
             provider.dataDesc({providerId: $scope.providerId, dataId: $scope.layerName}, function(response) {
                 $scope.dataProperties = response.properties;
+                $scope.dataBands = response.bands;
             }, function() {
                 $growl('error','Error','Unable to get data description');
             });

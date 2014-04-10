@@ -267,7 +267,7 @@ public final class LayerProviders extends Static {
 
 
     /**
-     * Produces a {@link PortlResponse} from the specified parameters.
+     * Produces a {@link PortrayalResponse} from the specified parameters.
      * <p/>
      * This method allows to perform data rendering without WMS layer.
      *
@@ -295,7 +295,7 @@ public final class LayerProviders extends Static {
     }
 
     /**
-     * Produces a {@link PortlResponse} from the specified parameters.
+     * Produces a {@link PortrayalResponse} from the specified parameters.
      * <p/>
      * This method allows to perform data rendering without WMS layer.
      *
@@ -446,7 +446,8 @@ public final class LayerProviders extends Static {
         // Bands description.
         if (dims != null) {
             for (final GridSampleDimension dim : dims) {
-                description.getBands().add(new BandDescription(dim.getMinimumValue(), dim.getMaximumValue(), dim.getNoDataValues()));
+                final String dimName = (dim.getCategoryNames() == null || dim.getCategoryNames().length == 0) ? "" :  dim.getCategoryNames()[0].toString();
+                description.getBands().add(new BandDescription(dimName, dim.getMinimumValue(), dim.getMaximumValue(), dim.getNoDataValues()));
             }
         }
 
