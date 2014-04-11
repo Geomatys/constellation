@@ -976,7 +976,7 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
                 return [{ 'id': '2.0.0'}, { 'id': '2.0.2', 'checked': true}];
             }
             if ($scope.type === 'sos') {
-                return [{ 'id': '1.0.0', 'checked': true}];
+                return [{ 'id': '1.0.0'}, { 'id': '2.0.0', 'checked': true}];
             }
             return [];
         };
@@ -1158,7 +1158,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
             return [{ 'id': '2.0.0'}, { 'id': '2.0.2'}];
         }
         if ($scope.type === 'sos') {
-            return [{ 'id': '1.0.0'}];
+            return [{ 'id': '1.0.0'}, { 'id': '2.0.0'}];
         }
         return [];
     };
