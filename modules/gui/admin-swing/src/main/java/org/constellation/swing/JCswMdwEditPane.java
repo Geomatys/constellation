@@ -33,6 +33,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle;
+import org.constellation.configuration.DataSourceType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.mdweb.sql.DatabaseCreator;
@@ -279,4 +280,9 @@ public class JCswMdwEditPane extends JServiceEditionPane {
     private JLabel jLabel6;
     private JLabel jLabel7;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public DataSourceType getDatasourceType() {
+        return DataSourceType.MDWEB;
+    }
 }

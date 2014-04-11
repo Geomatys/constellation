@@ -22,6 +22,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle;
+import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.WebdavContext;
 import org.openide.util.NbBundle;
 
@@ -164,5 +165,10 @@ public class JServiceWebDavPane extends JServiceEditionPane {
         this.configuration.setDigestAllowed(guiDigestAllowedCheckBox.isSelected());
         this.configuration.setHideDotFile(guiHideFileCheckBox.isSelected());
         return configuration;
+    }
+    
+    @Override
+    public DataSourceType getDatasourceType() {
+        throw new UnsupportedOperationException("Not supported on this panel.");
     }
 }

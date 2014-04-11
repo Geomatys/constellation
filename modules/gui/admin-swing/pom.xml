@@ -71,6 +71,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-om2</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.mdweb.metamodel</groupId>
       <artifactId>mdweb-metamodel-lib-sql-data</artifactId>
     </dependency>

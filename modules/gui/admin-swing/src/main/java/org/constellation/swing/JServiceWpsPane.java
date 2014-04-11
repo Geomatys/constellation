@@ -40,6 +40,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import org.constellation.admin.service.ConstellationServer;
+import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.ProcessContext;
 import org.constellation.configuration.ProcessFactory;
 import static org.constellation.swing.JServiceEditionPane.ICON_EDIT;
@@ -414,5 +415,10 @@ public class JServiceWpsPane extends JServiceEditionPane {
         public Icon getIcon(Object o) {
             return IconBundle.EMPTY_ICON_16;
         }
+    }
+    
+    @Override
+    public DataSourceType getDatasourceType() {
+        throw new UnsupportedOperationException("Not supported on this panel.");
     }
 }

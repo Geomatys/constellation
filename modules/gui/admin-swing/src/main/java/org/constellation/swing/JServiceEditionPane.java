@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import org.apache.sis.util.logging.Logging;
+import org.constellation.configuration.DataSourceType;
 
 /**
  *
@@ -43,4 +44,6 @@ public abstract class JServiceEditionPane extends JPanel {
      * @return 
      */
     public abstract Object getConfiguration();
+    
+    public abstract DataSourceType getDatasourceType();
 }

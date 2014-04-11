@@ -16,6 +16,7 @@
  */
 package org.constellation.swing;
 
+import org.constellation.configuration.DataSourceType;
 import org.constellation.generic.database.Automatic;
 
 /**
@@ -106,4 +107,9 @@ public class JCswFsEditPane extends JServiceEditionPane {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public DataSourceType getDatasourceType() {
+        return DataSourceType.FILESYSTEM;
+    }
 }

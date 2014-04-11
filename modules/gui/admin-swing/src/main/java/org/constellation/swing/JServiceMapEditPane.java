@@ -28,6 +28,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.xml.namespace.QName;
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.DataBrief;
+import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.ProviderReport;
@@ -537,5 +538,10 @@ public class JServiceMapEditPane extends JServiceEditionPane {
         public Icon getIcon(Object o) {
             return IconBundle.EMPTY_ICON_16;
         }
+    }
+    
+    @Override
+    public DataSourceType getDatasourceType() {
+        throw new UnsupportedOperationException("Not supported on this panel.");
     }
 }

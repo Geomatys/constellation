@@ -22,6 +22,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import org.constellation.configuration.DataSourceType;
 import org.constellation.generic.database.Automatic;
 
 /**
@@ -90,4 +91,9 @@ public class JCswInternalEditPane extends JServiceEditionPane {
     private JComboBox guiProfileCombo;
     private JLabel jLabel2;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public DataSourceType getDatasourceType() {
+        return DataSourceType.INTERNAL;
+    }
 }

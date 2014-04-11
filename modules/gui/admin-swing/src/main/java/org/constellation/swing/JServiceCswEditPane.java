@@ -34,13 +34,14 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.LayoutStyle;
 import org.constellation.admin.service.ConstellationServer;
+import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.Instance;
 import org.constellation.generic.database.Automatic;
 import static org.constellation.swing.JServiceEditionPane.LOGGER;
 
 /**
  *
- * @author guilhem
+ * @author Guilhem Legal (Geomatys)
  */
 public class JServiceCswEditPane extends JServiceEditionPane {
 
@@ -255,5 +256,10 @@ public class JServiceCswEditPane extends JServiceEditionPane {
     public Object getConfiguration() {
         updateConfiguration();
         return configuration;
+    }
+
+    @Override
+    public DataSourceType getDatasourceType() {
+        throw new UnsupportedOperationException("Not supported on this panel.");
     }
 }
