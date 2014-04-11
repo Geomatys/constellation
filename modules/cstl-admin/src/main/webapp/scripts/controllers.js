@@ -975,6 +975,9 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
             if ($scope.type === 'csw') {
                 return [{ 'id': '2.0.0'}, { 'id': '2.0.2', 'checked': true}];
             }
+            if ($scope.type === 'sos') {
+                return [{ 'id': '1.0.0', 'checked': true}];
+            }
             return [];
         };
         $scope.versions = $scope.getVersionsForType();
@@ -1034,8 +1037,8 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
             webService.create({type: $scope.type}, $scope.metadata,
                               function() {
                                   $growl('success', 'Success', 'Service ' + $scope.metadata.name + ' successfully created');
-                                  if ($scope.type == 'csw') {
-                                      $location.path('/webservice/csw/'+ $scope.metadata.name +'/source');
+                                  if ($scope.type == 'csw' || $scope.type == 'sos') {
+                                      $location.path('/webservice/'+ $scope.type +'/'+ $scope.metadata.name +'/source');
                                   } else {
                                       $location.path('/webservice');
                                   }
@@ -1052,8 +1055,20 @@ cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routePar
         $scope.id = $routeParams.id;
 
         $scope.source = {'automatic' : {'@format': null, 'bdd': {}}};
-
+        $scope.mdsource = {'automatic' : {'@format': null, 'bdd': {}}};
+        $scope.end = 'false';
+        $scope.setEnd=function(value){
+            $scope.end=value;
+        };
         $scope.saveServiceSource = function() {
+            webService.setConfig({type: $scope.type, id: $scope.id}, $scope.source, function() {
+                $growl('success','Success','Service '+ $scope.id +' successfully updated');
+                $location.path('/webservice');
+            }, function() {
+                $growl('error','Error','Service configuration update error');
+            });
+        };
+        $scope.saveSOSSource = function() {
             webService.setConfig({type: $scope.type, id: $scope.id}, $scope.source, function() {
                 $growl('success','Success','Service '+ $scope.id +' successfully updated');
                 $location.path('/webservice');
@@ -1141,6 +1156,9 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
         }
         if ($scope.type === 'csw') {
             return [{ 'id': '2.0.0'}, { 'id': '2.0.2'}];
+        }
+        if ($scope.type === 'sos') {
+            return [{ 'id': '1.0.0'}];
         }
         return [];
     };

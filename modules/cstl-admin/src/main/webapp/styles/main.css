@@ -187,12 +187,15 @@ ul.unstyled {
  */
 .service-item .well.started {
     border-left: #cedd9c 20px solid;
+    min-height: 214px;
 }
 .service-item .well.stopped {
     border-left: #db9080 20px solid;
+    min-height: 214px;
 }
 .service-item .well.not-started {
     border-left: #777777 20px solid;
+    min-height: 214px;
 }
 .service-item .btn.dropdown-toggle {
 

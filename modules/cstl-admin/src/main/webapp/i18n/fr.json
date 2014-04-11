@@ -848,7 +848,11 @@
         },
         "config": {
             "source": "Source",
+            "source.sos":"Source des Métadonnées",
+            "source.sos.data":"Source des données",
             "source.choose": "Choisir la source",
+            "source.choose.sos": "Choisir la source de Métadonnées",
+            "source.choose.sos.data": "Choisir la source de données",
             "source.csw.title": "Service de catalogues (CSW)",
             "source.database": "Base de données",
             "source.database.title": "Base de données (SGBDR)",
@@ -864,7 +868,8 @@
             "source.file.path": "Chemin du dossier",
             "source.internal": "Interne",
             "source.internal.description": "Base de données des métadonnées de Constellation, décrivant les données publiées par les services",
-            "source.internal.title": "Interne (SGBDR)"
+            "source.internal.title": "Interne (SGBDR)",
+            "source.sos.title":"Données de capteurs (SOS)"
         },
         "create": {
             "end": {
@@ -1075,6 +1080,9 @@
                 },
                 "wps": {
                     "label": "Géotraitements (WPS)"
+                },
+                "sos": {
+                    "label": "Données capteur (SOS)"
                 }
             },
             "modal.select.version": "Sélectionner la version du service souhaitée"

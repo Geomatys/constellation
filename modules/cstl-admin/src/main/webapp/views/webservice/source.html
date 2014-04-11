@@ -6,7 +6,9 @@
 </div>
 
 <div class="col-sm-12">
-    <div class="frame dashboard">
+    
+
+    <div class="frame dashboard" ng-if="type === 'csw'">
         
         <div id="description" class="row bg-white">
             <div class="frame dashboard">
@@ -151,5 +153,254 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="frame dashboard" ng-if="type === 'sos'">
+            <div ng-show="end==='false'">
+                <div id="description" class="row bg-white">
+                    <div class="frame dashboard">
+                        <div class="navbar navbar-default" style="margin-bottom: 0px;">
+                            <div class="navbar-header">
+                                <a class="navbar-brand" translate="service.config.source.choose.sos">Choose Metadata source</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row bg-white">
+                    <div class="col-sm-offset-3 col-sm-9">
+                        <form role="form row">
+                            <div class="form-group col-sm-5">
+                                <label class="control-label new-service-form-label col-sm-12" translate="service.config.source.sos">Metadata Source</label>
+                                <select id="sourceType" class="form-control col-sm-5" style="margin-bottom:20px;" ng-model="source['automatic']['@format']">
+                                    <option value="mdweb" translate="service.config.source.database">Database</option>
+                                    <option value="filesystem" translate="service.config.source.file">File system</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="row bg-white">
+                    <div class="form-separator"></div>
+                </div>
+
+                <!-- MDWeb database -->
+                <div class="row bg-white" ng-if="source['automatic']['@format'] === 'mdweb'">
+                    <div class="col-sm-3">
+                        <div class="well">
+                            <p><b translate="service.config.source.database.title">Database (SGBDR)</b></p>
+                            <p translate="service.config.source.database.description">Database which contains metadata records</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <form id="dbSourceForm">
+                            <fieldset>
+                                <div class="form-group">
+                                    <label class="control-label new-service-form-label" translate="service.config.source.database.type">Database type</label>
+                                    <select id="selectType" class="form-control col-sm-5" style="margin-bottom:10px;" ng-model="source.automatic.bdd.className">
+                                        <option value="org.postgresql.Driver">PostgreSQL</option>
+                                        <option value="com.mysql.jdbc.Driver">MySQL</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label new-service-form-label" translate="service.config.source.database.url">Database URL</label>
+                                    <input type="text" class="form-control" ng-model="source.automatic.bdd.connectURL">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label new-service-form-label" translate="service.config.source.database.username">User name</label>
+                                    <input type="text" class="form-control" ng-model="source.automatic.bdd.user">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label new-service-form-label" translate="service.config.source.database.password">Password</label>
+                                    <input type="password" class="form-control" ng-model="source.automatic.bdd.password">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label new-service-form-label" translate="service.config.source.database.shared">Shared connection</label>
+                                    <div class="checkbox inline">
+                                        <input type="checkbox" ng-model="source.automatic.bdd.sharedConnection">
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- File system -->
+                <div class="row bg-white" ng-if="source['automatic']['@format'] === 'filesystem'">
+                    <div class="col-sm-3">
+                        <div class="well">
+                            <p><b translate="service.config.source.file.title">File system</b></p>
+                            <p translate="service.config.source.file.description">Sets of metadata records in file system</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <form id="fsSourceForm">
+                            <fieldset>
+                                <div class="form-group">
+                                    <label class="control-label" translate="service.config.source.file.path">Folder path</label>
+                                    <input type="text" class="form-control" ng-model="source.automatic.dataDirectory">
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+
+                <div ng-if="!source['automatic']['@format']">
+                    <div class="row bg-white">
+                        <div class="col-sm-12">
+                            <div class="well">
+                                <div class="row" style="padding-bottom: 20px;">
+                                    <div class="col-sm-12">
+                                        <h4 translate="service.config.source.sos.title">Sensor (SOS)</h4>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <b><p translate="service.config.source.database">Database</p></b>
+                                        <p translate="service.config.source.database.description">Database which contains metadata records</p>
+                                    </div>
+                                    <div class="col-sm-3 col-sm-offset-1">
+                                        <b><p translate="service.config.source.file">File system</p></b>
+                                        <p translate="service.config.source.file.description">Sets of metadata records in file system</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div ng-show="end==='true'">
+                <div id="description" class="row bg-white">
+                    <div class="frame dashboard">
+                        <div class="navbar navbar-default" style="margin-bottom: 0px;">
+                            <div class="navbar-header">
+                                <a class="navbar-brand" translate="service.config.source.choose.sos.data">Choose Data source</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row bg-white">
+                    <div class="col-sm-offset-3 col-sm-9">
+                        <form role="form row">
+                            <div class="form-group col-sm-5">
+                                <label class="control-label new-service-form-label col-sm-12" translate="service.config.source.sos.data">Data Source</label>
+                                <select id="sourceType" class="form-control col-sm-5" style="margin-bottom:20px;" ng-model="mdsource['automatic']['@format']">
+                                    <option value="mdwebMD" translate="service.config.source.database">Database</option>
+                                    <option value="filesystemMD" translate="service.config.source.file">File system</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="row bg-white">
+                    <div class="form-separator"></div>
+                </div>
+
+                <!-- MDWeb database -->
+                <div class="row bg-white" ng-if="mdsource['automatic']['@format'] === 'mdwebMD'">
+                    <div class="col-sm-3">
+                        <div class="well">
+                            <p><b translate="service.config.source.database.title">Database (SGBDR)</b></p>
+                            <p translate="service.config.source.database.description">Database which contains metadata records</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <form id="dbSourceForm">
+                            <fieldset>
+                                <div class="form-group">
+                                    <label class="control-label new-service-form-label" translate="service.config.source.database.type">Database type</label>
+                                    <select id="selectType" class="form-control col-sm-5" style="margin-bottom:10px;" ng-model="mdsource.automatic.bdd.className">
+                                        <option value="org.postgresql.Driver">PostgreSQL</option>
+                                        <option value="com.mysql.jdbc.Driver">MySQL</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label new-service-form-label" translate="service.config.source.database.url">Database URL</label>
+                                    <input type="text" class="form-control" ng-model="mdsource.automatic.bdd.connectURL">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label new-service-form-label" translate="service.config.source.database.username">User name</label>
+                                    <input type="text" class="form-control" ng-model="mdsource.automatic.bdd.user">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label new-service-form-label" translate="service.config.source.database.password">Password</label>
+                                    <input type="password" class="form-control" ng-model="mdsource.automatic.bdd.password">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label new-service-form-label" translate="service.config.source.database.shared">Shared connection</label>
+                                    <div class="checkbox inline">
+                                        <input type="checkbox" ng-model="mdsource.automatic.bdd.sharedConnection">
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- File system -->
+                <div class="row bg-white" ng-if="mdsource['automatic']['@format'] === 'filesystemMD'">
+                    <div class="col-sm-3">
+                        <div class="well">
+                            <p><b translate="service.config.source.file.title">File system</b></p>
+                            <p translate="service.config.source.file.description">Sets of metadata records in file system</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <form id="fsSourceForm">
+                            <fieldset>
+                                <div class="form-group">
+                                    <label class="control-label" translate="service.config.source.file.path">Folder path</label>
+                                    <input type="text" class="form-control" ng-model="mdsource.automatic.dataDirectory">
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+
+                <div ng-if="!mdsource['automatic']['@format']">
+                    <div class="row bg-white">
+                        <div class="col-sm-12">
+                            <div class="well">
+                                <div class="row" style="padding-bottom: 20px;">
+                                    <div class="col-sm-12">
+                                        <h4 translate="service.config.source.sos.title">Sensor (SOS)</h4>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <b><p translate="service.config.source.database">Database</p></b>
+                                        <p translate="service.config.source.database.description">Database which contains metadata records</p>
+                                    </div>
+                                    <div class="col-sm-3 col-sm-offset-1">
+                                        <b><p translate="service.config.source.file">File system</p></b>
+                                        <p translate="service.config.source.file.description">Sets of metadata records in file system</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div ng-if="source['automatic']['@format']">
+
+                <div class="row bg-white">
+                    <div class="form-separator"></div>
+                </div>
+
+                <div class="row bg-white">
+                    <div class="pull-right" style="margin: 20px 30px;">
+                        <button class="btn btn-info" type="button" ng-show="end==='false'" ng-click="setEnd('true')"> <span translate="server.next.button">Next</span></button>
+                        <button class="btn btn-info" type="button" ng-show="end==='true'" ng-click="saveSOSSource();" ><span translate="label.save">Save</span></button>
+                    </div>
+                </div>
+            </div>
     </div>
 </div>

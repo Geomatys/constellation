@@ -447,8 +447,12 @@
         "abstract.label": "Service description",
         "config": {
             "source": "Source",
+            "source.sos":"Metadata source",
+            "source.sos.data":"Data source",
             "source.csw.title": "Catalogs service (CSW)",
             "source.choose": "Choose source",
+            "source.choose.sos": "Choose Metadata source",
+            "source.choose.sos.data": "Choose Data source",
             "source.database": "Database",
             "source.database.title": "Database (SGBDR)",
             "source.database.description": "Database of kind MDWeb, which contains georeferenced metadata records",
@@ -463,7 +467,8 @@
             "source.file.path": "Folder path",
             "source.internal": "Internal",
             "source.internal.description": "Constellation metadata database, describing published data by Constellation services",
-            "source.internal.title": "Internal (SGBDR)"
+            "source.internal.title": "Internal (SGBDR)",
+            "source.sos.title":"Sensor (SOS)"
         },
         "create.end": {
             "addlayers.label": "Add layers on service",
@@ -547,7 +552,8 @@
                 "wfs.label": "Features (WFS)",
                 "wms.label": "Maps (WMS)",
                 "wmts.label": "Tiles maps (WMTS)",
-                "wps.label": "Geoprocessing (WPS)"
+                "wps.label": "Geoprocessing (WPS)",
+                "sos.label":"Sensor (SOS)"
             },
             "modal.select.version": "Select the service version you want"
         },
@@ -859,7 +865,7 @@
             "color": "Color",
             "stroke":"Stroke",
             "size":"Size",
-            "stipple":"Stipple",
+            "stipple":"Dashed",
             "full":"Full",
             "line": "Line",
             "space":"Space",

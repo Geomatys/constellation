@@ -107,7 +107,7 @@
                                             <div class="pull-right" page-switcher="{page:currentpage,size:nbbypage,count:countdata}" on-select-page="displayPage(page)"></div>
                                         </div>
                                         <div class="item-list">
-                                            <div ng-if="type !== 'csw'">
+                                            <div ng-if="type !== 'csw' && type!== 'sos'">
                                                 <div class="item" ng-repeat="layer in dataList" ng-class="{selected:layer==selected,coverage:layer.Type==='coverage-store'||layer.Type==='raster',vector:layer.Type==='feature-store'||layer.Type==='vector'}" ng-click="select(layer)">
                                                     <div class="top">
                                                         <span class="item-title">{{layer.Name}}</span>
@@ -159,6 +159,26 @@
                                                     </div>
                                                 </div>
                                             </div>
+
+
+                                            <div ng-if="type === 'sos'">
+                                                <div class="item sensor" ng-repeat="sensordata in dataList" ng-class="{selected:sensordata==selected}"ng-click="select(sensordata)">
+                                                    <div class="top">
+                                                        <span class="item-title">{{sensordata.Name}}</span>
+                                                        <span class="pull-right text-right">Sensor</span>
+                                                    </div>
+                                                    <div class="bottom">
+                                                        <div class="block">
+                                                            <i class="icon-calendar"></i>{{sensordata.Date | date:'yyyy-MM-dd'}}
+                                                        </div>
+                                                        <div class="block">
+                                                            <i class="icon-user"></i>{{sensordata.Owner}}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
                                         </div>
                                     </div>
                                 </div>
