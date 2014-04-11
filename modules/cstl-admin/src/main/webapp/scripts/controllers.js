@@ -242,8 +242,8 @@ cstlAdminApp.controller('LogsController', ['$scope', 'resolvedLogs', 'LogsServic
         };
     }]);
 
-cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 'dataListing', 'provider', 'style', '$modal', '$growl', 'StyleSharedService', '$cookies',
-    function ($scope, $location, $dashboard, dataListing, provider, style, $modal, $growl, StyleSharedService, $cookies) {
+cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 'webService', 'dataListing', 'provider', 'style', '$modal', '$growl', 'StyleSharedService', '$cookies',
+    function ($scope, $location, $dashboard, webService, dataListing, provider, style, $modal, $growl, StyleSharedService, $cookies) {
 
         $scope.filtertype = "";
 
@@ -288,6 +288,16 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
             if (confirm("Are you sure?")) {
                 var layerName = $scope.selected.Name;
                 var providerId = $scope.selected.Provider;
+
+                // Remove layer on that data before
+                if ($scope.selected.TargetService && $scope.selected.TargetService.length > 0) {
+                    for (var i = 0; i < $scope.selected.TargetService.length; i++) {
+                        var servId = $scope.selected.TargetService[i].name;
+                        var servType = $scope.selected.TargetService[i].protocol[0];
+                        webService.deleteLayer({type : servType, id: servId, layerid : layerName});
+                    }
+                }
+
                 dataListing.deleteData({providerid: providerId, dataid: layerName}, {},
                     function() { $growl('success','Success','Data '+ layerName +' successfully deleted');
                         dataListing.listDataForProv({providerId: providerId}, function(response) {

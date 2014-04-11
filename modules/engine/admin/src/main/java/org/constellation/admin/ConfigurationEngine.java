@@ -1027,6 +1027,7 @@ public class ConfigurationEngine {
         final List<ServiceProtocol> serviceProtocols = new ArrayList<>(0);
         for (ServiceRecord serviceRecord : serviceRecords) {
             final List<String> protocol = new ArrayList<>(0);
+            protocol.add(serviceRecord.getType().name());
             protocol.add(serviceRecord.getType().fullName);
             final ServiceProtocol sp = new ServiceProtocol(serviceRecord.getIdentifier(), protocol);
             serviceProtocols.add(sp);
