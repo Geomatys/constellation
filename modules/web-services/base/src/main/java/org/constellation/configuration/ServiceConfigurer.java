@@ -17,6 +17,8 @@
 
 package org.constellation.configuration;
 
+import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.util.ReflectionUtilities;
 import org.constellation.ws.WSEngine;
@@ -27,6 +29,8 @@ import org.constellation.ws.WSEngine;
  * @since 0.9
  */
 public abstract class ServiceConfigurer {
+
+    protected static final Logger LOGGER = Logging.getLogger(ServiceConfigurer.class);
 
     /**
      * Gets the {@link ServiceConfigurer} implementation from the service {@link Specification}.

@@ -203,7 +203,8 @@ public final class Utils {
     /**
      * This method try to set an identifier for this object.
      *
-     * @param obj the object for which we want to set identifier.
+     * @param identifier the new identifier to set
+     * @param object the object for which we want to set identifier.
      *
      */
     public static void setIdentifier(final String identifier, final Object object) {
@@ -327,7 +328,8 @@ public final class Utils {
     /**
      * This method try to set an title for this object.
      *
-     * @param obj the object for which we want to set title.
+     * @param title the new title to set.
+     * @param object the object for which we want to set title.
      *
      */
     public static void setTitle(final String title, final Object object) {

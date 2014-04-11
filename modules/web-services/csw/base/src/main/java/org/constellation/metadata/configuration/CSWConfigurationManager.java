@@ -620,7 +620,7 @@ public class CSWConfigurationManager {
      * @param serviceID the service identifier (form multiple CSW) default: ""
      * @param indexer
      *
-     * @return A metadata reader.
+     * @return A metadata writer.
      * @throws ConfigurationException
      */
     protected MetadataWriter getWriter(final String serviceID, final AbstractIndexer indexer) throws ConfigurationException {

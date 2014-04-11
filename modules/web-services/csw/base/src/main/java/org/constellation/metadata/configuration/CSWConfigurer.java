@@ -20,8 +20,6 @@ package org.constellation.metadata.configuration;
 import java.io.File;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.apache.sis.util.logging.Logging;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.*;
 import org.constellation.dto.Service;
@@ -42,8 +40,6 @@ import org.w3c.dom.Node;
  */
 public class CSWConfigurer extends OGCConfigurer {
 
-    private static final Logger LOGGER = Logging.getLogger(CSWConfigurer.class);
-    
     /**
      * Create a new {@link CSWConfigurer} instance.
      */

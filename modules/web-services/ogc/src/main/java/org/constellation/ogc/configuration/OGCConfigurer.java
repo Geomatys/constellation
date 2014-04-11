@@ -74,6 +74,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
     /**
      * Creates a new service instance.
      *
+     * @param identifier    The identifier of the service.
      * @param metadata      the service metadata (can be null)
      * @param configuration the service configuration (can be null)
      * @throws ConfigurationException if the operation has failed for any reason

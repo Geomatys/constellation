@@ -65,7 +65,7 @@ public class FileSensorReader implements SensorReader {
      */
     private final File dataDirectory;
     
-    private final Map<String, List<String>> acceptedSensorMLFormats = new HashMap<String, List<String>>();
+    private final Map<String, List<String>> acceptedSensorMLFormats = new HashMap<>();
     
     public FileSensorReader(final Automatic configuration, final Map<String, Object> properties) throws MetadataIoException  {
         //we initialize the unmarshaller
@@ -154,7 +154,7 @@ public class FileSensorReader implements SensorReader {
      */
     @Override
     public List<String> getSensorNames() throws CstlServiceException {
-        final List<String> result = new ArrayList<String>();
+        final List<String> result = new ArrayList<>();
         if (dataDirectory.isDirectory()) {
             for (File sensorFile : dataDirectory.listFiles()) {
                 String sensorID = sensorFile.getName();
@@ -171,5 +171,10 @@ public class FileSensorReader implements SensorReader {
     @Override
     public void removeFromCache(String sensorID) {
         // do nothing no cache
+    }
+
+    @Override
+    public int getSensorCount() throws CstlServiceException {
+        return getSensorNames().size();
     }
 }

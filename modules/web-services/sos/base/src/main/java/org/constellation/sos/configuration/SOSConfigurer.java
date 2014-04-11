@@ -17,14 +17,40 @@
 
 package org.constellation.sos.configuration;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.logging.Level;
+import javax.imageio.spi.ServiceRegistry;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import org.constellation.ServiceDef.Specification;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
+import org.constellation.metadata.io.MetadataIoException;
+import org.constellation.metadata.utils.Utils;
 import org.constellation.ogc.configuration.OGCConfigurer;
+import org.constellation.sos.factory.OMFactory;
+import org.constellation.sos.factory.SMLFactory;
+import org.constellation.sos.io.SensorReader;
+import org.constellation.sos.io.SensorWriter;
+import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.factory.FactoryNotFoundException;
+import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
+import org.geotoolkit.util.FileUtilities;
 
 /**
  * {@link org.constellation.configuration.ServiceConfigurer} implementation for SOS service.
@@ -58,5 +84,197 @@ public class SOSConfigurer extends OGCConfigurer {
             configuration = baseConfig;
         }
         super.createInstance(identifier, metadata, configuration);
+    }
+
+    public AcknowlegementType importSensor(final String id, final File sensorFile, final String type) throws ConfigurationException {
+        LOGGER.info("Importing sensor");
+        
+        final SensorWriter writer = getSensorWriter(id);
+        final List<File> files;
+        switch (type) {
+            case "zip":
+                try  {
+                    final FileInputStream fis = new FileInputStream(sensorFile);
+                    files = FileUtilities.unZipFileList(fis);
+                    fis.close();
+                } catch (IOException ex) {
+                    throw new ConfigurationException(ex);
+                }   break;
+
+            case "xml":
+                files = Arrays.asList(sensorFile);
+                break;
+
+            default:
+                throw new ConfigurationException("Unexpected file extension, accepting zip or xml");
+        }
+        
+        try {
+            for (File importedFile: files) {
+                if (importedFile != null) {
+                    final AbstractSensorML sensor = unmarshallSensor(importedFile);
+                    final String sensorID = Utils.findIdentifier(sensor);
+                    writer.writeSensor(sensorID, sensor);
+                } else {
+                    throw new ConfigurationException("An imported file is null");
+                }
+            }
+            return new AcknowlegementType("Success", "The specified record have been imported in the CSW");
+        } catch (JAXBException ex) {
+            LOGGER.log(Level.WARNING, "Exception while unmarshalling imported file", ex);
+        } catch (CstlServiceException ex) {
+            throw new ConfigurationException(ex);
+        }
+        return new AcknowlegementType("Error", "An error occurs during the process");
+    }
+    
+    public AcknowlegementType removeSensor(final String id, final String sensorID) throws ConfigurationException {
+        final SensorWriter writer = getSensorWriter(id);
+        try {
+            boolean sucess = writer.deleteSensor(sensorID);
+            if (sucess) {
+                return new AcknowlegementType("Success", "The specified sensor have been removed in the SOS");
+            } else {
+                return new AcknowlegementType("Error", "Unable to remove the sensor.");
+            }
+        } catch (CstlServiceException ex) {
+            throw new ConfigurationException(ex);
+        }
+    }
+    
+    public Object getSensor(final String id, final String sensorID) throws ConfigurationException {
+        final SensorReader reader = getReader(id);
+        try {
+            return reader.getSensor(sensorID);
+        } catch (CstlServiceException ex) {
+            throw new ConfigurationException(ex);
+        }
+    }
+    
+    public int getSensorCount(final String id) throws ConfigurationException {
+        final SensorReader reader = getReader(id);
+        try {
+            return reader.getSensorCount();
+        } catch (CstlServiceException ex) {
+            throw new ConfigurationException(ex);
+        }
+    }
+    
+    private static AbstractSensorML unmarshallSensor(final File f) throws JAXBException, CstlServiceException {
+        final Unmarshaller um = SensorMLMarshallerPool.getInstance().acquireUnmarshaller();
+        Object obj = um.unmarshal(f);
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement)obj).getValue();
+        }
+        if (obj instanceof AbstractSensorML) {
+            return (AbstractSensorML)obj;
+        }
+        throw new CstlServiceException("the sensorML file does not contain a valid sensorML object");
+    }
+    
+    /**
+     * Build a new Sensor writer for the specified service ID.
+     *
+     * @param serviceID the service identifier (form multiple SOS) default: ""
+     *
+     * @return A sensor Writer.
+     * @throws ConfigurationException
+     */
+    protected SensorWriter getSensorWriter(final String serviceID) throws ConfigurationException {
+
+        // we get the SOS configuration file
+        final SOSConfiguration config = getServiceConfiguration(serviceID);
+        if (config != null) {
+            final SMLFactory smlfactory = getSMLFactory(config.getSMLType());
+            try {
+                return smlfactory.getSensorWriter(config.getSMLType(), config.getSMLConfiguration(), new HashMap<String, Object>());
+
+            } catch (MetadataIoException ex) {
+                throw new ConfigurationException("JAXBException while initializing the writer!", ex);
+            }
+        } else {
+            throw new ConfigurationException("there is no configuration file correspounding to this ID:" + serviceID);
+        }
+    }
+    
+    /**
+     * Build a new Sensor reader for the specified service ID.
+     *
+     * @param serviceID the service identifier (form multiple SOS) default: ""
+     *
+     * @return A sensor reader.
+     * @throws ConfigurationException
+     */
+    protected SensorReader getReader(final String serviceID) throws ConfigurationException {
+
+        // we get the CSW configuration file
+        final SOSConfiguration config = getServiceConfiguration(serviceID);
+        if (config != null) {
+            final SMLFactory smlfactory = getSMLFactory(config.getSMLType());
+            try {
+                return smlfactory.getSensorReader(config.getSMLType(), config.getSMLConfiguration(), new HashMap<String, Object>());
+
+            } catch (MetadataIoException ex) {
+                throw new ConfigurationException("MetadataIoException while initializing the reader:" + ex.getMessage(), ex);
+            }
+        } else {
+            throw new ConfigurationException("there is no configuration file correspounding to this ID:" + serviceID);
+        }
+    }
+    
+    /**
+     * Refresh the map of configuration object.
+     *
+     * @param id identifier of the CSW service.
+     * @return
+     * @throws ConfigurationException
+     */
+    protected SOSConfiguration getServiceConfiguration(final String id) throws ConfigurationException {
+        try {
+            // we get the SOS configuration file
+            final SOSConfiguration config = (SOSConfiguration) ConfigurationEngine.getConfiguration("SOS", id);
+            return config;
+
+        } catch (JAXBException ex) {
+            throw new ConfigurationException("JAXBexception while getting the SOS configuration for:" + id, ex.getMessage());
+        } catch (IllegalArgumentException ex) {
+            throw new ConfigurationException("IllegalArgumentException: " + ex.getMessage());
+        } catch (FileNotFoundException ex) {
+            throw new ConfigurationException("Unable to find the configuration file");
+        }
+    }
+
+    /**
+     * Select the good SML factory in the available ones in function of the dataSource type.
+     *
+     * @param type
+     * @return
+     */
+    private SMLFactory getSMLFactory(DataSourceType type) {
+        final Iterator<SMLFactory> ite = ServiceRegistry.lookupProviders(SMLFactory.class);
+        while (ite.hasNext()) {
+            SMLFactory currentFactory = ite.next();
+            if (currentFactory.factoryMatchType(type)) {
+                return currentFactory;
+            }
+        }
+        throw new FactoryNotFoundException("No SML factory has been found for type:" + type);
+    }
+    
+    /**
+     * Select the good OM factory in the available ones in function of the dataSource type.
+     *
+     * @param type
+     * @return
+     */
+    private OMFactory getOMFactory(DataSourceType type) {
+        final Iterator<OMFactory> ite = ServiceRegistry.lookupProviders(OMFactory.class);
+        while (ite.hasNext()) {
+            OMFactory currentFactory = ite.next();
+            if (currentFactory.factoryMatchType(type)) {
+                return currentFactory;
+            }
+        }
+        throw new FactoryNotFoundException("No OM factory has been found for type:" + type);
     }
 }

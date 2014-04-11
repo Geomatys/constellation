@@ -66,8 +66,8 @@ public class MDWebSensorReader extends MDWebMetadataReader implements SensorRead
      * Build a new Sensor reader for a MDweb database.
      * 
      * @param configuration
-     * @param map
-     * @throws org.constellation.ws.CstlServiceException
+     * @param properties
+     * @throws org.constellation.metadata.io.MetadataIoException
      */
     public MDWebSensorReader(final Automatic configuration, final Map<String, Object> properties) throws MetadataIoException  {
         super(configuration);
@@ -187,5 +187,10 @@ public class MDWebSensorReader extends MDWebMetadataReader implements SensorRead
         } catch (MD_IOException ex) {
             throw new CstlServiceException(ex);
         }
+    }
+
+    @Override
+    public int getSensorCount() throws CstlServiceException {
+        return getSensorNames().size();
     }
 }

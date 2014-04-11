@@ -54,6 +54,8 @@ public interface SensorReader {
      */
     String getInfos();
 
+    int getSensorCount()throws CstlServiceException;
+    
     void removeFromCache(final String sensorID);
     
     /**

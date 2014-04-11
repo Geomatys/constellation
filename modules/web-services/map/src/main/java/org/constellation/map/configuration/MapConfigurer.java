@@ -24,10 +24,8 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 
 import java.awt.*;
-import java.io.FileNotFoundException;
 
 import org.apache.sis.storage.DataStoreException;
-import org.apache.sis.util.logging.Logging;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.dao.LayerRecord;
@@ -41,8 +39,6 @@ import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.*;
 import org.constellation.map.featureinfo.FeatureInfoUtilities;
 import org.constellation.ogc.configuration.OGCConfigurer;
-import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.provider.style.SetStyleToStyleProviderDescriptor;
 import org.constellation.process.service.AddLayerToMapServiceDescriptor;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
@@ -57,7 +53,6 @@ import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
-import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.MutableStyleFactory;
 import org.geotoolkit.style.function.InterpolationPoint;
@@ -79,13 +74,11 @@ import org.opengis.style.Symbolizer;
 
 import javax.measure.unit.NonSI;
 import javax.measure.unit.Unit;
-import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 
 import static org.geotoolkit.style.StyleConstants.DEFAULT_CATEGORIZE_LOOKUP;
@@ -104,8 +97,6 @@ import static org.geotoolkit.style.StyleConstants.LITERAL_ONE_FLOAT;
  * @since 0.9
  */
 public class MapConfigurer extends OGCConfigurer {
-
-    private static final Logger LOGGER = Logging.getLogger(MapConfigurer.class);
 
     /**
      * Create a new {@link MapConfigurer} instance.
