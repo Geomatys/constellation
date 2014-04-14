@@ -18,10 +18,10 @@
 
 cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', '$growl', 'StyleSharedService',
     function ($scope, $dashboard, style, $growl, StyleSharedService) {
-        $scope.filtertype = "";
 
         style.listAll({}, function(response) {
             $dashboard($scope, response.styles, false);
+            $scope.filtertype = "";
         });
 
         $scope.deleteStyle = function() {
@@ -73,8 +73,6 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             }
             return '';
         };
-
-        $scope.filtertype = $scope.initFilterType();
 
         // Page to include
         $scope.pageSld = ($scope.dataType.toLowerCase() === 'vector' || $scope.dataType === 'feature-store') ? "views/style/vectors.html" : "views/style/raster.html";
@@ -247,12 +245,14 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         $scope.initScopeStyle = function() {
             style.listAll({}, function(response) {
                 $dashboard($scope, response.styles, true);
+                $scope.filtertype = $scope.initFilterType();
             });
         };
 
         $scope.initScopeData = function() {
             dataListing.listAll({}, function(response) {
                 $dashboard($scope, response, true);
+                $scope.filtertype = $scope.initFilterType();
             });
         };
 

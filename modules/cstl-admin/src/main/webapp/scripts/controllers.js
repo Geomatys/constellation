@@ -245,10 +245,9 @@ cstlAdminApp.controller('LogsController', ['$scope', 'resolvedLogs', 'LogsServic
 cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 'webService', 'dataListing', 'provider', 'style', '$modal', '$growl', 'StyleSharedService', '$cookies',
     function ($scope, $location, $dashboard, webService, dataListing, provider, style, $modal, $growl, StyleSharedService, $cookies) {
 
-        $scope.filtertype = "";
-
         dataListing.listAll({}, function(response) {
             $dashboard($scope, response, true);
+            $scope.filtertype = "";
         });
 
         // Map methods
@@ -1100,8 +1099,6 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
     $scope.service = webService.get({type: $scope.type, id:$routeParams.id});
     $scope.metadata = webService.metadata({type: $scope.type, id:$routeParams.id});
 
-    $scope.filtertype = "";
-
     $scope.tabdata = true;
     $scope.tabdesc = false;
     $scope.tabmetadata = false;
@@ -1127,6 +1124,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
             csw.count({id: $routeParams.id}, {}, function(max) {
                 csw.getRecords({id: $routeParams.id, count: max.asInt, startIndex: 0}, {}, function(response) {
                     $dashboard($scope, response.BriefNode, false);
+                    $scope.filtertype = "";
                     dataListing.listData({},
                         function(response) { $scope.relatedDatas = response; },
                         function() { $growl('error','Error','Unable to get related data for providers'); }
@@ -1137,6 +1135,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
             $scope.config = webService.config({type: $scope.type, id:$routeParams.id});
             $scope.layers = webService.layers({type: $scope.type, id:$routeParams.id}, {}, function(response) {
                 $dashboard($scope, response, true);
+                $scope.filtertype = "";
             });
         }
     };
@@ -1325,6 +1324,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
                      csw.count({id: $routeParams.id}, {}, function(max) {
                          csw.getRecords({id: $routeParams.id, count: max.asInt, startIndex: 0}, {}, function(response) {
                              $dashboard($scope, response.BriefNode, false);
+                             $scope.filtertype = "";
                          });
                      });
                  }, function() { $growl('error','Error','Failed to delete metadata'); }
@@ -1427,7 +1427,6 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
             }
             return '';
         };
-        $scope.filtertype = $scope.getDefaultFilter();
         $scope.nbbypage = 5;
         $scope.exclude = exclude;
 
@@ -1443,6 +1442,7 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
 
         dataListing.listAll({}, function(response) {
             $dashboard($scope, response, true);
+            $scope.filtertype = $scope.getDefaultFilter();
         });
 
         $scope.close = function() {
