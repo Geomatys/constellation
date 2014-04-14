@@ -179,6 +179,13 @@
                 <form id="dbSourceForm">
                     <fieldset>
                         <div class="form-group">
+                            <label class="control-label new-service-form-label" translate="service.config.source.database.type">Database type</label>
+                            <select id="selectType" class="form-control col-sm-5" style="margin-bottom:10px;" ng-model="source.automatic.bdd.className">
+                                <option value="org.postgresql.Driver">PostgreSQL</option>
+                                <option value="com.mysql.jdbc.Driver">MySQL</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label class="control-label new-service-form-label" translate="service.config.source.database.url">Database URL</label>
                             <input type="text" class="form-control" ng-model="source.automatic.bdd.connectURL">
                         </div>

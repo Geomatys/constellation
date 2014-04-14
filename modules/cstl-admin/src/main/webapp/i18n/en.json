@@ -513,8 +513,13 @@
             "dashboard.header.type": "Type",
             "dashboard.action.add.button": "Add",
             "dashboard.action.add.data": "Add data",
-            "dashboard.action.add.layer": "Add Layer"
-
+            "dashboard.action.add.layer": "Add Layer",
+            "dashboard.sensors.list":"Available sensors",
+            "dashboard.measures.list":"Available measures",
+            "dashboard.aera": "Geographical aera",
+            "dashboard.date.to":"to",
+            "dashboard.date.from":"From",
+            "dashboard.button.graph":"Draw the graph"
         },
         "menu": {
             "delete.label": "Delete service",

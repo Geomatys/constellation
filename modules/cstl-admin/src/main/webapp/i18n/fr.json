@@ -956,7 +956,13 @@
             "dashboard.header.type": "Type",
             "dashboard.action.add.button": "Ajouter",
             "dashboard.action.add.data": "Ajouter une donnée",
-            "dashboard.action.add.layer": "Ajouter une couche"
+            "dashboard.action.add.layer": "Ajouter une couche",
+            "dashboard.sensors.list":"Capteurs dipsonibles",
+            "dashboard.measures.list":"Mesures possibles",
+            "dashboard.aera":"Zone géographique",
+            "dashboard.date.to":"au",
+            "dashboard.date.from":"Du",
+            "dashboard.button.graph":"Tracer le graphique"
         },
         "menu": {
             "delete": {

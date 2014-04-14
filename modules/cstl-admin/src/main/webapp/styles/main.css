@@ -326,7 +326,44 @@ ul.unstyled {
         font-size:13px;
     }
 }
-
+.sos_edit_checkboxlist{
+    border:solid 1px #eeeeee; 
+    height:215px; 
+    overflow:auto; 
+    border-radius:5px; 
+    padding: 0 15px;
+}
+.sos_edit_checkboxlist>label{
+    font-weight:normal;
+}
+.sos_edit_blocs{
+    border-top:solid 1px #eeeeee; 
+    height:265px; 
+    padding-top:10px; 
+}
+.sos_edit_button{
+    margin-bottom:20px;
+    text-align:right;
+}
+.sos_edit_blocgraph{
+    height:455px; 
+    padding-top:20px; 
+    border-top:solid 1px #eeeeee; 
+}
+.sos_edit_graph{
+    border:solid 1px #eeeeee; 
+    height:425px; 
+    border-radius:3px;
+}
+.sos_edit_graph_date{
+    border:solid 1px #eeeeee; 
+    height:55px; 
+    border-bottom-left-radius:3px;  
+    border-top:none; 
+    border-right:none; 
+    background-color:#eeeeee; 
+    padding:10px;
+}
 
 /*
  * Dashboards
