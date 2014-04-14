@@ -223,12 +223,18 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         };
 
         $scope.dataProperties = null;
+        $scope.dataBbox = null;
         $scope.dataBands = null;
 
         $scope.initDataProperties = function() {
             provider.dataDesc({providerId: $scope.providerId, dataId: $scope.layerName}, function(response) {
                 $scope.dataProperties = response.properties;
+                $scope.dataBbox = response.boundingBox;
                 $scope.dataBands = response.bands;
+                if ($scope.dataBands && $scope.dataBands.length > 0) {
+                    $scope.palette.rasterMinValue = $scope.dataBands[0].minValue;
+                    $scope.palette.rasterMaxValue = $scope.dataBands[0].maxValue;
+                }
             }, function() {
                 $growl('error','Error','Unable to get data description');
             });
@@ -261,7 +267,9 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         };
 
         $scope.createStyle = function() {
-            $scope.addPalette();
+            if ($scope.dataType.toLowerCase() === 'coverage' || $scope.dataType.toLowerCase() === 'raster') {
+                $scope.addPalette();
+            }
             style.create({provider: 'sld'}, $scope.newStyle, function() {
                 $growl('success','Success','Style '+ $scope.newStyle.name +' successfully created');
                 $modalInstance.close({"Provider": "sld", "Name": $scope.newStyle.name});
@@ -297,12 +305,19 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         };
 
         $scope.displayCurrentStyle = function() {
-            $scope.addPalette();
+            if ($scope.dataType.toLowerCase() === 'coverage' || $scope.dataType.toLowerCase() === 'raster') {
+                $scope.addPalette();
+            }
             style.create({provider: 'sld'}, $scope.newStyle, function() {
                 var layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName, $scope.providerId, $scope.newStyle.name);
-                var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
-                DataViewer.layers = [layerData, layerBackground];
+                //var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
+                DataViewer.layers = [layerData];
                 DataViewer.initMap('styledMapOL');
+
+                if ($scope.dataBbox) {
+                    var extent = new OpenLayers.Bounds($scope.dataBbox[0], $scope.dataBbox[1], $scope.dataBbox[2], $scope.dataBbox[3]);
+                    DataViewer.map.zoomToExtent(extent, true);
+                }
             });
         };
 

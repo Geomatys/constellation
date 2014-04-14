@@ -71,7 +71,7 @@
                         <button type="button" class="btn btn-default" ng-click="dispPropNames = true"><span class="icon-link"></span></button>
                    </div>
                    <div class="col-sm-4" ng-show="dispPropNames">
-                       <select class="form-control" ng-model="$parent.newStyle.rules[0].symbolizers[0].label" ng-init="$parent.initDataProperties()">
+                       <select class="form-control" ng-model="$parent.newStyle.rules[0].symbolizers[0].label">
                            <option ng-value="'{'+dp.name+'}'" ng-repeat="dp in $parent.dataProperties">{{dp.name}}</option>
                        </select>
                    </div>

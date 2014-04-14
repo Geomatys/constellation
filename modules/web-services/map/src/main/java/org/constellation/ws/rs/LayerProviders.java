@@ -432,22 +432,21 @@ public final class LayerProviders extends Static {
         final CoverageReference ref = (CoverageReference)layer.getOrigin();
         final GridCoverageReader reader = ref.acquireReader();
         final List<GridSampleDimension> dims = reader.getSampleDimensions(ref.getImageIndex());
-//
-//        // Acquire coverage data.
-//        GridCoverage2D coverage = layer.getCoverage(null, null, null, null);
-//
-//        coverage = coverage.view(ViewType.GEOPHYSICS);
-//        RenderedImage ri = coverage.getRenderedImage();
-//
-//        Map<String, Object> map = StatisticOp.analyze(ri);
-//        double[] min = (double[]) map.get("min");
-//        double[] max = (double[]) map.get("max");
 
         // Bands description.
         if (dims != null) {
             for (final GridSampleDimension dim : dims) {
                 final String dimName = (dim.getCategoryNames() == null || dim.getCategoryNames().length == 0) ? "" :  dim.getCategoryNames()[0].toString();
                 description.getBands().add(new BandDescription(dimName, dim.getMinimumValue(), dim.getMaximumValue(), dim.getNoDataValues()));
+            }
+        } else {
+            Map<String, Object> map = StatisticOp.analyze(reader, ref.getImageIndex());
+            double[] min = (double[]) map.get("min");
+            double[] max = (double[]) map.get("max");
+            if (min != null && min.length > 0) {
+                for (int i=0; i<min.length; i++) {
+                    description.getBands().add(new BandDescription(String.valueOf(i), min[i], max[i], null));
+                }
             }
         }
 
