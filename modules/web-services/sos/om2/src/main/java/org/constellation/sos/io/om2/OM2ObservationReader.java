@@ -81,12 +81,12 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
         RESPONSE_FORMAT.put("2.0.0", Arrays.asList(RESPONSE_FORMAT_V200));
     }
     
-    private final Map<String, List<String>> acceptedSensorMLFormats = new HashMap<String, List<String>>();
+    private final Map<String, List<String>> acceptedSensorMLFormats = new HashMap<>();
     
     /**
      *
-     * @param dataSourceOM
-     * @param observationIdBase
+     * @param configuration
+     * @param properties
      */
     public OM2ObservationReader(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
         super(properties);
@@ -132,7 +132,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
         try {
             final Connection c         = source.getConnection();
             final Statement stmt       = c.createStatement();
-            final List<String> results = new ArrayList<String>();
+            final List<String> results = new ArrayList<>();
             final ResultSet rs         = stmt.executeQuery("SELECT \"identifier\" FROM \"om\".\"offerings\"");
             while (rs.next()) {
                 results.add(rs.getString(1));
@@ -151,7 +151,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      */
     @Override
     public List<ObservationOffering> getObservationOfferings(final List<String> offeringNames, final String version) throws CstlServiceException {
-        final List<ObservationOffering> offerings = new ArrayList<ObservationOffering>();
+        final List<ObservationOffering> offerings = new ArrayList<>();
         for (String offeringName : offeringNames) {
             offerings.add(getObservationOffering(offeringName, version));
         }
@@ -170,9 +170,9 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
             final String description;
             final TemporalGeometricPrimitive time;
             final String procedure;
-            final List<String> phen200             = new ArrayList<String>();
-            final List<PhenomenonProperty> phen100 = new ArrayList<PhenomenonProperty>();
-            final List<String> foi                 = new ArrayList<String>();
+            final List<String> phen200             = new ArrayList<>();
+            final List<PhenomenonProperty> phen100 = new ArrayList<>();
+            final List<String> foi                 = new ArrayList<>();
             try {
                 final PreparedStatement stmt = c.prepareStatement("SELECT * FROM \"om\".\"offerings\" WHERE \"identifier\"=?");
                 stmt.setString(1, offeringName);
@@ -255,7 +255,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
     @Override
     public List<ObservationOffering> getObservationOfferings(final String version) throws CstlServiceException {
         final List<String> offeringNames    = getOfferingNames(version);
-        final List<ObservationOffering> loo = new ArrayList<ObservationOffering>();
+        final List<ObservationOffering> loo = new ArrayList<>();
         for (String offeringName : offeringNames) {
             loo.add(getObservationOffering(offeringName, version));
         }
@@ -270,7 +270,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
         try {
             final Connection c         = source.getConnection();
             final Statement stmt       = c.createStatement();
-            final List<String> results = new ArrayList<String>();
+            final List<String> results = new ArrayList<>();
             final ResultSet rs         = stmt.executeQuery("SELECT \"id\" FROM \"om\".\"procedures\"");
             while (rs.next()) {
                 results.add(rs.getString(1));
@@ -292,7 +292,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
         try {
             final Connection c         = source.getConnection();
             final Statement stmt       = c.createStatement();
-            final List<String> results = new ArrayList<String>();
+            final List<String> results = new ArrayList<>();
             final ResultSet rs         = stmt.executeQuery("SELECT \"id\" FROM \"om\".\"observed_properties\"");
             while (rs.next()) {
                 results.add(rs.getString(1));
@@ -322,7 +322,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
         try {
             final Connection c         = source.getConnection();
             final Statement stmt       = c.createStatement();
-            final List<String> results = new ArrayList<String>();
+            final List<String> results = new ArrayList<>();
             final ResultSet rs         = stmt.executeQuery("SELECT \"id\" FROM \"om\".\"sampling_features\"");
             while (rs.next()) {
                 results.add(rs.getString(1));
@@ -477,12 +477,12 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
     }
     
     private DataArrayProperty buildComplexResult(final String identifier, final String version, final Connection c) throws CstlServiceException, SQLException {
-        final List<String> value      = new ArrayList<String>();
-        final List<String> uom        = new ArrayList<String>();
-        final List<String> fieldType  = new ArrayList<String>();
-        final List<Timestamp> time    = new ArrayList<Timestamp>();
-        final List<String> fieldDef   = new ArrayList<String>();
-        final List<String> fieldNames = new ArrayList<String>();
+        final List<String> value      = new ArrayList<>();
+        final List<String> uom        = new ArrayList<>();
+        final List<String> fieldType  = new ArrayList<>();
+        final List<Timestamp> time    = new ArrayList<>();
+        final List<String> fieldDef   = new ArrayList<>();
+        final List<String> fieldNames = new ArrayList<>();
         
         final PreparedStatement stmt  = c.prepareStatement("SELECT \"value\", \"field_type\", \"uom\", \"time\" ,\"field_definition\", \"field_name\""
                                                          + "FROM \"om\".\"mesures\" "
@@ -509,7 +509,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
         final TextBlock encoding = getDefaultTextEncoding(version);
         final String arrayID =  "dataArray-1"; // TODO
         final String recordID = "datarecord-0"; // TODO
-        final Map<String, AnyScalar> fields = new HashMap<String, AnyScalar>();
+        final Map<String, AnyScalar> fields = new HashMap<>();
         fields.put("Time", getDefaultTimeField(version));
         final StringBuilder values = new StringBuilder();
         int nbValue = 0;
@@ -653,7 +653,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
             final Connection c         = source.getConnection();
             final Statement stmt       = c.createStatement();
             final ResultSet rs         = stmt.executeQuery("SELECT max(\"time_begin\"), min(\"time_end\") FROM \"om\".\"offerings\"");
-            final List<String> results = new ArrayList<String>();
+            final List<String> results = new ArrayList<>();
             if (rs.next()) {
                 String s = rs.getString(1);
                 if (s != null) {

@@ -17,17 +17,16 @@
 
 package org.constellation.sos.io;
 
-// constellation dependencies
 import java.util.List;
+
+// constellation dependencies
 import org.constellation.ws.CstlServiceException;
 
-// geotoolkit dependencies
-import org.geotoolkit.sos.xml.ObservationOffering;
+// Geotoolkit dependencies
 import org.geotoolkit.gml.xml.DirectPosition;
+import org.geotoolkit.observation.xml.AbstractObservation;
+import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.swes.xml.ObservationTemplate;
-
-// GeoAPI dependencies
-import org.opengis.observation.Observation;
 
 /**
  *
@@ -41,8 +40,8 @@ public interface ObservationWriter {
      * @param template An O&M observation
      *
      * @return The new identifiers of the observation
-     *
-     * @throws CstlServiceException
+     * 
+     * @throws org.constellation.ws.CstlServiceException
      */
     String writeObservationTemplate(final ObservationTemplate template) throws CstlServiceException;
     
@@ -53,16 +52,25 @@ public interface ObservationWriter {
      *
      * @return The new identifiers of the observation
      *
-     * @throws CstlServiceException
+     * @throws org.constellation.ws.CstlServiceException
      */
-    String writeObservation(final Observation observation) throws CstlServiceException;
+    String writeObservation(final AbstractObservation observation) throws CstlServiceException;
 
+    /**
+     * Remove an observation with the specified identifier.
+     *
+     * @param observationID
+     * 
+     * @throws org.constellation.ws.CstlServiceException
+     */
+    void removeObservation(final String observationID) throws CstlServiceException;
+    
     /**
      * Write a new Observation offering into the database
      *
      * @param offering
      * @return
-     * @throws CstlServiceException
+     * @throws org.constellation.ws.CstlServiceException
      */
     String writeOffering(final ObservationOffering offering) throws CstlServiceException;
 
@@ -70,11 +78,12 @@ public interface ObservationWriter {
      * Update an offering after the add of a new Observation.
      * The field updated are offering.procedure, offering.phenomenon, offering.samplingFeature
      *
-     * @param offProc A mapping between an offering and a procedure
-     * @param offPheno A mapping between an offering and a phenomenon
-     * @param offSF A mapping between an offering and a samplingFeature
+     * @param offeringID The offering identifier.
+     * @param offProc A mapping between an offering and a procedure.
+     * @param offPheno A mapping between an offering and a phenomenon.
+     * @param offSF A mapping between an offering and a samplingFeature.
      *
-     * @throws CstlServiceException
+     * @throws org.constellation.ws.CstlServiceException
      */
     void updateOffering(final String offeringID, final String offProc, final List<String> offPheno, final String offSF) throws CstlServiceException;
 
@@ -88,7 +97,7 @@ public interface ObservationWriter {
      *
      * @param physicalID The physical id of the sensor.
      * @param position The GML position of the sensor.
-     * @throws CstlServiceException
+     * @throws org.constellation.ws.CstlServiceException
      */
     void recordProcedureLocation(final String physicalID, final DirectPosition position) throws CstlServiceException;
 

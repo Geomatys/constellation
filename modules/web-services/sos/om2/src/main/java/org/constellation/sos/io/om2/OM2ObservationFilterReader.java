@@ -28,32 +28,29 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import org.constellation.generic.database.Automatic;
-
 import org.constellation.sos.io.ObservationFilterReader;
-import org.constellation.ws.CstlServiceException;
 
 import static org.constellation.sos.ws.SOSConstants.*;
 import static org.constellation.sos.ws.Utils.getTimeValue;
-
+import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.gml.xml.FeatureProperty;
 import org.geotoolkit.observation.xml.AbstractObservation;
 import org.geotoolkit.observation.xml.OMXmlFactory;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.referencing.CRS;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
 import org.geotoolkit.swe.xml.AbstractDataComponent;
 import org.geotoolkit.swe.xml.AbstractDataRecord;
 import org.geotoolkit.swe.xml.AnyScalar;
 import org.geotoolkit.swe.xml.DataArrayProperty;
 import org.geotoolkit.swe.xml.TextBlock;
 import org.geotoolkit.swe.xml.UomProperty;
-
-import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import org.geotoolkit.referencing.CRS;
-
 import org.opengis.observation.Observation;
 import org.opengis.observation.Phenomenon;
 import org.opengis.observation.sampling.SamplingFeature;
@@ -162,13 +159,13 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             return getMesurementTemplates(version);
         }
         try {
-            final Map<String, Observation> observations = new HashMap<String, Observation>();
+            final Map<String, Observation> observations = new HashMap<>();
             final Connection c                          = source.getConnection();
             c.setReadOnly(true);
             final Statement currentStatement            = c.createStatement();
             final ResultSet rs                          = currentStatement.executeQuery(sqlRequest.toString());
             final TextBlock encoding                    = getDefaultTextEncoding(version);
-            final Map<String, AnyScalar> fields         = new HashMap<String, AnyScalar>();
+            final Map<String, AnyScalar> fields         = new HashMap<>();
             Observation currentObservation              = null;
             
             while (rs.next()) {
@@ -234,7 +231,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             rs.close();
             currentStatement.close();
             c.close();
-            return new ArrayList<Observation>(observations.values());
+            return new ArrayList<>(observations.values());
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
@@ -244,7 +241,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
     
     public List<Observation> getMesurementTemplates(final String version) throws CstlServiceException {
         try {
-            final Map<String, Observation> observations = new HashMap<String, Observation>();
+            final Map<String, Observation> observations = new HashMap<>();
             final Connection c                          = source.getConnection();
             c.setReadOnly(true);
             final Statement currentStatement            = c.createStatement();
@@ -281,7 +278,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             rs.close();
             currentStatement.close();
             c.close();
-            return new ArrayList<Observation>(observations.values());
+            return new ArrayList<>(observations.values());
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
@@ -295,7 +292,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             return getMesurements(version);
         }
         try {
-            final Map<String, Observation> observations = new HashMap<String, Observation>();
+            final Map<String, Observation> observations = new HashMap<>();
             final Connection c                          = source.getConnection();
             final Statement currentStatement            = c.createStatement();
             c.setReadOnly(true);
@@ -304,7 +301,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             Timestamp oldTime                           = null;
             StringBuilder values                        = new StringBuilder();
             int nbValue                                 = 0;
-            final Map<String, AnyScalar> fields         = new HashMap<String, AnyScalar>();
+            final Map<String, AnyScalar> fields         = new LinkedHashMap<>();
             Observation currentObservation              = null;
             
             while (rs.next()) {
@@ -397,7 +394,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             rs.close();
             currentStatement.close();
             c.close();
-            return new ArrayList<Observation>(observations.values());
+            return new ArrayList<>(observations.values());
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
@@ -405,13 +402,19 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
         }
     }
     
-    private AnyScalar buildField(final String version, final String fieldName, final String fieldType, final String uom, final String fieldDef) {
+    private AnyScalar buildField(final String version, final String fieldName, final String fieldType, final String uom, final String fieldDef) throws CstlServiceException {
         if ("Quantity".equals(fieldType)) {
             final UomProperty uomCode     = buildUomProperty(version, uom, null);
             final AbstractDataComponent c = buildQuantity(version, fieldDef, uomCode, null);
             return buildAnyScalar(version, null, fieldName, c);
+        } else if ("Boolean".equals(fieldType)) {
+            final AbstractDataComponent c = buildBoolean(version, fieldDef, null);
+            return buildAnyScalar(version, null, fieldName, c);
+        } else if ("Text".equals(fieldType)) {
+            final AbstractDataComponent c = buildText(version, fieldDef, null);
+            return buildAnyScalar(version, null, fieldName, c);
         } else {
-            throw new IllegalArgumentException("Unexpected field Type:" + fieldType);
+            throw new CstlServiceException("Unsupported field Type:" + fieldType);
         }
     }
     
@@ -419,13 +422,13 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             final TextBlock encoding, final String values, final int cpt) {
         final String arrayID     = "dataArray-" + cpt;
         final String recordID    = "datarecord-" + cpt;
-        final AbstractDataRecord record = buildSimpleDatarecord(version, null, recordID, null, false, new ArrayList<AnyScalar>(fields));
+        final AbstractDataRecord record = buildSimpleDatarecord(version, null, recordID, null, false, new ArrayList<>(fields));
         return buildDataArrayProperty(version, arrayID, nbValue, arrayID, record, encoding, values);
     }
     
     public List<Observation> getMesurements(final String version) throws CstlServiceException {
         try {
-            final List<Observation> observations        = new ArrayList<Observation>();
+            final List<Observation> observations        = new ArrayList<>();
             final Connection c                          = source.getConnection();
             c.setReadOnly(true);
             final Statement currentStatement            = c.createStatement();
@@ -522,7 +525,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
     @Override
     public List<SamplingFeature> getFeatureOfInterests(final String version) throws CstlServiceException {
         try {
-            final List<SamplingFeature> features = new ArrayList<SamplingFeature>();
+            final List<SamplingFeature> features = new ArrayList<>();
             final Connection c = source.getConnection();
             c.setReadOnly(true);
             final Statement currentStatement = c.createStatement();

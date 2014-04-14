@@ -26,28 +26,22 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-
-// constellation dependencies
+import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.factory.OMFactory;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.sos.io.lucene.LuceneObservationIndexer;
 import org.constellation.ws.CstlServiceException;
-
-
-// Geotoolkit dependencies
-import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.gml.xml.DirectPosition;
-import org.geotoolkit.sos.xml.SOSMarshallerPool;
-import org.geotoolkit.sos.xml.ObservationOffering;
-import org.apache.sis.xml.MarshallerPool;
-import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.lucene.IndexingException;
+import org.geotoolkit.observation.xml.AbstractObservation;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.sampling.xml.SamplingFeature;
+import org.geotoolkit.sos.xml.ObservationOffering;
+import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.swe.xml.Phenomenon;
 import org.geotoolkit.swes.xml.ObservationTemplate;
-
-// GeoAPI dependencies
 import org.opengis.observation.Observation;
 
 
@@ -57,7 +51,7 @@ import org.opengis.observation.Observation;
  */
 public class FileObservationWriter implements ObservationWriter {
 
-     private File offeringDirectory;
+    private File offeringDirectory;
 
     private File phenomenonDirectory;
 
@@ -148,7 +142,7 @@ public class FileObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public String writeObservation(final Observation observation) throws CstlServiceException {
+    public String writeObservation(final AbstractObservation observation) throws CstlServiceException {
         try {
             final File observationFile;
             if (observation.getName().startsWith(observationTemplateIdBase)) {
@@ -182,6 +176,21 @@ public class FileObservationWriter implements ObservationWriter {
         }
     }
 
+    @Override
+    public void removeObservation(final String observationID) throws CstlServiceException {
+        final File observationFile;
+        if (observationID.startsWith(observationTemplateIdBase)) {
+            observationFile = new File(observationTemplateDirectory, observationID + FILE_EXTENSION);
+        } else {
+            observationFile = new File(observationDirectory, observationID + FILE_EXTENSION);
+        }
+        if (observationFile.exists()) {
+            observationFile.delete();
+        } else {
+            LOGGER.log(Level.WARNING, "unable to find t he fiel to delete:{0}", observationFile.getPath());
+        }
+    }
+    
     private void writePhenomenon(final Phenomenon phenomenon) throws CstlServiceException {
         try {
             if (!phenomenonDirectory.exists()) {
@@ -257,7 +266,7 @@ public class FileObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public void updateOffering(final String offId, final String offProc, final List<String> offPheno, final String offSF) throws CstlServiceException {
+    public void updateOffering(final String offeringID, final String offProc, final List<String> offPheno, final String offSF) throws CstlServiceException {
         // TODO
     }
 

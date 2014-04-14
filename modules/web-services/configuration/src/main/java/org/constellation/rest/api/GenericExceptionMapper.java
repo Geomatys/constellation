@@ -17,6 +17,8 @@
 
 package org.constellation.rest.api;
 
+import com.sun.istack.logging.Logger;
+import java.util.logging.Level;
 import org.apache.sis.util.NullArgumentException;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigProcessException;
@@ -42,12 +44,16 @@ import static org.constellation.utils.RESTfulUtilities.notFound;
  */
 @Provider
 public class GenericExceptionMapper implements ExceptionMapper<Exception> {
-
+    
+    public static Logger LOGGER = Logger.getLogger(GenericExceptionMapper.class);
     /**
      * {@inheritDoc}
      */
     @Override
     public Response toResponse(final Exception exception) {
+    
+        LOGGER.log(Level.WARNING, exception.getMessage(), exception);
+        
         /*
          * Runtime exception that defines the response to be returned.
          */

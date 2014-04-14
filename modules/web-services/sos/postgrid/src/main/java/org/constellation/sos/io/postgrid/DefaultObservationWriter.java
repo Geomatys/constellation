@@ -16,15 +16,16 @@
  */
 package org.constellation.sos.io.postgrid;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Connection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-// constellation dependencies
+import org.apache.sis.util.logging.Logging;
+
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.observation.MeasurementTable;
@@ -32,28 +33,24 @@ import org.constellation.observation.ObservationTable;
 import org.constellation.sos.ObservationOfferingTable;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.gml.xml.DirectPosition;
 
-// Geotoolkit dependencies
+import org.geotoolkit.gml.xml.DirectPosition;
 import org.geotoolkit.internal.sql.table.CatalogException;
 import org.geotoolkit.internal.sql.table.Database;
 import org.geotoolkit.internal.sql.table.NoSuchTableException;
+import org.geotoolkit.observation.xml.AbstractObservation;
 import org.geotoolkit.observation.xml.OMXmlFactory;
-import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
 import org.geotoolkit.sos.xml.v100.OfferingPhenomenonType;
 import org.geotoolkit.sos.xml.v100.OfferingProcedureType;
 import org.geotoolkit.sos.xml.v100.OfferingSamplingFeatureType;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.swe.xml.v101.PhenomenonType;
 import org.geotoolkit.swes.xml.ObservationTemplate;
 
-// GeoAPI dependencies
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
 import org.opengis.observation.Measurement;
-import org.opengis.observation.Observation;
-
-
 
 /**
  * Default Observation reader for Postgrid O&M database.
@@ -132,7 +129,7 @@ public class DefaultObservationWriter implements ObservationWriter {
     @Override
     public String writeObservationTemplate(final ObservationTemplate template) throws CstlServiceException {
         if (template.getObservation() != null) {
-            return writeObservation(template.getObservation());
+            return writeObservation((AbstractObservation)template.getObservation());
         }
         return null;
     }
@@ -141,7 +138,7 @@ public class DefaultObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public String writeObservation(final Observation observation) throws CstlServiceException {
+    public String writeObservation(final AbstractObservation observation) throws CstlServiceException {
         try {
             if (observation instanceof Measurement && measTable != null) {
                 return measTable.getIdentifier((Measurement) OMXmlFactory.convert("1.0.0", observation));
@@ -154,6 +151,18 @@ public class DefaultObservationWriter implements ObservationWriter {
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
+                                             NO_APPLICABLE_CODE);
+        }
+    }
+    
+    @Override
+    public void removeObservation(final String observationID) throws CstlServiceException {
+        try {
+            obsTable.delete(observationID);
+            measTable.delete(observationID);
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                                              NO_APPLICABLE_CODE);
         }
     }
@@ -178,21 +187,21 @@ public class DefaultObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public void updateOffering(final String offeringId, final String offProc, final List<String> offPheno, final String offSF) throws CstlServiceException {
+    public void updateOffering(final String offeringID, final String offProc, final List<String> offPheno, final String offSF) throws CstlServiceException {
         try {
             if (offProc != null) {
-                final OfferingProcedureType offProcedure = new OfferingProcedureType(offeringId, offProc);
+                final OfferingProcedureType offProcedure = new OfferingProcedureType(offeringID, offProc);
                 offTable.getProcedures().getIdentifier(offProcedure);
             }
             if (offPheno != null) {
                 for (String phenId : offPheno) {
                     final PhenomenonType pheno = new PhenomenonType(phenId, null);
-                    final OfferingPhenomenonType offPhenomenon = new OfferingPhenomenonType(offeringId, pheno);
+                    final OfferingPhenomenonType offPhenomenon = new OfferingPhenomenonType(offeringID, pheno);
                     offTable.getPhenomenons().getIdentifier(offPhenomenon);
                 }
             }
             if (offSF != null) {
-                final OfferingSamplingFeatureType offSamp = new OfferingSamplingFeatureType(offeringId, offSF);
+                final OfferingSamplingFeatureType offSamp = new OfferingSamplingFeatureType(offeringID, offSF);
                 offTable.getStations().getIdentifier(offSamp);
             }
         } catch (CatalogException ex) {

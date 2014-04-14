@@ -37,6 +37,8 @@ public interface ObservationFilter {
     /**
      * Initialize the query for a full observation request.
      *
+     * @param requestMode
+     * @param resultModel
      * @throws org.constellation.ws.CstlServiceException
      */
     void initFilterObservation(final ResponseModeType requestMode, final QName resultModel) throws CstlServiceException;
@@ -44,6 +46,8 @@ public interface ObservationFilter {
     /**
      * Initialize the query for a restricted to the results request.
      *
+     * @param procedure
+     * @param resultModel
      * @throws org.constellation.ws.CstlServiceException
      */
     void initFilterGetResult(final String procedure, final QName resultModel) throws CstlServiceException;

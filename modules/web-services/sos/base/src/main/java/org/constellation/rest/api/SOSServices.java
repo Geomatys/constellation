@@ -45,7 +45,7 @@ public class SOSServices {
     
     @PUT
     @Path("{id}/sensors")
-    public Response importSensor(final @PathParam("id") String id, final @PathParam("fileName") String fileName, final File sensor) throws Exception {
+    public Response importSensor(final @PathParam("id") String id, final File sensor) throws Exception {
         return ok(getConfigurer().importSensor(id, sensor, "xml"));
     }
     
@@ -66,6 +66,19 @@ public class SOSServices {
     public Response getSensortCount(final @PathParam("id") String id) throws Exception {
         return ok(new SimpleValue(getConfigurer().getSensorCount(id)));
     }
+    
+    @PUT
+    @Path("{id}/observations")
+    public Response importObservation(final @PathParam("id") String id, final File obs) throws Exception {
+        return ok(getConfigurer().importSingleObservation(id, obs));
+    }
+    
+    @DELETE
+    @Path("{id}/observation/{observationID}")
+    public Response removeObservation(final @PathParam("id") String id, final @PathParam("observationID") String observationID) throws Exception {
+        return ok(getConfigurer().removeSingleObservation(id, observationID));
+    }
+
     
     private static SOSConfigurer getConfigurer() throws NotRunningServiceException {
         return (SOSConfigurer) ServiceConfigurer.newInstance(ServiceDef.Specification.SOS);

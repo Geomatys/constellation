@@ -44,13 +44,18 @@ import org.constellation.metadata.utils.Utils;
 import org.constellation.ogc.configuration.OGCConfigurer;
 import org.constellation.sos.factory.OMFactory;
 import org.constellation.sos.factory.SMLFactory;
+import org.constellation.sos.io.ObservationWriter;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.factory.FactoryNotFoundException;
+import org.geotoolkit.observation.xml.AbstractObservation;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
+import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.util.FileUtilities;
+import org.opengis.observation.Observation;
+import org.opengis.observation.ObservationCollection;
 
 /**
  * {@link org.constellation.configuration.ServiceConfigurer} implementation for SOS service.
@@ -119,7 +124,7 @@ public class SOSConfigurer extends OGCConfigurer {
                     throw new ConfigurationException("An imported file is null");
                 }
             }
-            return new AcknowlegementType("Success", "The specified record have been imported in the CSW");
+            return new AcknowlegementType("Success", "The specified sensor have been imported in the SOS");
         } catch (JAXBException ex) {
             LOGGER.log(Level.WARNING, "Exception while unmarshalling imported file", ex);
         } catch (CstlServiceException ex) {
@@ -170,6 +175,53 @@ public class SOSConfigurer extends OGCConfigurer {
             return (AbstractSensorML)obj;
         }
         throw new CstlServiceException("the sensorML file does not contain a valid sensorML object");
+    }
+    
+    private static AbstractObservation unmarshallObservation(final File f) throws JAXBException, CstlServiceException {
+        final Unmarshaller um = SOSMarshallerPool.getInstance().acquireUnmarshaller();
+        Object obj = um.unmarshal(f);
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement)obj).getValue();
+        }
+        if (obj instanceof AbstractObservation) {
+            return (AbstractObservation)obj;
+        }
+        throw new CstlServiceException("the observation file does not contain a valid O&M object");
+    }
+    
+    public AcknowlegementType importSingleObservation(final String id, final File observationFile) throws ConfigurationException {
+        final ObservationWriter writer = getObservationWriter(id);
+        try {
+            final AbstractObservation observation = unmarshallObservation(observationFile);
+            writer.writeObservation(observation);
+            return new AcknowlegementType("Success", "The specified observation have been imported in the SOS");
+        } catch (JAXBException | CstlServiceException ex) {
+            throw new ConfigurationException(ex);
+        }
+        //return new AcknowlegementType("Error", "An error occurs during the process");
+    }
+    
+    public AcknowlegementType importObservations(final String id, final ObservationCollection collection) throws ConfigurationException {
+        final ObservationWriter writer = getObservationWriter(id);
+        try {
+            for (Observation observation : collection.getMember()) {
+                writer.writeObservation((AbstractObservation)observation);
+            }
+            return new AcknowlegementType("Success", "The specified observations have been imported in the SOS");
+        } catch (CstlServiceException ex) {
+            throw new ConfigurationException(ex);
+        }
+        //return new AcknowlegementType("Error", "An error occurs during the process");
+    }
+    
+    public Object removeSingleObservation(final String id, final String observationID) throws ConfigurationException {
+        final ObservationWriter writer = getObservationWriter(id);
+        try {
+            writer.removeObservation(observationID);
+            return new AcknowlegementType("Success", "The specified observation have been removed from the SOS");
+        } catch (CstlServiceException ex) {
+            throw new ConfigurationException(ex);
+        }
     }
     
     /**
@@ -276,5 +328,30 @@ public class SOSConfigurer extends OGCConfigurer {
             }
         }
         throw new FactoryNotFoundException("No OM factory has been found for type:" + type);
+    }
+    
+    /**
+     * Build a new Observation writer for the specified service ID.
+     *
+     * @param serviceID the service identifier (form multiple SOS) default: ""
+     *
+     * @return An observation Writer.
+     * @throws ConfigurationException
+     */
+    protected ObservationWriter getObservationWriter(final String serviceID) throws ConfigurationException {
+
+        // we get the SOS configuration file
+        final SOSConfiguration config = getServiceConfiguration(serviceID);
+        if (config != null) {
+            final OMFactory omfactory = getOMFactory(config.getObservationWriterType());
+            try {
+                return omfactory.getObservationWriter(config.getObservationWriterType(), config.getOMConfiguration(), new HashMap<String, Object>());
+
+            } catch (CstlServiceException ex) {
+                throw new ConfigurationException("JAXBException while initializing the writer!", ex);
+            }
+        } else {
+            throw new ConfigurationException("there is no configuration file correspounding to this ID:" + serviceID);
+        }
     }
 }
