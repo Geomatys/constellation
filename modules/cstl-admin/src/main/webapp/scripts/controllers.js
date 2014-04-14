@@ -178,25 +178,20 @@ cstlAdminApp.controller('UserDetailsController', ['$scope', '$modalInstance', 'u
 
 cstlAdminApp.controller('ProcessController', ['$scope', 'ProcessService',
                                               function ($scope, Process) {
-                                         	   $scope.oneAtATime=true;
-                                                $scope.registries = Process.get();
-                                                $scope.groups = [
-                                                                 {
-                                                                   title: "Dynamic Group Header - 1",
-                                                                   content: "Dynamic Group Body - 1"
-                                                                 },
-                                                                 {
-                                                                   title: "Dynamic Group Header - 2",
-                                                                   content: "Dynamic Group Body - 2"
-                                                                 }
-                                                               ];
-
-                                                               $scope.items = ['Item 1', 'Item 2', 'Item 3'];
-
-                                                               $scope.addItem = function() {
-                                                                 var newItemNo = $scope.items.length + 1;
-                                                                 $scope.items.push('Item ' + newItemNo);
-                                                               };
+                                             var lastOpened = null;
+                                             $scope.registries = Process.get();
+                                             $scope.toggle = function(id){
+                                               if(lastOpened == id){
+                                                 $(lastOpened).collapse("hide")
+                                                 lastOpened = null;
+                                               }else{
+                                                 if(lastOpened){
+                                                   $(lastOpened).collapse("hide")
+                                                 }
+                                                 $(id).collapse("toggle")
+                                                 lastOpened = id;
+                                               }
+                                             };
                                          }]);
 
 cstlAdminApp.controller('SessionsController', ['$scope', 'resolvedSessions', 'Sessions',

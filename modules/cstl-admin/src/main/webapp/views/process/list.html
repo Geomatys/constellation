@@ -1,6 +1,20 @@
 <div>
-		<ul close-others="oneAtATime" ng-repeat="registry in registries">
-		  {{registry.name}}
-		  <li ng-repeat="process in registry.processes">{{process.id}}</li>
-		 </ul>
+	<div class="panel-group" id="accordion">
+		<div class="panel panel-default"
+			ng-repeat="(index,registry) in registries">
+			<div class="panel-heading">
+				<h4 class="panel-title">
+					<a data-toggle="collapse" data-parent="#accordion"
+						ng-click="toggle('#collapse' + index)">{{registry.name}} </a>
+				</h4>
+			</div>
+			<div id="collapse{{index}}" class="panel-collapse collapse">
+				<div class="panel-body">
+					<ul>
+						<li ng-repeat="process in registry.processes">{{process.id}}</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>

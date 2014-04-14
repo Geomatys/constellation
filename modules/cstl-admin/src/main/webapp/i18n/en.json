@@ -577,6 +577,7 @@
                 "password": "Password",
                 "contact": "Contact",
                 "metrics": "Metrics",
+                "processes": "Processes",
                 "logs": "Logs",
                 "logout": "Log out"
             },
