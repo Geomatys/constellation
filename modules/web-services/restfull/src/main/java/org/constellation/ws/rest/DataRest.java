@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -42,6 +43,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
 import org.apache.sis.geometry.GeneralDirectPosition;
 import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.iso.Types;
 import org.apache.sis.util.logging.Logging;
@@ -81,6 +83,7 @@ import org.geotoolkit.coverage.grid.ViewType;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageReference;
+import org.geotoolkit.coverage.xmlstore.XMLCoverageStore;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageStoreFactory;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.display.PortrayalException;
@@ -106,6 +109,7 @@ import org.opengis.geometry.Envelope;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.Role;
 import org.opengis.metadata.identification.TopicCategory;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.GeographicCRS;
@@ -353,6 +357,30 @@ public class DataRest {
             LOGGER.log(Level.SEVERE, "Bad configuration for data Integrated directory", e);
             return Response.status(500).entity("failed").build();
         }
+    }
+
+    @DELETE
+    @Path("pyramid/folder/{id}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response deletePyramidFolder(@PathParam("id") final String providerId) {
+        final DataStore ds = DataProviders.getInstance().getProvider(providerId).getMainStore();
+        if (!(ds instanceof XMLCoverageStore)) {
+            return Response.status(500).entity("failed").build();
+        }
+
+        final XMLCoverageStore xmlCoverageStore = (XMLCoverageStore)ds;
+        final ParameterValue paramVal = ParametersExt.getValue(xmlCoverageStore.getConfiguration(), XMLCoverageStoreFactory.PATH.getName().getCode());
+        if (paramVal.getValue() instanceof URL) {
+            try {
+                final File dataFolder = new File(((URL)paramVal.getValue()).toURI());
+                recursiveDelete(dataFolder);
+            } catch (Exception ex) {
+                LOGGER.log(Level.SEVERE, "Unable to delete folder "+ paramVal.getValue(), ex);
+                return Response.status(500).entity("failed").build();
+            }
+        }
+        return Response.status(200).build();
     }
 
     private static void truncateZipFolder(String filePath) throws IOException {
