@@ -930,6 +930,30 @@ public class ConfigurationEngine {
         return null;
     }
 
+    public static void updateDataVisibility(final QName name, final String providerId, final boolean visible) {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            String login = null;
+            try {
+                login = securityManager.getCurrentUserLogin();
+            } catch (NoSecurityManagerException ex) {
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+            }
+
+            if (login == null) {
+                login = "admin";
+            }
+            final DataRecord dr = session.readData(name, providerId);
+            dr.setVisible(visible);
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "error when try to delete data", e);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+    }
+
     private static DataBrief _getData(QName name, String providerId) {
         Session session = null;
         try {

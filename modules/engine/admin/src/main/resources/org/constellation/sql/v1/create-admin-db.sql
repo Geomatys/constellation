@@ -83,6 +83,7 @@ CREATE TABLE "admin"."data"(
   "namespace"     VARCHAR(256)NOT NULL,
   "provider"      INTEGER     NOT NULL,
   "type"          VARCHAR(32) NOT NULL,
+  "visible"       BOOLEAN     NOT NULL DEFAULT TRUE,
   "date"          BIGINT      NOT NULL,
   "title"         INTEGER     NOT NULL,
   "description"   INTEGER     NOT NULL,

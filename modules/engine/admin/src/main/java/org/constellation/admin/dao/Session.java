@@ -142,6 +142,7 @@ public final class Session implements Closeable {
     private static final String UPDATE_DATA                 = "data.update";
     private static final String UPDATE_DATA_METADATA        = "data.update.metadata";
     private static final String UPDATE_DATA_ISO_METADATA    = "data.update.iso_metadata";
+    private static final String UPDATE_DATA_VISIBLE         = "data.update.visible";
     private static final String DELETE_DATA                 = "data.delete";
     private static final String DELETE_DATA_NMSP            = "data.delete.nmsp";
     private static final String SEARCH_DATA_ISO_METADATA    = "data.search.iso_metadata";
@@ -808,7 +809,7 @@ public final class Session implements Closeable {
         final int id = new Query(WRITE_DATA).with(name.getLocalPart(), name.getNamespaceURI(), provider.id, type.name(), date.getTime(), title, description, login).insert();
 
         // Return inserted line.
-        return new DataRecord(this, id, name.getLocalPart(), name.getNamespaceURI(), provider.id, type, date, title, description, login, null);
+        return new DataRecord(this, id, name.getLocalPart(), name.getNamespaceURI(), provider.id, type, true, date, title, description, login, null);
     }
 
     /* internal */ void updateData(final int generatedId, final String newName, final String newNamespace, final int newProvider, final DataType newType, final String newOwner) throws SQLException {
@@ -821,6 +822,10 @@ public final class Session implements Closeable {
     
     /* internal */ void updateDataIsoMetadata(final int dataId, final String metadataId, final StringReader metadata) throws SQLException {
         new Query(UPDATE_DATA_ISO_METADATA).with(metadataId, metadata, dataId).update();
+    }
+
+    /* internal */ void updateDataVisibility(final int dataId, final boolean visible) throws SQLException {
+        new Query(UPDATE_DATA_VISIBLE).with(visible, dataId).update();
     }
 
     public void deleteData(final QName name, final String providerId) throws SQLException {

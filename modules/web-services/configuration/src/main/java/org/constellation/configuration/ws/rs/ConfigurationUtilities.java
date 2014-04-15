@@ -323,16 +323,8 @@ public class ConfigurationUtilities {
             }
         }
 
-        // Brut force solution : we reload all providers, otherwise, Constellation will have trouble to work with newly imported data.
         layerProxy.reload();
-        for (DataProvider provider : layerProxy.getProviders()) {
-            provider.reload();
-        }
-
         styleProxy.reload();
-        for (StyleProvider provider : styleProxy.getProviders()) {
-            provider.reload();
-        }
 
         RestartServiceDescriptor restartDesc = new RestartServiceDescriptor();
         for (String serviceType : ServiceProcessCommon.servicesAvaible()) {

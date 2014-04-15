@@ -49,6 +49,7 @@ public final class DataRecord extends Record {
     private String namespace;
     private int provider;
     private DataType type;
+    private boolean visible;
     private final Date date;
     private final int title;
     private final int description;
@@ -56,13 +57,14 @@ public final class DataRecord extends Record {
     private String metadataId;
 
     DataRecord(final Session session, final int id, final String name, final String namespace, final int provider, final DataType type,
-               final Date date, final int title, final int description, final String owner, final String metadataId) {
+               final boolean visible, final Date date, final int title, final int description, final String owner, final String metadataId) {
         this.session     = session;
         this.id          = id;
         this.name        = name;
         this.namespace   = namespace;
         this.provider    = provider;
         this.type        = type;
+        this.visible     = visible;
         this.date        = date;
         this.title       = title;
         this.description = description;
@@ -76,11 +78,12 @@ public final class DataRecord extends Record {
                 rs.getString(3),
                 rs.getInt(4),
                 DataType.valueOf(rs.getString(5)),
-                new Date(rs.getLong(6)),
-                rs.getInt(7),
+                rs.getBoolean(6),
+                new Date(rs.getLong(7)),
                 rs.getInt(8),
-                rs.getString(9),
-                rs.getString(10));
+                rs.getInt(9),
+                rs.getString(10),
+                rs.getString(11));
     }
 
     /**
@@ -135,6 +138,16 @@ public final class DataRecord extends Record {
         this.type = type;
         ensureConnectionNotClosed();
         session.updateData(id, name, namespace, provider, type, owner);
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) throws SQLException {
+        this.visible = visible;
+        ensureConnectionNotClosed();
+        session.updateDataVisibility(id, visible);
     }
 
     public Date getDate() {

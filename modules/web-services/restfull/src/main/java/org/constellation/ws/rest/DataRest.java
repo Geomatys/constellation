@@ -1086,16 +1086,28 @@ public class DataRest {
     @Consumes({MediaType.APPLICATION_JSON})
     public Response getDataList(@PathParam("type") String type) {
         final List<DataBrief> briefs = new ArrayList<>();
+        final List<String> providerIds = ConfigurationEngine.getProviderIds();
+        for (final String providerId : providerIds) {
+            final ProviderRecord provider = ConfigurationEngine.getProvider(providerId);
 
-        final Collection<DataProvider> providers = DataProviders.getInstance().getProviders();
-        for (final DataProvider p : providers) {
-            if (type != null && !p.getDataType().equals(DataRecord.DataType.valueOf(type))) {
-                continue;
+            final List<DataRecord> datas;
+            try {
+                datas = provider.getData();
+            } catch (SQLException ex) {
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+                return Response.status(500).entity("failed").build();
             }
-            for(Name n : p.getKeys()){
-                final QName name = new QName(n.getNamespaceURI(), n.getLocalPart());
-                final DataBrief db = ConfigurationEngine.getData(name, p.getId());
-                briefs.add(db);
+
+            for (final DataRecord data : datas) {
+                if (type != null && !data.getType().equals(DataRecord.DataType.valueOf(type))) {
+                    continue;
+                }
+
+                if (data.isVisible()) {
+                    final QName name = new QName(data.getNamespace(), data.getName());
+                    final DataBrief db = ConfigurationEngine.getData(name, providerId);
+                    briefs.add(db);
+                }
             }
         }
 
@@ -1108,16 +1120,26 @@ public class DataRest {
     @Consumes({MediaType.APPLICATION_JSON})
     public Response getDataListsForProviders() {
         final Map<String, List<DataBrief>> all = new HashMap<>();
+        final List<String> providerIds = ConfigurationEngine.getProviderIds();
+        for (final String providerId : providerIds) {
+            final ProviderRecord provider = ConfigurationEngine.getProvider(providerId);
 
-        final Collection<DataProvider> providers = DataProviders.getInstance().getProviders();
-        for (final DataProvider p : providers) {
             final List<DataBrief> briefs = new ArrayList<>();
-            for (Name n : p.getKeys()) {
-                final QName name = new QName(n.getNamespaceURI(), n.getLocalPart());
-                final DataBrief db = ConfigurationEngine.getData(name, p.getId());
-                briefs.add(db);
+            final List<DataRecord> datas;
+            try {
+                datas = provider.getData();
+            } catch (SQLException ex) {
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+                return Response.status(500).entity("failed").build();
             }
-            all.put(p.getId(), briefs);
+            for (final DataRecord data : datas) {
+                if (data.isVisible()) {
+                    final QName name = new QName(data.getNamespace(), data.getName());
+                    final DataBrief db = ConfigurationEngine.getData(name, providerId);
+                    briefs.add(db);
+                }
+            }
+            all.put(provider.getIdentifier(), briefs);
         }
 
         return Response.ok(all).build();
@@ -1138,9 +1160,11 @@ public class DataRest {
             return Response.status(500).entity("failed").build();
         }
         for (final DataRecord data : datas) {
-            final QName name = new QName(data.getNamespace(), data.getName());
-            final DataBrief db = ConfigurationEngine.getData(name, providerId);
-            briefs.add(db);
+            if (data.isVisible()) {
+                final QName name = new QName(data.getNamespace(), data.getName());
+                final DataBrief db = ConfigurationEngine.getData(name, providerId);
+                briefs.add(db);
+            }
         }
         return Response.ok(briefs).build();
     }
@@ -1180,9 +1204,11 @@ public class DataRest {
                     continue;
                 }
 
-                final QName name = new QName(data.getNamespace(), data.getName());
-                final DataBrief db = ConfigurationEngine.getData(name, providerId);
-                briefs.add(db);
+                if (data.isVisible()) {
+                    final QName name = new QName(data.getNamespace(), data.getName());
+                    final DataBrief db = ConfigurationEngine.getData(name, providerId);
+                    briefs.add(db);
+                }
             }
         }
 
@@ -1193,6 +1219,20 @@ public class DataRest {
     @Path("{providerid}/{dataid}")
     public Response deleteData(@PathParam("providerid") String providerid, @PathParam("dataid") String dataid) {
         ConfigurationEngine.deleteData(new QName("", dataid), providerid);
+        return Response.status(200).build();
+    }
+
+    @POST
+    @Path("{providerid}/{dataid}/visible")
+    public Response visibleData(@PathParam("providerid") String providerid, @PathParam("dataid") String dataid) {
+        ConfigurationEngine.updateDataVisibility(new QName("", dataid), providerid, true);
+        return Response.status(200).build();
+    }
+
+    @POST
+    @Path("{providerid}/{dataid}/hidden")
+    public Response hideData(@PathParam("providerid") String providerid, @PathParam("dataid") String dataid) {
+        ConfigurationEngine.updateDataVisibility(new QName("", dataid), providerid, false);
         return Response.status(200).build();
     }
 
