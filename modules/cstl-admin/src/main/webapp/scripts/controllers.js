@@ -29,8 +29,24 @@ cstlAdminApp.controller('HeaderController', ['$scope','$http',
 	                                        });
                                            }]);
 
-cstlAdminApp.controller('MainController', ['$scope','$location',
-    function ($scope, $location) {
+cstlAdminApp.controller('MainController', ['$scope','$location','webService','dataListing','$growl',
+    function ($scope, $location, webService, dataListing, $growl) {
+        $scope.countStats = function() {
+            webService.listAll({}, function(response) {
+                $scope.nbservices = response.instance.length;
+            }, function() {
+                $scope.nbservices = 0;
+                $growl('error', 'Error', 'Unable to count services');
+            });
+
+
+            dataListing.listAll({}, function(response) {
+                $scope.nbdata = response.length;
+            }, function() {
+                $scope.nbdata = 0;
+                $growl('error', 'Error', 'Unable to count data');
+            });
+        };
     }]);
 
 cstlAdminApp.controller('LanguageController', ['$scope', '$translate',
