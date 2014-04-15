@@ -734,7 +734,7 @@ public class ConfigurationEngine {
             }
             final List<DataRecord> datas = session.readData();
             for (DataRecord record : datas) {
-                if (record.hasIsoMetadata()) {
+                if (record.isVisible() && record.hasIsoMetadata()) {
                     results.add(record.getMetadataId());
                 }
             }
