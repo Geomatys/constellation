@@ -20,7 +20,7 @@ cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', '$
     function ($scope, $dashboard, style, $growl, StyleSharedService) {
 
         style.listAll({}, function(response) {
-            $dashboard($scope, response.styles, false);
+            $dashboard($scope, response.styles, true);
             $scope.filtertype = "";
         });
 
