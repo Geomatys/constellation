@@ -835,7 +835,8 @@
         "contact": "Contact",
         "create.service":"New service",
         "create.service.source":"Source",
-        "edit.service":"Edit Service"
+        "edit.service":"Edit Service",
+        "process":"Processes"
     },
     "com.codahale.metrics.servlet.AbstractInstrumentedFilter.requests": "Metrics",
     "org.constellation.map.ws.DefaultWMSWorker.getCapabilities": "WMS(getCapabilies)",

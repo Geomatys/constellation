@@ -277,7 +277,8 @@
                 "metrics": "Métriques",
                 "password": "Mot de passe",
                 "sessions": "Sessions",
-                "users": "Utilisateurs"
+                "users": "Utilisateurs",
+                "processes": "Process"
             },
             "data": "Données",
             "home": "Accueil",
@@ -1105,7 +1106,8 @@
         "contact": "Contact",
         "create.service":"Nouveau service",
         "create.service.source":"Source",
-        "edit.service":"Edition du service"
+        "edit.service":"Edition du service",
+        "process":"Process"
     },
     "style.information.title":"Styles sisponibles",
     "users": {

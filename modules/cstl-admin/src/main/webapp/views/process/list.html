@@ -1,10 +1,16 @@
 <div>
+	<div class="logo-wrapper row">
+        <div class="col-sm-12">
+            <h3 class="header-title" translate="page.header.title.process">Processes</h3>
+        </div>
+    </div>
+
 	<div class="panel-group" id="accordion">
 		<div class="panel panel-default"
 			ng-repeat="(index,registry) in registries">
 			<div class="panel-heading">
 				<h4 class="panel-title">
-					<a data-toggle="collapse" data-parent="#accordion"
+					<a style="cursor: pointer;" data-toggle="collapse" data-parent="#accordion"
 						ng-click="toggle('#collapse' + index)">{{registry.name}} </a>
 				</h4>
 			</div>
