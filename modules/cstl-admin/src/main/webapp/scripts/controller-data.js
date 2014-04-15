@@ -117,7 +117,9 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
             });
 
             modal.result.then(function(result) {
-                $location.path('/description/'+ result.type +"/"+ result.file +"/"+ result.missing);
+                dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}}, function() {
+                    $location.path('/description/'+ result.type +"/"+ result.file +"/"+ result.missing);
+                }, function() { $growl('error','Error','Unable to save metadata'); });
             });
         };
 
@@ -191,7 +193,7 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','data
 //            $scope.metadata.dataPath = $uploadFiles.files.file;
             $scope.metadata.type = $scope.type;
 
-            dataListing.setMetadata({}, $scope.metadata,
+            dataListing.mergeMetadata({}, $scope.metadata,
                 function() {
                     $location.path('/data');
                 }

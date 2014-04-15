@@ -453,27 +453,28 @@ public class DataRest {
         return Response.status(418).build();
     }
 
-    
+
 
 
     /**
-     * Save metadata with merge from ISO19115 form
+     * Save metadata.
      *
-     * @param overridenValue {@link org.constellation.dto.DataMetadata} which contains new information for metadata.
+     * @param values
      * @return {@link javax.ws.rs.core.Response} with code 200.
      */
     @POST
     @Path("metadata")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response saveMetadata(final DataMetadata overridenValue) {
-        final String providerID         = overridenValue.getDataName();
-        final DataProvider dataProvider = DataProviders.getInstance().getProvider(providerID);
+    public Response saveMetadata(final ParameterValues values) {
+        final String providerId         = values.getValues().get("providerId");
+        final String dataType           = values.getValues().get("dataType");
+        final DataProvider dataProvider = DataProviders.getInstance().getProvider(providerId);
         
         for (Name dataName : dataProvider.getKeys()) {
             
             DefaultMetadata extractedMetadata = null;
-            switch (overridenValue.getType()) {
+            switch (dataType) {
                 case "raster":
                     try {
                         extractedMetadata = MetadataUtilities.getRasterMetadata(dataProvider, dataName);
@@ -495,7 +496,6 @@ public class DataRest {
             }
             //Update metadata
             final Properties prop = ConfigurationEngine.getMetadataTemplateProperties();
-            MetadataUtilities.overrideProperties(prop, overridenValue, dataName, "TODO");
             final DefaultMetadata templateMetadata = MetadataUtilities.getTemplateMetadata(prop);
             
             DefaultMetadata mergedMetadata = new DefaultMetadata();
@@ -508,8 +508,35 @@ public class DataRest {
             
             //Save metadata
             final QName name = Utils.getQnameFromName(dataName);
-            ConfigurationEngine.saveDataMetadata(mergedMetadata, name, providerID);
+            ConfigurationEngine.saveDataMetadata(mergedMetadata, name, providerId);
         }
+        return Response.status(200).build();
+    }
+
+    /**
+     * Save metadata with merge from ISO19115 form
+     *
+     * @param overridenValue {@link org.constellation.dto.DataMetadata} which contains new information for metadata.
+     * @return {@link javax.ws.rs.core.Response} with code 200.
+     */
+    @POST
+    @Path("metadata/merge")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response mergeMetadata(final DataMetadata overridenValue) {
+        final String providerId = overridenValue.getDataName();
+        final DataProvider dataProvider = DataProviders.getInstance().getProvider(providerId);
+
+        for (Name dataName : dataProvider.getKeys()) {
+            // TODO: Get previously saved metadata for the current data
+
+            // TODO: Import changes from DataMetadata into the DefaultMetadata
+
+            //Save metadata
+//            final QName name = Utils.getQnameFromName(dataName);
+//            ConfigurationEngine.saveDataMetadata(metadata, name, providerId);
+        }
+
         return Response.status(200).build();
     }
 
