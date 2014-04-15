@@ -74,9 +74,6 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             return '';
         };
 
-        // Page to include
-        $scope.pageSld = ($scope.dataType.toLowerCase() === 'vector' || $scope.dataType === 'feature-store') ? "views/style/vectors.html" : "views/style/raster.html";
-
         $scope.stylechooser = 'new';
 
         // TODO: add field to handle style name
@@ -249,6 +246,9 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         };
 
         $scope.initScopeStyle = function() {
+            // Page to include
+            $scope.pageSld = ($scope.dataType.toLowerCase() === 'vector' || $scope.dataType === 'feature-store') ? "views/style/vectors.html" : "views/style/raster.html";
+
             style.listAll({}, function(response) {
                 $dashboard($scope, response.styles, true);
                 $scope.filtertype = $scope.initFilterType();
