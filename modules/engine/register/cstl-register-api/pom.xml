@@ -13,14 +13,14 @@
 
   <name>Constellation register API</name>
 
-  
+
 
 
   <dependencies>
     <dependency>
       <groupId>org.apache.sis.core</groupId>
       <artifactId>sis-utility</artifactId>
-      <version>0.4-jdk7-SNAPSHOT</version>
+      <version>${sis.version}</version>
     </dependency>
     <dependency>
       <groupId>org.constellation.xml-bindings</groupId>
