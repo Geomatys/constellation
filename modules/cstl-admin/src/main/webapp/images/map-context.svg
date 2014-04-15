@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 15.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" [
+	<!ENTITY ns_extend "http://ns.adobe.com/Extensibility/1.0/">
+	<!ENTITY ns_ai "http://ns.adobe.com/AdobeIllustrator/10.0/">
+	<!ENTITY ns_graphs "http://ns.adobe.com/Graphs/1.0/">
+	<!ENTITY ns_vars "http://ns.adobe.com/Variables/1.0/">
+	<!ENTITY ns_imrep "http://ns.adobe.com/ImageReplacement/1.0/">
+	<!ENTITY ns_sfw "http://ns.adobe.com/SaveForWeb/1.0/">
+	<!ENTITY ns_custom "http://ns.adobe.com/GenericCustomNamespace/1.0/">
+	<!ENTITY ns_adobe_xpath "http://ns.adobe.com/XPath/1.0/">
+]>
+<svg version="1.1" id="Calque_1" xmlns:x="&ns_extend;" xmlns:i="&ns_ai;" xmlns:graph="&ns_graphs;"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="872px" height="72px"
+	 viewBox="-1 -0.583 872 72" enable-background="new -1 -0.583 872 72" xml:space="preserve">
+<metadata>
+	<sfw  xmlns="&ns_sfw;">
+		<slices></slices>
+		<sliceSourceBounds  y="342.48" x="75.668" width="872" height="72" bottomLeftOrigin="true"></sliceSourceBounds>
+	</sfw>
+</metadata>
+<g opacity="0.78">
+	<rect x="-0.332" y="-0.066" fill="#DCE8D3" width="871" height="70.509"/>
+	<path fill="#CBD6C3" d="M870.168,0.43v69.517H0.169V0.43H870.168 M871.168-0.563h-1H0.169h-1V0.43v69.517v0.993h1h869.999h1v-0.993
+		V0.43V-0.563L871.168-0.563z"/>
+</g>
+<g opacity="0.5">
+	<ellipse fill="#FFFFFF" stroke="#2D2E82" stroke-miterlimit="10" cx="254.168" cy="27.552" rx="4.83" ry="3.546"/>
+	<text transform="matrix(1.3622 0 0 1 251.0005 29.2461)" fill="#2D2E82" font-family="'MyriadPro-Regular'" font-size="5.7827">M</text>
+</g>
+<line opacity="0.08" fill="none" stroke="#1D1D1B" stroke-width="0.75" enable-background="new    " x1="611.763" y1="0.229" x2="552.079" y2="70.924"/>
+<path opacity="0.5" fill="#BFD1B5" enable-background="new    " d="M679.038,69.947l1.091-3.061c0,0-14.006-9.391,7.503-10.31
+	l9.003-15.025l-45.518-12.902l-22.972,41.297H679.038z"/>
+<path opacity="0.5" fill="#C5D0BF" enable-background="new    " d="M550.783,69.947h55.514
+	c-30.531-8.872-140.794-40.851-147.254-41.799c-7.503-1.102-212.582,17.255-212.582,17.255v18.361
+	c0,0,197.576-18.361,209.081-18.361C464.99,45.403,528.416,63.485,550.783,69.947z"/>
+<polygon opacity="0.5" fill="#BFD1B5" enable-background="new    " points="522.657,0.482 504.579,35.096 626.672,71.437 
+	650.915,28.313 550.219,0.355 "/>
+<g>
+	<polyline fill="none" stroke="#E8F0E1" stroke-width="3" stroke-miterlimit="10" points="628.714,69.636 666.378,1.019 
+		651.117,28.649 	"/>
+	<path fill="none" stroke="#E8F0E1" stroke-width="3" stroke-miterlimit="10" d="M678.86,70.606l1.27-3.72
+		c0,0,7.906,1.959,9.838-3.304c2.022-5.518-6.087-6.977-6.087-6.977s-6.418-2.008-8.603,4.492c-1.562,4.647,4.852,5.788,4.852,5.788
+		"/>
+	<path fill="none" stroke="#E8F0E1" stroke-width="3" stroke-miterlimit="10" d="M696.635,41.551c0,0-2.396,9.348-9.9,15.986"/>
+	<line fill="none" stroke="#E8F0E1" stroke-width="3" stroke-miterlimit="10" x1="791.932" y1="69.947" x2="651.117" y2="28.649"/>
+	<line fill="none" stroke="#E8F0E1" stroke-width="3" stroke-miterlimit="10" x1="713.295" y1="1.019" x2="696.575" y2="41.831"/>
+	<line fill="none" stroke="#E8F0E1" stroke-width="3" stroke-miterlimit="10" x1="799.398" y1="1.019" x2="774.251" y2="64.352"/>
+	<path fill="none" stroke="#E8F0E1" stroke-width="3" stroke-miterlimit="10" d="M853.504,70.606c0,0,1.594-15.52-74.635-17.881
+		l-79.395-17.967L634.066,3.153"/>
+	<line fill="none" stroke="#E8F0E1" stroke-width="3" stroke-miterlimit="10" x1="768.02" y1="1.019" x2="751.563" y2="46.548"/>
+	<polygon fill="#E8F0E1" points="631.632,70.606 491.556,28.1 488.391,32.557 612.899,70.606 	"/>
+	<polygon fill="#E8F0E1" points="548.113,70.606 479.35,52.307 475.683,57.607 527.385,70.606 	"/>
+	<polygon fill="#E8F0E1" points="520.729,0.355 503.373,31.687 506.361,33.433 525.519,0.355 	"/>
+	<polygon fill="#E8F0E1" points="631.836,0.229 624.823,0.229 699.007,35.897 699.103,32.768 	"/>
+	<polygon fill="#E8F0E1" points="558.283,0.229 549.181,0.229 650.197,29.888 651.082,27.303 	"/>
+</g>
+<g opacity="0.5">
+	<ellipse fill="#FFFFFF" stroke="#2D2E82" stroke-miterlimit="10" cx="697.464" cy="43.162" rx="4.83" ry="3.545"/>
+	<text transform="matrix(1.3622 0 0 1 694.2959 44.8569)" fill="#2D2E82" font-family="'MyriadPro-Regular'" font-size="5.7827">M</text>
+</g>
+<polygon opacity="0.5" fill="#BFD1B5" enable-background="new    " points="717.885,0.229 712.139,18.185 734.149,23.123 
+	742.761,0.229 "/>
+<g opacity="0.5">
+	<ellipse fill="#FFFFFF" stroke="#2D2E82" stroke-miterlimit="10" cx="778.868" cy="52.725" rx="4.829" ry="3.545"/>
+	<text transform="matrix(1.3622 0 0 1 775.6992 54.4233)" fill="#2D2E82" font-family="'MyriadPro-Regular'" font-size="5.7827">M</text>
+</g>
+<g opacity="0.5">
+	<ellipse fill="#FFFFFF" stroke="#2D2E82" stroke-miterlimit="10" cx="504.579" cy="33.433" rx="4.83" ry="3.545"/>
+	<text transform="matrix(1.3622 0 0 1 501.4131 35.1284)" fill="#2D2E82" font-family="'MyriadPro-Regular'" font-size="5.7827">M</text>
+</g>
+<polygon fill="#F1F4F0" points="522.309,0.889 485.431,69.704 0.159,69.947 0.18,0.889 "/>
+<g opacity="0.5">
+	<line fill="none" stroke="#C4CCBF" stroke-miterlimit="10" x1="706.583" y1="18.113" x2="785.829" y2="34.04"/>
+	<polyline fill="none" stroke="#C4CCBF" stroke-miterlimit="10" points="765.212,10.354 790.88,22.648 812.507,28.567 
+		847.521,0.993 	"/>
+	<line fill="none" stroke="#C4CCBF" stroke-miterlimit="10" x1="824.012" y1="0.993" x2="864.027" y2="69.385"/>
+	<line fill="none" stroke="#C4CCBF" stroke-miterlimit="10" x1="782.487" y1="41.571" x2="854.943" y2="53.86"/>
+	<line fill="none" stroke="#C4CCBF" stroke-miterlimit="10" x1="806.366" y1="51.803" x2="808.699" y2="46.016"/>
+	<line fill="none" stroke="#C4CCBF" stroke-miterlimit="10" x1="818.717" y1="53.357" x2="819.368" y2="47.827"/>
+	<line fill="none" stroke="#C4CCBF" stroke-miterlimit="10" x1="649.097" y1="12.314" x2="641.456" y2="26.076"/>
+	<line fill="none" stroke="#C4CCBF" stroke-miterlimit="10" x1="631.274" y1="4.601" x2="626.436" y2="22.133"/>
+	<line fill="none" stroke="#C4CCBF" stroke-miterlimit="10" x1="613.912" y1="19.195" x2="617.932" y2="0.993"/>
+	<line fill="none" stroke="#C4CCBF" stroke-miterlimit="10" x1="743.48" y1="0.993" x2="733.977" y2="23.619"/>
+	<line fill="none" stroke="#C4CCBF" stroke-miterlimit="10" x1="718.471" y1="0.993" x2="711.965" y2="19.195"/>
+</g>
+</svg>

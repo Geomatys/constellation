@@ -512,46 +512,46 @@ ul.unstyled {
     margin-bottom: 10px;
 }
 .dashboard .item-list .item.coverage {
-    background: transparent url('../images/raster.png') right center no-repeat;
+    background: transparent url('../images/raster.svg') right center no-repeat;
 }
 .dashboard .item-list .item.coverage.selected {
-    background: transparent url('../images/raster-selected.png') right center no-repeat;
+    background: transparent url('../images/raster-selected.svg') right center no-repeat;
 }
 .dashboard .item-list .item.vector {
-    background: transparent url('../images/vector.png') right center no-repeat;
+    background: transparent url('../images/vector.svg') right center no-repeat;
 }
 .dashboard .item-list .item.vector.selected {
-    background: transparent url('../images/vector-selected.png') right center no-repeat;
+    background: transparent url('../images/vector-selected.svg') right center no-repeat;
 }
 .dashboard .item-list .item.sensor {
-    background: transparent url('../images/sensor.png') right center no-repeat;
+    background: transparent url('../images/sensor.svg') right center no-repeat;
 }
 .dashboard .item-list .item.sensor.selected {
-    background: transparent url('../images/sensor-selected.png') right center no-repeat;
+    background: transparent url('../images/sensor-selected.svg') right center no-repeat;
 }
 .dashboard .item-list .item.pyramid {
-    background: transparent url('../images/pyramid.png') right center no-repeat;
+    background: transparent url('../images/pyramid.svg') right center no-repeat;
 }
 .dashboard .item-list .item.pyramid.selected {
-    background: transparent url('../images/pyramid-selected.png') right center no-repeat;
+    background: transparent url('../images/pyramid-selected.svg') right center no-repeat;
 }
 .dashboard .item-list .item.style-coverage {
-    background: transparent url('../images/style-raster.png') right center no-repeat;
+    background: transparent url('../images/style-raster.svg') right center no-repeat;
 }
 .dashboard .item-list .item.style-coverage.selected{
-    background: transparent url('../images/style-raster-selected.png') right center no-repeat;
+    background: transparent url('../images/style-raster-selected.svg') right center no-repeat;
 }
 .dashboard .item-list .item.style-vector {
-    background: transparent url('../images/style-vector.png') right center no-repeat;
+    background: transparent url('../images/style-vector.svg') right center no-repeat;
 }
 .dashboard .item-list .item.style-vector.selected{
-    background: transparent url('../images/style-vector-selected.png') right center no-repeat;
+    background: transparent url('../images/style-vector-selected.svg') right center no-repeat;
 }
 .dashboard .item-list .item.metadata {
-    background: transparent url('../images/metadata.png') right center no-repeat;
+    background: transparent url('../images/metadata.svg') right center no-repeat;
 }
 .dashboard .item-list .item.metadata.selected {
-    background: transparent url('../images/metadata-selected.png') right center no-repeat;
+    background: transparent url('../images/metadata-selected.svg') right center no-repeat;
 }
 .dashboard .item-list .item {
     border: 1px solid white;
