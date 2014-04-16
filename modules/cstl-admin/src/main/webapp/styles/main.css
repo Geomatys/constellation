@@ -34,8 +34,12 @@ body {
 }
 
 .error {
-    color: white;
-    background-color: red;
+    color: #5e5e5e;
+    font-weight:bold;
+    background-color: #f2dede;
+    margin-top:10px;
+    padding:8px;
+    border-radius: 3px;
 }
 
 .logo-wrapper {

@@ -18,12 +18,12 @@
                 </div>
                 <div id="dataServerMap" class="col-sm-9" style="height:400px;width:735px;"></div>
             </div>
-            <div ng-show="!finished" class="row" id="folderPart">
+            <div ng-show="!finished" class="container" id="folderPart">
                 <ul class="breadcrumb col-sm-12">
                     <li class="active"><span class="divider">{{currentPath}}</span></li>
                 </ul>
-                <div>
-                    <div ng-repeat="col in columns" class="col-sm-3 well block-folders" style="overflow:auto; height:300px; margin-bottom:20px; margin-left:10px;">
+                <div class="row">
+                    <div ng-repeat="col in columns" class="col-sm-5 col-md-3 well block-folders" style="overflow:auto; height:275px; margin-bottom:20px; margin-left:20px;">
                         <input type="text" style="margin-bottom:10px;" placeholder="filter" class="col-sm-12" ng-model="search">
                         <ul class="unstyled">
                             <li ng-repeat="item in col | filter:search">

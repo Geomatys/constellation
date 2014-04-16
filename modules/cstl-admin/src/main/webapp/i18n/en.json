@@ -638,6 +638,7 @@
             "lastname.placeholder": "Your last name",
             "email": "E-mail",
             "roles": "Roles",
+            "roles.admin":"Add admin role",
             "email.placeholder": "Your e-mail",
             "button": "Save",
             "login.placeholder": "Your login",

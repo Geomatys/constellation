@@ -4,11 +4,10 @@
 			<button type="button" class="close" ng-click="close()">×</button>
 			<h4 class="modal-title" translate="settings.form.modal.title">New User</h4>
 		</div>
-		<div class="modal-body" style="height: 575px; overflow-y: auto;">
-			<div class="container">
+		<div class="modal-body" style="height: 510px; overflow-y: auto;">
+			<div class="container" style="height: 470px; ">
 				<form name="form" role="form" novalidate
-					class="ng-scope ng-invalid ng-invalid-required ng-dirty ng-valid-minlength"
-					ng-submit="save()">
+					class="ng-scope ng-invalid ng-invalid-required ng-dirty ng-valid-minlength">
 
 					<div class="form-group">
 						<label translate="settings.form.login">Login</label> <input
@@ -31,7 +30,7 @@
 
 					<div class="form-group">
 						<label translate="settings.form.password">Password</label> <input
-							type="text" class="form-control" name="password"
+							type="password" class="form-control" name="password"
 							placeholder="{{'settings.form.password.placeholder' | translate}}"
 							ng-model="user.password" ng-minlength=6 ng-maxlength=62 required>
 						<div class="error"
@@ -108,7 +107,7 @@
 					</div>
 
 					<div class="form-group">
-						<div class="control-label" translate="settings.form.roles">Roles</div>
+						<label class="control-label" translate="settings.form.roles">Roles</label>
 						<div class="tag-input-ctn">
 							<div data-ng-repeat="role in user.roles" class="input-tag">
 								{{ role }}
@@ -117,12 +116,12 @@
 							<input type="text" data-tag-input="" data-ng-model="tagText"
 								data-new-tag="addTag()" data-delete-tag="deleteTag()">
 						</div>
+					<button type="button" class="btn btn-default" ng-click="addRole('cstl-admin')"><span translate="settings.form.roles.admin">Add admin role</span></button>
 					</div>
-					<div ng-click="addRole('cstl-admin')">Add admin role</div>
+					
 
 
-					<button type="submit" ng-disabled="form.$invalid"
-						class="btn btn-primary" translate="settings.form.button">Save</button>
+					
 				</form>
 
 
@@ -133,6 +132,8 @@
 		<div class="modal-footer">
 			<button type="button" id="cancelButton" class="btn btn-default"
 				ng-click="close()">Close</button>
+			<button type="submit" ng-disabled="form.$invalid"
+				class="btn btn-primary" ng-click="save()"><span translate="settings.form.button">Save</span></button>
 			<button ng-show="$parent.allowNext" type="button" id="nextButton"
 				class="btn btn-primary" ng-click="next();">Next</button>
 			<button ng-show="$parent.allowSubmit" type="button" id="submitButton"
