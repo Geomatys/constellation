@@ -1401,6 +1401,19 @@ public class DataRest {
     }
 
     @POST
+    @Path("metadata/associated")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getAssociatedData(final String[] params) {
+        final Map<String, List<DataBrief>> mapping = new HashMap<>();
+        for (final String id : params) {
+            final List<DataBrief> dataRecords = ConfigurationEngine.getDataRecordsForMetadata(id);
+            mapping.put(id, dataRecords);
+        }
+        return Response.ok(mapping).build();
+    }
+
+    @POST
     @Path("testextension")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})

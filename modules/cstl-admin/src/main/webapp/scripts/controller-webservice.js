@@ -302,9 +302,15 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
                     csw.getRecords({id: $routeParams.id, count: max.asInt, startIndex: 0}, {}, function(response) {
                         $dashboard($scope, response.BriefNode, false);
                         $scope.filtertype = "";
-                        dataListing.listData({},
+
+                        var mdIds = [];
+                        for (var i=0; i<response.BriefNode.length; i++) {
+                            mdIds.push(response.BriefNode[i].identifier);
+                        }
+
+                        dataListing.dataForMetadata({}, mdIds,
                             function(response) { $scope.relatedDatas = response; },
-                            function() { $growl('error','Error','Unable to get related data for providers'); }
+                            function() { $growl('error','Error','Unable to get related data for metadata'); }
                         );
                     });
                 });

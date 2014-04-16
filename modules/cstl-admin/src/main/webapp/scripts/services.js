@@ -151,6 +151,7 @@ cstlAdminApp.factory('dataListing', ['$resource',
             'setUpMetadata':  {method: 'POST', url: '@cstl/api/1/data/metadata/upload;jsessionid='},
             'mergeMetadata':  {method: 'POST', url: '@cstl/api/1/data/metadata/merge;jsessionid='},
             'metadata': {method: 'GET', url: '@cstl/api/1/data/metadata/iso/:providerId/:dataId;jsessionid='},
+            'dataForMetadata': {method:'POST', url: '@cstl/api/1/data/metadata/associated;jsessionid='},
             'codeLists':    {method: 'GET', url: '@cstl/api/1/data/metadataCodeLists/:lang;jsessionid='}
         });
     }]);

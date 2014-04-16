@@ -671,6 +671,41 @@ public class ConfigurationEngine {
         return null;
     }
 
+    public static List<DataBrief> getDataRecordsForMetadata(final String metadataId) {
+        final List<DataRecord> records = new ArrayList<>();
+        final List<DataBrief> recordsBrief = new ArrayList<>();
+
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+
+            final Record record = session.searchMetadata(metadataId);
+            if (record instanceof DataRecord) {
+                records.add((DataRecord)record);
+            } else if (record instanceof ProviderRecord) {
+                final ProviderRecord provider = (ProviderRecord)record;
+                records.addAll(provider.getData());
+            } else if (record instanceof ServiceRecord) {
+                final ServiceRecord serv = (ServiceRecord)record;
+                final List<LayerRecord> layers = session.readLayers(serv);
+                for (final LayerRecord layer : layers) {
+                    records.add(layer.getData());
+                }
+            }
+
+            for (final DataRecord rec : records) {
+                recordsBrief.add(_getDataBrief(session, rec));
+            }
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while reading provider metadata", ex);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+
+        return recordsBrief;
+    }
+
     public static boolean existInternalMetadata(final String metadataID) {
         Session session = null;
         try {
