@@ -33,6 +33,7 @@ import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.IdentifierSpace;
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
+import org.constellation.dto.DataMetadata;
 import org.constellation.dto.Service;
 import org.geotoolkit.service.OperationMetadataImpl;
 import org.geotoolkit.service.ServiceIdentificationImpl;
@@ -81,7 +82,7 @@ public class MetadataFeeder {
     public void feedService(Service serviceInfo) {
         setAbstract(serviceInfo.getDescription());
         setTitle(serviceInfo.getName());
-        addKeywords(serviceInfo.getKeywords());
+        setKeywordsNoType(serviceInfo.getKeywords());
         feedServiceContraint(serviceInfo.getServiceConstraints());
         feedServiceContact(serviceInfo.getServiceContact());
         
@@ -194,6 +195,51 @@ public class MetadataFeeder {
     }
 
     /**
+     * merge {@link org.constellation.dto.DataMetadata} feeded on {@link org.apache.sis.metadata.iso.DefaultMetadata} eater
+     *
+     * @param feeded : {@link org.constellation.dto.DataMetadata} need to be merge on metadata
+     */
+    public void feed(final DataMetadata feeded) {
+
+        final Locale metadataLocale;
+        final String localeMd = feeded.getLocaleMetadata();
+        if (localeMd != null) {
+            final String[] localeAndCountry = localeMd.split("_");
+            if (localeAndCountry.length == 2) {
+                metadataLocale = new Locale(localeAndCountry[0], localeAndCountry[1]);
+            }else{
+                metadataLocale = new Locale(localeAndCountry[0]);
+            }
+            setMetadataLocale(metadataLocale);
+        }
+
+        if (feeded.getDate() != null && feeded.getDateType() != null) {
+            final DateType dt = DateType.valueOf(feeded.getDateType());
+            setCitationDate(feeded.getDate(), dt);
+        }
+        
+        setTitle(feeded.getTitle());
+        setAbstract(feeded.getAnAbstract());
+        setContact(feeded.getUsername(), feeded.getOrganisationName(), feeded.getRole());
+
+        final String localeData = feeded.getLocaleData();
+        if (localeData != null) {
+            final String[] localeAndCountry = localeData.split("_");
+            Locale dataLocale;
+            if(localeAndCountry.length==2){
+                dataLocale = new Locale(localeAndCountry[0], localeAndCountry[1]);
+            }else{
+                dataLocale = new Locale(localeAndCountry[0]);
+            }
+
+            setDataLanguage(dataLocale);
+        }
+
+        setKeywordsNoType(feeded.getKeywords());
+        setTopicCategory(feeded.getTopicCategory());
+    }
+    
+    /**
      * Get IdentifiationInformation from metadata
      *
      * @param metadata {@link org.apache.sis.metadata.iso.DefaultMetadata} where we can found Identification
@@ -219,6 +265,20 @@ public class MetadataFeeder {
         return getServiceIdentification(eater);
     }
 
+    public String getTitle() {
+        final AbstractIdentification identification = (AbstractIdentification) getIdentification(eater);
+        if (identification.getCitation() != null) {
+            final Citation citation = identification.getCitation();
+            if (citation != null) {
+                final InternationalString is = citation.getTitle();
+                if (is != null) {
+                    return is.toString();
+                }
+            }
+        }
+        return null;
+    }
+    
     /**
      * Add title on metadata
      *
@@ -235,6 +295,17 @@ public class MetadataFeeder {
             final DefaultCitation citation = (DefaultCitation) identification.getCitation();
             citation.setTitle(internationalizeTitle);
         }
+    }
+    
+    private CitationDate getCitationDate() {
+        final AbstractIdentification identification = (AbstractIdentification) getIdentification(eater);
+        if (identification.getCitation() != null) {
+            final Citation citation = identification.getCitation();
+            if (!citation.getDates().isEmpty()) {
+                return citation.getDates().iterator().next();
+            }
+        }
+        return null;
     }
     
     /**
@@ -294,6 +365,15 @@ public class MetadataFeeder {
         citation.setIdentifiers(Collections.singleton(new DefaultIdentifier(fileIdentifier)));
     }
 
+    private String getAbstract() {
+        final AbstractIdentification identification = (AbstractIdentification) getIdentification(eater);
+        final InternationalString internationalizeAbstract = identification.getAbstract();
+        if (internationalizeAbstract != null) {
+            return internationalizeAbstract.toString();
+        }
+        return null;
+    }
+    
     /**
      * Add abstract on metadata
      *
@@ -309,13 +389,26 @@ public class MetadataFeeder {
         }
         identification.setAbstract(internationalizeAbstract);
     }
+    
+    public final List<String> getKeywordsNoType() {
+        final List<String> keywords = new ArrayList<>();
+        final AbstractIdentification ident = (AbstractIdentification) getIdentification(eater);
+        for (Keywords descKeywords : ident.getDescriptiveKeywords()) {
+            if (descKeywords.getType() == null) {
+                for (InternationalString is : descKeywords.getKeywords()) {
+                    keywords.add(is.toString());
+                }
+            }
+        }
+        return keywords;
+    }
 
     /**
      * Add keywords on metadata
      *
      * @param keywords a Keyword {@link java.util.List}
      */
-    public void addKeywords(final List<String> keywords) {
+    public void setKeywordsNoType(final List<String> keywords) {
         if (keywords == null) {
             return;
         }
@@ -336,6 +429,13 @@ public class MetadataFeeder {
         ident.getDescriptiveKeywords().add(keywordsNoType);
     }
 
+    private String getDataLanguage() {
+        final DefaultDataIdentification identification = (DefaultDataIdentification) getIdentification(eater);
+        if (!identification.getLanguages().isEmpty()) {
+            return identification.getLanguages().iterator().next().getLanguage();
+        }
+        return null;
+    }
 
     /**
      * Add data locale on metadata
@@ -353,7 +453,28 @@ public class MetadataFeeder {
             identification.getLanguages().add(dataLocale);
         }
     }
+    
+    public void setDataLanguage(final Locale dataLocale) {
+        if (dataLocale == null) {
+            return;
+        }
+        final DefaultDataIdentification identification = (DefaultDataIdentification) getIdentification(eater);
+        if (identification.getLanguages() == null) {
+            identification.setLanguages(Collections.singletonList(dataLocale));
+        } else {
+            identification.getLanguages().clear();
+            identification.getLanguages().add(dataLocale);
+        }
+    }
 
+    public String getTopicCategory() {
+        final DefaultDataIdentification identification = (DefaultDataIdentification) getIdentification(eater);
+        if (!identification.getTopicCategories().isEmpty()) {
+            return identification.getTopicCategories().iterator().next().identifier();
+        }
+        return null;
+    }
+    
     /**
      * Add a topicCategory on metadata
      *
@@ -368,6 +489,20 @@ public class MetadataFeeder {
         if (identification.getTopicCategories() == null) {
             identification.setTopicCategories(Collections.singletonList(topic));
         } else {
+            identification.getTopicCategories().add(topic);
+        }
+    }
+    
+    public void setTopicCategory(final String topicCategoryName) {
+        if (topicCategoryName == null) {
+            return;
+        }
+        final TopicCategory topic = TopicCategory.valueOf(topicCategoryName);
+        final DefaultDataIdentification identification = (DefaultDataIdentification) getIdentification(eater);
+        if (identification.getTopicCategories() == null) {
+            identification.setTopicCategories(Collections.singletonList(topic));
+        } else {
+            identification.getTopicCategories().clear();
             identification.getTopicCategories().add(topic);
         }
     }
@@ -394,12 +529,19 @@ public class MetadataFeeder {
         eater.setDateStamp(dateStamp);
     }
 
+    private String getMetadataLocale() {
+        if (!eater.getLocales().isEmpty()) {
+            return eater.getLocales().iterator().next().getLanguage();
+        }
+        return null;
+    }
+    
     /**
      * Add locale on metadata
      *
      * @param metadataLocale
      */
-    private void addMetadataLocale(final Locale metadataLocale) {
+    private void setMetadataLocale(final Locale metadataLocale) {
         Collection<Locale> locales = new ArrayList<>(0);
         locales.add(metadataLocale);
         eater.setLocales(locales);
@@ -420,6 +562,44 @@ public class MetadataFeeder {
         Role currentRole = Role.valueOf(userRole);
         newContact.setRole(currentRole);
         eater.getContacts().add(newContact);
+    }
+    
+    private void setContact(final String individualName, final String organisationName, final String userRole) {
+        DefaultResponsibleParty newContact = new DefaultResponsibleParty();
+        newContact.setIndividualName(individualName);
+        final InternationalString internationalizeOrganisation = new DefaultInternationalString(organisationName);
+        newContact.setOrganisationName(internationalizeOrganisation);
+        Role currentRole = Role.valueOf(userRole);
+        newContact.setRole(currentRole);
+        eater.getContacts().clear();
+        eater.getContacts().add(newContact);
+    }
+    
+    private String getOrganisationName() {
+        if (!eater.getContacts().isEmpty()) {
+            final InternationalString is = eater.getContacts().iterator().next().getOrganisationName();
+            if (is != null) {
+                return is.toString();
+            }
+        }
+        return null;
+    }
+    
+    private String getIndividualName() {
+        if (!eater.getContacts().isEmpty()) {
+            return eater.getContacts().iterator().next().getIndividualName();
+        }
+        return null;
+    }
+    
+    private String getRole() {
+        if (!eater.getContacts().isEmpty()) {
+            final Role is = eater.getContacts().iterator().next().getRole();
+            if (is != null) {
+                return is.name();
+            }
+        }
+        return null;
     }
     
     public String getServiceType() {
@@ -638,5 +818,28 @@ public class MetadataFeeder {
                 }
             }
         }
+    }
+
+    public DataMetadata extractDataMetadata() {
+        final DataMetadata result = new DataMetadata();
+        
+        result.setAnAbstract(getAbstract());
+        
+        final CitationDate date = getCitationDate();
+        if (date != null) {
+            result.setDate(date.getDate());
+            result.setDateType(date.getDateType().name());
+        }
+        
+        result.setKeywords(getKeywordsNoType());
+        result.setLocaleData(getDataLanguage());
+        result.setLocaleMetadata(getMetadataLocale());
+        result.setOrganisationName(getOrganisationName());
+        result.setRole(getRole());
+        result.setTitle(getTitle());
+        result.setTopicCategory(getTopicCategory());
+        result.setUsername(getIndividualName());
+
+        return result;
     }
 }

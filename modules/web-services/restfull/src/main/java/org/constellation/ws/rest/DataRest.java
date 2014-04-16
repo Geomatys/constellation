@@ -12,7 +12,6 @@ import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -54,7 +53,6 @@ import org.constellation.admin.dao.DataRecord;
 import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.DataBrief;
-import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.configuration.StringList;
 import org.constellation.coverage.PyramidCoverageHelper;
 import org.constellation.coverage.PyramidCoverageProcessListener;
@@ -72,9 +70,9 @@ import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.provider.coveragestore.CoverageStoreProvider;
 import org.constellation.security.SecurityManagerHolder;
 import org.constellation.util.SimplyMetadataTreeNode;
-import org.constellation.utils.CstlMetadatas;
 import org.constellation.utils.GeotoolkitFileExtensionAvailable;
 import org.constellation.utils.ISOMarshallerPool;
+import org.constellation.utils.MetadataFeeder;
 import org.constellation.utils.MetadataUtilities;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
@@ -446,8 +444,6 @@ public class DataRest {
             choosingMetadataFile = new File(dataIntegratedDirectory.getAbsolutePath(), metadataFilePath);
         }
         
-
-
         if (choosingFile.exists()) {
             final DataInformation information = MetadataUtilities.generateMetadatasInformation(choosingFile, choosingMetadataFile, dataType);
             final String choosingName = choosingFile.getName();
@@ -505,6 +501,38 @@ public class DataRest {
         return Response.status(200).build();
     }
 
+    
+    @GET
+    @Path("metadata")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getDataMetadata(final ParameterValues values) {
+        final String providerId = values.getValues().get("providerId");
+        final String dataName   = values.getValues().get("providerId");
+        final DefaultMetadata metadata;
+        if (dataName != null) {
+            final QName name = QName.valueOf(dataName);
+            metadata =  ConfigurationEngine.loadIsoDataMetadata(providerId, name, ISOMarshallerPool.getInstance());
+        } else {
+            final DataProvider dataProvider = DataProviders.getInstance().getProvider(providerId);
+            // multiple ?
+            if (!dataProvider.getKeys().isEmpty()) {
+                final QName name = Utils.getQnameFromName(dataProvider.getKeys().iterator().next());
+                metadata =  ConfigurationEngine.loadIsoDataMetadata(providerId, name, ISOMarshallerPool.getInstance());
+            } else {
+                metadata = null;
+            }
+        }
+        if (metadata != null) {
+            final MetadataFeeder feeder = new MetadataFeeder(metadata);
+            final DataMetadata information = feeder.extractDataMetadata();
+                    
+            return Response.status(200).entity(information).build();
+        } else {
+            return Response.status(500).build();
+        }
+    }
+    
     /**
      * Save metadata.
      *
@@ -577,15 +605,18 @@ public class DataRest {
         final DataProvider dataProvider = DataProviders.getInstance().getProvider(providerId);
 
         for (Name dataName : dataProvider.getKeys()) {
-            // TODO: Get previously saved metadata for the current data
-
-            // TODO: Import changes from DataMetadata into the DefaultMetadata
-
+            final QName name = Utils.getQnameFromName(dataName);
+            
+            // Get previously saved metadata for the current data
+            final DefaultMetadata previous = ConfigurationEngine.loadIsoDataMetadata(providerId, name, ISOMarshallerPool.getInstance());
+            
+            // Import changes from DataMetadata into the DefaultMetadata
+            final MetadataFeeder feeder = new MetadataFeeder(previous);
+            feeder.feed(overridenValue);
+            
             //Save metadata
-//            final QName name = Utils.getQnameFromName(dataName);
-//            ConfigurationEngine.saveDataMetadata(metadata, name, providerId);
+            ConfigurationEngine.saveDataMetadata(previous, name, providerId);
         }
-
         return Response.status(200).build();
     }
 
