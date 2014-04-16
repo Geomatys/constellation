@@ -142,7 +142,7 @@
                                                             </div>
                                                         </div>
 
-                                                        <div class="item coverage data" ng-if="cswdata==selected" ng-repeat="relatedData in relatedDatas[cswdata.identifier]">
+                                                        <div class="item metadata data" ng-if="cswdata==selected" ng-repeat="relatedData in relatedDatas[cswdata.identifier]">
                                                             <div class="top">
                                                                 <span class="item-title">{{relatedData.Name}}</span>
                                                                 <span class="pull-right text-right">{{relatedData.Type}}</span>
@@ -158,26 +158,6 @@
                                                         </div>
                                                     </div>
                                                 </div>
-
-
-                                                <div ng-if="type === 'sos'">
-                                                    <div class="item sensor" ng-repeat="sensordata in dataList" ng-class="{selected:sensordata==selected}"ng-click="select(sensordata)">
-                                                        <div class="top">
-                                                            <span class="item-title">{{sensordata.Name}}</span>
-                                                            <span class="pull-right text-right">Sensor</span>
-                                                        </div>
-                                                        <div class="bottom">
-                                                            <div class="block">
-                                                                <i class="icon-calendar"></i>{{sensordata.Date | date:'yyyy-MM-dd'}}
-                                                            </div>
-                                                            <div class="block">
-                                                                <i class="icon-user"></i>{{sensordata.Owner}}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-
                                             </div>
                                         </div>
                                     </div>
