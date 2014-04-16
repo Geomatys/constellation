@@ -33,7 +33,13 @@ cstlAdminApp.controller('MainController', ['$scope','$location','webService','da
     function ($scope, $location, webService, dataListing, Process, $growl, UserResource) {
         $scope.countStats = function() {
             webService.listAll({}, function(response) {
-                $scope.nbservices = response.instance.length;
+                var count = 0;
+                for (var i=0; i<response.instance.length; i++) {
+                    if (response.instance[i].status === 'WORKING') {
+                        count++;
+                    }
+                }
+                $scope.nbservices = count;
             }, function() {
                 $scope.nbservices = 0;
                 $growl('error', 'Error', 'Unable to count services');
