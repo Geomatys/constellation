@@ -280,6 +280,7 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
         $scope.allowNext = false;
 
         $scope.dataPath = null;
+        $scope.mdPath = null;
 
         $scope.next = function() {
             if ($scope.step1A === true) {
@@ -355,18 +356,19 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                 async: false,
                 cache: false,
                 contentType: false,
-                processData: false
+                processData: false,
+                success: function(mdPath) {
+                    $scope.mdPath = mdPath;
+                }
             });
         };
 
         $scope.uploaded = function() {
-            var message = $scope.dataPath;
-            if (message.indexOf('failed') === -1) {
-                var files = message.split(',');
-                var upFile = files[0];
+            if ($scope.dataPath && $scope.dataPath.indexOf('failed') === -1) {
+                var upFile = $scope.dataPath;
                 var upMdFile = null;
-                if (files.length === 2) {
-                    upMdFile = files[1];
+                if ($scope.mdPath && $scope.mdPath.indexOf('failed') === -1) {
+                    upMdFile = $scope.mdPath;
                 }
 
                 // Stores uploaded files in session for further use
@@ -398,9 +400,14 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                             parameters: {
                                 path: importedData
                             }
+                        }, function() {
+                            if (importedMetaData) {
+                                dataListing.setUpMetadata({values: {'providerId': $scope.providerId, 'mdPath': importedMetaData}});
+                            }
+
+                            $growl('success','Success','Shapefile data '+ fileName +' successfully added');
+                            $modalInstance.close({type: "vector", file: fileName, missing: $scope.metadata == null});
                         });
-                        $growl('success','Success','Shapefile data '+ fileName +' successfully added');
-                        $modalInstance.close({type: "vector", file: fileName, missing: $scope.metadata == null});
                     } else if ($scope.uploadType === "raster") {
                         provider.create({
                             id: fileName
@@ -411,27 +418,21 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                                 path: importedData
                             }
                         }, function() {
+                            if (importedMetaData) {
+                                dataListing.setUpMetadata({values: {'providerId': $scope.providerId, 'mdPath': importedMetaData}});
+                            }
+
                             if (!fileExtension || fileExtension !== "nc") {
-                                //dataListing.pyramidData({id: fileName}, {value: upFile}, function() {
                                 $growl('success','Success','Coverage data '+ fileName +' successfully added');
                                 $modalInstance.close({type: "raster", file: fileName, missing: $scope.metadata == null});
-                                //});
                             } else {
                                 displayNetCDF(fileName);
                             }
-//                            if (fileExtension === "nc") {
-//                                displayNetCDF(fileName);
-//                            }
-//                            if (fileExtention === "tif"){
-//                                $growl('success','Success','Geotiff data '+ fileName +' successfully added');
-//                                $modalInstance.close({type: "raster", file: fileName, missing: $scope.metadata == null});
-//                            }
                         });
                     } else {
                         $growl('warning','Warning','Not implemented choice');
                         $modalInstance.close();
                     }
-
                 });
 
             } else {

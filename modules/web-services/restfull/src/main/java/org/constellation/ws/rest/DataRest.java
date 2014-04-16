@@ -40,6 +40,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import org.apache.sis.geometry.GeneralDirectPosition;
 import org.apache.sis.metadata.iso.DefaultMetadata;
@@ -47,6 +48,7 @@ import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.iso.Types;
 import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.dao.DataRecord;
 import org.constellation.admin.dao.ProviderRecord;
@@ -312,8 +314,14 @@ public class DataRest {
             LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             return Response.status(500).entity("failed").build();
         }
-        String result = ","+ mdFile.getAbsolutePath();
-        return Response.ok(result).build();
+
+        if (mdFile != null) {
+            String result = mdFile.getAbsolutePath();
+            return Response.ok(result).build();
+        }
+
+        // Did nothing cause no metadata file was given
+        return Response.status(200).build();
     }
 
 
@@ -435,7 +443,7 @@ public class DataRest {
 
         File choosingMetadataFile = null;
         if (metadataFilePath != null && !metadataFilePath.isEmpty()) {
-            choosingMetadataFile = new File(dataIntegratedDirectory.getAbsolutePath() + "/metadata/" + metadataFilePath);
+            choosingMetadataFile = new File(dataIntegratedDirectory.getAbsolutePath(), metadataFilePath);
         }
         
 
@@ -455,6 +463,47 @@ public class DataRest {
 
 
 
+
+    /**
+     * Save metadata.
+     *
+     * @param values
+     * @return {@link javax.ws.rs.core.Response} with code 200.
+     */
+    @POST
+    @Path("metadata/upload")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response saveUploadedMetadata(final ParameterValues values) {
+        final String providerId         = values.getValues().get("providerId");
+        final String mdPath             = values.getValues().get("mdPath");
+        final DataProvider dataProvider = DataProviders.getInstance().getProvider(providerId);
+
+        final Object obj;
+        try {
+            final MarshallerPool pool = CSWMarshallerPool.getInstance();
+            final Unmarshaller unmarsh = pool.acquireUnmarshaller();
+            obj = unmarsh.unmarshal(new File(mdPath));
+            pool.recycle(unmarsh);
+        } catch (JAXBException ex) {
+            LOGGER.log(Level.WARNING, "Error when trying to unmarshal metadata", ex);
+            return Response.status(500).entity("failed").build();
+        }
+
+        if (!(obj instanceof DefaultMetadata)) {
+            return Response.status(500).entity("failed").build();
+        }
+
+        final DefaultMetadata metadata = (DefaultMetadata)obj;
+
+        for (Name dataName : dataProvider.getKeys()) {
+            //Save metadata
+            final QName name = Utils.getQnameFromName(dataName);
+            ConfigurationEngine.saveDataMetadata(metadata, name, providerId);
+        }
+
+        return Response.status(200).build();
+    }
 
     /**
      * Save metadata.
