@@ -558,6 +558,7 @@ public class ConfigurationEngine {
      * 
      * @param metadata
      * @param dataName
+     * @param providerId
      */
     public static void saveDataMetadata(final DefaultMetadata metadata, final QName dataName, final String providerId) {
         ensureNonNull("metadata", metadata);
@@ -941,9 +942,6 @@ public class ConfigurationEngine {
                 LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
 
-            if (login == null) {
-                login = "admin";
-            }
             final DataRecord dr = session.readData(name, providerId);
             dr.setVisible(visible);
         } catch (SQLException e) {

@@ -70,7 +70,7 @@ public class SOSServices {
     @PUT
     @Path("{id}/observations")
     public Response importObservation(final @PathParam("id") String id, final File obs) throws Exception {
-        return ok(getConfigurer().importSingleObservation(id, obs));
+        return ok(getConfigurer().importObservations(id, obs));
     }
     
     @DELETE

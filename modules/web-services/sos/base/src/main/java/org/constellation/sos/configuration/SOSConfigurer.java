@@ -177,28 +177,33 @@ public class SOSConfigurer extends OGCConfigurer {
         throw new CstlServiceException("the sensorML file does not contain a valid sensorML object");
     }
     
-    private static AbstractObservation unmarshallObservation(final File f) throws JAXBException, CstlServiceException {
+    private static Object unmarshallObservationFile(final File f) throws JAXBException, CstlServiceException {
         final Unmarshaller um = SOSMarshallerPool.getInstance().acquireUnmarshaller();
         Object obj = um.unmarshal(f);
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement)obj).getValue();
         }
-        if (obj instanceof AbstractObservation) {
-            return (AbstractObservation)obj;
+        if (obj != null) {
+            return obj;
         }
         throw new CstlServiceException("the observation file does not contain a valid O&M object");
     }
     
-    public AcknowlegementType importSingleObservation(final String id, final File observationFile) throws ConfigurationException {
+    public AcknowlegementType importObservations(final String id, final File observationFile) throws ConfigurationException {
         final ObservationWriter writer = getObservationWriter(id);
         try {
-            final AbstractObservation observation = unmarshallObservation(observationFile);
-            writer.writeObservation(observation);
+            final Object objectFile = unmarshallObservationFile(observationFile);
+            if (objectFile instanceof AbstractObservation) {
+                writer.writeObservation((AbstractObservation)objectFile);
+            } else if (objectFile instanceof ObservationCollection) {
+                importObservations(id, (ObservationCollection)objectFile);
+            } else {
+                return new AcknowlegementType("Failure", "Unexpected object type for observation file");
+            }
             return new AcknowlegementType("Success", "The specified observation have been imported in the SOS");
         } catch (JAXBException | CstlServiceException ex) {
             throw new ConfigurationException(ex);
         }
-        //return new AcknowlegementType("Error", "An error occurs during the process");
     }
     
     public AcknowlegementType importObservations(final String id, final ObservationCollection collection) throws ConfigurationException {
