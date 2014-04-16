@@ -859,3 +859,24 @@ table.user-table tbody>tr>td.user-delete{
         margin-bottom: 10px;
     }
 }
+
+/*Modal responsive*/
+
+@media (min-width: 768px) and (max-width: 991px) { 
+    /*choix type*/
+    .modal-dialog-responsive{
+        width:700px;
+    }
+}
+@media (min-width: 992px)  and (max-width: 1199px) { 
+    /*choix type*/
+    .modal-dialog-responsive{
+        width:950px;
+    }
+}
+@media (min-width: 1200px) { 
+    /*choix type*/
+    .modal-dialog-responsive{
+        width:1024px;
+    }
+}

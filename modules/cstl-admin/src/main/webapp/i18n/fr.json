@@ -278,7 +278,7 @@
                 "password": "Mot de passe",
                 "sessions": "Sessions",
                 "users": "Utilisateurs",
-                "processes": "Process"
+                "processes": "Processus"
             },
             "data": "Données",
             "home": "Accueil",
@@ -385,10 +385,10 @@
         },
         "satistics" :{
             "title":"Statistiques",
-            "services":"Services Actifs",
+            "services":"Services actifs",
             "data":"Données intégrées",
             "users": "Utilisateurs créés",
-            "process": "Process"
+            "process": "Processus"
         },
         "text":{
             "intro":"<b>Constellation-SDI</b> permet de créer et de gérer simplement une Infrastructure de Données Spatiales complète.",
@@ -1100,14 +1100,14 @@
         "title": "Services disponibles"
     },
     "page.header.title":{
-        "webservices":"Dashboard de gestion des services",
-        "data":"Dashboard de gestion des données",
-        "style":"Dashboard de gestion des styles",
+        "webservices":"Gestion des services",
+        "data":"Gestion des données",
+        "style":"Gestion des styles",
         "contact": "Contact",
         "create.service":"Nouveau service",
         "create.service.source":"Source",
         "edit.service":"Edition du service",
-        "process":"Process"
+        "process":"Processus"
     },
     "style.information.title":"Styles disponibles",
     "users": {

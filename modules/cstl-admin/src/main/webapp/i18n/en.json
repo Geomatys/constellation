@@ -271,9 +271,9 @@
         },
         "satistics" :{
             "title":"Statistics",
-            "services":"Active Services",
-            "data":"Integrated Data",
-            "users": "Created Users",
+            "services":"Active services",
+            "data":"Integrated data",
+            "users": "Created users",
             "process": "Process"
         },
         "text":{

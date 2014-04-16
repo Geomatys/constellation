@@ -1,4 +1,4 @@
-<div class="modal-dialog" id="serverFileModal" style="width:1024px;">
+<div class="modal-dialog  modal-dialog-responsive" id="serverFileModal">
     <div class="modal-content" ng-init="init()">
         <div class="modal-header">
             <button type="button" class="close" ng-click="close()">×</button>
@@ -23,8 +23,8 @@
                     <li class="active"><span class="divider">{{currentPath}}</span></li>
                 </ul>
                 <div>
-                    <div ng-repeat="col in columns" class="col-sm-3 well block-folders">
-                        <input type="text" placeholder="filter" class="col-sm-12" ng-model="search">
+                    <div ng-repeat="col in columns" class="col-sm-3 well block-folders" style="overflow:auto; height:300px; margin-bottom:20px; margin-left:10px;">
+                        <input type="text" style="margin-bottom:10px;" placeholder="filter" class="col-sm-12" ng-model="search">
                         <ul class="unstyled">
                             <li ng-repeat="item in col | filter:search">
                                 <i ng-class="{'icon-folder-close-alt':item.folder && !startWith(item.subPath),'icon-folder-open-alt':item.folder && startWith(item.subPath),'icon-file':!item.folder}"></i>
@@ -55,6 +55,7 @@
                 </div>
             </div>
         </div>
+
         <div class="modal-footer">
             <button type="button" class="btn btn-default" ng-click="close()" translate="data.modal.cancel">Cancel</button>
             <button type="button" class="btn btn-primary" ng-disabled="!hasSelectedSomething" ng-show="!finished" ng-click="ok()" translate="data.modal.validate">Validate</button>
