@@ -29,8 +29,8 @@ cstlAdminApp.controller('HeaderController', ['$scope','$http',
 	                                        });
                                            }]);
 
-cstlAdminApp.controller('MainController', ['$scope','$location','webService','dataListing','ProcessService','$growl',
-    function ($scope, $location, webService, dataListing, Process, $growl) {
+cstlAdminApp.controller('MainController', ['$scope','$location','webService','dataListing','ProcessService','$growl', 'UserResource',
+    function ($scope, $location, webService, dataListing, Process, $growl, UserResource) {
         $scope.countStats = function() {
             webService.listAll({}, function(response) {
                 $scope.nbservices = response.instance.length;
@@ -56,6 +56,13 @@ cstlAdminApp.controller('MainController', ['$scope','$location','webService','da
             }, function() {
                 $scope.nbprocess = 0;
                 $growl('error', 'Error', 'Unable to count process');
+            });
+
+            UserResource.query(function(response) {
+                $scope.nbusers = response.length;
+            }, function() {
+                $scope.nbusers = 1;
+                $growl('error', 'Error', 'Unable to count users');
             });
         };
     }]);
