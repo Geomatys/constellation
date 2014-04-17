@@ -229,6 +229,16 @@ public class SOSConfigurer extends OGCConfigurer {
         }
     }
     
+    public Object removeObservationForProcedure(final String id, final String procedureID) throws ConfigurationException {
+        final ObservationWriter writer = getObservationWriter(id);
+        try {
+            writer.removeObservationForProcedure(procedureID);
+            return new AcknowlegementType("Success", "The specified observations have been removed from the SOS");
+        } catch (CstlServiceException ex) {
+            throw new ConfigurationException(ex);
+        }
+    }
+    
     /**
      * Build a new Sensor writer for the specified service ID.
      *

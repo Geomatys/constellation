@@ -166,6 +166,11 @@ public class DefaultObservationWriter implements ObservationWriter {
                                              NO_APPLICABLE_CODE);
         }
     }
+    
+    @Override
+    public void removeObservationForProcedure(String procedureID) throws CstlServiceException {
+        throw new UnsupportedOperationException("Not supported yet in this implementation.");
+    }
 
     /**
      * {@inheritDoc}

@@ -732,7 +732,54 @@ public class OM2ObservationWriter implements ObservationWriter {
         }
     }
 
+    @Override
+    public void removeObservationForProcedure(final String procedureID) throws CstlServiceException {
+        try {
+            final Connection c              = source.getConnection();
+            c.setAutoCommit(false);
+            final PreparedStatement stmtMes = c.prepareStatement("DELETE FROM \"om\".\"mesures\" WHERE id_observation IN (SELECT \"id\" FROM \"om\".\"observations\" WHERE procedure=?)");
+            final PreparedStatement stmtObs = c.prepareStatement("DELETE FROM \"om\".\"observations\" WHERE procedure=?");
+            
+            stmtMes.setString(1, procedureID);
+            stmtMes.executeUpdate();
+            stmtMes.close();
+            stmtObs.setString(1, procedureID);
+            stmtObs.executeUpdate();
+            stmtObs.close();
+            
+            c.commit();
+            c.close();
+        } catch (SQLException ex) {
+            throw new CstlServiceException("Error while inserting observation.", ex, NO_APPLICABLE_CODE);
+        }
+    }
+    
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeObservation(final String observationID) throws CstlServiceException {
+        try {
+            final Connection c              = source.getConnection();
+            c.setAutoCommit(false);
+            final PreparedStatement stmtMes = c.prepareStatement("DELETE FROM \"om\".\"mesures\" WHERE id_observation IN (SELECT \"id\" FROM \"om\".\"observations\" WHERE identifier=?)");
+            final PreparedStatement stmtObs = c.prepareStatement("DELETE FROM \"om\".\"observations\" WHERE identifier=?");
+            
+            stmtMes.setString(1, observationID);
+            stmtMes.executeUpdate();
+            stmtMes.close();
+            stmtObs.setString(1, observationID);
+            stmtObs.executeUpdate();
+            stmtObs.close();
+            
+            c.commit();
+            c.close();
+        } catch (SQLException ex) {
+            throw new CstlServiceException("Error while inserting observation.", ex, NO_APPLICABLE_CODE);
+        }
+    }
+    
+     /**
      * {@inheritDoc}
      */
     @Override
@@ -746,32 +793,6 @@ public class OM2ObservationWriter implements ObservationWriter {
     @Override
     public void destroy() {
        
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void removeObservation(final String observationID) throws CstlServiceException {
-        try {
-            final Connection c              = source.getConnection();
-            c.setAutoCommit(false);
-            final PreparedStatement stmtMes = c.prepareStatement("DELETE FROM \"om\".\"mesures\" WHERE id_observation=?");
-            final PreparedStatement stmtObs = c.prepareStatement("DELETE FROM \"om\".\"observations\" WHERE id=?");
-            
-            final int oid = Integer.parseInt(observationID.substring(observationIdBase.length()));
-            stmtMes.setInt(1, oid);
-            stmtMes.executeUpdate();
-            stmtMes.close();
-            stmtObs.setInt(1, oid);
-            stmtObs.executeUpdate();
-            stmtObs.close();
-            
-            c.commit();
-            c.close();
-        } catch (SQLException ex) {
-            throw new CstlServiceException("Error while inserting observation.", ex, NO_APPLICABLE_CODE);
-        }
     }
 
     private static class Field {

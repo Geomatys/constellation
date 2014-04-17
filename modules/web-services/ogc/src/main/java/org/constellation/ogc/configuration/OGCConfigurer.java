@@ -77,7 +77,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      * @param identifier    The identifier of the service.
      * @param metadata      the service metadata (can be null)
      * @param configuration the service configuration (can be null)
-     * @throws ConfigurationException if the operation has failed for any reason
+     * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
     public void createInstance(final String identifier, final Service metadata, final Object configuration) throws ConfigurationException {
         final ProcessDescriptor desc = getProcessDescriptor(CreateServiceDescriptor.NAME);
@@ -99,7 +99,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      *
      * @param identifier the service identifier
      * @throws TargetNotFoundException if the service with specified identifier does not exist
-     * @throws ConfigurationException if the operation has failed for any reason
+     * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
     public void startInstance(final String identifier) throws ConfigurationException {
         this.ensureExistingInstance(identifier);
@@ -119,7 +119,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      *
      * @param identifier the service identifier
      * @throws TargetNotFoundException if the service with specified identifier does not exist
-     * @throws ConfigurationException if the operation has failed for any reason
+     * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
     public void stopInstance(final String identifier) throws ConfigurationException {
         this.ensureExistingInstance(identifier);
@@ -140,7 +140,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      * @param identifier the service identifier
      * @param closeFirst indicates if the service should be closed before trying to restart it
      * @throws TargetNotFoundException if the service with specified identifier does not exist
-     * @throws ConfigurationException if the operation has failed for any reason
+     * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
     public void restartInstance(final String identifier, final boolean closeFirst) throws ConfigurationException {
         this.ensureExistingInstance(identifier);
@@ -162,7 +162,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      * @param identifier    the current service identifier
      * @param newIdentifier the new service identifier
      * @throws TargetNotFoundException if the service with specified identifier does not exist
-     * @throws ConfigurationException if the operation has failed for any reason
+     * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
     public void renameInstance(final String identifier, final String newIdentifier) throws ConfigurationException {
         this.ensureExistingInstance(identifier);
@@ -183,7 +183,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      *
      * @param identifier the service identifier
      * @throws TargetNotFoundException if the service with specified identifier does not exist
-     * @throws ConfigurationException if the operation has failed for any reason
+     * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
     public void deleteInstance(final String identifier) throws ConfigurationException {
         this.ensureExistingInstance(identifier);
@@ -205,7 +205,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      * @param configuration the service configuration (depending on implementation)
      * @param metadata      the service metadata
      * @throws TargetNotFoundException if the service with specified identifier does not exist
-     * @throws ConfigurationException if the operation has failed for any reason
+     * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
     public void configureInstance(final String identifier, final Service metadata, final Object configuration) throws ConfigurationException {
         this.ensureExistingInstance(identifier);
@@ -232,7 +232,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      * @param identifier the service
      * @return a configuration {@link Object} (depending on implementation)
      * @throws TargetNotFoundException if the service with specified identifier does not exist
-     * @throws ConfigurationException if the operation has failed for any reason
+     * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
     public Object getInstanceConfiguration(final String identifier) throws ConfigurationException {
         this.ensureExistingInstance(identifier);
@@ -255,7 +255,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      * @param identifier    the service identifier
      * @param configuration the service configuration
      * @throws TargetNotFoundException if the service with specified identifier does not exist
-     * @throws ConfigurationException if the operation has failed for any reason
+     * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
     public void setInstanceConfiguration(final String identifier, final Object configuration) throws ConfigurationException {
         this.ensureExistingInstance(identifier);
@@ -268,8 +268,9 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      * TODO: use a process and remove IOException
      *
      * @param identifier the service identifier
+     * @return 
      * @throws TargetNotFoundException if the service with specified identifier does not exist
-     * @throws ConfigurationException if the operation has failed for any reason
+     * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
     public Service getInstanceMetadata(final String identifier) throws ConfigurationException {
         this.ensureExistingInstance(identifier);
@@ -287,7 +288,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      * @param identifier the service identifier
      * @param metadata   the service metadata
      * @throws TargetNotFoundException if the service with specified identifier does not exist
-     * @throws ConfigurationException if the operation has failed for any reason
+     * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
     public void setInstanceMetadata(final String identifier, final Service metadata) throws ConfigurationException {
         this.ensureExistingInstance(identifier);

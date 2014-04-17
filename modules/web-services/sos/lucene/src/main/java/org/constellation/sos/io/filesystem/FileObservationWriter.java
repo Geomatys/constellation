@@ -191,6 +191,11 @@ public class FileObservationWriter implements ObservationWriter {
         }
     }
     
+    @Override
+    public void removeObservationForProcedure(final String procedureID) throws CstlServiceException {
+        throw new UnsupportedOperationException("Not supported yet in this implementation.");
+    }
+    
     private void writePhenomenon(final Phenomenon phenomenon) throws CstlServiceException {
         try {
             if (!phenomenonDirectory.exists()) {

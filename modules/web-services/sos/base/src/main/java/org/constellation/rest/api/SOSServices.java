@@ -78,6 +78,12 @@ public class SOSServices {
     public Response removeObservation(final @PathParam("id") String id, final @PathParam("observationID") String observationID) throws Exception {
         return ok(getConfigurer().removeSingleObservation(id, observationID));
     }
+    
+    @DELETE
+    @Path("{id}/observation/procedure/{procedureID}")
+    public Response removeObservationForProcedure(final @PathParam("id") String id, final @PathParam("procedureID") String procedureID) throws Exception {
+        return ok(getConfigurer().removeObservationForProcedure(id, procedureID));
+    }
 
     
     private static SOSConfigurer getConfigurer() throws NotRunningServiceException {
