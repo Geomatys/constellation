@@ -5,7 +5,7 @@
     <!-- Menu to create services -->
     <div class="col-sm-3">
         <div class="dropdown pull-right">
-            <a data-toggle="dropdown" class="btn btn-info btn-lg dropdown-toggle" style="margin-top:8px;padding:15px 19px;">
+            <a data-toggle="dropdown" class="btn btn-lg dropdown-toggle btn-info" style="margin-top:8px;padding:15px 19px;">
                 <span class="icon-plus icon-white" style="margin-right:5px;"></span>
                 <span translate="label.add.style">Ajouter un style</span>
                 <span class="caret"></span>
@@ -25,7 +25,7 @@
                     <a class="navbar-brand" translate="style.information.title">Available styles</a>
                 </div>
                 <div class="collapse navbar-collapse">
-                    <ul class="nav navbar-nav navbar-right">
+                    <ul class="nav navbar-nav navbar-right ">
                         <li ng-class="{active:filtertype == ''}" ng-click="filtertype = ''"><a translate="label.all">Tous</a></li>
                         <li ng-class="{active:filtertype=='VECTOR'}" ng-click="filtertype='VECTOR'"><a translate="label.vector">Vector</a></li>
                         <li ng-class="{active:filtertype=='COVERAGE'}" ng-click="filtertype='COVERAGE'"><a translate="label.raster">Raster</a></li>
@@ -36,7 +36,7 @@
 
             <div class="navbar sort-navbar">
                 <div class="navbar-inner">
-                    <ul class="nav">
+                    <ul class="nav nav-style">
                         <li ng-click="ordertype='Name';orderreverse=false"><a translate="label.title">
                             Titre<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
                         </a></li>
@@ -50,7 +50,7 @@
                         </a></li>
                         <li class="divider-vertical"></li>
                     </ul>
-                    <button type="button" ng-click="ordertype='Name';orderreverse=false" class="btn btn-xs btn-info"><i class="icon-remove icon-white"></i></button>
+                    <button type="button" ng-click="ordertype='Name';orderreverse=false" class="btn btn-xs btn-info btn-style"><i class="icon-remove icon-white"></i></button>
                     <div class="pull-right">
                         <div style="position:relative;">
                             <div class="ajax-loader" style="right:0;position:absolute;"></div>
@@ -62,7 +62,7 @@
             <div class="dash-inner row">
                 <div class="pull-left" style="width: 60%;">
                     <div id="list" data-role="list">
-                        <div class="pagination-wrapper">
+                        <div class="pagination-wrapper pagination-style">
                             <strong><span class="nb-results pull-left">{{countdata}}&nbsp;</span><span class="nb-results" translate="label.count.style">available styles</span></strong>
                             <select class="nb-per-page input-small form-control pull-right" ng-model="nbbypage">
                                 <option value="5">5</option>
@@ -77,6 +77,7 @@
                             <div class="item style-{{style.Type | lowercase}}" ng-repeat="style in dataList" ng-class="{selected:style==selected}" ng-click="select(style)">
                                 <div class="top">
                                     <span class="item-title">{{style.Name}}</span>
+                                    <span class="pull-right text-right item-list-style" style="font-size:14px;"> {{style.Type}}</span>
                                 </div>
                                 <div class="bottom">
                                     <div class="block">
@@ -85,9 +86,6 @@
                                     <div class="block">
                                         <i class="icon-user"></i>{{style.Owner}}
                                     </div>
-                                    <div class="block">
-                                        <i class="icon-folder-close-alt"></i>{{style.Type}}
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -95,7 +93,7 @@
                 </div>
                 <div class="pull-left" style="width: 40%;">
                     <div id="selection">
-                        <div class="alert alert-info" ng-class="{hide: selected != null}">
+                        <div class="alert alert-info alert-style" ng-class="{hide: selected != null}">
                             <h4 translate="label.no.selected.style">No selected style</h4>
 
                             <p translate="msg.no.selected.style">Click on a style to display more information</p>
@@ -110,7 +108,7 @@
 
                                 <div class="separator"></div>
                                 <h6 translate="label.date">Date</h6>
-                                <span>{{selected.Date | date:'yyyy-MM-dd HH:mm:ss'}}</span>
+                                <span>{{selected.Date | date:'yyyy-MM-dd'}}</span>
 
                                 <div class="separator"></div>
                                 <h6 translate="label.type">Type</h6>

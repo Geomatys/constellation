@@ -37,7 +37,7 @@
 
             <div class="navbar sort-navbar">
                 <div class="navbar-inner">
-                    <ul class="nav">
+                    <ul class="nav nav-style">
                         <li ng-click="ordertype='Name';orderreverse=false"><a translate="label.title">
                             Title<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
                         </a></li>
@@ -51,7 +51,7 @@
                         </a></li>
                         <li class="divider-vertical"></li>
                     </ul>
-                    <button type="button" ng-click="ordertype='Name';orderreverse=false" class="btn btn-xs btn-info"><i class="icon-remove icon-white"></i></button>
+                    <button type="button" ng-click="ordertype='Name';orderreverse=false" class="btn btn-xs btn-info btn-data"><i class="icon-remove icon-white"></i></button>
                     <div class="pull-right">
                         <div style="position:relative;">
                             <div class="ajax-loader" style="right:0;position:absolute;"></div>
@@ -63,7 +63,7 @@
             <div class="dash-inner row">
                 <div class="pull-left" style="width: 60%;">
                     <div id="list" data-role="list">
-                        <div class="pagination-wrapper">
+                        <div class="pagination-wrapper pagination-data">
                             <strong><span class="nb-results pull-left"><strong>{{countdata}}&nbsp;</span><span class="nb-results" translate="label.count.data">available data</span></strong>
                             <select class="nb-per-page input-small form-control pull-right" ng-model="nbbypage">
                                 <option value="5">5</option>
@@ -78,6 +78,7 @@
                             <div class="item {{service.Type | lowercase}}" ng-repeat="service in dataList" ng-class="{selected:service==selected}" ng-click="select(service)">
                                 <div class="top">
                                     <span class="item-title">{{service.Name}}</span>
+                                    <span class="pull-right text-right item-list-style" style="font-size:14px;">{{service.Type}}</span>
                                 </div>
                                 <div class="bottom">
                                     <div class="block">
@@ -86,9 +87,6 @@
                                     <div class="block">
                                         <i class="icon-user"></i>{{service.Owner}}
                                     </div>
-                                    <div class="block">
-                                        <i class="icon-folder-close-alt"></i>{{service.Type}}
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -96,10 +94,10 @@
                 </div>
                 <div class="pull-left" style="width: 40%;">
                     <div id="selection">
-                        <div class="alert alert-info" ng-class="{hide: selected != null}">
+                        <div class="alert alert-info alert-data" ng-class="{hide: selected != null}">
                             <h4 translate="label.no.selected.data">No selected data</h4>
 
-                            <p translate="msg.no.selected.data">Click on a data to display more information</p>
+                            <p translate="msg.no.selected.data" style="font-weight:normal;">Click on a data to display more information</p>
                         </div>
                         <div class="selected-item" id="selected-item" ng-class="{hide: selected == null}">
                             <div class="block-header" ng-click="toggleUpDownSelected()">
@@ -111,7 +109,7 @@
 
                                 <div class="separator"></div>
                                 <h6 translate="label.date">Date</h6>
-                                <span>{{selected.Date | date:'yyyy-MM-dd HH:mm:ss'}}</span>
+                                <span>{{selected.Date | date:'yyyy-MM-dd'}}</span>
 
                                 <div class="separator"></div>
                                 <h6 translate="label.type">Type</h6>

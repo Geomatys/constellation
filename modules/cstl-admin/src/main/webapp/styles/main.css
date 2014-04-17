@@ -632,7 +632,91 @@ ul.unstyled {
 .modal .dashboard .searchbox {
     width: 150px;
 }
+/*dashboard style*/
+.btn-style{
+    background-color: #9e96c2;
+    color:#ffffff;
+    border: solid 1px #8f86b9;
+}
+ .btn-style:hover, .btn-style:focus, .btn-style:hover .open .dropdown-toggle.btn-info{
+    background-color: #8f86b9;
+    border-color: #8076b0;
+    color:#ffffff;
+ }
+ ul.nav-style>li>a{
+    color:#929292;
+ }
+  ul.nav-style>li>a:hover{
+    color:#8b8b8b;
+ }
+ .alert-style{
+    background-color: #ededf3;
+    border: solid 1px #cfcbdf;
+    color:#9e96c2;
+ }
+ .pagination-style .pagination > .active > a{
+    background-color: #9e96c2;
+     border: solid 1px #8f86b9;
+     color:#ffffff;
+ }
+ .pagination-style .pagination > li > a, .pagination-style .pagination > li > span{
+    color:#8f86b9;
+ }
+ .style-coverage, .style-vector{
+    color: #222222;
+    font-weight: bold;
+ }
+ .dashboard .item-list .item.selected .top .item-list-style{
+    color:#ffffff;
+ }
+ /*dashboard data*/
+.btn-data{
+    background-color: #8ac1d4;
+    color:#ffffff;
+    border: solid 1px #77b7cd;
+}
+ .btn-data:hover, .btn-data:focus, .btn-data:hover .open .dropdown-toggle.btn-info{
+    background-color: #77b7cd;
+    border-color: #64adc6;
+    color:#ffffff;
+ }
+  .alert-data{
+    background-color: #e8f3f7;
+    border: solid 1px #c2dfea;
+    color:#4298b5;
+ }
+ .pagination-data .pagination > .active > a{
+    background-color: #8ac1d4;
+     border: solid 1px #77b7cd;
+     color:#ffffff;
+ }
+ .pagination-data .pagination > li > a, .pagination-data .pagination > li > span{
+    color:#77b7cd;
+ }
 
+ .alert-csw{
+    background-color: #faf1e8;
+    border: solid 1px #f1d7be;
+    color:#d58940;
+ }
+ .btn-csw{
+    background-color: #e8bd94;
+    border: solid 1px #e3b07f;
+    color:#ffffff;
+ }
+ .btn-csw:hover, .btn-csw:focus, .btn-csw:hover .open .dropdown-toggle.btn-info{
+    background-color: #e3b07f;
+    border: solid 1px #dfa36a;
+    color:#ffffff;
+ }
+  .pagination-csw .pagination > .active > a{
+    background-color: #e8bd94;
+     border: solid 1px #e3b07f;
+     color:#ffffff;
+ }
+ .pagination-csw .pagination > li > a, .pagination-csw .pagination > li > span{
+    color:#e3b07f;
+ }
 /*
  * Data Viewer
  */
