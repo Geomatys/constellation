@@ -124,7 +124,7 @@
                                                 </div>
                                                 <div ng-if="type === 'csw'">
                                                     <div ng-repeat="cswdata in dataList">
-                                                        <div class="item metadata" ng-class="{selected:cswdata==selected}" ng-click="select(cswdata)">
+                                                        <div class="item metadata" ng-class="{selected:cswdata==selected}" ng-click="select(cswdata);selectDataMetadata(null)">
                                                             <div class="top">
                                                                 <span class="item-title">{{cswdata.title ? cswdata.title : cswdata.identifier}}</span>
                                                                 <span class="pull-right text-right item-list-style"  style="font-size:14px;" translate="md.listing.metadata.type">METADATA</span>
