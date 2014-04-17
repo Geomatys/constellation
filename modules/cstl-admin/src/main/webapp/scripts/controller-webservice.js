@@ -203,10 +203,10 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
 
         $scope.saveServiceMetadata = function() {
             // Ensures both name and identifier are filled
-            if ($scope.metadata.identifier == null && $scope.metadata.name != null) {
+            if (($scope.metadata.identifier == null || $scope.metadata.identifier == '') && $scope.metadata.name != null && $scope.metadata.name != '') {
                 $scope.metadata.identifier = $scope.metadata.name;
             }
-            if ($scope.metadata.name == null && $scope.metadata.identifier != null) {
+            if (($scope.metadata.name == null || $scope.metadata.name == '') && $scope.metadata.identifier != null && $scope.metadata.identifier != '') {
                 $scope.metadata.name = $scope.metadata.identifier;
             }
 
@@ -229,6 +229,12 @@ cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routePar
     function ($scope, $routeParams , webService, $growl, $location) {
         $scope.type = $routeParams.type;
         $scope.id = $routeParams.id;
+        $scope.db = {
+            'url': 'localhost',
+            'port': '5432',
+            'className': 'org.postgresql.Driver',
+            'name': ''
+        };
 
         $scope.initSource = function() {
             if ($scope.type === 'csw') {
@@ -253,18 +259,17 @@ cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routePar
             }
         };
 
-        $scope.setDefaultUrlForBdd = function() {
-            if ($scope.source) {
-                var type = $scope.source['constellation-config.SOSConfiguration']['constellation-config.OMConfiguration'].bdd.className;
-                if (type === 'org.postgresql.Driver') {
-                    $scope.source['constellation-config.SOSConfiguration']['constellation-config.OMConfiguration'].bdd.connectURL = 'jdbc:postgresql://localhost:5432/dbname';
-                } else if (type === 'com.mysql.jdbc.Driver') {
-                    $scope.source['constellation-config.SOSConfiguration']['constellation-config.OMConfiguration'].bdd.connectURL = 'jdbc:mysql://localhost:port/dbname';
-                }
-            }
-        };
-
         $scope.saveServiceSource = function() {
+            var fullDbUrl = ($scope.db.className === 'org.postgresql.Driver') ? 'jdbc:postgresql' : 'jdbc:mysql';
+            fullDbUrl += '://'+ $scope.db.url +':'+ $scope.db.port +'/'+ $scope.db.name;
+            if ($scope.type === 'csw') {
+                $scope.source.automatic.bdd.className = $scope.db.className;
+                $scope.source.automatic.bdd.connectURL = fullDbUrl;
+            } else {
+                $scope.source['constellation-config.SOSConfiguration']['constellation-config.OMConfiguration'].bdd.className = $scope.db.className;
+                $scope.source['constellation-config.SOSConfiguration']['constellation-config.OMConfiguration'].bdd.connectURL = fullDbUrl;
+            }
+
             webService.setConfig({type: $scope.type, id: $scope.id}, $scope.source, function() {
                 $growl('success','Success','Service '+ $scope.id +' successfully updated');
                 $location.path('/webservice');

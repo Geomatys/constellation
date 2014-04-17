@@ -52,14 +52,22 @@
                     <fieldset>
                         <div class="form-group">
                             <label class="control-label new-service-form-label" translate="service.config.source.database.type">Database type</label>
-                            <select id="selectType" class="form-control col-sm-5" style="margin-bottom:10px;" ng-model="source.automatic.bdd.className">
+                            <select id="selectType" class="form-control col-sm-5" style="margin-bottom:10px;" ng-model="db.className">
                                 <option value="org.postgresql.Driver">PostgreSQL</option>
                                 <option value="com.mysql.jdbc.Driver">MySQL</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label class="control-label new-service-form-label" translate="service.config.source.database.url">Database URL</label>
-                            <input type="text" class="form-control" ng-model="source.automatic.bdd.connectURL">
+                            <input type="text" class="form-control" ng-model="db.url">
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label new-service-form-label" translate="service.config.source.database.port">Database port</label>
+                            <input type="text" class="form-control" ng-model="db.port">
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label new-service-form-label" translate="service.config.source.database.name">Database name</label>
+                            <input type="text" class="form-control" ng-model="db.name">
                         </div>
                         <div class="form-group">
                             <label class="control-label new-service-form-label" translate="service.config.source.database.username">User name</label>
@@ -180,14 +188,22 @@
                     <fieldset>
                         <div class="form-group">
                             <label class="control-label new-service-form-label" translate="service.config.source.database.type">Database type</label>
-                            <select ng-change="setDefaultUrlForBdd()" class="form-control col-sm-5" style="margin-bottom:10px;" ng-model="source['constellation-config.SOSConfiguration']['constellation-config.OMConfiguration'].bdd.className">
+                            <select class="form-control col-sm-5" style="margin-bottom:10px;" ng-model="db.className">
                                 <option value="org.postgresql.Driver">PostgreSQL</option>
                                 <option value="com.mysql.jdbc.Driver">MySQL</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label class="control-label new-service-form-label" translate="service.config.source.database.url">Database URL</label>
-                            <input type="text" class="form-control" ng-model="source['constellation-config.SOSConfiguration']['constellation-config.OMConfiguration'].bdd.connectURL">
+                            <input type="text" class="form-control" ng-model="db.url">
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label new-service-form-label" translate="service.config.source.database.port">Database port</label>
+                            <input type="text" class="form-control" ng-model="db.port">
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label new-service-form-label" translate="service.config.source.database.name">Database name</label>
+                            <input type="text" class="form-control" ng-model="db.name">
                         </div>
                         <div class="form-group">
                             <label class="control-label new-service-form-label" translate="service.config.source.database.username">User name</label>
