@@ -470,7 +470,7 @@
             "source.internal": "Internal",
             "source.internal.description": "Constellation metadata database, describing published data by Constellation services",
             "source.internal.title": "Internal (SGBDR)",
-            "source.sos.title":"Sensor (SOS)"
+            "source.sos.title":"Sensors (SOS)"
         },
         "create.end": {
             "addlayers.label": "Add layers on service",
@@ -560,7 +560,7 @@
                 "wms.label": "Maps (WMS)",
                 "wmts.label": "Tiles maps (WMTS)",
                 "wps.label": "Geoprocessing (WPS)",
-                "sos.label":"Sensor (SOS)"
+                "sos.label":"Sensors (SOS)"
             },
             "modal.select.version": "Select the service version you want"
         },

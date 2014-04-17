@@ -240,13 +240,13 @@ public final class OGCServices {
             final String json = FileUtilities.getStringFromStream(is);
             if (json.startsWith("{\"automatic\"")) {
                 c = Automatic.class;
-            } else if (json.startsWith("{\"layercontext\"")) {
+            } else if (json.startsWith("{\"constellation-config.LayerContext\"")) {
                 c = LayerContext.class;
-            } else if (json.startsWith("{\"processcontext\"")) {
+            } else if (json.startsWith("{\"constellation-config.ProcessContext\"")) {
                 c = ProcessContext.class;
             } else if (json.startsWith("{\"constellation-config.SOSConfiguration\"")) {
                 c = SOSConfiguration.class;
-            } else if (json.startsWith("{\"webdavcontext\"")) {
+            } else if (json.startsWith("{\"constellation-config.WebdavContext\"")) {
                 c = WebdavContext.class;
             } else {
                 return ok(AcknowlegementType.failure("Unknown configuration object given, unable to update service configuration"));

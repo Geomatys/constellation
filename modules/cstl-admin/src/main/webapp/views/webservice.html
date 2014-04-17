@@ -16,7 +16,7 @@
                 <li><a href="#/webservice/wcs" id="wcschoice" translate="webservicepage.button.dropdown.wcs.label">Coverages (WCS)</a></li>
                 <li><a href="#/webservice/wmts" id="wmtschoice" translate="webservicepage.button.dropdown.wmts.label">Tiles maps (WMTS)</a></li>
                 <li><a href="#/webservice/csw" id="cswchoice" translate="webservicepage.button.dropdown.csw.label">Catalogs (CSW)</a></li>
-                <li><a href="#/webservice/sos" id="soschoice" translate="webservicepage.button.dropdown.sos.label">Sensor (SOS)</a></li>
+                <li><a href="#/webservice/sos" id="soschoice" translate="webservicepage.button.dropdown.sos.label">Sensors (SOS)</a></li>
             </ul>
         </div>
     </div>
@@ -38,7 +38,6 @@
                             <li ng-class="{active:typeFilter.type === 'WMTS'}"><a ng-click="typeFilter = {type: 'WMTS'}">WMTS</a></li>
                             <li ng-class="{active:typeFilter.type === 'CSW'}"><a ng-click="typeFilter = {type: 'CSW'}">CSW</a></li>
                             <li ng-class="{active:typeFilter.type === 'SOS'}"><a ng-click="typeFilter = {type: 'SOS'}">SOS</a></li>
-                            <li ng-class="{active:typeFilter.type === 'WPS'}"><a ng-click="typeFilter = {type: 'WPS'}">WPS</a></li>
                         </ul>
                     </div>
                 </div>
