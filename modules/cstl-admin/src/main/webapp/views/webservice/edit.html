@@ -142,7 +142,8 @@
                                                             </div>
                                                         </div>
 
-                                                        <div class="item metadata data" ng-if="cswdata==selected" ng-repeat="relatedData in relatedDatas[cswdata.identifier]">
+                                                        <div class="item data" ng-if="cswdata==selected" ng-repeat="relatedData in relatedDatas[cswdata.identifier]"
+                                                             ng-click="selectDataMetadata(relatedData)" ng-class="{selected:relatedData==selectedDataMetadata,'metadata-vector':relatedData.Type.toLowerCase()=='vector','metadata-coverage':relatedData.Type.toLowerCase()=='coverage','metadata-sensor':relatedData.Type.toLowerCase()=='sensor'}">
                                                             <div class="top">
                                                                 <span class="item-title">{{relatedData.Name}}</span>
                                                                 <span class="pull-right text-right">{{relatedData.Type}}</span>
@@ -266,14 +267,33 @@
                                                 <div class="block-header" ng-click="toggleUpDownSelected()">
                                                     <strong>{{selected.title ? selected.title : selected.identifier}}</strong><i class="icon-chevron-up pull-right"></i>
                                                 </div>
-                                                <div class="block-content">
-                                                    <h6 translate="label.owner">Owner</h6>
-                                                    <span>{{selected.creator}}</span>
+                                                <div>
+                                                    <div class="block-content">
+                                                        <h6 translate="label.owner">Owner</h6>
+                                                        <span>{{selected.creator}}</span>
 
-                                                    <div class="separator"></div>
-                                                    <h6 translate="label.date">Date</h6>
-                                                    <span>{{selected.createDate | date:'yyyy-MM-dd'}}</span>
+                                                        <div class="separator"></div>
+                                                        <h6 translate="label.date">Date</h6>
+                                                        <span>{{selected.createDate | date:'yyyy-MM-dd'}}</span>
+                                                    </div>
+                                                    <div class="block-content" ng-if="selectedDataMetadata != null">
+                                                        <h6 translate="label.title">Title</h6>
+                                                        <span>{{selectedDataMetadata.Name}}</span>
+
+                                                        <div class="separator"></div>
+                                                        <h6 translate="label.type">Type</h6>
+                                                        <span>{{selectedDataMetadata.Type}}</span>
+
+                                                        <div class="separator"></div>
+                                                        <h6 translate="label.owner">Owner</h6>
+                                                        <span>{{selectedDataMetadata.Owner}}</span>
+
+                                                        <div class="separator"></div>
+                                                        <h6 translate="label.date">Date</h6>
+                                                        <span>{{selectedDataMetadata.Date | date:'yyyy-MM-dd'}}</span>
+                                                    </div>
                                                 </div>
+
                                                 <div class="block-action">
                                                     <div class="row">
                                                         <div class="col-sm-6">

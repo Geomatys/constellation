@@ -631,4 +631,10 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
         $scope.unlinkStyle = function(providerName, styleName, dataProvider, dataId) {
             StyleSharedService.unlinkStyle($scope,providerName, styleName, dataProvider, dataId, style);
         };
+
+        $scope.selectedDataMetadata = null;
+
+        $scope.selectDataMetadata = function(item) {
+            $scope.selectedDataMetadata = item;
+        };
     }]);
