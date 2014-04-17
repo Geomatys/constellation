@@ -220,12 +220,6 @@ ul.unstyled {
     padding-top:30px;
     padding-bottom:30px;
 }
-@media (max-width: 991px){
-    .service-item{
-        float: none !important;
-        margin-top: 10px;
-    }
-}
 .navbar {
     min-height: 0;
     border: 0;

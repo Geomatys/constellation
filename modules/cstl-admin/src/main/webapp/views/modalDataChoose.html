@@ -20,7 +20,7 @@
                 </div>
                 <div class="navbar sort-navbar">
                     <div class="navbar-inner">
-                        <ul class="nav">
+                        <ul class="nav nav-style">
                             <li ng-click="$parent.ordertype='Name';$parent.orderreverse=false"><a translate="service.edit.dashboard.header.title">
                                 Title<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
                             </a></li>
@@ -38,7 +38,7 @@
                             </a></li>
                             <li class="divider-vertical"></li>
                         </ul>
-                        <button type="button" ng-click="$parent.ordertype='Name';$parent.orderreverse=false" class="btn btn-xs btn-info"><i class="icon-remove icon-white"></i></button>
+                        <button type="button" ng-click="$parent.ordertype='Name';$parent.orderreverse=false" class="btn btn-xs btn-data"><i class="icon-remove icon-white"></i></button>
                         <div class="pull-right">
                             <div style="position:relative;">
                                 <div class="ajax-loader" style="right:0;position:absolute;"></div>
@@ -49,8 +49,8 @@
                 </div>
                 <div class="dash-inner row dashboard">
                     <div id="list" data-role="list">
-                        <div class="pagination-wrapper">
-                            <span class="nb-results pull-left"><strong>{{countdata}}</strong></span>
+                        <div class="pagination-wrapper pagination-data">
+                             <strong><span class="nb-results pull-left"><strong>{{countdata}}&nbsp;</span><span class="nb-results" translate="label.count.data">available data</span></strong>
                             <select class="nb-per-page input-small form-control pull-right" ng-model="$parent.nbbypage">
                                 <option value="5">5</option>
                                 <option value="10">10</option>
@@ -64,7 +64,7 @@
                             <div class="item {{data.Type.toLowerCase()}}" ng-repeat="data in dataList" ng-class="{selected:data==selected}" ng-click="select(data)">
                                 <div class="top">
                                     <span class="item-title">{{data.Name}}</span>
-                                    <span class="pull-right text-right">{{data.Type}}</span>
+                                    <span class="pull-right text-right item-list-style"  style="font-size:14px;">{{data.Type}}</span>
                                 </div>
                                 <div class="bottom">
                                     <div class="block">

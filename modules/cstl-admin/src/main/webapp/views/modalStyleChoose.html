@@ -27,7 +27,7 @@
                 <!--</div>-->
                 <div class="navbar sort-navbar">
                     <div class="navbar-inner">
-                        <ul class="nav">
+                        <ul class="nav nav-style">
                             <li ng-click="$parent.ordertype='Name';$parent.orderreverse=false"><a translate="label.title">
                                 Titre<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
                             </a></li>
@@ -41,7 +41,7 @@
                             </a></li>
                             <li class="divider-vertical"></li>
                         </ul>
-                        <button type="button" ng-click="$parent.ordertype='Name';$parent.orderreverse=false" class="btn btn-xs btn-info"><i class="icon-remove icon-white"></i></button>
+                        <button type="button" ng-click="$parent.ordertype='Name';$parent.orderreverse=false" class="btn btn-xs btn-style"><i class="icon-remove icon-white"></i></button>
                         <div class="pull-right">
                             <div style="position:relative;">
                                 <div class="ajax-loader" style="right:0;position:absolute;"></div>
@@ -52,7 +52,7 @@
                 </div>
                 <div class="dash-inner">
                     <div id="list" data-role="list">
-                        <div class="pagination-wrapper">
+                        <div class="pagination-wrapper pagination-style">
                             <strong><span class="nb-results pull-left"><strong>{{countdata}}&nbsp;</span><span class="nb-results" translate="label.count.data">available data</span></strong>
                             <select class="nb-per-page input-small form-control pull-right" ng-model="$parent.nbbypage">
                                 <option value="5">5</option>
@@ -67,6 +67,7 @@
                             <div class="item style-{{style.Type | lowercase}}" ng-repeat="style in dataList" ng-class="{selected:style==selected}" ng-click="select(style)">
                                 <div class="top">
                                     <span class="item-title">{{style.Name}}</span>
+                                    <span class="pull-right text-right item-list-style"  style="font-size:14px;">{{style.Type}}</span>
                                 </div>
                                 <div class="bottom">
                                     <div class="block">
@@ -74,9 +75,6 @@
                                     </div>
                                     <div class="block">
                                         <i class="icon-user"></i>{{style.Owner}}
-                                    </div>
-                                    <div class="block">
-                                        <i class="icon-folder-close-alt"></i>{{style.Type}}
                                     </div>
                                 </div>
                             </div>
