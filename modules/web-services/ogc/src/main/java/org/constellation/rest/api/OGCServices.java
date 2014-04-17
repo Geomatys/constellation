@@ -244,7 +244,7 @@ public final class OGCServices {
                 c = LayerContext.class;
             } else if (json.startsWith("{\"processcontext\"")) {
                 c = ProcessContext.class;
-            } else if (json.startsWith("{\"sosconfiguration\"")) {
+            } else if (json.startsWith("{\"constellation-config.SOSConfiguration\"")) {
                 c = SOSConfiguration.class;
             } else if (json.startsWith("{\"webdavcontext\"")) {
                 c = WebdavContext.class;

@@ -5,7 +5,7 @@
     </div>
 </div>
 
-<div class="col-sm-12">
+<div class="col-sm-12" ng-init="initSource()">
     
 
     <div class="frame dashboard" ng-if="type === 'csw'">
@@ -157,7 +157,7 @@
 
     <div class="frame dashboard" ng-if="type === 'sos'">
         
-        <div id="description" class="row bg-white">
+        <div class="row bg-white">
             <div class="frame dashboard">
                 <div class="navbar navbar-default" style="margin-bottom: 0px;">
                     <div class="navbar-header">
@@ -176,31 +176,31 @@
                 </div>
             </div>
             <div class="col-sm-6">
-                <form id="dbSourceForm">
+                <form id="dbSourceSOSForm">
                     <fieldset>
                         <div class="form-group">
                             <label class="control-label new-service-form-label" translate="service.config.source.database.type">Database type</label>
-                            <select id="selectType" class="form-control col-sm-5" style="margin-bottom:10px;" ng-model="source.automatic.bdd.className">
+                            <select ng-change="setDefaultUrlForBdd()" class="form-control col-sm-5" style="margin-bottom:10px;" ng-model="source['constellation-config.SOSConfiguration']['constellation-config.OMConfiguration'].bdd.className">
                                 <option value="org.postgresql.Driver">PostgreSQL</option>
                                 <option value="com.mysql.jdbc.Driver">MySQL</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label class="control-label new-service-form-label" translate="service.config.source.database.url">Database URL</label>
-                            <input type="text" class="form-control" ng-model="source.automatic.bdd.connectURL">
+                            <input type="text" class="form-control" ng-model="source['constellation-config.SOSConfiguration']['constellation-config.OMConfiguration'].bdd.connectURL">
                         </div>
                         <div class="form-group">
                             <label class="control-label new-service-form-label" translate="service.config.source.database.username">User name</label>
-                            <input type="text" class="form-control" ng-model="source.automatic.bdd.user">
+                            <input type="text" class="form-control" ng-model="source['constellation-config.SOSConfiguration']['constellation-config.OMConfiguration'].bdd.user">
                         </div>
                         <div class="form-group">
                             <label class="control-label new-service-form-label" translate="service.config.source.database.password">Password</label>
-                            <input type="password" class="form-control" ng-model="source.automatic.bdd.password">
+                            <input type="password" class="form-control" ng-model="source['constellation-config.SOSConfiguration']['constellation-config.OMConfiguration'].bdd.password">
                         </div>
                         <div class="form-group">
                             <label class="control-label new-service-form-label" translate="service.config.source.database.shared">Shared connection</label>
                             <div class="checkbox inline">
-                                <input type="checkbox" ng-model="source.automatic.bdd.sharedConnection">
+                                <input type="checkbox" ng-model="source['constellation-config.SOSConfiguration']['constellation-config.OMConfiguration'].bdd.sharedConnection">
                             </div>
                         </div>
                     </fieldset>
