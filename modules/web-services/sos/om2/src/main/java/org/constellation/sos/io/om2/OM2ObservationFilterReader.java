@@ -327,7 +327,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                     final int oid                 = rs.getInt("id");
                     final String obsID            = "obs-"  + oid;
                     final String timeID           = "time-" + oid;
-                    final String name             = observationIdBase + oid;
+                    final String name             = rs.getString("identifier");
                     final String featureID        = rs.getString("foi");
                     final String observedProperty = rs.getString("observed_property");
                     final SamplingFeature feature = getFeatureOfInterest(featureID, version, c);
@@ -440,7 +440,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                 final String value            = rs.getString("value");
                 final int oid                 = rs.getInt("id");
                 final String rid              = rs.getString("resultid");
-                final String name             = observationIdBase + oid;
+                final String name             = rs.getString("identifier");
                 final String obsID            = "obs-"  + oid;
                 final String timeID           = "time-" + oid;
                 final String featureID        = rs.getString("foi");

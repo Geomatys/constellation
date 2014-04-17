@@ -8,6 +8,7 @@ CREATE SCHEMA "om";
 
 
 CREATE TABLE "om"."observations" (
+    "identifier"        character varying(200) NOT NULL,
     "id"                integer NOT NULL,
     "time_begin"        timestamp,
     "time_end"          timestamp,

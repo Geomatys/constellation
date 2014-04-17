@@ -117,7 +117,7 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
                                           + "WHERE o.\"id\" = m.\"id_observation\"");
             template = true;
         } else {
-            sqlRequest = new StringBuilder("SELECT o.\"id\", m.\"id\" as resultid, \"observed_property\", \"procedure\", \"foi\", \"time\", \"value\", \"uom\", \"field_type\", \"field_name\", \"field_definition\" "
+            sqlRequest = new StringBuilder("SELECT o.\"id\", o.\"identifier\", m.\"id\" as resultid, \"observed_property\", \"procedure\", \"foi\", \"time\", \"value\", \"uom\", \"field_type\", \"field_name\", \"field_definition\" "
                                          + "FROM \"om\".\"observations\" o, \"om\".\"mesures\" m "
                                          + "WHERE o.\"id\" = m.\"id_observation\"");
         }

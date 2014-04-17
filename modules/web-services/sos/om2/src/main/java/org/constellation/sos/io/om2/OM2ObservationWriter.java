@@ -155,15 +155,27 @@ public class OM2ObservationWriter implements ObservationWriter {
         try {
             final Connection c           = source.getConnection();
             c.setAutoCommit(false);
-            final PreparedStatement stmt = c.prepareStatement("INSERT INTO \"om\".\"observations\" VALUES(?,?,?,?,?,?)");
+            final PreparedStatement stmt = c.prepareStatement("INSERT INTO \"om\".\"observations\" VALUES(?,?,?,?,?,?,?)");
             final String observationName;
+            int oid;
             if (observation.getName() == null) {
-                observationName = getNewObservationId();
+                oid = getNewObservationId();
+                observationName = observationIdBase + oid;
             } else {
                 observationName = observation.getName();
+                if (observationName.startsWith(observationIdBase)) {
+                    try {
+                        oid = Integer.parseInt(observationName.substring(observationIdBase.length()));
+                    } catch (NumberFormatException ex) {
+                        oid = getNewObservationId();
+                    }
+                } else {
+                    oid = getNewObservationId();
+                }
             }
-            final int oid = Integer.parseInt(observationName.substring(observationIdBase.length()));
-            stmt.setInt(1, oid);
+            
+            stmt.setString(1, observationName);
+            stmt.setInt(2, oid);
             
             final TemporalObject samplingTime = observation.getSamplingTime();
             if (samplingTime instanceof Period) {
@@ -171,41 +183,41 @@ public class OM2ObservationWriter implements ObservationWriter {
                 final Date beginDate = period.getBeginning().getPosition().getDate();
                 final Date endDate   = period.getEnding().getPosition().getDate();
                 if (beginDate != null) {
-                    stmt.setTimestamp(2, new Timestamp(beginDate.getTime()));
-                } else {
-                    stmt.setNull(2, java.sql.Types.TIMESTAMP);
-                }
-                if (endDate != null) {
-                    stmt.setTimestamp(3, new Timestamp(endDate.getTime()));
+                    stmt.setTimestamp(3, new Timestamp(beginDate.getTime()));
                 } else {
                     stmt.setNull(3, java.sql.Types.TIMESTAMP);
+                }
+                if (endDate != null) {
+                    stmt.setTimestamp(4, new Timestamp(endDate.getTime()));
+                } else {
+                    stmt.setNull(4, java.sql.Types.TIMESTAMP);
                 }
             } else if (samplingTime instanceof Instant) {
                 final Instant instant = (Instant) samplingTime;
                 final Date date       = instant.getPosition().getDate();
                 if (date != null) {
-                    stmt.setTimestamp(2, new Timestamp(date.getTime()));
+                    stmt.setTimestamp(3, new Timestamp(date.getTime()));
                 } else {
-                    stmt.setNull(2, java.sql.Types.TIMESTAMP);
+                    stmt.setNull(3, java.sql.Types.TIMESTAMP);
                 }
-                stmt.setNull(3, java.sql.Types.TIMESTAMP);
+                stmt.setNull(4, java.sql.Types.TIMESTAMP);
             } else {
-                stmt.setNull(2, java.sql.Types.TIMESTAMP);
                 stmt.setNull(3, java.sql.Types.TIMESTAMP);
+                stmt.setNull(4, java.sql.Types.TIMESTAMP);
             }
             final PhenomenonProperty phenomenon = (PhenomenonProperty)observation.getPropertyObservedProperty();
             final String phenRef = writePhenomenon(phenomenon, c);
-            stmt.setString(4, phenRef);
+            stmt.setString(5, phenRef);
             
             final org.geotoolkit.observation.xml.Process procedure = (org.geotoolkit.observation.xml.Process)observation.getProcedure();
             writeProcedure(procedure.getHref(), c);
-            stmt.setString(5, procedure.getHref());
+            stmt.setString(6, procedure.getHref());
             final org.geotoolkit.sampling.xml.SamplingFeature foi = (org.geotoolkit.sampling.xml.SamplingFeature)observation.getFeatureOfInterest();
             if (foi != null) {
-                stmt.setString(6, foi.getId());
+                stmt.setString(7, foi.getId());
                 writeFeatureOfInterest(foi, c);
             } else {
-                stmt.setNull(6, java.sql.Types.VARCHAR);
+                stmt.setNull(7, java.sql.Types.VARCHAR);
             }
             
             stmt.executeUpdate();
@@ -700,7 +712,7 @@ public class OM2ObservationWriter implements ObservationWriter {
     /**
      * {@inheritDoc}
      */
-    private String getNewObservationId() throws CstlServiceException {
+    private int getNewObservationId() throws CstlServiceException {
         try {
             final Connection c         = source.getConnection();
             final Statement stmt       = c.createStatement();
@@ -714,7 +726,7 @@ public class OM2ObservationWriter implements ObservationWriter {
             rs.close();
             stmt.close();
             c.close();
-            return observationIdBase + resultNum;
+            return resultNum;
         } catch (SQLException ex) {
             throw new CstlServiceException("Error while looking for available observation id.", ex, NO_APPLICABLE_CODE);
         }

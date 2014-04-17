@@ -43,6 +43,8 @@ public interface ObservationReader {
     /**
      * Return the list of offering names.
      *
+     * @param version SOS version of the request
+     * @return A list of offering name.
      * @throws org.constellation.ws.CstlServiceException
      */
     Collection<String> getOfferingNames(final String version) throws CstlServiceException;
@@ -51,6 +53,7 @@ public interface ObservationReader {
      * Return The offering with the specified name.
      *
      * @param offeringName The identifier of the offering
+     * @param version SOS version of the request
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
@@ -60,6 +63,7 @@ public interface ObservationReader {
      * Return The offerings for the specified names.
      *
      * @param offeringNames The identifiers of the offerings
+     * @param version SOS version of the request
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
@@ -67,6 +71,8 @@ public interface ObservationReader {
 
     /**
      * Return a list of all the offerings.
+     * 
+     * @param version SOS version of the request
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
@@ -86,6 +92,12 @@ public interface ObservationReader {
      */
     Collection<String> getPhenomenonNames() throws CstlServiceException;
 
+    /**
+     * 
+     * @param phenomenonName
+     * @return
+     * @throws CstlServiceException 
+     */
     boolean existPhenomenon(final String phenomenonName) throws CstlServiceException;
     
     /**
@@ -100,6 +112,7 @@ public interface ObservationReader {
      * Return a sampling feature for the specified sampling feature.
      *
      * @param samplingFeatureName The identifier of the feature of interest.
+     * @param version SOS version of the request
      *
      * @return the corresponding feature Of interest.
      * @throws org.constellation.ws.CstlServiceException
@@ -111,6 +124,8 @@ public interface ObservationReader {
      * Return a sampling feature for the specified sampling feature.
      *
      * @param samplingFeatureName
+     * @param version SOS version of the request
+     * 
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
@@ -120,6 +135,9 @@ public interface ObservationReader {
      * Return an observation for the specified identifier.
      * 
      * @param identifier
+     * @param resultModel
+     * @param mode
+     * @param version
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
@@ -129,6 +147,8 @@ public interface ObservationReader {
      * Return a result for the specified identifier.
      *
      * @param identifier
+     * @param resultModel
+     * @param version
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
@@ -144,26 +164,35 @@ public interface ObservationReader {
     
     /**
      * Create a new identifier for an observation.
+     * @return 
+     * @throws org.constellation.ws.CstlServiceException
      */
     String getNewObservationId() throws CstlServiceException;
     
     /**
      * Return the minimal/maximal value for the offering event Time
+     * @return 
+     * @throws org.constellation.ws.CstlServiceException
      */
     List<String> getEventTime() throws CstlServiceException;
 
     /**
      * Return the list of supported response Mode
+     * @return 
+     * @throws org.constellation.ws.CstlServiceException
      */
     List<ResponseModeType> getResponseModes() throws CstlServiceException;
 
     /**
      * Return the list of supported response Mode
+     * @return 
+     * @throws org.constellation.ws.CstlServiceException
      */
     List<String> getResponseFormats() throws CstlServiceException;
     
     /**
      * Return informations about the implementation class.
+     * @return 
      */
     String getInfos();
     

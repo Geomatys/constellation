@@ -75,7 +75,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
 
     protected final DataSource source;
     
-    private static final Map<String, List<String>> RESPONSE_FORMAT = new HashMap<String, List<String>>();
+    private static final Map<String, List<String>> RESPONSE_FORMAT = new HashMap<>();
     static {
         RESPONSE_FORMAT.put("1.0.0", Arrays.asList(RESPONSE_FORMAT_V100));
         RESPONSE_FORMAT.put("2.0.0", Arrays.asList(RESPONSE_FORMAT_V200));
@@ -87,6 +87,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      *
      * @param configuration
      * @param properties
+     * @throws org.constellation.ws.CstlServiceException
      */
     public OM2ObservationReader(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
         super(properties);
@@ -340,12 +341,12 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      * {@inheritDoc}
      */
     @Override
-    public SamplingFeature getFeatureOfInterest(final String id, final String version) throws CstlServiceException {
+    public SamplingFeature getFeatureOfInterest(final String samplingFeatureName, final String version) throws CstlServiceException {
         try {
             final Connection c = source.getConnection();
             c.setReadOnly(true);
             try {
-                return getFeatureOfInterest(id, version, c);
+                return getFeatureOfInterest(samplingFeatureName, version, c);
             } finally {
                 c.close();
             }
@@ -403,8 +404,8 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
                 stmt.setInt(1, id);
                 final ResultSet rs = stmt.executeQuery();
                 if (rs.next()) {
-                    final String b  = rs.getString(2);
-                    final String e  = rs.getString(3);
+                    final String b  = rs.getString(3);
+                    final String e  = rs.getString(4);
                     if (b != null && e == null) {
                         time = buildTimeInstant(version, timeID, b.replace(' ', 'T'));
                     } else if (b != null && e != null) {
@@ -412,9 +413,9 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
                     } else {
                         time = null;
                     }
-                    observedProperty = rs.getString(4);
-                    procedure        = rs.getString(5);
-                    foi              = rs.getString(6);
+                    observedProperty = rs.getString(5);
+                    procedure        = rs.getString(6);
+                    foi              = rs.getString(7);
                     
                 } else {
                     return null;
@@ -540,7 +541,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
             oldTime = currentTime;
         }
         values.append(encoding.getBlockSeparator());
-        final AbstractDataRecord record = buildSimpleDatarecord(version, null, recordID, null, false, new ArrayList<AnyScalar>(fields.values()));
+        final AbstractDataRecord record = buildSimpleDatarecord(version, null, recordID, null, false, new ArrayList<>(fields.values()));
 
         return buildDataArrayProperty(version, arrayID, nbValue, arrayID, record, encoding, values.toString());
     }
