@@ -1,53 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Generator: Adobe Illustrator 15.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" [
-	<!ENTITY ns_extend "http://ns.adobe.com/Extensibility/1.0/">
-	<!ENTITY ns_ai "http://ns.adobe.com/AdobeIllustrator/10.0/">
-	<!ENTITY ns_graphs "http://ns.adobe.com/Graphs/1.0/">
-	<!ENTITY ns_vars "http://ns.adobe.com/Variables/1.0/">
-	<!ENTITY ns_imrep "http://ns.adobe.com/ImageReplacement/1.0/">
-	<!ENTITY ns_sfw "http://ns.adobe.com/SaveForWeb/1.0/">
-	<!ENTITY ns_custom "http://ns.adobe.com/GenericCustomNamespace/1.0/">
-	<!ENTITY ns_adobe_xpath "http://ns.adobe.com/XPath/1.0/">
-]>
-<svg version="1.1" id="Calque_1" xmlns:x="&ns_extend;" xmlns:i="&ns_ai;" xmlns:graph="&ns_graphs;"
-	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="872px" height="72px"
-	 viewBox="0 0 872 72" enable-background="new 0 0 872 72" xml:space="preserve">
-<metadata>
-	<sfw  xmlns="&ns_sfw;">
-		<slices></slices>
-		<sliceSourceBounds  y="37.048" x="-256.5" width="872.765" height="72.412" bottomLeftOrigin="true"></sliceSourceBounds>
-	</sfw>
-</metadata>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="872px" height="72px" viewBox="0 0 872 72" enable-background="new 0 0 872 72" xml:space="preserve">
 <rect x="-1" y="-0.583" fill="#EECDAE" width="872" height="72"/>
-<rect x="816.357" y="13.58" transform="matrix(1 0.0048 -0.0048 1 0.082 -3.9343)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.943" height="2.987"/>
-<rect x="803.824" y="38.765" transform="matrix(1 0.0046 -0.0046 1 0.1957 -3.7401)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.943" height="2.988"/>
-<rect x="796.77" y="23.441" transform="matrix(1 0.0046 -0.0046 1 0.1244 -3.7063)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.944" height="2.986"/>
-<rect x="858.754" y="32.612" transform="matrix(1 0.0046 -0.0046 1 0.1677 -3.994)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.944" height="2.986"/>
-<rect x="838.294" y="38.865" transform="matrix(1 0.0053 -0.0053 1 0.2259 -4.4529)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.946" height="2.986"/>
-<rect x="721.12" y="51.011" transform="matrix(1 0.0046 -0.0046 1 0.2515 -3.3525)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.946" height="2.986"/>
-<rect x="758.705" y="37.26" transform="matrix(1 0.0046 -0.0046 1 0.1881 -3.5294)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.944" height="2.986"/>
-<rect x="740.951" y="29.249" transform="matrix(1 0.0048 -0.0048 1 0.1564 -3.5678)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.946" height="2.987"/>
-<rect x="770.735" y="3.763" transform="matrix(1 0.0045 -0.0045 1 0.0313 -3.4587)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.943" height="2.987"/>
-<rect x="687.52" y="15.092" transform="matrix(1 0.0046 -0.0046 1 0.0844 -3.197)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.946" height="2.988"/>
-<rect x="619.398" y="41.749" transform="matrix(1 0.0043 -0.0043 1 0.1921 -2.6749)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.946" height="2.987"/>
-<rect x="606.835" y="7.05" transform="matrix(1 0.0048 -0.0048 1 0.0481 -2.9244)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.945" height="2.986"/>
-<rect x="572.755" y="48.051" transform="matrix(1 0.0046 -0.0046 1 0.2363 -2.6667)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.943" height="2.985"/>
-<rect x="528.154" y="8.561" transform="matrix(1 0.0045 -0.0045 1 0.0503 -2.3698)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.946" height="2.987"/>
-<rect x="545.193" y="16.544" transform="matrix(1 0.005 -0.005 1 0.0964 -2.7177)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.946" height="2.986"/>
-<rect x="533.698" y="51.794" transform="matrix(1 0.0046 -0.0046 1 0.2532 -2.4844)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.944" height="2.986"/>
-<rect x="559.382" y="30.739" transform="matrix(1 0.0048 -0.0048 1 0.1614 -2.696)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.945" height="2.987"/>
-<rect x="504.096" y="49.542" transform="matrix(1 0.0046 -0.0046 1 0.2423 -2.3455)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.946" height="2.988"/>
-<rect x="651.437" y="7.051" transform="matrix(1 0.0048 -0.0048 1 0.0486 -3.1378)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.946" height="2.986"/>
-<rect x="701.705" y="60.729" transform="matrix(1 0.0046 -0.0046 1 0.2963 -3.2623)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.946" height="2.985"/>
+<rect x="816.367" y="13.571" transform="matrix(-1 -0.0046 0.0046 -1 1635.5979 33.9298)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.942" height="2.987"/>
+<rect x="803.835" y="38.729" transform="matrix(-1 -0.0046 0.0046 -1 1610.4167 84.1886)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.942" height="2.988"/>
+<rect x="796.779" y="23.407" transform="matrix(-1 -0.0046 0.0046 -1 1596.3787 53.5056)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.944" height="2.986"/>
+<rect x="858.765" y="32.575" transform="matrix(-1 -0.0046 0.0046 -1 1720.3062 72.1302)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.944" height="2.986"/>
+<rect x="838.306" y="38.863" transform="matrix(-1 -0.0053 0.0053 -1 1679.3318 85.1649)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.946" height="2.985"/>
+<rect x="721.13" y="50.982" transform="matrix(-1 -0.0046 0.0046 -1 1444.9548 108.3027)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.946" height="2.985"/>
+<rect x="758.715" y="37.228" transform="matrix(-1 -0.0046 0.0046 -1 1520.186 80.9708)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.944" height="2.986"/>
+<rect x="740.959" y="29.245" transform="matrix(-1 -0.0048 0.0048 -1 1484.709 65.0443)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.946" height="2.987"/>
+<rect x="770.742" y="3.779" transform="matrix(-1 -0.0045 0.0045 -1 1544.3964 14.0042)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.943" height="2.987"/>
+<rect x="687.528" y="15.064" transform="matrix(-1 -0.0046 0.0046 -1 1377.9177 36.3136)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.946" height="2.988"/>
+<rect x="619.404" y="41.744" transform="matrix(-1 -0.0043 0.0043 -1 1241.5618 89.1495)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.946" height="2.987"/>
+<rect x="606.843" y="7.046" transform="matrix(-1 -0.0048 0.0048 -1 1216.5818 20.0026)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.944" height="2.986"/>
+<rect x="572.764" y="48.026" transform="matrix(-1 -0.0046 0.0046 -1 1148.2334 101.7047)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.942" height="2.984"/>
+<rect x="528.16" y="8.574" transform="matrix(-1 -0.0045 0.0045 -1 1059.2144 22.5067)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.945" height="2.987"/>
+<rect x="545.2" y="16.56" transform="matrix(-1 -0.005 0.005 -1 1093.2482 38.8235)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.945" height="2.986"/>
+<rect x="533.706" y="51.771" transform="matrix(-1 -0.0046 0.0046 -1 1070.1033 109.0128)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.944" height="2.985"/>
+<rect x="559.388" y="30.735" transform="matrix(-1 -0.0048 0.0048 -1 1121.5603 67.1531)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.945" height="2.987"/>
+<rect x="504.103" y="49.522" transform="matrix(-1 -0.0046 0.0046 -1 1010.9111 104.3786)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.946" height="2.988"/>
+<rect x="651.445" y="7.047" transform="matrix(-1 -0.0048 0.0048 -1 1305.7874 20.219)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.945" height="2.986"/>
+<rect x="701.715" y="60.701" transform="matrix(-1 -0.0046 0.0046 -1 1406.0798 127.65)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.946" height="2.985"/>
 <polyline opacity="0.13" fill="none" stroke="#000000" stroke-width="2" enable-background="new    " points="500.05,19.525 
 	547.627,44.241 598.078,40.176 619.396,15.024 668.53,21.543 688.075,-0.293 "/>
 <polyline opacity="0.13" fill="none" stroke="#000000" stroke-width="2" enable-background="new    " points="619.396,70.743 
 	651.43,38.842 740.378,41.771 759.655,55.3 798.244,-0.293 "/>
 <polyline opacity="0.13" fill="none" stroke="#000000" stroke-width="2" enable-background="new    " points="871,63.657 
 	831.967,17.331 816.855,57.738 777.697,55.3 766.662,70.743 "/>
-<polygon fill="#F2DAC3" enable-background="new    " points="571.545,-0.583 534.748,71.165 -0.011,71.417 0.01,-0.583 "/>
+<polygon fill="#F2DAC3" points="571.545,-0.583 534.748,71.165 -0.011,71.417 0.01,-0.583 "/>
 <path opacity="0.13" fill="none" stroke="#000000" stroke-width="0.75" enable-background="new    " d="M728.696,1.111"/>
-<rect x="656.216" y="51.012" transform="matrix(1 0.0053 -0.0053 1 0.2879 -3.4894)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.944" height="2.984"/>
-<rect x="707.348" y="8.578" transform="matrix(1 0.0046 -0.0046 1 0.0544 -3.2912)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.944" height="2.987"/>
+<rect x="656.226" y="51.008" transform="matrix(-1 -0.0053 0.0053 -1 1315.1077 108.4894)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.944" height="2.984"/>
+<rect x="707.356" y="8.547" transform="matrix(-1 -0.0046 0.0046 -1 1417.6021 23.3739)" opacity="0.13" fill="#3D3D3C" stroke="#000000" stroke-width="2" enable-background="new    " width="2.943" height="2.987"/>
 </svg>

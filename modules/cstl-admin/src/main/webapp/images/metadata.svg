@@ -1,26 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Generator: Adobe Illustrator 15.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" [
-	<!ENTITY ns_extend "http://ns.adobe.com/Extensibility/1.0/">
-	<!ENTITY ns_ai "http://ns.adobe.com/AdobeIllustrator/10.0/">
-	<!ENTITY ns_graphs "http://ns.adobe.com/Graphs/1.0/">
-	<!ENTITY ns_vars "http://ns.adobe.com/Variables/1.0/">
-	<!ENTITY ns_imrep "http://ns.adobe.com/ImageReplacement/1.0/">
-	<!ENTITY ns_sfw "http://ns.adobe.com/SaveForWeb/1.0/">
-	<!ENTITY ns_custom "http://ns.adobe.com/GenericCustomNamespace/1.0/">
-	<!ENTITY ns_adobe_xpath "http://ns.adobe.com/XPath/1.0/">
-]>
-<svg version="1.1" id="Calque_1" xmlns:x="&ns_extend;" xmlns:i="&ns_ai;" xmlns:graph="&ns_graphs;"
-	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="872px" height="72px"
-	 viewBox="0 0 872 72" enable-background="new 0 0 872 72" xml:space="preserve">
-<metadata>
-	<sfw  xmlns="&ns_sfw;">
-		<slices></slices>
-		<sliceSourceBounds  y="36.5" x="-255.138" width="872.229" height="72" bottomLeftOrigin="true"></sliceSourceBounds>
-	</sfw>
-</metadata>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="872px" height="72px" viewBox="0 0 872 72" enable-background="new 0 0 872 72" xml:space="preserve">
 <rect x="0.591" fill="#EECDAE" width="872" height="72"/>
-<image overflow="visible" opacity="0.8" enable-background="new    " width="117" height="70" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHYAAABHCAYAAADSgbMZAAAACXBIWXMAAAsSAAALEgHS3X78AAAA
+<image overflow="visible" opacity="0.8" enable-background="new    " width="118" height="71" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHYAAABHCAYAAADSgbMZAAAACXBIWXMAAAsSAAALEgHS3X78AAAA
 GXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAG59JREFUeNrsXelyG8mRzr7Q3Th5
 AIR4jClKWkvjsb0R418b4UfZt9nH2PfYl3CsI9YezXgc3p3YdWh0kKJI4j66e78vq6oJSCRGlkkJ
 ktURHSBxNKrrq8z88qiEJ5+PtTz+8If/qoVh2AiCIM3zvOb5flzkeZxl2ZNf/vJX//tTn/c+T+GH
@@ -146,9 +130,9 @@ D2qSpLGqUzr7nonAwVaOZMYUpG6eynQB9y56MsE4zC7/iVTrLbmzt7+kimmP7/3s4Nqw52Jnu7KX
 st3gZiTSMGYXf4+sKWTMugx7vtYcjTH9/mDAfaC1lcBisr7FOP6Dv35IMHnetptB4Pi7BBwwG2vx
 f9oqAnnTRendvQM9XUCBPSPOoTJTdmuF8PUGQ3nyf/8jvdFMurv7EnnQJn6oO/K427BaawDA5K2Z
 t6pl+9s5Zk+UMR1uO4jmuNnNlS3+sLBdwj16y+0z9lelX+I7Rv8vwAB4EdZn2nrHmQAAAABJRU5E
-rkJggg==" transform="matrix(0.9999 0 0 0.9999 545.9414 1.2627)">
+rkJggg==" transform="matrix(0.9914 0 0 0.9858 545.9414 1.2627)">
 </image>
-<polygon fill="#F2DAC3" enable-background="new    " points="525.134,0.05 485.96,71.68 0.362,71.68 0.376,0.05 "/>
+<polygon fill="#F2DAC3" points="525.134,0.05 485.96,71.68 0.362,71.68 0.376,0.05 "/>
 <g>
 	<polygon fill="#EECDAE" points="630.284,3.688 659.414,27.678 655.27,0.807 	"/>
 	<polygon fill="#DCDCDC" points="657.015,25.84 630.264,3.708 633.431,29.275 	"/>

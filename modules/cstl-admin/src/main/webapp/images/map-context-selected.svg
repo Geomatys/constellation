@@ -1,24 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Generator: Adobe Illustrator 15.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" [
-	<!ENTITY ns_extend "http://ns.adobe.com/Extensibility/1.0/">
-	<!ENTITY ns_ai "http://ns.adobe.com/AdobeIllustrator/10.0/">
-	<!ENTITY ns_graphs "http://ns.adobe.com/Graphs/1.0/">
-	<!ENTITY ns_vars "http://ns.adobe.com/Variables/1.0/">
-	<!ENTITY ns_imrep "http://ns.adobe.com/ImageReplacement/1.0/">
-	<!ENTITY ns_sfw "http://ns.adobe.com/SaveForWeb/1.0/">
-	<!ENTITY ns_custom "http://ns.adobe.com/GenericCustomNamespace/1.0/">
-	<!ENTITY ns_adobe_xpath "http://ns.adobe.com/XPath/1.0/">
-]>
-<svg version="1.1" id="Calque_1" xmlns:x="&ns_extend;" xmlns:i="&ns_ai;" xmlns:graph="&ns_graphs;"
-	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="872px" height="72px"
-	 viewBox="-1 -0.583 872 72" enable-background="new -1 -0.583 872 72" xml:space="preserve">
-<metadata>
-	<sfw  xmlns="&ns_sfw;">
-		<slices></slices>
-		<sliceSourceBounds  y="342.85" x="75.5" width="872" height="72" bottomLeftOrigin="true"></sliceSourceBounds>
-	</sfw>
-</metadata>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="872px" height="72px" viewBox="0 0 872 72" enable-background="new 0 0 872 72" xml:space="preserve">
 <g>
 	<rect x="-0.5" y="-0.435" fill="#707070" width="870.999" height="70.51"/>
 	<path fill="#707070" d="M870,0.062v69.516H0V0.062H870 M871-0.932h-1H0h-1v0.994v69.516v0.994h1h869.999h1v-0.994V0.062L871-0.932
@@ -26,27 +10,27 @@
 </g>
 <g opacity="0.5">
 	<ellipse fill="#FFFFFF" stroke="#2D2E82" stroke-miterlimit="10" cx="253.999" cy="27.184" rx="4.83" ry="3.546"/>
-	<text transform="matrix(1.3622 0 0 1 250.832 28.8774)" fill="#2D2E82" font-family="'MyriadPro-Regular'" font-size="5.7828">M</text>
+	<text transform="matrix(1.3622 0 0 1 250.832 28.877)" fill="#2D2E82" font-family="'MyriadPro-Regular'" font-size="5.7828">M</text>
 </g>
-<line opacity="0.08" fill="none" stroke="#1D1D1B" stroke-width="0.75" enable-background="new    " x1="611.595" y1="-0.139" x2="551.911" y2="70.558"/>
-<path fill="#696969" d="M678.87,69.578l1.091-3.059c0,0-14.006-9.392,7.503-10.311l9.003-15.025l-45.518-12.902l-22.972,41.297
+<line opacity="0.08" fill="none" stroke="#1D1D1B" stroke-width="0.75" enable-background="new    " x1="611.595" y1="-0.139" x2="551.911" y2="70.559"/>
+<path fill="#696969" d="M678.87,69.578l1.091-3.059c0,0-14.006-9.393,7.503-10.312l9.003-15.024l-45.518-12.902l-22.973,41.297
 	H678.87z"/>
 <path fill="#696969" d="M550.615,69.578h55.514c-30.532-8.872-140.794-40.851-147.254-41.799
-	c-7.503-1.102-212.582,17.257-212.582,17.257v18.359c0,0,197.576-18.359,209.081-18.359
+	c-7.503-1.102-212.582,17.257-212.582,17.257v18.358c0,0,197.576-18.358,209.081-18.358
 	C464.821,45.036,528.247,63.116,550.615,69.578z"/>
 <polygon fill="#696969" points="522.488,0.113 504.41,34.728 626.503,71.068 650.747,27.945 550.05,-0.013 "/>
 <g>
-	<polyline fill="none" stroke="#7C7B7B" stroke-width="3" stroke-miterlimit="10" points="628.544,69.269 666.21,0.65 
+	<polyline fill="none" stroke="#7C7B7B" stroke-width="3" stroke-miterlimit="10" points="628.544,69.27 666.21,0.65 
 		650.949,28.281 	"/>
 	<path fill="none" stroke="#7C7B7B" stroke-width="3" stroke-miterlimit="10" d="M678.691,70.238l1.27-3.719
-		c0,0,7.906,1.959,9.838-3.304c2.021-5.52-6.087-6.977-6.087-6.977s-6.418-2.009-8.603,4.491c-1.562,4.648,4.852,5.79,4.852,5.79"/>
-	<path fill="none" stroke="#7C7B7B" stroke-width="3" stroke-miterlimit="10" d="M696.467,41.183c0,0-2.397,9.347-9.9,15.986"/>
+		c0,0,7.906,1.959,9.838-3.305c2.021-5.52-6.087-6.977-6.087-6.977s-6.418-2.01-8.603,4.49c-1.562,4.648,4.852,5.791,4.852,5.791"/>
+	<path fill="none" stroke="#7C7B7B" stroke-width="3" stroke-miterlimit="10" d="M696.467,41.184c0,0-2.396,9.346-9.899,15.985"/>
 	<line fill="none" stroke="#7C7B7B" stroke-width="3" stroke-miterlimit="10" x1="791.763" y1="69.578" x2="650.949" y2="28.281"/>
 	<line fill="none" stroke="#7C7B7B" stroke-width="3" stroke-miterlimit="10" x1="713.126" y1="0.65" x2="696.406" y2="41.461"/>
-	<line fill="none" stroke="#7C7B7B" stroke-width="3" stroke-miterlimit="10" x1="799.229" y1="0.65" x2="774.083" y2="63.983"/>
-	<path fill="none" stroke="#7C7B7B" stroke-width="3" stroke-miterlimit="10" d="M853.335,70.238c0,0,1.594-15.52-74.635-17.882
-		l-79.396-17.964L633.897,2.785"/>
-	<line fill="none" stroke="#7C7B7B" stroke-width="3" stroke-miterlimit="10" x1="767.85" y1="0.65" x2="751.396" y2="46.179"/>
+	<line fill="none" stroke="#7C7B7B" stroke-width="3" stroke-miterlimit="10" x1="799.229" y1="0.65" x2="774.083" y2="63.982"/>
+	<path fill="none" stroke="#7C7B7B" stroke-width="3" stroke-miterlimit="10" d="M853.335,70.238c0,0,1.594-15.521-74.635-17.883
+		l-79.396-17.963L633.896,2.785"/>
+	<line fill="none" stroke="#7C7B7B" stroke-width="3" stroke-miterlimit="10" x1="767.85" y1="0.65" x2="751.396" y2="46.18"/>
 	<polygon fill="#7C7B7B" points="631.463,70.238 491.388,27.732 488.223,32.189 612.731,70.238 	"/>
 	<polygon fill="#7C7B7B" points="547.945,70.238 479.182,51.939 475.515,57.238 527.216,70.238 	"/>
 	<polygon fill="#7C7B7B" points="520.561,-0.013 503.204,31.318 506.193,33.064 525.351,-0.013 	"/>
@@ -55,12 +39,12 @@
 </g>
 <g opacity="0.5">
 	<ellipse fill="#FFFFFF" stroke="#2D2E82" stroke-miterlimit="10" cx="697.295" cy="42.793" rx="4.829" ry="3.545"/>
-	<text transform="matrix(1.3622 0 0 1 694.1279 44.4888)" fill="#2D2E82" font-family="'MyriadPro-Regular'" font-size="5.7828">M</text>
+	<text transform="matrix(1.3622 0 0 1 694.1279 44.4893)" fill="#2D2E82" font-family="'MyriadPro-Regular'" font-size="5.7828">M</text>
 </g>
 <polygon fill="#696969" points="717.717,-0.139 711.97,17.816 733.981,22.755 742.591,-0.139 "/>
 <g opacity="0.5">
-	<ellipse fill="#FFFFFF" stroke="#2D2E82" stroke-miterlimit="10" cx="778.7" cy="52.356" rx="4.829" ry="3.545"/>
-	<text transform="matrix(1.3622 0 0 1 775.5312 54.0532)" fill="#2D2E82" font-family="'MyriadPro-Regular'" font-size="5.7828">M</text>
+	<ellipse fill="#FFFFFF" stroke="#2D2E82" stroke-miterlimit="10" cx="778.7" cy="52.355" rx="4.829" ry="3.545"/>
+	<text transform="matrix(1.3622 0 0 1 775.5312 54.0527)" fill="#2D2E82" font-family="'MyriadPro-Regular'" font-size="5.7828">M</text>
 </g>
 <g opacity="0.5">
 	<ellipse fill="#FFFFFF" stroke="#2D2E82" stroke-miterlimit="10" cx="504.41" cy="33.065" rx="4.83" ry="3.545"/>
@@ -70,8 +54,8 @@
 <g>
 	<line fill="none" stroke="#696969" stroke-miterlimit="10" x1="706.415" y1="17.745" x2="785.66" y2="33.671"/>
 	<polyline fill="none" stroke="#696969" stroke-miterlimit="10" points="765.043,9.986 790.711,22.281 812.339,28.199 
-		847.353,0.623 	"/>
-	<line fill="none" stroke="#696969" stroke-miterlimit="10" x1="823.843" y1="0.623" x2="863.858" y2="69.019"/>
+		847.354,0.623 	"/>
+	<line fill="none" stroke="#696969" stroke-miterlimit="10" x1="823.843" y1="0.623" x2="863.858" y2="69.02"/>
 	<line fill="none" stroke="#696969" stroke-miterlimit="10" x1="782.319" y1="41.204" x2="854.775" y2="53.492"/>
 	<line fill="none" stroke="#696969" stroke-miterlimit="10" x1="806.196" y1="51.436" x2="808.529" y2="45.648"/>
 	<line fill="none" stroke="#696969" stroke-miterlimit="10" x1="818.548" y1="52.99" x2="819.199" y2="47.459"/>

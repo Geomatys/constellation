@@ -1,24 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Generator: Adobe Illustrator 15.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" [
-	<!ENTITY ns_extend "http://ns.adobe.com/Extensibility/1.0/">
-	<!ENTITY ns_ai "http://ns.adobe.com/AdobeIllustrator/10.0/">
-	<!ENTITY ns_graphs "http://ns.adobe.com/Graphs/1.0/">
-	<!ENTITY ns_vars "http://ns.adobe.com/Variables/1.0/">
-	<!ENTITY ns_imrep "http://ns.adobe.com/ImageReplacement/1.0/">
-	<!ENTITY ns_sfw "http://ns.adobe.com/SaveForWeb/1.0/">
-	<!ENTITY ns_custom "http://ns.adobe.com/GenericCustomNamespace/1.0/">
-	<!ENTITY ns_adobe_xpath "http://ns.adobe.com/XPath/1.0/">
-]>
-<svg version="1.1" id="Calque_1" xmlns:x="&ns_extend;" xmlns:i="&ns_ai;" xmlns:graph="&ns_graphs;"
-	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="872px" height="72px"
-	 viewBox="0 0 872 72" enable-background="new 0 0 872 72" xml:space="preserve">
-<metadata>
-	<sfw  xmlns="&ns_sfw;">
-		<slices></slices>
-		<sliceSourceBounds  y="0.5" x="-0.325" width="872" height="72" bottomLeftOrigin="true"></sliceSourceBounds>
-	</sfw>
-</metadata>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="872px" height="72px" viewBox="0 0 872 72" enable-background="new 0 0 872 72" xml:space="preserve">
 <rect x="0.175" fill="#A198C0" fill-opacity="0.5" width="872" height="72"/>
 <rect x="1.029" y="1.286" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.52" height="7.714"/>
 <rect x="8.548" y="9" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.521" height="7.714"/>
@@ -269,20 +253,20 @@
 <rect x="422.165" y="47.57" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.521" height="7.715"/>
 <rect x="414.646" y="24.429" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.521" height="7.713"/>
 <rect x="422.165" y="32.142" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.521" height="7.715"/>
-<rect x="429.688" y="39.857" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.52" height="7.715"/>
+<rect x="429.688" y="39.857" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.521" height="7.715"/>
 <rect x="399.604" y="55.285" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.521" height="7.715"/>
 <rect x="414.646" y="55.285" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.521" height="7.715"/>
-<rect x="429.688" y="55.285" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.52" height="7.715"/>
+<rect x="429.688" y="55.285" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.521" height="7.715"/>
 <rect x="437.205" y="47.57" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.521" height="7.715"/>
 <rect x="444.727" y="55.285" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.521" height="7.715"/>
 <rect x="444.727" y="39.857" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.521" height="7.715"/>
 <rect x="437.205" y="32.142" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.521" height="7.715"/>
-<rect x="429.688" y="24.429" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.52" height="7.713"/>
+<rect x="429.688" y="24.429" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.521" height="7.713"/>
 <rect x="422.165" y="16.713" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.521" height="7.716"/>
 <rect x="414.646" y="9" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.521" height="7.714"/>
 <rect x="407.124" y="1.286" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.521" height="7.714"/>
 <rect x="422.165" y="1.286" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.521" height="7.714"/>
-<rect x="429.688" y="9" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.52" height="7.714"/>
+<rect x="429.688" y="9" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.521" height="7.714"/>
 <rect x="437.205" y="1.286" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.521" height="7.714"/>
 <rect x="444.727" y="9" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.521" height="7.714"/>
 <rect x="437.205" y="16.713" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.521" height="7.716"/>
@@ -403,11 +387,11 @@
 <rect x="602.65" y="63" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.521" height="7.713"/>
 <rect x="617.691" y="63" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.521" height="7.713"/>
 <rect x="632.732" y="63" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.52" height="7.713"/>
-<path fill="#E9E9F1" d="M597.235,54.345c0,0-30.018,2.86-63.165-54.345h338.104v72H568.487
-	C568.487,72,581.584,57.555,597.235,54.345z"/>
-<path opacity="0.3" fill="#A198C0" enable-background="new    " d="M594.479,54.262c15.435,1.118,18.33-10.61,34.217-27.697
-	c7.811-8.398,19.873-7.58,19.873-7.58l11.39,23.75C659.957,42.735,645.43,81.121,594.479,54.262z"/>
+<path fill="#E9E9F1" d="M597.235,54.346c0,0-30.019,2.859-63.165-54.346h338.104v72H568.487
+	C568.487,72,581.584,57.555,597.235,54.346z"/>
+<path opacity="0.3" fill="#A198C0" enable-background="new    " d="M594.479,54.262c15.436,1.118,18.33-10.609,34.218-27.697
+	c7.811-8.398,19.873-7.58,19.873-7.58l11.39,23.75C659.957,42.734,645.43,81.121,594.479,54.262z"/>
 <path opacity="0.3" fill="#A198C0" enable-background="new    " d="M699.323,0.387c-8.215,3.97-15.886,7.679-18.866,9.12
-	c-7.602,3.667-25.748,5.847-25.748,5.847l11.39,23.749c0,0,12.458-14.051,20.063-17.726c6.502-3.146,35.329-17.077,43.424-20.989
-	H699.323z"/>
+	c-7.602,3.667-25.748,5.847-25.748,5.847l11.39,23.75c0,0,12.458-14.052,20.063-17.727c6.502-3.146,35.329-17.077,43.424-20.989
+	L699.323,0.387L699.323,0.387z"/>
 </svg>
