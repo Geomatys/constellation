@@ -465,6 +465,7 @@
             "source.database.username": "User name",
             "source.file": "File system",
             "source.file.description": "Sets of metadata records stored in the local file system",
+            "source.file.sml": "SensorML folder",
             "source.file.title": "File system",
             "source.file.path": "Folder path",
             "source.internal": "Internal",

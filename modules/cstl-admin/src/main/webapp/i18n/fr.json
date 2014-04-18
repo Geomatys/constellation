@@ -867,6 +867,7 @@
             "source.database.username": "Nom d'utilisateur",
             "source.file": "Système de fichiers",
             "source.file.description": "Jeu de métadonnées stocké dans le système de fichiers local",
+            "source.file.sml": "Dossier contenant des fichiers SensorML",
             "source.file.title": "Système de fichiers",
             "source.file.path": "Chemin du dossier",
             "source.internal": "Interne",
