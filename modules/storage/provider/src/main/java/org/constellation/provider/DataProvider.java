@@ -39,6 +39,8 @@ public interface DataProvider extends Provider<Name,Data>{
     
     ElevationModel getElevationModel(Name name);
 
+    Data get(String key);
+    
     /**
      * Get the data related to the given key in given version.
      * @return LayerDetails if it is in the data provider, or null if not.
