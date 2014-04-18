@@ -352,11 +352,11 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
         $scope.measures = undefined;
         $scope.initSensors = function() {
             sos.listSensors({id: $routeParams.id}, function(response) {
-                $scope.sensors = response;
+                $scope.sensors = response.Entry;
             }, function() { $growl('error','Error','Unable to list sensors'); });
 
             sos.listMeasures({id: $routeParams.id}, function(response) {
-                $scope.measures = response;
+                $scope.measures = response.Entry;
             }, function() { $growl('error','Error','Unable to list measures'); });
         };
 
