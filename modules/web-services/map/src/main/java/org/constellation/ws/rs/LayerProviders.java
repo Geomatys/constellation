@@ -413,7 +413,7 @@ public final class LayerProviders extends Static {
      * @return the {@link Data} instance
      * @throws CstlServiceException if the provider or the layer does not exists
      */
-    private static Data getLayer(final String providerId, final String layerName) throws CstlServiceException {
+    public static Data getLayer(final String providerId, final String layerName) throws CstlServiceException {
         return getLayer(getProvider(providerId), layerName);
     }
 

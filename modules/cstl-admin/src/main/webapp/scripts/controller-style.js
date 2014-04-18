@@ -245,6 +245,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             return choice === $scope.stylechooser;
         };
 
+        $scope.isgeophys = false;
         $scope.initScopeStyle = function() {
             // Page to include
             $scope.pageSld = ($scope.dataType.toLowerCase() === 'vector' || $scope.dataType === 'feature-store') ? "views/style/vectors.html" : "views/style/raster.html";
@@ -253,6 +254,11 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                 $dashboard($scope, response.styles, true);
                 $scope.filtertype = $scope.initFilterType();
             });
+            
+            provider.isGeophysic({providerId: $scope.providerId, dataId: $scope.layerName}, function(response) {
+                $scope.isgeophys = (response.value == 'true');
+            });
+            
         };
 
         $scope.initScopeData = function() {
