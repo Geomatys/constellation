@@ -180,9 +180,11 @@
                 </gmd:MD_Resolution>
             </gmd:spatialResolution>
             <%}%>
+            <% if (param.dataLocale!= null){%>
             <gmd:language>
                 <gco:CharacterString>${param.dataLocale}</gco:CharacterString>
             </gmd:language>
+            <%}%>
             <% if (param.topicCategory!= null){%>
             <gmd:topicCategory>
                 <gmd:MD_TopicCategoryCode>${param.topicCategory}</gmd:MD_TopicCategoryCode>
