@@ -364,9 +364,9 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
             final Connection c         = source.getConnection();
             c.setReadOnly(true);
             try {
-                final String idToParse;
+                final String observationID;
                 if (identifier.startsWith(observationIdBase)) {
-                    idToParse = identifier.substring(observationIdBase.length());
+                    observationID = identifier.substring(observationIdBase.length());
                 } else if (identifier.startsWith(observationTemplateIdBase)) {
                     final String procedureID     = sensorIdBase + identifier.substring(observationTemplateIdBase.length());
                     final PreparedStatement stmt = c.prepareStatement("SELECT \"id\" FROM \"om\".\"observations\" WHERE \"procedure\"=?");
@@ -383,25 +383,19 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
                     if (oid == null) {
                         return null;
                     }
-                    idToParse = oid;
+                    observationID = oid;
                 } else {
-                    idToParse = identifier;
+                    observationID = identifier;
                 }
-                final int id;
-                try {
-                    id = Integer.parseInt(idToParse);
-                } catch (NumberFormatException ex) {
-                    throw new CstlServiceException("observation id can't be parsed as an integer:" + idToParse);
-                }
-                final String obsID = "obs-" + idToParse;
-                final String timeID = "time-" + idToParse;
+
+                final String timeID = "time-" + observationID;
                 final String observedProperty;
                 final String procedure;
                 final String foi;
                 final TemporalGeometricPrimitive time;
                 
-                final PreparedStatement stmt  = c.prepareStatement("SELECT * FROM \"om\".\"observations\" WHERE \"id\"=?");
-                stmt.setInt(1, id);
+                final PreparedStatement stmt  = c.prepareStatement("SELECT * FROM \"om\".\"observations\" WHERE \"identifier\"=?");
+                stmt.setString(1, identifier);
                 final ResultSet rs = stmt.executeQuery();
                 if (rs.next()) {
                     final String b  = rs.getString(3);
@@ -426,21 +420,19 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
                 final Phenomenon phen         = getPhenomenon(version, observedProperty, c);
                 
                 final String name;
-                if (identifier.startsWith(observationIdBase)) {
-                    name = identifier;
-                } else if (ResponseModeType.RESULT_TEMPLATE.equals(mode)) {
+                if (ResponseModeType.RESULT_TEMPLATE.equals(mode)) {
                     final String procedureID = procedure.substring(sensorIdBase.length());
                     name = observationTemplateIdBase + procedureID;
                 } else {
-                    name = observationIdBase + idToParse;
+                    name = identifier;
                 }
 
                 if (resultModel.equals(MEASUREMENT_QNAME)) {
                     final Object result = getResult(identifier, resultModel, version); 
-                    return OMXmlFactory.buildMeasurement(version, obsID, name, null, prop, phen, procedure, result, time);
+                    return OMXmlFactory.buildMeasurement(version, identifier, name, null, prop, phen, procedure, result, time);
                 } else {
-                    final Object result = getResult(idToParse, resultModel, version);
-                    return OMXmlFactory.buildObservation(version, obsID, name, null, prop, phen, procedure, result, time);
+                    final Object result = getResult(identifier, resultModel, version);
+                    return OMXmlFactory.buildObservation(version, identifier, name, null, prop, phen, procedure, result, time);
                 }
             } finally {
                 c.close();
@@ -485,16 +477,13 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
         final List<String> fieldDef   = new ArrayList<>();
         final List<String> fieldNames = new ArrayList<>();
         
-        final PreparedStatement stmt  = c.prepareStatement("SELECT \"value\", \"field_type\", \"uom\", \"time\" ,\"field_definition\", \"field_name\""
-                                                         + "FROM \"om\".\"mesures\" "
-                                                         + "WHERE \"id_observation\"=?");
-        final int id;
-        try {
-            id = Integer.parseInt(identifier);
-        } catch (NumberFormatException ex) {
-            throw new CstlServiceException("Unable to parse result ID:" + identifier);
-        }
-        stmt.setInt(1, id);
+        final PreparedStatement stmt  = c.prepareStatement("SELECT \"value\", \"field_type\", \"uom\", \"time\" ,\"field_definition\", \"field_name\" "
+                                                         + "FROM \"om\".\"mesures\" m, \"om\".\"observations\" o "
+                                                         + "WHERE \"id_observation\" = o.\"id\" "
+                                                         + "AND o.\"identifier\"=?"
+                                                         + "ORDER BY m.\"id\"");
+        
+        stmt.setString(1, identifier);
         final ResultSet rs = stmt.executeQuery();
         while (rs.next()) {
             value.add(rs.getString(1));
@@ -515,6 +504,8 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
         final StringBuilder values = new StringBuilder();
         int nbValue = 0;
         Timestamp oldTime = null;
+        int nbFieldWritten = 0;
+        int totalField = 0;
         for (int i = 0; i < uom.size(); i++) {
             final String fieldName = fieldNames.get(i);
             if (!fields.containsKey(fieldName)) {
@@ -522,14 +513,17 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
                 if ("Quantity".equals(fieldType.get(i))) {
                     final UomProperty uomCode = buildUomProperty(version, uom.get(i), null);
                     compo = buildQuantity(version, fieldDef.get(i), uomCode, null);
+                } else if ("Text".equals(fieldType.get(i))) {
+                    compo = buildText(version, fieldDef.get(i), null);
                 } else {
                     throw new IllegalArgumentException("Unexpected field Type:" + fieldType);
                 }
                 final AnyScalar scalar = buildAnyScalar(version, null, fieldName, compo);
                 fields.put(fieldName, scalar);
+                totalField++;
             }
             final Timestamp currentTime = time.get(i);
-            if (currentTime.equals(oldTime)) {
+            if (currentTime.equals(oldTime) && nbFieldWritten != totalField) {
                 values.append(encoding.getTokenSeparator()).append(value.get(i));
             } else {
                 nbValue++;
@@ -537,7 +531,9 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
                     values.append(encoding.getBlockSeparator());
                 }
                 values.append(format.format(currentTime)).append(encoding.getTokenSeparator()).append(value.get(i));
+                nbFieldWritten = 0;
             }
+            nbFieldWritten ++;
             oldTime = currentTime;
         }
         values.append(encoding.getBlockSeparator());

@@ -292,6 +292,8 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             return getMesurements(version);
         }
         try {
+            // add orderby to the query
+            sqlRequest.append(" ORDER BY o.\"id\", m.\"id\"");
             final Map<String, Observation> observations = new HashMap<>();
             final Connection c                          = source.getConnection();
             final Statement currentStatement            = c.createStatement();
@@ -303,6 +305,8 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             int nbValue                                 = 0;
             final Map<String, AnyScalar> fields         = new LinkedHashMap<>();
             Observation currentObservation              = null;
+            int nbFieldWritten                          = 0;
+            int totalField                              = 0;
             
             while (rs.next()) {
                 final String procedure        = rs.getString("procedure");
@@ -320,8 +324,10 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                         final Object result = buildComplexResult(version, fields.values(), nbValue, encoding, values.toString(), observations.size() -1);
                         ((AbstractObservation)currentObservation).setResult(result);
                         ((AbstractObservation)currentObservation).extendSamplingTime(format.format(oldTime));
-                        values  = new StringBuilder();
-                        nbValue = 0;
+                        values         = new StringBuilder();
+                        nbValue        = 0;
+                        totalField     = 0;
+                        nbFieldWritten = 0;
                         fields.clear();
                     }
                     
@@ -347,9 +353,11 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                     
                     final AnyScalar scalar = buildField(version, fieldName, fieldType, uom, fieldDef);
                     fields.put(fieldName, scalar);
+                    totalField++;
                         
                     values.append(format.format(currentTime)).append(encoding.getTokenSeparator()).append(value);
                     nbValue++;
+                    nbFieldWritten++;
                     
                     currentObservation = OMXmlFactory.buildObservation(version, obsID, name, null, prop, phen, procedure, null, time);
                     observations.put(procedure + '-' + featureID, currentObservation);
@@ -365,17 +373,20 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                         final String fieldDef   = rs.getString("field_definition");
                         final AnyScalar scalar  = buildField(version, fieldName, fieldType, uom, fieldDef);
                         fields.put(fieldName, scalar);
+                        totalField++;
                     }
                     
                     /*
                      *  UPDATE RESULT
                      */
-                    if (!currentTime.equals(oldTime)) {
+                    if (!currentTime.equals(oldTime) || nbFieldWritten == totalField) {
                         values.append(encoding.getBlockSeparator()).append(format.format(currentTime)).append(encoding.getTokenSeparator()).append(value);
                         nbValue++;
+                        nbFieldWritten = 0;
                     } else {
                         values.append(encoding.getTokenSeparator()).append(value);
                     }
+                    nbFieldWritten++;
                     
                 }
             
@@ -428,6 +439,9 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
     
     public List<Observation> getMesurements(final String version) throws CstlServiceException {
         try {
+            // add orderby to the query
+            sqlRequest.append(" ORDER BY o.\"id\", m.\"id\"");
+            
             final List<Observation> observations        = new ArrayList<>();
             final Connection c                          = source.getConnection();
             c.setReadOnly(true);
@@ -483,6 +497,9 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
     @Override
     public String getResults() throws CstlServiceException {
         try {
+            // add orderby to the query
+            sqlRequest.append(" ORDER BY  o.\"id\", m.\"id\"");
+            
             final Connection c                          = source.getConnection();
             c.setReadOnly(true);
             final Statement currentStatement            = c.createStatement();
