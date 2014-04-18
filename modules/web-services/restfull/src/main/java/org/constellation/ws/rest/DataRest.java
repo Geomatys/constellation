@@ -86,10 +86,7 @@ import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.provider.coveragestore.CoverageStoreProvider;
 import org.constellation.security.SecurityManagerHolder;
 import org.constellation.util.SimplyMetadataTreeNode;
-import org.constellation.utils.GeotoolkitFileExtensionAvailable;
-import org.constellation.utils.ISOMarshallerPool;
-import org.constellation.utils.MetadataFeeder;
-import org.constellation.utils.MetadataUtilities;
+import org.constellation.utils.*;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.coverage.CoverageUtilities;
@@ -518,13 +515,13 @@ public class DataRest {
     }
 
     
-    @GET
-    @Path("metadata")
+    @POST
+    @Path("metadata/data")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getDataMetadata(final ParameterValues values) {
         final String providerId = values.getValues().get("providerId");
-        final String dataName   = values.getValues().get("providerId");
+        final String dataName   = values.getValues().get("dataName");
         final DefaultMetadata metadata;
         if (dataName != null) {
             final QName name = QName.valueOf(dataName);
@@ -589,6 +586,10 @@ public class DataRest {
             }
             //Update metadata
             final Properties prop = ConfigurationEngine.getMetadataTemplateProperties();
+            final String metadataID = CstlMetadatas.getMetadataIdForData(providerId, dataName);
+            prop.put("fileId", metadataID);
+            prop.put("dataTitle", dataName);
+            prop.put("dataAbstract", "");
             final DefaultMetadata templateMetadata = MetadataUtilities.getTemplateMetadata(prop);
             
             DefaultMetadata mergedMetadata = new DefaultMetadata();

@@ -149,6 +149,21 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','data
         $scope.metadata = {};
         $scope.metadata.keywords = [];
 
+        dataListing.getDataMetadata({}, {values: {'providerId': $scope.provider}}, function(response) {
+            if (response) {
+                $scope.metadata.title = response.title;
+                $scope.metadata.anAbstract = response.anAbstract;
+                $scope.metadata.keywords = response.keywords;
+                $scope.metadata.username = response.username;
+                $scope.metadata.organisationName = response.organisationName;
+                $scope.metadata.role = response.role;
+                $scope.metadata.localeData = response.localeMetadata;
+                $scope.metadata.topicCategory = response.topicCategory;
+                $scope.metadata.date = response.date;
+                $scope.metadata.dateType = response.dateType;
+            }
+        });
+
         $scope.selectTab = function(item) {
             if (item === 'tabiso') {
                 $scope.tabiso = true;

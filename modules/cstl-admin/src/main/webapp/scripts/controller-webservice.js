@@ -333,7 +333,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
         $scope.initScope = function() {
             if ($scope.type === 'csw') {
                 csw.count({id: $routeParams.id}, {}, function(max) {
-                    csw.getRecords({id: $routeParams.id, count: max.asInt, startIndex: 0}, {}, function(response) {
+                    csw.getRecords({id: $routeParams.id, count: max.value, startIndex: 0}, {}, function(response) {
                         $dashboard($scope, response.BriefNode, false);
                         $scope.filtertype = "";
 

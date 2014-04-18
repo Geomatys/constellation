@@ -152,7 +152,7 @@ cstlAdminApp.factory('dataListing', ['$resource',
             'mergeMetadata':  {method: 'POST', url: '@cstl/api/1/data/metadata/merge;jsessionid='},
             'metadata': {method: 'GET', url: '@cstl/api/1/data/metadata/iso/:providerId/:dataId;jsessionid='},
             'dataForMetadata': {method:'POST', url: '@cstl/api/1/data/metadata/associated;jsessionid='},
-            'getDataMetadata': {method:'GET', url: '@cstl/api/1/data/metadata/associated;jsessionid='},
+            'getDataMetadata': {method:'POST', url: '@cstl/api/1/data/metadata/data;jsessionid='},
             'codeLists':    {method: 'GET', url: '@cstl/api/1/data/metadataCodeLists/:lang;jsessionid='}
         });
     }]);
