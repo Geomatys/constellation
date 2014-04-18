@@ -110,6 +110,17 @@ cstlAdminApp.controller('LogoutController', ['$location', 'AuthenticationSharedS
         });
     }]);
 
+cstlAdminApp.controller('ModalInstanceCtrl', ['$scope', '$modalInstance', function($scope, $modalInstance){
+    $scope.ok = function () {
+    $modalInstance.close();
+  };
+
+  $scope.cancel = function () {
+    $modalInstance.dismiss();
+  };
+}]);
+
+
 cstlAdminApp.controller('ContactController', ['$scope', 'Contact',
                                                function ($scope, Contact) {
 	$scope.data = Contact.get();
