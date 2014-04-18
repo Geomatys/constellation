@@ -16,6 +16,7 @@
  */
 package org.constellation.scheduler;
 
+import org.constellation.scheduler.configuration.XMLTasksWriter;
 import java.util.Collection;
 import java.io.File;
 import java.io.IOException;
@@ -85,7 +86,7 @@ public class TasksWriterTest {
         
         final File tempfile = File.createTempFile("tasks", ".xml");
         tempfile.deleteOnExit();
-        final TasksWriter writer = new TasksWriter();
+        final XMLTasksWriter writer = new XMLTasksWriter();
         writer.setOutput(tempfile);
         writer.write(tasks);
         writer.dispose();

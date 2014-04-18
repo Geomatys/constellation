@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.scheduler;
+package org.constellation.scheduler.configuration;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -31,6 +31,7 @@ import java.util.List;
 import java.io.IOException;
 import java.util.ArrayList;
 import javax.xml.stream.XMLStreamException;
+import org.constellation.scheduler.Task;
 
 import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.process.quartz.ProcessJobDetail;
@@ -44,7 +45,7 @@ import org.quartz.SimpleScheduleBuilder;
 import org.quartz.TriggerBuilder;
 
 import static javax.xml.stream.XMLStreamReader.*;
-import static org.constellation.scheduler.TasksConstants.*;
+import static org.constellation.scheduler.configuration.XMLTasksConstants.*;
 
 /**
  * Reader tasks from an xml file. A task can get a repeat step (in seconds), a start date ( formatted as YYYY/MM/dd HH:mm:ss)
@@ -59,9 +60,9 @@ import static org.constellation.scheduler.TasksConstants.*;
  * @author Alexis Manin (Geomatys)
  * @module pending
  */
-public class TasksReader extends StaxStreamReader{
+public class XMLTasksReader extends StaxStreamReader{
     
-    public TasksReader(){
+    public XMLTasksReader(){
         
     }
     
@@ -79,7 +80,7 @@ public class TasksReader extends StaxStreamReader{
     }
     
     private List<Task> readTasks() throws XMLStreamException, IOException {
-        final List<Task> tasks = new ArrayList<Task>();
+        final List<Task> tasks = new ArrayList<>();
         
         while (reader.hasNext()) {
             final int type = reader.next();
@@ -90,7 +91,7 @@ public class TasksReader extends StaxStreamReader{
                     t = readTask();
                 } catch (NoSuchIdentifierException ex) {
                     t = null;
-                    Logging.getLogger(TasksReader.class).log(Level.WARNING, ex.getMessage());
+                    Logging.getLogger(XMLTasksReader.class).log(Level.WARNING, ex.getMessage());
                 }
                 if(t != null){
                     tasks.add(t);

@@ -14,18 +14,19 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.scheduler;
+package org.constellation.scheduler.configuration;
 
 import java.io.IOException;
 import java.util.Collection;
 import javax.xml.stream.XMLStreamException;
+import org.constellation.scheduler.Task;
 import org.geotoolkit.process.quartz.ProcessJobDetail;
 import org.geotoolkit.xml.StaxStreamWriter;
 import org.geotoolkit.xml.parameter.ParameterValueWriter;
 import org.opengis.parameter.ParameterValueGroup;
 import org.quartz.SimpleTrigger;
 
-import static org.constellation.scheduler.TasksConstants.*;
+import static org.constellation.scheduler.configuration.XMLTasksConstants.*;
 
 /**
  * Write tasks in xml.
@@ -33,9 +34,9 @@ import static org.constellation.scheduler.TasksConstants.*;
  * @author Johann Sorel (Geomatys)
  * @module pending
  */
-public class TasksWriter extends StaxStreamWriter{
+public class XMLTasksWriter extends StaxStreamWriter{
 
-    public TasksWriter() {
+    public XMLTasksWriter() {
     }
     
     public void write(final Collection<? extends Task> tasks) throws XMLStreamException, IOException{

@@ -16,10 +16,6 @@
  */
 package org.constellation.scheduler;
 
-import java.util.Properties;
-
-import org.geotoolkit.internal.SetupService;
-
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 

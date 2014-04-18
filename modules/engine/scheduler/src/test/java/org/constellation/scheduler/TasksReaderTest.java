@@ -16,6 +16,7 @@
  */
 package org.constellation.scheduler;
 
+import org.constellation.scheduler.configuration.XMLTasksReader;
 import java.util.List;
 import java.io.IOException;
 import javax.xml.stream.XMLStreamException;
@@ -40,7 +41,7 @@ public class TasksReaderTest {
     @Test
     public void testReader() throws IOException, XMLStreamException {
         
-        final TasksReader reader = new TasksReader();
+        final XMLTasksReader reader = new XMLTasksReader();
         reader.setInput(TasksReaderTest.class.getResource("/org/constellation/scheduler/tasks.xml"));
         
         final List<Task> tasks = reader.read();
