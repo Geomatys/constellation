@@ -279,8 +279,8 @@ cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routePar
         };
     }]);
 
-cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'webService', 'dataListing', 'provider', 'csw', '$modal','textService', '$dashboard', '$growl', '$filter', 'StyleSharedService','style','$cookies',
-    function ($scope, $routeParams , webService, dataListing, provider, csw, $modal, textService, $dashboard, $growl, $filter, StyleSharedService, style, $cookies) {
+cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'webService', 'dataListing', 'provider', 'csw', 'sos', '$modal','textService', '$dashboard', '$growl', '$filter', 'StyleSharedService','style','$cookies',
+    function ($scope, $routeParams , webService, dataListing, provider, csw, sos, $modal, textService, $dashboard, $growl, $filter, StyleSharedService, style, $cookies) {
         $scope.tagText = '';
         $scope.type = $routeParams.type;
         $scope.url = $cookies.cstlUrl + "WS/" + $routeParams.type + "/" + $routeParams.id;
@@ -346,6 +346,18 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
                     $scope.filtertype = "";
                 });
             }
+        };
+
+        $scope.sensors = undefined;
+        $scope.measures = undefined;
+        $scope.initSensors = function() {
+            sos.listSensors({id: $routeParams.id}, function(response) {
+                $scope.sensors = response;
+            }, function() { $growl('error','Error','Unable to list sensors'); });
+
+            sos.listMeasures({id: $routeParams.id}, function(response) {
+                $scope.measures = response;
+            }, function() { $growl('error','Error','Unable to list measures'); });
         };
 
         $scope.getVersionsForType = function() {

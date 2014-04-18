@@ -152,6 +152,7 @@ cstlAdminApp.factory('dataListing', ['$resource',
             'mergeMetadata':  {method: 'POST', url: '@cstl/api/1/data/metadata/merge;jsessionid='},
             'metadata': {method: 'GET', url: '@cstl/api/1/data/metadata/iso/:providerId/:dataId;jsessionid='},
             'dataForMetadata': {method:'POST', url: '@cstl/api/1/data/metadata/associated;jsessionid='},
+            'getDataMetadata': {method:'GET', url: '@cstl/api/1/data/metadata/associated;jsessionid='},
             'codeLists':    {method: 'GET', url: '@cstl/api/1/data/metadataCodeLists/:lang;jsessionid='}
         });
     }]);
@@ -187,6 +188,16 @@ cstlAdminApp.factory('csw', ['$resource',
             'downloadMd': {method: 'GET',  url: '@cstl/api/1/CSW/:id/record/download/:metaId;jsessionid='},
             'refresh':    {method: 'POST', url: '@cstl/api/1/CSW/:id/index/refresh;jsessionid='},
             'delete':     {method: 'DELETE', url: '@cstl/api/1/CSW/:id/record/:metaId;jsessionid='}
+        });
+    }]);
+
+cstlAdminApp.factory('sos', ['$resource',
+    function ($resource) {
+        return $resource('@cstl/api/1/SOS', {}, {
+            'count':        {method: 'GET',  url: '@cstl/api/1/SOS/:id/sensors/count;jsessionid='},
+            'add':          {method: 'PUT',  url: '@cstl/api/1/SOS/:id/observations;jsessionid='},
+            'listSensors':  {method: 'GET',  url: '@cstl/api/1/SOS/:id/sensors;jsessionid=', isArray: true},
+            'listMeasures': {method: 'GET',  url: '@cstl/api/1/SOS/:id/measures;jsessionid=', isArray: true}
         });
     }]);
 
