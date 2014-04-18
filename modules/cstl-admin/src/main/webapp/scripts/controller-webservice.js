@@ -17,8 +17,13 @@
 
 cstlAdminApp.controller('WebServiceController', ['$scope', 'webService', 'csw', '$modal', 'textService', '$growl',
     function ($scope, webService, csw, $modal, textService, $growl) {
-
-        $scope.services = webService.listAll();
+        var modalLoader = $modal.open({
+          templateUrl: 'views/modalLoader.html',
+          controller: 'ModalInstanceCtrl'
+        });
+        $scope.services = webService.listAll(function(){
+            modalLoader.close();
+        });
 
         // Show Capa methods
         $scope.showCapa = function(service) {

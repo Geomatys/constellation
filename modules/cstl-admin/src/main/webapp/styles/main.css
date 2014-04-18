@@ -1,3 +1,6 @@
+[ng\:cloak], [ng-cloak], .ng-cloak {
+ display: none !important;
+}
 .header {
     color: white;
     background-color: #313131;

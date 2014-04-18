@@ -17,10 +17,14 @@
 
 cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 'webService', 'dataListing', 'provider', 'style', '$modal', '$growl', 'StyleSharedService', '$cookies',
     function ($scope, $location, $dashboard, webService, dataListing, provider, style, $modal, $growl, StyleSharedService, $cookies) {
-
+        var modalLoader = $modal.open({
+          templateUrl: 'views/modalLoader.html',
+          controller: 'ModalInstanceCtrl'
+        });
         dataListing.listAll({}, function(response) {
             $dashboard($scope, response, true);
             $scope.filtertype = "";
+            modalLoader.close();
         });
 
         // Map methods

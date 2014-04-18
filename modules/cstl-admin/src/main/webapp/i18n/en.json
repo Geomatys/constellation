@@ -534,7 +534,8 @@
             "log.modal.close": "Close",
             "refresh.label": "Refresh",
             "show.label": "Show",
-            "url.label": "Service URL"
+            "url.label": "Service URL",
+            "loader.modal.title": "Loading..."
         }
     },
     "style.listing": {

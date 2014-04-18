@@ -110,7 +110,6 @@ cstlAdminApp.controller('LogoutController', ['$location', 'AuthenticationSharedS
         });
     }]);
 
-
 cstlAdminApp.controller('ContactController', ['$scope', 'Contact',
                                                function ($scope, Contact) {
 	$scope.data = Contact.get();
@@ -127,6 +126,9 @@ cstlAdminApp.controller('ContactController', ['$scope', 'Contact',
        });
     };
 }]);
+
+
+
 
 cstlAdminApp.controller('SettingsController', ['$scope', 'resolvedAccount', 'Account',
     function ($scope, resolvedAccount, Account) {
@@ -276,3 +278,5 @@ cstlAdminApp.controller('LogsController', ['$scope', 'resolvedLogs', 'LogsServic
             });
         };
     }]);
+
+

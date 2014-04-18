@@ -16,12 +16,16 @@
 'use strict';
 
 
-cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', '$growl', 'StyleSharedService',
-    function ($scope, $dashboard, style, $growl, StyleSharedService) {
-
+cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', '$growl', 'StyleSharedService','$modal',
+    function ($scope, $dashboard, style, $growl, StyleSharedService, $modal) {
+        var modalLoader = $modal.open({
+          templateUrl: 'views/modalLoader.html',
+          controller: 'ModalInstanceCtrl'
+        });
         style.listAll({}, function(response) {
             $dashboard($scope, response.styles, true);
             $scope.filtertype = "";
+            modalLoader.close();
         });
 
         $scope.deleteStyle = function() {

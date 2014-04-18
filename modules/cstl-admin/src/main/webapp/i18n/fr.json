@@ -1,4 +1,13 @@
 {
+    "city": "Ville",
+    "country": "Pays",
+    "fax": "Fax",
+    "name": "Nom",
+    "organization": "Organisation",
+    "phone": "Téléphone",
+    "position": "Position",
+    "zip": "Code postal",
+    "save": "Enregistrer",
     "adddata": {
         "popup": {
             "datalist": {
@@ -990,7 +999,8 @@
             },
             "url": {
                 "label": "URL du service"
-            }
+            },
+            "loader.modal.title": "Chargement"
         }
     },
     "sessions": {
@@ -1043,6 +1053,12 @@
                     "maxlength": "Votre nom ne doit pas comporter plus de 50 caractères",
                     "minlength": "Votre nom doit comporter au moins un caractère",
                     "required": "Votre nom est requis."
+                },
+                "password": {
+                    "required": "Votre mot de passe est requis.",
+                    "invalid": "Votre mot de passe est invalide.",
+                    "minlength": "Votre mot de passe doit comporter au moins 6 caractères",
+                    "maxlength": "Votre mot de passe ne peux pas dépasser 62 caractères"
                 }
             }
         },
