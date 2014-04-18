@@ -306,9 +306,10 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             
             while (rs.next()) {
                 final String procedure        = rs.getString("procedure");
+                final String featureID        = rs.getString("foi");
                 final Timestamp currentTime   = rs.getTimestamp("time");
                 final String value            = rs.getString("value");
-                final Observation observation = observations.get(procedure);
+                final Observation observation = observations.get(procedure + '-' + featureID);
                 
                 if (observation == null) {
                     
@@ -328,7 +329,6 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                     final String obsID            = "obs-"  + oid;
                     final String timeID           = "time-" + oid;
                     final String name             = rs.getString("identifier");
-                    final String featureID        = rs.getString("foi");
                     final String observedProperty = rs.getString("observed_property");
                     final SamplingFeature feature = getFeatureOfInterest(featureID, version, c);
                     final FeatureProperty prop    = buildFeatureProperty(version, feature); 
@@ -352,7 +352,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                     nbValue++;
                     
                     currentObservation = OMXmlFactory.buildObservation(version, obsID, name, null, prop, phen, procedure, null, time);
-                    observations.put(procedure, currentObservation);
+                    observations.put(procedure + '-' + featureID, currentObservation);
                 } else {
                     
                     /*

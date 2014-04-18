@@ -29,6 +29,7 @@ import javax.ws.rs.core.Response;
 import org.constellation.ServiceDef;
 import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.configuration.ServiceConfigurer;
+import org.constellation.configuration.StringList;
 import org.constellation.dto.SimpleValue;
 import org.constellation.sos.configuration.SOSConfigurer;
 import static org.constellation.utils.RESTfulUtilities.ok;
@@ -62,6 +63,12 @@ public class SOSServices {
     }
     
     @GET
+    @Path("{id}/sensors/identifiers")
+    public Response getSensorIds(final @PathParam("id") String id) throws Exception {
+        return ok(new StringList(getConfigurer().getSensorIds(id)));
+    }
+    
+    @GET
     @Path("{id}/sensors/count")
     public Response getSensortCount(final @PathParam("id") String id) throws Exception {
         return ok(new SimpleValue(getConfigurer().getSensorCount(id)));
@@ -85,6 +92,11 @@ public class SOSServices {
         return ok(getConfigurer().removeObservationForProcedure(id, procedureID));
     }
 
+    @GET
+    @Path("{id}/observedProperties/identifiers")
+    public Response getObservedPropertiesIds(final @PathParam("id") String id) throws Exception {
+        return ok(new StringList(getConfigurer().getObservedPropertiesIds(id)));
+    }
     
     private static SOSConfigurer getConfigurer() throws NotRunningServiceException {
         return (SOSConfigurer) ServiceConfigurer.newInstance(ServiceDef.Specification.SOS);

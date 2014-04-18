@@ -22,6 +22,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -44,6 +45,7 @@ import org.constellation.metadata.utils.Utils;
 import org.constellation.ogc.configuration.OGCConfigurer;
 import org.constellation.sos.factory.OMFactory;
 import org.constellation.sos.factory.SMLFactory;
+import org.constellation.sos.io.ObservationReader;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
@@ -165,6 +167,15 @@ public class SOSConfigurer extends OGCConfigurer {
         }
     }
     
+    public Collection<String> getSensorIds(final String id) throws ConfigurationException {
+        final ObservationReader reader = getObservationReader(id);
+        try {
+            return reader.getProcedureNames();
+        } catch (CstlServiceException ex) {
+            throw new ConfigurationException(ex);
+        }
+    }
+    
     private static AbstractSensorML unmarshallSensor(final File f) throws JAXBException, CstlServiceException {
         final Unmarshaller um = SensorMLMarshallerPool.getInstance().acquireUnmarshaller();
         Object obj = um.unmarshal(f);
@@ -234,6 +245,15 @@ public class SOSConfigurer extends OGCConfigurer {
         try {
             writer.removeObservationForProcedure(procedureID);
             return new AcknowlegementType("Success", "The specified observations have been removed from the SOS");
+        } catch (CstlServiceException ex) {
+            throw new ConfigurationException(ex);
+        }
+    }
+    
+    public Collection<String> getObservedPropertiesIds(String id) throws ConfigurationException {
+        final ObservationReader reader = getObservationReader(id);
+        try {
+            return reader.getPhenomenonNames();
         } catch (CstlServiceException ex) {
             throw new ConfigurationException(ex);
         }
@@ -361,6 +381,31 @@ public class SOSConfigurer extends OGCConfigurer {
             final OMFactory omfactory = getOMFactory(config.getObservationWriterType());
             try {
                 return omfactory.getObservationWriter(config.getObservationWriterType(), config.getOMConfiguration(), new HashMap<String, Object>());
+
+            } catch (CstlServiceException ex) {
+                throw new ConfigurationException("JAXBException while initializing the writer!", ex);
+            }
+        } else {
+            throw new ConfigurationException("there is no configuration file correspounding to this ID:" + serviceID);
+        }
+    }
+    
+    /**
+     * Build a new Observation writer for the specified service ID.
+     *
+     * @param serviceID the service identifier (form multiple SOS) default: ""
+     *
+     * @return An observation Writer.
+     * @throws ConfigurationException
+     */
+    protected ObservationReader getObservationReader(final String serviceID) throws ConfigurationException {
+
+        // we get the SOS configuration file
+        final SOSConfiguration config = getServiceConfiguration(serviceID);
+        if (config != null) {
+            final OMFactory omfactory = getOMFactory(config.getObservationWriterType());
+            try {
+                return omfactory.getObservationReader(config.getObservationWriterType(), config.getOMConfiguration(), new HashMap<String, Object>());
 
             } catch (CstlServiceException ex) {
                 throw new ConfigurationException("JAXBException while initializing the writer!", ex);

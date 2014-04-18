@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.gml.xml.AbstractFeature;
 import org.geotoolkit.gml.xml.AbstractTimePosition;
 import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.gml.xml.FeatureProperty;
@@ -41,9 +43,10 @@ import org.geotoolkit.swe.xml.DataArrayProperty;
 import org.geotoolkit.swe.xml.DataComponentProperty;
 import org.geotoolkit.swe.xml.PhenomenonProperty;
 import org.geotoolkit.swe.xml.v101.CompositePhenomenonType;
-import org.apache.sis.util.logging.Logging;
+import org.opengis.observation.AnyFeature;
 import org.opengis.observation.Observation;
 import org.opengis.observation.ObservationCollection;
+import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.temporal.Instant;
 import org.opengis.temporal.Period;
 
@@ -101,8 +104,10 @@ public final class Normalizer {
     }
 
     /**
-     * Regroup the different Observation by sensor.
+     * Regroup the different Observation by sensor and by feature of interest.
      *
+     * @param version
+     * @param bounds
      * @param collection
      *
      * @return a collection
@@ -111,9 +116,12 @@ public final class Normalizer {
         final List<Observation> members = collection.getMember();
         final Map<String, Observation> merged = new HashMap<>();
         for (Observation obs : members) {
-            final Process process = (Process) obs.getProcedure();
-            if (merged.containsKey(process.getHref())) {
-                final AbstractObservation uniqueObs = (AbstractObservation) merged.get(process.getHref());
+            final Process process    = (Process) obs.getProcedure();
+            final String featureID   = getFeatureID(obs);
+            final String key         = process.getHref() + '-' + featureID;
+            
+            if (merged.containsKey(key)) {
+                final AbstractObservation uniqueObs = (AbstractObservation) merged.get(key);
                 if (uniqueObs.getResult() instanceof DataArrayProperty) {
                     final DataArrayProperty mergedArrayP = (DataArrayProperty) uniqueObs.getResult();
                     final DataArray mergedArray          = mergedArrayP.getDataArray();
@@ -172,7 +180,7 @@ public final class Normalizer {
                 } else {
                     clone = SOSXmlFactory.cloneObservation(version, obs);
                 }
-                merged.put(process.getHref(), clone);
+                merged.put(key, clone);
             }
         }
 
@@ -183,6 +191,24 @@ public final class Normalizer {
         return SOSXmlFactory.buildGetObservationResponse(version, "collection-1", bounds, obervations);
     }
 
+    private static String getFeatureID(final Observation obs) {
+        if (obs instanceof AbstractObservation) {
+            final AbstractObservation observation = (AbstractObservation)obs;
+            final FeatureProperty featProp = observation.getPropertyFeatureOfInterest();
+            if (featProp.getHref() != null) {
+                return featProp.getHref();
+            } else if (featProp.getAbstractFeature() != null) {
+                final AbstractFeature feature = featProp.getAbstractFeature();
+                if (feature.getName() != null) {
+                    return feature.getName();
+                } else if (feature.getId() != null) {
+                    return feature.getId();
+                }
+            }
+        }
+        return null;
+    }
+    
     /**
      * Normalize the Observation collection document by replacing the double by reference
      *
@@ -263,17 +289,17 @@ public final class Normalizer {
     }
     
     private static FeatureProperty getPropertyFeatureOfInterest(final Observation obs) {
-        if (obs instanceof org.geotoolkit.observation.xml.v100.ObservationType) {
-            return ((org.geotoolkit.observation.xml.v100.ObservationType)obs).getPropertyFeatureOfInterest();
-        } else if (obs instanceof org.geotoolkit.observation.xml.v200.OMObservationType) {
-            return ((org.geotoolkit.observation.xml.v200.OMObservationType)obs).getFeatureOfInterestProperty();
+        if (obs instanceof AbstractObservation) {
+            final AbstractObservation observation = (AbstractObservation)obs;
+            return observation.getPropertyFeatureOfInterest();
         }
         return null;
     }
     
     private static PhenomenonProperty getPhenomenonProperty(final Observation obs) {
-        if (obs instanceof org.geotoolkit.observation.xml.v100.ObservationType) {
-            return ((org.geotoolkit.observation.xml.v100.ObservationType)obs).getPropertyObservedProperty();
+        if (obs instanceof AbstractObservation) {
+            final AbstractObservation observation = (AbstractObservation)obs;
+            return observation.getPropertyObservedProperty();
         }
         return null;
     }
