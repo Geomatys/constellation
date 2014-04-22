@@ -93,10 +93,28 @@ public interface ObservationReader {
     Collection<String> getPhenomenonNames() throws CstlServiceException;
 
     /**
+     * Return a list of the sensor identifiers measuring the specified phenomenon.
+     * 
+     * @param observedProperty an observed phenomenon.
+     * @return
+     * @throws org.constellation.ws.CstlServiceException
+     */
+    Collection<String> getProceduresForPhenomenon(final String observedProperty) throws CstlServiceException;
+    
+    /**
+     * Return a list of the observedProperties identifiers measured by the specified procedure.
+     * 
+     * @param sensorID an procedure identifier.
+     * @return
+     * @throws org.constellation.ws.CstlServiceException
+     */
+    Collection<String> getPhenomenonsForProcedure(String sensorID) throws CstlServiceException;
+    
+    /**
      * 
      * @param phenomenonName
      * @return
-     * @throws CstlServiceException 
+     * @throws org.constellation.ws.CstlServiceException 
      */
     boolean existPhenomenon(final String phenomenonName) throws CstlServiceException;
     
