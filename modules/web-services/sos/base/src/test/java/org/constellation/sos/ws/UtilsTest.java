@@ -17,34 +17,33 @@
 
 package org.constellation.sos.ws;
 
-import org.geotoolkit.temporal.object.TemporalUtilities;
-import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-// Junit dependencies
 import javax.xml.bind.Unmarshaller;
+import org.apache.sis.xml.MarshallerPool;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.gml.xml.DirectPosition;
+import org.geotoolkit.gml.xml.AbstractGeometry;
 import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.gml.xml.v311.EnvelopeType;
+import org.geotoolkit.gml.xml.v311.PointType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.observation.xml.v100.ObservationType;
-import org.geotoolkit.sampling.xml.v100.SamplingPointType;
-import org.geotoolkit.sml.xml.AbstractSensorML;
-import org.geotoolkit.swe.xml.v101.PhenomenonType;
-import org.apache.sis.xml.MarshallerPool;
-import org.junit.Test;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import static org.junit.Assert.*;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.sampling.xml.v100.SamplingPointType;
+import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
+import org.geotoolkit.swe.xml.v101.PhenomenonType;
+import org.geotoolkit.temporal.object.TemporalUtilities;
+import org.junit.After;
+import org.junit.AfterClass;
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.opengis.observation.Observation;
 
 /**
@@ -118,14 +117,14 @@ public class UtilsTest {
         Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
         AbstractSensorML sensor = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/system.xml"));
         List<String> names      = Utils.getNetworkNames(sensor);
-        List<String> expNames   = new ArrayList<String>();
+        List<String> expNames   = new ArrayList<>();
         expNames.add("600000221");
         expNames.add("600000025");
         assertEquals(expNames, names);
 
         sensor   = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/component.xml"));
         names    = Utils.getNetworkNames(sensor);
-        expNames = new ArrayList<String>();
+        expNames = new ArrayList<>();
         assertEquals(expNames, names);
 
         marshallerPool.recycle(unmarshaller);
@@ -139,8 +138,9 @@ public class UtilsTest {
     public void getSensorPositionTest() throws Exception {
         Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
         AbstractSensorML sensor = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/system.xml"));
-        DirectPosition result = Utils.getSensorPosition(sensor);
-        DirectPositionType expResult = new DirectPositionType("urn:ogc:crs:EPSG:27582", 2, Arrays.asList(65400.0,1731368.0));
+        AbstractGeometry result = Utils.getSensorPosition(sensor);
+        DirectPositionType posExpResult = new DirectPositionType("urn:ogc:crs:EPSG:27582", 2, Arrays.asList(65400.0,1731368.0));
+        PointType expResult = new PointType(posExpResult);
 
         assertEquals(expResult, result);
 

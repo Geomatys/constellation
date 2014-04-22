@@ -18,32 +18,33 @@
 package org.constellation.sos.ws;
 
 // JDK dependencies
-import java.util.Iterator;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.Iterator;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
-
 import javax.imageio.spi.ServiceRegistry;
-
-// JAXB dependencies
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
-
-
-import org.constellation.security.SecurityManagerHolder;
-// Constellation dependencies
-import org.constellation.sos.factory.SMLFactory;
-import org.constellation.sos.factory.OMFactory;
+import org.apache.sis.util.logging.MonolineFormatter;
+import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef;
+import org.constellation.admin.ConfigurationEngine;
+
+import static org.constellation.api.QueryConstants.*;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
+import org.constellation.dto.Service;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.MetadataIoException;
+import org.constellation.security.SecurityManagerHolder;
+import org.constellation.sos.factory.OMFactory;
+import org.constellation.sos.factory.SMLFactory;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationFilterReader;
 import org.constellation.sos.io.ObservationReader;
@@ -51,54 +52,18 @@ import org.constellation.sos.io.ObservationResult;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
+import static org.constellation.sos.ws.DatablockParser.*;
+import org.constellation.sos.ws.DatablockParser.Values;
+import static org.constellation.sos.ws.Normalizer.*;
+import static org.constellation.sos.ws.SOSConstants.*;
+import static org.constellation.sos.ws.Utils.*;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.UnauthorizedException;
-
-import static org.constellation.api.QueryConstants.*;
-import static org.constellation.sos.ws.SOSConstants.*;
-import static org.constellation.sos.ws.Utils.*;
-import static org.constellation.sos.ws.Normalizer.*;
-import static org.constellation.sos.ws.DatablockParser.*;
-
-// Geotoolkit dependencies
-import org.apache.sis.xml.MarshallerPool;
-import org.geotoolkit.ows.xml.AcceptFormats;
-import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
-import org.geotoolkit.ows.xml.AbstractOperation;
-import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
-import org.geotoolkit.ows.xml.AbstractServiceIdentification;
-import org.geotoolkit.ows.xml.AbstractServiceProvider;
-import org.geotoolkit.ows.xml.Range;
-import org.geotoolkit.ows.xml.RequestBase;
-import org.geotoolkit.ows.xml.Sections;
-import org.geotoolkit.ows.xml.OWSXmlFactory;
-import org.geotoolkit.sos.xml.SOSMarshallerPool;
-import org.geotoolkit.sos.xml.Capabilities;
-import org.geotoolkit.sos.xml.Contents;
-import org.geotoolkit.sos.xml.GetCapabilities;
-import org.geotoolkit.sos.xml.GetObservation;
-import org.geotoolkit.sos.xml.GetObservationById;
-import org.geotoolkit.sos.xml.GetResultTemplate;
-import org.geotoolkit.sos.xml.GetResultTemplateResponse;
-import org.geotoolkit.sos.xml.InsertResult;
-import org.geotoolkit.sos.xml.InsertResultResponse;
-import org.geotoolkit.sos.xml.ObservationOffering;
-import org.geotoolkit.sos.xml.GetFeatureOfInterest;
-import org.geotoolkit.sos.xml.v100.GetFeatureOfInterestTime;
-import org.geotoolkit.sos.xml.GetResult;
-import org.geotoolkit.sos.xml.GetResultResponse;
-import org.geotoolkit.sos.xml.InsertObservation;
-import org.geotoolkit.sos.xml.InsertObservationResponse;
-import org.geotoolkit.sos.xml.InsertResultTemplate;
-import org.geotoolkit.sos.xml.InsertResultTemplateResponse;
-import org.geotoolkit.sos.xml.FilterCapabilities;
-import org.geotoolkit.sos.xml.ResponseModeType;
-import org.geotoolkit.sos.xml.ResultTemplate;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.gml.xml.AbstractFeature;
+import org.geotoolkit.gml.xml.AbstractGeometry;
 import org.geotoolkit.gml.xml.AbstractTimePosition;
-import org.geotoolkit.gml.xml.DirectPosition;
 import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.gml.xml.FeatureCollection;
 import org.geotoolkit.gml.xml.FeatureProperty;
@@ -108,39 +73,62 @@ import org.geotoolkit.observation.xml.OMXmlFactory;
 import org.geotoolkit.observation.xml.ObservationComparator;
 import org.geotoolkit.observation.xml.Process;
 import org.geotoolkit.ogc.xml.XMLLiteral;
+import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
+import org.geotoolkit.ows.xml.AbstractOperation;
+import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
+import org.geotoolkit.ows.xml.AbstractServiceIdentification;
+import org.geotoolkit.ows.xml.AbstractServiceProvider;
+import org.geotoolkit.ows.xml.AcceptFormats;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.ows.xml.OWSXmlFactory;
+import org.geotoolkit.ows.xml.Range;
+import org.geotoolkit.ows.xml.RequestBase;
+import org.geotoolkit.ows.xml.Sections;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.SmlFactory;
 import org.geotoolkit.sml.xml.v100.SensorML;
+import org.geotoolkit.sos.xml.Capabilities;
+import org.geotoolkit.sos.xml.Contents;
+import org.geotoolkit.sos.xml.FilterCapabilities;
+import org.geotoolkit.sos.xml.GetCapabilities;
+import org.geotoolkit.sos.xml.GetFeatureOfInterest;
+import org.geotoolkit.sos.xml.GetObservation;
+import org.geotoolkit.sos.xml.GetObservationById;
+import org.geotoolkit.sos.xml.GetResult;
+import org.geotoolkit.sos.xml.GetResultResponse;
+import org.geotoolkit.sos.xml.GetResultTemplate;
+import org.geotoolkit.sos.xml.GetResultTemplateResponse;
+import org.geotoolkit.sos.xml.InsertObservation;
+import org.geotoolkit.sos.xml.InsertObservationResponse;
+import org.geotoolkit.sos.xml.InsertResult;
+import org.geotoolkit.sos.xml.InsertResultResponse;
+import org.geotoolkit.sos.xml.InsertResultTemplate;
+import org.geotoolkit.sos.xml.InsertResultTemplateResponse;
+import org.geotoolkit.sos.xml.ObservationOffering;
+import org.geotoolkit.sos.xml.ResponseModeType;
+import static org.geotoolkit.sos.xml.ResponseModeType.*;
+import org.geotoolkit.sos.xml.ResultTemplate;
+import org.geotoolkit.sos.xml.SOSMarshallerPool;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
+
+import org.geotoolkit.sos.xml.SosInsertionMetadata;
+import org.geotoolkit.sos.xml.v100.GetFeatureOfInterestTime;
+import org.geotoolkit.swe.xml.AbstractDataComponent;
 import org.geotoolkit.swe.xml.AbstractEncoding;
 import org.geotoolkit.swe.xml.DataArray;
-import org.geotoolkit.swe.xml.TextBlock;
-import org.geotoolkit.swe.xml.AbstractDataComponent;
 import org.geotoolkit.swe.xml.DataArrayProperty;
+import org.geotoolkit.swe.xml.DataRecord;
+import org.geotoolkit.swe.xml.TextBlock;
 import org.geotoolkit.swes.xml.DeleteSensor;
 import org.geotoolkit.swes.xml.DeleteSensorResponse;
 import org.geotoolkit.swes.xml.DescribeSensor;
 import org.geotoolkit.swes.xml.InsertSensor;
-import org.geotoolkit.swes.xml.ObservationTemplate;
 import org.geotoolkit.swes.xml.InsertSensorResponse;
+import org.geotoolkit.swes.xml.ObservationTemplate;
 import org.geotoolkit.temporal.object.ISODateParser;
-import org.geotoolkit.util.StringUtilities;
-import org.apache.sis.util.logging.MonolineFormatter;
-import org.constellation.dto.Service;
-import org.constellation.admin.ConfigurationEngine;
-import org.constellation.configuration.ConfigDirectory;
 import org.geotoolkit.temporal.object.TemporalUtilities;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import static org.geotoolkit.sos.xml.ResponseModeType.*;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
-
-import org.geotoolkit.sos.xml.SosInsertionMetadata;
-import org.geotoolkit.swe.xml.DataRecord;
-
-// GeoAPI dependencies
-import org.opengis.observation.Observation;
-import org.opengis.observation.Measure;
-import org.opengis.observation.sampling.SamplingFeature;
+import org.geotoolkit.util.StringUtilities;
 import org.opengis.filter.Filter;
 import org.opengis.filter.PropertyIsBetween;
 import org.opengis.filter.PropertyIsEqualTo;
@@ -163,8 +151,11 @@ import org.opengis.filter.temporal.TContains;
 import org.opengis.filter.temporal.TEquals;
 import org.opengis.filter.temporal.TOverlaps;
 import org.opengis.geometry.primitive.Point;
+import org.opengis.observation.Measure;
 import org.opengis.observation.Measurement;
+import org.opengis.observation.Observation;
 import org.opengis.observation.ObservationCollection;
+import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.temporal.Instant;
 import org.opengis.temporal.Period;
 import org.opengis.temporal.TemporalGeometricPrimitive;
@@ -1993,7 +1984,7 @@ public class SOSworker extends AbstractWorker {
             smlWriter.writeSensor(id, process);
 
             // and we record the position of the piezometer
-            final DirectPosition position = getSensorPosition(process);
+            final AbstractGeometry position = getSensorPosition(process);
             if (omWriter != null) {
                 omWriter.recordProcedureLocation(id, position);
 

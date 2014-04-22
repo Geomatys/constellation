@@ -17,23 +17,24 @@
 
 package org.constellation.sos.ws;
 
-import java.util.Date;
-import org.geotoolkit.temporal.object.ISODateParser;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
 import org.constellation.util.ReflectionUtilities;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.AbstractFeature;
+import org.geotoolkit.gml.xml.AbstractGeometry;
 import org.geotoolkit.gml.xml.BoundingShape;
-import org.geotoolkit.gml.xml.DirectPosition;
 import org.geotoolkit.gml.xml.Envelope;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.sml.xml.AbstractClassification;
 import org.geotoolkit.sml.xml.AbstractClassifier;
 import org.geotoolkit.sml.xml.AbstractDerivableComponent;
@@ -41,13 +42,12 @@ import org.geotoolkit.sml.xml.AbstractIdentification;
 import org.geotoolkit.sml.xml.AbstractIdentifier;
 import org.geotoolkit.sml.xml.AbstractProcess;
 import org.geotoolkit.sml.xml.AbstractSensorML;
-import org.apache.sis.util.logging.Logging;
-import org.opengis.observation.Observation;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.sos.xml.SOSXmlFactory;
 import org.geotoolkit.swe.xml.AbstractEncoding;
 import org.geotoolkit.swe.xml.TextBlock;
+import org.geotoolkit.temporal.object.ISODateParser;
 import org.opengis.geometry.primitive.Point;
+import org.opengis.observation.Observation;
 import org.opengis.temporal.Period;
 import org.opengis.temporal.Position;
 
@@ -122,13 +122,12 @@ public final class Utils {
      * @param sensor
      * @return
      */
-    public static DirectPosition getSensorPosition(final AbstractSensorML sensor) {
+    public static AbstractGeometry getSensorPosition(final AbstractSensorML sensor) {
         if (sensor.getMember().size() == 1) {
             if (sensor.getMember().get(0).getRealProcess() instanceof AbstractDerivableComponent) {
                 final AbstractDerivableComponent component = (AbstractDerivableComponent) sensor.getMember().get(0).getRealProcess();
-                if (component.getSMLLocation() != null && component.getSMLLocation().getPoint() != null &&
-                    component.getSMLLocation().getPoint() != null && component.getSMLLocation().getPoint().getPos() != null) {
-                return component.getSMLLocation().getPoint().getPos();
+                if (component.getSMLLocation() != null && component.getSMLLocation().getGeometry()!= null) {
+                    return component.getSMLLocation().getGeometry();
                 }
             }
         }
@@ -176,6 +175,7 @@ public final class Utils {
      * return a SQL formatted timestamp
      *
      * @param time a GML time position object.
+     * @throws org.constellation.ws.CstlServiceException
      */
     public static String getLuceneTimeValue(final Position time) throws CstlServiceException {
         if (time != null && time.getDateTime() != null) {
@@ -238,7 +238,7 @@ public final class Utils {
     /**
      * Return an envelope containing all the Observation member of the collection.
      *
-     * @param collection
+     * @param observations
      * @return
      */
     public static Envelope getCollectionBound(final String version, final List<Observation> observations, final String srsName) {

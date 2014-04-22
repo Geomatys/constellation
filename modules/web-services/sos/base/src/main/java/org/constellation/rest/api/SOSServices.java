@@ -33,6 +33,7 @@ import org.constellation.configuration.StringList;
 import org.constellation.dto.SimpleValue;
 import org.constellation.sos.configuration.SOSConfigurer;
 import static org.constellation.utils.RESTfulUtilities.ok;
+import org.geotoolkit.gml.xml.v321.AbstractGeometryType;
 
 /**
  *
@@ -78,6 +79,12 @@ public class SOSServices {
     @Path("{id}/sensors/count")
     public Response getSensortCount(final @PathParam("id") String id) throws Exception {
         return ok(new SimpleValue(getConfigurer().getSensorCount(id)));
+    }
+    
+    @PUT
+    @Path("{id}/sensor/location/{sensorID}")
+    public Response updateSensorLocation(final @PathParam("id") String id, final @PathParam("sensorID") String sensorID, final AbstractGeometryType location) throws Exception {
+        return ok(getConfigurer().updateSensorLocation(id, sensorID, location));
     }
     
     @GET

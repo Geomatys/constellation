@@ -412,7 +412,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      * {@inheritDoc}
      */
     @Override
-    public Observation getObservation(final String identifier, final QName resultModel, final ResponseModeType mode, final String version) throws CstlServiceException {
+    public Observation getObservation(String identifier, final QName resultModel, final ResponseModeType mode, final String version) throws CstlServiceException {
         try {
             final Connection c         = source.getConnection();
             c.setReadOnly(true);
@@ -422,12 +422,13 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
                     observationID = identifier.substring(observationIdBase.length());
                 } else if (identifier.startsWith(observationTemplateIdBase)) {
                     final String procedureID     = sensorIdBase + identifier.substring(observationTemplateIdBase.length());
-                    final PreparedStatement stmt = c.prepareStatement("SELECT \"id\" FROM \"om\".\"observations\" WHERE \"procedure\"=?");
+                    final PreparedStatement stmt = c.prepareStatement("SELECT \"id\", \"identifier\" FROM \"om\".\"observations\" WHERE \"procedure\"=?");
                     stmt.setString(1, procedureID);
                     final ResultSet rs = stmt.executeQuery();
                     final String oid;
                     if (rs.next()) {
                         oid = rs.getString(1);
+                        identifier = rs.getString(2);
                     } else {
                         oid = null;
                     }
@@ -441,6 +442,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
                     observationID = identifier;
                 }
 
+                final String obsID = "obs-" + observationID;
                 final String timeID = "time-" + observationID;
                 final String observedProperty;
                 final String procedure;
@@ -482,10 +484,10 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
 
                 if (resultModel.equals(MEASUREMENT_QNAME)) {
                     final Object result = getResult(identifier, resultModel, version); 
-                    return OMXmlFactory.buildMeasurement(version, identifier, name, null, prop, phen, procedure, result, time);
+                    return OMXmlFactory.buildMeasurement(version, obsID, name, null, prop, phen, procedure, result, time);
                 } else {
                     final Object result = getResult(identifier, resultModel, version);
-                    return OMXmlFactory.buildObservation(version, identifier, name, null, prop, phen, procedure, result, time);
+                    return OMXmlFactory.buildObservation(version, obsID, name, null, prop, phen, procedure, result, time);
                 }
             } finally {
                 c.close();

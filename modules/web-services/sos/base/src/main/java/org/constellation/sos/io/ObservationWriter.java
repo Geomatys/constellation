@@ -18,9 +18,8 @@
 package org.constellation.sos.io;
 
 import java.util.List;
-
-// constellation dependencies
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.gml.xml.AbstractGeometry;
 
 // Geotoolkit dependencies
 import org.geotoolkit.gml.xml.DirectPosition;
@@ -108,7 +107,7 @@ public interface ObservationWriter {
      * @param position The GML position of the sensor.
      * @throws org.constellation.ws.CstlServiceException
      */
-    void recordProcedureLocation(final String physicalID, final DirectPosition position) throws CstlServiceException;
+    void recordProcedureLocation(final String physicalID, final AbstractGeometry position) throws CstlServiceException;
 
     /**
      * Return informations about the implementation class.

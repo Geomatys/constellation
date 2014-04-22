@@ -17,7 +17,6 @@
 package org.constellation.sos.io.om2;
 
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.io.WKBWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -45,11 +44,9 @@ import org.constellation.ws.CstlServiceException;
 // Geotk dependencies
 import org.geotoolkit.gml.GeometrytoJTS;
 import org.geotoolkit.gml.xml.AbstractGeometry;
-import org.geotoolkit.gml.xml.DirectPosition;
 import org.geotoolkit.observation.xml.AbstractObservation;
 import org.geotoolkit.sampling.xml.SamplingFeature;
 import org.geotoolkit.sos.xml.ObservationOffering;
-import org.geotoolkit.sos.xml.SOSXmlFactory;
 import org.geotoolkit.swe.xml.AnyScalar;
 import org.geotoolkit.swe.xml.DataArray;
 import org.geotoolkit.swe.xml.DataArrayProperty;
@@ -724,15 +721,14 @@ public class OM2ObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public void recordProcedureLocation(final String physicalID, final DirectPosition position) throws CstlServiceException {
+    public void recordProcedureLocation(final String physicalID, final AbstractGeometry position) throws CstlServiceException {
         if (position != null) {
             try {
                 final Connection c     = source.getConnection();
                 final WKBWriter writer = new WKBWriter();
                 PreparedStatement ps   = c.prepareStatement("INSERT INTO \"om\".\"procedures\" VALUES (?,?)");
                 ps.setString(1, physicalID);
-                final org.geotoolkit.gml.xml.Point gmlPt = SOSXmlFactory.buildPoint("2.0.0", null, (org.geotoolkit.gml.xml.DirectPosition)position);
-                final Point pt = (Point) GeometrytoJTS.toJTS(gmlPt);
+                final Geometry pt = GeometrytoJTS.toJTS(position);
                 ps.setBytes(3, writer.write(pt));
                 ps.execute();
                 c.close();

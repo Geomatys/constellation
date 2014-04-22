@@ -23,9 +23,7 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.apache.sis.util.logging.Logging;
-
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.observation.MeasurementTable;
@@ -33,6 +31,7 @@ import org.constellation.observation.ObservationTable;
 import org.constellation.sos.ObservationOfferingTable;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.gml.xml.AbstractGeometry;
 
 import org.geotoolkit.gml.xml.DirectPosition;
 import org.geotoolkit.internal.sql.table.CatalogException;
@@ -40,6 +39,9 @@ import org.geotoolkit.internal.sql.table.Database;
 import org.geotoolkit.internal.sql.table.NoSuchTableException;
 import org.geotoolkit.observation.xml.AbstractObservation;
 import org.geotoolkit.observation.xml.OMXmlFactory;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
 import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingType;
 import org.geotoolkit.sos.xml.v100.OfferingPhenomenonType;
@@ -47,9 +49,6 @@ import org.geotoolkit.sos.xml.v100.OfferingProcedureType;
 import org.geotoolkit.sos.xml.v100.OfferingSamplingFeatureType;
 import org.geotoolkit.swe.xml.v101.PhenomenonType;
 import org.geotoolkit.swes.xml.ObservationTemplate;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-
 import org.opengis.observation.Measurement;
 
 /**
@@ -229,8 +228,12 @@ public class DefaultObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public void recordProcedureLocation(final String physicalID, final DirectPosition position) throws CstlServiceException {
-        if (position == null || position.getValue().size() < 2 || !isPostgres) {return;}
+    public void recordProcedureLocation(final String physicalID, final AbstractGeometry position) throws CstlServiceException {
+        if (!(position instanceof DirectPosition)) {
+            throw new CstlServiceException("Postgrid implementation only record directPosition procedure location");
+        }
+        final DirectPosition pos = (DirectPosition) position;
+        if (pos == null || pos.getValue().size() < 2 || !isPostgres) {return;}
         try {
             final Connection c       = omDatabase.getDataSource(true).getConnection();
             final Statement stmt2    = c.createStatement();
@@ -238,8 +241,8 @@ public class DefaultObservationWriter implements ObservationWriter {
             String request = "SELECT * FROM ";
             boolean insert = true;
             String srsName = "4326";
-            if (position.getSrsName() != null) {
-                srsName = position.getSrsName();
+            if (pos.getSrsName() != null) {
+                srsName = pos.getSrsName();
             }
 
             if (srsName.startsWith("urn:ogc:crs:EPSG:")) {
@@ -252,7 +255,7 @@ public class DefaultObservationWriter implements ObservationWriter {
                 request = request + " \"sos\".\"projected_localisations\" WHERE id='" + physicalID + "'";
                 result2 = stmt2.executeQuery(request);
                 if (!result2.next()) {
-                    request = "INSERT INTO \"sos\".\"projected_localisations\" VALUES ('" + physicalID + "', GeometryFromText( 'POINT(" + position.getValue().get(0) + ' ' + position.getValue().get(1) + ")', " + srsName + "))";
+                    request = "INSERT INTO \"sos\".\"projected_localisations\" VALUES ('" + physicalID + "', GeometryFromText( 'POINT(" + pos.getValue().get(0) + ' ' + pos.getValue().get(1) + ")', " + srsName + "))";
                 } else {
                     insert = false;
                     LOGGER.log(Level.INFO, "Projected sensor location already registred for {0} keeping old location", physicalID);
@@ -261,7 +264,7 @@ public class DefaultObservationWriter implements ObservationWriter {
                 request = request + " \"sos\".\"geographic_localisations\" WHERE id='" + physicalID + "'";
                 result2 = stmt2.executeQuery(request);
                 if (!result2.next()) {
-                    request = "INSERT INTO \"sos\".\"geographic_localisations\" VALUES ('" + physicalID + "', GeometryFromText( 'POINT(" + position.getValue().get(0) + ' ' + position.getValue().get(1) + ")', " + srsName + "))";
+                    request = "INSERT INTO \"sos\".\"geographic_localisations\" VALUES ('" + physicalID + "', GeometryFromText( 'POINT(" + pos.getValue().get(0) + ' ' + pos.getValue().get(1) + ")', " + srsName + "))";
                 } else {
                     insert = false;
                     LOGGER.log(Level.INFO, "Geographic sensor location already registred for {0} keeping old location", physicalID);

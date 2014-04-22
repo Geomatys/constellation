@@ -33,7 +33,7 @@ import org.constellation.sos.factory.OMFactory;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.sos.io.lucene.LuceneObservationIndexer;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.gml.xml.DirectPosition;
+import org.geotoolkit.gml.xml.AbstractGeometry;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.observation.xml.AbstractObservation;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -287,7 +287,7 @@ public class FileObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public void recordProcedureLocation(final String physicalID, final DirectPosition position) throws CstlServiceException {
+    public void recordProcedureLocation(final String physicalID, final AbstractGeometry position) throws CstlServiceException {
         // do nothing
     }
 

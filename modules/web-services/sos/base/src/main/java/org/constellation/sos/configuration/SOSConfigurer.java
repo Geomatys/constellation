@@ -51,6 +51,8 @@ import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.factory.FactoryNotFoundException;
+import org.geotoolkit.gml.xml.AbstractGeometry;
+import org.geotoolkit.gml.xml.v321.AbstractGeometryType;
 import org.geotoolkit.observation.xml.AbstractObservation;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
@@ -248,7 +250,7 @@ public class SOSConfigurer extends OGCConfigurer {
         //return new AcknowlegementType("Error", "An error occurs during the process");
     }
     
-    public Object removeSingleObservation(final String id, final String observationID) throws ConfigurationException {
+    public AcknowlegementType removeSingleObservation(final String id, final String observationID) throws ConfigurationException {
         final ObservationWriter writer = getObservationWriter(id);
         try {
             writer.removeObservation(observationID);
@@ -258,7 +260,7 @@ public class SOSConfigurer extends OGCConfigurer {
         }
     }
     
-    public Object removeObservationForProcedure(final String id, final String procedureID) throws ConfigurationException {
+    public AcknowlegementType removeObservationForProcedure(final String id, final String procedureID) throws ConfigurationException {
         final ObservationWriter writer = getObservationWriter(id);
         try {
             writer.removeObservationForProcedure(procedureID);
@@ -272,6 +274,16 @@ public class SOSConfigurer extends OGCConfigurer {
         final ObservationReader reader = getObservationReader(id);
         try {
             return reader.getPhenomenonNames();
+        } catch (CstlServiceException ex) {
+            throw new ConfigurationException(ex);
+        }
+    }
+    
+    public Object updateSensorLocation(final String id, final String sensorID, final AbstractGeometry location) throws ConfigurationException {
+        final ObservationWriter writer = getObservationWriter(id);
+        try {
+            writer.recordProcedureLocation(sensorID, location);
+            return new AcknowlegementType("Success", "The specified observations have been removed from the SOS");
         } catch (CstlServiceException ex) {
             throw new ConfigurationException(ex);
         }
