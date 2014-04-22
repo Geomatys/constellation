@@ -19,6 +19,8 @@ package org.constellation.scheduler;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
@@ -30,6 +32,7 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
+import static org.quartz.impl.matchers.EverythingMatcher.*;
 
 /**
  * Constellation can run tasks at regular intervals. 
@@ -40,11 +43,13 @@ import org.quartz.impl.StdSchedulerFactory;
  * @module pending
  */
 public final class CstlScheduler {
-    
+        
     private static final Logger LOGGER = Logging.getLogger(CstlScheduler.class);
     private static CstlScheduler INSTANCE = null;
         
     private final List<Task> tasks = new ArrayList<>();
+    private final Map<String,TaskState> statuses = new ConcurrentHashMap<>();
+    private final QuartzJobListener quartzListener = new QuartzJobListener();
     private Scheduler quartzScheduler;
     
     public static final TaskConfigurator DEFAULT_CONFIGURATOR = new XMLTaskConfigurator();    
@@ -64,6 +69,10 @@ public final class CstlScheduler {
         try {
             quartzScheduler = schedFact.getScheduler();
             quartzScheduler.start();
+            
+            //listen and attach a process on all geotk process tasks
+            quartzScheduler.getListenerManager().addJobListener(quartzListener, allJobs());
+            
         } catch (SchedulerException ex) {
             LOGGER.log(Level.SEVERE, "=== Failed to start quartz scheduler ===\n"+ex.getLocalizedMessage(), ex);            
             return;
@@ -108,6 +117,24 @@ public final class CstlScheduler {
             }
         }
         return null;
+    }
+    
+    /**
+     * Get task status.
+     * @param id, must be a valid id. Illegal
+     * @return TaskState, null if no task exist for this id.
+     */
+    public synchronized TaskState getaskState(final String id){
+        TaskState state = statuses.get(id);
+        if(state==null){
+            final Task task = getTask(id);
+            if(task==null){
+                return null;
+            }
+            state = new TaskState(task);
+            statuses.put(id, state);
+        }
+        return state;
     }
     
     /**
@@ -164,6 +191,8 @@ public final class CstlScheduler {
         }
         
         if(task != null){
+            statuses.remove(task.getId());
+            
             getConfigurator().removeTaskConfiguration(task);
             try {
                 unregisterTask(task);
@@ -193,6 +222,10 @@ public final class CstlScheduler {
      * Add the given task in the scheduler.
      */
     private void registerTask(final Task task) throws SchedulerException{
+        //ensure the job detail contain the task in the datamap, this is used in the
+        //job listener to track back the task
+        task.getDetail().getJobDataMap().put(QuartzJobListener.PROPERTY_TASK, task);
+                
         quartzScheduler.scheduleJob(task.getDetail(), task.getTrigger());
         LOGGER.log(Level.INFO, "Scheduler task added : {0}, {1}   type : {2}.{3}", new Object[]{
             task.getId(),
