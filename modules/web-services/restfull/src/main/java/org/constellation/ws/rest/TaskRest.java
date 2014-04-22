@@ -50,6 +50,7 @@ public final class TaskRest {
         final List<Task> tasks = scheduler.listTasks();
         
         final TaskList lst = new TaskList();
+        lst.getTasks(); //force create list
         for(Task t : tasks){
             final TaskState state = scheduler.getaskState(t.getId());
             final TaskStatus status = new TaskStatus();

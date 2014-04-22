@@ -587,6 +587,7 @@
                 "contact": "Contact",
                 "metrics": "Metrics",
                 "processes": "Processes",
+                "tasks": "Tasks",
                 "logs": "Logs",
                 "logout": "Log out"
             },
@@ -841,7 +842,8 @@
         "create.service":"New service",
         "create.service.source":"Source",
         "edit.service":"Edit Service",
-        "process":"Processes"
+        "process":"Processes",
+        "tasks":"Tasks"
     },
     "com.codahale.metrics.servlet.AbstractInstrumentedFilter.requests": "Metrics",
     "org.constellation.map.ws.DefaultWMSWorker.getCapabilities": "WMS(getCapabilies)",

@@ -201,6 +201,13 @@ cstlAdminApp.factory('sos', ['$resource',
         });
     }]);
 
+cstlAdminApp.factory('task', ['$resource',
+    function ($resource) {
+        return $resource('@cstl/api/1/task', {}, {
+            'list':        {method: 'GET',  url: '@cstl/api/1/task/listTasks;jsessionid='}
+        });
+    }]);
+
 cstlAdminApp.factory('textService', ['$http',
     function ($http){
         return {

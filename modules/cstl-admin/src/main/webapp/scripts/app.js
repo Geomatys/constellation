@@ -133,6 +133,11 @@ cstlAdminApp
                 controller: 'ProcessController'
             });
 
+            $routeProvider
+            .when('/task', {
+                templateUrl: 'views/task/list.html',
+                controller: 'TaskController'
+            });
 
             // Initialize angular-translate
             $translateProvider.useStaticFilesLoader({

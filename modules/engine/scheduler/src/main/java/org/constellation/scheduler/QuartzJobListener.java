@@ -21,6 +21,7 @@ import org.geotoolkit.process.ProcessEvent;
 import org.geotoolkit.process.ProcessListener;
 import org.geotoolkit.process.quartz.ProcessJob;
 import org.geotoolkit.process.quartz.ProcessJobDetail;
+import org.opengis.util.InternationalString;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -88,44 +89,52 @@ public class QuartzJobListener implements JobListener {
         @Override
         public void started(ProcessEvent event) {
             state.setStatus(TaskState.Status.RUN);
-            state.setMessage(event.getTask().toString());
+            state.setMessage(toString(event.getTask()));
             state.setPercent(event.getProgress());
         }
 
         @Override
         public void progressing(ProcessEvent event) {
             state.setStatus(TaskState.Status.RUN);
-            state.setMessage(event.getTask().toString());
+            state.setMessage(toString(event.getTask()));
             state.setPercent(event.getProgress());
         }
 
         @Override
         public void paused(ProcessEvent event) {
             state.setStatus(TaskState.Status.PAUSE);
-            state.setMessage(event.getTask().toString());
+            state.setMessage(toString(event.getTask()));
             state.setPercent(event.getProgress());
         }
 
         @Override
         public void resumed(ProcessEvent event) {
             state.setStatus(TaskState.Status.RUN);
-            state.setMessage(event.getTask().toString());
+            state.setMessage(toString(event.getTask()));
             state.setPercent(event.getProgress());
         }
 
         @Override
         public void completed(ProcessEvent event) {
             state.setStatus(TaskState.Status.FINISH);
-            state.setMessage(event.getTask().toString());
+            state.setMessage(toString(event.getTask()));
             state.setPercent(event.getProgress());
         }
 
         @Override
         public void failed(ProcessEvent event) {
             state.setStatus(TaskState.Status.FAIL);
-            state.setMessage(event.getTask().toString());
+            state.setMessage(toString(event.getTask()));
             state.setPercent(event.getProgress());
             state.setLastException(event.getException());
+        }
+        
+        private String toString(InternationalString str){
+            if(str==null){
+                return "";
+            }else{
+                return str.toString();
+            }
         }
 
     }

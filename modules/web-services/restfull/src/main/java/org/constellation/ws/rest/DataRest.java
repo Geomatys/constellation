@@ -84,6 +84,7 @@ import org.constellation.provider.FeatureData;
 import org.constellation.provider.Providers;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.provider.coveragestore.CoverageStoreProvider;
+import org.constellation.scheduler.CstlScheduler;
 import org.constellation.security.SecurityManagerHolder;
 import org.constellation.util.SimplyMetadataTreeNode;
 import org.constellation.utils.*;
@@ -1051,17 +1052,9 @@ public class DataRest {
         input.parameter("container").setValue(outputRef);
         final org.geotoolkit.process.Process p = desc.createProcess(input);
 
-        new Thread(){
-            @Override
-            public void run() {
-                try {
-                    p.call();
-                } catch (ProcessException ex) {
-                    Logger.getLogger(DataRest.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }.start();
-                        
+        //add task in scheduler
+        CstlScheduler.getInstance().runOnce("Create pyramid "+crs+" for "+providerId+":"+dataId, p);
+                                
         final ProviderData ref = new ProviderData(outProvider.getId(), outData.getName());
         return Response.ok(ref).status(202).build();
     }

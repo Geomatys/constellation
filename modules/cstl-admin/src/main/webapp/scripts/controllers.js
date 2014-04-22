@@ -29,8 +29,8 @@ cstlAdminApp.controller('HeaderController', ['$scope','$http',
 	                                        });
                                            }]);
 
-cstlAdminApp.controller('MainController', ['$scope','$location','webService','dataListing','ProcessService','$growl', 'UserResource',
-    function ($scope, $location, webService, dataListing, Process, $growl, UserResource) {
+cstlAdminApp.controller('MainController', ['$scope','$location','webService','dataListing','ProcessService','$growl', 'UserResource', 'task',
+    function ($scope, $location, webService, dataListing, Process, $growl, UserResource, task) {
         $scope.countStats = function() {
             webService.listAll({}, function(response) {
                 var count = 0;
@@ -53,12 +53,8 @@ cstlAdminApp.controller('MainController', ['$scope','$location','webService','da
                 $growl('error', 'Error', 'Unable to count data');
             });
 
-            Process.get({}, function(registries) {
-                var count = 0;
-                for (var i=0; i < registries.length; i++) {
-                    count += registries[i].processes.length;
-                }
-                $scope.nbprocess = count;
+            task.list({}, function(taskList) {
+                $scope.nbprocess = taskList.tasks.length;
             }, function() {
                 $scope.nbprocess = 0;
                 $growl('error', 'Error', 'Unable to count process');
@@ -230,7 +226,7 @@ cstlAdminApp.controller('UserDetailsController', ['$scope', '$modalInstance', 'u
 
 
 cstlAdminApp.controller('ProcessController', ['$scope', 'ProcessService',
-                                              function ($scope, Process) {
+                                  function ($scope, Process) {
                                              var lastOpened = null;
                                              $scope.registries = Process.get();
                                              $scope.toggle = function(id){
@@ -246,7 +242,17 @@ cstlAdminApp.controller('ProcessController', ['$scope', 'ProcessService',
                                                }
                                              };
                                          }]);
+                                     
 
+cstlAdminApp.controller('TaskController', ['$scope', 'task',
+       function ($scope, task) {
+          task.list({}, function(taskList) {
+                $scope.tasks = taskList.tasks;
+            }, function() {
+                $growl('error', 'Error', 'Unable to list tasks');
+            });
+}]);
+                                     
 cstlAdminApp.controller('SessionsController', ['$scope', 'resolvedSessions', 'Sessions',
     function ($scope, resolvedSessions, Sessions) {
         $scope.success = null;

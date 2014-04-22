@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,10 +28,17 @@ import javax.xml.stream.XMLStreamException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.scheduler.configuration.XMLTaskConfigurator;
+import org.geotoolkit.process.Process;
+import org.geotoolkit.process.ProcessEvent;
+import org.geotoolkit.process.ProcessListenerAdapter;
+import org.geotoolkit.process.quartz.ProcessJobDetail;
 
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
+import org.quartz.SimpleTrigger;
+import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
 import static org.quartz.impl.matchers.EverythingMatcher.*;
 
@@ -47,7 +55,11 @@ public final class CstlScheduler {
     private static final Logger LOGGER = Logging.getLogger(CstlScheduler.class);
     private static CstlScheduler INSTANCE = null;
         
+    //programmed tasks
     private final List<Task> tasks = new ArrayList<>();
+    //execute once tasks
+    private final List<Task> once = new ArrayList<>();
+    
     private final Map<String,TaskState> statuses = new ConcurrentHashMap<>();
     private final QuartzJobListener quartzListener = new QuartzJobListener();
     private Scheduler quartzScheduler;
@@ -107,6 +119,9 @@ public final class CstlScheduler {
         for(Task t : tasks){
             copy.add(new Task(t));
         }
+        for(Task t : once){
+            copy.add(new Task(t));
+        }
         return copy;
     }
     
@@ -150,8 +165,41 @@ public final class CstlScheduler {
         } catch (SchedulerException ex) {
             LOGGER.log(Level.WARNING, "Failed to register task :"+task.getId()+","+task.getTitle()+" in scheduler.",ex);
         }
-        
+                
         getConfigurator().addTaskConfiguration(task);
+    }
+    
+    public void runOnce(String title, Process process){
+        final TriggerBuilder tb = TriggerBuilder.newTrigger();
+        final Trigger trigger = tb.startNow().build();
+        
+        final Task task = new Task(UUID.randomUUID().toString());
+        final ProcessJobDetail detail = new ProcessJobDetail(process);
+        task.setDetail(detail);
+        task.setTitle(title);
+        task.setTrigger((SimpleTrigger)trigger);
+        
+        //add listener on this task to remove it from the list once finished
+        process.addListener(new ProcessListenerAdapter(){
+            @Override
+            public void failed(ProcessEvent event) {
+                once.remove(task);
+            }
+            @Override
+            public void completed(ProcessEvent event) {
+                once.remove(task);
+            }
+        });
+        
+        
+        once.add(task);
+        
+        try {
+            registerTask(task);
+        } catch (SchedulerException ex) {
+            LOGGER.log(Level.WARNING, "Failed to register task :"+task.getId()+","+task.getTitle()+" in scheduler.",ex);
+        }
+        
     }
     
     /**
