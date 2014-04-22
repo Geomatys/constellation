@@ -325,7 +325,7 @@
                         <div class="row">
                             <div class="col-sm-4 col-sm-offset-8">
                                 <div style="margin-bottom:10px;">
-                                    <a data-toggle="modal" class="btn btn-info btn-lg btn-block" ng-click="showDataToAdd()">
+                                    <a data-toggle="modal" class="btn btn-info btn-lg btn-block" ng-click="addSensor()">
                                         <span class="icon-plus icon-white" style="margin-right:5px;"></span>
                                         <span translate="service.edit.dashboard.action.add.button">Add</span>
                                     </a>
@@ -336,7 +336,7 @@
                         <div class="row" ng-init="initSensors()">
                             <div class="col-sm-3 sos_edit_blocs">
 
-                                <label class="control-label" translate="service.edit.dashboard.sensors.list">Avaiable sensors</label>
+                                <label class="control-label" translate="service.edit.dashboard.sensors.list">Available sensors</label>
                                 <div class="sos_edit_checkboxlist">
                                     <label class="checkbox" ng-repeat="sensor in sensors">
                                       <input type="checkbox"> {{sensor}}
@@ -344,7 +344,7 @@
                                 </div>
                             </div>
                             <div class="col-sm-3 sos_edit_blocs">
-                                <label class="control-label" translate="service.edit.dashboard.measures.list">Avaiable measures</label>
+                                <label class="control-label" translate="service.edit.dashboard.measures.list">Available measures</label>
                                 <div class="sos_edit_checkboxlist">
                                     <label class="checkbox" ng-repeat="measure in measures">
                                         <input type="checkbox"> {{measure}}
@@ -352,8 +352,9 @@
                                 </div>
                             </div>
                             <div class="col-sm-6 sos_edit_blocs">
-                                <label class="control-label" translate="service.edit.dashboard.aera">Geographical aera</label>
+                                <label class="control-label" translate="service.edit.dashboard.area">Geographical area</label>
                                 <div  class="sos_edit_checkboxlist">
+                                    <div id="olSensorMap" style="height:213px;"></div>
                                 </div>
                             </div>
                         </div>

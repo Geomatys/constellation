@@ -367,6 +367,10 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
             sos.listMeasures({id: $routeParams.id}, function(response) {
                 $scope.measures = response.Entry;
             }, function() { $growl('error','Error','Unable to list measures'); });
+
+            var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
+            DataViewer.layers = [layerBackground];
+            DataViewer.initMap('olSensorMap');
         };
 
         $scope.getVersionsForType = function() {

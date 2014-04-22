@@ -519,7 +519,7 @@
             "dashboard.action.add.layer": "Add Layer",
             "dashboard.sensors.list":"Available sensors",
             "dashboard.measures.list":"Available measures",
-            "dashboard.aera": "Geographical aera",
+            "dashboard.area": "Geographical area",
             "dashboard.date.to":"to",
             "dashboard.date.from":"From",
             "dashboard.button.graph":"Draw the graph"
