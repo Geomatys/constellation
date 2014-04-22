@@ -146,7 +146,7 @@
                                                              ng-click="selectDataMetadata(relatedData)" ng-class="{selected:relatedData==selectedDataMetadata,'metadata-vector':relatedData.Type.toLowerCase()=='vector','metadata-coverage':relatedData.Type.toLowerCase()=='coverage','metadata-sensor':relatedData.Type.toLowerCase()=='sensor'}">
                                                             <div class="top">
                                                                 <span class="item-title">{{relatedData.Name}}</span>
-                                                                <span class="pull-right text-right">{{relatedData.Type}}</span>
+                                                                <span class="pull-right text-right item-list-style" style="font-size:14px;">{{relatedData.Type}}</span>
                                                             </div>
                                                             <div class="bottom">
                                                                 <div class="block">
@@ -333,7 +333,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-sm-4 sos_edit_blocs">
+                            <div class="col-sm-3 sos_edit_blocs">
                                 <label class="control-label" translate="service.edit.dashboard.sensors.list">Avaiable sensors</label>
                                 <div class="sos_edit_checkboxlist"> 
                                     <label class="checkbox">
@@ -368,7 +368,7 @@
                                     </label>
                                 </div>
                             </div>
-                            <div class="col-sm-4 sos_edit_blocs">
+                            <div class="col-sm-3 sos_edit_blocs">
                                 <label class="control-label" translate="service.edit.dashboard.measures.list">Avaiable measures</label>
                                 <div class="sos_edit_checkboxlist"> 
                                     <label class="checkbox">
@@ -403,7 +403,7 @@
                                     </label>
                                 </div>
                             </div>
-                            <div class="col-sm-4 sos_edit_blocs">
+                            <div class="col-sm-6 sos_edit_blocs">
                                 <label class="control-label" translate="service.edit.dashboard.aera">Geographical aera</label>
                                 <div  class="sos_edit_checkboxlist">
                                 </div>

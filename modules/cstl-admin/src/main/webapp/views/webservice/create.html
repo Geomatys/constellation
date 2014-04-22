@@ -54,16 +54,22 @@
                 <fieldset style="padding-left:20px;">
                     <legend><span translate="service.description.tab.description.title">Service description</span></legend>
                     <form role="form-horizontal" role="form">
-                        <div class="form-group row">
+                        <div class="error" style="margin-top:0; margin-bottom:20px;"
+                                    ng-show="invalideName">
+                            <small class="error">Veuillez renseigner un Nom ou un identifiant</small> 
+                        </div>
+                        <div class="form-group row" ng-class="{'has-error':invalideName}">
                             <label class="control-label col-sm-2 new-service-form-label" translate="service.description.tab.description.name">Name</label>
                             <div class="col-sm-8 col-md-6">
-                                <input type="text" class="form-control" id="name" ng-model="metadata.name" value="">
+                                <input  type="text" class="form-control" id="name" ng-model="metadata.name" value="" required>
                             </div>
+                           <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="right" title="Tooltip on right">Tooltip on right</button>
+
                         </div>
-                        <div class="form-group row">
+                        <div class="form-group row" ng-class="{'has-error':invalideName}">
                             <label class="control-label col-sm-2 new-service-form-label" translate="service.description.tab.description.identifier">Identifier</label>
                             <div class="col-sm-8 col-md-6">
-                                <input type="text" class="form-control" id="identifier" ng-model="metadata.identifier" value="">
+                                <input type="text" class="form-control" id="identifier" ng-model="metadata.identifier" value="" required>
                             </div>
                         </div>
                         <div class="form-group row">

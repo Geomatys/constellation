@@ -271,16 +271,35 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         };
 
         $scope.createStyle = function() {
-            if ($scope.dataType.toLowerCase() === 'coverage' || $scope.dataType.toLowerCase() === 'raster') {
-                $scope.addPalette();
+            if($scope.dataType.toLowerCase() !== 'coverage' && $scope.dataType.toLowerCase() !== 'raster'){
+                style.create({provider: 'sld'}, $scope.newStyle, function() {
+                    $growl('success','Success','Style '+ $scope.newStyle.name +' successfully created');
+                    $modalInstance.close({"Provider": "sld", "Name": $scope.newStyle.name});
+                }, function() {
+                    $growl('error','Error','Unable to create style '+ $scope.newStyle.name);
+                    $modalInstance.close();
+                });
             }
-            style.create({provider: 'sld'}, $scope.newStyle, function() {
-                $growl('success','Success','Style '+ $scope.newStyle.name +' successfully created');
-                $modalInstance.close({"Provider": "sld", "Name": $scope.newStyle.name});
-            }, function() {
-                $growl('error','Error','Unable to create style '+ $scope.newStyle.name);
-                $modalInstance.close();
-            });
+            else if($scope.dataType.toLowerCase() === 'coverage' || $scope.dataType.toLowerCase() === 'raster'){
+                if($scope.palette.rasterMaxValue!= null && $scope.palette.rasterMinValue!=null){
+                    $scope.addPalette();
+                    style.create({provider: 'sld'}, $scope.newStyle, function() {
+                        $growl('success','Success','Style '+ $scope.newStyle.name +' successfully created');
+                        $modalInstance.close({"Provider": "sld", "Name": $scope.newStyle.name});
+                    }, function() {
+                        $growl('error','Error','Unable to create style '+ $scope.newStyle.name);
+                        $modalInstance.close();
+                    });
+                }
+                else {
+                    if($scope.palette.rasterMaxValue==null) {
+                        $scope.invalideMax=true;
+                    }
+                    if($scope.palette.rasterMinValue==null) {
+                        $scope.invalideMin=true;
+                    }
+                }
+            } 
         };
 
         $scope.close = function() {

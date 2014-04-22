@@ -165,7 +165,11 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
 
 
         $scope.goToServiceContact = function() {
-            $scope.tonext = false;
+            if($scope.metadata.name!= null || $scope.metadata.identifier!=null){
+                $scope.tonext = false;
+            } else {
+                $scope.invalideName=true;
+            }
         };
 
         $scope.goToServiceInfo = function() {
