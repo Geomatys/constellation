@@ -19,6 +19,9 @@ package org.constellation.dto;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 
 /**
  * @author Bernard Fabien (Geomatys).
@@ -26,8 +29,10 @@ import java.io.Serializable;
  * @since 0.9
  */
 @XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public final class SimpleValue implements Serializable {
 
+    @XmlElement
     private String value;
 
     public SimpleValue() {

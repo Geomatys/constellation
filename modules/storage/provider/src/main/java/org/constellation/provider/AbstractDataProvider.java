@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import org.constellation.admin.dao.ProviderRecord.ProviderType;
+import org.constellation.provider.configuration.ProviderParameters;
 
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.gui.swing.tree.Trees;
@@ -77,6 +78,12 @@ public abstract class AbstractDataProvider extends AbstractProvider<Name,Data> i
         return false;
     }
 
+    @Override
+    public Data get(String key){
+        final Name name = new DefaultName(ProviderParameters.getNamespace(this), key);
+        return get(name);
+    }
+    
     /**
      * Fill namespace on name is not present.
      */

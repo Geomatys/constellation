@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2011, Geomatys
+ *    (C) 2011-2014, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,32 +16,23 @@
  */
 package org.constellation.scheduler;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javanet.staxutils.IndentingXMLStreamWriter;
-import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-
-import org.constellation.configuration.ConfigDirectory;
-import org.geotoolkit.feature.DefaultName;
-import org.geotoolkit.process.ProcessFinder;
-
-import org.geotoolkit.process.ProcessingRegistry;
 import org.apache.sis.util.logging.Logging;
-import org.opengis.feature.type.Name;
+import org.constellation.configuration.ConfigurationException;
+import org.constellation.scheduler.configuration.XMLTaskConfigurator;
 
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
+import static org.quartz.impl.matchers.EverythingMatcher.*;
 
 /**
  * Constellation can run tasks at regular intervals. 
@@ -52,13 +43,18 @@ import org.quartz.impl.StdSchedulerFactory;
  * @module pending
  */
 public final class CstlScheduler {
-    
+        
     private static final Logger LOGGER = Logging.getLogger(CstlScheduler.class);
-    private static final String TASK_FILE = "scheduler-tasks.xml";    
     private static CstlScheduler INSTANCE = null;
         
     private final List<Task> tasks = new ArrayList<>();
+    private final Map<String,TaskState> statuses = new ConcurrentHashMap<>();
+    private final QuartzJobListener quartzListener = new QuartzJobListener();
     private Scheduler quartzScheduler;
+    
+    public static final TaskConfigurator DEFAULT_CONFIGURATOR = new XMLTaskConfigurator();    
+    protected static TaskConfigurator CONFIGURATOR = DEFAULT_CONFIGURATOR;
+    
     
     private CstlScheduler(){
         
@@ -73,6 +69,10 @@ public final class CstlScheduler {
         try {
             quartzScheduler = schedFact.getScheduler();
             quartzScheduler.start();
+            
+            //listen and attach a process on all geotk process tasks
+            quartzScheduler.getListenerManager().addJobListener(quartzListener, allJobs());
+            
         } catch (SchedulerException ex) {
             LOGGER.log(Level.SEVERE, "=== Failed to start quartz scheduler ===\n"+ex.getLocalizedMessage(), ex);            
             return;
@@ -88,63 +88,13 @@ public final class CstlScheduler {
         }
     }
     
-    /**
-     * The returned list is a subset of what can be found with ProcessFinder.
-     * But only process with simple types arguments are preserved.
-     * 
-     * @return List of all available process.
-     */
-    public List<Name> listProcess(){
-        final List<Name> names = new ArrayList<>();
-        
-        final Iterator<ProcessingRegistry> ite = ProcessFinder.getProcessFactories();
-        while(ite.hasNext()){
-            final ProcessingRegistry factory = ite.next();            
-            final String authorityCode = factory.getIdentification().getCitation()
-                              .getIdentifiers().iterator().next().getCode();
-            
-            for(String processCode : factory.getNames()){
-                names.add(new DefaultName(authorityCode, processCode));
-            }            
-        }
-        
-        return names;
+    public static TaskConfigurator getConfigurator() {
+        return CONFIGURATOR;
     }
 
-    /**
-     * The returned list is a subset of what can be found with ProcessFinder.
-     * But only process with simple types arguments are preserved.
-     *
-     * @param authorityCode
-     * @return List of all available process.
-     */
-    public List<String> listProcessForFactory(final String authorityCode){
-        final List<String> names = new ArrayList<>();
-
-        final Iterator<ProcessingRegistry> ite = ProcessFinder.getProcessFactories();
-        while(ite.hasNext()){
-            final ProcessingRegistry factory = ite.next();
-            final String currentAuthorityCode = factory.getIdentification().getCitation()
-                              .getIdentifiers().iterator().next().getCode();
-            if (currentAuthorityCode.equals(authorityCode)) {
-                for(String processCode : factory.getNames()){
-                    names.add(processCode);
-                }
-            }
-        }
-        return names;
-    }
-
-    public List<String> listProcessFactory(){
-        final List<String> names = new ArrayList<>();
-
-        final Iterator<ProcessingRegistry> ite = ProcessFinder.getProcessFactories();
-        while(ite.hasNext()){
-            final ProcessingRegistry factory = ite.next();
-            names.add(factory.getIdentification().getCitation()
-                              .getIdentifiers().iterator().next().getCode());
-        }
-        return names;
+    public static synchronized void setConfigurator(TaskConfigurator configurator) {
+        CONFIGURATOR = configurator;
+        //TODO need to clean the quartz task pool and reload task from new configurator
     }
     
     
@@ -170,30 +120,45 @@ public final class CstlScheduler {
     }
     
     /**
+     * Get task status.
+     * @param id, must be a valid id. Illegal
+     * @return TaskState, null if no task exist for this id.
+     */
+    public synchronized TaskState getaskState(final String id){
+        TaskState state = statuses.get(id);
+        if(state==null){
+            final Task task = getTask(id);
+            if(task==null){
+                return null;
+            }
+            state = new TaskState(task);
+            statuses.put(id, state);
+        }
+        return state;
+    }
+    
+    /**
      * Add a new task.
      * @param task
      */
-    public synchronized void addTask(Task task){
+    public synchronized void addTask(Task task) throws ConfigurationException{
         
-        tasks.add(new Task(task)); //defense copy
+        task = new Task(task); //defense copy
+        tasks.add(task);
         try {
             registerTask(task);
         } catch (SchedulerException ex) {
             LOGGER.log(Level.WARNING, "Failed to register task :"+task.getId()+","+task.getTitle()+" in scheduler.",ex);
         }
         
-        try {
-            saveTasks();
-        } catch (IOException | XMLStreamException ex) {
-            LOGGER.log(Level.WARNING, "Failed to save tasks list", ex);
-        }
+        getConfigurator().addTaskConfiguration(task);
     }
     
     /**
      * Update a task.
      * @param task
      */
-    public synchronized boolean updateTask(final Task task){
+    public synchronized boolean updateTask(final Task task) throws ConfigurationException{
         if(removeTask(task)){
             addTask(task);
             return true;
@@ -205,7 +170,7 @@ public final class CstlScheduler {
      * Remove a task.
      * @param task
      */
-    public synchronized boolean removeTask(Task task){
+    public synchronized boolean removeTask(Task task) throws ConfigurationException{
         return removeTask(task.getId());
     }
     
@@ -213,12 +178,12 @@ public final class CstlScheduler {
      * Remove task for the given id.
      * @param id
      */
-    public synchronized boolean removeTask(final String id){
+    public synchronized boolean removeTask(final String id) throws ConfigurationException{
         
+        //find task for this id
         Task task = null;
         for(int i=0,n=tasks.size(); i<n; i++){
-            final Task t = tasks.get(i);
-            
+            final Task t = tasks.get(i);            
             if(t.getId().equals(id)){
                 task = tasks.remove(i);
                 break;
@@ -226,11 +191,9 @@ public final class CstlScheduler {
         }
         
         if(task != null){
-            try {
-                saveTasks();
-            } catch (IOException | XMLStreamException ex) {
-                LOGGER.log(Level.WARNING, "Failed to save tasks list", ex);
-            }
+            statuses.remove(task.getId());
+            
+            getConfigurator().removeTaskConfiguration(task);
             try {
                 unregisterTask(task);
             } catch (SchedulerException ex) {
@@ -245,56 +208,24 @@ public final class CstlScheduler {
      * Load tasks defined in the configuration file.
      */
     private synchronized void loadTasks() throws IOException, XMLStreamException{
-        //open configuration file
-        final File configDir = ConfigDirectory.getConfigDirectory();
-        final File taskFile = new File(configDir, TASK_FILE);
-        if(!taskFile.exists()){
-            return;
-        }
-        
-        final TasksReader reader = new TasksReader();
-        reader.setInput(taskFile);
-        final List<Task> candidates = reader.read();
-        if(candidates != null){
-            tasks.addAll(candidates);
-        }
-    }
-    
-    /**
-     * save tasks in the configuration file.
-     */
-    private synchronized void saveTasks() throws IOException, XMLStreamException{
-        final File configDir = ConfigDirectory.getConfigDirectory();
-        if(!configDir.exists()){
-            configDir.mkdirs();
-        }
-        
-        final File taskFile = new File(configDir, TASK_FILE);
-        
-        XMLStreamWriter xmlWriter = null;
-        final XMLOutputFactory XMLfactory = XMLOutputFactory.newInstance();
-        XMLfactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
         try {
-            xmlWriter = XMLfactory.createXMLStreamWriter(new FileOutputStream(taskFile));
-        } catch (FileNotFoundException ex) {
-            throw new XMLStreamException(ex.getLocalizedMessage(), ex);
-        }
-        xmlWriter = new IndentingXMLStreamWriter(xmlWriter);
-        
-        try{
-            final TasksWriter taskWriter = new TasksWriter();
-            taskWriter.setOutput(xmlWriter);
-            taskWriter.write(tasks);
-            taskWriter.dispose();
-        }finally{
-            xmlWriter.close();
+            final List<Task> candidates = CONFIGURATOR.getTasksConfiguration();
+            if(candidates != null){
+                tasks.addAll(candidates);
+            }
+        } catch (ConfigurationException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
         }
     }
-    
+        
     /**
      * Add the given task in the scheduler.
      */
     private void registerTask(final Task task) throws SchedulerException{
+        //ensure the job detail contain the task in the datamap, this is used in the
+        //job listener to track back the task
+        task.getDetail().getJobDataMap().put(QuartzJobListener.PROPERTY_TASK, task);
+                
         quartzScheduler.scheduleJob(task.getDetail(), task.getTrigger());
         LOGGER.log(Level.INFO, "Scheduler task added : {0}, {1}   type : {2}.{3}", new Object[]{
             task.getId(),

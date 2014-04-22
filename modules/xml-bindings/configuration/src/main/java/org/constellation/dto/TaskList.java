@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2011, Geomatys
+ *    (C) 2014, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,24 +14,34 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.scheduler;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+package org.constellation.dto;
+
+import java.util.ArrayList;
+import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * @author Guilhem Legal (Geomatys)
+ * @author Johann Sorel (Geomatys)
  */
-public class CstlSchedulerSetup implements ServletContextListener {
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
+public class TaskList {
+    
+    @XmlElement
+    private List<TaskStatus> tasks;
 
-    @Override
-    public void contextInitialized(ServletContextEvent servletContextEvent) {
-        CstlScheduler.getInstance();
+    public List<TaskStatus> getTasks() {
+        if(tasks==null) tasks = new ArrayList<>();
+        return tasks;
     }
 
-    @Override
-    public void contextDestroyed(ServletContextEvent servletContextEvent) {
-        CstlScheduler.getInstance().stop();
+    public void setTasks(List<TaskStatus> tasks) {
+        this.tasks = tasks;
     }
+    
 }

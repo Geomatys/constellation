@@ -223,7 +223,7 @@ public class OM2ObservationWriter implements ObservationWriter {
             stmt.executeUpdate();
             stmt.close();
             
-            writeResult(oid, observation.getResult(), c);
+            writeResult(oid, observation.getResult(), samplingTime, c);
             
             updateOrCreateOffering(procedure.getHref(),samplingTime, phenRef, c);
             
@@ -323,7 +323,7 @@ public class OM2ObservationWriter implements ObservationWriter {
         stmtExist.close();
     }
     
-    private void writeResult(final int oid, final Object result, final Connection c) throws SQLException, CstlServiceException {
+    private void writeResult(final int oid, final Object result, final TemporalObject samplingTime, final Connection c) throws SQLException, CstlServiceException {
         final PreparedStatement stmt = c.prepareStatement("INSERT INTO \"om\".\"mesures\" VALUES(?,?,?,?,?,?,?,?)");
         if (result instanceof Measure) {
             final Measure measure = (Measure) result;
@@ -348,11 +348,12 @@ public class OM2ObservationWriter implements ObservationWriter {
                 throw new CstlServiceException("Only DataRecord is supported");
             }
             final List<Field> fields = new ArrayList<>();
+            boolean hasTime = false;
             if (array.getPropertyElementType().getAbstractRecord() instanceof DataRecord) {
                 final DataRecord record = (DataRecord)array.getPropertyElementType().getAbstractRecord();
                 for (DataComponentProperty field : record.getField()) {
                     if (field.getName().equalsIgnoreCase("Time")) {
-                        continue;
+                        hasTime = true;
                     } else {
                         if (field.getValue() instanceof Quantity) {
                             final Quantity q = (Quantity)field.getValue();
@@ -372,7 +373,7 @@ public class OM2ObservationWriter implements ObservationWriter {
                 final SimpleDataRecord record = (SimpleDataRecord)array.getPropertyElementType().getAbstractRecord();
                 for (AnyScalar field : record.getField()) {
                     if (field.getName().equalsIgnoreCase("Time")) {
-                        continue;
+                        hasTime = true;
                     } else {
                         if (field.getValue() instanceof Quantity) {
                             final Quantity q = (Quantity)field.getValue();
@@ -399,18 +400,46 @@ public class OM2ObservationWriter implements ObservationWriter {
             int n = 1;
             Timestamp lastDate = null;
             while (tokenizer.hasMoreTokens()) {
-                String block = tokenizer.nextToken();
+                String block       = tokenizer.nextToken();
+                
                 // time field
-                int tokenIndex = block.indexOf(encoding.getTokenSeparator());
-                final String time = block.substring(0, tokenIndex);
                 final Timestamp realTime;
-                try {
-                    final long millis = new ISODateParser().parseToMillis(time);
-                    realTime = new Timestamp(millis);
-                } catch (IllegalArgumentException ex) {
-                    throw new CstlServiceException("Bad format of timestamp for:" + time);
+                if (hasTime) {
+                    int tokenIndex     = block.indexOf(encoding.getTokenSeparator());
+                    final String first = block.substring(0, tokenIndex);
+                    try {
+                        final long millis = new ISODateParser().parseToMillis(first);
+                        realTime = new Timestamp(millis);
+                    } catch (IllegalArgumentException ex) {
+                        throw new CstlServiceException("Bad format of timestamp for:" + first);
+                    }
+                    block = block.substring(tokenIndex + 1);
+                } else {
+                    if (samplingTime instanceof Period) {
+                        LOGGER.warning("expecting a timeInstant for observation with no time field.");
+                        final Period period = (Period) samplingTime;
+                        final Date beginDate = period.getBeginning().getPosition().getDate();
+                        final Date endDate = period.getEnding().getPosition().getDate();
+                        if (beginDate != null) {
+                            realTime = new Timestamp(beginDate.getTime());
+                        } else if (endDate != null) {
+                            realTime = new Timestamp(endDate.getTime());
+                        } else {
+                            realTime = null;
+                        }
+                    } else if (samplingTime instanceof Instant) {
+                        final Instant instant = (Instant) samplingTime;
+                        final Date date = instant.getPosition().getDate();
+                        if (date != null) {
+                            realTime = new Timestamp(date.getTime());
+                        } else {
+                            realTime = null;
+                        }
+                    } else {
+                        realTime = null;
+                    }
                 }
-                block = block.substring(tokenIndex + 1);
+                
                 for (int i = 0; i < fields.size(); i++) {
                     final String value;
                     if (i == fields.size() - 1) {
@@ -423,7 +452,11 @@ public class OM2ObservationWriter implements ObservationWriter {
                     }
                     stmt.setInt(1, oid);
                     stmt.setInt(2, n);
-                    stmt.setTimestamp(3, realTime);
+                    if (realTime != null) {
+                        stmt.setTimestamp(3, realTime);
+                    } else {
+                        stmt.setNull(3, java.sql.Types.TIMESTAMP);
+                    }
                     stmt.setString(4, value);
                     stmt.setString(5, fields.get(i).fieldUom);
                     stmt.setString(6, fields.get(i).fieldType);

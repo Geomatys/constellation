@@ -53,6 +53,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.constellation.library</groupId>
+      <artifactId>cstl-lib-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-jaxp-core</artifactId>
     </dependency>

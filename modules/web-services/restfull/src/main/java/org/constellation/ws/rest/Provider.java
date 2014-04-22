@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2012, Geomatys
+ *    (C) 2007 - 2014, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,9 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,18 +40,30 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.referencing.IdentifiedObjects;
+import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.configuration.ProviderConfiguration;
+import org.constellation.dto.ProviderPyramidChoiceList;
+import org.constellation.dto.SimpleValue;
+import org.constellation.provider.CoverageData;
+import org.constellation.provider.Data;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviderFactory;
 import org.constellation.provider.DataProviders;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.LayerProviders;
+import org.geotoolkit.coverage.CoverageReference;
+import org.geotoolkit.coverage.GridSampleDimension;
+import org.geotoolkit.coverage.Pyramid;
+import org.geotoolkit.coverage.PyramidalCoverageReference;
 import org.geotoolkit.coverage.io.CoverageStoreException;
+import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.data.FeatureStoreFactory;
 import org.geotoolkit.data.FeatureStoreFinder;
@@ -60,6 +74,7 @@ import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.util.NoSuchIdentifierException;
 
 /**
@@ -304,6 +319,77 @@ public final class Provider {
         }
     }
 
+    /**
+     * Indicate if given provider contains a geophysic data.
+     */
+    @GET
+    @Path("{id}/{layerName}/isGeophysic")
+    public Response isGeophysic(final @PathParam("id") String id,
+                                final @PathParam("layerName") String layerName) {
+        
+        boolean isGeophysic = false;
+        try {
+            final Data data = LayerProviders.getLayer(id, layerName);
+            if(data!=null && data.getOrigin() instanceof CoverageReference){
+                final CoverageReference ref = (CoverageReference) data.getOrigin();
+                final GridCoverageReader reader = ref.acquireReader();
+                final List<GridSampleDimension> dims = reader.getSampleDimensions(ref.getImageIndex());
+                if(dims!=null && !dims.isEmpty()){
+                    isGeophysic = true;
+                }                
+                ref.recycle(reader);
+            }
+        } catch (CstlServiceException|CoverageStoreException ex) {
+            return Response.ok(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
+        }
+                
+       return Response.ok(new SimpleValue(isGeophysic)).build();
+    }
+        
+    /**
+     * List the available pyramids for this layer
+     */
+    @GET
+    @Path("{id}/{layerName}/listPyramidChoice")
+    public Response listPyramids(final @PathParam("id") String id,
+                                final @PathParam("layerName") String layerName) {
+        
+        final ProviderPyramidChoiceList choices = new ProviderPyramidChoiceList();
+        
+        final ProviderRecord providerRec = ConfigurationEngine.getProvider(id);
+        final List<ProviderRecord> childrenRecs = providerRec.getChildrenProviders();
+        
+        for(ProviderRecord childRec : childrenRecs){
+            final DataProvider provider = DataProviders.getInstance().getProvider(childRec.getIdentifier());
+            final CoverageData cacheData = (CoverageData) provider.get(layerName);
+            if(cacheData!=null){
+                final PyramidalCoverageReference cacheRef = (PyramidalCoverageReference) cacheData.getOrigin();
+                try {
+                    final Collection<Pyramid> pyramids = cacheRef.getPyramidSet().getPyramids();
+                    if(pyramids.isEmpty()) continue;
+                    //TODO what do we do if there are more then one pyramid ?
+                    //it the current state of constellation there is only one pyramid
+                    final Pyramid pyramid = pyramids.iterator().next();                    
+                    final ReferenceIdentifier crsid = pyramid.getCoordinateReferenceSystem().getIdentifiers().iterator().next();
+                    
+                    final ProviderPyramidChoiceList.CachePyramid cache = new ProviderPyramidChoiceList.CachePyramid();
+                    cache.setCrs(crsid.getCode());
+                    cache.setScales(pyramid.getScales());
+                    cache.setProviderId(provider.getId());
+                    cache.setDataId(layerName);
+                    cache.setConform(childRec.isPyramidConformProvider());
+                    
+                    choices.getPyramids().add(cache);
+                    
+                } catch (DataStoreException ex) {
+                    return Response.ok(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
+                }
+            }
+        }
+        
+        return Response.ok(choices).build();
+    }
+    
     /**
      * @see LayerProviders#getBandValues(String, String, int)
      */

@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.scheduler;
+package org.constellation.scheduler.configuration;
 
 /**
  * XML constants for tag and attributes name.
@@ -22,7 +22,7 @@ package org.constellation.scheduler;
  * @author Johann Sorel (Geomatys)
  * @module pending
  */
-final class TasksConstants {
+final class XMLTasksConstants {
     
     public static final String TAG_TASKS = "tasks";
     public static final String TAG_TASK = "task";
@@ -38,6 +38,6 @@ final class TasksConstants {
     
     public static final String TAG_PARAMETERS = "parameters";
     
-    private TasksConstants(){}
+    private XMLTasksConstants(){}
     
 }

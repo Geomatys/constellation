@@ -81,7 +81,9 @@ import org.constellation.process.provider.style.SetStyleToStyleProviderDescripto
 import org.constellation.process.provider.style.DeleteStyleToStyleProviderDescriptor;
 import org.constellation.ws.WSEngine;
 import org.constellation.api.CommonConstants;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
+import org.constellation.scheduler.Tasks;
 import org.constellation.ws.Worker;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.InvalidParameterValueException;
@@ -915,7 +917,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      * Returns a list of all process available in the current factories.
      */
     private StringList listProcess(){
-        final List<Name> names = CstlScheduler.getInstance().listProcess();
+        final List<Name> names = Tasks.listProcess();
         final StringList lst = new StringList();
         for(Name n : names){
             lst.getList().add(DefaultName.toJCRExtendedForm(n));
@@ -928,14 +930,14 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      */
     private StringList listProcessForFactory(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
         final String authorityCode = getParameter("authorityCode", true, parameters);
-        return new StringList(CstlScheduler.getInstance().listProcessForFactory(authorityCode));
+        return new StringList(Tasks.listProcessForFactory(authorityCode));
     }
 
     /**
      * Returns a list of all process available in the current factories.
      */
     private StringList listProcessFactories(){
-        final List<String> names = CstlScheduler.getInstance().listProcessFactory();
+        final List<String> names = Tasks.listProcessFactory();
         return new StringList(names);
     }
 
@@ -1068,7 +1070,13 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
                 .build());
         ProcessJobDetail detail = new ProcessJobDetail(authority, code, orig);
         task.setDetail(detail);
-        CstlScheduler.getInstance().addTask(task);
+        
+        try{
+            CstlScheduler.getInstance().addTask(task);
+        }catch(ConfigurationException ex){
+            LOGGER.log(Level.WARNING, ex.getMessage(),ex);
+            return new AcknowlegementType("Failure", "Failed to create task : "+ex.getMessage());
+        }
 
         return new AcknowlegementType("Success", "The task has been created");
     }
@@ -1122,10 +1130,15 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         ProcessJobDetail detail = new ProcessJobDetail(authority, code, orig);
         task.setDetail(detail);
 
-        if(CstlScheduler.getInstance().updateTask(task)){
-            return new AcknowlegementType("Success", "The task has been updated.");
-        }else{
-            return new AcknowlegementType("Failure", "Could not find task for given id.");
+        try{
+            if(CstlScheduler.getInstance().updateTask(task)){
+                return new AcknowlegementType("Success", "The task has been updated.");
+            }else{
+                return new AcknowlegementType("Failure", "Could not find task for given id.");
+            }
+        }catch(ConfigurationException ex){
+            LOGGER.log(Level.WARNING, ex.getMessage(),ex);
+            return new AcknowlegementType("Failure", "Could not find task for given id : "+ex.getMessage());
         }
     }
 
@@ -1135,11 +1148,15 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     private Object deleteTask(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
         final String id = getParameter("id", true, parameters);
 
-
-        if( CstlScheduler.getInstance().removeTask(id)){
-            return new AcknowlegementType("Success", "The task has been deleted");
-        }else{
-            return new AcknowlegementType("Failure", "Could not find task for given id.");
+        try{
+            if( CstlScheduler.getInstance().removeTask(id)){
+                return new AcknowlegementType("Success", "The task has been deleted");
+            }else{
+                return new AcknowlegementType("Failure", "Could not find task for given id.");
+            }
+        }catch(ConfigurationException ex){
+            LOGGER.log(Level.WARNING, ex.getMessage(),ex);
+            return new AcknowlegementType("Failure", "Could not find task for given id : "+ex.getMessage());
         }
     }
 

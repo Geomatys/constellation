@@ -397,8 +397,7 @@ public final class LayerProviders extends Static {
      * @throws CstlServiceException if the layer does not exists
      */
     private static Data getLayer(final DataProvider provider, final String layerName) throws CstlServiceException {
-        final Name name = new DefaultName(ProviderParameters.getNamespace(provider), layerName);
-        final Data layer = provider.get(name);
+        final Data layer = provider.get(layerName);
         if (layer == null) {
             throw new CstlServiceException("No layer named \"" + layerName + "\" in provider with id \"" + provider.getId() + "\".");
         }
@@ -413,7 +412,7 @@ public final class LayerProviders extends Static {
      * @return the {@link Data} instance
      * @throws CstlServiceException if the provider or the layer does not exists
      */
-    private static Data getLayer(final String providerId, final String layerName) throws CstlServiceException {
+    public static Data getLayer(final String providerId, final String layerName) throws CstlServiceException {
         return getLayer(getProvider(providerId), layerName);
     }
 

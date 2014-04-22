@@ -332,74 +332,22 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
+
+                        <div class="row" ng-init="initSensors()">
                             <div class="col-sm-3 sos_edit_blocs">
+
                                 <label class="control-label" translate="service.edit.dashboard.sensors.list">Avaiable sensors</label>
-                                <div class="sos_edit_checkboxlist"> 
-                                    <label class="checkbox">
-                                      <input type="checkbox" > Capteur
-                                    </label>
-                                    <label class="checkbox">
-                                      <input type="checkbox"> Capteur
-                                    </label>
-                                    <label class="checkbox">
-                                      <input type="checkbox"> Capteur
-                                    </label>
-                                    <label class="checkbox">
-                                      <input type="checkbox"> Capteur
-                                    </label>
-                                    <label class="checkbox">
-                                      <input type="checkbox"> Capteur
-                                    </label>
-                                    <label class="checkbox">
-                                      <input type="checkbox"> Capteur
-                                    </label>
-                                    <label class="checkbox">
-                                      <input type="checkbox"> Capteur
-                                    </label>
-                                    <label class="checkbox">
-                                      <input type="checkbox"> Capteur
-                                    </label>
-                                    <label class="checkbox">
-                                      <input type="checkbox"> Capteur
-                                    </label>
-                                    <label class="checkbox">
-                                      <input type="checkbox"> Capteur
+                                <div class="sos_edit_checkboxlist">
+                                    <label class="checkbox" ng-repeat="sensor in sensors">
+                                      <input type="checkbox"> {{sensor}}
                                     </label>
                                 </div>
                             </div>
                             <div class="col-sm-3 sos_edit_blocs">
                                 <label class="control-label" translate="service.edit.dashboard.measures.list">Avaiable measures</label>
-                                <div class="sos_edit_checkboxlist"> 
-                                    <label class="checkbox">
-                                      <input type="checkbox"> Mesure
-                                    </label>
-                                    <label class="checkbox">
-                                      <input type="checkbox"> Mesure
-                                    </label>
-                                    <label class="checkbox">
-                                      <input type="checkbox"> Mesure
-                                    </label>
-                                    <label class="checkbox">
-                                      <input type="checkbox"> Mesure
-                                    </label>
-                                    <label class="checkbox">
-                                      <input type="checkbox"> Mesure
-                                    </label>
-                                    <label class="checkbox">
-                                      <input type="checkbox"> Mesure
-                                    </label>
-                                    <label class="checkbox">
-                                      <input type="checkbox"> Mesure
-                                    </label>
-                                    <label class="checkbox">
-                                      <input type="checkbox"> Mesure
-                                    </label>
-                                    <label class="checkbox">
-                                      <input type="checkbox"> Mesure
-                                    </label>
-                                    <label class="checkbox">
-                                      <input type="checkbox"> Mesure
+                                <div class="sos_edit_checkboxlist">
+                                    <label class="checkbox" ng-repeat="measure in measures">
+                                        <input type="checkbox"> {{measure}}
                                     </label>
                                 </div>
                             </div>
