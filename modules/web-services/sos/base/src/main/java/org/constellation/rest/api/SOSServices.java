@@ -69,9 +69,21 @@ public class SOSServices {
     }
     
     @GET
+    @Path("{id}/sensors/identifiers/{observedProperty}")
+    public Response getSensorIdsForObservedProperty(final @PathParam("id") String id, final @PathParam("observedProperty") String observedProperty) throws Exception {
+        return ok(new StringList(getConfigurer().getSensorIdsForObservedProperty(id, observedProperty)));
+    }
+    
+    @GET
     @Path("{id}/sensors/count")
     public Response getSensortCount(final @PathParam("id") String id) throws Exception {
         return ok(new SimpleValue(getConfigurer().getSensorCount(id)));
+    }
+    
+    @GET
+    @Path("{id}/observedProperty/identifiers/{sensorID}")
+    public Response getObservedPropertiesForSensor(final @PathParam("id") String id, final @PathParam("sensorID") String sensorID) throws Exception {
+        return ok(new StringList(getConfigurer().getObservedPropertiesForSensorId(id, sensorID)));
     }
     
     @PUT

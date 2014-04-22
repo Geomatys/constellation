@@ -27,6 +27,7 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
@@ -304,6 +305,58 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
             return results;
         } catch (SQLException ex) {
             throw new CstlServiceException("Error while retrieving phenomenon names.", ex, NO_APPLICABLE_CODE);
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<String> getProceduresForPhenomenon(final String observedProperty) throws CstlServiceException {
+        try {
+            final Connection c           = source.getConnection();
+            final List<String> results   = new ArrayList<>();
+            final PreparedStatement stmt = c.prepareStatement("SELECT DISTINCT \"procedure\" "
+                                                            + "FROM \"om\".\"offerings\", \"om\".\"offering_observed_properties\""
+                                                            + "WHERE \"identifier\"=\"id_offerings\""
+                                                            + "AND \"phenomenon\"=?");
+            stmt.setString(1, observedProperty);
+            final ResultSet rs =  stmt.executeQuery();
+            while (rs.next()) {
+                results.add(rs.getString(1));
+            }
+            rs.close();
+            stmt.close();
+            c.close();
+            return results;
+        } catch (SQLException ex) {
+            throw new CstlServiceException("Error while retrieving procedure names.", ex, NO_APPLICABLE_CODE);
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<String> getPhenomenonsForProcedure(final String sensorID) throws CstlServiceException {
+        try {
+            final Connection c           = source.getConnection();
+            final List<String> results   = new ArrayList<>();
+            final PreparedStatement stmt = c.prepareStatement("SELECT \"phenomenon\" "
+                                                            + "FROM \"om\".\"offerings\", \"om\".\"offering_observed_properties\""
+                                                            + "WHERE \"identifier\"=\"id_offerings\""
+                                                            + "AND \"procedure\"=?");
+            stmt.setString(1, sensorID);
+            final ResultSet rs =  stmt.executeQuery();
+            while (rs.next()) {
+                results.add(rs.getString(1));
+            }
+            rs.close();
+            stmt.close();
+            c.close();
+            return results;
+        } catch (SQLException ex) {
+            throw new CstlServiceException("Error while retrieving procedure names.", ex, NO_APPLICABLE_CODE);
         }
     }
 

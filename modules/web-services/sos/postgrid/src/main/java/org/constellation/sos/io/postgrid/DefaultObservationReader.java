@@ -137,8 +137,10 @@ public class DefaultObservationReader implements ObservationReader {
 
     /**
      *
-     * @param dataSourceOM
-     * @param observationIdBase
+     * @param configuration
+     * @param properties
+     * 
+     * @throws org.constellation.ws.CstlServiceException
      */
     public DefaultObservationReader(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
         this.observationIdBase = (String) properties.get(OMFactory.OBSERVATION_ID_BASE);
@@ -191,7 +193,7 @@ public class DefaultObservationReader implements ObservationReader {
      */
     @Override
     public List<ObservationOffering> getObservationOfferings(final List<String> offeringNames, final String version) throws CstlServiceException {
-        final List<ObservationOffering> offerings = new ArrayList<ObservationOffering>();
+        final List<ObservationOffering> offerings = new ArrayList<>();
         for (String offeringName : offeringNames) {
             offerings.add(getObservationOffering(offeringName, version));
         }
@@ -228,7 +230,7 @@ public class DefaultObservationReader implements ObservationReader {
     @Override
     public List<ObservationOffering> getObservationOfferings(final String version) throws CstlServiceException {
         try {
-            final List<ObservationOffering> loo = new ArrayList<ObservationOffering>();
+            final List<ObservationOffering> loo = new ArrayList<>();
             if (version.equals("2.0.0")) {
                 final Collection<String> offeringNames = getOfferingNames(version);
                 for (String offeringName : offeringNames) {
@@ -290,13 +292,23 @@ public class DefaultObservationReader implements ObservationReader {
         }
     }
 
+    @Override
+    public Collection<String> getProceduresForPhenomenon(String observedProperty) throws CstlServiceException {
+        throw new UnsupportedOperationException("Not supported yet in this implementation.");
+    }
+
+    @Override
+    public Collection<String> getPhenomenonsForProcedure(String sensorID) throws CstlServiceException {
+        throw new UnsupportedOperationException("Not supported yet in this implementation.");
+    }
+    
     /**
      * {@inheritDoc}
      */
     @Override
     public boolean existPhenomenon(String phenomenonName) throws CstlServiceException {
         // we remove the phenomenon id base
-        if (phenomenonName.indexOf(phenomenonIdBase) != -1) {
+        if (phenomenonName.contains(phenomenonIdBase)) {
             phenomenonName = phenomenonName.replace(phenomenonIdBase, "");
         }
         try {

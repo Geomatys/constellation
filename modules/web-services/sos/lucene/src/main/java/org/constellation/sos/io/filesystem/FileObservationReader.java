@@ -109,7 +109,7 @@ public class FileObservationReader implements ObservationReader {
      */
     @Override
     public Collection<String> getOfferingNames(final String version) throws CstlServiceException {
-        final List<String> offeringNames = new ArrayList<String>();
+        final List<String> offeringNames = new ArrayList<>();
         if (offeringDirectory.isDirectory()) {
             final File offeringVersionDir = new File(observationDirectory, version);
             if (offeringVersionDir.isDirectory()) {
@@ -128,7 +128,7 @@ public class FileObservationReader implements ObservationReader {
      */
     @Override
     public List<ObservationOffering> getObservationOfferings(final List<String> offeringNames, final String version) throws CstlServiceException {
-        final List<ObservationOffering> offerings = new ArrayList<ObservationOffering>();
+        final List<ObservationOffering> offerings = new ArrayList<>();
         for (String offeringName : offeringNames) {
             offerings.add(getObservationOffering(offeringName, version));
         }
@@ -170,7 +170,7 @@ public class FileObservationReader implements ObservationReader {
      */
     @Override
     public List<ObservationOffering> getObservationOfferings(final String version) throws CstlServiceException {
-        final List<ObservationOffering> offerings = new ArrayList<ObservationOffering>();
+        final List<ObservationOffering> offerings = new ArrayList<>();
         if (offeringDirectory.exists()) {
             final File offeringVersionDir = new File(offeringDirectory, version); 
             if (offeringVersionDir.isDirectory()) {
@@ -207,7 +207,7 @@ public class FileObservationReader implements ObservationReader {
      */
     @Override
     public Collection<String> getProcedureNames() throws CstlServiceException {
-        final List<String> sensorNames = new ArrayList<String>();
+        final List<String> sensorNames = new ArrayList<>();
         if (sensorDirectory.exists()) {
             for (File sensorFile: sensorDirectory.listFiles()) {
                 String sensorName = sensorFile.getName();
@@ -223,7 +223,7 @@ public class FileObservationReader implements ObservationReader {
      */
     @Override
     public Collection<String> getPhenomenonNames() throws CstlServiceException {
-        final List<String> phenomenonNames = new ArrayList<String>();
+        final List<String> phenomenonNames = new ArrayList<>();
         if (phenomenonDirectory.exists()) {
             for (File phenomenonFile: phenomenonDirectory.listFiles()) {
                 String phenomenonName = phenomenonFile.getName();
@@ -234,13 +234,23 @@ public class FileObservationReader implements ObservationReader {
         return phenomenonNames;
     }
 
+    @Override
+    public Collection<String> getProceduresForPhenomenon(String observedProperty) throws CstlServiceException {
+        throw new UnsupportedOperationException("Not supported yet in this implementation.");
+    }
+
+    @Override
+    public Collection<String> getPhenomenonsForProcedure(String sensorID) throws CstlServiceException {
+        throw new UnsupportedOperationException("Not supported yet in this implementation.");
+    }
+    
     /**
      * {@inheritDoc}
      */
     @Override
     public boolean existPhenomenon(String phenomenonName) throws CstlServiceException {
         // we remove the phenomenon id base
-        if (phenomenonName.indexOf(phenomenonIdBase) != -1) {
+        if (phenomenonName.contains(phenomenonIdBase)) {
             phenomenonName = phenomenonName.replace(phenomenonIdBase, "");
         }
         final File phenomenonFile = new File(phenomenonDirectory, phenomenonName + FILE_EXTENSION);
@@ -252,7 +262,7 @@ public class FileObservationReader implements ObservationReader {
      */
     @Override
     public Collection<String> getFeatureOfInterestNames() throws CstlServiceException {
-        final List<String> foiNames = new ArrayList<String>();
+        final List<String> foiNames = new ArrayList<>();
         if (foiDirectory.exists()) {
             for (File foiFile: foiDirectory.listFiles()) {
                 String foiName = foiFile.getName();
@@ -320,7 +330,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public Object getResult(final String identifier, final QName resutModel, final String version) throws CstlServiceException {
+    public Object getResult(final String identifier, final QName resultModel, final String version) throws CstlServiceException {
         final File anyResultFile = new File(observationDirectory, identifier + FILE_EXTENSION);
         if (anyResultFile.exists()) {
             

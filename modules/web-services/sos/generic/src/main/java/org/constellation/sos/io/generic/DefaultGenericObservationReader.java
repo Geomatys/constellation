@@ -20,6 +20,7 @@ package org.constellation.sos.io.generic;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import javax.xml.namespace.QName;
@@ -106,7 +107,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             // for 2.0 we adapt the offering with one by procedure   
             } else if (version.equals("2.0.0")) {
                 final Values values = loadData("var02");
-                final List<String> result = new ArrayList<String>();
+                final List<String> result = new ArrayList<>();
                 for (String procedure : values.getVariables("var02")) {
                     if (procedure.startsWith(sensorIdBase)) {
                         procedure = procedure.replace(sensorIdBase, "");
@@ -213,7 +214,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      */
     @Override
     public List<ObservationOffering> getObservationOfferings(final List<String> offeringNames, final String version) throws CstlServiceException {
-        final List<ObservationOffering> offerings = new ArrayList<ObservationOffering>();
+        final List<ObservationOffering> offerings = new ArrayList<>();
         for (String offeringName : offeringNames) {
             offerings.add(getObservationOffering(offeringName, version));
         }
@@ -262,12 +263,12 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             }
             
             // phenomenon
-            final List<String> observedPropertiesv200             = new ArrayList<String>();
-            final List<PhenomenonProperty> observedProperties = new ArrayList<PhenomenonProperty>();
+            final List<String> observedPropertiesv200         = new ArrayList<>();
+            final List<PhenomenonProperty> observedProperties = new ArrayList<>();
             for (String phenomenonId : values.getVariables("var12")) {
                 if (phenomenonId!= null && !phenomenonId.isEmpty()) {
                     Values compositeValues = loadData(Arrays.asList("var17"), phenomenonId);
-                    final List<PhenomenonType> components = new ArrayList<PhenomenonType>();
+                    final List<PhenomenonType> components = new ArrayList<>();
                     for (String componentID : compositeValues.getVariables("var17")) {
                         components.add(getPhenomenon(componentID));
                     }
@@ -290,7 +291,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             }
 
             // feature of interest
-            final List<String> foisV200    = new ArrayList<String>();
+            final List<String> foisV200    = new ArrayList<>();
             for (String foiID : values.getVariables("var18")) {
                 foisV200.add(foiID);
             }
@@ -328,7 +329,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      */
     @Override
     public List<ObservationOffering> getObservationOfferings(final String version) throws CstlServiceException {
-        final List<ObservationOffering> offerings = new ArrayList<ObservationOffering>();
+        final List<ObservationOffering> offerings = new ArrayList<>();
         final List<String> offeringNames = getOfferingNames(version);
         for (String offeringName : offeringNames) {
             offerings.add(getObservationOffering(offeringName, version));
@@ -341,7 +342,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      */
     private PhenomenonType getPhenomenon(String phenomenonName) throws CstlServiceException {
         // we remove the phenomenon id base
-        if (phenomenonName.indexOf(phenomenonIdBase) != -1) {
+        if (phenomenonName.contains(phenomenonIdBase)) {
             phenomenonName = phenomenonName.replace(phenomenonIdBase, "");
         }
         try {
@@ -358,7 +359,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
     
     private PhenomenonType getCompositePhenomenon(String phenomenonName) throws CstlServiceException {
         // we remove the phenomenon id base
-        if (phenomenonName.indexOf(phenomenonIdBase) != -1) {
+        if (phenomenonName.contains(phenomenonIdBase)) {
             phenomenonName = phenomenonName.replace(phenomenonIdBase, "");
         }
         try {
@@ -368,7 +369,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
                 return null;
             }
             compositeValues = loadData(Arrays.asList("var17"), phenomenonName);
-            final List<PhenomenonType> components = new ArrayList<PhenomenonType>();
+            final List<PhenomenonType> components = new ArrayList<>();
             for (String componentID : compositeValues.getVariables("var17")) {
                 components.add(getPhenomenon(componentID));
             }
@@ -388,13 +389,13 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public SamplingFeature getFeatureOfInterest(final String samplingFeatureId, final String version) throws CstlServiceException {
+    public SamplingFeature getFeatureOfInterest(final String samplingFeatureName, final String version) throws CstlServiceException {
         try {
-            final Values values = loadData(Arrays.asList("var19", "var20", "var21", "var22", "var23", "var24", "var48"), samplingFeatureId);
+            final Values values = loadData(Arrays.asList("var19", "var20", "var21", "var22", "var23", "var24", "var48"), samplingFeatureName);
 
             final boolean exist = values.getVariable("var48") != null;
             if (!exist) {
-                return getFeatureOfInterestCurve(samplingFeatureId, version);
+                return getFeatureOfInterestCurve(samplingFeatureName, version);
             }
 
             final String name            = values.getVariable("var19");
@@ -411,7 +412,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             } catch (NumberFormatException ex) {
                 LOGGER.log(Level.SEVERE, "unable to parse the srs dimension: {0}", dimension);
             }
-            final List<Double> coordinates = getCoordinates(samplingFeatureId);
+            final List<Double> coordinates = getCoordinates(samplingFeatureName);
             final DirectPosition pos = buildDirectPosition(version, srsName, srsDimension, coordinates);
             final Point location     = buildPoint(version, pointID, pos);
 
@@ -421,7 +422,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             } else {
                 sampleFeatureProperty = null;
             }
-            return buildSamplingPoint(version, samplingFeatureId, name, description, sampleFeatureProperty, location);
+            return buildSamplingPoint(version, samplingFeatureName, name, description, sampleFeatureProperty, location);
         } catch (MetadataIoException ex) {
             throw new CstlServiceException(ex);
         }
@@ -474,9 +475,9 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
         final List<Object> xValues     = values.getTypedVariables("var64");
         final List<Object> yValues     = values.getTypedVariables("var65");
         final List<Object> zValues     = values.getTypedVariables("var66");
-        final List<DirectPosition> pos = new ArrayList<DirectPosition>();
+        final List<DirectPosition> pos = new ArrayList<>();
         for (int i = 0; i < xValues.size(); i++) {
-            final List<Double> coord = new ArrayList<Double>();
+            final List<Double> coord = new ArrayList<>();
             final Double x = (Double) xValues.get(i);
             final Double y = (Double) yValues.get(i);
             coord.add(x);
@@ -494,7 +495,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
     private List<Double> getCoordinates(String samplingFeatureId) throws CstlServiceException {
         try {
             final Values values = loadData(Arrays.asList("var25", "var45"), samplingFeatureId);
-            final List<Double> result = new ArrayList<Double>();
+            final List<Double> result = new ArrayList<>();
             String coordinate = values.getVariable("var25");
             if (coordinate != null) {
                 try {
@@ -640,7 +641,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
                 //data block description
                 final String blockId          = values.getVariable("var38");
                 final String dataRecordId     = values.getVariable("var39");
-                final List<AnyScalar> fields  = new ArrayList<AnyScalar>();
+                final List<AnyScalar> fields  = new ArrayList<>();
                 final List<String> fieldNames = values.getVariables("var40");
                 final List<String> fieldDef   = values.getVariables("var41");
                 final List<String> type       = values.getVariables("var42");
@@ -744,5 +745,15 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
     @Override
     public List<String> getResponseFormats() throws CstlServiceException {
         return Arrays.asList("text/xml; subtype=\"om/1.0.0\"");
+    }
+
+    @Override
+    public Collection<String> getProceduresForPhenomenon(String observedProperty) throws CstlServiceException {
+        throw new UnsupportedOperationException("Not supported yet in this implementation.");
+    }
+
+    @Override
+    public Collection<String> getPhenomenonsForProcedure(String sensorID) throws CstlServiceException {
+        throw new UnsupportedOperationException("Not supported yet in this implementation."); 
     }
 }

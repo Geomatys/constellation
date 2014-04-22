@@ -176,6 +176,24 @@ public class SOSConfigurer extends OGCConfigurer {
         }
     }
     
+    public Collection<String> getSensorIdsForObservedProperty(final String id, final String observedProperty) throws ConfigurationException {
+        final ObservationReader reader = getObservationReader(id);
+        try {
+            return reader.getProceduresForPhenomenon(observedProperty);
+        } catch (CstlServiceException ex) {
+            throw new ConfigurationException(ex);
+        }
+    }
+    
+    public Collection<String> getObservedPropertiesForSensorId(final String id, final String sensorID) throws ConfigurationException {
+        final ObservationReader reader = getObservationReader(id);
+        try {
+            return reader.getPhenomenonsForProcedure(sensorID);
+        } catch (CstlServiceException ex) {
+            throw new ConfigurationException(ex);
+        }
+    }
+    
     private static AbstractSensorML unmarshallSensor(final File f) throws JAXBException, CstlServiceException {
         final Unmarshaller um = SensorMLMarshallerPool.getInstance().acquireUnmarshaller();
         Object obj = um.unmarshal(f);
