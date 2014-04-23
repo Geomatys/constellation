@@ -169,6 +169,7 @@ public class OM2ObservationWriter implements ObservationWriter {
             int generatedID = getNewObservationId();
             for (Observation observation : observations) {
                 final String oid = writeObservation(observation, c, generatedID);
+                c.commit();
                 results.add(oid);
                 generatedID++;
             }
@@ -258,7 +259,6 @@ public class OM2ObservationWriter implements ObservationWriter {
             writeResult(oid, observation.getResult(), samplingTime, c);
             
             updateOrCreateOffering(procedure.getHref(),samplingTime, phenRef, foiID, c);
-            c.commit();
             return observation.getName();
         } catch (SQLException ex) {
             throw new CstlServiceException("Error while inserting observation.", ex, NO_APPLICABLE_CODE);
@@ -267,7 +267,7 @@ public class OM2ObservationWriter implements ObservationWriter {
     
     private String writePhenomenon(final PhenomenonProperty phenomenonP, final Connection c) throws SQLException {
         final String phenomenonId = getPhenomenonId(phenomenonP);
-        final PreparedStatement stmtExist = c.prepareStatement("SELECT * FROM  \"om\".\"observed_properties\" WHERE \"id\"=?");
+        final PreparedStatement stmtExist = c.prepareStatement("SELECT \"id\" FROM  \"om\".\"observed_properties\" WHERE \"id\"=?");
         stmtExist.setString(1, phenomenonId);
         final ResultSet rs = stmtExist.executeQuery();
         if (!rs.next()) {
@@ -318,7 +318,7 @@ public class OM2ObservationWriter implements ObservationWriter {
     }
     
     private void writeFeatureOfInterest(final SamplingFeature foi, final Connection c) throws SQLException {
-        final PreparedStatement stmtExist = c.prepareStatement("SELECT * FROM  \"om\".\"sampling_features\" WHERE \"id\"=?");
+        final PreparedStatement stmtExist = c.prepareStatement("SELECT \"id\" FROM  \"om\".\"sampling_features\" WHERE \"id\"=?");
         stmtExist.setString(1, foi.getId());
         final ResultSet rs = stmtExist.executeQuery();
         if (!rs.next()) {
@@ -353,8 +353,8 @@ public class OM2ObservationWriter implements ObservationWriter {
     }
     
     private void writeResult(final int oid, final Object result, final TemporalObject samplingTime, final Connection c) throws SQLException, CstlServiceException {
-        final PreparedStatement stmt = c.prepareStatement("INSERT INTO \"om\".\"mesures\" VALUES(?,?,?,?,?,?,?,?)");
         if (result instanceof Measure) {
+            final PreparedStatement stmt = c.prepareStatement("INSERT INTO \"om\".\"mesures\" VALUES(?,?,?,?,?,?,?,?)");
             final Measure measure = (Measure) result;
             stmt.setInt(1, oid);
             stmt.setInt(2, 1);
@@ -365,6 +365,7 @@ public class OM2ObservationWriter implements ObservationWriter {
             stmt.setNull(7, java.sql.Types.VARCHAR);
             stmt.setNull(8, java.sql.Types.VARCHAR);
             stmt.executeUpdate();
+            stmt.close();
         } else if (result instanceof DataArrayProperty) {
             final DataArray array = ((DataArrayProperty) result).getDataArray();
             if (!(array.getEncoding() instanceof TextBlock)) {
@@ -484,13 +485,9 @@ public class OM2ObservationWriter implements ObservationWriter {
                     }
 
                     sql.append('(').append(oid).append(',').append(n).append(',');
-                    stmt.setInt(1, oid);
-                    stmt.setInt(2, n);
                     if (realTime != null) {
-                        stmt.setTimestamp(3, realTime);
                         sql.append("'").append(realTime.toString()).append("',");
                     } else {
-                        stmt.setNull(3, java.sql.Types.TIMESTAMP);
                         sql.append("NULL,");
                     }
                     
@@ -499,20 +496,14 @@ public class OM2ObservationWriter implements ObservationWriter {
                     sql.append("'").append(fields.get(i).fieldType).append("',");
                     sql.append("'").append(fields.get(i).fieldName).append("',");
                     sql.append("'").append(fields.get(i).fieldDesc).append("'),\n");
-                            
-                    stmt.setString(4, value);
-                    stmt.setString(5, fields.get(i).fieldUom);
-                    stmt.setString(6, fields.get(i).fieldType);
-                    stmt.setString(7, fields.get(i).fieldName);
-                    stmt.setString(8, fields.get(i).fieldDesc);
-                    //stmt.executeUpdate();
                     n++;
                     sqlCpt++;
                 }
                 if (sqlCpt > 99) {
                     sql.setCharAt(sql.length() - 2, ' ');
                     sql.setCharAt(sql.length() - 1, ';');
-                    stmtSQL.execute(sql.toString());
+                    //stmtSQL.execute(sql.toString());
+                    stmtSQL.addBatch(sql.toString());
                     sqlCpt = 0;
                     sql = new StringBuilder("INSERT INTO \"om\".\"mesures\" VALUES ");
                 }
@@ -520,8 +511,9 @@ public class OM2ObservationWriter implements ObservationWriter {
             if (sqlCpt > 0) {
                 sql.setCharAt(sql.length() - 2, ' ');
                 sql.setCharAt(sql.length() - 1, ';');
-                stmtSQL.execute(sql.toString());
+                stmtSQL.addBatch(sql.toString());
             }
+            stmtSQL.executeBatch();
             stmtSQL.close();
             
             if (lastDate != null) {
@@ -531,7 +523,6 @@ public class OM2ObservationWriter implements ObservationWriter {
                 stmt2.executeUpdate();
             }
         }
-        stmt.close();
     }
     
     private void updateOrCreateOffering(final String procedureID, final TemporalObject samplingTime, final String phenoID, final String foiID, final Connection c) throws SQLException {
@@ -666,7 +657,7 @@ public class OM2ObservationWriter implements ObservationWriter {
              * Phenomenon
              */
             if (phenoID != null) {
-                final PreparedStatement phenoStmt = c.prepareStatement("SELECT * FROM  \"om\".\"offering_observed_properties\" WHERE \"id_offering\"=? AND \"phenomenon\"=?");
+                final PreparedStatement phenoStmt = c.prepareStatement("SELECT \"phenomenon\" FROM  \"om\".\"offering_observed_properties\" WHERE \"id_offering\"=? AND \"phenomenon\"=?");
                 phenoStmt.setString(1, offeringID);
                 phenoStmt.setString(2, phenoID);
                 final ResultSet rsp = phenoStmt.executeQuery();
@@ -685,7 +676,7 @@ public class OM2ObservationWriter implements ObservationWriter {
              * Feature Of interest
              */
             if (foiID != null) {
-                final PreparedStatement foiStmt = c.prepareStatement("SELECT * FROM  \"om\".\"offering_foi\" WHERE \"id_offering\"=? AND \"foi\"=?");
+                final PreparedStatement foiStmt = c.prepareStatement("SELECT \"foi\" FROM  \"om\".\"offering_foi\" WHERE \"id_offering\"=? AND \"foi\"=?");
                 foiStmt.setString(1, offeringID);
                 foiStmt.setString(2, foiID);
                 final ResultSet rsf = foiStmt.executeQuery();
