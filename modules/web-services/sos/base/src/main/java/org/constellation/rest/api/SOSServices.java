@@ -30,6 +30,7 @@ import org.constellation.ServiceDef;
 import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.configuration.ServiceConfigurer;
 import org.constellation.configuration.StringList;
+import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
 import org.constellation.sos.configuration.SOSConfigurer;
 import static org.constellation.utils.RESTfulUtilities.ok;
@@ -116,7 +117,18 @@ public class SOSServices {
     public Response getObservedPropertiesIds(final @PathParam("id") String id) throws Exception {
         return ok(new StringList(getConfigurer().getObservedPropertiesIds(id)));
     }
-    
+
+    @PUT
+    @Path("{id}/sensor/import")
+    public Response importSensorFromData(final @PathParam("id") String id, final ParameterValues params) throws Exception {
+        final String providerId = params.get("providerId");
+        final String dataId = params.get("dataId");
+
+        // TODO: work on data reading for adding sensors
+        //return ok(getConfigurer().importSensorFromData(id, providerId, dataId));
+        return Response.ok().build();
+    }
+
     private static SOSConfigurer getConfigurer() throws NotRunningServiceException {
         return (SOSConfigurer) ServiceConfigurer.newInstance(ServiceDef.Specification.SOS);
     }

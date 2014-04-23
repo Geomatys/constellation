@@ -197,7 +197,8 @@ cstlAdminApp.factory('sos', ['$resource',
             'count':        {method: 'GET',  url: '@cstl/api/1/SOS/:id/sensors/count;jsessionid='},
             'add':          {method: 'PUT',  url: '@cstl/api/1/SOS/:id/observations;jsessionid='},
             'listSensors':  {method: 'GET',  url: '@cstl/api/1/SOS/:id/sensors/identifiers;jsessionid='},
-            'listMeasures': {method: 'GET',  url: '@cstl/api/1/SOS/:id/observedProperties/identifiers;jsessionid='}
+            'listMeasures': {method: 'GET',  url: '@cstl/api/1/SOS/:id/observedProperties/identifiers;jsessionid='},
+            'importSensorFromData': {method: 'PUT', url: '@cstl/api/1/SOS/:id/sensor/import;jsessionid='}
         });
     }]);
 

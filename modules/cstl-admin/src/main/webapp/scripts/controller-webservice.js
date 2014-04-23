@@ -383,7 +383,8 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
 
         $scope.sensors = undefined;
         $scope.measures = undefined;
-        $scope.initSensors = function() {
+
+        $scope.loadSensorsInfo = function() {
             sos.listSensors({id: $routeParams.id}, function(response) {
                 $scope.sensors = response.Entry;
             }, function() { $growl('error','Error','Unable to list sensors'); });
@@ -391,10 +392,14 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
             sos.listMeasures({id: $routeParams.id}, function(response) {
                 $scope.measures = response.Entry;
             }, function() { $growl('error','Error','Unable to list measures'); });
+        };
+
+        $scope.initSensors = function() {
+            $scope.loadSensorsInfo();
 
             var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
             var layer = DataViewer.createLayerWithStyle($cookies.cstlUrl, "Sensor", $routeParams.id +"-om2", "default-point");
-            DataViewer.layers = [layer, layerBackground];
+            DataViewer.layers = [layerBackground, layer];
             DataViewer.initMap('olSensorMap');
         };
 
@@ -555,9 +560,13 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
             });
 
             modal.result.then(function() {
-                $scope.layers = webService.layers({type: $scope.type, id:$routeParams.id}, {}, function(response) {
-                    $scope.fullList = response;
-                });
+                if ($scope.type.toLowerCase() !== 'sos') {
+                    $scope.layers = webService.layers({type: $scope.type, id: $routeParams.id}, {}, function (response) {
+                        $scope.fullList = response;
+                    });
+                } else {
+                    $scope.loadSensorsInfo();
+                }
             });
         };
 
