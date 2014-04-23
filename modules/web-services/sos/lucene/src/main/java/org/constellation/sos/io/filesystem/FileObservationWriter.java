@@ -20,6 +20,7 @@ package org.constellation.sos.io.filesystem;
 // J2SE dependencies
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -142,7 +143,7 @@ public class FileObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public String writeObservation(final AbstractObservation observation) throws CstlServiceException {
+    public String writeObservation(final Observation observation) throws CstlServiceException {
         try {
             final File observationFile;
             if (observation.getName().startsWith(observationTemplateIdBase)) {
@@ -174,6 +175,19 @@ public class FileObservationWriter implements ObservationWriter {
         } catch (IOException ex) {
             throw new CstlServiceException("IO exception while marshalling the observation file.", ex, NO_APPLICABLE_CODE);
         }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> writeObservations(List<Observation> observations) throws CstlServiceException {
+        final List<String> results = new ArrayList<>();
+        for (Observation observation : observations) {
+            final String oid = writeObservation(observation);
+            results.add(oid);
+        }
+        return results;
     }
 
     @Override

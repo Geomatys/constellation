@@ -52,13 +52,11 @@ import org.constellation.sos.io.SensorWriter;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.gml.xml.AbstractGeometry;
-import org.geotoolkit.gml.xml.v321.AbstractGeometryType;
 import org.geotoolkit.observation.xml.AbstractObservation;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.util.FileUtilities;
-import org.opengis.observation.Observation;
 import org.opengis.observation.ObservationCollection;
 
 /**
@@ -241,9 +239,7 @@ public class SOSConfigurer extends OGCConfigurer {
         final ObservationWriter writer = getObservationWriter(id);
         try {
             final long start = System.currentTimeMillis();
-            for (Observation observation : collection.getMember()) {
-                writer.writeObservation((AbstractObservation)observation);
-            }
+            writer.writeObservations(collection.getMember());
             LOGGER.info("observations imported in :" + (System.currentTimeMillis() - start) + " ms");
             return new AcknowlegementType("Success", "The specified observations have been imported in the SOS");
         } catch (CstlServiceException ex) {

@@ -22,10 +22,9 @@ import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.AbstractGeometry;
 
 // Geotoolkit dependencies
-import org.geotoolkit.gml.xml.DirectPosition;
-import org.geotoolkit.observation.xml.AbstractObservation;
 import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.swes.xml.ObservationTemplate;
+import org.opengis.observation.Observation;
 
 /**
  *
@@ -49,11 +48,22 @@ public interface ObservationWriter {
      *
      * @param observation An O&M observation
      *
+     * @return The new identifier of the observation.
+     *
+     * @throws org.constellation.ws.CstlServiceException
+     */
+    String writeObservation(final Observation observation) throws CstlServiceException;
+    
+    /**
+     * Write a list of observations into the database
+     *
+     * @param observations A list of O&M observations
+     *
      * @return The new identifiers of the observation
      *
      * @throws org.constellation.ws.CstlServiceException
      */
-    String writeObservation(final AbstractObservation observation) throws CstlServiceException;
+    List<String> writeObservations(final List<Observation> observations) throws CstlServiceException;
 
     /**
      * Remove an observation with the specified identifier.

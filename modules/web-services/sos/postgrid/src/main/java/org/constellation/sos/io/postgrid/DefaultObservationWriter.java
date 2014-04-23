@@ -20,6 +20,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,7 +33,6 @@ import org.constellation.sos.ObservationOfferingTable;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.AbstractGeometry;
-
 import org.geotoolkit.gml.xml.DirectPosition;
 import org.geotoolkit.internal.sql.table.CatalogException;
 import org.geotoolkit.internal.sql.table.Database;
@@ -50,6 +50,7 @@ import org.geotoolkit.sos.xml.v100.OfferingSamplingFeatureType;
 import org.geotoolkit.swe.xml.v101.PhenomenonType;
 import org.geotoolkit.swes.xml.ObservationTemplate;
 import org.opengis.observation.Measurement;
+import org.opengis.observation.Observation;
 
 /**
  * Default Observation reader for Postgrid O&M database.
@@ -137,7 +138,7 @@ public class DefaultObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public String writeObservation(final AbstractObservation observation) throws CstlServiceException {
+    public String writeObservation(final Observation observation) throws CstlServiceException {
         try {
             if (observation instanceof Measurement && measTable != null) {
                 return measTable.getIdentifier((Measurement) OMXmlFactory.convert("1.0.0", observation));
@@ -152,6 +153,19 @@ public class DefaultObservationWriter implements ObservationWriter {
             throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
                                              NO_APPLICABLE_CODE);
         }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> writeObservations(List<Observation> observations) throws CstlServiceException {
+        final List<String> results = new ArrayList<>();
+        for (Observation observation : observations) {
+            final String oid = writeObservation(observation);
+            results.add(oid);
+        }
+        return results;
     }
     
     @Override

@@ -33,39 +33,34 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sql.DataSource;
 import org.apache.sis.util.logging.Logging;
-
-// Constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.sos.factory.OMFactory;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.ws.CstlServiceException;
-
-// Geotk dependencies
 import org.geotoolkit.gml.GeometrytoJTS;
 import org.geotoolkit.gml.xml.AbstractGeometry;
 import org.geotoolkit.observation.xml.AbstractObservation;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.sampling.xml.SamplingFeature;
 import org.geotoolkit.sos.xml.ObservationOffering;
+import org.geotoolkit.swe.xml.AbstractBoolean;
+import org.geotoolkit.swe.xml.AbstractText;
 import org.geotoolkit.swe.xml.AnyScalar;
+import org.geotoolkit.swe.xml.CompositePhenomenon;
 import org.geotoolkit.swe.xml.DataArray;
 import org.geotoolkit.swe.xml.DataArrayProperty;
 import org.geotoolkit.swe.xml.DataComponentProperty;
 import org.geotoolkit.swe.xml.DataRecord;
-import org.geotoolkit.swe.xml.CompositePhenomenon;
 import org.geotoolkit.swe.xml.PhenomenonProperty;
 import org.geotoolkit.swe.xml.Quantity;
-import org.geotoolkit.swe.xml.AbstractText;
-import org.geotoolkit.swe.xml.AbstractBoolean;
 import org.geotoolkit.swe.xml.SimpleDataRecord;
 import org.geotoolkit.swe.xml.TextBlock;
 import org.geotoolkit.swes.xml.ObservationTemplate;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.temporal.object.ISODateParser;
-
-// GeoAPI dependencies
 import org.opengis.observation.Measure;
+import org.opengis.observation.Observation;
 import org.opengis.temporal.Instant;
 import org.opengis.temporal.Period;
 import org.opengis.temporal.TemporalObject;
@@ -148,15 +143,52 @@ public class OM2ObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public String writeObservation(final AbstractObservation observation) throws CstlServiceException {
+    public String writeObservation(final Observation observation) throws CstlServiceException {
+        try {
+            final Connection c      = source.getConnection();
+            c.setAutoCommit(false);
+            final int generatedID   = getNewObservationId();
+            final String oid        = writeObservation(observation, c, generatedID);
+            c.commit();
+            c.close();
+            return oid;
+        } catch (SQLException ex) {
+            throw new CstlServiceException("Error while inserting observations.", ex, NO_APPLICABLE_CODE);
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> writeObservations(final List<Observation> observations) throws CstlServiceException {
+        final List<String> results = new ArrayList<>();
         try {
             final Connection c           = source.getConnection();
             c.setAutoCommit(false);
+            int generatedID = getNewObservationId();
+            for (Observation observation : observations) {
+                final String oid = writeObservation(observation, c, generatedID);
+                results.add(oid);
+                generatedID++;
+            }
+            c.close();
+        } catch (SQLException ex) {
+            throw new CstlServiceException("Error while inserting observations.", ex, NO_APPLICABLE_CODE);
+        }
+        return results;
+    }
+    
+    
+    
+    
+    private String writeObservation(final Observation observation, final Connection c, final int generatedID) throws CstlServiceException {
+        try {
             final PreparedStatement stmt = c.prepareStatement("INSERT INTO \"om\".\"observations\" VALUES(?,?,?,?,?,?,?)");
             final String observationName;
             int oid;
             if (observation.getName() == null) {
-                oid = getNewObservationId();
+                oid = generatedID;
                 observationName = observationIdBase + oid;
             } else {
                 observationName = observation.getName();
@@ -164,10 +196,10 @@ public class OM2ObservationWriter implements ObservationWriter {
                     try {
                         oid = Integer.parseInt(observationName.substring(observationIdBase.length()));
                     } catch (NumberFormatException ex) {
-                        oid = getNewObservationId();
+                        oid = generatedID;
                     }
                 } else {
-                    oid = getNewObservationId();
+                    oid = generatedID;
                 }
             }
             
@@ -202,7 +234,7 @@ public class OM2ObservationWriter implements ObservationWriter {
                 stmt.setNull(3, java.sql.Types.TIMESTAMP);
                 stmt.setNull(4, java.sql.Types.TIMESTAMP);
             }
-            final PhenomenonProperty phenomenon = (PhenomenonProperty)observation.getPropertyObservedProperty();
+            final PhenomenonProperty phenomenon = (PhenomenonProperty)((AbstractObservation)observation).getPropertyObservedProperty();
             final String phenRef = writePhenomenon(phenomenon, c);
             stmt.setString(5, phenRef);
             
@@ -226,9 +258,7 @@ public class OM2ObservationWriter implements ObservationWriter {
             writeResult(oid, observation.getResult(), samplingTime, c);
             
             updateOrCreateOffering(procedure.getHref(),samplingTime, phenRef, foiID, c);
-            
             c.commit();
-            c.close();
             return observation.getName();
         } catch (SQLException ex) {
             throw new CstlServiceException("Error while inserting observation.", ex, NO_APPLICABLE_CODE);
@@ -274,7 +304,7 @@ public class OM2ObservationWriter implements ObservationWriter {
     }
     
     private void writeProcedure(final String procedureID, final Connection c) throws SQLException {
-        final PreparedStatement stmtExist = c.prepareStatement("SELECT * FROM  \"om\".\"procedures\" WHERE \"id\"=?");
+        final PreparedStatement stmtExist = c.prepareStatement("SELECT \"id\" FROM  \"om\".\"procedures\" WHERE \"id\"=?");
         stmtExist.setString(1, procedureID);
         final ResultSet rs = stmtExist.executeQuery();
         if (!rs.next()) {
@@ -287,7 +317,6 @@ public class OM2ObservationWriter implements ObservationWriter {
         stmtExist.close();
     }
     
-    // TODO
     private void writeFeatureOfInterest(final SamplingFeature foi, final Connection c) throws SQLException {
         final PreparedStatement stmtExist = c.prepareStatement("SELECT * FROM  \"om\".\"sampling_features\" WHERE \"id\"=?");
         stmtExist.setString(1, foi.getId());
@@ -398,7 +427,10 @@ public class OM2ObservationWriter implements ObservationWriter {
             final String values = array.getValues();
             final StringTokenizer tokenizer = new StringTokenizer(values, encoding.getBlockSeparator());
             int n = 1;
+            int sqlCpt = 0;
             Timestamp lastDate = null;
+            final Statement stmtSQL = c.createStatement();
+            StringBuilder sql = new StringBuilder("INSERT INTO \"om\".\"mesures\" VALUES ");
             while (tokenizer.hasMoreTokens()) {
                 String block       = tokenizer.nextToken();
                 
@@ -450,22 +482,48 @@ public class OM2ObservationWriter implements ObservationWriter {
                         value = block.substring(0, separator);
                         block = block.substring(separator + 1);
                     }
+
+                    sql.append('(').append(oid).append(',').append(n).append(',');
                     stmt.setInt(1, oid);
                     stmt.setInt(2, n);
                     if (realTime != null) {
                         stmt.setTimestamp(3, realTime);
+                        sql.append("'").append(realTime.toString()).append("',");
                     } else {
                         stmt.setNull(3, java.sql.Types.TIMESTAMP);
+                        sql.append("NULL,");
                     }
+                    
+                    sql.append("'").append(value).append("',");
+                    sql.append("'").append(fields.get(i).fieldUom).append("',");
+                    sql.append("'").append(fields.get(i).fieldType).append("',");
+                    sql.append("'").append(fields.get(i).fieldName).append("',");
+                    sql.append("'").append(fields.get(i).fieldDesc).append("'),\n");
+                            
                     stmt.setString(4, value);
                     stmt.setString(5, fields.get(i).fieldUom);
                     stmt.setString(6, fields.get(i).fieldType);
                     stmt.setString(7, fields.get(i).fieldName);
                     stmt.setString(8, fields.get(i).fieldDesc);
-                    stmt.executeUpdate();
+                    //stmt.executeUpdate();
                     n++;
+                    sqlCpt++;
+                }
+                if (sqlCpt > 99) {
+                    sql.setCharAt(sql.length() - 2, ' ');
+                    sql.setCharAt(sql.length() - 1, ';');
+                    stmtSQL.execute(sql.toString());
+                    sqlCpt = 0;
+                    sql = new StringBuilder("INSERT INTO \"om\".\"mesures\" VALUES ");
                 }
             }
+            if (sqlCpt > 0) {
+                sql.setCharAt(sql.length() - 2, ' ');
+                sql.setCharAt(sql.length() - 1, ';');
+                stmtSQL.execute(sql.toString());
+            }
+            stmtSQL.close();
+            
             if (lastDate != null) {
                 final PreparedStatement stmt2 = c.prepareStatement("UPDATE \"om\".\"observations\" SET \"time_end\"=? WHERE \"id\"=?");
                 stmt2.setTimestamp(1, lastDate);

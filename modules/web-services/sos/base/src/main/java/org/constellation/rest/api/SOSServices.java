@@ -26,7 +26,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.namespace.QName;
 import org.constellation.ServiceDef;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.dao.DataRecord;
+import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.configuration.ServiceConfigurer;
 import org.constellation.configuration.StringList;
@@ -123,7 +127,11 @@ public class SOSServices {
     public Response importSensorFromData(final @PathParam("id") String id, final ParameterValues params) throws Exception {
         final String providerId = params.get("providerId");
         final String dataId = params.get("dataId");
-
+        final QName dataName = new QName(dataId);
+        DataRecord record = ConfigurationEngine.getDataRecord(dataName, providerId);
+        ProviderRecord precord = null;
+        
+                
         // TODO: work on data reading for adding sensors
         //return ok(getConfigurer().importSensorFromData(id, providerId, dataId));
         return Response.ok().build();
