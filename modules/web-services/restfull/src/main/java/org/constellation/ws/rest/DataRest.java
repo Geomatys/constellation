@@ -593,11 +593,16 @@ public class DataRest {
             prop.put("dataAbstract", "");
             final DefaultMetadata templateMetadata = MetadataUtilities.getTemplateMetadata(prop);
             
-            DefaultMetadata mergedMetadata = new DefaultMetadata();
-            try {
-                mergedMetadata = MetadataUtilities.mergeTemplate(templateMetadata, extractedMetadata);
-            } catch (NoSuchIdentifierException | ProcessException ex) {
-                LOGGER.log(Level.WARNING, "error while merging metadata", ex);
+            DefaultMetadata mergedMetadata;
+            if (extractedMetadata != null) {
+                mergedMetadata = new DefaultMetadata();
+                try {
+                    mergedMetadata = MetadataUtilities.mergeTemplate(templateMetadata, extractedMetadata);
+                } catch (NoSuchIdentifierException | ProcessException ex) {
+                    LOGGER.log(Level.WARNING, "error while merging metadata", ex);
+                }
+            } else {
+                mergedMetadata = templateMetadata;
             }
             mergedMetadata.prune();
             

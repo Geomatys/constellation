@@ -726,10 +726,15 @@ public class OM2ObservationWriter implements ObservationWriter {
             try {
                 final Connection c     = source.getConnection();
                 final WKBWriter writer = new WKBWriter();
-                PreparedStatement ps   = c.prepareStatement("INSERT INTO \"om\".\"procedures\" VALUES (?,?)");
-                ps.setString(1, physicalID);
+                PreparedStatement ps   = c.prepareStatement("UPDATE \"om\".\"procedures\" SET \"shape\"=?, \"crs\"=? WHERE id=?");
+                ps.setString(3, physicalID);
                 final Geometry pt = GeometrytoJTS.toJTS(position);
-                ps.setBytes(3, writer.write(pt));
+                ps.setBytes(1, writer.write(pt));
+                int srid = pt.getSRID();
+                if (srid == 0) {
+                    srid = 4326;
+                }
+                ps.setInt(2, srid);
                 ps.execute();
                 c.close();
             } catch (SQLException | FactoryException e) {

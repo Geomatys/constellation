@@ -281,11 +281,12 @@ public final class MetadataUtilities {
     	final CoverageStore coverageStore =(CoverageStore)dataStore;
     	final CoverageReference coverageReference = coverageStore.getCoverageReference(dataName);
         if (coverageReference != null) {
-            GridCoverageReader coverageReader = coverageReference.acquireReader();
-            if (!(coverageReader.getGridGeometry(0).getCoordinateReferenceSystem() instanceof ImageCRS)) {
+            final GridCoverageReader coverageReader = coverageReference.acquireReader();
+            try {
                 return (DefaultMetadata) coverageReader.getMetadata();
+            } finally {
+                coverageReference.recycle(coverageReader);
             }
-            coverageReference.recycle(coverageReader);
         }
         return null;
     }

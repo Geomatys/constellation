@@ -14,32 +14,27 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
+package org.constellation.rest.api;
 
-package org.constellation.ws.rs.provider;
-
-import org.glassfish.jersey.jettison.JettisonConfig;
-import org.glassfish.jersey.jettison.JettisonJaxbContext;
-import org.glassfish.jersey.jettison.JettisonUnmarshaller;
-
-import org.constellation.configuration.LayerContext;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.geotoolkit.gml.xml.AbstractGeometry;
+import org.geotoolkit.gml.xml.GMLMarshallerPool;
+
 
 /**
  * {@link javax.ws.rs.ext.MessageBodyReader} implementation when POST operation send a {@link org.constellation.configuration.LayerContext}
@@ -53,21 +48,25 @@ import java.util.logging.Logger;
  */
 @Provider
 @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-public class LayerContextReader implements MessageBodyReader<LayerContext> {
+public class AbstractGeometryReader implements MessageBodyReader<AbstractGeometry> {
 
-    private static final Logger LOGGER = Logger.getLogger(LayerContextReader.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(AbstractGeometryReader.class.getName());
 
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return LayerContext.class.isAssignableFrom(type);
+        return AbstractGeometry.class.isAssignableFrom(type);
     }
 
     @Override
-    public LayerContext readFrom(Class<LayerContext> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException, WebApplicationException {
-        LayerContext context = null;
+    public AbstractGeometry readFrom(Class<AbstractGeometry> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException, WebApplicationException {
+        AbstractGeometry context = null;
         try {
 
             if (mediaType.equals(MediaType.APPLICATION_JSON_TYPE)) {
+                /*
+                
+                TODO
+                
                 Map<String, String> nSMap = new HashMap<String, String>(0);
                 nSMap.put("http://www.constellation.org/config", "constellation-config");
                 JettisonConfig config = JettisonConfig.mappedJettison().xml2JsonNs(nSMap).build();
@@ -77,11 +76,16 @@ public class LayerContextReader implements MessageBodyReader<LayerContext> {
                         "org.apache.sis.internal.jaxb.geometry:" +
                         "org.geotoolkit.gml.xml.v311");
                 JettisonUnmarshaller jsonUnmarshaller = cxtx.createJsonUnmarshaller();
-                context = jsonUnmarshaller.unmarshalFromJSON(entityStream, LayerContext.class);
+                context = jsonUnmarshaller.unmarshalFromJSON(entityStream, LayerContext.class);*/
+                
             } else {
-                final Unmarshaller m = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-                context = (LayerContext) m.unmarshal(entityStream);
-                GenericDatabaseMarshallerPool.getInstance().recycle(m);
+                final Unmarshaller m = GMLMarshallerPool.getInstance().acquireUnmarshaller();
+                Object obj = m.unmarshal(entityStream);
+                if (obj instanceof JAXBElement) {
+                    obj = ((JAXBElement)obj).getValue();
+                }
+                context = (AbstractGeometry) obj;
+                GMLMarshallerPool.getInstance().recycle(m);
             }
 
         } catch (JAXBException ex) {

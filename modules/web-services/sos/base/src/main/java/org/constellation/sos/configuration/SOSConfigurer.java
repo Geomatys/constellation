@@ -240,9 +240,11 @@ public class SOSConfigurer extends OGCConfigurer {
     public AcknowlegementType importObservations(final String id, final ObservationCollection collection) throws ConfigurationException {
         final ObservationWriter writer = getObservationWriter(id);
         try {
+            final long start = System.currentTimeMillis();
             for (Observation observation : collection.getMember()) {
                 writer.writeObservation((AbstractObservation)observation);
             }
+            LOGGER.info("observations imported in :" + (System.currentTimeMillis() - start) + " ms");
             return new AcknowlegementType("Success", "The specified observations have been imported in the SOS");
         } catch (CstlServiceException ex) {
             throw new ConfigurationException(ex);

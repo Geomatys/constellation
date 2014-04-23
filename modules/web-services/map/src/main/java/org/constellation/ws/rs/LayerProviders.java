@@ -35,12 +35,10 @@ import org.constellation.provider.FeatureData;
 import org.constellation.provider.Data;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
-import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.GridSampleDimension;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
-import org.geotoolkit.coverage.grid.ViewType;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.FeatureStore;
@@ -54,7 +52,6 @@ import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
-import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapItem;
@@ -70,7 +67,6 @@ import org.geotoolkit.style.function.Method;
 import org.geotoolkit.style.function.Mode;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
-import org.opengis.feature.type.Name;
 import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Function;
@@ -92,7 +88,6 @@ import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBException;
 
 import java.awt.*;
-import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -451,7 +446,7 @@ public final class LayerProviders extends Static {
         // Bands description.
         if (dims != null) {
             for (final GridSampleDimension dim : dims) {
-                final String dimName = (dim.getCategoryNames() == null || dim.getCategoryNames().length == 0) ? "" :  dim.getCategoryNames()[0].toString();
+                final String dimName = dim.getDescription().toString();
                 description.getBands().add(new BandDescription(dimName, dim.getMinimumValue(), dim.getMaximumValue(), dim.getNoDataValues()));
             }
         } else {
