@@ -53,7 +53,7 @@ CREATE TABLE "om"."observed_properties" (
 
 CREATE TABLE "om"."procedures" (
     "id"     character varying(100) NOT NULL,
-    "shape"  bit varying(200),
+    "shape"  postgis.geometry,
     "crs"    integer
 );
 

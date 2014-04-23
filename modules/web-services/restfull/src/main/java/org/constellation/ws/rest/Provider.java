@@ -118,66 +118,68 @@ public final class Provider {
                 boolean foundProvider = false;
                 try {
                     final String filePath = inParams.get("path");
-                    final URL url = new URL("file:" + filePath);
-                    final File folder = new File(filePath);
-                    
-                    final File[] candidates;
-                    if(folder.isDirectory()){
-                        candidates = folder.listFiles();
-                    }else{
-                        candidates = new File[]{folder};
-                    }
-                    
-                    search:
-                    for(File candidate : candidates){
-                        final String candidateName = candidate.getName().toLowerCase();
+                    if (filePath != null && !filePath.isEmpty()) {
+                        final URL url = new URL("file:" + filePath);
+                        final File folder = new File(filePath);
 
-                        //loop on features file factories
-                        final Iterator<FeatureStoreFactory> ite = FeatureStoreFinder.getAllFactories(null).iterator();
-                        while (ite.hasNext()) {
-                            final FeatureStoreFactory factory = ite.next();
-                            if(factory instanceof FileFeatureStoreFactory){
-                                final FileFeatureStoreFactory fileFactory = (FileFeatureStoreFactory) factory;
-                                for (String tempExtension : fileFactory.getFileExtensions()) {
-                                    //we do not want shapefiles or dbf types, a folder provider will be created in those cases
-                                    if (candidateName.endsWith(tempExtension) && !tempExtension.endsWith("shp") && !tempExtension.endsWith("dbf")) {
-                                        //found a factory which can handle it
-                                        final ParameterValueGroup params = sources.groups("choice").get(0).addGroup(
-                                                factory.getParametersDescriptor().getName().getCode());
-                                        params.parameter("url").setValue(url);
-                                        params.parameter("namespace").setValue("no namespace");
-                                        foundProvider = true;
-                                        //TODO we should add all files which define a possible feature-store
-                                        //but the web interfaces do not handle that yet, so we limit to one for now.
-                                        break search;
+                        final File[] candidates;
+                        if(folder.isDirectory()){
+                            candidates = folder.listFiles();
+                        }else{
+                            candidates = new File[]{folder};
+                        }
+
+                        search:
+                        for(File candidate : candidates) {
+                            final String candidateName = candidate.getName().toLowerCase();
+
+                            //loop on features file factories
+                            final Iterator<FeatureStoreFactory> ite = FeatureStoreFinder.getAllFactories(null).iterator();
+                            while (ite.hasNext()) {
+                                final FeatureStoreFactory factory = ite.next();
+                                if (factory instanceof FileFeatureStoreFactory) {
+                                    final FileFeatureStoreFactory fileFactory = (FileFeatureStoreFactory) factory;
+                                    for (String tempExtension : fileFactory.getFileExtensions()) {
+                                        //we do not want shapefiles or dbf types, a folder provider will be created in those cases
+                                        if (candidateName.endsWith(tempExtension) && !tempExtension.endsWith("shp") && !tempExtension.endsWith("dbf")) {
+                                            //found a factory which can handle it
+                                            final ParameterValueGroup params = sources.groups("choice").get(0).addGroup(
+                                                    factory.getParametersDescriptor().getName().getCode());
+                                            params.parameter("url").setValue(url);
+                                            params.parameter("namespace").setValue("no namespace");
+                                            foundProvider = true;
+                                            //TODO we should add all files which define a possible feature-store
+                                            //but the web interfaces do not handle that yet, so we limit to one for now.
+                                            break search;
+                                        }
                                     }
-                                }
-                            }else{
-                                final ParameterValueGroup testParams = factory.getParametersDescriptor().createValue();
-                                try{
-                                    testParams.parameter("namespace").setValue("no namespace");
-                                    final ParameterValue pv = ParametersExt.getOrCreateValue(testParams, "url");
-                                    pv.setValue(url);
-                                    
-                                    if(factory.canProcess(testParams)){
-                                        final ParameterValueGroup params = sources.groups("choice").get(0).addGroup(
-                                                factory.getParametersDescriptor().getName().getCode());
-                                        params.parameter("url").setValue(url);
-                                        params.parameter("namespace").setValue("no namespace");
-                                        foundProvider = true;
-                                        //TODO we should add all files which define a possible feature-store
-                                        //but the web interfaces do not handle that yet, so we limit to one for now.
-                                        break search;
+                                } else {
+                                    final ParameterValueGroup testParams = factory.getParametersDescriptor().createValue();
+                                    try {
+                                        testParams.parameter("namespace").setValue("no namespace");
+                                        final ParameterValue pv = ParametersExt.getOrCreateValue(testParams, "url");
+                                        pv.setValue(url);
+
+                                        if (factory.canProcess(testParams)) {
+                                            final ParameterValueGroup params = sources.groups("choice").get(0).addGroup(
+                                                    factory.getParametersDescriptor().getName().getCode());
+                                            params.parameter("url").setValue(url);
+                                            params.parameter("namespace").setValue("no namespace");
+                                            foundProvider = true;
+                                            //TODO we should add all files which define a possible feature-store
+                                            //but the web interfaces do not handle that yet, so we limit to one for now.
+                                            break search;
+                                        }
+
+                                    } catch (Exception ex) {
+                                        //parameter might not exist
                                     }
-                                    
-                                }catch(Exception ex){
-                                    //parameter might not exist
+
                                 }
-                                
                             }
                         }
                     }
-                    
+
                 } catch (MalformedURLException e) {
                     LOGGER.log(Level.WARNING, "unable to create url from path", e);
                 }
@@ -194,6 +196,16 @@ public final class Provider {
                             } catch (MalformedURLException e) {
                                 LOGGER.log(Level.WARNING, "unable to create url from path", e);
                             }
+                            break;
+                        case "om2":
+                            final ParameterValueGroup omParams = sources.groups("choice").get(0).addGroup("OM2Parameters");
+                            omParams.parameter("host").setValue(inParams.get("host"));
+                            omParams.parameter("port").setValue(Integer.parseInt(inParams.get("port")));
+                            omParams.parameter("database").setValue(inParams.get("database"));
+                            omParams.parameter("user").setValue(inParams.get("user"));
+                            omParams.parameter("password").setValue(inParams.get("password"));
+                            omParams.parameter("sgbdtype").setValue(inParams.get("sgbdtype"));
+                            omParams.parameter("namespace").setValue("no namespace");
                             break;
                         default:
                             final ParameterValueGroup pgParams = sources.groups("choice").get(0).addGroup("PostgresParameters");

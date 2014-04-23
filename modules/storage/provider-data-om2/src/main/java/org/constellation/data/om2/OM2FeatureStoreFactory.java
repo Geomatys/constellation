@@ -42,7 +42,6 @@ import org.opengis.metadata.quality.ConformanceResult;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.*;
 import org.apache.sis.util.iso.ResourceInternationalString;
 
 /**
@@ -76,7 +75,7 @@ public class OM2FeatureStoreFactory extends AbstractFeatureStoreFactory {
      * Parameter identifying the OM datastore
      */
     public static final ParameterDescriptor<String> DBTYPE =
-             new DefaultParameterDescriptor<>("dbtype","DbType",String.class, "OM", true);
+             new DefaultParameterDescriptor<>("dbtype","DbType",String.class, "OM2", true);
 
     /**
      * Parameter for database type (postgres, derby, ...)

@@ -27,11 +27,15 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 
+import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.PortrayalContext;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.LayerProviders;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * RestFull API for provider data rendering/portraying.
@@ -44,9 +48,10 @@ import org.constellation.ws.rs.LayerProviders;
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Produces("image/png")
 public final class Portrayal {
+    private static final Logger LOGGER = Logging.getLogger(Portrayal.class);
 
     /**
-     * @see LayerProviders#portray(String, String, String, String, int, int, String, String)
+     * @see LayerProviders#portray(String, String, String, String, int, int, String, String, String)
      */
     @GET
     @Path("/portray")
@@ -57,10 +62,12 @@ public final class Portrayal {
                             @QueryParam("WIDTH") final int width,
                             @QueryParam("HEIGHT") final int height,
                             @QueryParam("SLD_BODY") final String sldBody,
-                            @QueryParam("SLD_VERSION") final String sldVersion) {
+                            @QueryParam("SLD_VERSION") final String sldVersion,
+                            @QueryParam("CQLFILTER") final String filter) {
         try {
-            return Response.ok(LayerProviders.portray(providerId, dataName, crs, bbox, width, height, sldBody, sldVersion)).build();
+            return Response.ok(LayerProviders.portray(providerId, dataName, crs, bbox, width, height, sldBody, sldVersion, filter)).build();
         } catch (CstlServiceException ex) {
+            LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
             return Response.ok(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
         }
     }
@@ -69,24 +76,25 @@ public final class Portrayal {
     
     
     /**
-     * @see LayerProviders#portray(String, String, String, String, int, int, String)
+     * @see LayerProviders#portray(String, String, String, String, int, int, String, String, String, String)
      */
     @GET
     @Path("/portray/style")
-    public Response portray(@QueryParam("PROVIDER") final String providerId,
+    public Response portrayStyle(@QueryParam("PROVIDER") final String providerId,
                             @QueryParam("LAYERS") final String dataName,
                             @QueryParam("BBOX") final String bbox,
                             @QueryParam("CRS") final String crs,
                             @QueryParam("WIDTH") final int width,
                             @QueryParam("HEIGHT") final int height,
-                            @QueryParam("SLD_BODY") final String sldBody,
                             @QueryParam("SLD_VERSION") final String sldVersion,
                             @QueryParam("SLDPROVIDER") final String sldProvider,
-                            @QueryParam("SLDID") final String styleId) {
+                            @QueryParam("SLDID") final String styleId,
+                            @QueryParam("CQLFILTER") final String filter) {
                            
         try {
-            return Response.ok(LayerProviders.portray(providerId, dataName, crs, bbox, width, height, sldBody, sldVersion,sldProvider,styleId )).build();
+            return Response.ok(LayerProviders.portray(providerId, dataName, crs, bbox, width, height, sldVersion, sldProvider, styleId, filter)).build();
         } catch (CstlServiceException | TargetNotFoundException | JAXBException ex) {
+            LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
             return Response.ok(new AcknowlegementType("Failure", ex.getLocalizedMessage()), MediaType.APPLICATION_XML).build();
         }
     }
@@ -101,6 +109,7 @@ public final class Portrayal {
         try {
             return Response.ok(LayerProviders.portray(context)).build();
         } catch (CstlServiceException ex) {
+            LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
             return Response.ok(new AcknowlegementType("Failure", ex.getLocalizedMessage())).build();
         }
     }

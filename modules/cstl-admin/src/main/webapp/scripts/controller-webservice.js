@@ -234,8 +234,8 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
         };
     }]);
 
-cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routeParams', 'webService', '$growl', '$location',
-    function ($scope, $routeParams , webService, $growl, $location) {
+cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routeParams', 'webService', 'provider', '$growl', '$location',
+    function ($scope, $routeParams , webService, provider, $growl, $location) {
         $scope.type = $routeParams.type;
         $scope.id = $routeParams.id;
         $scope.db = {
@@ -281,11 +281,33 @@ cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routePar
 
             webService.setConfig({type: $scope.type, id: $scope.id}, $scope.source, function() {
                 $growl('success','Success','Service '+ $scope.id +' successfully updated');
+                createOmProvider();
                 $location.path('/webservice');
             }, function() {
                 $growl('error','Error','Service configuration update error');
             });
         };
+
+        function createOmProvider() {
+            provider.create({
+                id: $scope.db.name +'-om'
+            }, {
+                type: "feature-store",
+                subType: "om2",
+                parameters: {
+                    port: $scope.db.port,
+                    host: $scope.db.url,
+                    database: $scope.db.name,
+                    user: $scope.source['constellation-config.SOSConfiguration']['constellation-config.OMConfiguration'].bdd.user,
+                    password: $scope.source['constellation-config.SOSConfiguration']['constellation-config.OMConfiguration'].bdd.password,
+                    sgbdtype: 'postgres'
+                }
+            }, function() {
+                $growl('success','Success','OM provider created');
+            }, function() {
+                $growl('error','Error','Unable to create om provider');
+            });
+        }
     }]);
 
 cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'webService', 'dataListing', 'provider', 'csw', 'sos', '$modal','textService', '$dashboard', '$growl', '$filter', 'StyleSharedService','style','$cookies',
@@ -369,7 +391,8 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
             }, function() { $growl('error','Error','Unable to list measures'); });
 
             var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
-            DataViewer.layers = [layerBackground];
+            var layer = DataViewer.createLayer($cookies.cstlUrl, "Sensor", "om-om");
+            DataViewer.layers = [layer, layerBackground];
             DataViewer.initMap('olSensorMap');
         };
 

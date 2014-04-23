@@ -85,8 +85,6 @@ public class OM2FeatureStore extends AbstractFeatureStore {
     private static final FeatureFactory FF = FactoryFinder.getFeatureFactory(
                         new Hints(Hints.FEATURE_FACTORY,LenientFeatureFactory.class));
 
-    private static final Logger LOGGER = Logging.getLogger("org.geotoolkit.data.om");
-
     private static final String CSTL_NAMESPACE = "http://constellation.org/om2";
     private static final Name CSTL_TN_SENSOR = new DefaultName(CSTL_NAMESPACE, "Sensor");
     protected static final Name ATT_POSITION = new DefaultName(CSTL_NAMESPACE,  "position");
@@ -98,9 +96,9 @@ public class OM2FeatureStore extends AbstractFeatureStore {
     private final ManageableDataSource source;
 
     private static final String SQL_ALL_PROCEDURE = "SELECT * FROM \"om\".\"procedures\"";
-    private static final String SQL_ALL_PROCEDURE_PG = "SELECT  \"id\", \"postgis\".st_asBinary(\"shape\") FROM \"om\".\"procedures\"";
+    private static final String SQL_ALL_PROCEDURE_PG = "SELECT  \"id\", \"postgis\".st_asBinary(\"shape\"), \"crs\" FROM \"om\".\"procedures\"";
     private static final String SQL_ALL_ID = "SELECT \"id\" FROM \"om\".\"procedures\" ORDER BY \"id\" ASC";
-    private static final String SQL_WRITE_PROCEDURE = "INSERT INTO \"om\".\"procedures\" VALUES(?,?)";
+    private static final String SQL_WRITE_PROCEDURE = "INSERT INTO \"om\".\"procedures\" VALUES(?,?,?)";
     private static final String SQL_DELETE_PROCEDURE = "DELETE FROM \"om\".\"procedures\" WHERE \"id\" = ?";
 
     private final String sensorIdBase = "urn:ogc:object:sensor:GEOM:"; // TODO
@@ -245,13 +243,13 @@ public class OM2FeatureStore extends AbstractFeatureStore {
                 result.add(identifier);
             }
         } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, SQL_WRITE_PROCEDURE, ex);
+            getLogger().log(Level.WARNING, SQL_WRITE_PROCEDURE, ex);
         }finally{
             if(stmtWrite != null){
                 try {
                     stmtWrite.close();
                 } catch (SQLException ex) {
-                    LOGGER.log(Level.WARNING, null, ex);
+                    getLogger().log(Level.WARNING, null, ex);
                 }
             }
 
@@ -259,7 +257,7 @@ public class OM2FeatureStore extends AbstractFeatureStore {
                 try {
                     cnx.close();
                 } catch (SQLException ex) {
-                    LOGGER.log(Level.WARNING, null, ex);
+                    getLogger().log(Level.WARNING, null, ex);
                 }
             }
         }
@@ -284,20 +282,20 @@ public class OM2FeatureStore extends AbstractFeatureStore {
                     final int i = Integer.parseInt(id.substring(sensorIdBase.length()));
                     return new DefaultFeatureId(sensorIdBase + i);
                 } catch (NumberFormatException ex) {
-                    LOGGER.warning("a snesor ID is malformed in procedures tables");
+                    getLogger().warning("a snesor ID is malformed in procedures tables");
                 }
             } else {
                 return new DefaultFeatureId(sensorIdBase + 1);
             }
 
         } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
+            getLogger().log(Level.WARNING, null, ex);
         }finally{
             if(stmtLastId != null){
                 try {
                     stmtLastId.close();
                 } catch (SQLException ex) {
-                    LOGGER.log(Level.WARNING, null, ex);
+                    getLogger().log(Level.WARNING, null, ex);
                 }
             }
 
@@ -305,7 +303,7 @@ public class OM2FeatureStore extends AbstractFeatureStore {
                 try {
                     cnx.close();
                 } catch (SQLException ex) {
-                    LOGGER.log(Level.WARNING, null, ex);
+                    getLogger().log(Level.WARNING, null, ex);
                 }
             }
         }
@@ -417,37 +415,40 @@ public class OM2FeatureStore extends AbstractFeatureStore {
             }
 
 
-            if (firstCRS) {
-                try {
-                    CoordinateReferenceSystem crs = CRS.decode("EPSG:" + result.getString("crs"));
-                    if (type instanceof DefaultSimpleFeatureType) {
-                        ((DefaultSimpleFeatureType) type).setCoordinateReferenceSystem(crs);
+            final String crsStr = result.getString(3);
+            Geometry geom = null;
+
+            if (crsStr != null && !crsStr.isEmpty()) {
+                if (firstCRS) {
+                    try {
+                        CoordinateReferenceSystem crs = CRS.decode("EPSG:" + crsStr);
+                        if (type instanceof DefaultSimpleFeatureType) {
+                            ((DefaultSimpleFeatureType) type).setCoordinateReferenceSystem(crs);
+                        }
+                        if (type.getGeometryDescriptor() instanceof DefaultGeometryDescriptor) {
+                            ((DefaultGeometryDescriptor) type.getGeometryDescriptor()).setCoordinateReferenceSystem(crs);
+                        }
+                        firstCRS = false;
+                    } catch (NoSuchAuthorityCodeException ex) {
+                        throw new IOException(ex);
+                    } catch (FactoryException ex) {
+                        throw new IOException(ex);
                     }
-                    if (type.getGeometryDescriptor() instanceof DefaultGeometryDescriptor) {
-                        ((DefaultGeometryDescriptor) type.getGeometryDescriptor()).setCoordinateReferenceSystem(crs);
-                    }
-                    firstCRS = false;
-                } catch (NoSuchAuthorityCodeException ex) {
-                    throw new IOException(ex);
-                } catch (FactoryException ex) {
-                    throw new IOException(ex);
+                }
+
+                final byte[] b = result.getBytes(2);
+                if (b != null) {
+                    WKBReader reader = new WKBReader();
+                    geom = reader.read(b);
                 }
             }
 
             final Collection<Property> props = new ArrayList<>();
-            final String id = result.getString(1);
-            final byte[] b  = result.getBytes(2);
-            final Geometry geom;
-            if (b != null) {
-                WKBReader reader = new WKBReader();
-                geom             = reader.read(b);
-            } else {
-                geom = null;
-            }
             props.add(FF.createAttribute(geom, (AttributeDescriptor) type.getDescriptor(ATT_POSITION), null));
             //props.add(FF.createAttribute(result.getString("description"), (AttributeDescriptor) type.getDescriptor(ATT_DESC), null));
             //props.add(FF.createAttribute(result.getString("name"), (AttributeDescriptor) type.getDescriptor(ATT_NAME), null));
 
+            final String id = result.getString(1);
             current = FF.createFeature(props, type, id);
         }
 
@@ -502,13 +503,13 @@ public class OM2FeatureStore extends AbstractFeatureStore {
                 stmtDelete.executeUpdate();
 
             } catch (SQLException ex) {
-                LOGGER.log(Level.WARNING, SQL_WRITE_PROCEDURE, ex);
+                getLogger().log(Level.WARNING, SQL_WRITE_PROCEDURE, ex);
             } finally {
                 if (stmtDelete != null) {
                     try {
                         stmtDelete.close();
                     } catch (SQLException ex) {
-                        LOGGER.log(Level.WARNING, null, ex);
+                        getLogger().log(Level.WARNING, null, ex);
                     }
                 }
             }

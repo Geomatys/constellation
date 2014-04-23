@@ -97,6 +97,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -262,22 +263,26 @@ public final class LayerProviders extends Static {
                 context.getWidth(),
                 context.getHeight(),
                 context.getStyleBody(),
-                context.getSldVersion());
+                context.getSldVersion(),
+                null);
     }
-
 
     /**
      * Produces a {@link PortrayalResponse} from the specified parameters.
      * <p/>
      * This method allows to perform data rendering without WMS layer.
      *
-     * @param providerId the layer provider id
-     * @param layerName  the layer name
-     * @param crsCode    the projection code
-     * @param bbox       the bounding box
-     * @param width      the image width
-     * @param height     the image height
-     * @param sld	     the style to apply
+     * @param providerId  the layer provider id
+     * @param layerName   the layer name
+     * @param crsCode     the projection code
+     * @param bbox        the bounding box
+     * @param width       the image width
+     * @param height      the image height
+     * @param sldVersion  the SLD version
+     * @param sldProvider the SLD provider name
+     * @param styleId     the style identifier in the provider
+     * @param filter      the filter on data
+     *
      * @return a {@link PortrayalResponse} instance
      * @throws CstlServiceException if the {@link PortrayalResponse} can't be produced for
      * any reason
@@ -285,13 +290,17 @@ public final class LayerProviders extends Static {
      * @throws JAXBException
      */
     public static PortrayalResponse portray(final String providerId, final String layerName, final String crsCode,
-                                            final String bbox, final int width, final int height, final String sldBody,
-                                            final String sldVersion, final String sldProvider, final String styleId) throws CstlServiceException, TargetNotFoundException, JAXBException {
+                                            final String bbox, final int width, final int height, final String sldVersion,
+                                            final String sldProvider, final String styleId, final String filter)
+                                            throws CstlServiceException, TargetNotFoundException, JAXBException {
+        if (sldProvider == null || styleId == null) {
+            return portray(providerId, layerName, crsCode, bbox, width, height, null, sldVersion, filter);
+        }
     	MutableStyle style = StyleProviderConfig.getStyle(sldProvider, styleId);
     	StyleXmlIO styleXmlIO = new StyleXmlIO();
     	final StringWriter sw = new StringWriter();
     	styleXmlIO.writeStyle(sw, style, Specification.StyledLayerDescriptor.V_1_1_0);
-    	return portray(providerId, layerName, crsCode, bbox, width, height, sw.toString(),"1.1.0");
+    	return portray(providerId, layerName, crsCode, bbox, width, height, sw.toString(), sldVersion, filter);
     }
 
     /**
@@ -313,7 +322,7 @@ public final class LayerProviders extends Static {
      */
     public static PortrayalResponse portray(final String providerId, final String layerName, final String crsCode,
                                             final String bbox, final int width, final int height, final String sldBody,
-                                            final String sldVersion) throws CstlServiceException {
+                                            final String sldVersion, final String filter) throws CstlServiceException {
         ensureNonNull("providerId", providerId);
         ensureNonNull("layerName", layerName);
 
@@ -351,7 +360,14 @@ public final class LayerProviders extends Static {
 
             // Map context.
             final MapContext mapContext = MapBuilder.createContext();
-            final MapItem mapItem = layer.getMapLayer(style, null);
+            final MapItem mapItem;
+            if (filter != null) {
+                final Map<String,Object> params = new HashMap<>();
+                params.put("CQL_FILTER", filter);
+                mapItem = layer.getMapLayer(style, params);
+            } else {
+                mapItem = layer.getMapLayer(style, null);
+            }
             mapContext.items().add(mapItem);
 
             // Inputs.

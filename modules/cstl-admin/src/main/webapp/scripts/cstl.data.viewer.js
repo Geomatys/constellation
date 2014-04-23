@@ -37,7 +37,7 @@ DataViewer = {
 
     },
 
-    createLayer : function(cstlUrlPrefix, layerName, providerId){
+    createLayer : function(cstlUrlPrefix, layerName, providerId, filter){
         var layer = new OpenLayers.Layer.WMS(layerName,
            cstlUrlPrefix +'api/1/portrayal/portray',
             {
@@ -45,7 +45,8 @@ DataViewer = {
                 provider:    providerId,
                 version:     '1.3.0',
                 sld_version: '1.1.0',
-                format:      'image/png'
+                format:      'image/png',
+                CQLFILTER:   filter
             },
             {
                 ratio: 1,
@@ -57,7 +58,7 @@ DataViewer = {
         return layer;
     },
 
-    createLayerWithStyle : function(cstlUrlPrefix, layerName, providerId, style){
+    createLayerWithStyle : function(cstlUrlPrefix, layerName, providerId, style, filter){
         var layer = new OpenLayers.Layer.WMS(layerName,
                 cstlUrlPrefix +'api/1/portrayal/portray/style',
             {
@@ -67,7 +68,8 @@ DataViewer = {
                 sld_version: '1.1.0',
                 format:      'image/png',
                 SLDID:        style,
-                SLDPROVIDER:  "sld"
+                SLDPROVIDER:  "sld",
+                CQLFILTER:    filter
             },
             {
                 ratio: 1,
