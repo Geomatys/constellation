@@ -393,7 +393,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
             }, function() { $growl('error','Error','Unable to list measures'); });
 
             var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
-            var layer = DataViewer.createLayer($cookies.cstlUrl, "Sensor", $routeParams.id +"-om2");
+            var layer = DataViewer.createLayerWithStyle($cookies.cstlUrl, "Sensor", $routeParams.id +"-om2", "default-point");
             DataViewer.layers = [layer, layerBackground];
             DataViewer.initMap('olSensorMap');
         };
