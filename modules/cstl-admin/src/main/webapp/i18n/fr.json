@@ -975,7 +975,8 @@
             "dashboard.area":"Zone géographique",
             "dashboard.date.to":"au",
             "dashboard.date.from":"Du",
-            "dashboard.button.graph":"Tracer le graphique"
+            "dashboard.button.graph.hide":"Cacher le graphique",
+            "dashboard.button.graph.show":"Afficher le graphique"
         },
         "menu": {
             "delete": {

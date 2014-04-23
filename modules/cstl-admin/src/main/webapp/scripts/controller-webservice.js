@@ -15,8 +15,8 @@
  */
 'use strict';
 
-cstlAdminApp.controller('WebServiceController', ['$scope', 'webService', 'csw', '$modal', 'textService', '$growl',
-    function ($scope, webService, csw, $modal, textService, $growl) {
+cstlAdminApp.controller('WebServiceController', ['$scope', 'webService', 'provider', 'csw', '$modal', 'textService', '$growl',
+    function ($scope, webService, provider, csw, $modal, textService, $growl) {
         var modalLoader = $modal.open({
           templateUrl: 'views/modalLoader.html',
           controller: 'ModalInstanceCtrl'
@@ -95,6 +95,10 @@ cstlAdminApp.controller('WebServiceController', ['$scope', 'webService', 'csw', 
 
         $scope.deleteService = function(service) {
             if (confirm("Are you sure?")) {
+                if (service.type.toLowerCase() === 'sos') {
+                    // A provider has been created for this SOS service, so remove it
+                    provider.delete({id: service.identifier +"-om2"});
+                }
                 webService.delete({type: service.type, id: service.identifier}, {} ,
                     function() { $growl('success','Success','Service '+ service.name +' successfully deleted');
                         $scope.services = webService.listAll(); },
@@ -223,7 +227,7 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
                 function() {
                     $growl('success', 'Success', 'Service ' + $scope.metadata.name + ' successfully created');
                     if ($scope.type == 'csw' || $scope.type == 'sos') {
-                        $location.path('/webservice/'+ $scope.type +'/'+ $scope.metadata.name +'/source');
+                        $location.path('/webservice/'+ $scope.type +'/'+ $scope.metadata.identifier +'/source');
                     } else {
                         $location.path('/webservice');
                     }
@@ -290,7 +294,7 @@ cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routePar
 
         function createOmProvider() {
             provider.create({
-                id: $scope.db.name +'-om'
+                id: $scope.id +'-om2'
             }, {
                 type: "feature-store",
                 subType: "om2",
@@ -302,10 +306,8 @@ cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routePar
                     password: $scope.source['constellation-config.SOSConfiguration']['constellation-config.OMConfiguration'].bdd.password,
                     sgbdtype: 'postgres'
                 }
-            }, function() {
-                $growl('success','Success','OM provider created');
-            }, function() {
-                $growl('error','Error','Unable to create om provider');
+            }, function() {}, function() {
+                $growl('error','Error','Unable to create OM2 provider');
             });
         }
     }]);
@@ -391,7 +393,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
             }, function() { $growl('error','Error','Unable to list measures'); });
 
             var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
-            var layer = DataViewer.createLayer($cookies.cstlUrl, "Sensor", "om-om");
+            var layer = DataViewer.createLayer($cookies.cstlUrl, "Sensor", $routeParams.id +"-om2");
             DataViewer.layers = [layer, layerBackground];
             DataViewer.initMap('olSensorMap');
         };

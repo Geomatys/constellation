@@ -329,7 +329,7 @@ ul.unstyled {
 }
 .sos_edit_checkboxlist{
     border:solid 1px #eeeeee; 
-    height:215px; 
+    height:315px;
     overflow:auto; 
     border-radius:5px; 
     padding: 0 15px;
@@ -339,7 +339,7 @@ ul.unstyled {
 }
 .sos_edit_blocs{
     border-top:solid 1px #eeeeee; 
-    height:265px; 
+    height:365px;
     padding-top:10px; 
 }
 .sos_edit_button{

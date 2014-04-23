@@ -522,7 +522,8 @@
             "dashboard.area": "Geographical area",
             "dashboard.date.to":"to",
             "dashboard.date.from":"From",
-            "dashboard.button.graph":"Draw the graph"
+            "dashboard.button.graph.hide":"Hide graph",
+            "dashboard.button.graph.show":"Show graph"
         },
         "menu": {
             "delete.label": "Delete service",
