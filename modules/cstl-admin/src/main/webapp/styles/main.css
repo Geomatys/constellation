@@ -940,6 +940,13 @@ table.user-table tbody>tr>td.user-delete{
 .modal-header{
     min-height: 56px;
 }
+.tooltipicon{
+    padding: 0;
+    margin-top:5px;
+}
+.tooltipfloat{
+    float:right;
+}
 /*contact*/
 .contact-form{
     background-color: #e3e3e3;

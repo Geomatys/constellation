@@ -8,6 +8,7 @@
     "position": "Position",
     "zip": "Code postal",
     "save": "Enregistrer",
+    "address":"Adresse",
     "adddata": {
         "popup": {
             "datalist": {
@@ -1181,5 +1182,12 @@
             "validate":"Valider",
             "create":"Créer"
         }
+    },
+    "tooltip":{
+        "service.create.name":"L'identifiant peut être le même que le nom",
+        "service.create.version":"Au moins une version doit être sélectionnée",
+        "service.source.url":"Renseignez uniquement le nom de domaine",
+        "service.source.connexion":"Connexion entre plusieurs bases",
+        "service.source.sensormlfolder":"TODO"
     }
 }

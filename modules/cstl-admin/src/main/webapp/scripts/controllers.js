@@ -296,26 +296,3 @@ cstlAdminApp.controller('LogsController', ['$scope', 'resolvedLogs', 'LogsServic
         };
     }]);
 
-cstlAdminApp.controller('tooltip', function() {
-        return {
-            restrict: 'A',
-            link: function(scope, element, attrs) {
-                scope.$watch(attrs['tooltip'], function(options) {
-                    element.tooltip({
-                        animation: options.animation,
-                        html:      options.html,
-                        placement: options.placement,
-                        selector:  options.selector,
-                        title:     options.title,
-                        trigger:   options.trigger,
-                        delay:     options.delay,
-                        container: options.container
-                    });
-                }, true);
-                
-                element.on('$destroy', function() {
-                    element.tooltip('destroy');
-                });
-            }
-        };
-    });
