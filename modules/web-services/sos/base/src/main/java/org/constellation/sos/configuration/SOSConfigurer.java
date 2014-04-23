@@ -285,7 +285,7 @@ public class SOSConfigurer extends OGCConfigurer {
         final ObservationWriter writer = getObservationWriter(id);
         try {
             writer.recordProcedureLocation(sensorID, location);
-            return new AcknowlegementType("Success", "The specified observations have been removed from the SOS");
+            return new AcknowlegementType("Success", "The sensor location have been updated in the SOS");
         } catch (CstlServiceException ex) {
             throw new ConfigurationException(ex);
         }

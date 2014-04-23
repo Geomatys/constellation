@@ -210,10 +210,13 @@ public class OM2ObservationWriter implements ObservationWriter {
             writeProcedure(procedure.getHref(), c);
             stmt.setString(6, procedure.getHref());
             final org.geotoolkit.sampling.xml.SamplingFeature foi = (org.geotoolkit.sampling.xml.SamplingFeature)observation.getFeatureOfInterest();
+            final String foiID;
             if (foi != null) {
-                stmt.setString(7, foi.getId());
+                foiID = foi.getId();
+                stmt.setString(7, foiID);
                 writeFeatureOfInterest(foi, c);
             } else {
+                foiID = null;
                 stmt.setNull(7, java.sql.Types.VARCHAR);
             }
             
@@ -222,7 +225,7 @@ public class OM2ObservationWriter implements ObservationWriter {
             
             writeResult(oid, observation.getResult(), samplingTime, c);
             
-            updateOrCreateOffering(procedure.getHref(),samplingTime, phenRef, c);
+            updateOrCreateOffering(procedure.getHref(),samplingTime, phenRef, foiID, c);
             
             c.commit();
             c.close();
@@ -473,7 +476,7 @@ public class OM2ObservationWriter implements ObservationWriter {
         stmt.close();
     }
     
-    private void updateOrCreateOffering(final String procedureID, final TemporalObject samplingTime, final String phenoID, final Connection c) throws SQLException {
+    private void updateOrCreateOffering(final String procedureID, final TemporalObject samplingTime, final String phenoID, final String foiID, final Connection c) throws SQLException {
         final String offeringID;
         if (procedureID.startsWith(sensorIdBase)) {
             offeringID  = "offering-" + procedureID.substring(sensorIdBase.length());
@@ -522,11 +525,21 @@ public class OM2ObservationWriter implements ObservationWriter {
             stmtInsert.executeUpdate();
             stmtInsert.close();
             
-            final PreparedStatement stmtInsertOP = c.prepareStatement("INSERT INTO \"om\".\"offering_observed_properties\" VALUES(?,?)");
-            stmtInsertOP.setString(1, offeringID);
-            stmtInsertOP.setString(2, phenoID);
-            stmtInsertOP.executeUpdate();
-            stmtInsertOP.close();
+            if (phenoID != null) {
+                final PreparedStatement stmtInsertOP = c.prepareStatement("INSERT INTO \"om\".\"offering_observed_properties\" VALUES(?,?)");
+                stmtInsertOP.setString(1, offeringID);
+                stmtInsertOP.setString(2, phenoID);
+                stmtInsertOP.executeUpdate();
+                stmtInsertOP.close();
+            }
+            
+            if (foiID != null) {
+                final PreparedStatement stmtInsertFOI = c.prepareStatement("INSERT INTO \"om\".\"offering_foi\" VALUES(?,?)");
+                stmtInsertFOI.setString(1, offeringID);
+                stmtInsertFOI.setString(2, foiID);
+                stmtInsertFOI.executeUpdate();
+                stmtInsertFOI.close();
+            }
             
         // UPDATE
         } else {
@@ -594,23 +607,40 @@ public class OM2ObservationWriter implements ObservationWriter {
             /*
              * Phenomenon
              */
-            final PreparedStatement phenoStmt = c.prepareStatement("SELECT * FROM  \"om\".\"offering_observed_properties\" WHERE \"id_offering\"=? AND \"phenomenon\"=?");
-            phenoStmt.setString(1, offeringID);
-            phenoStmt.setString(2, phenoID);
-            final ResultSet rsp = phenoStmt.executeQuery();
-            if (!rsp.next()) {
-                final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"offering_observed_properties\" VALUES(?,?)");
-                stmtInsert.setString(1, offeringID);
-                stmtInsert.setString(2, phenoID);
-                stmtInsert.executeUpdate();
-                stmtInsert.close();
+            if (phenoID != null) {
+                final PreparedStatement phenoStmt = c.prepareStatement("SELECT * FROM  \"om\".\"offering_observed_properties\" WHERE \"id_offering\"=? AND \"phenomenon\"=?");
+                phenoStmt.setString(1, offeringID);
+                phenoStmt.setString(2, phenoID);
+                final ResultSet rsp = phenoStmt.executeQuery();
+                if (!rsp.next()) {
+                    final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"offering_observed_properties\" VALUES(?,?)");
+                    stmtInsert.setString(1, offeringID);
+                    stmtInsert.setString(2, phenoID);
+                    stmtInsert.executeUpdate();
+                    stmtInsert.close();
+                }
+                rsp.close();
+                phenoStmt.close();
             }
-            rsp.close();
-            phenoStmt.close();
             
             /*
-             * Feature Of interest TODO
+             * Feature Of interest
              */
+            if (foiID != null) {
+                final PreparedStatement foiStmt = c.prepareStatement("SELECT * FROM  \"om\".\"offering_foi\" WHERE \"id_offering\"=? AND \"foi\"=?");
+                foiStmt.setString(1, offeringID);
+                foiStmt.setString(2, foiID);
+                final ResultSet rsf = foiStmt.executeQuery();
+                if (!rsf.next()) {
+                    final PreparedStatement stmtInsert = c.prepareStatement("INSERT INTO \"om\".\"offering_foi\" VALUES(?,?)");
+                    stmtInsert.setString(1, offeringID);
+                    stmtInsert.setString(2, foiID);
+                    stmtInsert.executeUpdate();
+                    stmtInsert.close();
+                }
+                rsf.close();
+                foiStmt.close();
+            }
         }
         rs.close();
         stmtExist.close();
