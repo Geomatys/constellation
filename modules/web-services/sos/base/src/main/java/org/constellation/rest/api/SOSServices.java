@@ -165,6 +165,12 @@ public class SOSServices {
                     configurer.importSensor(id, sml, providerId);
                     configurer.importObservations(id, result.observations);
                     
+                    //record location
+                    final AbstractGeometryType geom = (AbstractGeometryType) result.spatialBound.getGeometry("2.0.0");
+                    if (geom != null) {
+                        configurer.updateSensorLocation(id, providerId, geom);
+                    }
+                    
                     response = new AcknowlegementType("Success", "The specified observations have been imported in the SOS");
                 } else {
                     response = new AcknowlegementType("Failure", "Only available on netCDF file for now");

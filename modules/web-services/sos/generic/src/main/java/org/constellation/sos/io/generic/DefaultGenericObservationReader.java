@@ -488,7 +488,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             }
             pos.add(buildDirectPosition(version, null, null, coord));
         }
-        return buildLineString(version, pos);
+        return buildLineString(version, null, null, pos);
         
     }
 
