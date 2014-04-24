@@ -899,6 +899,33 @@ public class OM2ObservationWriter implements ObservationWriter {
             stmtObs.executeUpdate();
             stmtObs.close();
             
+            //look for unused observed properties
+            final Statement stmtOP = c.createStatement();
+            final ResultSet rs = stmtOP.executeQuery(" SELECT \"id\" FROM \"om\".\"observed_properties\""
+                                                   + " WHERE  \"id\" NOT IN (SELECT DISTINCT \"observed_property\" FROM \"om\".\"observations\") " +
+                                                     " AND    \"id\" NOT IN (SELECT DISTINCT \"phenomenon\"        FROM \"om\".\"offering_observed_properties\")");
+            
+            while (rs.next()) {
+                stmtOP.addBatch("DELETE FROM \"om\".\"components\" WHERE \"phenomenon\"='" + rs.getString(1) + "';");
+                stmtOP.addBatch("DELETE FROM \"om\".\"observed_properties\" WHERE \"id\"='" + rs.getString(1) + "';");
+            }
+            rs.close();
+            stmtOP.executeBatch();
+            stmtOP.close();
+            
+            //look for unused foi
+            final Statement stmtFOI = c.createStatement();
+            final ResultSet rs2 = stmtFOI.executeQuery(" SELECT \"id\" FROM \"om\".\"sampling_features\""
+                                                     + " WHERE  \"id\" NOT IN (SELECT DISTINCT \"foi\" FROM \"om\".\"observations\") " +
+                                                       " AND    \"id\" NOT IN (SELECT DISTINCT \"foi\" FROM \"om\".\"offering_foi\")");
+            
+            while (rs2.next()) {
+                stmtFOI.addBatch("DELETE FROM \"om\".\"sampling_features\" WHERE \"id\"='" + rs2.getString(1) + "';");
+            }
+            rs2.close();
+            stmtFOI.executeBatch();
+            stmtFOI.close();
+            
             c.commit();
             c.close();
         } catch (SQLException ex) {
