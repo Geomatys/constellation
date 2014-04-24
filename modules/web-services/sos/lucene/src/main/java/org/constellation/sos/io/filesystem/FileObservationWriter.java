@@ -36,7 +36,6 @@ import org.constellation.sos.io.lucene.LuceneObservationIndexer;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.AbstractGeometry;
 import org.geotoolkit.lucene.IndexingException;
-import org.geotoolkit.observation.xml.AbstractObservation;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.sampling.xml.SamplingFeature;
 import org.geotoolkit.sos.xml.ObservationOffering;
@@ -207,6 +206,11 @@ public class FileObservationWriter implements ObservationWriter {
     
     @Override
     public void removeObservationForProcedure(final String procedureID) throws CstlServiceException {
+        throw new UnsupportedOperationException("Not supported yet in this implementation.");
+    }
+    
+    @Override
+    public void removeProcedure(final String procedureID) throws CstlServiceException {
         throw new UnsupportedOperationException("Not supported yet in this implementation.");
     }
     

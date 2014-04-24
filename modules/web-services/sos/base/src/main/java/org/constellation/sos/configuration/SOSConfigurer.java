@@ -57,6 +57,7 @@ import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.util.FileUtilities;
+import org.opengis.observation.Observation;
 import org.opengis.observation.ObservationCollection;
 
 /**
@@ -136,13 +137,15 @@ public class SOSConfigurer extends OGCConfigurer {
     }
     
     public AcknowlegementType removeSensor(final String id, final String sensorID) throws ConfigurationException {
-        final SensorWriter writer = getSensorWriter(id);
+        final SensorWriter smlWriter = getSensorWriter(id);
+        final ObservationWriter omWriter = getObservationWriter(id);
         try {
-            boolean sucess = writer.deleteSensor(sensorID);
+            boolean sucess = smlWriter.deleteSensor(sensorID);
             if (sucess) {
+                omWriter.removeProcedure(sensorID);
                 return new AcknowlegementType("Success", "The specified sensor have been removed in the SOS");
             } else {
-                return new AcknowlegementType("Error", "Unable to remove the sensor.");
+                return new AcknowlegementType("Error", "Unable to remove the sensor from SML datasource.");
             }
         } catch (CstlServiceException ex) {
             throw new ConfigurationException(ex);
@@ -240,12 +243,23 @@ public class SOSConfigurer extends OGCConfigurer {
         try {
             final long start = System.currentTimeMillis();
             writer.writeObservations(collection.getMember());
-            LOGGER.info("observations imported in :" + (System.currentTimeMillis() - start) + " ms");
+            LOGGER.log(Level.INFO, "observations imported in :{0} ms", (System.currentTimeMillis() - start));
             return new AcknowlegementType("Success", "The specified observations have been imported in the SOS");
         } catch (CstlServiceException ex) {
             throw new ConfigurationException(ex);
         }
-        //return new AcknowlegementType("Error", "An error occurs during the process");
+    }
+    
+    public AcknowlegementType importObservations(final String id, final List<Observation> observations) throws ConfigurationException {
+        final ObservationWriter writer = getObservationWriter(id);
+        try {
+            final long start = System.currentTimeMillis();
+            writer.writeObservations(observations);
+            LOGGER.log(Level.INFO, "observations imported in :{0} ms", (System.currentTimeMillis() - start));
+            return new AcknowlegementType("Success", "The specified observations have been imported in the SOS");
+        } catch (CstlServiceException ex) {
+            throw new ConfigurationException(ex);
+        }
     }
     
     public AcknowlegementType removeSingleObservation(final String id, final String observationID) throws ConfigurationException {

@@ -34,6 +34,7 @@ import org.constellation.configuration.SOSConfiguration;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
+import org.constellation.dto.ParameterValues;
 import org.constellation.dto.Service;
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -595,5 +596,13 @@ public class GenericConfigurationXMLBindingTest {
         final XMLComparator comparator = new XMLComparator(expResult, result);
         comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
+    }
+    
+    @Test
+    public void parameterValuesMarshalingTest() throws Exception {
+        final ParameterValues values = new ParameterValues();
+        values.getValues().put("providerId", "test");
+        StringWriter sw = new StringWriter();
+        marshaller.marshal(values, System.out);
     }
 }

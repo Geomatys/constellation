@@ -84,6 +84,15 @@ public interface ObservationWriter {
     void removeObservationForProcedure(final String procedureID) throws CstlServiceException;
     
     /**
+     * Remove a procedure from the O&M datasource.
+     *
+     * @param procedureID
+     * 
+     * @throws org.constellation.ws.CstlServiceException
+     */
+    void removeProcedure(String procedureID) throws CstlServiceException;
+    
+    /**
      * Write a new Observation offering into the database
      *
      * @param offering

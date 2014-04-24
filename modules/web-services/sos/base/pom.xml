@@ -73,6 +73,11 @@
       <artifactId>cstl-lib-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-provider</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
      <!-- geotoolkit dependencies -->
     <dependency>
