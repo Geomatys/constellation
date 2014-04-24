@@ -288,7 +288,8 @@
                 "password": "Mot de passe",
                 "sessions": "Sessions",
                 "users": "Utilisateurs",
-                "processes": "Processus"
+                "processes": "Processus",
+                "tasks":"Tâches"
             },
             "data": "Données",
             "home": "Accueil",
@@ -1130,7 +1131,8 @@
         "create.service":"Nouveau service",
         "create.service.source":"Source",
         "edit.service":"Edition du service",
-        "process":"Processus"
+        "process":"Processus",
+        "tasks":"Tâches"
     },
     "style.information.title":"Styles disponibles",
     "users": {
