@@ -486,7 +486,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
             // Change on map
             var filterSensor = $scope.generateLayerFilter();
             if (DataViewer.map.layers.length === 1) {
-                var newLayer = DataViewer.createLayerWithStyle($cookies.cstlUrl, "Sensor", $routeParams.id +"-om2", "default-point", filterSensor);
+                var newLayer = DataViewer.createLayerWithStyle($cookies.cstlUrl, "Sensor", $routeParams.id +"-om2", "default-point-sensor", filterSensor);
                 DataViewer.map.addLayer(newLayer);
             } else {
                 var oldLayer = DataViewer.map.layers[1];

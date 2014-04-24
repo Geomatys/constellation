@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2011, Geomatys
+ *    (C) 2011 - 2014, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -18,7 +18,8 @@ package org.constellation.map.setup;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,11 +41,11 @@ import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
-import org.geotoolkit.style.DefaultStyleFactory;
-import org.geotoolkit.style.MutableStyle;
+import org.geotoolkit.style.*;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.style.GraphicalSymbol;
 import org.opengis.util.NoSuchIdentifierException;
 
 import static org.geotoolkit.parameter.ParametersExt.createGroup;
@@ -53,10 +54,11 @@ import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
 import static org.geotoolkit.style.StyleConstants.*;
 
 /**
- * specific setup for map service
+ * Specific setup for map service
  *
  * @author Guilhem Legal (Geomatys)
  * @author Alexis Manin (Geomatys)
+ * @author Cédric Briançon (Geomatys)
  */
 public class MapSetup implements ServletContextListener {
 
@@ -133,6 +135,22 @@ public class MapSetup implements ServletContextListener {
             provider = StyleProviders.getInstance().getProvider("sld");
         }
 
+        final File dstImages = new File(ConfigDirectory.getDataDirectory(), "images");
+        try {
+            if (dstImages.exists()) {
+                if (!dstImages.isDirectory() || (dstImages.isDirectory() && dstImages.listFiles().length == 0)) {
+                    final File src = FileUtilities.getDirectoryFromResource("org/constellation/map/setup/images");
+                    FileUtilities.copy(src, dstImages);
+                }
+            } else {
+                dstImages.mkdir();
+                final File src = FileUtilities.getDirectoryFromResource("org/constellation/map/setup/images");
+                FileUtilities.copy(src, dstImages);
+            }
+        } catch (IOException ex) {
+
+        }
+
         // Fill default SLD provider.
         final DefaultStyleFactory sf = new DefaultStyleFactory();
         try {
@@ -140,6 +158,42 @@ public class MapSetup implements ServletContextListener {
                 final MutableStyle style = sf.style(DEFAULT_POINT_SYMBOLIZER);
                 style.setName("default-point");
                 style.featureTypeStyles().get(0).rules().get(0).setName("default-point");
+                StyleProviderConfig.createStyle("sld", style);
+            }
+            if (provider.get("default-point-sensor") == null) {
+                final MutableStyle style = sf.style(DEFAULT_POINT_SYMBOLIZER);
+                style.setName("default-point-sensor");
+                style.featureTypeStyles().get(0).rules().get(0).setName("default-point-sensor");
+
+                // Marker
+                final File markerFile = new File(dstImages, "marker_normal.png");
+                final DefaultExternalGraphic graphSymb = new DefaultExternalGraphic(
+                        new DefaultOnlineResource(markerFile.toURI(), "", "", "marker_normal.png", null, null), "png", null
+                );
+                final List<GraphicalSymbol> symbs = new ArrayList<>();
+                symbs.add(graphSymb);
+                final DefaultGraphic graphic = new DefaultGraphic(symbs, null, null, null, null, null);
+                final DefaultPointSymbolizer pointSymbolizer = new DefaultPointSymbolizer(graphic, null, "", "default-point-sensor", null);
+                style.featureTypeStyles().get(0).rules().get(0).symbolizers().clear();
+                style.featureTypeStyles().get(0).rules().get(0).symbolizers().add(pointSymbolizer);
+                StyleProviderConfig.createStyle("sld", style);
+            }
+            if (provider.get("default-point-sensor-selected") == null) {
+                final MutableStyle style = sf.style(DEFAULT_POINT_SYMBOLIZER);
+                style.setName("default-point-sensor-selected");
+                style.featureTypeStyles().get(0).rules().get(0).setName("default-point-sensor-selected");
+
+                // Marker
+                final File markerFile = new File(dstImages, "marker_selected.png");
+                final DefaultExternalGraphic graphSymb = new DefaultExternalGraphic(
+                        new DefaultOnlineResource(markerFile.toURI(), "", "", "marker_selected.png", null, null), "png", null
+                );
+                final List<GraphicalSymbol> symbs = new ArrayList<>();
+                symbs.add(graphSymb);
+                final DefaultGraphic graphic = new DefaultGraphic(symbs, null, null, null, null, null);
+                final DefaultPointSymbolizer pointSymbolizer = new DefaultPointSymbolizer(graphic, null, "", "default-point-sensor-selected", null);
+                style.featureTypeStyles().get(0).rules().get(0).symbolizers().clear();
+                style.featureTypeStyles().get(0).rules().get(0).symbolizers().add(pointSymbolizer);
                 StyleProviderConfig.createStyle("sld", style);
             }
             if (provider.get("default-line") == null) {
