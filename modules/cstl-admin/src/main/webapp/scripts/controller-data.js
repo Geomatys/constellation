@@ -33,6 +33,10 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
             var layerName = $scope.selected.Name;
             var providerId = $scope.selected.Provider;
             var layerData;
+            var modalLoader = $modal.open({
+              templateUrl: 'views/modalLoader.html',
+              controller: 'ModalInstanceCtrl'
+            });
             if ($scope.selected.TargetStyle && $scope.selected.TargetStyle.length > 0) {
                 layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, layerName, providerId, $scope.selected.TargetStyle[0].Name);
             } else {
@@ -54,9 +58,11 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
                         DataViewer.map.zoomToExtent(extent, true);
                     }
                 }
+            modalLoader.close();
             }, function() {
                 // failed to find a metadata, just load the full map
                 DataViewer.initMap('dataMap');
+                modalLoader.close();
             });
         };
 
@@ -135,8 +141,8 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
         };
     }]);
 
-cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','dataListing','$location', '$translate', '$uploadFiles',
-    function ($scope, $routeParams, dataListing, $location, $translate, $uploadFiles) {
+cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','dataListing','$location', '$translate', '$uploadFiles', '$modal',
+    function ($scope, $routeParams, dataListing, $location, $translate, $uploadFiles, $modal) {
         $scope.provider = $routeParams.id;
         $scope.missing = $routeParams.missing === 'true';
         $scope.type = $routeParams.type;
