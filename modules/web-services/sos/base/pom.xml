@@ -78,6 +78,11 @@
       <artifactId>cstl-store-provider</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.constellation.engine</groupId>
+      <artifactId>cstl-engine-templating</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
      <!-- geotoolkit dependencies -->
     <dependency>

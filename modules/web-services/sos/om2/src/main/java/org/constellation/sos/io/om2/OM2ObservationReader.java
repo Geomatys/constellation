@@ -318,7 +318,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
             final List<String> results   = new ArrayList<>();
             final PreparedStatement stmt = c.prepareStatement("SELECT DISTINCT \"procedure\" "
                                                             + "FROM \"om\".\"offerings\", \"om\".\"offering_observed_properties\""
-                                                            + "WHERE \"identifier\"=\"id_offerings\""
+                                                            + "WHERE \"identifier\"=\"id_offering\""
                                                             + "AND \"phenomenon\"=?");
             stmt.setString(1, observedProperty);
             final ResultSet rs =  stmt.executeQuery();
@@ -344,7 +344,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
             final List<String> results   = new ArrayList<>();
             final PreparedStatement stmt = c.prepareStatement("SELECT \"phenomenon\" "
                                                             + "FROM \"om\".\"offerings\", \"om\".\"offering_observed_properties\""
-                                                            + "WHERE \"identifier\"=\"id_offerings\""
+                                                            + "WHERE \"identifier\"=\"id_offering\""
                                                             + "AND \"procedure\"=?");
             stmt.setString(1, sensorID);
             final ResultSet rs =  stmt.executeQuery();

@@ -136,6 +136,17 @@ public class SOSConfigurer extends OGCConfigurer {
         return new AcknowlegementType("Error", "An error occurs during the process");
     }
     
+    public AcknowlegementType importSensor(final String id, final AbstractSensorML sensor, final String sensorID) throws ConfigurationException {
+        LOGGER.info("Importing sensor");
+        final SensorWriter writer = getSensorWriter(id);
+        try {
+            writer.writeSensor(sensorID, sensor);
+            return new AcknowlegementType("Success", "The specified sensor have been imported in the SOS");
+        } catch (CstlServiceException ex) {
+            throw new ConfigurationException(ex);
+        }
+    }
+    
     public AcknowlegementType removeSensor(final String id, final String sensorID) throws ConfigurationException {
         final SensorWriter smlWriter = getSensorWriter(id);
         final ObservationWriter omWriter = getObservationWriter(id);

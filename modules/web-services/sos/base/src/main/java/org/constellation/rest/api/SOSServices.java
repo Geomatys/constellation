@@ -18,6 +18,7 @@ package org.constellation.rest.api;
 
 import java.io.File;
 import java.util.List;
+import java.util.Properties;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -36,9 +37,12 @@ import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
 import org.constellation.provider.Providers;
 import org.constellation.sos.configuration.SOSConfigurer;
+import org.constellation.sos.configuration.SensorMLGenerator;
 import static org.constellation.utils.RESTfulUtilities.ok;
 import org.geotoolkit.gml.xml.v321.AbstractGeometryType;
 import org.geotoolkit.parameter.ParametersExt;
+import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.geotoolkit.sos.netcdf.ExtractionResult;
 import org.geotoolkit.sos.netcdf.NetCDFExtractor;
 import org.opengis.observation.Observation;
 import org.opengis.parameter.ParameterValueGroup;
@@ -145,9 +149,21 @@ public class SOSServices {
             if (filePath != null) {
                 if (filePath.endsWith(".nc")) {
                     final File ncFile = new File(filePath);
-                    final List<Observation> observations = NetCDFExtractor.getObservationFromNetCDF(ncFile, providerId, bandName);
+                    final ExtractionResult result = NetCDFExtractor.getObservationFromNetCDF(ncFile, providerId, bandName);
+                    
+                    // SensorML generation
+                    final Properties prop = new Properties();
+                    prop.put("id",         providerId);
+                    prop.put("beginTime",  result.spatialBound.dateStart);
+                    prop.put("endTime",    result.spatialBound.dateEnd);
+                    prop.put("longitude",  result.spatialBound.minx);
+                    prop.put("latitude",   result.spatialBound.miny);
+                    prop.put("phenomenon", result.phenomenons);
+                    final AbstractSensorML sml = SensorMLGenerator.getTemplateSensorML(prop);
+                    
                     final SOSConfigurer configurer = getConfigurer();
-                    configurer.importObservations(id, observations);
+                    configurer.importSensor(id, sml, providerId);
+                    configurer.importObservations(id, result.observations);
                     
                     response = new AcknowlegementType("Success", "The specified observations have been imported in the SOS");
                 } else {
