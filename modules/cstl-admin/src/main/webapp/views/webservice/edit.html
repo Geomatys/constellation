@@ -339,7 +339,7 @@
                                 <label class="control-label" translate="service.edit.dashboard.sensors.list">Available sensors</label>
                                 <div class="sos_edit_checkboxlist">
                                     <label class="checkbox" ng-repeat="sensor in sensors">
-                                        <input type="checkbox" ng-model="sensor.checked"> {{sensor.id}}
+                                        <input type="checkbox" ng-model="sensor.checked" ng-change="changeSensorState(sensor)"> {{sensor.id}}
                                     </label>
                                 </div>
                             </div>

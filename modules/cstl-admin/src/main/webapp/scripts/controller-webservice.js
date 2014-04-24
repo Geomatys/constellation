@@ -400,6 +400,11 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
                     str += "id='" + sensor.id +"'";
                 }
             }
+
+            if (str === "") {
+                // Filter on an invalid id, to be sure no features will be displayed
+                return "id='-'";
+            }
             return str;
         };
 
@@ -456,24 +461,12 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
             $scope.metadata.versions = strVersions;
         };
 
-        $scope.changeSensorValue = function(currentSensor) {
-            for (var i=0; i<$scope.sensors.length; i++) {
-                var sensor = $scope.sensors[i];
-                if (sensor.id = currentSensor) {
-                    $scope.sensors[i].checked = !$scope.sensors[i].checked;
-                    break;
-                }
-            }
-        };
-
-        $scope.sensorIsSelected = function(currentSensor){
-            for (var i=0; i<$scope.sensors.length; i++) {
-                var sensor = $scope.sensors[i];
-                if (sensor.id = currentSensor) {
-                    return sensor.checked;
-                }
-            }
-            return false;
+        $scope.changeSensorState = function(currentSensor) {
+            var filterSensor = $scope.generateLayerFilter();
+            var layer = DataViewer.layers[1];
+            layer.mergeNewParams({
+                'CQLFILTER' : filterSensor
+            });
         };
 
         // define which version is Selected
