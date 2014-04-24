@@ -386,39 +386,15 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
         $scope.sensors = undefined;
         $scope.measures = undefined;
 
-        $scope.generateLayerFilter = function() {
-            var str = "";
-            if ($scope.sensors && $scope.sensors.length > 0) {
-                for (var i = 0; i < $scope.sensors.length; i++) {
-                    var sensor = $scope.sensors[i];
-                    if (sensor.checked === false) {
-                        continue;
-                    }
-                    if (str !== "") {
-                        str += " OR ";
-                    }
-                    str += "id='" + sensor.id +"'";
-                }
-            }
-
-            if (str === "") {
-                // Filter on an invalid id, to be sure no features will be displayed
-                return "id='-'";
-            }
-            return str;
-        };
-
         $scope.initSensors = function() {
             sos.listSensors({id: $routeParams.id}, function(response) {
                 $scope.sensors = [];
                 for (var i=0; i<response.Entry.length; i++) {
-                    $scope.sensors[i] = {id: response.Entry[i], checked:true};
+                    $scope.sensors[i] = {id: response.Entry[i], checked:false};
                 }
 
-                var filterSensor = $scope.generateLayerFilter();
                 var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
-                var layer = DataViewer.createLayerWithStyle($cookies.cstlUrl, "Sensor", $routeParams.id +"-om2", "default-point", filterSensor);
-                DataViewer.layers = [layerBackground, layer];
+                DataViewer.layers = [layerBackground];
                 DataViewer.initMap('olSensorMap');
 
             }, function() { $growl('error','Error','Unable to list sensors'); });
@@ -461,12 +437,40 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
             $scope.metadata.versions = strVersions;
         };
 
+        $scope.generateLayerFilter = function() {
+            var str = "";
+            if ($scope.sensors && $scope.sensors.length > 0) {
+                for (var i = 0; i < $scope.sensors.length; i++) {
+                    var sensor = $scope.sensors[i];
+                    if (sensor.checked === false) {
+                        continue;
+                    }
+                    if (str !== "") {
+                        str += " OR ";
+                    }
+                    str += "id='" + sensor.id +"'";
+                }
+            }
+
+            if (str === "") {
+                // Filter on an invalid id, to be sure no features will be displayed
+                return "id='-'";
+            }
+            return str;
+        };
+
         $scope.changeSensorState = function(currentSensor) {
             var filterSensor = $scope.generateLayerFilter();
-            var layer = DataViewer.layers[1];
-            layer.mergeNewParams({
-                'CQLFILTER' : filterSensor
-            });
+
+            if (DataViewer.map.layers.length === 1) {
+                var newLayer = DataViewer.createLayerWithStyle($cookies.cstlUrl, "Sensor", $routeParams.id +"-om2", "default-point", filterSensor);
+                DataViewer.map.addLayer(newLayer);
+            } else {
+                var oldLayer = DataViewer.map.layers[1];
+                oldLayer.mergeNewParams({
+                    'CQLFILTER' : filterSensor
+                });
+            }
         };
 
         // define which version is Selected
