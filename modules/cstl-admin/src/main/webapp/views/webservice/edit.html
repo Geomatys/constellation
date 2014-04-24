@@ -347,7 +347,7 @@
                                 <label class="control-label" translate="service.edit.dashboard.measures.list">Available measures</label>
                                 <div class="sos_edit_checkboxlist">
                                     <label class="checkbox" ng-repeat="measure in measures">
-                                        <input type="checkbox"> {{measure}}
+                                        <input type="checkbox" ng-model="measure.checked" ng-change="changeMeasureState(measure)"> {{measure.id}}
                                     </label>
                                 </div>
                             </div>
