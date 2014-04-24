@@ -382,7 +382,8 @@
             "export.button": "Export",
             "metadata.button": "Metadata"
         },
-        "title": "Layers list"
+        "title": "Layers list",
+        "modal.dataviewer":"Data Viewer"
     },
     "md": {
         "iso": {

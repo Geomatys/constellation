@@ -577,7 +577,8 @@
                     "button": "Métadonnées"
                 }
             },
-            "title": "Liste des couches"
+            "title": "Liste des couches",
+            "modal.dataviewer":"Visualisation de la donnée"
         }
     },
     "login": {
