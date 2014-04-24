@@ -91,6 +91,7 @@ public class QuartzJobListener implements JobListener {
             state.setStatus(TaskState.Status.RUN);
             state.setMessage(toString(event.getTask()));
             state.setPercent(event.getProgress());
+            CstlScheduler.getInstance().fireTaskUpdate(state);
         }
 
         @Override
@@ -98,6 +99,7 @@ public class QuartzJobListener implements JobListener {
             state.setStatus(TaskState.Status.RUN);
             state.setMessage(toString(event.getTask()));
             state.setPercent(event.getProgress());
+            CstlScheduler.getInstance().fireTaskUpdate(state);
         }
 
         @Override
@@ -105,6 +107,7 @@ public class QuartzJobListener implements JobListener {
             state.setStatus(TaskState.Status.PAUSE);
             state.setMessage(toString(event.getTask()));
             state.setPercent(event.getProgress());
+            CstlScheduler.getInstance().fireTaskUpdate(state);
         }
 
         @Override
@@ -112,6 +115,7 @@ public class QuartzJobListener implements JobListener {
             state.setStatus(TaskState.Status.RUN);
             state.setMessage(toString(event.getTask()));
             state.setPercent(event.getProgress());
+            CstlScheduler.getInstance().fireTaskUpdate(state);
         }
 
         @Override
@@ -119,6 +123,7 @@ public class QuartzJobListener implements JobListener {
             state.setStatus(TaskState.Status.FINISH);
             state.setMessage(toString(event.getTask()));
             state.setPercent(event.getProgress());
+            CstlScheduler.getInstance().fireTaskUpdate(state);
         }
 
         @Override
@@ -127,6 +132,7 @@ public class QuartzJobListener implements JobListener {
             state.setMessage(toString(event.getTask()));
             state.setPercent(event.getProgress());
             state.setLastException(event.getException());
+            CstlScheduler.getInstance().fireTaskUpdate(state);
         }
         
         private String toString(InternationalString str){

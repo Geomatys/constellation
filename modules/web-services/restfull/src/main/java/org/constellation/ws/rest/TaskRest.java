@@ -16,14 +16,17 @@
  */
 package org.constellation.ws.rest;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.constellation.dto.TaskList;
+
 import org.constellation.dto.TaskStatus;
 import org.constellation.scheduler.CstlScheduler;
 import org.constellation.scheduler.Task;
@@ -49,8 +52,8 @@ public final class TaskRest {
         final CstlScheduler scheduler = CstlScheduler.getInstance();
         final List<Task> tasks = scheduler.listTasks();
         
-        final TaskList lst = new TaskList();
-        lst.getTasks(); //force create list
+        final Map<String, TaskStatus> lst = new HashMap<String, TaskStatus>();
+        
         for(Task t : tasks){
             final TaskState state = scheduler.getaskState(t.getId());
             final TaskStatus status = new TaskStatus();
@@ -59,7 +62,7 @@ public final class TaskRest {
             status.setPercent(state.getPercent());
             status.setStatus(state.getStatus().name());
             status.setTitle(t.getTitle());
-            lst.getTasks().add(status);
+            lst.put(status.getId(), status);
         }
                 
         return Response.ok(lst).build();

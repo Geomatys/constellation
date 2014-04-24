@@ -55,7 +55,45 @@ cstlAdminApp.factory('AuthInterceptor', function($cookies) {
 
 var context = findWebappContext();
 
+function Topic(stompClient, path){
+  var self = this;
+  this.path = path;
+  this.unsubscribe = function(){
+    stompClient.unsubscribe(self.id);
+    console.log('Unsubscribed from ' + path + ' (' + self.id + ')')
+  }
+}
 
+function Stomper(url){
+  var self = this;
+  var socket = new SockJS(url);
+  var stompClient = Stomp.over(socket);
+  var connected = false;
+  this.subscribe = function(path, cb){
+      var topic = new Topic(stompClient, path)    
+      if(connected){
+        topic.id = stompClient.subscribe(topic.path, cb)
+        console.log('Subscribed to ' + topic.path + ' with already connected: ' + topic.id)
+      }else {
+        stompClient.connect('','', function(frame) {
+          console.log('Connected to ' + url)
+          topic.id = stompClient.subscribe(topic.path, cb)
+          self.connected = true;
+          console.log('Subscribed to ' + topic.path + ' with newly: ' + topic.id)
+        });
+      }
+      return topic;
+    };
+   
+  
+}
+
+cstlAdminApp.factory('StompService', ['$cookies', function($cookies){
+  var cstlUrl = $cookies.cstlUrl;
+  
+  return new Stomper(cstlUrl + 'spring/ws/adminmessages')
+  
+}]);
 
 
 cstlAdminApp.factory('Account', ['$resource',
@@ -70,13 +108,6 @@ cstlAdminApp.factory('Contact', ['$resource',
             	 save: {method:'PUT'}
          });
 }]);
-
-cstlAdminApp.factory('ProcessService', ['$resource', '$cookies',
-   function($resource, $cookies) {
-       	return $resource('@cstl/spring/admin/process;jsessionid=', {}, {
-       		'get' : {method : 'GET',isArray : true}
-       	});
-} ]);
 
 
 cstlAdminApp.factory('Sessions', ['$resource',
@@ -204,10 +235,17 @@ cstlAdminApp.factory('sos', ['$resource',
         });
     }]);
 
-cstlAdminApp.factory('task', ['$resource',
+cstlAdminApp.factory('ProcessService', ['$resource', '$cookies',
+    function($resource, $cookies) {
+        return $resource('@cstl/spring/admin/process;jsessionid=', {}, {
+           'get' : {method : 'GET',isArray : true}
+        });
+} ]);
+
+cstlAdminApp.factory('TaskService', ['$resource',
     function ($resource) {
         return $resource('@cstl/api/1/task', {}, {
-            'list':        {method: 'GET',  url: '@cstl/api/1/task/listTasks;jsessionid='}
+            'list':        {method: 'GET',  url: '@cstl/api/1/task/listTasks;jsessionid=', isArray: false}
         });
     }]);
 

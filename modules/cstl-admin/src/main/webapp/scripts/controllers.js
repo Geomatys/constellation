@@ -16,20 +16,20 @@
 'use strict';
 
 ZeroClipboard.config({
-	  moviePath: "scripts/zeroclipboard/ZeroClipboard.swf"
-	} );
+    moviePath: "scripts/zeroclipboard/ZeroClipboard.swf"
+});
 
 /* Controllers */
 
 cstlAdminApp.controller('HeaderController', ['$scope','$http',
-                                           function ($scope, $http) {
-	                                         $http.get("app/conf").success(function(data){
-	                                        	 $scope.cstlLoginUrl = data.cstl + "spring/auth/form";
-	                                        	 $scope.cstlLogoutUrl = data.cstl + "logout";
-	                                        });
-                                           }]);
+    function ($scope, $http) {
+        $http.get("app/conf").success(function(data){
+	       	  $scope.cstlLoginUrl = data.cstl + "spring/auth/form";
+	          $scope.cstlLogoutUrl = data.cstl + "logout";
+	      });
+}]);
 
-cstlAdminApp.controller('MainController', ['$scope','$location','webService','dataListing','ProcessService','$growl', 'UserResource', 'task',
+cstlAdminApp.controller('MainController', ['$scope','$location','webService','dataListing','ProcessService','$growl', 'UserResource', 'TaskService',
     function ($scope, $location, webService, dataListing, Process, $growl, UserResource, task) {
         $scope.countStats = function() {
             webService.listAll({}, function(response) {
@@ -54,7 +54,7 @@ cstlAdminApp.controller('MainController', ['$scope','$location','webService','da
             });
 
             task.list({}, function(taskList) {
-                $scope.nbprocess = taskList.tasks.length;
+                $scope.nbprocess = Object.keys(taskList).length;
             }, function() {
                 $scope.nbprocess = 0;
                 $growl('error', 'Error', 'Unable to count process');
@@ -244,14 +244,37 @@ cstlAdminApp.controller('ProcessController', ['$scope', 'ProcessService',
                                          }]);
                                      
 
-cstlAdminApp.controller('TaskController', ['$scope', 'task',
-       function ($scope, task) {
-          task.list({}, function(taskList) {
-                $scope.tasks = taskList.tasks;
-            }, function() {
-                $growl('error', 'Error', 'Unable to list tasks');
-            });
+cstlAdminApp.controller('TaskController', ['$scope', 'TaskService','$timeout','StompService', 
+       function ($scope, TaskService, $timeout, StompService) {
+
+   $scope.tasks = TaskService.list();      
+
+   var topic = StompService.subscribe('/topic/taskevents', function(data){
+     var event = JSON.parse(data.body)
+     var task = $scope.tasks[event.id]
+     if(task!=null){
+       task.percent = event.percent
+       if(task.percent > 99)
+         delete $scope.tasks[event.id]
+       $scope.$digest();
+     }else{
+       //new task
+       $scope.tasks[event.id] = {
+         id: event.id,
+         status: event.status,
+         message: event.message,
+         percent: event.percent
+       }
+       $scope.$digest();
+     }
+ })
+          //connect();
+    $scope.$on('$destroy', function () { 
+        topic.unsubscribe();
+    });
+          
 }]);
+
                                      
 cstlAdminApp.controller('SessionsController', ['$scope', 'resolvedSessions', 'Sessions',
     function ($scope, resolvedSessions, Sessions) {

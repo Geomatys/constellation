@@ -18,13 +18,17 @@ package org.constellation.scheduler;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.EventListener;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.swing.event.EventListenerList;
 import javax.xml.stream.XMLStreamException;
+
 import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.scheduler.configuration.XMLTaskConfigurator;
@@ -32,7 +36,6 @@ import org.geotoolkit.process.Process;
 import org.geotoolkit.process.ProcessEvent;
 import org.geotoolkit.process.ProcessListenerAdapter;
 import org.geotoolkit.process.quartz.ProcessJobDetail;
-
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
@@ -40,6 +43,7 @@ import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
+
 import static org.quartz.impl.matchers.EverythingMatcher.*;
 
 /**
@@ -63,6 +67,10 @@ public final class CstlScheduler {
     private final Map<String,TaskState> statuses = new ConcurrentHashMap<>();
     private final QuartzJobListener quartzListener = new QuartzJobListener();
     private Scheduler quartzScheduler;
+    
+    
+    private final EventListenerList listeners = new EventListenerList();
+    
     
     public static final TaskConfigurator DEFAULT_CONFIGURATOR = new XMLTaskConfigurator();    
     protected static TaskConfigurator CONFIGURATOR = DEFAULT_CONFIGURATOR;
@@ -326,5 +334,23 @@ public final class CstlScheduler {
         }
         LOGGER.log(Level.INFO, "=== Scheduler sucessfully stopped ===");    
     }
+
+    public void addListener(CstlSchedulerListener l) {
+        listeners.add(CstlSchedulerListener.class, l);
+    }
+
+    public void removeListener(CstlSchedulerListener l) {
+        listeners.remove(CstlSchedulerListener.class, l);
+    }
+    
+    
+    public void fireTaskUpdate(TaskState taskState) {
+        CstlSchedulerListener[] cstlSchedulerListeners = listeners.getListeners(CstlSchedulerListener.class);
+        for (CstlSchedulerListener cstlSchedulerListener : cstlSchedulerListeners) {
+            cstlSchedulerListener.taskUpdated(taskState);
+        }
+    }
+    
+    
     
 }

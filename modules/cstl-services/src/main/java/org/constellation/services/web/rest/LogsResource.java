@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 
-import com.codahale.metrics.annotation.Timed;
-
 /**
  * Controller for view and managing Log Level at runtime.
  */

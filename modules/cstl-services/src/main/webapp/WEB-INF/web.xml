@@ -53,6 +53,10 @@
   <filter>
     <filter-name>CorsFilter</filter-name>
     <filter-class>org.constellation.filter.CorsFilter</filter-class>
+    <init-param>
+     <param-name>exclude</param-name>
+     <param-value>/spring/ws/.*</param-value>
+    </init-param>
   </filter>
   <filter-mapping>
     <filter-name>CorsFilter</filter-name>
