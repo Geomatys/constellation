@@ -285,7 +285,9 @@ cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routePar
 
             webService.setConfig({type: $scope.type, id: $scope.id}, $scope.source, function() {
                 $growl('success','Success','Service '+ $scope.id +' successfully updated');
-                createOmProvider();
+                if ($scope.type.toLowerCase() === 'sos') {
+                    createOmProvider();
+                }
                 $location.path('/webservice');
             }, function() {
                 $growl('error','Error','Service configuration update error');
@@ -384,23 +386,41 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
         $scope.sensors = undefined;
         $scope.measures = undefined;
 
-        $scope.loadSensorsInfo = function() {
+        $scope.generateLayerFilter = function() {
+            var str = "";
+            if ($scope.sensors && $scope.sensors.length > 0) {
+                for (var i = 0; i < $scope.sensors.length; i++) {
+                    var sensor = $scope.sensors[i];
+                    if (sensor.checked === false) {
+                        continue;
+                    }
+                    if (str !== "") {
+                        str += " OR ";
+                    }
+                    str += "id='" + sensor.id +"'";
+                }
+            }
+            return str;
+        };
+
+        $scope.initSensors = function() {
             sos.listSensors({id: $routeParams.id}, function(response) {
-                $scope.sensors = response.Entry;
+                $scope.sensors = [];
+                for (var i=0; i<response.Entry.length; i++) {
+                    $scope.sensors[i] = {id: response.Entry[i], checked:true};
+                }
+
+                var filterSensor = $scope.generateLayerFilter();
+                var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
+                var layer = DataViewer.createLayerWithStyle($cookies.cstlUrl, "Sensor", $routeParams.id +"-om2", "default-point", filterSensor);
+                DataViewer.layers = [layerBackground, layer];
+                DataViewer.initMap('olSensorMap');
+
             }, function() { $growl('error','Error','Unable to list sensors'); });
 
             sos.listMeasures({id: $routeParams.id}, function(response) {
                 $scope.measures = response.Entry;
             }, function() { $growl('error','Error','Unable to list measures'); });
-        };
-
-        $scope.initSensors = function() {
-            $scope.loadSensorsInfo();
-
-            var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
-            var layer = DataViewer.createLayerWithStyle($cookies.cstlUrl, "Sensor", $routeParams.id +"-om2", "default-point");
-            DataViewer.layers = [layerBackground, layer];
-            DataViewer.initMap('olSensorMap');
         };
 
         $scope.getVersionsForType = function() {
@@ -434,6 +454,26 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
                 strVersions.push(selVersions[i].id);
             }
             $scope.metadata.versions = strVersions;
+        };
+
+        $scope.changeSensorValue = function(currentSensor) {
+            for (var i=0; i<$scope.sensors.length; i++) {
+                var sensor = $scope.sensors[i];
+                if (sensor.id = currentSensor) {
+                    $scope.sensors[i].checked = !$scope.sensors[i].checked;
+                    break;
+                }
+            }
+        };
+
+        $scope.sensorIsSelected = function(currentSensor){
+            for (var i=0; i<$scope.sensors.length; i++) {
+                var sensor = $scope.sensors[i];
+                if (sensor.id = currentSensor) {
+                    return sensor.checked;
+                }
+            }
+            return false;
         };
 
         // define which version is Selected
@@ -565,7 +605,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
                         $scope.fullList = response;
                     });
                 } else {
-                    $scope.loadSensorsInfo();
+                    $scope.initSensors();
                 }
             });
         };

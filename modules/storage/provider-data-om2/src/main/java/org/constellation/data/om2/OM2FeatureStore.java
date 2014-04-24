@@ -87,6 +87,7 @@ public class OM2FeatureStore extends AbstractFeatureStore {
 
     private static final String CSTL_NAMESPACE = "http://constellation.org/om2";
     private static final Name CSTL_TN_SENSOR = new DefaultName(CSTL_NAMESPACE, "Sensor");
+    protected static final Name ATT_ID = new DefaultName(CSTL_NAMESPACE,  "id");
     protected static final Name ATT_POSITION = new DefaultName(CSTL_NAMESPACE,  "position");
 
     private static final QueryCapabilities capabilities = new DefaultQueryCapabilities(false);
@@ -125,6 +126,7 @@ public class OM2FeatureStore extends AbstractFeatureStore {
     private void initTypes() {
         final FeatureTypeBuilder featureTypeBuilder = new FeatureTypeBuilder();
         featureTypeBuilder.setName(CSTL_TN_SENSOR);
+        featureTypeBuilder.add(ATT_ID, String.class,1,1,false,null);
         featureTypeBuilder.add(ATT_POSITION,Geometry.class,1,1,false,null);
         featureTypeBuilder.setDefaultGeometry(ATT_POSITION);
         types.put(CSTL_TN_SENSOR, featureTypeBuilder.buildFeatureType());
@@ -444,11 +446,11 @@ public class OM2FeatureStore extends AbstractFeatureStore {
             }
 
             final Collection<Property> props = new ArrayList<>();
+            final String id = result.getString(1);
+            props.add(FF.createAttribute(id, (AttributeDescriptor) type.getDescriptor(ATT_ID), null));
             props.add(FF.createAttribute(geom, (AttributeDescriptor) type.getDescriptor(ATT_POSITION), null));
             //props.add(FF.createAttribute(result.getString("description"), (AttributeDescriptor) type.getDescriptor(ATT_DESC), null));
-            //props.add(FF.createAttribute(result.getString("name"), (AttributeDescriptor) type.getDescriptor(ATT_NAME), null));
 
-            final String id = result.getString(1);
             current = FF.createFeature(props, type, id);
         }
 

@@ -226,7 +226,13 @@ public class DefaultFeatureData extends AbstractData implements FeatureData {
                 Filter filter = null;
                 for (String key : extras.keySet()) {
                     if (key.equalsIgnoreCase("cql_filter")) {
-                        final String cqlFilter = ((List) extras.get(key)).get(0).toString();
+                        final Object extra = extras.get(key);
+                        String cqlFilter = null;
+                        if (extra instanceof List) {
+                            cqlFilter = ((List) extra).get(0).toString();
+                        } else if (extra instanceof String){
+                            cqlFilter = (String)extra;
+                        }
                         if (cqlFilter != null) {
                             filter = buildCQLFilter(cqlFilter, filter);
                         }

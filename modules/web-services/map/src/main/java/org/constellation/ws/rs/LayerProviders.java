@@ -356,10 +356,12 @@ public final class LayerProviders extends Static {
             // Map context.
             final MapContext mapContext = MapBuilder.createContext();
             final MapItem mapItem;
-            if (filter != null) {
+            if (filter != null && !filter.isEmpty()) {
                 final Map<String,Object> params = new HashMap<>();
                 params.put("CQL_FILTER", filter);
-                mapItem = layer.getMapLayer(style, params);
+                final Map<String,Object> extraParams = new HashMap<>();
+                extraParams.put(Data.KEY_EXTRA_PARAMETERS, params);
+                mapItem = layer.getMapLayer(style, extraParams);
             } else {
                 mapItem = layer.getMapLayer(style, null);
             }
