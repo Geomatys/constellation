@@ -845,13 +845,16 @@ public class OM2ObservationWriter implements ObservationWriter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void removeObservationForProcedure(final String procedureID) throws CstlServiceException {
         try {
             final Connection c              = source.getConnection();
             c.setAutoCommit(false);
-            final PreparedStatement stmtMes = c.prepareStatement("DELETE FROM \"om\".\"mesures\" WHERE id_observation IN (SELECT \"id\" FROM \"om\".\"observations\" WHERE procedure=?)");
-            final PreparedStatement stmtObs = c.prepareStatement("DELETE FROM \"om\".\"observations\" WHERE procedure=?");
+            final PreparedStatement stmtMes = c.prepareStatement("DELETE FROM \"om\".\"mesures\" WHERE \"id_observation\" IN (SELECT \"id\" FROM \"om\".\"observations\" WHERE \"procedure\"=?)");
+            final PreparedStatement stmtObs = c.prepareStatement("DELETE FROM \"om\".\"observations\" WHERE \"procedure\"=?");
             
             stmtMes.setString(1, procedureID);
             stmtMes.executeUpdate();
@@ -864,6 +867,42 @@ public class OM2ObservationWriter implements ObservationWriter {
             c.close();
         } catch (SQLException ex) {
             throw new CstlServiceException("Error while inserting observation.", ex, NO_APPLICABLE_CODE);
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeProcedure(final String procedureID) throws CstlServiceException {
+        try {
+            removeObservationForProcedure(procedureID);
+            final Connection c              = source.getConnection();
+            c.setAutoCommit(false);
+            final PreparedStatement stmtObsP = c.prepareStatement("DELETE FROM \"om\".\"offering_observed_properties\" "
+                                                                + "WHERE \"id_offering\" IN(SELECT \"identifier\" FROM \"om\".\"offerings\" WHERE \"procedure\"=?)");
+            final PreparedStatement stmtFoi  = c.prepareStatement("DELETE FROM \"om\".\"offering_foi\" "
+                                                                + "WHERE \"id_offering\" IN(SELECT \"identifier\" FROM \"om\".\"offerings\" WHERE \"procedure\"=?)");
+            final PreparedStatement stmtMes = c.prepareStatement("DELETE FROM \"om\".\"offerings\" WHERE \"procedure\"=?");
+            final PreparedStatement stmtObs = c.prepareStatement("DELETE FROM \"om\".\"procedures\" WHERE \"id\"=?");
+            
+            stmtObsP.setString(1, procedureID);
+            stmtObsP.executeUpdate();
+            stmtObsP.close();
+            stmtFoi.setString(1, procedureID);
+            stmtFoi.executeUpdate();
+            stmtFoi.close();
+            stmtMes.setString(1, procedureID);
+            stmtMes.executeUpdate();
+            stmtMes.close();
+            stmtObs.setString(1, procedureID);
+            stmtObs.executeUpdate();
+            stmtObs.close();
+            
+            c.commit();
+            c.close();
+        } catch (SQLException ex) {
+            throw new CstlServiceException("Error while removeing procedure observation.", ex, NO_APPLICABLE_CODE);
         }
     }
     

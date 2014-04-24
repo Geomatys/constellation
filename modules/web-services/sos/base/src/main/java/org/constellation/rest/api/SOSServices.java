@@ -17,6 +17,7 @@
 package org.constellation.rest.api;
 
 import java.io.File;
+import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -26,19 +27,21 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.namespace.QName;
 import org.constellation.ServiceDef;
-import org.constellation.admin.ConfigurationEngine;
-import org.constellation.admin.dao.DataRecord;
-import org.constellation.admin.dao.ProviderRecord;
+import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.configuration.ServiceConfigurer;
 import org.constellation.configuration.StringList;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
+import org.constellation.provider.Providers;
 import org.constellation.sos.configuration.SOSConfigurer;
 import static org.constellation.utils.RESTfulUtilities.ok;
 import org.geotoolkit.gml.xml.v321.AbstractGeometryType;
+import org.geotoolkit.parameter.ParametersExt;
+import org.geotoolkit.sos.netcdf.NetCDFExtractor;
+import org.opengis.observation.Observation;
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
  *
@@ -127,14 +130,37 @@ public class SOSServices {
     public Response importSensorFromData(final @PathParam("id") String id, final ParameterValues params) throws Exception {
         final String providerId = params.get("providerId");
         final String dataId = params.get("dataId");
-        final QName dataName = new QName(dataId);
-        DataRecord record = ConfigurationEngine.getDataRecord(dataName, providerId);
-        ProviderRecord precord = null;
+        final String bandName;
+        if (dataId != null && dataId.startsWith(providerId + '.')) {
+            bandName = dataId.substring(providerId.length() + 1, dataId.length());
+        } else {
+            bandName = dataId;
+        }
+        final AcknowlegementType response;
+        final ParameterValueGroup config = Providers.getConfigurator().getProviderConfiguration(providerId);
+        ParameterValueGroup choice = ParametersExt.getGroup(config, "choice");
+        ParameterValueGroup type   = (ParameterValueGroup) choice.values().get(0);
+        if (type.getDescriptor().getName().getCode().equals("FileCoverageStoreParameters")) {
+            final String filePath = type.parameter("path").getValue().toString();
+            if (filePath != null) {
+                if (filePath.endsWith(".nc")) {
+                    final File ncFile = new File(filePath);
+                    final List<Observation> observations = NetCDFExtractor.getObservationFromNetCDF(ncFile, providerId, bandName);
+                    final SOSConfigurer configurer = getConfigurer();
+                    configurer.importObservations(id, observations);
+                    
+                    response = new AcknowlegementType("Success", "The specified observations have been imported in the SOS");
+                } else {
+                    response = new AcknowlegementType("Failure", "Only available on netCDF file for now");
+                }
+            } else {
+                response = new AcknowlegementType("Failure", "Unable to find a \"path\" parameter in the provider configuration");
+            }
+        } else {
+            response = new AcknowlegementType("Failure", "Available only on FileCoverageStore provider for now");
+        }
         
-                
-        // TODO: work on data reading for adding sensors
-        //return ok(getConfigurer().importSensorFromData(id, providerId, dataId));
-        return Response.ok().build();
+        return ok(response);
     }
 
     private static SOSConfigurer getConfigurer() throws NotRunningServiceException {

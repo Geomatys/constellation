@@ -29,6 +29,7 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.observation.MeasurementTable;
 import org.constellation.observation.ObservationTable;
+import org.constellation.observation.ProcessTable;
 import org.constellation.sos.ObservationOfferingTable;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.ws.CstlServiceException;
@@ -83,6 +84,11 @@ public class DefaultObservationWriter implements ObservationWriter {
      * A database table for insert and get observation offering.
      */
     private final ObservationOfferingTable offTable;
+    
+    /**
+     * A database table for insert and get observation offering.
+     */
+    private final ProcessTable procTable;
 
     /**
      * A flag indicating if the dataSource is a postgreSQL SGBD
@@ -117,6 +123,7 @@ public class DefaultObservationWriter implements ObservationWriter {
             obsTable  = omDatabase.getTable(ObservationTable.class);
             measTable = omDatabase.getTable(MeasurementTable.class);
             offTable  = omDatabase.getTable(ObservationOfferingTable.class);
+            procTable = omDatabase.getTable(ProcessTable.class);
 
         } catch (NoSuchTableException ex) {
             throw new CstlServiceException("NoSuchTable Exception while initalizing the O&M writer:" + ex.getMessage(), NO_APPLICABLE_CODE);
@@ -180,9 +187,26 @@ public class DefaultObservationWriter implements ObservationWriter {
         }
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void removeObservationForProcedure(String procedureID) throws CstlServiceException {
+    public void removeObservationForProcedure(final String procedureID) throws CstlServiceException {
         throw new UnsupportedOperationException("Not supported yet in this implementation.");
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeProcedure(final String procedureID) throws CstlServiceException {
+        try {
+            procTable.delete(procedureID);
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
+                                             NO_APPLICABLE_CODE);
+        }
     }
 
     /**
