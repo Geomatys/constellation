@@ -226,6 +226,10 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','data
         $scope.createMetadataTree = function(parentDivId, isCoverageMetadata){
             var upFile = $uploadFiles.files.file;
             var upMdFile;
+            var modalLoader = $modal.open({
+                templateUrl: 'views/modalLoader.html',
+                controller: 'ModalInstanceCtrl'
+            });
             if (upFile) {
                 upFile = upFile.substring(upFile.lastIndexOf("/")+1);
                 upMdFile = $uploadFiles.files.mdFile;
@@ -245,6 +249,7 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','data
                 }
 
                 $("#"+ parentDivId +" .collapse").collapse('show');
+                modalLoader.close();
             });
 
             function generateMetadataTags(metadataList, parentDivId) {
@@ -402,7 +407,6 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                     fileName = fileName.substring(0, fileName.lastIndexOf("."));
                     fileExtension = justFile.substring(justFile.lastIndexOf(".")+1);
                 }
-
                 dataListing.importData({values: {'filePath': upFiles.file, 'metadataFilePath': upFiles.mdFile, dataType: $scope.type}}, function(response) {
 
                     var importedData = response.dataFile;
