@@ -9,8 +9,11 @@
                 <div id="part1A" ng-show="$parent.step1A">
                     <form id="uploadDataForm" class="form-horizontal">
                         <!-- Upload data -->
-                        <div translate="data.modal.data">Data</div>
-                        <div class="fileinput fileinput-new" data-provides="fileinput">
+                        <label class="col-sm-2 col-xs-3" translate="data.modal.data">Data</label>
+                        <div class="btn-lg tooltipicon">
+                            <span type="button" class="glyphicon glyphicon-info-sign" tooltip data-placement="right" title="{{'tooltip.data.add.choicedata' | translate }}" ></span>
+                        </div>
+                        <div class="fileinput fileinput-new" style="margin-top:5px;"  data-provides="fileinput">
                             <div class="input-group">
                                 <div class="form-control uneditable-input" data-trigger="fileinput">
                                     <i class="glyphicon glyphicon-file fileinput-exists"></i>

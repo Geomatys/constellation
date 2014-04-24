@@ -1191,6 +1191,7 @@
         "service.create.version":"Au moins une version doit être sélectionnée",
         "service.source.url":"Renseignez uniquement le nom de domaine",
         "service.source.connexion":"Connexion entre plusieurs bases",
-        "service.source.sensormlfolder":"TODO"
+        "service.source.sensormlfolder":"TODO",
+        "data.add.choicedata":"Formats supportés : shp (dans un fichier .zip), NetCDF, tif"
     }
 }

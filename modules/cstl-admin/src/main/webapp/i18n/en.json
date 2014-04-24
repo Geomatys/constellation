@@ -906,6 +906,7 @@
         "service.create.version":"At least one version must be selected",
         "service.source.url":"Fill only the domain name",
         "service.source.connexion":"Connection between multiple databases",
-        "service.source.sensormlfolder":"TODO"
+        "service.source.sensormlfolder":"TODO",
+        "data.add.choicedata":"Supported formats: shp (in a zip file.), NetCDF, tif"
     }
 }
