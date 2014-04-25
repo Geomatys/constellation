@@ -919,7 +919,8 @@
             }
         },
         "data": {
-            "label": "Données publiées sur le service"
+            "label": "Données publiées sur le service",
+            "label.sos": "Capteurs disponibles sur le service"
         },
         "description": {
             "getcapabilities": {

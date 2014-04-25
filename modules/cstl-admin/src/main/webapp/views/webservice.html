@@ -75,7 +75,8 @@
                                 <p><strong><span translate="service.abstract.label">Service description</span></strong></p>
                                 <p ng-if="service._abstract != null && service._abstract !==''">{{service._abstract}}</p>
                                 <p ng-if="service._abstract == null || service._abstract ===''"> - </p>
-                                <p><strong><span translate="service.data.label">Published data on service</span></strong></p>
+                                <p><strong><span ng-if="service.type.toLocaleLowerCase()!=='sos'" translate="service.data.label">Published data on service</span></strong></p>
+                                <p><strong><span ng-if="service.type.toLocaleLowerCase()==='sos'" translate="service.data.label.sos">Available sensors on service</span></strong></p>
                                 <p ng-if="service.layersNumber != null">{{service.layersNumber}}</p>
                                 <p ng-if="service.layersNumber == null">0</p>
                             </div>

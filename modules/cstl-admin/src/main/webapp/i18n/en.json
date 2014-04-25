@@ -487,6 +487,7 @@
             "version.label": "Version"
         },
         "data.label": "Published data on service",
+        "data.label.sos": "Available sensors on service",
         "description": {
             "getcapabilities.button": "GetCapabilities",
             "logs.button": "Logs",
