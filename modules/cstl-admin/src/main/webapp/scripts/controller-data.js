@@ -642,8 +642,8 @@ cstlAdminApp.controller('ServerFileModalController', ['$scope', '$dashboard', '$
         $scope.load($scope.currentPath);
     }]);
 
-cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webService', 'sos', '$dashboard', '$modalInstance', 'service', 'exclude', '$growl',
-    function ($scope, dataListing, webService, sos, $dashboard, $modalInstance, service, exclude, $growl) {
+cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webService', 'sos', '$dashboard', '$modalInstance', 'service', 'exclude', '$growl', '$modal',
+    function ($scope, dataListing, webService, sos, $dashboard, $modalInstance, service, exclude, $growl, $modal) {
         $scope.service = service;
 
         $scope.getDefaultFilter = function() {
@@ -721,10 +721,15 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
                         });
                     } else {
                         // Not in WMTS and no pyramid requested
+                        var modalLoader = $modal.open({
+                          templateUrl: 'views/modalLoader.html',
+                          controller: 'ModalInstanceCtrl'
+                        });
                         webService.addLayer({type: service.type, id: service.identifier},
                             {layerAlias: data.Name, layerId: data.Name, serviceType: service.type, serviceId: service.identifier, providerId: data.Provider},
                             function () {
                                 $growl('success', 'Success', 'Layer ' + data.Name + ' successfully added to service ' + service.name);
+                                modalLoader.close();
                                 $modalInstance.close();
                             },
                             function () {
