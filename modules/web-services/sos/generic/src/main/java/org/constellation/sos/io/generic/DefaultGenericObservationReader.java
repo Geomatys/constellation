@@ -35,6 +35,7 @@ import org.constellation.sos.io.ObservationReader;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import static org.constellation.sos.ws.SOSConstants.*;
+import org.geotoolkit.gml.xml.AbstractGeometry;
 
 import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.gml.xml.FeatureProperty;
@@ -755,5 +756,10 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
     @Override
     public Collection<String> getPhenomenonsForProcedure(String sensorID) throws CstlServiceException {
         throw new UnsupportedOperationException("Not supported yet in this implementation."); 
+    }
+
+    @Override
+    public AbstractGeometry getSensorLocation(String sensorID, String version) throws CstlServiceException {
+        throw new UnsupportedOperationException("Not supported yet in this implementation.");
     }
 }

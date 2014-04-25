@@ -17,6 +17,8 @@
 
 package org.constellation.sos.configuration;
 
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.io.WKTWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -51,6 +53,7 @@ import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.factory.FactoryNotFoundException;
+import org.geotoolkit.gml.GeometrytoJTS;
 import org.geotoolkit.gml.xml.AbstractGeometry;
 import org.geotoolkit.observation.xml.AbstractObservation;
 import org.geotoolkit.sml.xml.AbstractSensorML;
@@ -59,6 +62,7 @@ import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.observation.Observation;
 import org.opengis.observation.ObservationCollection;
+import org.opengis.util.FactoryException;
 
 /**
  * {@link org.constellation.configuration.ServiceConfigurer} implementation for SOS service.
@@ -302,12 +306,24 @@ public class SOSConfigurer extends OGCConfigurer {
         }
     }
     
-    public Object updateSensorLocation(final String id, final String sensorID, final AbstractGeometry location) throws ConfigurationException {
+    public AcknowlegementType updateSensorLocation(final String id, final String sensorID, final AbstractGeometry location) throws ConfigurationException {
         final ObservationWriter writer = getObservationWriter(id);
         try {
             writer.recordProcedureLocation(sensorID, location);
             return new AcknowlegementType("Success", "The sensor location have been updated in the SOS");
         } catch (CstlServiceException ex) {
+            throw new ConfigurationException(ex);
+        }
+    }
+    
+    public String getWKTSensorLocation(final String id, final String sensorID) throws ConfigurationException {
+        final ObservationReader reader = getObservationReader(id);
+        try {
+            final AbstractGeometry geom = reader.getSensorLocation(sensorID, "2.0.0");
+            final Geometry jtsGeometry  = GeometrytoJTS.toJTS(geom);
+            final WKTWriter writer = new WKTWriter();
+            return writer.write(jtsGeometry);
+        } catch (CstlServiceException | FactoryException ex) {
             throw new ConfigurationException(ex);
         }
     }

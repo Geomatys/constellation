@@ -18,7 +18,9 @@
 package org.constellation.sos.io.om2;
 
 // J2SE dependencies
-import java.util.Map;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.io.ParseException;
+import com.vividsolutions.jts.io.WKBReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -28,43 +30,43 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
-import java.util.HashMap;
-
-// Constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.sos.io.ObservationReader;
-import org.constellation.ws.CstlServiceException;
+import static org.constellation.sos.io.om2.OM2BaseReader.defaultCRS;
 
 import static org.constellation.sos.ws.SOSConstants.*;
-
-// Geotk dependencies
+import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.gml.JTStoGeometry;
+import org.geotoolkit.gml.xml.AbstractGeometry;
 import org.geotoolkit.gml.xml.FeatureProperty;
 import org.geotoolkit.observation.xml.OMXmlFactory;
-import org.geotoolkit.sos.xml.ResponseModeType;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.sos.xml.ObservationOffering;
-import org.geotoolkit.swe.xml.PhenomenonProperty;
-import org.geotoolkit.swe.xml.v101.PhenomenonPropertyType;
+import org.geotoolkit.sos.xml.ResponseModeType;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
 import org.geotoolkit.swe.xml.AbstractDataComponent;
 import org.geotoolkit.swe.xml.AbstractDataRecord;
 import org.geotoolkit.swe.xml.AnyScalar;
+import org.geotoolkit.swe.xml.DataArrayProperty;
+import org.geotoolkit.swe.xml.PhenomenonProperty;
 import org.geotoolkit.swe.xml.TextBlock;
 import org.geotoolkit.swe.xml.UomProperty;
-import org.geotoolkit.swe.xml.DataArrayProperty;
-
-import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.swe.xml.v101.PhenomenonPropertyType;
 import org.geotoolkit.util.StringUtilities;
-
-// GeoAPI dependencies
 import org.opengis.observation.Observation;
 import org.opengis.observation.Phenomenon;
 import org.opengis.observation.sampling.SamplingFeature;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.temporal.TemporalGeometricPrimitive;
 import org.opengis.temporal.TemporalPrimitive;
+import org.opengis.util.FactoryException;
 
 
 /**
@@ -408,6 +410,48 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
         }
     }
 
+    @Override
+    public AbstractGeometry getSensorLocation(final String sensorID, final String version) throws CstlServiceException {
+        try {
+            final Connection c = source.getConnection();
+            c.setReadOnly(true);
+            
+            final byte[] b;
+            final int srid;
+            final PreparedStatement stmt;
+            if (isPostgres) {
+                stmt  = c.prepareStatement("SELECT \"postgis\".st_asBinary(\"shape\"), \"crs\" FROM \"om\".\"procedures\" WHERE \"id\"=?");
+            } else {
+                stmt  = c.prepareStatement("SELECT \"shape\", \"crs\" FROM \"om\".\"procedures\" WHERE \"id\"=?");
+            }
+            stmt.setString(1, sensorID);
+            final ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                b    = rs.getBytes(1);
+                srid = rs.getInt(2);
+            } else {
+                return null;
+            }
+            final CoordinateReferenceSystem crs;
+            if (srid != 0) {
+                crs = CRS.decode("urn:ogc:def:crs:EPSG:" + srid);
+            } else {
+                crs = defaultCRS;
+            }
+            final Geometry geom;
+            if (b != null) {
+                WKBReader reader = new WKBReader();
+                geom             = reader.read(b);
+            } else {
+                return null;
+            }
+            final String gmlVersion = getGMLVersion(version);
+            return JTStoGeometry.toGML(gmlVersion, geom, crs);
+        } catch (SQLException | FactoryException  | ParseException ex) {
+            throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
+        }
+    }
+    
     /**
      * {@inheritDoc}
      */

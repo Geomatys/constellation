@@ -59,6 +59,7 @@ import org.constellation.ws.CstlServiceException;
 import static org.constellation.sos.ws.SOSConstants.*;
 
 import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.gml.xml.AbstractGeometry;
 import org.geotoolkit.gml.xml.v311.ReferenceType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
@@ -593,5 +594,10 @@ public class DefaultObservationReader implements ObservationReader {
     @Override
     public List<String> getResponseFormats() throws CstlServiceException {
         return Arrays.asList("text/xml; subtype=\"om/1.0.0\"");
+    }
+
+    @Override
+    public AbstractGeometry getSensorLocation(String sensorID, String version) throws CstlServiceException {
+        throw new UnsupportedOperationException("Not supported yet in this implementation.");
     }
 }

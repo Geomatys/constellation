@@ -24,6 +24,7 @@ import javax.xml.namespace.QName;
 
 // Constellation dependencies
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.gml.xml.AbstractGeometry;
 
 // Geotoolkit
 import org.geotoolkit.sos.xml.ObservationOffering;
@@ -207,6 +208,8 @@ public interface ObservationReader {
      * @throws org.constellation.ws.CstlServiceException
      */
     List<String> getResponseFormats() throws CstlServiceException;
+
+    AbstractGeometry getSensorLocation(final String sensorID, final String version) throws CstlServiceException;
     
     /**
      * Return informations about the implementation class.

@@ -41,6 +41,7 @@ import org.geotoolkit.sos.xml.ResponseModeType;
 import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.swe.xml.DataArrayProperty;
 import org.apache.sis.xml.MarshallerPool;
+import org.geotoolkit.gml.xml.AbstractGeometry;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 import org.opengis.observation.Observation;
@@ -436,4 +437,8 @@ public class FileObservationReader implements ObservationReader {
         return Arrays.asList("text/xml; subtype=\"om/1.0.0\"");
     }
 
+    @Override
+    public AbstractGeometry getSensorLocation(String sensorID, String version) throws CstlServiceException {
+        throw new UnsupportedOperationException("Not supported yet in this implementation.");
+    }
 }

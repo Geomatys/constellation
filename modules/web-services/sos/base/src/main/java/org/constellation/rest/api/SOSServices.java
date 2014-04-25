@@ -17,7 +17,6 @@
 package org.constellation.rest.api;
 
 import java.io.File;
-import java.util.List;
 import java.util.Properties;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -44,7 +43,6 @@ import org.geotoolkit.parameter.ParametersExt;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sos.netcdf.ExtractionResult;
 import org.geotoolkit.sos.netcdf.NetCDFExtractor;
-import org.opengis.observation.Observation;
 import org.opengis.parameter.ParameterValueGroup;
 
 /**
@@ -97,6 +95,12 @@ public class SOSServices {
     @Path("{id}/sensor/location/{sensorID}")
     public Response updateSensorLocation(final @PathParam("id") String id, final @PathParam("sensorID") String sensorID, final AbstractGeometryType location) throws Exception {
         return ok(getConfigurer().updateSensorLocation(id, sensorID, location));
+    }
+    
+    @GET
+    @Path("{id}/sensor/location/{sensorID}")
+    public Response getWKTSensorLocation(final @PathParam("id") String id, final @PathParam("sensorID") String sensorID) throws Exception {
+        return ok(new SimpleValue(getConfigurer().getWKTSensorLocation(id, sensorID)));
     }
     
     @GET
