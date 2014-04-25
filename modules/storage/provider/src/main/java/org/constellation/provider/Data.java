@@ -53,7 +53,8 @@ public interface Data {
      */
     enum TYPE {
         COVERAGE,
-        FEATURE;
+        FEATURE,
+        OBSERVATION;
     };
 
     String KEY_EXTRA_PARAMETERS = "EXTRA";

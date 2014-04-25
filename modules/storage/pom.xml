@@ -106,6 +106,7 @@
                 <module>provider-data-coveragesql</module>
                 <module>provider-data-featurestore</module>
                 <module>provider-data-coveragestore</module>
+                <module>provider-data-observationstore</module>
                 <module>provider-data-serverstore</module>
                 <module>provider-style-sld</module>
                 <module>provider-data-om2</module>
@@ -163,6 +164,7 @@
                 <module>observation</module>
                 <module>om2</module>
                 <module>provider-data-om2</module>
+                <module>provider-data-observationstore</module>
             </modules>
         </profile>
         <profile>

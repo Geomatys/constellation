@@ -256,8 +256,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         final ProviderFactory service = this.services.get(serviceName);
         if (service != null) {
 
-            final ParameterValueReader reader = new ParameterValueReader(
-                    service.getProviderDescriptor().descriptor(ProviderParameters.SOURCE_DESCRIPTOR_NAME));
+            final ParameterValueReader reader = new ParameterValueReader(service.getProviderDescriptor());
 
             try {
                 // we read the source parameter to add

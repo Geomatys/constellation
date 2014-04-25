@@ -74,8 +74,7 @@ public class JProviderCreationPane extends javax.swing.JPanel {
     public ParameterValueGroup getParameters(){
 
         final String type = getType();
-        final ParameterDescriptorGroup serviceDesc = (ParameterDescriptorGroup) cstl.providers.getServiceDescriptor(type);
-        final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup) serviceDesc.descriptor("source");
+        final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup) cstl.providers.getServiceDescriptor(type);
         ParameterValueGroup sources = sourceDesc.createValue();
         sources.parameter("id").setValue(guiId.getText().trim());
         sources.parameter("providerType").setValue(guiCategory.getSelectedItem());

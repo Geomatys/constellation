@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2012, Geomatys
+ *    (C) 2014, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,7 +14,8 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.provider.coveragestore;
+
+package org.constellation.provider.observationstore;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,8 +27,8 @@ import org.constellation.provider.Data;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviderFactory;
 import static org.constellation.provider.configuration.ProviderParameters.createDescriptor;
-import org.geotoolkit.coverage.CoverageStoreFactory;
-import org.geotoolkit.coverage.CoverageStoreFinder;
+import org.geotoolkit.observation.ObservationStoreFactory;
+import org.geotoolkit.observation.ObservationStoreFinder;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.GeneralParameterDescriptor;
@@ -36,22 +37,20 @@ import org.opengis.parameter.ParameterValueGroup;
 
 /**
  *
- * @version $Id$
- *
- * @author Johann Sorel (Geomatys)
+ * @author Guilhem Legal (Geomatys)
  */
-public class CoverageStoreProviderService extends AbstractProviderFactory
+public class ObservationStoreProviderService extends AbstractProviderFactory
         <Name,Data,DataProvider> implements DataProviderFactory {
 
     /**
      * Service name
      */
-    public static final String NAME = "coverage-store";
+    public static final String NAME = "observation-store";
     public static final ParameterDescriptorGroup SOURCE_CONFIG_DESCRIPTOR;
 
     static {
         final List<ParameterDescriptorGroup> descs = new ArrayList<>();
-        final Iterator<CoverageStoreFactory> ite = CoverageStoreFinder.getAllFactories(null).iterator();
+        final Iterator<ObservationStoreFactory> ite = ObservationStoreFinder.getAllFactories(null).iterator();
         while(ite.hasNext()){
             //copy the descriptor with a minimum number of zero
             final ParameterDescriptorGroup desc = ite.next().getParametersDescriptor();
@@ -71,11 +70,11 @@ public class CoverageStoreProviderService extends AbstractProviderFactory
 
     public static final ParameterDescriptorGroup SERVICE_CONFIG_DESCRIPTOR =
             createDescriptor(SOURCE_CONFIG_DESCRIPTOR);
-
-    public CoverageStoreProviderService(){
+    
+    public ObservationStoreProviderService(){
         super(NAME);
     }
-
+    
     @Override
     public ParameterDescriptorGroup getProviderDescriptor() {
         return SERVICE_CONFIG_DESCRIPTOR;
@@ -92,9 +91,9 @@ public class CoverageStoreProviderService extends AbstractProviderFactory
             return null;
         }
 
-        final CoverageStoreProvider provider = new CoverageStoreProvider(providerId,this,ps);
-        getLogger().log(Level.INFO, "[PROVIDER]> coverage-store provider created.");
+        final ObservationStoreProvider provider = new ObservationStoreProvider(providerId,this,ps);
+        getLogger().log(Level.INFO, "[PROVIDER]> observation-store provider created.");
         return provider;
     }
-
+    
 }
