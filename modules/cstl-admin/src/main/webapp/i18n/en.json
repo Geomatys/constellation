@@ -908,6 +908,7 @@
         "service.source.url":"Fill only the domain name",
         "service.source.connexion":"Connection between multiple databases",
         "service.source.sensormlfolder":"TODO",
-        "data.add.choicedata":"Supported formats: shp (in a zip file.), NetCDF, tif"
+        "data.add.choicedata":"Supported formats: shp (in a zip file.), NetCDF, tif",
+        "style.create":"You must select a data to associate the style created."
     }
 }

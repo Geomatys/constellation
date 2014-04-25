@@ -2,7 +2,7 @@
 <link rel='stylesheet' href='styles/spectrum.css' />
 <script src="scripts/spectrum.js"></script>
 
-<div class="modal-dialog modal-dialog-sld" ng-init="initScopeStyle()">
+<div class="modal-dialog modal-dialog-sld modal-dialog-responsive" ng-init="initScopeStyle()">
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" ng-click="close()">×</button>
@@ -53,7 +53,7 @@
                 <div class="dash-inner">
                     <div id="list" data-role="list">
                         <div class="pagination-wrapper pagination-style">
-                            <strong><span class="nb-results pull-left"><strong>{{countdata}}&nbsp;</span><span class="nb-results" translate="label.count.data">available data</span></strong>
+                            <strong><span class="nb-results pull-left"><strong>{{countdata}}&nbsp;</span><span class="nb-results" translate="label.count.style">available data</span></strong>
                             <select class="nb-per-page input-small form-control pull-right" ng-model="$parent.nbbypage">
                                 <option value="5">5</option>
                                 <option value="10">10</option>

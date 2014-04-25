@@ -1193,6 +1193,7 @@
         "service.source.url":"Renseignez uniquement le nom de domaine",
         "service.source.connexion":"Connexion entre plusieurs bases",
         "service.source.sensormlfolder":"TODO",
-        "data.add.choicedata":"Formats supportés : shp (dans un fichier .zip), NetCDF, tif"
+        "data.add.choicedata":"Formats supportés : shp (dans un fichier .zip), NetCDF, tif",
+        "style.create":"Vous devez sélectionner une donnée afin de lui associer le style créé."
     }
 }
