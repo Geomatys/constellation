@@ -53,15 +53,20 @@ import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.factory.FactoryNotFoundException;
+import org.geotoolkit.geometry.jts.JTS;
 import org.geotoolkit.gml.GeometrytoJTS;
 import org.geotoolkit.gml.xml.AbstractGeometry;
 import org.geotoolkit.observation.xml.AbstractObservation;
+import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.observation.Observation;
 import org.opengis.observation.ObservationCollection;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
 
 /**
@@ -75,6 +80,15 @@ import org.opengis.util.FactoryException;
  */
 public class SOSConfigurer extends OGCConfigurer {
 
+    private static CoordinateReferenceSystem WGS84; 
+    static {
+        try {
+            WGS84 = CRS.decode("CRS:84");
+        } catch (FactoryException ex) {
+            LOGGER.log(Level.WARNING, "Unable to retrieve CRS:84", ex);
+        }
+    }
+    
     /**
      * Create a new {@link SOSConfigurer} instance.
      */
@@ -320,10 +334,14 @@ public class SOSConfigurer extends OGCConfigurer {
         final ObservationReader reader = getObservationReader(id);
         try {
             final AbstractGeometry geom = reader.getSensorLocation(sensorID, "2.0.0");
-            final Geometry jtsGeometry  = GeometrytoJTS.toJTS(geom);
+            Geometry jtsGeometry  = GeometrytoJTS.toJTS(geom);
+            // reproject to CRS:84
+            final MathTransform mt = CRS.findMathTransform(geom.getCoordinateReferenceSystem(),WGS84);
+            jtsGeometry = JTS.transform(jtsGeometry, mt);
+            
             final WKTWriter writer = new WKTWriter();
             return writer.write(jtsGeometry);
-        } catch (CstlServiceException | FactoryException ex) {
+        } catch (CstlServiceException | FactoryException | TransformException ex) {
             throw new ConfigurationException(ex);
         }
     }
