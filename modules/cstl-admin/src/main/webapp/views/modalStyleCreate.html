@@ -2,7 +2,7 @@
 <link rel='stylesheet' href='styles/spectrum.css' />
 <script src="scripts/spectrum.js"></script>
 
-<div class="modal-dialog" ng-class="{'modal-dialog-sld':chooseData===false}" ng-init="initScopeData(); chooseData=true">
+<div class="modal-dialog modal-dialog-resp-height " ng-class="{'modal-dialog-sld':chooseData===false}" ng-init="initScopeData(); chooseData=true">
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" ng-click="close()">×</button>
@@ -11,7 +11,7 @@
                 <span type="button" class="glyphicon glyphicon-info-sign" tooltip data-placement="right" title="{{'tooltip.style.create' | translate }}" style="margin-top:-2px;"></span>
             </div>
         </div>
-        <div class="modal-body">
+        <div class="modal-body" style="overflow-y: auto;">
             <div class="dashboard" ng-show="chooseData===true">
                 <div class="navbar title">
                     <div class="navbar-inner">

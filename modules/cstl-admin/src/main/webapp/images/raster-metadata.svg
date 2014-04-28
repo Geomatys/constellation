@@ -3,7 +3,7 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="872px" height="72px" viewBox="0 0 872 72" enable-background="new 0 0 872 72" xml:space="preserve">
-<rect x="-0.854" y="-0.583" fill="#EECDAE" width="872" height="72"/>
+<rect x="-0.854" y="-0.583" fill="#E6BC95" width="872" height="72"/>
 <rect x="472.569" y="0.343" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.52" height="7.714"/>
 <rect x="480.088" y="8.057" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.521" height="7.714"/>
 <rect x="487.609" y="15.771" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.521" height="7.715"/>
@@ -242,5 +242,5 @@
 <rect x="833.543" y="62.732" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.521" height="7.713"/>
 <rect x="848.584" y="62.732" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.521" height="7.713"/>
 <rect x="863.625" y="62.732" opacity="0.1" fill="#3D3D3C" enable-background="new    " width="7.52" height="7.713"/>
-<polygon fill="#F2DAC3" points="573.395,-0.507 536.598,71.15 -0.004,70.314 0.017,-1.18 "/>
+<polygon fill="#EECDAE" points="573.395,-0.507 536.598,71.15 -0.004,70.314 0.017,-1.18 "/>
 </svg>
