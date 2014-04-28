@@ -17,8 +17,6 @@
 
 package org.constellation.generic.database;
 
-import org.apache.sis.test.XMLComparator;
-import org.w3c.dom.Node;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -28,16 +26,17 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-
-//Junit dependencies
-import org.constellation.configuration.SOSConfiguration;
+import org.apache.sis.test.XMLComparator;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.configuration.SOSConfiguration;
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
+import org.constellation.dto.ObservationFilter;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.Service;
 import org.junit.*;
 import static org.junit.Assert.*;
+import org.w3c.dom.Node;
 
 /**
  *
@@ -602,6 +601,15 @@ public class GenericConfigurationXMLBindingTest {
     public void parameterValuesMarshalingTest() throws Exception {
         final ParameterValues values = new ParameterValues();
         values.getValues().put("providerId", "test");
+        StringWriter sw = new StringWriter();
+        marshaller.marshal(values, System.out);
+    }
+    
+    @Test
+    public void ObservationFilterMarshalingTest() throws Exception {
+        final ObservationFilter values = new ObservationFilter();
+        values.setSensorID("senord:1");
+        values.setObservedProperty(Arrays.asList("phen1", "phen2"));
         StringWriter sw = new StringWriter();
         marshaller.marshal(values, System.out);
     }
