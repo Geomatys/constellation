@@ -35,10 +35,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.ConfigurationEngine;
-import org.constellation.configuration.AcknowlegementType;
-import org.constellation.configuration.ConfigurationException;
-import org.constellation.configuration.DataSourceType;
-import org.constellation.configuration.SOSConfiguration;
+import org.constellation.configuration.*;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
@@ -110,6 +107,17 @@ public class SOSConfigurer extends OGCConfigurer {
             configuration = baseConfig;
         }
         super.createInstance(identifier, metadata, configuration);
+    }
+
+    @Override
+    public Instance getInstance(String identifier) throws ConfigurationException {
+        final Instance instance = super.getInstance(identifier);
+        try {
+            instance.setLayersNumber(getSensorIds(identifier).size());
+        } catch (ConfigurationException ex) {
+            LOGGER.log(Level.WARNING, "Error while getting metadata count on CSW instance:" + identifier, ex);
+        }
+        return instance;
     }
 
     public AcknowlegementType importSensor(final String id, final File sensorFile, final String type) throws ConfigurationException {
