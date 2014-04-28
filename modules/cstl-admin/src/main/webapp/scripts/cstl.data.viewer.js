@@ -20,9 +20,15 @@ DataViewer = {
 
     layers : undefined,
 
-    initMap : function(mapId){
+    sensorClicked : undefined,
+
+    initMap : function(mapId, $scope){
         if (DataViewer.map) {
             DataViewer.map.destroy();
+            DataViewer.sensorClicked = undefined;
+            if ($scope) {
+                $scope.$digest();
+            }
         }
         DataViewer.map = new OpenLayers.Map(mapId, {
             controls: [new OpenLayers.Control.Navigation()],
@@ -36,10 +42,23 @@ DataViewer = {
                     e.feature.layer.drawFeature(e.feature);
                 },
                 featureout: function(e) {
+                    if (DataViewer.sensorClicked && DataViewer.sensorClicked.sensorName === e.feature.sensorName) {
+                        return;
+                    }
+
                     e.feature.renderIntent = "default";
                     e.feature.layer.drawFeature(e.feature);
                 },
                 featureclick: function(e) {
+                    if (DataViewer.sensorClicked) {
+                        // Unselect last sensor
+                        DataViewer.sensorClicked.renderIntent = "default";
+                        DataViewer.sensorClicked.layer.drawFeature(DataViewer.sensorClicked);
+                    }
+                    DataViewer.sensorClicked = e.feature;
+                    if ($scope) {
+                        $scope.$digest();
+                    }
                 }
             }
         });

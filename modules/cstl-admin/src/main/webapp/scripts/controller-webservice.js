@@ -395,7 +395,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
 
                 var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
                 DataViewer.layers = [layerBackground];
-                DataViewer.initMap('olSensorMap');
+                DataViewer.initMap('olSensorMap', $scope);
 
             }, function() { $growl('error','Error','Unable to list sensors'); });
 
@@ -511,6 +511,10 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
                     $scope.sensors[i] = {id: newSensorId, checked: check};
                 }
             }, function() { $growl('error','Error','Unable to list sensors for measure '+ currentMeasure.id); });
+        };
+
+        $scope.testSensorClicked = function() {
+            return DataViewer.sensorClicked !== undefined
         };
 
         // define which version is Selected
