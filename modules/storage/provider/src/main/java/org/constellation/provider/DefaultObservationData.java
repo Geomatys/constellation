@@ -37,7 +37,7 @@ import org.opengis.geometry.Envelope;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class DefaultObservationData extends AbstractData {
+public class DefaultObservationData extends AbstractData implements ObservationData {
 
     public DefaultObservationData(final Name name) {
         super(name, new ArrayList<String>());

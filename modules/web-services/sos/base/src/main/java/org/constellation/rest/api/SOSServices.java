@@ -34,11 +34,15 @@ import org.constellation.configuration.ServiceConfigurer;
 import org.constellation.configuration.StringList;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
+import org.constellation.provider.DataProviders;
+import org.constellation.provider.Provider;
 import org.constellation.provider.Providers;
+import org.constellation.provider.observationstore.ObservationStoreProvider;
 import org.constellation.sos.configuration.SOSConfigurer;
 import org.constellation.sos.configuration.SensorMLGenerator;
 import static org.constellation.utils.RESTfulUtilities.ok;
 import org.geotoolkit.gml.xml.v321.AbstractGeometryType;
+import org.geotoolkit.observation.ObservationStore;
 import org.geotoolkit.parameter.ParametersExt;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sos.netcdf.ExtractionResult;
@@ -65,6 +69,12 @@ public class SOSServices {
     @Path("{id}/sensor/{sensorID}")
     public Response removeSensor(final @PathParam("id") String id, final @PathParam("sensorID") String sensorID) throws Exception {
         return ok(getConfigurer().removeSensor(id, sensorID));
+    }
+    
+    @DELETE
+    @Path("{id}/sensors")
+    public Response removeAllSensor(final @PathParam("id") String id) throws Exception {
+        return ok(getConfigurer().removeAllSensors(id));
     }
 
     @GET
@@ -144,49 +154,54 @@ public class SOSServices {
         } else {
             bandName = dataId;
         }
-        final AcknowlegementType response;
-        final ParameterValueGroup config = Providers.getConfigurator().getProviderConfiguration(providerId);
-        ParameterValueGroup choice = ParametersExt.getGroup(config, "choice");
-        ParameterValueGroup type   = (ParameterValueGroup) choice.values().get(0);
-        if (type.getDescriptor().getName().getCode().equals("FileCoverageStoreParameters")) {
-            final String filePath = type.parameter("path").getValue().toString();
-            if (filePath != null) {
-                if (filePath.endsWith(".nc")) {
-                    final File ncFile = new File(filePath);
-                    final ExtractionResult result = NetCDFExtractor.getObservationFromNetCDF(ncFile, providerId, bandName);
-                    
-                    // SensorML generation
-                    final Properties prop = new Properties();
-                    prop.put("id",         providerId);
-                    prop.put("beginTime",  result.spatialBound.dateStart);
-                    prop.put("endTime",    result.spatialBound.dateEnd);
-                    prop.put("longitude",  result.spatialBound.minx);
-                    prop.put("latitude",   result.spatialBound.miny);
-                    prop.put("phenomenon", result.phenomenons);
-                    final AbstractSensorML sml = SensorMLGenerator.getTemplateSensorML(prop);
-                    
-                    final SOSConfigurer configurer = getConfigurer();
-                    configurer.importSensor(id, sml, providerId);
-                    configurer.importObservations(id, result.observations);
-                    
-                    //record location
-                    final AbstractGeometryType geom = (AbstractGeometryType) result.spatialBound.getGeometry("2.0.0");
-                    if (geom != null) {
-                        configurer.updateSensorLocation(id, providerId, geom);
+        final Provider provider = DataProviders.getInstance().getProvider(providerId);
+        final ExtractionResult result;
+        if (provider instanceof ObservationStoreProvider) {
+            final ObservationStoreProvider omProvider = (ObservationStoreProvider) provider;
+            result = ((ObservationStore)omProvider.getMainStore()).getResults();
+        } else {
+            final ParameterValueGroup config = Providers.getConfigurator().getProviderConfiguration(providerId);
+            final ParameterValueGroup choice = ParametersExt.getGroup(config, "choice");
+            final ParameterValueGroup type   = (ParameterValueGroup) choice.values().get(0);
+            if (type.getDescriptor().getName().getCode().equals("FileCoverageStoreParameters")) {
+                final String filePath = type.parameter("path").getValue().toString();
+                if (filePath != null) {
+                    if (filePath.endsWith(".nc")) {
+                        final File ncFile = new File(filePath);
+                        result = NetCDFExtractor.getObservationFromNetCDF(ncFile, providerId, bandName);
+                        
+                    } else {
+                        return ok(new AcknowlegementType("Failure", "Only available on netCDF file for now"));
                     }
-                    
-                    response = new AcknowlegementType("Success", "The specified observations have been imported in the SOS");
                 } else {
-                    response = new AcknowlegementType("Failure", "Only available on netCDF file for now");
+                    return ok(new AcknowlegementType("Failure", "Unable to find a \"path\" parameter in the provider configuration"));
                 }
             } else {
-                response = new AcknowlegementType("Failure", "Unable to find a \"path\" parameter in the provider configuration");
+                return ok(new AcknowlegementType("Failure", "Available only on FileCoverageStore provider for now"));
             }
-        } else {
-            response = new AcknowlegementType("Failure", "Available only on FileCoverageStore provider for now");
         }
         
-        return ok(response);
+        // SensorML generation
+        final Properties prop = new Properties();
+        prop.put("id",         providerId);
+        prop.put("beginTime",  result.spatialBound.dateStart);
+        prop.put("endTime",    result.spatialBound.dateEnd);
+        prop.put("longitude",  result.spatialBound.minx);
+        prop.put("latitude",   result.spatialBound.miny);
+        prop.put("phenomenon", result.phenomenons);
+        final AbstractSensorML sml = SensorMLGenerator.getTemplateSensorML(prop);
+
+        final SOSConfigurer configurer = getConfigurer();
+        configurer.importSensor(id, sml, providerId);
+        configurer.importObservations(id, result.observations);
+
+        //record location
+        final AbstractGeometryType geom = (AbstractGeometryType) result.spatialBound.getGeometry("2.0.0");
+        if (geom != null) {
+            configurer.updateSensorLocation(id, providerId, geom);
+        }
+        
+        return ok(new AcknowlegementType("Success", "The specified observations have been imported in the SOS"));
     }
 
     private static SOSConfigurer getConfigurer() throws NotRunningServiceException {

@@ -113,6 +113,7 @@ import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.process.ProcessListener;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.ReferencingUtilities;
+import org.geotoolkit.sos.netcdf.NetCDFExtractor;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.StringUtilities;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -1190,7 +1191,7 @@ public class DataRest {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getCoverageList(final SimpleValue value) {
-        final CoverageStoreProvider provider = (CoverageStoreProvider) DataProviders.getInstance().getProvider(value.getValue());
+        final DataProvider provider = DataProviders.getInstance().getProvider(value.getValue());
         final Set<Name> nameSet = provider.getKeys();
         final List<String> names = new ArrayList<>();
         for (Name n : nameSet) {
@@ -1475,6 +1476,25 @@ public class DataRest {
             validate.setDataType("");
         }
         return validate;
+    }
+    
+    @POST
+    @Path("findDataType")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public SelectedExtension findDataType(final ParameterValues values) {
+        final String filePath     = values.getValues().get("filePath");
+        final String extension    = values.getValues().get("extension");
+        final String selectedType = values.getValues().get("dataType");
+        final SelectedExtension r = new SelectedExtension();
+        r.setExtension(extension);
+        r.setDataType(selectedType);
+        
+        // look for observation netcdf
+        if ("nc".equals(extension) && NetCDFExtractor.isObservationFile(filePath)) {
+            r.setDataType("sensor");
+        }
+        return r;
     }
 }
 

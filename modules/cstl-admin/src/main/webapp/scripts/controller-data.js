@@ -418,50 +418,77 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                     var importedData = response.dataFile;
                     var importedMetaData = response.metadataFile;
 
-                    // Store the providerId for further calls
-                    $scope.providerId = fileName;
-                    if ($scope.uploadType === "vector") {
-                        provider.create({
-                            id: fileName
-                        }, {
-                            type: "feature-store",
-                            subType: "shapefile",
-                            parameters: {
-                                path: importedData
-                            }
-                        }, function() {
-                            if (importedMetaData) {
-                                dataListing.setUpMetadata({values: {'providerId': $scope.providerId, 'mdPath': importedMetaData}});
-                            }
+                    dataListing.findDataType({values: {'filePath':importedData, 'extension': fileExtension, dataType: $scope.type}}, function(selectedExtension) {
+                        
+                    
+                        // Store the providerId for further calls
+                        $scope.providerId = fileName;
+                        $scope.uploadType = selectedExtension.dataType;
+                        
+                        if ($scope.uploadType === "vector") {
+                            provider.create({
+                                id: fileName
+                            }, {
+                                type: "feature-store",
+                                subType: "shapefile",
+                                parameters: {
+                                    path: importedData
+                                }
+                            }, function() {
+                                if (importedMetaData) {
+                                    dataListing.setUpMetadata({values: {'providerId': $scope.providerId, 'mdPath': importedMetaData}});
+                                }
 
-                            $growl('success','Success','Shapefile data '+ fileName +' successfully added');
-                            $modalInstance.close({type: "vector", file: fileName, missing: $scope.metadata == null});
-                        });
-                    } else if ($scope.uploadType === "raster") {
-                        provider.create({
-                            id: fileName
-                        }, {
-                            type: "coverage-store",
-                            subType: "coverage-file",
-                            parameters: {
-                                path: importedData
-                            }
-                        }, function() {
-                            if (importedMetaData) {
-                                dataListing.setUpMetadata({values: {'providerId': $scope.providerId, 'mdPath': importedMetaData}});
-                            }
+                                $growl('success','Success','Shapefile data '+ fileName +' successfully added');
+                                $modalInstance.close({type: "vector", file: fileName, missing: $scope.metadata == null});
+                            });
+                        } else if ($scope.uploadType === "raster") {
+                            provider.create({
+                                id: fileName
+                            }, {
+                                type: "coverage-store",
+                                subType: "coverage-file",
+                                parameters: {
+                                    path: importedData
+                                }
+                            }, function() {
+                                if (importedMetaData) {
+                                    dataListing.setUpMetadata({values: {'providerId': $scope.providerId, 'mdPath': importedMetaData}});
+                                }
 
-                            if (!fileExtension || fileExtension !== "nc") {
-                                $growl('success','Success','Coverage data '+ fileName +' successfully added');
-                                $modalInstance.close({type: "raster", file: fileName, missing: $scope.metadata == null});
-                            } else {
-                                displayNetCDF(fileName);
-                            }
-                        });
-                    } else {
-                        $growl('warning','Warning','Not implemented choice');
-                        $modalInstance.close();
-                    }
+                                if (!fileExtension || fileExtension !== "nc") {
+                                    $growl('success','Success','Coverage data '+ fileName +' successfully added');
+                                    $modalInstance.close({type: "raster", file: fileName, missing: $scope.metadata == null});
+                                } else {
+                                    displayNetCDF(fileName);
+                                }
+                            });
+                        } else if ($scope.uploadType === "sensor") {
+                            provider.create({
+                                id: fileName
+                            }, {
+                                type: "observation-store",
+                                subType: "observation-file",
+                                parameters: {
+                                    path: importedData
+                                }
+                            }, function() {
+                                if (importedMetaData) {
+                                    dataListing.setUpMetadata({values: {'providerId': $scope.providerId, 'mdPath': importedMetaData}});
+                                }
+
+                                if (!fileExtension || fileExtension !== "nc") {
+                                    $growl('success','Success','Observation data '+ fileName +' successfully added');
+                                    $modalInstance.close({type: "sensor", file: fileName, missing: $scope.metadata == null});
+                                } else {
+                                    displayNetCDF(fileName);
+                                }
+                            });
+                        } else {
+                            $growl('warning','Warning','Not implemented choice');
+                            $modalInstance.close();
+                        }
+                    });
                 });
 
             } else {

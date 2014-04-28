@@ -181,6 +181,25 @@ public class SOSConfigurer extends OGCConfigurer {
         }
     }
     
+    public AcknowlegementType removeAllSensors(final String id) throws ConfigurationException {
+        final SensorWriter smlWriter = getSensorWriter(id);
+        final ObservationWriter omWriter = getObservationWriter(id);
+        try {
+            final Collection<String> sensorNames = getSensorIds(id);
+            for (String sensorID : sensorNames) {
+                boolean sucess = smlWriter.deleteSensor(sensorID);
+                if (sucess) {
+                    omWriter.removeProcedure(sensorID);
+                } else {
+                    return new AcknowlegementType("Error", "Unable to remove the sensor from SML datasource:" + sensorID);
+                }
+            }
+            return new AcknowlegementType("Success", "The specified sensor have been removed in the SOS");
+        } catch (CstlServiceException ex) {
+            throw new ConfigurationException(ex);
+        }
+    }
+    
     public Object getSensor(final String id, final String sensorID) throws ConfigurationException {
         final SensorReader reader = getReader(id);
         try {

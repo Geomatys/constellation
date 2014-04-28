@@ -19,8 +19,21 @@ package org.constellation.ws.rs;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+import java.awt.*;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.measure.unit.NonSI;
+import javax.measure.unit.Unit;
+import javax.xml.bind.JAXBException;
 import org.apache.sis.geometry.GeneralEnvelope;
 import org.apache.sis.storage.DataStoreException;
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import static org.apache.sis.util.ArgumentChecks.ensurePositive;
 import org.apache.sis.util.Static;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.BandDescription;
@@ -31,10 +44,11 @@ import org.constellation.dto.PortrayalContext;
 import org.constellation.dto.PropertyDescription;
 import org.constellation.map.configuration.StyleProviderConfig;
 import org.constellation.portrayal.internal.PortrayalResponse;
-import org.constellation.provider.FeatureData;
 import org.constellation.provider.Data;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
+import org.constellation.provider.FeatureData;
+import org.constellation.provider.ObservationData;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.GridSampleDimension;
@@ -62,6 +76,11 @@ import org.geotoolkit.sld.xml.Specification;
 import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.MutableStyleFactory;
+import static org.geotoolkit.style.StyleConstants.DEFAULT_CATEGORIZE_LOOKUP;
+import static org.geotoolkit.style.StyleConstants.DEFAULT_DESCRIPTION;
+import static org.geotoolkit.style.StyleConstants.DEFAULT_FALLBACK;
+import static org.geotoolkit.style.StyleConstants.DEFAULT_GEOM;
+import static org.geotoolkit.style.StyleConstants.LITERAL_ONE_FLOAT;
 import org.geotoolkit.style.function.InterpolationPoint;
 import org.geotoolkit.style.function.Method;
 import org.geotoolkit.style.function.Mode;
@@ -82,27 +101,6 @@ import org.opengis.style.RasterSymbolizer;
 import org.opengis.style.ShadedRelief;
 import org.opengis.style.Symbolizer;
 import org.opengis.util.FactoryException;
-
-import javax.measure.unit.NonSI;
-import javax.measure.unit.Unit;
-import javax.xml.bind.JAXBException;
-
-import java.awt.*;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
-import static org.apache.sis.util.ArgumentChecks.ensurePositive;
-import static org.geotoolkit.style.StyleConstants.DEFAULT_CATEGORIZE_LOOKUP;
-import static org.geotoolkit.style.StyleConstants.DEFAULT_DESCRIPTION;
-import static org.geotoolkit.style.StyleConstants.DEFAULT_FALLBACK;
-import static org.geotoolkit.style.StyleConstants.DEFAULT_GEOM;
-import static org.geotoolkit.style.StyleConstants.LITERAL_ONE_FLOAT;
 
 /**
  * Utility class for layer provider management/configuration.
@@ -346,7 +344,7 @@ public final class LayerProviders extends Static {
                 }
             } else {
                 // Fallback to a default/auto-generated style.
-                if (layer instanceof FeatureData) {
+                if (layer instanceof FeatureData || layer instanceof ObservationData) {
                     style = null; // Let portrayal process apply is own style.
                 } else {
                     style = generateCoverageStyle(layer);

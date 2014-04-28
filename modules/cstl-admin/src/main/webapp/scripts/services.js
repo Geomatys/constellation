@@ -184,7 +184,8 @@ cstlAdminApp.factory('dataListing', ['$resource',
             'metadata': {method: 'GET', url: '@cstl/api/1/data/metadata/iso/:providerId/:dataId;jsessionid='},
             'dataForMetadata': {method:'POST', url: '@cstl/api/1/data/metadata/associated;jsessionid='},
             'getDataMetadata': {method:'POST', url: '@cstl/api/1/data/metadata/data;jsessionid='},
-            'codeLists':    {method: 'GET', url: '@cstl/api/1/data/metadataCodeLists/:lang;jsessionid='}
+            'codeLists':    {method: 'GET', url: '@cstl/api/1/data/metadataCodeLists/:lang;jsessionid='},
+            'findDataType':    {method: 'POST', url: '@cstl/api/1/data/findDataType;jsessionid='}
         });
     }]);
 

@@ -265,6 +265,20 @@ public final class Provider {
                         LOGGER.log(Level.WARNING, "error on subtype definition");
                 }
                 break;
+                case "observation-store":
+
+                switch (subType) {
+                    case "observation-file":
+                        
+                        final ParameterValueGroup xmlCovParams = sources.groups("choice").get(0).addGroup("ObservationFileParameters");
+                        xmlCovParams.parameter("identifier").setValue("observationFile");
+                        xmlCovParams.parameter("url").setValue(new File(inParams.get("path")));
+                        break;
+                   
+                    default:
+                        LOGGER.log(Level.WARNING, "error on subtype definition");
+                }
+                break;
             default:
                 if (LOGGER.isLoggable(Level.FINER)) {
                     LOGGER.log(Level.FINER, "Provider type not known");

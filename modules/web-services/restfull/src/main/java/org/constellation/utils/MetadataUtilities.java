@@ -167,6 +167,15 @@ public final class MetadataUtilities {
                     LOGGER.log(Level.WARNING, "error on un zip", e);
                 }
                 break;
+                
+            case "sensor":
+                
+                // TODO
+                final String fileName = Files.getNameWithoutExtension(file.getName());
+                final DataInformation di = new DataInformation(fileName, file.getPath(), dataType, null);
+                di.setPath(file.getPath());
+                return di;
+                
         }
         return null;
     }
