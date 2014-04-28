@@ -693,6 +693,10 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
         $scope.showLayer = function() {
             $('#viewerData').modal("show");
             var layerName = $scope.selected.Name;
+            var modalLoader = $modal.open({
+              templateUrl: 'views/modalLoader.html',
+              controller: 'ModalInstanceCtrl'
+            });
             if ($scope.service.type === 'WMTS') {
                 // GetCaps
                 textService.capa($scope.service.type.toLowerCase(), $scope.service.identifier, $scope.service.versions[0])
@@ -704,6 +708,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
                         WmtsViewer.map.addLayer(layerData);
                         var maxExtent = capabilities.contents.layers[0].bounds;
                         WmtsViewer.map.zoomToExtent(maxExtent, true);
+                        modalLoader.close();
                     });
             } else {
                 var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
@@ -727,12 +732,12 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
                             DataViewer.layers = [layerData, layerBackground];
                             DataViewer.initMap('dataMap');
                             DataViewer.map.zoomToExtent(extent, true);
+                            modalLoader.close();
                         });
                 } else {
                     var providerId = $scope.selected.Provider;
                     layerData = DataViewer.createLayer($cookies.cstlUrl, layerName, providerId);
                     DataViewer.layers = [layerData, layerBackground];
-
                     dataListing.metadata({providerId: providerId, dataId: layerName}, {}, function(response) {
                         // Success getting the metadata, try to find the data extent
                         var ident = response['gmd.MD_Metadata']['gmd.identificationInfo'];
@@ -744,10 +749,12 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
                                     bbox['gmd.eastBoundLongitude']['gco.Decimal'], bbox['gmd.northBoundLatitude']['gco.Decimal']);
                                 DataViewer.initMap('dataMap');
                                 DataViewer.map.zoomToExtent(extent, true);
+                                modalLoader.close();
                             }
                         }
                     }, function() {
                         DataViewer.initMap('dataMap');
+                        modalLoader.close();
                     });
                 }
             }
