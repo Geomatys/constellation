@@ -371,7 +371,19 @@ ul.unstyled {
     background-color:#eeeeee; 
     padding:10px;
 }
-
+.form_service_md legend{
+    margin-bottom: 0;
+    border-bottom: none;
+    padding-bottom: 7px;
+}
+.form_service_md form{
+    background-color: #f8f8f8;
+    padding: 10px 20px;
+    border:solid 1px #eeeeee;
+}
+.form_service_md .control-group{
+    margin-bottom: 10px;
+}
 /*
  * Dashboards
  */

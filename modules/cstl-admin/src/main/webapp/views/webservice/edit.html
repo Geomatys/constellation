@@ -442,14 +442,14 @@
                     <!-- END Description Service Tab -->
 
                 </div>
-                <div class="tab-pane" ng-class="{active:tabmetadata}" ng-show="tabmetadata">
+                <div class="tab-pane form_service_md" ng-class="{active:tabmetadata}" ng-show="tabmetadata">
                     <div class="row">
                         <div class="col-sm-6">
                             <!-- contact part -->
                             <fieldset>
                                 <legend translate="create.contact.legend">Contact information</legend>
-                                <form role="form-horizontal" role="form">
-                                    <div class="control-group">
+                                <form class="form" role="form">
+                                    <div class="form-group">
                                         <label class="control-label new-service-form-label" for="contactFirstName" translate="create.contact.firstname.label">First name</label>
                                         <input type="text" class="form-control" id="contactFirstName" ng-model="metadata.serviceContact.firstname"/>
                                     </div>
@@ -470,16 +470,20 @@
                                     </div>
 
                                     <div class="control-group">
-                                        <label class="control-label new-service-form-label" for="contactPhone" translate="create.contact.phone.label">Phone</label>
-                                        <input type="text" class="form-control" id="contactPhone" ng-model="metadata.serviceContact.phone"/>
+                                        <label class="col-xs-12 control-label new-service-form-label" for="contactPhone" translate="create.contact.phone.label" style="padding:0;">Phone</label>
+                                        <div class="col-xs-6" style="padding:0; margin-bottom:7px;">
+                                            <input type="tel" class="form-control" id="contactPhone" ng-model="metadata.serviceContact.phone"/>
+                                        </div>
                                     </div>
                                     <div class="control-group">
-                                        <label class="control-label new-service-form-label" for="contactFax" translate="create.contact.fax.label">Fax</label>
-                                        <input type="text" class="form-control" id="contactFax" ng-model="metadata.serviceContact.fax"/>
+                                        <label class="col-xs-12 control-label new-service-form-label" for="contactFax" translate="create.contact.fax.label" style="padding:0;">Fax</label>
+                                        <div class="col-xs-6" style="padding:0; margin-bottom:7px;">
+                                            <input type="tel" class="form-control" id="contactFax" ng-model="metadata.serviceContact.fax"/>
+                                        </div>
                                     </div>
                                     <div class="control-group">
-                                        <label class="control-label new-service-form-label" for="contactemail" translate="create.contact.email.label">Email</label>
-                                        <input type="text" class="form-control" id="contactEmail" ng-model="metadata.serviceContact.email"/>
+                                        <label class="col-xs-12 control-label new-service-form-label" for="contactemail" translate="create.contact.email.label" style="padding:0;">Email</label>
+                                        <input type="email" class="form-control" id="contactEmail" ng-model="metadata.serviceContact.email"/>
                                     </div>
                                 </form>
                             </fieldset>
@@ -488,7 +492,7 @@
                             <!-- address part -->
                             <fieldset>
                                 <legend translate="create.contact.address.legend">Contact address</legend>
-                                <form role="form-horizontal" role="form">
+                                <form class="form" role="form">
                                     <div class="control-group">
                                         <label class="control-label new-service-form-label" for="contactAddress" translate="create.contact.address.label">Address</label>
                                         <input type="text" class="form-control" id="contactAddress" ng-model="metadata.serviceContact.address"/>
@@ -502,11 +506,13 @@
                                         <input type="text" class="form-control" id="contactState" ng-model="metadata.serviceContact.state"/>
                                     </div>
                                     <div class="control-group">
-                                        <label class="control-label new-service-form-label" for="contactPostcode" translate="create.contact.address.postcode.label">Zip code</label>
-                                        <input type="text" class="form-control" id="contactPostcode" ng-model="metadata.serviceContact.zipCode"/>
+                                        <label class="col-xs-12 control-label new-service-form-label" for="contactPostcode" translate="create.contact.address.postcode.label" style="padding:0;">Zip code</label>
+                                        <div class="col-xs-4" style="padding:0; margin-bottom:7px;">
+                                            <input type="text" class="form-control" id="contactPostcode" ng-model="metadata.serviceContact.zipCode"/>
+                                        </div>
                                     </div>
                                     <div class="control-group">
-                                        <label class="control-label new-service-form-label" for="contactCountry" translate="create.contact.address.country.label">Country</label>
+                                        <label class="col-xs-12 control-label new-service-form-label" for="contactCountry" translate="create.contact.address.country.label" style="padding:0;">Country</label>
                                         <input type="text" class="form-control" id="contactCountry" ng-model="metadata.serviceContact.country"/>
                                     </div>
                                 </form>
@@ -527,17 +533,23 @@
                                         <label class="control-label new-service-form-label" for="accessConstraints" translate="create.accessconstraint.label">Access constraints</label>
                                         <textarea rows="5" id="accessConstraints" class="form-control" ng-model="metadata.serviceConstraints.accessConstraint"></textarea>
                                     </div>
-                                    <div class="control-group" data-toggle="tooltip" title="{{'create.accessconstraint.layerlimit.tooltip' | translate }}" id="layerlimitGroup">
-                                        <label class="control-label new-service-form-label" for="layerLimit" translate="create.accessconstraint.layerlimit.label">Layer limit</label>
-                                        <input type="text" id="layerLimit" class="form-control" ng-model="metadata.serviceConstraints.layerLimit"/>
+                                    <div class="control-group" data-toggle="tooltip" title="{{'create.accessconstraint.layerlimit.tooltip' | translate }}" id="layerlimitGroup" style="height:59px;">
+                                        <label class="col-xs-12 control-label new-service-form-label" for="layerLimit" translate="create.accessconstraint.layerlimit.label" style="padding:0;">Layer limit</label>
+                                        <div class="col-xs-4" style="padding:0; margin-bottom:7px;">
+                                            <input type="number" id="layerLimit" class="form-control" ng-model="metadata.serviceConstraints.layerLimit"/>
+                                        </div>
                                     </div>
-                                    <div class="control-group" data-toggle="tooltip" title="{{'create.accessconstraint.maxwidth.tooltip' | translate }}" id="maxWidthGroup">
-                                        <label class="control-label new-service-form-label" for="maxWidth" translate="create.accessconstraint.maxwidth.label">Max width</label>
-                                        <input type="text" id="maxWidth" class="form-control" ng-model="metadata.serviceConstraints.maxWidth"/>
+                                    <div class="control-group" data-toggle="tooltip" title="{{'create.accessconstraint.maxwidth.tooltip' | translate }}" id="maxWidthGroup" style="height:59px;">
+                                        <label class="col-xs-12 control-label new-service-form-label" for="maxWidth" translate="create.accessconstraint.maxwidth.label" style="padding:0;">Max width</label>
+                                        <div class="col-xs-4" style="padding:0; margin-bottom:7px;">
+                                            <input type="number" id="maxWidth" class="form-control" ng-model="metadata.serviceConstraints.maxWidth"/>
+                                        </div>
                                     </div>
-                                    <div class="control-group" data-toggle="tooltip" title="{{'create.accessconstraint.maxheight.tooltip' | translate }}" id="maxHeightGroup">
-                                        <label class="control-label new-service-form-label" for="maxHeight" translate="create.accessconstraint.maxheight.label">Max height</label>
-                                        <input type="text" id="maxHeight" class="form-control" ng-model="metadata.serviceConstraints.maxHeight"/>
+                                    <div class="control-group" data-toggle="tooltip" title="{{'create.accessconstraint.maxheight.tooltip' | translate }}" id="maxHeightGroup" style="height:59px;">
+                                        <label class="col-xs-12 control-label new-service-form-label" for="maxHeight" translate="create.accessconstraint.maxheight.label" style="padding:0;">Max height</label>
+                                        <div class="col-xs-4" style="padding:0; margin-bottom:7px;">
+                                            <input type="number" id="maxHeight" class="form-control" ng-model="metadata.serviceConstraints.maxHeight"/>
+                                        </div>
                                     </div>
                                 </form>
                             </fieldset>
