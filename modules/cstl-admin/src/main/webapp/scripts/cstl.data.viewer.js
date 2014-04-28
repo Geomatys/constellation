@@ -29,12 +29,23 @@ DataViewer = {
             projection: new OpenLayers.Projection('CRS:84'),
             maxExtent: new OpenLayers.Bounds(-180, -90, 180, 90),
             fractionalZoom: true,
-            allOverlays:true
+            allOverlays:true,
+            eventListeners: {
+                featureover: function(e) {
+                    e.feature.renderIntent = "select";
+                    e.feature.layer.drawFeature(e.feature);
+                },
+                featureout: function(e) {
+                    e.feature.renderIntent = "default";
+                    e.feature.layer.drawFeature(e.feature);
+                },
+                featureclick: function(e) {
+                }
+            }
         });
         DataViewer.map.addLayers(DataViewer.layers);
         DataViewer.map.zoomToMaxExtent();
         DataViewer.map.updateSize();
-
     },
 
     createLayer : function(cstlUrlPrefix, layerName, providerId, filter){
@@ -126,6 +137,34 @@ DataViewer = {
             }
         );
         return layer;
-    }
+    },
 
-}
+    createSensorsLayer : function(layerName) {
+        var style = new OpenLayers.StyleMap({
+            'default': new OpenLayers.Style({
+                    pointRadius: 12,
+                    'externalGraphic': 'images/marker_normal.png'
+                }
+            ),
+            'select': new OpenLayers.Style({
+                    pointRadius: 12,
+                    'externalGraphic': 'images/marker_selected.png'
+                }
+            )
+        });
+
+        var layer = new OpenLayers.Layer.Vector(layerName,
+            {
+                styleMap: style,
+                ratio: 1,
+                isBaseLayer: true,
+                singleTile: true,
+                transitionEffect: 'resize',
+                tileOptions: {
+                    maxGetUrlLength: 2048
+                }
+            }
+        );
+        return layer;
+    }
+};

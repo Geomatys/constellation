@@ -148,7 +148,7 @@ public class MapSetup implements ServletContextListener {
                 FileUtilities.copy(src, dstImages);
             }
         } catch (IOException ex) {
-
+            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
         }
 
         // Fill default SLD provider.

@@ -440,28 +440,6 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
             $scope.metadata.versions = strVersions;
         };
 
-        $scope.generateLayerFilter = function() {
-            var str = "";
-            if ($scope.sensors && $scope.sensors.length > 0) {
-                for (var i = 0; i < $scope.sensors.length; i++) {
-                    var sensor = $scope.sensors[i];
-                    if (sensor.checked === false) {
-                        continue;
-                    }
-                    if (str !== "") {
-                        str += " OR ";
-                    }
-                    str += "id='" + sensor.id +"'";
-                }
-            }
-
-            if (str === "") {
-                // Filter on an invalid id, to be sure no features will be displayed
-                return "id='-'";
-            }
-            return str;
-        };
-
         $scope.changeSensorState = function(currentSensor) {
             // Change on available measures
             sos.measuresForSensor({id: $routeParams.id, 'sensorID': currentSensor.id}, function(measures){
@@ -484,15 +462,33 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
             }, function() { $growl('error','Error','Unable to list measures for sensor '+ currentSensor.id); });
 
             // Change on map
-            var filterSensor = $scope.generateLayerFilter();
             if (DataViewer.map.layers.length === 1) {
-                var newLayer = DataViewer.createLayerWithStyle($cookies.cstlUrl, "Sensor", $routeParams.id +"-om2", "default-point-sensor", filterSensor);
+                var newLayer = DataViewer.createSensorsLayer("sensors");
+                sos.getFeatures({id: $routeParams.id, sensor: currentSensor.id}, function(wkt) {
+                    var wktReader = new OpenLayers.Format.WKT();
+                    var vector = wktReader.read(wkt.value);
+                    vector.sensorName = currentSensor.id;
+                    newLayer.addFeatures(vector);
+                });
                 DataViewer.map.addLayer(newLayer);
             } else {
-                var oldLayer = DataViewer.map.layers[1];
-                oldLayer.mergeNewParams({
-                    'CQLFILTER' : filterSensor
-                });
+                var featureLayer = DataViewer.map.layers[1];
+                if (currentSensor.checked) {
+                    sos.getFeatures({id: $routeParams.id, sensor: currentSensor.id}, function(wkt) {
+                        var wktReader = new OpenLayers.Format.WKT();
+                        var vector = wktReader.read(wkt.value);
+                        vector.sensorName = currentSensor.id;
+                        featureLayer.addFeatures(vector);
+                    });
+                } else {
+                    for (var i=0; i<featureLayer.features.length; i++) {
+                        var feature = featureLayer.features[i];
+                        if (feature.sensorName === currentSensor.id) {
+                            featureLayer.removeFeatures(feature);
+                            break;
+                        }
+                    }
+                }
             }
         };
 
