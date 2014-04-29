@@ -620,7 +620,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
                         $scope.fullList = response;
                     });
                 } else {
-                    $scope.initSensors();
+                    $scope.initScope();
                 }
             });
         };

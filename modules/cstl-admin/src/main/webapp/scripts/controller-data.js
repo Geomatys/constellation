@@ -683,6 +683,9 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
             if (service.type.toLowerCase() === 'wfs') {
                 return 'vector';
             }
+            if (service.type.toLowerCase() === 'sos') {
+                return 'sensor';
+            }
             return '';
         };
         $scope.nbbypage = 5;
