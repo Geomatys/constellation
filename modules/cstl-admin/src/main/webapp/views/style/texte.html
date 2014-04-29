@@ -19,7 +19,7 @@
 <div class="tab-content" ng-init="$parent.newStyle.rules[0].symbolizers[0]['@symbol'] = 'text'">
   <div class="tab-pane" ng-class="{active:chosenTab==='simple'}">
     <div class="row">
-      <div class="col-xs-12 col-sm-6 col-md-8">
+      <div class="col-xs-12 col-sm-6">
         <h2 translate="sldeditor.breadcrumb.edition">Style Edition</h2>
         <div class="style_bloc">
            <form class="form-horizontal" role="form">
@@ -80,9 +80,9 @@
            </div>
 
       </div>
-      <div class="col-xs-12 col-sm-6 col-md-4">
+      <div class="col-xs-12 col-sm-6">
         <h2 translate="sldeditor.apercu.titre">Style preview</h2>
-        <div class="bloc_apercu" id="styledMapOL" style="width: 299px; height: 299px;"></div>
+        <div class="bloc_apercu" id="styledMapOL" style="height: 299px;"></div>
         <button type="button" class="btn-apercu col-xs-12 btn btn-primary" ng-click="displayCurrentStyle()"><span translate="sldeditor.apercu.data">Data preview</span></button>
       </div>
     </div>

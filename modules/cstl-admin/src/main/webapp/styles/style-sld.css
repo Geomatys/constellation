@@ -235,6 +235,9 @@ ul.dropdown-images li a:hover{
 		width: 117px;
 		height: 20px;
 	}
+	.bloc_apercu{
+		width:305px;
+	}
 }
 
 /* Medium devices (desktops, 992px and up) */
@@ -262,7 +265,14 @@ ul.dropdown-images li a:hover{
 		margin-right: 15px;
 	}
 	img.img_palette{
-		width: 368px;
+		width: 235px;
+	}
+	.bloc_apercu{
+		width:430px;
+	}
+	.dashed-pb{
+		height:30px;
+		margin-top:30px;
 	}
 }
 
@@ -279,6 +289,9 @@ ul.dropdown-images li a:hover{
 		margin-right: 15px;
 	}
 	img.img_palette{
-		width: 410px;
+		width: 267px;
+	}
+	.bloc_apercu{
+		width:465px;
 	}
  }
