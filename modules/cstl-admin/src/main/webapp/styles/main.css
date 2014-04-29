@@ -1012,6 +1012,21 @@ table.user-table tbody>tr>td.user-delete{
         margin-bottom: 10px;
     }
 }
+/*process*/
+.process-list .panel-default > .panel-heading{
+    background: #ededed url('../images/process.svg') right center no-repeat;
+    height:50px;
+    padding-top: 15px;
+}
+.process-list .panel-default > .panel-heading.selected{
+    background: #ededed url('../images/process-selected.svg') right center no-repeat;
+    height:50px;
+    padding-top: 15px;
+}
+.process-list .panel{
+    margin-bottom:15px;
+}
+
 
 /*Modal responsive*/
 .modal-dialog-responsive .modal-body{
