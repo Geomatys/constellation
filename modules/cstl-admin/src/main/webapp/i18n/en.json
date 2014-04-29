@@ -127,6 +127,7 @@
             "choose.tile.format": "Tile format",
             "choose.uppercornerx": "Upper corner X",
             "choose.uppercornery": "Upper corner Y",
+            "close": "Close",
             "data": "Data",
             "end": "Finish",
             "local.title": "Local file",
@@ -134,6 +135,7 @@
             "next": "Next",
             "remove": "Remove",
             "select": "Select",
+            "sensor.title": "Sensor view",
             "server.title": "Server file",
             "validate": "Validate"
         }

@@ -175,6 +175,7 @@
             "choose.tile.format": "Fomat de sortie du tuilage",
             "choose.uppercornerx": "Coin haut X",
             "choose.uppercornery": "Coin haut Y",
+            "close": "Fermer",
             "data": "Données",
             "end": "Terminer",
             "local.title": "Fichier local",
@@ -182,6 +183,7 @@
             "next": "Suivant",
             "remove": "Enlever",
             "select": "Sélectionner",
+            "sensor.title": "Vue du capteur",
             "server.title": "Fichier serveur",
             "validate": "Valider"
         }

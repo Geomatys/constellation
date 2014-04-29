@@ -22,13 +22,10 @@ DataViewer = {
 
     sensorClicked : undefined,
 
-    initMap : function(mapId, $scope){
+    initMap : function(mapId){
         if (DataViewer.map) {
             DataViewer.map.destroy();
             DataViewer.sensorClicked = undefined;
-            if ($scope) {
-                $scope.$digest();
-            }
         }
         DataViewer.map = new OpenLayers.Map(mapId, {
             controls: [new OpenLayers.Control.Navigation()],
@@ -56,9 +53,6 @@ DataViewer = {
                         DataViewer.sensorClicked.layer.drawFeature(DataViewer.sensorClicked);
                     }
                     DataViewer.sensorClicked = e.feature;
-                    if ($scope) {
-                        $scope.$digest();
-                    }
                 }
             }
         });

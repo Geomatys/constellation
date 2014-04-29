@@ -363,6 +363,8 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
             }
         };
 
+        $scope.sensors = undefined;
+
         $scope.initScope = function() {
             if ($scope.type === 'csw') {
                 csw.count({id: $routeParams.id}, {}, function(max) {
@@ -381,6 +383,16 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
                         );
                     });
                 });
+            } else if ($scope.type === 'sos') {
+                sos.listSensors({id: $routeParams.id}, function(sensors) {
+                    $dashboard($scope, sensors.Entry, false);
+
+                    $scope.sensors = [];
+                    for (var i=0; i<sensors.Entry.length; i++) {
+                        $scope.sensors[i] = {id: sensors.Entry[i], checked:false};
+                    }
+
+                }, function() { $growl('error','Error','Unable to list sensors'); });
             } else {
                 $scope.config = webService.config({type: $scope.type, id:$routeParams.id});
                 $scope.layers = webService.layers({type: $scope.type, id:$routeParams.id}, {}, function(response) {
@@ -388,30 +400,6 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
                     $scope.filtertype = "";
                 });
             }
-        };
-
-        $scope.sensors = undefined;
-        $scope.measures = undefined;
-
-        $scope.initSensors = function() {
-            sos.listSensors({id: $routeParams.id}, function(sensors) {
-                $scope.sensors = [];
-                for (var i=0; i<sensors.Entry.length; i++) {
-                    $scope.sensors[i] = {id: sensors.Entry[i], checked:false};
-                }
-
-                var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
-                DataViewer.layers = [layerBackground];
-                DataViewer.initMap('olSensorMap', $scope);
-
-            }, function() { $growl('error','Error','Unable to list sensors'); });
-
-            sos.listMeasures({id: $routeParams.id}, function(measures) {
-                $scope.measures = [];
-                for (var i=0; i<measures.Entry.length; i++) {
-                    $scope.measures[i] = {id: measures.Entry[i], checked:false};
-                }
-            }, function() { $growl('error','Error','Unable to list measures'); });
         };
 
         $scope.getVersionsForType = function() {
@@ -497,27 +485,6 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
                     }
                 }
             }
-        };
-
-        $scope.changeMeasureState = function(currentMeasure) {
-            sos.sensorsForMeasure({id: $routeParams.id, measure: currentMeasure.id}, function(sensors){
-                var oldSensors = $scope.sensors;
-
-                $scope.sensors = [];
-                for (var i=0; i<sensors.Entry.length; i++) {
-                    var newSensorId = sensors.Entry[i];
-                    var check = false;
-                    for (var j=0; j<oldSensors.length; j++) {
-                        // Get back old values checked or not for new sensors that match the chosen measure
-                        var oldSensor = oldSensors[j];
-                        if (oldSensor.id === newSensorId) {
-                            check = oldSensor.checked;
-                            break;
-                        }
-                    }
-                    $scope.sensors[i] = {id: newSensorId, checked: check};
-                }
-            }, function() { $growl('error','Error','Unable to list sensors for measure '+ currentMeasure.id); });
         };
 
         $scope.testSensorClicked = function() {
@@ -771,6 +738,18 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
             }
         };
 
+        $scope.showSensor = function() {
+            var sensorId = $scope.selected;
+            $modal.open({
+                templateUrl: 'views/modalSensorView.html',
+                controller: 'SensorModalController',
+                resolve: {
+                    service: function() { return $scope.service; },
+                    sensorId: function() { return sensorId; }
+                }
+            });
+        };
+
         $scope.toggleUpDownSelected = function() {
             var $header = $('#serviceDashboard').find('.selected-item').find('.block-header');
             $header.next().slideToggle(200);
@@ -790,5 +769,69 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
 
         $scope.selectDataMetadata = function(item) {
             $scope.selectedDataMetadata = item;
+        };
+    }]);
+
+cstlAdminApp.controller('SensorModalController', ['$scope', '$modalInstance', '$modal', '$cookies', 'sos', 'service', 'sensorId', '$growl',
+    function ($scope, $modalInstance, $modal, $cookies, sos, service, sensorId, $growl) {
+        $scope.service = service;
+        $scope.sensorId = sensorId;
+        $scope.measures = undefined;
+        $scope.val.displayGraph = false;
+
+        $scope.init = function() {
+            sos.measuresForSensor({id: service.identifier, 'sensorID': sensorId}, function(measures){
+                var oldMeasures = $scope.measures;
+
+                $scope.measures = [];
+                for (var i=0; i<measures.Entry.length; i++) {
+                    var newMeasureId = measures.Entry[i];
+                    var check = false;
+                    if (oldMeasures != null) {
+                        for (var j = 0; j < oldMeasures.length; j++) {
+                            // Get back old values checked or not for new measures that match the chosen sensor
+                            var oldMeasure = oldMeasures[j];
+                            if (oldMeasure.id === newMeasureId) {
+                                check = oldMeasure.checked;
+                                break;
+                            }
+                        }
+                    }
+                    $scope.measures[i] = {id: newMeasureId, checked:check};
+                }
+            }, function() { $growl('error','Error','Unable to list measures for sensor '+ sensorId); });
+        };
+
+        $scope.initMap = function() {
+            var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
+            var newLayer = DataViewer.createSensorsLayer("sensors");
+            sos.getFeatures({id: $scope.service.identifier, sensor: $scope.sensorId}, function(wkt) {
+                var wktReader = new OpenLayers.Format.WKT();
+                var vector = wktReader.read(wkt.value);
+                vector.sensorName = $scope.sensorId;
+                newLayer.addFeatures(vector);
+            });
+
+            DataViewer.layers = [layerBackground,newLayer];
+            DataViewer.initMap('olSensorMap');
+        };
+
+        function getMeasuresChecked() {
+            var checked = [];
+            for (var i=0; i<$scope.measures.length; i++) {
+                var measure = $scope.measures[i];
+                if (measure.checked) {
+                    checked.push(measure.id);
+                }
+            }
+            return checked;
+        }
+
+        $scope.showGraph = function() {
+            $scope.val.displayGraph = true;
+        };
+
+        $scope.close = function() {
+            $modalInstance.dismiss('close');
         };
     }]);
