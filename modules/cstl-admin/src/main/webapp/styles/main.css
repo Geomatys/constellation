@@ -548,7 +548,7 @@ ul.unstyled {
 .dashboard .item-list .item.sensor-sos {
     background: transparent url('../images/sensor-sos.svg') right center no-repeat;
 }
-.dashboard .item-list .item.sensor.selected, .dashboard .item-list .item.metadata-sensor.selected {
+.dashboard .item-list .item.sensor.selected, .dashboard .item-list .item.metadata-sensor.selected, .dashboard .item-list .item.sensor-sos.selected, .dashboard .item-list .item.metadata-sensor-sos.selected {
     background: transparent url('../images/sensor-selected.svg') right center no-repeat;
 }
 .dashboard .item-list .item.pyramid {
@@ -743,6 +743,30 @@ ul.unstyled {
  }
  .pagination-csw .pagination > li > a, .pagination-csw .pagination > li > span{
     color:#e3b07f;
+ }
+
+ .alert-sos{
+    background-color: #d5ebe7;
+    border: solid 1px #8fcbbf;
+    color:#4da795;
+ }
+ .btn-sos{
+    background-color: #8fcbbf;
+    border: solid 1px #7cc3b5;
+    color:#ffffff;
+ }
+ .btn-sos:hover, .btn-sos:focus, .btn-sos:hover .open .dropdown-toggle.btn-info{
+    background-color: #7cc3b5;
+    border: solid 1px #59b3a1;
+    color:#ffffff;
+ }
+   .pagination-sos .pagination > .active > a{
+    background-color: #7cc3b5;
+     border: solid 1px #59b3a1;
+     color:#ffffff;
+ }
+ .pagination-sos .pagination > li > a, .pagination-sos .pagination > li > span{
+    color:#59b3a1;
  }
 /*
  * Data Viewer
