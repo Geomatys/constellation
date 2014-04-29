@@ -64,4 +64,15 @@ public class ObservationFilter {
     public void setObservedProperty(List<String> observedProperty) {
         this.observedProperty = observedProperty;
     }
+    
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("[Observation Filter]\n");
+        sb.append("sensorID:").append(sensorID).append("\n");
+        sb.append("observedProperties:\n");
+        for (String op : observedProperty) {
+            sb.append(op).append("\n");
+        }
+        return sb.toString();
+    }
 }

@@ -505,17 +505,24 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             final Connection c                          = source.getConnection();
             c.setReadOnly(true);
             final Statement currentStatement            = c.createStatement();
-            System.out.println(sqlRequest.toString());
+            LOGGER.info(sqlRequest.toString());
             final ResultSet rs                          = currentStatement.executeQuery(sqlRequest.toString());
-            final TextBlock encoding;
-            if ("text/csv".equals(responseFormat)) {
-                encoding = getCsvTextEncoding("2.0.0");
-            } else {
-                encoding = getDefaultTextEncoding("2.0.0");
-            }
             Timestamp oldTime                           = null;
             final StringBuilder values                  = new StringBuilder();
             boolean first                               = true;
+            final TextBlock encoding;
+            if ("text/csv".equals(responseFormat)) {
+                encoding = getCsvTextEncoding("2.0.0");
+                // Add the header
+                values.append("date\t");
+                for (String pheno : currentObservedProperties) {
+                    values.append(pheno).append('\t');
+                }
+                values.setCharAt(values.length() - 1, '\n');
+            } else {
+                encoding = getDefaultTextEncoding("2.0.0");
+            }
+            
             while (rs.next()) {
                 final Timestamp currentTime   = rs.getTimestamp("time");
                 final String value            = rs.getString("value");

@@ -65,6 +65,8 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
     protected boolean firstFilter = true;
     
     protected QName resultModel;
+
+    protected final List<String> currentObservedProperties = new ArrayList<>();
     
     /**
      * Clone a new Observation Filter.
@@ -195,7 +197,7 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
             final StringBuilder sb = new StringBuilder();
             for (String p : phenomenon) {
                 sb.append(" \"observed_property\"='").append(p).append("' OR ");
-
+                currentObservedProperties.add(p);
             }
             sb.delete(sb.length() - 3, sb.length());
             if (!firstFilter) {
