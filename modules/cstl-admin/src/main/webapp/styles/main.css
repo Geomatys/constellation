@@ -545,6 +545,9 @@ ul.unstyled {
 .dashboard .item-list .item.sensor {
     background: transparent url('../images/sensor.svg') right center no-repeat;
 }
+.dashboard .item-list .item.sensor-sos {
+    background: transparent url('../images/sensor-sos.svg') right center no-repeat;
+}
 .dashboard .item-list .item.sensor.selected, .dashboard .item-list .item.metadata-sensor.selected {
     background: transparent url('../images/sensor-selected.svg') right center no-repeat;
 }
