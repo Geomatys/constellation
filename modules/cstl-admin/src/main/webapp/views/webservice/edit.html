@@ -384,63 +384,6 @@
 
                         <!-- End DashBoard -->
                     </div>
-
-                    <div ng-if="type === 'sos-old'">
-                        <div class="row">
-                            <div class="col-sm-4 col-sm-offset-8">
-                                <div style="margin-bottom:10px;">
-                                    <a data-toggle="modal" class="btn btn-info btn-lg btn-block" ng-click="showDataToAdd()">
-                                        <span class="icon-plus icon-white" style="margin-right:5px;"></span>
-                                        <span translate="service.edit.dashboard.action.add.button">Add</span>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row" ng-init="initSensors()">
-                            <div class="col-sm-3 sos_edit_blocs">
-
-                                <label class="control-label" translate="service.edit.dashboard.sensors.list">Available sensors</label>
-                                <div class="sos_edit_checkboxlist">
-                                    <label class="checkbox" ng-repeat="sensor in sensors">
-                                        <input type="checkbox" ng-model="sensor.checked" ng-change="changeSensorState(sensor)"> {{sensor.id}}
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-sm-3 sos_edit_blocs">
-                                <label class="control-label" translate="service.edit.dashboard.measures.list">Available measures</label>
-                                <div class="sos_edit_checkboxlist">
-                                    <label class="checkbox" ng-repeat="measure in measures">
-                                        <input type="checkbox" ng-model="measure.checked" ng-change="changeMeasureState(measure)"> {{measure.id}}
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-sm-6 sos_edit_blocs">
-                                <label class="control-label" translate="service.edit.dashboard.area">Geographical area</label>
-                                <div  class="sos_edit_checkboxlist">
-                                    <div id="olSensorMap" style="height:313px;"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row" ng-show="testSensorClicked()">
-                            <div class="col-sm-12 sos_edit_blocgraph">
-                                <div class="sos_edit_graph">
-                                    <div class="col-lg-3 col-lg-offset-9 col-md-4 col-md-offset-8 col-sm-5 col-sm-offset-7 sos_edit_graph_date">
-                                        <div class="form-inline">
-                                            <label class="control-label" translate="service.edit.dashboard.date.from">From</label>
-                                            <input type="text" class="form-control" style="width:100px;" datepicker="{language:getCurrentLang(),format:'yyyy-mm-dd'}" value="2013-04-14"/>
-                                             <label class="control-label" translate="service.edit.dashboard.date.to"> to</label>
-                                            <input type="text" class="form-control" style="width:100px;" datepicker="{language:getCurrentLang(),format:'yyyy-mm-dd'}" value="2014-04-14"/>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-
                 </div>
                 <div class="tab-pane" ng-class="{active:tabdesc}" ng-show="tabdesc">
 
