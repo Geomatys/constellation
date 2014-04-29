@@ -396,6 +396,9 @@
                                     <div class="col-sm-8 col-md-6">
                                         <input type="text" readonly="" id="identifier" class="form-control" ng-model="metadata.identifier" value="">
                                     </div>
+                                    <div class="btn-lg tooltipicon">
+                                        <span type="button" class="glyphicon glyphicon-info-sign" tooltip data-placement="right" title="{{'tooltip.service.create.name' | translate }}" ></span>
+                                    </div>
                                 </div>
                                 <div class="form-group row">
                                     <label class="control-label col-sm-2 new-service-form-label" translate="service.description.tab.description.tags">Tags</label>
@@ -418,14 +421,18 @@
 
                                 <div class="form-group row">
                                     <label class="control-label col-sm-2 new-service-form-label" translate="service.description.tab.description.version" >Version</label>
-                                    <div id="versionsCheck">
-                                        <div ng-repeat="version in versions" class="inline">
-                                            <div class="checkbox inline">
-                                            <div class="col-sm-8 col-md-6">
-                                                <input type="checkbox"  id="{{version.id}}"  ng-model="version.checked" ng-change="selectedVersion()" ng-checked="versionIsSelected(version.id)"> {{version.id}}</div>
+                                    <div class="col-sm-8 col-md-6">
+                                        <div id="versionsCheck">
+                                            <div ng-repeat="version in versions" class="inline">
+                                                <div class="checkbox inline">
+                                                <div class="col-sm-8 col-md-6">
+                                                    <input type="checkbox"  id="{{version.id}}"  ng-model="version.checked" ng-change="selectedVersion()" ng-checked="versionIsSelected(version.id)"> {{version.id}}</div>
+                                                </div>
                                             </div>
                                         </div>
-
+                                    </div>
+                                    <div class="btn-lg tooltipicon">
+                                        <span type="button" class="glyphicon glyphicon-info-sign" tooltip data-placement="right" title="{{'tooltip.service.create.version' | translate }}" ></span>
                                     </div>
                                 </div>
                             </form>
@@ -521,18 +528,31 @@
                             <fieldset>
                                 <legend translate="create.accessconstraint.legend">Access constraints</legend>
                                 <form class="form" role="form">
-                                    <div class="control-group">
-                                        <label class="control-label new-service-form-label" for="fees" translate="create.accessconstraint.fees.label">Fees</label>
-                                        <input id="fees" class="form-control" type="text" ng-model="metadata.serviceConstraints.fees"/>
+                                    <div class="control-group row">
+                                        <label class="control-label new-service-form-label col-xs-12" for="fees" translate="create.accessconstraint.fees.label" style="padding:0;  padding-left:15px;">Fees</label>
+                                        <div class="col-xs-11" style=" padding:0 15px; margin-bottom:7px;">
+                                            <input id="fees" class="form-control" type="text" ng-model="metadata.serviceConstraints.fees"/>
+                                        </div>  
+                                        <div class="btn-lg tooltipicon">
+                                            <span type="button" class="glyphicon glyphicon-info-sign" tooltip data-placement="right" title="{{'tooltip.service.create.fees' | translate }}" ></span>
+                                        </div>
                                     </div>
-                                    <div class="control-group">
-                                        <label class="control-label new-service-form-label" for="accessConstraints" translate="create.accessconstraint.label">Access constraints</label>
-                                        <textarea rows="5" id="accessConstraints" class="form-control" ng-model="metadata.serviceConstraints.accessConstraint"></textarea>
+                                    <div class="control-group row">
+                                        <label class="col-xs-12 control-label new-service-form-label" for="accessConstraints" translate="create.accessconstraint.label" style="padding:0; padding-left:15px;">Access constraints</label>
+                                        <div class="col-xs-11" style="margin-bottom:7px; padding:0 15px;">
+                                            <textarea rows="5" id="accessConstraints" class="form-control" ng-model="metadata.serviceConstraints.accessConstraint"></textarea>
+                                        </div>
+                                        <div class="btn-lg tooltipicon">
+                                            <span type="button" class="glyphicon glyphicon-info-sign" tooltip data-placement="right" title="{{'tooltip.service.create.contraints' | translate }}" ></span>
+                                        </div>
                                     </div>
                                     <div class="control-group" data-toggle="tooltip" title="{{'create.accessconstraint.layerlimit.tooltip' | translate }}" id="layerlimitGroup" style="height:59px;">
                                         <label class="col-xs-12 control-label new-service-form-label" for="layerLimit" translate="create.accessconstraint.layerlimit.label" style="padding:0;">Layer limit</label>
                                         <div class="col-xs-4" style="padding:0; margin-bottom:7px;">
                                             <input type="number" id="layerLimit" class="form-control" ng-model="metadata.serviceConstraints.layerLimit"/>
+                                        </div>
+                                        <div class="btn-lg tooltipicon">
+                                            <span type="button" style="margin-left:15px;" class="glyphicon glyphicon-info-sign" tooltip data-placement="right" title="{{'tooltip.service.create.layer' | translate }}" ></span>
                                         </div>
                                     </div>
                                     <div class="control-group" data-toggle="tooltip" title="{{'create.accessconstraint.maxwidth.tooltip' | translate }}" id="maxWidthGroup" style="height:59px;">
@@ -540,11 +560,17 @@
                                         <div class="col-xs-4" style="padding:0; margin-bottom:7px;">
                                             <input type="number" id="maxWidth" class="form-control" ng-model="metadata.serviceConstraints.maxWidth"/>
                                         </div>
+                                        <div class="btn-lg tooltipicon">
+                                            <span type="button" style="margin-left:15px;" class="glyphicon glyphicon-info-sign" tooltip data-placement="right" title="{{'tooltip.service.create.maxwidth' | translate }}" ></span>
+                                        </div>
                                     </div>
                                     <div class="control-group" data-toggle="tooltip" title="{{'create.accessconstraint.maxheight.tooltip' | translate }}" id="maxHeightGroup" style="height:59px;">
                                         <label class="col-xs-12 control-label new-service-form-label" for="maxHeight" translate="create.accessconstraint.maxheight.label" style="padding:0;">Max height</label>
                                         <div class="col-xs-4" style="padding:0; margin-bottom:7px;">
                                             <input type="number" id="maxHeight" class="form-control" ng-model="metadata.serviceConstraints.maxHeight"/>
+                                        </div>
+                                        <div class="btn-lg tooltipicon">
+                                            <span type="button" style="margin-left:15px;" class="glyphicon glyphicon-info-sign" tooltip data-placement="right" title="{{'tooltip.service.create.maxheight' | translate }}" ></span>
                                         </div>
                                     </div>
                                 </form>
