@@ -500,6 +500,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
     public String getResults() throws CstlServiceException {
         try {
             // add orderby to the query
+            final String fieldRequest = sqlRequest.toString();
             sqlRequest.append(" ORDER BY  o.\"id\", m.\"id\"");
             
             final Connection c                          = source.getConnection();
@@ -514,20 +515,30 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             if ("text/csv".equals(responseFormat)) {
                 encoding = getCsvTextEncoding("2.0.0");
                 // Add the header
+                final List<String> fieldNames = getFieldsForGetResult(fieldRequest, c);
                 values.append("date\t");
-                for (String pheno : currentObservedProperties) {
+                for (String pheno : fieldNames) {
                     values.append(pheno).append('\t');
                 }
                 values.setCharAt(values.length() - 1, '\n');
             } else {
                 encoding = getDefaultTextEncoding("2.0.0");
             }
-            
+
+            final List<String> writtenFields = new ArrayList<>();
             while (rs.next()) {
                 final Timestamp currentTime   = rs.getTimestamp("time");
                 final String value            = rs.getString("value");
+                final String fieldName        = rs.getString("field_name");
+
+                boolean newRound = false;
+                if (writtenFields.contains(fieldName)) {
+                    newRound = true;
+                    writtenFields.clear();
+                }
+                writtenFields.add(fieldName);
                 
-                if (!currentTime.equals(oldTime)) {
+                if (!currentTime.equals(oldTime) || newRound) {
                     if (!first) {
                         values.append(encoding.getBlockSeparator());
                     }
@@ -551,6 +562,19 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                                           NO_APPLICABLE_CODE);
         }
+    }
+    
+    private List<String> getFieldsForGetResult(String request, final Connection c) throws SQLException {
+        request = request.replace("SELECT \"time\", \"value\", \"field_name\"", "SELECT DISTINCT \"field_name\"");
+        final Statement stmt = c.createStatement();
+        final ResultSet rs = stmt.executeQuery(request);
+        final List<String> results = new ArrayList<>();
+        while (rs.next()) {
+            results.add(rs.getString(1));
+        }
+        rs.close();
+        stmt.close();
+        return results;
     }
     
     @Override
