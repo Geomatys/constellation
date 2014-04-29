@@ -548,8 +548,14 @@ ul.unstyled {
 .dashboard .item-list .item.sensor-sos {
     background: transparent url('../images/sensor-sos.svg') right center no-repeat;
 }
+.dashboard .item-list .item.sensor-system {
+    background: transparent url('../images/sensor-system.svg') right center no-repeat;
+}
 .dashboard .item-list .item.sensor.selected, .dashboard .item-list .item.metadata-sensor.selected, .dashboard .item-list .item.sensor-sos.selected, .dashboard .item-list .item.metadata-sensor-sos.selected {
     background: transparent url('../images/sensor-selected.svg') right center no-repeat;
+}
+.dashboard .item-list .item.sensor-system.selected, .dashboard .item-list .item.metadata-sensor-system.selected{
+    background: transparent url('../images/sensor-system-selected.svg') right center no-repeat;
 }
 .dashboard .item-list .item.pyramid {
     background: transparent url('../images/pyramid.svg') right center no-repeat;
