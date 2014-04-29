@@ -35,7 +35,7 @@ import org.constellation.sos.io.ObservationResult;
 import static org.constellation.sos.io.om2.OM2BaseReader.LOGGER;
 import org.constellation.ws.CstlServiceException;
 
-import static org.constellation.sos.ws.Utils.*;
+import static org.constellation.sos.ws.SOSUtils.*;
 import static org.constellation.sos.ws.SOSConstants.*;
 
 // Geotoolkit dependencies

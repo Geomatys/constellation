@@ -36,7 +36,7 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.ObservationFilterReader;
 
 import static org.constellation.sos.ws.SOSConstants.*;
-import static org.constellation.sos.ws.Utils.getTimeValue;
+import static org.constellation.sos.ws.SOSUtils.getTimeValue;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.gml.xml.FeatureProperty;

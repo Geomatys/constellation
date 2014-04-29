@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 
 // Constellation dependencies
 import org.constellation.ws.CstlServiceException;
-import static org.constellation.sos.ws.Utils.*;
+import static org.constellation.sos.ws.SOSUtils.*;
 
 // Geotk dependencies
 import org.geotoolkit.swe.xml.AbstractEncoding;

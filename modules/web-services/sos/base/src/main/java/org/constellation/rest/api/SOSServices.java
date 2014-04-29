@@ -86,6 +86,12 @@ public class SOSServices {
     }
     
     @GET
+    @Path("{id}/sensors")
+    public Response getSensorTree(final @PathParam("id") String id) throws Exception {
+        return ok(getConfigurer().getSensorTree(id));
+    }
+    
+    @GET
     @Path("{id}/sensors/identifiers")
     public Response getSensorIds(final @PathParam("id") String id) throws Exception {
         return ok(new StringList(getConfigurer().getSensorIds(id)));

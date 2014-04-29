@@ -30,7 +30,7 @@ import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationResult;
 import org.constellation.ws.CstlServiceException;
 import static org.constellation.sos.ws.SOSConstants.*;
-import static org.constellation.sos.ws.Utils.*;
+import static org.constellation.sos.ws.SOSUtils.*;
 
 import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.lucene.IndexingException;

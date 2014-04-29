@@ -28,6 +28,7 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.sis.util.logging.Logging;
+import org.constellation.dto.SensorMLTree;
 import org.constellation.util.ReflectionUtilities;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.AbstractFeature;
@@ -37,11 +38,19 @@ import org.geotoolkit.gml.xml.Envelope;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.sml.xml.AbstractClassification;
 import org.geotoolkit.sml.xml.AbstractClassifier;
+import org.geotoolkit.sml.xml.AbstractComponents;
+import org.geotoolkit.sml.xml.AbstractDataSource;
 import org.geotoolkit.sml.xml.AbstractDerivableComponent;
 import org.geotoolkit.sml.xml.AbstractIdentification;
 import org.geotoolkit.sml.xml.AbstractIdentifier;
 import org.geotoolkit.sml.xml.AbstractProcess;
+import org.geotoolkit.sml.xml.AbstractProcessChain;
+import org.geotoolkit.sml.xml.AbstractProcessModel;
 import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.geotoolkit.sml.xml.Component;
+import org.geotoolkit.sml.xml.ComponentProperty;
+import org.geotoolkit.sml.xml.SMLMember;
+import org.geotoolkit.sml.xml.System;
 import org.geotoolkit.sos.xml.SOSXmlFactory;
 import org.geotoolkit.swe.xml.AbstractEncoding;
 import org.geotoolkit.swe.xml.TextBlock;
@@ -55,14 +64,14 @@ import org.opengis.temporal.Position;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public final class Utils {
+public final class SOSUtils {
 
     /**
      * use for debugging purpose
      */
     private static final Logger LOGGER = Logging.getLogger("org.constellation.sos");
 
-    private Utils() {}
+    private SOSUtils() {}
     
     /**
      * Return the physical ID of a sensor.
@@ -87,6 +96,34 @@ public final class Utils {
             }
         }
         return null;
+    }
+    
+    public static String getSmlID(final AbstractSensorML sensor) {
+        if (sensor != null && sensor.getMember().size() > 0) {
+            final AbstractProcess process = sensor.getMember().get(0).getRealProcess();
+            return getSmlID(process);
+        }
+        return "unknow_identifier";
+    }
+    
+    public static String getSmlID(final AbstractProcess process) {
+        final List<? extends AbstractIdentification> idents = process.getIdentification();
+
+        for(AbstractIdentification ident : idents) {
+            if (ident.getIdentifierList() != null) {
+                for (AbstractIdentifier identifier: ident.getIdentifierList().getIdentifier()) {
+                    if ("uniqueID".equals(identifier.getName()) && identifier.getTerm() != null) {
+                        return identifier.getTerm().getValue();
+                    }
+                }
+            }
+        }
+
+        // else look for simple id mark
+        if (process.getId() != null) {
+            return process.getId();
+        }
+        return "unknow_identifier";
     }
 
     /**
@@ -447,5 +484,99 @@ public final class Utils {
             LOGGER.log(Level.WARNING, " the feature of interest (samplingCurve){0} does not have proper bounds", sc.getId());
         }
         return false;
+    }
+    
+    public static String getSensorMLType(final AbstractSensorML sml) {
+        if (sml.getMember() != null)  {
+            //assume only one member
+            for (SMLMember member : sml.getMember()) {
+                final AbstractProcess process = member.getRealProcess();
+                return getSensorMLType(process);
+            }
+        }
+        return "unknow";
+    }
+    
+    public static String getSensorMLType(final AbstractProcess process) {
+        if (process instanceof System) {
+            return "System";
+        } else if (process instanceof AbstractProcessChain) {
+            return "ProcessChain";
+        } else if (process instanceof Component) {
+            return "Component";
+        } else if (process instanceof AbstractDataSource) {
+            return "DataSource";
+        } else if (process instanceof AbstractProcessModel) {
+            return "ProcessModel";
+        }
+        return "unknow";
+    }
+    
+     public static List<SensorMLTree> getChildren(final AbstractSensorML sml) {
+        if (sml.getMember() != null)  {
+            //assume only one member
+            for (SMLMember member : sml.getMember()) {
+                final AbstractProcess process = member.getRealProcess();
+                return getChildren(process);
+            }
+        }
+        return new ArrayList<>();
+    }
+    
+    public static List<SensorMLTree> getChildren(final AbstractProcess process) {
+        final List<SensorMLTree> results = new ArrayList<>();
+        if (process instanceof System) {
+            final System s = (System) process;
+            final AbstractComponents compos = s.getComponents();
+            if (compos != null && compos.getComponentList() != null) {
+                for (ComponentProperty cp : compos.getComponentList().getComponent()){
+                    if (cp.getHref() != null) {
+                        results.add(new SensorMLTree(cp.getHref(), "unknow"));
+                    } else if (cp.getAbstractProcess()!= null) {
+                        results.add(new SensorMLTree(getSmlID(cp.getAbstractProcess()), getSensorMLType(cp.getAbstractProcess())));
+                    } else {
+                        LOGGER.warning("SML system component has no href or embedded object");
+                    }
+                }
+            }
+        } else if (process instanceof AbstractProcessChain) {
+            final AbstractProcessChain s = (AbstractProcessChain) process;
+            final AbstractComponents compos = s.getComponents();
+            if (compos != null && compos.getComponentList() != null) {
+                for (ComponentProperty cp : compos.getComponentList().getComponent()){
+                    if (cp.getHref() != null) {
+                        results.add(new SensorMLTree(cp.getHref(), "unknow"));
+                    } else if (cp.getAbstractProcess()!= null) {
+                        results.add(new SensorMLTree(getSmlID(cp.getAbstractProcess()), getSensorMLType(cp.getAbstractProcess())));
+                    } else {
+                        LOGGER.warning("SML system component has no href or embedded object");
+                    }
+                }
+            }
+        }
+        return results;
+    }
+    
+    public static SensorMLTree buildTree(final List<SensorMLTree> nodeList) {
+        final SensorMLTree root = new SensorMLTree("root", "System");
+        
+        for (SensorMLTree node : nodeList) {
+            final SensorMLTree parent = getParent(node, nodeList);
+            if (parent == null) {
+                root.getChildren().add(node);
+            } else {
+                parent.replaceChildren(node);
+            }
+        }
+        return root;
+    }
+    
+    private static SensorMLTree getParent(final SensorMLTree current, final List<SensorMLTree> nodeList) {
+        for (SensorMLTree node : nodeList) {
+            if (node.hasChild(current.getId())) {
+                return node;
+            }
+        }
+        return null;
     }
 }

@@ -37,7 +37,7 @@ import org.geotoolkit.sos.xml.ResponseModeType;
 import org.constellation.ws.CstlServiceException;
 import static org.geotoolkit.sos.xml.ResponseModeType.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import static org.constellation.sos.ws.Utils.*;
+import static org.constellation.sos.ws.SOSUtils.*;
 import static org.constellation.sos.ws.SOSConstants.*;
 import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.sos.xml.ObservationOffering;

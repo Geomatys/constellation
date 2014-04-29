@@ -42,7 +42,7 @@ import org.apache.lucene.search.TopDocs;
 // constellation dependencies
 import org.apache.lucene.util.Version;
 import org.constellation.sos.io.ObservationResult;
-import static org.constellation.sos.ws.Utils.*;
+import static org.constellation.sos.ws.SOSUtils.*;
 
 // Geotoolkit dependencies
 import org.geotoolkit.lucene.IndexingException;

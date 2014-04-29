@@ -56,7 +56,7 @@ import static org.constellation.sos.ws.DatablockParser.*;
 import org.constellation.sos.ws.DatablockParser.Values;
 import static org.constellation.sos.ws.Normalizer.*;
 import static org.constellation.sos.ws.SOSConstants.*;
-import static org.constellation.sos.ws.Utils.*;
+import static org.constellation.sos.ws.SOSUtils.*;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.UnauthorizedException;

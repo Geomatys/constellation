@@ -37,7 +37,7 @@ import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.store.SimpleFSDirectory;
 import org.apache.lucene.util.Version;
 import org.constellation.generic.database.Automatic;
-import org.constellation.sos.ws.Utils;
+import org.constellation.sos.ws.SOSUtils;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.AbstractGML;
 import org.geotoolkit.lucene.IndexingException;
@@ -68,6 +68,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<Observation> {
      *
      * @param configuration A configuration object containing the database informations.Must not be null.
      * @param serviceID  The identifier, if there is one, of the index/service.
+     * @param create
      */
     public LuceneObservationIndexer(final Automatic configuration, final String serviceID, final boolean create) throws IndexingException {
         super(serviceID, configuration.getConfigurationDirectory(), new WhitespaceAnalyzer(Version.LUCENE_46));
@@ -213,12 +214,12 @@ public class LuceneObservationIndexer extends AbstractIndexer<Observation> {
             final TemporalObject time = observation.getSamplingTime();
             if (time instanceof Period) {
                 final Period period = (Period) time;
-                doc.add(new Field("sampling_time_begin", Utils.getLuceneTimeValue(period.getBeginning().getPosition()), ft));
-                doc.add(new Field("sampling_time_end",   Utils.getLuceneTimeValue(period.getEnding().getPosition()), ft));
+                doc.add(new Field("sampling_time_begin", SOSUtils.getLuceneTimeValue(period.getBeginning().getPosition()), ft));
+                doc.add(new Field("sampling_time_end",   SOSUtils.getLuceneTimeValue(period.getEnding().getPosition()), ft));
 
             } else if (time instanceof Instant) {
                 final Instant instant = (Instant) time;
-                doc.add(new Field("sampling_time_begin",   Utils.getLuceneTimeValue(instant.getPosition()), ft));
+                doc.add(new Field("sampling_time_begin",   SOSUtils.getLuceneTimeValue(instant.getPosition()), ft));
                 doc.add(new Field("sampling_time_end",    "NULL", ft));
 
             } else if (time != null) {

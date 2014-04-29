@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -36,6 +37,7 @@ import javax.xml.bind.Unmarshaller;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.*;
+import org.constellation.dto.SensorMLTree;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
@@ -50,6 +52,7 @@ import org.constellation.sos.io.ObservationWriter;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
 import org.constellation.sos.ws.SOSConstants;
+import org.constellation.sos.ws.SOSUtils;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.geometry.jts.JTS;
@@ -59,7 +62,6 @@ import org.geotoolkit.observation.xml.AbstractObservation;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
-import org.geotoolkit.sos.xml.ResponseModeType;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.observation.Observation;
@@ -206,6 +208,26 @@ public class SOSConfigurer extends OGCConfigurer {
                 }
             }
             return new AcknowlegementType("Success", "The specified sensor have been removed in the SOS");
+        } catch (CstlServiceException ex) {
+            throw new ConfigurationException(ex);
+        }
+    }
+    
+    public SensorMLTree getSensorTree(String id) throws ConfigurationException {
+        final SensorReader reader = getReader(id);
+         try {
+            final Collection<String> sensorNames = reader.getSensorNames();
+            final List<SensorMLTree> values = new ArrayList<>();
+            for (String sensorID : sensorNames) {
+                final AbstractSensorML sml = reader.getSensor(sensorID);
+                final String smlType = SOSUtils.getSensorMLType(sml);
+                final String smlID   = SOSUtils.getSmlID(sml);
+                final SensorMLTree t = new SensorMLTree(smlID, smlType);
+                final List<SensorMLTree> children = SOSUtils.getChildren(sml);
+                t.setChildren(children);
+                values.add(t);
+            }
+            return SOSUtils.buildTree(values);
         } catch (CstlServiceException ex) {
             throw new ConfigurationException(ex);
         }
