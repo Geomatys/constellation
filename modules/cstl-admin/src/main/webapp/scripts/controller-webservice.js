@@ -777,7 +777,8 @@ cstlAdminApp.controller('SensorModalController', ['$scope', '$modalInstance', '$
         $scope.service = service;
         $scope.sensorId = sensorId;
         $scope.measures = undefined;
-        $scope.val.displayGraph = false;
+        $scope.var = {};
+        $scope.var.displayGraph = false;
 
         $scope.init = function() {
             sos.measuresForSensor({id: service.identifier, 'sensorID': sensorId}, function(measures){
