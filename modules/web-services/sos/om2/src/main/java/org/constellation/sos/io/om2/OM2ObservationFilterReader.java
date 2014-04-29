@@ -67,6 +67,8 @@ import org.opengis.util.FactoryException;
  */
 public class OM2ObservationFilterReader extends OM2ObservationFilter implements ObservationFilterReader {
 
+    private String responseFormat;
+    
     public OM2ObservationFilterReader(final OM2ObservationFilter omFilter) {
         super(omFilter);
     }
@@ -505,7 +507,12 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             final Statement currentStatement            = c.createStatement();
             System.out.println(sqlRequest.toString());
             final ResultSet rs                          = currentStatement.executeQuery(sqlRequest.toString());
-            final TextBlock encoding                    = getDefaultTextEncoding("2.0.0");
+            final TextBlock encoding;
+            if ("text/csv".equals(responseFormat)) {
+                encoding = getCsvTextEncoding("2.0.0");
+            } else {
+                encoding = getDefaultTextEncoding("2.0.0");
+            }
             Timestamp oldTime                           = null;
             final StringBuilder values                  = new StringBuilder();
             boolean first                               = true;
@@ -596,7 +603,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
 
     @Override
     public void setResponseFormat(final String responseFormat) {
-        // TODO
+        this.responseFormat = responseFormat;
     }
 
     @Override

@@ -15,8 +15,8 @@
  */
 'use strict';
 
-cstlAdminApp.controller('WebServiceController', ['$scope', 'webService', 'provider', 'csw', '$modal', 'textService', '$growl',
-    function ($scope, webService, provider, csw, $modal, textService, $growl) {
+cstlAdminApp.controller('WebServiceController', ['$scope', 'webService', 'provider', 'csw', 'sos', '$modal', 'textService', '$growl',
+    function ($scope, webService, provider, csw, sos, $modal, textService, $growl) {
         var modalLoader = $modal.open({
           templateUrl: 'views/modalLoader.html',
           controller: 'ModalInstanceCtrl'
@@ -112,6 +112,13 @@ cstlAdminApp.controller('WebServiceController', ['$scope', 'webService', 'provid
                 function() { $growl('success','Success','Search index for the service '+ service.name +' successfully refreshed'); },
                 function() { $growl('error','Error','Search index for the service '+ service.name +' failed to be updated'); }
             );
+        };
+
+        $scope.getLayersCount = function(service) {
+            if (service.layersNumber !== null) {
+                return service.layersNumber;
+            }
+            return 0;
         };
     }]);
 

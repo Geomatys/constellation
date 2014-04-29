@@ -53,4 +53,8 @@ public class ObjectFactory {
     public ParameterValues createParameterValues(){
         return new ParameterValues();
     }
+    
+    public ObservationFilter createObservationFilter(){
+        return new ObservationFilter();
+    }
 }

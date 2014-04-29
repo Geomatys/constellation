@@ -21,6 +21,7 @@ import java.util.Properties;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -32,6 +33,7 @@ import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.configuration.ServiceConfigurer;
 import org.constellation.configuration.StringList;
+import org.constellation.dto.ObservationFilter;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
 import org.constellation.provider.DataProviders;
@@ -117,6 +119,12 @@ public class SOSServices {
     @Path("{id}/observedProperty/identifiers/{sensorID}")
     public Response getObservedPropertiesForSensor(final @PathParam("id") String id, final @PathParam("sensorID") String sensorID) throws Exception {
         return ok(new StringList(getConfigurer().getObservedPropertiesForSensorId(id, sensorID)));
+    }
+    
+    @POST
+    @Path("{id}/observations")
+    public Response getObservations(final @PathParam("id") String id, final ObservationFilter filter) throws Exception {
+        return ok(getConfigurer().getObservationsCsv(id, filter.getSensorID(), filter.getObservedProperty()));
     }
     
     @PUT
