@@ -362,6 +362,20 @@ ul.unstyled {
     height:425px; 
     border-radius:3px;
 }
+.sos_edit_graph .axis path, .sos_edit_graph .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+.sos_edit_graph .x.axis path {
+    display: none;
+}
+
+.sos_edit_graph .line {
+    fill: none;
+    stroke: #4da795;
+    stroke-width: 1.5px;
+}
 .sos_edit_graph_date{
     border:solid 1px #eeeeee; 
     height:55px; 

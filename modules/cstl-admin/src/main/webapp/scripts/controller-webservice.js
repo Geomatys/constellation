@@ -384,12 +384,12 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
                     });
                 });
             } else if ($scope.type === 'sos') {
-                sos.listSensors({id: $routeParams.id}, function(sensors) {
-                    $dashboard($scope, sensors.Entry, false);
+                sos.sensorsTree({id: $routeParams.id}, function(sensors) {
+                    $dashboard($scope, sensors.children, false);
 
                     $scope.sensors = [];
-                    for (var i=0; i<sensors.Entry.length; i++) {
-                        $scope.sensors[i] = {id: sensors.Entry[i], checked:false};
+                    for (var i=0; i<sensors.children.length; i++) {
+                        $scope.sensors[i] = {id: sensors.children[i].id, checked:false};
                     }
 
                 }, function() { $growl('error','Error','Unable to list sensors'); });
@@ -433,62 +433,6 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
                 strVersions.push(selVersions[i].id);
             }
             $scope.metadata.versions = strVersions;
-        };
-
-        $scope.changeSensorState = function(currentSensor) {
-            // Change on available measures
-            sos.measuresForSensor({id: $routeParams.id, 'sensorID': currentSensor.id}, function(measures){
-                var oldMeasures = $scope.measures;
-
-                $scope.measures = [];
-                for (var i=0; i<measures.Entry.length; i++) {
-                    var newMeasureId = measures.Entry[i];
-                    var check = false;
-                    for (var j=0; j<oldMeasures.length; j++) {
-                        // Get back old values checked or not for new measures that match the chosen sensor
-                        var oldMeasure = oldMeasures[j];
-                        if (oldMeasure.id === newMeasureId) {
-                            check = oldMeasure.checked;
-                            break;
-                        }
-                    }
-                    $scope.measures[i] = {id: newMeasureId, checked:check};
-                }
-            }, function() { $growl('error','Error','Unable to list measures for sensor '+ currentSensor.id); });
-
-            // Change on map
-            if (DataViewer.map.layers.length === 1) {
-                var newLayer = DataViewer.createSensorsLayer("sensors");
-                sos.getFeatures({id: $routeParams.id, sensor: currentSensor.id}, function(wkt) {
-                    var wktReader = new OpenLayers.Format.WKT();
-                    var vector = wktReader.read(wkt.value);
-                    vector.sensorName = currentSensor.id;
-                    newLayer.addFeatures(vector);
-                });
-                DataViewer.map.addLayer(newLayer);
-            } else {
-                var featureLayer = DataViewer.map.layers[1];
-                if (currentSensor.checked) {
-                    sos.getFeatures({id: $routeParams.id, sensor: currentSensor.id}, function(wkt) {
-                        var wktReader = new OpenLayers.Format.WKT();
-                        var vector = wktReader.read(wkt.value);
-                        vector.sensorName = currentSensor.id;
-                        featureLayer.addFeatures(vector);
-                    });
-                } else {
-                    for (var i=0; i<featureLayer.features.length; i++) {
-                        var feature = featureLayer.features[i];
-                        if (feature.sensorName === currentSensor.id) {
-                            featureLayer.removeFeatures(feature);
-                            break;
-                        }
-                    }
-                }
-            }
-        };
-
-        $scope.testSensorClicked = function() {
-            return DataViewer.sensorClicked !== undefined
         };
 
         // define which version is Selected
@@ -739,7 +683,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
         };
 
         $scope.showSensor = function() {
-            var sensorId = $scope.selected;
+            var sensorId = $scope.selected.id;
             $modal.open({
                 templateUrl: 'views/modalSensorView.html',
                 controller: 'SensorModalController',
@@ -772,8 +716,8 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
         };
     }]);
 
-cstlAdminApp.controller('SensorModalController', ['$scope', '$modalInstance', '$modal', '$cookies', 'sos', 'service', 'sensorId', '$growl',
-    function ($scope, $modalInstance, $modal, $cookies, sos, service, sensorId, $growl) {
+cstlAdminApp.controller('SensorModalController', ['$scope', '$modalInstance', '$modal', '$cookies', 'sos', 'service', 'sensorId', '$growl', '$http',
+    function ($scope, $modalInstance, $modal, $cookies, sos, service, sensorId, $growl, $http) {
         $scope.service = service;
         $scope.sensorId = sensorId;
         $scope.measures = undefined;
@@ -829,8 +773,76 @@ cstlAdminApp.controller('SensorModalController', ['$scope', '$modalInstance', '$
         }
 
         $scope.showGraph = function() {
-            $scope.val.displayGraph = true;
+            $scope.var.displayGraph = true;
+
+            var measuresChecked = getMeasuresChecked();
+
+            $http.post('@cstl/api/1/SOS/'+ $scope.service.identifier +'/observations;jsessionid=', {'sensorID': $scope.sensorId, 'observedProperty': measuresChecked})
+                .success(function(response){
+                    generateD3Graph(response, measuresChecked[0]);
+                });
         };
+
+        function generateD3Graph(csv, measure) {
+
+            var margin = {top: 10, right: 70, bottom: 30, left: 50},
+                width = $('.sos_edit_graph').width() - margin.left - margin.right,
+                height = $('.sos_edit_graph').height() - margin.top - margin.bottom;
+
+            var parseDate = d3.time.format("%Y-%m-%dT%H:%M:%S").parse;
+
+            var x = d3.time.scale().range([0, width]);
+            var y = d3.scale.linear().range([height, 0]);
+
+            var xAxis = d3.svg.axis().scale(x).orient("bottom");
+            var yAxis = d3.svg.axis().scale(y).orient("left");
+
+            var line = d3.svg.line()
+                .x(function(d) { return x(d.date); })
+                .y(function(d) { return y(d[measure]); });
+
+            var svg = d3.select("#graph").append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            var data = d3.csv.parse(csv);
+
+            // Hack to limit number of values
+            var originalLength = data.length;
+            if (originalLength > 10000) {
+                data.splice(10000, originalLength - 10000);
+            }
+
+            data.forEach(function(d) {
+                d.date = parseDate(d.date);
+                d[measure] = +d[measure];
+            });
+
+            x.domain(d3.extent(data, function(d) { return d.date; }));
+            y.domain(d3.extent(data, function(d) { return d[measure]; }));
+
+            svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis);
+
+            svg.append("g")
+                .attr("class", "y axis")
+                .call(yAxis)
+                .append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 6)
+                .attr("dy", ".71em")
+                .style("text-anchor", "end")
+                .text(measure);
+
+            svg.append("path")
+                .datum(data)
+                .attr("class", "line")
+                .attr("d", line);
+        }
 
         $scope.close = function() {
             $modalInstance.dismiss('close');
