@@ -413,12 +413,12 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                     fileName = fileName.substring(0, fileName.lastIndexOf("."));
                     fileExtension = justFile.substring(justFile.lastIndexOf(".")+1);
                 }
-                dataListing.importData({values: {'filePath': upFiles.file, 'metadataFilePath': upFiles.mdFile, dataType: $scope.type}}, function(response) {
+                dataListing.importData({values: {'filePath': upFiles.file, 'metadataFilePath': upFiles.mdFile, dataType: $scope.uploadType}}, function(response) {
 
                     var importedData = response.dataFile;
                     var importedMetaData = response.metadataFile;
 
-                    dataListing.findDataType({values: {'filePath':importedData, 'extension': fileExtension, dataType: $scope.type}}, function(selectedExtension) {
+                    dataListing.findDataType({values: {'filePath':importedData, 'extension': fileExtension, dataType: $scope.uploadType}}, function(selectedExtension) {
                         
                     
                         // Store the providerId for further calls
@@ -463,6 +463,25 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                                     displayNetCDF(fileName);
                                 }
                             });
+                        } else if ($scope.uploadType === "sensor" && fileExtension === "xml") {
+                            provider.create({
+                                id: fileName
+                            }, {
+                                type: "observation-store",
+                                subType: "observation-xml",
+                                parameters: {
+                                    path: importedData
+                                }
+                            }, function() {
+                                if (importedMetaData) {
+                                    dataListing.setUpMetadata({values: {'providerId': $scope.providerId, 'mdPath': importedMetaData}});
+                                }
+
+                                $growl('success','Success','Observation data '+ fileName +' successfully added');
+                                $modalInstance.close({type: "sensor", file: fileName, missing: $scope.metadata == null});
+                                
+                            });
+                            
                         } else if ($scope.uploadType === "sensor") {
                             provider.create({
                                 id: fileName

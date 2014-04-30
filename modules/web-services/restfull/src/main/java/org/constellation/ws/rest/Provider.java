@@ -68,7 +68,6 @@ import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.data.FeatureStoreFactory;
 import org.geotoolkit.data.FeatureStoreFinder;
 import org.geotoolkit.data.FileFeatureStoreFactory;
-import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.parameter.ParametersExt;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -270,9 +269,16 @@ public final class Provider {
                 switch (subType) {
                     case "observation-file":
                         
-                        final ParameterValueGroup xmlCovParams = sources.groups("choice").get(0).addGroup("ObservationFileParameters");
-                        xmlCovParams.parameter("identifier").setValue("observationFile");
-                        xmlCovParams.parameter("url").setValue(new File(inParams.get("path")));
+                        final ParameterValueGroup ncObsParams = sources.groups("choice").get(0).addGroup("ObservationFileParameters");
+                        ncObsParams.parameter("identifier").setValue("observationFile");
+                        ncObsParams.parameter("url").setValue(new File(inParams.get("path")));
+                        break;
+                    
+                    case "observation-xml":
+                        
+                        final ParameterValueGroup xmlObsParams = sources.groups("choice").get(0).addGroup("ObservationXmlFileParameters");
+                        xmlObsParams.parameter("identifier").setValue("observationXmlFile");
+                        xmlObsParams.parameter("url").setValue(new File(inParams.get("path")));
                         break;
                    
                     default:

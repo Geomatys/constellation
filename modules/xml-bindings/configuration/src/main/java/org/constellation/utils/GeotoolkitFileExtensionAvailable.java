@@ -47,6 +47,10 @@ public final class GeotoolkitFileExtensionAvailable extends Static {
                 extensions.put(extension.replace(".", "").toLowerCase(), "vector");
             }
         }
+        
+        // for O&M files
+        extensions.put("xml", "sensor");
+        
         return extensions;
     }
 
