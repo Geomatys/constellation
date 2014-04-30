@@ -516,9 +516,9 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                 encoding = getCsvTextEncoding("2.0.0");
                 // Add the header
                 final List<String> fieldNames = getFieldsForGetResult(fieldRequest, c);
-                values.append("date\t");
+                values.append("date,");
                 for (String pheno : fieldNames) {
-                    values.append(pheno).append('\t');
+                    values.append(pheno).append(',');
                 }
                 values.setCharAt(values.length() - 1, '\n');
             } else {
