@@ -32,6 +32,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import org.apache.sis.storage.DataStoreException;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.ObservationFilterReader;
 
@@ -238,6 +239,9 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                                           NO_APPLICABLE_CODE);
+        } catch (DataStoreException ex) {
+            throw new CstlServiceException("the service has throw a Datastore Exception:" + ex.getMessage(),
+                                          NO_APPLICABLE_CODE);
         }
     }
     
@@ -284,6 +288,9 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
+                                          NO_APPLICABLE_CODE);
+        } catch (DataStoreException ex) {
+            throw new CstlServiceException("the service has throw a Datastore Exception:" + ex.getMessage(),
                                           NO_APPLICABLE_CODE);
         }
     }
@@ -412,6 +419,9 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                                           NO_APPLICABLE_CODE);
+        } catch (DataStoreException ex) {
+            throw new CstlServiceException("the service has throw a Datastore Exception:" + ex.getMessage(),
+                                          NO_APPLICABLE_CODE);
         }
     }
     
@@ -487,6 +497,9 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
+                                          NO_APPLICABLE_CODE);
+        } catch (DataStoreException ex) {
+            throw new CstlServiceException("the service has throw a Datastore Exception:" + ex.getMessage(),
                                           NO_APPLICABLE_CODE);
         }
     }

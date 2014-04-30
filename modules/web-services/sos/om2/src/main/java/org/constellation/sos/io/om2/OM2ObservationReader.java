@@ -35,18 +35,17 @@ import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
+import org.apache.sis.storage.DataStoreException;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.constellation.sos.io.ObservationReader;
 import static org.constellation.sos.io.om2.OM2BaseReader.defaultCRS;
-
 import static org.constellation.sos.ws.SOSConstants.*;
-import org.constellation.ws.CstlServiceException;
+
 import org.geotoolkit.gml.JTStoGeometry;
 import org.geotoolkit.gml.xml.AbstractGeometry;
 import org.geotoolkit.gml.xml.FeatureProperty;
+import org.geotoolkit.observation.ObservationReader;
 import org.geotoolkit.observation.xml.OMXmlFactory;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.sos.xml.ResponseModeType;
@@ -90,17 +89,17 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      *
      * @param configuration
      * @param properties
-     * @throws org.constellation.ws.CstlServiceException
+     * @throws org.apache.sis.storage.DataStoreException
      */
-    public OM2ObservationReader(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
+    public OM2ObservationReader(final Automatic configuration, final Map<String, Object> properties) throws DataStoreException {
         super(properties);
         if (configuration == null) {
-            throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
+            throw new DataStoreException("The configuration object is null");
         }
         // we get the database informations
         final BDD db = configuration.getBdd();
         if (db == null) {
-            throw new CstlServiceException("The configuration file does not contains a BDD object (DefaultObservationReader)", NO_APPLICABLE_CODE);
+            throw new DataStoreException("The configuration file does not contains a BDD object (DefaultObservationReader)");
         }
         isPostgres = db.getClassName() != null && db.getClassName().equals("org.postgresql.Driver");
         try {
@@ -109,7 +108,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
             final Connection c = this.source.getConnection();
             c.close();
         } catch (SQLException ex) {
-            throw new CstlServiceException(ex);
+            throw new DataStoreException(ex);
         }
         final String smlFormats100 = (String) properties.get("smlFormats100");
         if (smlFormats100 != null) {
@@ -132,7 +131,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      * {@inheritDoc}
      */
     @Override
-    public List<String> getOfferingNames(final String version) throws CstlServiceException {
+    public List<String> getOfferingNames(final String version) throws DataStoreException {
         try {
             final Connection c         = source.getConnection();
             final Statement stmt       = c.createStatement();
@@ -146,7 +145,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
             c.close();
             return results;
         } catch (SQLException ex) {
-            throw new CstlServiceException("Error while retrieving offering names.", ex, NO_APPLICABLE_CODE);
+            throw new DataStoreException("Error while retrieving offering names.", ex);
         }
     }
 
@@ -154,7 +153,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      * {@inheritDoc}
      */
     @Override
-    public List<ObservationOffering> getObservationOfferings(final List<String> offeringNames, final String version) throws CstlServiceException {
+    public List<ObservationOffering> getObservationOfferings(final List<String> offeringNames, final String version) throws DataStoreException {
         final List<ObservationOffering> offerings = new ArrayList<>();
         for (String offeringName : offeringNames) {
             offerings.add(getObservationOffering(offeringName, version));
@@ -166,7 +165,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      * {@inheritDoc}
      */
     @Override
-    public ObservationOffering getObservationOffering(final String offeringName, final String version) throws CstlServiceException {
+    public ObservationOffering getObservationOffering(final String offeringName, final String version) throws DataStoreException {
         try {
             final Connection c           = source.getConnection();
             final String id;
@@ -249,7 +248,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
                                  procedureDescription);
             
         } catch (SQLException e) {
-            throw new CstlServiceException("Error while retrieving offering names.", e, NO_APPLICABLE_CODE);
+            throw new DataStoreException("Error while retrieving offering names.", e);
         }
     }
     
@@ -257,7 +256,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      * {@inheritDoc}
      */
     @Override
-    public List<ObservationOffering> getObservationOfferings(final String version) throws CstlServiceException {
+    public List<ObservationOffering> getObservationOfferings(final String version) throws DataStoreException {
         final List<String> offeringNames    = getOfferingNames(version);
         final List<ObservationOffering> loo = new ArrayList<>();
         for (String offeringName : offeringNames) {
@@ -270,7 +269,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      * {@inheritDoc}
      */
     @Override
-    public List<String> getProcedureNames() throws CstlServiceException {
+    public List<String> getProcedureNames() throws DataStoreException {
         try {
             final Connection c         = source.getConnection();
             final Statement stmt       = c.createStatement();
@@ -284,7 +283,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
             c.close();
             return results;
         } catch (SQLException ex) {
-            throw new CstlServiceException("Error while retrieving procedure names.", ex, NO_APPLICABLE_CODE);
+            throw new DataStoreException("Error while retrieving procedure names.", ex);
         }
     }
 
@@ -292,7 +291,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      * {@inheritDoc}
      */
     @Override
-    public List<String> getPhenomenonNames() throws CstlServiceException {
+    public List<String> getPhenomenonNames() throws DataStoreException {
         try {
             final Connection c         = source.getConnection();
             final Statement stmt       = c.createStatement();
@@ -306,7 +305,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
             c.close();
             return results;
         } catch (SQLException ex) {
-            throw new CstlServiceException("Error while retrieving phenomenon names.", ex, NO_APPLICABLE_CODE);
+            throw new DataStoreException("Error while retrieving phenomenon names.", ex);
         }
     }
     
@@ -314,7 +313,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      * {@inheritDoc}
      */
     @Override
-    public Collection<String> getProceduresForPhenomenon(final String observedProperty) throws CstlServiceException {
+    public Collection<String> getProceduresForPhenomenon(final String observedProperty) throws DataStoreException {
         try {
             final Connection c           = source.getConnection();
             final List<String> results   = new ArrayList<>();
@@ -332,7 +331,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
             c.close();
             return results;
         } catch (SQLException ex) {
-            throw new CstlServiceException("Error while retrieving procedure names.", ex, NO_APPLICABLE_CODE);
+            throw new DataStoreException("Error while retrieving procedure names.", ex);
         }
     }
     
@@ -340,7 +339,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      * {@inheritDoc}
      */
     @Override
-    public Collection<String> getPhenomenonsForProcedure(final String sensorID) throws CstlServiceException {
+    public Collection<String> getPhenomenonsForProcedure(final String sensorID) throws DataStoreException {
         try {
             final Connection c           = source.getConnection();
             final List<String> results   = new ArrayList<>();
@@ -358,7 +357,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
             c.close();
             return results;
         } catch (SQLException ex) {
-            throw new CstlServiceException("Error while retrieving procedure names.", ex, NO_APPLICABLE_CODE);
+            throw new DataStoreException("Error while retrieving procedure names.", ex);
         }
     }
 
@@ -366,7 +365,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      * {@inheritDoc}
      */
     @Override
-    public boolean existPhenomenon(final String phenomenonName) throws CstlServiceException {
+    public boolean existPhenomenon(final String phenomenonName) throws DataStoreException {
         return getPhenomenonNames().contains(phenomenonName);
     }
 
@@ -374,7 +373,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      * {@inheritDoc}
      */
     @Override
-    public List<String> getFeatureOfInterestNames() throws CstlServiceException {
+    public List<String> getFeatureOfInterestNames() throws DataStoreException {
         try {
             final Connection c         = source.getConnection();
             final Statement stmt       = c.createStatement();
@@ -388,7 +387,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
             c.close();
             return results;
         } catch (SQLException ex) {
-            throw new CstlServiceException("Error while retrieving phenomenon names.", ex, NO_APPLICABLE_CODE);
+            throw new DataStoreException("Error while retrieving phenomenon names.", ex);
         }
     }
 
@@ -396,7 +395,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      * {@inheritDoc}
      */
     @Override
-    public SamplingFeature getFeatureOfInterest(final String samplingFeatureName, final String version) throws CstlServiceException {
+    public SamplingFeature getFeatureOfInterest(final String samplingFeatureName, final String version) throws DataStoreException {
         try {
             final Connection c = source.getConnection();
             c.setReadOnly(true);
@@ -406,12 +405,12 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
                 c.close();
             }
         } catch (SQLException ex) {
-            throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
+            throw new DataStoreException(ex.getMessage(), ex);
         }
     }
 
     @Override
-    public AbstractGeometry getSensorLocation(final String sensorID, final String version) throws CstlServiceException {
+    public AbstractGeometry getSensorLocation(final String sensorID, final String version) throws DataStoreException {
         try {
             final Connection c = source.getConnection();
             c.setReadOnly(true);
@@ -448,7 +447,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
             final String gmlVersion = getGMLVersion(version);
             return JTStoGeometry.toGML(gmlVersion, geom, crs);
         } catch (SQLException | FactoryException  | ParseException ex) {
-            throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
+            throw new DataStoreException(ex.getMessage(), ex);
         }
     }
     
@@ -456,7 +455,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      * {@inheritDoc}
      */
     @Override
-    public Observation getObservation(String identifier, final QName resultModel, final ResponseModeType mode, final String version) throws CstlServiceException {
+    public Observation getObservation(String identifier, final QName resultModel, final ResponseModeType mode, final String version) throws DataStoreException {
         try {
             final Connection c         = source.getConnection();
             c.setReadOnly(true);
@@ -538,7 +537,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
             }
             
         } catch (SQLException ex) {
-            throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
+            throw new DataStoreException(ex.getMessage(), ex);
         }
     }
     
@@ -546,7 +545,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      * {@inheritDoc}
      */
     @Override
-    public Object getResult(final String identifier, final QName resultModel, final String version) throws CstlServiceException {
+    public Object getResult(final String identifier, final QName resultModel, final String version) throws DataStoreException {
         try {
             final Connection c = source.getConnection();
             c.setReadOnly(true);
@@ -556,11 +555,11 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
                 c.close();
             }
         } catch (SQLException ex) {
-            throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
+            throw new DataStoreException(ex.getMessage(), ex);
         }
     }
     
-    private Object getResult(final String identifier, final QName resultModel, final String version, final Connection c) throws CstlServiceException, SQLException {
+    private Object getResult(final String identifier, final QName resultModel, final String version, final Connection c) throws DataStoreException, SQLException {
         if (resultModel.equals(MEASUREMENT_QNAME)) {
             return buildMeasureResult(identifier, version, c);
         } else {
@@ -568,7 +567,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
         }
     }
     
-    private DataArrayProperty buildComplexResult(final String identifier, final String version, final Connection c) throws CstlServiceException, SQLException {
+    private DataArrayProperty buildComplexResult(final String identifier, final String version, final Connection c) throws DataStoreException, SQLException {
         final List<String> value      = new ArrayList<>();
         final List<String> uom        = new ArrayList<>();
         final List<String> fieldType  = new ArrayList<>();
@@ -641,7 +640,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
         return buildDataArrayProperty(version, arrayID, nbValue, arrayID, record, encoding, values.toString());
     }
     
-    private Object buildMeasureResult(final String identifier, final String version, final Connection c) throws CstlServiceException, SQLException {
+    private Object buildMeasureResult(final String identifier, final String version, final Connection c) throws DataStoreException, SQLException {
         final double value;
         final String uom;
         final String name;
@@ -659,7 +658,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
                 return null;
             }
         } catch (NumberFormatException ex) {
-            throw new CstlServiceException("Unable ta parse the result value as a double");
+            throw new DataStoreException("Unable ta parse the result value as a double");
         } finally {
             c.close();
         }
@@ -670,7 +669,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      * {@inheritDoc}
      */
     @Override
-    public boolean existProcedure(final String href) throws CstlServiceException {
+    public boolean existProcedure(final String href) throws DataStoreException {
         return getProcedureNames().contains(href);
     }
 
@@ -686,7 +685,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      * {@inheritDoc}
      */
     @Override
-    public String getNewObservationId() throws CstlServiceException {
+    public String getNewObservationId() throws DataStoreException {
         try {
             final Connection c         = source.getConnection();
             final Statement stmt       = c.createStatement();
@@ -702,7 +701,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
             c.close();
             return observationIdBase + resultNum;
         } catch (SQLException ex) {
-            throw new CstlServiceException("Error while looking for available observation id.", ex, NO_APPLICABLE_CODE);
+            throw new DataStoreException("Error while looking for available observation id.", ex);
         }
     }
 
@@ -710,7 +709,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      * {@inheritDoc}
      */
     @Override
-    public TemporalPrimitive getFeatureOfInterestTime(final String samplingFeatureName, final String version) throws CstlServiceException {
+    public TemporalPrimitive getFeatureOfInterestTime(final String samplingFeatureName, final String version) throws DataStoreException {
         try {
             final Connection c           = source.getConnection();
             final PreparedStatement stmt = c.prepareStatement("SELECT max(\"time_begin\"), min(\"time_end\") "
@@ -736,7 +735,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
             c.close();
             return time;
         } catch (SQLException ex) {
-            throw new CstlServiceException("Error while retrieving phenomenon names.", ex, NO_APPLICABLE_CODE);
+            throw new DataStoreException("Error while retrieving phenomenon names.", ex);
         }
     }
 
@@ -744,7 +743,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      * {@inheritDoc}
      */
     @Override
-    public List<String> getEventTime() throws CstlServiceException {
+    public List<String> getEventTime() throws DataStoreException {
         try {
             final Connection c         = source.getConnection();
             final Statement stmt       = c.createStatement();
@@ -765,7 +764,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
             c.close();
             return results;
         } catch (SQLException ex) {
-            throw new CstlServiceException("Error while retrieving phenomenon names.", ex, NO_APPLICABLE_CODE);
+            throw new DataStoreException("Error while retrieving phenomenon names.", ex);
         }
     }
 
@@ -781,7 +780,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      * {@inheritDoc}
      */
     @Override
-    public List<ResponseModeType> getResponseModes() throws CstlServiceException {
+    public List<ResponseModeType> getResponseModes() throws DataStoreException {
         return Arrays.asList(ResponseModeType.INLINE, ResponseModeType.RESULT_TEMPLATE);
     }
 
@@ -789,7 +788,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
      * {@inheritDoc}
      */
     @Override
-    public List<String> getResponseFormats() throws CstlServiceException {
+    public List<String> getResponseFormats() throws DataStoreException {
         return Arrays.asList(RESPONSE_FORMAT_V100, RESPONSE_FORMAT_V200);
     }
 }

@@ -18,13 +18,14 @@
 package org.constellation.sos.factory;
 
 import java.util.Map;
+import org.apache.sis.storage.DataStoreException;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.postgrid.DefaultObservationFilter;
 import org.constellation.sos.io.postgrid.DefaultObservationReader;
 import org.constellation.sos.io.postgrid.DefaultObservationWriter;
 import org.constellation.sos.io.ObservationFilter;
-import org.constellation.sos.io.ObservationReader;
+import org.geotoolkit.observation.ObservationReader;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.ws.CstlServiceException;
 
@@ -69,7 +70,7 @@ public class PostgridSOSFactory implements OMFactory {
      * {@inheritDoc}
      */
     @Override
-    public ObservationReader getObservationReader(DataSourceType type, Automatic configuration, Map<String, Object> properties) throws CstlServiceException {
+    public ObservationReader getObservationReader(DataSourceType type, Automatic configuration, Map<String, Object> properties) throws DataStoreException {
         return new DefaultObservationReader(configuration, properties);
     }
 

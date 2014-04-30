@@ -30,6 +30,7 @@ import javax.imageio.spi.ServiceRegistry;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
+import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.MonolineFormatter;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef;
@@ -47,7 +48,7 @@ import org.constellation.sos.factory.OMFactory;
 import org.constellation.sos.factory.SMLFactory;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationFilterReader;
-import org.constellation.sos.io.ObservationReader;
+import org.geotoolkit.observation.ObservationReader;
 import org.constellation.sos.io.ObservationResult;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.sos.io.SensorReader;
@@ -451,7 +452,7 @@ public class SOSworker extends AbstractWorker {
             startError("Unable to find a SOS Factory." + ex.getMessage(), ex);
         } catch (MetadataIoException ex) {
             startError("MetadataIOException while initializing the sensor reader/writer:\n" + ex.getMessage(), ex);
-        } catch (CstlServiceException ex) {
+        } catch (CstlServiceException | DataStoreException ex) {
             startError(ex.getMessage(), ex);
         } catch (FileNotFoundException ex) {
             startError("The configuration file can't be found.", null);
@@ -655,123 +656,128 @@ public class SOSworker extends AbstractWorker {
         }
         //we update the URL
         om.updateURL(getServiceUrl());
-
-        if (!keepCapabilities) {
-
-            //we update the parameter in operation metadata.
-            final AbstractOperation go = om.getOperation("GetObservation");
-
-            final Collection<String> foiNames;
-            final Collection<String> procNames;
-            final Collection<String> phenNames;
-            final Collection<String> offNames;
-            final List<String> eventTime;
-            final List<String> queryableResultProperties;
-            if (omReader != null) {
-                foiNames  = omReader.getFeatureOfInterestNames();
-                procNames = omReader.getProcedureNames();
-                phenNames = omReader.getPhenomenonNames();
-                offNames  = omReader.getOfferingNames(currentVersion);
-                eventTime = omReader.getEventTime();
-            } else {
-                foiNames  = new ArrayList<>();
-                procNames = new ArrayList<>();
-                phenNames = new ArrayList<>();
-                offNames  = new ArrayList<>();
-                eventTime = new ArrayList<>();
-            }
-            if (omFilter != null) {
-                queryableResultProperties = omFilter.supportedQueryableResultProperties();
-            } else {
-                queryableResultProperties = new ArrayList<>();
-            }
-            
-            // the list of offering names
-            go.updateParameter(OFFERING, offNames);
-
-            // the event time range
-            if (eventTime != null && eventTime.size() == 1) {
-                final Range range = buildRange(currentVersion, eventTime.get(0), "now");
-                go.updateParameter(EVENT_TIME, range);
-            } else if (eventTime != null && eventTime.size() == 2) {
-                final Range range = buildRange(currentVersion, eventTime.get(0), eventTime.get(1));
-                go.updateParameter(EVENT_TIME, range);
-            }
-
-            //the process list
-            go.updateParameter(PROCEDURE, procNames);
-
-            //the phenomenon list
-            go.updateParameter("observedProperty", phenNames);
-
-            //the feature of interest list
-            go.updateParameter("featureOfInterest", foiNames);
-            
-            // the different responseMode available
-            final List<String> arm = new ArrayList<>();
-            for (ResponseModeType rm: acceptedResponseMode) {
-                arm.add(rm.value());
-            }
-            go.updateParameter(RESPONSE_MODE, arm);
-
-            // the different responseFormat available
-            go.updateParameter("responseFormat", acceptedResponseFormat);
-
-            // the result filtrable part
-            if (!queryableResultProperties.isEmpty()) {
-                go.updateParameter("result", queryableResultProperties);
-            }
-
-            /**
-             * Because sometimes there is some sensor that are queryable in DescribeSensor but not in GetObservation
-             */
-            final AbstractOperation ds = om.getOperation("DescribeSensor");
-            if (smlReader != null) {
-                final List<String> sensorNames = new ArrayList<>(smlReader.getSensorNames());
-                Collections.sort(sensorNames);
-                ds.updateParameter(PROCEDURE, sensorNames);
-            } else {
-                ds.updateParameter(PROCEDURE, procNames);
-            }
-            
-            final List<String> smlformats = acceptedSensorMLFormats.get(currentVersion);
-            if (smlformats != null) {
-                ds.updateParameter("outputFormat", smlformats);
-            }
-
-            final AbstractOperation gfoi = om.getOperation("GetFeatureOfInterest");
-            if (gfoi != null) {
-                //the feature of interest list
-                gfoi.updateParameter("featureOfInterestId", foiNames);
-            }
-
-            final AbstractOperation gfoit = om.getOperation("GetFeatureOfInterestTime");
-            if (gfoit != null) {
-                //the feature of interest list
-                gfoit.updateParameter("featureOfInterestId", foiNames);
-            }
-        }
-
-        final Contents cont;
-        if (keepCapabilities) {
-            cont = loadedCapabilities.getContents();
-        } else {
-            // we add the list of observation offerings
-            final List<ObservationOffering> offerings;
-            if (omReader != null) {
-                offerings = omReader.getObservationOfferings(currentVersion);
-            } else {
-                offerings = new ArrayList<>();
-            }
-            cont = buildContents(currentVersion, offerings);
-        }
         
-        // we build and normalize the document
-        final Capabilities temp = buildCapabilities(currentVersion, si, sp, om, getCurrentUpdateSequence(), fc, cont, Arrays.asList((Object)INSERTION_CAPABILITIES));
-        final Capabilities c    = normalizeDocument(temp);
+        final Capabilities c;
+        try {
+            if (!keepCapabilities) {
 
-        LOGGER.log(logLevel, "getCapabilities processed in {0} ms.\n", (System.currentTimeMillis() - start));
-        putCapabilitiesInCache(currentVersion, null, c);
+                //we update the parameter in operation metadata.
+                final AbstractOperation go = om.getOperation("GetObservation");
+
+                final Collection<String> foiNames;
+                final Collection<String> procNames;
+                final Collection<String> phenNames;
+                final Collection<String> offNames;
+                final List<String> eventTime;
+                final List<String> queryableResultProperties;
+                if (omReader != null) {
+                    foiNames  = omReader.getFeatureOfInterestNames();
+                    procNames = omReader.getProcedureNames();
+                    phenNames = omReader.getPhenomenonNames();
+                    offNames  = omReader.getOfferingNames(currentVersion);
+                    eventTime = omReader.getEventTime();
+                } else {
+                    foiNames  = new ArrayList<>();
+                    procNames = new ArrayList<>();
+                    phenNames = new ArrayList<>();
+                    offNames  = new ArrayList<>();
+                    eventTime = new ArrayList<>();
+                }
+                if (omFilter != null) {
+                    queryableResultProperties = omFilter.supportedQueryableResultProperties();
+                } else {
+                    queryableResultProperties = new ArrayList<>();
+                }
+
+                // the list of offering names
+                go.updateParameter(OFFERING, offNames);
+
+                // the event time range
+                if (eventTime != null && eventTime.size() == 1) {
+                    final Range range = buildRange(currentVersion, eventTime.get(0), "now");
+                    go.updateParameter(EVENT_TIME, range);
+                } else if (eventTime != null && eventTime.size() == 2) {
+                    final Range range = buildRange(currentVersion, eventTime.get(0), eventTime.get(1));
+                    go.updateParameter(EVENT_TIME, range);
+                }
+
+                //the process list
+                go.updateParameter(PROCEDURE, procNames);
+
+                //the phenomenon list
+                go.updateParameter("observedProperty", phenNames);
+
+                //the feature of interest list
+                go.updateParameter("featureOfInterest", foiNames);
+
+                // the different responseMode available
+                final List<String> arm = new ArrayList<>();
+                for (ResponseModeType rm: acceptedResponseMode) {
+                    arm.add(rm.value());
+                }
+                go.updateParameter(RESPONSE_MODE, arm);
+
+                // the different responseFormat available
+                go.updateParameter("responseFormat", acceptedResponseFormat);
+
+                // the result filtrable part
+                if (!queryableResultProperties.isEmpty()) {
+                    go.updateParameter("result", queryableResultProperties);
+                }
+
+                /**
+                 * Because sometimes there is some sensor that are queryable in DescribeSensor but not in GetObservation
+                 */
+                final AbstractOperation ds = om.getOperation("DescribeSensor");
+                if (smlReader != null) {
+                    final List<String> sensorNames = new ArrayList<>(smlReader.getSensorNames());
+                    Collections.sort(sensorNames);
+                    ds.updateParameter(PROCEDURE, sensorNames);
+                } else {
+                    ds.updateParameter(PROCEDURE, procNames);
+                }
+
+                final List<String> smlformats = acceptedSensorMLFormats.get(currentVersion);
+                if (smlformats != null) {
+                    ds.updateParameter("outputFormat", smlformats);
+                }
+
+                final AbstractOperation gfoi = om.getOperation("GetFeatureOfInterest");
+                if (gfoi != null) {
+                    //the feature of interest list
+                    gfoi.updateParameter("featureOfInterestId", foiNames);
+                }
+
+                final AbstractOperation gfoit = om.getOperation("GetFeatureOfInterestTime");
+                if (gfoit != null) {
+                    //the feature of interest list
+                    gfoit.updateParameter("featureOfInterestId", foiNames);
+                }
+            }
+
+            final Contents cont;
+            if (keepCapabilities) {
+                cont = loadedCapabilities.getContents();
+            } else {
+                // we add the list of observation offerings
+                final List<ObservationOffering> offerings;
+                if (omReader != null) {
+                    offerings = omReader.getObservationOfferings(currentVersion);
+                } else {
+                    offerings = new ArrayList<>();
+                }
+                cont = buildContents(currentVersion, offerings);
+            }
+
+            // we build and normalize the document
+            final Capabilities temp = buildCapabilities(currentVersion, si, sp, om, getCurrentUpdateSequence(), fc, cont, Arrays.asList((Object)INSERTION_CAPABILITIES));
+            c    = normalizeDocument(temp);
+
+            LOGGER.log(logLevel, "getCapabilities processed in {0} ms.\n", (System.currentTimeMillis() - start));
+            putCapabilitiesInCache(currentVersion, null, c);
+        } catch (DataStoreException ex) {
+            throw new CstlServiceException(ex);
+        }
         return (Capabilities) c.applySections(sections);
     }
 
@@ -863,17 +869,21 @@ public class SOSworker extends AbstractWorker {
         final String currentVersion = request.getVersion().toString();
      
         final List<Observation> observation = new ArrayList<>();
-        for (String oid : request.getObservation()) {
-            if (oid.isEmpty()) {
-                final String locator;
-                if (currentVersion.equals("2.0.0")) {
-                    locator = "observation";
-                } else {
-                    locator = "observationId";
+        try {
+            for (String oid : request.getObservation()) {
+                if (oid.isEmpty()) {
+                    final String locator;
+                    if (currentVersion.equals("2.0.0")) {
+                        locator = "observation";
+                    } else {
+                        locator = "observationId";
+                    }
+                    throw new CstlServiceException("Empty observation id", MISSING_PARAMETER_VALUE, locator);
                 }
-                throw new CstlServiceException("Empty observation id", MISSING_PARAMETER_VALUE, locator);
+                observation.add(omReader.getObservation(oid, OBSERVATION_QNAME, INLINE, currentVersion));
             }
-            observation.add(omReader.getObservation(oid, OBSERVATION_QNAME, INLINE, currentVersion));
+        } catch (DataStoreException ex) {
+            throw new CstlServiceException(ex);
         }
         final ObservationCollection response = buildGetObservationByIdResponse(currentVersion, "collection-1", null, observation);
         LOGGER.log(logLevel, "getObservationById processed in {0}ms.\n", (System.currentTimeMillis() - start));
@@ -970,369 +980,373 @@ public class SOSworker extends AbstractWorker {
                                            "Supported Values are:\n" + arm.toString(),
                                              OPERATION_NOT_SUPPORTED, RESPONSE_MODE);
         }
-
-        //we verify that there is an offering (mandatory in 1.0.0, optional in 2.0.0)
-        final List<ObservationOffering> offerings = new ArrayList<>();
-        final List<String> offeringNames = requestObservation.getOfferings();
-        if (currentVersion.equals("1.0.0") && (offeringNames == null || offeringNames.isEmpty())) {
-            throw new CstlServiceException("Offering must be specify!", MISSING_PARAMETER_VALUE, OFFERING);
-        } else {
-            for (String offeringName : offeringNames) {
-                // CITE
-                if (offeringName.isEmpty()) {
-                    throw new CstlServiceException("This offering name is empty", MISSING_PARAMETER_VALUE, OFFERING);
-                }
-                final ObservationOffering offering = omReader.getObservationOffering(offeringName, currentVersion);
-                if (offering == null) {
-                    throw new CstlServiceException("This offering is not registered in the service", INVALID_PARAMETER_VALUE, OFFERING);
-                }
-                offerings.add(offering);
-            }
-        }
-        localOmFilter.setOfferings(offerings);
-
-        //we verify that the srsName (if there is one) is advertised in the offering
-        if (requestObservation.getSrsName() != null) {
-            for (ObservationOffering off : offerings) {
-                if (!off.getSrsName().contains(requestObservation.getSrsName())) {
-                    final StringBuilder availableSrs = new StringBuilder();
-                    for (String s : off.getSrsName()) {
-                        availableSrs.append(s).append('\n');
-                    }
-                    throw new CstlServiceException("This srs name is not advertised in the offering.\n" +
-                                                   "Available srs name are:\n" + availableSrs.toString(),
-                                                    INVALID_PARAMETER_VALUE, "srsName");
-                }
-            }
-        }
-
-        //we verify that the resultModel (if there is one) is advertised in the offering
-        if (requestObservation.getResultModel() != null) {
-            for (ObservationOffering off : offerings) {
-                if (!off.getResultModel().contains(requestObservation.getResultModel())) {
-                    final StringBuilder availableRM = new StringBuilder();
-                    for (QName s : off.getResultModel()) {
-                        availableRM.append(s).append('\n');
-                    }
-                    throw new CstlServiceException("This result model is not advertised in the offering:" + requestObservation.getResultModel() + '\n' +
-                                                   "Available result model for this offering are:", INVALID_PARAMETER_VALUE, "resultModel");
-                }
-            }
-        }
-
-        //we get the list of process
-        final List<String> procedures = requestObservation.getProcedure();
-        for (String procedure : procedures) {
-            if (procedure != null) {
-                LOGGER.log(logLevel, "process ID: {0}", procedure);
-                // CITE
-                if (procedure.isEmpty()) {
-                    throw new CstlServiceException(" the procedure parameter is empty", MISSING_PARAMETER_VALUE, PROCEDURE);
-                }
-                
-                if (!omReader.existProcedure(procedure)) {
-                    throw new CstlServiceException(" this process is not registred in the table", INVALID_PARAMETER_VALUE, PROCEDURE);
-                }
-                if (!offerings.isEmpty()) {
-                    boolean found = false;
-                    for (ObservationOffering off : offerings) {
-                        if (!found && off.getProcedures().contains(procedure)) {
-                            found = true;
-                        }
-                    }
-                    if (!found) {
-                        throw new CstlServiceException(" this process is not registred in the offerings", INVALID_PARAMETER_VALUE, PROCEDURE);
-                    }
-                }
-            } else {
-                //if there is only one proccess null we return error (we'll see)
-                if (procedures.size() == 1) {
-                    throw new CstlServiceException("the procedure is null", INVALID_PARAMETER_VALUE, PROCEDURE);
-                }
-            }
-        }
-        localOmFilter.setProcedure(procedures, offerings);
-
-        //we get the list of phenomenon
-        //TODO verifier que les pheno appartiennent a l'offering
-        final List<String> observedProperties = requestObservation.getObservedProperty();
-        if (observedProperties != null && !observedProperties.isEmpty()) {
-            final List<String> phenomenons    = new ArrayList<>();
-            for (String phenomenonName : observedProperties) {
-
-                if (!phenomenonName.equals(phenomenonIdBase + "ALL")) {
-
-                    if (!omReader.existPhenomenon(phenomenonName)) {
-                        throw new CstlServiceException(" this phenomenon " + phenomenonName + " is not registred in the database!",
-                                INVALID_PARAMETER_VALUE, "observedProperty");
-                    }
-                    phenomenons.add(phenomenonName);
-                }
-            }
-            if (!phenomenons.isEmpty()) {
-                localOmFilter.setObservedProperties(phenomenons);
-            }
-        } else if (currentVersion.equals("1.0.0")){
-            throw new CstlServiceException("You must specify at least One phenomenon", MISSING_PARAMETER_VALUE, "observedProperty");
-        }
-
-
-        //we treat the time restriction
-        final List<Filter> times = requestObservation.getTemporalFilter();
-        final TemporalGeometricPrimitive templateTime = treatEventTimeRequest(currentVersion, times, template, localOmFilter);
-
-        //we treat the restriction on the feature of interest
-
-        // if the request is a list of station
-        if (!requestObservation.getFeatureIds().isEmpty()) {
-
-            //verify that the station is registred in the DB.
-            final Collection<String> fois = omReader.getFeatureOfInterestNames();
-            for (final String samplingFeatureName : requestObservation.getFeatureIds()) {
-                if (!fois.contains(samplingFeatureName)) {
-                    throw new CstlServiceException("the feature of interest "+ samplingFeatureName + " is not registered",
-                                                     INVALID_PARAMETER_VALUE, "featureOfInterest");
-                }
-            }
-            localOmFilter.setFeatureOfInterest(requestObservation.getFeatureIds());
-        }
         
-        // if the request is a spatial operator
-        if (requestObservation.getSpatialFilter() != null) {
-            // for a BBOX Spatial ops
-            if (requestObservation.getSpatialFilter() instanceof BBOX) {
-                final Envelope e = getEnvelopeFromBBOX(currentVersion, (BBOX)requestObservation.getSpatialFilter());
+        final Object response;
+        try {
+            //we verify that there is an offering (mandatory in 1.0.0, optional in 2.0.0)
+            final List<ObservationOffering> offerings = new ArrayList<>();
+            final List<String> offeringNames = requestObservation.getOfferings();
+            if (currentVersion.equals("1.0.0") && (offeringNames == null || offeringNames.isEmpty())) {
+                throw new CstlServiceException("Offering must be specify!", MISSING_PARAMETER_VALUE, OFFERING);
+            } else {
+                for (String offeringName : offeringNames) {
+                    // CITE
+                    if (offeringName.isEmpty()) {
+                        throw new CstlServiceException("This offering name is empty", MISSING_PARAMETER_VALUE, OFFERING);
+                    }
+                    final ObservationOffering offering = omReader.getObservationOffering(offeringName, currentVersion);
+                    if (offering == null) {
+                        throw new CstlServiceException("This offering is not registered in the service", INVALID_PARAMETER_VALUE, OFFERING);
+                    }
+                    offerings.add(offering);
+                }
+            }
+            localOmFilter.setOfferings(offerings);
 
-                if (e != null && e.isCompleteEnvelope2D()) {
-                    boolean add = false;
-                    final List<String> matchingFeatureOfInterest = new ArrayList<>();
-                    if (localOmFilter.isBoundedObservation()) {
-                        localOmFilter.setBoundingBox(e);
-                    } else {
+            //we verify that the srsName (if there is one) is advertised in the offering
+            if (requestObservation.getSrsName() != null) {
+                for (ObservationOffering off : offerings) {
+                    if (!off.getSrsName().contains(requestObservation.getSrsName())) {
+                        final StringBuilder availableSrs = new StringBuilder();
+                        for (String s : off.getSrsName()) {
+                            availableSrs.append(s).append('\n');
+                        }
+                        throw new CstlServiceException("This srs name is not advertised in the offering.\n" +
+                                                       "Available srs name are:\n" + availableSrs.toString(),
+                                                        INVALID_PARAMETER_VALUE, "srsName");
+                    }
+                }
+            }
+
+            //we verify that the resultModel (if there is one) is advertised in the offering
+            if (requestObservation.getResultModel() != null) {
+                for (ObservationOffering off : offerings) {
+                    if (!off.getResultModel().contains(requestObservation.getResultModel())) {
+                        final StringBuilder availableRM = new StringBuilder();
+                        for (QName s : off.getResultModel()) {
+                            availableRM.append(s).append('\n');
+                        }
+                        throw new CstlServiceException("This result model is not advertised in the offering:" + requestObservation.getResultModel() + '\n' +
+                                                       "Available result model for this offering are:", INVALID_PARAMETER_VALUE, "resultModel");
+                    }
+                }
+            }
+
+            //we get the list of process
+            final List<String> procedures = requestObservation.getProcedure();
+            for (String procedure : procedures) {
+                if (procedure != null) {
+                    LOGGER.log(logLevel, "process ID: {0}", procedure);
+                    // CITE
+                    if (procedure.isEmpty()) {
+                        throw new CstlServiceException(" the procedure parameter is empty", MISSING_PARAMETER_VALUE, PROCEDURE);
+                    }
+
+                    if (!omReader.existProcedure(procedure)) {
+                        throw new CstlServiceException(" this process is not registred in the table", INVALID_PARAMETER_VALUE, PROCEDURE);
+                    }
+                    if (!offerings.isEmpty()) {
+                        boolean found = false;
                         for (ObservationOffering off : offerings) {
-                    
-                            for (String refStation : off.getFeatureOfInterestIds()) {
-                                // TODO for SOS 2.0 use observed area
-                                final org.geotoolkit.sampling.xml.SamplingFeature station = (org.geotoolkit.sampling.xml.SamplingFeature) omReader.getFeatureOfInterest(refStation, currentVersion);
-                                if (station == null) {
-                                    throw new CstlServiceException("the feature of interest is not registered",
-                                            INVALID_PARAMETER_VALUE);
-                                }
-                                if (station.getGeometry() instanceof Point) {
-                                    if (samplingPointMatchEnvelope((Point)station.getGeometry(), e)) {
-                                        matchingFeatureOfInterest.add(getIDFromObject(station));
-                                        add = true;
-                                    } else {
-                                        LOGGER.log(Level.FINER, " the feature of interest {0} is not in the BBOX", getIDFromObject(station));
-                                    }
-
-                                } else if (station instanceof AbstractFeature) {
-                                    final AbstractFeature sc = (AbstractFeature) station;
-                                    if (BoundMatchEnvelope(sc, e)) {
-                                        matchingFeatureOfInterest.add(sc.getId());
-                                        add = true;
-                                    }
-                                } else {
-                                    LOGGER.log(Level.WARNING, "unknow implementation:{0}", station.getClass().getName());
-                                }
+                            if (!found && off.getProcedures().contains(procedure)) {
+                                found = true;
                             }
                         }
-                        if (add) {
-                            localOmFilter.setFeatureOfInterest(matchingFeatureOfInterest);
-                        // if there is no matching FOI we must return an empty result
-                        } else {
-                            return buildObservationCollection(currentVersion, "urn:ogc:def:nil:OGC:inapplicable");
+                        if (!found) {
+                            throw new CstlServiceException(" this process is not registred in the offerings", INVALID_PARAMETER_VALUE, PROCEDURE);
                         }
+                    }
+                } else {
+                    //if there is only one proccess null we return error (we'll see)
+                    if (procedures.size() == 1) {
+                        throw new CstlServiceException("the procedure is null", INVALID_PARAMETER_VALUE, PROCEDURE);
+                    }
+                }
+            }
+            localOmFilter.setProcedure(procedures, offerings);
+
+            //we get the list of phenomenon
+            //TODO verifier que les pheno appartiennent a l'offering
+            final List<String> observedProperties = requestObservation.getObservedProperty();
+            if (observedProperties != null && !observedProperties.isEmpty()) {
+                final List<String> phenomenons    = new ArrayList<>();
+                for (String phenomenonName : observedProperties) {
+
+                    if (!phenomenonName.equals(phenomenonIdBase + "ALL")) {
+
+                        if (!omReader.existPhenomenon(phenomenonName)) {
+                            throw new CstlServiceException(" this phenomenon " + phenomenonName + " is not registred in the database!",
+                                    INVALID_PARAMETER_VALUE, "observedProperty");
+                        }
+                        phenomenons.add(phenomenonName);
+                    }
+                }
+                if (!phenomenons.isEmpty()) {
+                    localOmFilter.setObservedProperties(phenomenons);
+                }
+            } else if (currentVersion.equals("1.0.0")){
+                throw new CstlServiceException("You must specify at least One phenomenon", MISSING_PARAMETER_VALUE, "observedProperty");
+            }
+
+
+            //we treat the time restriction
+            final List<Filter> times = requestObservation.getTemporalFilter();
+            final TemporalGeometricPrimitive templateTime = treatEventTimeRequest(currentVersion, times, template, localOmFilter);
+
+            //we treat the restriction on the feature of interest
+
+            // if the request is a list of station
+            if (!requestObservation.getFeatureIds().isEmpty()) {
+
+                //verify that the station is registred in the DB.
+                final Collection<String> fois = omReader.getFeatureOfInterestNames();
+                for (final String samplingFeatureName : requestObservation.getFeatureIds()) {
+                    if (!fois.contains(samplingFeatureName)) {
+                        throw new CstlServiceException("the feature of interest "+ samplingFeatureName + " is not registered",
+                                                         INVALID_PARAMETER_VALUE, "featureOfInterest");
+                    }
+                }
+                localOmFilter.setFeatureOfInterest(requestObservation.getFeatureIds());
+            }
+
+            // if the request is a spatial operator
+            if (requestObservation.getSpatialFilter() != null) {
+                // for a BBOX Spatial ops
+                if (requestObservation.getSpatialFilter() instanceof BBOX) {
+                    final Envelope e = getEnvelopeFromBBOX(currentVersion, (BBOX)requestObservation.getSpatialFilter());
+
+                    if (e != null && e.isCompleteEnvelope2D()) {
+                        boolean add = false;
+                        final List<String> matchingFeatureOfInterest = new ArrayList<>();
+                        if (localOmFilter.isBoundedObservation()) {
+                            localOmFilter.setBoundingBox(e);
+                        } else {
+                            for (ObservationOffering off : offerings) {
+
+                                for (String refStation : off.getFeatureOfInterestIds()) {
+                                    // TODO for SOS 2.0 use observed area
+                                    final org.geotoolkit.sampling.xml.SamplingFeature station = (org.geotoolkit.sampling.xml.SamplingFeature) omReader.getFeatureOfInterest(refStation, currentVersion);
+                                    if (station == null) {
+                                        throw new CstlServiceException("the feature of interest is not registered",
+                                                INVALID_PARAMETER_VALUE);
+                                    }
+                                    if (station.getGeometry() instanceof Point) {
+                                        if (samplingPointMatchEnvelope((Point)station.getGeometry(), e)) {
+                                            matchingFeatureOfInterest.add(getIDFromObject(station));
+                                            add = true;
+                                        } else {
+                                            LOGGER.log(Level.FINER, " the feature of interest {0} is not in the BBOX", getIDFromObject(station));
+                                        }
+
+                                    } else if (station instanceof AbstractFeature) {
+                                        final AbstractFeature sc = (AbstractFeature) station;
+                                        if (BoundMatchEnvelope(sc, e)) {
+                                            matchingFeatureOfInterest.add(sc.getId());
+                                            add = true;
+                                        }
+                                    } else {
+                                        LOGGER.log(Level.WARNING, "unknow implementation:{0}", station.getClass().getName());
+                                    }
+                                }
+                            }
+                            if (add) {
+                                localOmFilter.setFeatureOfInterest(matchingFeatureOfInterest);
+                            // if there is no matching FOI we must return an empty result
+                            } else {
+                                return buildObservationCollection(currentVersion, "urn:ogc:def:nil:OGC:inapplicable");
+                            }
+                        }
+
+                    } else {
+                        throw new CstlServiceException("the envelope is not build correctly", INVALID_PARAMETER_VALUE);
+                    }
+                } else {
+                    throw new CstlServiceException(NOT_SUPPORTED, OPERATION_NOT_SUPPORTED);
+                }
+            }
+
+
+            //TODO we treat the restriction on the result
+            if (requestObservation.getComparisonFilter() != null) {
+
+                final Filter filter = requestObservation.getComparisonFilter();
+
+                //we treat the different operation
+                if (filter instanceof PropertyIsLessThan) {
+
+                    final Expression propertyName  = ((PropertyIsLessThan)filter).getExpression1();
+                    final Expression literal       = ((PropertyIsLessThan)filter).getExpression2();
+                    if (literal == null || propertyName == null) {
+                        throw new CstlServiceException(" to use the operation Less Than you must specify the propertyName and the litteral",
+                                                      MISSING_PARAMETER_VALUE, "lessThan");
+                    }
+
+
+                } else if (filter instanceof PropertyIsGreaterThan) {
+
+                    final Expression propertyName  = ((PropertyIsGreaterThan)filter).getExpression1();
+                    final Expression literal       = ((PropertyIsGreaterThan)filter).getExpression2();
+                    if (propertyName == null || literal == null) {
+                        throw new CstlServiceException(" to use the operation Greater Than you must specify the propertyName and the litteral",
+                                                     MISSING_PARAMETER_VALUE, "greaterThan");
+                    }
+
+                } else if (filter instanceof PropertyIsEqualTo) {
+
+                    final PropertyName propertyName  = (PropertyName)((PropertyIsEqualTo)filter).getExpression1();
+                    final Expression literal         = ((PropertyIsEqualTo)filter).getExpression2();
+                    if (propertyName == null || propertyName.getPropertyName() == null || propertyName.getPropertyName().isEmpty() || literal == null) {
+                         throw new CstlServiceException(" to use the operation Equal you must specify the propertyName and the litteral",
+                                                       INVALID_PARAMETER_VALUE, "propertyIsEqualTo"); // cite test
+                    }
+                    if (!localOmFilter.supportedQueryableResultProperties().isEmpty()) {
+                        localOmFilter.setResultEquals(propertyName.getPropertyName(), literal.toString());
+                    }
+
+                } else if (filter instanceof PropertyIsLike) {
+                    throw new CstlServiceException(NOT_SUPPORTED, OPERATION_NOT_SUPPORTED, "propertyIsLike");
+
+                } else if (filter instanceof PropertyIsBetween) {
+                    final PropertyIsBetween pib = (PropertyIsBetween) filter;
+                    if (pib.getExpression() == null) {
+                        throw new CstlServiceException("To use the operation Between you must specify the propertyName and the litteral",
+                                                      MISSING_PARAMETER_VALUE, "propertyIsBetween");
+                    }
+
+                    final String propertyName       = pib.getExpression().toString();
+                    final XMLLiteral lowerLiteral  = (XMLLiteral) pib.getLowerBoundary();
+                    final XMLLiteral upperLiteral  = (XMLLiteral) pib.getUpperBoundary();
+
+                    if (propertyName == null || propertyName.isEmpty() || lowerLiteral == null || upperLiteral == null) {
+                            throw new CstlServiceException("This property name, lower and upper literal must be specify",
+                                                          INVALID_PARAMETER_VALUE, "result");
                     }
 
                 } else {
-                    throw new CstlServiceException("the envelope is not build correctly", INVALID_PARAMETER_VALUE);
+                    throw new CstlServiceException(NOT_SUPPORTED,OPERATION_NOT_SUPPORTED);
                 }
-            } else {
-                throw new CstlServiceException(NOT_SUPPORTED, OPERATION_NOT_SUPPORTED);
             }
-        }
 
+            if (!outOfBand) {
 
-        //TODO we treat the restriction on the result
-        if (requestObservation.getComparisonFilter() != null) {
+                /*
+                 * here we can have 2 different behaviour :
+                 *
+                 * (1) - We have separate observation filter and reader :
+                 *        - The filter execute a request and return a list of identifiers.
+                 *        - The reader retrieve each observation from the list of identifiers
+                 *
+                 * (2) - We have mixed observation filter and reader :
+                 *        - The filterReader execute a request and return directly the observations
+                 *
+                 */
+                final List<Observation> matchingResult;
+                final Envelope computedBounds;
 
-            final Filter filter = requestObservation.getComparisonFilter();
-            
-            //we treat the different operation
-            if (filter instanceof PropertyIsLessThan) {
+                // case (1)
+                if (!(localOmFilter instanceof ObservationFilterReader)) {
+                    matchingResult = new ArrayList<>();
+                    final Set<String> observationIDs = localOmFilter.filterObservation();
+                    for (String observationID : observationIDs) {
+                        final Observation obs = OMXmlFactory.cloneObervation(currentVersion, omReader.getObservation(observationID, resultModel, mode, currentVersion));
 
-                final Expression propertyName  = ((PropertyIsLessThan)filter).getExpression1();
-                final Expression literal       = ((PropertyIsLessThan)filter).getExpression2();
-                if (literal == null || propertyName == null) {
-                    throw new CstlServiceException(" to use the operation Less Than you must specify the propertyName and the litteral",
-                                                  MISSING_PARAMETER_VALUE, "lessThan");
-                }
-
-
-            } else if (filter instanceof PropertyIsGreaterThan) {
-
-                final Expression propertyName  = ((PropertyIsGreaterThan)filter).getExpression1();
-                final Expression literal       = ((PropertyIsGreaterThan)filter).getExpression2();
-                if (propertyName == null || literal == null) {
-                    throw new CstlServiceException(" to use the operation Greater Than you must specify the propertyName and the litteral",
-                                                 MISSING_PARAMETER_VALUE, "greaterThan");
-                }
-
-            } else if (filter instanceof PropertyIsEqualTo) {
-
-                final PropertyName propertyName  = (PropertyName)((PropertyIsEqualTo)filter).getExpression1();
-                final Expression literal         = ((PropertyIsEqualTo)filter).getExpression2();
-                if (propertyName == null || propertyName.getPropertyName() == null || propertyName.getPropertyName().isEmpty() || literal == null) {
-                     throw new CstlServiceException(" to use the operation Equal you must specify the propertyName and the litteral",
-                                                   INVALID_PARAMETER_VALUE, "propertyIsEqualTo"); // cite test
-                }
-                if (!localOmFilter.supportedQueryableResultProperties().isEmpty()) {
-                    localOmFilter.setResultEquals(propertyName.getPropertyName(), literal.toString());
-                }
-
-            } else if (filter instanceof PropertyIsLike) {
-                throw new CstlServiceException(NOT_SUPPORTED, OPERATION_NOT_SUPPORTED, "propertyIsLike");
-
-            } else if (filter instanceof PropertyIsBetween) {
-                final PropertyIsBetween pib = (PropertyIsBetween) filter;
-                if (pib.getExpression() == null) {
-                    throw new CstlServiceException("To use the operation Between you must specify the propertyName and the litteral",
-                                                  MISSING_PARAMETER_VALUE, "propertyIsBetween");
-                }
-
-                final String propertyName       = pib.getExpression().toString();
-                final XMLLiteral lowerLiteral  = (XMLLiteral) pib.getLowerBoundary();
-                final XMLLiteral upperLiteral  = (XMLLiteral) pib.getUpperBoundary();
-
-                if (propertyName == null || propertyName.isEmpty() || lowerLiteral == null || upperLiteral == null) {
-                        throw new CstlServiceException("This property name, lower and upper literal must be specify",
-                                                      INVALID_PARAMETER_VALUE, "result");
-                }
-
-            } else {
-                throw new CstlServiceException(NOT_SUPPORTED,OPERATION_NOT_SUPPORTED);
-            }
-        }
-
-        Object response;
-        if (!outOfBand) {
-
-            /*
-             * here we can have 2 different behaviour :
-             *
-             * (1) - We have separate observation filter and reader :
-             *        - The filter execute a request and return a list of identifiers.
-             *        - The reader retrieve each observation from the list of identifiers
-             *
-             * (2) - We have mixed observation filter and reader :
-             *        - The filterReader execute a request and return directly the observations
-             *
-             */
-            final List<Observation> matchingResult;
-            final Envelope computedBounds;
-
-            // case (1)
-            if (!(localOmFilter instanceof ObservationFilterReader)) {
-                matchingResult = new ArrayList<>();
-                final Set<String> observationIDs = localOmFilter.filterObservation();
-                for (String observationID : observationIDs) {
-                    final Observation obs = OMXmlFactory.cloneObervation(currentVersion, omReader.getObservation(observationID, resultModel, mode, currentVersion));
-                    
-                    // parse result values to eliminate wrong results
-                    if (obs.getSamplingTime() instanceof Period) {
-                        final Timestamp tbegin;
-                        final Timestamp tend;
-                        final Period p = (Period)obs.getSamplingTime();
-                        if (p.getBeginning() != null && p.getBeginning().getPosition() != null && p.getBeginning().getPosition().getDate() != null) {
-                            tbegin = new Timestamp(p.getBeginning().getPosition().getDate().getTime());
-                        } else {
-                            tbegin = null;
+                        // parse result values to eliminate wrong results
+                        if (obs.getSamplingTime() instanceof Period) {
+                            final Timestamp tbegin;
+                            final Timestamp tend;
+                            final Period p = (Period)obs.getSamplingTime();
+                            if (p.getBeginning() != null && p.getBeginning().getPosition() != null && p.getBeginning().getPosition().getDate() != null) {
+                                tbegin = new Timestamp(p.getBeginning().getPosition().getDate().getTime());
+                            } else {
+                                tbegin = null;
+                            }
+                            if (p.getEnding() != null && p.getEnding().getPosition() != null && p.getEnding().getPosition().getDate() != null) {
+                                tend = new Timestamp(p.getEnding().getPosition().getDate().getTime());
+                            } else {
+                                tend = null;
+                            }
+                            if (obs.getResult() instanceof DataArrayProperty) {
+                                final DataArray array = ((DataArrayProperty)obs.getResult()).getDataArray();
+                                final Values result   = getResultValues(tbegin, tend, array, times);
+                                array.setValues(result.values.toString());
+                                array.setElementCount(result.nbBlock);
+                            }
                         }
-                        if (p.getEnding() != null && p.getEnding().getPosition() != null && p.getEnding().getPosition().getDate() != null) {
-                            tend = new Timestamp(p.getEnding().getPosition().getDate().getTime());
-                        } else {
-                            tend = null;
-                        }
-                        if (obs.getResult() instanceof DataArrayProperty) {
-                            final DataArray array = ((DataArrayProperty)obs.getResult()).getDataArray();
-                            final Values result   = getResultValues(tbegin, tend, array, times);
-                            array.setValues(result.values.toString());
-                            array.setElementCount(result.nbBlock);
-                        }
+                        matchingResult.add(obs);
                     }
-                    matchingResult.add(obs);
-                }
-                Collections.sort(matchingResult, new ObservationComparator());
-                computedBounds         = null;
+                    Collections.sort(matchingResult, new ObservationComparator());
+                    computedBounds         = null;
 
-            // case (2)
-            } else {
-                final ObservationFilterReader omFR = (ObservationFilterReader) localOmFilter;
-                if (template) {
-                    matchingResult = omFR.getObservationTemplates(currentVersion);
+                // case (2)
                 } else {
-                    matchingResult = omFR.getObservations(currentVersion);
-                }
-                if (omFR.computeCollectionBound()) {
-                    computedBounds = omFR.getCollectionBoundingShape();
-                } else {
-                    computedBounds = null;
-                }
-            }
-
-            final List<Observation> observations = new ArrayList<>();
-            for (Observation o : matchingResult) {
-                if (template) {
-
-                    final String temporaryTemplateId = o.getName() + '-' + getTemplateSuffix(o.getName());
-                    final AbstractObservation temporaryTemplate = ((AbstractObservation) o).getTemporaryTemplate(temporaryTemplateId, templateTime);
-                    
-                    // Remove the default templateTime
-                    if (!localOmFilter.isDefaultTemplateTime() && templateTime == null) {
-                        temporaryTemplate.emptySamplingTime();
+                    final ObservationFilterReader omFR = (ObservationFilterReader) localOmFilter;
+                    if (template) {
+                        matchingResult = omFR.getObservationTemplates(currentVersion);
+                    } else {
+                        matchingResult = omFR.getObservations(currentVersion);
                     }
-                    templates.put(temporaryTemplateId, temporaryTemplate);
-
-                    // we launch a timer which will destroy the template in one hours
-                    final Timer t = new Timer();
-                    //we get the date and time for now
-                    final Date d = new Date(System.currentTimeMillis() + templateValidTime);
-                    LOGGER.log(logLevel, "this template will be destroyed at:{0}", d.toString());
-                    t.schedule(new DestroyTemplateTask(temporaryTemplateId), d);
-                    schreduledTask.add(t);
-
-                    observations.add(temporaryTemplate);
-                } else {
-                    observations.add(o);
+                    if (omFR.computeCollectionBound()) {
+                        computedBounds = omFR.getCollectionBoundingShape();
+                    } else {
+                        computedBounds = null;
+                    }
                 }
-            }
 
-            // this is a little hack for cite test dummy srsName comparaison
-            String srsName = "urn:ogc:def:crs:EPSG::4326";
-            if ("EPSG:4326".equals(requestObservation.getSrsName())) {
-                srsName ="EPSG:4326";
-            }
-            final Envelope envelope;
-            if (computedBounds == null) {
-                envelope = getCollectionBound(currentVersion, observations, srsName);
+                final List<Observation> observations = new ArrayList<>();
+                for (Observation o : matchingResult) {
+                    if (template) {
+
+                        final String temporaryTemplateId = o.getName() + '-' + getTemplateSuffix(o.getName());
+                        final AbstractObservation temporaryTemplate = ((AbstractObservation) o).getTemporaryTemplate(temporaryTemplateId, templateTime);
+
+                        // Remove the default templateTime
+                        if (!localOmFilter.isDefaultTemplateTime() && templateTime == null) {
+                            temporaryTemplate.emptySamplingTime();
+                        }
+                        templates.put(temporaryTemplateId, temporaryTemplate);
+
+                        // we launch a timer which will destroy the template in one hours
+                        final Timer t = new Timer();
+                        //we get the date and time for now
+                        final Date d = new Date(System.currentTimeMillis() + templateValidTime);
+                        LOGGER.log(logLevel, "this template will be destroyed at:{0}", d.toString());
+                        t.schedule(new DestroyTemplateTask(temporaryTemplateId), d);
+                        schreduledTask.add(t);
+
+                        observations.add(temporaryTemplate);
+                    } else {
+                        observations.add(o);
+                    }
+                }
+
+                // this is a little hack for cite test dummy srsName comparaison
+                String srsName = "urn:ogc:def:crs:EPSG::4326";
+                if ("EPSG:4326".equals(requestObservation.getSrsName())) {
+                    srsName ="EPSG:4326";
+                }
+                final Envelope envelope;
+                if (computedBounds == null) {
+                    envelope = getCollectionBound(currentVersion, observations, srsName);
+                } else {
+                    LOGGER.log(Level.FINER, "Using computed bounds:{0}", computedBounds);
+                    envelope = computedBounds;
+                }
+                ObservationCollection ocResponse = buildGetObservationResponse(currentVersion, "collection-1", envelope, observations);
+                ocResponse = regroupObservation(currentVersion, envelope, ocResponse);
+                ocResponse = normalizeDocument(currentVersion, ocResponse);
+                response   = ocResponse;
             } else {
-                LOGGER.log(Level.FINER, "Using computed bounds:{0}", computedBounds);
-                envelope = computedBounds;
+                final Object sReponse;
+                if (localOmFilter instanceof ObservationFilterReader) {
+                    sReponse = ((ObservationFilterReader)localOmFilter).getOutOfBandResults();
+                } else {
+                    throw new CstlServiceException("Out of band response mode has been implemented only for ObservationFilterReader for now", NO_APPLICABLE_CODE, RESPONSE_MODE);
+                }
+                response = sReponse;
             }
-            ObservationCollection ocResponse = buildGetObservationResponse(currentVersion, "collection-1", envelope, observations);
-            ocResponse = regroupObservation(currentVersion, envelope, ocResponse);
-            ocResponse = normalizeDocument(currentVersion, ocResponse);
-            response   = ocResponse;
-        } else {
-            final Object sReponse;
-            if (localOmFilter instanceof ObservationFilterReader) {
-                sReponse = ((ObservationFilterReader)localOmFilter).getOutOfBandResults();
-            } else {
-                throw new CstlServiceException("Out of band response mode has been implemented only for ObservationFilterReader for now", NO_APPLICABLE_CODE, RESPONSE_MODE);
-            }
-            response = sReponse;
-        }
+        } catch (DataStoreException ex) {
+            throw new CstlServiceException(ex);
+        }    
         LOGGER.log(logLevel, "getObservation processed in {0}ms.\n", (System.currentTimeMillis() - start));
         return response;
     }
@@ -1362,126 +1376,130 @@ public class SOSworker extends AbstractWorker {
         final String observedProperty;
         final TemporalObject time;
         final QName resultModel;
-        if (observationTemplateID != null) {
-            final Observation template = templates.get(observationTemplateID);
-            if (template == null) {
-                throw new CstlServiceException("this template does not exist or is no longer usable",
-                                              INVALID_PARAMETER_VALUE, "ObservationTemplateId");
-            }
-            procedure        = ((Process) template.getProcedure()).getHref();
-            time             = template.getSamplingTime();
-            observedProperty = null;
-            if (template instanceof Measurement) {
-                resultModel = MEASUREMENT_QNAME;
+        final String values;
+        try {
+            if (observationTemplateID != null) {
+                final Observation template = templates.get(observationTemplateID);
+                if (template == null) {
+                    throw new CstlServiceException("this template does not exist or is no longer usable",
+                                                  INVALID_PARAMETER_VALUE, "ObservationTemplateId");
+                }
+                procedure        = ((Process) template.getProcedure()).getHref();
+                time             = template.getSamplingTime();
+                observedProperty = null;
+                if (template instanceof Measurement) {
+                    resultModel = MEASUREMENT_QNAME;
+                } else {
+                    resultModel = OBSERVATION_QNAME;
+                }
+            } else if (currentVersion.equals("1.0.0")){
+                throw new CstlServiceException("ObservationTemplateID must be specified", MISSING_PARAMETER_VALUE, "ObservationTemplateId");
             } else {
+                if (request.getOffering() == null || request.getOffering().isEmpty()) {
+                    throw new CstlServiceException("The offering parameter must be specified", MISSING_PARAMETER_VALUE, "offering");
+                } else {
+                    final ObservationOffering off = omReader.getObservationOffering(request.getOffering(), currentVersion);
+                    if (off== null) {
+                        throw new CstlServiceException("The offering parameter is invalid",
+                                                  INVALID_PARAMETER_VALUE, "offering");
+                    } 
+                    procedure = off.getProcedures().get(0);
+                }
+                if (request.getObservedProperty() == null || request.getObservedProperty().isEmpty()) {
+                    throw new CstlServiceException("The observedProperty parameter must be specified", MISSING_PARAMETER_VALUE, "observedProperty");
+                } else {
+                    if (!omReader.existPhenomenon(request.getObservedProperty())) {
+                        throw new CstlServiceException("The observedProperty parameter is invalid", INVALID_PARAMETER_VALUE, "observedProperty");
+                    } 
+                    observedProperty = request.getObservedProperty();
+                }
+                time = null;
                 resultModel = OBSERVATION_QNAME;
             }
-        } else if (currentVersion.equals("1.0.0")){
-            throw new CstlServiceException("ObservationTemplateID must be specified", MISSING_PARAMETER_VALUE, "ObservationTemplateId");
-        } else {
-            if (request.getOffering() == null || request.getOffering().isEmpty()) {
-                throw new CstlServiceException("The offering parameter must be specified", MISSING_PARAMETER_VALUE, "offering");
-            } else {
-                final ObservationOffering off = omReader.getObservationOffering(request.getOffering(), currentVersion);
-                if (off== null) {
-                    throw new CstlServiceException("The offering parameter is invalid",
-                                              INVALID_PARAMETER_VALUE, "offering");
-                } 
-                procedure = off.getProcedures().get(0);
+
+            //we begin to create the sql request
+            localOmFilter.initFilterGetResult(procedure, resultModel);
+
+            // phenomenon property
+            if (observedProperty !=  null) {
+                localOmFilter.setObservedProperties(Arrays.asList(observedProperty));
             }
-            if (request.getObservedProperty() == null || request.getObservedProperty().isEmpty()) {
-                throw new CstlServiceException("The observedProperty parameter must be specified", MISSING_PARAMETER_VALUE, "observedProperty");
-            } else {
-                if (!omReader.existPhenomenon(request.getObservedProperty())) {
-                    throw new CstlServiceException("The observedProperty parameter is invalid", INVALID_PARAMETER_VALUE, "observedProperty");
-                } 
-                observedProperty = request.getObservedProperty();
-            }
-            time = null;
-            resultModel = OBSERVATION_QNAME;
-        }
 
-        //we begin to create the sql request
-        localOmFilter.initFilterGetResult(procedure, resultModel);
+            //we treat the time constraint
+            final List<Filter> times = request.getTemporalFilter();
 
-        // phenomenon property
-        if (observedProperty !=  null) {
-            localOmFilter.setObservedProperties(Arrays.asList(observedProperty));
-        }
-        
-        //we treat the time constraint
-        final List<Filter> times = request.getTemporalFilter();
+            /**
+             * The template time :
+             */
 
-        /**
-         * The template time :
-         */
+            // case TEquals with time instant
+            if (time instanceof Instant) {
+               final TEquals equals  = buildTimeEquals(currentVersion, null, time);
+               times.add(equals);
 
-        // case TEquals with time instant
-        if (time instanceof Instant) {
-           final TEquals equals  = buildTimeEquals(currentVersion, null, time);
-           times.add(equals);
+            } else if (time instanceof Period) {
+                final Period tp = (Period) time;
 
-        } else if (time instanceof Period) {
-            final Period tp = (Period) time;
+                //case TBefore
+                if (TimeIndeterminateValueType.BEFORE.equals(((AbstractTimePosition)tp.getBeginning().getPosition()).getIndeterminatePosition())) {
+                    final Before before  = buildTimeBefore(currentVersion, null, tp.getEnding());
+                    times.add(before);
 
-            //case TBefore
-            if (TimeIndeterminateValueType.BEFORE.equals(((AbstractTimePosition)tp.getBeginning().getPosition()).getIndeterminatePosition())) {
-                final Before before  = buildTimeBefore(currentVersion, null, tp.getEnding());
-                times.add(before);
+                //case TAfter
+                } else if (TimeIndeterminateValueType.NOW.equals(((AbstractTimePosition)tp.getEnding().getPosition()).getIndeterminatePosition())) {
+                    final After after  = buildTimeAfter(currentVersion, null, tp.getBeginning());
+                    times.add(after);
 
-            //case TAfter
-            } else if (TimeIndeterminateValueType.NOW.equals(((AbstractTimePosition)tp.getEnding().getPosition()).getIndeterminatePosition())) {
-                final After after  = buildTimeAfter(currentVersion, null, tp.getBeginning());
-                times.add(after);
-
-            //case TDuring/TEquals  (here the sense of T_Equals with timePeriod is lost but not very usefull)
-            } else {
-                final During during  = buildTimeDuring(currentVersion, null, tp);
-                times.add(during);
-            }
-        }
-
-        //we treat the time constraint
-        treatEventTimeRequest(currentVersion, times, false, localOmFilter);
-
-        //we prepare the response document
-
-        String values;
-        if (localOmFilter instanceof ObservationFilterReader) {
-            values = ((ObservationFilterReader)localOmFilter).getResults();
-
-        } else {
-            final List<ObservationResult> results = localOmFilter.filterResult();
-            final StringBuilder datablock         = new StringBuilder();
-
-            for (ObservationResult result: results) {
-                final Timestamp tBegin = result.beginTime;
-                final Timestamp tEnd   = result.endTime;
-                final Object r         = omReader.getResult(result.resultID, resultModel, currentVersion);
-                if (r instanceof DataArray || r instanceof DataArrayProperty) {
-                    final DataArray array;
-                    if (r instanceof DataArrayProperty) {
-                        array = ((DataArrayProperty)r).getDataArray();
-                    } else {
-                        array = (DataArray)r;
-                    }
-                    if (array != null) {
-                        final Values resultValues = getResultValues(tBegin, tEnd, array, times);
-                        final String brutValues   = resultValues.values.toString();
-                        if (!brutValues.isEmpty()) {
-                            datablock.append(brutValues);
-                        }
-                    } else {
-                        throw new IllegalArgumentException("Array is null");
-                    }
-                } else if (r instanceof Measure) {
-                    final Measure meas = (Measure) r;
-                    datablock.append(tBegin).append(',').append(meas.getValue()).append("@@");
+                //case TDuring/TEquals  (here the sense of T_Equals with timePeriod is lost but not very usefull)
                 } else {
-                    throw new IllegalArgumentException("Unexpected result type:" + r);
+                    final During during  = buildTimeDuring(currentVersion, null, tp);
+                    times.add(during);
                 }
             }
-            values = datablock.toString();
+
+            //we treat the time constraint
+            treatEventTimeRequest(currentVersion, times, false, localOmFilter);
+
+            //we prepare the response document
+            if (localOmFilter instanceof ObservationFilterReader) {
+                values = ((ObservationFilterReader)localOmFilter).getResults();
+
+            } else {
+                final List<ObservationResult> results = localOmFilter.filterResult();
+                final StringBuilder datablock         = new StringBuilder();
+
+                for (ObservationResult result: results) {
+                    final Timestamp tBegin = result.beginTime;
+                    final Timestamp tEnd   = result.endTime;
+                    final Object r         = omReader.getResult(result.resultID, resultModel, currentVersion);
+                    if (r instanceof DataArray || r instanceof DataArrayProperty) {
+                        final DataArray array;
+                        if (r instanceof DataArrayProperty) {
+                            array = ((DataArrayProperty)r).getDataArray();
+                        } else {
+                            array = (DataArray)r;
+                        }
+                        if (array != null) {
+                            final Values resultValues = getResultValues(tBegin, tEnd, array, times);
+                            final String brutValues   = resultValues.values.toString();
+                            if (!brutValues.isEmpty()) {
+                                datablock.append(brutValues);
+                            }
+                        } else {
+                            throw new IllegalArgumentException("Array is null");
+                        }
+                    } else if (r instanceof Measure) {
+                        final Measure meas = (Measure) r;
+                        datablock.append(tBegin).append(',').append(meas.getValue()).append("@@");
+                    } else {
+                        throw new IllegalArgumentException("Unexpected result type:" + r);
+                    }
+                }
+                values = datablock.toString();
+            }
+        
+        } catch (DataStoreException ex) {
+            throw new CstlServiceException(ex);
         }
         final String url = getServiceUrl().substring(0, getServiceUrl().length() -1);
         final GetResultResponse response = buildGetResultResponse(currentVersion, values, url + '/' + observationTemplateID);
@@ -1508,139 +1526,150 @@ public class SOSworker extends AbstractWorker {
         if (request.getTemporalFilters().size() > 0) {
             throw new CstlServiceException("The time filter on feature Of Interest is not yet supported", OPERATION_NOT_SUPPORTED);
         }
-
-        boolean ofilter = false;
-        
-        if (request.getObservedProperty() != null && !request.getObservedProperty().isEmpty()) {
-            for (String observedProperty : request.getObservedProperty()) {
-                // CITE
-                if (observedProperty.isEmpty()) {
-                    throw new CstlServiceException("The observedProperty name is empty", MISSING_PARAMETER_VALUE, "observedProperty");
-                } else if (!omReader.existPhenomenon(observedProperty)){
-                    throw new CstlServiceException("This observedProperty is not registered", INVALID_PARAMETER_VALUE, "observedProperty");
-                }
-            }
-            localOmFilter.setObservedProperties(request.getObservedProperty());
-            ofilter = true;
-        }
-        
-        if (request.getProcedure() != null && !request.getProcedure().isEmpty()) {
-            for (String procedure : request.getProcedure()) {
-                // CITE
-                if (procedure.isEmpty()) {
-                    throw new CstlServiceException("The procedure name is empty", MISSING_PARAMETER_VALUE, PROCEDURE);
-                } else if (!omReader.existProcedure(procedure)){
-                    throw new CstlServiceException("This procedure is not registered", INVALID_PARAMETER_VALUE, PROCEDURE);
-                }
-            }
-            localOmFilter.setProcedure(request.getProcedure(), null);
-            ofilter = true;
-        }
-
-        boolean filter = false;
-        
         AbstractFeature result = null;
-        // we return a single result
-        final String locatorFID;
-        if (currentVersion.equals("2.0.0")) {
-            locatorFID = "featureOfInterest";
-        } else {
-            locatorFID = "featureOfInterestId";
-        }
-        if (request.getFeatureOfInterestId().size() == 1) {
-            // CITE
-            if (request.getFeatureOfInterestId().get(0).isEmpty()) {
-                throw new CstlServiceException("The foi name is empty", MISSING_PARAMETER_VALUE, locatorFID);
+        
+        try {
+            boolean ofilter = false;
+            if (request.getObservedProperty() != null && !request.getObservedProperty().isEmpty()) {
+                for (String observedProperty : request.getObservedProperty()) {
+                    // CITE
+                    if (observedProperty.isEmpty()) {
+                        throw new CstlServiceException("The observedProperty name is empty", MISSING_PARAMETER_VALUE, "observedProperty");
+                    } else if (!omReader.existPhenomenon(observedProperty)){
+                        throw new CstlServiceException("This observedProperty is not registered", INVALID_PARAMETER_VALUE, "observedProperty");
+                    }
+                }
+                localOmFilter.setObservedProperties(request.getObservedProperty());
+                ofilter = true;
             }
-            final SamplingFeature singleResult = omReader.getFeatureOfInterest(request.getFeatureOfInterestId().get(0), currentVersion);
-            if (singleResult == null) {
-                throw new CstlServiceException("There is no such Feature Of Interest", INVALID_PARAMETER_VALUE, locatorFID);
+
+            if (request.getProcedure() != null && !request.getProcedure().isEmpty()) {
+                for (String procedure : request.getProcedure()) {
+                    // CITE
+                    if (procedure.isEmpty()) {
+                        throw new CstlServiceException("The procedure name is empty", MISSING_PARAMETER_VALUE, PROCEDURE);
+                    } else if (!omReader.existProcedure(procedure)){
+                        throw new CstlServiceException("This procedure is not registered", INVALID_PARAMETER_VALUE, PROCEDURE);
+                    }
+                }
+                localOmFilter.setProcedure(request.getProcedure(), null);
+                ofilter = true;
+            }
+
+            boolean filter = false;
+
+            // we return a single result
+            final String locatorFID;
+            if (currentVersion.equals("2.0.0")) {
+                locatorFID = "featureOfInterest";
             } else {
-                if (!alwaysFeatureCollection) {
-                    return (AbstractFeature) singleResult;
+                locatorFID = "featureOfInterestId";
+            }
+            if (request.getFeatureOfInterestId().size() == 1) {
+                // CITE
+                if (request.getFeatureOfInterestId().get(0).isEmpty()) {
+                    throw new CstlServiceException("The foi name is empty", MISSING_PARAMETER_VALUE, locatorFID);
+                }
+                final SamplingFeature singleResult = omReader.getFeatureOfInterest(request.getFeatureOfInterestId().get(0), currentVersion);
+                if (singleResult == null) {
+                    throw new CstlServiceException("There is no such Feature Of Interest", INVALID_PARAMETER_VALUE, locatorFID);
                 } else {
+                    if (!alwaysFeatureCollection) {
+                        return (AbstractFeature) singleResult;
+                    } else {
+                        final List<FeatureProperty> features = new ArrayList<>();
+                        features.add(buildFeatureProperty(currentVersion, singleResult));
+                        final FeatureCollection collection = buildFeatureCollection(currentVersion, "feature-collection-1", null, null, features);
+                        collection.computeBounds();
+                        result = collection;
+                        filter = true;
+                    }
+                }
+
+            // we return a featureCollection
+            } else if (request.getFeatureOfInterestId().size() > 1) {
+                final List<FeatureProperty> features = new ArrayList<>();
+                for (String featureID : request.getFeatureOfInterestId()) {
+                    final SamplingFeature feature = omReader.getFeatureOfInterest(featureID, currentVersion);
+                    if (feature == null) {
+                        throw new CstlServiceException("There is no such Feature Of Interest", INVALID_PARAMETER_VALUE, locatorFID);
+                    } else {
+                        features.add(buildFeatureProperty(currentVersion, feature));
+                    }
+                }
+                final FeatureCollection collection = buildFeatureCollection(currentVersion, "feature-collection-1", null, null, features);
+                collection.computeBounds();
+                result = collection;
+                filter = true;
+            }
+
+            if (request.getSpatialFilters() != null && !request.getSpatialFilters().isEmpty()) {
+                final Filter spatialFilter = request.getSpatialFilters().get(0); // TODO handle multiple filters (SOS 2.0.0)
+                if (spatialFilter instanceof BBOX) {
+                    final BBOX bboxFilter = (BBOX) spatialFilter;
+                    // CITE
+                    if (bboxFilter.getPropertyName() == null || bboxFilter.getPropertyName().isEmpty()) {
+                        final String locator;
+                        if (currentVersion.equals("2.0.0")) {
+                            locator = "ValueReference";
+                        } else {
+                            locator = "propertyName";
+                        }
+                        throw new CstlServiceException("The spatial filter property name is empty", MISSING_PARAMETER_VALUE, locator);
+                    } 
+
+                    final List<SamplingFeature> results = spatialFiltering(bboxFilter, currentVersion);
+
+                    // we return a single result
+                    if (results.size() == 1) {
+                        result = (AbstractFeature) results.get(0);
+
+                    // we return a feature collection
+                    } else if (results.size() > 1) {
+                        final List<FeatureProperty> features = new ArrayList<>();
+                        for (SamplingFeature feature : results) {
+                            features.add(buildFeatureProperty(currentVersion, feature));
+                        }
+                        final FeatureCollection collection = buildFeatureCollection(currentVersion, "feature-collection-1", null, null, features);
+                        collection.computeBounds();
+                        result = collection;
+
+                    // if there is no response we send an error
+                    } else {
+                        //throw new CstlServiceException("There is no such Feature Of Interest", INVALID_PARAMETER_VALUE);
+                        result = buildFeatureCollection(currentVersion, "feature-collection-empty", null, null, null);
+                    }
+                } else {
+                    throw new CstlServiceException("Only the filter BBOX is upported for now", OPERATION_NOT_SUPPORTED);
+                }
+                filter = true;
+            }
+
+            if (ofilter) {
+                if (localOmFilter instanceof ObservationFilterReader) {
                     final List<FeatureProperty> features = new ArrayList<>();
-                    features.add(buildFeatureProperty(currentVersion, singleResult));
+                    final List<SamplingFeature> sfeatures = ((ObservationFilterReader)localOmFilter).getFeatureOfInterests(currentVersion);
+                    for (SamplingFeature sf : sfeatures) {
+                        features.add(buildFeatureProperty(currentVersion, sf));
+                    }
                     final FeatureCollection collection = buildFeatureCollection(currentVersion, "feature-collection-1", null, null, features);
                     collection.computeBounds();
                     result = collection;
-                    filter = true;
-                }
-            }
-
-        // we return a featureCollection
-        } else if (request.getFeatureOfInterestId().size() > 1) {
-            final List<FeatureProperty> features = new ArrayList<>();
-            for (String featureID : request.getFeatureOfInterestId()) {
-                final SamplingFeature feature = omReader.getFeatureOfInterest(featureID, currentVersion);
-                if (feature == null) {
-                    throw new CstlServiceException("There is no such Feature Of Interest", INVALID_PARAMETER_VALUE, locatorFID);
                 } else {
-                    features.add(buildFeatureProperty(currentVersion, feature));
-                }
-            }
-            final FeatureCollection collection = buildFeatureCollection(currentVersion, "feature-collection-1", null, null, features);
-            collection.computeBounds();
-            result = collection;
-            filter = true;
-        }
-
-        if (request.getSpatialFilters() != null && !request.getSpatialFilters().isEmpty()) {
-            final Filter spatialFilter = request.getSpatialFilters().get(0); // TODO handle multiple filters (SOS 2.0.0)
-            if (spatialFilter instanceof BBOX) {
-                final BBOX bboxFilter = (BBOX) spatialFilter;
-                // CITE
-                if (bboxFilter.getPropertyName() == null || bboxFilter.getPropertyName().isEmpty()) {
-                    final String locator;
-                    if (currentVersion.equals("2.0.0")) {
-                        locator = "ValueReference";
-                    } else {
-                        locator = "propertyName";
-                    }
-                    throw new CstlServiceException("The spatial filter property name is empty", MISSING_PARAMETER_VALUE, locator);
-                } 
-                
-                final List<SamplingFeature> results = spatialFiltering(bboxFilter, currentVersion);
-
-                // we return a single result
-                if (results.size() == 1) {
-                    result = (AbstractFeature) results.get(0);
-
-                // we return a feature collection
-                } else if (results.size() > 1) {
                     final List<FeatureProperty> features = new ArrayList<>();
-                    for (SamplingFeature feature : results) {
+                    final Set<String> fid = localOmFilter.filterFeatureOfInterest();
+                    for (String foid : fid) {
+                        final SamplingFeature feature = omReader.getFeatureOfInterest(foid, currentVersion);
                         features.add(buildFeatureProperty(currentVersion, feature));
                     }
                     final FeatureCollection collection = buildFeatureCollection(currentVersion, "feature-collection-1", null, null, features);
                     collection.computeBounds();
                     result = collection;
-
-                // if there is no response we send an error
-                } else {
-                    //throw new CstlServiceException("There is no such Feature Of Interest", INVALID_PARAMETER_VALUE);
-                    result = buildFeatureCollection(currentVersion, "feature-collection-empty", null, null, null);
                 }
-            } else {
-                throw new CstlServiceException("Only the filter BBOX is upported for now", OPERATION_NOT_SUPPORTED);
-            }
-            filter = true;
-        }
-        
-        if (ofilter) {
-            if (localOmFilter instanceof ObservationFilterReader) {
+            // request for all foi
+            } else if (!filter) {
                 final List<FeatureProperty> features = new ArrayList<>();
-                final List<SamplingFeature> sfeatures = ((ObservationFilterReader)localOmFilter).getFeatureOfInterests(currentVersion);
-                for (SamplingFeature sf : sfeatures) {
-                    features.add(buildFeatureProperty(currentVersion, sf));
-                }
-                final FeatureCollection collection = buildFeatureCollection(currentVersion, "feature-collection-1", null, null, features);
-                collection.computeBounds();
-                result = collection;
-            } else {
-                final List<FeatureProperty> features = new ArrayList<>();
-                final Set<String> fid = localOmFilter.filterFeatureOfInterest();
-                for (String foid : fid) {
+                for (String foid : omReader.getFeatureOfInterestNames()) {
                     final SamplingFeature feature = omReader.getFeatureOfInterest(foid, currentVersion);
                     features.add(buildFeatureProperty(currentVersion, feature));
                 }
@@ -1648,18 +1677,10 @@ public class SOSworker extends AbstractWorker {
                 collection.computeBounds();
                 result = collection;
             }
-        // request for all foi
-        } else if (!filter) {
-            final List<FeatureProperty> features = new ArrayList<>();
-            for (String foid : omReader.getFeatureOfInterestNames()) {
-                final SamplingFeature feature = omReader.getFeatureOfInterest(foid, currentVersion);
-                features.add(buildFeatureProperty(currentVersion, feature));
-            }
-            final FeatureCollection collection = buildFeatureCollection(currentVersion, "feature-collection-1", null, null, features);
-            collection.computeBounds();
-            result = collection;
+        
+        } catch (DataStoreException ex) {
+            throw new CstlServiceException(ex);
         }
-
         LOGGER.log(logLevel, "GetFeatureOfInterest processed in {0}ms", (System.currentTimeMillis() - start));
         return result;
     }
@@ -1678,10 +1699,14 @@ public class SOSworker extends AbstractWorker {
         }
 
         final TemporalPrimitive result;
-        if (omReader.getFeatureOfInterestNames().contains(fid)) {
-            result = omReader.getFeatureOfInterestTime(fid, currentVersion);
-        } else {
-            throw new CstlServiceException("there is not such samplingFeature on the server", INVALID_PARAMETER_VALUE);
+        try {
+            if (omReader.getFeatureOfInterestNames().contains(fid)) {
+                result = omReader.getFeatureOfInterestTime(fid, currentVersion);
+            } else {
+                throw new CstlServiceException("there is not such samplingFeature on the server", INVALID_PARAMETER_VALUE);
+            }
+        } catch (DataStoreException ex) {
+            throw new CstlServiceException(ex);
         }
         LOGGER.log(logLevel, "GetFeatureOfInterestTime processed in {0} ms", (System.currentTimeMillis() - start));
         return result;
@@ -1765,11 +1790,15 @@ public class SOSworker extends AbstractWorker {
                                                structure, 
                                                encoding, 
                                                values);
-        obs.setName(omReader.getNewObservationId());
-        obs.setResult(array);
-        obs.setSamplingTimePeriod(extractTimeBounds(currentVersion, values, encoding));
-        omWriter.writeObservation(obs);
-        omFilter.refresh();
+        try {
+            obs.setName(omReader.getNewObservationId());
+            obs.setResult(array);
+            obs.setSamplingTimePeriod(extractTimeBounds(currentVersion, values, encoding));
+            omWriter.writeObservation(obs);
+            omFilter.refresh();
+        } catch (DataStoreException ex) {
+            throw new CstlServiceException(ex);
+        }
         final InsertResultResponse result = buildInsertResultResponse(currentVersion);
         LOGGER.log(logLevel, "InsertResult processed in {0} ms", (System.currentTimeMillis() - start));
         return result;
@@ -1783,61 +1812,65 @@ public class SOSworker extends AbstractWorker {
         if (request.getOffering() == null || request.getOffering().isEmpty()) {
             throw new CstlServiceException("offering parameter is missing.", MISSING_PARAMETER_VALUE, "offering");
         }
-        final ObservationOffering offering = omReader.getObservationOffering(request.getOffering(), currentVersion);
-        if (offering == null) {
-            throw new CstlServiceException("offering parameter is invalid.", INVALID_PARAMETER_VALUE, "offering");
-        }
-        // we clone the filter for this request
-        final ObservationFilter localOmFilter = omFactory.cloneObservationFilter(omFilter);
-        
-        localOmFilter.initFilterObservation(RESULT_TEMPLATE, OBSERVATION_QNAME);
-        localOmFilter.setProcedure(offering.getProcedures(), Arrays.asList(offering));
-        if (request.getObservedProperty() == null || request.getObservedProperty().isEmpty()) {
-            throw new CstlServiceException("observedProperty parameter is missing.", MISSING_PARAMETER_VALUE, "observedProperty");
-        }
-        if (!omReader.existPhenomenon(request.getObservedProperty())) {
-            throw new CstlServiceException(" this phenomenon " + request.getObservedProperty() + " is not registred in the database!",
-                    INVALID_PARAMETER_VALUE, "observedProperty");
-        }
-        localOmFilter.setObservedProperties(Arrays.asList(request.getObservedProperty()));
-        
-        final List<Observation> matchingResult;
-        // case (1)
-        if (!(localOmFilter instanceof ObservationFilterReader)) {
-            matchingResult = new ArrayList<>();
-            final Set<String> observationIDs = localOmFilter.filterObservation();
-            for (String observationID : observationIDs) {
-                matchingResult.add(omReader.getObservation(observationID, OBSERVATION_QNAME, RESULT_TEMPLATE, currentVersion));
-            }
-        // case (2)
-        } else {
-            final ObservationFilterReader omFR = (ObservationFilterReader) localOmFilter;
-            matchingResult = omFR.getObservationTemplates(currentVersion);
-        }
         final AbstractDataComponent structure;
         final AbstractEncoding encoding;
-        if (matchingResult.isEmpty()) {
-            throw new CstlServiceException("there is no result template matching the arguments");
-        } else {
-            if (matchingResult.size() > 1) {
-                LOGGER.warning("more than one result for resultTemplate");
-            }
-            final Object result = matchingResult.get(0).getResult();
-            if (result instanceof DataArrayProperty) {
-                final DataArray array = ((DataArrayProperty)result).getDataArray();
-                structure             = array.getPropertyElementType().getAbstractRecord();
-                encoding              = array.getEncoding();
-            } else {
-                throw new CstlServiceException("unable to extract structure and encoding for other result type than DataArrayProperty");
-            }
-        }
         
+        try {
+            final ObservationOffering offering = omReader.getObservationOffering(request.getOffering(), currentVersion);
+            if (offering == null) {
+                throw new CstlServiceException("offering parameter is invalid.", INVALID_PARAMETER_VALUE, "offering");
+            }
+            // we clone the filter for this request
+            final ObservationFilter localOmFilter = omFactory.cloneObservationFilter(omFilter);
+
+            localOmFilter.initFilterObservation(RESULT_TEMPLATE, OBSERVATION_QNAME);
+            localOmFilter.setProcedure(offering.getProcedures(), Arrays.asList(offering));
+            if (request.getObservedProperty() == null || request.getObservedProperty().isEmpty()) {
+                throw new CstlServiceException("observedProperty parameter is missing.", MISSING_PARAMETER_VALUE, "observedProperty");
+            }
+            if (!omReader.existPhenomenon(request.getObservedProperty())) {
+                throw new CstlServiceException(" this phenomenon " + request.getObservedProperty() + " is not registred in the database!",
+                        INVALID_PARAMETER_VALUE, "observedProperty");
+            }
+            localOmFilter.setObservedProperties(Arrays.asList(request.getObservedProperty()));
+
+            final List<Observation> matchingResult;
+            // case (1)
+            if (!(localOmFilter instanceof ObservationFilterReader)) {
+                matchingResult = new ArrayList<>();
+                final Set<String> observationIDs = localOmFilter.filterObservation();
+                for (String observationID : observationIDs) {
+                    matchingResult.add(omReader.getObservation(observationID, OBSERVATION_QNAME, RESULT_TEMPLATE, currentVersion));
+                }
+            // case (2)
+            } else {
+                final ObservationFilterReader omFR = (ObservationFilterReader) localOmFilter;
+                matchingResult = omFR.getObservationTemplates(currentVersion);
+            }
+            if (matchingResult.isEmpty()) {
+                throw new CstlServiceException("there is no result template matching the arguments");
+            } else {
+                if (matchingResult.size() > 1) {
+                    LOGGER.warning("more than one result for resultTemplate");
+                }
+                final Object result = matchingResult.get(0).getResult();
+                if (result instanceof DataArrayProperty) {
+                    final DataArray array = ((DataArrayProperty)result).getDataArray();
+                    structure             = array.getPropertyElementType().getAbstractRecord();
+                    encoding              = array.getEncoding();
+                } else {
+                    throw new CstlServiceException("unable to extract structure and encoding for other result type than DataArrayProperty");
+                }
+            }
+        } catch (DataStoreException ex) {
+            throw new CstlServiceException(ex);
+        }
         final GetResultTemplateResponse result = buildGetResultTemplateResponse(currentVersion, structure, encoding);
         LOGGER.log(logLevel, "InsertResult processed in {0} ms", (System.currentTimeMillis() - start));
         return result;
     }
 
-    private List<SamplingFeature> spatialFiltering(final BBOX bbox, final String currentVersion) throws CstlServiceException {
+    private List<SamplingFeature> spatialFiltering(final BBOX bbox, final String currentVersion) throws DataStoreException, CstlServiceException {
         final Envelope e = getEnvelopeFromBBOX(currentVersion, bbox);
         if (e != null && e.isCompleteEnvelope2D()) {
 
@@ -2000,6 +2033,8 @@ public class SOSworker extends AbstractWorker {
             }
             success = true;
 
+        } catch(DataStoreException ex) {
+            throw new CstlServiceException(ex);
         } finally {
             if (!success) {
                smlWriter.abortTransaction();
@@ -2035,93 +2070,98 @@ public class SOSworker extends AbstractWorker {
         //we verify the base request attribute
         verifyBaseRequest(request, true, false);
         final String currentVersion = request.getVersion().toString();
-        
-        //we get the id of the sensor and we create a sensor object
-        final String sensorId = request.getAssignedSensorId();
-        String num = null;
-        if (currentVersion.equals("1.0.0")) {
-            if (sensorId == null) {
-                throw new CstlServiceException("The sensor identifier is missing.",
-                                             MISSING_PARAMETER_VALUE, "assignedSensorId");
-            } else if (sensorId.startsWith(sensorIdBase)) {
-                num = sensorId.substring(sensorIdBase.length());
-            } else {
-                throw new CstlServiceException("The sensor identifier is not valid it must start with " + sensorIdBase,
-                                             INVALID_PARAMETER_VALUE, "assignedSensorId");
-            }
-        } else {
-            final List<String> offeringNames = request.getOffering();
-            if (offeringNames == null || offeringNames.isEmpty()) {
-                throw new CstlServiceException("The offering identifiers are missing.",
-                                             MISSING_PARAMETER_VALUE, "offering");
-            } else {
-                final ObservationOffering off = omReader.getObservationOffering(offeringNames.get(0), currentVersion);
-                if (off != null) {
-                    // TODO
-                } else {
-                    throw new CstlServiceException("The offering identifier is invalid.",
-                                             INVALID_PARAMETER_VALUE, "offering");
-                }
-            }
-        }
-
-        //we get the observation and we assign to it the sensor
         final List<String> ids = new ArrayList<>();
-        final List<? extends Observation> observations = request.getObservations();
-        for (Observation observation : observations) {
-            final AbstractObservation obs = (AbstractObservation) observation;
-            if (obs != null) {
-                obs.setProcedure(sensorId);
-                obs.setName(omReader.getNewObservationId());
-                LOGGER.log(Level.FINER, "samplingTime received: {0}", obs.getSamplingTime());
-                LOGGER.log(Level.FINER, "template received:\n{0}", obs.toString());
+        
+        try {
+            
+            //we get the id of the sensor and we create a sensor object
+            final String sensorId = request.getAssignedSensorId();
+            String num = null;
+            if (currentVersion.equals("1.0.0")) {
+                if (sensorId == null) {
+                    throw new CstlServiceException("The sensor identifier is missing.",
+                                                 MISSING_PARAMETER_VALUE, "assignedSensorId");
+                } else if (sensorId.startsWith(sensorIdBase)) {
+                    num = sensorId.substring(sensorIdBase.length());
+                } else {
+                    throw new CstlServiceException("The sensor identifier is not valid it must start with " + sensorIdBase,
+                                                 INVALID_PARAMETER_VALUE, "assignedSensorId");
+                }
             } else {
-                throw new CstlServiceException("The observation template must be specified",
-                                                 MISSING_PARAMETER_VALUE, OBSERVATION_TEMPLATE);
-            }
-
-            // Debug part
-            if (verifySynchronization) {
-                if (obs.getSamplingTime() instanceof Instant) {
-                   final Instant timeInstant = (Instant) obs.getSamplingTime();
-                    try {
-                        final ISODateParser parser = new ISODateParser();
-                        final Date d = parser.parseToDate(timeInstant.getPosition().getDateTime().toString());
-                        final long t = System.currentTimeMillis() - d.getTime();
-                        LOGGER.info("gap between time of reception and time of sampling: " + t + " ms (" + TemporalUtilities.durationToString(t) + ')');
-                    } catch (IllegalArgumentException ex) {
-                        LOGGER.warning("unable to parse the samplingTime");
+                final List<String> offeringNames = request.getOffering();
+                if (offeringNames == null || offeringNames.isEmpty()) {
+                    throw new CstlServiceException("The offering identifiers are missing.",
+                                                 MISSING_PARAMETER_VALUE, "offering");
+                } else {
+                    final ObservationOffering off = omReader.getObservationOffering(offeringNames.get(0), currentVersion);
+                    if (off != null) {
+                        // TODO
+                    } else {
+                        throw new CstlServiceException("The offering identifier is invalid.",
+                                                 INVALID_PARAMETER_VALUE, "offering");
                     }
                 }
             }
 
-            //we record the observation in the O&M database
-           final String id;
-            if (currentVersion.equals("2.0.0")) {
-                id = omWriter.writeObservation(obs);
-            } else {
-                if (obs instanceof Measurement) {
+            //we get the observation and we assign to it the sensor
+            final List<? extends Observation> observations = request.getObservations();
+            for (Observation observation : observations) {
+                final AbstractObservation obs = (AbstractObservation) observation;
+                if (obs != null) {
+                    obs.setProcedure(sensorId);
+                    obs.setName(omReader.getNewObservationId());
+                    LOGGER.log(Level.FINER, "samplingTime received: {0}", obs.getSamplingTime());
+                    LOGGER.log(Level.FINER, "template received:\n{0}", obs.toString());
+                } else {
+                    throw new CstlServiceException("The observation template must be specified",
+                                                     MISSING_PARAMETER_VALUE, OBSERVATION_TEMPLATE);
+                }
+
+                // Debug part
+                if (verifySynchronization) {
+                    if (obs.getSamplingTime() instanceof Instant) {
+                       final Instant timeInstant = (Instant) obs.getSamplingTime();
+                        try {
+                            final ISODateParser parser = new ISODateParser();
+                            final Date d = parser.parseToDate(timeInstant.getPosition().getDateTime().toString());
+                            final long t = System.currentTimeMillis() - d.getTime();
+                            LOGGER.info("gap between time of reception and time of sampling: " + t + " ms (" + TemporalUtilities.durationToString(t) + ')');
+                        } catch (IllegalArgumentException ex) {
+                            LOGGER.warning("unable to parse the samplingTime");
+                        }
+                    }
+                }
+
+                //we record the observation in the O&M database
+               final String id;
+                if (currentVersion.equals("2.0.0")) {
                     id = omWriter.writeObservation(obs);
                 } else {
-                    //in first we verify that the observation is conform to the template
-                    final Observation template = (Observation) omReader.getObservation(observationTemplateIdBase + num, OBSERVATION_QNAME, RESULT_TEMPLATE, currentVersion);
-                    //if the observation to insert match the template we can insert it in the OM db
-                    if (obs.matchTemplate(template)) {
-                        if (obs.getSamplingTime() != null && obs.getResult() != null) {
-                            id = omWriter.writeObservation(obs);
-                            LOGGER.log(logLevel, "new observation inserted: id = " + id + " for the sensor " + obs.getProcedure());
-                        } else {
-                            throw new CstlServiceException("The observation sampling time and the result must be specify",
-                                    MISSING_PARAMETER_VALUE, "samplingTime");
-                        }
+                    if (obs instanceof Measurement) {
+                        id = omWriter.writeObservation(obs);
                     } else {
-                        throw new CstlServiceException(" The observation doesn't match with the template of the sensor",
-                                INVALID_PARAMETER_VALUE, "samplingTime");
+                        //in first we verify that the observation is conform to the template
+                        final Observation template = (Observation) omReader.getObservation(observationTemplateIdBase + num, OBSERVATION_QNAME, RESULT_TEMPLATE, currentVersion);
+                        //if the observation to insert match the template we can insert it in the OM db
+                        if (obs.matchTemplate(template)) {
+                            if (obs.getSamplingTime() != null && obs.getResult() != null) {
+                                id = omWriter.writeObservation(obs);
+                                LOGGER.log(logLevel, "new observation inserted: id = " + id + " for the sensor " + obs.getProcedure());
+                            } else {
+                                throw new CstlServiceException("The observation sampling time and the result must be specify",
+                                        MISSING_PARAMETER_VALUE, "samplingTime");
+                            }
+                        } else {
+                            throw new CstlServiceException(" The observation doesn't match with the template of the sensor",
+                                    INVALID_PARAMETER_VALUE, "samplingTime");
+                        }
                     }
                 }
+
+               ids.add(id);
             }
-           
-           ids.add(id);
+        } catch (DataStoreException ex) {
+            throw new CstlServiceException(ex);
         }
 
         LOGGER.log(logLevel, "insertObservation processed in {0} ms", (System.currentTimeMillis() - start));
@@ -2327,7 +2367,7 @@ public class SOSworker extends AbstractWorker {
      *
      * @throws CstlServiceException If an error occurs during the the storage of offering in the datasource.
      */
-    private String addSensorToOffering(final AbstractSensorML sensor, final String num, final ObservationTemplate template, final String version) throws CstlServiceException {
+    private String addSensorToOffering(final AbstractSensorML sensor, final String num, final ObservationTemplate template, final String version) throws CstlServiceException, DataStoreException {
 
         final String offeringName          = "offering-" + num;
         final ObservationOffering offering = omReader.getObservationOffering(offeringName, version);

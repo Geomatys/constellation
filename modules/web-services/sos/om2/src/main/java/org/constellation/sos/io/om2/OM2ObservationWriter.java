@@ -501,8 +501,12 @@ public class OM2ObservationWriter implements ObservationWriter {
                 }
                 if (sqlCpt > 99) {
                     sql.setCharAt(sql.length() - 2, ' ');
-                    sql.setCharAt(sql.length() - 1, ';');
-                    //stmtSQL.execute(sql.toString());
+                    if (isPostgres){
+                        sql.setCharAt(sql.length() - 1, ';');
+                    } else {
+                        sql.setCharAt(sql.length() - 1, ' ');
+                    }
+                    
                     stmtSQL.addBatch(sql.toString());
                     sqlCpt = 0;
                     sql = new StringBuilder("INSERT INTO \"om\".\"mesures\" VALUES ");
@@ -510,7 +514,11 @@ public class OM2ObservationWriter implements ObservationWriter {
             }
             if (sqlCpt > 0) {
                 sql.setCharAt(sql.length() - 2, ' ');
-                sql.setCharAt(sql.length() - 1, ';');
+               if (isPostgres){
+                    sql.setCharAt(sql.length() - 1, ';');
+                } else {
+                    sql.setCharAt(sql.length() - 1, ' ');
+                }
                 stmtSQL.addBatch(sql.toString());
             }
             stmtSQL.executeBatch();

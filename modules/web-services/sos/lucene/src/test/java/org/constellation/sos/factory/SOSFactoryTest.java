@@ -23,11 +23,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Properties;
+import org.apache.sis.storage.DataStoreException;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.sos.io.ObservationFilter;
-import org.constellation.sos.io.ObservationReader;
+import org.geotoolkit.observation.ObservationReader;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.util.FileUtilities;
@@ -105,7 +106,7 @@ public class SOSFactoryTest {
         exLaunched = false;
         try  {
             ObservationReader or = omFactory.getObservationReader(DataSourceType.FILESYSTEM, config, parameters);
-        } catch (CstlServiceException ex) {
+        } catch (DataStoreException ex) {
             exLaunched = true;
             assertEquals(ex.getMessage(), "There is no data Directory");
         }

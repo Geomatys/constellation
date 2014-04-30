@@ -18,10 +18,11 @@
 package org.constellation.sos.factory;
 
 import java.util.Map;
+import org.apache.sis.storage.DataStoreException;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.ObservationFilter;
-import org.constellation.sos.io.ObservationReader;
+import org.geotoolkit.observation.ObservationReader;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.ws.CstlServiceException;
 
@@ -44,6 +45,7 @@ public interface OMFactory {
 
     /**
      * Return true if the factory can return an implementation for the specified type.
+     * @param type
      */
     boolean factoryMatchType(DataSourceType type);
     
@@ -77,9 +79,9 @@ public interface OMFactory {
      * @param properties The associated parameters (observation base identifier, template base identifiers,....)
      *
      * @return An Observation reader for the specified datasource.
-     * @throws CstlServiceException
+     * @throws DataStoreException
      */
-    ObservationReader getObservationReader(DataSourceType type, Automatic configuration, Map<String, Object> properties) throws CstlServiceException;
+    ObservationReader getObservationReader(DataSourceType type, Automatic configuration, Map<String, Object> properties) throws DataStoreException;
 
     /**
      * Return an Observation writer for the specified datasource.

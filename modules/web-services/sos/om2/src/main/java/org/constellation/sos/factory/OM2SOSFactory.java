@@ -18,13 +18,14 @@
 package org.constellation.sos.factory;
 
 import java.util.Map;
+import org.apache.sis.storage.DataStoreException;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.om2.OM2ObservationFilter;
 import org.constellation.sos.io.om2.OM2ObservationReader;
 import org.constellation.sos.io.om2.OM2ObservationWriter;
 import org.constellation.sos.io.ObservationFilter;
-import org.constellation.sos.io.ObservationReader;
+import org.geotoolkit.observation.ObservationReader;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.ws.CstlServiceException;
 
@@ -70,7 +71,7 @@ public class OM2SOSFactory implements OMFactory {
      * {@inheritDoc}
      */
     @Override
-    public ObservationReader getObservationReader(final DataSourceType type, final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
+    public ObservationReader getObservationReader(final DataSourceType type, final Automatic configuration, final Map<String, Object> properties) throws DataStoreException {
         return new OM2ObservationReader(configuration, properties);
     }
 

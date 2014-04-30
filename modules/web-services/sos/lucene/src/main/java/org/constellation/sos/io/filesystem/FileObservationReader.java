@@ -18,32 +18,30 @@
 package org.constellation.sos.io.filesystem;
 
 
-import java.util.Map;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
-
-import org.constellation.sos.factory.OMFactory;
-import org.constellation.generic.database.Automatic;
-import org.constellation.sos.io.ObservationReader;
-import org.constellation.ws.CstlServiceException;
-
-import org.geotoolkit.sos.xml.SOSMarshallerPool;
+import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
-import org.geotoolkit.sos.xml.ResponseModeType;
-import org.geotoolkit.sos.xml.ObservationOffering;
-import org.geotoolkit.swe.xml.DataArrayProperty;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.generic.database.Automatic;
+import org.constellation.sos.factory.OMFactory;
 import org.geotoolkit.gml.xml.AbstractGeometry;
+import org.geotoolkit.observation.ObservationReader;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
+import org.geotoolkit.sos.xml.ObservationOffering;
+import org.geotoolkit.sos.xml.ResponseModeType;
+import org.geotoolkit.sos.xml.SOSMarshallerPool;
+import org.geotoolkit.swe.xml.DataArrayProperty;
 import org.opengis.observation.Observation;
 import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.temporal.TemporalPrimitive;
@@ -85,7 +83,7 @@ public class FileObservationReader implements ObservationReader {
 
     private static final String FILE_EXTENSION = ".xml";
 
-    public FileObservationReader(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
+    public FileObservationReader(final Automatic configuration, final Map<String, Object> properties) throws DataStoreException {
         this.observationIdBase = (String) properties.get(OMFactory.OBSERVATION_ID_BASE);
         this.phenomenonIdBase  = (String) properties.get(OMFactory.PHENOMENON_ID_BASE);
         final File dataDirectory = configuration.getDataDirectory();
@@ -97,10 +95,10 @@ public class FileObservationReader implements ObservationReader {
             sensorDirectory              = new File(dataDirectory, "sensors");
             foiDirectory                 = new File(dataDirectory, "features");
         } else {
-            throw new CstlServiceException("There is no data Directory", NO_APPLICABLE_CODE);
+            throw new DataStoreException("There is no data Directory");
         }
         if (MARSHALLER_POOL == null) {
-            throw new CstlServiceException("JAXB exception while initializing the file observation reader", NO_APPLICABLE_CODE);
+            throw new DataStoreException("JAXB exception while initializing the file observation reader");
         }
 
     }
@@ -109,7 +107,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public Collection<String> getOfferingNames(final String version) throws CstlServiceException {
+    public Collection<String> getOfferingNames(final String version) throws DataStoreException {
         final List<String> offeringNames = new ArrayList<>();
         if (offeringDirectory.isDirectory()) {
             final File offeringVersionDir = new File(observationDirectory, version);
@@ -128,7 +126,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public List<ObservationOffering> getObservationOfferings(final List<String> offeringNames, final String version) throws CstlServiceException {
+    public List<ObservationOffering> getObservationOfferings(final List<String> offeringNames, final String version) throws DataStoreException {
         final List<ObservationOffering> offerings = new ArrayList<>();
         for (String offeringName : offeringNames) {
             offerings.add(getObservationOffering(offeringName, version));
@@ -140,7 +138,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public ObservationOffering getObservationOffering(final String offeringName, final String version) throws CstlServiceException {
+    public ObservationOffering getObservationOffering(final String offeringName, final String version) throws DataStoreException {
         final File offeringVersionDir = new File(offeringDirectory, version); 
         if (offeringVersionDir.isDirectory()) {
             final File offeringFile = new File(offeringVersionDir, offeringName + FILE_EXTENSION);
@@ -155,13 +153,13 @@ public class FileObservationReader implements ObservationReader {
                     if (obj instanceof ObservationOffering) {
                         return (ObservationOffering) obj;
                     }
-                    throw new CstlServiceException("The file " + offeringFile + " does not contains an offering Object.", NO_APPLICABLE_CODE);
+                    throw new DataStoreException("The file " + offeringFile + " does not contains an offering Object.");
                 } catch (JAXBException ex) {
-                    throw new CstlServiceException("Unable to unmarshall The file " + offeringFile, ex, NO_APPLICABLE_CODE);
+                    throw new DataStoreException("Unable to unmarshall The file " + offeringFile, ex);
                 }
             }
         } else {
-            throw new CstlServiceException("Unsuported version:" + version);
+            throw new DataStoreException("Unsuported version:" + version);
         }
         return null;
     }
@@ -170,7 +168,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public List<ObservationOffering> getObservationOfferings(final String version) throws CstlServiceException {
+    public List<ObservationOffering> getObservationOfferings(final String version) throws DataStoreException {
         final List<ObservationOffering> offerings = new ArrayList<>();
         if (offeringDirectory.exists()) {
             final File offeringVersionDir = new File(offeringDirectory, version); 
@@ -186,7 +184,7 @@ public class FileObservationReader implements ObservationReader {
                         if (obj instanceof ObservationOffering) {
                             offerings.add((ObservationOffering) obj);
                         } else {
-                            throw new CstlServiceException("The file " + offeringFile + " does not contains an offering Object.", NO_APPLICABLE_CODE);
+                            throw new DataStoreException("The file " + offeringFile + " does not contains an offering Object.");
                         }
                     } catch (JAXBException ex) {
                         String msg = ex.getMessage();
@@ -197,7 +195,7 @@ public class FileObservationReader implements ObservationReader {
                     }
                 }
             } else {
-                throw new CstlServiceException("Unsuported version:" + version);
+                throw new DataStoreException("Unsuported version:" + version);
             }
         }
         return offerings;
@@ -207,7 +205,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public Collection<String> getProcedureNames() throws CstlServiceException {
+    public Collection<String> getProcedureNames() throws DataStoreException {
         final List<String> sensorNames = new ArrayList<>();
         if (sensorDirectory.exists()) {
             for (File sensorFile: sensorDirectory.listFiles()) {
@@ -223,7 +221,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public Collection<String> getPhenomenonNames() throws CstlServiceException {
+    public Collection<String> getPhenomenonNames() throws DataStoreException {
         final List<String> phenomenonNames = new ArrayList<>();
         if (phenomenonDirectory.exists()) {
             for (File phenomenonFile: phenomenonDirectory.listFiles()) {
@@ -236,12 +234,12 @@ public class FileObservationReader implements ObservationReader {
     }
 
     @Override
-    public Collection<String> getProceduresForPhenomenon(String observedProperty) throws CstlServiceException {
+    public Collection<String> getProceduresForPhenomenon(String observedProperty) throws DataStoreException {
         throw new UnsupportedOperationException("Not supported yet in this implementation.");
     }
 
     @Override
-    public Collection<String> getPhenomenonsForProcedure(String sensorID) throws CstlServiceException {
+    public Collection<String> getPhenomenonsForProcedure(String sensorID) throws DataStoreException {
         throw new UnsupportedOperationException("Not supported yet in this implementation.");
     }
     
@@ -249,7 +247,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public boolean existPhenomenon(String phenomenonName) throws CstlServiceException {
+    public boolean existPhenomenon(String phenomenonName) throws DataStoreException {
         // we remove the phenomenon id base
         if (phenomenonName.contains(phenomenonIdBase)) {
             phenomenonName = phenomenonName.replace(phenomenonIdBase, "");
@@ -262,7 +260,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public Collection<String> getFeatureOfInterestNames() throws CstlServiceException {
+    public Collection<String> getFeatureOfInterestNames() throws DataStoreException {
         final List<String> foiNames = new ArrayList<>();
         if (foiDirectory.exists()) {
             for (File foiFile: foiDirectory.listFiles()) {
@@ -278,7 +276,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public SamplingFeature getFeatureOfInterest(final String samplingFeatureName, final String version) throws CstlServiceException {
+    public SamplingFeature getFeatureOfInterest(final String samplingFeatureName, final String version) throws DataStoreException {
         final File samplingFeatureFile = new File(foiDirectory, samplingFeatureName + FILE_EXTENSION);
         if (samplingFeatureFile.exists()) {
             try {
@@ -291,9 +289,9 @@ public class FileObservationReader implements ObservationReader {
                 if (obj instanceof SamplingFeature) {
                     return (SamplingFeature) obj;
                 }
-                throw new CstlServiceException("The file " + samplingFeatureFile + " does not contains an foi Object.", NO_APPLICABLE_CODE);
+                throw new DataStoreException("The file " + samplingFeatureFile + " does not contains an foi Object.");
             } catch (JAXBException ex) {
-                throw new CstlServiceException("Unable to unmarshall The file " + samplingFeatureFile, ex, NO_APPLICABLE_CODE);
+                throw new DataStoreException("Unable to unmarshall The file " + samplingFeatureFile, ex);
             } 
         }
         return null;
@@ -303,7 +301,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public Observation getObservation(final String identifier, final QName resultModel, final ResponseModeType mode, final String version) throws CstlServiceException {
+    public Observation getObservation(final String identifier, final QName resultModel, final ResponseModeType mode, final String version) throws DataStoreException {
         File observationFile = new File(observationDirectory, identifier + FILE_EXTENSION);
         if (!observationFile.exists()) {
             observationFile = new File(observationTemplateDirectory, identifier + FILE_EXTENSION);
@@ -319,19 +317,19 @@ public class FileObservationReader implements ObservationReader {
                 if (obj instanceof Observation) {
                     return (Observation) obj;
                 }
-                throw new CstlServiceException("The file " + observationFile + " does not contains an observation Object.", NO_APPLICABLE_CODE);
+                throw new DataStoreException("The file " + observationFile + " does not contains an observation Object.");
             } catch (JAXBException ex) {
-                throw new CstlServiceException("Unable to unmarshall The file " + observationFile, ex, NO_APPLICABLE_CODE);
+                throw new DataStoreException("Unable to unmarshall The file " + observationFile, ex);
             }
         }
-        throw new CstlServiceException("The file " + observationFile + " does not exist", NO_APPLICABLE_CODE);
+        throw new DataStoreException("The file " + observationFile + " does not exist");
     }
     
     /**
      * {@inheritDoc}
      */
     @Override
-    public Object getResult(final String identifier, final QName resultModel, final String version) throws CstlServiceException {
+    public Object getResult(final String identifier, final QName resultModel, final String version) throws DataStoreException {
         final File anyResultFile = new File(observationDirectory, identifier + FILE_EXTENSION);
         if (anyResultFile.exists()) {
             
@@ -347,19 +345,19 @@ public class FileObservationReader implements ObservationReader {
                     final DataArrayProperty arrayP = (DataArrayProperty) obs.getResult();
                     return arrayP.getDataArray();
                 }
-                throw new CstlServiceException("The file " + anyResultFile + " does not contains an observation Object.", NO_APPLICABLE_CODE);
+                throw new DataStoreException("The file " + anyResultFile + " does not contains an observation Object.");
             } catch (JAXBException ex) {
-                throw new CstlServiceException("Unable to unmarshall The file " + anyResultFile, ex, NO_APPLICABLE_CODE);
+                throw new DataStoreException("Unable to unmarshall The file " + anyResultFile, ex);
             }
         }
-        throw new CstlServiceException("The file " + anyResultFile + " does not exist", NO_APPLICABLE_CODE);
+        throw new DataStoreException("The file " + anyResultFile + " does not exist");
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean existProcedure(final String href) throws CstlServiceException {
+    public boolean existProcedure(final String href) throws DataStoreException {
         if (sensorDirectory.exists()) {
             for (File sensorFile: sensorDirectory.listFiles()) {
                 String sensorName = sensorFile.getName();
@@ -376,7 +374,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public String getNewObservationId() throws CstlServiceException {
+    public String getNewObservationId() throws DataStoreException {
         String obsID = null;
         boolean exist = true;
         int i = observationDirectory.list().length;
@@ -393,7 +391,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public List<String> getEventTime() throws CstlServiceException {
+    public List<String> getEventTime() throws DataStoreException {
         return Arrays.asList("undefined", "now");
     }
 
@@ -401,8 +399,8 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public TemporalPrimitive getFeatureOfInterestTime(final String samplingFeatureName, final String version) throws CstlServiceException {
-        throw new CstlServiceException("The Filesystem implementation of SOS does not support GetFeatureofInterestTime");
+    public TemporalPrimitive getFeatureOfInterestTime(final String samplingFeatureName, final String version) throws DataStoreException {
+        throw new DataStoreException("The Filesystem implementation of SOS does not support GetFeatureofInterestTime");
     }
     
     /**
@@ -425,7 +423,7 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public List<ResponseModeType> getResponseModes() throws CstlServiceException {
+    public List<ResponseModeType> getResponseModes() throws DataStoreException {
         return Arrays.asList(ResponseModeType.INLINE, ResponseModeType.RESULT_TEMPLATE);
     }
 
@@ -433,12 +431,12 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
-    public List<String> getResponseFormats() throws CstlServiceException {
+    public List<String> getResponseFormats() throws DataStoreException {
         return Arrays.asList("text/xml; subtype=\"om/1.0.0\"");
     }
 
     @Override
-    public AbstractGeometry getSensorLocation(String sensorID, String version) throws CstlServiceException {
+    public AbstractGeometry getSensorLocation(String sensorID, String version) throws DataStoreException {
         throw new UnsupportedOperationException("Not supported yet in this implementation.");
     }
 }

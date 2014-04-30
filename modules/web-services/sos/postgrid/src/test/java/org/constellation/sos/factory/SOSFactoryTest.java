@@ -22,10 +22,11 @@ import javax.imageio.spi.ServiceRegistry;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
+import org.apache.sis.storage.DataStoreException;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.sos.io.ObservationFilter;
-import org.constellation.sos.io.ObservationReader;
+import org.geotoolkit.observation.ObservationReader;
 import org.constellation.ws.CstlServiceException;
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -87,7 +88,7 @@ public class SOSFactoryTest {
         exLaunched = false;
         try  {
             ObservationReader or = omFactory.getObservationReader(DataSourceType.POSTGRID, config, parameters);
-        } catch (CstlServiceException ex) {
+        } catch (DataStoreException ex) {
             exLaunched = true;
             assertTrue(ex.getMessage().contains("No suitable driver found for SomeUrl"));
             

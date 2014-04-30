@@ -34,6 +34,7 @@ import javax.imageio.spi.ServiceRegistry;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import org.apache.sis.storage.DataStoreException;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.*;
@@ -47,7 +48,7 @@ import org.constellation.ogc.configuration.OGCConfigurer;
 import org.constellation.sos.factory.OMFactory;
 import org.constellation.sos.factory.SMLFactory;
 import org.constellation.sos.io.ObservationFilterReader;
-import org.constellation.sos.io.ObservationReader;
+import org.geotoolkit.observation.ObservationReader;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
@@ -255,7 +256,7 @@ public class SOSConfigurer extends OGCConfigurer {
         final ObservationReader reader = getObservationReader(id);
         try {
             return reader.getProcedureNames();
-        } catch (CstlServiceException ex) {
+        } catch (DataStoreException ex) {
             throw new ConfigurationException(ex);
         }
     }
@@ -264,7 +265,7 @@ public class SOSConfigurer extends OGCConfigurer {
         final ObservationReader reader = getObservationReader(id);
         try {
             return reader.getProceduresForPhenomenon(observedProperty);
-        } catch (CstlServiceException ex) {
+        } catch (DataStoreException ex) {
             throw new ConfigurationException(ex);
         }
     }
@@ -273,7 +274,7 @@ public class SOSConfigurer extends OGCConfigurer {
         final ObservationReader reader = getObservationReader(id);
         try {
             return reader.getPhenomenonsForProcedure(sensorID);
-        } catch (CstlServiceException ex) {
+        } catch (DataStoreException ex) {
             throw new ConfigurationException(ex);
         }
     }
@@ -367,7 +368,7 @@ public class SOSConfigurer extends OGCConfigurer {
         final ObservationReader reader = getObservationReader(id);
         try {
             return reader.getPhenomenonNames();
-        } catch (CstlServiceException ex) {
+        } catch (DataStoreException ex) {
             throw new ConfigurationException(ex);
         }
     }
@@ -393,7 +394,7 @@ public class SOSConfigurer extends OGCConfigurer {
             
             final WKTWriter writer = new WKTWriter();
             return writer.write(jtsGeometry);
-        } catch (CstlServiceException | FactoryException | TransformException ex) {
+        } catch (DataStoreException | FactoryException | TransformException ex) {
             throw new ConfigurationException(ex);
         }
     }
@@ -564,7 +565,7 @@ public class SOSConfigurer extends OGCConfigurer {
             try {
                 return omfactory.getObservationReader(config.getObservationWriterType(), config.getOMConfiguration(), new HashMap<String, Object>());
 
-            } catch (CstlServiceException ex) {
+            } catch (DataStoreException ex) {
                 throw new ConfigurationException("JAXBException while initializing the writer!", ex);
             }
         } else {

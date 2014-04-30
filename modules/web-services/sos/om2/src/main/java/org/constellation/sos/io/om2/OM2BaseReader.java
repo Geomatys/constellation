@@ -33,8 +33,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.sis.storage.DataStoreException;
 import org.constellation.sos.factory.OMFactory;
-import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.JTStoGeometry;
 import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.gml.xml.FeatureProperty;
@@ -42,7 +42,6 @@ import org.geotoolkit.referencing.CRS;
 import org.apache.sis.util.logging.Logging;
 
 import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 import org.opengis.observation.Phenomenon;
 import org.opengis.observation.sampling.SamplingFeature;
@@ -102,7 +101,7 @@ public class OM2BaseReader {
         defaultCRS = candidate;
     }
     
-    protected SamplingFeature getFeatureOfInterest(final String id, final String version, final Connection c) throws SQLException, CstlServiceException {
+    protected SamplingFeature getFeatureOfInterest(final String id, final String version, final Connection c) throws SQLException, DataStoreException {
         try {
             final String name;
             final String description;
@@ -142,9 +141,9 @@ public class OM2BaseReader {
             return buildFoi(version, id, name, description, sampledFeature, geom, crs);
             
         } catch (ParseException ex) {
-            throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
+            throw new DataStoreException(ex.getMessage(), ex);
         } catch (FactoryException ex) {
-            throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
+            throw new DataStoreException(ex.getMessage(), ex);
         }
     }
     
@@ -185,7 +184,7 @@ public class OM2BaseReader {
      * DELETE this methode when cstl point on trunk version of geotk-pending
      *
      ****************************************************************************************************
-     */
+     
     public static SamplingFeature buildSamplingPolygon(final String version, final String id, final String name, final String description, final FeatureProperty sampledFeature,
                               final org.geotoolkit.gml.xml.Polygon location, final Double areaValue, final String uom, final Envelope env) {
         if ("1.0.0".equals(version)) {
@@ -230,9 +229,9 @@ public class OM2BaseReader {
         } else {
             throw new IllegalArgumentException("unexpected sos version number:" + version);
         }
-    }
+    }*/
     
-    protected Phenomenon getPhenomenon(final String version, final String observedProperty, final Connection c) throws CstlServiceException {
+    protected Phenomenon getPhenomenon(final String version, final String observedProperty, final Connection c) throws DataStoreException {
         final String id;
         if (observedProperty.startsWith(phenomenonIdBase)) {
             id = observedProperty.substring(phenomenonIdBase.length());
@@ -267,7 +266,7 @@ public class OM2BaseReader {
                 }
             }
         } catch (SQLException ex) {
-            throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
+            throw new DataStoreException(ex.getMessage(), ex);
         }
     }
 }

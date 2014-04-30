@@ -17,51 +17,46 @@
 
 package org.constellation.sos.io.generic;
 
-import java.util.Map;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import javax.xml.namespace.QName;
-
-// constellation dependencies
-import org.constellation.sos.factory.OMFactory;
+import org.apache.sis.storage.DataStoreException;
 import org.constellation.generic.GenericReader;
 import org.constellation.generic.Values;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.MetadataIoException;
-import org.constellation.sos.io.ObservationReader;
-import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.MimeType;
+import org.constellation.sos.factory.OMFactory;
 import static org.constellation.sos.ws.SOSConstants.*;
+import org.constellation.ws.MimeType;
 import org.geotoolkit.gml.xml.AbstractGeometry;
-
 import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.gml.xml.FeatureProperty;
 import org.geotoolkit.gml.xml.GMLXmlFactory;
 import org.geotoolkit.gml.xml.LineString;
 import org.geotoolkit.gml.xml.Point;
 import org.geotoolkit.gml.xml.v311.UnitOfMeasureEntry;
-import org.geotoolkit.sos.xml.ResponseModeType;
-import org.geotoolkit.swe.xml.v101.CompositePhenomenonType;
-import org.geotoolkit.swe.xml.v101.PhenomenonType;
-import org.geotoolkit.swe.xml.v101.PhenomenonPropertyType;
+import org.geotoolkit.observation.ObservationReader;
 import org.geotoolkit.observation.xml.OMXmlFactory;
 import org.geotoolkit.observation.xml.v100.MeasureType;
+
 import org.geotoolkit.sos.xml.ObservationOffering;
+import org.geotoolkit.sos.xml.ResponseModeType;
 import org.geotoolkit.sos.xml.SOSXmlFactory;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
 import org.geotoolkit.swe.xml.AbstractDataComponent;
 import org.geotoolkit.swe.xml.AbstractDataRecord;
 import org.geotoolkit.swe.xml.AnyScalar;
-import org.geotoolkit.swe.xml.TextBlock;
-import org.geotoolkit.swe.xml.UomProperty;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
 import org.geotoolkit.swe.xml.Phenomenon;
 import org.geotoolkit.swe.xml.PhenomenonProperty;
-
+import org.geotoolkit.swe.xml.TextBlock;
+import org.geotoolkit.swe.xml.UomProperty;
+import org.geotoolkit.swe.xml.v101.CompositePhenomenonType;
+import org.geotoolkit.swe.xml.v101.PhenomenonPropertyType;
+import org.geotoolkit.swe.xml.v101.PhenomenonType;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.observation.Measure;
 import org.opengis.observation.Observation;
@@ -87,7 +82,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
     
     protected final String sensorIdBase;
 
-    public DefaultGenericObservationReader(Automatic configuration, Map<String, Object> properties) throws CstlServiceException, MetadataIoException {
+    public DefaultGenericObservationReader(Automatic configuration, Map<String, Object> properties) throws DataStoreException, MetadataIoException {
         super(configuration);
         this.observationIdBase = (String) properties.get(OMFactory.OBSERVATION_ID_BASE);
         this.phenomenonIdBase  = (String) properties.get(OMFactory.PHENOMENON_ID_BASE);
@@ -99,7 +94,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public List<String> getOfferingNames(final String version) throws CstlServiceException {
+    public List<String> getOfferingNames(final String version) throws DataStoreException {
         try {
             if (version.equals("1.0.0")) {
                 final Values values = loadData("var01");
@@ -120,7 +115,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
                 throw new IllegalArgumentException("unexpected SOS version:" + version);
             }
         } catch (MetadataIoException ex) {
-            throw new CstlServiceException(ex);
+            throw new DataStoreException(ex);
         }
     }
 
@@ -128,12 +123,12 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public List<String> getProcedureNames() throws CstlServiceException {
+    public List<String> getProcedureNames() throws DataStoreException {
         try {
             final Values values = loadData(Arrays.asList("var02"));
             return values.getVariables("var02");
         } catch (MetadataIoException ex) {
-            throw new CstlServiceException(ex);
+            throw new DataStoreException(ex);
         }
     }
 
@@ -141,19 +136,19 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public List<String> getPhenomenonNames() throws CstlServiceException {
+    public List<String> getPhenomenonNames() throws DataStoreException {
         try {
             final Values values = loadData(Arrays.asList("var03", "var83"));
             final List<String> results = values.getVariables("var03");
             results.addAll(values.getVariables("var83"));
             return results;
         } catch (MetadataIoException ex) {
-            throw new CstlServiceException(ex);
+            throw new DataStoreException(ex);
         }
     }
     
     @Override
-    public boolean existPhenomenon(String phenomenonName) throws CstlServiceException {
+    public boolean existPhenomenon(String phenomenonName) throws DataStoreException {
         return getPhenomenonNames().contains(phenomenonName);
     }
 
@@ -161,7 +156,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public List<String> getFeatureOfInterestNames() throws CstlServiceException {
+    public List<String> getFeatureOfInterestNames() throws DataStoreException {
         try {
             final Values values = loadData(Arrays.asList("var04", "var67"));
             final List<String> result = values.getVariables("var04");
@@ -171,7 +166,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             }
             return result;
         } catch (MetadataIoException ex) {
-            throw new CstlServiceException(ex);
+            throw new DataStoreException(ex);
         }
     }
 
@@ -179,7 +174,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public String getNewObservationId() throws CstlServiceException {
+    public String getNewObservationId() throws DataStoreException {
         try {
             Values values = loadData(Arrays.asList("var05"));
             int id = Integer.parseInt(values.getVariable("var05"));
@@ -193,7 +188,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             } while (continues != null);
             return observationIdBase + id;
         } catch (MetadataIoException ex) {
-            throw new CstlServiceException(ex);
+            throw new DataStoreException(ex);
         }
     }
 
@@ -201,12 +196,12 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public List<String> getEventTime() throws CstlServiceException {
+    public List<String> getEventTime() throws DataStoreException {
          try {
             final Values values = loadData(Arrays.asList("var06"));
             return Arrays.asList(values.getVariable("var06"));
          } catch (MetadataIoException ex) {
-            throw new CstlServiceException(ex);
+            throw new DataStoreException(ex);
          }
     }
 
@@ -214,7 +209,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public List<ObservationOffering> getObservationOfferings(final List<String> offeringNames, final String version) throws CstlServiceException {
+    public List<ObservationOffering> getObservationOfferings(final List<String> offeringNames, final String version) throws DataStoreException {
         final List<ObservationOffering> offerings = new ArrayList<>();
         for (String offeringName : offeringNames) {
             offerings.add(getObservationOffering(offeringName, version));
@@ -226,7 +221,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public ObservationOffering getObservationOffering(final String offeringName, final String version) throws CstlServiceException {
+    public ObservationOffering getObservationOffering(final String offeringName, final String version) throws DataStoreException {
         try {
             final Values values = loadData(Arrays.asList("var07", "var08", "var09", "var10", "var11", "var12", "var18", "var46"), offeringName);
 
@@ -321,7 +316,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
                     
             
         } catch (MetadataIoException ex) {
-            throw new CstlServiceException(ex);
+            throw new DataStoreException(ex);
         }
     }
 
@@ -329,7 +324,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public List<ObservationOffering> getObservationOfferings(final String version) throws CstlServiceException {
+    public List<ObservationOffering> getObservationOfferings(final String version) throws DataStoreException {
         final List<ObservationOffering> offerings = new ArrayList<>();
         final List<String> offeringNames = getOfferingNames(version);
         for (String offeringName : offeringNames) {
@@ -341,7 +336,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
     /**
      * {@inheritDoc}
      */
-    private PhenomenonType getPhenomenon(String phenomenonName) throws CstlServiceException {
+    private PhenomenonType getPhenomenon(String phenomenonName) throws DataStoreException {
         // we remove the phenomenon id base
         if (phenomenonName.contains(phenomenonIdBase)) {
             phenomenonName = phenomenonName.replace(phenomenonIdBase, "");
@@ -354,11 +349,11 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             }
             return new PhenomenonType(phenomenonName, values.getVariable("var13"), values.getVariable("var14"));
         } catch (MetadataIoException ex) {
-            throw new CstlServiceException(ex);
+            throw new DataStoreException(ex);
         }
     }
     
-    private PhenomenonType getCompositePhenomenon(String phenomenonName) throws CstlServiceException {
+    private PhenomenonType getCompositePhenomenon(String phenomenonName) throws DataStoreException {
         // we remove the phenomenon id base
         if (phenomenonName.contains(phenomenonIdBase)) {
             phenomenonName = phenomenonName.replace(phenomenonIdBase, "");
@@ -382,7 +377,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
                                                                                components);
             return phenomenon;
         } catch (MetadataIoException ex) {
-            throw new CstlServiceException(ex);
+            throw new DataStoreException(ex);
         }
     }
 
@@ -390,7 +385,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public SamplingFeature getFeatureOfInterest(final String samplingFeatureName, final String version) throws CstlServiceException {
+    public SamplingFeature getFeatureOfInterest(final String samplingFeatureName, final String version) throws DataStoreException {
         try {
             final Values values = loadData(Arrays.asList("var19", "var20", "var21", "var22", "var23", "var24", "var48"), samplingFeatureName);
 
@@ -425,11 +420,11 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             }
             return buildSamplingPoint(version, samplingFeatureName, name, description, sampleFeatureProperty, location);
         } catch (MetadataIoException ex) {
-            throw new CstlServiceException(ex);
+            throw new DataStoreException(ex);
         }
     }
     
-    public SamplingFeature getFeatureOfInterestCurve(final String samplingFeatureId, final String version) throws CstlServiceException {
+    public SamplingFeature getFeatureOfInterestCurve(final String samplingFeatureId, final String version) throws DataStoreException {
         try {
             final Values values = loadData(Arrays.asList("var51", "var52", "var53", "var54", "var55", "var56", "var56", "var57",
                                                          "var58", "var59", "var60", "var61", "var62", "var63", "var82"), samplingFeatureId);
@@ -467,7 +462,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             }
             return buildSamplingCurve(version, samplingFeatureId, name, description, sampleFeatureProperty, location, lengthValue, lengthUom, env);
         } catch (MetadataIoException ex) {
-            throw new CstlServiceException(ex);
+            throw new DataStoreException(ex);
         }
     }
     
@@ -493,7 +488,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
         
     }
 
-    private List<Double> getCoordinates(String samplingFeatureId) throws CstlServiceException {
+    private List<Double> getCoordinates(String samplingFeatureId) throws DataStoreException {
         try {
             final Values values = loadData(Arrays.asList("var25", "var45"), samplingFeatureId);
             final List<Double> result = new ArrayList<>();
@@ -502,7 +497,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
                 try {
                     result.add(Double.parseDouble(coordinate));
                 } catch (NumberFormatException ex) {
-                    throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+                    throw new DataStoreException(ex);
                 }
             }
             coordinate = values.getVariable("var45");
@@ -510,12 +505,12 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
                 try {
                     result.add(Double.parseDouble(coordinate));
                 } catch (NumberFormatException ex) {
-                    throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+                    throw new DataStoreException(ex);
                 }
             }
             return result;
         } catch (MetadataIoException ex) {
-            throw new CstlServiceException(ex);
+            throw new DataStoreException(ex);
         }
     }
 
@@ -523,7 +518,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public Observation getObservation(final String identifier, final QName resultModel, final ResponseModeType mode, final String version) throws CstlServiceException {
+    public Observation getObservation(final String identifier, final QName resultModel, final ResponseModeType mode, final String version) throws DataStoreException {
         try {
             final List<String> variables;
             if (resultModel.equals(OBSERVATION_QNAME))  {
@@ -617,7 +612,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
                 throw new IllegalArgumentException("Unexpected version:" + version);
             }
         } catch (MetadataIoException ex) {
-            throw new CstlServiceException(ex);
+            throw new DataStoreException(ex);
         }
     }
 
@@ -625,7 +620,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public Object getResult(final String identifier, final QName resultModel, final String version) throws CstlServiceException {
+    public Object getResult(final String identifier, final QName resultModel, final String version) throws DataStoreException {
         try {
             if (resultModel.equals(OBSERVATION_QNAME)) {
                 final Values values = loadData(Arrays.asList("var32", "var33", "var34", "var35", "var36", "var37", "var38", "var39",
@@ -698,7 +693,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
                 throw new IllegalArgumentException("unexpected resultModel:" + resultModel);
             }
         } catch (MetadataIoException ex) {
-            throw new CstlServiceException(ex);
+            throw new DataStoreException(ex);
         }
     }
 
@@ -706,21 +701,21 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public TemporalPrimitive getFeatureOfInterestTime(final String samplingFeatureName, final String version) throws CstlServiceException {
-        throw new CstlServiceException("The Default generic implementation of SOS does not support GetFeatureofInterestTime");
+    public TemporalPrimitive getFeatureOfInterestTime(final String samplingFeatureName, final String version) throws DataStoreException {
+        throw new DataStoreException("The Default generic implementation of SOS does not support GetFeatureofInterestTime");
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean existProcedure(final String href) throws CstlServiceException {
+    public boolean existProcedure(final String href) throws DataStoreException {
         try {
             final Values values = loadData(Arrays.asList("var02"));
             final List<String>  procedureNames = values.getVariables("var02");
             return procedureNames.contains(href);
         } catch (MetadataIoException ex) {
-            throw new CstlServiceException(ex);
+            throw new DataStoreException(ex);
         }
     }
 
@@ -736,7 +731,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public List<ResponseModeType> getResponseModes() throws CstlServiceException {
+    public List<ResponseModeType> getResponseModes() throws DataStoreException {
         return Arrays.asList(ResponseModeType.INLINE, ResponseModeType.RESULT_TEMPLATE);
     }
 
@@ -744,22 +739,22 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * {@inheritDoc}
      */
     @Override
-    public List<String> getResponseFormats() throws CstlServiceException {
+    public List<String> getResponseFormats() throws DataStoreException {
         return Arrays.asList("text/xml; subtype=\"om/1.0.0\"");
     }
 
     @Override
-    public Collection<String> getProceduresForPhenomenon(String observedProperty) throws CstlServiceException {
+    public Collection<String> getProceduresForPhenomenon(String observedProperty) throws DataStoreException {
         throw new UnsupportedOperationException("Not supported yet in this implementation.");
     }
 
     @Override
-    public Collection<String> getPhenomenonsForProcedure(String sensorID) throws CstlServiceException {
+    public Collection<String> getPhenomenonsForProcedure(String sensorID) throws DataStoreException {
         throw new UnsupportedOperationException("Not supported yet in this implementation."); 
     }
 
     @Override
-    public AbstractGeometry getSensorLocation(String sensorID, String version) throws CstlServiceException {
+    public AbstractGeometry getSensorLocation(String sensorID, String version) throws DataStoreException {
         throw new UnsupportedOperationException("Not supported yet in this implementation.");
     }
 }
