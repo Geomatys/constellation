@@ -130,7 +130,7 @@ public class SOSServices {
     @POST
     @Path("{id}/observations")
     public Response getObservations(final @PathParam("id") String id, final ObservationFilter filter) throws Exception {
-        return ok(getConfigurer().getObservationsCsv(id, filter.getSensorID(), filter.getObservedProperty(), filter.getStart(), filter.getEnd()));
+        return ok(getConfigurer().getDecimatedObservationsCsv(id, filter.getSensorID(), filter.getObservedProperty(), filter.getStart(), filter.getEnd(), 840));
     }
     
     @PUT
@@ -195,18 +195,21 @@ public class SOSServices {
             }
         }
         
-        // SensorML generation
-        final Properties prop = new Properties();
-        prop.put("id",         providerId);
-        prop.put("beginTime",  result.spatialBound.dateStart);
-        prop.put("endTime",    result.spatialBound.dateEnd);
-        prop.put("longitude",  result.spatialBound.minx);
-        prop.put("latitude",   result.spatialBound.miny);
-        prop.put("phenomenon", result.phenomenons);
-        final AbstractSensorML sml = SensorMLGenerator.getTemplateSensorML(prop);
-
         final SOSConfigurer configurer = getConfigurer();
-        configurer.importSensor(id, sml, providerId);
+        
+        // SensorML generation
+        for (String process : result.procedures) {
+            final Properties prop = new Properties();
+            prop.put("id",         process);
+            prop.put("beginTime",  result.spatialBound.dateStart);
+            prop.put("endTime",    result.spatialBound.dateEnd);
+            prop.put("longitude",  result.spatialBound.minx);
+            prop.put("latitude",   result.spatialBound.miny);
+            prop.put("phenomenon", result.phenomenons);
+            final AbstractSensorML sml = SensorMLGenerator.getTemplateSensorML(prop);
+
+            configurer.importSensor(id, sml, process);
+        }
         configurer.importObservations(id, result.observations);
 
         //record location

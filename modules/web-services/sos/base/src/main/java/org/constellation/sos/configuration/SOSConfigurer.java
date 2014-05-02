@@ -393,13 +393,16 @@ public class SOSConfigurer extends OGCConfigurer {
         final ObservationReader reader = getObservationReader(id);
         try {
             final AbstractGeometry geom = reader.getSensorLocation(sensorID, "2.0.0");
-            Geometry jtsGeometry  = GeometrytoJTS.toJTS(geom);
-            // reproject to CRS:84
-            final MathTransform mt = CRS.findMathTransform(geom.getCoordinateReferenceSystem(),WGS84);
-            jtsGeometry = JTS.transform(jtsGeometry, mt);
-            
-            final WKTWriter writer = new WKTWriter();
-            return writer.write(jtsGeometry);
+            if (geom != null) {
+                Geometry jtsGeometry  = GeometrytoJTS.toJTS(geom);
+                // reproject to CRS:84
+                final MathTransform mt = CRS.findMathTransform(geom.getCoordinateReferenceSystem(),WGS84);
+                jtsGeometry = JTS.transform(jtsGeometry, mt);
+
+                final WKTWriter writer = new WKTWriter();
+                return writer.write(jtsGeometry);
+            } 
+            return "";
         } catch (DataStoreException | FactoryException | TransformException ex) {
             throw new ConfigurationException(ex);
         }
@@ -426,6 +429,33 @@ public class SOSConfigurer extends OGCConfigurer {
                 filter.setTimeBefore(time);
             }
             return filter.getResults();
+            
+        } catch (DataStoreException ex) {
+            throw new ConfigurationException(ex);
+        }
+    }
+    
+    public String getDecimatedObservationsCsv(final String id, final String sensorID, final List<String> observedProperties, final Date start, final Date end, final int width) throws ConfigurationException {
+        final ObservationFilterReader filter = getObservationFilter(id);
+        try {
+            filter.initFilterGetResult(sensorID, SOSConstants.OBSERVATION_QNAME);
+            if (observedProperties.isEmpty()) {
+                observedProperties.addAll(getObservedPropertiesForSensorId(id, sensorID));
+            }
+            filter.setObservedProperties(observedProperties);
+            filter.setResponseFormat("text/csv");
+            
+            if (start != null && end != null) {
+                final Period period = new TimePeriodType(new Timestamp(start.getTime()), new Timestamp(end.getTime()));
+                filter.setTimeDuring(period);
+            } else if (start != null) {
+                final Instant time = new TimeInstantType(new Timestamp(start.getTime()));
+                filter.setTimeAfter(time);
+            } else if (end != null) {
+                final Instant time = new TimeInstantType(new Timestamp(end.getTime()));
+                filter.setTimeBefore(time);
+            }
+            return filter.getDecimatedResults(width);
             
         } catch (DataStoreException ex) {
             throw new ConfigurationException(ex);

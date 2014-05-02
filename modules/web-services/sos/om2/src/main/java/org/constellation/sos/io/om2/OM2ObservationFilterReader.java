@@ -27,6 +27,7 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -34,12 +35,12 @@ import java.util.Map;
 import java.util.logging.Level;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.generic.database.Automatic;
-import org.geotoolkit.observation.ObservationFilterReader;
 
 import static org.constellation.sos.ws.SOSConstants.*;
 import static org.constellation.sos.ws.SOSUtils.getTimeValue;
 import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.gml.xml.FeatureProperty;
+import org.geotoolkit.observation.ObservationFilterReader;
 import org.geotoolkit.observation.ObservationStoreException;
 import org.geotoolkit.observation.xml.AbstractObservation;
 import org.geotoolkit.observation.xml.OMXmlFactory;
@@ -568,6 +569,117 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
         }
     }
     
+    @Override
+    public String getDecimatedResults(final int width) throws DataStoreException {
+        try {
+            // add orderby to the query
+            final String fieldRequest = sqlRequest.toString();
+            sqlRequest.append(" ORDER BY  o.\"id\", m.\"id\"");
+            
+            final Connection c                          = source.getConnection();
+            c.setReadOnly(true);
+            final Statement currentStatement            = c.createStatement();
+            LOGGER.info(sqlRequest.toString());
+            final ResultSet rs                          = currentStatement.executeQuery(sqlRequest.toString());
+            final StringBuilder values                  = new StringBuilder();
+            boolean first                               = true;
+            final TextBlock encoding;
+            final List<String> fieldNames               = getFieldsForGetResult(fieldRequest, c);
+            if ("text/csv".equals(responseFormat)) {
+                encoding = getCsvTextEncoding("2.0.0");
+                // Add the header
+                values.append("date,");
+                for (String pheno : fieldNames) {
+                    values.append(pheno).append(',');
+                }
+                values.setCharAt(values.length() - 1, '\n');
+            } else {
+                encoding = getDefaultTextEncoding("2.0.0");
+            }
+            Map<String, Double> minVal = initMapVal(fieldNames, false);
+            Map<String, Double> maxVal = initMapVal(fieldNames, true);
+            final long[] times               = getTimeStepForGetResult(fieldRequest, c, width);
+            final long step                  = times[1];
+            long start                       = times[0];
+            
+            while (rs.next()) {
+                final Timestamp currentTime   = rs.getTimestamp("time");
+                final long currentTimeMs      = currentTime.getTime();
+                final String value            = rs.getString("value");
+                final String fieldName        = rs.getString("field_name");
+
+                addToMapVal(minVal, maxVal, fieldName, value);
+                
+                if (currentTimeMs > (start + step)) {
+                    //min
+                    long minTime = start + 1000;
+                    values.append(format.format(new Date(minTime)));
+                    for (String field : fieldNames) {
+                        values.append(encoding.getTokenSeparator());
+                        final double minValue = minVal.get(field);
+                        if (minValue != Double.MAX_VALUE) {
+                            values.append(minValue);
+                        }
+                    }
+                    values.append(encoding.getBlockSeparator());
+                    //max
+                    long maxTime = start + step + 1000;
+                    values.append(format.format(new Date(maxTime)));
+                    for (String field : fieldNames) {
+                        values.append(encoding.getTokenSeparator());
+                        final double maxValue = maxVal.get(field);
+                        if (maxValue != -Double.MAX_VALUE) {
+                            values.append(maxValue);
+                        }
+                    }
+                    values.append(encoding.getBlockSeparator());
+                    start = currentTimeMs;
+                    minVal = initMapVal(fieldNames, false);
+                    maxVal = initMapVal(fieldNames, true);
+                }
+                
+            }
+            
+            rs.close();
+            currentStatement.close();
+            c.close();
+            return values.toString();
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
+            throw new DataStoreException("the service has throw a SQL Exception:" + ex.getMessage());
+        }
+    }
+    
+    private Map<String, Double> initMapVal(final List<String> fields, final boolean max) {
+        final Map<String, Double> result = new HashMap<>();
+        final double value;
+        if (max) {
+            value = -Double.MAX_VALUE;
+        } else {
+            value = Double.MAX_VALUE;
+        }
+        for (String field : fields) {
+            result.put(field, value);
+        }
+        return result;
+    }
+    
+    private void addToMapVal(final Map<String, Double> minMap, final Map<String, Double> maxMap, final String field, final String value) {
+        final Double minPrevious = minMap.get(field);
+        final Double maxPrevious = maxMap.get(field);
+        try {
+            final Double current = Double.parseDouble(value);
+            if (current > maxPrevious) {
+                maxMap.put(field, current);
+            }
+            if (current < minPrevious) {
+                minMap.put(field, current);
+            }
+        } catch (NumberFormatException ex) {
+            LOGGER.finer("unable to parse value:" + value);
+        }
+    }
+    
     private List<String> getFieldsForGetResult(String request, final Connection c) throws SQLException {
         request = request.replace("SELECT \"time\", \"value\", \"field_name\"", "SELECT DISTINCT \"field_name\"");
         final Statement stmt = c.createStatement();
@@ -579,6 +691,26 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
         rs.close();
         stmt.close();
         return results;
+    }
+    
+    private long[] getTimeStepForGetResult(String request, final Connection c, final int width) throws SQLException {
+        request = request.replace("SELECT \"time\", \"value\", \"field_name\"", "SELECT MIN(\"time\"), MAX(\"time\") ");
+        final Statement stmt = c.createStatement();
+        final ResultSet rs = stmt.executeQuery(request);
+        try {
+            if (rs.next()) {
+                final long[] result = new long[2];
+                final long min = rs.getTimestamp(1).getTime();
+                final long max = rs.getTimestamp(2).getTime();
+                result[0] = min;
+                result[1] = (max - min) / width;
+                return result;
+            }
+        } finally {
+            rs.close();
+            stmt.close();
+        }
+        throw new IllegalArgumentException("unable to find a min/max time bound for getResult request");
     }
     
     @Override

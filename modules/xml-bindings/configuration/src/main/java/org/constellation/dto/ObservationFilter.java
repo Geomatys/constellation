@@ -39,6 +39,9 @@ public class ObservationFilter {
     
     private Date end;
     
+    private int width;
+    
+    
     /**
      * @return the sensorID
      */
@@ -107,5 +110,19 @@ public class ObservationFilter {
             sb.append(op).append("\n");
         }
         return sb.toString();
+    }
+
+    /**
+     * @return the width
+     */
+    public int getWidth() {
+        return width;
+    }
+
+    /**
+     * @param width the width to set
+     */
+    public void setWidth(int width) {
+        this.width = width;
     }
 }
