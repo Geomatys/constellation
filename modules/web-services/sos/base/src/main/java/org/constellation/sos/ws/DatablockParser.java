@@ -23,9 +23,9 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.sis.storage.DataStoreException;
 
 // Constellation dependencies
-import org.constellation.ws.CstlServiceException;
 import static org.constellation.sos.ws.SOSUtils.*;
 
 // Geotk dependencies
@@ -53,7 +53,7 @@ public class DatablockParser {
     private static final Logger LOGGER = Logging.getLogger(DatablockParser.class);
     
     
-    public static Values getResultValues(final Timestamp tBegin, final Timestamp tEnd, final DataArray array, final List<Filter> eventTimes) throws CstlServiceException {
+    public static Values getResultValues(final Timestamp tBegin, final Timestamp tEnd, final DataArray array, final List<Filter> eventTimes) throws DataStoreException {
         Values values;
 
         //for multiple observations we parse the brut values (if we got a time constraint)

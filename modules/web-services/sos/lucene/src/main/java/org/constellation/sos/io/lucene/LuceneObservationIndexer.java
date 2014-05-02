@@ -36,6 +36,7 @@ import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.store.SimpleFSDirectory;
 import org.apache.lucene.util.Version;
+import org.apache.sis.storage.DataStoreException;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.ws.SOSUtils;
 import org.constellation.ws.CstlServiceException;
@@ -225,7 +226,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<Observation> {
             } else if (time != null) {
                 LOGGER.log(Level.WARNING, "unrecognized sampling time type:{0}", time);
             }
-        } catch(CstlServiceException ex) {
+        } catch(DataStoreException ex) {
             LOGGER.severe("error while indexing sampling time.");
         }
         if (template) {

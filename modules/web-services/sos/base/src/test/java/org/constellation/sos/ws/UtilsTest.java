@@ -23,13 +23,13 @@ import java.util.List;
 import javax.xml.bind.Unmarshaller;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.util.Util;
-import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.AbstractGeometry;
 import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.gml.xml.v311.EnvelopeType;
 import org.geotoolkit.gml.xml.v311.PointType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
+import org.geotoolkit.observation.ObservationStoreException;
 import org.geotoolkit.observation.xml.v100.ObservationType;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -171,7 +171,7 @@ public class UtilsTest {
         boolean exLaunched = false;
         try {
             SOSUtils.getTimeValue(position);
-        } catch (CstlServiceException ex) {
+        } catch (ObservationStoreException ex) {
             exLaunched = true;
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
             assertEquals(ex.getLocator(), "eventTime");
@@ -185,7 +185,7 @@ public class UtilsTest {
         exLaunched = false;
         try {
             SOSUtils.getTimeValue(position);
-        } catch (CstlServiceException ex) {
+        } catch (ObservationStoreException ex) {
             exLaunched = true;
             assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
             assertEquals(ex.getLocator(), "eventTime");
@@ -196,7 +196,7 @@ public class UtilsTest {
         exLaunched = false;
         try {
             SOSUtils.getTimeValue(null);
-        } catch (CstlServiceException ex) {
+        } catch (ObservationStoreException ex) {
             exLaunched = true;
             assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
             assertEquals(ex.getLocator(), "eventTime");
@@ -223,7 +223,7 @@ public class UtilsTest {
         boolean exLaunched = false;
         try {
             SOSUtils.getLuceneTimeValue(position);
-        } catch (CstlServiceException ex) {
+        } catch (ObservationStoreException ex) {
             exLaunched = true;
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
             assertEquals(ex.getLocator(), "eventTime");
@@ -237,7 +237,7 @@ public class UtilsTest {
         exLaunched = false;
         try {
             SOSUtils.getLuceneTimeValue(position);
-        } catch (CstlServiceException ex) {
+        } catch (ObservationStoreException ex) {
             exLaunched = true;
             assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
             assertEquals(ex.getLocator(), "eventTime");
@@ -248,7 +248,7 @@ public class UtilsTest {
         exLaunched = false;
         try {
             SOSUtils.getLuceneTimeValue(null);
-        } catch (CstlServiceException ex) {
+        } catch (ObservationStoreException ex) {
             exLaunched = true;
             assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
             assertEquals(ex.getLocator(), "eventTime");
@@ -266,7 +266,7 @@ public class UtilsTest {
 
         PhenomenonType pheno = new PhenomenonType("test", "test");
 
-        List<Observation> observations = new ArrayList<Observation>();
+        List<Observation> observations = new ArrayList<>();
 
         ObservationType obs1 = new ObservationType();
         ObservationType obs2 = new ObservationType();
@@ -296,7 +296,7 @@ public class UtilsTest {
         sp3.setBoundedBy(new EnvelopeType(null, new DirectPositionType(0.0, -8.0), new DirectPositionType(20.0, 10.0), "urn:ogc:def:crs:EPSG::4326"));
         obs3 = new ObservationType(null, null, sp3, pheno, null, this, null);
 
-        observations = new ArrayList<Observation>();
+        observations = new ArrayList<>();
         observations.add(obs1);
         observations.add(obs2);
         observations.add(obs3);

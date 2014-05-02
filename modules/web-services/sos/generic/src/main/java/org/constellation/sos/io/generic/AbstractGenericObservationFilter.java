@@ -29,12 +29,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.sql.SQLException;
 import javax.sql.DataSource;
+import org.apache.sis.storage.DataStoreException;
 
 
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.generic.database.Query;
-import org.constellation.sos.io.ObservationFilter;
+import org.geotoolkit.observation.ObservationFilter;
 import org.constellation.sos.factory.OMFactory;
 import org.constellation.ws.CstlServiceException;
 
@@ -97,23 +98,23 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
      */
     protected static final Logger LOGGER = Logging.getLogger("org.constellation.sos.io.generic");
 
-    public AbstractGenericObservationFilter(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
+    public AbstractGenericObservationFilter(final Automatic configuration, final Map<String, Object> properties) throws DataStoreException {
         this.observationIdBase         = (String) properties.get(OMFactory.OBSERVATION_ID_BASE);
         this.observationTemplateIdBase = (String) properties.get(OMFactory.OBSERVATION_TEMPLATE_ID_BASE);
         this.phenomenonIdBase          = (String) properties.get(OMFactory.PHENOMENON_ID_BASE);
         if (configuration == null) {
-            throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
+            throw new DataStoreException("The configuration object is null");
         }
         this.configuration = configuration;
         
         // we get the database informations
         final BDD db = configuration.getBdd();
         if (db == null) {
-            throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
+            throw new DataStoreException("The configuration file does not contains a BDD object");
         }
         this.configurationQuery = configuration.getFilterQueries();
         if (configurationQuery == null) {
-            throw new CstlServiceException("Unable to find the filter queries part", NO_APPLICABLE_CODE);
+            throw new DataStoreException("Unable to find the filter queries part");
         }
         try {
             this.dataSource = db.getDataSource();
@@ -123,8 +124,7 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
                 }
             }
         } catch (SQLException ex) {
-            throw new CstlServiceException("SQLException while initializing the observation filter:" +'\n'+
-                                           "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
+            throw new DataStoreException("SQLException while initializing the observation filter:\ncause:" + ex.getMessage());
         }
     }
 
@@ -201,8 +201,8 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
      * {@inheritDoc}
      */
     @Override
-    public void setResultEquals(final String propertyName, final String value) throws CstlServiceException {
-        throw new CstlServiceException("setResultEquals is not supported by this ObservationFilter implementation.");
+    public void setResultEquals(final String propertyName, final String value) throws DataStoreException {
+        throw new DataStoreException("setResultEquals is not supported by this ObservationFilter implementation.");
     }
 
     /**

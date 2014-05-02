@@ -27,7 +27,7 @@ import org.apache.sis.storage.DataStoreException;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.constellation.sos.io.ObservationFilter;
+import org.geotoolkit.observation.ObservationFilter;
 import org.geotoolkit.observation.ObservationReader;
 import org.geotoolkit.observation.ObservationWriter;
 import org.constellation.ws.CstlServiceException;
@@ -97,7 +97,7 @@ public class SOSFactoryTest {
         boolean exLaunched = false;
         try  {
             ObservationFilter of = omFactory.getObservationFilter(DataSourceType.LUCENE, config, parameters);
-        } catch (CstlServiceException ex) {
+        } catch (DataStoreException ex) {
             exLaunched = true;
             assertTrue(ex.getMessage().contains("IndexingException in LuceneObservationFilter constructor"));
         }

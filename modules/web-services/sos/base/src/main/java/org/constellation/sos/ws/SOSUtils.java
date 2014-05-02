@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.dto.SensorMLTree;
 import org.constellation.util.ReflectionUtilities;
@@ -35,6 +36,7 @@ import org.geotoolkit.gml.xml.AbstractFeature;
 import org.geotoolkit.gml.xml.AbstractGeometry;
 import org.geotoolkit.gml.xml.BoundingShape;
 import org.geotoolkit.gml.xml.Envelope;
+import org.geotoolkit.observation.ObservationStoreException;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.sml.xml.AbstractClassification;
 import org.geotoolkit.sml.xml.AbstractClassifier;
@@ -135,7 +137,7 @@ public final class SOSUtils {
      */
     @Deprecated
     public static List<String> getNetworkNames(final AbstractSensorML sensor) {
-        final List<String> results = new ArrayList<String>();
+        final List<String> results = new ArrayList<>();
         if (sensor != null && sensor.getMember().size() == 1) {
             final AbstractProcess component = sensor.getMember().get(0).getRealProcess();
             if (component != null) {
@@ -176,8 +178,10 @@ public final class SOSUtils {
      * return a SQL formatted timestamp
      *
      * @param time a GML time position object.
+     * @return 
+     * @throws org.geotoolkit.observation.ObservationStoreException
      */
-    public static String getTimeValue(final Position time) throws CstlServiceException {
+    public static String getTimeValue(final Position time) throws ObservationStoreException {
         if (time != null && time.getDateTime() != null) {
              try {
                  final String value = time.getDateTime().toString();
@@ -188,7 +192,7 @@ public final class SOSUtils {
                  return t.toString();
 
              } catch(IllegalArgumentException e) {
-                throw new CstlServiceException("Unable to parse the value: " + time.toString() + '\n' +
+                throw new ObservationStoreException("Unable to parse the value: " + time.toString() + '\n' +
                                                "Bad format of timestamp:\n" + e.getMessage(),
                                                INVALID_PARAMETER_VALUE, "eventTime");
              } 
@@ -199,12 +203,12 @@ public final class SOSUtils {
             } else {
                 locator = "TimePosition value";
             }
-            throw new  CstlServiceException("bad format of time, " + locator + " mustn't be null",
+            throw new  ObservationStoreException("bad format of time, " + locator + " mustn't be null",
                                               MISSING_PARAMETER_VALUE, "eventTime");
           }
     }
     
-    public static Timestamp getTimestampValue(final Position time) throws CstlServiceException {
+    public static Timestamp getTimestampValue(final Position time) throws ObservationStoreException {
         return Timestamp.valueOf(getTimeValue(time));
     }
 
@@ -212,9 +216,9 @@ public final class SOSUtils {
      * return a SQL formatted timestamp
      *
      * @param time a GML time position object.
-     * @throws org.constellation.ws.CstlServiceException
+     * @throws org.apache.sis.storage.DataStoreException
      */
-    public static String getLuceneTimeValue(final Position time) throws CstlServiceException {
+    public static String getLuceneTimeValue(final Position time) throws DataStoreException {
         if (time != null && time.getDateTime() != null) {
             String value = time.getDateTime().toString();
 
@@ -229,7 +233,7 @@ public final class SOSUtils {
                  final Date d = parser.parseToDate(value);
 
             } catch(IllegalArgumentException e) {
-               throw new CstlServiceException("Unable to parse the value: " + value + '\n' +
+               throw new ObservationStoreException("Unable to parse the value: " + value + '\n' +
                                               "Bad format of timestamp:\n" + e.getMessage(),
                                               INVALID_PARAMETER_VALUE, "eventTime");
             }
@@ -245,7 +249,7 @@ public final class SOSUtils {
             } else {
                 locator = "TimePosition value";
             }
-            throw new  CstlServiceException("bad format of time, " + locator + " mustn't be null",
+            throw new  ObservationStoreException("bad format of time, " + locator + " mustn't be null",
                                               MISSING_PARAMETER_VALUE, "eventTime");
           }
     }
@@ -275,6 +279,7 @@ public final class SOSUtils {
     /**
      * Return an envelope containing all the Observation member of the collection.
      *
+     * @param version
      * @param observations
      * @return
      */

@@ -46,10 +46,10 @@ import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.security.SecurityManagerHolder;
 import org.constellation.sos.factory.OMFactory;
 import org.constellation.sos.factory.SMLFactory;
-import org.constellation.sos.io.ObservationFilter;
-import org.constellation.sos.io.ObservationFilterReader;
+import org.geotoolkit.observation.ObservationFilter;
+import org.geotoolkit.observation.ObservationFilterReader;
 import org.geotoolkit.observation.ObservationReader;
-import org.constellation.sos.io.ObservationResult;
+import org.geotoolkit.observation.ObservationResult;
 import org.geotoolkit.observation.ObservationWriter;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
@@ -69,6 +69,7 @@ import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.gml.xml.FeatureCollection;
 import org.geotoolkit.gml.xml.FeatureProperty;
 import org.geotoolkit.gml.xml.TimeIndeterminateValueType;
+import org.geotoolkit.observation.ObservationStoreException;
 import org.geotoolkit.observation.xml.AbstractObservation;
 import org.geotoolkit.observation.xml.OMXmlFactory;
 import org.geotoolkit.observation.xml.ObservationComparator;
@@ -907,10 +908,6 @@ public class SOSworker extends AbstractWorker {
 
         final String currentVersion = requestObservation.getVersion().toString();
         
-        // we clone the filter for this request
-        final ObservationFilter localOmFilter = omFactory.cloneObservationFilter(omFilter);
-
-
         //we verify that the output format is good.
         final String responseFormat = requestObservation.getResponseFormat();
         if (responseFormat != null && !responseFormat.isEmpty()) {
@@ -931,12 +928,7 @@ public class SOSworker extends AbstractWorker {
             throw new CstlServiceException("Response format must be specify.\nAccepted values are:\n" + arf.toString(),
                     MISSING_PARAMETER_VALUE, "responseFormat");
         }
-
-        // we set the response format on the filter reader
-        if (localOmFilter instanceof ObservationFilterReader) {
-            ((ObservationFilterReader)localOmFilter).setResponseFormat(responseFormat);
-        }
-
+        
         QName resultModel = requestObservation.getResultModel();
         if (resultModel == null) {
             resultModel = OBSERVATION_QNAME;
@@ -961,12 +953,7 @@ public class SOSworker extends AbstractWorker {
                                                  INVALID_PARAMETER_VALUE, RESPONSE_MODE);
             }
         }
-        try {
-            localOmFilter.initFilterObservation(mode, resultModel);
-        } catch (IllegalArgumentException ex) {
-            throw new CstlServiceException(ex);
-        }
-
+        
         if (mode == OUT_OF_BAND) {
             outOfBand = true;
         } else if (mode == RESULT_TEMPLATE) {
@@ -983,6 +970,17 @@ public class SOSworker extends AbstractWorker {
         
         final Object response;
         try {
+            
+            // we clone the filter for this request
+            final ObservationFilter localOmFilter = omFactory.cloneObservationFilter(omFilter);
+
+            // we set the response format on the filter reader
+            if (localOmFilter instanceof ObservationFilterReader) {
+                ((ObservationFilterReader)localOmFilter).setResponseFormat(responseFormat);
+            }
+        
+            localOmFilter.initFilterObservation(mode, resultModel);
+            
             //we verify that there is an offering (mandatory in 1.0.0, optional in 2.0.0)
             final List<ObservationOffering> offerings = new ArrayList<>();
             final List<String> offeringNames = requestObservation.getOfferings();
@@ -1345,7 +1343,12 @@ public class SOSworker extends AbstractWorker {
                 response = sReponse;
             }
         } catch (DataStoreException ex) {
-            throw new CstlServiceException(ex);
+            if (ex instanceof ObservationStoreException) {
+                final ObservationStoreException oex = (ObservationStoreException) ex;
+                throw new CstlServiceException(ex, oex.getExceptionCode(), oex.getLocator());
+            } else {
+                throw new CstlServiceException(ex);
+            }
         }    
         LOGGER.log(logLevel, "getObservation processed in {0}ms.\n", (System.currentTimeMillis() - start));
         return response;
@@ -1366,18 +1369,19 @@ public class SOSworker extends AbstractWorker {
 
         //we verify the base request attribute
         verifyBaseRequest(request, true, false);
-        final String currentVersion = request.getVersion().toString();
-        
-        // we clone the filter for this request
-        final ObservationFilter localOmFilter = omFactory.cloneObservationFilter(omFilter);
-        final String observationTemplateID    = request.getObservationTemplateId();
-        
+
+        final String currentVersion         = request.getVersion().toString();
+        final String observationTemplateID  = request.getObservationTemplateId();
         final String procedure;
         final String observedProperty;
         final TemporalObject time;
         final QName resultModel;
         final String values;
+            
         try {
+            // we clone the filter for this request
+            final ObservationFilter localOmFilter = omFactory.cloneObservationFilter(omFilter);
+
             if (observationTemplateID != null) {
                 final Observation template = templates.get(observationTemplateID);
                 if (template == null) {
@@ -1518,17 +1522,17 @@ public class SOSworker extends AbstractWorker {
             throw new CstlServiceException("You must choose a filter parameter: eventTime, featureId or location", MISSING_PARAMETER_VALUE);
         }
 
-        // we clone the filter for this request
-        final ObservationFilter localOmFilter = omFactory.cloneObservationFilter(omFilter);
-        localOmFilter.initFilterGetFeatureOfInterest();
-        
-        // for now we don't support time filter on FOI
-        if (request.getTemporalFilters().size() > 0) {
-            throw new CstlServiceException("The time filter on feature Of Interest is not yet supported", OPERATION_NOT_SUPPORTED);
-        }
         AbstractFeature result = null;
-        
         try {
+            // we clone the filter for this request
+            final ObservationFilter localOmFilter = omFactory.cloneObservationFilter(omFilter);
+            localOmFilter.initFilterGetFeatureOfInterest();
+
+            // for now we don't support time filter on FOI
+            if (request.getTemporalFilters().size() > 0) {
+                throw new CstlServiceException("The time filter on feature Of Interest is not yet supported", OPERATION_NOT_SUPPORTED);
+            }
+        
             boolean ofilter = false;
             if (request.getObservedProperty() != null && !request.getObservedProperty().isEmpty()) {
                 for (String observedProperty : request.getObservedProperty()) {
@@ -2160,12 +2164,13 @@ public class SOSworker extends AbstractWorker {
 
                ids.add(id);
             }
+            
+            LOGGER.log(logLevel, "insertObservation processed in {0} ms", (System.currentTimeMillis() - start));
+            omFilter.refresh();
+        
         } catch (DataStoreException ex) {
             throw new CstlServiceException(ex);
         }
-
-        LOGGER.log(logLevel, "insertObservation processed in {0} ms", (System.currentTimeMillis() - start));
-        omFilter.refresh();
         return buildInsertObservationResponse(currentVersion, ids);
     }
 
@@ -2177,7 +2182,7 @@ public class SOSworker extends AbstractWorker {
      *
      * @return true if there is no errors in the time constraint else return false.
      */
-    private TemporalGeometricPrimitive treatEventTimeRequest(final String version, final List<Filter> times, final boolean template, final ObservationFilter localOmFilter) throws CstlServiceException {
+    private TemporalGeometricPrimitive treatEventTimeRequest(final String version, final List<Filter> times, final boolean template, final ObservationFilter localOmFilter) throws CstlServiceException, DataStoreException {
 
         //In template mode  his method return a temporal Object.
         TemporalGeometricPrimitive templateTime = null;

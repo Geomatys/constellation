@@ -34,13 +34,13 @@ import java.util.Map;
 import java.util.logging.Level;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.generic.database.Automatic;
-import org.constellation.sos.io.ObservationFilterReader;
+import org.geotoolkit.observation.ObservationFilterReader;
 
 import static org.constellation.sos.ws.SOSConstants.*;
 import static org.constellation.sos.ws.SOSUtils.getTimeValue;
-import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.gml.xml.FeatureProperty;
+import org.geotoolkit.observation.ObservationStoreException;
 import org.geotoolkit.observation.xml.AbstractObservation;
 import org.geotoolkit.observation.xml.OMXmlFactory;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -75,7 +75,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
     }
 
     
-    public OM2ObservationFilterReader(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
+    public OM2ObservationFilterReader(final Automatic configuration, final Map<String, Object> properties) throws DataStoreException {
         super(configuration, properties);
     }
     
@@ -83,7 +83,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
      * {@inheritDoc}
      */
     @Override
-    public void setTimeEquals(final Object time) throws CstlServiceException {
+    public void setTimeEquals(final Object time) throws DataStoreException {
         if (time instanceof Period) {
             final Period tp    = (Period) time;
             final String begin = getTimeValue(tp.getBeginning().getPosition());
@@ -101,7 +101,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             sqlRequest.append("AND (\"time\"='").append(position).append("') ");
 
         } else {
-            throw new CstlServiceException("TM_Equals operation require timeInstant or TimePeriod!",
+            throw new ObservationStoreException("TM_Equals operation require timeInstant or TimePeriod!",
                     INVALID_PARAMETER_VALUE, EVENT_TIME);
         }
     }
@@ -110,7 +110,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
      * {@inheritDoc}
      */
     @Override
-    public void setTimeBefore(final Object time) throws CstlServiceException  {
+    public void setTimeBefore(final Object time) throws DataStoreException  {
         // for the operation before the temporal object must be an timeInstant
         if (time instanceof Instant) {
             final Instant ti      = (Instant) time;
@@ -118,7 +118,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             sqlRequest.append("AND (\"time\"<='").append(position).append("')");
 
         } else {
-            throw new CstlServiceException("TM_Before operation require timeInstant!",
+            throw new ObservationStoreException("TM_Before operation require timeInstant!",
                     INVALID_PARAMETER_VALUE, EVENT_TIME);
         }
     }
@@ -127,14 +127,14 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
      * {@inheritDoc}
      */
     @Override
-    public void setTimeAfter(final Object time) throws CstlServiceException {
+    public void setTimeAfter(final Object time) throws DataStoreException {
         // for the operation after the temporal object must be an timeInstant
         if (time instanceof Instant) {
             final Instant ti      = (Instant) time;
             final String position = getTimeValue(ti.getPosition());
             sqlRequest.append("AND (\"time\">='").append(position).append("')");
         } else {
-            throw new CstlServiceException("TM_After operation require timeInstant!",
+            throw new ObservationStoreException("TM_After operation require timeInstant!",
                     INVALID_PARAMETER_VALUE, EVENT_TIME);
         }
     }
@@ -143,7 +143,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
      * {@inheritDoc}
      */
     @Override
-    public void setTimeDuring(final Object time) throws CstlServiceException {
+    public void setTimeDuring(final Object time) throws DataStoreException {
         if (time instanceof Period) {
             final Period tp    = (Period) time;
             final String begin = getTimeValue(tp.getBeginning().getPosition());
@@ -151,13 +151,13 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             
             sqlRequest.append("AND (\"time\">='").append(begin).append("' AND \"time\"<= '").append(end).append("')");
         } else {
-            throw new CstlServiceException("TM_During operation require TimePeriod!",
+            throw new ObservationStoreException("TM_During operation require TimePeriod!",
                     INVALID_PARAMETER_VALUE, EVENT_TIME);
         }
     }
     
     @Override
-    public List<Observation> getObservationTemplates(final String version) throws CstlServiceException {
+    public List<Observation> getObservationTemplates(final String version) throws DataStoreException {
         if (resultModel.equals(MEASUREMENT_QNAME)) {
             return getMesurementTemplates(version);
         }
@@ -237,15 +237,13 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             return new ArrayList<>(observations.values());
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
-            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE);
+            throw new DataStoreException("the service has throw a SQL Exception:" + ex.getMessage());
         } catch (DataStoreException ex) {
-            throw new CstlServiceException("the service has throw a Datastore Exception:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE);
+            throw new DataStoreException("the service has throw a Datastore Exception:" + ex.getMessage());
         }
     }
     
-    public List<Observation> getMesurementTemplates(final String version) throws CstlServiceException {
+    public List<Observation> getMesurementTemplates(final String version) throws DataStoreException {
         try {
             final Map<String, Observation> observations = new HashMap<>();
             final Connection c                          = source.getConnection();
@@ -287,16 +285,14 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             return new ArrayList<>(observations.values());
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
-            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE);
+            throw new DataStoreException("the service has throw a SQL Exception:" + ex.getMessage());
         } catch (DataStoreException ex) {
-            throw new CstlServiceException("the service has throw a Datastore Exception:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE);
+            throw new DataStoreException("the service has throw a Datastore Exception:" + ex.getMessage());
         }
     }
 
     @Override
-    public List<Observation> getObservations(final String version) throws CstlServiceException {
+    public List<Observation> getObservations(final String version) throws DataStoreException {
         if (resultModel.equals(MEASUREMENT_QNAME)) {
             return getMesurements(version);
         }
@@ -417,15 +413,13 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             return new ArrayList<>(observations.values());
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
-            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE);
+            throw new DataStoreException("the service has throw a SQL Exception:" + ex.getMessage());
         } catch (DataStoreException ex) {
-            throw new CstlServiceException("the service has throw a Datastore Exception:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE);
+            throw new DataStoreException("the service has throw a Datastore Exception:" + ex.getMessage());
         }
     }
     
-    private AnyScalar buildField(final String version, final String fieldName, final String fieldType, final String uom, final String fieldDef) throws CstlServiceException {
+    private AnyScalar buildField(final String version, final String fieldName, final String fieldType, final String uom, final String fieldDef) throws DataStoreException {
         if ("Quantity".equals(fieldType)) {
             final UomProperty uomCode     = buildUomProperty(version, uom, null);
             final AbstractDataComponent c = buildQuantity(version, fieldDef, uomCode, null);
@@ -437,7 +431,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             final AbstractDataComponent c = buildText(version, fieldDef, null);
             return buildAnyScalar(version, null, fieldName, c);
         } else {
-            throw new CstlServiceException("Unsupported field Type:" + fieldType);
+            throw new DataStoreException("Unsupported field Type:" + fieldType);
         }
     }
     
@@ -449,7 +443,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
         return buildDataArrayProperty(version, arrayID, nbValue, arrayID, record, encoding, values);
     }
     
-    public List<Observation> getMesurements(final String version) throws CstlServiceException {
+    public List<Observation> getMesurements(final String version) throws DataStoreException {
         try {
             // add orderby to the query
             sqlRequest.append(" ORDER BY o.\"id\", m.\"id\"");
@@ -484,7 +478,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                 try {
                     dValue = Double.parseDouble(value);
                 } catch (NumberFormatException ex) {
-                    throw new CstlServiceException("Unable ta parse the result value as a double");
+                    throw new DataStoreException("Unable ta parse the result value as a double");
                 }
                 final Object result = buildMeasureResult(version, dValue, uom, rid);
                 observations.add(OMXmlFactory.buildMeasurement(version, obsID, name, null, prop, phen, procedure, result, time));
@@ -496,21 +490,19 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             return observations;
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
-            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE);
+            throw new DataStoreException("the service has throw a SQL Exception:" + ex.getMessage());
         } catch (DataStoreException ex) {
-            throw new CstlServiceException("the service has throw a Datastore Exception:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE);
+            throw new DataStoreException("the service has throw a Datastore Exception:" + ex.getMessage());
         }
     }
     
-    private Object buildMeasureResult(final String version, final double value, final String uom, final String resultId) throws CstlServiceException, SQLException {
+    private Object buildMeasureResult(final String version, final double value, final String uom, final String resultId) {
         final String name   = "measure-00" + resultId;
         return buildMeasure(version, name, uom, value);
     }
     
     @Override
-    public String getResults() throws CstlServiceException {
+    public String getResults() throws DataStoreException {
         try {
             // add orderby to the query
             final String fieldRequest = sqlRequest.toString();
@@ -572,8 +564,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             return values.toString();
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
-            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE);
+            throw new DataStoreException("the service has throw a SQL Exception:" + ex.getMessage());
         }
     }
     
@@ -591,7 +582,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
     }
     
     @Override
-    public List<SamplingFeature> getFeatureOfInterests(final String version) throws CstlServiceException {
+    public List<SamplingFeature> getFeatureOfInterests(final String version) throws DataStoreException {
         try {
             final List<SamplingFeature> features = new ArrayList<>();
             final Connection c = source.getConnection();
@@ -627,22 +618,19 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             return features;
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
-            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(), ex,
-                    NO_APPLICABLE_CODE);
+            throw new DataStoreException("the service has throw a SQL Exception:" + ex.getMessage(), ex);
         }catch (FactoryException ex) {
             LOGGER.log(Level.SEVERE, "FactoryException while executing the query: {0}", sqlRequest.toString());
-            throw new CstlServiceException("the service has throw a Factory Exception:" + ex.getMessage(), ex,
-                    NO_APPLICABLE_CODE);
+            throw new DataStoreException("the service has throw a Factory Exception:" + ex.getMessage(), ex);
         }catch (ParseException ex) {
             LOGGER.log(Level.SEVERE, "ParseException while executing the query: {0}", sqlRequest.toString());
-            throw new CstlServiceException("the service has throw a Parse Exception:" + ex.getMessage(), ex,
-                    NO_APPLICABLE_CODE);
+            throw new DataStoreException("the service has throw a Parse Exception:" + ex.getMessage(), ex);
         }
     }
 
     @Override
-    public String getOutOfBandResults() throws CstlServiceException {
-        throw new CstlServiceException("Out of band response mode has not been implemented yet", NO_APPLICABLE_CODE, RESPONSE_MODE);
+    public String getOutOfBandResults() throws DataStoreException {
+        throw new ObservationStoreException("Out of band response mode has not been implemented yet", NO_APPLICABLE_CODE, RESPONSE_MODE);
     }
 
     @Override

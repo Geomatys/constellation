@@ -17,30 +17,30 @@
 
 package org.constellation.sos.io.generic;
 
-import javax.xml.namespace.QName;
-import java.util.Map;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
+import java.util.Map;
 import java.util.logging.Level;
-
-// Constellation dependencies
+import javax.xml.namespace.QName;
+import org.apache.sis.storage.DataStoreException;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.From;
 import org.constellation.generic.database.Query;
 import org.constellation.generic.database.Select;
 import org.constellation.generic.database.Where;
-import org.constellation.sos.io.ObservationResult;
-import org.geotoolkit.sos.xml.ResponseModeType;
-import org.constellation.ws.CstlServiceException;
-import static org.geotoolkit.sos.xml.ResponseModeType.*;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import static org.constellation.sos.ws.SOSUtils.*;
 import static org.constellation.sos.ws.SOSConstants.*;
+import static org.constellation.sos.ws.SOSUtils.*;
+import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.Envelope;
+import org.geotoolkit.observation.ObservationResult;
+import org.geotoolkit.observation.ObservationStoreException;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.sos.xml.ObservationOffering;
+import org.geotoolkit.sos.xml.ResponseModeType;
+import static org.geotoolkit.sos.xml.ResponseModeType.*;
 import org.opengis.temporal.Instant;
 import org.opengis.temporal.Period;
 
@@ -64,9 +64,9 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      * @param configuration
      * @param properties
      * 
-     * @throws CstlServiceException
+     * @throws DataStoreException
      */
-    public GenericObservationFilter(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
+    public GenericObservationFilter(final Automatic configuration, final Map<String, Object> properties) throws DataStoreException {
         super(configuration, properties);
     }
     
@@ -122,7 +122,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void initFilterGetFeatureOfInterest() throws CstlServiceException {
+    public void initFilterGetFeatureOfInterest() throws DataStoreException {
         // do nothing no implemented
     }
     
@@ -182,7 +182,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setTimeEquals(final Object time) throws CstlServiceException {
+    public void setTimeEquals(final Object time) throws DataStoreException {
         if (time instanceof Period) {
             final Period tp    = (Period) time;
             final String begin = getTimeValue(tp.getBeginning().getPosition());
@@ -203,7 +203,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
             currentQuery.addWhere(where);
 
         } else {
-            throw new CstlServiceException("TM_Equals operation require timeInstant or TimePeriod!",
+            throw new ObservationStoreException("TM_Equals operation require timeInstant or TimePeriod!",
                     INVALID_PARAMETER_VALUE, EVENT_TIME);
         }
     }
@@ -212,7 +212,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setTimeBefore(final Object time) throws CstlServiceException  {
+    public void setTimeBefore(final Object time) throws DataStoreException  {
         // for the operation before the temporal object must be an timeInstant
         if (time instanceof Instant) {
             final Instant ti = (Instant) time;
@@ -223,7 +223,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
             currentQuery.addWhere(where);
 
         } else {
-            throw new CstlServiceException("TM_Before operation require timeInstant!",
+            throw new ObservationStoreException("TM_Before operation require timeInstant!",
                     INVALID_PARAMETER_VALUE, EVENT_TIME);
         }
     }
@@ -232,7 +232,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setTimeAfter(final Object time) throws CstlServiceException {
+    public void setTimeAfter(final Object time) throws DataStoreException {
         // for the operation after the temporal object must be an timeInstant
         if (time instanceof Instant) {
             final Instant ti = (Instant) time;
@@ -243,7 +243,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
             currentQuery.addWhere(where);
 
         } else {
-            throw new CstlServiceException("TM_After operation require timeInstant!",
+            throw new ObservationStoreException("TM_After operation require timeInstant!",
                     INVALID_PARAMETER_VALUE, EVENT_TIME);
         }
     }
@@ -252,7 +252,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setTimeDuring(final Object time) throws CstlServiceException {
+    public void setTimeDuring(final Object time) throws DataStoreException {
         if (time instanceof Period) {
             final Period tp    = (Period) time;
             final String begin = getTimeValue(tp.getBeginning().getPosition());
@@ -264,7 +264,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
             currentQuery.addWhere(where);
 
         } else {
-            throw new CstlServiceException("TM_During operation require TimePeriod!",
+            throw new ObservationStoreException("TM_During operation require TimePeriod!",
                     INVALID_PARAMETER_VALUE, EVENT_TIME);
         }
     }
@@ -273,7 +273,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setOfferings(final List<ObservationOffering> offerings) throws CstlServiceException {
+    public void setOfferings(final List<ObservationOffering> offerings) throws DataStoreException {
         // not used in this implementations
     }
     
@@ -281,7 +281,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public List<ObservationResult> filterResult() throws CstlServiceException {
+    public List<ObservationResult> filterResult() throws DataStoreException {
         final String request = currentQuery.buildSQLQuery();
         LOGGER.log(Level.INFO, "request:{0}", request);
         try {
@@ -301,8 +301,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
 
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, "SQLException while executing the query: {0}", request);
-            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage() + '\n' + "while executing the request:" + request,
-                                          NO_APPLICABLE_CODE);
+            throw new DataStoreException("the service has throw a SQL Exception:" + ex.getMessage() + '\n' + "while executing the request:" + request);
         }
 
     }
@@ -311,7 +310,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public Set<String> filterObservation() throws CstlServiceException {
+    public Set<String> filterObservation() throws DataStoreException {
         final String request = currentQuery.buildSQLQuery();
         LOGGER.log(Level.INFO, "request:{0}", request);
         try {
@@ -328,8 +327,7 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
             return results;
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, "SQLException while executing the query: {0} \nmsg:{1}", new Object[]{request, ex.getMessage()});
-            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(), ex,
-                                          NO_APPLICABLE_CODE);
+            throw new DataStoreException("the service has throw a SQL Exception:" + ex.getMessage(), ex);
         }
     }
 
@@ -353,23 +351,23 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setBoundingBox(final Envelope e) throws CstlServiceException {
-        throw new CstlServiceException("SetBoundingBox is not supported by this ObservationFilter implementation.");
+    public void setBoundingBox(final Envelope e) throws DataStoreException {
+        throw new DataStoreException("SetBoundingBox is not supported by this ObservationFilter implementation.");
     }
 
     @Override
-    public void setTimeLatest() throws CstlServiceException {
-        throw new CstlServiceException("setTimeLatest is not supported by this ObservationFilter implementation.");
+    public void setTimeLatest() throws DataStoreException {
+        throw new DataStoreException("setTimeLatest is not supported by this ObservationFilter implementation.");
     }
 
     @Override
-    public void setTimeFirst() throws CstlServiceException {
-        throw new CstlServiceException("setTimeFirst is not supported by this ObservationFilter implementation.");
+    public void setTimeFirst() throws DataStoreException {
+        throw new DataStoreException("setTimeFirst is not supported by this ObservationFilter implementation.");
     }
 
     @Override
-    public Set<String> filterFeatureOfInterest() throws CstlServiceException {
-        throw new CstlServiceException("filterFeatureOfInterest is not supported by this ObservationFilter implementation.");
+    public Set<String> filterFeatureOfInterest() throws DataStoreException {
+        throw new DataStoreException("filterFeatureOfInterest is not supported by this ObservationFilter implementation.");
     }
 
     @Override

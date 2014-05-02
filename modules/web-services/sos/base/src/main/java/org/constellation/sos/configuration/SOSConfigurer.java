@@ -49,7 +49,7 @@ import org.constellation.metadata.utils.Utils;
 import org.constellation.ogc.configuration.OGCConfigurer;
 import org.constellation.sos.factory.OMFactory;
 import org.constellation.sos.factory.SMLFactory;
-import org.constellation.sos.io.ObservationFilterReader;
+import org.geotoolkit.observation.ObservationFilterReader;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
 import org.constellation.sos.ws.SOSConstants;
@@ -427,7 +427,7 @@ public class SOSConfigurer extends OGCConfigurer {
             }
             return filter.getResults();
             
-        } catch (CstlServiceException  ex) {
+        } catch (DataStoreException ex) {
             throw new ConfigurationException(ex);
         }
     }
@@ -605,7 +605,7 @@ public class SOSConfigurer extends OGCConfigurer {
             try {
                 return (ObservationFilterReader) omfactory.getObservationFilter(DataSourceType.OM2, config.getOMConfiguration(), new HashMap<String, Object>());
 
-            } catch (CstlServiceException ex) {
+            } catch (DataStoreException ex) {
                 throw new ConfigurationException("JAXBException while initializing the filter reader!", ex);
             }
         } else {

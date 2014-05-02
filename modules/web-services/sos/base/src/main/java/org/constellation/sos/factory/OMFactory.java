@@ -21,10 +21,9 @@ import java.util.Map;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.generic.database.Automatic;
-import org.constellation.sos.io.ObservationFilter;
+import org.geotoolkit.observation.ObservationFilter;
 import org.geotoolkit.observation.ObservationReader;
 import org.geotoolkit.observation.ObservationWriter;
-import org.constellation.ws.CstlServiceException;
 
 /**
  * Factory used to load various implementation of observation reader/writer/filter.
@@ -57,9 +56,9 @@ public interface OMFactory {
      * @param properties The associated parameters (observation base identifier, template base identifiers,....)
      *
      * @return An observation filter for  the specified datasource.
-     * @throws CstlServiceException
+     * @throws DataStoreException
      */
-    ObservationFilter getObservationFilter(DataSourceType type, Automatic configuration, Map<String, Object> properties) throws CstlServiceException;
+    ObservationFilter getObservationFilter(DataSourceType type, Automatic configuration, Map<String, Object> properties) throws DataStoreException;
 
     /**
      * Clone an observation filter.
@@ -67,9 +66,9 @@ public interface OMFactory {
      * @param omFilter The observation filter to clone.
      * 
      * @return a clone of the specified Observation filter.
-     * @throws CstlServiceException
+     * @throws DataStoreException
      */
-    ObservationFilter cloneObservationFilter(ObservationFilter omFilter) throws CstlServiceException;
+    ObservationFilter cloneObservationFilter(ObservationFilter omFilter) throws DataStoreException;
 
     /**
      * Return an Observation reader for the specified datasource.

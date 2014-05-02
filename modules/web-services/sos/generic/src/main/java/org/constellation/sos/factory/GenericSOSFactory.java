@@ -24,10 +24,9 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.sos.io.generic.DefaultGenericObservationReader;
 import org.constellation.sos.io.generic.GenericObservationFilter;
-import org.constellation.sos.io.ObservationFilter;
+import org.geotoolkit.observation.ObservationFilter;
 import org.geotoolkit.observation.ObservationReader;
 import org.geotoolkit.observation.ObservationWriter;
-import org.constellation.ws.CstlServiceException;
 
 import static org.constellation.configuration.DataSourceType.*;
 
@@ -55,7 +54,7 @@ public class GenericSOSFactory implements OMFactory {
      * {@inheritDoc}
      */
     @Override
-    public ObservationFilter getObservationFilter(DataSourceType type, Automatic configuration, Map<String, Object> properties) throws CstlServiceException {
+    public ObservationFilter getObservationFilter(DataSourceType type, Automatic configuration, Map<String, Object> properties) throws DataStoreException {
         return new GenericObservationFilter(configuration, properties);
     }
 
@@ -63,7 +62,7 @@ public class GenericSOSFactory implements OMFactory {
      * {@inheritDoc}
      */
     @Override
-    public ObservationFilter cloneObservationFilter(ObservationFilter omFilter) throws CstlServiceException {
+    public ObservationFilter cloneObservationFilter(ObservationFilter omFilter) throws DataStoreException {
         if (omFilter instanceof GenericObservationFilter) {
             return new GenericObservationFilter((GenericObservationFilter) omFilter);
         } else {

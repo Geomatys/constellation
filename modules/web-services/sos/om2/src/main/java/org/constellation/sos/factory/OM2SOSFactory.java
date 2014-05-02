@@ -24,10 +24,9 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.om2.OM2ObservationFilter;
 import org.constellation.sos.io.om2.OM2ObservationReader;
 import org.constellation.sos.io.om2.OM2ObservationWriter;
-import org.constellation.sos.io.ObservationFilter;
+import org.geotoolkit.observation.ObservationFilter;
 import org.geotoolkit.observation.ObservationReader;
 import org.geotoolkit.observation.ObservationWriter;
-import org.constellation.ws.CstlServiceException;
 
 import static org.constellation.configuration.DataSourceType.*;
 import org.constellation.sos.io.om2.OM2ObservationFilterReader;
@@ -55,7 +54,7 @@ public class OM2SOSFactory implements OMFactory {
      * {@inheritDoc}
      */
     @Override
-    public ObservationFilter getObservationFilter(final DataSourceType type, final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
+    public ObservationFilter getObservationFilter(final DataSourceType type, final Automatic configuration, final Map<String, Object> properties) throws DataStoreException {
        return new OM2ObservationFilterReader(configuration, properties);
     }
 
@@ -63,7 +62,7 @@ public class OM2SOSFactory implements OMFactory {
      * {@inheritDoc}
      */
     @Override
-    public ObservationFilter cloneObservationFilter(final ObservationFilter omFilter) throws CstlServiceException {
+    public ObservationFilter cloneObservationFilter(final ObservationFilter omFilter) throws DataStoreException {
        return new OM2ObservationFilterReader((OM2ObservationFilter)omFilter);
     }
 

@@ -26,62 +26,60 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+import org.apache.sis.xml.MarshallerPool;
+import static org.constellation.sos.ws.SOSConstants.*;
 import org.constellation.test.utils.MetadataUtilities;
-
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.MimeType;
-
-import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
-import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
-import org.geotoolkit.ows.xml.v110.SectionsType;
-import org.geotoolkit.sos.xml.Capabilities;
-import org.geotoolkit.sos.xml.v100.DescribeSensor;
-import org.geotoolkit.sos.xml.v100.GetCapabilities;
+import org.geotoolkit.gml.xml.AbstractFeature;
 import org.geotoolkit.gml.xml.TimeIndeterminateValueType;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
+import org.geotoolkit.observation.xml.v100.MeasureType;
 import org.geotoolkit.observation.xml.v100.MeasurementType;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionType;
 import org.geotoolkit.observation.xml.v100.ObservationType;
-import org.geotoolkit.ogc.xml.v110.BBOXType;
-import org.geotoolkit.sampling.xml.v100.SamplingCurveType;
-import org.geotoolkit.sml.xml.AbstractSensorML;
-import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
-import org.geotoolkit.sml.xml.v100.SensorML;
-import org.geotoolkit.sos.xml.SOSMarshallerPool;
-import org.geotoolkit.sos.xml.v100.EventTime;
-import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
-import org.geotoolkit.sos.xml.v100.GetObservation;
-import org.geotoolkit.sos.xml.v100.GetResult;
-import org.geotoolkit.sos.xml.v100.GetResultResponse;
-import org.geotoolkit.sos.xml.v100.InsertObservation;
-import org.geotoolkit.sos.xml.v100.ObservationTemplate;
-import org.geotoolkit.sos.xml.v100.RegisterSensor;
-import org.geotoolkit.sos.xml.ResponseModeType;
-import org.geotoolkit.swe.xml.v101.AnyScalarPropertyType;
-import org.geotoolkit.swe.xml.v101.DataArrayType;
-import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
-import org.geotoolkit.swe.xml.v101.SimpleDataRecordType;
-import org.geotoolkit.swe.xml.v101.TimeType;
-import org.apache.sis.xml.MarshallerPool;
-import static org.constellation.sos.ws.SOSConstants.*;
-import org.geotoolkit.gml.xml.AbstractFeature;
-import org.geotoolkit.observation.xml.v100.MeasureType;
 import org.geotoolkit.observation.xml.v100.ProcessType;
+import org.geotoolkit.ogc.xml.v110.BBOXType;
 import org.geotoolkit.ogc.xml.v110.TimeAfterType;
 import org.geotoolkit.ogc.xml.v110.TimeBeforeType;
 import org.geotoolkit.ogc.xml.v110.TimeDuringType;
 import org.geotoolkit.ogc.xml.v110.TimeEqualsType;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
+import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
+import org.geotoolkit.ows.xml.v110.SectionsType;
+import org.geotoolkit.sampling.xml.v100.SamplingCurveType;
+import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
+import org.geotoolkit.sml.xml.v100.SensorML;
+import org.geotoolkit.sos.xml.Capabilities;
+import org.geotoolkit.sos.xml.ResponseModeType;
+import org.geotoolkit.sos.xml.SOSMarshallerPool;
+import org.geotoolkit.sos.xml.v100.DescribeSensor;
+import org.geotoolkit.sos.xml.v100.EventTime;
+import org.geotoolkit.sos.xml.v100.GetCapabilities;
+import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
+import org.geotoolkit.sos.xml.v100.GetObservation;
 import org.geotoolkit.sos.xml.v100.GetObservationById;
+import org.geotoolkit.sos.xml.v100.GetResult;
+import org.geotoolkit.sos.xml.v100.GetResultResponse;
+import org.geotoolkit.sos.xml.v100.InsertObservation;
+import org.geotoolkit.sos.xml.v100.ObservationTemplate;
+import org.geotoolkit.sos.xml.v100.RegisterSensor;
+import org.geotoolkit.swe.xml.v101.AnyScalarPropertyType;
+import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
+import org.geotoolkit.swe.xml.v101.DataArrayType;
+import org.geotoolkit.swe.xml.v101.SimpleDataRecordType;
+import org.geotoolkit.swe.xml.v101.TimeType;
 import org.geotoolkit.swes.xml.InsertSensorResponse;
-
-import org.opengis.observation.sampling.SamplingPoint;
 
 // JUnit dependencies
 import static org.junit.Assert.*;
+import org.opengis.observation.sampling.SamplingPoint;
 
 /**
  *
@@ -443,7 +441,7 @@ public abstract class SOSWorkerTest {
             worker.getObservation(request);
         } catch (CstlServiceException ex) {
             exLaunched = true;
-            assertEquals(ex.getExceptionCode(), NO_APPLICABLE_CODE);
+            assertTrue(ex.getExceptionCode().equals(NO_APPLICABLE_CODE) || ex.getExceptionCode().equals(ExceptionCode.NO_APPLICABLE_CODE));
             assertEquals(ex.getLocator(), RESPONSE_MODE);
         }
         assertTrue(exLaunched);

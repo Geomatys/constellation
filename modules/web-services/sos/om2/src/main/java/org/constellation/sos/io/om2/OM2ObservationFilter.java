@@ -26,12 +26,13 @@ import java.util.*;
 import java.util.logging.Level;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
+import org.apache.sis.storage.DataStoreException;
 
 // Constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.constellation.sos.io.ObservationFilter;
-import org.constellation.sos.io.ObservationResult;
+import org.geotoolkit.observation.ObservationFilter;
+import org.geotoolkit.observation.ObservationResult;
 import static org.constellation.sos.io.om2.OM2BaseReader.LOGGER;
 import org.constellation.ws.CstlServiceException;
 
@@ -40,6 +41,7 @@ import static org.constellation.sos.ws.SOSConstants.*;
 
 // Geotoolkit dependencies
 import org.geotoolkit.gml.xml.Envelope;
+import org.geotoolkit.observation.ObservationStoreException;
 import org.geotoolkit.sos.xml.ResponseModeType;
 import org.geotoolkit.sos.xml.ObservationOffering;
 
@@ -80,16 +82,16 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
     }
 
     
-    public OM2ObservationFilter(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
+    public OM2ObservationFilter(final Automatic configuration, final Map<String, Object> properties) throws DataStoreException {
         super(properties);
 
         if (configuration == null) {
-            throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
+            throw new DataStoreException("The configuration object is null");
         }
         // we get the database informations
         final BDD db = configuration.getBdd();
         if (db == null) {
-            throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
+            throw new DataStoreException("The configuration file does not contains a BDD object");
         }
         isPostgres  = db.getClassName() != null && db.getClassName().equals("org.postgresql.Driver");
         resultModel = null;
@@ -99,8 +101,8 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
             final Connection c = this.source.getConnection();
             c.close();
         } catch (SQLException ex) {
-            throw new CstlServiceException("SQLException while initializing the observation filter:" +'\n'+
-                                           "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
+            throw new DataStoreException("SQLException while initializing the observation filter:" +'\n'+
+                                           "cause:" + ex.getMessage());
         }
     }
 
@@ -231,7 +233,7 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
      * {@inheritDoc}
      */
     @Override
-    public void setTimeEquals(final Object time) throws CstlServiceException {
+    public void setTimeEquals(final Object time) throws DataStoreException {
         if (time instanceof Period) {
             final Period tp    = (Period) time;
             final String begin = getTimeValue(tp.getBeginning().getPosition());
@@ -256,7 +258,7 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
             sqlRequest.append("(\"time_begin\"<='").append(position).append("' AND \"time_end\">='").append(position).append("'))");
 
         } else {
-            throw new CstlServiceException("TM_Equals operation require timeInstant or TimePeriod!",
+            throw new ObservationStoreException("TM_Equals operation require timeInstant or TimePeriod!",
                     INVALID_PARAMETER_VALUE, EVENT_TIME);
         }
     }
@@ -265,7 +267,7 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
      * {@inheritDoc}
      */
     @Override
-    public void setTimeBefore(final Object time) throws CstlServiceException  {
+    public void setTimeBefore(final Object time) throws DataStoreException  {
         // for the operation before the temporal object must be an timeInstant
         if (time instanceof Instant) {
             final Instant ti      = (Instant) time;
@@ -276,7 +278,7 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
             sqlRequest.append("(\"time_begin\"<='").append(position).append("'))");
 
         } else {
-            throw new CstlServiceException("TM_Before operation require timeInstant!",
+            throw new ObservationStoreException("TM_Before operation require timeInstant!",
                     INVALID_PARAMETER_VALUE, EVENT_TIME);
         }
     }
@@ -285,7 +287,7 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
      * {@inheritDoc}
      */
     @Override
-    public void setTimeAfter(final Object time) throws CstlServiceException {
+    public void setTimeAfter(final Object time) throws DataStoreException {
         // for the operation after the temporal object must be an timeInstant
         if (time instanceof Instant) {
             final Instant ti      = (Instant) time;
@@ -300,7 +302,7 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
 
 
         } else {
-            throw new CstlServiceException("TM_After operation require timeInstant!",
+            throw new ObservationStoreException("TM_After operation require timeInstant!",
                     INVALID_PARAMETER_VALUE, EVENT_TIME);
         }
     }
@@ -309,7 +311,7 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
      * {@inheritDoc}
      */
     @Override
-    public void setTimeDuring(final Object time) throws CstlServiceException {
+    public void setTimeDuring(final Object time) throws DataStoreException {
         if (time instanceof Period) {
             final Period tp    = (Period) time;
             final String begin = getTimeValue(tp.getBeginning().getPosition());
@@ -333,7 +335,7 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
 
 
         } else {
-            throw new CstlServiceException("TM_During operation require TimePeriod!",
+            throw new ObservationStoreException("TM_During operation require TimePeriod!",
                     INVALID_PARAMETER_VALUE, EVENT_TIME);
         }
     }
@@ -342,8 +344,8 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
      * {@inheritDoc}
      */
     @Override
-    public void setResultEquals(final String propertyName, final String value) throws CstlServiceException{
-        throw new CstlServiceException("setResultEquals is not supported by this ObservationFilter implementation.");
+    public void setResultEquals(final String propertyName, final String value) throws DataStoreException{
+        throw new DataStoreException("setResultEquals is not supported by this ObservationFilter implementation.");
     }
     
     /**
@@ -358,7 +360,7 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
      * {@inheritDoc}
      */
     @Override
-    public List<ObservationResult> filterResult() throws CstlServiceException {
+    public List<ObservationResult> filterResult() throws DataStoreException {
         LOGGER.log(Level.FINER, "request:{0}", sqlRequest.toString());
         try {
             final List<ObservationResult> results = new ArrayList<>();
@@ -377,8 +379,7 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
 
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
-            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE);
+            throw new DataStoreException("the service has throw a SQL Exception:" + ex.getMessage());
         }
 
     }
@@ -387,7 +388,7 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
      * {@inheritDoc}
      */
     @Override
-    public Set<String> filterObservation() throws CstlServiceException {
+    public Set<String> filterObservation() throws DataStoreException {
         LOGGER.log(Level.FINER, "request:{0}", sqlRequest.toString());
         try {
             final Set<String> results        = new LinkedHashSet<>();
@@ -408,8 +409,7 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
             return results;
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
-            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE);
+            throw new DataStoreException("the service has throw a SQL Exception:" + ex.getMessage());
         }
     }
     
@@ -417,7 +417,7 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
      * {@inheritDoc}
      */
     @Override
-    public Set<String> filterFeatureOfInterest() throws CstlServiceException {
+    public Set<String> filterFeatureOfInterest() throws DataStoreException {
         LOGGER.log(Level.FINER, "request:{0}", sqlRequest.toString());
         try {
             final Set<String> results        = new LinkedHashSet<>();
@@ -433,8 +433,7 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
             return results;
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
-            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE);
+            throw new DataStoreException("the service has throw a SQL Exception:" + ex.getMessage());
         }
     }
 
@@ -458,8 +457,8 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
      * {@inheritDoc}
      */
     @Override
-    public void setBoundingBox(final Envelope e) throws CstlServiceException {
-        throw new CstlServiceException("SetBoundingBox is not supported by this ObservationFilter implementation.");
+    public void setBoundingBox(final Envelope e) throws DataStoreException {
+        throw new DataStoreException("SetBoundingBox is not supported by this ObservationFilter implementation.");
     }
 
     /**
@@ -479,17 +478,17 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
     }
 
     @Override
-    public void setTimeLatest() throws CstlServiceException {
+    public void setTimeLatest() throws DataStoreException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public void setTimeFirst() throws CstlServiceException {
+    public void setTimeFirst() throws DataStoreException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public void setOfferings(final List<ObservationOffering> offerings) throws CstlServiceException {
+    public void setOfferings(final List<ObservationOffering> offerings) throws DataStoreException {
         // not used in this implementations
     }
     

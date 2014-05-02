@@ -19,38 +19,35 @@
 package org.constellation.sos.io.postgrid;
 
 
-import java.util.Map;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
-
-// Constellation dependencies
+import org.apache.sis.storage.DataStoreException;
+import org.apache.sis.util.logging.Logging;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.sos.factory.OMFactory;
-import org.constellation.sos.io.ObservationFilter;
-import org.constellation.sos.io.ObservationResult;
-import org.constellation.ws.CstlServiceException;
-
-import static org.constellation.sos.ws.SOSUtils.*;
+import org.geotoolkit.observation.ObservationFilter;
+import org.geotoolkit.observation.ObservationResult;
 import static org.constellation.sos.ws.SOSConstants.*;
 
 // Geotoolkit dependencies
+import static org.constellation.sos.ws.SOSUtils.*;
 import org.geotoolkit.gml.xml.Envelope;
-import org.geotoolkit.sos.xml.ResponseModeType;
-import org.geotoolkit.sos.xml.ObservationOffering;
-import org.apache.sis.util.logging.Logging;
-
-import static org.geotoolkit.sos.xml.ResponseModeType.*;
+import org.geotoolkit.observation.ObservationStoreException;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // GeoAPI dependencies
+import org.geotoolkit.sos.xml.ObservationOffering;
+import org.geotoolkit.sos.xml.ResponseModeType;
+import static org.geotoolkit.sos.xml.ResponseModeType.*;
 import org.opengis.temporal.Instant;
 import org.opengis.temporal.Period;
 
@@ -98,18 +95,18 @@ public class DefaultObservationFilter implements ObservationFilter {
     }
 
     
-    public DefaultObservationFilter(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
+    public DefaultObservationFilter(final Automatic configuration, final Map<String, Object> properties) throws DataStoreException {
         this.observationIdBase         = (String)     properties.get(OMFactory.OBSERVATION_ID_BASE);
         this.observationTemplateIdBase = (String)     properties.get(OMFactory.OBSERVATION_TEMPLATE_ID_BASE);
         this.phenomenonIdBase          = (String)     properties.get(OMFactory.PHENOMENON_ID_BASE);
         
         if (configuration == null) {
-            throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
+            throw new DataStoreException("The configuration object is null");
         }
         // we get the database informations
         final BDD db = configuration.getBdd();
         if (db == null) {
-            throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
+            throw new DataStoreException("The configuration file does not contains a BDD object");
         }
         try {
             Connection candidate = DatabasePool.getDatabaseConnection(db);
@@ -119,8 +116,8 @@ public class DefaultObservationFilter implements ObservationFilter {
             }
             this.connection = candidate;
         } catch (SQLException ex) {
-            throw new CstlServiceException("SQLException while initializing the observation filter:" +'\n'+
-                                           "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
+            throw new DataStoreException("SQLException while initializing the observation filter:" +'\n'+
+                                           "cause:" + ex.getMessage());
         }
     }
 
@@ -161,7 +158,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void initFilterGetFeatureOfInterest() throws CstlServiceException {
+    public void initFilterGetFeatureOfInterest() throws DataStoreException {
         // do nothing not implemented
     }
     
@@ -229,7 +226,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setTimeEquals(final Object time) throws CstlServiceException {
+    public void setTimeEquals(final Object time) throws DataStoreException {
         if (time instanceof Period) {
             final Period tp    = (Period) time;
             final String begin = getTimeValue(tp.getBeginning().getPosition());
@@ -254,7 +251,7 @@ public class DefaultObservationFilter implements ObservationFilter {
             sqlRequest.append("(\"sampling_time_begin\"<='").append(position).append("' AND \"sampling_time_end\">='").append(position).append("'))");
 
         } else {
-            throw new CstlServiceException("TM_Equals operation require timeInstant or TimePeriod!",
+            throw new ObservationStoreException("TM_Equals operation require timeInstant or TimePeriod!",
                     INVALID_PARAMETER_VALUE, EVENT_TIME);
         }
     }
@@ -263,7 +260,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setTimeBefore(final Object time) throws CstlServiceException  {
+    public void setTimeBefore(final Object time) throws DataStoreException  {
         // for the operation before the temporal object must be an timeInstant
         if (time instanceof Instant) {
             final Instant ti      = (Instant) time;
@@ -274,7 +271,7 @@ public class DefaultObservationFilter implements ObservationFilter {
             sqlRequest.append("(\"sampling_time_begin\"<='").append(position).append("'))");
 
         } else {
-            throw new CstlServiceException("TM_Before operation require timeInstant!",
+            throw new ObservationStoreException("TM_Before operation require timeInstant!",
                     INVALID_PARAMETER_VALUE, EVENT_TIME);
         }
     }
@@ -283,7 +280,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setTimeAfter(final Object time) throws CstlServiceException {
+    public void setTimeAfter(final Object time) throws DataStoreException {
         // for the operation after the temporal object must be an timeInstant
         if (time instanceof Instant) {
             final Instant ti      = (Instant) time;
@@ -298,7 +295,7 @@ public class DefaultObservationFilter implements ObservationFilter {
 
 
         } else {
-            throw new CstlServiceException("TM_After operation require timeInstant!",
+            throw new ObservationStoreException("TM_After operation require timeInstant!",
                     INVALID_PARAMETER_VALUE, EVENT_TIME);
         }
     }
@@ -307,7 +304,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setTimeDuring(final Object time) throws CstlServiceException {
+    public void setTimeDuring(final Object time) throws DataStoreException {
         if (time instanceof Period) {
             final Period tp    = (Period) time;
             final String begin = getTimeValue(tp.getBeginning().getPosition());
@@ -331,7 +328,7 @@ public class DefaultObservationFilter implements ObservationFilter {
 
 
         } else {
-            throw new CstlServiceException("TM_During operation require TimePeriod!",
+            throw new ObservationStoreException("TM_During operation require TimePeriod!",
                     INVALID_PARAMETER_VALUE, EVENT_TIME);
         }
     }
@@ -340,8 +337,8 @@ public class DefaultObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setResultEquals(final String propertyName, final String value) throws CstlServiceException{
-        throw new CstlServiceException("setResultEquals is not supported by this ObservationFilter implementation.");
+    public void setResultEquals(final String propertyName, final String value) throws DataStoreException{
+        throw new DataStoreException("setResultEquals is not supported by this ObservationFilter implementation.");
     }
     
     /**
@@ -356,7 +353,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public List<ObservationResult> filterResult() throws CstlServiceException {
+    public List<ObservationResult> filterResult() throws DataStoreException {
         LOGGER.log(Level.FINER, "request:{0}", sqlRequest.toString());
         try {
             final List<ObservationResult> results = new ArrayList<>();
@@ -373,8 +370,7 @@ public class DefaultObservationFilter implements ObservationFilter {
 
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
-            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE);
+            throw new DataStoreException("the service has throw a SQL Exception:" + ex.getMessage());
         }
 
     }
@@ -383,7 +379,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public Set<String> filterObservation() throws CstlServiceException {
+    public Set<String> filterObservation() throws DataStoreException {
         LOGGER.log(Level.FINER, "request:{0}", sqlRequest.toString());
         try {
             final Set<String> results       = new LinkedHashSet<>();
@@ -397,8 +393,7 @@ public class DefaultObservationFilter implements ObservationFilter {
             return results;
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
-            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE);
+            throw new DataStoreException("the service has throw a SQL Exception:" + ex.getMessage());
         }
 
     }
@@ -423,8 +418,8 @@ public class DefaultObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setBoundingBox(final Envelope e) throws CstlServiceException {
-        throw new CstlServiceException("SetBoundingBox is not supported by this ObservationFilter implementation.");
+    public void setBoundingBox(final Envelope e) throws DataStoreException {
+        throw new DataStoreException("SetBoundingBox is not supported by this ObservationFilter implementation.");
     }
 
     /**
@@ -444,17 +439,17 @@ public class DefaultObservationFilter implements ObservationFilter {
     }
 
     @Override
-    public void setTimeLatest() throws CstlServiceException {
-        throw new CstlServiceException("setTimeLatest is not supported by this ObservationFilter implementation.");
+    public void setTimeLatest() throws DataStoreException {
+        throw new DataStoreException("setTimeLatest is not supported by this ObservationFilter implementation.");
     }
 
     @Override
-    public void setTimeFirst() throws CstlServiceException {
-        throw new CstlServiceException("setTimeFirst is not supported by this ObservationFilter implementation.");
+    public void setTimeFirst() throws DataStoreException {
+        throw new DataStoreException("setTimeFirst is not supported by this ObservationFilter implementation.");
     }
 
     @Override
-    public void setOfferings(final List<ObservationOffering> offerings) throws CstlServiceException {
+    public void setOfferings(final List<ObservationOffering> offerings) throws DataStoreException {
         // not used in this implementations
     }
     
@@ -464,8 +459,8 @@ public class DefaultObservationFilter implements ObservationFilter {
     }
 
     @Override
-    public Set<String> filterFeatureOfInterest() throws CstlServiceException {
-        throw new CstlServiceException("filterFeatureOfInterest is not supported by this ObservationFilter implementation.");
+    public Set<String> filterFeatureOfInterest() throws DataStoreException {
+        throw new DataStoreException("filterFeatureOfInterest is not supported by this ObservationFilter implementation.");
     }
 
     @Override

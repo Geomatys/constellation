@@ -21,25 +21,25 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
-
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
-
+import org.apache.sis.storage.DataStoreException;
 import org.constellation.generic.database.Automatic;
-import org.constellation.sos.io.ObservationFilter;
-import org.constellation.sos.io.ObservationResult;
-import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.observation.ObservationFilter;
+import org.geotoolkit.observation.ObservationResult;
 import static org.constellation.sos.ws.SOSConstants.*;
 import static org.constellation.sos.ws.SOSUtils.*;
 
+import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.SearchingException;
 import org.geotoolkit.lucene.filter.SpatialQuery;
-import org.geotoolkit.sos.xml.ResponseModeType;
-import org.geotoolkit.sos.xml.ObservationOffering;
+import org.geotoolkit.observation.ObservationStoreException;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
+import org.geotoolkit.sos.xml.ObservationOffering;
+import org.geotoolkit.sos.xml.ResponseModeType;
 import org.opengis.temporal.Instant;
 import org.opengis.temporal.Period;
 /**
@@ -57,15 +57,15 @@ public class LuceneObservationFilter implements ObservationFilter {
 
     private static final String OR_OPERATOR = " OR ";
 
-    public LuceneObservationFilter(final LuceneObservationFilter omFilter) throws CstlServiceException {
+    public LuceneObservationFilter(final LuceneObservationFilter omFilter) throws DataStoreException {
         this.searcher = omFilter.searcher;
     }
 
-    public LuceneObservationFilter(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
+    public LuceneObservationFilter(final Automatic configuration, final Map<String, Object> properties) throws DataStoreException {
         try {
             this.searcher = new LuceneObservationSearcher(configuration.getConfigurationDirectory(), "");
         } catch (IndexingException ex) {
-            throw new CstlServiceException("IndexingException in LuceneObservationFilter constructor", ex, NO_APPLICABLE_CODE);
+            throw new DataStoreException("IndexingException in LuceneObservationFilter constructor", ex);
         }
     }
 
@@ -103,7 +103,7 @@ public class LuceneObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void initFilterGetFeatureOfInterest() throws CstlServiceException {
+    public void initFilterGetFeatureOfInterest() throws DataStoreException {
         // do nothing no implementes
     }
 
@@ -168,7 +168,7 @@ public class LuceneObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setTimeEquals(final Object time) throws CstlServiceException {
+    public void setTimeEquals(final Object time) throws DataStoreException {
         if (time instanceof Period) {
             final Period tp = (Period) time;
             final String begin      = getLuceneTimeValue(tp.getBeginning().getPosition());
@@ -193,7 +193,7 @@ public class LuceneObservationFilter implements ObservationFilter {
             luceneRequest.append("(sampling_time_begin: [19700000 ").append(position).append("] ").append(" AND sampling_time_end: [").append(position).append(" 30000000]))");
 
         } else {
-            throw new CstlServiceException("TM_Equals operation require timeInstant or TimePeriod!",
+            throw new ObservationStoreException("TM_Equals operation require timeInstant or TimePeriod!",
                     INVALID_PARAMETER_VALUE, EVENT_TIME);
         }
     }
@@ -202,7 +202,7 @@ public class LuceneObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setTimeBefore(final Object time) throws CstlServiceException {
+    public void setTimeBefore(final Object time) throws DataStoreException {
         // for the operation before the temporal object must be an timeInstant
         if (time instanceof Instant) {
             final Instant ti = (Instant) time;
@@ -213,7 +213,7 @@ public class LuceneObservationFilter implements ObservationFilter {
             luceneRequest.append("(sampling_time_begin: [19700000000000 ").append(position).append("]))");
 
         } else {
-            throw new CstlServiceException("TM_Before operation require timeInstant!",
+            throw new ObservationStoreException("TM_Before operation require timeInstant!",
                     INVALID_PARAMETER_VALUE, EVENT_TIME);
         }
     }
@@ -222,7 +222,7 @@ public class LuceneObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setTimeAfter(final Object time) throws CstlServiceException {
+    public void setTimeAfter(final Object time) throws DataStoreException {
         // for the operation after the temporal object must be an timeInstant
         if (time instanceof Instant) {
             final Instant ti = (Instant) time;
@@ -237,7 +237,7 @@ public class LuceneObservationFilter implements ObservationFilter {
 
 
         } else {
-            throw new CstlServiceException("TM_After operation require timeInstant!",
+            throw new ObservationStoreException("TM_After operation require timeInstant!",
                     INVALID_PARAMETER_VALUE, EVENT_TIME);
         }
     }
@@ -246,7 +246,7 @@ public class LuceneObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setTimeDuring(final Object time) throws CstlServiceException {
+    public void setTimeDuring(final Object time) throws DataStoreException {
         if (time instanceof Period) {
             final Period tp = (Period) time;
             final String begin      = getLuceneTimeValue(tp.getBeginning().getPosition());
@@ -270,7 +270,7 @@ public class LuceneObservationFilter implements ObservationFilter {
 
 
         } else {
-            throw new CstlServiceException("TM_During operation require TimePeriod!",
+            throw new ObservationStoreException("TM_During operation require TimePeriod!",
                     INVALID_PARAMETER_VALUE, EVENT_TIME);
         }
     }
@@ -279,7 +279,7 @@ public class LuceneObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setOfferings(final List<ObservationOffering> offerings) throws CstlServiceException {
+    public void setOfferings(final List<ObservationOffering> offerings) throws DataStoreException {
         // not used in this implementations
     }
     
@@ -287,14 +287,14 @@ public class LuceneObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public List<ObservationResult> filterResult() throws CstlServiceException {
+    public List<ObservationResult> filterResult() throws DataStoreException {
         try {
             final SpatialQuery query = new SpatialQuery(luceneRequest.toString());
             final SortField sf       = new SortField("sampling_time_begin", SortField.Type.STRING, false);
             query.setSort(new Sort(sf));
             return searcher.doResultSearch(query);
         } catch(SearchingException ex) {
-            throw new CstlServiceException("Search exception while filtering the observation", ex, NO_APPLICABLE_CODE);
+            throw new DataStoreException("Search exception while filtering the observation", ex);
         }
     }
 
@@ -302,11 +302,11 @@ public class LuceneObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public Set<String> filterObservation() throws CstlServiceException {
+    public Set<String> filterObservation() throws DataStoreException {
         try {
             return searcher.doSearch(new SpatialQuery(luceneRequest.toString()));
         } catch(SearchingException ex) {
-            throw new CstlServiceException("Search exception while filtering the observation", ex, NO_APPLICABLE_CODE);
+            throw new DataStoreException("Search exception while filtering the observation", ex);
         }
     }
 
@@ -330,16 +330,16 @@ public class LuceneObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void setBoundingBox(Envelope e) throws CstlServiceException {
-        throw new CstlServiceException("SetBoundingBox is not supported by this ObservationFilter implementation.");
+    public void setBoundingBox(Envelope e) throws DataStoreException {
+        throw new DataStoreException("SetBoundingBox is not supported by this ObservationFilter implementation.");
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void setResultEquals(String propertyName, String value) throws CstlServiceException{
-        throw new CstlServiceException("setResultEquals is not supported by this ObservationFilter implementation.");
+    public void setResultEquals(String propertyName, String value) throws DataStoreException {
+        throw new DataStoreException("setResultEquals is not supported by this ObservationFilter implementation.");
     }
 
     /**
@@ -354,11 +354,11 @@ public class LuceneObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
-    public void refresh() throws CstlServiceException {
+    public void refresh() throws DataStoreException {
         try {
             searcher.refresh();
         } catch (IndexingException ex) {
-            throw new CstlServiceException("Indexing Exception while refreshing the lucene index", ex, NO_APPLICABLE_CODE);
+            throw new DataStoreException("Indexing Exception while refreshing the lucene index", ex);
         }
     }
 
@@ -373,12 +373,12 @@ public class LuceneObservationFilter implements ObservationFilter {
     }
 
     @Override
-    public void setTimeLatest() throws CstlServiceException {
+    public void setTimeLatest() throws DataStoreException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public void setTimeFirst() throws CstlServiceException {
+    public void setTimeFirst() throws DataStoreException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -388,8 +388,8 @@ public class LuceneObservationFilter implements ObservationFilter {
     }
 
     @Override
-    public Set<String> filterFeatureOfInterest() throws CstlServiceException {
-        throw new CstlServiceException("filterFeatureOfInterest is not supported by this ObservationFilter implementation.");
+    public Set<String> filterFeatureOfInterest() throws DataStoreException {
+        throw new DataStoreException("filterFeatureOfInterest is not supported by this ObservationFilter implementation.");
     }
 
     @Override
