@@ -247,6 +247,14 @@
   </div>
 
   <div class="tab-pane" ng-class="{active:chosenTab==='xml'}">
-    <h2 translate="sldeditor.tab.xml" >XML Editor</h2>
+    <h2 translate="sldeditor.tab.xmledit" >XML Editor</h2>
+
+      <div ui-ace="{
+                 mode: 'xml',
+                 onLoad: aceLoaded,
+                 onChange: aceChanged
+                }"></div>
+
+      <button type="button" class="btn btn-info"ng-click="saveXml()" translate="data.modal.change">Change</button>
   </div>
 </div>

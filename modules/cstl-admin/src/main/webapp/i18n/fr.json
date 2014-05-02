@@ -1159,7 +1159,8 @@
         "name":"Nom du style",
         "tab":{
             "simple":"Editeur simple",
-            "xml":"Editeur XML"
+            "xml":"Editeur XML",
+            "xmledit":"editer votre style xml"
         },
         "apercu":{
             "titre": "Aperçu du style",

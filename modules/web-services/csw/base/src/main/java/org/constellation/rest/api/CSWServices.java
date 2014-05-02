@@ -64,7 +64,7 @@ public class CSWServices {
             conf.restartInstance(id, false);
         }
         return ok(ack);
-    }
+   }
 
     @PUT
     @Path("{id}/index/{metaID}")

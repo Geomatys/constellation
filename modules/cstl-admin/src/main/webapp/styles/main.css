@@ -1075,3 +1075,4 @@ table.user-table tbody>tr>td.user-delete{
         max-height:365px;
     }
 }
+.ace_editor { height: 200px; }

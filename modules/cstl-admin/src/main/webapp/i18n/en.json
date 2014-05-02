@@ -874,7 +874,8 @@
         "name":"Style name",
         "tab":{
             "simple":"Simple editor",
-            "xml":"XML editor"
+            "xml":"XML editor",
+            "xmledit":"edit your xml style"
         },
         "apercu":{
             "titre": "Style preview",

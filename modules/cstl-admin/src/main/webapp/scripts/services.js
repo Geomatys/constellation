@@ -193,7 +193,7 @@ cstlAdminApp.factory('style', ['$resource',
     function ($resource) {
         return $resource('@cstl/api/1/SP/all/style/available;jsessionid=', {}, {
             'listAll': { method: 'GET',    isArray: false },
-            'create':  { method: 'PUT',    url: '@cstl/api/1/SP/:provider/style/create;jsessionid='},
+            'createjson':  { method: 'PUT',    url: '@cstl/api/1/SP/:provider/style/create;jsessionid='},
             'delete':  { method: 'DELETE', url: '@cstl/api/1/SP/:provider/style/:name;jsessionid='},
             'link':    { method: 'POST',   url: '@cstl/api/1/SP/:provider/style/:name/linkData;jsessionid='},
             'unlink':  { method: 'POST',   url: '@cstl/api/1/SP/:provider/style/:name/unlinkData;jsessionid='}
@@ -263,6 +263,14 @@ cstlAdminApp.factory('textService', ['$http',
             capa : function(type, id, version){
                 return $http.get('@cstl/WS/'+type+'/'+id+';jsessionid=?REQUEST=GetCapabilities&SERVICE='+type.toUpperCase()+'&VERSION='+version);
 
+            },
+            createStyleXml : function(provider, styleXml){
+                return $http({
+                    url: '@cstl/api/1/SP/'+provider+'/style;jsessionid=',
+                        method: "PUT",
+                        data: styleXml,
+                        headers: {'Content-Type': 'application/xml'}
+                });
             }
         };
     }]);

@@ -60,13 +60,38 @@ cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', '$
         };
     }]);
 
-cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modalInstance', 'style', 'exclude', 'layerName', 'providerId', 'serviceName', 'dataType', '$cookies', 'dataListing', 'provider', '$growl',
-    function ($scope, $dashboard, $modalInstance, style, exclude, layerName, providerId, serviceName, dataType, $cookies, dataListing, provider, $growl) {
+cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modalInstance', 'style', 'exclude', 'layerName', 'providerId', 'serviceName', 'dataType', '$cookies', 'dataListing', 'provider', '$growl', 'textService',
+    function ($scope, $dashboard, $modalInstance, style, exclude, layerName, providerId, serviceName, dataType, $cookies, dataListing, provider, $growl, textService) {
         $scope.exclude = exclude;
         $scope.layerName = layerName;
         $scope.providerId = providerId;
         $scope.serviceName = serviceName;
         $scope.dataType = dataType;
+        $scope.xmlStyle = '<xml><h2></h2></xml>';
+
+
+
+        $scope.aceLoaded = function(_editor) {
+            // Options
+            _editor.setValue($scope.xmlStyle);
+            $scope.aceEditor = _editor;
+        };
+
+        $scope.aceChanged = function(e) {
+
+        };
+
+        $scope.saveXml = function(){
+            alert("ace="+$scope.aceEditor.getValue());
+            textService.createStyleXml('sld',$scope.aceEditor.getValue());
+//                , function() {
+//                $growl('success','Success','Style '+ $scope.newStyle.name +' successfully created');
+//                $modalInstance.close({"Provider": "sld", "Name": $scope.newStyle.name});
+//            }, function() {
+//                $growl('error','Error','Unable to create style '+ $scope.newStyle.name);
+//                $modalInstance.close();
+//            });
+        };
 
         $scope.initFilterType = function() {
             if (dataType.toLowerCase() === 'vector' || dataType.toLowerCase() === 'feature-store') {
@@ -278,7 +303,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
 
         $scope.createStyle = function() {
             if($scope.dataType.toLowerCase() !== 'coverage' && $scope.dataType.toLowerCase() !== 'raster'){
-                style.create({provider: 'sld'}, $scope.newStyle, function() {
+                style.createjson({provider: 'sld'}, $scope.newStyle, function() {
                     $growl('success','Success','Style '+ $scope.newStyle.name +' successfully created');
                     $modalInstance.close({"Provider": "sld", "Name": $scope.newStyle.name});
                 }, function() {

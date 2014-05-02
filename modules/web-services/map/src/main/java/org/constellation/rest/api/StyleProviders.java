@@ -22,6 +22,7 @@ import org.constellation.dto.ParameterValues;
 import org.constellation.dto.StyleListBrief;
 import org.constellation.json.binding.Style;
 import org.constellation.map.configuration.StyleProviderConfig;
+import org.geotoolkit.style.DefaultMutableStyle;
 import org.geotoolkit.style.MutableStyle;
 
 import javax.servlet.http.HttpServletRequest;
@@ -59,7 +60,7 @@ public final class StyleProviders {
      */
     @PUT
     @Path("{id}/style")
-    public Response createStyle(final @PathParam("id") String id, final MutableStyle style) throws Exception {
+    public Response createStyle(final @PathParam("id") String id, final DefaultMutableStyle style) throws Exception {
         StyleProviderConfig.createStyle(id, style);
         return ok(AcknowlegementType.success("Style named \"" + style.getName() + "\" successfully added to provider with id \"" + id + "\"."));
     }
