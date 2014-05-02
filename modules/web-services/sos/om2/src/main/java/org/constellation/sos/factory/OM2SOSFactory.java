@@ -26,7 +26,7 @@ import org.constellation.sos.io.om2.OM2ObservationReader;
 import org.constellation.sos.io.om2.OM2ObservationWriter;
 import org.constellation.sos.io.ObservationFilter;
 import org.geotoolkit.observation.ObservationReader;
-import org.constellation.sos.io.ObservationWriter;
+import org.geotoolkit.observation.ObservationWriter;
 import org.constellation.ws.CstlServiceException;
 
 import static org.constellation.configuration.DataSourceType.*;
@@ -79,7 +79,7 @@ public class OM2SOSFactory implements OMFactory {
      * {@inheritDoc}
      */
     @Override
-    public ObservationWriter getObservationWriter(final DataSourceType type, final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
+    public ObservationWriter getObservationWriter(final DataSourceType type, final Automatic configuration, final Map<String, Object> properties) throws DataStoreException {
         return new OM2ObservationWriter(configuration, properties);
     }
 

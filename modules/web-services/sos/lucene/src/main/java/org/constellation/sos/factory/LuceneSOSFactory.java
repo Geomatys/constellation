@@ -26,7 +26,7 @@ import org.constellation.sos.io.filesystem.FileObservationWriter;
 import org.constellation.sos.io.lucene.LuceneObservationFilter;
 import org.constellation.sos.io.ObservationFilter;
 import org.geotoolkit.observation.ObservationReader;
-import org.constellation.sos.io.ObservationWriter;
+import org.geotoolkit.observation.ObservationWriter;
 import org.constellation.ws.CstlServiceException;
 
 import static org.constellation.configuration.DataSourceType.*;
@@ -80,7 +80,7 @@ public class LuceneSOSFactory implements OMFactory {
      * {@inheritDoc}
      */
     @Override
-    public ObservationWriter getObservationWriter(DataSourceType type, Automatic configuration, Map<String, Object> properties) throws CstlServiceException {
+    public ObservationWriter getObservationWriter(DataSourceType type, Automatic configuration, Map<String, Object> properties) throws DataStoreException {
         return new FileObservationWriter(configuration, properties);
     }
 }

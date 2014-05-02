@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
@@ -31,7 +32,7 @@ import org.constellation.observation.MeasurementTable;
 import org.constellation.observation.ObservationTable;
 import org.constellation.observation.ProcessTable;
 import org.constellation.sos.ObservationOfferingTable;
-import org.constellation.sos.io.ObservationWriter;
+import org.geotoolkit.observation.ObservationWriter;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.AbstractGeometry;
 import org.geotoolkit.gml.xml.DirectPosition;
@@ -106,14 +107,14 @@ public class DefaultObservationWriter implements ObservationWriter {
      *
      * @throws org.constellation.ws.CstlServiceException
      */
-    public DefaultObservationWriter(final Automatic configuration) throws CstlServiceException {
+    public DefaultObservationWriter(final Automatic configuration) throws DataStoreException {
         if (configuration == null) {
-            throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
+            throw new DataStoreException("The configuration object is null");
         }
         // we get the database informations
         final BDD db = configuration.getBdd();
         if (db == null) {
-            throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
+            throw new DataStoreException("The configuration file does not contains a BDD object");
         }
         isPostgres = db.getClassName() != null && db.getClassName().equals("org.postgresql.Driver");
         try {
@@ -126,7 +127,7 @@ public class DefaultObservationWriter implements ObservationWriter {
             procTable = omDatabase.getTable(ProcessTable.class);
 
         } catch (NoSuchTableException ex) {
-            throw new CstlServiceException("NoSuchTable Exception while initalizing the O&M writer:" + ex.getMessage(), NO_APPLICABLE_CODE);
+            throw new DataStoreException("NoSuchTable Exception while initalizing the O&M writer:" + ex.getMessage());
         }
     }
 
@@ -134,7 +135,7 @@ public class DefaultObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public String writeObservationTemplate(final ObservationTemplate template) throws CstlServiceException {
+    public String writeObservationTemplate(final ObservationTemplate template) throws DataStoreException {
         if (template.getObservation() != null) {
             return writeObservation((AbstractObservation)template.getObservation());
         }
@@ -145,7 +146,7 @@ public class DefaultObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public String writeObservation(final Observation observation) throws CstlServiceException {
+    public String writeObservation(final Observation observation) throws DataStoreException {
         try {
             if (observation instanceof Measurement && measTable != null) {
                 return measTable.getIdentifier((Measurement) OMXmlFactory.convert("1.0.0", observation));
@@ -154,11 +155,10 @@ public class DefaultObservationWriter implements ObservationWriter {
             }
             return null;
         } catch (CatalogException ex) {
-            throw new CstlServiceException(CAT_ERROR_MSG + ex.getMessage(), NO_APPLICABLE_CODE);
+            throw new DataStoreException(CAT_ERROR_MSG + ex.getMessage());
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
-                                             NO_APPLICABLE_CODE);
+            throw new DataStoreException("the service has throw a SQL Exception:" + e.getMessage());
         }
     }
     
@@ -166,7 +166,7 @@ public class DefaultObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public List<String> writeObservations(List<Observation> observations) throws CstlServiceException {
+    public List<String> writeObservations(List<Observation> observations) throws DataStoreException {
         final List<String> results = new ArrayList<>();
         for (Observation observation : observations) {
             final String oid = writeObservation(observation);
@@ -176,14 +176,13 @@ public class DefaultObservationWriter implements ObservationWriter {
     }
     
     @Override
-    public void removeObservation(final String observationID) throws CstlServiceException {
+    public void removeObservation(final String observationID) throws DataStoreException {
         try {
             obsTable.delete(observationID);
             measTable.delete(observationID);
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
-                                             NO_APPLICABLE_CODE);
+            throw new DataStoreException("the service has throw a SQL Exception:" + ex.getMessage());
         }
     }
     
@@ -191,7 +190,7 @@ public class DefaultObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public void removeObservationForProcedure(final String procedureID) throws CstlServiceException {
+    public void removeObservationForProcedure(final String procedureID) throws DataStoreException {
         throw new UnsupportedOperationException("Not supported yet in this implementation.");
     }
     
@@ -199,13 +198,12 @@ public class DefaultObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public void removeProcedure(final String procedureID) throws CstlServiceException {
+    public void removeProcedure(final String procedureID) throws DataStoreException {
         try {
             procTable.delete(procedureID);
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
-                                             NO_APPLICABLE_CODE);
+            throw new DataStoreException("the service has throw a SQL Exception:" + ex.getMessage());
         }
     }
 
@@ -213,15 +211,15 @@ public class DefaultObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public String writeOffering(final ObservationOffering offering) throws CstlServiceException {
+    public String writeOffering(final ObservationOffering offering) throws DataStoreException {
         try {
             return offTable.getIdentifier((ObservationOfferingType)offering);
 
         } catch (CatalogException ex) {
-            throw new CstlServiceException(CAT_ERROR_MSG + ex.getMessage(), NO_APPLICABLE_CODE);
+            throw new DataStoreException(CAT_ERROR_MSG + ex.getMessage());
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            throw new CstlServiceException(SQL_ERROR_MSG + e.getMessage(), NO_APPLICABLE_CODE);
+            throw new DataStoreException(SQL_ERROR_MSG + e.getMessage());
         }
     }
 
@@ -229,7 +227,7 @@ public class DefaultObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public void updateOffering(final String offeringID, final String offProc, final List<String> offPheno, final String offSF) throws CstlServiceException {
+    public void updateOffering(final String offeringID, final String offProc, final List<String> offPheno, final String offSF) throws DataStoreException {
         try {
             if (offProc != null) {
                 final OfferingProcedureType offProcedure = new OfferingProcedureType(offeringID, offProc);
@@ -247,10 +245,10 @@ public class DefaultObservationWriter implements ObservationWriter {
                 offTable.getStations().getIdentifier(offSamp);
             }
         } catch (CatalogException ex) {
-            throw new CstlServiceException(CAT_ERROR_MSG + ex.getMessage(), NO_APPLICABLE_CODE);
+            throw new DataStoreException(CAT_ERROR_MSG + ex.getMessage());
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            throw new CstlServiceException(SQL_ERROR_MSG + e.getMessage(), NO_APPLICABLE_CODE);
+            throw new DataStoreException(SQL_ERROR_MSG + e.getMessage());
         }
     }
 
@@ -266,9 +264,9 @@ public class DefaultObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public void recordProcedureLocation(final String physicalID, final AbstractGeometry position) throws CstlServiceException {
+    public void recordProcedureLocation(final String physicalID, final AbstractGeometry position) throws DataStoreException {
         if (!(position instanceof DirectPosition)) {
-            throw new CstlServiceException("Postgrid implementation only record directPosition procedure location");
+            throw new DataStoreException("Postgrid implementation only record directPosition procedure location");
         }
         final DirectPosition pos = (DirectPosition) position;
         if (pos == null || pos.getValue().size() < 2 || !isPostgres) {return;}
@@ -308,7 +306,7 @@ public class DefaultObservationWriter implements ObservationWriter {
                     LOGGER.log(Level.INFO, "Geographic sensor location already registred for {0} keeping old location", physicalID);
                 }
             } else {
-                throw new CstlServiceException("This CRS " + srsName + " is not supported", INVALID_PARAMETER_VALUE);
+                throw new DataStoreException("This CRS " + srsName + " is not supported");
             }
             LOGGER.info(request);
             if (insert) {
@@ -319,7 +317,7 @@ public class DefaultObservationWriter implements ObservationWriter {
             c.close();
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            throw new CstlServiceException(SQL_ERROR_MSG + e.getMessage(), NO_APPLICABLE_CODE);
+            throw new DataStoreException(SQL_ERROR_MSG + e.getMessage());
         }
     }
 

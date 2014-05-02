@@ -50,7 +50,7 @@ import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationFilterReader;
 import org.geotoolkit.observation.ObservationReader;
 import org.constellation.sos.io.ObservationResult;
-import org.constellation.sos.io.ObservationWriter;
+import org.geotoolkit.observation.ObservationWriter;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
 import static org.constellation.sos.ws.DatablockParser.*;
@@ -2401,7 +2401,7 @@ public class SOSworker extends AbstractWorker {
      *
      * @throws CstlServiceException If the service does not succeed to update the offering in the datasource.
      */
-    private void updateOffering(final ObservationOffering offering, final ObservationTemplate template) throws CstlServiceException {
+    private void updateOffering(final ObservationOffering offering, final ObservationTemplate template) throws DataStoreException {
 
         //we add the new sensor to the offering
         String offProc = null;
@@ -2439,7 +2439,7 @@ public class SOSworker extends AbstractWorker {
      *
      * @throws CstlServiceException If the service does not succeed to store the offering in the datasource.
      */
-    private void createOffering(final String version, final String offeringName, final ObservationTemplate template) throws CstlServiceException {
+    private void createOffering(final String version, final String offeringName, final ObservationTemplate template) throws DataStoreException {
        LOGGER.log(logLevel, "offering {0} not present, first build", offeringName);
 
         // TODO bounded by??? station?

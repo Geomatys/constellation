@@ -49,7 +49,7 @@ import org.constellation.sos.factory.OMFactory;
 import org.constellation.sos.factory.SMLFactory;
 import org.constellation.sos.io.ObservationFilterReader;
 import org.geotoolkit.observation.ObservationReader;
-import org.constellation.sos.io.ObservationWriter;
+import org.geotoolkit.observation.ObservationWriter;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
 import org.constellation.sos.ws.SOSConstants;
@@ -190,7 +190,7 @@ public class SOSConfigurer extends OGCConfigurer {
             } else {
                 return new AcknowlegementType("Error", "Unable to remove the sensor from SML datasource.");
             }
-        } catch (CstlServiceException ex) {
+        } catch (CstlServiceException | DataStoreException ex) {
             throw new ConfigurationException(ex);
         }
     }
@@ -209,7 +209,7 @@ public class SOSConfigurer extends OGCConfigurer {
                 }
             }
             return new AcknowlegementType("Success", "The specified sensor have been removed in the SOS");
-        } catch (CstlServiceException ex) {
+        } catch (CstlServiceException | DataStoreException ex) {
             throw new ConfigurationException(ex);
         }
     }
@@ -291,7 +291,7 @@ public class SOSConfigurer extends OGCConfigurer {
         throw new CstlServiceException("the sensorML file does not contain a valid sensorML object");
     }
     
-    private static Object unmarshallObservationFile(final File f) throws JAXBException, CstlServiceException {
+    private static Object unmarshallObservationFile(final File f) throws JAXBException, DataStoreException {
         final Unmarshaller um = SOSMarshallerPool.getInstance().acquireUnmarshaller();
         Object obj = um.unmarshal(f);
         if (obj instanceof JAXBElement) {
@@ -300,7 +300,7 @@ public class SOSConfigurer extends OGCConfigurer {
         if (obj != null) {
             return obj;
         }
-        throw new CstlServiceException("the observation file does not contain a valid O&M object");
+        throw new DataStoreException("the observation file does not contain a valid O&M object");
     }
     
     public AcknowlegementType importObservations(final String id, final File observationFile) throws ConfigurationException {
@@ -315,7 +315,7 @@ public class SOSConfigurer extends OGCConfigurer {
                 return new AcknowlegementType("Failure", "Unexpected object type for observation file");
             }
             return new AcknowlegementType("Success", "The specified observation have been imported in the SOS");
-        } catch (JAXBException | CstlServiceException ex) {
+        } catch (JAXBException | DataStoreException ex) {
             throw new ConfigurationException(ex);
         }
     }
@@ -327,7 +327,7 @@ public class SOSConfigurer extends OGCConfigurer {
             writer.writeObservations(collection.getMember());
             LOGGER.log(Level.INFO, "observations imported in :{0} ms", (System.currentTimeMillis() - start));
             return new AcknowlegementType("Success", "The specified observations have been imported in the SOS");
-        } catch (CstlServiceException ex) {
+        } catch (DataStoreException ex) {
             throw new ConfigurationException(ex);
         }
     }
@@ -339,7 +339,7 @@ public class SOSConfigurer extends OGCConfigurer {
             writer.writeObservations(observations);
             LOGGER.log(Level.INFO, "observations imported in :{0} ms", (System.currentTimeMillis() - start));
             return new AcknowlegementType("Success", "The specified observations have been imported in the SOS");
-        } catch (CstlServiceException ex) {
+        } catch (DataStoreException ex) {
             throw new ConfigurationException(ex);
         }
     }
@@ -349,7 +349,7 @@ public class SOSConfigurer extends OGCConfigurer {
         try {
             writer.removeObservation(observationID);
             return new AcknowlegementType("Success", "The specified observation have been removed from the SOS");
-        } catch (CstlServiceException ex) {
+        } catch (DataStoreException ex) {
             throw new ConfigurationException(ex);
         }
     }
@@ -359,7 +359,7 @@ public class SOSConfigurer extends OGCConfigurer {
         try {
             writer.removeObservationForProcedure(procedureID);
             return new AcknowlegementType("Success", "The specified observations have been removed from the SOS");
-        } catch (CstlServiceException ex) {
+        } catch (DataStoreException ex) {
             throw new ConfigurationException(ex);
         }
     }
@@ -378,7 +378,7 @@ public class SOSConfigurer extends OGCConfigurer {
         try {
             writer.recordProcedureLocation(sensorID, location);
             return new AcknowlegementType("Success", "The sensor location have been updated in the SOS");
-        } catch (CstlServiceException ex) {
+        } catch (DataStoreException ex) {
             throw new ConfigurationException(ex);
         }
     }
@@ -540,7 +540,7 @@ public class SOSConfigurer extends OGCConfigurer {
             try {
                 return omfactory.getObservationWriter(config.getObservationWriterType(), config.getOMConfiguration(), new HashMap<String, Object>());
 
-            } catch (CstlServiceException ex) {
+            } catch (DataStoreException ex) {
                 throw new ConfigurationException("JAXBException while initializing the writer!", ex);
             }
         } else {

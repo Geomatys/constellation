@@ -23,7 +23,7 @@ import org.constellation.configuration.DataSourceType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.ObservationFilter;
 import org.geotoolkit.observation.ObservationReader;
-import org.constellation.sos.io.ObservationWriter;
+import org.geotoolkit.observation.ObservationWriter;
 import org.constellation.ws.CstlServiceException;
 
 /**
@@ -91,8 +91,8 @@ public interface OMFactory {
      * @param properties The associated parameters (observation base identifier, template base identifiers,....)
      * 
      * @return an Observation writer for the specified datasource.
-     * @throws CstlServiceException
+     * @throws DataStoreException
      */
-    ObservationWriter getObservationWriter(DataSourceType type,  Automatic configuration, Map<String, Object> properties) throws CstlServiceException;
+    ObservationWriter getObservationWriter(DataSourceType type,  Automatic configuration, Map<String, Object> properties) throws DataStoreException;
 
 }

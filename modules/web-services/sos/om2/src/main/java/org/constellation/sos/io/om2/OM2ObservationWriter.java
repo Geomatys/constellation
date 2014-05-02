@@ -32,11 +32,12 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sql.DataSource;
+import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.sos.factory.OMFactory;
-import org.constellation.sos.io.ObservationWriter;
+import org.geotoolkit.observation.ObservationWriter;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.GeometrytoJTS;
 import org.geotoolkit.gml.xml.AbstractGeometry;
@@ -97,9 +98,9 @@ public class OM2ObservationWriter implements ObservationWriter {
      * @param configuration
      * @param properties
      *
-     * @throws org.constellation.ws.CstlServiceException
+     * @throws org.apache.sis.storage.DataStoreException
      */
-    public OM2ObservationWriter(final Automatic configuration, final Map<String, Object> properties) throws CstlServiceException {
+    public OM2ObservationWriter(final Automatic configuration, final Map<String, Object> properties) throws DataStoreException {
         final String oidBase = (String) properties.get(OMFactory.OBSERVATION_ID_BASE);
         if (oidBase == null) {
             this.observationIdBase = "";
@@ -113,18 +114,18 @@ public class OM2ObservationWriter implements ObservationWriter {
             this.sensorIdBase = sidBase;
         }
         if (configuration == null) {
-            throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
+            throw new DataStoreException("The configuration object is null");
         }
         // we get the database informations
         final BDD db = configuration.getBdd();
         if (db == null) {
-            throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
+            throw new DataStoreException("The configuration file does not contains a BDD object");
         }
         isPostgres = db.getClassName() != null && db.getClassName().equals("org.postgresql.Driver");
         try {
             this.source = db.getDataSource();
         } catch (SQLException ex) {
-            throw new CstlServiceException(ex);
+            throw new DataStoreException(ex);
         }
     }
 
@@ -132,7 +133,7 @@ public class OM2ObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public String writeObservationTemplate(final ObservationTemplate template) throws CstlServiceException {
+    public String writeObservationTemplate(final ObservationTemplate template) throws DataStoreException {
         if (template.getObservation() != null) {
             return writeObservation((AbstractObservation)template.getObservation());
         }
@@ -143,7 +144,7 @@ public class OM2ObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public String writeObservation(final Observation observation) throws CstlServiceException {
+    public String writeObservation(final Observation observation) throws DataStoreException {
         try {
             final Connection c      = source.getConnection();
             c.setAutoCommit(false);
@@ -153,7 +154,7 @@ public class OM2ObservationWriter implements ObservationWriter {
             c.close();
             return oid;
         } catch (SQLException ex) {
-            throw new CstlServiceException("Error while inserting observations.", ex, NO_APPLICABLE_CODE);
+            throw new DataStoreException("Error while inserting observations.", ex);
         }
     }
     
@@ -161,7 +162,7 @@ public class OM2ObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public List<String> writeObservations(final List<Observation> observations) throws CstlServiceException {
+    public List<String> writeObservations(final List<Observation> observations) throws DataStoreException {
         final List<String> results = new ArrayList<>();
         try {
             final Connection c           = source.getConnection();
@@ -175,7 +176,7 @@ public class OM2ObservationWriter implements ObservationWriter {
             }
             c.close();
         } catch (SQLException ex) {
-            throw new CstlServiceException("Error while inserting observations.", ex, NO_APPLICABLE_CODE);
+            throw new DataStoreException("Error while inserting observations.", ex);
         }
         return results;
     }
@@ -183,7 +184,7 @@ public class OM2ObservationWriter implements ObservationWriter {
     
     
     
-    private String writeObservation(final Observation observation, final Connection c, final int generatedID) throws CstlServiceException {
+    private String writeObservation(final Observation observation, final Connection c, final int generatedID) throws DataStoreException {
         try {
             final PreparedStatement stmt = c.prepareStatement("INSERT INTO \"om\".\"observations\" VALUES(?,?,?,?,?,?,?)");
             final String observationName;
@@ -261,7 +262,7 @@ public class OM2ObservationWriter implements ObservationWriter {
             updateOrCreateOffering(procedure.getHref(),samplingTime, phenRef, foiID, c);
             return observation.getName();
         } catch (SQLException ex) {
-            throw new CstlServiceException("Error while inserting observation.", ex, NO_APPLICABLE_CODE);
+            throw new DataStoreException("Error while inserting observation.", ex);
         }
     }
     
@@ -352,7 +353,7 @@ public class OM2ObservationWriter implements ObservationWriter {
         stmtExist.close();
     }
     
-    private void writeResult(final int oid, final Object result, final TemporalObject samplingTime, final Connection c) throws SQLException, CstlServiceException {
+    private void writeResult(final int oid, final Object result, final TemporalObject samplingTime, final Connection c) throws SQLException, DataStoreException {
         if (result instanceof Measure) {
             final PreparedStatement stmt = c.prepareStatement("INSERT INTO \"om\".\"mesures\" VALUES(?,?,?,?,?,?,?,?)");
             final Measure measure = (Measure) result;
@@ -369,13 +370,13 @@ public class OM2ObservationWriter implements ObservationWriter {
         } else if (result instanceof DataArrayProperty) {
             final DataArray array = ((DataArrayProperty) result).getDataArray();
             if (!(array.getEncoding() instanceof TextBlock)) {
-                throw new CstlServiceException("Only TextEncoding is supported");
+                throw new DataStoreException("Only TextEncoding is supported");
             }
             final TextBlock encoding = (TextBlock) array.getEncoding();
             
             if (!(array.getPropertyElementType().getAbstractRecord() instanceof DataRecord) &&
                 !(array.getPropertyElementType().getAbstractRecord() instanceof SimpleDataRecord)) {
-                throw new CstlServiceException("Only DataRecord is supported");
+                throw new DataStoreException("Only DataRecord is supported");
             }
             final List<Field> fields = new ArrayList<>();
             boolean hasTime = false;
@@ -395,7 +396,7 @@ public class OM2ObservationWriter implements ObservationWriter {
                             final String desc = q.getDefinition();
                             fields.add(new Field("Text", field.getName(), desc, null));
                         } else {
-                            throw new CstlServiceException("Only Quantity and Text is supported for now");
+                            throw new DataStoreException("Only Quantity and Text is supported for now");
                         }
                     }
                 }
@@ -419,7 +420,7 @@ public class OM2ObservationWriter implements ObservationWriter {
                             final String desc = q.getDefinition();
                             fields.add(new Field("Boolean", field.getName(), desc, null));
                         } else {
-                            throw new CstlServiceException("Only Quantity is supported for now");
+                            throw new DataStoreException("Only Quantity is supported for now");
                         }
                         
                     }
@@ -444,7 +445,7 @@ public class OM2ObservationWriter implements ObservationWriter {
                         final long millis = new ISODateParser().parseToMillis(first);
                         realTime = new Timestamp(millis);
                     } catch (IllegalArgumentException ex) {
-                        throw new CstlServiceException("Bad format of timestamp for:" + first);
+                        throw new DataStoreException("Bad format of timestamp for:" + first);
                     }
                     block = block.substring(tokenIndex + 1);
                 } else {
@@ -707,7 +708,7 @@ public class OM2ObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public String writeOffering(final ObservationOffering offering) throws CstlServiceException {
+    public String writeOffering(final ObservationOffering offering) throws DataStoreException {
         try {
             final Connection c           = source.getConnection();
             final PreparedStatement stmt = c.prepareStatement("INSERT INTO \"om\".\"offerings\" VALUES(?,?,?,?,?,?)");
@@ -760,7 +761,7 @@ public class OM2ObservationWriter implements ObservationWriter {
             c.close();
             return offering.getId();
         } catch (SQLException ex) {
-            throw new CstlServiceException("Error while inserting offering.", ex, NO_APPLICABLE_CODE);
+            throw new DataStoreException("Error while inserting offering.", ex);
         }
     }
 
@@ -768,7 +769,7 @@ public class OM2ObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public void updateOffering(final String offeringID, final String offProc, final List<String> offPheno, final String offSF) throws CstlServiceException {
+    public void updateOffering(final String offeringID, final String offProc, final List<String> offPheno, final String offSF) throws DataStoreException {
         try {
             final Connection c           = source.getConnection();
             if (offProc != null) {
@@ -792,7 +793,7 @@ public class OM2ObservationWriter implements ObservationWriter {
             }
             c.close();
         } catch (SQLException e) {
-            throw new CstlServiceException(e.getMessage(), e, NO_APPLICABLE_CODE);
+            throw new DataStoreException(e.getMessage(), e);
         }
     }
 
@@ -808,7 +809,7 @@ public class OM2ObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public void recordProcedureLocation(final String physicalID, final AbstractGeometry position) throws CstlServiceException {
+    public void recordProcedureLocation(final String physicalID, final AbstractGeometry position) throws DataStoreException {
         if (position != null) {
             try {
                 final Connection c     = source.getConnection();
@@ -825,7 +826,7 @@ public class OM2ObservationWriter implements ObservationWriter {
                 ps.execute();
                 c.close();
             } catch (SQLException | FactoryException e) {
-                throw new CstlServiceException(e.getMessage(), e, NO_APPLICABLE_CODE);
+                throw new DataStoreException(e.getMessage(), e);
             }
         }
     }
@@ -833,7 +834,7 @@ public class OM2ObservationWriter implements ObservationWriter {
     /**
      * {@inheritDoc}
      */
-    private int getNewObservationId() throws CstlServiceException {
+    private int getNewObservationId() throws DataStoreException {
         try {
             final Connection c         = source.getConnection();
             final Statement stmt       = c.createStatement();
@@ -849,7 +850,7 @@ public class OM2ObservationWriter implements ObservationWriter {
             c.close();
             return resultNum;
         } catch (SQLException ex) {
-            throw new CstlServiceException("Error while looking for available observation id.", ex, NO_APPLICABLE_CODE);
+            throw new DataStoreException("Error while looking for available observation id.", ex);
         }
     }
 
@@ -857,7 +858,7 @@ public class OM2ObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public void removeObservationForProcedure(final String procedureID) throws CstlServiceException {
+    public void removeObservationForProcedure(final String procedureID) throws DataStoreException {
         try {
             final Connection c              = source.getConnection();
             c.setAutoCommit(false);
@@ -874,7 +875,7 @@ public class OM2ObservationWriter implements ObservationWriter {
             c.commit();
             c.close();
         } catch (SQLException ex) {
-            throw new CstlServiceException("Error while inserting observation.", ex, NO_APPLICABLE_CODE);
+            throw new DataStoreException("Error while inserting observation.", ex);
         }
     }
     
@@ -882,7 +883,7 @@ public class OM2ObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public void removeProcedure(final String procedureID) throws CstlServiceException {
+    public void removeProcedure(final String procedureID) throws DataStoreException {
         try {
             removeObservationForProcedure(procedureID);
             final Connection c              = source.getConnection();
@@ -937,7 +938,7 @@ public class OM2ObservationWriter implements ObservationWriter {
             c.commit();
             c.close();
         } catch (SQLException ex) {
-            throw new CstlServiceException("Error while removeing procedure observation.", ex, NO_APPLICABLE_CODE);
+            throw new DataStoreException("Error while removeing procedure observation.", ex);
         }
     }
     
@@ -945,7 +946,7 @@ public class OM2ObservationWriter implements ObservationWriter {
      * {@inheritDoc}
      */
     @Override
-    public void removeObservation(final String observationID) throws CstlServiceException {
+    public void removeObservation(final String observationID) throws DataStoreException {
         try {
             final Connection c              = source.getConnection();
             c.setAutoCommit(false);
@@ -962,7 +963,7 @@ public class OM2ObservationWriter implements ObservationWriter {
             c.commit();
             c.close();
         } catch (SQLException ex) {
-            throw new CstlServiceException("Error while inserting observation.", ex, NO_APPLICABLE_CODE);
+            throw new DataStoreException("Error while inserting observation.", ex);
         }
     }
     

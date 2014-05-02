@@ -26,7 +26,7 @@ import org.constellation.sos.io.postgrid.DefaultObservationReader;
 import org.constellation.sos.io.postgrid.DefaultObservationWriter;
 import org.constellation.sos.io.ObservationFilter;
 import org.geotoolkit.observation.ObservationReader;
-import org.constellation.sos.io.ObservationWriter;
+import org.geotoolkit.observation.ObservationWriter;
 import org.constellation.ws.CstlServiceException;
 
 import static org.constellation.configuration.DataSourceType.*;
@@ -78,7 +78,7 @@ public class PostgridSOSFactory implements OMFactory {
      * {@inheritDoc}
      */
     @Override
-    public ObservationWriter getObservationWriter(DataSourceType type, Automatic configuration, Map<String, Object> properties) throws CstlServiceException {
+    public ObservationWriter getObservationWriter(DataSourceType type, Automatic configuration, Map<String, Object> properties) throws DataStoreException {
         return new DefaultObservationWriter(configuration);
     }
 
