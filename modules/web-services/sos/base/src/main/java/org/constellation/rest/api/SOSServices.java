@@ -130,7 +130,7 @@ public class SOSServices {
     @POST
     @Path("{id}/observations")
     public Response getObservations(final @PathParam("id") String id, final ObservationFilter filter) throws Exception {
-        return ok(getConfigurer().getObservationsCsv(id, filter.getSensorID(), filter.getObservedProperty()));
+        return ok(getConfigurer().getObservationsCsv(id, filter.getSensorID(), filter.getObservedProperty(), filter.getStart(), filter.getEnd()));
     }
     
     @PUT

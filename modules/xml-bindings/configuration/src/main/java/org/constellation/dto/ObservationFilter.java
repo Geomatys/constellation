@@ -17,6 +17,7 @@
 package org.constellation.dto;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -34,6 +35,10 @@ public class ObservationFilter {
     
     private List<String> observedProperty;
 
+    private Date start;
+    
+    private Date end;
+    
     /**
      * @return the sensorID
      */
@@ -46,6 +51,34 @@ public class ObservationFilter {
      */
     public void setSensorID(String sensorID) {
         this.sensorID = sensorID;
+    }
+    
+    /**
+     * @return the start
+     */
+    public Date getStart() {
+        return start;
+    }
+
+    /**
+     * @param start the start to set
+     */
+    public void setStart(Date start) {
+        this.start = start;
+    }
+    
+    /**
+     * @return the end
+     */
+    public Date getEnd() {
+        return end;
+    }
+
+    /**
+     * @param end the end to set
+     */
+    public void setEnd(Date end) {
+        this.end = end;
     }
 
     /**

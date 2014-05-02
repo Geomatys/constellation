@@ -23,9 +23,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -48,8 +50,6 @@ import org.constellation.ogc.configuration.OGCConfigurer;
 import org.constellation.sos.factory.OMFactory;
 import org.constellation.sos.factory.SMLFactory;
 import org.constellation.sos.io.ObservationFilterReader;
-import org.geotoolkit.observation.ObservationReader;
-import org.geotoolkit.observation.ObservationWriter;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
 import org.constellation.sos.ws.SOSConstants;
@@ -59,6 +59,10 @@ import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.geometry.jts.JTS;
 import org.geotoolkit.gml.GeometrytoJTS;
 import org.geotoolkit.gml.xml.AbstractGeometry;
+import org.geotoolkit.gml.xml.v321.TimeInstantType;
+import org.geotoolkit.gml.xml.v321.TimePeriodType;
+import org.geotoolkit.observation.ObservationReader;
+import org.geotoolkit.observation.ObservationWriter;
 import org.geotoolkit.observation.xml.AbstractObservation;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.sml.xml.AbstractSensorML;
@@ -70,6 +74,8 @@ import org.opengis.observation.ObservationCollection;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.temporal.Instant;
+import org.opengis.temporal.Period;
 import org.opengis.util.FactoryException;
 
 /**
@@ -399,7 +405,7 @@ public class SOSConfigurer extends OGCConfigurer {
         }
     }
     
-    public String getObservationsCsv(final String id, final String sensorID, final List<String> observedProperties) throws ConfigurationException {
+    public String getObservationsCsv(final String id, final String sensorID, final List<String> observedProperties, final Date start, final Date end) throws ConfigurationException {
         final ObservationFilterReader filter = getObservationFilter(id);
         try {
             filter.initFilterGetResult(sensorID, SOSConstants.OBSERVATION_QNAME);
@@ -409,7 +415,16 @@ public class SOSConfigurer extends OGCConfigurer {
             filter.setObservedProperties(observedProperties);
             filter.setResponseFormat("text/csv");
             
-            // TODO time
+            if (start != null && end != null) {
+                final Period period = new TimePeriodType(new Timestamp(start.getTime()), new Timestamp(end.getTime()));
+                filter.setTimeDuring(period);
+            } else if (start != null) {
+                final Instant time = new TimeInstantType(new Timestamp(start.getTime()));
+                filter.setTimeAfter(time);
+            } else if (end != null) {
+                final Instant time = new TimeInstantType(new Timestamp(end.getTime()));
+                filter.setTimeBefore(time);
+            }
             return filter.getResults();
             
         } catch (CstlServiceException  ex) {
