@@ -575,19 +575,30 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
         $scope.deleteLayer = function() {
             var txt = ($scope.service.type.toLowerCase() === 'wmts') ? 'Are you sure? This will also delete the generated tiles for this layer.' : 'Are you sure?';
             if ($scope.selected != null && confirm(txt)) {
-                webService.deleteLayer({type: $scope.service.type, id: $scope.service.identifier, layerid: $scope.selected.Name}, {layernamespace: ''},
-                    function() {
-                        if ($scope.service.type.toLowerCase() === 'wmts' || $scope.service.type.toLowerCase() === 'wms') {
-                            $scope.deleteTiledData($scope.service, $scope.selected.Name, $scope.selected.Provider);
-                        }
+                if ($scope.service.type.toLowerCase() === 'sos') {
+                    sos.removeSensor({id: $scope.service.identifier, sensor: $scope.selected.id}, function() {
+                        $growl('success', 'Success', 'Sensor ' + $scope.selected.id + ' successfully removed from service ' + $scope.service.name);
+                        $scope.initScope();
+                    },function () {
+                        $growl('error', 'Error', 'Unable to remove sensor ' + $scope.selected.id + ' from service ' + $scope.service.name);
+                    });
+                } else {
+                    webService.deleteLayer({type: $scope.service.type, id: $scope.service.identifier, layerid: $scope.selected.Name}, {layernamespace: ''},
+                        function () {
+                            if ($scope.service.type.toLowerCase() === 'wmts' || $scope.service.type.toLowerCase() === 'wms') {
+                                $scope.deleteTiledData($scope.service, $scope.selected.Name, $scope.selected.Provider);
+                            }
 
-                        $growl('success','Success','Layer '+ $scope.selected.Name +' successfully deleted from service '+ $scope.service.name);
-                        $scope.layers = webService.layers({type: $scope.type, id:$routeParams.id}, {}, function(response) {
-                            $scope.fullList = response;
-                        });
-                    },
-                    function() {$growl('error','Error','Layer '+ $scope.selected.Name +' failed to be deleted from service '+ $scope.service.name);}
-                );
+                            $growl('success', 'Success', 'Layer ' + $scope.selected.Name + ' successfully deleted from service ' + $scope.service.name);
+                            $scope.layers = webService.layers({type: $scope.type, id: $routeParams.id}, {}, function (response) {
+                                $scope.fullList = response;
+                            });
+                        },
+                        function () {
+                            $growl('error', 'Error', 'Layer ' + $scope.selected.Name + ' failed to be deleted from service ' + $scope.service.name);
+                        }
+                    );
+                }
             }
         };
 

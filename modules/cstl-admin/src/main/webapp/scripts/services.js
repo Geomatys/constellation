@@ -231,6 +231,7 @@ cstlAdminApp.factory('sos', ['$resource',
         return $resource('@cstl/api/1/SOS', {}, {
             'count':        {method: 'GET',  url: '@cstl/api/1/SOS/:id/sensors/count;jsessionid='},
             'add':          {method: 'PUT',  url: '@cstl/api/1/SOS/:id/observations;jsessionid='},
+            'removeSensor': {method: 'DELETE', url: '@cstl/api/1/SOS/:id/sensor/:sensor;jsessionid='},
             'getFeatures':  {method: 'GET',  url: '@cstl/api/1/SOS/:id/sensor/location/:sensor;jsessionid='},
             'listSensors':  {method: 'GET',  url: '@cstl/api/1/SOS/:id/sensors/identifiers;jsessionid='},
             'sensorsTree':  {method: 'GET',  url: '@cstl/api/1/SOS/:id/sensors;jsessionid='},
