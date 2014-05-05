@@ -121,7 +121,6 @@
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>
             <version>10.10.1.1</version>
-            <scope>runtime</scope>
           </dependency>
         </dependencies>
 
@@ -131,7 +130,7 @@
           <!-- JDBC connection parameters -->
           <jdbc>
             <driver>org.apache.derby.jdbc.EmbeddedDriver</driver>
-            <url>jdbc:derby:/Users/cheleb/.constellation/admin/admin-db</url>
+            <url>jdbc:derby:${env.HOME}/.constellation/admin/admin-db/</url>
             <user>geoadmin</user>
             <password>g3o4dmin</password>
           </jdbc>
