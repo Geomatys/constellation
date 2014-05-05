@@ -981,6 +981,7 @@
             "dashboard.action.add.layer": "Ajouter une couche",
             "dashboard.sensors.list":"Capteurs disponibles",
             "dashboard.measures.list":"Mesures possibles",
+            "dashboard.measures.error.select.one" : "Vous devez sélectionner une mesure dans la liste précédente",
             "dashboard.area":"Zone géographique",
             "dashboard.date.to":"au",
             "dashboard.date.from":"Du",

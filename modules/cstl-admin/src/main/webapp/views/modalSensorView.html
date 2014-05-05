@@ -8,9 +8,9 @@
             <div class="row" ng-if="var.displayGraph === false">
                 <div class="col-sm-4 sos_edit_blocs">
                     <label class="control-label" translate="service.edit.dashboard.measures.list">Available measures</label>
-                    <div class="sos_edit_checkboxlist">
+                    <div class="sos_edit_checkboxlist" ng-class="{'error-select-one': var.needToSelectMeasure === true}">
                         <label class="checkbox" ng-repeat="measure in measures">
-                            <input type="checkbox" ng-model="measure.checked"> {{measure.id}}
+                            <input type="checkbox" ng-model="measure.checked" ng-change="clickMeasure(measure)"> {{measure.id}}
                         </label>
                     </div>
                 </div>
@@ -21,6 +21,13 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Error no measure selected -->
+            <div class="row" ng-if="var.needToSelectMeasure === true">
+                <p class="error-select-one" translate="service.edit.dashboard.measures.error.select.one">You need to select one measure in the list</p>
+            </div>
+
+            <!-- Graph -->
             <div class="row" ng-if="var.displayGraph === true">
                 <div class="col-sm-12">
                     <div class="sos_edit_graph" id="graph">
@@ -38,7 +45,7 @@
         </div>
         <div class="modal-footer">
             <button type="button" id="cancelButton" class="btn btn-default" ng-click="close()" translate="data.modal.close">Close</button>
-            <button type="button" class="btn btn-primary" ng-click="showGraph()" translate="service.edit.dashboard.button.graph.show">Show graph</button>
+            <button type="button" class="btn btn-primary" ng-show="var.displayGraph === false" ng-click="showGraph()" translate="service.edit.dashboard.button.graph.show">Show graph</button>
         </div>
     </div>
 </div>

@@ -498,6 +498,7 @@ cstlAdminApp.service('$dashboard', function($filter) {
         $scope.currentpage = $scope.currentpage || 1;
         $scope.selected = $scope.selected || null;
         $scope.exclude = $scope.exclude || [];
+        $scope.service = $scope.service || null;
 
         // Dashboard methods
         $scope.displayPage = function(page) {
@@ -513,9 +514,16 @@ cstlAdminApp.service('$dashboard', function($filter) {
             for (var i = 0; i < array.length; i++) {
                 var found = false;
                 for (var j = 0; j < $scope.exclude.length; j++) {
-                    if ($scope.exclude[j].Name === array[i].Name) {
-                        found = true;
-                        break;
+                    if ($scope.service && $scope.service.type.toLowerCase() === 'sos') {
+                        if ($scope.exclude[j].id === array[i].Name) {
+                            found = true;
+                            break;
+                        }
+                    } else {
+                        if ($scope.exclude[j].Name === array[i].Name) {
+                            found = true;
+                            break;
+                        }
                     }
                 }
                 if (!found) {

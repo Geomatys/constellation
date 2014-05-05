@@ -389,13 +389,10 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
             } else if ($scope.type === 'sos') {
                 sos.sensorsTree({id: $routeParams.id}, function(sensors) {
                     $dashboard($scope, sensors.children, false);
-
-                    $scope.sensors = [];
-                    for (var i=0; i<sensors.children.length; i++) {
-                        $scope.sensors[i] = {id: sensors.children[i].id, checked:false};
-                    }
+                    $scope.sensors = sensors.children;
 
                 }, function() { $growl('error','Error','Unable to list sensors'); });
+                $scope.layers = $scope.sensors;
             } else {
                 $scope.config = webService.config({type: $scope.type, id:$routeParams.id});
                 $scope.layers = webService.layers({type: $scope.type, id:$routeParams.id}, {}, function(response) {
@@ -727,8 +724,10 @@ cstlAdminApp.controller('SensorModalController', ['$scope', '$modalInstance', '$
         $scope.service = service;
         $scope.sensorId = sensorId;
         $scope.measures = undefined;
-        $scope.var = {};
-        $scope.var.displayGraph = false;
+        $scope.var = {
+            displayGraph:  false,
+            needToSelectMeasure: false
+        };
 
         $scope.init = function() {
             sos.measuresForSensor({id: service.identifier, 'sensorID': sensorId}, function(measures){
@@ -778,15 +777,38 @@ cstlAdminApp.controller('SensorModalController', ['$scope', '$modalInstance', '$
             return checked;
         }
 
-        $scope.showGraph = function() {
-            $scope.var.displayGraph = true;
+        function getAllMeasures() {
+            var allMeasures = [];
+            for (var i=0; i<$scope.measures.length; i++) {
+                var measure = $scope.measures[i];
+                allMeasures.push(measure.id);
+            }
+            return allMeasures;
+        }
 
+        $scope.showGraph = function() {
             var measuresChecked = getMeasuresChecked();
+            if (measuresChecked.length === 0) {
+                var allMeasures = getAllMeasures();
+                if (allMeasures.length === 1) {
+                    measuresChecked = allMeasures;
+                } else {
+                    // Please select one or more measure(s) in the list
+                    $scope.var.needToSelectMeasure = true;
+                    return;
+                }
+            }
+
+            $scope.var.displayGraph = true;
 
             $http.post('@cstl/api/1/SOS/'+ $scope.service.identifier +'/observations;jsessionid=', {'sensorID': $scope.sensorId, 'observedProperty': measuresChecked})
                 .success(function(response){
                     generateD3Graph(response, measuresChecked[0]);
                 });
+        };
+
+        $scope.clickMeasure = function(measure) {
+            $scope.var.needToSelectMeasure = false;
         };
 
         function generateD3Graph(csv, measure) {

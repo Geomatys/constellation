@@ -527,6 +527,7 @@
             "dashboard.action.add.layer": "Add Layer",
             "dashboard.sensors.list":"Available sensors",
             "dashboard.measures.list":"Available measures",
+            "dashboard.measures.error.select.one" : "You need to select one measure in the list",
             "dashboard.area": "Geographical area",
             "dashboard.date.to":"to",
             "dashboard.date.from":"From",

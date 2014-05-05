@@ -340,6 +340,12 @@ ul.unstyled {
     border-radius:5px; 
     padding: 0 15px;
 }
+.sos_edit_checkboxlist.error-select-one{
+    border-color: #ff0000;
+}
+p.error-select-one{
+    color: #ff0000;
+}
 .sos_edit_checkboxlist>label{
     font-weight:normal;
 }
