@@ -205,12 +205,12 @@ public class SOSServices {
             prop.put("endTime",    result.spatialBound.dateEnd);
             prop.put("longitude",  result.spatialBound.minx);
             prop.put("latitude",   result.spatialBound.miny);
-            prop.put("phenomenon", result.phenomenons);
+            prop.put("phenomenon", result.fields);
             final AbstractSensorML sml = SensorMLGenerator.getTemplateSensorML(prop);
 
             configurer.importSensor(id, sml, process);
         }
-        configurer.importObservations(id, result.observations);
+        configurer.importObservations(id, result.observations, result.phenomenons);
 
         //record location
         final AbstractGeometryType geom = (AbstractGeometryType) result.spatialBound.getGeometry("2.0.0");

@@ -34,10 +34,8 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.sos.factory.OMFactory;
 import org.geotoolkit.observation.ObservationWriter;
 import org.constellation.sos.io.lucene.LuceneObservationIndexer;
-import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.AbstractGeometry;
 import org.geotoolkit.lucene.IndexingException;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.sampling.xml.SamplingFeature;
 import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
@@ -251,6 +249,21 @@ public class FileObservationWriter implements ObservationWriter {
             }
         } catch (JAXBException | IOException ex) {
             throw new DataStoreException("Exception while marshalling the feature of interest file.", ex);
+        }
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void writePhenomenons(final List<org.opengis.observation.Phenomenon> phenomenons) throws DataStoreException {
+        for (org.opengis.observation.Phenomenon phenomenon : phenomenons)  {
+            if (phenomenon instanceof Phenomenon) {
+                writePhenomenon((Phenomenon)phenomenon);
+            } else if (phenomenon != null) {
+                LOGGER.log(Level.WARNING, "Bad implementation of phenomenon:{0}", phenomenon.getClass().getName());
+            }
         }
     }
 

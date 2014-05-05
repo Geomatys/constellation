@@ -49,7 +49,6 @@ import org.constellation.metadata.utils.Utils;
 import org.constellation.ogc.configuration.OGCConfigurer;
 import org.constellation.sos.factory.OMFactory;
 import org.constellation.sos.factory.SMLFactory;
-import org.geotoolkit.observation.ObservationFilterReader;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
 import org.constellation.sos.ws.SOSConstants;
@@ -61,6 +60,7 @@ import org.geotoolkit.gml.GeometrytoJTS;
 import org.geotoolkit.gml.xml.AbstractGeometry;
 import org.geotoolkit.gml.xml.v321.TimeInstantType;
 import org.geotoolkit.gml.xml.v321.TimePeriodType;
+import org.geotoolkit.observation.ObservationFilterReader;
 import org.geotoolkit.observation.ObservationReader;
 import org.geotoolkit.observation.ObservationWriter;
 import org.geotoolkit.observation.xml.AbstractObservation;
@@ -71,6 +71,7 @@ import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.observation.Observation;
 import org.opengis.observation.ObservationCollection;
+import org.opengis.observation.Phenomenon;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
@@ -338,10 +339,11 @@ public class SOSConfigurer extends OGCConfigurer {
         }
     }
     
-    public AcknowlegementType importObservations(final String id, final List<Observation> observations) throws ConfigurationException {
+    public AcknowlegementType importObservations(final String id, final List<Observation> observations, final List<Phenomenon> phenomenons) throws ConfigurationException {
         final ObservationWriter writer = getObservationWriter(id);
         try {
             final long start = System.currentTimeMillis();
+            writer.writePhenomenons(phenomenons);
             writer.writeObservations(observations);
             LOGGER.log(Level.INFO, "observations imported in :{0} ms", (System.currentTimeMillis() - start));
             return new AcknowlegementType("Success", "The specified observations have been imported in the SOS");

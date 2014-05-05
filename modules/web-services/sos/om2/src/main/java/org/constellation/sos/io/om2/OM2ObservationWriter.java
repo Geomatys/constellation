@@ -38,14 +38,13 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.sos.factory.OMFactory;
 import org.geotoolkit.observation.ObservationWriter;
-import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.GeometrytoJTS;
 import org.geotoolkit.gml.xml.AbstractGeometry;
 import org.geotoolkit.observation.xml.AbstractObservation;
 
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.sampling.xml.SamplingFeature;
 import org.geotoolkit.sos.xml.ObservationOffering;
+import org.geotoolkit.sos.xml.SOSXmlFactory;
 import org.geotoolkit.swe.xml.AbstractBoolean;
 import org.geotoolkit.swe.xml.AbstractText;
 import org.geotoolkit.swe.xml.AnyScalar;
@@ -62,6 +61,7 @@ import org.geotoolkit.swes.xml.ObservationTemplate;
 import org.geotoolkit.temporal.object.ISODateParser;
 import org.opengis.observation.Measure;
 import org.opengis.observation.Observation;
+import org.opengis.observation.Phenomenon;
 import org.opengis.temporal.Instant;
 import org.opengis.temporal.Period;
 import org.opengis.temporal.TemporalObject;
@@ -263,6 +263,22 @@ public class OM2ObservationWriter implements ObservationWriter {
             return observation.getName();
         } catch (SQLException ex) {
             throw new DataStoreException("Error while inserting observation.", ex);
+        }
+    }
+    
+    @Override
+    public void writePhenomenons(final List<Phenomenon> phenomenons) throws DataStoreException {
+        try {
+            final Connection c           = source.getConnection();
+            c.setAutoCommit(false);
+            for (Phenomenon phenomenon : phenomenons) {
+                final PhenomenonProperty phenomenonP = SOSXmlFactory.buildPhenomenonProperty("1.0.0", (org.geotoolkit.swe.xml.Phenomenon) phenomenon);
+                writePhenomenon(phenomenonP, c);
+            }
+            c.commit();
+            c.close();
+        } catch (SQLException ex) {
+            throw new DataStoreException("Error while inserting phenomenons.", ex);
         }
     }
     
