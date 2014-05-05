@@ -2,11 +2,21 @@ package org.constellation.engine.register.jpa;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.constellation.engine.register.ConstellationPersistenceException;
+import org.constellation.engine.register.ConstellationRegistryRuntimeException;
 import org.constellation.engine.register.DTOMapper;
+import org.constellation.engine.register.Domain;
+import org.constellation.engine.register.DomainAccess;
+import org.constellation.engine.register.DomainAccessDTO;
+import org.constellation.engine.register.DomainDTO;
+import org.constellation.engine.register.DomainRole;
+import org.constellation.engine.register.DomainRoleDTO;
 import org.constellation.engine.register.Layer;
 import org.constellation.engine.register.LayerDTO;
 import org.constellation.engine.register.Property;
@@ -14,6 +24,10 @@ import org.constellation.engine.register.Role;
 import org.constellation.engine.register.RoleDTO;
 import org.constellation.engine.register.User;
 import org.constellation.engine.register.UserDTO;
+import org.hibernate.Hibernate;
+import org.hibernate.proxy.HibernateProxyHelper;
+import org.springframework.orm.hibernate3.HibernateAccessor;
+import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 public class JpaDTOMapper implements DTOMapper {
 
@@ -28,13 +42,13 @@ public class JpaDTOMapper implements DTOMapper {
         return copy(dto, new LayerEntity());
     }
 
-    private <T> T copy(Object dto, T entity) {
+    public <T> T copy(Object orig, T dest) {
         try {
-            BeanUtils.copyProperties(entity, dto);
+            BeanUtils.copyProperties(dest, orig);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new ConstellationPersistenceException(e);
         }
-        return entity;
+        return dest;
     }
 
 
@@ -53,12 +67,14 @@ public class JpaDTOMapper implements DTOMapper {
     @Override
     public UserDTO entityToDTO(User user) {
         UserDTO userDTO = new UserDTO();
+        
         userDTO.setLogin(user.getLogin());
         userDTO.setLastname(user.getLastname());
         userDTO.setFirstname(user.getFirstname());
         userDTO.setEmail(user.getEmail());
         userDTO.setPassword(user.getPassword());
         userDTO.setRoles(user.getRoles());
+           
         return userDTO;
     }
 

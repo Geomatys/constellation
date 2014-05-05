@@ -13,6 +13,15 @@ CREATE TABLE "admin"."i18n"(
 
 ALTER TABLE "admin"."i18n" ADD CONSTRAINT i18n_pk PRIMARY KEY ("id","lang");
 
+-- domains
+
+CREATE TABLE "admin"."domain" (
+  "id"      INTEGER     NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
+  "name"    VARCHAR(64) NOT NULL,
+  "description" VARCHAR(512)
+);
+
+ALTER TABLE "admin"."domain" ADD CONSTRAINT domain_pk       PRIMARY KEY ("id");
 
 -- users
 
@@ -30,7 +39,16 @@ CREATE TABLE "admin"."role"(
   "name"    VARCHAR(32) NOT NULL
 );
 
+
 ALTER TABLE "admin"."role" ADD CONSTRAINT role_pk PRIMARY KEY ("name");
+
+CREATE TABLE "admin"."domainrole"(
+  "name"    VARCHAR(32) NOT NULL,
+  "description" VARCHAR(512)
+);
+
+ALTER TABLE "admin"."domainrole" ADD CONSTRAINT domainrole_pk PRIMARY KEY ("name");
+
 
 CREATE TABLE "admin"."user_x_role"(
   "login"   VARCHAR(32) NOT NULL,
@@ -40,6 +58,22 @@ CREATE TABLE "admin"."user_x_role"(
 ALTER TABLE "admin"."user_x_role" ADD CONSTRAINT user_x_role_pk PRIMARY KEY ("login", "role");
 ALTER TABLE "admin"."user_x_role" ADD CONSTRAINT user_x_role_login_fk FOREIGN KEY ("login") REFERENCES "admin"."user"("login");
 ALTER TABLE "admin"."user_x_role" ADD CONSTRAINT user_x_role_role_fk FOREIGN KEY ("role") REFERENCES "admin"."role"("name");
+
+
+CREATE TABLE "admin"."user_x_domain_x_domainrole"(
+  "login"   VARCHAR(32) NOT NULL,
+  "domain_id"    INTEGER NOT NULL,
+  "domainrole" VARCHAR(32) NOT NULL
+);
+
+ALTER TABLE "admin"."user_x_domain_x_domainrole" ADD CONSTRAINT user_x_domain_x_role_pk PRIMARY KEY ("login", "domain_id", "domainrole");
+ALTER TABLE "admin"."user_x_domain_x_domainrole" ADD CONSTRAINT user_x_domain_x_role_login_fk FOREIGN KEY ("login") REFERENCES "admin"."user"("login");
+ALTER TABLE "admin"."user_x_domain_x_domainrole" ADD CONSTRAINT user_x_domain_x_role_domain_fk FOREIGN KEY ("domain_id") REFERENCES "admin"."domain"("id");
+ALTER TABLE "admin"."user_x_domain_x_domainrole" ADD CONSTRAINT user_x_domain_x_role_role_fk FOREIGN KEY ("domainrole") REFERENCES "admin"."domainrole"("name");
+
+
+
+
 
 -- providers
 
@@ -57,6 +91,15 @@ CREATE TABLE "admin"."provider"(
 
 ALTER TABLE "admin"."provider" ADD CONSTRAINT provider_pk       PRIMARY KEY ("id");
 ALTER TABLE "admin"."provider" ADD CONSTRAINT provider_owner_fk FOREIGN KEY ("owner") REFERENCES "admin"."user"("login");
+
+CREATE TABLE "admin"."provider_x_domain"(
+  "provider_id"   INTEGER NOT NULL,
+  "domain_id"  INTEGER NOT NULL
+);
+
+ALTER TABLE "admin"."provider_x_domain" ADD CONSTRAINT provider_x_domain_pk PRIMARY KEY ("provider_id", "domain_id");
+ALTER TABLE "admin"."provider_x_domain" ADD CONSTRAINT provider_x_domain_login_fk FOREIGN KEY ("provider_id") REFERENCES "admin"."provider"("id");
+ALTER TABLE "admin"."provider_x_domain" ADD CONSTRAINT provider_x_domain_domain_id_fk FOREIGN KEY ("domain_id") REFERENCES "admin"."domain"("id");
 
 
 -- provider items
@@ -77,6 +120,21 @@ ALTER TABLE "admin"."style" ADD CONSTRAINT style_pk          PRIMARY KEY ("id");
 ALTER TABLE "admin"."style" ADD CONSTRAINT style_owner_fk    FOREIGN KEY ("owner")    REFERENCES "admin"."user"("login");
 ALTER TABLE "admin"."style" ADD CONSTRAINT style_provider_fk FOREIGN KEY ("provider") REFERENCES "admin"."provider"("id") ON DELETE CASCADE;
 
+
+-- Domain cross tables with for styles
+
+CREATE TABLE "admin"."style_x_domain"(
+  "style_id"   INTEGER NOT NULL,
+  "domain_id"  INTEGER NOT NULL
+);
+
+ALTER TABLE "admin"."style_x_domain" ADD CONSTRAINT style_x_domain_pk PRIMARY KEY ("style_id", "domain_id");
+ALTER TABLE "admin"."style_x_domain" ADD CONSTRAINT style_x_domain_login_fk FOREIGN KEY ("style_id") REFERENCES "admin"."style"("id");
+ALTER TABLE "admin"."style_x_domain" ADD CONSTRAINT style_x_domain_domain_id_fk FOREIGN KEY ("domain_id") REFERENCES "admin"."domain"("id");
+
+
+
+
 CREATE TABLE "admin"."data"(
   "id"            INTEGER     NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0, INCREMENT BY 1),
   "name"          VARCHAR(512) NOT NULL,
@@ -96,6 +154,18 @@ CREATE TABLE "admin"."data"(
 ALTER TABLE "admin"."data" ADD CONSTRAINT data_pk          PRIMARY KEY ("id");
 ALTER TABLE "admin"."data" ADD CONSTRAINT data_owner_fk    FOREIGN KEY ("owner")    REFERENCES "admin"."user"("login");
 ALTER TABLE "admin"."data" ADD CONSTRAINT data_provider_fk FOREIGN KEY ("provider") REFERENCES "admin"."provider"("id") ON DELETE CASCADE;
+
+-- Domain cross tables with for datas
+
+CREATE TABLE "admin"."data_x_domain"(
+  "data_id"   INTEGER NOT NULL,
+  "domain_id"  INTEGER NOT NULL
+);
+
+ALTER TABLE "admin"."data_x_domain" ADD CONSTRAINT data_x_domain_pk PRIMARY KEY ("data_id", "domain_id");
+ALTER TABLE "admin"."data_x_domain" ADD CONSTRAINT data_x_domain_login_fk FOREIGN KEY ("data_id") REFERENCES "admin"."data"("id");
+ALTER TABLE "admin"."data_x_domain" ADD CONSTRAINT data_x_domain_domain_id_fk FOREIGN KEY ("domain_id") REFERENCES "admin"."domain"("id");
+
 
 
 CREATE TABLE "admin"."crs"(
@@ -134,6 +204,20 @@ CREATE TABLE "admin"."service"(
 ALTER TABLE "admin"."service" ADD CONSTRAINT service_pk       PRIMARY KEY ("id");
 ALTER TABLE "admin"."service" ADD CONSTRAINT service_uq       UNIQUE ("identifier","type");
 ALTER TABLE "admin"."service" ADD CONSTRAINT service_owner_fk FOREIGN KEY ("owner") REFERENCES "admin"."user"("login");
+
+
+-- Domain cross tables with for services
+
+CREATE TABLE "admin"."service_x_domain"(
+  "service_id"   INTEGER NOT NULL,
+  "domain_id"  INTEGER NOT NULL
+);
+
+ALTER TABLE "admin"."service_x_domain" ADD CONSTRAINT service_x_domain_pk PRIMARY KEY ("service_id", "domain_id");
+ALTER TABLE "admin"."service_x_domain" ADD CONSTRAINT service_x_domain_layer_fk FOREIGN KEY ("service_id") REFERENCES "admin"."service"("id");
+ALTER TABLE "admin"."service_x_domain" ADD CONSTRAINT service_x_domain_domain_id_fk FOREIGN KEY ("domain_id") REFERENCES "admin"."domain"("id");
+
+
 
 CREATE TABLE "admin"."service_extra_config"(
   "id"          INTEGER     NOT NULL,
@@ -177,6 +261,18 @@ ALTER TABLE "admin"."layer" ADD CONSTRAINT layer_data_fk    FOREIGN KEY ("data")
 ALTER TABLE "admin"."layer" ADD CONSTRAINT layer_owner_fk   FOREIGN KEY ("owner") REFERENCES "admin"."user"("login");
 
 
+-- Domain cross tables with for layers
+
+CREATE TABLE "admin"."layer_x_domain"(
+  "layer_id"   INTEGER NOT NULL,
+  "domain_id"  INTEGER NOT NULL
+);
+
+ALTER TABLE "admin"."layer_x_domain" ADD CONSTRAINT layer_x_domain_pk PRIMARY KEY ("layer_id", "domain_id");
+ALTER TABLE "admin"."layer_x_domain" ADD CONSTRAINT layer_x_domain_login_fk FOREIGN KEY ("layer_id") REFERENCES "admin"."layer"("id");
+ALTER TABLE "admin"."layer_x_domain" ADD CONSTRAINT layer_x_domain_domain_id_fk FOREIGN KEY ("domain_id") REFERENCES "admin"."domain"("id");
+
+
 -- tasks
 
 CREATE TABLE "admin"."task"(
@@ -200,7 +296,11 @@ CREATE TABLE "admin"."properties"(
 ALTER TABLE "admin"."properties" ADD CONSTRAINT properties_pk PRIMARY KEY ("key");
 
 
-insert into "admin"."user" ("login", "password", "firstname", "lastname", "email" ) values('admin', '21232f297a57a5a743894a0e4a801fc3', 'Frédéric', 'Houbie', 'frederic.houbie@geomatys.com');
 insert into "admin"."role" ("name") values('cstl-admin');
+insert into "admin"."domainrole" ("name") values('manager');
+insert into "admin"."domain" ("name", "description") values('default', 'default domain');
+
+insert into "admin"."user" ("login", "password", "firstname", "lastname", "email" ) values('admin', '21232f297a57a5a743894a0e4a801fc3', 'Frédéric', 'Houbie', 'frederic.houbie@geomatys.com');
 insert into "admin"."user_x_role" ("login", "role") values('admin', 'cstl-admin');
 
+insert into "admin"."user_x_domain_x_domainrole" ("login", "domainrole", "domain_id") values('admin', 'manager', 1);

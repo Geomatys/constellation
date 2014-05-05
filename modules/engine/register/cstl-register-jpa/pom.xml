@@ -25,8 +25,9 @@
       <groupId>org.constellation.engine</groupId>
       <artifactId>cstl-engine-admin</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
-
+            
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-entitymanager</artifactId>

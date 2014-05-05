@@ -2,8 +2,11 @@ package org.constellation.services.admin;
 
 import java.lang.invoke.MethodHandles;
 
+import javax.inject.Inject;
+
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.engine.register.ConfigurationService;
+import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.security.SecurityManagerHolder;
 import org.constellation.util.ReflectionUtilities;
 import org.constellation.ws.DIEnhancer;
@@ -29,8 +32,11 @@ public class ConfigurationServiceInit implements ApplicationContextAware {
     
     private final static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    @Autowired
+    @Inject
     private ConfigurationService configurationService;
+    
+    @Inject
+    private ProviderRepository providerRepository;
     
     /**
      * Spring applucation context.
@@ -38,9 +44,11 @@ public class ConfigurationServiceInit implements ApplicationContextAware {
     private ApplicationContext applicationContext;
 
     public void init() {
-        ConfigurationEngine.setConfigurationService(configurationService);
+        
         ConfigurationEngine.setSecurityManager(SecurityManagerHolder.getInstance());
-
+        ConfigurationEngine.setConfigurationService(configurationService);
+        ConfigurationEngine.setProviderRepository(providerRepository);
+        
         WSEngine.setWorkerFactory(new DIEnhancer() {
 
             @Override

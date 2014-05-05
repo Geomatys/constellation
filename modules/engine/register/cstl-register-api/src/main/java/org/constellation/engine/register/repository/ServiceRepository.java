@@ -3,11 +3,12 @@ package org.constellation.engine.register.repository;
 import java.util.List;
 
 import org.constellation.engine.register.Service;
+import org.constellation.engine.register.ServiceExtraConfig;
 import org.constellation.engine.register.ServiceMetaData;
 
 public interface ServiceRepository {
 
-    List<? extends Service> findAll();
+    List<Service> findAll();
     
     List<? extends Service> findByDataId(int dataId);
     
@@ -18,4 +19,6 @@ public interface ServiceRepository {
     List<String> findIdentifiersByType(String type);
 
     ServiceMetaData findMetaDataForLangByIdentifierAndType(String identifier, String serviceType, String language);
+
+    List<ServiceExtraConfig> getExtraConfig(int id);
 }

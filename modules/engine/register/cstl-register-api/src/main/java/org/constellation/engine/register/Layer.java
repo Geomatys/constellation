@@ -1,49 +1,116 @@
 package org.constellation.engine.register;
 
-public interface Layer {
 
-    public abstract void setOwner(User owner);
 
-    public abstract User getOwner();
+public class Layer {
+    
+    private int id;
 
-    public abstract void setConfig(String config);
+    private String name;
 
-    public abstract String getConfig();
+    private String namespace;
 
-    public abstract void setDescription(int description);
+    private String alias;
 
-    public abstract int getDescription();
+    private Service service;
 
-    public abstract void setTitle(int title);
+    private Data data;
 
-    public abstract int getTitle();
+    private long date;
 
-    public abstract void setDate(long date);
+    private int title;
 
-    public abstract long getDate();
+    private int description;
 
-    public abstract void setData(Data data);
+    private String config;
 
-    public abstract Data getData();
+    private User owner;
 
-    public abstract void setService(Service service);
+    public int getId() {
+        return id;
+    }
 
-    public abstract Service getService();
+    public void setId(int id) {
+        this.id = id;
+    }
 
-    public abstract void setAlias(String alias);
+    public String getName() {
+        return name;
+    }
 
-    public abstract String getAlias();
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public abstract void setNamespace(String namespace);
+    public String getNamespace() {
+        return namespace;
+    }
 
-    public abstract String getNamespace();
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
+    }
 
-    public abstract void setName(String name);
+    public String getAlias() {
+        return alias;
+    }
 
-    public abstract String getName();
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
 
-    public abstract void setId(int id);
+    public Service getService() {
+        return service;
+    }
 
-    public abstract int getId();
+    public void setService(Service service) {
+        this.service = service;
+    }
 
+    public Data getData() {
+        return data;
+    }
+
+    public void setData(Data data) {
+        this.data = data;
+    }
+
+    public long getDate() {
+        return date;
+    }
+
+    public void setDate(long date) {
+        this.date = date;
+    }
+
+    public int getTitle() {
+        return title;
+    }
+
+    public void setTitle(int title) {
+        this.title = title;
+    }
+
+    public int getDescription() {
+        return description;
+    }
+
+    public void setDescription(int description) {
+        this.description = description;
+    }
+
+    public String getConfig() {
+        return config;
+    }
+
+    public void setConfig(String config) {
+        this.config = config;
+    }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
+    }
 }

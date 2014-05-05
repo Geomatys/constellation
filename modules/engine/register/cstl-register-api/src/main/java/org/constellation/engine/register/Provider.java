@@ -1,33 +1,100 @@
 package org.constellation.engine.register;
 
-public interface Provider {
+import java.io.Serializable;
 
-    public abstract void setMetadata(String metadata);
+public class Provider implements Serializable {
 
-    public abstract String getMetadata();
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
 
-    public abstract void setOwner(User owner);
+    private int id;
 
-    public abstract User getOwner();
+    private String identifier;
 
-    public abstract void setConfig(String config);
+    private String metadata;
 
-    public abstract String getConfig();
+    private String owner;
 
-    public abstract void setImpl(String impl);
+    private String config;
 
-    public abstract String getImpl();
+    private String impl;
 
-    public abstract void setType(String type);
+    private String type;
 
-    public abstract String getType();
+    private String parent;
 
-    public abstract void setIdentifier(String identifier);
+    public int getId() {
+        return id;
+    }
 
-    public abstract String getIdentifier();
+    public void setId(int id) {
+        this.id = id;
+    }
 
-    public abstract void setId(int id);
+    public String getIdentifier() {
+        return identifier;
+    }
 
-    public abstract int getId();
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
+
+    public String getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(String metadata) {
+        this.metadata = metadata;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    public String getConfig() {
+        return config;
+    }
+
+    public void setConfig(String config) {
+        this.config = config;
+    }
+
+    public String getImpl() {
+        return impl;
+    }
+
+    public void setImpl(String impl) {
+        this.impl = impl;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getParent() {
+        return parent;
+    }
+
+    public void setParent(String parent) {
+        this.parent = parent;
+    }
+
+    @Override
+    public String toString() {
+        return "Provider [id=" + id + ", identifier=" + identifier + ", metadata=" + metadata + ", owner=" + owner
+                + ", config=" + config + ", impl=" + impl + ", type=" + type + ", parent=" + parent + "]";
+    }
+    
+    
 
 }

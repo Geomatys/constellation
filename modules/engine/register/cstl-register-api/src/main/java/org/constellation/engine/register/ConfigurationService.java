@@ -10,8 +10,6 @@ import javax.xml.namespace.QName;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.configuration.DataBrief;
 import org.constellation.dto.Service;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterValueGroup;
 
 public interface ConfigurationService {
 
@@ -25,12 +23,12 @@ public interface ConfigurationService {
 
     DataBrief getDataLayer(String layerAlias, String providerId);
 
-    ParameterValueGroup getProviderConfiguration(String serviceName, ParameterDescriptorGroup desc);
-
     boolean isServiceConfigurationExist(String serviceType, String identifier);
 
     List<String> getServiceIdentifiersByServiceType(String name);
 
     Service readServiceMetadata(String identifier, String serviceType, String language) throws JAXBException, IOException;
+
+    List<String> getProviderIdentifiers();
 
 }

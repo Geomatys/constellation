@@ -191,7 +191,7 @@
     </dependency>
     <dependency>
         <groupId>org.constellation.engine.register</groupId>
-        <artifactId>cstl-register-jpa</artifactId>
+        <artifactId>cstl-register-jooq</artifactId>
         <version>${project.version}</version>
     </dependency>
     <dependency>

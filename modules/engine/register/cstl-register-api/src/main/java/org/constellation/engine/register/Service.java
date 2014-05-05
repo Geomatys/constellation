@@ -1,48 +1,86 @@
 package org.constellation.engine.register;
 
-import java.util.Set;
 
+public class Service {
 
-public interface Service {
+    private int id;
+    private String identifier;
+    private String type;
+    private long date;
+    private int title;
+    private int description;
+    private String config;
+    private String owner;
 
-    public abstract int getId();
+    public int getId() {
+        return id;
+    }
 
-    public abstract void setId(int id);
+    public void setId(int id) {
+        this.id = id;
+    }
 
-    public abstract String getIdentifier();
+    public String getIdentifier() {
+        return identifier;
+    }
 
-    public abstract void setIdentifier(String identifier);
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
 
-    public abstract String getType();
+    public String getType() {
+        return this.type;
+    }
 
-    public abstract void setType(String type);
+    public void setType(String type) {
+        this.type = type;
+    }
 
-    public abstract long getDate();
+    public long getDate() {
+        return this.date;
+    }
 
-    public abstract void setDate(long date);
+    public void setDate(long date) {
+        this.date = date;
+    }
 
-    public abstract int getTitle();
+    public int getTitle() {
+        return this.title;
+    }
 
-    public abstract void setTitle(int title);
+    public void setTitle(int title) {
+        this.title = title;
+    }
 
-    public abstract int getDescription();
+    public int getDescription() {
+        return this.description;
+    }
 
-    public abstract void setDescription(int description);
+    public void setDescription(int description) {
+        this.description = description;
+    }
 
-    public abstract String getConfig();
+    public String getConfig() {
+        return this.config;
+    }
 
-    public abstract void setConfig(String config);
+    public void setConfig(String config) {
+        this.config = config;
 
-    public abstract User getOwner();
+    }
 
-    public abstract void setOwner(User owner);
+    public String getOwner() {
+        return this.owner;
+    }
 
-    public abstract Set<ServiceExtraConfig> getExtraConfig();
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
 
-    public abstract void setExtraConfig(Set<ServiceExtraConfig> extraConfig);
-
-    public abstract Set<ServiceMetaData> getMetaData();
-
-    public abstract void setMetaData(Set<ServiceMetaData> metaDatas);
+    @Override
+    public String toString() {
+        return "ServiceDTO [id=" + id + ", identifier=" + identifier + ", type=" + type + ", date=" + date + ", title="
+                + title + ", description=" + description + ", config=" + config + ", owner=" + owner + "]";
+    }
 
 }

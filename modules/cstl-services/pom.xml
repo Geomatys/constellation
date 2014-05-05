@@ -508,11 +508,6 @@
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-core</artifactId>
-      <version>1.0.13</version>
-    </dependency>
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
       <version>1.0.13</version>
     </dependency>
@@ -627,7 +622,7 @@
 
     <dependency>
       <groupId>org.constellation.engine.register</groupId>
-      <artifactId>cstl-register-jpa</artifactId>
+      <artifactId>cstl-register-jooq</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

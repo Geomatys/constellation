@@ -17,6 +17,8 @@
 
 package org.constellation.admin;
 
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -31,12 +33,14 @@ import java.util.Properties;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+
+import org.apache.commons.io.IOUtils;
 import org.apache.sis.metadata.iso.DefaultMetadata;
-import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.apache.sis.xml.XML;
@@ -49,6 +53,7 @@ import org.constellation.admin.dao.ServiceRecord;
 import org.constellation.admin.dao.Session;
 import org.constellation.admin.dao.StyleRecord;
 import org.constellation.admin.dao.TaskRecord;
+import org.constellation.admin.util.IOUtilities;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.Layer;
@@ -59,6 +64,8 @@ import org.constellation.configuration.StyleBrief;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.Service;
 import org.constellation.engine.register.ConfigurationService;
+import org.constellation.engine.register.Provider;
+import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.security.NoSecurityManagerException;
 import org.constellation.security.SecurityManager;
@@ -69,6 +76,7 @@ import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 
 /**
@@ -79,30 +87,36 @@ public class ConfigurationEngine {
     private static final Logger LOGGER = Logging.getLogger(ConfigurationEngine.class);
 
     public static final String SERVICES_URL_KEY = "services.url";
-    
+
     /**
      * TODO Temporary hack to activate JPA daos.
      */
-    private final static boolean JPA = Boolean.getBoolean("cstlJPA");
 
+    
+    //Spring managed component 
+    
     private static SecurityManager securityManager;
 
     private static ConfigurationService configurationService;
-
-
-    public static void setConfigurationService(ConfigurationService configurationService) {
-        ConfigurationEngine.configurationService = configurationService;
-    }
+    
+    private static ProviderRepository providerRepository;
 
     public static void setSecurityManager(SecurityManager securityManager) {
         ConfigurationEngine.securityManager = securityManager;
     }
 
+    public static void setConfigurationService(ConfigurationService configurationService) {
+        ConfigurationEngine.configurationService = configurationService;
+    }
+
+    public static void setProviderRepository(ProviderRepository providerRepository) {
+        ConfigurationEngine.providerRepository = providerRepository;
+    }
+
+    //End of spring managed component.
+    
     public static ParameterValueGroup getProviderConfiguration(final String serviceName,
             final ParameterDescriptorGroup desc) {
-
-        if (JPA)
-            return configurationService.getProviderConfiguration(serviceName, desc);
 
         final ParameterValueGroup params = desc.createValue();
         Session session = null;
@@ -123,6 +137,8 @@ public class ConfigurationEngine {
         return null;
     }
 
+   
+
     public static void storePoviderConfiguration(final String serviceName, final ParameterValueGroup params) {
         // TODO move from Configurator
     }
@@ -139,8 +155,6 @@ public class ConfigurationEngine {
 
     public static Object getConfiguration(final String serviceType, final String serviceID, final String fileName,
             final MarshallerPool pool) throws JAXBException, FileNotFoundException {
-        if (JPA)
-            return configurationService.getConfiguration(serviceType, serviceID, fileName, pool);
 
         Session session = null;
         try {
@@ -233,7 +247,7 @@ public class ConfigurationEngine {
                     service.setExtraFile(fileName, sr);
                 }
             }
-            
+
             // update service metadata for a WxS
             if (obj instanceof LayerContext) {
                 final LayerContext context = (LayerContext) obj;
@@ -267,9 +281,6 @@ public class ConfigurationEngine {
     }
 
     public static List<String> getServiceConfigurationIds(final String serviceType) {
-        if (JPA)
-            return configurationService.getServiceIdentifiersByServiceType(ServiceDef.Specification.fromShortName(
-                    serviceType).name());
 
         final List<String> results = new ArrayList<>();
         final ServiceDef.Specification spec = ServiceDef.Specification.fromShortName(serviceType);
@@ -291,9 +302,6 @@ public class ConfigurationEngine {
     }
 
     public static boolean serviceConfigurationExist(final String serviceType, final String identifier) {
-        if (JPA)
-            return configurationService.isServiceConfigurationExist(ServiceDef.Specification.fromShortName(serviceType)
-                    .name(), identifier);
 
         final ServiceDef.Specification spec = ServiceDef.Specification.fromShortName(serviceType);
         Session session = null;
@@ -311,9 +319,6 @@ public class ConfigurationEngine {
     }
 
     public static boolean deleteConfiguration(final String serviceType, final String identifier) {
-        if (JPA)
-            return configurationService.deleteService(identifier, ServiceDef.Specification.fromShortName(serviceType)
-                    .name());
 
         final ServiceDef.Specification spec = ServiceDef.Specification.fromShortName(serviceType);
         Session session = null;
@@ -375,12 +380,13 @@ public class ConfigurationEngine {
                 GenericDatabaseMarshallerPool.getInstance().recycle(m);
                 final StringReader sr = new StringReader(sw.toString());
                 service.setMetadata(language, sr);
-                
+
                 // ISO metadata
                 String url = getConstellationProperty(SERVICES_URL_KEY, null);
-                final DefaultMetadata isoMetadata = CstlMetadatas.defaultServiceMetadata(identifier, serviceType, url, metadata);
+                final DefaultMetadata isoMetadata = CstlMetadatas.defaultServiceMetadata(identifier, serviceType, url,
+                        metadata);
                 final StringReader srIso = marshallMetadata(isoMetadata);
-                
+
                 service.setIsoMetadata(isoMetadata.getFileIdentifier(), srIso);
             }
 
@@ -399,10 +405,6 @@ public class ConfigurationEngine {
         if (language == null) {
             language = "eng";
         }
-        if (JPA)
-            return configurationService.readServiceMetadata(identifier,
-                    ServiceDef.Specification.fromShortName(serviceType).name(), language);
-
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
@@ -464,9 +466,9 @@ public class ConfigurationEngine {
     }
 
     public static String getConstellationProperty(final String key, final String defaultValue) {
-       return configurationService.getProperty(key, defaultValue);
+        return configurationService.getProperty(key, defaultValue);
     }
-    
+
     public static void setConstellationProperty(final String key, final String value) {
         Session session = null;
         try {
@@ -476,7 +478,7 @@ public class ConfigurationEngine {
             } else {
                 session.updateProperty(key, value);
             }
-            
+
             // update metadata when service URL key is updated
             if (SERVICES_URL_KEY.equals(key)) {
                 updateServiceUrlForMetadata(value);
@@ -489,7 +491,7 @@ public class ConfigurationEngine {
             }
         }
     }
-    
+
     public static Properties getMetadataTemplateProperties() {
         final File cstlDir = ConfigDirectory.getConfigDirectory();
         final File propFile = new File(cstlDir, "metadataTemplate.properties");
@@ -500,10 +502,10 @@ public class ConfigurationEngine {
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, "IOException while loading metadata template properties file", ex);
             }
-        } 
+        }
         return prop;
     }
-    
+
     private static void updateServiceUrlForMetadata(final String url) {
         Session session = null;
         try {
@@ -512,7 +514,8 @@ public class ConfigurationEngine {
             for (ServiceRecord record : records) {
                 if (record.hasIsoMetadata()) {
                     final DefaultMetadata servMeta = unmarshallMetadata(record.getIsoMetadata());
-                    CstlMetadatas.updateServiceMetadataURL(record.getIdentifier(), record.getType().name(), url, servMeta);
+                    CstlMetadatas.updateServiceMetadataURL(record.getIdentifier(), record.getType().name(), url,
+                            servMeta);
                     final StringReader sr = marshallMetadata(servMeta);
                     record.setIsoMetadata(servMeta.getFileIdentifier(), sr);
                 }
@@ -552,7 +555,7 @@ public class ConfigurationEngine {
                 session.close();
         }
     }
-    
+
     /**
      * Save metadata on specific folder
      * 
@@ -619,7 +622,8 @@ public class ConfigurationEngine {
      * @param pool
      * @return
      */
-    public static DefaultMetadata loadIsoDataMetadata(final String providerId, final QName dataId, final MarshallerPool pool) {
+    public static DefaultMetadata loadIsoDataMetadata(final String providerId, final QName dataId,
+            final MarshallerPool pool) {
         Session session = null;
         DefaultMetadata metadata = null;
         try {
@@ -647,21 +651,21 @@ public class ConfigurationEngine {
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
-            
+
             final Record record = session.searchMetadata(metadataID);
             if (record instanceof ProviderRecord) {
-               final ProviderRecord provider = (ProviderRecord)record;
-               return provider.getMetadata();
-                
+                final ProviderRecord provider = (ProviderRecord) record;
+                return provider.getMetadata();
+
             } else if (record instanceof ServiceRecord) {
-                final ServiceRecord serv = (ServiceRecord)record;
+                final ServiceRecord serv = (ServiceRecord) record;
                 return serv.getIsoMetadata();
-                
+
             } else if (record instanceof DataRecord) {
                 final DataRecord data = (DataRecord) record;
                 return data.getIsoMetadata();
             }
-            
+
         } catch (SQLException | IOException ex) {
             LOGGER.log(Level.WARNING, "An error occurred while reading provider metadata", ex);
         } finally {
@@ -681,12 +685,12 @@ public class ConfigurationEngine {
 
             final Record record = session.searchMetadata(metadataId);
             if (record instanceof DataRecord) {
-                records.add((DataRecord)record);
+                records.add((DataRecord) record);
             } else if (record instanceof ProviderRecord) {
-                final ProviderRecord provider = (ProviderRecord)record;
+                final ProviderRecord provider = (ProviderRecord) record;
                 records.addAll(provider.getData());
             } else if (record instanceof ServiceRecord) {
-                final ServiceRecord serv = (ServiceRecord)record;
+                final ServiceRecord serv = (ServiceRecord) record;
                 final List<LayerRecord> layers = session.readLayers(serv);
                 for (final LayerRecord layer : layers) {
                     records.add(layer.getData());
@@ -750,7 +754,7 @@ public class ConfigurationEngine {
         }
         return results;
     }
-    
+
     public static List<String> getInternalMetadataIds() {
         final List<String> results = new ArrayList<>();
         Session session = null;
@@ -796,7 +800,7 @@ public class ConfigurationEngine {
         }
         return new ArrayList<>();
     }
-    
+
     public static List<ProviderRecord> getProvidersFromParent(final String parentIdentifier) {
         Session session = null;
         try {
@@ -840,7 +844,7 @@ public class ConfigurationEngine {
         }
     }
 
-    public static ProviderRecord writeProvider(final String identifier, final String parent, 
+    public static ProviderRecord writeProvider(final String identifier, final String parent,
             final ProviderRecord.ProviderType type, final String serviceName, final GeneralParameterValue config) {
         Session session = null;
         try {
@@ -923,9 +927,6 @@ public class ConfigurationEngine {
      */
 
     public static DataBrief getData(QName name, String providerId) {
-        if (JPA) {
-            return configurationService.getData(name, providerId);
-        }
         return _getData(name, providerId);
     }
 
@@ -1024,9 +1025,6 @@ public class ConfigurationEngine {
      * @return
      */
     public static DataBrief getDataLayer(final String layerAlias, final String providerId) {
-        if (JPA)
-            return configurationService.getDataLayer(layerAlias, providerId);
-
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
@@ -1176,7 +1174,7 @@ public class ConfigurationEngine {
                 LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             if (login == null) {
-                login="admin";
+                login = "admin";
             }
             return session.writeStyle(name, provider, type, body, login);
         } catch (SQLException | IOException e) {
@@ -1258,8 +1256,6 @@ public class ConfigurationEngine {
         return null;
     }
 
- 
-
     public static void writeTask(final String identifier, final String type, final String owner) {
         Session session = null;
         try {
@@ -1272,14 +1268,14 @@ public class ConfigurationEngine {
                 session.close();
         }
     }
-    
+
     private static DefaultMetadata unmarshallMetadata(final InputStream stream) throws JAXBException {
         final Unmarshaller um = ISOMarshallerPool.getInstance().acquireUnmarshaller();
         final DefaultMetadata meta = (DefaultMetadata) um.unmarshal(stream);
         ISOMarshallerPool.getInstance().recycle(um);
         return meta;
     }
-    
+
     private static StringReader marshallMetadata(final DefaultMetadata meta) throws JAXBException {
         final StringWriter swIso = new StringWriter();
         final Marshaller mi = ISOMarshallerPool.getInstance().acquireMarshaller();

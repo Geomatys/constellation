@@ -41,6 +41,8 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.CRC32;
+
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -57,6 +59,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+
 import org.apache.sis.geometry.GeneralDirectPosition;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStore;
@@ -73,6 +76,7 @@ import org.constellation.configuration.StringList;
 import org.constellation.coverage.PyramidCoverageHelper;
 import org.constellation.coverage.PyramidCoverageProcessListener;
 import org.constellation.dto.*;
+import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.model.SelectedExtension;
 import org.constellation.provider.CoverageData;
@@ -144,6 +148,8 @@ public class DataRest {
 
     private static final Logger LOGGER = Logging.getLogger(DataRest.class);
 
+    @Inject
+    private ProviderRepository providerRepository;
 
     /**
      * Give metadata CodeList (example {@link org.opengis.metadata.citation.Role} codes
@@ -1335,7 +1341,7 @@ public class DataRest {
     public Response getTopDataList(@PathParam("type") String type) {
         final List<DataBrief> briefs = new ArrayList<>();
 
-        final List<String> providerIds = ConfigurationEngine.getProviderIds();
+        final List<String> providerIds = providerRepository.getProviderIds();
         for (final String providerId : providerIds) {
             final ProviderRecord provider = ConfigurationEngine.getProvider(providerId);
             final String parent = provider.getParentIdentifier();

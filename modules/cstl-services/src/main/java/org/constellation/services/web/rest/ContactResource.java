@@ -10,7 +10,6 @@ import java.util.Properties;
 import javax.inject.Inject;
 
 import org.apache.commons.lang.StringUtils;
-import org.constellation.engine.register.DTOMapper;
 import org.constellation.engine.register.Property;
 import org.constellation.engine.register.repository.PropertyRepository;
 import org.constellation.utils.JSonUtils;
@@ -28,11 +27,7 @@ public class ContactResource {
 	@Inject
 	private PropertyRepository propertyRepository;
 	
-	@Inject
-	private DTOMapper dtoMapper;
-
 	
-
 	@RequestMapping(value = "/admin/contact", method = RequestMethod.GET, produces = "application/json")
 	public Map<String, Object> get() {
 		List<? extends Property> properties = propertyRepository.startWith("contact.%");
@@ -66,7 +61,7 @@ public class ContactResource {
 		}
 		
 		for (Entry<Object, Object> entry : properties.entrySet()) {
-			Property prop = dtoMapper.propertyEntity((String)entry.getKey(), (String)entry.getValue());
+			Property prop = new Property((String)entry.getKey(), (String)entry.getValue());
 			propertyRepository.save(prop);
 		}
 	}

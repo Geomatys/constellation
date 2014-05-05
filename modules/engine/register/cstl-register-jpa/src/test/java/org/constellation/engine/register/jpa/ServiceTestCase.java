@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.repository.ServiceRepository;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -15,7 +14,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:/spring/test-derby.xml")
 public class ServiceTestCase {
@@ -49,7 +47,7 @@ public class ServiceTestCase {
     public void testFindIdentiersByType() {
         dump(serviceRepository.findIdentifiersByType("WMS"));
     }
-    
+
     private void dump(List<?> findAll) {
         for (Object object : findAll) {
             LOGGER.debug(object.toString());
@@ -57,7 +55,8 @@ public class ServiceTestCase {
     }
 
     private void dump(Object o) {
-        LOGGER.debug(o.toString());
+        if (o != null)
+            LOGGER.debug(o.toString());
     }
 
 }

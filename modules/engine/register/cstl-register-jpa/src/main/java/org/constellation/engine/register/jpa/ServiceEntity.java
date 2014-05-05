@@ -10,10 +10,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.Layer;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.ServiceExtraConfig;
@@ -58,6 +60,10 @@ public class ServiceEntity implements Service {
     @OneToMany(mappedBy="service", targetEntity=ServiceMetaDataEntity.class, fetch=FetchType.LAZY, cascade=CascadeType.ALL)
     private Set<ServiceMetaData> metaDatas;
 
+    @ManyToMany(mappedBy="services", targetEntity=DomainEntity.class)
+    private Set<Domain> domains;
+
+    
     /* (non-Javadoc)
      * @see org.constellation.engine.register.jpa.Service#getId()
      */

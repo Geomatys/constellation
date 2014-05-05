@@ -23,6 +23,11 @@ import org.constellation.engine.register.User;
 @Table(schema = "`admin`", name = "`provider`")
 public class ProviderEntity implements Provider {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "`id`")
@@ -49,6 +54,10 @@ public class ProviderEntity implements Provider {
 
     @OneToMany(mappedBy="provider", targetEntity=DataEntity.class)
     private List<Data> datas;
+    
+    @ManyToOne(targetEntity=ProviderEntity.class)
+    @JoinColumn(name="`parent`", referencedColumnName="`identifier`")
+    private Provider parent; 
 
     @Override
     public String toString() {
@@ -66,6 +75,16 @@ public class ProviderEntity implements Provider {
         this.id = id;
     }
 
+    
+    public void setParent(Provider parent) {
+        this.parent = parent;
+    }
+    
+    @Override
+    public Provider getParent() {
+        return parent;
+    }
+    
     @Override
     public String getIdentifier() {
         return identifier;

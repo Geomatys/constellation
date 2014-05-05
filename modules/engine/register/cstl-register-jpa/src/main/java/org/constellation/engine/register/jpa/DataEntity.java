@@ -1,9 +1,13 @@
 package org.constellation.engine.register.jpa;
 
 import java.util.List;
+import java.util.Set;
 
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -14,6 +18,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.constellation.engine.register.Data;
+import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.Layer;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.Style;
@@ -37,9 +42,11 @@ public class DataEntity implements Data {
     @JoinColumn(name = "`provider`")
     private Provider provider;
 
-    @ManyToOne(targetEntity=ProviderEntity.class)
-    @JoinColumn(name = "`parent`")
-    private Provider parent;
+    @ElementCollection(fetch=FetchType.EAGER)
+    @CollectionTable( schema="`admin`", name = "`crs`", joinColumns = { @JoinColumn(name = "`dataid`", referencedColumnName = "`id`")})
+    @Column(name="`crscode`")
+    private Set<Integer> crs;
+
 
     @Column(name = "`type`")
     private String type;
@@ -66,6 +73,11 @@ public class DataEntity implements Data {
     @Column(name = "`metadata`")
     private String metadata;
 
+    
+    @ManyToMany(mappedBy="datas", targetEntity=DomainEntity.class)
+    private Set<Domain> domains;
+
+    
     public int getId() {
         return id;
     }
@@ -98,13 +110,13 @@ public class DataEntity implements Data {
         this.provider = provider;
     }
 
-    public Provider getParent() {
-        return parent;
-    }
-
-    public void setParent(Provider parent) {
-        this.parent = parent;
-    }
+//    public Provider getParent() {
+//        return parent;
+//    }
+//
+//    public void setParent(Provider parent) {
+//        this.parent = parent;
+//    }
 
     public String getType() {
         return type;
@@ -164,8 +176,8 @@ public class DataEntity implements Data {
 
     @Override
     public String toString() {
-        return "Data [id=" + id + ", name=" + name + ", namespace=" + namespace + ", provider=" + provider + ", parent=" + parent +", type="
+        return "Data [id=" + id + ", name=" + name + ", namespace=" + namespace + ", provider=" + provider /* + ", parent=" + parent */ +", type="
                 + type + ", date=" + date + ", title=" + title + ", description=" + description + ", owner=" + owner
-                + ", styles=" + styles + ", metadata="+metadata+"]";
+                + ", styles=" + styles + ", metadata="+metadata+ " crs=" +crs + "]";
     }
 }

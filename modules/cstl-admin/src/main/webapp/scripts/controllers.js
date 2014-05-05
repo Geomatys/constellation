@@ -165,6 +165,7 @@ cstlAdminApp.controller('UserController', ['$scope', 'UserResource', '$modal',
             templateUrl: 'views/user/details.html',
             controller: 'UserDetailsController',
             resolve: {
+                'isUpdate': function() {return true},
                 'user': function(){
                     return angular.copy($scope.list[i]);
                 }
@@ -179,6 +180,7 @@ cstlAdminApp.controller('UserController', ['$scope', 'UserResource', '$modal',
             templateUrl: 'views/user/add.html',
             controller: 'UserDetailsController',
             resolve: {
+                'isUpdate': function() {return false},
                 'user': function(){
                     return {roles:[]};
                 }
@@ -194,8 +196,8 @@ cstlAdminApp.controller('UserController', ['$scope', 'UserResource', '$modal',
     };
 }]);
 
-cstlAdminApp.controller('UserDetailsController', ['$scope', '$modalInstance', 'user', 'UserResource',
-  function ($scope, $modalInstance, user, UserResource) {
+cstlAdminApp.controller('UserDetailsController', ['$scope', '$modalInstance', 'user', 'isUpdate', 'UserResource',
+  function ($scope, $modalInstance, user, isUpdate, UserResource) {
     $scope.user = user;
 
     $scope.close = function() {
@@ -219,7 +221,10 @@ cstlAdminApp.controller('UserDetailsController', ['$scope', '$modalInstance', 'u
 
     $scope.save = function(){
     	var userResource = new UserResource($scope.user);
-    	userResource.$save();
+    	if(isUpdate)
+    	  userResource.$update();
+    	else
+    	  userResource.$save();
     	$modalInstance.close($scope.user);
     }
 }]);

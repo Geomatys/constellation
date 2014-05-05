@@ -14,11 +14,9 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef;
 import org.constellation.ServiceDef.Specification;
-import org.constellation.admin.util.IOUtilities;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.ServiceProtocol;
 import org.constellation.configuration.StyleBrief;
@@ -36,10 +34,6 @@ import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.util.Util;
-import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterNotFoundException;
-import org.opengis.parameter.ParameterValueGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,12 +53,12 @@ public class ConfigurationJpaService implements ConfigurationService {
 
     @Autowired
     private PropertyRepository propertyRepository;
-    
+
     @Autowired
     private ProviderRepository providerRepository;
-    
-    
 
+    
+  
     @Override
     @Transactional
     public Object getConfiguration(String serviceType, String serviceID, String fileName, MarshallerPool pool)
@@ -194,25 +188,6 @@ public class ConfigurationJpaService implements ConfigurationService {
     }
 
     @Override
-    public ParameterValueGroup getProviderConfiguration(String serviceName, ParameterDescriptorGroup desc) {
-       
-        final ParameterValueGroup params = desc.createValue();
-
-            final List<? extends Provider> records = providerRepository.findByImpl(serviceName);
-            for (Provider record : records) {
-                try {
-                    GeneralParameterValue readParameter = IOUtilities.readParameter(IOUtils.toInputStream(record.getConfig()), desc.descriptor("source"));
-                    params.values().add(readParameter);
-                } catch (ParameterNotFoundException | IOException e) {
-                    LOGGER.warn(e.getMessage(), e);
-                }
-            }
-            return params;
-
-        
-    }
-
-    @Override
     public boolean isServiceConfigurationExist(String serviceType, String identifier) {
         return serviceRepository.findByIdentifierAndType(identifier, serviceType) != null;
     }
@@ -222,17 +197,21 @@ public class ConfigurationJpaService implements ConfigurationService {
         return serviceRepository.findIdentifiersByType(name);
     }
 
+    // TODO check this code with ConfigurationEngine
     @Override
-    public org.constellation.dto.Service readServiceMetadata(String identifier, String serviceType, String language) throws JAXBException, IOException {
-        ServiceMetaData serviceMetaData = serviceRepository.findMetaDataForLangByIdentifierAndType(identifier, serviceType, language);
-        if(serviceMetaData!=null) {
+    public org.constellation.dto.Service readServiceMetadata(String identifier, String serviceType, String language)
+            throws JAXBException, IOException {
+        ServiceMetaData serviceMetaData = serviceRepository.findMetaDataForLangByIdentifierAndType(identifier,
+                serviceType, language);
+        if (serviceMetaData != null) {
             final Unmarshaller u = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-            final org.constellation.dto.Service config = (org.constellation.dto.Service) u.unmarshal(new StringReader(serviceMetaData.getContent()));
+            final org.constellation.dto.Service config = (org.constellation.dto.Service) u.unmarshal(new StringReader(
+                    serviceMetaData.getContent()));
             GenericDatabaseMarshallerPool.getInstance().recycle(u);
             return config;
         } else {
-            final InputStream in = Util.getResourceAsStream("org/constellation/xml/" + serviceType
-                    + "Capabilities.xml");
+            final InputStream in = Util
+                    .getResourceAsStream("org/constellation/xml/" + serviceType + "Capabilities.xml");
             if (in != null) {
                 final Unmarshaller u = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
                 final org.constellation.dto.Service metadata = (org.constellation.dto.Service) u.unmarshal(in);
@@ -244,8 +223,18 @@ public class ConfigurationJpaService implements ConfigurationService {
                 throw new IOException("Unable to find the capabilities skeleton from resource.");
             }
         }
-        
 
     }
+
+    @Override
+    public List<String> getProviderIdentifiers() {
+        List<String> result = new ArrayList<String>();
+        for (Provider provider : providerRepository.findAll()) {
+            result.add(provider.getIdentifier());
+        }
+        return result;
+    }
+
+  
 
 }

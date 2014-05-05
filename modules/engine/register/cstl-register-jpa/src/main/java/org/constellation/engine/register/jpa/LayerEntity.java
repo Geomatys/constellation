@@ -1,15 +1,19 @@
 package org.constellation.engine.register.jpa;
 
+import java.util.Set;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.constellation.engine.register.Data;
+import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.Layer;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.User;
@@ -55,6 +59,9 @@ public class LayerEntity implements Layer {
     @ManyToOne(targetEntity=UserEntity.class)
     @JoinColumn(name = "`owner`")
     private User owner;
+    
+    @ManyToMany(mappedBy="layers", targetEntity=DomainEntity.class)
+    private Set<Domain> domains;
 
     @Override
     public int getId() {
@@ -166,4 +173,12 @@ public class LayerEntity implements Layer {
         this.owner = owner;
     }
 
+    @Override
+    public String toString() {
+        return "LayerEntity [id=" + id + ", name=" + name + ", namespace=" + namespace + ", alias=" + alias +  ", date=" + date + ", title=" + title + ", description=" + description + "]";
+    }
+
+    
+    
+    
 }

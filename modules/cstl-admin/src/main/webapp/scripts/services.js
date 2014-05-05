@@ -135,7 +135,10 @@ cstlAdminApp.factory('LogsService', ['$resource',
 
 cstlAdminApp.factory('UserResource', ['$resource', '$cookies',
    function ($resource, $cookies) {
-        return $resource('@cstl/api/1/user/:id;jsessionid=');
+        return $resource('@cstl/api/1/user/:id;jsessionid=', null,
+            {
+          'update': { method:'PUT' }
+      });
 }]);
 
 cstlAdminApp.factory('webService', ['$resource',

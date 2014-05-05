@@ -1,6 +1,7 @@
 package org.constellation.engine.register.jpa;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,6 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.constellation.engine.register.Data;
+import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.Style;
 import org.constellation.engine.register.User;
@@ -49,6 +51,9 @@ public class StyleEntity implements Style {
     @Column(name = "`body`")
     private String body;
 
+    @ManyToMany(mappedBy="styles", targetEntity=DomainEntity.class)
+    private Set<Domain> domains;
+    
     @ManyToOne(targetEntity=UserEntity.class)
     @JoinColumn(name = "`owner`")
     private User owner;

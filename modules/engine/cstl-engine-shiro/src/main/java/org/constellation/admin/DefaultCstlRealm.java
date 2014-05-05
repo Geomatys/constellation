@@ -33,7 +33,6 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.sis.util.logging.Logging;
-import org.constellation.engine.register.Role;
 import org.constellation.engine.register.User;
 import org.constellation.engine.register.repository.UserRepository;
 import org.mdweb.model.auth.MDwebRole;
@@ -63,7 +62,7 @@ public final class DefaultCstlRealm extends AuthorizingRealm {
         checkNotNull(username, "Null username are not allowed by this realm.");
 
         // Acquire user record.
-        User user = userRepository.findOne(username);
+        User user = userRepository.findOneWithRolesAndDomains(username);
         if (user == null)
             throw new UnknownAccountException();
 
@@ -80,7 +79,7 @@ public final class DefaultCstlRealm extends AuthorizingRealm {
         final String username = (String) principals.getPrimaryPrincipal();
 
         // Acquire user record.
-        final User user = userRepository.findOneWithRole(username);
+        final User user = userRepository.findOneWithRolesAndDomains(username);
         final HashSet<String> roles = new HashSet<>();
         final HashSet<String> permissions = new HashSet<>();
         for (String role : user.getRoles()) {

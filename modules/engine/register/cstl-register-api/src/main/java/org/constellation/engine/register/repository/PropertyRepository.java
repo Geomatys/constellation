@@ -16,5 +16,9 @@ public interface PropertyRepository {
 
 	void delete(Property property);
 
+    List<? extends Property> findAll();
+
+    String getValue(String key, String defaultValue);
+
 	
 }

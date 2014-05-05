@@ -1,21 +1,34 @@
 package org.constellation.engine.register;
 
-public interface ServiceExtraConfig {
+public class ServiceExtraConfig {
 
-    public abstract void setService(Service service);
+ private int id;
+    
+    private String filename;
+    
+    private String content;
 
-    public abstract Service getService();
+    public int getId() {
+        return id;
+    }
 
-    public abstract void setContent(String content);
+    public void setId(int id) {
+        this.id = id;
+    }
 
-    public abstract String getContent();
+    public String getFilename() {
+        return filename;
+    }
 
-    public abstract void setFilename(String filename);
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
 
-    public abstract String getFilename();
+    public String getContent() {
+        return content;
+    }
 
-    public abstract void setId(int id);
-
-    public abstract int getId();
-
+    public void setContent(String content) {
+        this.content = content;
+    }
 }

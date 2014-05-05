@@ -15,7 +15,6 @@
  */
 'use strict';
 
-
 cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', '$growl', 'StyleSharedService','$modal',
     function ($scope, $dashboard, style, $growl, StyleSharedService, $modal) {
         var modalLoader = $modal.open({

@@ -6,11 +6,13 @@ import org.constellation.engine.register.Provider;
 
  public interface ProviderRepository {
 
-    List<? extends Provider> findAll();
+    List<Provider> findAll();
 
     Provider findOne(Integer id);
 
-    List<? extends Provider> findByImpl(String serviceName);
+    List<Provider> findByImpl(String serviceName);
+
+    List<String> getProviderIds();
 
 
     

@@ -2,9 +2,7 @@ package org.constellation.services.web.controller;
 
 import java.util.List;
 
-import org.constellation.engine.register.DTOMapper;
 import org.constellation.engine.register.User;
-import org.constellation.engine.register.UserDTO;
 import org.constellation.engine.register.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,9 +17,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class UserController {
 
     @Autowired
-    private DTOMapper dtoMapper;
-
-    @Autowired
     private UserRepository userRepository;
 
     @RequestMapping(method = RequestMethod.GET)
@@ -33,14 +28,21 @@ public class UserController {
     @RequestMapping(value="/{login}", method = RequestMethod.GET)
     public @ResponseBody
     User oneWithRole(@PathVariable("login") String login) {
-        return userRepository.findOneWithRole(login);
+        return userRepository.findOneWithRolesAndDomains(login);
     }
 
     // @Transactional
     @RequestMapping(method = RequestMethod.POST)
     public @ResponseBody
-    List<? extends User> post(@RequestBody UserDTO user) {
-        userRepository.save(dtoMapper.dtoToEntity(user));
+    List<? extends User> post(@RequestBody User user) {
+        userRepository.insert(user);
+        return all();
+    }
+    
+    @RequestMapping(method = RequestMethod.PUT)
+    public @ResponseBody
+    List<? extends User> put(@RequestBody User user) {
+        userRepository.insert(user);
         return all();
     }
 

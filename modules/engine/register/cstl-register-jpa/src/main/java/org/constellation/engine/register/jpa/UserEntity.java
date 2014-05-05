@@ -1,7 +1,11 @@
 package org.constellation.engine.register.jpa;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -9,9 +13,18 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
+import javax.persistence.MapKeyJoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.constellation.engine.register.Domain;
+import org.constellation.engine.register.DomainAccess;
+import org.constellation.engine.register.DomainAccessDTO;
+import org.constellation.engine.register.DomainRole;
 import org.constellation.engine.register.User;
+import org.hibernate.annotations.Target;
 
 @Entity
 @Table(schema = "`admin`", name = "`user`")
@@ -34,10 +47,15 @@ public class UserEntity implements User {
     private String email;
 
     
+    @OneToMany(targetEntity=DomainAccessEntity.class, cascade= {CascadeType.ALL})
+    @JoinColumn(name="`login`")
+    private Set<DomainAccess> domains;
+
+    
     @ElementCollection(fetch=FetchType.EAGER)
     @CollectionTable(schema="`admin`", name = "`user_x_role`", joinColumns = { @JoinColumn(name = "`login`", referencedColumnName = "`login`")})
     @Column(name="`role`")
-    private List<String> roles;
+    private Set<String> roles;
 
     @Override
     public String getLogin() {
@@ -61,11 +79,11 @@ public class UserEntity implements User {
 
 
     @Override
-    public List<String> getRoles() {
+    public Set<String> getRoles() {
         return roles;
     }
 
-    public void setRoles(List<String> roles) {
+    public void setRoles(Set<String> roles) {
         this.roles = roles;
     }
 
@@ -93,11 +111,30 @@ public class UserEntity implements User {
         this.email = email;
     }
 
+   
+   
+    
     @Override
     public String toString() {
         return "UserEntity [login=" + login + ", password=" + password + ", lastname=" + lastname + ", firstname="
                 + firstname + ", email=" + email + "]";
     }
+
+    @Override
+    public void setDomainAccesses(List<DomainAccessDTO> domainsAccesses) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public List<DomainAccessDTO> getDomainAccesses() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+   
+
+   
     
     
     

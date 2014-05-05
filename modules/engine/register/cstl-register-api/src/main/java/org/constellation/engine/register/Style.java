@@ -1,43 +1,101 @@
 package org.constellation.engine.register;
 
-public interface Style {
+public class Style {
 
-    public abstract void setOwner(User owner);
+    private User owner;
+    private String body;
+    private int description;
+    private int title;
+    private long date;
+    private String type;
+    private Provider provider;
+    private String name;
+    private int id;
 
-    public abstract User getOwner();
+    public void setOwner(User owner) {
+        this.owner = owner;
+    }
 
-    public abstract void setBody(String body);
+    public User getOwner() {
+        return owner;
+    }
 
-    public abstract String getBody();
+    public void setBody(String body) {
+        this.body = body;
+    }
 
-    public abstract void setDescription(int description);
+    public String getBody() {
+        return body;
+    }
 
-    public abstract int getDescription();
 
-    public abstract void setTitle(int title);
+    public void setDescription(int description) {
+        this.description = description;
+    }
 
-    public abstract int getTitle();
 
-    public abstract void setDate(long date);
+    public int getDescription() {
+        return description;
+    }
 
-    public abstract long getDate();
 
-    public abstract void setType(String type);
+    public void setTitle(int title) {
+        this.title = title;
+    }
 
-    public abstract String getType();
 
-    public abstract void setProvider(Provider provider);
+    public int getTitle() {
+        return title;
+    }
 
-    public abstract Provider getProvider();
 
-    public abstract void setName(String name);
+    public void setDate(long date) {
+        this.date = date;
+    }
 
-    public abstract String getName();
 
-    public abstract void setId(int id);
+    public long getDate() {
+        return date;
+    }
 
-    public abstract int getId();
 
-    public abstract String toString();
+    public void setType(String type) {
+        this.type = type;
+    }
+
+
+    public String getType() {
+        return type;
+    }
+
+
+    public void setProvider(Provider provider) {
+        this.provider = provider;
+    }
+
+
+    public Provider getProvider() {
+        return provider;
+    }
+
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+
+    public String getName() {
+        return this.name;
+    }
+
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+
+    public int getId() {
+        return this.id;
+    }
 
 }

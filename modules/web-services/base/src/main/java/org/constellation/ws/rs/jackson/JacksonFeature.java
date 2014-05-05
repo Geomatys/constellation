@@ -46,6 +46,7 @@ public class JacksonFeature implements Feature {
         context.property(sb.toString(), true);
 
         context.register(com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider.class, MessageBodyReader.class, MessageBodyWriter.class);
+        
         return true;
     }
 }

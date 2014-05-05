@@ -1,21 +1,35 @@
 package org.constellation.engine.register;
 
-public interface ServiceMetaData {
+public class ServiceMetaData {
 
-    public abstract void setService(Service service);
+    private int id;
+    
+    private String lang;
+    
+    private String content;
 
-    public abstract Service getService();
+    public int getId() {
+        return id;
+    }
 
-    public abstract void setContent(String content);
+    public void setId(int id) {
+        this.id = id;
+    }
 
-    public abstract String getContent();
+    public String getLang() {
+        return lang;
+    }
 
-    public abstract void setLang(String lang);
+    public void setLang(String lang) {
+        this.lang = lang;
+    }
 
-    public abstract String getLang();
-
-    public abstract void setId(int id);
-
-    public abstract int getId();
-
+    public String getContent() {
+        return content;
+    }
+    
+    public void setContent(String content) {
+        this.content = content;
+    }
+    
 }

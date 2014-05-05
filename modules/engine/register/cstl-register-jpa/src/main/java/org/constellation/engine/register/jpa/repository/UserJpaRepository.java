@@ -18,11 +18,11 @@ public interface UserJpaRepository extends JpaRepository<UserEntity, String>, Us
     @Transactional
     void delete(String id);
     
-    @Query("select u from UserEntity u where u.login = :login")
-    User findOneWithRole(@Param("login") String login);
+    @Query("select u from UserEntity u left join fetch u.domains where u.login = :login")
+    User findOneWithRolesAndDomains(@Param("login") String login);
 
     
-    @Query("select u from UserEntity u")
+    @Query("select u from UserEntity u left join fetch u.domains")
     List<? extends User> all();
 
     

@@ -47,7 +47,8 @@
   <!-- =========================================================== -->
   <modules>
     <module>cstl-register-api</module>
-    <module>cstl-register-jpa</module>
+    
+    <module>cstl-register-jooq</module>
   </modules>
 
 </project>

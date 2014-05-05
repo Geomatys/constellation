@@ -7,18 +7,14 @@ import org.constellation.engine.register.User;
 
 public interface UserRepository {
 
-    List<? extends User> findAll();
+    List<User> all();
+
+    void insert(User user);
+
+    void update(User user);
     
-    List<? extends User> all();
-
-    void save(User user);
-
-    void saveAndFlush(User entity);
-
     void delete(String string);
     
-    User findOne(String login);
-    
-    User findOneWithRole(String login);
+    User findOneWithRolesAndDomains(String login);
     
 }

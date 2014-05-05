@@ -188,7 +188,7 @@ public final class ConfigurationService extends WebService {
             }
 
             else if (REQUEST_GET_USER_NAME.equalsIgnoreCase(request)) {
-                List<? extends User> findAll = userRepository.findAll();
+                List<User> findAll = userRepository.all();
                 AcknowlegementType acknowlegementType;
                 if (findAll.isEmpty())
                     acknowlegementType = new AcknowlegementType("Failure", "An error occurs");

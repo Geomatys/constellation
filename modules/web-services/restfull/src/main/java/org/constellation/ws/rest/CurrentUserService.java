@@ -26,9 +26,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.constellation.configuration.AcknowlegementType;
-import org.constellation.engine.register.DTOMapper;
 import org.constellation.engine.register.User;
-import org.constellation.engine.register.UserDTO;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.security.SecurityManagerHolder;
 import org.springframework.util.StringUtils;
@@ -47,9 +45,6 @@ import org.springframework.util.StringUtils;
 public class CurrentUserService {
 
     @Inject
-    private DTOMapper dtoMapper;
-
-    @Inject
     private UserRepository userRepository;
 
     /**
@@ -60,9 +55,9 @@ public class CurrentUserService {
     public Response current() {
         String login = SecurityManagerHolder.getInstance().getCurrentUserLogin();
         if (StringUtils.hasText(login)) {
-            User user = userRepository.findOneWithRole(login);
-            UserDTO userDTO = dtoMapper.entityToDTO(user);
-            return Response.ok(userDTO).build();
+            User user = userRepository.findOneWithRolesAndDomains(login);
+            
+            return Response.ok(user).build();
         }
         return Response.status(401).build();
     }

@@ -2,8 +2,14 @@ package org.constellation.engine.register.jpa;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import org.constellation.engine.register.Domain;
+import org.constellation.engine.register.DomainAccess;
+import org.constellation.engine.register.DomainRole;
 import org.constellation.engine.register.Provider;
+import org.constellation.engine.register.User;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.LayerRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
@@ -11,7 +17,7 @@ import org.constellation.engine.register.repository.ServiceRepository;
 import org.constellation.engine.register.repository.StyleRepository;
 import org.constellation.engine.register.repository.TaskRepository;
 import org.constellation.engine.register.repository.UserRepository;
-import org.junit.Ignore;
+import org.geotoolkit.gml.xml.v321.DomainSetType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -21,7 +27,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-@Ignore
+//@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:/spring/test-derby.xml")
 public class SpringDerbyTestCase {
@@ -49,10 +55,7 @@ public class SpringDerbyTestCase {
     @Autowired
     private TaskRepository taskRepository;
 
-    @Test
-    public void listUser() {
-        dump(userRepository.findAll());
-    }
+    
 
     @Test
     @Transactional
@@ -91,23 +94,23 @@ public class SpringDerbyTestCase {
     public void listTask() {
         dump(taskRepository.findAll());
     }
-    
+
     @Test
     @Transactional
     public void saveUser() {
         UserEntity entity = new UserEntity();
         entity.setLogin("zoz");
         entity.setLastname("roro");
+        entity.setFirstname("zozo");
         entity.setPassword("ppp");
+        entity.setEmail("olivier.nouguier@gmail.com");
         userRepository.saveAndFlush(entity);
     }
-    
-   
+
     @Transactional
     public void deleteUser() {
         userRepository.delete("zozo");
     }
-    
 
     private void dump(List<?> findAll) {
         for (Object object : findAll) {

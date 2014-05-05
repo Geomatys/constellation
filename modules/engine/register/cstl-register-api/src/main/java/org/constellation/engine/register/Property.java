@@ -1,13 +1,41 @@
 package org.constellation.engine.register;
 
-public interface Property {
+public class Property {
 
-    public void setKey(String k);
+    private String key;
+
+    private String value;
+
     
-    public String getKey();
-
-    public void setValue(String v);
-
-    public String getValue();
+    public Property() {
+    }
     
+    public Property(String key, String value) {
+        super();
+        this.key = key;
+        this.value = value;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public String toString() {
+        return "PropertyDTO [key=" + key + ", value=" + value + "]";
+    }
+    
+    
+
 }
