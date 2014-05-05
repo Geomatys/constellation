@@ -382,7 +382,10 @@
             "data.button": "View",
             "delete.button": "Delete",
             "export.button": "Export",
-            "metadata.button": "Metadata"
+            "metadata.button": "Metadata",
+            "edit.button": "Edit",
+            "dataview.button": "View data",
+            "metadataedit.button": "Edit"
         },
         "title": "Layers list",
         "modal.dataviewer":"Data Viewer"

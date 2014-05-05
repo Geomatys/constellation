@@ -577,7 +577,10 @@
                 },
                 "metadata": {
                     "button": "Métadonnées"
-                }
+                },
+                "edit.button": "Editer",
+                "dataview.button": "View data",
+                "metadataedit.button": "Editer"
             },
             "title": "Liste des couches",
             "modal.dataviewer":"Visualisation de la donnée"
