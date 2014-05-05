@@ -296,7 +296,6 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','data
 cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$modalInstance', '$growl', 'provider', 'dataListing', '$uploadFiles', '$cookies',
     function ($scope, $dashboard, $modalInstance, $growl, provider, dataListing, $uploadFiles, $cookies) {
         $scope.layer = null;
-        $scope.data = null;
         $scope.providerId = null;
         $scope.metadata = null;
         $scope.uploadType = null;
@@ -342,9 +341,9 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
             }
         };
 
-        $scope.verifyExtension = function() {
-            var lastPointIndex = $scope.data.lastIndexOf(".");
-            var extension = $scope.data.substring(lastPointIndex+1, $scope.data.length);
+        $scope.verifyExtension = function(path) {
+            var lastPointIndex = path.lastIndexOf(".");
+            var extension = path.substring(lastPointIndex+1, path.length);
             dataListing.extension({}, {value: extension},
                 function(response) {
                     if (response.dataType!="") {
@@ -352,6 +351,11 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                     }
                     $scope.allowNext = true;
                 });
+        };
+
+        $scope.metadataChosen = function(md) {
+            $scope.metadata = md.value;
+            $scope.$digest();
         };
 
         $scope.uploadData = function() {

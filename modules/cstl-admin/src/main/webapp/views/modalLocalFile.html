@@ -22,7 +22,7 @@
                                 <span class="input-group-addon btn btn-default btn-file">
                                     <span class="fileinput-new" translate="data.modal.select">Select file</span>
                                     <span class="fileinput-exists" translate="data.modal.change">Change</span>
-                                    <input type="file" name="data" ng-model="$parent.data" ng-change="verifyExtension()"></span>
+                                    <input type="file" name="data" onchange="angular.element(this).scope().verifyExtension(this.value);"></span>
                                 <a class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput" translate="data.modal.remove">Remove</a>
                             </div>
                         </div>
@@ -41,7 +41,7 @@
                                 <span class="input-group-addon btn btn-default btn-file">
                                     <span class="fileinput-new" translate="data.modal.select">Select file</span>
                                     <span class="fileinput-exists" translate="data.modal.change">Change</span>
-                                    <input type="file" name="metadata" ng-model="$parent.metadata"></span>
+                                    <input type="file" name="metadata" onchange="angular.element(this).scope().metadataChosen(this);"></span>
                                 <a class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput" translate="data.modal.remove">Remove</a>
                             </div>
                         </div>
