@@ -1100,3 +1100,7 @@ table.user-table tbody>tr>td.user-delete{
     }
 }
 .ace_editor { height: 200px; }
+
+.datepicker{
+    z-index:3000;
+}
