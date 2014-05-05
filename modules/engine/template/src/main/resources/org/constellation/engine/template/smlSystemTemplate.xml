@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<sml:SensorML xmlns:gml="http://www.opengis.net/gml" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sos="http://www.opengis.net/sos/1.0" xmlns:swe="http://www.opengis.net/swe/1.0.1" xmlns:om="http://www.opengis.net/om/1.0" xmlns:sampling="http://www.opengis.net/sampling/1.0" xmlns:ogc="http://www.opengis.net/ogc" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:sml1="http://www.opengis.net/sensorML/1.0" xmlns:swe1="http://www.opengis.net/swe/1.0" xmlns:icism="urn:us:gov:ic:ism:v2" xmlns:ns12="http://www.opengis.net/gml/" xmlns:sml="http://www.opengis.net/sensorML/1.0.1" version="1.0.1">
+    <sml:member>
+        <sml:System>
+            <sml:identification>
+                <sml:IdentifierList>
+                    <sml:identifier name="uniqueID">
+                        <sml:Term definition="urn:ogc:def:identifierType:OGC:uniqueID">
+                            <sml:value>${param.id}</sml:value>
+                        </sml:Term>
+                    </sml:identifier>
+                </sml:IdentifierList>
+            </sml:identification>
+            <sml:validTime>
+                <gml:TimePeriod>
+                    <gml:beginPosition>${param.beginTime}</gml:beginPosition>
+                    <gml:endPosition>${param.endTime}</gml:endPosition>
+                </gml:TimePeriod>
+            </sml:validTime>
+            <sml:position name="platform-location">
+                <swe:Position referenceFrame="urn:ogc:def:crs,crs:EPSG::4326">
+                    <swe:location>
+                        <swe:Vector definition="urn:ogc:def:phenomenon:location">
+                            <swe:coordinate name="longitude">
+                                <swe:Quantity definition="urn:ogc:def:phenomenon:longitude">
+                                    <swe:uom code="degree"/>
+                                    <swe:value>${param.longitude}</swe:value>
+                                </swe:Quantity>
+                            </swe:coordinate>
+                            <swe:coordinate name="latitude">
+                                <swe:Quantity definition="urn:ogc:def:phenomenon:latitude">
+                                    <swe:uom code="degree"/>
+                                    <swe:value>${param.latitude}</swe:value>
+                                </swe:Quantity>
+                            </swe:coordinate>
+                        </swe:Vector>
+                    </swe:location>
+                </swe:Position>
+            </sml:position>
+            <sml:inputs>
+                <sml:InputList>
+                    <% for (String p : param.phenomenon){%>
+                    <sml:input name="${p}">
+                        <swe:ObservableProperty definition="${p}"/>
+                    </sml:input>
+                    <%}%>
+                </sml:InputList>
+            </sml:inputs>
+            <sml:outputs>
+                <sml:OutputList>
+                    <% for (String p : param.phenomenon){%>
+                    <sml:output name="${p}">
+                        <swe:Quantity definition="${p}">
+                            <swe:uom code="TODO"/>
+                        </swe:Quantity>
+                    </sml:output>
+                    <%}%>
+                </sml:OutputList>
+            </sml:outputs>
+            <sml:components>
+                <sml:ComponentList>
+                    <% for (String c : param.component){%>
+                    <sml:component xlink:href="${c}" name="${c}"/>
+                     <%}%>
+                </sml:ComponentList>
+            </sml:components>
+        </sml:System>
+    </sml:member>
+</sml:SensorML>
