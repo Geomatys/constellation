@@ -313,7 +313,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             else if($scope.dataType.toLowerCase() === 'coverage' || $scope.dataType.toLowerCase() === 'raster'){
                 if($scope.palette.rasterMaxValue!= null && $scope.palette.rasterMinValue!=null){
                     $scope.addPalette();
-                    style.create({provider: 'sld'}, $scope.newStyle, function() {
+                    style.createjson({provider: 'sld'}, $scope.newStyle, function() {
                         $growl('success','Success','Style '+ $scope.newStyle.name +' successfully created');
                         $modalInstance.close({"Provider": "sld", "Name": $scope.newStyle.name});
                     }, function() {
@@ -361,7 +361,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             if ($scope.dataType.toLowerCase() === 'coverage' || $scope.dataType.toLowerCase() === 'raster') {
                 $scope.addPalette();
             }
-            style.create({provider: 'sld'}, $scope.newStyle, function() {
+            style.createjson({provider: 'sld'}, $scope.newStyle, function() {
                 var layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName, $scope.providerId, $scope.newStyle.name);
                 //var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
                 DataViewer.layers = [layerData];
