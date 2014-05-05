@@ -170,6 +170,9 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
             if ($scope.type === 'sos') {
                 return [{ 'id': '1.0.0'}, { 'id': '2.0.0', 'checked': true}];
             }
+            if ($scope.type === 'wps') {
+                return [{ 'id': '1.0.0', 'checked': true}];
+            }
             return [];
         };
         $scope.versions = $scope.getVersionsForType();
@@ -420,6 +423,9 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
             }
             if ($scope.type === 'sos') {
                 return [{ 'id': '1.0.0'}, { 'id': '2.0.0'}];
+            }
+            if ($scope.type === 'wps') {
+                return [{ 'id': '1.0.0'}];
             }
             return [];
         };
