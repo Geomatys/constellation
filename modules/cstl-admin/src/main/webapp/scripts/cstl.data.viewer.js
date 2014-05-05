@@ -179,5 +179,53 @@ DataViewer = {
             }
         );
         return layer;
+    },
+
+    setSensorStyle : function(type, layer) {
+        var style;
+        if (type && type === 'polygon') {
+            style = new OpenLayers.StyleMap({
+                'default': new OpenLayers.Style({
+                        strokeColor: '#000000',
+                        strokeWidth: 2,
+                        fillColor: '39B3D7'
+                    }
+                ),
+                'select': new OpenLayers.Style({
+                        strokeColor: '#000000',
+                        strokeWidth: 4,
+                        fillColor: '#BE1522'
+                    }
+                )
+            });
+        } else if (type && type === 'line') {
+            style = new OpenLayers.StyleMap({
+                'default': new OpenLayers.Style({
+                        strokeColor: '#39B3D7',
+                        strokeWidth: 4
+                    }
+                ),
+                'select': new OpenLayers.Style({
+                        strokeColor: '#BE1522',
+                        strokeWidth: 6
+                    }
+                )
+            });
+        } else {
+            style = new OpenLayers.StyleMap({
+                'default': new OpenLayers.Style({
+                        pointRadius: 12,
+                        'externalGraphic': 'images/marker_normal.png'
+                    }
+                ),
+                'select': new OpenLayers.Style({
+                        pointRadius: 12,
+                        'externalGraphic': 'images/marker_selected.png'
+                    }
+                )
+            });
+        }
+
+        layer.styleMap = style;
     }
 };

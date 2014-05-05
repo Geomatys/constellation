@@ -759,6 +759,17 @@ cstlAdminApp.controller('SensorModalController', ['$scope', '$modalInstance', '$
                 var wktReader = new OpenLayers.Format.WKT();
                 var vector = wktReader.read(wkt.value);
                 vector.sensorName = $scope.sensorId;
+                var vectorClass = vector.geometry.CLASS_NAME;
+                switch (vectorClass) {
+                    case 'OpenLayers.Geometry.Point': DataViewer.setSensorStyle('point', newLayer); break;
+                    case 'OpenLayers.Geometry.MultiPoint': DataViewer.setSensorStyle('point', newLayer); break;
+                    case 'OpenLayers.Geometry.LineString': DataViewer.setSensorStyle('line', newLayer); break;
+                    case 'OpenLayers.Geometry.MultiLineString': DataViewer.setSensorStyle('line', newLayer); break;
+                    case 'OpenLayers.Geometry.Polygon': DataViewer.setSensorStyle('polygon', newLayer); break;
+                    case 'OpenLayers.Geometry.MultiPolygon': DataViewer.setSensorStyle('polygon', newLayer); break;
+                    default: break;
+                }
+
                 newLayer.addFeatures(vector);
             });
 
