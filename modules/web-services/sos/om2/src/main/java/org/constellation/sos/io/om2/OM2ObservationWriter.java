@@ -37,11 +37,13 @@ import org.apache.sis.util.logging.Logging;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.sos.factory.OMFactory;
-import org.geotoolkit.observation.ObservationWriter;
 import org.geotoolkit.gml.GeometrytoJTS;
 import org.geotoolkit.gml.xml.AbstractGeometry;
+import org.geotoolkit.observation.ObservationWriter;
 import org.geotoolkit.observation.xml.AbstractObservation;
+import org.geotoolkit.observation.xml.v200.OMObservationType;
 
+import org.geotoolkit.observation.xml.v200.OMObservationType.InternalPhenomenon;
 import org.geotoolkit.sampling.xml.SamplingFeature;
 import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.sos.xml.SOSXmlFactory;
@@ -57,6 +59,7 @@ import org.geotoolkit.swe.xml.PhenomenonProperty;
 import org.geotoolkit.swe.xml.Quantity;
 import org.geotoolkit.swe.xml.SimpleDataRecord;
 import org.geotoolkit.swe.xml.TextBlock;
+import org.geotoolkit.swe.xml.v101.PhenomenonType;
 import org.geotoolkit.swes.xml.ObservationTemplate;
 import org.geotoolkit.temporal.object.ISODateParser;
 import org.opengis.observation.Measure;
@@ -272,6 +275,10 @@ public class OM2ObservationWriter implements ObservationWriter {
             final Connection c           = source.getConnection();
             c.setAutoCommit(false);
             for (Phenomenon phenomenon : phenomenons) {
+                if (phenomenon instanceof InternalPhenomenon) {
+                    final InternalPhenomenon internal = (InternalPhenomenon)phenomenon;
+                    phenomenon = new PhenomenonType(internal.getName(), internal.getName());
+                }
                 final PhenomenonProperty phenomenonP = SOSXmlFactory.buildPhenomenonProperty("1.0.0", (org.geotoolkit.swe.xml.Phenomenon) phenomenon);
                 writePhenomenon(phenomenonP, c);
             }

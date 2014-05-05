@@ -17,6 +17,8 @@
 package org.constellation.rest.api;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -30,6 +32,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.constellation.ServiceDef;
 import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.configuration.ServiceConfigurer;
 import org.constellation.configuration.StringList;
@@ -48,6 +51,7 @@ import org.geotoolkit.observation.ObservationStore;
 import org.geotoolkit.parameter.ParametersExt;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sos.netcdf.ExtractionResult;
+import org.geotoolkit.sos.netcdf.ExtractionResult.ProcedureTree;
 import org.geotoolkit.sos.netcdf.NetCDFExtractor;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -198,17 +202,8 @@ public class SOSServices {
         final SOSConfigurer configurer = getConfigurer();
         
         // SensorML generation
-        for (String process : result.procedures) {
-            final Properties prop = new Properties();
-            prop.put("id",         process);
-            prop.put("beginTime",  result.spatialBound.dateStart);
-            prop.put("endTime",    result.spatialBound.dateEnd);
-            prop.put("longitude",  result.spatialBound.minx);
-            prop.put("latitude",   result.spatialBound.miny);
-            prop.put("phenomenon", result.fields);
-            final AbstractSensorML sml = SensorMLGenerator.getTemplateSensorML(prop);
-
-            configurer.importSensor(id, sml, process);
+        for (ProcedureTree process : result.procedures) {
+            generateSensorML(id, process, result, configurer);
         }
         configurer.importObservations(id, result.observations, result.phenomenons);
 
@@ -221,6 +216,25 @@ public class SOSServices {
         return ok(new AcknowlegementType("Success", "The specified observations have been imported in the SOS"));
     }
 
+    private void generateSensorML(final String id, final ProcedureTree process, final ExtractionResult result, final SOSConfigurer configurer) throws ConfigurationException {
+        final Properties prop = new Properties();
+        prop.put("id",         process.id);
+        prop.put("beginTime",  result.spatialBound.dateStart);
+        prop.put("endTime",    result.spatialBound.dateEnd);
+        prop.put("longitude",  result.spatialBound.minx);
+        prop.put("latitude",   result.spatialBound.miny);
+        prop.put("phenomenon", result.fields);
+        final List<String> component = new ArrayList<>();
+        for (ProcedureTree child : process.children) {
+            component.add(child.id);
+            generateSensorML(id, child, result, configurer);
+        }
+        prop.put("component", component);
+        final AbstractSensorML sml = SensorMLGenerator.getTemplateSensorML(prop, process.type);
+
+        configurer.importSensor(id, sml, process.id);
+    }
+    
     private static SOSConfigurer getConfigurer() throws NotRunningServiceException {
         return (SOSConfigurer) ServiceConfigurer.newInstance(ServiceDef.Specification.SOS);
     }

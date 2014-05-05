@@ -42,10 +42,18 @@ public class SensorMLGenerator {
     
     private static final Logger LOGGER = Logger.getLogger(SensorMLGenerator.class);
     
-    public static AbstractSensorML getTemplateSensorML(final Properties prop) {
+    public static AbstractSensorML getTemplateSensorML(final Properties prop, final String type) {
         try {
             final TemplateEngine templateEngine = TemplateEngineFactory.getInstance(TemplateEngineFactory.GROOVY_TEMPLATE_ENGINE);
-            final InputStream stream = Util.getResourceAsStream("org/constellation/engine/template/smlTemplate.xml");
+            final InputStream stream;
+            if ("Component".equals(type)) {
+                stream = Util.getResourceAsStream("org/constellation/engine/template/smlComponentTemplate.xml");
+            } else if ("System".equals(type)) {
+                stream = Util.getResourceAsStream("org/constellation/engine/template/smlSystemTemplate.xml");
+            } else {
+                throw new IllegalArgumentException("unexpected sml type");
+            }
+            
             final File templateFile = File.createTempFile("smlTemplate", ".xml");
             FileUtilities.buildFileFromStream(stream, templateFile);
             final String templateApplied = templateEngine.apply(templateFile, prop);
