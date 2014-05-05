@@ -30,9 +30,10 @@
             <!-- Graph -->
             <div class="row" ng-if="var.displayGraph === true">
                 <div class="col-sm-12">
-                    <div class="sos_edit_graph" id="graph">
-                        <div class="sos_edit_graph_date" style="right:15px;position:absolute;">
-                            <div class="form-inline">
+                    <div class="sos_edit_graph" id="graph" ng-init="test=false">
+                        <div ng-class="{'sos_edit_graph_date-selected':test==true, 'sos_edit_graph_date':test==false}" style="padding:0; right:15px;position:absolute; text-align:right;">
+                            <div class="btn-lg calendar-button" style="cursor:pointer;" ng-click="test=!test"><span class="glyphicon glyphicon-calendar"></span></div>
+                            <div ng-show="test==true" class="form-inline form-calendar">
                                 <label class="control-label" translate="service.edit.dashboard.date.from">From</label>
                                 <input type="text" class="form-control" style="width:100px;" datepicker="{language:getCurrentLang(),format:'yyyy-mm-dd'}" ng-model="var.start"/>
                                 <label class="control-label" translate="service.edit.dashboard.date.to"> to</label>

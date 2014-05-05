@@ -384,12 +384,29 @@ p.error-select-one{
 }
 .sos_edit_graph_date{
     border:solid 1px #eeeeee; 
-    height:55px; 
-    border-bottom-left-radius:3px;  
+    border-bottom-left-radius:5px;  
     border-top:none; 
     border-right:none; 
-    background-color:#eeeeee; 
     padding:10px;
+}
+.sos_edit_graph_date-selected{
+    background-color:#eeeeee; 
+    border-bottom-left-radius:5px; 
+}
+.sos_edit_graph_date .calendar-button{
+    background-color:#eeeeee;
+    border-radius:0;
+    border-bottom-left-radius:5px;  
+}
+.sos_edit_graph_date-selected .calendar-button{
+    background-color:#dadada; 
+    max-width:50px;
+    margin-left: 216px;
+    border-radius:0;
+    border-bottom-left-radius:5px; 
+}
+.form-calendar{
+    margin: 10px;
 }
 .form_service_md legend{
     margin-bottom: 0;
