@@ -647,7 +647,12 @@ public abstract class WebService {
     
     protected String getServiceURL() {
         String result;
-        Property service = propertyRepository.findOne(SERVICES_URL_KEY);
+        Property service;
+        if (propertyRepository != null) {
+            service = propertyRepository.findOne(SERVICES_URL_KEY);
+        } else {
+            service = null;
+        }
         if (service != null && (result = service.getValue()) != null && !result.isEmpty()) {
         } else if (PROPERTIES_URL != null && !PROPERTIES_URL.isEmpty()) {
             result = PROPERTIES_URL;

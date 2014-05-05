@@ -126,12 +126,6 @@
     </dependency>
     <dependency>
       <groupId>org.constellation.storage</groupId>
-      <artifactId>cstl-store-observation</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.storage</groupId>
       <artifactId>cstl-store-data-featurestore</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>

@@ -16,7 +16,7 @@
                 </gml:Envelope>
             </gml:boundedBy>
             <gml:featureMember>
-                <sampling:SamplingPoint gml:id="station-008">
+                <sampling:SamplingPoint gml:id="station-009">
                     <gml:description>some station 5</gml:description>
                     <gml:name>10972X0137-SLAPS</gml:name>
                     <sampling:sampledFeature>urn:-sandre:object:bdrhf:48X</sampling:sampledFeature>
@@ -28,7 +28,7 @@
                 </sampling:SamplingPoint>
             </gml:featureMember>
             <gml:featureMember>
-                <sampling:SamplingPoint gml:id="station-009">
+                <sampling:SamplingPoint gml:id="station-010">
                     <gml:description>some station 6</gml:description>
                     <gml:name>10972X0137-SLIDE</gml:name>
                     <sampling:sampledFeature>urn:-sandre:object:bdrhf:560X</sampling:sampledFeature>

@@ -66,7 +66,6 @@
     <module>filesystem</module>
     <module>mdweb</module>
     <module>generic</module>
-    <module>postgrid</module>
     <module>om2</module>
   </modules>
 

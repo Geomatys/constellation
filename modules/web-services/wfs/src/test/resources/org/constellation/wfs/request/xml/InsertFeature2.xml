@@ -12,7 +12,7 @@
                                      request=describefeaturetype&amp;typename=InWaterA_1M.xsd
                                      http://www.opengis.net/wfs ../wfs/1.1.0/WFS.xsd">
     <wfs:Insert idgen="UseExisting">
-        <sampling:SamplingPoint gml:id="station-006" xmlns:gml="http://www.opengis.net/gml" xmlns:sampling="http://www.opengis.net/sampling/1.0">
+        <sampling:SamplingPoint gml:id="station-007" xmlns:gml="http://www.opengis.net/gml" xmlns:sampling="http://www.opengis.net/sampling/1.0">
             <gml:description>station de test 4</gml:description>
             <gml:name>666-999</gml:name>
             <sampling:sampledFeature>urn:blablabla:4</sampling:sampledFeature>
@@ -24,7 +24,7 @@
         </sampling:SamplingPoint>
     </wfs:Insert>
     <wfs:Insert idgen="UseExisting">
-        <sampling:SamplingPoint gml:id="station-007" xmlns:gml="http://www.opengis.net/gml" xmlns:sampling="http://www.opengis.net/sampling/1.0">
+        <sampling:SamplingPoint gml:id="station-008" xmlns:gml="http://www.opengis.net/gml" xmlns:sampling="http://www.opengis.net/sampling/1.0">
             <gml:description>station de test 5</gml:description>
             <gml:name>r2d2-xoupi</gml:name>
             <sampling:sampledFeature>urn:blablabla:5</sampling:sampledFeature>

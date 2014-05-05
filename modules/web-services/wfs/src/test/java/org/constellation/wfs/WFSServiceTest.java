@@ -152,7 +152,7 @@ public class WFSServiceTest {
 
         assertTrue(result.getEntity() instanceof FeatureCollectionWrapper);
         FeatureCollection collection = ((FeatureCollectionWrapper) result.getEntity()).getFeatureCollection();
-        assertEquals(5, collection.size());
+        assertEquals(6, collection.size());
 
         /*
          * we insert the feature
@@ -172,7 +172,7 @@ public class WFSServiceTest {
 
         assertTrue(result.getEntity() instanceof FeatureCollectionWrapper);
         collection = ((FeatureCollectionWrapper) result.getEntity()).getFeatureCollection();
-        assertEquals(7, collection.size());
+        assertEquals(8, collection.size());
 
         /*
          * we delete the features
@@ -192,7 +192,7 @@ public class WFSServiceTest {
 
         assertTrue(result.getEntity() instanceof FeatureCollectionWrapper);
         collection = ((FeatureCollectionWrapper) result.getEntity()).getFeatureCollection();
-        assertEquals(5, collection.size());
+        assertEquals(6, collection.size());
 
         /*
          * we insert the feature with another request
@@ -212,7 +212,7 @@ public class WFSServiceTest {
 
         assertTrue(result.getEntity() instanceof FeatureCollectionWrapper);
         collection = ((FeatureCollectionWrapper) result.getEntity()).getFeatureCollection();
-        assertEquals(7, collection.size());
+        assertEquals(8, collection.size());
 
     }
 
@@ -235,8 +235,8 @@ public class WFSServiceTest {
                         final DefaultDataSource ds = new DefaultDataSource(url + ";create=true");
                         Connection con = ds.getConnection();
                         DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
-                        sr.run(Util.getResourceAsStream("org/constellation/observation/structure_observations.sql"));
-                        sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
+                        sr.run(Util.getResourceAsStream("org/constellation/om2/structure_observations.sql"));
+                        sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data-om2.sql"));
                         con.close();
                         ds.shutdown();
                         

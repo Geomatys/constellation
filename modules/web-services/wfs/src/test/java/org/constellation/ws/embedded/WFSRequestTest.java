@@ -196,8 +196,8 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
                         if (!datasourceCreated) {
                             Connection con = ds.getConnection();
                             DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
-                            sr.run(Util.getResourceAsStream("org/constellation/observation/structure_observations.sql"));
-                            sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
+                            sr.run(Util.getResourceAsStream("org/constellation/om2/structure_observations.sql"));
+                            sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data-om2.sql"));
                             con.close();
                             datasourceCreated = true;
                         }
@@ -523,8 +523,8 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
 
         TransactionSummaryType sum        = new TransactionSummaryType(2, 0, 0);
         List<InsertedFeatureType> insertedFeatures = new ArrayList<>();
-        insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-006"), null));
         insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-007"), null));
+        insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-008"), null));
         InsertResultsType insertResult    = new InsertResultsType(insertedFeatures);
         TransactionResponseType ExpResult = new TransactionResponseType(sum, null, insertResult, "1.1.0");
 
@@ -564,7 +564,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
 
         sum              = new TransactionSummaryType(2, 0, 0);
         insertedFeatures = new ArrayList<>();
-        insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-008"), null));
+        insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-010"), null));
         insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-009"), null));
         insertResult    = new InsertResultsType(insertedFeatures);
         ExpResult = new TransactionResponseType(sum, null, insertResult, "1.1.0");
@@ -607,7 +607,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
 
         sum              = new TransactionSummaryType(2, 0, 0);
         insertedFeatures = new ArrayList<>();
-        insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-010"), null));
+        insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-012"), null));
         insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-011"), null));
         insertResult    = new InsertResultsType(insertedFeatures);
         ExpResult = new TransactionResponseType(sum, null, insertResult, "1.1.0");
@@ -741,7 +741,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer {
         assertTrue("unexpected type: " + result.getClass().getName() + "\n" + result, result instanceof ValueCollectionType);
         
         assertTrue(result instanceof ValueCollection);
-        assertEquals(11, ((ValueCollection)result).getNumberReturned());
+        assertEquals(12, ((ValueCollection)result).getNumberReturned());
 
         /**
          * Test 2 : query on typeName samplingPoint with RESULTS

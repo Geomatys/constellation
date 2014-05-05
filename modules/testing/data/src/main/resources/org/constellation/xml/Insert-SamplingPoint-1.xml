@@ -8,7 +8,7 @@
           xmlns:sampling="http://www.opengis.net/sampling/1.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <wfs:Insert idgen="UseExisting">
-        <sampling:SamplingPoint gml:id="station-006">
+        <sampling:SamplingPoint gml:id="station-007">
             <gml:description>station de test 4</gml:description>
             <gml:name>666-999</gml:name>
             <sampling:sampledFeature>urn:blablabla:4</sampling:sampledFeature>
@@ -18,7 +18,7 @@
                 </gml:Point>
             </sampling:position>
         </sampling:SamplingPoint>
-        <sampling:SamplingPoint gml:id="station-007">
+        <sampling:SamplingPoint gml:id="station-008">
             <gml:description>station de test 5</gml:description>
             <gml:name>r2d2-xoupi</gml:name>
             <sampling:sampledFeature>urn:blablabla:5</sampling:sampledFeature>

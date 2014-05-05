@@ -1,8 +1,8 @@
 <?xml version='1.0'?>
-<wfs:FeatureCollection gml:id="id" timeStamp="" numberOfFeatures="11" xmlns:gml="http://www.opengis.net/gml" xmlns:wfs="http://www.opengis.net/wfs" xmlns:sampling="http://www.opengis.net/sampling/1.0">
+<wfs:FeatureCollection gml:id="id" timeStamp="" numberOfFeatures="12" xmlns:gml="http://www.opengis.net/gml" xmlns:wfs="http://www.opengis.net/wfs" xmlns:sampling="http://www.opengis.net/sampling/1.0">
     <gml:boundedBy>
         <gml:Envelope srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
-            <gml:lowerCorner>21400.0 1591753.0</gml:lowerCorner>
+            <gml:lowerCorner>-30.711 134.196</gml:lowerCorner>
             <gml:upperCorner>95800.0 2567987.0</gml:upperCorner>
         </gml:Envelope>
     </gml:boundedBy>
@@ -68,6 +68,17 @@
     </gml:featureMember>
     <gml:featureMember>
         <sampling:SamplingPoint gml:id="station-006">
+            <gml:description>Geology traverse</gml:description>
+            <gml:name>cycle1</gml:name>
+            <sampling:position>
+                <gml:LineString srsName="urn:ogc:def:crs:epsg:7.9:27582">
+                    <gml:posList>-30.711 134.205 -30.71 134.204 -30.709 134.203 -30.708 134.201 -30.706 134.196 -30.703 134.197 -30.702 134.199</gml:posList>
+                </gml:LineString>
+            </sampling:position>
+        </sampling:SamplingPoint>
+    </gml:featureMember>
+    <gml:featureMember>
+        <sampling:SamplingPoint gml:id="station-007">
             <gml:description>station de test 4</gml:description>
             <gml:name>666-999</gml:name>
             <sampling:sampledFeature>urn:blablabla:4</sampling:sampledFeature>
@@ -79,7 +90,7 @@
         </sampling:SamplingPoint>
     </gml:featureMember>
     <gml:featureMember>
-        <sampling:SamplingPoint gml:id="station-007">
+        <sampling:SamplingPoint gml:id="station-008">
             <gml:description>station de test 5</gml:description>
             <gml:name>r2d2-xoupi</gml:name>
             <sampling:sampledFeature>urn:blablabla:5</sampling:sampledFeature>
@@ -91,19 +102,7 @@
         </sampling:SamplingPoint>
     </gml:featureMember>
     <gml:featureMember>
-        <sampling:SamplingPoint gml:id="station-008">
-            <gml:description>some station 5</gml:description>
-            <gml:name>10972X0137-SLAPS</gml:name>
-            <sampling:sampledFeature>urn:-sandre:object:bdrhf:48X</sampling:sampledFeature>
-            <sampling:position>
-                <gml:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
-                    <gml:pos>21400.0 2001368.0</gml:pos>
-                </gml:Point>
-            </sampling:position>
-        </sampling:SamplingPoint>
-    </gml:featureMember>
-    <gml:featureMember>
-        <sampling:SamplingPoint gml:id="station-009">
+        <sampling:SamplingPoint gml:id="station-010">
             <gml:description>some station 6</gml:description>
             <gml:name>10972X0137-SLIDE</gml:name>
             <sampling:sampledFeature>urn:-sandre:object:bdrhf:560X</sampling:sampledFeature>
@@ -115,25 +114,37 @@
         </sampling:SamplingPoint>
     </gml:featureMember>
     <gml:featureMember>
-        <sampling:SamplingPoint gml:id="station-010">
-            <gml:description>some station 7</gml:description>
-            <gml:name>10972X0137-BODY</gml:name>
-            <sampling:sampledFeature>urn:-sandre:object:bdrhf:999X</sampling:sampledFeature>
+        <sampling:SamplingPoint gml:id="station-009">
+            <gml:description>some station 5</gml:description>
+            <gml:name>10972X0137-SLAPS</gml:name>
+            <sampling:sampledFeature>urn:-sandre:object:bdrhf:48X</sampling:sampledFeature>
             <sampling:position>
                 <gml:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
-                    <gml:pos>45900.0 2001214.0</gml:pos>
+                    <gml:pos>21400.0 2001368.0</gml:pos>
                 </gml:Point>
             </sampling:position>
         </sampling:SamplingPoint>
     </gml:featureMember>
     <gml:featureMember>
-        <sampling:SamplingPoint gml:id="station-011">
+        <sampling:SamplingPoint gml:id="station-012">
             <gml:description>some station 8</gml:description>
             <gml:name>10972X0137-CANOL</gml:name>
             <sampling:sampledFeature>urn:-sandre:object:bdrhf:666X</sampling:sampledFeature>
             <sampling:position>
                 <gml:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
                     <gml:pos>87400.0 2001654.0</gml:pos>
+                </gml:Point>
+            </sampling:position>
+        </sampling:SamplingPoint>
+    </gml:featureMember>
+    <gml:featureMember>
+        <sampling:SamplingPoint gml:id="station-011">
+            <gml:description>some station 7</gml:description>
+            <gml:name>10972X0137-BODY</gml:name>
+            <sampling:sampledFeature>urn:-sandre:object:bdrhf:999X</sampling:sampledFeature>
+            <sampling:position>
+                <gml:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
+                    <gml:pos>45900.0 2001214.0</gml:pos>
                 </gml:Point>
             </sampling:position>
         </sampling:SamplingPoint>

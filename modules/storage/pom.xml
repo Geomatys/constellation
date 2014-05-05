@@ -99,7 +99,6 @@
                 <module>metadata-mdw</module>
                 <module>metadata-dom</module>
                 <module>generic</module>
-                <module>observation</module>
                 <module>om2</module>
                 <module>provider</module>
                 <module>provider-data-coveragesgroup</module>
@@ -161,7 +160,6 @@
                 <module>metadata-mdw</module>
                 <module>metadata-dom</module>
                 <module>generic</module>
-                <module>observation</module>
                 <module>om2</module>
                 <module>provider-data-om2</module>
                 <module>provider-data-observationstore</module>

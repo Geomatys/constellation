@@ -389,7 +389,7 @@ public class WFSWorkerTest {
 
         FeatureCollectionType resultHits = (FeatureCollectionType) worker.getFeature(request);
 
-        assertTrue(resultHits.getNumberOfFeatures() == 5);
+        assertTrue(resultHits.getNumberOfFeatures() == 6);
 
 
         /**
@@ -588,7 +588,7 @@ public class WFSWorkerTest {
 
         resultHits = (FeatureCollectionType) worker.getFeature(request);
 
-        assertTrue(resultHits.getNumberOfFeatures() == 5);
+        assertTrue(resultHits.getNumberOfFeatures() == 6);
 
 
         /**
@@ -1334,8 +1334,8 @@ public class WFSWorkerTest {
                         ds = new DefaultDataSource(url + ";create=true");
                         Connection con = ds.getConnection();
                         DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
-                        sr.run(Util.getResourceAsStream("org/constellation/observation/structure_observations.sql"));
-                        sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
+                        sr.run(Util.getResourceAsStream("org/constellation/om2/structure_observations.sql"));
+                        sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data-om2.sql"));
                         con.close();
                         ds.shutdown();
                         

@@ -1,8 +1,8 @@
 <?xml version='1.0'?>
-<wfs:FeatureCollection numberOfFeatures="5" gml:id="id" timeStamp="" xmlns:gml="http://www.opengis.net/gml" xmlns:wfs="http://www.opengis.net/wfs" xmlns:sampling="http://www.opengis.net/sampling/1.0">
+<wfs:FeatureCollection numberOfFeatures="6" gml:id="id" timeStamp="" xmlns:gml="http://www.opengis.net/gml" xmlns:wfs="http://www.opengis.net/wfs" xmlns:sampling="http://www.opengis.net/sampling/1.0">
     <gml:boundedBy>
         <gml:Envelope srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
-            <gml:lowerCorner>41945.0 1625236.0</gml:lowerCorner>
+            <gml:lowerCorner>-30.711 134.196</gml:lowerCorner>
             <gml:upperCorner>70800.0 2567987.0</gml:upperCorner>
         </gml:Envelope>
     </gml:boundedBy>
@@ -53,6 +53,16 @@
                 <gml:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
                     <gml:pos>62500.0 1625236.0</gml:pos>
                 </gml:Point>
+            </sampling:position>
+        </sampling:SamplingPoint>
+    </gml:featureMember>
+    <gml:featureMember>
+         <sampling:SamplingPoint gml:id="station-006">
+            <gml:name>cycle1</gml:name>
+            <sampling:position>
+                <gml:LineString srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:27582">
+                    <gml:posList>-30.711 134.205 -30.71 134.204 -30.709 134.203 -30.708 134.201 -30.706 134.196 -30.703 134.197 -30.702 134.199</gml:posList>
+                </gml:LineString>
             </sampling:position>
         </sampling:SamplingPoint>
     </gml:featureMember>

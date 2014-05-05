@@ -412,7 +412,7 @@ public class WFS2WorkerTest {
         assertEquals("3.2.1", wrapper.getGmlVersion());
 
         StringWriter writer = new StringWriter();
-        featureWriter.write((FeatureCollection)result,writer, 5);
+        featureWriter.write((FeatureCollection)result,writer, 6);
 
         String expectedResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-3v2.xml"));
         expectedResult = expectedResult.replace("EPSG_VERSION", EPSG_VERSION);
@@ -431,7 +431,7 @@ public class WFS2WorkerTest {
 
         FeatureCollectionType resultHits = (FeatureCollectionType) worker.getFeature(request);
 
-        assertTrue("results:" + resultHits, resultHits.getNumberReturned() == 5);
+        assertTrue("results:" + resultHits, resultHits.getNumberReturned() == 6);
 
 
         /**
@@ -663,7 +663,7 @@ public class WFS2WorkerTest {
 
         resultHits = (FeatureCollectionType) worker.getFeature(request);
 
-        assertTrue(resultHits.getNumberReturned() == 5);
+        assertTrue(resultHits.getNumberReturned() == 6);
 
 
         /**
@@ -719,7 +719,7 @@ public class WFS2WorkerTest {
         Object result = worker.getPropertyValue(request);
 
         assertTrue(result instanceof ValueCollection);
-        assertEquals(5, ((ValueCollection)result).getNumberReturned());
+        assertEquals(6, ((ValueCollection)result).getNumberReturned());
 
         /**
          * Test 2 : query on typeName samplingPoint with RESULTS
@@ -2125,8 +2125,8 @@ public class WFS2WorkerTest {
                         final DefaultDataSource ds = new DefaultDataSource(url + ";create=true");
                         Connection con = ds.getConnection();
                         DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
-                        sr.run(Util.getResourceAsStream("org/constellation/observation/structure_observations.sql"));
-                        sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
+                        sr.run(Util.getResourceAsStream("org/constellation/om2/structure_observations.sql"));
+                        sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data-om2.sql"));
                         con.close();
                         ds.shutdown();
 
