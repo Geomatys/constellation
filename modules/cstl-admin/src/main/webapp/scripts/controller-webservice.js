@@ -726,7 +726,9 @@ cstlAdminApp.controller('SensorModalController', ['$scope', '$modalInstance', '$
         $scope.measures = undefined;
         $scope.var = {
             displayGraph:  false,
-            needToSelectMeasure: false
+            needToSelectMeasure: false,
+            start: '',
+            end: ''
         };
 
         $scope.init = function() {
@@ -812,7 +814,17 @@ cstlAdminApp.controller('SensorModalController', ['$scope', '$modalInstance', '$
 
             $scope.var.displayGraph = true;
 
-            $http.post('@cstl/api/1/SOS/'+ $scope.service.identifier +'/observations;jsessionid=', {'sensorID': $scope.sensorId, 'observedProperty': measuresChecked})
+            var width = $('.sos_edit_graph').width() - 120;
+            var obsFilter = {
+                'sensorID': $scope.sensorId,
+                'observedProperty': measuresChecked,
+                'width': width
+            };
+            if ($scope.var.start !== '' && $scope.var.end !== '') {
+                obsFilter.start = $scope.var.start;
+                obsFilter.end = $scope.var.end;
+            }
+            $http.post('@cstl/api/1/SOS/'+ $scope.service.identifier +'/observations;jsessionid=', obsFilter)
                 .success(function(response){
                     generateD3Graph(response, measuresChecked[0]);
                 });

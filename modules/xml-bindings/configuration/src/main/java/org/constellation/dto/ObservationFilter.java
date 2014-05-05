@@ -39,7 +39,7 @@ public class ObservationFilter {
     
     private Date end;
     
-    private int width;
+    private int width = 840;
     
     
     /**
