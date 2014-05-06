@@ -1073,6 +1073,10 @@ table.user-table tbody>tr>td.user-delete{
 .modal-dialog-responsive{
     max-height:800px;
 }
+.list-style-modal{
+    height:800px;
+    overflow-y:auto;
+}
 @media (min-width: 768px) and (max-width: 991px) { 
     /*choix type*/
     .modal-dialog-responsive{
@@ -1098,9 +1102,9 @@ table.user-table tbody>tr>td.user-delete{
     .modal-dialog-resp-height .modal-body{
         max-height:365px;
     }
+    .list-style-modal{
+    height:350px;
+    overflow-y:auto;
+}
 }
 .ace_editor { height: 200px; }
-
-.datepicker{
-    z-index:3000;
-}
