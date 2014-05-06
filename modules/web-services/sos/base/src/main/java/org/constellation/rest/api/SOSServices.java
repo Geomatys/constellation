@@ -231,7 +231,7 @@ public class SOSServices {
         configurer.importSensor(id, sml, process.id);
         
         //record location
-        final AbstractGeometryType geom = (AbstractGeometryType) result.spatialBound.getGeometry("2.0.0");
+        final AbstractGeometryType geom = (AbstractGeometryType) process.spatialBound.getGeometry("2.0.0");
         if (geom != null) {
             configurer.updateSensorLocation(id, process.id, geom);
         }
