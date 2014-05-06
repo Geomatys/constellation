@@ -11,8 +11,8 @@
 </div>
 <!-- Tab nav -->
 <ul class="nav nav-tabs" ng-init="chosenTab = 'colorMap'">
-    <li ng-if="isgeophys == false" ng-class="{active: chosenTab==='simple'}"><a ng-click="chosenTab = 'simple'" data-toggle="tab"><span translate="sldeditor.tab.simple" >Simple editor</span></a></li>
-    <li ng-if="isgeophys == true" ng-class="{active: chosenTab==='colorMap'}"><a ng-click="chosenTab = 'colorMap'" data-toggle="tab">ColorMap</a></li>
+    <li ng-class="{active: chosenTab==='simple'}"><a ng-click="chosenTab = 'simple'" data-toggle="tab"><span translate="sldeditor.tab.simple" >Simple editor</span></a></li>
+    <li ng-class="{active: chosenTab==='colorMap'}"><a ng-click="chosenTab = 'colorMap'" data-toggle="tab">ColorMap</a></li>
     <li ng-class="{active: chosenTab==='xml'}"><a ng-click="chosenTab = 'xml'" data-toggle="tab"><span translate="sldeditor.tab.xml" >XML Editor</span></a></li>
 </ul>
 
@@ -257,4 +257,5 @@
 
       <button type="button" class="btn btn-info"ng-click="saveXml()" translate="data.modal.change">Change</button>
   </div>
+
 </div>

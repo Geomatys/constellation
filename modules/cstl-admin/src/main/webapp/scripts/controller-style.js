@@ -66,7 +66,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         $scope.providerId = providerId;
         $scope.serviceName = serviceName;
         $scope.dataType = dataType;
-        $scope.xmlStyle = '<xml><h2></h2></xml>';
+        $scope.xmlStyle = '<xml></xml>';
 
 
 
@@ -93,16 +93,27 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         };
 
         $scope.initFilterType = function() {
-            if (dataType.toLowerCase() === 'vector' || dataType.toLowerCase() === 'feature-store') {
-                return 'vector';
-            }
-            if (dataType.toLowerCase() === 'coverage' || dataType.toLowerCase() === 'raster') {
-                return 'coverage';
+            if (dataType ) {
+                if (dataType.toLowerCase() === 'vector' || dataType.toLowerCase() === 'feature-store') {
+                    return 'vector';
+                }
+                if (dataType.toLowerCase() === 'coverage' || dataType.toLowerCase() === 'raster') {
+                    return 'coverage';
+                }
             }
             return '';
         };
 
         $scope.stylechooser = 'new';
+
+        $scope.refreshNewStyle = function(){
+            $scope.newStyle = { "name": $scope.layerName +"-sld",
+                "rules": [{
+                    "symbolizers": [{}],
+                    "filter": null
+                }]
+            };
+        };
 
         // TODO: add field to handle style name
         $scope.newStyle = { "name": $scope.layerName +"-sld",
@@ -252,6 +263,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         $scope.dataBands = null;
 
         $scope.initDataProperties = function() {
+
             provider.dataDesc({providerId: $scope.providerId, dataId: $scope.layerName}, function(response) {
                 $scope.dataProperties = response.properties;
                 $scope.dataBbox = response.boundingBox;
@@ -341,6 +353,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             $scope.providerId = data.Provider;
             $scope.dataType = data.Type;
             $scope.pageSld = ($scope.dataType.toLowerCase() === 'vector' || $scope.dataType === 'feature-store') ? "views/style/vectors.html" : "views/style/raster.html";
+            $scope.refreshNewStyle();
         };
 
         $scope.showLayerWithStyle = function(style) {
