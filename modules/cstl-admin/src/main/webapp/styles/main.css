@@ -341,7 +341,7 @@ ul.unstyled {
     padding: 0 15px;
 }
 .sos_edit_checkboxlist.error-select-one{
-    border-color: #ff0000;
+    border: #C58D8D solid 2px;
 }
 p.error-select-one{
     color: #ff0000;
@@ -401,7 +401,7 @@ p.error-select-one{
 .sos_edit_graph_date-selected .calendar-button{
     background-color:#dadada; 
     max-width:50px;
-    margin-left: 216px;
+    margin-left: 231px;
     border-radius:0;
     border-bottom-left-radius:5px; 
 }
@@ -626,6 +626,30 @@ p.error-select-one{
 }
 .dashboard .item-list .item.metadata-sensor {
     background: transparent url('../images/sensor-metadata.svg') right center no-repeat;
+}
+.dashboard .item-list .item.metadata-product-sensor {
+    background: transparent url('../images/metadata-product-sensor.svg') right center no-repeat;
+}
+.dashboard .item-list .item.metadata-product-sensor.selected {
+    background: transparent url('../images/metadata-product-sensor-selected.svg') right center no-repeat;
+}
+.dashboard .item-list .item.metadata-product-vector {
+    background: transparent url('../images/metadata-product-vector.svg') right center no-repeat;
+}
+.dashboard .item-list .item.metadata-product-vector.selected {
+    background: transparent url('../images/metadata-product-vector-selected.svg') right center no-repeat;
+}
+.dashboard .item-list .item.metadata-product-coverage {
+    background: transparent url('../images/metadata-product-raster.svg') right center no-repeat;
+}
+.dashboard .item-list .item.metadata-product-coverage.selected {
+    background: transparent url('../images/metadata-product-raster-selected.svg') right center no-repeat;
+}
+.dashboard .item-list .item.metadata-service {
+    background: transparent url('../images/metadata-service.svg') right center no-repeat;
+}
+.dashboard .item-list .item.metadata-service.selected {
+    background: transparent url('../images/metadata-service-selected.svg') right center no-repeat;
 }
 .dashboard .item-list .item {
     border: 1px solid white;

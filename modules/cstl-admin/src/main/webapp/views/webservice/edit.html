@@ -142,7 +142,7 @@
                                                     </div>
 
                                                     <div class="item child" ng-if="cswdata==selected" ng-repeat="relatedData in relatedDatas[cswdata.identifier]"
-                                                         ng-click="selectMetadataChild(relatedData)" ng-class="{selected:relatedData==selectedMetadataChild,'metadata-vector':relatedData.Type.toLowerCase()=='vector','metadata-coverage':relatedData.Type.toLowerCase()=='coverage','metadata-sensor':relatedData.Type.toLowerCase()=='sensor'}">
+                                                         ng-click="selectMetadataChild(relatedData)" ng-class="{selected:relatedData==selectedMetadataChild,'metadata-product-vector':relatedData.Type.toLowerCase()=='vector','metadata-product-coverage':relatedData.Type.toLowerCase()=='coverage','metadata-product-sensor':relatedData.Type.toLowerCase()=='sensor'}">
                                                         <div class="top">
                                                             <span class="item-title">{{relatedData.Name}}</span>
                                                             <span class="pull-right text-right item-list-style" style="font-size:14px;">{{relatedData.Type}}</span>
