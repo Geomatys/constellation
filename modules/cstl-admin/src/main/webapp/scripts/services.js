@@ -491,18 +491,18 @@ cstlAdminApp.directive('pageSwitcher', function() {
 cstlAdminApp.service('$dashboard', function($filter) {
     return function($scope, fullList, filterOnType) {
 
+        $scope.service = $scope.service || null;
         $scope.fullList = fullList || [];
         $scope.dataList = $scope.dataList || [];
         $scope.filtertext = $scope.filtertext || "";
         $scope.filtertype = $scope.filtertype || undefined;
-        $scope.ordertype = $scope.ordertype || "Name";
+        $scope.ordertype = $scope.ordertype || ($scope.service && $scope.service.type && $scope.service.type.toLowerCase()==='sos') ? "id" : ($scope.service && $scope.service.type && $scope.service.type.toLowerCase==='csw') ? "title" : "Name";
         $scope.orderreverse = $scope.orderreverse || false;
         $scope.countdata = $scope.countdata || 0;
         $scope.nbbypage = $scope.nbbypage || 10;
         $scope.currentpage = $scope.currentpage || 1;
         $scope.selected = $scope.selected || null;
         $scope.exclude = $scope.exclude || [];
-        $scope.service = $scope.service || null;
 
         // Dashboard methods
         $scope.displayPage = function(page) {

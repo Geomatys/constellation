@@ -65,15 +65,15 @@
                                 <div class="navbar sort-navbar">
                                     <div class="navbar-inner">
                                         <ul class="nav nav-style">
-                                            <li ng-click="ordertype='Name';orderreverse=false"><a translate="service.edit.dashboard.header.title">
+                                            <li ng-click="ordertype= (service && service.type && service.type.toLowerCase()==='sos') ? 'id' : (service && service.type && service.type.toLowerCase==='csw') ? 'title' : 'Name';orderreverse=false"><a translate="service.edit.dashboard.header.title">
                                                 Title<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
                                             </a></li>
                                             <li class="divider-vertical"></li>
-                                            <li ng-click="ordertype='Date';orderreverse=true"><a translate="service.edit.dashboard.header.date">
+                                            <li ng-click="ordertype= (service && service.type && (service.type.toLowerCase()==='csw' || service.type.toLowerCase()==='sos')) ? 'createDate' : 'Date';orderreverse=true"><a translate="service.edit.dashboard.header.date">
                                                 Date<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
                                             </a></li>
                                             <li class="divider-vertical"></li>
-                                            <li ng-click="ordertype='Owner';orderreverse=false"><a translate="service.edit.dashboard.header.owner">
+                                            <li ng-click="ordertype=(service && service.type && (service.type.toLowerCase()==='csw' || service.type.toLowerCase()==='sos')) ? 'creator' : 'Owner';orderreverse=false"><a translate="service.edit.dashboard.header.owner">
                                                 Owner<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
                                             </a></li>
                                             <li class="divider-vertical"></li>
