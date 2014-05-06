@@ -825,11 +825,9 @@ cstlAdminApp.controller('SensorModalController', ['$scope', '$modalInstance', '$
 
             $scope.var.displayGraph = true;
 
-            var width = $('.sos_edit_graph').width() - 120;
             var obsFilter = {
                 'sensorID': $scope.sensorId,
-                'observedProperty': measuresChecked,
-                'width': width
+                'observedProperty': measuresChecked
             };
             if ($scope.var.start !== '' && $scope.var.end !== '') {
                 obsFilter.start = $scope.var.start;

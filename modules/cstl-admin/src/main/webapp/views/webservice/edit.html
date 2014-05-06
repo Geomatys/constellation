@@ -160,7 +160,7 @@
                                             </div>
                                             <div ng-if="type === 'sos'">
                                                 <div ng-repeat="sosdata in dataList">
-                                                    <div class="item sensor-sos" ng-class="{selected:sosdata==selected}" ng-click="select(sosdata)">
+                                                    <div class="item" ng-class="{'sensor-sos':sosdata.type!=='System','sensor-system':sosdata.type==='System','selected':sosdata==selected}" ng-click="select(sosdata)">
                                                         <div class="top">
                                                             <span class="item-title">{{sosdata.id}}</span>
                                                             <span class="pull-right text-right item-list-style"  style="font-size:14px;" translate="label.sensor">SENSOR</span>
