@@ -637,7 +637,7 @@ p.error-select-one{
     max-height: 68px;
     cursor: pointer;
 }
-.dashboard .item-list .item.data {
+.dashboard .item-list .item.child {
     margin-left: 30px;
     margin-top: 0px;
 }

@@ -123,7 +123,7 @@
                                             </div>
                                             <div ng-if="type === 'csw'">
                                                 <div ng-repeat="cswdata in dataList">
-                                                    <div class="item metadata" ng-class="{selected:cswdata==selected}" ng-click="select(cswdata);selectDataMetadata(null)">
+                                                    <div class="item metadata" ng-class="{selected:cswdata==selected}" ng-click="select(cswdata);selectMetadataChild(null)">
                                                         <div class="top">
                                                             <span class="item-title">{{cswdata.title ? cswdata.title : cswdata.identifier}}</span>
                                                             <span class="pull-right text-right item-list-style"  style="font-size:14px;">METADATA</span>
@@ -141,8 +141,8 @@
                                                         </div>
                                                     </div>
 
-                                                    <div class="item data" ng-if="cswdata==selected" ng-repeat="relatedData in relatedDatas[cswdata.identifier]"
-                                                         ng-click="selectDataMetadata(relatedData)" ng-class="{selected:relatedData==selectedDataMetadata,'metadata-vector':relatedData.Type.toLowerCase()=='vector','metadata-coverage':relatedData.Type.toLowerCase()=='coverage','metadata-sensor':relatedData.Type.toLowerCase()=='sensor'}">
+                                                    <div class="item child" ng-if="cswdata==selected" ng-repeat="relatedData in relatedDatas[cswdata.identifier]"
+                                                         ng-click="selectMetadataChild(relatedData)" ng-class="{selected:relatedData==selectedMetadataChild,'metadata-vector':relatedData.Type.toLowerCase()=='vector','metadata-coverage':relatedData.Type.toLowerCase()=='coverage','metadata-sensor':relatedData.Type.toLowerCase()=='sensor'}">
                                                         <div class="top">
                                                             <span class="item-title">{{relatedData.Name}}</span>
                                                             <span class="pull-right text-right item-list-style" style="font-size:14px;">{{relatedData.Type}}</span>
@@ -160,10 +160,11 @@
                                             </div>
                                             <div ng-if="type === 'sos'">
                                                 <div ng-repeat="sosdata in dataList">
-                                                    <div class="item" ng-class="{'sensor-sos':sosdata.type!=='System','sensor-system':sosdata.type==='System','selected':sosdata==selected}" ng-click="select(sosdata)">
+                                                    <div class="item" ng-class="{'sensor-sos':sosdata.type!=='System','sensor-system':sosdata.type==='System','selected':sosdata==selected}" ng-click="select(sosdata);selectSensorsChild(null);">
                                                         <div class="top">
                                                             <span class="item-title">{{sosdata.id}}</span>
-                                                            <span class="pull-right text-right item-list-style"  style="font-size:14px;" translate="label.sensor">SENSOR</span>
+                                                            <span ng-if="sosdata.type==='System'" class="pull-right text-right item-list-style"  style="font-size:14px;" translate="label.sensor.system">sensor system</span>
+                                                            <span ng-if="sosdata.type!=='System'" class="pull-right text-right item-list-style"  style="font-size:14px;" translate="label.sensor">sensor</span>
                                                         </div>
                                                         <div class="bottom">
                                                             <div class="block">
@@ -172,27 +173,29 @@
                                                             <div class="block">
                                                                 <i class="icon-user"></i>{{sosdata.creator}}
                                                             </div>
-                                                            <!--<div class="block pull-right">-->
-                                                                <!--<i class="icon-paper-clip"></i><span ng-if="relatedDatas[cswdata.identifier] == null || relatedDatas[cswdata.identifier].length == 0" translate="md.listing.no.data">No</span><span ng-if="relatedDatas[cswdata.identifier].length > 0">{{relatedDatas[cswdata.identifier].length}}</span> <span translate="md.listing.data.associated">associated data</span>-->
-                                                            <!--</div>-->
+                                                            <div class="block pull-right">
+                                                                <i class="icon-paper-clip"></i>
+                                                                <span ng-if="sosdata.children == null || sosdata.children.length == 0" translate="md.listing.no.data">No</span>
+                                                                <span ng-if="sosdata.children.length > 0">{{sosdata.children.length}}</span>
+                                                                <span translate="service.edit.dashboard.sensors.list.associated">associated sensors</span>
+                                                            </div>
                                                         </div>
                                                     </div>
 
-                                                    <!--<div class="item data" ng-if="cswdata==selected" ng-repeat="relatedData in relatedDatas[cswdata.identifier]"-->
-                                                         <!--ng-click="selectDataMetadata(relatedData)" ng-class="{selected:relatedData==selectedDataMetadata,'metadata-vector':relatedData.Type.toLowerCase()=='vector','metadata-coverage':relatedData.Type.toLowerCase()=='coverage','metadata-sensor':relatedData.Type.toLowerCase()=='sensor'}">-->
-                                                        <!--<div class="top">-->
-                                                            <!--<span class="item-title">{{relatedData.Name}}</span>-->
-                                                            <!--<span class="pull-right text-right item-list-style" style="font-size:14px;">{{relatedData.Type}}</span>-->
-                                                        <!--</div>-->
-                                                        <!--<div class="bottom">-->
-                                                            <!--<div class="block">-->
-                                                                <!--<i class="icon-calendar"></i>{{relatedData.Date | date:'yyyy-MM-dd'}}-->
-                                                            <!--</div>-->
-                                                            <!--<div class="block">-->
-                                                                <!--<i class="icon-user"></i>{{relatedData.Owner}}-->
-                                                            <!--</div>-->
-                                                        <!--</div>-->
-                                                    <!--</div>-->
+                                                    <div class="item child sensor-sos" ng-if="sosdata==selected" ng-repeat="soschild in sosdata.children" ng-class="{'selected':soschild===selectedSensorsChild}" ng-click="selectSensorsChild(soschild)">
+                                                        <div class="top">
+                                                            <span class="item-title">{{soschild.id}}</span>
+                                                            <span class="pull-right text-right item-list-style" style="font-size:14px;" translate="label.sensor">sensor</span>
+                                                        </div>
+                                                        <div class="bottom">
+                                                            <div class="block">
+                                                                <i class="icon-calendar"></i>{{soschild.createDate | date:'yyyy-MM-dd'}}
+                                                            </div>
+                                                            <div class="block">
+                                                                <i class="icon-user"></i>{{soschild.creator}}
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

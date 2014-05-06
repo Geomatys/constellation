@@ -697,7 +697,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
         };
 
         $scope.showSensor = function() {
-            var sensorId = $scope.selected.id;
+            var sensorId = ($scope.selectedSensorsChild != null) ? $scope.selectedSensorsChild.id : $scope.selected.id;
             $modal.open({
                 templateUrl: 'views/modalSensorView.html',
                 controller: 'SensorModalController',
@@ -723,10 +723,14 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
             StyleSharedService.unlinkStyle($scope,providerName, styleName, dataProvider, dataId, style);
         };
 
-        $scope.selectedDataMetadata = null;
+        $scope.selectedMetadataChild = null;
+        $scope.selectedSensorsChild = null;
 
-        $scope.selectDataMetadata = function(item) {
-            $scope.selectedDataMetadata = item;
+        $scope.selectMetadataChild = function(item) {
+            $scope.selectedMetadataChild = item;
+        };
+        $scope.selectSensorsChild = function(item) {
+            $scope.selectedSensorsChild = item;
         };
     }]);
 
