@@ -464,6 +464,24 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
             }
         };
 
+        $scope.selectedMetadataChild = null;
+        $scope.selectedSensorsChild = null;
+
+        $scope.selectMetadataChild = function(item) {
+            if ($scope.selectedMetadataChild === item) {
+                $scope.selectedMetadataChild = null;
+            } else {
+                $scope.selectedMetadataChild = item;
+            }
+        };
+        $scope.selectSensorsChild = function(item) {
+            if ($scope.selectedSensorsChild === item) {
+                $scope.selectedSensorsChild = null;
+            } else {
+                $scope.selectedSensorsChild = item;
+            }
+        };
+
         $scope.saveServiceMetadata = function() {
             webService.updateMd({type: $scope.service.type, id: $scope.service.identifier},$scope.metadata,
                 function(response) {
@@ -576,11 +594,12 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
             var txt = ($scope.service.type.toLowerCase() === 'wmts') ? 'Are you sure? This will also delete the generated tiles for this layer.' : 'Are you sure?';
             if ($scope.selected != null && confirm(txt)) {
                 if ($scope.service.type.toLowerCase() === 'sos') {
-                    sos.removeSensor({id: $scope.service.identifier, sensor: $scope.selected.id}, function() {
-                        $growl('success', 'Success', 'Sensor ' + $scope.selected.id + ' successfully removed from service ' + $scope.service.name);
+                    var idToDel = ($scope.selectedSensorsChild !== null) ? $scope.selectedSensorsChild.id : $scope.selected.id;
+                    sos.removeSensor({id: $scope.service.identifier, sensor: idToDel}, function() {
+                        $growl('success', 'Success', 'Sensor ' + idToDel + ' successfully removed from service ' + $scope.service.name);
                         $scope.initScope();
                     },function () {
-                        $growl('error', 'Error', 'Unable to remove sensor ' + $scope.selected.id + ' from service ' + $scope.service.name);
+                        $growl('error', 'Error', 'Unable to remove sensor ' + idToDel + ' from service ' + $scope.service.name);
                     });
                 } else {
                     webService.deleteLayer({type: $scope.service.type, id: $scope.service.identifier, layerid: $scope.selected.Name}, {layernamespace: ''},
@@ -721,20 +740,6 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
 
         $scope.unlinkStyle = function(providerName, styleName, dataProvider, dataId) {
             StyleSharedService.unlinkStyle($scope,providerName, styleName, dataProvider, dataId, style);
-        };
-
-        $scope.selectedMetadataChild = null;
-        $scope.selectedSensorsChild = null;
-
-        $scope.selectMetadataChild = function(item) {
-            $scope.selectedMetadataChild = item;
-        };
-        $scope.selectSensorsChild = function(item) {
-            if ($scope.selectedSensorsChild === item) {
-                $scope.selectedSensorsChild = null;
-            } else {
-                $scope.selectedSensorsChild = item;
-            }
         };
     }]);
 
