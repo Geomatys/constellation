@@ -318,21 +318,21 @@
                                                     <h6 translate="label.date">Date</h6>
                                                     <span>{{selected.createDate | date:'yyyy-MM-dd'}}</span>
                                                 </div>
-                                                <div class="block-content" ng-if="selectedDataMetadata != null">
+                                                <div class="block-content" ng-if="selectedMetadataChild != null">
                                                     <h6 translate="label.title">Title</h6>
-                                                    <span>{{selectedDataMetadata.Name}}</span>
+                                                    <span>{{selectedMetadataChild.Name}}</span>
 
                                                     <div class="separator"></div>
                                                     <h6 translate="label.type">Type</h6>
-                                                    <span>{{selectedDataMetadata.Type}}</span>
+                                                    <span>{{selectedMetadataChild.Type}}</span>
 
                                                     <div class="separator"></div>
                                                     <h6 translate="label.owner">Owner</h6>
-                                                    <span>{{selectedDataMetadata.Owner}}</span>
+                                                    <span>{{selectedMetadataChild.Owner}}</span>
 
                                                     <div class="separator"></div>
                                                     <h6 translate="label.date">Date</h6>
-                                                    <span>{{selectedDataMetadata.Date | date:'yyyy-MM-dd'}}</span>
+                                                    <span>{{selectedMetadataChild.Date | date:'yyyy-MM-dd'}}</span>
                                                 </div>
                                             </div>
 
@@ -365,7 +365,7 @@
                                         </div>
                                         <div ng-if="service.type.toLowerCase() === 'sos'">
                                             <div class="block-header" ng-click="toggleUpDownSelected()">
-                                                <strong>{{selected.title ? selected.title : selected.identifier}}</strong><i class="icon-chevron-up pull-right"></i>
+                                                <strong>{{selected.id}}</strong><i class="icon-chevron-up pull-right"></i>
                                             </div>
                                             <div>
                                                 <div class="block-content">
@@ -373,8 +373,21 @@
                                                     <span>{{selected.creator}}</span>
 
                                                     <div class="separator"></div>
+                                                    <h6 translate="label.type">Type</h6>
+                                                    <span translate="label.sensor.system">Sensor system</span>
+
+                                                    <div class="separator"></div>
                                                     <h6 translate="label.date">Date</h6>
                                                     <span>{{selected.createDate | date:'yyyy-MM-dd'}}</span>
+                                                </div>
+
+                                                <div class="block-content" ng-if="selectedSensorsChild != null">
+                                                    <h6 translate="label.title">Title</h6>
+                                                    <span>{{selectedSensorsChild.id}}</span>
+
+                                                    <div class="separator"></div>
+                                                    <h6 translate="label.type">Type</h6>
+                                                    <span translate="label.sensor">sensor</span>
                                                 </div>
                                             </div>
                                             <div class="block-action">
