@@ -848,7 +848,7 @@ cstlAdminApp.controller('SensorModalController', ['$scope', '$modalInstance', '$
             }
             $http.post('@cstl/api/1/SOS/'+ $scope.service.identifier +'/observations;jsessionid=', obsFilter)
                 .success(function(response){
-                    generateD3Graph(response, measuresChecked[0]);
+                    generateD3Graph(response, measuresChecked);
                 });
         };
 
@@ -856,7 +856,7 @@ cstlAdminApp.controller('SensorModalController', ['$scope', '$modalInstance', '$
             $scope.var.needToSelectMeasure = false;
         };
 
-        function generateD3Graph(csv, measure) {
+        function generateD3Graph(csv, measures) {
 
             var margin = {top: 10, right: 70, bottom: 30, left: 50},
                 width = $('.sos_edit_graph').width() - margin.left - margin.right,
@@ -864,15 +864,28 @@ cstlAdminApp.controller('SensorModalController', ['$scope', '$modalInstance', '$
 
             var parseDate = d3.time.format("%Y-%m-%dT%H:%M:%S").parse;
 
-            var x = d3.time.scale().range([0, width]);
+            var x;
+            if (measures.length === 1) {
+                x = d3.time.scale().range([0, width]);
+            } else {
+                x = d3.scale.linear().range([0, width]);
+            }
             var y = d3.scale.linear().range([height, 0]);
 
             var xAxis = d3.svg.axis().scale(x).orient("bottom");
             var yAxis = d3.svg.axis().scale(y).orient("left");
 
-            var line = d3.svg.line()
-                .x(function(d) { return x(d.date); })
-                .y(function(d) { return y(d[measure]); });
+
+            var line;
+            if (measures.length === 1) {
+                line = d3.svg.line()
+                    .x(function (d) { return x(d.date); })
+                    .y(function (d) { return y(d[measures[0]]); });
+            } else {
+                line = d3.svg.line()
+                    .x(function (d) { return x(d[measures[0]]); })
+                    .y(function (d) { return y(d[measures[1]]); });
+            }
 
             var svg = d3.select("#graph").append("svg")
                 .attr("width", width + margin.left + margin.right)
@@ -889,12 +902,30 @@ cstlAdminApp.controller('SensorModalController', ['$scope', '$modalInstance', '$
             }
 
             data.forEach(function(d) {
-                d.date = parseDate(d.date);
-                d[measure] = +d[measure];
+                if (measures.length === 1) {
+                    d.date = parseDate(d.date);
+                    d[measures[0]] = +d[measures[0]];
+                } else {
+                    d[measures[0]] = +d[measures[0]];
+                    d[measures[1]] = +d[measures[1]];
+                }
             });
 
-            x.domain(d3.extent(data, function(d) { return d.date; }));
-            y.domain(d3.extent(data, function(d) { return d[measure]; }));
+            if (measures.length === 1) {
+                x.domain(d3.extent(data, function (d) {
+                    return d.date;
+                }));
+                y.domain(d3.extent(data, function (d) {
+                    return d[measures[0]];
+                }));
+            } else {
+                x.domain(d3.extent(data, function (d) {
+                    return d[measures[0]];
+                }));
+                y.domain(d3.extent(data, function (d) {
+                    return d[measures[1]];
+                }));
+            }
 
             svg.append("g")
                 .attr("class", "x axis")
@@ -909,7 +940,7 @@ cstlAdminApp.controller('SensorModalController', ['$scope', '$modalInstance', '$
                 .attr("y", 6)
                 .attr("dy", ".71em")
                 .style("text-anchor", "end")
-                .text(measure);
+                .text(measures[0]);
 
             svg.append("path")
                 .datum(data)
