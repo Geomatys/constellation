@@ -697,20 +697,23 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
         request = request.replace("SELECT \"time\", \"value\", \"field_name\"", "SELECT MIN(\"time\"), MAX(\"time\") ");
         final Statement stmt = c.createStatement();
         final ResultSet rs = stmt.executeQuery(request);
+        final long[] result = {-1L, -1L};
         try {
             if (rs.next()) {
-                final long[] result = new long[2];
-                final long min = rs.getTimestamp(1).getTime();
-                final long max = rs.getTimestamp(2).getTime();
-                result[0] = min;
-                result[1] = (max - min) / width;
-                return result;
+                final Timestamp minT = rs.getTimestamp(1);
+                final Timestamp maxT = rs.getTimestamp(2);
+                if (minT != null && maxT != null) {
+                    final long min = minT.getTime();
+                    final long max = maxT.getTime();
+                    result[0] = min;
+                    result[1] = (max - min) / width;
+                }
             }
         } finally {
             rs.close();
             stmt.close();
         }
-        throw new IllegalArgumentException("unable to find a min/max time bound for getResult request");
+        return result;
     }
     
     @Override

@@ -31,8 +31,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 import org.apache.sis.storage.DataStoreException;
@@ -341,8 +343,8 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
     @Override
     public Collection<String> getPhenomenonsForProcedure(final String sensorID) throws DataStoreException {
         try {
-            final Connection c           = source.getConnection();
-            final List<String> results   = new ArrayList<>();
+            final Connection c          = source.getConnection();
+            final Set<String> results   = new HashSet<>();
             final PreparedStatement stmt = c.prepareStatement("SELECT \"phenomenon\" "
                                                             + "FROM \"om\".\"offerings\", \"om\".\"offering_observed_properties\""
                                                             + "WHERE \"identifier\"=\"id_offering\""
@@ -354,6 +356,26 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
             }
             rs.close();
             stmt.close();
+            
+            //look for composite phenomenons
+            final PreparedStatement stmtC = c.prepareStatement("SELECT \"component\" "
+                                                             + "FROM \"om\".\"components\""
+                                                             + "WHERE \"phenomenon\"=?");
+            for (String pheno : results) {
+                stmtC.setString(1, pheno);
+                final ResultSet rsC =  stmtC.executeQuery();
+                boolean composite = false;
+                while (rsC.next()) {
+                    composite = true;
+                    results.add(rsC.getString(1));
+                }
+                rsC.close();
+                if (composite) {
+                    results.remove(pheno);
+                }
+            }
+            stmtC.close();
+            
             c.close();
             return results;
         } catch (SQLException ex) {

@@ -931,18 +931,21 @@ public class OM2ObservationWriter implements ObservationWriter {
             stmtObs.executeUpdate();
             stmtObs.close();
             
-            //look for unused observed properties
+            //look for unused observed properties (execute the statement 2 times for remaining components)
             final Statement stmtOP = c.createStatement();
-            final ResultSet rs = stmtOP.executeQuery(" SELECT \"id\" FROM \"om\".\"observed_properties\""
-                                                   + " WHERE  \"id\" NOT IN (SELECT DISTINCT \"observed_property\" FROM \"om\".\"observations\") " +
-                                                     " AND    \"id\" NOT IN (SELECT DISTINCT \"phenomenon\"        FROM \"om\".\"offering_observed_properties\")");
-            
-            while (rs.next()) {
-                stmtOP.addBatch("DELETE FROM \"om\".\"components\" WHERE \"phenomenon\"='" + rs.getString(1) + "';");
-                stmtOP.addBatch("DELETE FROM \"om\".\"observed_properties\" WHERE \"id\"='" + rs.getString(1) + "';");
+            for (int i = 0; i < 2; i++) {
+                final ResultSet rs = stmtOP.executeQuery(" SELECT \"id\" FROM \"om\".\"observed_properties\""
+                                                       + " WHERE  \"id\" NOT IN (SELECT DISTINCT \"observed_property\" FROM \"om\".\"observations\") " 
+                                                       + " AND    \"id\" NOT IN (SELECT DISTINCT \"phenomenon\"        FROM \"om\".\"offering_observed_properties\")"
+                                                       + " AND    \"id\" NOT IN (SELECT DISTINCT \"component\"         FROM \"om\".\"components\")");
+
+                while (rs.next()) {
+                    stmtOP.addBatch("DELETE FROM \"om\".\"components\" WHERE \"phenomenon\"='" + rs.getString(1) + "';");
+                    stmtOP.addBatch("DELETE FROM \"om\".\"observed_properties\" WHERE \"id\"='" + rs.getString(1) + "';");
+                }
+                rs.close();
+                stmtOP.executeBatch();
             }
-            rs.close();
-            stmtOP.executeBatch();
             stmtOP.close();
             
             //look for unused foi

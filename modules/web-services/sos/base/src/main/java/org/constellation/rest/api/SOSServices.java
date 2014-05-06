@@ -200,17 +200,13 @@ public class SOSServices {
         }
         
         final SOSConfigurer configurer = getConfigurer();
+
+        // import in O&M database
+        configurer.importObservations(id, result.observations, result.phenomenons);
         
         // SensorML generation
         for (ProcedureTree process : result.procedures) {
             generateSensorML(id, process, result, configurer);
-        }
-        configurer.importObservations(id, result.observations, result.phenomenons);
-
-        //record location
-        final AbstractGeometryType geom = (AbstractGeometryType) result.spatialBound.getGeometry("2.0.0");
-        if (geom != null) {
-            configurer.updateSensorLocation(id, providerId, geom);
         }
         
         return ok(new AcknowlegementType("Success", "The specified observations have been imported in the SOS"));
@@ -233,6 +229,12 @@ public class SOSServices {
         final AbstractSensorML sml = SensorMLGenerator.getTemplateSensorML(prop, process.type);
 
         configurer.importSensor(id, sml, process.id);
+        
+        //record location
+        final AbstractGeometryType geom = (AbstractGeometryType) result.spatialBound.getGeometry("2.0.0");
+        if (geom != null) {
+            configurer.updateSensorLocation(id, process.id, geom);
+        }
     }
     
     private static SOSConfigurer getConfigurer() throws NotRunningServiceException {
