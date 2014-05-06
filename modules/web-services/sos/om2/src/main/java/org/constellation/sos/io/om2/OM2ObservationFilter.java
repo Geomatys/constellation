@@ -17,37 +17,35 @@
 
 package org.constellation.sos.io.om2;
 
-import java.util.Map;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
+import java.util.Map;
 import java.util.logging.Level;
 import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 import org.apache.sis.storage.DataStoreException;
-
-// Constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.geotoolkit.observation.ObservationFilter;
-import org.geotoolkit.observation.ObservationResult;
 import static org.constellation.sos.io.om2.OM2BaseReader.LOGGER;
-import org.constellation.ws.CstlServiceException;
-
-import static org.constellation.sos.ws.SOSUtils.*;
 import static org.constellation.sos.ws.SOSConstants.*;
 
 // Geotoolkit dependencies
+import static org.constellation.sos.ws.SOSUtils.*;
 import org.geotoolkit.gml.xml.Envelope;
+import org.geotoolkit.observation.ObservationFilter;
+import org.geotoolkit.observation.ObservationResult;
 import org.geotoolkit.observation.ObservationStoreException;
-import org.geotoolkit.sos.xml.ResponseModeType;
-import org.geotoolkit.sos.xml.ObservationOffering;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // GeoAPI dependencies
+import org.geotoolkit.sos.xml.ObservationOffering;
+import org.geotoolkit.sos.xml.ResponseModeType;
+import org.geotoolkit.swe.xml.CompositePhenomenon;
+import org.opengis.observation.Phenomenon;
 import org.opengis.temporal.Instant;
 import org.opengis.temporal.Period;
 
@@ -67,6 +65,8 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
     protected boolean firstFilter = true;
     
     protected QName resultModel;
+    
+    protected boolean getFOI = false;
 
     /**
      * Clone a new Observation Filter.
@@ -77,6 +77,7 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
         super(omFilter);
         this.source                    = omFilter.source;
         this.template                  = false;
+        this.getFOI                    = false;
         resultModel                    = null;
         
     }
@@ -148,6 +149,7 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
         firstFilter = false;
         sqlRequest = new StringBuilder("SELECT distinct sf.* FROM \"om\".\"observations\" o, \"om\".\"sampling_features\" sf "
                                      + "WHERE o.\"foi\" = sf.\"id\"");
+        getFOI = true;
     }
 
     /**
@@ -194,18 +196,57 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
     @Override
     public void setObservedProperties(final List<String> phenomenon) {
         if (!phenomenon.isEmpty()) {
-            final StringBuilder sb = new StringBuilder();
+            final StringBuilder sbPheno = new StringBuilder();
+            final StringBuilder sbCompo = new StringBuilder(" OR \"observed_property\" IN (SELECT \"phenomenon\" FROM \"om\".\"components\" WHERE ");
+            final Set<String> fields    = new HashSet<>();
             for (String p : phenomenon) {
-                sb.append(" \"observed_property\"='").append(p).append("' OR ");
+                sbPheno.append(" \"observed_property\"='").append(p).append("' OR ");
+                sbCompo.append(" \"component\"='").append(p).append("' OR ");
+                fields.addAll(getFieldsForPhenomenon(p));
             }
-            sb.delete(sb.length() - 3, sb.length());
-            if (!firstFilter) {
-                sqlRequest.append(" AND( ").append(sb).append(") ");
+            sbPheno.delete(sbPheno.length() - 3, sbPheno.length());
+            sbCompo.delete(sbCompo.length() - 3, sbCompo.length());
+            sbCompo.append(')');
+            final StringBuilder sbField;
+            if (!getFOI) {
+                sbField = new StringBuilder(" AND (");
+                for (String field : fields) {
+                    if (field.startsWith(phenomenonIdBase)) {
+                        field = field.substring(phenomenonIdBase.length());
+                    }
+                    sbField.append(" \"field_name\"='").append(field).append("' OR ");
+                }
+                sbField.delete(sbField.length() - 3, sbField.length());
+                sbField.append(')');
             } else {
-                sqlRequest.append(sb);
+                sbField = new StringBuilder();
+            }
+            if (!firstFilter) {
+                sqlRequest.append(" AND( ").append(sbPheno).append(sbCompo).append(") ").append(sbField);
+            } else {
+                sqlRequest.append(sbPheno).append(sbCompo).append(sbField);
                 firstFilter = false;
             }
         }
+    }
+    
+    private Set<String> getFieldsForPhenomenon(final String phenomenon) {
+        final Set<String> results = new HashSet<>();
+        try {
+            final Connection c = source.getConnection();
+            final Phenomenon phen = getPhenomenon("1.0.0", phenomenon, c);
+            if (phen instanceof CompositePhenomenon) {
+                final CompositePhenomenon compo = (CompositePhenomenon) phen;
+                for (Phenomenon child : compo.getComponent()) {
+                    results.add(((org.geotoolkit.swe.xml.Phenomenon)child).getName());
+                }
+            } else {
+                results.add(phenomenon);
+            }
+        } catch (SQLException | DataStoreException ex) {
+            LOGGER.log(Level.WARNING, "Exception while reading phenomenon", ex);
+        }
+        return results;
     }
 
     /**

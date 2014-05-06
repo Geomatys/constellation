@@ -582,7 +582,6 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             LOGGER.info(sqlRequest.toString());
             final ResultSet rs                          = currentStatement.executeQuery(sqlRequest.toString());
             final StringBuilder values                  = new StringBuilder();
-            boolean first                               = true;
             final TextBlock encoding;
             final List<String> fieldNames               = getFieldsForGetResult(fieldRequest, c);
             if ("text/csv".equals(responseFormat)) {
@@ -609,7 +608,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                 final String fieldName        = rs.getString("field_name");
 
                 addToMapVal(minVal, maxVal, fieldName, value);
-                
+
                 if (currentTimeMs > (start + step)) {
                     //min
                     long minTime = start + 1000;
@@ -637,7 +636,6 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                     minVal = initMapVal(fieldNames, false);
                     maxVal = initMapVal(fieldNames, true);
                 }
-                
             }
             
             rs.close();
@@ -676,7 +674,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                 minMap.put(field, current);
             }
         } catch (NumberFormatException ex) {
-            LOGGER.finer("unable to parse value:" + value);
+            LOGGER.log(Level.FINER, "unable to parse value:{0}", value);
         }
     }
     

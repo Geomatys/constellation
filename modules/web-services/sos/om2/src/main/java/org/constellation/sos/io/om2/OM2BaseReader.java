@@ -71,7 +71,12 @@ public class OM2BaseReader {
     protected static final SimpleDateFormat format2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S");
     
     public OM2BaseReader(final Map<String, Object> properties) {
-        this.phenomenonIdBase          = (String) properties.get(OMFactory.PHENOMENON_ID_BASE);
+        final String phenID = (String) properties.get(OMFactory.PHENOMENON_ID_BASE);
+        if (phenID == null) {
+            this.phenomenonIdBase      = "";
+        } else {
+            this.phenomenonIdBase      = phenID;
+        }
         this.sensorIdBase              = (String) properties.get(OMFactory.SENSOR_ID_BASE);
         this.observationTemplateIdBase = (String) properties.get(OMFactory.OBSERVATION_TEMPLATE_ID_BASE);
         this.observationIdBase         = (String) properties.get(OMFactory.OBSERVATION_ID_BASE);
@@ -179,64 +184,12 @@ public class OM2BaseReader {
         return buildSamplingFeature(version, id, name, description, prop);
     }
 
-    /*****************************************************************************************************
-     *
-     * DELETE this methode when cstl point on trunk version of geotk-pending
-     *
-     ****************************************************************************************************
-     
-    public static SamplingFeature buildSamplingPolygon(final String version, final String id, final String name, final String description, final FeatureProperty sampledFeature,
-                              final org.geotoolkit.gml.xml.Polygon location, final Double areaValue, final String uom, final Envelope env) {
-        if ("1.0.0".equals(version)) {
-            if (sampledFeature != null && !(sampledFeature instanceof org.geotoolkit.gml.xml.v311.FeaturePropertyType)) {
-                throw new IllegalArgumentException("unexpected object version for sampled feature element");
-            }
-            if (location != null && !(location instanceof org.geotoolkit.gml.xml.v311.PolygonType)) {
-                throw new IllegalArgumentException("unexpected object version for location element");
-            }
-            if (env != null && !(env instanceof org.geotoolkit.gml.xml.v311.EnvelopeType)) {
-                throw new IllegalArgumentException("unexpected object version for env element");
-            }
-            final org.geotoolkit.gml.xml.v311.MeasureType area;
-            if (areaValue != null) {
-                area = new org.geotoolkit.gml.xml.v311.MeasureType(areaValue, uom);
-            } else {
-                area = new org.geotoolkit.gml.xml.v311.MeasureType(0.0, uom);
-            }
-            final org.geotoolkit.gml.xml.v311.SurfacePropertyType sp =  new org.geotoolkit.gml.xml.v311.SurfacePropertyType();
-            sp.setAbstractSurface((org.geotoolkit.gml.xml.v311.PolygonType)location);
-            final org.geotoolkit.sampling.xml.v100.SamplingSurfaceType sst =  new org.geotoolkit.sampling.xml.v100.SamplingSurfaceType();
-            sst.setId(id);
-            sst.setName(name);
-            sst.setDescription(description);
-            // pas de setter corrigé ds le trunk avec le constructeur (org.geotoolkit.gml.xml.v311.FeaturePropertyType)sampledFeature,
-            sst.setShape(sp);
-            sst.setArea(area);
-            sst.setBoundedBy((org.geotoolkit.gml.xml.v311.EnvelopeType)env);
-
-            return sst;
-        } else if ("2.0.0".equals(version)) {
-            if (sampledFeature != null && !(sampledFeature instanceof org.geotoolkit.gml.xml.v321.FeaturePropertyType)) {
-                throw new IllegalArgumentException("unexpected object version for sampled feature element");
-            }
-            if (location != null && !(location instanceof org.geotoolkit.gml.xml.v321.PolygonType)) {
-                throw new IllegalArgumentException("unexpected object version for location element");
-            }
-            return new org.geotoolkit.samplingspatial.xml.v200.SFSpatialSamplingFeatureType(id, name, description, "http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingCurve",
-                                                                          (org.geotoolkit.gml.xml.v321.FeaturePropertyType)sampledFeature,
-                                                                          (org.geotoolkit.gml.xml.v321.PolygonType)location,
-                                                                          (org.geotoolkit.gml.xml.v321.EnvelopeType)env);
-        } else {
-            throw new IllegalArgumentException("unexpected sos version number:" + version);
-        }
-    }*/
-    
     protected Phenomenon getPhenomenon(final String version, final String observedProperty, final Connection c) throws DataStoreException {
         final String id;
         if (observedProperty.startsWith(phenomenonIdBase)) {
             id = observedProperty.substring(phenomenonIdBase.length());
         } else {
-            id = null;
+            id = observedProperty;
         }
         try {
             if (version.equals("2.0.0")) {
