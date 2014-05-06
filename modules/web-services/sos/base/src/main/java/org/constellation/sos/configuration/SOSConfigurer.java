@@ -187,16 +187,37 @@ public class SOSConfigurer extends OGCConfigurer {
     }
     
     public AcknowlegementType removeSensor(final String id, final String sensorID) throws ConfigurationException {
-        final SensorWriter smlWriter = getSensorWriter(id);
+        final SensorWriter smlWriter     = getSensorWriter(id);
+        final SensorReader smlReader     = getSensorReader(id);
         final ObservationWriter omWriter = getObservationWriter(id);
         try {
-            boolean sucess = smlWriter.deleteSensor(sensorID);
-            if (sucess) {
-                omWriter.removeProcedure(sensorID);
-                return new AcknowlegementType("Success", "The specified sensor have been removed in the SOS");
+            final SensorMLTree root = getSensorTree(id);
+            final SensorMLTree tree = root.find(sensorID);
+            
+            // for a System sensor, we delete also his components
+            final List<String> toRemove = new ArrayList<>();
+            if (tree != null) {
+                toRemove.addAll(tree.getAllChildrenIds());
             } else {
-                return new AcknowlegementType("Error", "Unable to remove the sensor from SML datasource.");
+                // tree should no be null
+                toRemove.add(sensorID);
             }
+            for (String sid : toRemove) {
+                smlWriter.deleteSensor(sid);
+                omWriter.removeProcedure(sid);
+            }
+            
+            // if the sensor has a System parent, we must update his component list
+            if (tree != null && tree.getParent() != null) {
+                final String parentID = tree.getParent().getId();
+                if (!"root".equals(parentID)) {
+                    final AbstractSensorML sml = smlReader.getSensor(parentID);
+                    SOSUtils.removeComponent(sml, sensorID);
+                    smlWriter.replaceSensor(parentID, sml);
+                }
+            }
+            
+            return new AcknowlegementType("Success", "The specified sensor have been removed in the SOS");
         } catch (CstlServiceException | DataStoreException ex) {
             throw new ConfigurationException(ex);
         }
@@ -222,7 +243,7 @@ public class SOSConfigurer extends OGCConfigurer {
     }
     
     public SensorMLTree getSensorTree(String id) throws ConfigurationException {
-        final SensorReader reader = getReader(id);
+        final SensorReader reader = getSensorReader(id);
          try {
             final Collection<String> sensorNames = reader.getSensorNames();
             final List<SensorMLTree> values = new ArrayList<>();
@@ -242,7 +263,7 @@ public class SOSConfigurer extends OGCConfigurer {
     }
     
     public Object getSensor(final String id, final String sensorID) throws ConfigurationException {
-        final SensorReader reader = getReader(id);
+        final SensorReader reader = getSensorReader(id);
         try {
             return reader.getSensor(sensorID);
         } catch (CstlServiceException ex) {
@@ -251,7 +272,7 @@ public class SOSConfigurer extends OGCConfigurer {
     }
     
     public int getSensorCount(final String id) throws ConfigurationException {
-        final SensorReader reader = getReader(id);
+        final SensorReader reader = getSensorReader(id);
         try {
             return reader.getSensorCount();
         } catch (CstlServiceException ex) {
@@ -497,7 +518,7 @@ public class SOSConfigurer extends OGCConfigurer {
      * @return A sensor reader.
      * @throws ConfigurationException
      */
-    protected SensorReader getReader(final String serviceID) throws ConfigurationException {
+    protected SensorReader getSensorReader(final String serviceID) throws ConfigurationException {
 
         // we get the CSW configuration file
         final SOSConfiguration config = getServiceConfiguration(serviceID);

@@ -23,6 +23,7 @@ import java.util.Objects;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -37,6 +38,9 @@ public class SensorMLTree {
     private String id;
     
     private List<SensorMLTree> children;
+    
+    @XmlTransient
+    private SensorMLTree parent;
 
     public SensorMLTree() {
         
@@ -75,6 +79,13 @@ public class SensorMLTree {
         this.id = id;
     }
 
+     /**
+     * @return the parent
+     */
+    public SensorMLTree getParent() {
+        return parent;
+    }
+    
     /**
      * @return the children
      */
@@ -83,6 +94,14 @@ public class SensorMLTree {
             children = new ArrayList<>();
         }
         return children;
+    }
+    
+    public void addChildren(final SensorMLTree child) {
+        child.parent = this;
+        if (children == null) {
+            children = new ArrayList<>();
+        }
+        children.add(child);
     }
 
     /**
@@ -100,6 +119,7 @@ public class SensorMLTree {
             if (newChild.getId().equals(child.getId())) {
                 children.remove(child);
                 children.add(newChild);
+                newChild.parent = this;
                 return;
             }
         }
@@ -116,6 +136,30 @@ public class SensorMLTree {
             }
         }
         return false;
+    }
+    
+    public SensorMLTree find(final String id) {
+        if (this.id.equals(id)) {
+            return this;
+        }
+        for (SensorMLTree child : getChildren()) {
+            final SensorMLTree found = child.find(id);
+            if (found != null) {
+                return found;
+            }
+        }
+        return null;
+    }
+    
+    public List<String> getAllChildrenIds() {
+        final List<String> results = new ArrayList<>();
+        results.add(id);
+        for (SensorMLTree child : getChildren()) {
+            if (child != null) {
+                results.addAll(child.getAllChildrenIds());
+            }
+        }
+        return results;
     }
 
     @Override

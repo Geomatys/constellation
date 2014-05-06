@@ -528,6 +528,22 @@ public final class SOSUtils {
         return new ArrayList<>();
     }
     
+    public static void removeComponent(final AbstractSensorML sml, final String component) {
+        if (sml.getMember() != null)  {
+            //assume only one member
+            for (SMLMember member : sml.getMember()) {
+                final AbstractProcess process = member.getRealProcess();
+                if (process instanceof System) {
+                    final System s = (System) process;
+                    final AbstractComponents compos = s.getComponents();
+                    if (compos != null && compos.getComponentList() != null) {
+                        compos.getComponentList().removeComponent(component);
+                    }
+                }
+            }
+        }
+    }
+    
     public static List<SensorMLTree> getChildren(final AbstractProcess process) {
         final List<SensorMLTree> results = new ArrayList<>();
         if (process instanceof System) {
@@ -568,7 +584,7 @@ public final class SOSUtils {
         for (SensorMLTree node : nodeList) {
             final SensorMLTree parent = getParent(node, nodeList);
             if (parent == null) {
-                root.getChildren().add(node);
+                root.addChildren(node);
             } else {
                 parent.replaceChildren(node);
             }
