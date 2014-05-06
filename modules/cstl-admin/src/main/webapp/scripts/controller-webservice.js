@@ -730,7 +730,11 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
             $scope.selectedMetadataChild = item;
         };
         $scope.selectSensorsChild = function(item) {
-            $scope.selectedSensorsChild = item;
+            if ($scope.selectedSensorsChild === item) {
+                $scope.selectedSensorsChild = null;
+            } else {
+                $scope.selectedSensorsChild = item;
+            }
         };
     }]);
 

@@ -544,7 +544,11 @@ cstlAdminApp.service('$dashboard', function($filter) {
         };
 
         $scope.select = function(item) {
-            $scope.selected = item;
+            if ($scope.selected === item) {
+                $scope.selected = null;
+            } else {
+                $scope.selected = item;
+            }
         };
 
         $scope.$watch('nbbypage', function() {
