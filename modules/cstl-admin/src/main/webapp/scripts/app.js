@@ -106,6 +106,10 @@ cstlAdminApp
                     templateUrl: 'views/data.html',
                     controller: 'DataController'
                 })
+                .when('/sensors', {
+                    templateUrl: 'views/sensors.html',
+                    controller: 'SensorsController'
+                })
                 .when('/styles', {
                     templateUrl: 'views/styles.html',
                     controller: 'StylesController'

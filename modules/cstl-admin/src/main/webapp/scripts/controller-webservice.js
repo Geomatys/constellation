@@ -21,7 +21,8 @@ cstlAdminApp.controller('WebServiceController', ['$scope', 'webService', 'provid
           templateUrl: 'views/modalLoader.html',
           controller: 'ModalInstanceCtrl'
         });
-        $scope.services = webService.listAll(function(){
+        webService.listAll(function(response){
+            $scope.services = response;
             modalLoader.close();
         });
 

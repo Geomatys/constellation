@@ -294,6 +294,7 @@
                 "tasks":"Tâches"
             },
             "data": "Données",
+            "sensor": "Capteurs",
             "home": "Accueil",
             "language": "Langue",
             "map-composition": "Compositions cartographiques",
@@ -413,6 +414,7 @@
     "label": {
         "add": "Ajouter",
         "add.data": "Ajouter une donnée",
+        "add.sensors": "Ajouter un capteur",
         "add.style": "Ajouter un style",
         "all": "Tous",
         "all_fem": "Toutes",
@@ -465,6 +467,7 @@
             "description": "Aucune description disponible.",
             "selected": {
                 "data": "Aucune donnée sélectionnée.",
+                "sensor": "Aucun capteur sélectionné.",
                 "layer": "Aucune couche sélectionnée.",
                 "metadata": "Aucune métadonnée sélectionnée.",
                 "style": "Aucun style sélectionné."
@@ -482,7 +485,7 @@
         "return": "Retour",
         "save": "Sauvegarder",
         "search": "Rechercher",
-        "sensor": "Capteur",
+        "sensor": "Observation",
         "sensor.system": "Système de capteurs",
         "success": "Succès",
         "symbols": "Symboles",
@@ -492,6 +495,7 @@
         "validate": "Valider",
         "vector": "Vecteur",
         "count.data":"donnée(s) disponible(s)",
+        "count.sensors": "capteur(s) disponible(s)",
         "count.style": "styles(s) disponible(s)"
     },
     "layer": {
@@ -817,6 +821,7 @@
         "no": {
             "selected": {
                 "data": "Cliquez sur une donnée ci-contre pour afficher plus d'informations.",
+                "sensor": "Cliquez sur un capteur ci-contre pour afficher plus d'informations.",
                 "layer": "Cliquez sur une couche ci-contre pour afficher plus d'informations.",
                 "metadata": "Cliquez sur une fiche de métadonnées ci-contre pour afficher plus d'informations.",
                 "style": "Cliquez sur un style ci-contre pour afficher plus d'informations."
@@ -1142,7 +1147,8 @@
         "create.service.source":"Source",
         "edit.service":"Edition du service",
         "process":"Processus",
-        "tasks":"Tâches"
+        "tasks":"Tâches",
+        "sensors":"Gestion des capteurs"
     },
     "style.information.title":"Styles disponibles",
     "users": {
@@ -1204,5 +1210,6 @@
         "service.source.sensormlfolder":"TODO",
         "data.add.choicedata":"Formats supportés : shp (dans un fichier .zip), NetCDF, tif",
         "style.create":"Vous devez sélectionner une donnée afin de lui associer le style créé."
-    }
+    },
+    "sensors.information.title":"Capteurs disponibles"
 }

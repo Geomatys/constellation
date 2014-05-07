@@ -289,6 +289,7 @@
     "label": {
         "add": "Add",
         "add.data": "Add data",
+        "add.sensors": "Add sensor",
         "add.style": "Add style",
         "all": "All",
         "all_fem": "All",
@@ -323,6 +324,7 @@
         "no.available.style": "No available style.",
         "no.description": "No description available.",
         "no.selected.data": "No selected data.",
+        "no.selected.sensor": "No selected sensor.",
         "no.selected.layer": "No selected layer.",
         "no.selected.metadata": "No selected metadata.",
         "no.selected.style": "No selected style.",
@@ -336,7 +338,7 @@
         "return": "Return",
         "save": "Save",
         "search": "Search",
-        "sensor": "Sensor",
+        "sensor": "Observation",
         "sensor.system": "Sensors system",
         "success": "Success",
         "symbols": " Symbols",
@@ -346,6 +348,7 @@
         "validate": "Validate",
         "vector": "Vector",
         "count.data": "available data",
+        "count.sensors": "available sensors",
         "count.style": "available style(s)"
     },
     "layer.listing": {
@@ -441,6 +444,7 @@
         "edit.style.selected": "Edit the selected style.",
         "no.selected": {
             "data": "Click on a data to display more information.",
+            "sensor": "Click on a sensor to display more information.",
             "layer": "Click on a layer to display more information.",
             "metadata": "Click on a metadata to display more information.",
             "style": "Click on a style to display more information."
@@ -588,6 +592,7 @@
             "home": "Home",
             "web-service": "Web Services ",
             "data": "Data",
+            "sensor": "Sensors",
             "style": "Styles",
             "map-composition": "Map Editor",
             "viewer": "Map Viewer",
@@ -855,7 +860,8 @@
         "create.service.source":"Source",
         "edit.service":"Edit Service",
         "process":"Processes",
-        "tasks":"Tasks"
+        "tasks":"Tasks",
+        "sensors":"Sensors Dashboard"
     },
     "com.codahale.metrics.servlet.AbstractInstrumentedFilter.requests": "Metrics",
     "org.constellation.map.ws.DefaultWMSWorker.getCapabilities": "WMS(getCapabilies)",
@@ -919,5 +925,6 @@
         "service.source.sensormlfolder":"TODO",
         "data.add.choicedata":"Supported formats: shp (in a zip file.), NetCDF, tif",
         "style.create":"You must select a data to associate the style created."
-    }
+    },
+    "sensors.information.title":"Available Sensors"
 }
