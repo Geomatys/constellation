@@ -18,6 +18,7 @@ package org.constellation.ws.rest;
 
 import java.awt.Dimension;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -59,6 +60,9 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import org.apache.sis.geometry.GeneralDirectPosition;
 import org.apache.sis.metadata.iso.DefaultMetadata;
@@ -87,7 +91,6 @@ import org.constellation.provider.DataProviders;
 import org.constellation.provider.FeatureData;
 import org.constellation.provider.Providers;
 import org.constellation.provider.configuration.ProviderParameters;
-import org.constellation.provider.coveragestore.CoverageStoreProvider;
 import org.constellation.scheduler.CstlScheduler;
 import org.constellation.security.SecurityManagerHolder;
 import org.constellation.util.SimplyMetadataTreeNode;
@@ -145,6 +148,7 @@ import org.opengis.util.NoSuchIdentifierException;
 @Path("/1/data/")
 public class DataRest {
 
+    private final XMLInputFactory xif = XMLInputFactory.newFactory();
 
     private static final Logger LOGGER = Logging.getLogger(DataRest.class);
 
@@ -1408,7 +1412,9 @@ public class DataRest {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getIsoMetadata(final @PathParam("providerId") String providerId, final @PathParam("dataId") String dataId) {
         final DefaultMetadata metadata = ConfigurationEngine.loadIsoDataMetadata(providerId, new QName("", dataId), CSWMarshallerPool.getInstance());
-        metadata.prune();
+        if (metadata != null) {
+            metadata.prune(); 
+        }
         return Response.ok(metadata).build();
     }
 
@@ -1500,7 +1506,29 @@ public class DataRest {
         if ("nc".equals(extension) && NetCDFExtractor.isObservationFile(filePath)) {
             r.setDataType("sensor");
         }
+        // look for SML file
+        if ("xml".equals(extension)) {
+            try {
+                String rootMark = getXmlDocumentRoot(filePath);
+                if (rootMark.equals("SensorML")) {
+                    r.setDataType("sensor");
+                }
+            } catch (IOException | XMLStreamException ex) {
+                LOGGER.log(Level.WARNING, "error while reading xml file", ex);
+            }
+            
+        }
         return r;
+    }
+    
+    protected String getXmlDocumentRoot(final String filePath) throws IOException, XMLStreamException {
+        final FileInputStream stream = new FileInputStream(new File(filePath));
+        final XMLStreamReader xsr = xif.createXMLStreamReader(stream);
+        xsr.nextTag();
+        final String rootName = xsr.getLocalName();
+        xsr.close();
+        stream.close();
+        return rootName;
     }
 }
 
