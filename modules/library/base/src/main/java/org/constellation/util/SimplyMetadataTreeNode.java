@@ -19,6 +19,20 @@ public class SimplyMetadataTreeNode {
     private int depthSpan;
     private String parentName;
 
+    public SimplyMetadataTreeNode() {
+        
+    }
+    
+    public SimplyMetadataTreeNode(final String name, final boolean childrenExist, final String nameNoWhiteSpace, 
+            final int depthSpan, final String parentName) {
+        this.name             = name;
+        this.childrenExist    = childrenExist;
+        this.nameNoWhiteSpace = nameNoWhiteSpace;
+        this.depthSpan        = depthSpan;
+        this.parentName       = parentName;
+        
+    }
+    
     public String getName() {
         return name;
     }

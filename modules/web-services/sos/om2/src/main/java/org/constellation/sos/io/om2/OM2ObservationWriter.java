@@ -411,7 +411,12 @@ public class OM2ObservationWriter implements ObservationWriter {
                     } else {
                         if (field.getValue() instanceof Quantity) {
                             final Quantity q = (Quantity)field.getValue();
-                            final String uom  = q.getUom().getCode();
+                            final String uom;
+                            if (q.getUom() != null) {
+                                uom = q.getUom().getCode();
+                            } else {
+                                uom = null;
+                            }
                             final String desc = q.getDefinition();
                             fields.add(new Field("Quantity", field.getName(), desc, uom));
                         } else if (field.getValue() instanceof AbstractText) {

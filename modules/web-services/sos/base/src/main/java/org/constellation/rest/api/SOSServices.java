@@ -223,8 +223,12 @@ public class SOSServices {
         prop.put("id",         process.id);
         prop.put("beginTime",  process.spatialBound.dateStart);
         prop.put("endTime",    process.spatialBound.dateEnd);
-        prop.put("longitude",  process.spatialBound.minx);
-        prop.put("latitude",   process.spatialBound.miny);
+        if (process.spatialBound.minx != null) {
+            prop.put("longitude",  process.spatialBound.minx);
+        }
+        if (process.spatialBound.miny != null) {
+            prop.put("latitude",   process.spatialBound.miny);
+        }
         prop.put("phenomenon", result.fields);
         final List<String> component = new ArrayList<>();
         for (ProcedureTree child : process.children) {

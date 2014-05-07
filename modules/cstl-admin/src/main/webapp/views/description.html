@@ -25,6 +25,9 @@
                 <li id="descriptionTab" ng-hide="missing" ng-class="{active:!missing && type==='vector'}">
                     <a ng-click="selectTab('tabdesc')" data-toggle="tab"><span translate="data.information.tab.title"></span></a>
                 </li>
+                <li id="sensorInfoTab" ng-show="type=='sensor'" ng-class="{active:type==='sensor'}">
+                    <a ng-click="selectTab('tabsensorinfo')" data-toggle="tab">Sensor information</a>
+                </li>
                 <li id="imageInfoTab" ng-show="type=='raster'" ng-class="{active:type==='raster'}">
                     <a ng-click="selectTab('tabimageinfo')" data-toggle="tab"><span translate="metadata.information.tab.title">Picture metadata</span></a>
                 </li>
@@ -105,21 +108,26 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane" ng-class="{active:tabcrs}" ng-show="tabcrs">
+                <div class="tab-pane" ng-class="{active:tabcrs}" ng-if="tabcrs">
                     <div class="row">
                         <div class="col-sm-3">
                             <input type="text" class="form-control" ng-model="crs" value="{{crs}}"/>
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane" ng-class="{active:tabdesc}" ng-show="tabdesc">
+                <div class="tab-pane" ng-class="{active:tabdesc}" ng-if="tabdesc">
                     <div class="row">
                         <div id="mdDesc" ng-init="createMetadataTree('mdDesc',false)"></div>
                     </div>
                 </div>
-                <div class="tab-pane" ng-class="{active:tabimageinfo}" ng-show="tabimageinfo">
+                <div class="tab-pane" ng-class="{active:tabimageinfo}" ng-if="tabimageinfo">
                     <div class="row">
                         <div id="mdImageInfo" ng-init="createMetadataTree('mdImageInfo',true)"></div>
+                    </div>
+                </div>
+                 <div class="tab-pane" ng-class="{active:tabsensorinfo}" ng-if="tabsensorinfo">
+                    <div class="row">
+                        <div id="mdSensorInfo" ng-init="createMetadataTree('mdSensorInfo',false)"></div>
                     </div>
                 </div>
             </div>

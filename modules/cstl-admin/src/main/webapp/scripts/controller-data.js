@@ -164,6 +164,7 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','data
         $scope.tabcrs = false;
         $scope.tabdesc = $scope.type==='vector' && !$scope.missing;
         $scope.tabimageinfo = $scope.type==='raster';
+        $scope.tabsensorinfo = $scope.type==='sensor';
 
         $scope.metadata = {};
         $scope.metadata.keywords = [];
@@ -189,21 +190,31 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','data
                 $scope.tabcrs = false;
                 $scope.tabdesc = false;
                 $scope.tabimageinfo = false;
+                $scope.tabsensorinfo = false;
             } else if (item === 'tabcrs') {
                 $scope.tabiso = false;
                 $scope.tabcrs = true;
                 $scope.tabdesc = false;
                 $scope.tabimageinfo = false;
+                $scope.tabsensorinfo = false;
             } else if (item === 'tabdesc') {
                 $scope.tabiso = false;
                 $scope.tabcrs = false;
                 $scope.tabdesc = true;
                 $scope.tabimageinfo = false;
-            } else {
+                $scope.tabsensorinfo = false;
+            } else if (item === 'tabimageinfo') {
                 $scope.tabiso = false;
                 $scope.tabcrs = false;
                 $scope.tabdesc = false;
                 $scope.tabimageinfo = true;
+                $scope.tabsensorinfo = false;
+            } else {
+                $scope.tabiso = false;
+                $scope.tabcrs = false;
+                $scope.tabdesc = false;
+                $scope.tabimageinfo = false;
+                $scope.tabsensorinfo = true;
             }
         };
 

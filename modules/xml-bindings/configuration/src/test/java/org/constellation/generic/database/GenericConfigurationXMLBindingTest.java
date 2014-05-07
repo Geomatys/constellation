@@ -21,6 +21,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -610,6 +611,8 @@ public class GenericConfigurationXMLBindingTest {
         final ObservationFilter values = new ObservationFilter();
         values.setSensorID("senord:1");
         values.setObservedProperty(Arrays.asList("phen1", "phen2"));
+        values.setStart(new Date(System.currentTimeMillis()));
+        values.setEnd(new Date(System.currentTimeMillis() + 10000));
         StringWriter sw = new StringWriter();
         marshaller.marshal(values, System.out);
     }

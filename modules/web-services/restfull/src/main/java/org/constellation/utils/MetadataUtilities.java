@@ -66,6 +66,9 @@ import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.data.shapefile.ShapefileFeatureStore;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
+import org.geotoolkit.observation.ObservationStore;
+import org.geotoolkit.observation.file.FileObservationStore;
+import org.geotoolkit.observation.xml.XmlObservationStore;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
@@ -77,6 +80,9 @@ import org.opengis.geometry.Envelope;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.ImageCRS;
+import org.opengis.temporal.Instant;
+import org.opengis.temporal.Period;
+import org.opengis.temporal.TemporalGeometricPrimitive;
 import org.opengis.util.GenericName;
 import org.opengis.util.NoSuchIdentifierException;
 import org.w3c.dom.Node;
@@ -169,11 +175,18 @@ public final class MetadataUtilities {
                 break;
                 
             case "sensor":
+                final String extension = Files.getFileExtension(file.getName());
+                final String fileName  = Files.getNameWithoutExtension(file.getName());
+                ObservationStore store = null;
+                if (extension.equalsIgnoreCase("nc")) {
+                    store = new FileObservationStore(file);
+                } else if (extension.equalsIgnoreCase("xml")) {
+                    store = new XmlObservationStore(file);
+                }
                 
-                // TODO
-                final String fileName = Files.getNameWithoutExtension(file.getName());
                 final DataInformation di = new DataInformation(fileName, file.getPath(), dataType, null);
                 di.setPath(file.getPath());
+                di.setFileMetadata(getSensorInformations(fileName, store));
                 return di;
                 
         }
@@ -181,6 +194,62 @@ public final class MetadataUtilities {
     }
 
 
+    public static ArrayList<SimplyMetadataTreeNode> getSensorInformations(final String fileName, final ObservationStore store) {
+        final ArrayList<SimplyMetadataTreeNode> results = new ArrayList<>();
+        final SimplyMetadataTreeNode root = new SimplyMetadataTreeNode(fileName, true, "root", 11, null);
+        results.add(root);
+        
+        final SimplyMetadataTreeNode procedures = new SimplyMetadataTreeNode("Procedures:", true, "procedures", 10, "root");
+        results.add(procedures);
+        int i = 0;
+        for (Name procedure : store.getProcedureNames()) {
+            final SimplyMetadataTreeNode procNode = new SimplyMetadataTreeNode(procedure.getLocalPart(), false, "proc" + i, 9, "procedures");
+            procNode.setValue(procedure.getLocalPart());
+            results.add(procNode);
+        }
+        
+        final SimplyMetadataTreeNode variables = new SimplyMetadataTreeNode("Variables:", true, "variables", 10, "root");
+        results.add(variables);
+        i = 0;
+        for (String phenomenon : store.getPhenomenonNames()) {
+            final SimplyMetadataTreeNode phenNode = new SimplyMetadataTreeNode(phenomenon, false, "phen" + i, 9, "variables");
+            phenNode.setValue(phenomenon);
+            results.add(phenNode);
+            i++;
+        }
+        
+        final SimplyMetadataTreeNode times = new SimplyMetadataTreeNode("Temporal bounds:", true, "times", 10, "root");
+        results.add(times);
+        final TemporalGeometricPrimitive time = store.getTemporalBounds();
+        
+        if (time instanceof Period) {
+            final Period period = (Period) time;
+            final SimplyMetadataTreeNode beginNode = new SimplyMetadataTreeNode("Begin position", false, "time-begin", 9, "times");
+            synchronized(FORMAT) {
+                beginNode.setValue(FORMAT.format(period.getBeginning().getPosition().getDate()));
+            }
+            results.add(beginNode);
+            final SimplyMetadataTreeNode endNode = new SimplyMetadataTreeNode("End position", false, "time-end", 9, "times");
+            synchronized(FORMAT) {
+                endNode.setValue(FORMAT.format(period.getEnding().getPosition().getDate()));
+            }
+            results.add(endNode);
+        } else if (time instanceof Instant) {
+            final Instant instant = (Instant) time;
+            final SimplyMetadataTreeNode beginNode = new SimplyMetadataTreeNode("Position", false, "time-position", 9, "times");
+            synchronized(FORMAT) {
+                beginNode.setValue(FORMAT.format(instant.getPosition().getDate()));
+            }
+            results.add(beginNode);    
+            
+        } else {
+            final SimplyMetadataTreeNode timeNode = new SimplyMetadataTreeNode("Undefined", false, "time-undef", 9, "times");
+            timeNode.setValue("Undefined");
+            results.add(timeNode);
+        }
+        return results;
+    }
+    
     /**
      * @param coverageReader
      * @param metadata
