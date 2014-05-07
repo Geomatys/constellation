@@ -41,6 +41,7 @@ import org.glassfish.jersey.jettison.JettisonMarshaller;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 
 import org.apache.sis.util.logging.Logging;
+import org.constellation.utils.ISOMarshallerPool;
 
 
 /**
@@ -100,9 +101,9 @@ public final class MetadataBodyWriter implements MessageBodyWriter {
                 jsonMarshaller.marshallToJSON(r, out);
             } else {
                 // Default : use xml marshaller
-                final Marshaller m = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+                final Marshaller m = ISOMarshallerPool.getInstance().acquireMarshaller();
                 m.marshal(r, out);
-                GenericDatabaseMarshallerPool.getInstance().recycle(m);
+                ISOMarshallerPool.getInstance().recycle(m);
             }
 
         } catch (JAXBException ex) {
