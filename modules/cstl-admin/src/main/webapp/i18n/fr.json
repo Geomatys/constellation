@@ -185,7 +185,10 @@
             "select": "Sélectionner",
             "sensor.title": "Vue du capteur",
             "server.title": "Fichier serveur",
-            "validate": "Valider"
+            "validate": "Valider",
+            "view.metadata": {
+                "title": "Voir la métadonnée"
+            }
         }
     },
     "edition": {

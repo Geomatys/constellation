@@ -15,8 +15,8 @@
  */
 'use strict';
 
-cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 'webService', 'dataListing', 'provider', 'style', '$modal', '$growl', 'StyleSharedService', '$cookies',
-    function ($scope, $location, $dashboard, webService, dataListing, provider, style, $modal, $growl, StyleSharedService, $cookies) {
+cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 'webService', 'dataListing', 'provider', 'style', 'textService', '$modal', '$growl', 'StyleSharedService', '$cookies',
+    function ($scope, $location, $dashboard, webService, dataListing, provider, style, textService, $modal, $growl, StyleSharedService, $cookies) {
         var modalLoader = $modal.open({
           templateUrl: 'views/modalLoader.html',
           controller: 'ModalInstanceCtrl'
@@ -101,8 +101,21 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
             }
         };
 
+        $scope.displayMetadata = function() {
+            $modal.open({
+                templateUrl: 'views/modalViewMetadata.html',
+                controller: 'ViewMetadataModalController',
+                resolve: {
+                    'details': function(textService){
+                        return textService.metadata($scope.selected.Provider, $scope.selected.Name);
+                    }
+                }
+            });
+        };
 
-
+        $scope.exportData = function() {
+            // todo
+        };
 
         // Style methods
         $scope.showStyleList = function() {
@@ -825,4 +838,13 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
                     }, function() { $growl('error', 'Error', 'Pyramid process failed for ' + $scope.data.Name); });
             }
         };
+    }]);
+
+cstlAdminApp.controller('ViewMetadataModalController', ['$scope', '$modalInstance', 'details',
+    function ($scope, $modalInstance, details) {
+        $scope.details = details.data;
+        $scope.close = function() {
+            $modalInstance.dismiss('close');
+        };
+
     }]);

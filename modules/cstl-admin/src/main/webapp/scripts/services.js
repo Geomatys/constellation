@@ -257,28 +257,6 @@ cstlAdminApp.factory('TaskService', ['$resource',
         });
     }]);
 
-cstlAdminApp.factory('textService', ['$http',
-    function ($http){
-        return {
-            logs : function(type, id){
-                return $http.get('@cstl/api/1/log/'+type+'/'+id+';jsessionid=');
-
-            },
-            capa : function(type, id, version){
-                return $http.get('@cstl/WS/'+type+'/'+id+';jsessionid=?REQUEST=GetCapabilities&SERVICE='+type.toUpperCase()+'&VERSION='+version);
-
-            },
-            createStyleXml : function(provider, styleXml){
-                return $http({
-                    url: '@cstl/api/1/SP/'+provider+'/style;jsessionid=',
-                        method: "PUT",
-                        data: styleXml,
-                        headers: {'Content-Type': 'application/xml'}
-                });
-            }
-        };
-    }]);
-
 cstlAdminApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'authService', '$base64','$cookieStore',
     function ($rootScope, $http, authService, $base64, $cookieStore) {
         return {
@@ -322,6 +300,40 @@ cstlAdminApp.service('$growl', function() {
         }
     };
 });
+
+
+cstlAdminApp.factory('textService', ['$http', '$growl',
+    function ($http, $growl){
+        return {
+            logs : function(type, id){
+                return $http.get('@cstl/api/1/log/'+type+'/'+id+';jsessionid=');
+
+            },
+            capa : function(type, id, version){
+                return $http.get('@cstl/WS/'+type+'/'+id+';jsessionid=?REQUEST=GetCapabilities&SERVICE='+type.toUpperCase()+'&VERSION='+version);
+
+            },
+            createStyleXml : function(provider, styleXml){
+                return $http({
+                    url: '@cstl/api/1/SP/'+provider+'/style;jsessionid=',
+                    method: "PUT",
+                    data: styleXml,
+                    headers: {'Content-Type': 'application/xml'}
+                });
+            },
+            metadata : function(provider, data){
+                var promise = $http({
+                    url: '@cstl/api/1/data/metadata/iso/'+ provider+'/'+ data +';jsessionid=',
+                    method: "GET",
+                    headers: {'Accept': 'application/xml'}
+                });
+                promise.error(function(errorMsg) {
+                    $growl('warning', 'Warning', 'No metadata found for data '+ data);
+                });
+                return promise;
+            }
+        };
+    }]);
 
 cstlAdminApp.factory('StyleSharedService', ['$modal', 'style', 'webService', '$growl',
     function ($modal, style, webService, $growl) {

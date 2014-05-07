@@ -137,7 +137,10 @@
             "select": "Select",
             "sensor.title": "Sensor view",
             "server.title": "Server file",
-            "validate": "Validate"
+            "validate": "Validate",
+            "view.metadata": {
+                "title": "View metadata"
+            }
         }
     },
     "edition.style": {
