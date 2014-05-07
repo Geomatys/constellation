@@ -41,6 +41,7 @@ import java.util.TreeMap;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.Adler32;
 import java.util.zip.CRC32;
 
 import javax.inject.Inject;
@@ -107,6 +108,7 @@ import org.geotoolkit.coverage.xmlstore.XMLCoverageReference;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageStore;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageStoreFactory;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
+import org.geotoolkit.data.memory.ExtendedFeatureStore;
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.feature.xml.Utils;
@@ -121,6 +123,7 @@ import org.geotoolkit.process.ProcessListener;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.ReferencingUtilities;
 import org.geotoolkit.sos.netcdf.NetCDFExtractor;
+import org.geotoolkit.storage.DataFileStore;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.StringUtilities;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -1519,6 +1522,52 @@ public class DataRest {
             
         }
         return r;
+    }
+
+    @GET
+    @Path("export/{providerId}/{dataId}")
+    public Response exportData(final @PathParam("providerId") String providerId, final @PathParam("dataId") String dataId) {
+        final DataProvider provider = DataProviders.getInstance().getProvider(providerId);
+        DataStore store = provider.getMainStore();
+        if (store instanceof ExtendedFeatureStore) {
+            store = ((ExtendedFeatureStore)store).getWrapped();
+        }
+
+        if (!(store instanceof DataFileStore)) {
+            LOGGER.info("No files for this data to export!");
+            return Response.status(500).entity("failed").build();
+        }
+
+        final DataFileStore fileStore = (DataFileStore)store;
+        final File[] filesToSend;
+        try {
+            filesToSend = fileStore.getDataFiles();
+        } catch (DataStoreException ex) {
+            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+            return Response.status(500).entity("failed").build();
+        }
+
+        if (filesToSend.length == 0) {
+            LOGGER.info("No files for this data to export!");
+            return Response.status(500).entity("failed").build();
+        }
+
+        if (filesToSend.length == 1 && !filesToSend[0].isDirectory()) {
+            final File f = filesToSend[0];
+            return Response.ok(f).header("content-disposition", "attachment; filename="+ f.getName()).build();
+        }
+
+        final File zip = new File(System.getProperty("java.io.tmpdir"), "export_data.zip");
+        if (zip.exists()) {
+            zip.delete();
+        }
+        try {
+            FileUtilities.zip(zip, new Adler32(), filesToSend);
+        } catch (IOException ex) {
+            LOGGER.info("Error while zipping data");
+            return Response.status(500).entity("failed").build();
+        }
+        return Response.ok(zip).header("content-disposition", "attachment; filename=" + zip.getName()).build();
     }
     
     protected String getXmlDocumentRoot(final String filePath) throws IOException, XMLStreamException {

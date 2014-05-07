@@ -143,9 +143,9 @@
                             <div class="block-action">
                                 <div class="row" style="padding-bottom: 5px">
                                     <div class="col-sm-6">
-                                        <button type="button" class="btn btn-info" ng-click="exportData()">
+                                        <a id="exportMD" class="btn btn-info" ng-href="{{cstlUrl}}api/1/data/export/{{selected.Provider}}/{{selected.Name}};jsessionid={{cstlSessionId}}">
                                             <i class="icon-download-alt"></i> <span translate="layer.listing.selected.export.button">Export</span>
-                                        </button>
+                                        </a>
                                     </div>
                                     <div class="col-sm-6">
                                         <button type="button" id="seeMetadata" class="btn btn-warning" ng-click="displayMetadata()">

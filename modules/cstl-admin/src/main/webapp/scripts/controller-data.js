@@ -17,6 +17,9 @@
 
 cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 'webService', 'dataListing', 'provider', 'style', 'textService', '$modal', '$growl', 'StyleSharedService', '$cookies',
     function ($scope, $location, $dashboard, webService, dataListing, provider, style, textService, $modal, $growl, StyleSharedService, $cookies) {
+        $scope.cstlUrl = $cookies.cstlUrl;
+        $scope.cstlSessionId = $cookies.cstlSessionId;
+
         var modalLoader = $modal.open({
           templateUrl: 'views/modalLoader.html',
           controller: 'ModalInstanceCtrl'
@@ -38,11 +41,11 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
               controller: 'ModalInstanceCtrl'
             });
             if ($scope.selected.TargetStyle && $scope.selected.TargetStyle.length > 0) {
-                layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, layerName, providerId, $scope.selected.TargetStyle[0].Name);
+                layerData = DataViewer.createLayerWithStyle($scope.cstlUrl, layerName, providerId, $scope.selected.TargetStyle[0].Name);
             } else {
-                layerData = DataViewer.createLayer($cookies.cstlUrl, layerName, providerId);
+                layerData = DataViewer.createLayer($scope.cstlUrl, layerName, providerId);
             }
-            var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
+            var layerBackground = DataViewer.createLayer($scope.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
             DataViewer.layers = [layerData, layerBackground];
 
             dataListing.metadata({providerId: providerId, dataId: layerName}, {}, function(response) {
@@ -113,10 +116,6 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
             });
         };
 
-        $scope.exportData = function() {
-            // todo
-        };
-
         // Style methods
         $scope.showStyleList = function() {
             StyleSharedService.showStyleList($scope);
@@ -147,7 +146,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
         };
 
         $scope.showServerFilePopup = function() {
-            var modal = $modal.open({
+            $modal.open({
                 templateUrl: 'views/modalServerFile.html',
                 controller: 'ServerFileModalController'
             });
