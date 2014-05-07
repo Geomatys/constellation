@@ -21,6 +21,7 @@ ZeroClipboard.config({
 
 /* Controllers */
 
+
 cstlAdminApp.controller('HeaderController', ['$scope','$http',
     function ($scope, $http) {
         $http.get("app/conf").success(function(data){
@@ -35,7 +36,7 @@ cstlAdminApp.controller('MainController', ['$scope','$location','webService','da
             webService.listAll({}, function(response) {
                 var count = 0;
                 for (var i=0; i<response.instance.length; i++) {
-                    if (response.instance[i].status === 'WORKING') {
+                    if (response.instance[i].status === 'WORKING' && response.instance[i].type != 'WEBDAV') {
                         count++;
                     }
                 }

@@ -17,6 +17,11 @@
 
 cstlAdminApp.controller('WebServiceController', ['$scope', 'webService', 'provider', 'csw', 'sos', '$modal', 'textService', '$growl',
     function ($scope, webService, provider, csw, sos, $modal, textService, $growl) {
+
+
+        $scope.typeFilter = {type: '!WEBDAV'};
+
+
         var modalLoader = $modal.open({
           templateUrl: 'views/modalLoader.html',
           controller: 'ModalInstanceCtrl'
@@ -25,6 +30,7 @@ cstlAdminApp.controller('WebServiceController', ['$scope', 'webService', 'provid
             $scope.services = response;
             modalLoader.close();
         });
+
 
         // Show Capa methods
         $scope.showCapa = function(service) {

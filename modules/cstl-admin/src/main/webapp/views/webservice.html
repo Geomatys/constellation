@@ -32,7 +32,7 @@
                     </div>
                     <div class="collapse navbar-collapse">
                         <ul class="nav navbar-nav navbar-right">
-                            <li ng-class="{active:typeFilter == null}"><a ng-click="typeFilter = null">Tous</a></li>
+                            <li ng-class="{active:typeFilter == null}"><a ng-click="typeFilter = {type: '!WEBDAV'}">ALL</a></li>
                             <li ng-class="{active:typeFilter.type === 'WMS'}"><a ng-click="typeFilter = {type: 'WMS'}">WMS</a></li>
                             <li ng-class="{active:typeFilter.type === 'WFS'}"><a ng-click="typeFilter = {type: 'WFS'}">WFS</a></li>
                             <li ng-class="{active:typeFilter.type === 'WCS'}"><a ng-click="typeFilter = {type: 'WCS'}">WCS</a></li>
