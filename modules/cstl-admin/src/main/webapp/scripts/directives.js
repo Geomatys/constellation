@@ -164,4 +164,19 @@ angular.module('cstlAdminApp')
                 });
             }
         };
+    })
+
+    .directive('datetimepicker', function() {
+        return {
+            restrict: 'A',
+            link: function(scope, $element, attrs) {
+                $element.datetimepicker({
+                    language: 'en'
+                });
+
+                $element.on('$destroy', function() {
+                    $element.spectrum('destroy');
+                });
+            }
+        };
     });
