@@ -51,6 +51,7 @@ import org.geotoolkit.observation.xml.OMXmlFactory;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.sos.xml.ResponseModeType;
+import org.geotoolkit.sos.xml.SOSXmlFactory;
 import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
 import org.geotoolkit.swe.xml.AbstractDataComponent;
 import org.geotoolkit.swe.xml.AbstractDataRecord;
@@ -471,6 +472,39 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
         } catch (SQLException | FactoryException  | ParseException ex) {
             throw new DataStoreException(ex.getMessage(), ex);
         }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public TemporalGeometricPrimitive getTimeForProcedure(final String version, final String sensorID) throws DataStoreException {
+        TemporalGeometricPrimitive result = null;
+        try {
+            final Connection c          = source.getConnection();
+            final PreparedStatement stmt = c.prepareStatement("SELECT \"time_begin\", \"time_end\" "
+                                                            + "FROM \"om\".\"offerings\" "
+                                                            + "WHERE \"procedure\"=?");
+            stmt.setString(1, sensorID);
+            final ResultSet rs =  stmt.executeQuery();
+            if (rs.next()) {
+                final Timestamp begin = rs.getTimestamp(1);
+                final Timestamp end   = rs.getTimestamp(2);
+                if (begin != null && end == null) {
+                    result = SOSXmlFactory.buildTimeInstant(version, begin);
+                } else if (begin == null && end != null){
+                    result = SOSXmlFactory.buildTimeInstant(version, begin);
+                } else if (begin != null && end != null) {
+                    result = SOSXmlFactory.buildTimePeriod(version, begin, end);
+                }
+            }
+            rs.close();
+            stmt.close();
+            c.close();
+        } catch (SQLException ex) {
+            throw new DataStoreException("Error while retrieving procedure time.", ex);
+        }
+        return result;
     }
     
     /**

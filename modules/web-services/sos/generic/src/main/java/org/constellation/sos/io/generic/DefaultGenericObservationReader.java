@@ -62,6 +62,7 @@ import org.opengis.observation.Measure;
 import org.opengis.observation.Observation;
 import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.temporal.Period;
+import org.opengis.temporal.TemporalGeometricPrimitive;
 import org.opengis.temporal.TemporalPrimitive;
 
 
@@ -147,6 +148,9 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
         }
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean existPhenomenon(String phenomenonName) throws DataStoreException {
         return getPhenomenonNames().contains(phenomenonName);
@@ -333,9 +337,6 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
         return offerings;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     private PhenomenonType getPhenomenon(String phenomenonName) throws DataStoreException {
         // we remove the phenomenon id base
         if (phenomenonName.contains(phenomenonIdBase)) {
@@ -743,18 +744,35 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
         return Arrays.asList("text/xml; subtype=\"om/1.0.0\"");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Collection<String> getProceduresForPhenomenon(String observedProperty) throws DataStoreException {
         throw new UnsupportedOperationException("Not supported yet in this implementation.");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Collection<String> getPhenomenonsForProcedure(String sensorID) throws DataStoreException {
         throw new UnsupportedOperationException("Not supported yet in this implementation."); 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public AbstractGeometry getSensorLocation(String sensorID, String version) throws DataStoreException {
+        throw new UnsupportedOperationException("Not supported yet in this implementation.");
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public TemporalGeometricPrimitive getTimeForProcedure(final String version, final String sensorID) throws DataStoreException {
         throw new UnsupportedOperationException("Not supported yet in this implementation.");
     }
 }

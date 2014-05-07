@@ -44,6 +44,7 @@ import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.swe.xml.DataArrayProperty;
 import org.opengis.observation.Observation;
 import org.opengis.observation.sampling.SamplingFeature;
+import org.opengis.temporal.TemporalGeometricPrimitive;
 import org.opengis.temporal.TemporalPrimitive;
 
 /**
@@ -435,8 +436,19 @@ public class FileObservationReader implements ObservationReader {
         return Arrays.asList("text/xml; subtype=\"om/1.0.0\"");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public AbstractGeometry getSensorLocation(String sensorID, String version) throws DataStoreException {
+        throw new UnsupportedOperationException("Not supported yet in this implementation.");
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public TemporalGeometricPrimitive getTimeForProcedure(final String version, final String sensorID) throws DataStoreException {
         throw new UnsupportedOperationException("Not supported yet in this implementation.");
     }
 }

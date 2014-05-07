@@ -77,6 +77,7 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.temporal.Instant;
 import org.opengis.temporal.Period;
+import org.opengis.temporal.TemporalGeometricPrimitive;
 import org.opengis.util.FactoryException;
 
 /**
@@ -302,6 +303,15 @@ public class SOSConfigurer extends OGCConfigurer {
         final ObservationReader reader = getObservationReader(id);
         try {
             return reader.getPhenomenonsForProcedure(sensorID);
+        } catch (DataStoreException ex) {
+            throw new ConfigurationException(ex);
+        }
+    }
+    
+    public TemporalGeometricPrimitive getTimeForSensorId(final String id, final String sensorID) throws ConfigurationException {
+        final ObservationReader reader = getObservationReader(id);
+        try {
+            return reader.getTimeForProcedure("2.0.0", sensorID);
         } catch (DataStoreException ex) {
             throw new ConfigurationException(ex);
         }

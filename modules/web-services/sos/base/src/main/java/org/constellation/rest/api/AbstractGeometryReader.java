@@ -31,13 +31,12 @@ import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.geotoolkit.gml.xml.AbstractGeometry;
 import org.geotoolkit.gml.xml.GMLMarshallerPool;
 
 
 /**
- * {@link javax.ws.rs.ext.MessageBodyReader} implementation when POST operation send a {@link org.constellation.configuration.LayerContext}
+ * {@link javax.ws.rs.ext.MessageBodyReader} implementation when POST operation send a {@link org.geotoolkit.gml.xml.AbstractGeometry}
  *
  * @author Benjamin Garcia (Geomatys)
  * @version 0.9

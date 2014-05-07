@@ -131,6 +131,12 @@ public class SOSServices {
         return ok(new StringList(getConfigurer().getObservedPropertiesForSensorId(id, sensorID)));
     }
     
+    @GET
+    @Path("{id}/time/{sensorID}")
+    public Response getTimeForSensor(final @PathParam("id") String id, final @PathParam("sensorID") String sensorID) throws Exception {
+        return ok(getConfigurer().getTimeForSensorId(id, sensorID));
+    }
+    
     @POST
     @Path("{id}/observations")
     public Response getObservations(final @PathParam("id") String id, final ObservationFilter filter) throws Exception {
@@ -215,10 +221,10 @@ public class SOSServices {
     private void generateSensorML(final String id, final ProcedureTree process, final ExtractionResult result, final SOSConfigurer configurer) throws ConfigurationException {
         final Properties prop = new Properties();
         prop.put("id",         process.id);
-        prop.put("beginTime",  result.spatialBound.dateStart);
-        prop.put("endTime",    result.spatialBound.dateEnd);
-        prop.put("longitude",  result.spatialBound.minx);
-        prop.put("latitude",   result.spatialBound.miny);
+        prop.put("beginTime",  process.spatialBound.dateStart);
+        prop.put("endTime",    process.spatialBound.dateEnd);
+        prop.put("longitude",  process.spatialBound.minx);
+        prop.put("latitude",   process.spatialBound.miny);
         prop.put("phenomenon", result.fields);
         final List<String> component = new ArrayList<>();
         for (ProcedureTree child : process.children) {
