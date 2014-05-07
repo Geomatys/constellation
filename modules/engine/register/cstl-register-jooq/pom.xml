@@ -10,6 +10,10 @@
   <groupId>org.constellation.engine.register</groupId>
 
 
+  <properties>
+      <maven.test.skip>true</maven.test.skip>
+  </properties>
+
   <dependencies>
     <dependency>
      <groupId>org.constellation.engine.register</groupId>
@@ -107,13 +111,16 @@
           <execution>
             <phase>generate-sources</phase>
             <goals>
-              <goal>java</goal>
+              <goal>exec</goal>
             </goals>
           </execution>
         </executions>
         <configuration>
-          <mainClass>org.constellation.admin.util.TempDatabase</mainClass>
+          <executable>java</executable>
           <arguments>
+            <argument>-classpath</argument>
+            <classpath/>
+            <argument>org.constellation.admin.util.TempDatabase</argument>
             <argument>/tmp/constellation-build/admin-db</argument>
           </arguments>
         </configuration>
