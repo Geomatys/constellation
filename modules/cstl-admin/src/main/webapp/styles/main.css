@@ -38,6 +38,11 @@ li>a {
 .header .nav>ul{
     list-style: none;
 }
+.img-sensor-menu{
+    width:14px;
+    height:17px;
+    background: transparent url('../images/icon-menu-sensor.png') right center no-repeat;
+}
 body {
     background-color: #f2f2f2;
 }

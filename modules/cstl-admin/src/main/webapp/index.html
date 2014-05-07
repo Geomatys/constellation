@@ -81,7 +81,7 @@
                     <li><a href="#/data"> <span class="glyphicon glyphicon-file"></span>
                         <span translate="global.menu.data">Données</span>
                     </a></li>
-                    <li><a href="#/sensors"> <span class="glyphicon glyphicon-record"></span>
+                    <li><a href="#/sensors" ng-mouseenter="sensorhover = true" ng-mouseleave="sensorhover = false" > <img ng-show="!sensorhover" src="images/icon-menu-sensor.png"><img ng-show="sensorhover" src="images/icon-menu-sensor-selected.png">
                         <span translate="global.menu.sensor">Sensor</span>
                     </a></li>
                     <li><a href="#/styles"> <span class="glyphicon glyphicon-pencil"></span>
