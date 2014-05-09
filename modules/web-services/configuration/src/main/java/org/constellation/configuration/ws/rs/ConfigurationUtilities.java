@@ -257,7 +257,7 @@ public class ConfigurationUtilities {
                     if (providerFile.getName().toLowerCase().contains(SLD_PROVIDER_NAME)) {
                         for (final ProviderFactory factory : styleProxy.getFactories()) {
                             try {
-                                paramReader = new ParameterValueReader(factory.getProviderDescriptor());
+                                paramReader = new ParameterValueReader(wrapSourceDescriptor(factory.getProviderDescriptor()));
                                 paramReader.setInput(providerFile);
                                 sourceGroup = (ParameterValueGroup) paramReader.read();
                                 sources = ParametersExt.getGroups(sourceGroup, SOURCE_DESCRIPTOR_NAME);
@@ -270,7 +270,7 @@ public class ConfigurationUtilities {
                                             ConfigurationEngine.writeProvider(sourceName, null, ProviderRecord.ProviderType.STYLE, factory.getName(), source);
                                         } else {
                                             LOGGER.log(Level.FINE, "Provider cannot be imported. A provider with the same name already exists : " + sourceName);
-                                            break;
+                                            continue;
                                         }
                                     } catch (Exception e) {
                                         // A problem occured while creating the provider, check the next one.
@@ -300,7 +300,7 @@ public class ConfigurationUtilities {
                                             ConfigurationEngine.writeProvider(sourceName, null, ProviderRecord.ProviderType.LAYER, factory.getName(), source);
                                         } else {
                                             LOGGER.log(Level.FINE, "Provider cannot be imported. A provider with the same name already exists : " + sourceName);
-                                            break;
+                                            continue;
                                         }
                                     } catch (Exception e) {
                                         // A problem occured while creating the provider, check the next one.
