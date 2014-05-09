@@ -221,8 +221,12 @@ public class SOSServices {
     private void generateSensorML(final String id, final ProcedureTree process, final ExtractionResult result, final SOSConfigurer configurer) throws ConfigurationException {
         final Properties prop = new Properties();
         prop.put("id",         process.id);
-        prop.put("beginTime",  process.spatialBound.dateStart);
-        prop.put("endTime",    process.spatialBound.dateEnd);
+        if (process.spatialBound.dateStart != null) {
+            prop.put("beginTime",  process.spatialBound.dateStart);
+        }
+        if (process.spatialBound.dateEnd != null) {
+            prop.put("endTime",    process.spatialBound.dateEnd);
+        }
         if (process.spatialBound.minx != null) {
             prop.put("longitude",  process.spatialBound.minx);
         }

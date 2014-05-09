@@ -158,10 +158,12 @@ public class FileSensorReader implements SensorReader {
         if (dataDirectory.isDirectory()) {
             for (File sensorFile : dataDirectory.listFiles()) {
                 String sensorID = sensorFile.getName();
-                final int suffixPos = sensorID.indexOf(".xml");
-                if (suffixPos != -1){
-                    sensorID = sensorID.substring(0, suffixPos);
-                    result.add(sensorID);
+                if (!sensorID.endsWith("~")) {
+                    final int suffixPos = sensorID.indexOf(".xml");
+                    if (suffixPos != -1){
+                        sensorID = sensorID.substring(0, suffixPos);
+                        result.add(sensorID);
+                    }
                 }
             }
         }
