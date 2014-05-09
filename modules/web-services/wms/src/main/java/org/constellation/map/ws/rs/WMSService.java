@@ -635,9 +635,9 @@ public class WMSService extends GridWebService<WMSWorker> {
         } catch (NumberFormatException n) {
             throw new CstlServiceException(n, INVALID_PARAMETER_VALUE, KEY_ELEVATION.toLowerCase());
         }
-        final Date date;
+        final ArrayList<Date> dates = new ArrayList<>();
         try {
-            date = TimeParser.toDate(strTime);
+            TimeParser.parse(strTime, 0l, dates);
         } catch (ParseException ex) {
             throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, KEY_TIME.toLowerCase());
         }
@@ -710,6 +710,6 @@ public class WMSService extends GridWebService<WMSWorker> {
 
         // Builds the request.
         return new GetMap(env, new Version(version), format, namedLayers, styles, sld, elevation,
-                    date, size, background, transparent, azimuth, strExceptions, getParameters());
+                    dates, size, background, transparent, azimuth, strExceptions, getParameters());
     }
 }

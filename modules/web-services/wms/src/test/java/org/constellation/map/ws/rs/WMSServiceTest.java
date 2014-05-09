@@ -175,8 +175,14 @@ public class WMSServiceTest {
         assertEquals(3200d, env2D.getMaximum(0),DELTA);
         assertEquals(560d, env2D.getMaximum(1),DELTA);
 
-        //enevelope 4D
-        Envelope env4D = ReferencingUtilities.combine(parsedQuery.getEnvelope2D(), new Date[]{parsedQuery.getTime(), parsedQuery.getTime()}, new Double[]{parsedQuery.getElevation(), parsedQuery.getElevation()});
+        //envelope 4D
+        final List<Date> times = parsedQuery.getTime();
+        final Date[] dates = new Date[2];
+        if (times != null && !times.isEmpty()) {
+            dates[0] = times.get(0);
+            dates[1] = times.get(times.size()-1);
+        }
+        Envelope env4D = ReferencingUtilities.combine(parsedQuery.getEnvelope2D(), dates, new Double[]{parsedQuery.getElevation(), parsedQuery.getElevation()});
         CoordinateReferenceSystem crs = env4D.getCoordinateReferenceSystem();
         assertEquals(4, crs.getCoordinateSystem().getDimension());
         CoordinateReferenceSystem crs2D = CRSUtilities.getCRS2D(crs);
@@ -255,8 +261,14 @@ public class WMSServiceTest {
         assertEquals(3200d, env2D.getMaximum(0),DELTA);
         assertEquals(560d, env2D.getMaximum(1),DELTA);
 
-        //enevelope 4D
-        Envelope env4D = ReferencingUtilities.combine(parsedQuery.getEnvelope2D(), new Date[]{parsedQuery.getTime(), parsedQuery.getTime()}, new Double[]{parsedQuery.getElevation(), parsedQuery.getElevation()});
+        //envelope 4D
+        final List<Date> times = parsedQuery.getTime();
+        final Date[] dates = new Date[2];
+        if (times != null && !times.isEmpty()) {
+            dates[0] = times.get(0);
+            dates[1] = times.get(times.size()-1);
+        }
+        Envelope env4D = ReferencingUtilities.combine(parsedQuery.getEnvelope2D(), dates, new Double[]{parsedQuery.getElevation(), parsedQuery.getElevation()});
         CoordinateReferenceSystem crs = env4D.getCoordinateReferenceSystem();
         assertEquals(4, crs.getCoordinateSystem().getDimension());
         CoordinateReferenceSystem crs2D = CRSUtilities.getCRS2D(crs);

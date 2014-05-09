@@ -111,7 +111,7 @@ public class XMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
         }
 
         final Envelope objEnv;
-        Date time;
+        List<Date> time;
         Double elevation;
         if (gfi != null && gfi instanceof org.geotoolkit.wms.xml.GetFeatureInfo) {
             org.geotoolkit.wms.xml.GetFeatureInfo wmsGFI = (org.geotoolkit.wms.xml.GetFeatureInfo) gfi;
@@ -165,15 +165,16 @@ public class XMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
             }
             if (dates != null && !(dates.isEmpty())) {
                 if (dates.getMaxValue() != null) {
-                    time = dates.getMaxValue();
+                    time = Collections.singletonList(dates.getMaxValue());
                 }
             }
         }
 
-        if (time != null) {
+        if (time != null && !time.isEmpty()) {
+            // TODO : Manage periods.
             final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
             df.setTimeZone(TimeZone.getTimeZone("UTC"));
-            builder.append(margin).append("<time>").append(encodeXML(df.format(time))).append("</time>").append("\n");
+            builder.append(margin).append("<time>").append(encodeXML(df.format(time.get(time.size()-1)))).append("</time>").append("\n");
         }
 
         if (elevation == null) {

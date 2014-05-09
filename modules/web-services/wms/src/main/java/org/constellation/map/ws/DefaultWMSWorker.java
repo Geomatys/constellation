@@ -986,7 +986,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         final List<MutableStyle> styles        = getStyles(layerConfig, sld, styleNames, userLogin);
         //       -- create the rendering parameter Map
         final Double elevation                 = getFI.getElevation();
-        final Date time                        = getFI.getTime();
+        final List<Date> time                  = getFI.getTime();
         final Map<String, Object> params       = new HashMap<>();
         params.put(WMSQuery.KEY_ELEVATION, elevation);
         params.put(WMSQuery.KEY_TIME, time);
@@ -1005,7 +1005,12 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         // 2. VIEW
         Envelope refEnv;
         try {
-            refEnv = ReferencingUtilities.combine(getFI.getEnvelope2D(), new Date[]{getFI.getTime(), getFI.getTime()}, new Double[]{getFI.getElevation(), getFI.getElevation()});
+            final Date[] dates = new Date[2];
+            if (time != null && !time.isEmpty()) {
+                dates[0] = time.get(0);
+                dates[1] = time.get(time.size()-1);
+            }
+            refEnv = ReferencingUtilities.combine(getFI.getEnvelope2D(), dates, new Double[]{getFI.getElevation(), getFI.getElevation()});
         } catch (TransformException ex) {
             throw new CstlServiceException(ex);
         }
@@ -1267,7 +1272,13 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 getMap.getEnvelope2D().getLowerCorner().getOrdinate(1) > getMap.getEnvelope2D().getUpperCorner().getOrdinate(1)) {
                 throw new CstlServiceException("BBOX parameter minimum is greater than the maximum", INVALID_PARAMETER_VALUE, KEY_BBOX.toLowerCase());
             }
-            refEnv = ReferencingUtilities.combine(getMap.getEnvelope2D(), new Date[]{getMap.getTime(), getMap.getTime()}, new Double[]{getMap.getElevation(), getMap.getElevation()});
+            final List<Date> times = getMap.getTime();
+            final Date[] dates = new Date[2];
+            if (times != null && !times.isEmpty()) {
+                dates[0] = times.get(0);
+                dates[1] = times.get(times.size()-1);
+            }
+            refEnv = ReferencingUtilities.combine(getMap.getEnvelope2D(), dates, new Double[]{getMap.getElevation(), getMap.getElevation()});
         } catch (TransformException ex) {
             throw new CstlServiceException(ex);
         }
@@ -1300,7 +1311,6 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         }
 
         final PortrayalResponse response = new PortrayalResponse(cdef, sdef, vdef, odef);
-
         if(!mapPortrayal.isCoverageWriter()){
             try {
                 response.prepareNow();

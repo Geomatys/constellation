@@ -182,7 +182,7 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
         }
 
         final Envelope objEnv;
-        final Date time;
+        final List<Date> time;
         final Double elevation;
         if (gfi != null && gfi instanceof org.geotoolkit.wms.xml.GetFeatureInfo) {
             org.geotoolkit.wms.xml.GetFeatureInfo wmsGFI = (org.geotoolkit.wms.xml.GetFeatureInfo) gfi;
@@ -218,8 +218,9 @@ public class GMLFeatureInfoFormat extends AbstractTextFeatureInfoFormat {
                         .append("\t\t\t<y>").append(pos.getOrdinate(1)).append("</y>").append("\n");
             }
         }
-        if (time != null) {
-            builder.append("\t\t\t<time>").append(time).append("</time>")
+        if (time != null && !time.isEmpty()) {
+            // TODO : Adapt code to use periods.
+            builder.append("\t\t\t<time>").append(time.get(time.size()-1)).append("</time>")
                     .append("\n");
         } else {
             /*
