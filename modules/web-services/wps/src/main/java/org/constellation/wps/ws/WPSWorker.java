@@ -952,7 +952,6 @@ public class WPSWorker extends AbstractWorker {
              throw new CstlServiceException("Set the storeExecuteResponse to true if you want to see status in response documents.", INVALID_PARAMETER_VALUE, "storeExecuteResponse");
         }
 
-        StatusType status = new StatusType();
         LOGGER.log(Level.INFO, "Process Execute : {0}", request.getIdentifier().getValue());
 
         /*
@@ -1055,6 +1054,7 @@ public class WPSWorker extends AbstractWorker {
                     "WPS_"+getId()+"_"+WPSUtils.buildLayerName(processDesc),
                     wmsSupported);
 
+            StatusType status = new StatusType();
             ////////
             // DOC Async
             ////////
@@ -1070,7 +1070,6 @@ public class WPSWorker extends AbstractWorker {
 
                 process.addListener(new WPSProcessListener(request, responseAsync, respDocFileName, ServiceDef.WPS_1_0_0, parameters));
 
-                status = new StatusType();
                 status.setCreationTime(WPSUtils.getCurrentXMLGregorianCalendar());
                 status.setProcessAccepted("Process "+request.getIdentifier().getValue()+" accepted.");
                 response.setStatus(status);
@@ -1089,7 +1088,6 @@ public class WPSWorker extends AbstractWorker {
                 ////////
                 final Future<ParameterValueGroup> future = WPSService.getExecutor().submit(process);
 
-                status = new StatusType();
                 final ProcessFailedType processFT = new ProcessFailedType();
                 ExceptionReport report = null;
 
