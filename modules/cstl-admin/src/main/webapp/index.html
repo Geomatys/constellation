@@ -66,58 +66,10 @@
                         </ul>
                     </li>
                 </ul>
-                <ul ng-hide="authenticated" class="nav nav-pills pull-right">
-                    <li ng-hide="authenticated"><a href="{{cstlLoginUrl}}" id="authenticateLink"><span
+                <ul class="nav nav-pills pull-right">
+                    <li ><a href="{{cstlLoginUrl}}" id="authenticateLink"><span
                             class="glyphicon glyphicon-log-in"></span> &nbsp;<span
                             translate="global.menu.account.login">Authenticate</span></a></li>
-                </ul>
-                <ul ng-show="authenticated" class="nav nav-pills pull-right">
-                    <li><a href="#"> <span class="glyphicon glyphicon-home"></span>
-                        <span translate="global.menu.home">Accueil</span>
-                    </a></li>
-                    <li><a ng-show="authenticated" href="#/webservice"> <span
-                            class="glyphicon glyphicon-cloud"></span> <span
-                            translate="global.menu.web-service">Services web</span>
-                    </a></li>
-                    <li><a href="#/data"> <span class="glyphicon glyphicon-file"></span>
-                        <span translate="global.menu.data">Données</span>
-                    </a></li>
-                    <li><a href="#/sensors" ng-mouseenter="sensorhover = true" ng-mouseleave="sensorhover = false" > <img ng-show="!sensorhover" src="images/icon-menu-sensor.svg"><img ng-show="sensorhover" src="images/icon-menu-sensor-selected.svg">
-                        <span translate="global.menu.sensor">Sensor</span>
-                    </a></li>
-                    <li><a href="#/styles"> <span class="glyphicon glyphicon-pencil"></span>
-                        <span translate="global.menu.style">Styles</span>
-                    </a></li>
-                    <!--         <li><a href="#/viewer"> <span class="glyphicon glyphicon-picture"></span> -->
-                    <!--             <span translate="global.menu.viewer">visualiseur</span> -->
-                    <!--         </a></li> -->
-                    <li class="dropdown pointer"><a class="dropdown-toggle"
-                                                    data-toggle="dropdown"> <span> <span
-                            class="glyphicon glyphicon-cog"></span> <span
-                            class="hidden-tablet" translate="global.menu.admin.main">
-                                        Administration</span> <b class="caret"></b>
-                            </span>
-                    </a>
-                        <ul class="dropdown-menu" ng-controller="MenuController">
-                            <li ng-show="authenticated"><a href="#/user"><span
-                                    class="glyphicon glyphicon-user"></span> &nbsp;<span
-                                    translate="global.menu.admin.users">Users</span></a></li>
-                            <li ng-show="authenticated"><a href="#/contact"><span
-                                    class="glyphicon glyphicon-envelope"></span> &nbsp;<span
-                                    translate="global.menu.admin.contact">Contact</span></a></li>
-                            <li ng-show="authenticated"><a href="#/metrics"><span
-                                    class="glyphicon glyphicon-tasks"></span> &nbsp;<span
-                                    translate="global.menu.admin.metrics">Metrics</span></a></li>
-                            <li ng-show="authenticated"><a href="#/logs"><span
-                                    class="glyphicon glyphicon-list-alt"></span> &nbsp;<span
-                                    translate="global.menu.admin.logs">Logs</span></a></li>
-                            <li ng-show="authenticated"><a href="{{cstlLogoutUrl}}"><span
-                                    class="glyphicon glyphicon-log-out"></span> &nbsp;<span
-                                    translate="global.menu.admin.logout">Log out</span></a></li>
-                            <li ng-hide="authenticated"><a href="#/login"><span
-                                    class="glyphicon glyphicon-log-in"></span> &nbsp;<span
-                                    translate="global.menu.admin.login">Authenticate</span></a></li>
-                        </ul></li>
                 </ul>
             </div>
         </div>
