@@ -167,10 +167,7 @@ cstlAdminApp
 
             // Call when the 401 response is returned by the client
             $rootScope.$on('event:auth-loginRequired', function(rejection) {
-                $rootScope.authenticated = false;
-                if ($location.path() !== "/" && $location.path() !== "") {
-                    $location.path('/').replace();
-                }
+              window.location.href="index.html";
             });
 
             // Call when the user is authenticated

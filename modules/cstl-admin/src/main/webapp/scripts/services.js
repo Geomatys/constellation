@@ -27,11 +27,15 @@ var cstlUrlPrefix = "@cstl/";
 /*
  * Injection of jessionid for csltSessionId cookie.
  */
-cstlAdminApp.factory('AuthInterceptor', function($cookies) {
+cstlAdminApp.factory('AuthInterceptor', function($rootScope, $cookies) {
     return {
 	    'request': function(config) {
 	    	var url = config.url+'';
 	    	if(url.indexOf(cstlUrlPrefix) == 0){
+	    	  if($cookies.cstlUrl==null){
+	    	    $rootScope.$broadcast('event:auth-loginRequired', null);
+	    	    return
+	    	  }
 	    	  url = $cookies.cstlUrl + url.substring(cstlUrlPrefix.length);
 	    	  var jsessionIdIndex = url.indexOf(";jsessionid=");
 	    	  if(jsessionIdIndex != -1){
