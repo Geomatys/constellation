@@ -750,6 +750,11 @@ public final class Session implements Closeable {
      */
     public void deleteSensor(final String identifier) throws SQLException {
         ensureNonNull("identifier", identifier);
+        //remove children
+        final List<SensorRecord> children = readSensorsFromParent(identifier);
+        for (SensorRecord child : children) {
+            deleteSensor(child.getIdentifier());
+        }
         new Query(DELETE_SENSOR).with(identifier).update();
     }
 

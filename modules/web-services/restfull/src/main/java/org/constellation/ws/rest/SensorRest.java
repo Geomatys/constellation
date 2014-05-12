@@ -27,15 +27,18 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.dao.SensorRecord;
@@ -72,6 +75,13 @@ public class SensorRest {
         }
         final SensorMLTree result = SensorMLTree.buildTree(values);
         return Response.ok(result).build();
+    }
+    
+    @DELETE
+    @Path("{sensorid}")
+    public Response deleteSensor(@PathParam("sensorid") String sensorid) {
+        ConfigurationEngine.deleteSensor(sensorid);
+        return Response.status(200).build();
     }
     
     @PUT
