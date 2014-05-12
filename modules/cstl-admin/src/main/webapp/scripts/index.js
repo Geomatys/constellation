@@ -27,7 +27,7 @@ function findWebappContext(){
 
 /* App Module */
 
-var cstlIndexApp = angular.module('cstlIndexApp', ['http-auth-interceptor', 'ngResource', 'ngRoute', 'ngCookies', 'pascalprecht.translate', 'uiModal', 'hljs', 'base64']);
+var cstlIndexApp = angular.module('cstlIndexApp', ['http-auth-interceptor', 'ngResource', 'ngRoute', 'ngCookies', 'pascalprecht.translate']);
 
 cstlIndexApp
     .config(['$routeProvider', '$httpProvider', '$translateProvider',
