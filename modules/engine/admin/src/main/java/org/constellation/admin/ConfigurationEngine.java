@@ -1170,6 +1170,8 @@ public class ConfigurationEngine {
         db.setDate(record.getDate());
         db.setProvider(record.getProvider().getIdentifier());
         db.setType(record.getType().toString());
+        db.setSensorable(record.isSensorable());
+        db.setUsedAsSensor(record.isUsedAsSensor());
 
         final List<StyleBrief> styleBriefs = new ArrayList<>(0);
         for (StyleRecord styleRecord : styleRecords) {

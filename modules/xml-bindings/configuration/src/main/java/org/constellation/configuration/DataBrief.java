@@ -57,6 +57,12 @@ public final class DataBrief implements Serializable {
     @XmlElement(name="Type")
     private String type;
 
+    @XmlElement(name="Sensorable")
+    private boolean sensorable;
+
+    @XmlElement(name="UsedAsSensor")
+    private boolean usedAsSensor;
+
     @XmlElement(name="Owner")
     private String owner;
 
@@ -122,6 +128,22 @@ public final class DataBrief implements Serializable {
         this.type = type;
     }
 
+    public boolean isSensorable() {
+        return sensorable;
+    }
+
+    public void setSensorable(boolean sensorable) {
+        this.sensorable = sensorable;
+    }
+
+    public boolean isUsedAsSensor() {
+        return usedAsSensor;
+    }
+
+    public void setUsedAsSensor(boolean usedAsSensor) {
+        this.usedAsSensor = usedAsSensor;
+    }
+
     public String getOwner() {
         return owner;
     }
@@ -156,6 +178,8 @@ public final class DataBrief implements Serializable {
                 ", title='" + title + '\'' +
                 ", date=" + date +
                 ", type='" + type + '\'' +
+                ", sensorable='" + sensorable + '\'' +
+                ", usedAsSensor='" + usedAsSensor + '\'' +
                 ", owner='" + owner + '\'' +
                 ", targetStyle=" + targetStyle +
                 '}';

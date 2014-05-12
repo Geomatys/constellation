@@ -164,6 +164,12 @@ public final class DataRecord extends Record {
         session.updateDataSensorable(id, sensorable);
     }
 
+    public boolean isUsedAsSensor() throws SQLException {
+        ensureConnectionNotClosed();
+        final List<SensorRecord> sensors = session.readSensoredDataFromData(this);
+        return !sensors.isEmpty();
+    }
+
     public Date getDate() {
         return date;
     }

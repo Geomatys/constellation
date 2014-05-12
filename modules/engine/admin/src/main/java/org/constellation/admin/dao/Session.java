@@ -1081,14 +1081,14 @@ public final class Session implements Closeable {
         new Query(DELETE_SENSORED_DATA).with(sensor.id, data.id).update();
     }
 
-    public void readSensoredDataFromData(final DataRecord data) throws SQLException {
+    public List<SensorRecord> readSensoredDataFromData(final DataRecord data) throws SQLException {
         ensureNonNull("data",  data);
-        new Query(LIST_SENSORED_DATA_FROM_DATA).with(data.id).select().getAll(SensorRecord.class);
+        return new Query(LIST_SENSORED_DATA_FROM_DATA).with(data.id).select().getAll(SensorRecord.class);
     }
 
-    public void readSensoredDataFromSensor(final SensorRecord sensor) throws SQLException {
+    public List<DataRecord> readSensoredDataFromSensor(final SensorRecord sensor) throws SQLException {
         ensureNonNull("sensor",  sensor);
-        new Query(LIST_SENSORED_DATA_FROM_SENSOR).with(sensor.id).select().getAll(DataRecord.class);
+        return new Query(LIST_SENSORED_DATA_FROM_SENSOR).with(sensor.id).select().getAll(DataRecord.class);
     }
 
     /**************************************************************************
