@@ -476,6 +476,7 @@
                 "style": "Aucun style sélectionné."
             }
         },
+        "observation": "Observation",
         "owner": "Propriétaire",
         "raster": "Raster",
         "related": {
@@ -488,7 +489,7 @@
         "return": "Retour",
         "save": "Sauvegarder",
         "search": "Rechercher",
-        "sensor": "Observation",
+        "sensor": "Sensor",
         "sensor.system": "Système de capteurs",
         "success": "Succès",
         "symbols": "Symboles",
