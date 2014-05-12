@@ -2,8 +2,11 @@ CREATE TABLE "version" (
     "number"   character varying(10) NOT NULL
 );
 
-INSERT INTO "version" VALUES ('1.0.0');
+INSERT INTO "version" VALUES ('1.0.1');
+
 CREATE SCHEMA "om";
+
+CREATE SCHEMA "mesures";
 
 
 CREATE TABLE "om"."observations" (
@@ -53,7 +56,17 @@ CREATE TABLE "om"."observed_properties" (
 CREATE TABLE "om"."procedures" (
     "id"     character varying(200) NOT NULL,
     "shape"  varchar (200) for bit data,
-    "crs"              integer
+    "crs"    integer,
+    "pid"    integer NOT NULL
+);
+
+CREATE TABLE "om"."procedure_descriptions" (
+    "procedure"         character varying(100) NOT NULL,
+    "order"             integer NOT NULL,
+    "field_name"        character varying(30),
+    "field_type"        character varying(30),
+    "field_definition"  character varying(200),
+    "uom"               character varying(20)
 );
 
 CREATE TABLE "om"."sampling_features" (
@@ -89,9 +102,13 @@ ALTER TABLE "om"."observed_properties" ADD CONSTRAINT observed_properties_pk PRI
 
 ALTER TABLE "om"."procedures" ADD CONSTRAINT procedure_pk PRIMARY KEY ("id");
 
+ALTER TABLE "om"."procedure_descriptions" ADD CONSTRAINT procedure_descriptions_pk PRIMARY KEY ("procedure", "field_name");
+
 ALTER TABLE "om"."sampling_features" ADD CONSTRAINT sf_pk PRIMARY KEY ("id");
 
 ALTER TABLE "om"."components" ADD CONSTRAINT components_op_pk PRIMARY KEY ("phenomenon", "component");
+
+ALTER TABLE "om"."procedure_descriptions" ADD CONSTRAINT procedure_desc_fk FOREIGN KEY ("procedure") REFERENCES "om"."procedures"("id");
 
 ALTER TABLE "om"."observations" ADD CONSTRAINT observation_op_fk FOREIGN KEY ("observed_property") REFERENCES "om"."observed_properties"("id");
 

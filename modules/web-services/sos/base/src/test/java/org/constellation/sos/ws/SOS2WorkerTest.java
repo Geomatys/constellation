@@ -1703,7 +1703,7 @@ public abstract class SOS2WorkerTest implements ApplicationContextAware {
         OMObservationType obsResult = (OMObservationType) resultGO.getMember().iterator().next();
 
         Marshaller marshaller = marshallerPool.acquireMarshaller();
-        marshaller.marshal(obsResult, System.out);
+        //marshaller.marshal(obsResult, System.out);
         marshallerPool.recycle(marshaller);
         
         assertTrue(obsResult != null);

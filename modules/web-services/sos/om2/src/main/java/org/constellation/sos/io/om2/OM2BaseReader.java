@@ -231,4 +231,33 @@ public class OM2BaseReader {
             throw new DataStoreException(ex.getMessage(), ex);
         }
     }
+    
+    protected List<Field> readFields(final String procedureID, final Connection c) throws SQLException {
+        final List<Field> results = new ArrayList<>();
+        final PreparedStatement stmt = c.prepareStatement("SELECT  FROM \"om\".\"procedure_descriptions\" WHERE \"procedure\"=? ORDER BY \"order\"");
+        stmt.setString(1, procedureID);
+        final ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            results.add(new Field(rs.getString("field_type"),
+                      rs.getString("field_name"),
+                      rs.getString("field_definition"),
+                      rs.getString("uom")));
+        }
+        return results;
+    }
+    
+    protected static class Field {
+        
+        public String fieldType;
+        public String fieldName;
+        public String fieldDesc;
+        public String fieldUom;
+        
+        public Field(final String fieldType, final String fieldName, final String fieldDesc, final String fieldUom) {
+            this.fieldDesc = fieldDesc;
+            this.fieldName = fieldName;
+            this.fieldType = fieldType;
+            this.fieldUom  = fieldUom;
+        }
+    }
 }
