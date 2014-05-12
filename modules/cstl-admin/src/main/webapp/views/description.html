@@ -25,7 +25,7 @@
                 <li id="descriptionTab" ng-hide="missing" ng-class="{active:!missing && type==='vector'}">
                     <a ng-click="selectTab('tabdesc')" data-toggle="tab"><span translate="data.information.tab.title"></span></a>
                 </li>
-                <li id="sensorInfoTab" ng-show="type=='sensor'" ng-class="{active:type==='sensor'}">
+                <li id="sensorInfoTab" ng-show="type=='observation'" ng-class="{active:type==='observation'}">
                     <a ng-click="selectTab('tabsensorinfo')" data-toggle="tab">Sensor information</a>
                 </li>
                 <li id="imageInfoTab" ng-show="type=='raster'" ng-class="{active:type==='raster'}">

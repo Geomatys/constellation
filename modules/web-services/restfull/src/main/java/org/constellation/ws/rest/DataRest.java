@@ -1507,14 +1507,14 @@ public class DataRest {
         
         // look for observation netcdf
         if ("nc".equals(extension) && NetCDFExtractor.isObservationFile(filePath)) {
-            r.setDataType("sensor");
+            r.setDataType("observation");
         }
         // look for SML file (available for data import ?)
         if ("xml".equals(extension)) {
             try {
                 String rootMark = getXmlDocumentRoot(filePath);
                 if (rootMark.equals("SensorML")) {
-                    r.setDataType("sensor");
+                    r.setDataType("observation");
                 }
             } catch (IOException | XMLStreamException ex) {
                 LOGGER.log(Level.WARNING, "error while reading xml file", ex);

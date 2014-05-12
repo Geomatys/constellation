@@ -63,7 +63,7 @@ public class ObservationStoreProvider extends AbstractDataProvider {
 
     @Override
     public DataRecord.DataType getDataType() {
-        return DataRecord.DataType.SENSOR;
+        return DataRecord.DataType.OBSERVATION;
     }
 
     @Override

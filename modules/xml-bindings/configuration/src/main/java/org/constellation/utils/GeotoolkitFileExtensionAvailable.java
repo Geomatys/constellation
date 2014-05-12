@@ -49,7 +49,7 @@ public final class GeotoolkitFileExtensionAvailable extends Static {
         }
         
         // for O&M files
-        extensions.put("xml", "sensor");
+        extensions.put("xml", "observation");
         
         return extensions;
     }

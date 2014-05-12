@@ -174,7 +174,7 @@ public final class MetadataUtilities {
                 }
                 break;
                 
-            case "sensor":
+            case "observation":
                 final String extension = Files.getFileExtension(file.getName());
                 final String fileName  = Files.getNameWithoutExtension(file.getName());
                 ObservationStore store = null;

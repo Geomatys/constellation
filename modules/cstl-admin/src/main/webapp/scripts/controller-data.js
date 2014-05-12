@@ -163,7 +163,7 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','data
         $scope.tabcrs = false;
         $scope.tabdesc = $scope.type==='vector' && !$scope.missing;
         $scope.tabimageinfo = $scope.type==='raster';
-        $scope.tabsensorinfo = $scope.type==='sensor';
+        $scope.tabsensorinfo = $scope.type==='observation';
 
         $scope.metadata = {};
         $scope.metadata.keywords = [];
@@ -490,7 +490,7 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                                     displayNetCDF(fileName);
                                 }
                             });
-                        } else if ($scope.uploadType === "sensor" && fileExtension === "xml") {
+                        } else if ($scope.uploadType === "observation" && fileExtension === "xml") {
                             provider.create({
                                 id: fileName
                             }, {
@@ -505,11 +505,11 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                                 }
 
                                 $growl('success','Success','Observation data '+ fileName +' successfully added');
-                                $modalInstance.close({type: "sensor", file: fileName, missing: $scope.metadata == null});
+                                $modalInstance.close({type: "observation", file: fileName, missing: $scope.metadata == null});
                                 
                             });
                             
-                        } else if ($scope.uploadType === "sensor") {
+                        } else if ($scope.uploadType === "observation") {
                             provider.create({
                                 id: fileName
                             }, {
@@ -525,7 +525,7 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
 
                                 if (!fileExtension || fileExtension !== "nc") {
                                     $growl('success','Success','Observation data '+ fileName +' successfully added');
-                                    $modalInstance.close({type: "sensor", file: fileName, missing: $scope.metadata == null});
+                                    $modalInstance.close({type: "observation", file: fileName, missing: $scope.metadata == null});
                                 } else {
                                     displayNetCDF(fileName);
                                 }
