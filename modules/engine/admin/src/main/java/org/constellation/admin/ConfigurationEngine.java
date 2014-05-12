@@ -913,6 +913,62 @@ public class ConfigurationEngine {
         return new ArrayList<>();
     }
 
+    public static SensorRecord getSensor(final String sensorID) {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            return session.readSensor(sensorID);
+
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while reading service database", ex);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+        return null;
+    }
+    
+    public static void deleteSensor(final String sensorID) {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            session.deleteSensor(sensorID);
+
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+    }
+
+    public static SensorRecord writeSensor(final String identifier, final String type, final String parent) {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+
+            String login = null;
+            try {
+                login = securityManager.getCurrentUserLogin();
+            } catch (NoSecurityManagerException ex) {
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+            }
+
+            if (login == null) {
+                // FIXME Wahhhhhhhhh !
+                login = "admin";
+            }
+            return session.writeSensor(identifier, type, parent, login);
+
+        } catch (SQLException | IOException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while writing sensor in database", ex);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+        return null;
+    }
+    
     /**
      * Load a metadata for a provider.
      * 

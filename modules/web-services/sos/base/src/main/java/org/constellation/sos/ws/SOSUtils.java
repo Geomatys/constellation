@@ -31,7 +31,6 @@ import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.dto.SensorMLTree;
 import org.constellation.util.ReflectionUtilities;
-import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.AbstractFeature;
 import org.geotoolkit.gml.xml.AbstractGeometry;
 import org.geotoolkit.gml.xml.BoundingShape;
@@ -41,17 +40,15 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.sml.xml.AbstractClassification;
 import org.geotoolkit.sml.xml.AbstractClassifier;
 import org.geotoolkit.sml.xml.AbstractComponents;
-import org.geotoolkit.sml.xml.AbstractDataSource;
 import org.geotoolkit.sml.xml.AbstractDerivableComponent;
 import org.geotoolkit.sml.xml.AbstractIdentification;
 import org.geotoolkit.sml.xml.AbstractIdentifier;
 import org.geotoolkit.sml.xml.AbstractProcess;
 import org.geotoolkit.sml.xml.AbstractProcessChain;
-import org.geotoolkit.sml.xml.AbstractProcessModel;
 import org.geotoolkit.sml.xml.AbstractSensorML;
-import org.geotoolkit.sml.xml.Component;
 import org.geotoolkit.sml.xml.ComponentProperty;
 import org.geotoolkit.sml.xml.SMLMember;
+import static org.geotoolkit.sml.xml.SensorMLUtilities.*;
 import org.geotoolkit.sml.xml.System;
 import org.geotoolkit.sos.xml.SOSXmlFactory;
 import org.geotoolkit.swe.xml.AbstractEncoding;
@@ -100,34 +97,6 @@ public final class SOSUtils {
         return null;
     }
     
-    public static String getSmlID(final AbstractSensorML sensor) {
-        if (sensor != null && sensor.getMember().size() > 0) {
-            final AbstractProcess process = sensor.getMember().get(0).getRealProcess();
-            return getSmlID(process);
-        }
-        return "unknow_identifier";
-    }
-    
-    public static String getSmlID(final AbstractProcess process) {
-        final List<? extends AbstractIdentification> idents = process.getIdentification();
-
-        for(AbstractIdentification ident : idents) {
-            if (ident.getIdentifierList() != null) {
-                for (AbstractIdentifier identifier: ident.getIdentifierList().getIdentifier()) {
-                    if ("uniqueID".equals(identifier.getName()) && identifier.getTerm() != null) {
-                        return identifier.getTerm().getValue();
-                    }
-                }
-            }
-        }
-
-        // else look for simple id mark
-        if (process.getId() != null) {
-            return process.getId();
-        }
-        return "unknow_identifier";
-    }
-
     /**
      * Return the networks names binded to this sensor.
      *
@@ -491,43 +460,6 @@ public final class SOSUtils {
         return false;
     }
     
-    public static String getSensorMLType(final AbstractSensorML sml) {
-        if (sml.getMember() != null)  {
-            //assume only one member
-            for (SMLMember member : sml.getMember()) {
-                final AbstractProcess process = member.getRealProcess();
-                return getSensorMLType(process);
-            }
-        }
-        return "unknow";
-    }
-    
-    public static String getSensorMLType(final AbstractProcess process) {
-        if (process instanceof System) {
-            return "System";
-        } else if (process instanceof AbstractProcessChain) {
-            return "ProcessChain";
-        } else if (process instanceof Component) {
-            return "Component";
-        } else if (process instanceof AbstractDataSource) {
-            return "DataSource";
-        } else if (process instanceof AbstractProcessModel) {
-            return "ProcessModel";
-        }
-        return "unknow";
-    }
-    
-     public static List<SensorMLTree> getChildren(final AbstractSensorML sml) {
-        if (sml.getMember() != null)  {
-            //assume only one member
-            for (SMLMember member : sml.getMember()) {
-                final AbstractProcess process = member.getRealProcess();
-                return getChildren(process);
-            }
-        }
-        return new ArrayList<>();
-    }
-    
     public static void removeComponent(final AbstractSensorML sml, final String component) {
         if (sml.getMember() != null)  {
             //assume only one member
@@ -542,6 +474,17 @@ public final class SOSUtils {
                 }
             }
         }
+    }
+    
+    public static List<SensorMLTree> getChildren(final AbstractSensorML sml) {
+        if (sml.getMember() != null)  {
+            //assume only one member
+            for (SMLMember member : sml.getMember()) {
+                final AbstractProcess process = member.getRealProcess();
+                return getChildren(process);
+            }
+        }
+        return new ArrayList<>();
     }
     
     public static List<SensorMLTree> getChildren(final AbstractProcess process) {

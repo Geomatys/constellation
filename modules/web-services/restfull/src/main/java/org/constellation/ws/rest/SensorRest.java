@@ -17,8 +17,14 @@
 
 package org.constellation.ws.rest;
 
+import java.io.File;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -27,11 +33,17 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.dao.SensorRecord;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SensorMLTree;
+import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
+import static org.geotoolkit.sml.xml.SensorMLUtilities.*;
 
 /**
  *
@@ -68,7 +80,67 @@ public class SensorRest {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response importSensor(final ParameterValues pv) {
         final String path = pv.get("path");
-        // TODO add to database
-        return Response.ok(null).build();
+        final File imported = new File(path);
+        try {
+            if (imported.isDirectory()) {
+                final Map<String, List<String>> parents = new HashMap<>();
+                final List<File> files = getFiles(imported);
+                for (File f : files) {
+                    final AbstractSensorML sml  = unmarshallSensor(f);
+                    final String type           = getSensorMLType(sml);
+                    final String sensorID       = getSmlID(sml);
+                    final List<String> children = getChildrenIdentifiers(sml);
+                    ConfigurationEngine.writeSensor(sensorID, type, null);
+                    parents.put(sensorID, children);
+                }
+                // update dependencies
+                for (Entry<String, List<String>> entry : parents.entrySet()) {
+                    for (String child : entry.getValue()) {
+                        final SensorRecord childRecord = ConfigurationEngine.getSensor(child);
+                        childRecord.setParentIdentifier(entry.getKey());
+                    }
+                }
+            } else {
+                final AbstractSensorML sml = unmarshallSensor(imported);
+                final String type          = getSensorMLType(sml);
+                final String sensorID      = getSmlID(sml);
+                ConfigurationEngine.writeSensor(sensorID, type, null);
+            }
+        } catch (JAXBException ex) {
+            LOGGER.log(Level.WARNING, "Error while reading sensorML file", ex);
+            return Response.status(500).entity("fail to read sensorML file").build();
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "Error while storing sensor record", ex);
+            return Response.status(500).entity("Error while storing sensor record").build();
+        }
+        return Response.status(200).build();
+    }
+    
+    private List<File> getFiles(final File directory) {
+        final List<File> results = new ArrayList<>();
+        if (directory.isDirectory()) {
+            for (File f : directory.listFiles()) {
+                if (f.isDirectory()) {
+                    results.addAll(getFiles(f));
+                } else {
+                    results.add(f);
+                }
+            }
+        } else {
+            results.add(directory);
+        }
+        return results;
+    }
+    
+    private static AbstractSensorML unmarshallSensor(final File f) throws JAXBException {
+        final Unmarshaller um = SensorMLMarshallerPool.getInstance().acquireUnmarshaller();
+        Object obj = um.unmarshal(f);
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement)obj).getValue();
+        }
+        if (obj instanceof AbstractSensorML) {
+            return (AbstractSensorML)obj;
+        }
+        return null;
     }
 }

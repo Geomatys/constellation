@@ -45,7 +45,6 @@ import org.constellation.dto.Service;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.metadata.io.MetadataIoException;
-import org.constellation.metadata.utils.Utils;
 import org.constellation.ogc.configuration.OGCConfigurer;
 import org.constellation.sos.factory.OMFactory;
 import org.constellation.sos.factory.SMLFactory;
@@ -79,6 +78,7 @@ import org.opengis.temporal.Instant;
 import org.opengis.temporal.Period;
 import org.opengis.temporal.TemporalGeometricPrimitive;
 import org.opengis.util.FactoryException;
+import static org.geotoolkit.sml.xml.SensorMLUtilities.*;
 
 /**
  * {@link org.constellation.configuration.ServiceConfigurer} implementation for SOS service.
@@ -161,7 +161,7 @@ public class SOSConfigurer extends OGCConfigurer {
             for (File importedFile: files) {
                 if (importedFile != null) {
                     final AbstractSensorML sensor = unmarshallSensor(importedFile);
-                    final String sensorID = Utils.findIdentifier(sensor);
+                    final String sensorID = getSmlID(sensor);
                     writer.writeSensor(sensorID, sensor);
                 } else {
                     throw new ConfigurationException("An imported file is null");
@@ -250,9 +250,9 @@ public class SOSConfigurer extends OGCConfigurer {
             final List<SensorMLTree> values = new ArrayList<>();
             for (String sensorID : sensorNames) {
                 final AbstractSensorML sml = reader.getSensor(sensorID);
-                final String smlType = SOSUtils.getSensorMLType(sml);
-                final String smlID   = SOSUtils.getSmlID(sml);
-                final SensorMLTree t = new SensorMLTree(smlID, smlType);
+                final String smlType       = getSensorMLType(sml);
+                final String smlID         = getSmlID(sml);
+                final SensorMLTree t       = new SensorMLTree(smlID, smlType);
                 final List<SensorMLTree> children = SOSUtils.getChildren(sml);
                 t.setChildren(children);
                 values.add(t);
