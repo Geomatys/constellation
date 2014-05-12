@@ -15,15 +15,14 @@
  */
 'use strict';
 
-cstlAdminApp.controller('SensorsController', ['$scope', '$dashboard', 'webService', 'dataListing', '$modal',
-    function ($scope, $dashboard, webService, dataListing, $modal){
+cstlAdminApp.controller('SensorsController', ['$scope', '$dashboard', 'webService', 'sensor', '$modal',
+    function ($scope, $dashboard, webService, sensor, $modal){
     	var modalLoader = $modal.open({
           templateUrl: 'views/modalLoader.html',
           controller: 'ModalInstanceCtrl'
         });
-        dataListing.listAll({}, function(response) {
-            $dashboard($scope, response, true);
-            $scope.filtertype= "observation";
+        sensor.list({}, function(response) {
+            $dashboard($scope, response.children, false);
             modalLoader.close();
         }, function() {
             modalLoader.close();
@@ -42,9 +41,22 @@ cstlAdminApp.controller('SensorsController', ['$scope', '$dashboard', 'webServic
                 controller: 'SensorAddModalController'
             });
 
-            modal.result.then(function(result) {
-
+            modal.result.then(function() {
+                sensor.list({}, function(sensors) {
+                    $dashboard($scope, sensors.children, false);
+                });
+                modal.close();
             });
+        };
+
+        $scope.selectedSensorsChild = null;
+
+        $scope.selectSensorsChild = function(item) {
+            if ($scope.selectedSensorsChild === item) {
+                $scope.selectedSensorsChild = null;
+            } else {
+                $scope.selectedSensorsChild = item;
+            }
         };
 	}]);
 
