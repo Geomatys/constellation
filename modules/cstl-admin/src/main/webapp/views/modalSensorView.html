@@ -34,11 +34,11 @@
                     <div class="sos_edit_graph" id="graph" ng-init="test=false">
                         <div ng-class="{'sos_edit_graph_date-selected':test==true, 'sos_edit_graph_date':test==false}" style="padding:0; right:15px;position:absolute; text-align:right;">
                             <div class="btn-lg calendar-button" style="cursor:pointer;" ng-click="test=!test"><span class="glyphicon glyphicon-calendar"></span></div>
-                            <div ng-show="test==true" class="form-inline form-calendar" style="width:351px;">
+                            <div ng-show="test==true" class="form-inline form-calendar" style="width:381px;">
                                 <label class="control-label" translate="service.edit.dashboard.date.from">From</label>
-                                <input type="text" class="form-control" style="width:145px;" datetimepicker ng-model="var.start"/>
+                                <input type="text" class="form-control" style="width:160px;" datetimepicker ng-model="var.start"/>
                                 <label class="control-label" translate="service.edit.dashboard.date.to"> to</label>
-                                <input type="text" class="form-control" style="width:145px;" datetimepicker ng-model="var.end"/>
+                                <input type="text" class="form-control" style="width:160px;" datetimepicker ng-model="var.end"/>
                             </div>
                         </div>
                     </div>

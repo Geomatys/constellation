@@ -171,11 +171,12 @@ angular.module('cstlAdminApp')
             restrict: 'A',
             link: function(scope, $element, attrs) {
                 $element.datetimepicker({
-                    language: 'en'
+                    format: 'yyyy-mm-dd hh:ii:ss',
+                    autoclose: true
                 });
 
                 $element.on('$destroy', function() {
-                    $element.spectrum('destroy');
+                    $element.datetimepicker('destroy');
                 });
             }
         };
