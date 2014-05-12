@@ -24,7 +24,7 @@
         <message.reloading.enabled>true</message.reloading.enabled>
         <!-- log configuration -->
         <logback.loglevel>DEBUG</logback.loglevel>
-        <cstl.url>http://localhost:8080/constellation/</cstl.url>
+        <cstl.url>http://localhost:8180/constellation/</cstl.url>
 
         <!-- development database configuration -->
         <datasource.datasourceclassname>org.hsqldb.jdbc.JDBCDataSource</datasource.datasourceclassname>
