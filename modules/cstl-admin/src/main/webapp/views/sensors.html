@@ -9,7 +9,7 @@
         </div>
     </div>
 </div>
-<div id="dataDashboard" class="row">
+<div id="dataDashboard" class="row" ng-init="init()">
     <div class="col-sm-12">
         <div class="frame dashboard">
             <div class="navbar navbar-default" style="margin-bottom: 0px;">
@@ -137,12 +137,12 @@
                             <div class="block-action">
                                 <div class="row">
                                     <div class="col-sm-6">
-                                        <button class="btn btn-success" type="button" ng-click="showSensor()" ng-show="service.status=='WORKING'">
+                                        <button class="btn btn-success" type="button" ng-click="showSensor()">
                                             <i class="icon-map-marker"></i> <span translate="layer.listing.selected.data.button">View</span>
                                         </button>
                                     </div>
                                     <div class="col-sm-6">
-                                        <button type="button" class="btn btn-danger" ng-click="deleteLayer();">
+                                        <button type="button" class="btn btn-danger" ng-click="deleteSensor();">
                                             <i class="icon-trash"></i> <span translate="layer.listing.selected.delete.button">Delete</span>
                                         </button>
                                     </div>

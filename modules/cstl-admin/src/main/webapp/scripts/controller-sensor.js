@@ -15,18 +15,20 @@
  */
 'use strict';
 
-cstlAdminApp.controller('SensorsController', ['$scope', '$dashboard', 'webService', 'sensor', '$modal',
-    function ($scope, $dashboard, webService, sensor, $modal){
-    	var modalLoader = $modal.open({
-          templateUrl: 'views/modalLoader.html',
-          controller: 'ModalInstanceCtrl'
-        });
-        sensor.list({}, function(response) {
-            $dashboard($scope, response.children, false);
-            modalLoader.close();
-        }, function() {
-            modalLoader.close();
-        });
+cstlAdminApp.controller('SensorsController', ['$scope', '$dashboard', 'webService', 'sensor', '$modal', '$growl',
+    function ($scope, $dashboard, webService, sensor, $modal, $growl){
+        $scope.init = function() {
+            var modalLoader = $modal.open({
+                templateUrl: 'views/modalLoader.html',
+                controller: 'ModalInstanceCtrl'
+            });
+            sensor.list({}, function(response) {
+                $dashboard($scope, response.children, false);
+                modalLoader.close();
+            }, function() {
+                modalLoader.close();
+            });
+        };
 
         $scope.toggleUpDownSelected = function() {
             var $header = $('#dataDashboard').find('.selected-item').find('.block-header');
@@ -44,8 +46,8 @@ cstlAdminApp.controller('SensorsController', ['$scope', '$dashboard', 'webServic
             modal.result.then(function() {
                 sensor.list({}, function(sensors) {
                     $dashboard($scope, sensors.children, false);
+                    $scope.init();
                 });
-                modal.close();
             });
         };
 
@@ -58,7 +60,19 @@ cstlAdminApp.controller('SensorsController', ['$scope', '$dashboard', 'webServic
                 $scope.selectedSensorsChild = item;
             }
         };
-	}]);
+
+        $scope.deleteSensor = function() {
+            if (confirm("Are you sure?")) {
+                var idToDel = ($scope.selectedSensorsChild !== null) ? $scope.selectedSensorsChild.id : $scope.selected.id;
+                sensor.delete({sensor: idToDel}, function () {
+                    $growl('success', 'Success', 'Sensor ' + idToDel + ' successfully removed');
+                    $scope.init();
+                }, function () {
+                    $growl('error', 'Error', 'Unable to remove sensor ' + idToDel);
+                });
+            }
+        };
+    }]);
 
 cstlAdminApp.controller('SensorAddModalController', ['$scope', '$modalInstance', 'sensor', '$growl', '$cookies',
     function ($scope, $modalInstance, sensor, $growl, $cookies) {
@@ -88,8 +102,10 @@ cstlAdminApp.controller('SensorAddModalController', ['$scope', '$modalInstance',
         function importSensor(path) {
             sensor.add({}, {values: {'path' : path}}, function() {
                 $growl('success','Success','Sensor correctly imported');
+                $modalInstance.close();
             }, function() {
                 $growl('error','Error','Unable to import sensor');
+                $modalInstance.dismiss('close');
             });
         }
     }]);
