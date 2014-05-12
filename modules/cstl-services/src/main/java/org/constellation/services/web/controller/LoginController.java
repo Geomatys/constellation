@@ -39,6 +39,12 @@ public class LoginController {
 	private void storeCstlAdmin(HttpServletRequest request,
 			HttpServletResponse response) {
 		String adminUrl = request.getHeader("REFERER");
+		if(adminUrl!=null) {
+		    int i = adminUrl.indexOf("index.html");
+		    if(i>0) {
+		        adminUrl = adminUrl.substring(0, i);
+		    }
+		}
 		
 		Cookie cookie = new Cookie("cstlAdmin", adminUrl);
 		cookie.setPath("/constellation/spring/auth/");
