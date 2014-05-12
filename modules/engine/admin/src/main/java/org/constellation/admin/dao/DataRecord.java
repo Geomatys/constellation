@@ -51,6 +51,7 @@ public final class DataRecord extends Record {
     private int provider;
     private DataType type;
     private boolean visible;
+    private boolean sensorable;
     private final Date date;
     private final int title;
     private final int description;
@@ -58,7 +59,7 @@ public final class DataRecord extends Record {
     private String metadataId;
 
     DataRecord(final Session session, final int id, final String name, final String namespace, final int provider, final DataType type,
-               final boolean visible, final Date date, final int title, final int description, final String owner, final String metadataId) {
+               final boolean visible, final boolean sensorable, final Date date, final int title, final int description, final String owner, final String metadataId) {
         this.session     = session;
         this.id          = id;
         this.name        = name;
@@ -66,6 +67,7 @@ public final class DataRecord extends Record {
         this.provider    = provider;
         this.type        = type;
         this.visible     = visible;
+        this.sensorable  = sensorable;
         this.date        = date;
         this.title       = title;
         this.description = description;
@@ -80,11 +82,12 @@ public final class DataRecord extends Record {
                 rs.getInt(4),
                 DataType.valueOf(rs.getString(5)),
                 rs.getBoolean(6),
-                new Date(rs.getLong(7)),
-                rs.getInt(8),
+                rs.getBoolean(7),
+                new Date(rs.getLong(8)),
                 rs.getInt(9),
-                rs.getString(10),
-                rs.getString(11));
+                rs.getInt(10),
+                rs.getString(11),
+                rs.getString(12));
     }
 
     /**
@@ -149,6 +152,16 @@ public final class DataRecord extends Record {
         this.visible = visible;
         ensureConnectionNotClosed();
         session.updateDataVisibility(id, visible);
+    }
+
+    public boolean isSensorable() {
+        return sensorable;
+    }
+
+    public void setSensorable(boolean sensorable) throws SQLException {
+        this.sensorable = sensorable;
+        ensureConnectionNotClosed();
+        session.updateDataSensorable(id, sensorable);
     }
 
     public Date getDate() {

@@ -154,6 +154,7 @@ CREATE TABLE "admin"."data"(
   "provider"      INTEGER     NOT NULL,
   "type"          VARCHAR(32) NOT NULL,
   "visible"       BOOLEAN     NOT NULL DEFAULT TRUE,
+  "sensorable"    BOOLEAN     NOT NULL DEFAULT FALSE,
   "date"          BIGINT      NOT NULL,
   "title"         INTEGER     NOT NULL,
   "description"   INTEGER     NOT NULL,
@@ -166,6 +167,16 @@ CREATE TABLE "admin"."data"(
 ALTER TABLE "admin"."data" ADD CONSTRAINT data_pk          PRIMARY KEY ("id");
 ALTER TABLE "admin"."data" ADD CONSTRAINT data_owner_fk    FOREIGN KEY ("owner")    REFERENCES "admin"."user"("login");
 ALTER TABLE "admin"."data" ADD CONSTRAINT data_provider_fk FOREIGN KEY ("provider") REFERENCES "admin"."provider"("id") ON DELETE CASCADE;
+
+CREATE TABLE "admin"."sensored_data"(
+  "sensor"      INTEGER     NOT NULL,
+  "data"        INTEGER     NOT NULL
+);
+
+ALTER TABLE "admin"."sensored_data" ADD CONSTRAINT sensor_data_pk PRIMARY KEY ("sensor","data");
+ALTER TABLE "admin"."sensored_data" ADD CONSTRAINT sensored_data_sensor_fk FOREIGN KEY ("sensor") REFERENCES "admin"."sensor"("id") ON DELETE CASCADE;
+ALTER TABLE "admin"."sensored_data" ADD CONSTRAINT sensored_data_data_fk   FOREIGN KEY ("data")   REFERENCES "admin"."data"("id")   ON DELETE CASCADE;
+
 
 -- Domain cross tables with for datas
 

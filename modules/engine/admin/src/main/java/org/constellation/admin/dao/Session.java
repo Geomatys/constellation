@@ -154,12 +154,18 @@ public final class Session implements Closeable {
     private static final String UPDATE_DATA_METADATA        = "data.update.metadata";
     private static final String UPDATE_DATA_ISO_METADATA    = "data.update.iso_metadata";
     private static final String UPDATE_DATA_VISIBLE         = "data.update.visible";
+    private static final String UPDATE_DATA_SENSORABLE      = "data.update.sensorable";
     private static final String DELETE_DATA                 = "data.delete";
     private static final String DELETE_DATA_NMSP            = "data.delete.nmsp";
     private static final String SEARCH_DATA_ISO_METADATA    = "data.search.iso_metadata";
 
     private static final String WRITE_STYLED_DATA           = "styled_data.write";
     private static final String DELETE_STYLED_DATA          = "styled_data.delete";
+
+    private static final String WRITE_SENSORED_DATA            = "sensored_data.write";
+    private static final String DELETE_SENSORED_DATA           = "sensored_data.delete";
+    private static final String LIST_SENSORED_DATA_FROM_DATA   = "sensored_data.list.from.data";
+    private static final String LIST_SENSORED_DATA_FROM_SENSOR = "sensored_data.list.from.sensor";
 
     private static final String READ_SERVICE                = "service.read";
     private static final String READ_SERVICE_FROM_ID        = "service.read.from.id";
@@ -222,7 +228,6 @@ public final class Session implements Closeable {
      * Create a new {@link Session} instance.
      *
      * @param connect   the {@link Connection} instance
-     * @param userCache a cache for queried users
      */
     public Session(final Connection connect) {
         this.connect   = connect;
@@ -391,7 +396,6 @@ public final class Session implements Closeable {
      * @param login    the user login
      * @param newPwd   the new user password (already encoded)
      * @param newName  the new user name
-     * @param newRoles the new user roles
      * @throws SQLException if a database access error occurs
      */
     /* internal */ void updateUser(final String login, final String newPwd, final String newName) throws SQLException {
@@ -971,7 +975,7 @@ public final class Session implements Closeable {
         final int id = new Query(WRITE_DATA).with(name.getLocalPart(), name.getNamespaceURI(), provider.id, type.name(), date.getTime(), title, description, login).insert();
 
         // Return inserted line.
-        return new DataRecord(this, id, name.getLocalPart(), name.getNamespaceURI(), provider.id, type, true, date, title, description, login, null);
+        return new DataRecord(this, id, name.getLocalPart(), name.getNamespaceURI(), provider.id, type, true, false, date, title, description, login, null);
     }
 
     /* internal */ void updateData(final int generatedId, final String newName, final String newNamespace, final int newProvider, final DataType newType, final String newOwner) throws SQLException {
@@ -988,6 +992,10 @@ public final class Session implements Closeable {
 
     /* internal */ void updateDataVisibility(final int dataId, final boolean visible) throws SQLException {
         new Query(UPDATE_DATA_VISIBLE).with(visible, dataId).update();
+    }
+
+    /* internal */ void updateDataSensorable(final int dataId, final boolean sensorable) throws SQLException {
+        new Query(UPDATE_DATA_SENSORABLE).with(sensorable, dataId).update();
     }
 
     public void deleteData(final QName name, final String providerId) throws SQLException {
@@ -1057,6 +1065,31 @@ public final class Session implements Closeable {
         new Query(DELETE_STYLED_DATA).with(style.id, data.id).update();
     }
 
+    /**************************************************************************
+     *                      sensored-data table queries                         *
+     **************************************************************************/
+
+    public void writeSensoredData(final SensorRecord sensor, final DataRecord data) throws SQLException {
+        ensureNonNull("sensor", sensor);
+        ensureNonNull("data",  data);
+        new Query(WRITE_SENSORED_DATA).with(sensor.id, data.id).update();
+    }
+
+    public void deleteSensoredData(final SensorRecord sensor, final DataRecord data) throws SQLException {
+        ensureNonNull("sensor", sensor);
+        ensureNonNull("data",  data);
+        new Query(DELETE_SENSORED_DATA).with(sensor.id, data.id).update();
+    }
+
+    public void readSensoredDataFromData(final DataRecord data) throws SQLException {
+        ensureNonNull("data",  data);
+        new Query(LIST_SENSORED_DATA_FROM_DATA).with(data.id).select().getAll(SensorRecord.class);
+    }
+
+    public void readSensoredDataFromSensor(final SensorRecord sensor) throws SQLException {
+        ensureNonNull("sensor",  sensor);
+        new Query(LIST_SENSORED_DATA_FROM_SENSOR).with(sensor.id).select().getAll(DataRecord.class);
+    }
 
     /**************************************************************************
      *                          service table queries                         *
