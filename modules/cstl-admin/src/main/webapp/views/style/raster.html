@@ -1,24 +1,29 @@
 <ol class="breadcrumb">
     <li class="active" translate="sldeditor.breadcrumb.edition">Style Edition</li>
 </ol>
-<div class="style_bloc">
-  <div class="form-group col-xs-12" style="margin: 6px 0; height:35px;">
-    <label class="col-sm-3 col-md-2 control-label" style="margin-top: 8px;" translate="sldeditor.name">Style name</label>
-    <div class="col-sm-9 col-md-4">
-        <input type="text" class="form-control" ng-model="$parent.newStyle.name" >
+<div class="row">
+  <div class="col-sm-12 col-md-6">
+    <div class="style_bloc">
+      <div class="form-group col-xs-12" style="margin: 6px 0; height:35px;">
+        <label class="col-xs-4 col-sm-3 col-md-4 control-label" style="margin-top: 8px;" translate="sldeditor.name">Style name</label>
+        <div class="col-xs-7 col-sm-9 col-md-8">
+            <input type="text" class="form-control" ng-model="$parent.newStyle.name" >
+        </div>
+      </div>
     </div>
   </div>
 </div>
 <!-- Tab nav -->
-<ul class="nav nav-tabs" ng-init="chosenTab = 'colorMap'">
-    <li ng-class="{active: chosenTab==='simple'}"><a ng-click="chosenTab = 'simple'" data-toggle="tab"><span translate="sldeditor.tab.simple" >Simple editor</span></a></li>
-    <li ng-class="{active: chosenTab==='colorMap'}"><a ng-click="chosenTab = 'colorMap'" data-toggle="tab">ColorMap</a></li>
-    <li ng-class="{active: chosenTab==='xml'}"><a ng-click="chosenTab = 'xml'" data-toggle="tab"><span translate="sldeditor.tab.xml" >XML Editor</span></a></li>
-</ul>
+
+  <ul class="nav nav-tabs" ng-init="chosenTab = 'colorMap'">
+      <li ng-class="{active: chosenTab==='simple'}"><a ng-click="chosenTab = 'simple'" data-toggle="tab"><span translate="sldeditor.tab.simple" >Simple editor</span></a></li>
+      <li ng-class="{active: chosenTab==='colorMap'}"><a ng-click="chosenTab = 'colorMap'" data-toggle="tab">ColorMap</a></li>
+      <li ng-class="{active: chosenTab==='xml'}"><a ng-click="chosenTab = 'xml'" data-toggle="tab"><span translate="sldeditor.tab.xml" >XML Editor</span></a></li>
+  </ul>
 
 <!-- Tab panes -->
 <div class="tab-content" ng-init="$parent.newStyle.rules[0].symbolizers[0]['@symbol'] = 'raster'">
-  <div class="tab-pane" ng-class="{active:chosenTab==='simple'}" ng-init="$parent.initDataProperties()">
+  <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='simple'}" ng-init="$parent.initDataProperties()">
     <div class="row">
       <div class="col-xs-12 col-sm-6 col-md-8">
         <h2 translate="sldeditor.breadcrumb.edition">Style Edition</h2>
@@ -95,7 +100,7 @@
     </div>
   </div>
 
-  <div class="tab-pane" ng-class="{active:chosenTab==='colorMap'}">
+  <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='colorMap'}">
     <div class="row">
       <div class="col-xs-12 col-sm-6">
         <h2 translate="sldeditor.breadcrumb.edition">Style Edition</h2>
@@ -246,7 +251,7 @@
     </div>
   </div>
 
-  <div class="tab-pane" ng-class="{active:chosenTab==='xml'}">
+  <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='xml'}">
     <h2 translate="sldeditor.tab.xmledit" >XML Editor</h2>
 
       <div ui-ace="{
