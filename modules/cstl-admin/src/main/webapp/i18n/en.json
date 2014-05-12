@@ -928,6 +928,7 @@
         "service.source.connexion":"Connection between multiple databases",
         "service.source.sensormlfolder":"TODO",
         "data.add.choicedata":"Supported formats: shp (in a zip file.), NetCDF, tif",
+        "sensor.add":"Supported formats: a sensorML file (*.xml) or a zip file.",
         "style.create":"You must select a data to associate the style created."
     },
     "sensors.information.title":"Available Sensors"

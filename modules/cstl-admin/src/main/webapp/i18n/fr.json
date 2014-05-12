@@ -1213,6 +1213,7 @@
         "service.source.connexion":"Connexion entre plusieurs bases",
         "service.source.sensormlfolder":"TODO",
         "data.add.choicedata":"Formats supportés : shp (dans un fichier .zip), NetCDF, tif",
+        "sensor.add":"Formats supportés : un fichier sensorML (*.xml) ou un fichier zip.",
         "style.create":"Vous devez sélectionner une donnée afin de lui associer le style créé."
     },
     "sensors.information.title":"Capteurs disponibles"

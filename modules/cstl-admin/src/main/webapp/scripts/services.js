@@ -243,6 +243,13 @@ cstlAdminApp.factory('sos', ['$resource',
         });
     }]);
 
+cstlAdminApp.factory('sensor', ['$resource',
+    function ($resource) {
+        return $resource('@cstl/api/1/sensor', {}, {
+            'add': {method: 'PUT',  url: '@cstl/api/1/sensor/add;jsessionid='}
+        });
+    }]);
+
 cstlAdminApp.factory('ProcessService', ['$resource', '$cookies',
     function($resource, $cookies) {
         return $resource('@cstl/spring/admin/process;jsessionid=', {}, {

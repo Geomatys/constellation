@@ -15,15 +15,17 @@
  */
 'use strict';
 
-cstlAdminApp.controller('SensorsController', ['$scope', '$dashboard', 'webService', 'dataListing', '$modal', '$growl',
-    function ($scope, $dashboard, webService, dataListing, $modal, $growl){
+cstlAdminApp.controller('SensorsController', ['$scope', '$dashboard', 'webService', 'dataListing', '$modal',
+    function ($scope, $dashboard, webService, dataListing, $modal){
     	var modalLoader = $modal.open({
           templateUrl: 'views/modalLoader.html',
           controller: 'ModalInstanceCtrl'
         });
         dataListing.listAll({}, function(response) {
             $dashboard($scope, response, true);
-            $scope.filtertype = "sensor";
+            $scope.filtertype= "observation";
+            modalLoader.close();
+        }, function() {
             modalLoader.close();
         });
 
@@ -34,23 +36,48 @@ cstlAdminApp.controller('SensorsController', ['$scope', '$dashboard', 'webServic
         };
 
         // Data loading
-        $scope.showLocalFilePopup = function() {
+        $scope.addSensor = function() {
             var modal = $modal.open({
-                templateUrl: 'views/modalLocalFile.html',
-                controller: 'LocalFileModalController'
+                templateUrl: 'views/modalAddSensor.html',
+                controller: 'SensorAddModalController'
             });
 
             modal.result.then(function(result) {
-                dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}}, function() {
-                    $location.path('/description/'+ result.type +"/"+ result.file +"/"+ result.missing);
-                }, function() { $growl('error','Error','Unable to save metadata'); });
-            });
-        };
 
-        $scope.showServerFilePopup = function() {
-            var modal = $modal.open({
-                templateUrl: 'views/modalServerFile.html',
-                controller: 'ServerFileModalController'
             });
         };
 	}]);
+
+cstlAdminApp.controller('SensorAddModalController', ['$scope', '$modalInstance', 'sensor', '$growl', '$cookies',
+    function ($scope, $modalInstance, sensor, $growl, $cookies) {
+        $scope.close = function() {
+            $modalInstance.dismiss('close');
+        };
+
+        $scope.uploadData = function() {
+            var $form = $('#uploadSensor');
+
+            var formData = new FormData($form[0]);
+
+            $.ajax({
+                url: $cookies.cstlUrl + "api/1/data/upload/data;jsessionid="+ $cookies.cstlSessionId,
+                type: 'POST',
+                data: formData,
+                async: false,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (path) {
+                    importSensor(path);
+                }
+            });
+        };
+
+        function importSensor(path) {
+            sensor.add({}, {values: {'path' : path}}, function() {
+                $growl('success','Success','Sensor correctly imported');
+            }, function() {
+                $growl('error','Error','Unable to import sensor');
+            });
+        }
+    }]);
