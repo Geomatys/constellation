@@ -117,6 +117,17 @@ public final class Session implements Closeable {
     private static final String UPDATE_PROVIDER_CONFIG      = "provider.update.config";
     private static final String UPDATE_PROVIDER_METADATA    = "provider.update.metadata";
     private static final String DELETE_PROVIDER             = "provider.delete";
+    
+    private static final String READ_SENSOR                 = "sensor.read";
+    private static final String READ_SENSOR_FROM_ID         = "sensor.read.from.id";
+    private static final String READ_SENSOR_METADATA        = "sensor.read.metadata";
+    private static final String EXIST_SENSOR_METADATA       = "sensor.exist.metadata";
+    private static final String LIST_SENSORS                = "sensor.list";
+    private static final String LIST_SENSORS_FROM_PARENT    = "sensor.list.from.parent";
+    private static final String WRITE_SENSOR                = "sensor.write";
+    private static final String UPDATE_SENSOR               = "sensor.update";
+    private static final String UPDATE_SENSOR_METADATA      = "sensor.update.metadata";
+    private static final String DELETE_SENSOR               = "sensor.delete";
 
     private static final String READ_STYLE                  = "style.read";
     private static final String READ_STYLE_FROM_ID          = "style.read";
@@ -594,6 +605,152 @@ public final class Session implements Closeable {
     public void deleteProvider(final String identifier) throws SQLException {
         ensureNonNull("identifier", identifier);
         new Query(DELETE_PROVIDER).with(identifier).update();
+    }
+    
+    /**************************************************************************
+     *                        sensor table queries                          *
+     **************************************************************************/
+
+    /**
+     * Queries a sensor for the specified {@code generatedId}.
+     *
+     * @param generatedId the sensor auto-generated id
+     * @return the {@link SensorRecord} instance or {@code null}
+     * @throws SQLException if a database access error occurs
+     */
+    /* internal */ SensorRecord readSensor(final int generatedId) throws SQLException {
+        return new Query(READ_SENSOR_FROM_ID).with(generatedId).select().getFirst(SensorRecord.class);
+    }
+
+    /**
+     * Queries a sensor for the specified {@code identifier}.
+     *
+     * @param identifier the sensor identifier
+     * @return the {@link SensorRecord} instance or {@code null}
+     * @throws SQLException if a database access error occurs
+     */
+    public SensorRecord readSensor(final String identifier) throws SQLException {
+        ensureNonNull("identifier", identifier);
+        return new Query(READ_SENSOR).with(identifier).select().getFirst(SensorRecord.class);
+    }
+
+    /**
+     * Queries the metadata of the sensor with the specified {@code generatedId}.
+     *
+     * @param generatedId the sensor auto-generated id
+     * @return the {@link ParameterValueGroup} instance
+     * @throws SQLException if a database access error occurs
+     * @throws IOException if the configuration cannot be read
+     */
+    /* internal */ InputStream readSensorMetadata(final int generatedId) throws SQLException, IOException {
+        final InputStream stream = new Query(READ_SENSOR_METADATA).with(generatedId).select().getClob();
+        return stream;
+    }
+
+    /**
+     * look for existence of the sensor metadata with the specified {@code generatedId}.
+     *
+     * @param generatedId the sensor auto-generated id
+     * @return the {@link ParameterValueGroup} instance
+     * @throws SQLException if a database access error occurs
+     * @throws IOException if the configuration cannot be read
+     */
+    /* internal */ boolean hasSensorMetadata(final int generatedId) throws SQLException, IOException {
+        return new Query(EXIST_SENSOR_METADATA).with(generatedId).select().hasNext();
+    }
+    /**
+     * Queries the complete list of registered sensors.
+     *
+     * @return a {@link List} of {@link SensorRecord}s
+     * @throws SQLException if a database access error occurs
+     */
+    public List<SensorRecord> readSensors() throws SQLException {
+        return new Query(LIST_SENSORS).select().getAll(SensorRecord.class);
+    }
+
+    /**
+     * Queries the list of registered providers for the specified parent sensor.
+     *
+     * @param parentIdentifier the sensor parent identifier
+     * @return a {@link List} of {@link SensorRecord}s
+     * @throws SQLException if a database access error occurs
+     */
+    public List<SensorRecord> readSensorsFromParent(final String parentIdentifier) throws SQLException {
+        ensureNonNull("parentIdentifier", parentIdentifier);
+        return new Query(LIST_SENSORS_FROM_PARENT).with(parentIdentifier).select().getAll(SensorRecord.class);
+    }
+
+    /**
+     * Inserts a new sensor.
+     *
+     * @param identifier The sensor identifier.
+     * @param parent The sensor parent identifier, can be null.
+     * @param owner The sensor owner.
+     * @return The inserted {@link SensorRecord} instance.
+     * @throws SQLException if a database access error occurs
+     * @throws IOException if the configuration cannot be written
+     */
+    public SensorRecord writeSensor(final String identifier, String type, String parent,
+            final String owner) throws SQLException, IOException {
+        ensureNonNull("identifier", identifier);
+        if(parent==null) parent="";
+
+        // Prepare insertion.
+        final String login        = owner;
+
+        // Proceed to insertion.
+        final int id = new Query(WRITE_SENSOR).with(identifier, type, parent, login).insert();
+
+        // Return inserted line.
+        return new SensorRecord(this, id, identifier, type, parent, login);
+    }
+
+    /**
+     * Updates the sensor with the specified {@code generatedId}.
+     *
+     * @param generatedId   the sensor auto-generated id
+     * @param newIdentifier the new sensor identifier
+     * @param newOwner      the new provider owner
+     * @throws SQLException
+     */
+    /* internal */ void updateSensor(final int generatedId, final String newIdentifier, final String type, 
+            String parent, final String newOwner) throws SQLException {
+        if(parent==null) parent="";
+        new Query(UPDATE_SENSOR).with(newIdentifier, type, parent, newOwner, generatedId).update();
+    }
+
+    /**
+     * Updates an existing sensor using the new given one.
+     *
+     * @param updatedSensor An existing sensor which contains updated fields.
+     * @throws SQLException
+     */
+    public void updateSensor(final SensorRecord updatedSensor) throws SQLException {
+        new Query(UPDATE_SENSOR).with(updatedSensor.getIdentifier(), updatedSensor.getType(), updatedSensor.getParentIdentifier(),
+                updatedSensor.getOwnerLogin(), updatedSensor.id).update();
+    }
+
+    /**
+     * Updates sensor metadata with the specified {@code generatedId}.
+     *
+     * @param generatedId the sensor auto-generated id
+     * @param metadata   the metadata sensor
+     * @throws SQLException if a database access error occurs
+     * @throws IOException if the configuration cannot be written
+     */
+    /* internal */ void updateSensorMetadata(final int generatedId, final StringReader metadata) throws SQLException, IOException {
+        new Query(UPDATE_SENSOR_METADATA).with(metadata, generatedId).update();
+    }
+
+    /**
+     * Deletes the sensor with the specified {@code identifier}.
+     *
+     * @param identifier the sensor identifier
+     * @throws SQLException if a database access error occurs
+     */
+    public void deleteSensor(final String identifier) throws SQLException {
+        ensureNonNull("identifier", identifier);
+        new Query(DELETE_SENSOR).with(identifier).update();
     }
 
 

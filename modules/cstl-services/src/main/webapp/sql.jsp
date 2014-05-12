@@ -40,6 +40,7 @@ query : <textarea rows="5" cols="80" name="query" id="query"><%= request.getPara
 <button class="btn btn-primary" id="task">task</button>
 <button class="btn btn-primary" id="user">user</button>
 <button class="btn btn-primary" id="styled_data">styled_data</button>
+<button class="btn btn-primary" id="sensor">sensor</button>
 </div>
         </div>
     <div class="row">
@@ -136,6 +137,10 @@ result :
         });
         $("#styled_data").on("click", function(){
             $("#query").val('select * from "admin"."styled_data"');
+            $("#sqlForm").submit();
+        });
+        $("#sensor").on("click", function(){
+            $("#query").val('select * from "admin"."sensor"');
             $("#sqlForm").submit();
         });
     })

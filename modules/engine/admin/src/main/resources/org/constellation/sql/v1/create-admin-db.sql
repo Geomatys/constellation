@@ -72,7 +72,19 @@ ALTER TABLE "admin"."user_x_domain_x_domainrole" ADD CONSTRAINT user_x_domain_x_
 ALTER TABLE "admin"."user_x_domain_x_domainrole" ADD CONSTRAINT user_x_domain_x_role_role_fk FOREIGN KEY ("domainrole") REFERENCES "admin"."domainrole"("name");
 
 
+-- sensors
 
+CREATE TABLE "admin"."sensor"(
+  "id"          INTEGER     NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 0, INCREMENT BY 1),
+  "identifier"  VARCHAR(512) NOT NULL UNIQUE,
+  "type"        VARCHAR(64)  NOT NULL,
+  "parent"      VARCHAR(512) NOT NULL,
+  "owner"       VARCHAR(32),
+  "metadata"    CLOB
+);
+
+ALTER TABLE "admin"."sensor" ADD CONSTRAINT sensor_pk       PRIMARY KEY ("id");
+ALTER TABLE "admin"."sensor" ADD CONSTRAINT sensor_owner_fk FOREIGN KEY ("owner") REFERENCES "admin"."user"("login");
 
 
 -- providers

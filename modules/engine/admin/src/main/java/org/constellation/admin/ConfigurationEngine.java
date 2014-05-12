@@ -17,8 +17,6 @@
 
 package org.constellation.admin;
 
-import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -33,7 +31,6 @@ import java.util.Properties;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -41,6 +38,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.sis.metadata.iso.DefaultMetadata;
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.apache.sis.xml.XML;
@@ -49,6 +47,7 @@ import org.constellation.admin.dao.DataRecord;
 import org.constellation.admin.dao.LayerRecord;
 import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.admin.dao.Record;
+import org.constellation.admin.dao.SensorRecord;
 import org.constellation.admin.dao.ServiceRecord;
 import org.constellation.admin.dao.Session;
 import org.constellation.admin.dao.StyleRecord;
@@ -884,6 +883,34 @@ public class ConfigurationEngine {
             if (session != null)
                 session.close();
         }
+    }
+    
+    public static List<SensorRecord> getSensors() {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            return session.readSensors();
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while reading sensor database", ex);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+        return new ArrayList<>();
+    }
+    
+    public static List<SensorRecord> getSensorChildren(final String parentIdentififer) {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            return session.readSensorsFromParent(parentIdentififer);
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while reading sensor database", ex);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+        return new ArrayList<>();
     }
 
     /**

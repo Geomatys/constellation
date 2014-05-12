@@ -257,7 +257,7 @@ public class SOSConfigurer extends OGCConfigurer {
                 t.setChildren(children);
                 values.add(t);
             }
-            return SOSUtils.buildTree(values);
+            return SensorMLTree.buildTree(values);
         } catch (CstlServiceException ex) {
             throw new ConfigurationException(ex);
         }

@@ -577,27 +577,4 @@ public final class SOSUtils {
         }
         return results;
     }
-    
-    public static SensorMLTree buildTree(final List<SensorMLTree> nodeList) {
-        final SensorMLTree root = new SensorMLTree("root", "System");
-        
-        for (SensorMLTree node : nodeList) {
-            final SensorMLTree parent = getParent(node, nodeList);
-            if (parent == null) {
-                root.addChildren(node);
-            } else {
-                parent.replaceChildren(node);
-            }
-        }
-        return root;
-    }
-    
-    private static SensorMLTree getParent(final SensorMLTree current, final List<SensorMLTree> nodeList) {
-        for (SensorMLTree node : nodeList) {
-            if (node.hasChild(current.getId())) {
-                return node;
-            }
-        }
-        return null;
-    }
 }

@@ -1509,7 +1509,7 @@ public class DataRest {
         if ("nc".equals(extension) && NetCDFExtractor.isObservationFile(filePath)) {
             r.setDataType("sensor");
         }
-        // look for SML file
+        // look for SML file (available for data import ?)
         if ("xml".equals(extension)) {
             try {
                 String rootMark = getXmlDocumentRoot(filePath);
