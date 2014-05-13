@@ -702,18 +702,21 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
                     DataViewer.layers = [layerData, layerBackground];
                     dataListing.metadata({providerId: providerId, dataId: layerName}, {}, function(response) {
                         // Success getting the metadata, try to find the data extent
-                        var ident = response['gmd.MD_Metadata']['gmd.identificationInfo'];
-                        if (ident) {
-                            var extentMD = ident['gmd.MD_DataIdentification']['gmd.extent'];
-                            if (extentMD) {
-                                var bbox = extentMD['gmd.EX_Extent']['gmd.geographicElement']['gmd.EX_GeographicBoundingBox'];
-                                var extent = new OpenLayers.Bounds(bbox['gmd.westBoundLongitude']['gco.Decimal'], bbox['gmd.southBoundLatitude']['gco.Decimal'],
-                                    bbox['gmd.eastBoundLongitude']['gco.Decimal'], bbox['gmd.northBoundLatitude']['gco.Decimal']);
-                                DataViewer.initMap('dataMap');
-                                DataViewer.map.zoomToExtent(extent, true);
-                                modalLoader.close();
+                        var md = response['gmd.MD_Metadata'];
+                        if (md) {
+                            var ident = md['gmd.identificationInfo'];
+                            if (ident) {
+                                var extentMD = ident['gmd.MD_DataIdentification']['gmd.extent'];
+                                if (extentMD) {
+                                    var bbox = extentMD['gmd.EX_Extent']['gmd.geographicElement']['gmd.EX_GeographicBoundingBox'];
+                                    var extent = new OpenLayers.Bounds(bbox['gmd.westBoundLongitude']['gco.Decimal'], bbox['gmd.southBoundLatitude']['gco.Decimal'],
+                                        bbox['gmd.eastBoundLongitude']['gco.Decimal'], bbox['gmd.northBoundLatitude']['gco.Decimal']);
+                                    DataViewer.initMap('dataMap');
+                                    DataViewer.map.zoomToExtent(extent, true);
+                                }
                             }
                         }
+                        modalLoader.close();
                     }, function() {
                         DataViewer.initMap('dataMap');
                         modalLoader.close();

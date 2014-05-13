@@ -21,16 +21,20 @@ public class AddLayer {
     private String providerId;
 
     private String layerId;
+    
+    private String layerNamespace;
 
     public AddLayer() {
     }
 
-    public AddLayer(final String layerAlias, final String serviceType, final String serviceId, final String providerId, final String layerId) {
+    public AddLayer(final String layerAlias, final String serviceType, final String serviceId, 
+            final String providerId, final String layerId, final String layerNamespace) {
         this.layerAlias = layerAlias;
         this.serviceType = serviceType;
         this.serviceId = serviceId;
         this.providerId = providerId;
         this.layerId = layerId;
+        this.layerNamespace = layerNamespace;
     }
 
     public String getLayerAlias() {
@@ -73,6 +77,20 @@ public class AddLayer {
         this.layerId = layerId;
     }
 
+    /**
+     * @return the layerNamespace
+     */
+    public String getLayerNamespace() {
+        return layerNamespace;
+    }
+
+    /**
+     * @param layerNamespace the layerNamespace to set
+     */
+    public void setLayerNamespace(String layerNamespace) {
+        this.layerNamespace = layerNamespace;
+    }
+    
     @Override
     public String toString() {
         return "addLayer{" +
@@ -81,6 +99,7 @@ public class AddLayer {
                 ", serviceId='" + serviceId + '\'' +
                 ", providerId='" + providerId + '\'' +
                 ", layerId='" + layerId + '\'' +
+                ", layerNamespace='" + layerNamespace + '\'' +
                 '}';
     }
 }

@@ -118,7 +118,12 @@ public class MapConfigurer extends OGCConfigurer {
         this.ensureExistingInstance(addLayerData.getServiceId());
 
         final DataProvider provider = DataProviders.getInstance().getProvider(addLayerData.getProviderId());
-        final String namespace = ProviderParameters.getNamespace(provider);
+        final String namespace;
+        if (addLayerData.getLayerNamespace() != null) {
+            namespace = addLayerData.getLayerNamespace();
+        } else {
+            namespace = ProviderParameters.getNamespace(provider);
+        }
         final String layerId = (namespace != null && !namespace.isEmpty()) ? "{" + namespace + "}" + addLayerData.getLayerId() : addLayerData.getLayerId();
 
         // Set layer provider reference.

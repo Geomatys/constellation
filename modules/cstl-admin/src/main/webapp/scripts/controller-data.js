@@ -70,7 +70,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
                         }
                     }
                 }
-            modalLoader.close();
+                modalLoader.close();
             }, function() {
                 // failed to find a metadata, just load the full map
                 DataViewer.initMap('dataMap');
@@ -811,7 +811,7 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
                           controller: 'ModalInstanceCtrl'
                         });
                         webService.addLayer({type: service.type, id: service.identifier},
-                            {layerAlias: data.Name, layerId: data.Name, serviceType: service.type, serviceId: service.identifier, providerId: data.Provider},
+                            {layerAlias: data.Name, layerId: data.Name, serviceType: service.type, serviceId: service.identifier, providerId: data.Provider, layerNamespace: data.Namespace},
                             function () {
                                 $growl('success', 'Success', 'Layer ' + data.Name + ' successfully added to service ' + service.name);
                                 modalLoader.close();
