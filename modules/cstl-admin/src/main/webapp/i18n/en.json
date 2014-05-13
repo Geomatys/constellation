@@ -541,6 +541,8 @@
             "dashboard.action.add.layer": "Add Layer",
             "dashboard.sensors.list":"Available sensors",
             "dashboard.sensors.list.associated": "associated sensors",
+            "dashboard.tasks.list.associated": "associated tasks",
+            "dashboard.tasks.list": "Available tasks",
             "dashboard.measures.list":"Available measures",
             "dashboard.measures.error.select.one" : "You need to select one measure in the list",
             "dashboard.area": "Geographical area",

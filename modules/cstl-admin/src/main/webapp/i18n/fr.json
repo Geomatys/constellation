@@ -997,6 +997,8 @@
             "dashboard.action.add.layer": "Ajouter une couche",
             "dashboard.sensors.list":"Capteurs disponibles",
             "dashboard.sensors.list.associated": "capteurs associés",
+            "dashboard.tasks.list.associated": "traitements associés",
+            "dashboard.tasks.list": "Traitements disponibles",
             "dashboard.measures.list":"Mesures possibles",
             "dashboard.measures.error.select.one" : "Vous devez sélectionner une mesure dans la liste précédente",
             "dashboard.area":"Zone géographique",
