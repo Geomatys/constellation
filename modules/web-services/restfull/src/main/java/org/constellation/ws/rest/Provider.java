@@ -43,7 +43,6 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 
 import org.apache.sis.metadata.iso.DefaultMetadata;
-import org.apache.sis.referencing.IdentifiedObjects;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ConfigurationEngine;
@@ -54,7 +53,6 @@ import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.configuration.ProviderConfiguration;
 import org.constellation.dto.ProviderPyramidChoiceList;
 import org.constellation.dto.SimpleValue;
-import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.provider.CoverageData;
 import org.constellation.provider.Data;
 import org.constellation.provider.DataProvider;
@@ -97,9 +95,7 @@ public final class Provider {
     @Inject
     private SessionData sessionData;
     
-    @Inject
-    private DomainRepository domainRepository;
-
+   
     
     /**
      * Create a new provider from the given configuration.
@@ -312,7 +308,7 @@ public final class Provider {
             try {
                 DataProvider dataProvider = DataProviders.getInstance().createProvider(id, providerService, sources);
                 
-                domainRepository.addProviderToDomain(id, sessionData.getActiveDomainId());
+
             } catch (ConfigurationException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
                 return Response.status(500).build();
