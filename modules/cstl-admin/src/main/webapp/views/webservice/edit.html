@@ -106,10 +106,10 @@
                                         </div>
                                         <div class="item-list">
                                             <div ng-if="type !== 'csw' && type!== 'sos'">
-                                                <div class="item" ng-repeat="layer in dataList" ng-class="{selected:layer==selected,coverage:layer.Type==='coverage-store'||layer.Type==='raster',vector:layer.Type==='feature-store'||layer.Type==='vector'}" ng-click="select(layer)">
+                                                <div class="item" ng-repeat="layer in dataList" ng-class="{selected:layer==selected,coverage:layer.Type==='coverage-store'||layer.Type==='raster',vector:layer.Type==='feature-store'||layer.Type==='observation-store'||layer.Type==='vector'}" ng-click="select(layer)">
                                                     <div class="top">
                                                         <span class="item-title">{{layer.Name}}</span>
-                                                        <span class="pull-right text-right item-list-style" style="font-size:14px;">{{layer.Type==='coverage-store'?'raster':layer.Type==='feature-store'?'vector':layer.Type}}</span>
+                                                        <span class="pull-right text-right item-list-style" style="font-size:14px;">{{layer.Type==='coverage-store'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector':layer.Type}}</span>
                                                     </div>
                                                     <div class="bottom">
                                                         <div class="block">
@@ -240,7 +240,7 @@
 
                                                 <div class="separator"></div>
                                                 <h6 translate="label.type">Type</h6>
-                                                <span>{{selected.Type==='coverage-store'?'raster':selected.Type==='feature-store'?'vector':selected.Type}}</span>
+                                                <span>{{selected.Type==='coverage-store'?'raster':selected.Type==='feature-store'?'vector':selected.Type==='observation-store'?'vector':selected.Type}}</span>
 
                                                 <div ng-if="service.type.toLowerCase() === 'wms'">
                                                     <div class="separator"></div>
