@@ -72,9 +72,15 @@
                             translate="global.menu.account.login">Authenticate</span></a></li>
                 </ul>
                 <ul ng-show="authenticated" class="nav nav-pills nav-header-mob pull-right  ng-cloak">
-                    <li><a href="#"> <span class="glyphicon glyphicon-home"></span>
-                        <span translate="global.menu.home">Accueil</span>
-                    </a></li>
+                    <li>
+                        <a class="hidden-xs hidden-lg hidden-md" href="#"> 
+                            <span class="glyphicon glyphicon-home"></span>
+                        </a>
+                        <a class="hidden-sm" href="#"> 
+                            <span class="glyphicon glyphicon-home"></span>
+                            <span translate="global.menu.home">Accueil</span>
+                        </a>
+                    </li>
                     <li><a ng-show="authenticated" href="#/webservice"> <span
                             class="glyphicon glyphicon-cloud"></span> <span
                             translate="global.menu.web-service">Services web</span>
@@ -94,13 +100,18 @@
                     <!--         <li><a href="#/viewer"> <span class="glyphicon glyphicon-picture"></span> -->
                     <!--             <span translate="global.menu.viewer">visualiseur</span> -->
                     <!--         </a></li> -->
-                    <li class="dropdown pointer"><a class="dropdown-toggle"
-                                                    data-toggle="dropdown"> <span> <span
-                            class="glyphicon glyphicon-wrench"></span> <span
-                            class="hidden-tablet" translate="global.menu.admin.main">
-                                        Administration</span> <b class="caret"></b>
+                    <li class="dropdown pointer">
+                        <a class="dropdown-toggle" data-toggle="dropdown"> 
+                            <span class="hidden-tablet hidden-sm hidden-md"> 
+                                <span class="glyphicon glyphicon-wrench"></span> 
+                                <span class="hidden-tablet" translate="global.menu.admin.main">Administration</span> 
+                                <b class="caret"></b>
                             </span>
-                    </a>
+                            <span class="hidden-tablet hidden-xs hidden-lg"> 
+                                <span class="glyphicon glyphicon-wrench"></span> 
+                                <b class="caret"></b>
+                            </span>
+                        </a>
                         <ul class="dropdown-menu" ng-controller="MenuController">
                             <li ng-show="authenticated"><a href="#/user"><span
                                     class="glyphicon glyphicon-user"></span> &nbsp;<span

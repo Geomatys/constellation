@@ -356,9 +356,13 @@ ul.unstyled {
         margin-top: -3px;
     }
 }
-@media (min-width:768px) and (max-width: 900px){
+@media (min-width:768px) and (max-width: 890px){
     .nav-header-mob>li>a{
         padding: 10px;
+    }
+}
+@media (min-width:768px) and (max-width: 800px){
+    .nav-header-mob>li>a{
         font-size:13px;
     }
 }
