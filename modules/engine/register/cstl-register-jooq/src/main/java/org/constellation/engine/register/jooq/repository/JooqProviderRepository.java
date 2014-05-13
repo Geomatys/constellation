@@ -31,4 +31,9 @@ public class JooqProviderRepository extends AbstractJooqRespository<ProviderReco
         return dsl.select(PROVIDER.IDENTIFIER).from(PROVIDER).fetch(PROVIDER.IDENTIFIER);
     }
 
+    @Override
+    public Provider findByIdentifie(String identifier) {
+        return dsl.select().from(PROVIDER).where(PROVIDER.IDENTIFIER.eq(identifier)).fetchOne().into(Provider.class);
+    }
+
 }

@@ -1,8 +1,9 @@
 package org.constellation.engine.register;
 
+import java.io.Serializable;
 import java.util.Set;
 
-public class Domain  {
+public class Domain implements Serializable {
 
     /**
      * 

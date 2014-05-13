@@ -13,6 +13,7 @@
    <bean class="org.constellation.services.admin.ConfigurationServiceInit" init-method="init" autowire="byType"/>
    <bean class="org.constellation.security.SecurityManagerHolder" factory-method="getInstance" />
   
+   <bean class="org.constellation.services.SessionDataImpl" scope="session" />
    
    <context:component-scan base-package="org.constellation.conf"  />
    <context:component-scan base-package="org.constellation.map.ws"  />

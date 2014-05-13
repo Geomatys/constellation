@@ -156,6 +156,10 @@ public class DataRest {
     private static final Logger LOGGER = Logging.getLogger(DataRest.class);
 
     @Inject
+    private SessionData sessionData;
+
+    
+    @Inject
     private ProviderRepository providerRepository;
 
     /**

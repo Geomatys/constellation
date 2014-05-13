@@ -12,9 +12,9 @@ public class Layer {
 
     private String alias;
 
-    private Service service;
+    private int serviceId;
 
-    private Data data;
+    private int dataId;
 
     private long date;
 
@@ -24,7 +24,7 @@ public class Layer {
 
     private String config;
 
-    private User owner;
+    private String owner;
 
     public int getId() {
         return id;
@@ -58,20 +58,20 @@ public class Layer {
         this.alias = alias;
     }
 
-    public Service getService() {
-        return service;
+    public int getService() {
+        return serviceId;
     }
 
-    public void setService(Service service) {
-        this.service = service;
+    public void setService(int serviceId) {
+        this.serviceId = serviceId;
     }
 
-    public Data getData() {
-        return data;
+    public int getData() {
+        return dataId;
     }
 
-    public void setData(Data data) {
-        this.data = data;
+    public void setData(int dataId) {
+        this.dataId = dataId;
     }
 
     public long getDate() {
@@ -106,11 +106,20 @@ public class Layer {
         this.config = config;
     }
 
-    public User getOwner() {
+    public String getOwner() {
         return owner;
     }
 
-    public void setOwner(User owner) {
+    public void setOwner(String owner) {
         this.owner = owner;
     }
+
+    @Override
+    public String toString() {
+        return "Layer [id=" + id + ", name=" + name + ", namespace=" + namespace + ", alias=" + alias + ", serviceId="
+                + serviceId + ", dataId=" + dataId + ", date=" + date + ", title=" + title + ", description="
+                + description + ", config=" + config + ", owner=" + owner + "]";
+    }
+    
+    
 }

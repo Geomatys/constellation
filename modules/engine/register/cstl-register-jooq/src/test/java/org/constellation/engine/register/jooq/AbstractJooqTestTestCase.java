@@ -24,8 +24,6 @@ public abstract class AbstractJooqTestTestCase {
 
     protected void dump(List<?> findAll) {
         for (Object property : findAll) {
-            System.out.println(property);
-            if (property != null)
                 LOGGER.debug(property.toString());
         }
 

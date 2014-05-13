@@ -3,6 +3,7 @@ package org.constellation.engine.register.jooq.repository;
 import static org.constellation.engine.register.jooq.Tables.USER;
 import static org.constellation.engine.register.jooq.Tables.USER_X_ROLE;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ import org.constellation.engine.register.jooq.tables.UserXDomainXDomainrole;
 import org.constellation.engine.register.jooq.tables.UserXRole;
 import org.constellation.engine.register.jooq.tables.records.UserRecord;
 import org.constellation.engine.register.jooq.tables.records.UserXRoleRecord;
+import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.jooq.DeleteConditionStep;
 import org.jooq.InsertSetMoreStep;
@@ -23,12 +25,23 @@ import org.jooq.Result;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectJoinStep;
 import org.jooq.UpdateConditionStep;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User> implements UserRepository {
 
+    
+    
+    private final static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+
+    @Autowired
+    private DomainRepository domainRepository;
+    
     private org.constellation.engine.register.jooq.tables.User userTable = USER.as("u");
     private UserXRole userXroleTable = Tables.USER_X_ROLE.as("uXr");
     private Domain domainTable = Tables.DOMAIN.as("d");
@@ -148,10 +161,26 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
 
     @Override
     public void delete(String userId) {
+        int deleteRole = deleteRole(userId);
+        
+        int removeUserFromAllDomain = domainRepository.removeUserFromAllDomain(userId);
+        LOGGER.debug("Delete " + removeUserFromAllDomain + " domain references");
+        
+        LOGGER.debug("Delete " + deleteRole + " role references");
+
         dsl.delete(USER).where(USER.LOGIN.eq(userId)).execute();
+        
+        
+        
     }
 
    
+
+    private int deleteRole(String userId) {
+        return dsl.delete(USER_X_ROLE).where(USER_X_ROLE.LOGIN.eq(userId)).execute();
+        
+    }
+
 
     @Override
     public User findOneWithRolesAndDomains(String login) {

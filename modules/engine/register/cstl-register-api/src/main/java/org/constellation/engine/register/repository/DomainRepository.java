@@ -20,4 +20,12 @@ public interface DomainRepository {
     int[] addUserToDomain(String userId, int domainId, Set<String> roles);
 
     int removeUserFromDomain(String userId, int domainId);
+    
+    void addServiceToDomain(int serviceId, int domainId);
+    
+    int removeServiceFromDomain(int serviceId, int domainId);
+
+    int removeUserFromAllDomain(String userId);
+
+
 }

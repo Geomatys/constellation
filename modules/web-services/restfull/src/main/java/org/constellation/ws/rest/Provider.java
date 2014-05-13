@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -39,6 +41,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
+
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.referencing.IdentifiedObjects;
 import org.apache.sis.storage.DataStoreException;
@@ -51,6 +54,7 @@ import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.configuration.ProviderConfiguration;
 import org.constellation.dto.ProviderPyramidChoiceList;
 import org.constellation.dto.SimpleValue;
+import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.provider.CoverageData;
 import org.constellation.provider.Data;
 import org.constellation.provider.DataProvider;
@@ -90,6 +94,13 @@ public final class Provider {
 
     private static final Logger LOGGER = Logging.getLogger(Provider.class);
 
+    @Inject
+    private SessionData sessionData;
+    
+    @Inject
+    private DomainRepository domainRepository;
+
+    
     /**
      * Create a new provider from the given configuration.
      */
@@ -299,7 +310,9 @@ public final class Provider {
             old.updateSource(sources);
         } else {
             try {
-                DataProviders.getInstance().createProvider(id, providerService, sources);
+                DataProvider dataProvider = DataProviders.getInstance().createProvider(id, providerService, sources);
+                
+                domainRepository.addProviderToDomain(id, sessionData.getActiveDomainId());
             } catch (ConfigurationException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
                 return Response.status(500).build();

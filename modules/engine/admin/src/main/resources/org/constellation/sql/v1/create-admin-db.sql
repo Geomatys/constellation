@@ -104,15 +104,6 @@ CREATE TABLE "admin"."provider"(
 ALTER TABLE "admin"."provider" ADD CONSTRAINT provider_pk       PRIMARY KEY ("id");
 ALTER TABLE "admin"."provider" ADD CONSTRAINT provider_owner_fk FOREIGN KEY ("owner") REFERENCES "admin"."user"("login");
 
-CREATE TABLE "admin"."provider_x_domain"(
-  "provider_id"   INTEGER NOT NULL,
-  "domain_id"  INTEGER NOT NULL
-);
-
-ALTER TABLE "admin"."provider_x_domain" ADD CONSTRAINT provider_x_domain_pk PRIMARY KEY ("provider_id", "domain_id");
-ALTER TABLE "admin"."provider_x_domain" ADD CONSTRAINT provider_x_domain_login_fk FOREIGN KEY ("provider_id") REFERENCES "admin"."provider"("id");
-ALTER TABLE "admin"."provider_x_domain" ADD CONSTRAINT provider_x_domain_domain_id_fk FOREIGN KEY ("domain_id") REFERENCES "admin"."domain"("id");
-
 
 -- provider items
 
@@ -284,19 +275,9 @@ ALTER TABLE "admin"."layer" ADD CONSTRAINT layer_data_fk    FOREIGN KEY ("data")
 ALTER TABLE "admin"."layer" ADD CONSTRAINT layer_owner_fk   FOREIGN KEY ("owner") REFERENCES "admin"."user"("login");
 
 
--- Domain cross tables with for layers
-
-CREATE TABLE "admin"."layer_x_domain"(
-  "layer_id"   INTEGER NOT NULL,
-  "domain_id"  INTEGER NOT NULL
-);
-
-ALTER TABLE "admin"."layer_x_domain" ADD CONSTRAINT layer_x_domain_pk PRIMARY KEY ("layer_id", "domain_id");
-ALTER TABLE "admin"."layer_x_domain" ADD CONSTRAINT layer_x_domain_login_fk FOREIGN KEY ("layer_id") REFERENCES "admin"."layer"("id");
-ALTER TABLE "admin"."layer_x_domain" ADD CONSTRAINT layer_x_domain_domain_id_fk FOREIGN KEY ("domain_id") REFERENCES "admin"."domain"("id");
+-- Domain cross tables
 
 
--- tasks
 
 CREATE TABLE "admin"."task"(
   "identifier"  VARCHAR(512) NOT NULL,

@@ -14,6 +14,8 @@ import org.constellation.engine.register.Provider;
 
     List<String> getProviderIds();
 
+    Provider findByIdentifie(String providerIdentifier);
+
 
     
 }

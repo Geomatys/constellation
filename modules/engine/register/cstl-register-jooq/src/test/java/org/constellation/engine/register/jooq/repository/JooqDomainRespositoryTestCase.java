@@ -19,14 +19,14 @@ public class JooqDomainRespositoryTestCase extends AbstractJooqTestTestCase {
         dump(domainRepository.findAll());
     }
     
-    @Test
+    //@Test
     public void save() {
         Domain domainDTO = new Domain("cadastre", "Domaine du cadastre");
         Domain save = domainRepository.save(domainDTO);
         LOGGER.debug("New domains: " + domainDTO);
     }
     
-    @Test
+    //@Test
     public void update() {
         Domain domainDTO = new Domain(3, "cadastre mec", "Domaine du cadastre");
         domainRepository.update(domainDTO);
@@ -34,23 +34,29 @@ public class JooqDomainRespositoryTestCase extends AbstractJooqTestTestCase {
         
     }
     
-    @Test
+    //@Test
     public void delete() {
         int n = domainRepository.delete(3);
         LOGGER.debug("Delete " + n + " domains");
     }
     
-    @Test
+    //@Test
     public void testAddUserToDomain() {
         Set<String> roles = new HashSet<String>(); 
         roles.add("manager");
         domainRepository.addUserToDomain("olivier", 2, roles );
     }
     
-    @Test
+    //@Test
     public void testRemoveUserFromDomain() {
         int removeUserFromDomain = domainRepository.removeUserFromDomain("zozoz", 1);
         LOGGER.debug("Removed: " + removeUserFromDomain);
     }
 
+    //@Test
+    public void findOne() {
+        Domain domain = domainRepository.findOne(1);
+        dump(domain);
+    }
+    
 }
