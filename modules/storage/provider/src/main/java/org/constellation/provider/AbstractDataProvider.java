@@ -175,4 +175,9 @@ public abstract class AbstractDataProvider extends AbstractProvider<Name,Data> i
     public ProviderType getProviderType() {
         return ProviderType.LAYER;
     }
+    
+    @Override
+    public boolean isSensorAffectable() {
+        return true;
+    }
 }

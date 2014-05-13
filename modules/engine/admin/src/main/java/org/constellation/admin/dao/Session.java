@@ -961,7 +961,7 @@ public final class Session implements Closeable {
         return stream;
     }
 
-    public DataRecord writeData(final QName name, final ProviderRecord provider, final DataType type, final String owner) throws SQLException {
+    public DataRecord writeData(final QName name, final ProviderRecord provider, final DataType type, final String owner, final boolean sensorable) throws SQLException {
         ensureNonNull("name",     name);
         ensureNonNull("provider", provider);
         ensureNonNull("type",     type);
@@ -972,10 +972,10 @@ public final class Session implements Closeable {
         final int description     = nextIdForI18n();
         final String login        = owner;
         // Proceed to insertion.
-        final int id = new Query(WRITE_DATA).with(name.getLocalPart(), name.getNamespaceURI(), provider.id, type.name(), date.getTime(), title, description, login).insert();
+        final int id = new Query(WRITE_DATA).with(name.getLocalPart(), name.getNamespaceURI(), provider.id, type.name(), date.getTime(), title, description, login, sensorable).insert();
 
         // Return inserted line.
-        return new DataRecord(this, id, name.getLocalPart(), name.getNamespaceURI(), provider.id, type, true, false, date, title, description, login, null);
+        return new DataRecord(this, id, name.getLocalPart(), name.getNamespaceURI(), provider.id, type, true, sensorable, date, title, description, login, null);
     }
 
     /* internal */ void updateData(final int generatedId, final String newName, final String newNamespace, final int newProvider, final DataType newType, final String newOwner) throws SQLException {

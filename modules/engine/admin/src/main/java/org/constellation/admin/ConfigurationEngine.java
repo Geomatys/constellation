@@ -1026,7 +1026,7 @@ public class ConfigurationEngine {
         }
     }
 
-    public static DataRecord writeData(final QName name, final ProviderRecord provider, final DataRecord.DataType type) {
+    public static DataRecord writeData(final QName name, final ProviderRecord provider, final DataRecord.DataType type, final boolean sensorable) {
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
@@ -1040,7 +1040,7 @@ public class ConfigurationEngine {
             if (login == null) {
                 login = "admin";
             }
-            return session.writeData(name, provider, type, login);
+            return session.writeData(name, provider, type, login, sensorable);
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "error when try to delete data", e);
         } finally {

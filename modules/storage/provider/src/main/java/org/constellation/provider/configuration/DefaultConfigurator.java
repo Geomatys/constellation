@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
@@ -153,7 +152,7 @@ public final class DefaultConfigurator implements Configurator {
                     }
                 }
                 if (!found) {
-                    DataRecord record = ConfigurationEngine.writeData(name, pr, provider.getDataType());
+                    DataRecord record = ConfigurationEngine.writeData(name, pr, provider.getDataType(), provider.isSensorAffectable());
                     final InputStream currentMetadata = metadata.get(record.getName());
                     if (currentMetadata != null) {
                         StringWriter writer = new StringWriter();

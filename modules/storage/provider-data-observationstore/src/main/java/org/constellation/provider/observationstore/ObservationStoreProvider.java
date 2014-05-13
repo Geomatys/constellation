@@ -63,7 +63,7 @@ public class ObservationStoreProvider extends AbstractDataProvider {
 
     @Override
     public DataRecord.DataType getDataType() {
-        return DataRecord.DataType.OBSERVATION;
+        return DataRecord.DataType.VECTOR;
     }
 
     @Override
@@ -138,5 +138,9 @@ public class ObservationStoreProvider extends AbstractDataProvider {
             names = null;
         }
     }
-    
+
+    @Override
+    public boolean isSensorAffectable() {
+        return true;
+    }
 }

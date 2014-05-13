@@ -18,7 +18,6 @@ package org.constellation.provider.sld;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -59,7 +58,6 @@ import static org.constellation.provider.sld.SLDProviderFactory.*;
  */
 public class SLDProvider extends AbstractStyleProvider{
 
-    private static final Logger LOGGER = Logging.getLogger("org.constellation.provider.sld");
     private static final MutableStyleFactory SF = (MutableStyleFactory)FactoryFinder.getStyleFactory(
                             new Hints(Hints.STYLE_FACTORY, MutableStyleFactory.class));
     private static final Collection<String> MASKS = new ArrayList<>();
@@ -328,4 +326,8 @@ public class SLDProvider extends AbstractStyleProvider{
         return null;
     }
 
+    @Override
+    public boolean isSensorAffectable() {
+        return false;
+    }
 }

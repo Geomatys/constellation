@@ -142,5 +142,10 @@ public class MockLayerProviderFactory extends AbstractProviderFactory
         public DataType getDataType() {
             throw new UnsupportedOperationException("Not supported.");
         }
+
+        @Override
+        public boolean isSensorAffectable() {
+            throw new UnsupportedOperationException("Not supported."); 
+        }
     }
 }

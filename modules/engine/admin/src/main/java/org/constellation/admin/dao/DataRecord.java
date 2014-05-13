@@ -38,9 +38,7 @@ public final class DataRecord extends Record {
 
     public static enum DataType {
         VECTOR,
-        COVERAGE,
-        SENSOR,
-        OBSERVATION
+        COVERAGE
     }
 
     private Session session;

@@ -112,7 +112,7 @@ public interface Provider<K,V> {
     /**
      * Remove a data from this provider.
      *
-     * @param name Data name to be removed from this provider.
+     * @param key Data name to be removed from this provider.
      */
     void remove(K key);
 
@@ -136,4 +136,6 @@ public interface Provider<K,V> {
     ProviderType getProviderType();
 
     DataType getDataType();
+    
+    boolean isSensorAffectable();
 }
