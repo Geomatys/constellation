@@ -43,6 +43,30 @@ li>a {
     height:17px;
     background: transparent url('../images/icon-menu-sensor.png') right center no-repeat;
 }
+.btn-language{
+    
+    margin-right: 16px;
+}
+.header .nav.btn-language>li>a {
+    color:#6f6f6f;
+    background-color: #D5D5D5;
+    border-radius: 0 0 5px 5px;
+    margin-top: 4px;
+    box-shadow: inset 0px 0px 10px #B4B1B1;
+}
+.header .nav.btn-language>li>a:hover, .header .nav.btn-language>li>a:focus, .header .nav.btn-language>li.open>a {
+    color:#555;
+    background-color: #e1e1e1;
+}
+.header .nav.btn-language>li>a .caret{
+    border-top-color: #6f6f6f;
+    border-bottom-color: #6f6f6f;
+}
+.header .nav.btn-language>li>a:hover .caret, .header .nav.btn-language>li>a:focus .caret, .header .nav.btn-language>li.open>a .caret{
+    border-top-color: #555;
+    border-bottom-color: #555;
+}
+
 body {
     background-color: #f2f2f2;
 }
