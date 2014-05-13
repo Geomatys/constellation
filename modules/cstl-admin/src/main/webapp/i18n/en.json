@@ -294,6 +294,7 @@
         "add.data": "Add data",
         "add.sensors": "Add sensor",
         "add.style": "Add style",
+        "add.task": "Add task",
         "all": "All",
         "all_fem": "All",
         "categories": "Categories",
@@ -331,6 +332,7 @@
         "no.selected.layer": "No selected layer.",
         "no.selected.metadata": "No selected metadata.",
         "no.selected.style": "No selected style.",
+        "no.selected.task": "No selected task.",
         "observation": "Observation",
         "owner": "Owner",
         "raster": "Raster",
@@ -338,6 +340,7 @@
         "related.mapcontext": "Related map context",
         "related.service": "Related service",
         "related.style": "Related style",
+        "related.sensors": "Related sensor(s)",
         "results": "result(s)",
         "return": "Return",
         "save": "Save",
@@ -353,7 +356,8 @@
         "vector": "Vector",
         "count.data": "available data",
         "count.sensors": "available sensors",
-        "count.style": "available style(s)"
+        "count.style": "available style(s)",
+        "count.tasks": "available task(s)"
     },
     "layer.listing": {
         "data": {
@@ -451,7 +455,8 @@
             "sensor": "Click on a sensor to display more information.",
             "layer": "Click on a layer to display more information.",
             "metadata": "Click on a metadata to display more information.",
-            "style": "Click on a style to display more information."
+            "style": "Click on a style to display more information.",
+            "task":"Click on a task to display more information."
         }
     },
     "server": {
@@ -600,6 +605,7 @@
             "style": "Styles",
             "map-composition": "Map Editor",
             "viewer": "Map Viewer",
+            "tasks":"Tasks",
             "account.login": "Authenticate",
             "admin": {
                 "main": "Administration",
@@ -865,7 +871,8 @@
         "edit.service":"Edit Service",
         "process":"Processes",
         "tasks":"Tasks",
-        "sensors":"Sensors Dashboard"
+        "sensors":"Sensors Dashboard",
+        "tasks":"Tasks Dashboard"
     },
     "com.codahale.metrics.servlet.AbstractInstrumentedFilter.requests": "Metrics",
     "org.constellation.map.ws.DefaultWMSWorker.getCapabilities": "WMS(getCapabilies)",
@@ -931,5 +938,6 @@
         "sensor.add":"Supported formats: a sensorML file (*.xml) or a zip file.",
         "style.create":"You must select a data to associate the style created."
     },
-    "sensors.information.title":"Available Sensors"
+    "sensors.information.title":"Available sensors",
+    "tasks.information.title":"Available tasks"
 }

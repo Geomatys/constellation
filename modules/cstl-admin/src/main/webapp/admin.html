@@ -88,12 +88,15 @@
                     <li><a href="#/styles"> <span class="glyphicon glyphicon-pencil"></span>
                         <span translate="global.menu.style">Styles</span>
                     </a></li>
+                    <li><a href="#/tasks"> <span class="glyphicon glyphicon-cog"></span>
+                        <span translate="global.menu.tasks">Tasks</span>
+                    </a></li>
                     <!--         <li><a href="#/viewer"> <span class="glyphicon glyphicon-picture"></span> -->
                     <!--             <span translate="global.menu.viewer">visualiseur</span> -->
                     <!--         </a></li> -->
                     <li class="dropdown pointer"><a class="dropdown-toggle"
                                                     data-toggle="dropdown"> <span> <span
-                            class="glyphicon glyphicon-cog"></span> <span
+                            class="glyphicon glyphicon-wrench"></span> <span
                             class="hidden-tablet" translate="global.menu.admin.main">
                                         Administration</span> <b class="caret"></b>
                             </span>
@@ -108,9 +111,6 @@
                             <li ng-show="authenticated"><a href="#/metrics"><span
                                     class="glyphicon glyphicon-tasks"></span> &nbsp;<span
                                     translate="global.menu.admin.metrics">Metrics</span></a></li>
-                            <li ng-show="authenticated"><a href="#/process"><span
-                                    class="glyphicon glyphicon-wrench"></span> &nbsp;<span
-                                    translate="global.menu.admin.processes">Processes</span></a></li>
                             <li ng-show="authenticated"><a href="#/task"><span
                                     class="glyphicon glyphicon-wrench"></span> &nbsp;<span
                                     translate="global.menu.admin.tasks">Tasks</span></a></li>
@@ -173,6 +173,7 @@
 <script src="scripts/controller-sensor.js"></script>
 <script src="scripts/controller-style.js"></script>
 <script src="scripts/controller-webservice.js"></script>
+<script src="scripts/controller-process.js"></script>
 <script src="scripts/services.js"></script>
 <script src="scripts/directives.js"></script>
 <script src="scripts/openlayers-fix-wmts.js"></script>

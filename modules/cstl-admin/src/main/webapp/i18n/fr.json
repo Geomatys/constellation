@@ -303,6 +303,7 @@
             "map-composition": "Compositions cartographiques",
             "style": "Styles",
             "viewer": "Visualiseur",
+            "tasks":"Traitements",
             "web-service": "Services web"
         },
         "title": "JHipster"
@@ -419,6 +420,7 @@
         "add.data": "Ajouter une donnée",
         "add.sensors": "Ajouter un capteur",
         "add.style": "Ajouter un style",
+        "add.task": "Ajouter un traitement",
         "all": "Tous",
         "all_fem": "Toutes",
         "categories": "Catégories",
@@ -473,7 +475,8 @@
                 "sensor": "Aucun capteur sélectionné.",
                 "layer": "Aucune couche sélectionnée.",
                 "metadata": "Aucune métadonnée sélectionnée.",
-                "style": "Aucun style sélectionné."
+                "style": "Aucun style sélectionné.",
+                "task": "Aucun traitement sélectionné."
             }
         },
         "observation": "Observation",
@@ -483,7 +486,8 @@
             "data": "Donnée(s) associée(s)",
             "mapcontext": "Composition(s) cartographique(s) associée(s)",
             "service": "Service(s) associé(s)",
-            "style": "Style(s) associé(s)"
+            "style": "Style(s) associé(s)",
+            "sensors": "Capteur(s) associé(s)"
         },
         "results": "résultat(s)",
         "return": "Retour",
@@ -500,7 +504,8 @@
         "vector": "Vecteur",
         "count.data":"donnée(s) disponible(s)",
         "count.sensors": "capteur(s) disponible(s)",
-        "count.style": "styles(s) disponible(s)"
+        "count.style": "styles(s) disponible(s)",
+        "count.tasks": "traitement(s) disponible(s)"
     },
     "layer": {
         "listing": {
@@ -828,7 +833,8 @@
                 "sensor": "Cliquez sur un capteur ci-contre pour afficher plus d'informations.",
                 "layer": "Cliquez sur une couche ci-contre pour afficher plus d'informations.",
                 "metadata": "Cliquez sur une fiche de métadonnées ci-contre pour afficher plus d'informations.",
-                "style": "Cliquez sur un style ci-contre pour afficher plus d'informations."
+                "style": "Cliquez sur un style ci-contre pour afficher plus d'informations.",
+                "task": "Cliquez sur un traitement ci-contre pour afficher plus d'informations."
             }
         }
     },
@@ -1152,7 +1158,8 @@
         "edit.service":"Edition du service",
         "process":"Processus",
         "tasks":"Tâches",
-        "sensors":"Gestion des capteurs"
+        "sensors":"Gestion des capteurs",
+        "tasks":"Gestion des traitements"
     },
     "style.information.title":"Styles disponibles",
     "users": {
@@ -1216,5 +1223,6 @@
         "sensor.add":"Formats supportés : un fichier sensorML (*.xml) ou un fichier zip.",
         "style.create":"Vous devez sélectionner une donnée afin de lui associer le style créé."
     },
-    "sensors.information.title":"Capteurs disponibles"
+    "sensors.information.title":"Capteurs disponibles",
+    "tasks.information.title":"Traitements disponibles"
 }

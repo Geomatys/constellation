@@ -230,26 +230,6 @@ cstlAdminApp.controller('UserDetailsController', ['$scope', '$modalInstance', 'u
     }
 }]);
 
-
-cstlAdminApp.controller('ProcessController', ['$scope', 'ProcessService',
-                                  function ($scope, Process) {
-                                             var lastOpened = null;
-                                             $scope.registries = Process.get();
-                                             $scope.toggle = function(id){
-                                               if(lastOpened == id){
-                                                 $(lastOpened).collapse("hide")
-                                                 lastOpened = null;
-                                               }else{
-                                                 if(lastOpened){
-                                                   $(lastOpened).collapse("hide")
-                                                 }
-                                                 $(id).collapse("toggle")
-                                                 lastOpened = id;
-                                               }
-                                             };
-                                         }]);
-                                     
-
 cstlAdminApp.controller('TaskController', ['$scope', 'TaskService','$timeout','StompService', 
        function ($scope, TaskService, $timeout, StompService) {
 

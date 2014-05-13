@@ -114,6 +114,10 @@ cstlAdminApp
                     templateUrl: 'views/styles.html',
                     controller: 'StylesController'
                 })
+                .when('/tasks', {
+                    templateUrl: 'views/tasks.html',
+                    controller: 'ProcessController'
+                })
                 .otherwise({
                     templateUrl: 'views/main.html',
                     controller: 'MainController'
@@ -131,12 +135,6 @@ cstlAdminApp
             });
 
             //Process routes
-            $routeProvider
-            .when('/process', {
-                templateUrl: 'views/process/list.html',
-                controller: 'ProcessController'
-            });
-
             $routeProvider
             .when('/task', {
                 templateUrl: 'views/task/list.html',
