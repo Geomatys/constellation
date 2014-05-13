@@ -618,6 +618,7 @@ public class ConfigurationEngine {
      * Load a metadata for a provider.
      *
      * @param providerId
+     * @param dataId
      * @param pool
      * @return
      */

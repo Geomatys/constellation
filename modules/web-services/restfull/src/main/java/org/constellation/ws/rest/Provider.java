@@ -271,6 +271,7 @@ public final class Provider {
                         
                         final ParameterValueGroup ncObsParams = sources.groups("choice").get(0).addGroup("ObservationFileParameters");
                         ncObsParams.parameter("identifier").setValue("observationFile");
+                        ncObsParams.parameter("namespace").setValue("no namespace");
                         ncObsParams.parameter("url").setValue(new File(inParams.get("path")));
                         break;
                     
@@ -278,6 +279,7 @@ public final class Provider {
                         
                         final ParameterValueGroup xmlObsParams = sources.groups("choice").get(0).addGroup("ObservationXmlFileParameters");
                         xmlObsParams.parameter("identifier").setValue("observationXmlFile");
+                        xmlObsParams.parameter("namespace").setValue("no namespace");
                         xmlObsParams.parameter("url").setValue(new File(inParams.get("path")));
                         break;
                    

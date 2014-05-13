@@ -25,8 +25,10 @@ import org.apache.sis.storage.DataStoreException;
 import org.constellation.admin.dao.DataRecord;
 import org.constellation.provider.AbstractDataProvider;
 import org.constellation.provider.Data;
-import org.constellation.provider.DefaultObservationData;
+import org.constellation.provider.DefaultFeatureData;
 import org.constellation.provider.ProviderFactory;
+import org.geotoolkit.data.FeatureStore;
+import org.geotoolkit.data.FeatureStoreFinder;
 import org.geotoolkit.observation.ObservationStore;
 import org.geotoolkit.observation.ObservationStoreFinder;
 import org.geotoolkit.parameter.ParametersExt;
@@ -40,7 +42,8 @@ import org.opengis.parameter.ParameterValueGroup;
  */
 public class ObservationStoreProvider extends AbstractDataProvider {
 
-    private ObservationStore store;
+    private FeatureStore featureStore;
+    private ObservationStore observationStore;
     private Set<Name> names;
     
     public ObservationStoreProvider(final String providerId, final ProviderFactory service, final ParameterValueGroup param){
@@ -68,10 +71,17 @@ public class ObservationStoreProvider extends AbstractDataProvider {
 
     @Override
     public DataStore getMainStore() {
-        if (store == null) {
+        if (featureStore == null) {
             reload();
         }
-        return store;
+        return featureStore;
+    }
+
+    public DataStore getObservationStore() {
+        if (observationStore == null) {
+            reload();
+        }
+        return observationStore;
     }
 
     @Override
@@ -79,12 +89,11 @@ public class ObservationStoreProvider extends AbstractDataProvider {
         if(!contains(key)){
             return null;
         }
+        final Name goodKey = fullyQualified(key);
         
-        if (store != null) {
-
-            return new DefaultObservationData(key);
+        if (featureStore != null) {
+            return new DefaultFeatureData(goodKey, featureStore, null, null, null, null, null, version);
         }
-        
         return null;
     }
 
@@ -110,12 +119,18 @@ public class ObservationStoreProvider extends AbstractDataProvider {
             return;
         }
         try {
-            //create the store
-            store = ObservationStoreFinder.open(factoryconfig);
-            if(store == null){
-                throw new DataStoreException("Could not create observation store for parameters : "+factoryconfig);
+            //create the observation store
+            observationStore = ObservationStoreFinder.open(factoryconfig);
+            if(observationStore == null){
+                throw new DataStoreException("Could not create observation store for parameters : " + factoryconfig);
             }
-            names = store.getProcedureNames();
+            
+            //create the feature store
+            featureStore = FeatureStoreFinder.open(factoryconfig);
+            if(featureStore == null){
+                throw new DataStoreException("Could not create feature store for parameters : " + factoryconfig);
+            }
+            names = featureStore.getNames();
         } catch (DataStoreException ex) {
             names = Collections.EMPTY_SET;
             getLogger().log(Level.WARNING, ex.getMessage(), ex);
@@ -128,13 +143,13 @@ public class ObservationStoreProvider extends AbstractDataProvider {
     @Override
     public void dispose() {
         super.dispose();
-        if (store != null) {
+        if (observationStore != null) {
             try {
-                store.close();
+                observationStore.close();
             } catch (DataStoreException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             }
-            store = null;
+            observationStore = null;
             names = null;
         }
     }

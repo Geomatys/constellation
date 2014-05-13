@@ -1414,7 +1414,7 @@ public class DataRest {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getIsoMetadata(final @PathParam("providerId") String providerId, final @PathParam("dataId") String dataId) {
-        final DefaultMetadata metadata = ConfigurationEngine.loadIsoDataMetadata(providerId, new QName("", dataId), CSWMarshallerPool.getInstance());
+        final DefaultMetadata metadata = ConfigurationEngine.loadIsoDataMetadata(providerId, QName.valueOf(dataId), CSWMarshallerPool.getInstance());
         if (metadata != null) {
             metadata.prune(); 
         }

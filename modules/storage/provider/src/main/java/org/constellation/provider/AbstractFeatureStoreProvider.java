@@ -39,6 +39,7 @@ import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.memory.ExtendedFeatureStore;
 import org.geotoolkit.data.memory.MemoryFeatureStore;
 import static org.geotoolkit.parameter.Parameters.*;
+import org.opengis.parameter.ParameterNotFoundException;
 
 /**
  * Abstract provider which handle a Datastore.
@@ -155,7 +156,12 @@ public abstract class AbstractFeatureStoreProvider extends AbstractDataProvider{
         String namespace;
         final ParameterValueGroup config = candidate.getConfiguration();
         if (config != null) {
-            namespace = Parameters.value(AbstractFeatureStoreFactory.NAMESPACE, config);
+            try {
+                namespace = Parameters.value(AbstractFeatureStoreFactory.NAMESPACE, config);
+            } catch (ParameterNotFoundException ex) {
+                LOGGER.log(Level.FINEST, "no parameter namespace found in provider configuration", ex);
+                namespace = null;
+            }
         } else {
             namespace = null;
         }

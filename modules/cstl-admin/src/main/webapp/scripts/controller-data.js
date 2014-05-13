@@ -33,7 +33,13 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
         // Map methods
         $scope.showData = function() {
             $('#viewerData').modal("show");
-            var layerName = $scope.selected.Name;
+            var layerName;
+            if ($scope.selected.Namespace) {
+                layerName = '{' + $scope.selected.Namespace + '}' + $scope.selected.Name;
+            } else {
+                layerName = $scope.selected.Name;
+            }
+                
             var providerId = $scope.selected.Provider;
             var layerData;
             var modalLoader = $modal.open({
@@ -51,14 +57,17 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
             dataListing.metadata({providerId: providerId, dataId: layerName}, {}, function(response) {
                 // Success getting the metadata, try to find the data extent
                 DataViewer.initMap('dataMap');
-                var ident = response['gmd.MD_Metadata']['gmd.identificationInfo'];
-                if (ident) {
-                    var extentMD = ident['gmd.MD_DataIdentification']['gmd.extent'];
-                    if (extentMD) {
-                        var bbox = extentMD['gmd.EX_Extent']['gmd.geographicElement']['gmd.EX_GeographicBoundingBox'];
-                        var extent = new OpenLayers.Bounds(bbox['gmd.westBoundLongitude']['gco.Decimal'], bbox['gmd.southBoundLatitude']['gco.Decimal'],
-                            bbox['gmd.eastBoundLongitude']['gco.Decimal'], bbox['gmd.northBoundLatitude']['gco.Decimal']);
-                        DataViewer.map.zoomToExtent(extent, true);
+                var md = response['gmd.MD_Metadata'];
+                if (md) {
+                    var ident = md['gmd.identificationInfo'];
+                    if (ident) {
+                        var extentMD = ident['gmd.MD_DataIdentification']['gmd.extent'];
+                        if (extentMD) {
+                            var bbox = extentMD['gmd.EX_Extent']['gmd.geographicElement']['gmd.EX_GeographicBoundingBox'];
+                            var extent = new OpenLayers.Bounds(bbox['gmd.westBoundLongitude']['gco.Decimal'], bbox['gmd.southBoundLatitude']['gco.Decimal'],
+                                bbox['gmd.eastBoundLongitude']['gco.Decimal'], bbox['gmd.northBoundLatitude']['gco.Decimal']);
+                            DataViewer.map.zoomToExtent(extent, true);
+                        }
                     }
                 }
             modalLoader.close();

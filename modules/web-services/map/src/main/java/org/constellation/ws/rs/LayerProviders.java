@@ -66,6 +66,7 @@ import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
+import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapItem;
@@ -86,6 +87,7 @@ import org.geotoolkit.style.function.Method;
 import org.geotoolkit.style.function.Mode;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.type.Name;
 import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Function;
@@ -408,7 +410,8 @@ public final class LayerProviders extends Static {
      * @throws CstlServiceException if the layer does not exists
      */
     private static Data getLayer(final DataProvider provider, final String layerName) throws CstlServiceException {
-        final Data layer = provider.get(layerName);
+        final Name name = DefaultName.valueOf(layerName);
+        final Data layer = provider.get(name);
         if (layer == null) {
             throw new CstlServiceException("No layer named \"" + layerName + "\" in provider with id \"" + provider.getId() + "\".");
         }
