@@ -365,6 +365,14 @@ ul.unstyled {
     .nav-header-mob>li>a{
         font-size:13px;
     }
+    .header .nav.btn-language>li>a{
+        margin-top:5px;
+    }
+}
+@media (max-width: 1199px){
+    .nav-header{
+        width:815px;
+    }
 }
 .sos_edit_checkboxlist{
     border:solid 1px #eeeeee; 
