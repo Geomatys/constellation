@@ -1590,10 +1590,12 @@ public class DataRest {
         return rootName;
     }
 
-    @GET
+    @POST
     @Path("link/sensor/{providerId}/{dataId}/{sensorId}")
-    public Response linkDataToSensor(final @PathParam("providerId") String providerId, final @PathParam("dataId") String dataId, final @PathParam("sensorId") String sensorId) {
-        ConfigurationEngine.linkDataToSensor(QName.valueOf(dataId), providerId, sensorId);
+    public Response linkDataToSensor(final @PathParam("providerId") String providerId, final @PathParam("dataId") String dataId, final @PathParam("sensorId") String sensorId, final SimpleValue value) {
+        final String namespace = value.getValue();
+        final QName name = new QName(namespace, dataId);
+        ConfigurationEngine.linkDataToSensor(name, providerId, sensorId);
         return Response.status(200).build();
     }
 }

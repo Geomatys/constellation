@@ -636,7 +636,7 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                     var sensorId = ($scope.selectedSensorsChild) ? $scope.selectedSensorsChild.id : $scope.selected.id;
                     dataListing.listDataForProv({providerId: $scope.providerId}, function(response) {
                         for (var i=0; i<response.length; i++) {
-                            dataListing.linkToSensor({providerId: response[i].Provider, dataId: response[i].Name, sensorId: sensorId});
+                            dataListing.linkToSensor({providerId: response[i].Provider, dataId: response[i].Name, sensorId: sensorId}, {value: response[i].Namespace});
                         }
                     });
                 } else if ($scope.sensor.mode === 'automatic') {

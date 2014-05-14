@@ -31,18 +31,19 @@ query : <textarea rows="5" cols="80" name="query" id="query"><%= request.getPara
         </div>
     <div class="row">
         <div class="col-md-12">
-<button class="btn btn-primary" id="provider">provider</button>
-<button class="btn btn-primary" id="data">data</button>
-<button class="btn btn-primary" id="style">style</button>
-<button class="btn btn-primary" id="service">service</button>
-<button class="btn btn-primary" id="layer">layer</button>
-<button class="btn btn-primary" id="service_metadata">service_metadata</button>
-<button class="btn btn-primary" id="task">task</button>
-<button class="btn btn-primary" id="user">user</button>
-<button class="btn btn-primary" id="styled_data">styled_data</button>
-<button class="btn btn-primary" id="sensor">sensor</button>
-</div>
+            <button class="btn btn-primary" id="provider">provider</button>
+            <button class="btn btn-primary" id="data">data</button>
+            <button class="btn btn-primary" id="style">style</button>
+            <button class="btn btn-primary" id="styled_data">styled_data</button>
+            <button class="btn btn-primary" id="sensor">sensor</button>
+            <button class="btn btn-primary" id="sensored_data">sensored_data</button>
+            <button class="btn btn-primary" id="service">service</button>
+            <button class="btn btn-primary" id="service_metadata">service_metadata</button>
+            <button class="btn btn-primary" id="layer">layer</button>
+            <button class="btn btn-primary" id="task">task</button>
+            <button class="btn btn-primary" id="user">user</button>
         </div>
+    </div>
     <div class="row">
         <div class="col-md-12">
 result :
@@ -141,6 +142,10 @@ result :
         });
         $("#sensor").on("click", function(){
             $("#query").val('select * from "admin"."sensor"');
+            $("#sqlForm").submit();
+        });
+        $("#sensored_data").on("click", function(){
+            $("#query").val('select * from "admin"."sensored_data"');
             $("#sqlForm").submit();
         });
     })

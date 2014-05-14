@@ -164,7 +164,7 @@ public final class DataRecord extends Record {
 
     public boolean isUsedAsSensor() throws SQLException {
         ensureConnectionNotClosed();
-        final List<SensorRecord> sensors = session.readSensoredDataFromData(this.id);
+        final List<SensorRecord> sensors = session.readSensoredDataFromData(this);
         return !sensors.isEmpty();
     }
 
