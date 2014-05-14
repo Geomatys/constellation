@@ -77,10 +77,10 @@
                             <div class="item {{service.Type | lowercase}}" ng-repeat="service in dataList" ng-class="{selected:service==selected}" ng-click="select(service)">
                                 <div class="top">
                                     <span class="item-title">{{service.Name}}</span>
-                                    
                                     <span class="pull-right text-right item-list-style" style="font-size:14px;">{{service.Type}}</span>
-                                    <img ng-if="service.Sensorable==true" src="images/icon-sensor-non-active.svg" class="pull-right" style="margin-top:8px; margin-right:10px;" >
-                                    <img ng-if="service.UsedAsSensor==true" src="images/icon-sensor-active.svg" class="pull-right" style="margin-top:8px; margin-right:10px;" >
+                                    <img ng-if="service.Type=='VECTOR' && service.subtype=='point'" src="images/vector-point.svg" class="pull-right" style="margin-top:8px; margin-right:10px;" >
+                                    <img ng-if="service.Type=='VECTOR' && service.subtype=='polygon'" src="images/vector-poly.svg" class="pull-right" style="margin-top:8px; margin-right:10px;" >
+                                    <img ng-if="service.Type=='VECTOR' && service.subtype=='line'" src="images/vector-line.svg" class="pull-right" style="margin-top:8px; margin-right:10px;" >
                                 </div>
                                 <div class="bottom">
                                     <div class="block">
@@ -89,6 +89,8 @@
                                     <div class="block">
                                         <i class="icon-user"></i>{{service.Owner}}
                                     </div>
+                                    <img ng-if="service.Sensorable==true" src="images/icon-sensor-non-active.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
+                                    <img ng-if="service.UsedAsSensor==true" src="images/icon-sensor-active.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
                                 </div>
                             </div>
                         </div>
