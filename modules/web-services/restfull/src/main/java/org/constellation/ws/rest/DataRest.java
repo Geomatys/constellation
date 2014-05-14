@@ -1589,6 +1589,13 @@ public class DataRest {
         stream.close();
         return rootName;
     }
+
+    @GET
+    @Path("link/sensor/{providerId}/{dataId}/{sensorId}")
+    public Response linkDataToSensor(final @PathParam("providerId") String providerId, final @PathParam("dataId") String dataId, final @PathParam("sensorId") String sensorId) {
+        ConfigurationEngine.linkDataToSensor(QName.valueOf(dataId), providerId, sensorId);
+        return Response.status(200).build();
+    }
 }
 
 

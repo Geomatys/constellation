@@ -1069,26 +1069,26 @@ public final class Session implements Closeable {
      *                      sensored-data table queries                         *
      **************************************************************************/
 
-    public void writeSensoredData(final SensorRecord sensor, final DataRecord data) throws SQLException {
+    public void writeSensoredData(final DataRecord data, final SensorRecord sensor) throws SQLException {
         ensureNonNull("sensor", sensor);
         ensureNonNull("data",  data);
         new Query(WRITE_SENSORED_DATA).with(sensor.id, data.id).update();
     }
 
-    public void deleteSensoredData(final SensorRecord sensor, final DataRecord data) throws SQLException {
-        ensureNonNull("sensor", sensor);
-        ensureNonNull("data",  data);
-        new Query(DELETE_SENSORED_DATA).with(sensor.id, data.id).update();
+    public void deleteSensoredData(final int dataId, final int sensorId) throws SQLException {
+        ensureNonNull("sensorId", sensorId);
+        ensureNonNull("dataId",  dataId);
+        new Query(DELETE_SENSORED_DATA).with(sensorId, dataId).update();
     }
 
-    public List<SensorRecord> readSensoredDataFromData(final DataRecord data) throws SQLException {
-        ensureNonNull("data",  data);
-        return new Query(LIST_SENSORED_DATA_FROM_DATA).with(data.id).select().getAll(SensorRecord.class);
+    public List<SensorRecord> readSensoredDataFromData(final int dataId) throws SQLException {
+        ensureNonNull("dataId",  dataId);
+        return new Query(LIST_SENSORED_DATA_FROM_DATA).with(dataId).select().getAll(SensorRecord.class);
     }
 
-    public List<DataRecord> readSensoredDataFromSensor(final SensorRecord sensor) throws SQLException {
-        ensureNonNull("sensor",  sensor);
-        return new Query(LIST_SENSORED_DATA_FROM_SENSOR).with(sensor.id).select().getAll(DataRecord.class);
+    public List<DataRecord> readSensoredDataFromSensor(final int sensorId) throws SQLException {
+        ensureNonNull("sensorId",  sensorId);
+        return new Query(LIST_SENSORED_DATA_FROM_SENSOR).with(sensorId).select().getAll(DataRecord.class);
     }
 
     /**************************************************************************

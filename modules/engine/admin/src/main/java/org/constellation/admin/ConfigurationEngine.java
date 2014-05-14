@@ -1095,6 +1095,28 @@ public class ConfigurationEngine {
         }
     }
 
+    public static void linkDataToSensor(final QName name, final String providerId, final String sensorId) {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            String login = null;
+            try {
+                login = securityManager.getCurrentUserLogin();
+            } catch (NoSecurityManagerException ex) {
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+            }
+
+            final DataRecord data = session.readData(name, providerId);
+            final SensorRecord sensor = session.readSensor(sensorId);
+            session.writeSensoredData(data, sensor);
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "error when try to delete data", e);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+    }
+
     private static DataBrief _getData(QName name, String providerId) {
         Session session = null;
         try {
