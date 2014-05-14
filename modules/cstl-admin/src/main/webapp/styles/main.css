@@ -508,6 +508,12 @@ p.error-select-one{
     margin-top: 5px;
     background: transparent url('../images/loader.gif') center center no-repeat;
 }
+.coverage-type-nd{
+    font-size:14px; 
+    margin-right:10px; 
+    margin-top:8px; 
+    font-weight:bold;
+}
 
 /*
  * Dashboard pagination.
