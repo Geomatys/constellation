@@ -31,7 +31,7 @@ cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', '$
             if (confirm("Are you sure?")) {
                 var styleName = $scope.selected.Name;
                 var providerId = $scope.selected.Provider;
-                style.delete({providerid: providerId, name: styleName}, {},
+                style.delete({provider: providerId, name: styleName}, {},
                     function() { $growl('success','Success','Style '+ styleName +' successfully deleted');
                         style.listAll({}, function(response) {
                             $scope.fullList = response.styles;
