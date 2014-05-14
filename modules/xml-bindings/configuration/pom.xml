@@ -130,11 +130,16 @@
             <groupId>org.geotoolkit</groupId>
             <artifactId>geotk-render2d</artifactId>
         </dependency>
-		<dependency>
-		  <groupId>com.fasterxml.jackson.module</groupId>
-		  <artifactId>jackson-module-jaxb-annotations</artifactId>
-		  <version>2.2.0</version>
-		</dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-jaxb-annotations</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-json-jettison</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.opengis</groupId>
             <artifactId>geoapi-conformance</artifactId>

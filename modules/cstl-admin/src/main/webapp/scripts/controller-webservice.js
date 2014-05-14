@@ -609,7 +609,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
                         $growl('error', 'Error', 'Unable to remove sensor ' + idToDel + ' from service ' + $scope.service.name);
                     });
                 } else {
-                    webService.deleteLayer({type: $scope.service.type, id: $scope.service.identifier, layerid: $scope.selected.Name}, {layernamespace: ''},
+                    webService.deleteLayer({type: $scope.service.type, id: $scope.service.identifier, layerid: $scope.selected.Name}, {value: $scope.selected.Namespace},
                         function () {
                             if ($scope.service.type.toLowerCase() === 'wmts' || $scope.service.type.toLowerCase() === 'wms') {
                                 $scope.deleteTiledData($scope.service, $scope.selected.Name, $scope.selected.Provider);

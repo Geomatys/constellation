@@ -17,6 +17,8 @@ import java.util.List;
 public class LayerSummary {
     @XmlElement(name = "Name")
     private String name;
+    @XmlElement(name = "Namespace")
+    private String namespace;
     @XmlElement(name = "Alias")
     private String alias;
     @XmlElement(name = "Type")
@@ -34,6 +36,7 @@ public class LayerSummary {
 
     public LayerSummary(final Layer layer, final DataBrief db) {
         this.name = layer.getName().getLocalPart();
+        this.namespace = layer.getName().getNamespaceURI();
         this.alias = layer.getAlias();
         this.type = layer.getProviderType();
         this.date = layer.getDate();
@@ -103,5 +106,19 @@ public class LayerSummary {
 
     public void setProvider(String provider) {
         this.provider = provider;
+    }
+
+    /**
+     * @return the namespace
+     */
+    public String getNamespace() {
+        return namespace;
+    }
+
+    /**
+     * @param namespace the namespace to set
+     */
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
     }
 }

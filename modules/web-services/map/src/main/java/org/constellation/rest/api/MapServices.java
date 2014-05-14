@@ -17,24 +17,23 @@
 
 package org.constellation.rest.api;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.xml.namespace.QName;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.*;
 import org.constellation.dto.AddLayer;
 import org.constellation.dto.ParameterValues;
+import org.constellation.dto.SimpleValue;
 import org.constellation.map.configuration.MapConfigurer;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.xml.namespace.QName;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import static org.constellation.utils.RESTfulUtilities.ok;
 
 /**
@@ -101,11 +100,11 @@ public final class MapServices {
     /**
      * @see org.constellation.map.configuration.MapConfigurer#removeLayer(String, javax.xml.namespace.QName)
      */
-    @DELETE
-    @Path("{id}/{layerid}")
-    public Response deleteLayer(final @PathParam("spec") String spec, final @PathParam("id") String serviceId, final @PathParam("layerid") String layerid, @QueryParam("layernamespace") String layernmsp) throws Exception {
+    @POST
+    @Path("{id}/delete/{layerid}")
+    public Response deleteLayer(final @PathParam("spec") String spec, final @PathParam("id") String serviceId, final @PathParam("layerid") String layerid, final SimpleValue layernmsp) throws Exception {
         try {
-            getConfigurer(spec).removeLayer(serviceId, new QName(layernmsp, layerid));
+            getConfigurer(spec).removeLayer(serviceId, new QName(layernmsp.getValue(), layerid));
         } catch (ConfigurationException e) {
             LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
             throw e;

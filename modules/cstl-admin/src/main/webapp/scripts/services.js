@@ -163,7 +163,7 @@ cstlAdminApp.factory('webService', ['$resource',
                                              'capabilities': {method: 'GET', url: '@cstl/WS/:type/:id;jsessionid=?REQUEST=GetCapabilities&SERVICE=:typeUpper&VERSION=:version'},
                                              'layers' :      {method: 'GET', url: '@cstl/api/1/MAP/:type/:id/layersummary/all;jsessionid=', isArray: true},
                                              'addLayer':     {method: 'PUT', url: '@cstl/api/1/MAP/:type/:id/layer;jsessionid='},
-                                             'deleteLayer':  {method: 'DELETE', url: '@cstl/api/1/MAP/:type/:id/:layerid;jsessionid='},
+                                             'deleteLayer':  {method: 'POST', url: '@cstl/api/1/MAP/:type/:id/delete/:layerid;jsessionid='},
                                              'updateLayerStyle': {method: 'POST', url: '@cstl/api/1/MAP/:type/:id/updatestyle;jsessionid='},
                                              'removeLayerStyle': {method: 'POST', url: '@cstl/api/1/MAP/:type/:id/removestyle;jsessionid='}
                                          });

@@ -18,20 +18,23 @@
 package org.constellation.configuration;
 
 import java.io.StringReader;
-import java.util.Arrays;
 import java.io.StringWriter;
 import java.util.*;
+import java.util.Arrays;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
-
 import org.apache.sis.test.XMLComparator;
+import org.apache.sis.xml.MarshallerPool;
+import org.constellation.dto.SimpleValue;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.util.DataReference;
 import org.geotoolkit.ogc.xml.v110.BBOXType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
-import org.apache.sis.xml.MarshallerPool;
+import org.glassfish.jersey.jettison.JettisonConfig;
+import org.glassfish.jersey.jettison.JettisonJaxbContext;
+import org.glassfish.jersey.jettison.JettisonMarshaller;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -1133,5 +1136,25 @@ public class ConfigurationXmlBindingTest {
 
         Object result =  unmarshaller.unmarshal(new StringReader(xml));
         assertEquals(expResult, result);
+    }
+    
+    @Test
+    public void simpleValueMarshallingTest() throws Exception {
+        final SimpleValue value = new SimpleValue("test");
+        
+        Map<String, String> nSMap = new HashMap<>(0);
+        nSMap.put("http://www.constellation.org/config", "constellation-config");
+
+        // create json marshaller configuration and context
+        JettisonConfig config = JettisonConfig.mappedJettison().xml2JsonNs(nSMap).build();
+        JettisonJaxbContext cxtx = new JettisonJaxbContext(config, SimpleValue.class);
+
+        // create marshaller
+        JettisonMarshaller jsonMarshaller = cxtx.createJsonMarshaller();
+
+        // Marshall object
+        jsonMarshaller.marshallToJSON(value, System.out);
+
+        
     }
 }
