@@ -16,28 +16,29 @@
  */
 package org.constellation.provider.coveragestore;
 
-import org.apache.sis.storage.DataStoreException;
-import org.constellation.provider.AbstractDataProvider;
-import org.constellation.provider.DefaultCoverageData;
-import org.constellation.provider.Data;
-import org.constellation.provider.ProviderFactory;
-import org.geotoolkit.coverage.CoverageReference;
-import org.geotoolkit.coverage.CoverageStore;
-import org.geotoolkit.coverage.CoverageStoreFinder;
-import org.geotoolkit.coverage.postgresql.PGCoverageStore;
-import org.geotoolkit.version.VersionControl;
-import org.geotoolkit.version.VersioningException;
-import org.opengis.feature.type.Name;
-import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.ParameterValueGroup;
-
+import java.io.File;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 import java.util.logging.Level;
 import org.apache.sis.storage.DataStore;
+import org.apache.sis.storage.DataStoreException;
 import org.constellation.admin.dao.DataRecord.DataType;
+import org.constellation.provider.AbstractDataProvider;
+import org.constellation.provider.Data;
+import org.constellation.provider.DefaultCoverageData;
+import org.constellation.provider.ProviderFactory;
+import org.geotoolkit.coverage.CoverageReference;
+import org.geotoolkit.coverage.CoverageStore;
+import org.geotoolkit.coverage.CoverageStoreFinder;
+import org.geotoolkit.coverage.postgresql.PGCoverageStore;
 import org.geotoolkit.parameter.ParametersExt;
+import org.geotoolkit.storage.DataFileStore;
+import org.geotoolkit.version.VersionControl;
+import org.geotoolkit.version.VersioningException;
+import org.opengis.feature.type.Name;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
  *
@@ -197,5 +198,30 @@ public class CoverageStoreProvider extends AbstractDataProvider{
     @Override
     public DataType getDataType() {
         return DataType.COVERAGE;
+    }
+
+    @Override
+    public boolean isSensorAffectable() {
+        if (store == null) {
+            reload();
+        }
+        if (store instanceof DataFileStore) {
+            try {
+                final DataFileStore dfStore = (DataFileStore) store;
+                final File[] files          =  dfStore.getDataFiles();
+                if (files.length > 0) {
+                    boolean isNetCDF = true;
+                    for (File f : dfStore.getDataFiles()) {
+                        if (!f.getName().endsWith(".nc")) {
+                            isNetCDF = false;
+                        }
+                    }
+                    return isNetCDF;
+                }
+            } catch (DataStoreException ex) {
+                LOGGER.log(Level.WARNING, "Error while retrieving file from datastore:" + getId(), ex);
+            }
+        }
+        return super.isSensorAffectable(); 
     }
 }
