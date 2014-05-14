@@ -104,7 +104,13 @@ public final class MapServices {
     @Path("{id}/delete/{layerid}")
     public Response deleteLayer(final @PathParam("spec") String spec, final @PathParam("id") String serviceId, final @PathParam("layerid") String layerid, final SimpleValue layernmsp) throws Exception {
         try {
-            getConfigurer(spec).removeLayer(serviceId, new QName(layernmsp.getValue(), layerid));
+            final QName layerName;
+            if (layernmsp != null) {
+                layerName = new QName(layernmsp.getValue(), layerid);
+            } else {
+                layerName = new QName(layerid);
+            }
+            getConfigurer(spec).removeLayer(serviceId, layerName);
         } catch (ConfigurationException e) {
             LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
             throw e;

@@ -92,7 +92,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
                     }
                 }
 
-                dataListing.hideData({providerid: providerId, dataid: layerName}, {},
+                dataListing.hideData({providerid: providerId, dataid: layerName}, {value : $scope.selected.Namespace},
                     function() { $growl('success','Success','Data '+ layerName +' successfully deleted');
                         dataListing.listDataForProv({providerId: providerId}, function(response) {
                             if (response.length == 0) {

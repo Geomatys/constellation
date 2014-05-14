@@ -1399,8 +1399,14 @@ public class DataRest {
 
     @POST
     @Path("{providerid}/{dataid}/hidden")
-    public Response hideData(@PathParam("providerid") String providerid, @PathParam("dataid") String dataid) {
-        ConfigurationEngine.updateDataVisibility(new QName("", dataid), providerid, false);
+    public Response hideData(@PathParam("providerid") String providerid, @PathParam("dataid") String dataid, final SimpleValue dataNmsp) {
+        final QName dataName;
+        if (dataNmsp != null) {
+            dataName = new QName(dataNmsp.getValue(), dataid);
+        } else {
+            dataName = new QName(dataid);
+        }
+        ConfigurationEngine.updateDataVisibility(dataName, providerid, false);
         return Response.status(200).build();
     }
 

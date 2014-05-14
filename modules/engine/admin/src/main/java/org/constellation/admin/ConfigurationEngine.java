@@ -1063,7 +1063,9 @@ public class ConfigurationEngine {
             }
 
             final DataRecord dr = session.readData(name, providerId);
-            dr.setVisible(visible);
+            if (dr != null) {
+                dr.setVisible(visible);
+            }
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "error when try to delete data", e);
         } finally {

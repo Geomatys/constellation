@@ -178,6 +178,6 @@ public abstract class AbstractDataProvider extends AbstractProvider<Name,Data> i
     
     @Override
     public boolean isSensorAffectable() {
-        return true;
+        return false;
     }
 }
