@@ -77,7 +77,7 @@ public class ObservationStoreProvider extends AbstractDataProvider {
         return featureStore;
     }
 
-    public DataStore getObservationStore() {
+    public ObservationStore getObservationStore() {
         if (observationStore == null) {
             reload();
         }

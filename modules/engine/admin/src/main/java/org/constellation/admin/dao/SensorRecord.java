@@ -17,7 +17,6 @@
 
 package org.constellation.admin.dao;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.sql.ResultSet;
@@ -97,17 +96,17 @@ public class SensorRecord extends Record {
         return owner;
     }
     
-    public InputStream getMetadata() throws IOException, SQLException {
+    public InputStream getMetadata() throws SQLException {
         ensureConnectionNotClosed();
         return session.readSensorMetadata(id);
     }
 
-    public boolean hasMetadata() throws IOException, SQLException {
+    public boolean hasMetadata() throws SQLException {
         ensureConnectionNotClosed();
         return session.hasSensorMetadata(id);
     }
 
-    public void setMetadata(final StringReader metadata) throws IOException, SQLException {
+    public void setMetadata(final StringReader metadata) throws SQLException {
         ensureConnectionNotClosed();
         session.updateSensorMetadata(id, metadata);
     }

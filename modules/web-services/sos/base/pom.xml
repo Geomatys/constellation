@@ -84,6 +84,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-data-coveragestore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.constellation.engine</groupId>
       <artifactId>cstl-engine-templating</artifactId>
       <version>${project.version}</version>

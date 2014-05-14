@@ -646,7 +646,7 @@ public final class Session implements Closeable {
      * @throws SQLException if a database access error occurs
      * @throws IOException if the configuration cannot be read
      */
-    /* internal */ InputStream readSensorMetadata(final int generatedId) throws SQLException, IOException {
+    /* internal */ InputStream readSensorMetadata(final int generatedId) throws SQLException {
         final InputStream stream = new Query(READ_SENSOR_METADATA).with(generatedId).select().getClob();
         return stream;
     }
@@ -659,7 +659,7 @@ public final class Session implements Closeable {
      * @throws SQLException if a database access error occurs
      * @throws IOException if the configuration cannot be read
      */
-    /* internal */ boolean hasSensorMetadata(final int generatedId) throws SQLException, IOException {
+    /* internal */ boolean hasSensorMetadata(final int generatedId) throws SQLException {
         return new Query(EXIST_SENSOR_METADATA).with(generatedId).select().hasNext();
     }
     /**
@@ -742,7 +742,7 @@ public final class Session implements Closeable {
      * @throws SQLException if a database access error occurs
      * @throws IOException if the configuration cannot be written
      */
-    /* internal */ void updateSensorMetadata(final int generatedId, final StringReader metadata) throws SQLException, IOException {
+    /* internal */ void updateSensorMetadata(final int generatedId, final StringReader metadata) throws SQLException {
         new Query(UPDATE_SENSOR_METADATA).with(metadata, generatedId).update();
     }
 

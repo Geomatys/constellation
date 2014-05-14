@@ -71,6 +71,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.constellation.web-services</groupId>
+            <artifactId>cstl-web-sos-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.constellation.engine</groupId>
             <artifactId>cstl-engine-process-core</artifactId>
             <version>${project.version}</version>

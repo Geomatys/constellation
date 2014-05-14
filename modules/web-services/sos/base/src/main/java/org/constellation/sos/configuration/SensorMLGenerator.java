@@ -42,7 +42,7 @@ public class SensorMLGenerator {
     
     private static final Logger LOGGER = Logger.getLogger(SensorMLGenerator.class);
     
-    public static AbstractSensorML getTemplateSensorML(final Properties prop, final String type) {
+    public static String getTemplateSensorMLString(final Properties prop, final String type) {
         try {
             final TemplateEngine templateEngine = TemplateEngineFactory.getInstance(TemplateEngineFactory.GROOVY_TEMPLATE_ENGINE);
             final InputStream stream;
@@ -58,12 +58,24 @@ public class SensorMLGenerator {
             FileUtilities.buildFileFromStream(stream, templateFile);
             final String templateApplied = templateEngine.apply(templateFile, prop);
             
-            //unmarshall the template
-            final Unmarshaller um = SensorMLMarshallerPool.getInstance().acquireUnmarshaller();
-            final AbstractSensorML meta = (AbstractSensorML) um.unmarshal(new StringReader(templateApplied));
-            SensorMLMarshallerPool.getInstance().recycle(um);
-            return meta;
-        } catch (TemplateEngineException | IOException | JAXBException ex) {
+            return templateApplied;
+        } catch (TemplateEngineException | IOException ex) {
+           LOGGER.log(Level.WARNING, null, ex);
+        }
+        return null;
+    }
+    
+    public static AbstractSensorML getTemplateSensorML(final Properties prop, final String type) {
+        try {
+            final String templateApplied = getTemplateSensorMLString(prop, type);
+            if (templateApplied != null) {
+                //unmarshall the template
+                final Unmarshaller um = SensorMLMarshallerPool.getInstance().acquireUnmarshaller();
+                final AbstractSensorML meta = (AbstractSensorML) um.unmarshal(new StringReader(templateApplied));
+                SensorMLMarshallerPool.getInstance().recycle(um);
+                return meta;
+            }
+        } catch (JAXBException ex) {
            LOGGER.log(Level.WARNING, null, ex);
         }
         return null;

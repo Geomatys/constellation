@@ -32,6 +32,8 @@ import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.coverage.CoverageStoreFinder;
 import org.geotoolkit.coverage.postgresql.PGCoverageStore;
+import org.geotoolkit.observation.ObservationStore;
+import org.geotoolkit.observation.file.FileObservationStore;
 import org.geotoolkit.parameter.ParametersExt;
 import org.geotoolkit.storage.DataFileStore;
 import org.geotoolkit.version.VersionControl;
@@ -223,5 +225,24 @@ public class CoverageStoreProvider extends AbstractDataProvider{
             }
         }
         return super.isSensorAffectable(); 
+    }
+    
+    public ObservationStore getObservationStore() {
+        if (isSensorAffectable()) {
+            if (store instanceof DataFileStore) {
+                try {
+                    final DataFileStore dfStore = (DataFileStore) store;
+                    final File[] files = dfStore.getDataFiles();
+                    //for now handle only one file
+                    if (files.length > 0) {
+                        final File f = files[0];
+                        return new FileObservationStore(f);
+                    }
+                } catch (DataStoreException ex) {
+                    LOGGER.log(Level.WARNING, "Error while retrieving file from datastore:" + getId(), ex);
+                }
+            }
+        }
+        return null;
     }
 }

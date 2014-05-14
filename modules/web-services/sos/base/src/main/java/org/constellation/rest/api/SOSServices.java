@@ -41,19 +41,15 @@ import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.Provider;
-import org.constellation.provider.Providers;
+import org.constellation.provider.coveragestore.CoverageStoreProvider;
 import org.constellation.provider.observationstore.ObservationStoreProvider;
 import org.constellation.sos.configuration.SOSConfigurer;
 import org.constellation.sos.configuration.SensorMLGenerator;
 import static org.constellation.utils.RESTfulUtilities.ok;
 import org.geotoolkit.gml.xml.v321.AbstractGeometryType;
-import org.geotoolkit.observation.ObservationStore;
-import org.geotoolkit.parameter.ParametersExt;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sos.netcdf.ExtractionResult;
 import org.geotoolkit.sos.netcdf.ExtractionResult.ProcedureTree;
-import org.geotoolkit.sos.netcdf.NetCDFExtractor;
-import org.opengis.parameter.ParameterValueGroup;
 
 /**
  *
@@ -172,39 +168,23 @@ public class SOSServices {
     public Response importSensorFromData(final @PathParam("id") String id, final ParameterValues params) throws Exception {
         final String providerId = params.get("providerId");
         final String dataId = params.get("dataId");
-        final String bandName;
-        if (dataId != null && dataId.startsWith(providerId + '.')) {
-            bandName = dataId.substring(providerId.length() + 1, dataId.length());
-        } else {
-            bandName = dataId;
-        }
+        
         final Provider provider = DataProviders.getInstance().getProvider(providerId);
         final ExtractionResult result;
         if (provider instanceof ObservationStoreProvider) {
             final ObservationStoreProvider omProvider = (ObservationStoreProvider) provider;
-            result = ((ObservationStore)omProvider.getMainStore()).getResults();
-        } else {
-            final ParameterValueGroup config = Providers.getConfigurator().getProviderConfiguration(providerId);
-            final ParameterValueGroup choice = ParametersExt.getGroup(config, "choice");
-            final ParameterValueGroup type   = (ParameterValueGroup) choice.values().get(0);
-            if (type.getDescriptor().getName().getCode().equals("FileCoverageStoreParameters")) {
-                final String filePath = type.parameter("path").getValue().toString();
-                if (filePath != null) {
-                    if (filePath.endsWith(".nc")) {
-                        final File ncFile = new File(filePath);
-                        result = NetCDFExtractor.getObservationFromNetCDF(ncFile, providerId, bandName);
-                        
-                    } else {
-                        return ok(new AcknowlegementType("Failure", "Only available on netCDF file for now"));
-                    }
-                } else {
-                    return ok(new AcknowlegementType("Failure", "Unable to find a \"path\" parameter in the provider configuration"));
-                }
+            result = omProvider.getObservationStore().getResults();
+        } else if (provider instanceof CoverageStoreProvider) {
+            final CoverageStoreProvider covProvider = (CoverageStoreProvider) provider;
+            if (covProvider.isSensorAffectable()) {
+                result = covProvider.getObservationStore().getResults();
             } else {
-                return ok(new AcknowlegementType("Failure", "Available only on FileCoverageStore provider for now"));
+                return ok(new AcknowlegementType("Failure", "Only available on netCDF file for coverage for now"));
             }
+        } else {
+            return ok(new AcknowlegementType("Failure", "Available only on Observation provider (and netCDF coverage) for now"));
         }
-        
+
         final SOSConfigurer configurer = getConfigurer();
 
         // import in O&M database

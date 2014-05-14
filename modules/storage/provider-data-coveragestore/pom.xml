@@ -67,6 +67,10 @@
         </dependency>
         <dependency>
             <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-observation-store</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.geotoolkit</groupId>
             <artifactId>geotk-client-osmtms</artifactId>
         </dependency>
         <dependency>

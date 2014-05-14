@@ -640,7 +640,11 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                         }
                     });
                 } else if ($scope.sensor.mode === 'automatic') {
-
+                    dataListing.listDataForProv({providerId: $scope.providerId}, function(response) {
+                        for (var i=0; i<response.length; i++) {
+                            dataListing.generateSML({}, {values: {'providerId': response[i].Provider, 'dataId': '{' + response[i].Namespace + '}' + response[i].Name}});
+                        }
+                    });
                 } else {
                     // Import sensorML
                     $scope.uploadImportAndLinkSensor();
