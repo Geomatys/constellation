@@ -642,7 +642,8 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                 } else if ($scope.sensor.mode === 'automatic') {
 
                 } else {
-
+                    // Import sensorML
+                    $scope.uploadImportAndLinkSensor();
                 }
 
                 $modalInstance.close({type: $scope.data.uploadType, file: $scope.providerId, missing: $scope.metadata == null});
@@ -650,6 +651,42 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
                 $scope.uploaded();
             }
         };
+
+        $scope.uploadImportAndLinkSensor = function() {
+            var $form = $('#uploadSensor');
+
+            var formData = new FormData($form[0]);
+
+            $.ajax({
+                url: $cookies.cstlUrl + "api/1/data/upload/data;jsessionid="+ $cookies.cstlSessionId,
+                type: 'POST',
+                data: formData,
+                async: false,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (path) {
+                    importAndLinkSensor(path);
+                }
+            });
+        };
+
+        function importAndLinkSensor(path) {
+            sensor.add({}, {values: {'path' : path}}, function(sensors) {
+                $growl('success','Success','Sensor correctly imported');
+
+                for (var s=0; s<sensors.length; s++) {
+                    var sensorId = sensors[s].identifier;
+                    dataListing.listDataForProv({providerId: $scope.providerId}, function(response) {
+                        for (var i=0; i<response.length; i++) {
+                            dataListing.linkToSensor({providerId: response[i].Provider, dataId: response[i].Name, sensorId: sensorId}, {value: response[i].Namespace});
+                        }
+                    });
+                }
+            }, function() {
+                $growl('error','Error','Unable to import sensor');
+            });
+        }
     }]);
 
 cstlAdminApp.controller('ServerFileModalController', ['$scope', '$dashboard', '$modalInstance', '$growl', 'dataListing', 'provider', '$cookies',

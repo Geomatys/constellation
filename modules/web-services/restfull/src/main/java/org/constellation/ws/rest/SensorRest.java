@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2013, Geomatys
+ *    (C) 2014, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -38,7 +38,6 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.dao.SensorRecord;
@@ -46,11 +45,13 @@ import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SensorMLTree;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
+
 import static org.geotoolkit.sml.xml.SensorMLUtilities.*;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
+ * @author Cédric Briançon (Geomatys)
  */
 @Path("/1/sensor/")
 public class SensorRest {
@@ -89,6 +90,7 @@ public class SensorRest {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response importSensor(final ParameterValues pv) {
+        final List<SensorRecord> sensorsImported = new ArrayList<>();
         final String path = pv.get("path");
         final File imported = new File(path);
         try {
@@ -100,7 +102,8 @@ public class SensorRest {
                     final String type           = getSensorMLType(sml);
                     final String sensorID       = getSmlID(sml);
                     final List<String> children = getChildrenIdentifiers(sml);
-                    ConfigurationEngine.writeSensor(sensorID, type, null);
+                    final SensorRecord sensor = ConfigurationEngine.writeSensor(sensorID, type, null);
+                    sensorsImported.add(sensor);
                     parents.put(sensorID, children);
                 }
                 // update dependencies
@@ -114,7 +117,8 @@ public class SensorRest {
                 final AbstractSensorML sml = unmarshallSensor(imported);
                 final String type          = getSensorMLType(sml);
                 final String sensorID      = getSmlID(sml);
-                ConfigurationEngine.writeSensor(sensorID, type, null);
+                final SensorRecord sensor = ConfigurationEngine.writeSensor(sensorID, type, null);
+                sensorsImported.add(sensor);
             }
         } catch (JAXBException ex) {
             LOGGER.log(Level.WARNING, "Error while reading sensorML file", ex);
@@ -123,7 +127,7 @@ public class SensorRest {
             LOGGER.log(Level.WARNING, "Error while storing sensor record", ex);
             return Response.status(500).entity("Error while storing sensor record").build();
         }
-        return Response.status(200).build();
+        return Response.ok(sensorsImported).build();
     }
     
     private List<File> getFiles(final File directory) {

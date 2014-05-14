@@ -252,7 +252,7 @@ cstlAdminApp.factory('sensor', ['$resource',
     function ($resource) {
         return $resource('@cstl/api/1/sensor', {}, {
             'list':   {method: 'GET',  url: '@cstl/api/1/sensor/list;jsessionid='},
-            'add':    {method: 'PUT',  url: '@cstl/api/1/sensor/add;jsessionid='},
+            'add':    {method: 'PUT',  url: '@cstl/api/1/sensor/add;jsessionid=', isArray: true},
             'delete': {method: 'DELETE',  url: '@cstl/api/1/sensor/:sensor;jsessionid='}
         });
     }]);
