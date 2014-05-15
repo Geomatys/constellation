@@ -373,8 +373,6 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
             }
         };
 
-        $scope.sensors = undefined;
-
         $scope.initScope = function() {
             if ($scope.type === 'csw') {
                 csw.count({id: $routeParams.id}, {}, function(max) {
@@ -396,10 +394,9 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
             } else if ($scope.type === 'sos') {
                 sos.sensorsTree({id: $routeParams.id}, function(sensors) {
                     $dashboard($scope, sensors.children, false);
-                    $scope.sensors = sensors.children;
+                    $scope.layers = sensors.children;
 
                 }, function() { $growl('error','Error','Unable to list sensors'); });
-                $scope.layers = $scope.sensors;
             } else {
                 $scope.config = webService.config({type: $scope.type, id:$routeParams.id});
                 $scope.layers = webService.layers({type: $scope.type, id:$routeParams.id}, {}, function(response) {

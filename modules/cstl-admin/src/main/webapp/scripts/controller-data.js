@@ -840,22 +840,16 @@ cstlAdminApp.controller('ServerFileModalController', ['$scope', '$dashboard', '$
         $scope.load($scope.currentPath);
     }]);
 
-cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webService', 'sos', '$dashboard', '$modalInstance', 'service', 'exclude', '$growl', '$modal',
-    function ($scope, dataListing, webService, sos, $dashboard, $modalInstance, service, exclude, $growl, $modal) {
+cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webService', 'sos', 'sensor', '$dashboard', '$modalInstance', 'service', 'exclude', '$growl', '$modal',
+    function ($scope, dataListing, webService, sos, sensor, $dashboard, $modalInstance, service, exclude, $growl, $modal) {
         $scope.service = service;
 
         $scope.getDefaultFilter = function() {
-            if (service.type.toLowerCase() === 'wms') {
-                return '';
-            }
             if (service.type.toLowerCase() === 'wcs') {
                 return 'coverage';
             }
             if (service.type.toLowerCase() === 'wfs') {
                 return 'vector';
-            }
-            if (service.type.toLowerCase() === 'sos') {
-                return 'sensor';
             }
             return '';
         };
@@ -872,28 +866,47 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
         $scope.upperCornerY = undefined;
         $scope.conformPyramid = undefined;
 
-        dataListing.listAll({}, function(response) {
-            $dashboard($scope, response, true);
-            $scope.filtertype = $scope.getDefaultFilter();
-        });
+        $scope.init = function() {
+            if (service.type.toLowerCase() === 'sos') {
+                sensor.list({}, function(response) {
+                    $dashboard($scope, response.children, false);
+                });
+            } else {
+                dataListing.listAll({}, function (response) {
+                    $dashboard($scope, response, true);
+                    $scope.filtertype = $scope.getDefaultFilter();
+                });
+            }
+        };
+
+        $scope.selectedSensorsChild = null;
+
+        $scope.selectSensorsChild = function(item) {
+            if ($scope.selectedSensorsChild === item) {
+                $scope.selectedSensorsChild = null;
+            } else {
+                $scope.selectedSensorsChild = item;
+            }
+        };
 
         $scope.close = function() {
             $modalInstance.dismiss('close');
         };
 
-        $scope.choose = function(data) {
-            if (data == null) {
+        $scope.choose = function() {
+            if ($scope.selected == null) {
                 $growl('warning','Warning','No data selected');
                 $modalInstance.dismiss('close');
                 return;
             }
 
             if ($scope.service.type.toLowerCase() === 'sos') {
-                sos.importSensorFromData({id: service.identifier}, {values: {providerId: data.Provider, dataId: data.Name}}, function() {
-                    $growl('success', 'Success', 'Data '+ data.Name +' imported in service '+ service.name);
+                var sensorId = ($scope.selectedSensorsChild !== null) ? $scope.selectedSensorsChild.id : $scope.selected.id;
+                sos.importSensor({id: service.identifier}, {values: {"sensorId" : sensorId}}, function() {
+                    $growl('success', 'Success', 'Sensor '+ sensorId +' imported in service '+ service.name);
                     $modalInstance.close();
                 }, function() {
-                    $growl('error', 'Error', 'Unable to import data '+ data.Name +' in service '+ service.name);
+                    $growl('error', 'Error', 'Unable to import sensor '+ sensorId +' in service '+ service.name);
                     $modalInstance.dismiss('close');
                 });
                 return;
@@ -904,7 +917,7 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
                 if (service.type.toLowerCase() !== 'wmts') {
                     if (service.type.toLowerCase() === 'wms' && $scope.conformPyramid) {
                         // In the case of a wms service and user asked to pyramid the data
-                        dataListing.pyramidConform({providerId: data.Provider, dataId: data.Name}, {}, function(tiledProvider) {
+                        dataListing.pyramidConform({providerId: $scope.selected.Provider, dataId: $scope.selected.Name}, {}, function(tiledProvider) {
                             webService.addLayer({type: service.type, id: service.identifier},
                                 {layerAlias: tiledProvider.dataId, layerId: tiledProvider.dataId, serviceType: service.type, serviceId: service.identifier, providerId: tiledProvider.providerId},
                                 function () {
@@ -917,7 +930,7 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
                                 }
                             );
                         } , function() {
-                            $growl('error', 'Error', 'Failed to generate conform pyramid for ' + data.Name);
+                            $growl('error', 'Error', 'Failed to generate conform pyramid for ' + $scope.selected.Name);
                             $modalInstance.dismiss('close');
                         });
                     } else {
@@ -927,14 +940,14 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
                           controller: 'ModalInstanceCtrl'
                         });
                         webService.addLayer({type: service.type, id: service.identifier},
-                            {layerAlias: data.Name, layerId: data.Name, serviceType: service.type, serviceId: service.identifier, providerId: data.Provider, layerNamespace: data.Namespace},
+                            {layerAlias: $scope.selected.Name, layerId: $scope.selected.Name, serviceType: service.type, serviceId: service.identifier, providerId: $scope.selected.Provider, layerNamespace: $scope.selected.Namespace},
                             function () {
-                                $growl('success', 'Success', 'Layer ' + data.Name + ' successfully added to service ' + service.name);
+                                $growl('success', 'Success', 'Layer ' + $scope.selected.Name + ' successfully added to service ' + service.name);
                                 modalLoader.close();
                                 $modalInstance.close();
                             },
                             function () {
-                                $growl('error', 'Error', 'Layer ' + data.Name + ' failed to be added to service ' + service.name);
+                                $growl('error', 'Error', 'Layer ' + $scope.selected.Name + ' failed to be added to service ' + service.name);
                                 $modalInstance.dismiss('close');
                             }
                         );
@@ -943,10 +956,10 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
                 }
 
                 // WMTS here, prepare form
-                dataListing.pyramidScales({providerId: data.Provider, dataId: data.Name}, function(response) {
+                dataListing.pyramidScales({providerId: $scope.selected.Provider, dataId: $scope.selected.Name}, function(response) {
                     $scope.scales = response.Entry[0].split(',');
                 }, function () {
-                    $growl('error', 'Error', 'Unable to pyramid data ' + data.Name);
+                    $growl('error', 'Error', 'Unable to pyramid data ' + $scope.selected.Name);
                 });
 
                 $scope.wmtsParams = true;
