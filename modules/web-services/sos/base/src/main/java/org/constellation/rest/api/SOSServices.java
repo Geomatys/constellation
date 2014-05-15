@@ -18,8 +18,10 @@ package org.constellation.rest.api;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -31,6 +33,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.constellation.ServiceDef;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.dao.DataRecord;
+import org.constellation.admin.dao.SensorRecord;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.NotRunningServiceException;
@@ -45,6 +50,7 @@ import org.constellation.provider.coveragestore.CoverageStoreProvider;
 import org.constellation.provider.observationstore.ObservationStoreProvider;
 import org.constellation.sos.configuration.SOSConfigurer;
 import org.constellation.sos.configuration.SensorMLGenerator;
+import org.constellation.sos.ws.SOSUtils;
 import static org.constellation.utils.RESTfulUtilities.ok;
 import org.geotoolkit.gml.xml.v321.AbstractGeometryType;
 import org.geotoolkit.sml.xml.AbstractSensorML;
@@ -63,7 +69,7 @@ public class SOSServices {
     
     @PUT
     @Path("{id}/sensors")
-    public Response importSensor(final @PathParam("id") String id, final File sensor) throws Exception {
+    public Response importSensorMetadata(final @PathParam("id") String id, final File sensor) throws Exception {
         return ok(getConfigurer().importSensor(id, sensor, "xml"));
     }
     
@@ -81,7 +87,7 @@ public class SOSServices {
 
     @GET
     @Path("{id}/sensor/{sensorID}")
-    public Response getSensor(final @PathParam("id") String id, final @PathParam("sensorID") String sensorID) throws Exception {
+    public Response getSensorMetadata(final @PathParam("id") String id, final @PathParam("sensorID") String sensorID) throws Exception {
         return ok(getConfigurer().getSensor(id, sensorID));
     }
     
@@ -164,7 +170,7 @@ public class SOSServices {
     }
 
     @PUT
-    @Path("{id}/sensor/import")
+    @Path("{id}/data/import")
     public Response importSensorFromData(final @PathParam("id") String id, final ParameterValues params) throws Exception {
         final String providerId = params.get("providerId");
         final String dataId = params.get("dataId");
@@ -197,7 +203,7 @@ public class SOSServices {
         
         return ok(new AcknowlegementType("Success", "The specified observations have been imported in the SOS"));
     }
-
+    
     private void generateSensorML(final String id, final ProcedureTree process, final ExtractionResult result, final SOSConfigurer configurer) throws ConfigurationException {
         final Properties prop = new Properties();
         prop.put("id",         process.id);
@@ -229,6 +235,57 @@ public class SOSServices {
         if (geom != null) {
             configurer.updateSensorLocation(id, process.id, geom);
         }
+    }
+    
+    @PUT
+    @Path("{id}/sensor/import")
+    public Response importSensor(final @PathParam("id") String id, final ParameterValues params) throws Exception {
+        final String sensorID          = params.get("sensorId");
+        final SensorRecord sensor      = ConfigurationEngine.getSensor(sensorID);
+        final List<DataRecord> datas   = ConfigurationEngine.getDataLinkedSensor(sensorID);
+        final SOSConfigurer configurer = getConfigurer();
+        
+        //import SML
+        final AbstractSensorML sml = SOSUtils.unmarshallSensor(sensor.getMetadata());
+        configurer.importSensor(id, sml, sensorID);
+        
+        //import sensor children
+        final List<SensorRecord> sensors = ConfigurationEngine.getSensorChildren(sensorID);
+        for (SensorRecord child : sensors) {
+            final AbstractSensorML smlChild = SOSUtils.unmarshallSensor(child.getMetadata());
+            configurer.importSensor(id, smlChild, child.getIdentifier());
+            datas.addAll(ConfigurationEngine.getDataLinkedSensor(child.getIdentifier()));
+        }
+        
+        // look for provider ids
+        final Set<String> providerIDs = new HashSet<>();
+        for (DataRecord data : datas) {
+            providerIDs.add(data.getProvider().getIdentifier());
+        }
+        
+        // import observations
+        for (String providerId : providerIDs) {
+            final Provider provider = DataProviders.getInstance().getProvider(providerId);
+            final ExtractionResult result;
+            if (provider instanceof ObservationStoreProvider) {
+                final ObservationStoreProvider omProvider = (ObservationStoreProvider) provider;
+                result = omProvider.getObservationStore().getResults();
+            } else if (provider instanceof CoverageStoreProvider) {
+                final CoverageStoreProvider covProvider = (CoverageStoreProvider) provider;
+                if (covProvider.isSensorAffectable()) {
+                    result = covProvider.getObservationStore().getResults();
+                } else {
+                    return ok(new AcknowlegementType("Failure", "Only available on netCDF file for coverage for now"));
+                }
+            } else {
+                return ok(new AcknowlegementType("Failure", "Available only on Observation provider (and netCDF coverage) for now"));
+            }
+            // import in O&M database
+            configurer.importObservations(id, result.observations, result.phenomenons);
+        }
+
+        
+        return ok(new AcknowlegementType("Success", "The specified sensor has been imported in the SOS"));
     }
     
     private static SOSConfigurer getConfigurer() throws NotRunningServiceException {

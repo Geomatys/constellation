@@ -33,9 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import javax.imageio.spi.ServiceRegistry;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.ConfigurationEngine;
@@ -65,8 +63,6 @@ import org.geotoolkit.observation.ObservationWriter;
 import org.geotoolkit.observation.xml.AbstractObservation;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.sml.xml.AbstractSensorML;
-import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
-import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.observation.Observation;
 import org.opengis.observation.ObservationCollection;
@@ -160,7 +156,7 @@ public class SOSConfigurer extends OGCConfigurer {
         try {
             for (File importedFile: files) {
                 if (importedFile != null) {
-                    final AbstractSensorML sensor = unmarshallSensor(importedFile);
+                    final AbstractSensorML sensor = SOSUtils.unmarshallSensor(importedFile);
                     final String sensorID = getSmlID(sensor);
                     writer.writeSensor(sensorID, sensor);
                 } else {
@@ -170,7 +166,7 @@ public class SOSConfigurer extends OGCConfigurer {
             return new AcknowlegementType("Success", "The specified sensor have been imported in the SOS");
         } catch (JAXBException ex) {
             LOGGER.log(Level.WARNING, "Exception while unmarshalling imported file", ex);
-        } catch (CstlServiceException ex) {
+        } catch (DataStoreException | CstlServiceException ex) {
             throw new ConfigurationException(ex);
         }
         return new AcknowlegementType("Error", "An error occurs during the process");
@@ -317,34 +313,10 @@ public class SOSConfigurer extends OGCConfigurer {
         }
     }
     
-    private static AbstractSensorML unmarshallSensor(final File f) throws JAXBException, CstlServiceException {
-        final Unmarshaller um = SensorMLMarshallerPool.getInstance().acquireUnmarshaller();
-        Object obj = um.unmarshal(f);
-        if (obj instanceof JAXBElement) {
-            obj = ((JAXBElement)obj).getValue();
-        }
-        if (obj instanceof AbstractSensorML) {
-            return (AbstractSensorML)obj;
-        }
-        throw new CstlServiceException("the sensorML file does not contain a valid sensorML object");
-    }
-    
-    private static Object unmarshallObservationFile(final File f) throws JAXBException, DataStoreException {
-        final Unmarshaller um = SOSMarshallerPool.getInstance().acquireUnmarshaller();
-        Object obj = um.unmarshal(f);
-        if (obj instanceof JAXBElement) {
-            obj = ((JAXBElement)obj).getValue();
-        }
-        if (obj != null) {
-            return obj;
-        }
-        throw new DataStoreException("the observation file does not contain a valid O&M object");
-    }
-    
     public AcknowlegementType importObservations(final String id, final File observationFile) throws ConfigurationException {
         final ObservationWriter writer = getObservationWriter(id);
         try {
-            final Object objectFile = unmarshallObservationFile(observationFile);
+            final Object objectFile = SOSUtils.unmarshallObservationFile(observationFile);
             if (objectFile instanceof AbstractObservation) {
                 writer.writeObservation((AbstractObservation)objectFile);
             } else if (objectFile instanceof ObservationCollection) {

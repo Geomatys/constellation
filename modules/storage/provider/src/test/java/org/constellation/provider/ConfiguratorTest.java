@@ -74,6 +74,11 @@ public class ConfiguratorTest {
             public List<Map.Entry<String, ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException {
                 return Collections.EMPTY_LIST;
             }
+
+            @Override
+            public List<Configurator.ProviderInformation> getProviderInformations() throws ConfigurationException {
+                return Collections.EMPTY_LIST;
+            }
         };
         Providers.setConfigurator(config);
 
@@ -97,6 +102,20 @@ public class ConfiguratorTest {
                 ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
                 srcconfig.parameter(LAYERS.getName().getCode()).setValue("A,B,C");
                 lst.add(new AbstractMap.SimpleImmutableEntry<>("mock",source));
+                
+                return lst;
+            }
+            
+            @Override
+            public List<Configurator.ProviderInformation> getProviderInformations() throws ConfigurationException {
+                final ArrayList<ProviderInformation> lst = new ArrayList<>();
+                
+                final ProviderFactory factory = DataProviders.getInstance().getFactory("mock");
+                final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("mock");
+                ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                srcconfig.parameter(LAYERS.getName().getCode()).setValue("A,B,C");
+                lst.add(new ProviderInformation("mock", "mock", source));
                 
                 return lst;
             }
@@ -143,6 +162,32 @@ public class ConfiguratorTest {
                 return lst;
             }
 
+            @Override
+            public List<Configurator.ProviderInformation> getProviderInformations() throws ConfigurationException {
+                final ArrayList<Configurator.ProviderInformation> lst = new ArrayList<>();
+                
+                final ProviderFactory factory = DataProviders.getInstance().getFactory("mock");
+                
+                {final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-0");
+                ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                srcconfig.parameter(LAYERS.getName().getCode()).setValue("A,B,C,D");
+                lst.add(new ProviderInformation("id-0", "mock", source));}
+                
+                {final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-1");
+                ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                srcconfig.parameter(LAYERS.getName().getCode()).setValue("E,F");
+                lst.add(new ProviderInformation("id-1", "mock",source));}
+                
+                {final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-2");
+                ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                srcconfig.parameter(LAYERS.getName().getCode()).setValue("G,H,I");
+                lst.add(new ProviderInformation("id-2", "mock",source));}
+                
+                return lst;
+            }
         };
         Providers.setConfigurator(config);
 
@@ -187,6 +232,34 @@ public class ConfiguratorTest {
                 ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
                 srcconfig.parameter(LAYERS.getName().getCode()).setValue("G,H,I");
                 lst.add(new AbstractMap.SimpleImmutableEntry<>("id-2",source));}
+                
+                return lst;
+            }
+            
+            @Override
+            public List<Configurator.ProviderInformation> getProviderInformations() throws ConfigurationException {
+                final ArrayList<Configurator.ProviderInformation> lst = new ArrayList<>();
+                
+                final ProviderFactory factory = DataProviders.getInstance().getFactory("mock");
+                
+                {final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-0");
+                ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                srcconfig.parameter(LAYERS.getName().getCode()).setValue("A,B,C,D");
+                lst.add(new ProviderInformation("id-0", "mock",source));}
+                
+                {final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-1");
+                ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                srcconfig.parameter(LAYERS.getName().getCode()).setValue("E,F");
+                srcconfig.parameter(CRASH_CREATE.getName().getCode()).setValue(true);
+                lst.add(new ProviderInformation("id-1", "mock",source));}
+                
+                {final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-2");
+                ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                srcconfig.parameter(LAYERS.getName().getCode()).setValue("G,H,I");
+                lst.add(new ProviderInformation("id-2", "mock",source));}
                 
                 return lst;
             }
@@ -237,6 +310,34 @@ public class ConfiguratorTest {
                 
                 return lst;
             }
+            
+            @Override
+            public List<Configurator.ProviderInformation> getProviderInformations() throws ConfigurationException {
+                final ArrayList<Configurator.ProviderInformation> lst = new ArrayList<>();
+                
+                final ProviderFactory factory = DataProviders.getInstance().getFactory("mock");
+                
+                {final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-0");
+                ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                srcconfig.parameter(LAYERS.getName().getCode()).setValue("A,B,C,D");
+                lst.add(new ProviderInformation("id-0", "mock",source));}
+                
+                {final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-1");
+                ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                srcconfig.parameter(LAYERS.getName().getCode()).setValue("E,F");
+                srcconfig.parameter(CRASH_DISPOSE.getName().getCode()).setValue(true);
+                lst.add(new ProviderInformation("id-1", "mock",source));}
+                
+                {final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("id-2");
+                ParameterValueGroup srcconfig = getOrCreate(PARAMETERS_DESCRIPTOR,source);
+                srcconfig.parameter(LAYERS.getName().getCode()).setValue("G,H,I");
+                lst.add(new ProviderInformation("id-2", "mock",source));}
+                
+                return lst;
+            }
         };
         Providers.setConfigurator(config);
 
@@ -254,6 +355,11 @@ public class ConfiguratorTest {
         Providers.setConfigurator(new AbstractConfigurator() {
             @Override
             public List<Map.Entry<String, ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException {
+                return Collections.EMPTY_LIST;
+            }
+            
+            @Override
+            public List<Configurator.ProviderInformation> getProviderInformations() throws ConfigurationException {
                 return Collections.EMPTY_LIST;
             }
         });

@@ -336,6 +336,10 @@ public class WFSServiceTest {
                 return lst;
              }
 
+             @Override
+            public List<Configurator.ProviderInformation> getProviderInformations() throws ConfigurationException {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
         };
 
         DataProviders.getInstance().setConfigurator(config);

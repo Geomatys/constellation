@@ -85,6 +85,19 @@ public final class DefaultConfigurator implements Configurator {
     }
     
     @Override
+    public List<ProviderInformation> getProviderInformations() throws ConfigurationException {
+        final List<ProviderRecord> records = ConfigurationEngine.getProviders();
+        final List<ProviderInformation> entries = new ArrayList<>();
+        for(ProviderRecord record : records){
+            ParameterValueGroup param = getProviderConfiguration(record.getIdentifier());
+            if(param!=null){
+                entries.add(new ProviderInformation(record.getIdentifier(), record.getImpl(), param));
+            }
+        }
+        return entries;
+    }
+    
+    @Override
     public ParameterValueGroup getProviderConfiguration(String providerId) throws ConfigurationException {
         final ProviderRecord record = ConfigurationEngine.getProvider(providerId);
         final String impl = record.getImpl();

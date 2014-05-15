@@ -29,7 +29,6 @@ import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
 import org.constellation.data.CoverageSQLTestCase;
 import org.constellation.provider.DataProviders;
-import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderFactory;
 import org.constellation.provider.Providers;
 import org.constellation.provider.configuration.AbstractConfigurator;
@@ -107,6 +106,11 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
                     lst.add(new AbstractMap.SimpleImmutableEntry<>("coverageTestSrc",config));
                 }
                 return lst;
+            }
+            
+            @Override
+            public List<Configurator.ProviderInformation> getProviderInformations() throws ConfigurationException {
+                throw new UnsupportedOperationException("Not supported yet.");
             }
         };
         DataProviders.getInstance().setConfigurator(configurator);

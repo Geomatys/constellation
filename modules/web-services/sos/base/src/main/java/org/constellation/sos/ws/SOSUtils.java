@@ -17,7 +17,9 @@
 
 package org.constellation.sos.ws;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -27,6 +29,9 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.dto.SensorMLTree;
@@ -48,8 +53,10 @@ import org.geotoolkit.sml.xml.AbstractProcessChain;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.ComponentProperty;
 import org.geotoolkit.sml.xml.SMLMember;
+import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
 import static org.geotoolkit.sml.xml.SensorMLUtilities.*;
 import org.geotoolkit.sml.xml.System;
+import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.sos.xml.SOSXmlFactory;
 import org.geotoolkit.swe.xml.AbstractEncoding;
 import org.geotoolkit.swe.xml.TextBlock;
@@ -519,5 +526,41 @@ public final class SOSUtils {
             }
         }
         return results;
+    }
+    
+    public static AbstractSensorML unmarshallSensor(final File f) throws JAXBException, DataStoreException {
+        final Unmarshaller um = SensorMLMarshallerPool.getInstance().acquireUnmarshaller();
+        Object obj = um.unmarshal(f);
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement)obj).getValue();
+        }
+        if (obj instanceof AbstractSensorML) {
+            return (AbstractSensorML)obj;
+        }
+        throw new DataStoreException("the sensorML file does not contain a valid sensorML object");
+    }
+    
+    public static AbstractSensorML unmarshallSensor(final InputStream is) throws JAXBException, DataStoreException {
+        final Unmarshaller um = SensorMLMarshallerPool.getInstance().acquireUnmarshaller();
+        Object obj = um.unmarshal(is);
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement)obj).getValue();
+        }
+        if (obj instanceof AbstractSensorML) {
+            return (AbstractSensorML)obj;
+        }
+        throw new DataStoreException("the sensorML file does not contain a valid sensorML object");
+    }
+    
+    public static Object unmarshallObservationFile(final File f) throws JAXBException, DataStoreException {
+        final Unmarshaller um = SOSMarshallerPool.getInstance().acquireUnmarshaller();
+        Object obj = um.unmarshal(f);
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement)obj).getValue();
+        }
+        if (obj != null) {
+            return obj;
+        }
+        throw new DataStoreException("the observation file does not contain a valid O&M object");
     }
 }

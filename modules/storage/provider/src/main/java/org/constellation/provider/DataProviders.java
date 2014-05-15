@@ -25,13 +25,13 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.logging.Level;
 import org.constellation.configuration.ConfigurationException;
 import static org.constellation.provider.Provider.RELOAD_TIME_PROPERTY;
+import org.constellation.provider.configuration.Configurator.ProviderInformation;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.map.ElevationModel;
 import org.opengis.feature.type.Name;
@@ -210,9 +210,9 @@ public final class DataProviders extends Providers implements PropertyChangeList
             return Collections.unmodifiableCollection(PROVIDERS);
         }
 
-        final List<Entry<String,ParameterValueGroup>> configs;
+        final List<ProviderInformation> configs;
         try {
-            configs = getConfigurator().getProviderConfigurations();
+            configs = getConfigurator().getProviderInformations();
         } catch (ConfigurationException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             return Collections.EMPTY_LIST;
@@ -221,13 +221,14 @@ public final class DataProviders extends Providers implements PropertyChangeList
         final List<DataProvider> cache = new ArrayList<>();
         
         //rebuild providers
-        for(Entry<String,ParameterValueGroup> entry : configs){
-            final String providerId = entry.getKey();
-            final ParameterValueGroup params = entry.getValue();
+        for(ProviderInformation entry : configs){
+            final String providerId = entry.id;
+            final ParameterValueGroup params = entry.config;
+            final String impl = entry.impl;
                 
             for(final ProviderFactory factory : getFactories()){
                 //check if config can be used by this factory
-                if(factory.canProcess(params)){
+                if(factory.getName().equals(impl) && factory.canProcess(params)){
                     try{
                         final DataProvider prov = (DataProvider)factory.createProvider(providerId, params);
                         if(prov != null){

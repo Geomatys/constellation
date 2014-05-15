@@ -36,7 +36,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import org.apache.sis.util.logging.Logging;
@@ -52,7 +51,6 @@ import org.constellation.admin.dao.ServiceRecord;
 import org.constellation.admin.dao.Session;
 import org.constellation.admin.dao.StyleRecord;
 import org.constellation.admin.dao.TaskRecord;
-import org.constellation.admin.util.IOUtilities;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.Layer;
@@ -63,7 +61,6 @@ import org.constellation.configuration.StyleBrief;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.Service;
 import org.constellation.engine.register.ConfigurationService;
-import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.security.NoSecurityManagerException;
@@ -75,7 +72,6 @@ import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 
 /**
@@ -787,6 +783,20 @@ public class ConfigurationEngine {
         return results;
     }
 
+    public static List<ProviderRecord> getProviders() {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            return session.readProviders();
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred while reading provider records in database", ex);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+        return new ArrayList<>();
+    }
+    
     public static List<ProviderRecord> getProviders(final String serviceName) {
         Session session = null;
         try {
@@ -1115,6 +1125,23 @@ public class ConfigurationEngine {
             if (session != null)
                 session.close();
         }
+    }
+    
+    public static List<DataRecord> getDataLinkedSensor(final String sensorId) {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            final SensorRecord sensor = session.readSensor(sensorId);
+            if (sensor != null) {
+                return session.readSensoredDataFromSensor(sensor);
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "error when try to read data linked to sensor", e);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+        return new ArrayList<>();
     }
 
     private static DataBrief _getData(QName name, String providerId) {

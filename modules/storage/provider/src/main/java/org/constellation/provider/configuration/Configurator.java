@@ -34,13 +34,25 @@ public interface Configurator {
     /**
      * Get a list of all provider configurations.
      * @return List of entry<providerId,parameters>
+     * @throws org.constellation.configuration.ConfigurationException
+     * 
+     *  @deprecated use getProviderInformations()
      */
+    @Deprecated 
     List<Entry<String,ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException;
+    
+    /**
+     * Get a list of all provider configurations.
+     * @return List of entry<providerId,parameters>
+     * @throws org.constellation.configuration.ConfigurationException
+     */
+    List<ProviderInformation> getProviderInformations() throws ConfigurationException;
     
     /**
      * Get configuration for one provider.
      * @param providerId 
      * @return Configuration or null
+     * @throws org.constellation.configuration.ConfigurationException
      */
     ParameterValueGroup getProviderConfiguration(String providerId) throws ConfigurationException;
     
@@ -48,6 +60,7 @@ public interface Configurator {
      * Store a new provider configuration.
      * @param providerId
      * @param config
+     * @throws org.constellation.configuration.ConfigurationException
      */
     void addProviderConfiguration(String providerId, ParameterValueGroup config) throws ConfigurationException;
     
@@ -66,4 +79,18 @@ public interface Configurator {
      */
     void removeProviderConfiguration(String providerId) throws ConfigurationException;
     
+    public static class ProviderInformation {
+        
+        public String id;
+        
+        public String impl;
+        
+        public ParameterValueGroup config;
+        
+        public ProviderInformation(final String id, final String impl, final ParameterValueGroup config) {
+            this.config = config;
+            this.id     = id;
+            this.impl   = impl;
+        }
+    }
 }

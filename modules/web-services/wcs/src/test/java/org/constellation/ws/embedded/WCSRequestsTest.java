@@ -36,9 +36,7 @@ import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
-import static org.constellation.coverage.ws.WCSWorkerInit.hasLocalDatabase;
 import org.constellation.provider.DataProviders;
-import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderFactory;
 import org.constellation.provider.Providers;
 import org.constellation.provider.configuration.AbstractConfigurator;
@@ -167,6 +165,11 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
                     lst.add(new AbstractMap.SimpleImmutableEntry<>("coverageTestSrc",config));
                 }
                 return lst;
+            }
+            
+            @Override
+            public List<Configurator.ProviderInformation> getProviderInformations() throws ConfigurationException {
+                throw new UnsupportedOperationException("Not supported yet.");
             }
         };
 
