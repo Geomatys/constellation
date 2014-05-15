@@ -230,6 +230,83 @@ cstlAdminApp.controller('UserDetailsController', ['$scope', '$modalInstance', 'u
     }
 }]);
 
+cstlAdminApp.controller('GroupController', ['$scope', '$modal',
+  function ($scope, $modal) {
+
+    $scope.add = function(i) {
+        $modal.open({
+            templateUrl: 'views/group/details.html',
+            controller: 'GroupDetailsController',
+            resolve: {
+                'isUpdate': function() {return false},
+                'user': function(){
+                    return {roles:[]};
+                }
+            }
+        }).result.then(function(user){
+            if(user != null)
+            $scope.list[$scope.list.length] = user;
+        });
+    };
+
+    $scope.details = function(i) {
+        $modal.open({
+            templateUrl: 'views/group/details.html',
+            controller: 'GroupDetailsController',
+            resolve: {
+                'isUpdate': function() {return false},
+                'user': function(){
+                    return {roles:[]};
+                }
+            }
+        }).result.then(function(user){
+            if(user != null)
+            $scope.list[$scope.list.length] = user;
+        });
+    };
+
+    $scope.members = function(i) {
+        $modal.open({
+            templateUrl: 'views/group/members.html',
+            controller: 'GroupMembersController',
+            resolve: {
+                'isUpdate': function() {return false},
+                'user': function(){
+                    return {roles:[]};
+                }
+            }
+        }).result.then(function(user){
+            if(user != null)
+            $scope.list[$scope.list.length] = user;
+        });
+    };
+
+}]);
+
+cstlAdminApp.controller('GroupDetailsController', ['$scope', '$modalInstance', 'user', 'isUpdate', 'UserResource',
+  function ($scope, $modalInstance, user, isUpdate, UserResource) {
+    $scope.user = user;
+
+    $scope.close = function() {
+        $modalInstance.dismiss('close');
+    };
+    $scope.user={
+        adduser:"normal"
+    };
+}]);
+
+cstlAdminApp.controller('GroupMembersController', ['$scope', '$modalInstance', 'user', 'isUpdate', 'UserResource',
+  function ($scope, $modalInstance, user, isUpdate, UserResource) {
+    $scope.user = user;
+
+    $scope.close = function() {
+        $modalInstance.dismiss('close');
+    };
+    $scope.user={
+        adduser:"normal"
+    };
+}]);
+
 cstlAdminApp.controller('TaskController', ['$scope', 'TaskService','$timeout','StompService', 
        function ($scope, TaskService, $timeout, StompService) {
 

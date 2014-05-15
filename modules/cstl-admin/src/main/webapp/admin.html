@@ -116,6 +116,8 @@
                             <li ng-show="authenticated"><a href="#/user"><span
                                     class="glyphicon glyphicon-user"></span> &nbsp;<span
                                     translate="global.menu.admin.users">Users</span></a></li>
+                            <li ng-show="authenticated"><a href="#/group" ng-mouseenter="grouphover = true" ng-mouseleave="grouphover = false" > <img ng-show="!grouphover" src="images/icon-groups.svg"><img ng-show="grouphover" src="images/icon-groups-hover.svg">
+                                    <span translate="global.menu.admin.group">Groups</span></a></li>
                             <li ng-show="authenticated"><a href="#/contact"><span
                                     class="glyphicon glyphicon-envelope"></span> &nbsp;<span
                                     translate="global.menu.admin.contact">Contact</span></a></li>

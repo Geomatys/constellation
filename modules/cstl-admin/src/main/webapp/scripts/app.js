@@ -129,6 +129,11 @@ cstlAdminApp
                 controller: 'UserController'
             });
             $routeProvider
+            .when('/group', {
+                templateUrl: 'views/group/list.html',
+                controller: 'GroupController'
+            });
+            $routeProvider
             .when('/contact', {
                 templateUrl: 'views/contact.html',
                 controller: 'ContactController'

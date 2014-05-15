@@ -1176,7 +1176,56 @@ table.user-table tbody>tr>td.user-delete{
 .process-list .panel{
     margin-bottom:15px;
 }
-
+/*Groups*/
+.multiSelect {
+    overflow: auto;
+}
+.multiSelect .select {
+    margin-right: 20px;
+    float: left;
+}
+.multiSelect .text {
+    clear: both;
+    font-size: 11px;
+}
+.multiSelect label::after {
+    content: ":";
+}
+.btn.mover {
+    display: block;
+    margin-top: 25px;
+    vertical-align: top;
+}
+.btn.mover.left {
+    padding: 3px 8px 2px 6px;
+}
+.btn.mover.right {
+    margin-top: 24px;
+    padding: 3px 7px 2px;
+}
+.btn.mover i {
+    margin: 0;
+}
+select[multiple]{
+height: auto;
+width: 209px;
+border: 1px solid #cccccc;
+background-color: #ffffff;
+display: inline-block;
+/* height: 20px; */
+padding: 4px 6px;
+margin-bottom: 10px;
+font-size: 14px;
+line-height: 20px;
+color: #555555;
+-webkit-border-radius: 4px;
+-moz-border-radius: 4px;
+border-radius: 4px;
+vertical-align: middle;
+}
+.multiSelect label{
+    display: block;
+}
 
 /*Modal responsive*/
 .modal-dialog-responsive .modal-body{
