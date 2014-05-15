@@ -237,6 +237,17 @@ public class SOSServices {
         }
     }
     
+    private void updateProcedureLocation(final String id, final ProcedureTree process, final ExtractionResult result, final SOSConfigurer configurer) throws ConfigurationException {
+        for (ProcedureTree child : process.children) {
+            updateProcedureLocation(id, child, result, configurer);
+        }
+        
+        final AbstractGeometryType geom = (AbstractGeometryType) process.spatialBound.getGeometry("2.0.0");
+        if (geom != null) {
+            configurer.updateSensorLocation(id, process.id, geom);
+        }
+    }
+    
     @PUT
     @Path("{id}/sensor/import")
     public Response importSensor(final @PathParam("id") String id, final ParameterValues params) throws Exception {
@@ -282,8 +293,13 @@ public class SOSServices {
             }
             // import in O&M database
             configurer.importObservations(id, result.observations, result.phenomenons);
+            
+            // update sensor location
+            for (ProcedureTree process : result.procedures) {
+                updateProcedureLocation(id, process, result, configurer);
+            }
         }
-
+        
         
         return ok(new AcknowlegementType("Success", "The specified sensor has been imported in the SOS"));
     }
