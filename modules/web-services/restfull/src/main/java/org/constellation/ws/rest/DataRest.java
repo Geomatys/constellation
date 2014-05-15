@@ -1599,6 +1599,15 @@ public class DataRest {
         ConfigurationEngine.linkDataToSensor(name, providerId, sensorId);
         return Response.status(200).build();
     }
+
+    @POST
+    @Path("unlink/sensor/{providerId}/{dataId}/{sensorId}")
+    public Response unlinkDataToSensor(final @PathParam("providerId") String providerId, final @PathParam("dataId") String dataId, final @PathParam("sensorId") String sensorId, final SimpleValue value) {
+        final String namespace = value.getValue();
+        final QName name = new QName(namespace, dataId);
+        ConfigurationEngine.unlinkDataToSensor(name, providerId, sensorId);
+        return Response.status(200).build();
+    }
 }
 
 

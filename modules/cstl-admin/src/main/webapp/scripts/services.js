@@ -194,7 +194,8 @@ cstlAdminApp.factory('dataListing', ['$resource',
             'codeLists':    {method: 'GET', url: '@cstl/api/1/data/metadataCodeLists/:lang;jsessionid='},
             'findDataType':    {method: 'POST', url: '@cstl/api/1/data/findDataType;jsessionid='},
             'linkToSensor': {method: 'POST', url: '@cstl/api/1/data/link/sensor/:providerId/:dataId/:sensorId;jsessionid='},
-            'generateSML': {method: 'PUT', url: '@cstl/api/1/sensor/generate;jsessionid='},
+            'unlinkSensor': {method: 'POST', url: '@cstl/api/1/data/unlink/sensor/:providerId/:dataId/:sensorId;jsessionid='},
+            'generateSML': {method: 'PUT', url: '@cstl/api/1/sensor/generate;jsessionid='}
         });
     }]);
 

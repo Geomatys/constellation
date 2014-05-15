@@ -109,3 +109,35 @@ cstlAdminApp.controller('SensorAddModalController', ['$scope', '$modalInstance',
             });
         }
     }]);
+
+cstlAdminApp.controller('SensorModalChooseController', ['$scope', '$modalInstance', '$dashboard', 'dataListing', 'sensor', 'selectedData', '$growl',
+    function ($scope, $modalInstance, $dashboard, dataListing, sensor, selectedData, $growl){
+        $scope.close = function() {
+            $modalInstance.dismiss('close');
+        };
+
+        sensor.list({}, function(response) {
+            $dashboard($scope, response.children, false);
+            $scope.nbbypage = 5;
+        });
+
+        $scope.selectedSensorsChild = null;
+
+        $scope.selectSensorsChild = function(item) {
+            if ($scope.selectedSensorsChild === item) {
+                $scope.selectedSensorsChild = null;
+            } else {
+                $scope.selectedSensorsChild = item;
+            }
+        };
+
+        $scope.choose = function() {
+            var sensorId = ($scope.selectedSensorsChild !== null) ? $scope.selectedSensorsChild.id : $scope.selected.id;
+            dataListing.linkToSensor({providerId: selectedData.Provider, dataId: selectedData.Name, sensorId: sensorId}, {value: selectedData.Namespace},
+                function() {
+                    selectedData.TargetSensor.push(sensorId);
+                });
+
+            $modalInstance.dismiss('close');
+        };
+    }]);

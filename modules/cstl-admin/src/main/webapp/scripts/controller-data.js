@@ -20,15 +20,17 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
         $scope.cstlUrl = $cookies.cstlUrl;
         $scope.cstlSessionId = $cookies.cstlSessionId;
 
-        var modalLoader = $modal.open({
-          templateUrl: 'views/modalLoader.html',
-          controller: 'ModalInstanceCtrl'
-        });
-        dataListing.listAll({}, function(response) {
-            $dashboard($scope, response, true);
-            $scope.filtertype = "";
-            modalLoader.close();
-        });
+        $scope.init = function() {
+            var modalLoader = $modal.open({
+                templateUrl: 'views/modalLoader.html',
+                controller: 'ModalInstanceCtrl'
+            });
+            dataListing.listAll({}, function(response) {
+                $dashboard($scope, response, true);
+                $scope.filtertype = "";
+                modalLoader.close();
+            });
+        };
 
         // Map methods
         $scope.showData = function() {
@@ -132,6 +134,23 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
 
         $scope.unlinkStyle = function(providerName, styleName, dataProvider, dataId) {
             StyleSharedService.unlinkStyle($scope,providerName, styleName, dataProvider, dataId, style);
+        };
+
+        $scope.showSensorsList = function() {
+            $modal.open({
+                templateUrl: 'views/modalSensorChoose.html',
+                controller: 'SensorModalChooseController',
+                resolve: {
+                    'selectedData': function() { return $scope.selected; }
+                }
+            });
+        };
+
+        $scope.unlinkSensor = function(sensorId) {
+            dataListing.unlinkSensor({providerId: $scope.selected.Provider, dataId: $scope.selected.Name, sensorId: sensorId}, {value: $scope.selected.Namespace},
+                function() {
+                    $scope.selected.TargetSensor.splice(0, 1);
+                });
         };
 
         $scope.toggleUpDownSelected = function() {

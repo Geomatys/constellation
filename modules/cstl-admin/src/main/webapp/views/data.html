@@ -17,7 +17,7 @@
         </div>
     </div>
 </div>
-<div id="dataDashboard" class="row">
+<div id="dataDashboard" class="row" ng-init="init()">
     <div class="col-sm-12">
         <div class="frame dashboard">
             <div class="navbar navbar-default" style="margin-bottom: 0px;">
@@ -154,10 +154,10 @@
                                 </h6>
                                 <div id="linkedSensorList">
                                     <span ng-show="selected.TargetSensor.length === 0" translate="label.no.association">No association</span>
-                                    <div ng-show="selected.TargetSensor.length > 0" class="style" ng-repeat="sensor in selected.TargetSensor">
-                                        <button type="button" ng-click="unlinkSensor(sensor)"
+                                    <div ng-show="selected.TargetSensor.length > 0" class="style" ng-repeat="sensorId in selected.TargetSensor">
+                                        <button type="button" ng-click="unlinkSensor(sensorId)"
                                                 class="btn btn-small"><i class="icon-minus"></i></button>
-                                        {{sensor}}
+                                        {{sensorId}}
                                     </div>
                                 </div>
                             </div>
