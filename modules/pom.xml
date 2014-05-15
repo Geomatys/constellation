@@ -88,7 +88,7 @@
         <module>cstl-client</module>
         <module>cstl-services</module>
         <module>cstl-admin</module>
-        <!-- <module>cstl-sdi</module> -->
+         <module>cstl-sdi</module>
     </modules>
 
 </project>
