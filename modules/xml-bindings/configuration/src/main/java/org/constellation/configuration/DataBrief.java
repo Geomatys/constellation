@@ -29,6 +29,7 @@ import java.util.List;
 /**
  * @author Bernard Fabien (Geomatys)
  * @author Garcia Benjamin (Geomatys)
+ * @author Cédric Briançon (Geomatys)
  * @version 0.9
  * @since 0.9
  */
@@ -60,9 +61,6 @@ public final class DataBrief implements Serializable {
     @XmlElement(name="Sensorable")
     private boolean sensorable;
 
-    @XmlElement(name="UsedAsSensor")
-    private boolean usedAsSensor;
-
     @XmlElement(name="Owner")
     private String owner;
 
@@ -71,6 +69,9 @@ public final class DataBrief implements Serializable {
 
     @XmlElement(name="TargetService")
     private List<ServiceProtocol> targetService = new ArrayList<>(0);
+
+    @XmlElement(name="TargetSensor")
+    private List<String> targetSensor = new ArrayList<>(0);
 
     public String getName() {
         return name;
@@ -136,14 +137,6 @@ public final class DataBrief implements Serializable {
         this.sensorable = sensorable;
     }
 
-    public boolean isUsedAsSensor() {
-        return usedAsSensor;
-    }
-
-    public void setUsedAsSensor(boolean usedAsSensor) {
-        this.usedAsSensor = usedAsSensor;
-    }
-
     public String getOwner() {
         return owner;
     }
@@ -168,6 +161,14 @@ public final class DataBrief implements Serializable {
         this.targetService = targetService;
     }
 
+    public List<String> getTargetSensor() {
+        return targetSensor;
+    }
+
+    public void setTargetSensor(final List<String> targetSensor) {
+        this.targetSensor = targetSensor;
+    }
+
     @Override
     public String toString() {
         return "DataBrief{" +
@@ -179,9 +180,10 @@ public final class DataBrief implements Serializable {
                 ", date=" + date +
                 ", type='" + type + '\'' +
                 ", sensorable='" + sensorable + '\'' +
-                ", usedAsSensor='" + usedAsSensor + '\'' +
                 ", owner='" + owner + '\'' +
                 ", targetStyle=" + targetStyle +
+                ", targetService=" + targetService +
+                ", targetSensor=" + targetSensor +
                 '}';
     }
 

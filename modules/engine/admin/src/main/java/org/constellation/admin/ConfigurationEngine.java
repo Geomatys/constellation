@@ -1223,7 +1223,7 @@ public class ConfigurationEngine {
         db.setProvider(record.getProvider().getIdentifier());
         db.setType(record.getType().toString());
         db.setSensorable(record.isSensorable());
-        db.setUsedAsSensor(record.isUsedAsSensor());
+        db.setTargetSensor(record.getLinkedSensors());
 
         final List<StyleBrief> styleBriefs = new ArrayList<>(0);
         for (StyleRecord styleRecord : styleRecords) {

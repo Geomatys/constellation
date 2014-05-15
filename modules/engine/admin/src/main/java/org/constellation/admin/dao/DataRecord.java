@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -162,10 +163,14 @@ public final class DataRecord extends Record {
         session.updateDataSensorable(id, sensorable);
     }
 
-    public boolean isUsedAsSensor() throws SQLException {
+    public List<String> getLinkedSensors() throws SQLException {
         ensureConnectionNotClosed();
         final List<SensorRecord> sensors = session.readSensoredDataFromData(this);
-        return !sensors.isEmpty();
+        final List<String> ret = new ArrayList<>();
+        for (final SensorRecord sensor : sensors) {
+            ret.add(sensor.getIdentifier());
+        }
+        return ret;
     }
 
     public Date getDate() {

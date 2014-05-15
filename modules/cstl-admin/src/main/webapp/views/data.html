@@ -90,8 +90,8 @@
                                     <div class="block">
                                         <i class="icon-user"></i>{{service.Owner}}
                                     </div>
-                                    <img ng-if="service.Sensorable===true && service.UsedAsSensor==false" src="images/icon-sensor-non-active.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
-                                    <img ng-if="service.UsedAsSensor==true" src="images/icon-sensor-active.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
+                                    <img ng-if="service.Sensorable===true && service.TargetSensor.length === 0" src="images/icon-sensor-non-active.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
+                                    <img ng-if="service.TargetSensor.length > 0" src="images/icon-sensor-active.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
                                 </div>
                             </div>
                         </div>
@@ -122,12 +122,11 @@
 
                                 <div class="separator"></div>
                                 <h6>
-                                    <span translate="label.related.style">Related styles</span>
+                                    <span translate="label.related.style">Related style(s)</span>
                                     <button type="button" ng-click="showStyleList();"
                                             class="btn btn-sm pull-right">
                                         <i class="icon-plus"></i></button>
                                 </h6>
-
                                 <div id="linkedList">
                                     <span ng-show="selected.TargetStyle.length == 0" translate="label.no.association">No association</span>
                                     <div ng-show="selected.TargetStyle.length > 0" class="style" ng-repeat="style in selected.TargetStyle">
@@ -136,12 +135,29 @@
                                         {{style.Name}}
                                     </div>
                                 </div>
+
                                 <div class="separator"></div>
-                                <h6 style="margin-bottom:12px;" translate="label.related.service"></h6>
+                                <h6 translate="label.related.service">Related service(s)</h6>
                                 <div id="linkedServiceList">
                                     <span ng-show="selected.TargetService.length == 0" translate="label.no.association">No association</span>
                                     <div ng-show="selected.TargetService.length > 0" class="style" ng-repeat="service in selected.TargetService">
                                         {{service.name}}
+                                    </div>
+                                </div>
+
+                                <div class="separator"></div>
+                                <h6>
+                                    <span translate="label.related.sensors">Related sensor(s)</span>
+                                    <button type="button" ng-show="selected.TargetSensor.length === 0" ng-click="showSensorsList();"
+                                            class="btn btn-sm pull-right">
+                                        <i class="icon-plus"></i></button>
+                                </h6>
+                                <div id="linkedSensorList">
+                                    <span ng-show="selected.TargetSensor.length === 0" translate="label.no.association">No association</span>
+                                    <div ng-show="selected.TargetSensor.length > 0" class="style" ng-repeat="sensor in selected.TargetSensor">
+                                        <button type="button" ng-click="unlinkSensor(sensor)"
+                                                class="btn btn-small"><i class="icon-minus"></i></button>
+                                        {{sensor}}
                                     </div>
                                 </div>
                             </div>
