@@ -467,7 +467,14 @@ public class OM2ObservationWriter implements ObservationWriter {
                 // time field
                 final Timestamp realTime;
                 if (hasTime) {
+                    final int next;
                     int tokenIndex     = block.indexOf(encoding.getTokenSeparator());
+                    if (tokenIndex == -1) {
+                        tokenIndex     = block.length();
+                        next = tokenIndex;
+                    } else {
+                        next = tokenIndex + 1;
+                    }
                     final String first = block.substring(0, tokenIndex);
                     try {
                         final long millis = new ISODateParser().parseToMillis(first);
@@ -475,7 +482,7 @@ public class OM2ObservationWriter implements ObservationWriter {
                     } catch (IllegalArgumentException ex) {
                         throw new DataStoreException("Bad format of timestamp for:" + first);
                     }
-                    block = block.substring(tokenIndex + 1);
+                    block = block.substring(next);
                 } else {
                     if (samplingTime instanceof Period) {
                         LOGGER.warning("expecting a timeInstant for observation with no time field.");
