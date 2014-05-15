@@ -52,6 +52,7 @@ import org.constellation.provider.DataProviders;
 import org.constellation.provider.coveragestore.CoverageStoreProvider;
 import org.constellation.provider.observationstore.ObservationStoreProvider;
 import org.constellation.sos.configuration.SensorMLGenerator;
+import org.constellation.util.Util;
 import static org.constellation.utils.RESTfulUtilities.ok;
 import org.geotoolkit.gml.xml.v321.AbstractGeometryType;
 import org.geotoolkit.sml.xml.AbstractSensorML;
@@ -104,7 +105,7 @@ public class SensorRest {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response generateSensor(final ParameterValues pv) {
         final String providerId = pv.get("providerId");
-        final QName dataId      = QName.valueOf(pv.get("dataId"));
+        final QName dataId      = Util.parseQName(pv.get("dataId"));
         
         final org.constellation.provider.Provider provider = DataProviders.getInstance().getProvider(providerId);
         final ExtractionResult result;

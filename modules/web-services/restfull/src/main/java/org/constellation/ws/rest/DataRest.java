@@ -95,6 +95,7 @@ import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.scheduler.CstlScheduler;
 import org.constellation.security.SecurityManagerHolder;
 import org.constellation.util.SimplyMetadataTreeNode;
+import org.constellation.util.Util;
 import org.constellation.utils.*;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
@@ -543,7 +544,7 @@ public class DataRest {
         final String dataName   = values.getValues().get("dataName");
         final DefaultMetadata metadata;
         if (dataName != null) {
-            final QName name = QName.valueOf(dataName);
+            final QName name = Util.parseQName(dataName);
             metadata =  ConfigurationEngine.loadIsoDataMetadata(providerId, name, ISOMarshallerPool.getInstance());
         } else {
             final DataProvider dataProvider = DataProviders.getInstance().getProvider(providerId);
@@ -1424,7 +1425,7 @@ public class DataRest {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getIsoMetadata(final @PathParam("providerId") String providerId, final @PathParam("dataId") String dataId) {
-        final DefaultMetadata metadata = ConfigurationEngine.loadIsoDataMetadata(providerId, QName.valueOf(dataId), CSWMarshallerPool.getInstance());
+        final DefaultMetadata metadata = ConfigurationEngine.loadIsoDataMetadata(providerId, Util.parseQName(dataId), CSWMarshallerPool.getInstance());
         if (metadata != null) {
             metadata.prune(); 
         }

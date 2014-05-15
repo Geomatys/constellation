@@ -157,7 +157,10 @@ public final class Util {
      * Parse a String to instantiate a named Layer ({namespace}name).
      * @param layerName
      * @return
+     * 
+     * @deprecated use parseQName()
      */
+    @Deprecated
     public static QName parseLayerQName(final String layerName) {
         final QName name;
         if (layerName != null && layerName.lastIndexOf('}') != -1) {
@@ -168,6 +171,16 @@ public final class Util {
             name = new QName(layerName);
         }
         return name;
+    }
+    
+    public static QName parseQName(String name) {
+        if (name != null) {
+            if (name.startsWith("{}")) {
+                name = name.substring(2);
+            }
+            return QName.valueOf(name);
+        } 
+        return null;
     }
 
     public static File getWebappDiretory() {
