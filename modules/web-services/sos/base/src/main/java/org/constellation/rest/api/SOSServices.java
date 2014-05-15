@@ -255,10 +255,12 @@ public class SOSServices {
         final SensorRecord sensor      = ConfigurationEngine.getSensor(sensorID);
         final List<DataRecord> datas   = ConfigurationEngine.getDataLinkedSensor(sensorID);
         final SOSConfigurer configurer = getConfigurer();
+        final List<String> sensorIds   = new ArrayList<>();
         
         //import SML
         final AbstractSensorML sml = SOSUtils.unmarshallSensor(sensor.getMetadata());
         configurer.importSensor(id, sml, sensorID);
+        sensorIds.add(sensorID);
         
         //import sensor children
         final List<SensorRecord> sensors = ConfigurationEngine.getSensorChildren(sensorID);
@@ -266,6 +268,7 @@ public class SOSServices {
             final AbstractSensorML smlChild = SOSUtils.unmarshallSensor(child.getMetadata());
             configurer.importSensor(id, smlChild, child.getIdentifier());
             datas.addAll(ConfigurationEngine.getDataLinkedSensor(child.getIdentifier()));
+            sensorIds.add(child.getIdentifier());
         }
         
         // look for provider ids
@@ -280,11 +283,11 @@ public class SOSServices {
             final ExtractionResult result;
             if (provider instanceof ObservationStoreProvider) {
                 final ObservationStoreProvider omProvider = (ObservationStoreProvider) provider;
-                result = omProvider.getObservationStore().getResults();
+                result = omProvider.getObservationStore().getResults(sensorIds);
             } else if (provider instanceof CoverageStoreProvider) {
                 final CoverageStoreProvider covProvider = (CoverageStoreProvider) provider;
                 if (covProvider.isSensorAffectable()) {
-                    result = covProvider.getObservationStore().getResults();
+                    result = covProvider.getObservationStore().getResults(sensorIds);
                 } else {
                     return ok(new AcknowlegementType("Failure", "Only available on netCDF file for coverage for now"));
                 }
