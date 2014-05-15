@@ -26,6 +26,8 @@
                                 <a class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput" translate="data.modal.remove">Remove</a>
                             </div>
                         </div>
+                        <div class="alert alert-data" ng-show="loader.loaderupload" translate="message.uploading">Your data is uploading...</div>
+
                     </form>
                 </div>
 
@@ -217,7 +219,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" id="cancelButton" class="btn btn-default" ng-click="close()" translate="data.modal.cancel">Cancel</button>
-                <button ng-show="$parent.allowNext" type="button" id="nextButton" class="btn btn-primary" ng-click="next();" translate="data.modal.next">Next</button>
+                <button ng-disabled="loader.loaderupload" ng-show="$parent.allowNext" type="button" id="nextButton" class="btn btn-primary" ng-click="next();" translate="data.modal.next">Next</button>
                 <button ng-show="$parent.allowSensorChoose" type="button" id="sensorChoose" class="btn btn-primary" ng-click="uploaded()" translate="data.modal.next">Next</button>
                 <button ng-show="$parent.allowSubmit" type="button" id="submitButton" class="btn btn-primary" ng-click="finish()" translate="data.modal.end">Finish</button>
             </div>

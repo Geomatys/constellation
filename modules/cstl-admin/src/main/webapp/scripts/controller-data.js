@@ -343,6 +343,9 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
         $scope.allowSensorChoose = false;
         $scope.allowSubmit = false;
         $scope.allowNext = false;
+        $scope.loader={
+            loaderupload : false
+        };
 
         $scope.dataPath = null;
         $scope.mdPath = null;
@@ -355,9 +358,6 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
         $scope.next = function() {
             if ($scope.step1Data === true) {
                 $scope.uploadData();
-                $scope.step2Metadata = true;
-                $scope.allowNext = true;
-                $scope.step1Data = false;
             } else {
                 if ($scope.metadata) {
                     $scope.uploadMetadata();
@@ -418,20 +418,23 @@ cstlAdminApp.controller('LocalFileModalController', ['$scope', '$dashboard', '$m
 
         $scope.uploadData = function() {
             var $form = $('#uploadDataForm');
-
+            
             var formData = new FormData($form[0]);
-
+            $scope.loader.loaderupload = true;
             $.ajax({
                 url: $cookies.cstlUrl + "api/1/data/upload/data;jsessionid="+ $cookies.cstlSessionId,
                 type: 'POST',
                 data: formData,
-                async: false,
                 cache: false,
                 contentType: false,
                 processData: false,
                 success: function (returndata) {
                     $scope.dataPath = returndata;
+                    $scope.loader.loaderupload = false;
+                    $scope.step2Metadata = true;
                     $scope.allowNext = true;
+                    $scope.step1Data = false;
+                    $scope.$digest();
                 }
             });
         };

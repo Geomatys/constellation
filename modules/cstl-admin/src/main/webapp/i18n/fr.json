@@ -294,7 +294,8 @@
                 "sessions": "Sessions",
                 "users": "Utilisateurs",
                 "processes": "Processus",
-                "tasks":"Tâches"
+                "tasks":"Tâches",
+                "group":"Groupes"
             },
             "data": "Données",
             "sensor": "Capteurs",
@@ -1226,5 +1227,21 @@
         "style.create":"Vous devez sélectionner une donnée afin de lui associer le style créé."
     },
     "sensors.information.title":"Capteurs disponibles",
-    "tasks.information.title":"Traitements disponibles"
+    "tasks.information.title":"Traitements disponibles",
+    "group":{
+        "title":"Gestion des groupes",
+        "add":"Ajouter un groupe",
+        "count": "Il y a {{ total }} groupes.",
+        "filter":"Filtrer :",
+        "tab.name":"Nom du groupe",
+        "tab.members":"Membres",
+        "multi.current":"Permissions actuelles",
+        "multi.available":"Permissions disponibles",
+        "rights":"Permissions du groupe",
+        "members.count": "{{ total }} utilisateurs",
+        "users.filter":"Filtrer",
+        "users.back":"Retour",
+        "new":"Nouveau groupe"
+    },
+    "message.uploading":"Votre donnée est en train d'être importée..."
 }

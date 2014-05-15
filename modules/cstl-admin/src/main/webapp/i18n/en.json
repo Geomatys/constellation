@@ -618,7 +618,8 @@
                 "processes": "Processes",
                 "tasks": "Tasks",
                 "logs": "Logs",
-                "logout": "Log out"
+                "logout": "Log out",
+                "group":"Groups"
             },
             "language": "Language"
         },
@@ -941,5 +942,21 @@
         "style.create":"You must select a data to associate the style created."
     },
     "sensors.information.title":"Available sensors",
-    "tasks.information.title":"Available tasks"
+    "tasks.information.title":"Available tasks",
+    "group":{
+        "title":"Roles Dashboard",
+        "add":"Add group",
+        "count": "There are {{ total }} groups.",
+        "filter":"Group filter:",
+        "tab.name":"Group name",
+        "tab.members":"Members",
+        "multi.current":"Current permissions",
+        "multi.available":"Available permissions",
+        "rights":"Group permissions",
+        "members.count": "{{ total }} users",
+        "users.filter":"User filter",
+        "users.back":"Back",
+        "new":"New group"
+    },
+    "message.uploading":"Your data is uploading..."
 }
