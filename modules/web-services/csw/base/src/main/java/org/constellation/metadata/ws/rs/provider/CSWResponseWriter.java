@@ -17,7 +17,7 @@
 
 package org.constellation.metadata.ws.rs.provider;
 
-import com.sun.xml.internal.bind.marshaller.DataWriter;
+import com.sun.xml.bind.marshaller.DataWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -29,18 +29,17 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-
+import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.XML;
 import org.constellation.jaxb.CstlXMLSerializer;
 import org.constellation.jaxb.MarshallWarnings;
 import org.constellation.metadata.utils.SerializerResponse;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.csw.xml.CSWResponse;
-import org.apache.sis.util.logging.Logging;
 
 /**
  * Note: replace <T extends CSWResponse> by <T extends Object> because an strange bug arrive with DescribeRecordResponse not passing in this Provider.

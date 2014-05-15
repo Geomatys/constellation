@@ -16,7 +16,7 @@
  */
 package org.constellation.jaxb;
 
-import com.sun.xml.internal.bind.marshaller.CharacterEscapeHandler;
+//import com.sun.xml.internal.bind.marshaller.CharacterEscapeHandler;
 import java.io.IOException;
 import java.io.Writer;
 
@@ -24,9 +24,9 @@ import java.io.Writer;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class NoCharacterEscapeHandler implements CharacterEscapeHandler {
+public class NoCharacterEscapeHandler { //implements CharacterEscapeHandler {
 
-    @Override
+    //@Override
     public void escape(char[] ch, int start, int length, boolean bln, Writer out) throws IOException {
         out.write(ch, start, length);
     }
