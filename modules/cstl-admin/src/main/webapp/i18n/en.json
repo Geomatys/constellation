@@ -950,6 +950,7 @@
         "style.create":"You must select a data to associate the style created."
     },
     "sensors.information.title":"Available sensors",
+    "sensor.obervation":"Sensor observation",
     "tasks.information.title":"Available tasks",
     "mapcontext.information.title":"Available map context",
     "group":{

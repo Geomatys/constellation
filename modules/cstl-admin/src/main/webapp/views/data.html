@@ -90,8 +90,11 @@
                                     <div class="block">
                                         <i class="icon-user"></i>{{data.Owner}}
                                     </div>
+
                                     <img ng-if="data.Sensorable===true && data.TargetSensor.length === 0" src="images/icon-sensor-non-active.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
                                     <img ng-if="data.TargetSensor.length > 0" src="images/icon-sensor-active.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
+                                    <span ng-if="data.TargetSensor.length > 0" src="images/icon-sensor-active.svg" class="pull-right text-right item-list-style" style="margin-right:10px; font-weight:bold;" translate="sensor.obervation" >Sensor observation</span>
+
                                 </div>
                             </div>
                         </div>
