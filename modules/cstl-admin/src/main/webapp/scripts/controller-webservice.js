@@ -155,6 +155,9 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
     function ($scope, $routeParams, webService, $filter, $location, $growl) {
         $scope.type = $routeParams.type;
         $scope.tonext = true;
+        $scope.serviceInfo = true;
+        $scope.serviceContact = false;
+        $scope.serviceRights = false;
         $scope.metadata = {};
         $scope.metadata.keywords = [];
 
@@ -187,14 +190,27 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
 
         $scope.goToServiceContact = function() {
             if($scope.metadata.name!= null || $scope.metadata.identifier!=null){
-                $scope.tonext = false;
+                $scope.serviceContact = true;
+                $scope.serviceInfo = false;
+                $scope.serviceRights = false;
+            } else {
+                $scope.invalideName=true;
+            }
+        };
+        $scope.goToServiceRights = function() {
+            if($scope.metadata.name!= null || $scope.metadata.identifier!=null){
+                $scope.serviceContact = false;
+                $scope.serviceRights = true;
+                $scope.serviceInfo = false;
             } else {
                 $scope.invalideName=true;
             }
         };
 
         $scope.goToServiceInfo = function() {
-            $scope.tonext = true;
+            $scope.serviceContact = false;
+            $scope.serviceRights = false;
+            $scope.serviceInfo = true;
         };
 
         $scope.addTag = function() {

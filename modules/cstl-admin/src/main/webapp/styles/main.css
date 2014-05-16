@@ -1343,3 +1343,22 @@ vertical-align: middle;
     }
 }
 .ace_editor { height: 200px; }
+
+.searchicon input{
+    padding-left:25px;
+}
+.searchicon:before{
+    opacity:.8;
+    height:100%;
+    width:25px;
+    display:-webkit-box;
+    -webkit-box-pack:center;
+    -webkit-box-align:center;
+    position: absolute;
+    content:"\e003";
+    font-family: 'Glyphicons Halflings';
+    font-style: normal;
+    font-weight: 400;
+    pointer-events: none;
+    -webkit-font-smoothing: antialiased;
+}

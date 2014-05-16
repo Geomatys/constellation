@@ -570,6 +570,13 @@
             "show.label": "Show",
             "url.label": "Service URL",
             "loader.modal.title": "Loading..."
+        },
+        "rights":"Service rights",
+        "rights.group": {
+            "list":"Group list",
+            "group":"Group",
+            "read":"Reading",
+            "write":"Writing"            
         }
     },
     "style.listing": {

@@ -986,6 +986,13 @@
                 }
             }
         },
+        "rights":"Gestion des droits",
+        "rights.group": {
+            "list":"Liste des groupes",
+            "group":"Groupe",
+            "read":"Lecture",
+            "write":"Ecriture"            
+        },
         "edit": {
             "dashboard.layer.title": "Liste des couches",
             "dashboard.metadata.title": "Liste des métadonnées",
