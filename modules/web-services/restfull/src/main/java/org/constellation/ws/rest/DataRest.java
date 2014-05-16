@@ -860,6 +860,20 @@ public class DataRest {
         for(int i=0;i<scales.length;i++) scales[i] = scalesList.get(i);
         resolutionPerEnvelope.put(dataEnv, scales);
         
+        //Prepare pyramid's mosaics.
+        final Dimension tileDim = new Dimension(tileSize, tileSize);
+        try {
+            CoverageUtilities.getOrCreatePyramid(outputRef, dataEnv, tileDim, scales);
+        } catch (Exception ex) {
+            Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            return Response.ok("Failed to create pyramid and mosaics in store "+ex.getMessage()).status(500).build();
+        }
+
+        //update the DataRecord objects
+        //this produces an update event which will create the DataRecord
+        outProvider.reload();
+        //we grab the store again, reload has recreate it
+        outStore = (CoverageStore)outProvider.getMainStore();
         
         //prepare process
         final ProcessDescriptor desc;
@@ -878,18 +892,9 @@ public class DataRest {
         input.parameter("resolution_per_envelope").setValue(resolutionPerEnvelope);
         final org.geotoolkit.process.Process p = desc.createProcess(input);
 
-        new Thread(){
-            @Override
-            public void run() {
-                try {
-                    p.call();
-                } catch (ProcessException ex) {
-                    LOGGER.log(Level.WARNING, null, ex);
-                }
-            }
-        }.start();
+        //add task in scheduler
+        CstlScheduler.getInstance().runOnce("Create conform pyramid for "+providerId+":"+dataId, p);
         
-                        
         final ProviderData ref = new ProviderData(outProvider.getId(), outData.getName());
         return Response.ok(ref).status(202).build();
     }
