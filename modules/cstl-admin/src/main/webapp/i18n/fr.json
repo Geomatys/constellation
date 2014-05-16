@@ -415,7 +415,7 @@
             "intro":"<b>Constellation-SDI</b> permet de créer et de gérer simplement une Infrastructure de Données Spatiales complète.",
             "services":"Vous pouvez créer des <b>services web</b> pour ensuite y ajouter des données",
             "data":"Vous pouvez gérer vos <b>données</b>",
-            "stat":"Vous pouvez visualiser les <b>statistiques</b> de votre serveur"
+            "stat":"Vous pouvez gérer des <b>capteurs</b> et les utiliser dans un context géospatial"
         }
     },
     "label": {
