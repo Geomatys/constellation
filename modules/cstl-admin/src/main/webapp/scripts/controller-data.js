@@ -880,7 +880,6 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
 
         // WMTS params in the last form before closing the popup
         $scope.wmtsParams = false;
-        $scope.data = undefined;
         $scope.tileFormat = undefined;
         $scope.crs = undefined;
         $scope.scales = [];
@@ -985,12 +984,10 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
                 });
 
                 $scope.wmtsParams = true;
-                // Stores the data for further click on the same choose button in the next form
-                $scope.data = data;
             } else {
                 // Finish the WMTS publish process
                 // Pyramid the data to get the new provider to add
-                dataListing.pyramidData({providerId: $scope.data.Provider, dataId: $scope.data.Name},
+                dataListing.pyramidData({providerId: $scope.selected.Provider, dataId: $scope.selected.Name},
                     {tileFormat: $scope.tileFormat, crs: $scope.crs, scales: $scope.scales, upperCornerX: $scope.upperCornerX, upperCornerY: $scope.upperCornerY},
                     function(respProvider) {
                         // Add the tiled provider to the service
@@ -1005,7 +1002,7 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
                                 $modalInstance.dismiss('close');
                             }
                         );
-                    }, function() { $growl('error', 'Error', 'Pyramid process failed for ' + $scope.data.Name); });
+                    }, function() { $growl('error', 'Error', 'Pyramid process failed for ' + $scope.selected.Name); });
             }
         };
     }]);
