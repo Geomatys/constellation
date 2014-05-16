@@ -32,6 +32,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
 import org.apache.commons.io.IOUtils;
+import org.apache.sis.storage.DataStore;
+import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.dao.DataRecord;
@@ -40,21 +42,19 @@ import org.constellation.admin.dao.StyleRecord;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.provider.Data;
-import org.constellation.provider.DataProviders;
-import org.constellation.provider.Provider;
-import org.constellation.provider.ProviderFactory;
-import org.constellation.provider.StyleProviders;
+import org.constellation.provider.*;
 import org.constellation.util.MetadataMapBuilder;
 import org.constellation.util.SimplyMetadataTreeNode;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
+import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
 import org.geotoolkit.style.MutableFeatureTypeStyle;
 import org.geotoolkit.style.MutableRule;
 import org.geotoolkit.style.MutableStyle;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.style.RasterSymbolizer;
@@ -166,6 +166,25 @@ public final class DefaultConfigurator implements Configurator {
                 }
                 if (!found) {
                     DataRecord record = ConfigurationEngine.writeData(name, pr, provider.getDataType(), provider.isSensorAffectable());
+
+                    // Subtype
+                    final DataProvider dp = DataProviders.getInstance().getProvider(provider.getId());
+                    final DataStore store = dp.getMainStore();
+                    if (store instanceof FeatureStore) {
+                        final FeatureStore fs = (FeatureStore)store;
+                        FeatureType fType = null;
+                        try {
+                            fType = fs.getFeatureType(new DefaultName(name));
+                        } catch (DataStoreException ex) {
+                            LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
+                        }
+                        if (fType != null) {
+                            final String subtype = fType.getGeometryDescriptor().getType().getName().getLocalPart();
+                            ConfigurationEngine.updateDataSubtype(name, provider.getId(), subtype);
+                        }
+                    }
+
+                    // Metadata
                     final InputStream currentMetadata = metadata.get(record.getName());
                     if (currentMetadata != null) {
                         StringWriter writer = new StringWriter();

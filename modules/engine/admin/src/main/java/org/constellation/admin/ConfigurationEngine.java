@@ -1105,6 +1105,27 @@ public class ConfigurationEngine {
         }
     }
 
+    public static void updateDataSubtype(final QName name, final String providerId, final String subtype) {
+        Session session = null;
+        try {
+            session = EmbeddedDatabase.createSession();
+            String login = null;
+            try {
+                login = securityManager.getCurrentUserLogin();
+            } catch (NoSecurityManagerException ex) {
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+            }
+
+            final DataRecord dr = session.readData(name, providerId);
+            dr.setSubtype(subtype);
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "error when try to delete data", e);
+        } finally {
+            if (session != null)
+                session.close();
+        }
+    }
+
     public static void linkDataToSensor(final QName name, final String providerId, final String sensorId) {
         Session session = null;
         try {
@@ -1244,6 +1265,7 @@ public class ConfigurationEngine {
         db.setDate(record.getDate());
         db.setProvider(record.getProvider().getIdentifier());
         db.setType(record.getType().toString());
+        db.setSubtype(record.getSubtype());
         db.setSensorable(record.isSensorable());
         db.setTargetSensor(record.getLinkedSensors());
 

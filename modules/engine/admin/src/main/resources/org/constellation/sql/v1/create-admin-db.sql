@@ -144,6 +144,7 @@ CREATE TABLE "admin"."data"(
   "namespace"     VARCHAR(256)NOT NULL,
   "provider"      INTEGER     NOT NULL,
   "type"          VARCHAR(32) NOT NULL,
+  "subtype"       VARCHAR(32) NOT NULL DEFAULT '',
   "visible"       BOOLEAN     NOT NULL DEFAULT TRUE,
   "sensorable"    BOOLEAN     NOT NULL DEFAULT FALSE,
   "date"          BIGINT      NOT NULL,

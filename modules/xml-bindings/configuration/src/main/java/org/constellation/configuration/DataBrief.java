@@ -58,6 +58,9 @@ public final class DataBrief implements Serializable {
     @XmlElement(name="Type")
     private String type;
 
+    @XmlElement(name="Subtype")
+    private String subtype;
+
     @XmlElement(name="Sensorable")
     private boolean sensorable;
 
@@ -129,6 +132,14 @@ public final class DataBrief implements Serializable {
         this.type = type;
     }
 
+    public String getSubtype() {
+        return subtype;
+    }
+
+    public void setSubtype(final String subtype) {
+        this.subtype = subtype;
+    }
+
     public boolean isSensorable() {
         return sensorable;
     }
@@ -179,6 +190,7 @@ public final class DataBrief implements Serializable {
                 ", title='" + title + '\'' +
                 ", date=" + date +
                 ", type='" + type + '\'' +
+                ", subtype='" + subtype + '\'' +
                 ", sensorable='" + sensorable + '\'' +
                 ", owner='" + owner + '\'' +
                 ", targetStyle=" + targetStyle +

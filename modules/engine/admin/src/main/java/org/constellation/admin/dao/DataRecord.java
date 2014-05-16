@@ -49,6 +49,7 @@ public final class DataRecord extends Record {
     private String namespace;
     private int provider;
     private DataType type;
+    private String subtype;
     private boolean visible;
     private boolean sensorable;
     private final Date date;
@@ -57,7 +58,7 @@ public final class DataRecord extends Record {
     private String owner;
     private String metadataId;
 
-    DataRecord(final Session session, final int id, final String name, final String namespace, final int provider, final DataType type,
+    DataRecord(final Session session, final int id, final String name, final String namespace, final int provider, final DataType type, final String subtype,
                final boolean visible, final boolean sensorable, final Date date, final int title, final int description, final String owner, final String metadataId) {
         this.session     = session;
         this.id          = id;
@@ -65,6 +66,7 @@ public final class DataRecord extends Record {
         this.namespace   = namespace;
         this.provider    = provider;
         this.type        = type;
+        this.subtype     = subtype;
         this.visible     = visible;
         this.sensorable  = sensorable;
         this.date        = date;
@@ -80,13 +82,14 @@ public final class DataRecord extends Record {
                 rs.getString(3),
                 rs.getInt(4),
                 DataType.valueOf(rs.getString(5)),
-                rs.getBoolean(6),
+                rs.getString(6),
                 rs.getBoolean(7),
-                new Date(rs.getLong(8)),
-                rs.getInt(9),
+                rs.getBoolean(8),
+                new Date(rs.getLong(9)),
                 rs.getInt(10),
-                rs.getString(11),
-                rs.getString(12));
+                rs.getInt(11),
+                rs.getString(12),
+                rs.getString(13));
     }
 
     /**
@@ -109,7 +112,7 @@ public final class DataRecord extends Record {
     public void setName(final String name) throws SQLException {
         this.name = name;
         ensureConnectionNotClosed();
-        session.updateData(id, name, namespace, provider, type, owner);
+        session.updateData(id, name, namespace, provider, type, subtype, owner);
     }
 
     public String getNamespace() {
@@ -119,7 +122,7 @@ public final class DataRecord extends Record {
     public void setNamespace(final String namespace) throws SQLException {
         this.namespace = namespace;
         ensureConnectionNotClosed();
-        session.updateData(id, name, namespace, provider, type, owner);
+        session.updateData(id, name, namespace, provider, type, subtype, owner);
     }
 
     public ProviderRecord getProvider() throws SQLException {
@@ -130,7 +133,7 @@ public final class DataRecord extends Record {
     public void setProvider(final ProviderRecord provider) throws SQLException {
         this.provider = provider.id;
         ensureConnectionNotClosed();
-        session.updateData(id, name, namespace, provider.id, type, owner);
+        session.updateData(id, name, namespace, provider.id, type, subtype, owner);
     }
 
     public DataType getType() {
@@ -140,7 +143,17 @@ public final class DataRecord extends Record {
     public void setType(final DataType type) throws SQLException {
         this.type = type;
         ensureConnectionNotClosed();
-        session.updateData(id, name, namespace, provider, type, owner);
+        session.updateData(id, name, namespace, provider, type, subtype, owner);
+    }
+
+    public String getSubtype() {
+        return subtype;
+    }
+
+    public void setSubtype(final String subtype) throws SQLException {
+        this.subtype = subtype;
+        ensureConnectionNotClosed();
+        session.updateData(id, name, namespace, provider, type, subtype, owner);
     }
 
     public boolean isVisible() {

@@ -155,6 +155,7 @@ public final class Session implements Closeable {
     private static final String UPDATE_DATA_ISO_METADATA    = "data.update.iso_metadata";
     private static final String UPDATE_DATA_VISIBLE         = "data.update.visible";
     private static final String UPDATE_DATA_SENSORABLE      = "data.update.sensorable";
+    private static final String UPDATE_DATA_SUBTYPE         = "data.update.subtype";
     private static final String DELETE_DATA                 = "data.delete";
     private static final String DELETE_DATA_NMSP            = "data.delete.nmsp";
     private static final String SEARCH_DATA_ISO_METADATA    = "data.search.iso_metadata";
@@ -975,11 +976,11 @@ public final class Session implements Closeable {
         final int id = new Query(WRITE_DATA).with(name.getLocalPart(), name.getNamespaceURI(), provider.id, type.name(), date.getTime(), title, description, login, sensorable).insert();
 
         // Return inserted line.
-        return new DataRecord(this, id, name.getLocalPart(), name.getNamespaceURI(), provider.id, type, true, sensorable, date, title, description, login, null);
+        return new DataRecord(this, id, name.getLocalPart(), name.getNamespaceURI(), provider.id, type, "", true, sensorable, date, title, description, login, null);
     }
 
-    /* internal */ void updateData(final int generatedId, final String newName, final String newNamespace, final int newProvider, final DataType newType, final String newOwner) throws SQLException {
-        new Query(UPDATE_DATA).with(newName, newNamespace, newProvider, newType.name(), newOwner, generatedId).update();
+    /* internal */ void updateData(final int generatedId, final String newName, final String newNamespace, final int newProvider, final DataType newType, final String newSubtype, final String newOwner) throws SQLException {
+        new Query(UPDATE_DATA).with(newName, newNamespace, newProvider, newType.name(), newSubtype, newOwner, generatedId).update();
     }
 
     /* internal */ void updateDataMetadata(final int dataId, final StringReader metadata) throws SQLException {
@@ -996,6 +997,10 @@ public final class Session implements Closeable {
 
     /* internal */ void updateDataSensorable(final int dataId, final boolean sensorable) throws SQLException {
         new Query(UPDATE_DATA_SENSORABLE).with(sensorable, dataId).update();
+    }
+
+    /* internal */ void updateDataSubtype(final int dataId, final String subtype) throws SQLException {
+        new Query(UPDATE_DATA_SUBTYPE).with(subtype, dataId).update();
     }
 
     public void deleteData(final QName name, final String providerId) throws SQLException {
