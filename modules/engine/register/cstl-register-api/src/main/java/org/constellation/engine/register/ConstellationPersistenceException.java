@@ -8,7 +8,7 @@ public class ConstellationPersistenceException extends RuntimeException {
      */
     private static final long serialVersionUID = 1L;
 
-    public ConstellationPersistenceException(ReflectiveOperationException e) {
+    public ConstellationPersistenceException(Exception e) {
         super(e);
     }
 }

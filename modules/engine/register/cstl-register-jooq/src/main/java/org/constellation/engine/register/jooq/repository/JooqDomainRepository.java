@@ -1,22 +1,38 @@
 package org.constellation.engine.register.jooq.repository;
 
+import static org.constellation.engine.register.jooq.Tables.DATA;
+import static org.constellation.engine.register.jooq.Tables.DATA_X_DOMAIN;
 import static org.constellation.engine.register.jooq.Tables.DOMAIN;
+import static org.constellation.engine.register.jooq.Tables.PROVIDER;
 import static org.constellation.engine.register.jooq.Tables.SERVICE_X_DOMAIN;
 import static org.constellation.engine.register.jooq.Tables.USER_X_DOMAIN_X_DOMAINROLE;
 
+import java.text.NumberFormat.Field;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.constellation.engine.register.Domain;
+import org.constellation.engine.register.User;
+import org.constellation.engine.register.jooq.Tables;
+import org.constellation.engine.register.jooq.tables.records.DataXDomainRecord;
 import org.constellation.engine.register.jooq.tables.records.DomainRecord;
 import org.constellation.engine.register.jooq.tables.records.ServiceXDomainRecord;
 import org.constellation.engine.register.jooq.tables.records.UserXDomainXDomainroleRecord;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
+import org.constellation.engine.register.repository.UserRepository;
 import org.jooq.Batch;
+import org.jooq.DeleteWhereStep;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
+import org.jooq.Result;
+import org.jooq.SelectHavingStep;
+import org.jooq.SelectJoinStep;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -109,11 +125,62 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
     @Override
     public int removeServiceFromDomain(int serviceId, int domainId) {
         return dsl.delete(SERVICE_X_DOMAIN)
-                .where(SERVICE_X_DOMAIN.SERVICE_ID.eq(serviceId).and(SERVICE_X_DOMAIN.DOMAIN_ID.eq(domainId))).execute();
+                .where(SERVICE_X_DOMAIN.SERVICE_ID.eq(serviceId).and(SERVICE_X_DOMAIN.DOMAIN_ID.eq(domainId)))
+                .execute();
     }
 
     @Override
     public int removeUserFromAllDomain(String userId) {
         return dsl.delete(USER_X_DOMAIN_X_DOMAINROLE).where(USER_X_DOMAIN_X_DOMAINROLE.LOGIN.eq(userId)).execute();
+    }
+
+    @Override
+    public int addDataToDomain(int dataId, int domainId) {
+        DataXDomainRecord record = dsl.newRecord(Tables.DATA_X_DOMAIN);
+        record.setDataId(dataId);
+        record.setDomainId(domainId);
+        return record.store();
+    }
+
+    @Override
+    public int removeDataFromDomain(int dataId, int domainId) {
+        return dsl.delete(DATA_X_DOMAIN)
+                .where(DATA_X_DOMAIN.DATA_ID.eq(dataId).and(DATA_X_DOMAIN.DOMAIN_ID.eq(domainId))).execute();
+
+    }
+
+    @Override
+    public int removeAllDataFromDomain(int domainId) {
+        return dsl.delete(DATA_X_DOMAIN).where(DATA_X_DOMAIN.DOMAIN_ID.eq(domainId)).execute();
+
+    }
+
+    @Override
+    public int addProviderDataToDomain(String identifier, int activeDomainId) {
+        org.jooq.Field<Integer> field = DSL.val(activeDomainId);
+        return dsl
+                .insertInto(DATA_X_DOMAIN)
+                .select(dsl
+                        .select(DATA.ID, field)
+                        .from(DATA)
+                        .join(PROVIDER)
+                        .onKey()
+                        .where(PROVIDER.IDENTIFIER.eq(identifier))
+                        .and(DATA.ID.notIn(dsl.select(DATA_X_DOMAIN.DATA_ID).from(DATA_X_DOMAIN)
+                                .where(DATA_X_DOMAIN.DOMAIN_ID.eq(activeDomainId))))).execute();
+    }
+
+    @Override
+    public List<User> findUsers(int domainId) {
+        List<User> result = new ArrayList<User>();
+        SelectJoinStep<Record> groupBy = dsl.select().from(Tables.USER).join(USER_X_DOMAIN_X_DOMAINROLE).onKey();
+        groupBy.execute();
+        Map<Record, Result<Record>> intoGroups = groupBy.getResult().intoGroups(Tables.USER.fields());
+        for (Entry<Record, Result<Record>> userRecord : intoGroups.entrySet()) {
+            User user = userRecord.getKey().into(User.class);
+            
+            result.add(user);
+        }
+        return result;
     }
 }

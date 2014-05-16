@@ -16,6 +16,10 @@ import org.constellation.engine.register.Provider;
 
     Provider findByIdentifie(String providerIdentifier);
 
+    List<String> getProviderIdsForDomain(int activeDomainId);
+
+    Provider getProviderParentIdOfLayer(String serviceType, String serviceId, String layerid);
+
 
     
 }

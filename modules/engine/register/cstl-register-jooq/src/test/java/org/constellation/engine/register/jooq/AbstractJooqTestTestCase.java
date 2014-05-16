@@ -4,6 +4,8 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Result;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +31,14 @@ public abstract class AbstractJooqTestTestCase {
 
     }
 
+    
+    
+    protected void dump(Result<Record> o) {
+        if(o != null)
+            LOGGER.debug(o.toString());
+        
+    }
+    
     protected void dump(Object o) {
         if(o != null)
             LOGGER.debug(o.toString());

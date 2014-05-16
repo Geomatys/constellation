@@ -4,10 +4,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.constellation.engine.register.Domain;
+import org.constellation.engine.register.User;
 
 public interface DomainRepository {
   
-    List<? extends Domain> findAll();
+    List<Domain> findAll();
 
     Domain findOne(Integer id);
     
@@ -26,6 +27,16 @@ public interface DomainRepository {
     int removeServiceFromDomain(int serviceId, int domainId);
 
     int removeUserFromAllDomain(String userId);
+
+    int addDataToDomain(int dataId, int domainId);
+    
+    int removeDataFromDomain(int dataId, int domainId);
+
+    int removeAllDataFromDomain(int i);
+
+    int addProviderDataToDomain(String id, int activeDomainId);
+
+    List<User> findUsers(int id);
 
 
 }

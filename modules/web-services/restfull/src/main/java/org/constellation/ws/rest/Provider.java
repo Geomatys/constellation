@@ -53,6 +53,7 @@ import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.configuration.ProviderConfiguration;
 import org.constellation.dto.ProviderPyramidChoiceList;
 import org.constellation.dto.SimpleValue;
+import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.provider.CoverageData;
 import org.constellation.provider.Data;
 import org.constellation.provider.DataProvider;
@@ -95,7 +96,8 @@ public final class Provider {
     @Inject
     private SessionData sessionData;
     
-   
+    @Inject
+    private DomainRepository domainRepository;
     
     /**
      * Create a new provider from the given configuration.
@@ -307,8 +309,8 @@ public final class Provider {
         } else {
             try {
                 DataProvider dataProvider = DataProviders.getInstance().createProvider(id, providerService, sources);
-                
-
+                int count = domainRepository.addProviderDataToDomain(id, sessionData.getActiveDomainId());
+                LOGGER.info("Added " + count + " data to domain " + sessionData.getActiveDomainId());
             } catch (ConfigurationException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
                 return Response.status(500).build();

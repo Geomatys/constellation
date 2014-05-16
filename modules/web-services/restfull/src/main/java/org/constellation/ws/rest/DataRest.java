@@ -1357,7 +1357,7 @@ public class DataRest {
     public Response getTopDataList(@PathParam("type") String type) {
         final List<DataBrief> briefs = new ArrayList<>();
 
-        final List<String> providerIds = providerRepository.getProviderIds();
+        final List<String> providerIds = providerRepository.getProviderIdsForDomain(sessionData.getActiveDomainId());
         for (final String providerId : providerIds) {
             final ProviderRecord provider = ConfigurationEngine.getProvider(providerId);
             final String parent = provider.getParentIdentifier();

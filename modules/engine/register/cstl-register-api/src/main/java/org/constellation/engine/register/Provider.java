@@ -2,6 +2,8 @@ package org.constellation.engine.register;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class Provider implements Serializable {
 
     /**
@@ -89,11 +91,16 @@ public class Provider implements Serializable {
         this.parent = parent;
     }
 
+    public boolean hasParent() {
+        return StringUtils.isNotBlank(parent);
+    }
+
     @Override
     public String toString() {
         return "Provider [id=" + id + ", identifier=" + identifier + ", metadata=" + metadata + ", owner=" + owner
                 + ", config=" + config + ", impl=" + impl + ", type=" + type + ", parent=" + parent + "]";
     }
+
     
     
 

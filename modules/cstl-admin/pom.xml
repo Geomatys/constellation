@@ -64,7 +64,7 @@
         <logback.loglevel>WARN</logback.loglevel>
         <logback.appender>CONSOLE</logback.appender>
         <!-- production database configuration -->
-         <datasource.datasourceclassname>org.hsqldb.jdbc.JDBCDataSource</datasource.datasourceclassname>
+        <datasource.datasourceclassname>org.hsqldb.jdbc.JDBCDataSource</datasource.datasourceclassname>
         <datasource.url>jdbc:hsqldb:mem:cstl-admin</datasource.url>
         <datasource.databaseName></datasource.databaseName>
         <datasource.serverName></datasource.serverName>
@@ -107,32 +107,52 @@
               </execution>
             </executions>
           </plugin>
-          <!--<plugin>-->
-                <!--<groupId>org.apache.maven.plugins</groupId>-->
-                <!--<artifactId>maven-war-plugin</artifactId>-->
-                <!--<version>2.4</version>-->
-                <!--<configuration>-->
-                    <!--<warSourceDirectory>src/main/webapp/dist</warSourceDirectory>-->
-                    <!--<webResources>-->
-                        <!--<resource>-->
-                            <!--<directory>src/main/webapp/WEB-INF/</directory>-->
-                            <!--<targetPath>WEB-INF</targetPath>-->
-                        <!--</resource>-->
-                    <!--</webResources>-->
-                <!--</configuration>-->
-          <!--</plugin>-->
-          <!--<plugin>-->
-            <!--<artifactId>maven-clean-plugin</artifactId>-->
-            <!--<version>2.5</version>-->
-            <!--<configuration>-->
-                <!--<filesets>-->
-                    <!--<fileset>-->
-                        <!--<directory>src/main/webapp/dist</directory>-->
-                        <!--<followSymlinks>false</followSymlinks>-->
-                    <!--</fileset>-->
-                <!--</filesets>-->
-            <!--</configuration>-->
-          <!--</plugin>-->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <version>2.4</version>
+            <configuration>
+              <warSourceDirectory>src/main/webapp/dist</warSourceDirectory>
+              <webResources>
+                <resource>
+                  <directory>src/main/webapp/WEB-INF/</directory>
+                  <targetPath>WEB-INF</targetPath>
+                </resource>
+              </webResources>
+            </configuration>
+          </plugin>
+
+          <plugin>
+            <artifactId>maven-clean-plugin</artifactId>
+            <version>2.5</version>
+            <configuration>
+              <filesets>
+                <fileset>
+                  <directory>src/main/webapp/dist</directory>
+                  <followSymlinks>false</followSymlinks>
+                </fileset>
+              </filesets>
+            </configuration>
+          </plugin>
+
+          <!-- <plugin> -->
+          <!-- <groupId>org.apache.tomcat.maven</groupId> -->
+          <!-- <artifactId>tomcat7-maven-plugin</artifactId> -->
+          <!-- <version>2.1</version> -->
+          <!-- <executions> -->
+          <!-- <execution> -->
+          <!-- <id>tomcat-run</id> -->
+          <!-- <goals> -->
+          <!-- <goal>exec-war-only</goal> -->
+          <!-- </goals> -->
+          <!-- <phase>package</phase> -->
+          <!-- <configuration> -->
+          <!-- <path>/cstl-admin</path> -->
+          <!-- <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol> -->
+          <!-- </configuration> -->
+          <!-- </execution> -->
+          <!-- </executions> -->
+          <!-- </plugin> -->
         </plugins>
       </build>
     </profile>
@@ -223,7 +243,7 @@
       <artifactId>HikariCP</artifactId>
       <version>1.1.8</version>
     </dependency>
-    <!-- The HikariCP Java Agent is disabled by default, as it is experimental <dependency> <groupId>com.zaxxer</groupId>
+    <!-- The HikariCP Java Agent is disabled by default, as it is experimental <dependency> <groupId>com.zaxxer</groupId> 
       <artifactId>HikariCP-agent</artifactId> <version>1.1.8</version> </dependency> -->
     <dependency>
       <groupId>commons-fileupload</groupId>

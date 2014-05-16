@@ -109,4 +109,14 @@ public class Data {
         this.metadata = metaData;
     }
 
+
+    @Override
+    public String toString() {
+        return "Data [id=" + id + ", name=" + name + ", namespace=" + namespace + ", providerId=" + providerId
+                + ", type=" + type + ", date=" + date + ", title=" + title + ", description=" + description
+                + ", owner=" + owner + ", styleIds=" + styleIds + ", metadata=" + metadata + "]";
+    }
+
+    
+    
 }

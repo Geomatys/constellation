@@ -178,8 +178,8 @@ CREATE TABLE "admin"."data_x_domain"(
 );
 
 ALTER TABLE "admin"."data_x_domain" ADD CONSTRAINT data_x_domain_pk PRIMARY KEY ("data_id", "domain_id");
-ALTER TABLE "admin"."data_x_domain" ADD CONSTRAINT data_x_domain_login_fk FOREIGN KEY ("data_id") REFERENCES "admin"."data"("id");
-ALTER TABLE "admin"."data_x_domain" ADD CONSTRAINT data_x_domain_domain_id_fk FOREIGN KEY ("domain_id") REFERENCES "admin"."domain"("id");
+ALTER TABLE "admin"."data_x_domain" ADD CONSTRAINT data_x_domain_login_fk FOREIGN KEY ("data_id") REFERENCES "admin"."data"("id")  ON DELETE CASCADE;
+ALTER TABLE "admin"."data_x_domain" ADD CONSTRAINT data_x_domain_domain_id_fk FOREIGN KEY ("domain_id") REFERENCES "admin"."domain"("id")  ON DELETE CASCADE;
 
 
 
