@@ -22,10 +22,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1568,12 +1567,26 @@ public class DataRest {
             return Response.ok(f).header("content-disposition", "attachment; filename="+ f.getName()).build();
         }
 
-        final File zip = new File(System.getProperty("java.io.tmpdir"), "export_data.zip");
+        final File zip = new File(System.getProperty("java.io.tmpdir"), dataId +".zip");
         if (zip.exists()) {
             zip.delete();
         }
+
+        final Map<String, String> env = new HashMap<>();
+        env.put("create", "true");
         try {
-            FileUtilities.zip(zip, new Adler32(), filesToSend);
+            URI uri = URI.create("jar:file:" + zip.getAbsolutePath());
+            try (FileSystem zipfs = FileSystems.newFileSystem(uri, env)) {
+                for (final File fileToSend : filesToSend) {
+                    File[] files = fileToSend.listFiles();
+                    for (int i = 0; i < files.length; i++) {
+                        File fileAddToZip = files[i];
+                        java.nio.file.Path pathFile = fileAddToZip.toPath();
+                        java.nio.file.Path pathInZipFile = zipfs.getPath(fileAddToZip.getName());
+                        Files.copy(pathFile, pathInZipFile, StandardCopyOption.REPLACE_EXISTING);
+                    }
+                }
+            }
         } catch (IOException ex) {
             LOGGER.info("Error while zipping data");
             return Response.status(500).entity("failed").build();
