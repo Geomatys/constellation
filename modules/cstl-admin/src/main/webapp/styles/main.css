@@ -74,6 +74,10 @@ li>a {
 .menu-selected span{
     color: #6f6f6f;
 }
+.header .nav>li>a.menu-selected .caret{
+    border-top-color: #555;
+    border-bottom-color: #555;
+}
 .icon-menu-sensor{
     background:url("../images/icon-menu-sensor.svg") no-repeat;
     width:15px;
