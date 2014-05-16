@@ -81,10 +81,14 @@
                             <span translate="global.menu.home">Accueil</span>
                         </a>
                     </li>
-                    <li><a ng-show="authenticated" ng-class="navClass('webservice')" href="#/webservice"> <span
+                    <li class="hidden-sm hidden-md"><a ng-show="authenticated" ng-class="navClass('webservice')" href="#/webservice"> <span
                             class="glyphicon glyphicon-cloud"></span> <span
                             translate="global.menu.web-service">Services web</span>
                     </a></li>
+                            <li class="hidden-xs hidden-lg"><a ng-show="authenticated" ng-class="navClass('webservice')" href="#/webservice"> <span
+                                    class="glyphicon glyphicon-cloud"></span> <span
+                                    translate="global.menu.web-service.min">Services web</span>
+                            </a></li>
                     <li><a ng-class="navClass('data')" href="#/data"> <span class="glyphicon glyphicon-file"></span>
                         <span translate="global.menu.data">Données</span>
                     </a></li>
@@ -95,10 +99,14 @@
                     <li><a ng-class="navClass('styles')" href="#/styles"> <span class="glyphicon glyphicon-pencil"></span>
                         <span translate="global.menu.style">Styles</span>
                     </a></li>
-                    <li><a ng-class="navClass('mapcontext')" href="#/mapcontext">
+                    <li class="hidden-sm"><a ng-class="navClass('mapcontext')" href="#/mapcontext">
                         <span ng-class="navClass('mapcontext')" class="icon-menu-mapcontext"></span>
                         <span translate="global.menu.mapcontext">Map context</span>
                     </a></li>
+                             <li class="hidden-xs hidden-md hidden-lg"><a ng-class="navClass('mapcontext')" href="#/mapcontext">
+                                <span ng-class="navClass('mapcontext')" class="icon-menu-mapcontext"></span>
+                                <span translate="global.menu.mapcontext-min">Map context</span>
+                            </a></li>
                     <li><a ng-class="navClass('tasks')" href="#/tasks"> <span class="glyphicon glyphicon-cog"></span>
                         <span translate="global.menu.tasks">Tasks</span>
                     </a></li>

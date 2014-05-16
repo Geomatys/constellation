@@ -385,17 +385,33 @@ ul.unstyled {
         padding: 10px;
     }
 }
-@media (min-width:768px) and (max-width: 800px){
+@media (max-width: 1199px){
+    .nav-header{
+        width:851px;
+    }
+}
+@media (max-width: 1365px){
+    .header .nav.btn-language>li>a{
+        margin-top:4px;
+    }
     .nav-header-mob>li>a{
         font-size:13px;
     }
-    .header .nav.btn-language>li>a{
-        margin-top:5px;
+}
+@media (min-width:1200px) and (max-width: 1272px){
+    .nav-header-mob>li>a{
+        padding: 10px;
     }
 }
-@media (max-width: 1199px){
+@media (min-width:768px) and (max-width: 800px){
+    .nav-header-mob>li>a{
+        padding: 8px;
+    }
     .nav-header{
-        width:824px;
+        margin-top:2px;
+    }
+    .header .nav.btn-language>li>a{
+        margin-top:6px;
     }
 }
 .sos_edit_checkboxlist{

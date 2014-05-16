@@ -302,10 +302,12 @@
             "home": "Accueil",
             "language": "Langue",
             "mapcontext": "Cartographie",
+            "mapcontext-min": "Carto.",
             "style": "Styles",
             "viewer": "Visualiseur",
             "tasks":"Traitements",
-            "web-service": "Services web"
+            "web-service": "Services web",
+            "web-service.min": "Services"
         },
         "title": "JHipster"
     },
