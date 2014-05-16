@@ -203,7 +203,9 @@ cstlAdminApp.factory('style', ['$resource',
     function ($resource) {
         return $resource('@cstl/api/1/SP/all/style/available;jsessionid=', {}, {
             'listAll': { method: 'GET',    isArray: false },
+            'get': {method:'GET', url: '@cstl/api/1/SP/:provider/style/:name;jsessionid='},
             'createjson':  { method: 'PUT',    url: '@cstl/api/1/SP/:provider/style/create;jsessionid='},
+            'updatejson':  { method: 'POST',    url: '@cstl/api/1/SP/:provider/style/:name/update;jsessionid='},
             'delete':  { method: 'DELETE', url: '@cstl/api/1/SP/:provider/style/:name;jsessionid='},
             'link':    { method: 'POST',   url: '@cstl/api/1/SP/:provider/style/:name/linkData;jsessionid='},
             'unlink':  { method: 'POST',   url: '@cstl/api/1/SP/:provider/style/:name/unlinkData;jsessionid='}
@@ -317,7 +319,6 @@ cstlAdminApp.service('$growl', function() {
     };
 });
 
-
 cstlAdminApp.factory('textService', ['$http', '$growl',
     function ($http, $growl){
         return {
@@ -370,7 +371,9 @@ cstlAdminApp.factory('StyleSharedService', ['$modal', 'style', 'webService', '$g
                             }
                             // For portraying
                             return null;
-                        }
+                        },
+                        newStyle: function() { return null },
+                        pageSld: function() {  return null }
                     }
                 });
 
@@ -444,7 +447,32 @@ cstlAdminApp.factory('StyleSharedService', ['$modal', 'style', 'webService', '$g
                         layerName: function() { return null },
                         providerId: function() { return null },
                         dataType: function() { return null},
-                        serviceName: function() { return null}
+                        serviceName: function() { return null},
+                        newStyle: function() { return null},
+                        pageSld: function() {  return null }
+
+                    }
+                });
+            },
+
+            showStyleEdit : function(scope, response) {
+
+                if(response.rules[0].symbolizers[0]['@symbol'] == 'line'){
+                    var typeURL = "views/style/ligne.html";
+                } else if(response.rules[0].symbolizers[0]['@symbol'] == 'point'){
+                    var typeURL = "views/style/point.html";
+                }
+                var modal = $modal.open({
+                    templateUrl: 'views/modalStyleEdit.html',
+                    controller: 'StyleModalController',
+                    resolve: {
+                        exclude: function() { return null },
+                        layerName: function() { return null },
+                        providerId: function() { return null },
+                        dataType: function() { return null},
+                        serviceName: function() { return null},
+                        newStyle: function() { return response},
+                        pageSld: function() {  return typeURL }
                     }
                 });
             }
