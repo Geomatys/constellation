@@ -187,11 +187,11 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','data
         $scope.missing = $routeParams.missing === 'true';
         $scope.type = $routeParams.type;
 
-        $scope.tabiso = $scope.type==='vector' && $scope.missing;
+        $scope.tabiso = $scope.missing;
         $scope.tabcrs = false;
         $scope.tabdesc = $scope.type==='vector' && !$scope.missing;
-        $scope.tabimageinfo = $scope.type==='raster';
-        $scope.tabsensorinfo = $scope.type==='observation';
+        $scope.tabimageinfo = $scope.type==='raster' && !$scope.missing;
+        $scope.tabsensorinfo = $scope.type==='observation' && !$scope.missing;
 
         $scope.metadata = {};
         $scope.metadata.keywords = [];

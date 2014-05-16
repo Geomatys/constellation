@@ -16,19 +16,19 @@
     <div class="row bg-white" style="padding-bottom:30px;">
         <div class="col-sm-12">
             <ul class="nav nav-tabs">
-                <li id="requiredISO19115Tab" ng-show="missing" ng-class="{active:missing && type==='vector'}">
+                <li id="requiredISO19115Tab" ng-show="missing" ng-class="{active:tabiso}">
                     <a ng-click="selectTab('tabiso')" data-toggle="tab"><span translate="data.information.tab.missing.title">Missing metadata</span></a>
                 </li>
-                <li id="crsTab" ng-show="type=='vector'">
+                <li id="crsTab" ng-show="type=='vector'" ng-class="{active:tabcrs}">
                     <a ng-click="selectTab('tabcrs')" data-toggle="tab">CRS</a>
                 </li>
-                <li id="descriptionTab" ng-hide="missing" ng-class="{active:!missing && type==='vector'}">
+                <li id="descriptionTab" ng-hide="missing" ng-class="{active:tabdesc}" >
                     <a ng-click="selectTab('tabdesc')" data-toggle="tab"><span translate="data.information.tab.title"></span></a>
                 </li>
-                <li id="sensorInfoTab" ng-show="type=='observation'" ng-class="{active:type==='observation'}">
+                <li id="sensorInfoTab" ng-show="type=='observation'" ng-class="{active:tabsensorinfo}">
                     <a ng-click="selectTab('tabsensorinfo')" data-toggle="tab">Sensor information</a>
                 </li>
-                <li id="imageInfoTab" ng-show="type=='raster'" ng-class="{active:type==='raster'}">
+                <li id="imageInfoTab" ng-show="type=='raster'" ng-class="{active:tabimageinfo}">
                     <a ng-click="selectTab('tabimageinfo')" data-toggle="tab"><span translate="metadata.information.tab.title">Picture metadata</span></a>
                 </li>
             </ul>
