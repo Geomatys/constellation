@@ -63,20 +63,122 @@ cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', '$
         };
     }]);
 
-cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modalInstance', 'style', 'exclude', 'layerName', 'providerId', 'serviceName', 'dataType', '$cookies', 'dataListing', 'provider', '$growl', 'textService','pageSld','newStyle',
-    function ($scope, $dashboard, $modalInstance, style, exclude, layerName, providerId, serviceName, dataType, $cookies, dataListing, provider, $growl, textService, pageSld, newStyle) {
-        $scope.exclude = exclude;
-        $scope.layerName = layerName;
-        $scope.providerId = providerId;
-        $scope.serviceName = serviceName;
-        $scope.dataType = dataType;
+cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modalInstance', 'style', '$cookies', 'dataListing', 'provider', '$growl', 'textService','pageSld','newStyle', 'selectedLayer', 'serviceName', 'exclude',
+    function ($scope, $dashboard, $modalInstance, style, $cookies, dataListing, provider, $growl, textService, pageSld, newStyle, selectedLayer, serviceName, exclude) {
         $scope.xmlStyle = '<xml></xml>';
+        $scope.exclude = exclude;
 
+        $scope.stylechooser = 'new';
+        $scope.chooseType = false;
         $scope.pageSld = pageSld;
 
         $scope.newStyle = newStyle;
+        $scope.sldName = '';
+        $scope.selectedLayer = selectedLayer || null;
+        $scope.serviceName = serviceName || null;
 
+        $scope.refreshNewStyle = function(){
+            $scope.newStyle = { "name": $scope.sldName,
+                "rules": [{
+                    "symbolizers": [{}],
+                    "filter": null
+                }]
+            };
+        };
 
+        if ($scope.newStyle === null) {
+            $scope.refreshNewStyle();
+        }
+        else {
+            $scope.sldName = $scope.newStyle.name;
+
+            if ($scope.newStyle.rules[0].symbolizers[0]['@symbol'] == 'line') {
+
+                $scope.dataType = 'vector';
+                $scope.providerId = 'generic_shp';
+                $scope.layerName = 'CNTR_BN_60M_2006';
+                if (typeof $scope.newStyle.rules[0].symbolizers[0].stroke !== 'undefined' && $scope.newStyle.rules[0].symbolizers[0].stroke.dashed == false){
+                    $scope.traitType='';
+                }else{
+                    $scope.traitType='pointille';
+                }
+            }else if ($scope.newStyle.rules[0].symbolizers[0]['@symbol'] == 'point') {
+                $scope.dataType = 'vector';
+                $scope.providerId = 'generic_shp';
+                $scope.layerName = 'CNTR_LB_2006';
+            }
+        }
+
+        $scope.initPolygon = function() {
+            $scope.dataType = 'vector';
+            $scope.providerId = 'generic_shp';
+            $scope.layerName = 'CNTR_RG_60M_2006';
+            $scope.newStyle.rules[0].symbolizers[0]['@symbol'] = 'polygon';
+        };
+
+        $scope.initLine = function() {
+            $scope.dataType = 'vector';
+            $scope.providerId = 'generic_shp';
+            $scope.layerName = 'CNTR_BN_60M_2006';
+            $scope.newStyle.rules[0].symbolizers[0]['@symbol'] = 'line';
+        };
+
+        $scope.initPoint = function() {
+            $scope.dataType = 'vector';
+            $scope.providerId = 'generic_shp';
+            $scope.layerName = 'CNTR_LB_2006';
+            $scope.newStyle.rules[0].symbolizers[0]['@symbol'] = 'point';
+        };
+
+        $scope.initText = function() {
+            $scope.dataType = 'vector';
+            $scope.providerId = 'generic_shp';
+            $scope.layerName = 'CNTR_BN_60M_2006';
+            $scope.newStyle.rules[0].symbolizers[0]['@symbol'] = 'text';
+        };
+
+        $scope.initRaster1Band = function() {
+            $scope.dataType = 'coverage';
+            $scope.providerId = 'generic_world_tif';
+            $scope.layerName = 'cloudsgrey';
+            $scope.newStyle.rules[0].symbolizers[0]['@symbol'] = 'raster';
+            $scope.initDataProperties();
+        };
+
+        $scope.initRasterNBands = function() {
+            // todo
+        };
+
+        $scope.dataProperties = null;
+        $scope.dataBbox = null;
+        $scope.dataBands = null;
+
+        $scope.initDataProperties = function() {
+
+            provider.dataDesc({providerId: $scope.providerId, dataId: $scope.layerName}, function(response) {
+                $scope.dataProperties = response.properties;
+                $scope.dataBbox = response.boundingBox;
+                $scope.dataBands = response.bands;
+                if ($scope.dataBands && $scope.dataBands.length > 0) {
+                    $scope.palette.rasterMinValue = $scope.dataBands[0].minValue;
+                    $scope.palette.rasterMaxValue = $scope.dataBands[0].maxValue;
+                }
+            }, function() {
+                $growl('error','Error','Unable to get data description');
+            });
+        };
+
+        $scope.isgeophys = false;
+        $scope.initScopeStyle = function() {
+            style.listAll({}, function(response) {
+                $dashboard($scope, response.styles, true);
+            });
+
+            provider.isGeophysic({providerId: $scope.providerId, dataId: $scope.layerName}, function(response) {
+                $scope.isgeophys = (response.value == 'true');
+            });
+
+        };
 
         $scope.aceLoaded = function(_editor) {
             // Options
@@ -99,57 +201,6 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
 //                $modalInstance.close();
 //            });
         };
-
-        $scope.initFilterType = function() {
-            if (dataType ) {
-                if (dataType.toLowerCase() === 'vector' || dataType.toLowerCase() === 'feature-store') {
-                    return 'vector';
-                }
-                if (dataType.toLowerCase() === 'coverage' || dataType.toLowerCase() === 'raster') {
-                    return 'coverage';
-                }
-            }
-            return '';
-        };
-
-        $scope.stylechooser = 'new';
-
-        $scope.refreshNewStyle = function(){
-            $scope.newStyle = { "name": $scope.layerName +"-sld",
-                "rules": [{
-                    "symbolizers": [{}],
-                    "filter": null
-                }]
-            };
-        };
-
-        // TODO: add field to handle style name
-        if ($scope.newStyle ==null ) {
-            $scope.newStyle = { "name": $scope.layerName +"-sld",
-                "rules": [{
-                    "symbolizers": [{}],
-                    "filter": null
-                }]
-            };
-        }
-        else {
-            if ($scope.newStyle.rules[0].symbolizers[0]['@symbol'] == 'line') {
-
-                $scope.dataType = 'vector';
-                $scope.providerId = 'generic_shp';
-                $scope.layerName = 'CNTR_BN_60M_2006';
-                if (typeof $scope.newStyle.rules[0].symbolizers[0].stroke !== 'undefined' && $scope.newStyle.rules[0].symbolizers[0].stroke.dashed == false){
-                    $scope.traitType='';
-                }else{
-                    $scope.traitType='pointille';
-                }
-            }else if ($scope.newStyle.rules[0].symbolizers[0]['@symbol'] == 'point') {
-                $scope.dataType = 'vector';
-                $scope.providerId = 'generic_shp';
-                $scope.layerName = 'CNTR_LB_2006';
-            }
-        }
-
 
         $scope.addStrokeDashArray = function(traitType) {
             if (traitType === 'pointille') {
@@ -288,25 +339,6 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             }
         };
 
-        $scope.dataProperties = null;
-        $scope.dataBbox = null;
-        $scope.dataBands = null;
-
-        $scope.initDataProperties = function() {
-
-            provider.dataDesc({providerId: $scope.providerId, dataId: $scope.layerName}, function(response) {
-                $scope.dataProperties = response.properties;
-                $scope.dataBbox = response.boundingBox;
-                $scope.dataBands = response.bands;
-                if ($scope.dataBands && $scope.dataBands.length > 0) {
-                    $scope.palette.rasterMinValue = $scope.dataBands[0].minValue;
-                    $scope.palette.rasterMaxValue = $scope.dataBands[0].maxValue;
-                }
-            }, function() {
-                $growl('error','Error','Unable to get data description');
-            });
-        };
-
         $scope.setStyleChooser = function(choice){
             $scope.stylechooser = choice;
         };
@@ -315,31 +347,12 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             return choice === $scope.stylechooser;
         };
 
-        $scope.isgeophys = false;
-        $scope.initScopeStyle = function() {
-            // Page to include
-            $scope.pageSld = ($scope.dataType.toLowerCase() === 'vector' || $scope.dataType === 'feature-store') ? "views/style/vectors.html" : "views/style/raster.html";
-
-            style.listAll({}, function(response) {
-                $dashboard($scope, response.styles, true);
-                $scope.filtertype = $scope.initFilterType();
-            });
-            
-            provider.isGeophysic({providerId: $scope.providerId, dataId: $scope.layerName}, function(response) {
-                $scope.isgeophys = (response.value == 'true');
-            });
-            
-        };
-
-        $scope.initScopeData = function() {
-            dataListing.listAll({}, function(response) {
-                $dashboard($scope, response, true);
-                $scope.filtertype = $scope.initFilterType();
-            });
-        };
-
         $scope.ok = function() {
             $modalInstance.close($scope.selected);
+        };
+
+        $scope.close = function() {
+            $modalInstance.dismiss('close');
         };
 
         $scope.updateStyle = function() {
@@ -385,26 +398,13 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             } 
         };
 
-        $scope.close = function() {
-            $modalInstance.dismiss('close');
-        };
-
-        $scope.chooseDataClicked = function(data) {
-            $scope.layerName = data.Name;
-            $scope.providerId = data.Provider;
-            $scope.dataType = data.Type;
-            $scope.pageSld = ($scope.dataType.toLowerCase() === 'vector' || $scope.dataType === 'feature-store') ? "views/style/vectors.html" : "views/style/raster.html";
-            $scope.refreshNewStyle();
-        };
-
         $scope.showLayerWithStyle = function(style) {
 
-            var layerName = $scope.layerName;
             var layerData;
             if (serviceName) {
-                layerData = DataViewer.createLayerWMSWithStyle($cookies.cstlUrl, layerName, $scope.serviceName, style);
+                layerData = DataViewer.createLayerWMSWithStyle($cookies.cstlUrl, $scope.layerName, $scope.serviceName, style);
             } else {
-                layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, layerName, providerId, style);
+                layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl,  $scope.layerName,  $scope.providerId, style);
             }
             var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
             DataViewer.layers = [layerData, layerBackground];
@@ -418,7 +418,11 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             style.createjson({provider: 'sld'}, $scope.newStyle, function() {
                 var layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName, $scope.providerId, $scope.newStyle.name);
                 var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
-                DataViewer.layers = [layerData, layerBackground];
+                if ($scope.layerName === 'CNTR_BN_60M_2006') {
+                    DataViewer.layers = [layerData];
+                } else {
+                    DataViewer.layers = [layerData, layerBackground];
+                }
                 DataViewer.initMap('styledMapOL');
 
                 if ($scope.dataBbox) {

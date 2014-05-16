@@ -1,5 +1,5 @@
 <ol class="breadcrumb">
-    <li><a ng-click="$parent.pageSld = 'views/style/vectors.html'"><span translate="sldeditor.breadcrumb.type">Type selection</span></a></li>
+    <li><a ng-click="$parent.pageSld = 'views/style/chooseType.html'; $parent.chooseType = false;"><span translate="sldeditor.breadcrumb.type">Type selection</span></a></li>
     <li class="active"><span translate="sldeditor.breadcrumb.edition">Style Edition</span></li>
 </ol>
 <div class="row">
@@ -21,7 +21,7 @@
     </ul>
 
 <!-- Tab panes -->
-<div class="tab-content" ng-init="$parent.newStyle.rules[0].symbolizers[0]['@symbol'] = 'line'">
+<div class="tab-content" ng-init="initLine()">
   <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='simple'}">
     <div class="row">
       <div class="col-xs-12 col-sm-6">

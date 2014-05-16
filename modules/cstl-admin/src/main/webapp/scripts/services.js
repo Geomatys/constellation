@@ -361,9 +361,7 @@ cstlAdminApp.factory('StyleSharedService', ['$modal', 'style', 'webService', '$g
                     controller: 'StyleModalController',
                     resolve: {
                         exclude: function() { return $scope.selected.TargetStyle },
-                        layerName: function() { return $scope.selected.Name },
-                        providerId: function() { return $scope.selected.Provider },
-                        dataType: function() { return $scope.selected.Type},
+                        selectedLayer: function() { return $scope.selected },
                         serviceName: function() {
                             if ($scope.service) {
                                 // In WMS mode
@@ -373,7 +371,7 @@ cstlAdminApp.factory('StyleSharedService', ['$modal', 'style', 'webService', '$g
                             return null;
                         },
                         newStyle: function() { return null },
-                        pageSld: function() {  return null }
+                        pageSld: function() {  return 'views/style/chooseType.html' }
                     }
                 });
 
@@ -443,14 +441,8 @@ cstlAdminApp.factory('StyleSharedService', ['$modal', 'style', 'webService', '$g
                     templateUrl: 'views/modalStyleCreate.html',
                     controller: 'StyleModalController',
                     resolve: {
-                        exclude: function() { return null },
-                        layerName: function() { return null },
-                        providerId: function() { return null },
-                        dataType: function() { return null},
-                        serviceName: function() { return null},
-                        newStyle: function() { return null},
-                        pageSld: function() {  return null }
-
+                        newStyle: function() { return null; },
+                        pageSld: function() {  return 'views/style/chooseType.html'; }
                     }
                 });
             },
@@ -466,11 +458,6 @@ cstlAdminApp.factory('StyleSharedService', ['$modal', 'style', 'webService', '$g
                     templateUrl: 'views/modalStyleEdit.html',
                     controller: 'StyleModalController',
                     resolve: {
-                        exclude: function() { return null },
-                        layerName: function() { return null },
-                        providerId: function() { return null },
-                        dataType: function() { return null},
-                        serviceName: function() { return null},
                         newStyle: function() { return response},
                         pageSld: function() {  return typeURL }
                     }

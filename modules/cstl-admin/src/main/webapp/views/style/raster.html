@@ -1,4 +1,5 @@
 <ol class="breadcrumb">
+    <li><a ng-click="$parent.pageSld = 'views/style/chooseType.html'; $parent.chooseType = false;"><span translate="sldeditor.breadcrumb.type">Type selection</span></a></li>
     <li class="active" translate="sldeditor.breadcrumb.edition">Style Edition</li>
 </ol>
 <div class="row">
@@ -22,8 +23,8 @@
   </ul>
 
 <!-- Tab panes -->
-<div class="tab-content" ng-init="$parent.newStyle.rules[0].symbolizers[0]['@symbol'] = 'raster'">
-  <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='simple'}" ng-init="$parent.initDataProperties()">
+<div class="tab-content" ng-init="initRaster1Band()">
+  <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='simple'}">
     <div class="row">
       <div class="col-xs-12 col-sm-6 col-md-8">
         <h2 translate="sldeditor.breadcrumb.edition">Style Edition</h2>
