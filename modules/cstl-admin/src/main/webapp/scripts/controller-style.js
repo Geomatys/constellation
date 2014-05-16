@@ -135,6 +135,11 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             $scope.providerId = 'generic_shp';
             $scope.layerName = 'CNTR_BN_60M_2006';
             $scope.newStyle.rules[0].symbolizers[0]['@symbol'] = 'text';
+            provider.dataDesc({providerId: $scope.providerId, dataId: $scope.layerName}, function(response) {
+                $scope.dataProperties = response.properties;
+            }, function() {
+                $growl('error','Error','Unable to get data description');
+            });
         };
 
         $scope.initRaster1Band = function() {

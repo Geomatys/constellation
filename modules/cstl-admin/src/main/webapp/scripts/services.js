@@ -442,7 +442,10 @@ cstlAdminApp.factory('StyleSharedService', ['$modal', 'style', 'webService', '$g
                     controller: 'StyleModalController',
                     resolve: {
                         newStyle: function() { return null; },
-                        pageSld: function() {  return 'views/style/chooseType.html'; }
+                        pageSld: function() {  return 'views/style/chooseType.html'; },
+                        selectedLayer: function() {  return null },
+                        serviceName: function() {  return null },
+                        exclude: function() {  return null }
                     }
                 });
             },
@@ -459,7 +462,10 @@ cstlAdminApp.factory('StyleSharedService', ['$modal', 'style', 'webService', '$g
                     controller: 'StyleModalController',
                     resolve: {
                         newStyle: function() { return response},
-                        pageSld: function() {  return typeURL }
+                        pageSld: function() {  return typeURL },
+                        selectedLayer: function() {  return null },
+                        serviceName: function() {  return null },
+                        exclude: function() {  return null }
                     }
                 });
             }
