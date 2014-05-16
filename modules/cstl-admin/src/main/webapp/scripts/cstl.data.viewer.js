@@ -187,14 +187,16 @@ DataViewer = {
             style = new OpenLayers.StyleMap({
                 'default': new OpenLayers.Style({
                         strokeColor: '#000000',
-                        strokeWidth: 2,
-                        fillColor: '39B3D7'
+                        strokeWidth: 1,
+                        fillColor: '#39B3D7',
+                        fillOpacity: 0.25
                     }
                 ),
                 'select': new OpenLayers.Style({
                         strokeColor: '#000000',
-                        strokeWidth: 4,
-                        fillColor: '#BE1522'
+                        strokeWidth: 1,
+                        fillColor: '#BE1522',
+                        fillOpacity: 0.25
                     }
                 )
             });

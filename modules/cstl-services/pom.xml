@@ -480,6 +480,16 @@
         </dependency>
       </dependencies>
     </profile>
+    <profile>
+        <id>orfeo</id>
+        <dependencies>
+            <dependency>
+                <groupId>org.geotoolkit</groupId>
+                <artifactId>geotk-processing-orfeo</artifactId>
+                <version>1.0-GEOTK-4-SNAPSHOT</version>
+            </dependency>
+        </dependencies>
+    </profile>
   </profiles>
 
 

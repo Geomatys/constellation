@@ -1229,13 +1229,13 @@ vertical-align: middle;
 
 /*Modal responsive*/
 .modal-dialog-responsive .modal-body{
-    max-height:800px;
+    max-height:720px;
 }
 .modal-dialog-responsive{
-    max-height:800px;
+    max-height:720px;
 }
 .list-style-modal{
-    height:800px;
+    height:720px;
     overflow-y:auto;
 }
 .modal-dialog-resp-height .modal-body.modal-body-style{
@@ -1260,7 +1260,7 @@ vertical-align: middle;
         width:1024px;
     }
 }
-@media(max-height:800px){
+@media(max-height:900px){
     .modal-dialog-resp-height .modal-content{
         max-height:552px;
     }
