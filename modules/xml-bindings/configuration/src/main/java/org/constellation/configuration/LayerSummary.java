@@ -23,6 +23,8 @@ public class LayerSummary {
     private String alias;
     @XmlElement(name = "Type")
     private String type;
+    @XmlElement(name = "Subtype")
+    private String subtype;
     @XmlElement(name = "Date")
     private Date date;
     @XmlElement(name = "Owner")
@@ -39,6 +41,7 @@ public class LayerSummary {
         this.namespace = layer.getName().getNamespaceURI();
         this.alias = layer.getAlias();
         this.type = layer.getProviderType();
+        this.subtype = db.getSubtype();
         this.date = layer.getDate();
         this.owner = layer.getOwner();
         this.provider = db.getProvider();
@@ -82,6 +85,14 @@ public class LayerSummary {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getSubtype() {
+        return subtype;
+    }
+
+    public void setSubtype(String subtype) {
+        this.subtype = subtype;
     }
 
     public Date getDate() {
