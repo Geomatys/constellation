@@ -712,6 +712,8 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
                                     DataViewer.map.zoomToExtent(extent, true);
                                 }
                             }
+                        } else {
+                            DataViewer.initMap('dataMap');
                         }
                         modalLoader.close();
                     }, function() {
