@@ -195,7 +195,7 @@ DataViewer = {
                 'select': new OpenLayers.Style({
                         strokeColor: '#000000',
                         strokeWidth: 1,
-                        fillColor: '#BE1522',
+                        fillColor: '#910000',
                         fillOpacity: 0.25
                     }
                 )

@@ -648,7 +648,7 @@ public class ConfigurationEngine {
         try {
             session = EmbeddedDatabase.createSession();
 
-            final Record record = session.searchMetadata(metadataID);
+            final Record record = session.searchMetadata(metadataID, true);
             if (record instanceof ProviderRecord) {
                 final ProviderRecord provider = (ProviderRecord) record;
                 return provider.getMetadata();
@@ -679,7 +679,7 @@ public class ConfigurationEngine {
         try {
             session = EmbeddedDatabase.createSession();
 
-            final Record record = session.searchMetadata(metadataId);
+            final Record record = session.searchMetadata(metadataId, true);
             if (record instanceof DataRecord) {
                 records.add((DataRecord) record);
             } else if (record instanceof ProviderRecord) {
@@ -706,11 +706,11 @@ public class ConfigurationEngine {
         return recordsBrief;
     }
 
-    public static boolean existInternalMetadata(final String metadataID) {
+    public static boolean existInternalMetadata(final String metadataID, final boolean includeService) {
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
-            final Record record = session.searchMetadata(metadataID);
+            final Record record = session.searchMetadata(metadataID, includeService);
             return record != null;
 
         } catch (SQLException ex) {
@@ -751,7 +751,7 @@ public class ConfigurationEngine {
         return results;
     }
 
-    public static List<String> getInternalMetadataIds() {
+    public static List<String> getInternalMetadataIds(final boolean includeService) {
         final List<String> results = new ArrayList<>();
         Session session = null;
         try {
@@ -762,10 +762,12 @@ public class ConfigurationEngine {
                     results.add(record.getMetadataId());
                 }
             }
-            final List<ServiceRecord> services = session.readServices();
-            for (ServiceRecord record : services) {
-                if (record.hasIsoMetadata()) {
-                    results.add(record.getMetadataId());
+            if (includeService) {
+                final List<ServiceRecord> services = session.readServices();
+                for (ServiceRecord record : services) {
+                    if (record.hasIsoMetadata()) {
+                        results.add(record.getMetadataId());
+                    }
                 }
             }
             final List<DataRecord> datas = session.readData();

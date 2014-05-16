@@ -74,6 +74,8 @@ import org.w3c.dom.Node;
  */
 public class InternalMetadataReader extends DomMetadataReader implements CSWMetadataReader {
 
+    private final boolean displayServiceMetadata = false;
+    
     /**
      * Build a new CSW File Reader.
      *
@@ -138,7 +140,7 @@ public class InternalMetadataReader extends DomMetadataReader implements CSWMeta
 
     @Override
     public boolean existMetadata(final String identifier) throws MetadataIoException {
-        return ConfigurationEngine.existInternalMetadata(identifier);
+        return ConfigurationEngine.existInternalMetadata(identifier, displayServiceMetadata);
     }
     
     private Node translateISOtoDCNode(final Node metadata, final ElementSetType type, final List<QName> elementName) throws MetadataIoException  {
@@ -397,7 +399,7 @@ public class InternalMetadataReader extends DomMetadataReader implements CSWMeta
     @Override
     public List<Node> getAllEntries() throws MetadataIoException {
         final List<Node> result = new ArrayList<>();
-        final List<String> metadataIds = ConfigurationEngine.getInternalMetadataIds();
+        final List<String> metadataIds = ConfigurationEngine.getInternalMetadataIds(displayServiceMetadata);
         for (String metadataID : metadataIds) {
             final InputStream stream = ConfigurationEngine.loadIsoMetadata(metadataID);
             result.add(getNodeFromStream(stream));
@@ -407,7 +409,7 @@ public class InternalMetadataReader extends DomMetadataReader implements CSWMeta
     
    @Override
     public int getEntryCount() throws MetadataIoException {
-        return ConfigurationEngine.getInternalMetadataIds().size();
+        return ConfigurationEngine.getInternalMetadataIds(displayServiceMetadata).size();
     }
 
     /**
@@ -415,12 +417,12 @@ public class InternalMetadataReader extends DomMetadataReader implements CSWMeta
      */
     @Override
     public List<String> getAllIdentifiers() throws MetadataIoException {
-        return ConfigurationEngine.getInternalMetadataIds();
+        return ConfigurationEngine.getInternalMetadataIds(displayServiceMetadata);
     }
 
     @Override
     public Iterator<String> getIdentifierIterator() throws MetadataIoException {
-        return ConfigurationEngine.getInternalMetadataIds().iterator();
+        return ConfigurationEngine.getInternalMetadataIds(displayServiceMetadata).iterator();
     }
 
     /**

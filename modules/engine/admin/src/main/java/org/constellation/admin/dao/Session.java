@@ -370,7 +370,7 @@ public final class Session implements Closeable {
         new Query(DELETE_I18N).with(id).update();
     }
 
-    public Record searchMetadata(final String metadataId) throws SQLException {
+    public Record searchMetadata(final String metadataId, final boolean includeService) throws SQLException {
         final Result rs = new Query(SEARCH_PROVIDER_METADATA).with(metadataId).select();
         if (rs.rs.next()) {
             final int id = rs.rs.getInt(1);
@@ -383,10 +383,12 @@ public final class Session implements Closeable {
             return readData(id);
         }
         
-        final Result rs3 = new Query(SEARCH_SERVICE_ISO_METADATA).with(metadataId).select();
-        if (rs3.rs.next()) {
-            final int id = rs3.rs.getInt(1);
-            return readService(id);
+        if (includeService) {
+            final Result rs3 = new Query(SEARCH_SERVICE_ISO_METADATA).with(metadataId).select();
+            if (rs3.rs.next()) {
+                final int id = rs3.rs.getInt(1);
+                return readService(id);
+            }
         }
         return null;
     }

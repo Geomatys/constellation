@@ -283,11 +283,11 @@ public class SOSServices {
             final ExtractionResult result;
             if (provider instanceof ObservationStoreProvider) {
                 final ObservationStoreProvider omProvider = (ObservationStoreProvider) provider;
-                result = omProvider.getObservationStore().getResults(sensorIds);
+                result = omProvider.getObservationStore().getResults(sensorID, sensorIds);
             } else if (provider instanceof CoverageStoreProvider) {
                 final CoverageStoreProvider covProvider = (CoverageStoreProvider) provider;
                 if (covProvider.isSensorAffectable()) {
-                    result = covProvider.getObservationStore().getResults(sensorIds);
+                    result = covProvider.getObservationStore().getResults(sensorID, sensorIds);
                 } else {
                     return ok(new AcknowlegementType("Failure", "Only available on netCDF file for coverage for now"));
                 }
