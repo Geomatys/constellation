@@ -301,7 +301,7 @@
             "sensor": "Capteurs",
             "home": "Accueil",
             "language": "Langue",
-            "map-composition": "Compositions cartographiques",
+            "mapcontext": "Cartographie",
             "style": "Styles",
             "viewer": "Visualiseur",
             "tasks":"Traitements",
@@ -422,6 +422,7 @@
         "add.sensors": "Ajouter un capteur",
         "add.style": "Ajouter un style",
         "add.task": "Ajouter un traitement",
+        "add.mapcontext" : "Ajouter une composition cartographique",
         "all": "Tous",
         "all_fem": "Toutes",
         "categories": "Catégories",
@@ -462,6 +463,7 @@
             "style": "Liste des styles"
         },
         "logical": "Logique",
+        "mapcontext.system":"Composition cartographique",
         "name": "Nom",
         "no": {
             "association": "Aucune association.",
@@ -506,7 +508,8 @@
         "count.data":"donnée(s) disponible(s)",
         "count.sensors": "capteur(s) disponible(s)",
         "count.style": "styles(s) disponible(s)",
-        "count.tasks": "traitement(s) disponible(s)"
+        "count.tasks": "traitement(s) disponible(s)",
+        "count.mapcontext": "composition(s) cartographique disponible(s)"
     },
     "layer": {
         "listing": {
@@ -1000,6 +1003,8 @@
             "dashboard.sensors.list.associated": "capteurs associés",
             "dashboard.tasks.list.associated": "traitements associés",
             "dashboard.tasks.list": "Traitements disponibles",
+            "dashboard.mapcontext.list.associated": "données associées",
+            "dashboard.mapcontext.list": "Compositions cartographiques disponibles",
             "dashboard.measures.list":"Mesures possibles",
             "dashboard.measures.error.select.one" : "Vous devez sélectionner une mesure dans la liste précédente",
             "dashboard.area":"Zone géographique",
@@ -1162,7 +1167,8 @@
         "process":"Processus",
         "tasks":"Tâches",
         "sensors":"Gestion des capteurs",
-        "tasks":"Gestion des traitements"
+        "tasks":"Gestion des traitements",
+        "mapcontext":"Gestion des compositions cartographiques"
     },
     "style.information.title":"Styles disponibles",
     "users": {
@@ -1228,6 +1234,7 @@
     },
     "sensors.information.title":"Capteurs disponibles",
     "tasks.information.title":"Traitements disponibles",
+    "mapcontext.information.title":"Compositions cartographiques disponibles",
     "group":{
         "title":"Gestion des groupes",
         "add":"Ajouter un groupe",

@@ -393,7 +393,7 @@ cstlAdminApp.controller('navCtrl', ['$scope', '$location', function ($scope, $lo
             return 'menu-selected';
         else if(currentRouteAdmin=='group')
             return 'menu-selected';
-        else if(currentRouteAdmin=='registery')
+        else if(currentRouteAdmin=='metrics')
             return 'menu-selected';
         else if(currentRouteAdmin=='logs')
             return 'menu-selected';

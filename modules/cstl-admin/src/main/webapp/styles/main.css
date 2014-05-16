@@ -82,6 +82,14 @@ li>a {
 .icon-menu-sensor.menu-selected, a:hover .icon-menu-sensor{
     background:url("../images/icon-menu-sensor-selected.svg") no-repeat;
 }
+.icon-menu-mapcontext{
+    background:url("../images/icon-menu-compo.svg") no-repeat;
+    width:15px;
+    height:15px;
+}
+.icon-menu-mapcontext.menu-selected, a:hover .icon-menu-mapcontext{
+    background:url("../images/icon-menu-compo-selected.svg") no-repeat;
+}
 
 body {
     background-color: #f2f2f2;
@@ -726,6 +734,12 @@ p.error-select-one{
 .dashboard .item-list .item.process-child.selected{
     background: transparent url('../images/process-selected.svg') right center no-repeat;
 }
+.dashboard .item-list .item.mapcontext{
+    background: transparent url('../images/map-context.svg') right center no-repeat;
+}
+.dashboard .item-list .item.mapcontext.selected{
+    background: transparent url('../images/map-context-selected.svg') right center no-repeat;
+}
 
 
 .dashboard .item-list .item {
@@ -914,6 +928,30 @@ p.error-select-one{
  }
  .pagination-sos .pagination > li > a, .pagination-sos .pagination > li > span{
     color:#59b3a1;
+ }
+
+ .alert-mapcontext{
+    background-color: #f5f3ed;
+    border: solid 1px #dad2bc;
+    color:#b6a67a;
+ }
+ .btn-mapcontext{
+    background-color: #dad2bc;
+    border: solid 1px #c8bc9b;
+    color:#ffffff;
+ }
+ .btn-mapcontext:hover, .btn-mapcontext:focus, .btn-mapcontext:hover .open .dropdown-toggle.btn-info{
+    background-color: #c8bc9b;
+    border: solid 1px #b6a67a;
+    color:#ffffff;
+ }
+   .pagination-mapcontext .pagination > .active > a{
+    background-color: #dad2bc;
+     border: solid 1px #c8bc9b;
+     color:#ffffff;
+ }
+ .pagination-mapcontext .pagination > li > a, .pagination-mapcontext .pagination > li > span{
+    color:#c8bc9b;
  }
 
  .alert-task{

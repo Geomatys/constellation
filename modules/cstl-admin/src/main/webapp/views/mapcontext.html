@@ -1,0 +1,225 @@
+<div class="logo-wrapper row">
+    <div class="col-sm-9">
+        <h3 class="header-title" translate="page.header.title.mapcontext">Map context Dashboard</h3>
+    </div>
+    <!-- Menu to create services -->
+    <div class="col-sm-3">
+        <div class="dropdown pull-right">
+            <a data-toggle="dropdown" class="btn btn-info btn-lg dropdown-toggle" style="margin-top:8px;padding:15px 19px;">
+                <span class="icon-plus icon-white" style="margin-right:5px;"></span>
+                <span translate="label.add.mapcontext">Add map context</span>
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+                <li><a id="uploadchoice" ng-click="showLocalFilePopup()" translate="label.file.local">Local file</a></li>
+                <li><a id="filesystemchoice" ng-click="showServerFilePopup()" translate="label.file.server">Server file</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div id="dataDashboard" class="row" ng-init="init()">
+    <div class="col-sm-12">
+        <div class="frame dashboard">
+            <div class="navbar navbar-default" style="margin-bottom: 0px;">
+                <div class="navbar-header">
+                    <a class="navbar-brand" translate="mapcontext.information.title">Available map context</a>
+                </div>
+            </div>
+
+
+            <div class="navbar sort-navbar">
+                <div class="navbar-inner">
+                    <ul class="nav nav-style">
+                        <li ng-click="ordertype='Name';orderreverse=false"><a translate="label.title">
+                            Title<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
+                        </a></li>
+                        <li class="divider-vertical"></li>
+                        <li ng-click="ordertype='Date';orderreverse=true"><a translate="label.date">
+                            Date<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
+                        </a></li>
+                        <li class="divider-vertical"></li>
+                        <li ng-click="ordertype='Owner';orderreverse=false"><a translate="label.owner">
+                            Owner<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
+                        </a></li>
+                        <li class="divider-vertical"></li>
+                    </ul>
+                    <button type="button" ng-click="ordertype='Name';orderreverse=false" class="btn btn-xs btn-info btn-mapcontext"><i class="icon-remove icon-white"></i></button>
+                    <div class="pull-right">
+                        <div style="position:relative;">
+                            <div class="ajax-loader" style="right:0;position:absolute;"></div>
+                            <input type="text" ng-model="filtertext" class="searchbox search-query form-control" placeholder="Search" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="dash-inner row">
+                <div class="pull-left" style="width: 60%;">
+                    <div id="list" data-role="list">
+                        <div class="pagination-wrapper pagination-mapcontext">
+                            <strong><span class="nb-results pull-left">{{countdata}}&nbsp;</span><span class="nb-results" translate="label.count.mapcontext">available data</span></strong>
+                            <select class="nb-per-page input-small form-control pull-right" ng-model="nbbypage">
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                            <div class="pull-right" page-switcher="{page:currentpage,size:nbbypage,count:countdata}" on-select-page="displayPage(page)"></div>
+                        </div>
+                        
+                        <div class="item-list">
+                            <div ng-repeat="context in dataList">
+                                <div class="item mapcontext" ng-class="{'selected':context==selected}" ng-click="select(context);selectContextChild(null);">
+                                    <div class="top">
+                                        <span class="item-title">{{context.id}}</span>
+                                        <span class="pull-right text-right item-list-style"  style="font-size:14px;" translate="label.mapcontext.system">mapcontext dashboard</span>
+                                    </div>
+                                    <div class="bottom">
+                                        <div class="block">
+                                            <i class="icon-calendar"></i>{{context.createDate | date:'yyyy-MM-dd'}}
+                                        </div>
+                                        <div class="block">
+                                            <i class="icon-user"></i>{{context.creator}}
+                                        </div>
+                                        <div class="block pull-right">
+                                            <i class="icon-paper-clip"></i>
+                                            <span ng-if="context.children == null || context.children.length == 0" translate="md.listing.no.data">No</span>
+                                            <span ng-if="context.children.length > 0">{{context.children.length}}</span>
+                                            <span translate="service.edit.dashboard.mapcontext.list.associated">associated data</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="item child {{service.Type | lowercase}}" ng-if="context==selected" ng-repeat="contextchild in context.children" ng-class="{'selected':contextchild===selectedSensorsChild}" ng-click="selectMapcontextChild(contextchild)">
+                                    <div class="top">
+                                        <span class="item-title">{{contextchild.id}}</span>
+                                        <span class="pull-right text-right item-list-style" style="font-size:14px;" translate="label.sensor">{{contextchild.type}}</span>
+                                    </div>
+                                    <div class="bottom">
+                                        <div class="block">
+                                            <i class="icon-calendar"></i>{{contextchild.createDate | date:'yyyy-MM-dd'}}
+                                        </div>
+                                        <div class="block">
+                                            <i class="icon-user"></i>{{contextchild.creator}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="pull-left" style="width: 40%;">
+                    <div id="selection">
+                        <div class="alert alert-info alert-mapcontext" ng-class="{hide: selected != null}">
+                            <h4 translate="label.no.selected.data">No selected data</h4>
+
+                            <p translate="msg.no.selected.data" style="font-weight:normal;">Click on a data to display more information</p>
+                        </div>
+                        <div class="selected-item" id="selected-item" ng-class="{hide: selected == null}">
+                            <div class="block-header" ng-click="toggleUpDownSelected()">
+                                <strong>{{selected.Name}}</strong><i class="icon-chevron-up pull-right"></i>
+                            </div>
+                            <div class="block-content">
+                                <h6 translate="label.owner">Owner</h6>
+                                <span>{{selected.Owner}}</span>
+
+                                <div class="separator"></div>
+                                <h6 translate="label.date">Date</h6>
+                                <span>{{selected.Date | date:'yyyy-MM-dd'}}</span>
+
+                                <div class="separator"></div>
+                                <h6 translate="label.type">Type</h6>
+                                <span>{{selected.Type}}</span>
+
+                                <div class="separator"></div>
+                                <h6>
+                                    <span translate="label.related.style">Related style(s)</span>
+                                    <button type="button" ng-click="showStyleList();"
+                                            class="btn btn-sm pull-right">
+                                        <i class="icon-plus"></i></button>
+                                </h6>
+                                <div id="linkedList">
+                                    <span ng-show="selected.TargetStyle.length == 0" translate="label.no.association">No association</span>
+                                    <div ng-show="selected.TargetStyle.length > 0" class="style" ng-repeat="style in selected.TargetStyle">
+                                        <button type="button" ng-click="unlinkStyle(style.Provider, style.Name, selected.Provider, selected.Name);"
+                                                class="btn btn-small"><i class="icon-minus"></i></button>
+                                        {{style.Name}}
+                                    </div>
+                                </div>
+
+                                <div class="separator"></div>
+                                <h6 translate="label.related.service">Related service(s)</h6>
+                                <div id="linkedServiceList">
+                                    <span ng-show="selected.TargetService.length == 0" translate="label.no.association">No association</span>
+                                    <div ng-show="selected.TargetService.length > 0" class="style" ng-repeat="service in selected.TargetService">
+                                        {{service.name}}
+                                    </div>
+                                </div>
+
+                                <div class="separator"></div>
+                                <h6>
+                                    <span translate="label.related.sensors">Related sensor(s)</span>
+                                    <button type="button" ng-show="selected.TargetSensor.length === 0" ng-click="showSensorsList();"
+                                            class="btn btn-sm pull-right">
+                                        <i class="icon-plus"></i></button>
+                                </h6>
+                                <div id="linkedSensorList">
+                                    <span ng-show="selected.TargetSensor.length === 0" translate="label.no.association">No association</span>
+                                    <div ng-show="selected.TargetSensor.length > 0" class="style" ng-repeat="sensorId in selected.TargetSensor">
+                                        <button type="button" ng-click="unlinkSensor(sensorId)"
+                                                class="btn btn-small"><i class="icon-minus"></i></button>
+                                        {{sensorId}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="block-action">
+                                <div class="row" style="padding-bottom: 5px">
+                                    <div class="col-sm-6">
+                                        <a id="exportMD" class="btn btn-info" ng-href="{{cstlUrl}}api/1/data/export/{{selected.Provider}}/{{selected.Name}};jsessionid={{cstlSessionId}}">
+                                            <i class="icon-download-alt"></i> <span translate="layer.listing.selected.export.button">Export</span>
+                                        </a>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <button type="button" id="seeMetadata" class="btn btn-warning" ng-click="displayMetadata()">
+                                            <i class="icon-file-alt"></i> <span translate="layer.listing.selected.metadata.button">Metadata</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <button id="showData" class="btn btn-success" type="button" ng-click="showData()">
+                                            <i class="icon-map-marker"></i> <span translate="layer.listing.selected.data.button">Layers</span>
+                                        </button>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <button type="button" id="deleteLayer" class="btn btn-danger" ng-click="deleteData();">
+                                            <i class="icon-trash"></i> <span translate="layer.listing.selected.delete.button">Delete</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Modal -->
+                            <div id="viewerData" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                            <h4 class="modal-title" translate="layer.listing.modal.dataviewer">Data Viewer</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div id="dataMap" style="height: 400px; width:740px"></div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

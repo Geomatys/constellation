@@ -114,6 +114,10 @@ cstlAdminApp
                     templateUrl: 'views/styles.html',
                     controller: 'StylesController'
                 })
+                .when('/mapcontext', {
+                    templateUrl: 'views/mapcontext.html',
+                    controller: 'MapcontextController'
+                })
                 .when('/tasks', {
                     templateUrl: 'views/tasks.html',
                     controller: 'ProcessController'

@@ -295,6 +295,7 @@
         "add.sensors": "Add sensor",
         "add.style": "Add style",
         "add.task": "Add task",
+        "add.mapcontext" : "Add map context",
         "all": "All",
         "all_fem": "All",
         "categories": "Categories",
@@ -321,6 +322,7 @@
         "import.style": "Import a style",
         "list.style": "Style list",
         "logical": "Logical",
+        "mapcontext.system":"Map context",
         "name": "Name",
         "no.association": "No association.",
         "no.available.data": "No available data.",
@@ -357,7 +359,8 @@
         "count.data": "available data",
         "count.sensors": "available sensors",
         "count.style": "available style(s)",
-        "count.tasks": "available task(s)"
+        "count.tasks": "available task(s)",
+        "count.mapcontext": "available map context(s)"
     },
     "layer.listing": {
         "data": {
@@ -543,6 +546,8 @@
             "dashboard.sensors.list.associated": "associated sensors",
             "dashboard.tasks.list.associated": "associated tasks",
             "dashboard.tasks.list": "Available tasks",
+            "dashboard.mapcontext.list.associated": "associated data",
+            "dashboard.mapcontext.list": "available map context",
             "dashboard.measures.list":"Available measures",
             "dashboard.measures.error.select.one" : "You need to select one measure in the list",
             "dashboard.area": "Geographical area",
@@ -605,7 +610,7 @@
             "data": "Data",
             "sensor": "Sensors",
             "style": "Styles",
-            "map-composition": "Map Editor",
+            "mapcontext": "Map Context",
             "viewer": "Map Viewer",
             "tasks":"Tasks",
             "account.login": "Authenticate",
@@ -875,7 +880,8 @@
         "process":"Processes",
         "tasks":"Tasks",
         "sensors":"Sensors Dashboard",
-        "tasks":"Tasks Dashboard"
+        "tasks":"Tasks Dashboard",
+        "mapcontext":"Map Context Dashboard"
     },
     "com.codahale.metrics.servlet.AbstractInstrumentedFilter.requests": "Metrics",
     "org.constellation.map.ws.DefaultWMSWorker.getCapabilities": "WMS(getCapabilies)",
@@ -943,6 +949,7 @@
     },
     "sensors.information.title":"Available sensors",
     "tasks.information.title":"Available tasks",
+    "mapcontext.information.title":"Available map context",
     "group":{
         "title":"Roles Dashboard",
         "add":"Add group",
