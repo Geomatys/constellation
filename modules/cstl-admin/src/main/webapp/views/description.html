@@ -33,52 +33,54 @@
                 </li>
             </ul>
             
-            <form name="form" style="margin-top:20px;">
+            <div style="margin-top:20px;">
                 <div class="tab-pane" ng-class="{active:tabiso}" ng-show="tabiso">
-                    <div class="alert alert-data" style="margin-top:20px;"> Tous les champs sont obligatoires</div>
+                    <div class="alert alert-data" style="margin-top:20px;" translation="label.fields.required"> Tous les champs sont obligatoires</div>
                     <div class="row">
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label class="control-label" for="title" translate="md.iso.title">Title</label>
-                                <input type="text" class="form-control" ng-model="metadata.title" id="title" required/>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="control-label" for="abstract" translate="md.iso.abstract">Abstract</label>
-                                <textarea class="form-control" ng-model="metadata.anAbstract" id="abstract" rows="5" required></textarea>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="control-label" for="keywords" translate="md.iso.keywords">Keywords</label>
-                                <div class="tag-input-ctn">
-                                    <div data-ng-repeat="(key, tag) in metadata.keywords" class="input-tag">
-                                        {{ tag }}
-                                        <div class="delete-tag" data-ng-click="deleteTag(key)">&times;</div>
-                                    </div>
-                                    <input type="text" data-tag-input="" data-ng-model="tagText" data-new-tag="addTag()" data-delete-tag="deleteTag()">
+                        <form name="form" style="margin-top:20px;">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label" for="title" translate="md.iso.title">Title</label>
+                                    <input type="text" class="form-control" ng-model="metadata.title" id="title" required/>
                                 </div>
-                                <!--input type="text" class="form-control" ng-model="mdkeywords" id="keywords" /-->
-                            </div>
 
-                            <div class="form-group">
-                                <label class="control-label" for="username" translate="md.iso.username">User name</label>
-                                <input type="text" class="form-control" ng-model="metadata.username" id="username" required
-                                           data-validation-matches-message="what?" aria-invalid="false"/>
-                            </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="abstract" translate="md.iso.abstract">Abstract</label>
+                                    <textarea class="form-control" ng-model="metadata.anAbstract" id="abstract" rows="5" required></textarea>
+                                </div>
 
-                            <div class="form-group">
-                                <label class="control-label" for="organisationName" translate="md.iso.organization">Organization</label>
-                                <input type="text" class="form-control" ng-model="metadata.organisationName" id="organisationName" required/>
-                            </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="keywords" translate="md.iso.keywords">Keywords</label>
+                                    <div class="tag-input-ctn">
+                                        <div data-ng-repeat="(key, tag) in metadata.keywords" class="input-tag">
+                                            {{ tag }}
+                                            <div class="delete-tag" data-ng-click="deleteTag(key)">&times;</div>
+                                        </div>
+                                        <input type="text" data-tag-input="" data-ng-model="tagText" data-new-tag="addTag()" data-delete-tag="deleteTag()">
+                                    </div>
+                                    <!--input type="text" class="form-control" ng-model="mdkeywords" id="keywords" /-->
+                                </div>
 
-                            <div class="form-group">
-                                <label class="control-label" for="roleCode" translate="md.iso.role">Role</label>
-                                <select ng-model="metadata.role" class="form-control" id="roleCode" required>
-                                    <option ng-repeat="role in codeLists.roles" value="{{role}}">{{role}}</option>
-                                </select>
-                            </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="username" translate="md.iso.username">User name</label>
+                                    <input type="text" class="form-control" ng-model="metadata.username" id="username" required
+                                               data-validation-matches-message="what?" aria-invalid="false"/>
+                                </div>
 
-                        </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="organisationName" translate="md.iso.organization">Organization</label>
+                                    <input type="text" class="form-control" ng-model="metadata.organisationName" id="organisationName" required/>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label" for="roleCode" translate="md.iso.role">Role</label>
+                                    <select ng-model="metadata.role" class="form-control" id="roleCode" required>
+                                        <option ng-repeat="role in codeLists.roles" value="{{role}}">{{role}}</option>
+                                    </select>
+                                </div>
+
+                            </div>
+                      
 
                         <div class="col-sm-6">
                             <div class="form-group">
@@ -107,6 +109,7 @@
                                 </select>
                             </div>
                         </div>
+                    </form>
                     </div>
                 </div>
                 <div class="tab-pane" ng-class="{active:tabcrs}" ng-if="tabcrs">
@@ -131,8 +134,9 @@
                         <div id="mdSensorInfo" ng-init="createMetadataTree('mdSensorInfo',false)"></div>
                     </div>
                 </div>
-            </form>
-            <button type="button" id="submitButton" ng-disabled="form.$invalid" class="btn btn-primary pull-right" ng-click="save()" translate="label.save">Save</button>
+            </div>
+            <button ng-if="missing" type="button" id="submitButton" ng-disabled="form.$invalid" class="btn btn-primary pull-right" ng-click="save()" translate="label.save">Save</button>
+            <button ng-if="!missing" type="button" id="submitButton" class="btn btn-primary pull-right" ng-click="save()" translate="label.save">Save</button>
         </div>
     </div>
 </div>

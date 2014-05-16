@@ -316,6 +316,7 @@
         "description": "Description",
         "edit": "Edit",
         "error": "Error",
+        "fields.required":"All fields are required.",
         "file.local": "Local file",
         "file.server": "Server file",
         "finish": "Finish",

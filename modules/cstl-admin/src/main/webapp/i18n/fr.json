@@ -457,6 +457,7 @@
             "local": "Fichier local",
             "server": "Fichier serveur"
         },
+        "fields.required":"Tous les champs sont obligatoires.",
         "finish": "Terminer",
         "import": {
             "style": "Importer un style"
