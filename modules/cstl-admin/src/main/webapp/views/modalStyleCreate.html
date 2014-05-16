@@ -85,8 +85,8 @@
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-default" ng-click="close()">Annuler</button>
-            <button type="button" ng-show="chooseData===true" ng-disabled="!selected" class="btn btn-primary" ng-click="chooseDataClicked(selected); chooseData=false">Choisir</button>
-            <button type="button" ng-show="chooseData===false" class="btn btn-primary" ng-click="createStyle();">Créer</button>
+            <button type="button" ng-show="chooseData===true" ng-disabled="!selected" class="btn btn-primary" ng-click="chooseDataClicked(selected); chooseData=false"><span translate="sldeditor.button.validate">Validate</span></button>
+            <button type="button" ng-show="chooseData===false" class="btn btn-primary" ng-click="createStyle();"><span translate="sldeditor.button.create">Create</span></button>
         </div>
     </div>
 </div>

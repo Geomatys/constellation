@@ -21,7 +21,9 @@ import org.constellation.configuration.AcknowlegementType;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.StyleListBrief;
 import org.constellation.json.binding.Style;
+import org.constellation.json.util.StyleUtilities;
 import org.constellation.map.configuration.StyleProviderConfig;
+import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.style.DefaultMutableStyle;
 import org.geotoolkit.style.MutableStyle;
 
@@ -39,6 +41,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import java.util.Locale;
+
 import javax.xml.namespace.QName;
 
 import static org.constellation.utils.RESTfulUtilities.ok;
@@ -81,7 +84,9 @@ public final class StyleProviders {
     @GET
     @Path("{id}/style/{styleId}")
     public Response getStyle(final @PathParam("id") String id, final @PathParam("styleId") String styleId) throws Exception {
-        return ok(StyleProviderConfig.getStyle(id, styleId));
+    	return ok(new Style(StyleProviderConfig.getStyle(id, styleId)));
+        //return ok(StyleProviderConfig.getStyle(id, styleId));
+        //return ok(new StyleXmlIO().getTransformerXMLv110().);
     }
 
     /**
@@ -119,6 +124,16 @@ public final class StyleProviders {
     public Response updateStyle(final @PathParam("id") String id, final @PathParam("styleId") String styleId, final MutableStyle style) throws Exception {
         StyleProviderConfig.setStyle(id, styleId, style);
         return ok(AcknowlegementType.success("Style named \"" + styleId + "\" successfully updated."));
+    }
+
+    /**
+     * @see StyleProviderConfig#createStyle(String, MutableStyle)
+     */
+    @PUT
+    @Path("{id}/style/{styleId}/update")
+    public Response updateStyleJson(final @PathParam("id") String id, final @PathParam("styleId") String styleId, final Style style) throws Exception {
+        StyleProviderConfig.setStyle(id, styleId, style.toType());
+        return ok(AcknowlegementType.success("Style named \"" + style.getName() + "\" successfully updated to provider with id \"" + id + "\"."));
     }
 
     /**

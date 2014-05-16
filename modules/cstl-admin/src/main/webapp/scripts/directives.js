@@ -126,7 +126,7 @@ angular.module('cstlAdminApp')
             restrict: 'A',
             link: function(scope, $element, attrs) {
                 $element.spectrum({
-                    color: tinycolor,
+                    color: scope.$eval(attrs['ngModel']),
                     showInput: true,
                     allowEmpty: true,
                     showAlpha: true,

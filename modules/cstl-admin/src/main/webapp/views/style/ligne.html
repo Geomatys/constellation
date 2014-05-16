@@ -31,13 +31,14 @@
             <div class="form-group">
               <label class="col-sm-3 col-md-2 control-label" translate="sldeditor.edition.color">Color</label>
               <div class="col-sm-9 col-md-10">
-                <input type='text' name="picker" class="picker" spectrum ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.color"/>
+
+                <input type='text' name="picker" class="picker" spectrum ng-model="newStyle.rules[0].symbolizers[0].stroke.color"/>
               </div>
             </div>
             <div class="form-group">
               <label class="col-sm-3 col-md-2 control-label" translate="sldeditor.edition.size">Size</label>
               <div class="col-sm-9 col-md-4">
-                <input type="number" class="form-control" value=1 ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.width">
+                <input type="number" class="form-control" ng-model="newStyle.rules[0].symbolizers[0].stroke.width">
               </div>
             </div>
             <div class="form-group">
@@ -52,9 +53,9 @@
                 <div class="col-sm-12 col-lg-6 pointille" ng-show=" traitType=='pointille' ">
                     <div class="row dashed-pb">
                         <div class="col-sm-2 col-xs-12"><label class="control-label" translate="sldeditor.edition.line">line</label></div>
-                        <div class="col-sm-4 col-xs-6"><input type="number" class="form-control" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.dashArray[0]"></div>
+                        <div class="col-sm-4 col-xs-6"><input type="number" class="form-control" ng-model="newStyle.rules[0].symbolizers[0].stroke.dashArray[0]"></div>
                         <div class="col-sm-2 col-xs-12"><label class="control-label" translate="sldeditor.edition.space">Space</label></div>
-                        <div class="col-sm-4 col-xs-6"><input type="number" class="form-control" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.dashArray[1]"></div>
+                        <div class="col-sm-4 col-xs-6"><input type="number" class="form-control" ng-model="newStyle.rules[0].symbolizers[0].stroke.dashArray[1]"></div>
                     </div>
                 </div>
               <div class="col-sm-12 col-md-6" ng-show=" traitType=='graphic' ">
@@ -79,20 +80,23 @@
         </div>
 
         <div ng-show="display" class="style_bloc">
+            cap:{{newStyle.rules[0].symbolizers[0].stroke.lineCap}}
+            join:{{newStyle.rules[0].symbolizers[0].stroke.lineJoin}}
           <form class="form-horizontal" role="form">
               <div class="form-group">
                   <label  class="col-xs-3 col-md-2 control-label" translate="sldeditor.edition.join">Join</label>
+
                   <div class="col-sm-9 col-md-10 btn-group" data-toggle="buttons">
-                      <label class="btn btn-default" ng-click="$parent.newStyle.rules[0].symbolizers[0].stroke.lineCap = 'square'">
-                          <input name="lineCap" type="radio" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.lineCap"
+                      <label class="btn btn-default" ng-click="newStyle.rules[0].symbolizers[0].stroke.lineCap = 'square'">
+                          <input name="lineCap" type="radio" ng-model="$newStyle.rules[0].symbolizers[0].stroke.lineCap"
                                  value="square"><img src="images/jointure2.png">
                       </label>
-                      <label class="btn btn-default" ng-click="$parent.newStyle.rules[0].symbolizers[0].stroke.lineCap = 'round'">
-                          <input name="lineCap" type="radio" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.lineCap"
+                      <label class="btn btn-default" ng-click="newStyle.rules[0].symbolizers[0].stroke.lineCap = 'round'">
+                          <input name="lineCap" type="radio" ng-model="newStyle.rules[0].symbolizers[0].stroke.lineCap"
                                  value="round"><img src="images/jointure3.png">
                       </label>
-                      <label class="btn btn-default" ng-click="$parent.newStyle.rules[0].symbolizers[0].stroke.lineCap = 'butt'">
-                          <input name="lineCap" type="radio" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.lineCap"
+                      <label class="btn btn-default" ng-click="newStyle.rules[0].symbolizers[0].stroke.lineCap = 'butt'">
+                          <input name="lineCap" type="radio" ng-model="newStyle.rules[0].symbolizers[0].stroke.lineCap"
                                  value="butt"><img src="images/jointure1.png">
                       </label>
                   </div>
@@ -100,16 +104,16 @@
               <div class="form-group">
                   <label  class="col-xs-3 col-md-2 control-label" translate="sldeditor.edition.cap">Cap</label>
                   <div class="col-sm-9 col-md-10 btn-group" data-toggle="buttons">
-                      <label class="btn btn-default" ng-click="$parent.newStyle.rules[0].symbolizers[0].stroke.lineJoin = 'miter'">
-                          <input name="lineJoin" type="radio" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.lineJoin"
+                      <label class="btn btn-default" ng-click="newStyle.rules[0].symbolizers[0].stroke.lineJoin = 'miter'">
+                          <input name="lineJoin" type="radio" ng-model="newStyle.rules[0].symbolizers[0].stroke.lineJoin"
                                  value="miter"><img src="images/angle1.png">
                       </label>
-                      <label class="btn btn-default" ng-click="$parent.newStyle.rules[0].symbolizers[0].stroke.lineJoin = 'round'">
-                          <input name="lineJoin" type="radio" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.lineJoin"
+                      <label class="btn btn-default" ng-click="newStyle.rules[0].symbolizers[0].stroke.lineJoin = 'round'">
+                          <input name="lineJoin" type="radio" ng-model="newStyle.rules[0].symbolizers[0].stroke.lineJoin"
                                  value="round"><img src="images/angle2.png">
                       </label>
-                      <label class="btn btn-default" ng-click="$parent.newStyle.rules[0].symbolizers[0].stroke.lineJoin = 'bevel'">
-                          <input name="lineJoin" type="radio" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.lineJoin"
+                      <label class="btn btn-default" ng-click="newStyle.rules[0].symbolizers[0].stroke.lineJoin = 'bevel'">
+                          <input name="lineJoin" type="radio" ng-model="newStyle.rules[0].symbolizers[0].stroke.lineJoin"
                                  value="bevel"><img src="images/angle3.png">
                       </label>
                   </div>
@@ -117,7 +121,7 @@
             <div class="form-group">
               <label class="col-sm-4 col-md-2 control-label" translate="sldeditor.edition.offset">Offset</label>
               <div class="col-sm-4">
-                <input type="number" class="form-control" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.dashOffset">
+                <input type="text" class="form-control" ng-model="newStyle.rules[0].symbolizers[0].stroke.dashOffset">
               </div>
             </div>
           </form>
@@ -363,255 +367,6 @@
         </div>
 
         <button type="button" class="btn-apercu btn-block btn btn-primary"><span translate="sldeditor.apercu.data">Data preview</span></button>
-      </div>
-    </div>
-  </div>
-
-  <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='classif'}" ng-init="apercu_ligne=1">
-    <div class="row">
-      <div class="col-xs-12 col-sm-6 col-md-8">
-        <h2 translate="sldeditor.breadcrumb.edition">Style Edition</h2>
-        <div class="style_bloc" style="min-height:60px;">
-                <div class="col-sm-9 col-md-10 btn-group" style="margin-bottom:20px;" ng-init="classification_ligne='unique'" data-toggle="buttons">
-                    <label ng-class="{active: classification_ligne==='unique'}" ng-click="classification_ligne='unique'" type="button" class="btn btn-default"><input type="radio" value="unique">Valeur unique</label>
-                    <label ng-class="{active: classification_ligne==='intervalle'}" ng-click="classification_ligne='intervalle'" type="button" class="btn btn-default"><input type="radio" value="intervalle">Intervalle de valeurs</label>
-                </div>
-
-
-          <div ng-show="classification_ligne=='unique'">
-            <form class="form_classification form-horizontal" role="form">
-             <div class="form-group col-xs-12">
-                <label class="col-sm-3 col-md-2 control-label">Palette</label>
-                <div class="col-sm-9 col-md-10">
-                  <select class="form-control">
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
-                    <option>4</option>
-                    <option>5</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-group col-xs-12">
-                <label class="col-sm-3 col-md-2 control-label">Attriut</label>
-                <div class="col-sm-9 col-md-10">
-                  <select class="form-control">
-                    <option>Attribut 1</option>
-                    <option>Attribut 2</option>
-                    <option>Attribut 3</option>
-                    <option>Attribut 4</option>
-                    <option>Attribut 5</option>
-                  </select>
-                </div>
-              </div>
-            </form>
-          </div>
-
-          <div ng-show="classification_ligne=='intervalle'">
-            <form class="form_classification form-horizontal" role="form">
-              <div class="form-group col-xs-12">
-                <label class="col-sm-3 col-md-2 control-label">Palette</label>
-                <div class="col-sm-9 col-md-10">
-                  <select class="form-control">
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
-                    <option>4</option>
-                    <option>5</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-group col-xs-12">
-                <label class="col-sm-3 col-md-2 control-label">Attriut</label>
-                <div class="col-sm-9 col-md-10">
-                  <select class="form-control">
-                    <option>Attribut 1</option>
-                    <option>Attribut 2</option>
-                    <option>Attribut 3</option>
-                    <option>Attribut 4</option>
-                    <option>Attribut 5</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-group col-xs-12">
-                <label class="col-sm-3 col-md-2 control-label">Méthode</label>
-                <div class="col-sm-9 col-md-10 btn-group" data-toggle="buttons">
-                    <label class="btn btn-default"><input type="radio" value="quantile">Quantile</label>
-                    <label class="btn btn-default"><input type="radio" value="el">EL</label>
-                </div>
-              </div>
-              <div class="form-group col-xs-12">
-                <label for="intervalles" class="col-sm-3 col-md-2 control-label">Intervalles</label>
-                <div class="col-xs-4">
-                  <input type="number" class="form-control" value=1 id="intervalles">
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-        <button type="button" ng-show="classification_ligne=='unique'" ng-click="palette_ligne=1" class="btn btn-generer btn-default">Générer la palette</button>
-        <button type="button" ng-show="classification_ligne=='intervalle'" ng-click="palette_ligne=2" class="btn btn-generer btn-default">Générer la palette</button>
-      </div>
-      <div class="col-xs-12 col-sm-6 col-md-4">
-          <div class="row div-apercu">
-            <div class="col-xs-12">
-              <div class="col-sm-9 col-md-10 btn-group" data-toggle="buttons" ng-init="apercu_ligne=1">
-                <label ng-class="{active: apercu_ligne===1}" ng-click="apercu_ligne=1" type="button" class="col-xs-8 btn btn-apercu btn-default"><input type="radio" value="unique">Apercu du style</label>
-                <label ng-class="{active: apercu_ligne===2}" ng-click="apercu_ligne=2" type="button" class="col-xs-4 btn btn-apercu btn-default"><input type="radio" value="intervalle">Modèle</label>
-              </div> 
-            </div>
-           </div>
-        <div class="row div-apercu">
-            <div class="bloc_apercu">
-                <div ng-class="{'sous_bloc_apercu': apercu_ligne==1, 'sous_bloc_apercu_grand': apercu_ligne==2}" class="sous_bloc_apercu">
-                    <table ng-show="palette_ligne==1 && apercu_ligne==1" class="table">
-                    <tr>
-                      <td><img src="images/polygone_mini.png"></td>
-                      <td><input type='text' class="text_transparent" value='valeur 1' /></td>
-                      <td>
-                        <button type="button" class="btn btn-default btn-xs btn-remove">
-                          <span class="glyphicon glyphicon-remove"></span>
-                        </button></span>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><img src="images/polygone_mini.png"></td>
-                      <td><input type='text' class="text_transparent" value='valeur 2' /></td>
-                      <td>
-                        <button type="button" class="btn btn-default btn-xs btn-remove">
-                          <span class="glyphicon glyphicon-remove"></span>
-                        </button></span>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><img src="images/polygone_mini.png"></td>
-                      <td><input type='text' class="text_transparent" value='valeur 3' /></td>
-                      <td>
-                        <button type="button" class="btn btn-default btn-xs btn-remove">
-                          <span class="glyphicon glyphicon-remove"></span>
-                        </button></span>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><img src="images/polygone_mini.png"></td>
-                      <td><input type='text' class="text_transparent" value='valeur 4' /></td>
-                      <td>
-                        <button type="button" class="btn btn-default btn-xs btn-remove">
-                          <span class="glyphicon glyphicon-remove"></span>
-                        </button></span>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><img src="images/polygone_mini.png"></td>
-                      <td><input type='text' class="text_transparent" value='valeur 5' /></td>
-                      <td>
-                        <button type="button" class="btn btn-default btn-xs btn-remove">
-                          <span class="glyphicon glyphicon-remove"></span>
-                        </button></span>
-                      </td>
-                    </tr>
-                  </table>
-
-                    <table ng-show="palette_ligne==2 && apercu_ligne==1" class="table">
-                    <tr>
-                      <td><img src="images/polygone_mini.png"></td>
-                      <td><input type='text' class="text_transparent" value='0  >  100     ' /></td>
-                      <td>
-                        <button type="button" class="btn btn-default btn-xs btn-remove">
-                          <span class="glyphicon glyphicon-remove"></span>
-                        </button></span>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><img src="images/polygone_mini.png"></td>
-                      <td><input type='text' class="text_transparent" value='100  >  200' /></td>
-                      <td>
-                        <button type="button" class="btn btn-default btn-xs btn-remove">
-                          <span class="glyphicon glyphicon-remove"></span>
-                        </button></span>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><img src="images/polygone_mini.png"></td>
-                      <td><input type='text' class="text_transparent" value='200  >  300' /></td>
-                      <td>
-                        <button type="button" class="btn btn-default btn-xs btn-remove">
-                          <span class="glyphicon glyphicon-remove"></span>
-                        </button></span>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><img src="images/polygone_mini.png"></td>
-                      <td><input type='text' class="text_transparent" value='300  >  400' /></td>
-                      <td>
-                        <button type="button" class="btn btn-default btn-xs btn-remove">
-                          <span class="glyphicon glyphicon-remove"></span>
-                        </button></span>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><img src="images/polygone_mini.png"></td>
-                      <td><input type='text' class="text_transparent" value='400  >  500' /></td>
-                      <td>
-                        <button type="button" class="btn btn-default btn-xs btn-remove">
-                          <span class="glyphicon glyphicon-remove"></span>
-                        </button></span>
-                      </td>
-                    </tr>
-                  </table>
-                  <form ng-show="apercu_ligne==2" class="form_classification form-horizontal" role="form">
-                    <div class="form-group">
-                      <label class="col-sm-4 control-label" translate="sldeditor.edition.stroke">Stroke</label>
-                      <div class="col-sm-8">
-                        <input type='text' name="picker" class="picker" spectrum />
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <label class="col-sm-4 control-label" translate="sldeditor.edition.size">Size</label>
-                      <div class="col-sm-8">
-                        <input type="number" class="form-control" value=1 >
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <label class="col-sm-4 control-label">Type</label>
-                      <div class="col-sm-8">
-                        <select ng-model="traitType" class="form-control">
-                          <option><span translate="sldeditor.edition.full">Full</span></option>
-                          <option value="pointille"><span translate="sldeditor.edition.stipple">Stipple</span></option>
-                          <!--<option value="graphic">Graphic stroke</option>-->
-                        </select>
-                      </div>
-                      <div class="col-sm-12" ng-show=" traitType=='pointille' ">
-                        <div class="row">
-                        <div class="col-md-2 col-sm-2 col-xs-12"><label class="control-label" translate="sldeditor.edition.line">line</label></div>
-                        <div class="col-md-4 col-sm-4 col-xs-6"><input type="number" class="form-control" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.dashArray[0]"></div>
-                        <div class="col-md-2 col-sm-2 col-xs-12"><label class="control-label" translate="sldeditor.edition.space">Space</label></div>
-                        <div class="col-md-4 col-sm-4 col-xs-6"><input type="number" class="form-control" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.dashArray[1]"></div>
-                    </div>
-                      <div class="col-sm-12" ng-show=" traitType=='stroke' ">
-                            <br/>
-                            <div class="input-group">
-                              <input type="text" class="form-control">
-                              <span class="input-group-btn">
-                                <button class="btn btn-default" type="button">Parcourir</button>
-                              </span>
-                            </div><!-- /input-group -->
-
-                      </div>
-                    </div>
-                    <div class="center">
-                         <button type="button" class="btn btn-default" >Supprimer le modèle</button>
-                         <button type="button" class="btn btn-primary">Appliquer</button>
-                    </div>
-                  </form>
-
-                </div>
-                <div ng-show="apercu_ligne==1" class="col-xs-12 div-btn-add">
-                    <button type="button" class="btn-apercu btn btn-default">Ajouter une valeur</button>
-                </div>
-            </div>
-            <button type="button" class="btn-apercu col-xs-12 btn btn-primary"><span translate="sldeditor.apercu.data">Data preview</span></button>
-        </div>
       </div>
     </div>
   </div>

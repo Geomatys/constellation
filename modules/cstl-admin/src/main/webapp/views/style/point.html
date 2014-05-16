@@ -22,6 +22,8 @@
         <li ng-class="{active: chosenTab==='xml'}"><a ng-click="chosenTab = 'xml'" data-toggle="tab"><span translate="sldeditor.tab.xml" >XML Editor</span></a></li>
     </ul>
 <!-- Tab panes -->
+        parent : {{parent.newStyle}}
+        style : {{newStyle}}
 <div class="tab-content" ng-init="$parent.newStyle.rules[0].symbolizers[0]['@symbol'] = 'point'">
   <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='simple'}">
     <div class="row">
@@ -39,22 +41,22 @@
                   </button>
                   <span class="dropdown-arrow dropdown-arrow-inverse"></span>
                   <ul class="dropdown-menu dropdown-inverse dropdown-images" role="menu" style="overflow-y: auto; min-width:60px; min-height: 108px;">
-                    <li ng-click="img_icone='images/icone_circle.png'; $parent.newStyle.rules[0].symbolizers[0].graphic.mark.geometry = 'circle'">
+                    <li ng-click="img_icone='images/icone_circle.png'; newStyle.rules[0].symbolizers[0].graphic.mark.geometry = 'circle'">
                         <a><img class="img_icone" src="images/icone_circle.png"></a>
                     </li>
-                    <li ng-click="img_icone='images/icone_triangle.png'; $parent.newStyle.rules[0].symbolizers[0].graphic.mark.geometry = 'triangle'">
+                    <li ng-click="img_icone='images/icone_triangle.png'; newStyle.rules[0].symbolizers[0].graphic.mark.geometry = 'triangle'">
                       <a><img class="img_icone" src="images/icone_triangle.png"></a>
                     </li>
-                    <li ng-click="img_icone='images/icone_square.png'; $parent.newStyle.rules[0].symbolizers[0].graphic.mark.geometry = 'square'">
+                    <li ng-click="img_icone='images/icone_square.png'; newStyle.rules[0].symbolizers[0].graphic.mark.geometry = 'square'">
                       <a><img class="img_icone" src="images/icone_square.png"></a>
                     </li>
-                    <li ng-click="img_icone='images/icone_star.png'; $parent.newStyle.rules[0].symbolizers[0].graphic.mark.geometry = 'star'">
+                    <li ng-click="img_icone='images/icone_star.png'; newStyle.rules[0].symbolizers[0].graphic.mark.geometry = 'star'">
                       <a><img class="img_icone" src="images/icone_star.png"></a>
                     </li>
-                    <li ng-click="img_icone='images/icone_cross.png'; $parent.newStyle.rules[0].symbolizers[0].graphic.mark.geometry = 'x'">
+                    <li ng-click="img_icone='images/icone_cross.png'; newStyle.rules[0].symbolizers[0].graphic.mark.geometry = 'x'">
                       <a><img class="img_icone" src="images/icone_cross.png"></a>
                     </li>
-                    <li ng-click="img_icone='images/icone_plus.png'; $parent.newStyle.rules[0].symbolizers[0].graphic.mark.geometry = 'cross'">
+                    <li ng-click="img_icone='images/icone_plus.png'; newStyle.rules[0].symbolizers[0].graphic.mark.geometry = 'cross'">
                       <a><img class="img_icone" src="images/icone_plus.png"></a>
                     </li>
                   </ul>
@@ -64,13 +66,13 @@
             <div class="form-group">
               <label class="col-sm-3 col-md-2 control-label" translate="sldeditor.edition.fill">Fill</label>
               <div class="col-sm-8">
-                <input type='text' name="picker" class="picker" spectrum ng-model="$parent.newStyle.rules[0].symbolizers[0].graphic.mark.fill.color" />
+                <input type='text' name="picker" class="picker" spectrum ng-model="newStyle.rules[0].symbolizers[0].graphic.mark.fill.color" />
               </div>
             </div>
             <div class="form-group">
               <label class="col-sm-3 col-md-2 control-label" translate="sldeditor.edition.stroke">Stroke</label>
               <div class="col-sm-8">
-                <input type='text' name="picker" class="picker" spectrum ng-model="$parent.newStyle.rules[0].symbolizers[0].graphic.mark.stroke.color" />
+                <input type='text' name="picker" class="picker" spectrum ng-model="newStyle.rules[0].symbolizers[0].graphic.mark.stroke.color" />
               </div>
             </div>
           </form>
@@ -80,28 +82,28 @@
             <div class="form-group">
               <label class="col-sm-3 col-md-2 control-label" translate="sldeditor.edition.size">Size</label>
               <div class="col-sm-6">
-                <input class="slider" type="range" ng-init="$parent.newStyle.rules[0].symbolizers[0].graphic.size = 15"
+                <input class="slider" type="range" ng-init="newStyle.rules[0].symbolizers[0].graphic.size = 15"
                        ng-model="$parent.newStyle.rules[0].symbolizers[0].graphic.size" max="100" min="0" step="1">
               </div>
               <div class="col-sm-3 col-md-2">
-                <input class="form-control" type="text" ng-model="$parent.newStyle.rules[0].symbolizers[0].graphic.size">
+                <input class="form-control" type="text" ng-model="newStyle.rules[0].symbolizers[0].graphic.size">
               </div>
             </div>
             <div class="form-group">
               <label class="col-sm-3 col-md-2 control-label">Rotation</label>
               <div class="col-sm-6">
-                <input class="slider" ng-init="$parent.newStyle.rules[0].symbolizers[0].graphic.rotation = 0"
-                       ng-model="$parent.newStyle.rules[0].symbolizers[0].graphic.rotation" type="range" max="360" min="0" step="1">
+                <input class="slider" ng-init="newStyle.rules[0].symbolizers[0].graphic.rotation = 0"
+                       ng-model="newStyle.rules[0].symbolizers[0].graphic.rotation" type="range" max="360" min="0" step="1">
               </div>
               <div class="col-sm-3 col-md-2">
-                <input class="form-control" type="text" ng-model="$parent.newStyle.rules[0].symbolizers[0].graphic.rotation" >
+                <input class="form-control" type="text" ng-model="newStyle.rules[0].symbolizers[0].graphic.rotation" >
               </div>
             </div>
             <div class="form-group">
               <label class="col-sm-3 col-md-2 control-label" translate="sldeditor.edition.opacity">Opacity</label>
               <div class="col-sm-6">
-                <input class="slider" ng-init="$parent.newStyle.rules[0].symbolizers[0].graphic.opacity = 100"
-                       ng-model="$parent.newStyle.rules[0].symbolizers[0].graphic.opacity" type="range" max="100" min="0" step="1">
+                <input class="slider" ng-init="newStyle.rules[0].symbolizers[0].graphic.opacity = 100"
+                       ng-model="newStyle.rules[0].symbolizers[0].graphic.opacity" type="range" max="100" min="0" step="1">
               </div>
               <div class="col-sm-3 col-md-2">
                 <input class="form-control" type="text" ng-model="$parent.newStyle.rules[0].symbolizers[0].graphic.opacity">

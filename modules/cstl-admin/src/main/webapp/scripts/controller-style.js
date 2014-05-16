@@ -44,6 +44,10 @@ cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', '$
         $scope.editStyle = function() {
             var styleName = $scope.selected.Name;
             var providerId = $scope.selected.Provider;
+            style.get({provider: providerId, name: styleName}, function(response) {
+                StyleSharedService.showStyleEdit($scope,response);
+            });
+
 
         };
 
@@ -59,14 +63,18 @@ cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', '$
         };
     }]);
 
-cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modalInstance', 'style', 'exclude', 'layerName', 'providerId', 'serviceName', 'dataType', '$cookies', 'dataListing', 'provider', '$growl', 'textService',
-    function ($scope, $dashboard, $modalInstance, style, exclude, layerName, providerId, serviceName, dataType, $cookies, dataListing, provider, $growl, textService) {
+cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modalInstance', 'style', 'exclude', 'layerName', 'providerId', 'serviceName', 'dataType', '$cookies', 'dataListing', 'provider', '$growl', 'textService','pageSld','newStyle',
+    function ($scope, $dashboard, $modalInstance, style, exclude, layerName, providerId, serviceName, dataType, $cookies, dataListing, provider, $growl, textService, pageSld, newStyle) {
         $scope.exclude = exclude;
         $scope.layerName = layerName;
         $scope.providerId = providerId;
         $scope.serviceName = serviceName;
         $scope.dataType = dataType;
         $scope.xmlStyle = '<xml></xml>';
+
+        $scope.pageSld = pageSld;
+
+        $scope.newStyle = newStyle;
 
 
 
@@ -116,12 +124,32 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         };
 
         // TODO: add field to handle style name
-        $scope.newStyle = { "name": $scope.layerName +"-sld",
-                            "rules": [{
-                                "symbolizers": [{}],
-                                "filter": null
-                            }]
-                          };
+        if ($scope.newStyle ==null ) {
+            $scope.newStyle = { "name": $scope.layerName +"-sld",
+                "rules": [{
+                    "symbolizers": [{}],
+                    "filter": null
+                }]
+            };
+        }
+        else {
+            if ($scope.newStyle.rules[0].symbolizers[0]['@symbol'] == 'line') {
+
+                $scope.dataType = 'vector';
+                $scope.providerId = 'generic_shp';
+                $scope.layerName = 'CNTR_BN_60M_2006';
+                if (typeof $scope.newStyle.rules[0].symbolizers[0].stroke !== 'undefined' && $scope.newStyle.rules[0].symbolizers[0].stroke.dashed == false){
+                    $scope.traitType='';
+                }else{
+                    $scope.traitType='pointille';
+                }
+            }else if ($scope.newStyle.rules[0].symbolizers[0]['@symbol'] == 'point') {
+                $scope.dataType = 'vector';
+                $scope.providerId = 'generic_shp';
+                $scope.layerName = 'CNTR_LB_2006';
+            }
+        }
+
 
         $scope.addStrokeDashArray = function(traitType) {
             if (traitType === 'pointille') {
@@ -129,8 +157,10 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                     $scope.newStyle.rules[0].symbolizers[0].stroke = {};
                 }
                 $scope.newStyle.rules[0].symbolizers[0].stroke.dashArray = [1, 1];
+                $scope.newStyle.rules[0].symbolizers[0].stroke.dashed =true;
             } else {
                 $scope.newStyle.rules[0].symbolizers[0].stroke.dashArray = null;
+                $scope.newStyle.rules[0].symbolizers[0].stroke.dashed =false;
             }
         };
 
@@ -312,10 +342,21 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             $modalInstance.close($scope.selected);
         };
 
+        $scope.updateStyle = function() {
+            // style.updatejson({provider: 'sld', name: $scope.newStyle.name }, $scope.newStyle, function() {
+            style.createjson({provider: 'sld'}, $scope.newStyle, function() {
+                $growl('success','Success','Style '+ $scope.newStyle.name +' successfully created');
+                $modalInstance.close({"Provider": "sld", "Name": $scope.newStyle.name});
+            }, function() {
+                $growl('error','Error','Unable to update style '+ $scope.newStyle.name);
+                $modalInstance.close();
+            });
+        };
+
         $scope.createStyle = function() {
             if($scope.dataType.toLowerCase() !== 'coverage' && $scope.dataType.toLowerCase() !== 'raster'){
                 style.createjson({provider: 'sld'}, $scope.newStyle, function() {
-                    $growl('success','Success','Style '+ $scope.newStyle.name +' successfully created');
+                    $growl('success','Success','Style '+ $scope.newStyle.name +' successfully updated');
                     $modalInstance.close({"Provider": "sld", "Name": $scope.newStyle.name});
                 }, function() {
                     $growl('error','Error','Unable to create style '+ $scope.newStyle.name);
@@ -376,8 +417,8 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             }
             style.createjson({provider: 'sld'}, $scope.newStyle, function() {
                 var layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName, $scope.providerId, $scope.newStyle.name);
-                //var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
-                DataViewer.layers = [layerData];
+                var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
+                DataViewer.layers = [layerData, layerBackground];
                 DataViewer.initMap('styledMapOL');
 
                 if ($scope.dataBbox) {
