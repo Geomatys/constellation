@@ -74,24 +74,24 @@
                             <div class="pull-right" page-switcher="{page:currentpage,size:nbbypage,count:countdata}" on-select-page="displayPage(page)"></div>
                         </div>
                         <div class="item-list">
-                            <div class="item {{service.Type | lowercase}}" ng-repeat="service in dataList" ng-class="{selected:service==selected}" ng-click="select(service)">
+                            <div class="item {{data.Type | lowercase}}" ng-repeat="data in dataList" ng-class="{selected:data==selected}" ng-click="select(data)">
                                 <div class="top">
-                                    <span class="item-title">{{service.Name}}</span>
-                                    <span class="pull-right text-right item-list-style" style="font-size:14px;">{{service.Type}}</span>
-                                    <span ng-if="service.Type=='COVERAGE' && service.subtype=='multiDimentions'" class="pull-right coverage-type-nd item-list-style" style="color:#30718c;">nD </span>
-                                    <img ng-if="service.Type=='VECTOR' && (service.Subtype=='Point' || service.Subtype=='MultiPoint')" src="images/vector-point.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
-                                    <img ng-if="service.Type=='VECTOR' && (service.Subtype=='Polygon' || service.Subtype=='MultiPolygon')" src="images/vector-poly.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
-                                    <img ng-if="service.Type=='VECTOR' && (service.Subtype=='LineString' || service.Subtype=='MultiLineString')" src="images/vector-line.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
+                                    <span class="item-title">{{data.Name}}</span>
+                                    <span class="pull-right text-right item-list-style" style="font-size:14px;">{{data.Type}}</span>
+                                    <span ng-if="data.Type=='COVERAGE' && data.subtype=='multiDimentions'" class="pull-right coverage-type-nd item-list-style" style="color:#30718c;">nD </span>
+                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Point' || data.Subtype=='MultiPoint')" src="images/vector-point.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
+                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Polygon' || data.Subtype=='MultiPolygon')" src="images/vector-poly.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
+                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='LineString' || data.Subtype=='MultiLineString')" src="images/vector-line.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
                                 </div>
                                 <div class="bottom">
                                     <div class="block">
-                                        <i class="icon-calendar"></i>{{service.Date | date:'yyyy-MM-dd'}}
+                                        <i class="icon-calendar"></i>{{data.Date | date:'yyyy-MM-dd'}}
                                     </div>
                                     <div class="block">
-                                        <i class="icon-user"></i>{{service.Owner}}
+                                        <i class="icon-user"></i>{{data.Owner}}
                                     </div>
-                                    <img ng-if="service.Sensorable===true && service.TargetSensor.length === 0" src="images/icon-sensor-non-active.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
-                                    <img ng-if="service.TargetSensor.length > 0" src="images/icon-sensor-active.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
+                                    <img ng-if="data.Sensorable===true && data.TargetSensor.length === 0" src="images/icon-sensor-non-active.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
+                                    <img ng-if="data.TargetSensor.length > 0" src="images/icon-sensor-active.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
                                 </div>
                             </div>
                         </div>
