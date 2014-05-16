@@ -66,6 +66,22 @@ li>a {
     border-top-color: #555;
     border-bottom-color: #555;
 }
+.menu-selected{
+    text-decoration: none;
+    background-color: #eeeeee;
+    color: #6f6f6f;
+}
+.menu-selected span{
+    color: #6f6f6f;
+}
+.icon-menu-sensor{
+    background:url("../images/icon-menu-sensor.svg") no-repeat;
+    width:15px;
+    height:15px;
+}
+.icon-menu-sensor.menu-selected, a:hover .icon-menu-sensor{
+    background:url("../images/icon-menu-sensor-selected.svg") no-repeat;
+}
 
 body {
     background-color: #f2f2f2;

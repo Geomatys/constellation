@@ -382,3 +382,24 @@ cstlAdminApp.controller('LogsController', ['$scope', 'resolvedLogs', 'LogsServic
         };
     }]);
 
+cstlAdminApp.controller('navCtrl', ['$scope', '$location', function ($scope, $location) {
+    $scope.navClass = function (page) {
+        var currentRoute = $location.path().split('/')[1] || 'home';
+        return page === currentRoute ? 'menu-selected' : '';
+    };   
+    $scope.navClassAdmin = function () {
+        var currentRouteAdmin = $location.path().substring(1) || 'home';
+        if(currentRouteAdmin=='user')
+            return 'menu-selected';
+        else if(currentRouteAdmin=='group')
+            return 'menu-selected';
+        else if(currentRouteAdmin=='registery')
+            return 'menu-selected';
+        else if(currentRouteAdmin=='logs')
+            return 'menu-selected';
+        else if(currentRouteAdmin=='contact')
+            return 'menu-selected';
+        else if(currentRouteAdmin=='task')
+            return 'menu-selected';
+    };       
+}]);
