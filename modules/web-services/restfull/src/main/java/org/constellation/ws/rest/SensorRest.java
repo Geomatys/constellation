@@ -21,6 +21,7 @@ package org.constellation.ws.rest;
 
 import java.io.File;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,6 +42,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import org.apache.sis.storage.DataStoreException;
@@ -210,6 +212,7 @@ public class SensorRest {
                     final String sensorID       = getSmlID(sml);
                     final List<String> children = getChildrenIdentifiers(sml);
                     final SensorRecord sensor = ConfigurationEngine.writeSensor(sensorID, type, null);
+                    sensor.setMetadata(new StringReader(marshallSensor(sml)));
                     sensorsImported.add(sensor);
                     parents.put(sensorID, children);
                 }
@@ -225,6 +228,7 @@ public class SensorRest {
                 final String type          = getSensorMLType(sml);
                 final String sensorID      = getSmlID(sml);
                 final SensorRecord sensor = ConfigurationEngine.writeSensor(sensorID, type, null);
+                sensor.setMetadata(new StringReader(marshallSensor(sml)));
                 sensorsImported.add(sensor);
             }
         } catch (JAXBException ex) {
@@ -256,6 +260,7 @@ public class SensorRest {
     private static AbstractSensorML unmarshallSensor(final File f) throws JAXBException {
         final Unmarshaller um = SensorMLMarshallerPool.getInstance().acquireUnmarshaller();
         Object obj = um.unmarshal(f);
+        SensorMLMarshallerPool.getInstance().recycle(um);
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement)obj).getValue();
         }
@@ -263,5 +268,13 @@ public class SensorRest {
             return (AbstractSensorML)obj;
         }
         return null;
+    }
+    
+    private static String marshallSensor(final AbstractSensorML f) throws JAXBException {
+        final Marshaller m = SensorMLMarshallerPool.getInstance().acquireMarshaller();
+        final StringWriter sw = new StringWriter();
+        m.marshal(f, sw);
+        SensorMLMarshallerPool.getInstance().recycle(m);
+        return sw.toString();
     }
 }
