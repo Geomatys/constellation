@@ -87,26 +87,14 @@
                             </select>
                         </div>
 
-                        <div class="row">
-                            <div ng-if="sensor.mode === 'existing'">
+                        <div>
+                            <div ng-if="sensor.mode === 'existing'" style="border-top: solid 1px #ddd; padding-top: 10px;">
                                 <div class="frame dashboard list-sos-modal" ng-init="initDashboardSensor()">
                                     <div class="navbar sort-navbar">
                                         <div class="navbar-inner">
-                                            <ul class="nav nav-style">
-                                                <li ng-click="$parent.ordertype='Name';$parent.orderreverse=false"><a translate="label.title">
-                                                    Titre<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
-                                                </a></li>
-                                                <li class="divider-vertical"></li>
-                                                <li ng-click="$parent.ordertype='Date';$parent.orderreverse=true"><a translate="label.date">
-                                                    Date<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
-                                                </a></li>
-                                                <li class="divider-vertical"></li>
-                                                <li ng-click="$parent.ordertype='Owner';$parent.orderreverse=false"><a translate="label.owner">
-                                                    Propriétaire<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
-                                                </a></li>
-                                                <li class="divider-vertical"></li>
-                                            </ul>
-                                            <button type="button" ng-click="$parent.ordertype='Name';$parent.orderreverse=false" class="btn btn-xs btn-sos"><i class="icon-remove icon-white"></i></button>
+                                            <div class="col-xs-6" style="margin-top:9px;">
+                                                <strong><span class="nb-results pull-left"><strong>{{countdata}}&nbsp;</span><span class="nb-results" translate="label.count.sensors">available sensors</span></strong>
+                                            </div>
                                             <div class="pull-right">
                                                 <div style="position:relative;">
                                                     <div class="ajax-loader" style="right:0;position:absolute;"></div>
@@ -118,7 +106,7 @@
                                     <div class="dash-inner">
                                         <div id="list" data-role="list">
                                             <div class="pagination-wrapper pagination-sos">
-                                                <strong><span class="nb-results pull-left"><strong>{{countdata}}&nbsp;</span><span class="nb-results" translate="label.count.sensors">available sensors</span></strong>
+                                                
                                                 <select class="nb-per-page input-small form-control pull-right" ng-model="$parent.nbbypage">
                                                     <option value="5">5</option>
                                                     <option value="10">10</option>
@@ -172,7 +160,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div ng-if="sensor.mode === 'sensorml'">
+                            <div ng-if="sensor.mode === 'sensorml'" style="border-top: solid 1px #ddd; padding-top: 10px;">
                                 <form id="uploadSensor" class="form-horizontal">
                                     <!-- Upload data -->
                                     <label class="col-sm-2 col-xs-3" translate="label.sensor">Sensor</label>
