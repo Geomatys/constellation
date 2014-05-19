@@ -675,7 +675,7 @@
                 "date": "Date des données"
             },
             "date": {
-                "type": "Type de données"
+                "type": "Type de date"
             },
             "keywords": "Mots clefs",
             "locale": {

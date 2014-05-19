@@ -75,7 +75,7 @@
                                 <div class="form-group">
                                     <label class="control-label" for="roleCode" translate="md.iso.role">Role</label>
                                     <select ng-model="metadata.role" class="form-control" id="roleCode" required>
-                                        <option ng-repeat="role in codeLists.roles" value="{{role}}">{{role}}</option>
+                                        <option ng-repeat="(key,value) in codeLists.roles" value="{{key}}">{{value}}</option>
                                     </select>
                                 </div>
 
@@ -98,7 +98,7 @@
                             <div class="form-group">
                                 <label class="control-label" for="dateType" translate="md.iso.date.type">Date type</label>
                                 <select ng-model="metadata.dateType" class="form-control" id="dateType" required>
-                                    <option ng-repeat="dateType in codeLists.dateTypes" value="{{dateType}}">{{dateType}}</option>
+                                    <option ng-repeat="(key,value) in codeLists.dateTypes" value="{{key}}">{{value}}</option>
                                 </select>
                             </div>
 
@@ -135,8 +135,8 @@
                     </div>
                 </div>
             </div>
-            <button ng-if="missing" type="button" id="submitButton" ng-disabled="form.$invalid" class="btn btn-primary pull-right" ng-click="save()" translate="label.save">Save</button>
-            <button ng-if="!missing" type="button" id="submitButton" class="btn btn-primary pull-right" ng-click="save()" translate="label.save">Save</button>
+            <button ng-if="missing" type="button" ng-disabled="form.$invalid" class="btn btn-primary pull-right" ng-click="save()" translate="label.save">Save</button>
+            <button ng-if="!missing" type="button" class="btn btn-primary pull-right" ng-click="save()" translate="label.save">Save</button>
         </div>
     </div>
 </div>
