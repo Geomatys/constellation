@@ -467,6 +467,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
             } else {
                 return null;
             }
+            c.close();
             final String gmlVersion = getGMLVersion(version);
             return JTStoGeometry.toGML(gmlVersion, geom, crs);
         } catch (SQLException | FactoryException  | ParseException ex) {

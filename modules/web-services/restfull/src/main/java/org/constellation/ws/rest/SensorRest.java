@@ -52,6 +52,7 @@ import org.constellation.provider.DataProviders;
 import org.constellation.provider.coveragestore.CoverageStoreProvider;
 import org.constellation.provider.observationstore.ObservationStoreProvider;
 import org.constellation.sos.configuration.SensorMLGenerator;
+import org.constellation.sos.ws.SOSUtils;
 import org.constellation.util.Util;
 import static org.constellation.utils.RESTfulUtilities.ok;
 import org.geotoolkit.sml.xml.AbstractSensorML;
@@ -96,6 +97,24 @@ public class SensorRest {
     public Response deleteSensor(@PathParam("sensorid") String sensorid) {
         ConfigurationEngine.deleteSensor(sensorid);
         return Response.status(200).build();
+    }
+    
+    @GET
+    @Path("{sensorid}")
+    public Response getSensorMetadata(@PathParam("sensorid") String sensorid) {
+        final SensorRecord record = ConfigurationEngine.getSensor(sensorid);
+        if (record != null) {
+            final AbstractSensorML sml;
+            try {
+                sml = SOSUtils.unmarshallSensor(record.getMetadata());
+                return ok(sml);
+            } catch (SQLException | JAXBException | DataStoreException ex) {
+                LOGGER.log(Level.WARNING, "error while unmarshalling SensorML", ex);
+                return Response.status(500).entity("failed").build();
+            }
+        } else {
+            return Response.status(404).build();
+        }
     }
     
     @PUT

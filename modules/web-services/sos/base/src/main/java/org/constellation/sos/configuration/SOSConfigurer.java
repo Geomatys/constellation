@@ -18,6 +18,8 @@
 package org.constellation.sos.configuration;
 
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.io.WKTWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -397,20 +399,41 @@ public class SOSConfigurer extends OGCConfigurer {
     public String getWKTSensorLocation(final String id, final String sensorID) throws ConfigurationException {
         final ObservationReader reader = getObservationReader(id);
         try {
-            final AbstractGeometry geom = reader.getSensorLocation(sensorID, "2.0.0");
-            if (geom != null) {
-                Geometry jtsGeometry  = GeometrytoJTS.toJTS(geom);
-                // reproject to CRS:84
-                final MathTransform mt = CRS.findMathTransform(geom.getCoordinateReferenceSystem(),WGS84);
-                jtsGeometry = JTS.transform(jtsGeometry, mt);
-
+            final SensorMLTree root          = getSensorTree(id);
+            final SensorMLTree current       = root.find(sensorID);
+            final List<Geometry> jtsGeometries = getJTSGeometryFromSensor(current, reader);
+            if (jtsGeometries.size() == 1) {
                 final WKTWriter writer = new WKTWriter();
-                return writer.write(jtsGeometry);
-            } 
+                return writer.write(jtsGeometries.get(0));
+            } else if (!jtsGeometries.isEmpty()) {
+                final Geometry[] geometries   = jtsGeometries.toArray(new Geometry[jtsGeometries.size()]);
+                final GeometryCollection coll = new GeometryCollection(geometries, new GeometryFactory());
+                final WKTWriter writer        = new WKTWriter();
+                return writer.write(coll);
+            }
             return "";
         } catch (DataStoreException | FactoryException | TransformException ex) {
             throw new ConfigurationException(ex);
         }
+    }
+    
+    private List<Geometry> getJTSGeometryFromSensor(final SensorMLTree sensor, final ObservationReader reader) throws DataStoreException, FactoryException, TransformException {
+        if ("Component".equals(sensor.getType())) {
+            final AbstractGeometry geom = reader.getSensorLocation(sensor.getId(), "2.0.0");
+            if (geom != null) {
+                Geometry jtsGeometry = GeometrytoJTS.toJTS(geom);
+                // reproject to CRS:84
+                final MathTransform mt = CRS.findMathTransform(geom.getCoordinateReferenceSystem(), WGS84);
+                return Arrays.asList(JTS.transform(jtsGeometry, mt));
+            }
+        } else {
+            final List<Geometry> geometries = new ArrayList<>();
+            for (SensorMLTree child : sensor.getChildren()) {
+                geometries.addAll(getJTSGeometryFromSensor(child, reader));
+            }
+            return geometries;
+        }
+        return new ArrayList<>();
     }
     
     public String getObservationsCsv(final String id, final String sensorID, final List<String> observedProperties, final Date start, final Date end) throws ConfigurationException {
