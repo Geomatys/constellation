@@ -41,11 +41,11 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.dao.SensorRecord;
 import org.constellation.configuration.AcknowlegementType;
-import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SensorMLTree;
 import org.constellation.provider.DataProviders;
@@ -54,7 +54,6 @@ import org.constellation.provider.observationstore.ObservationStoreProvider;
 import org.constellation.sos.configuration.SensorMLGenerator;
 import org.constellation.util.Util;
 import static org.constellation.utils.RESTfulUtilities.ok;
-import org.geotoolkit.gml.xml.v321.AbstractGeometryType;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
 
@@ -109,18 +108,23 @@ public class SensorRest {
         
         final org.constellation.provider.Provider provider = DataProviders.getInstance().getProvider(providerId);
         final ExtractionResult result;
-        if (provider instanceof ObservationStoreProvider) {
-            final ObservationStoreProvider omProvider = (ObservationStoreProvider) provider;
-            result = omProvider.getObservationStore().getResults();
-        } else if (provider instanceof CoverageStoreProvider) {
-            final CoverageStoreProvider covProvider = (CoverageStoreProvider) provider;
-            if (covProvider.isSensorAffectable()) {
-                result = covProvider.getObservationStore().getResults();
+        try {
+            if (provider instanceof ObservationStoreProvider) {
+                final ObservationStoreProvider omProvider = (ObservationStoreProvider) provider;
+                result = omProvider.getObservationStore().getResults();
+            } else if (provider instanceof CoverageStoreProvider) {
+                final CoverageStoreProvider covProvider = (CoverageStoreProvider) provider;
+                if (covProvider.isSensorAffectable()) {
+                    result = covProvider.getObservationStore().getResults();
+                } else {
+                    return ok(new AcknowlegementType("Failure", "Only available on netCDF file for coverage for now"));
+                }
             } else {
-                return ok(new AcknowlegementType("Failure", "Only available on netCDF file for coverage for now"));
+                return ok(new AcknowlegementType("Failure", "Available only on Observation provider (and netCDF coverage) for now"));
             }
-        } else {
-            return ok(new AcknowlegementType("Failure", "Available only on Observation provider (and netCDF coverage) for now"));
+        } catch (DataStoreException ex) {
+            LOGGER.log(Level.WARNING, "Error while reading netCDF", ex);
+            return ok(new AcknowlegementType("Failure", "Error while reading netCDF"));
         }
         
         // SensorML generation

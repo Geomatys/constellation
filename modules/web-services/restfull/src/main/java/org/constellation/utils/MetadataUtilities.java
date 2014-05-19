@@ -220,31 +220,38 @@ public final class MetadataUtilities {
         
         final SimplyMetadataTreeNode times = new SimplyMetadataTreeNode("Temporal bounds:", true, "times", 10, "root");
         results.add(times);
-        final TemporalGeometricPrimitive time = store.getTemporalBounds();
-        
-        if (time instanceof Period) {
-            final Period period = (Period) time;
-            final SimplyMetadataTreeNode beginNode = new SimplyMetadataTreeNode("Begin position", false, "time-begin", 9, "times");
-            synchronized(FORMAT) {
-                beginNode.setValue(FORMAT.format(period.getBeginning().getPosition().getDate()));
+        try {
+            final TemporalGeometricPrimitive time = store.getTemporalBounds();
+
+            if (time instanceof Period) {
+                final Period period = (Period) time;
+                final SimplyMetadataTreeNode beginNode = new SimplyMetadataTreeNode("Begin position", false, "time-begin", 9, "times");
+                synchronized(FORMAT) {
+                    beginNode.setValue(FORMAT.format(period.getBeginning().getPosition().getDate()));
+                }
+                results.add(beginNode);
+                final SimplyMetadataTreeNode endNode = new SimplyMetadataTreeNode("End position", false, "time-end", 9, "times");
+                synchronized(FORMAT) {
+                    endNode.setValue(FORMAT.format(period.getEnding().getPosition().getDate()));
+                }
+                results.add(endNode);
+            } else if (time instanceof Instant) {
+                final Instant instant = (Instant) time;
+                final SimplyMetadataTreeNode beginNode = new SimplyMetadataTreeNode("Position", false, "time-position", 9, "times");
+                synchronized(FORMAT) {
+                    beginNode.setValue(FORMAT.format(instant.getPosition().getDate()));
+                }
+                results.add(beginNode);    
+
+            } else {
+                final SimplyMetadataTreeNode timeNode = new SimplyMetadataTreeNode("Undefined", false, "time-undef", 9, "times");
+                timeNode.setValue("Undefined");
+                results.add(timeNode);
             }
-            results.add(beginNode);
-            final SimplyMetadataTreeNode endNode = new SimplyMetadataTreeNode("End position", false, "time-end", 9, "times");
-            synchronized(FORMAT) {
-                endNode.setValue(FORMAT.format(period.getEnding().getPosition().getDate()));
-            }
-            results.add(endNode);
-        } else if (time instanceof Instant) {
-            final Instant instant = (Instant) time;
-            final SimplyMetadataTreeNode beginNode = new SimplyMetadataTreeNode("Position", false, "time-position", 9, "times");
-            synchronized(FORMAT) {
-                beginNode.setValue(FORMAT.format(instant.getPosition().getDate()));
-            }
-            results.add(beginNode);    
-            
-        } else {
-            final SimplyMetadataTreeNode timeNode = new SimplyMetadataTreeNode("Undefined", false, "time-undef", 9, "times");
-            timeNode.setValue("Undefined");
+        } catch (DataStoreException ex) {
+            LOGGER.log(Level.WARNING, "Error while retrieving temporal data in dataStore", ex);
+            final SimplyMetadataTreeNode timeNode = new SimplyMetadataTreeNode("Error", false, "time-error", 9, "times");
+            timeNode.setValue("Error");
             results.add(timeNode);
         }
         return results;
