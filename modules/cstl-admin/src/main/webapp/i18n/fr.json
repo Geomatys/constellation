@@ -1192,7 +1192,8 @@
             "polygon":"Polygone",
             "line":"Ligne",
             "point":"Point",
-            "text":"Texte"
+            "text":"Texte",
+            "raster":"Raster"
         },
         "breadcrumb":{
             "type":"Choix du type",

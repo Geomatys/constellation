@@ -907,7 +907,8 @@
             "polygon":"Polygon",
             "line":"Line",
             "point":"Point",
-            "text":"Text"
+            "text":"Text",
+            "raster":"Raster"
         },
         "breadcrumb":{
             "type":"Type selection",
