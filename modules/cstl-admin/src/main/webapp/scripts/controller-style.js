@@ -78,8 +78,8 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         $scope.newStyle = newStyle;
         $scope.serviceName = serviceName || null;
 
-        function initSldPage() {
-            if ($scope.newStyle) {
+        function initSldPage(goToVectors) {
+            if ($scope.newStyle && $scope.newStyle.rules[0].symbolizers[0]['@symbol']) {
                 $scope.chooseType = true;
                 switch ($scope.newStyle.rules[0].symbolizers[0]['@symbol']){
                     case "point": $scope.page.pageSld = 'views/style/point.html'; break;
@@ -92,14 +92,24 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                 return;
             }
 
-            $scope.chooseType = false;
-
             if ($scope.selectedLayer != null) {
                 $scope.sldName = $scope.selectedLayer.Name + '-sld';
                 if ($scope.selectedLayer.Type && ($scope.selectedLayer.Type.toLowerCase() === 'coverage' || $scope.selectedLayer.Type.toLowerCase() === 'coverage-store')) {
                     $scope.page.pageSld = 'views/style/raster.html';
                 } else if ($scope.selectedLayer.Type && ($scope.selectedLayer.Type.toLowerCase() === 'vector' || $scope.selectedLayer.Type.toLowerCase() === 'feature-store')) {
-                    $scope.page.pageSld = 'views/style/vectors.html';
+                    if ($scope.selectedLayer.Subtype && !goToVectors) {
+                        switch ($scope.selectedLayer.Subtype){
+                            case "Point": $scope.page.pageSld = 'views/style/point.html'; break;
+                            case "MultiPoint": $scope.page.pageSld = 'views/style/point.html'; break;
+                            case "Polygon": $scope.page.pageSld = 'views/style/polygone.html'; break;
+                            case "MultiPolygon": $scope.page.pageSld = 'views/style/polygone.html'; break;
+                            case "LineString": $scope.page.pageSld = 'views/style/ligne.html'; break;
+                            case "MultiLineString": $scope.page.pageSld = 'views/style/ligne.html'; break;
+                            default: $scope.page.pageSld = 'views/style/vectors.html'; $scope.chooseType = false; break;
+                        }
+                    } else {
+                        $scope.page.pageSld = 'views/style/vectors.html';
+                    }
                 } else {
                     $scope.page.pageSld = 'views/style/chooseType.html';
                 }
@@ -110,7 +120,12 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         initSldPage();
 
         $scope.goBack = function() {
-            initSldPage();
+            $scope.refreshNewStyle();
+            if ($scope.selectedLayer && $scope.selectedLayer.Type && ($scope.selectedLayer.Type.toLowerCase() === 'vector' || $scope.selectedLayer.Type.toLowerCase() === 'feature-store')) {
+                initSldPage(true);
+            } else {
+                initSldPage();
+            }
         };
 
         $scope.refreshNewStyle = function(){
