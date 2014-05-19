@@ -72,6 +72,19 @@ cstlAdminApp.controller('SensorsController', ['$scope', '$dashboard', 'webServic
                 });
             }
         };
+
+        $scope.showSensor = function() {
+            var idToView = ($scope.selectedSensorsChild !== null) ? $scope.selectedSensorsChild.id : $scope.selected.id;
+            $modal.open({
+                templateUrl: 'views/modalViewSensorMetadata.html',
+                controller: 'ViewMetadataModalController',
+                resolve: {
+                    'details': function(textService){
+                        return textService.sensorMetadata(idToView);
+                    }
+                }
+            });
+        };
     }]);
 
 cstlAdminApp.controller('SensorAddModalController', ['$scope', '$modalInstance', 'sensor', '$growl', '$cookies',

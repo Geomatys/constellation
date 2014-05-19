@@ -255,9 +255,10 @@ cstlAdminApp.factory('sos', ['$resource',
 cstlAdminApp.factory('sensor', ['$resource',
     function ($resource) {
         return $resource('@cstl/api/1/sensor', {}, {
-            'list':   {method: 'GET',  url: '@cstl/api/1/sensor/list;jsessionid='},
-            'add':    {method: 'PUT',  url: '@cstl/api/1/sensor/add;jsessionid=', isArray: true},
-            'delete': {method: 'DELETE',  url: '@cstl/api/1/sensor/:sensor;jsessionid='}
+            'list':        {method: 'GET',  url: '@cstl/api/1/sensor/list;jsessionid='},
+            'add':         {method: 'PUT',  url: '@cstl/api/1/sensor/add;jsessionid=', isArray: true},
+            'delete':      {method: 'DELETE',  url: '@cstl/api/1/sensor/:sensor;jsessionid='},
+            'getMetadata': {method: 'GET',  url: '@cstl/api/1/sensor/:sensor;jsessionid='}
         });
     }]);
 
@@ -346,6 +347,17 @@ cstlAdminApp.factory('textService', ['$http', '$growl',
                 });
                 promise.error(function(errorMsg) {
                     $growl('warning', 'Warning', 'No metadata found for data '+ data);
+                });
+                return promise;
+            },
+            sensorMetadata : function(sensor){
+                var promise = $http({
+                    url: '@cstl/api/1/sensor/'+ sensor+';jsessionid=',
+                    method: "GET",
+                    headers: {'Accept': 'application/xml'}
+                });
+                promise.error(function(errorMsg) {
+                    $growl('warning', 'Warning', 'No sensorML found for sensor '+ sensor);
                 });
                 return promise;
             }
