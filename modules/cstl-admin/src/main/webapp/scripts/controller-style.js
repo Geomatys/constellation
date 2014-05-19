@@ -422,32 +422,37 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         };
 
         $scope.createStyle = function() {
-            if($scope.dataType.toLowerCase() !== 'coverage' && $scope.dataType.toLowerCase() !== 'raster'){
-                style.createjson({provider: 'sld'}, $scope.newStyle, function() {
-                    $growl('success','Success','Style '+ $scope.newStyle.name +' successfully updated');
-                    $modalInstance.close({"Provider": "sld", "Name": $scope.newStyle.name});
-                }, function() {
-                    $growl('error','Error','Unable to create style '+ $scope.newStyle.name);
-                    $modalInstance.close();
-                });
+            if($scope.newStyle.name==""){
+                $scope.noName=true;
             }
-            else if($scope.dataType.toLowerCase() === 'coverage' || $scope.dataType.toLowerCase() === 'raster'){
-                if($scope.palette.rasterMaxValue!= null && $scope.palette.rasterMinValue!=null){
-                    $scope.addPalette();
+            else{
+                if($scope.dataType.toLowerCase() !== 'coverage' && $scope.dataType.toLowerCase() !== 'raster'){
                     style.createjson({provider: 'sld'}, $scope.newStyle, function() {
-                        $growl('success','Success','Style '+ $scope.newStyle.name +' successfully created');
+                        $growl('success','Success','Style '+ $scope.newStyle.name +' successfully updated');
                         $modalInstance.close({"Provider": "sld", "Name": $scope.newStyle.name});
                     }, function() {
                         $growl('error','Error','Unable to create style '+ $scope.newStyle.name);
                         $modalInstance.close();
                     });
                 }
-                else {
-                    if($scope.palette.rasterMaxValue==null) {
-                        $scope.invalideMax=true;
+                else if($scope.dataType.toLowerCase() === 'coverage' || $scope.dataType.toLowerCase() === 'raster'){
+                    if($scope.palette.rasterMaxValue!= null && $scope.palette.rasterMinValue!=null){
+                        $scope.addPalette();
+                        style.createjson({provider: 'sld'}, $scope.newStyle, function() {
+                            $growl('success','Success','Style '+ $scope.newStyle.name +' successfully created');
+                            $modalInstance.close({"Provider": "sld", "Name": $scope.newStyle.name});
+                        }, function() {
+                            $growl('error','Error','Unable to create style '+ $scope.newStyle.name);
+                            $modalInstance.close();
+                        });
                     }
-                    if($scope.palette.rasterMinValue==null) {
-                        $scope.invalideMin=true;
+                    else {
+                        if($scope.palette.rasterMaxValue==null) {
+                            $scope.invalideMax=true;
+                        }
+                        if($scope.palette.rasterMinValue==null) {
+                            $scope.invalideMin=true;
+                        }
                     }
                 }
             } 
@@ -470,21 +475,27 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             if ($scope.dataType.toLowerCase() === 'coverage' || $scope.dataType.toLowerCase() === 'raster') {
                 $scope.addPalette();
             }
-            style.createjson({provider: 'sld'}, $scope.newStyle, function() {
-                var layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName, $scope.providerId, $scope.newStyle.name);
-                var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
-                if ($scope.layerName === 'CNTR_BN_60M_2006') {
-                    DataViewer.layers = [layerData];
-                } else {
-                    DataViewer.layers = [layerData, layerBackground];
-                }
-                DataViewer.initMap('styledMapOL');
+            if($scope.newStyle.name==""){
+                $scope.noName=true;
+            }
+            else{
+                $scope.noName=false;
+                style.createjson({provider: 'sld'}, $scope.newStyle, function() {
+                    var layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName, $scope.providerId, $scope.newStyle.name);
+                    var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
+                    if ($scope.layerName === 'CNTR_BN_60M_2006') {
+                        DataViewer.layers = [layerData];
+                    } else {
+                        DataViewer.layers = [layerData, layerBackground];
+                    }
+                    DataViewer.initMap('styledMapOL');
 
-                if ($scope.dataBbox) {
-                    var extent = new OpenLayers.Bounds($scope.dataBbox[0], $scope.dataBbox[1], $scope.dataBbox[2], $scope.dataBbox[3]);
-                    DataViewer.map.zoomToExtent(extent, true);
-                }
-            });
+                    if ($scope.dataBbox) {
+                        var extent = new OpenLayers.Bounds($scope.dataBbox[0], $scope.dataBbox[1], $scope.dataBbox[2], $scope.dataBbox[3]);
+                        DataViewer.map.zoomToExtent(extent, true);
+                    }
+                });
+            }
         };
 
         $scope.StyleisSelected = function(){

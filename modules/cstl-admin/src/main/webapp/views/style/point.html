@@ -14,6 +14,9 @@
         </div>
       </div>
     </div>
+    <div class="col-sm-12 col-md-6">
+      <div ng-if="noName" class="alert alert-style">Veuillez renseigner un nom de style</div>
+    </div>
   </div>
 <!-- Tab nav -->
 
@@ -22,8 +25,6 @@
         <li ng-class="{active: chosenTab==='xml'}"><a ng-click="chosenTab = 'xml'" data-toggle="tab"><span translate="sldeditor.tab.xml" >XML Editor</span></a></li>
     </ul>
 <!-- Tab panes -->
-        parent : {{parent.newStyle}}
-        style : {{newStyle}}
 <div class="tab-content" ng-init="initPoint()">
   <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='simple'}">
     <div class="row">
