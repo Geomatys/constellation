@@ -214,7 +214,7 @@
 
                         <div class="col-sm-4">
                             <!-- begin add data button -->
-                            <div style="margin-bottom:10px;">
+                            <div style="margin-bottom:10px;" ng-if="service.type.toLowerCase() !== 'csw'">
                                 <a data-toggle="modal" class="btn btn-info btn-lg btn-block" ng-click="showDataToAdd()">
                                     <span class="icon-plus icon-white" style="margin-right:5px;"></span>
                                     <span translate="service.edit.dashboard.action.add.button">Add</span>
