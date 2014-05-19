@@ -1262,5 +1262,6 @@
         "users.back":"Retour",
         "new":"Nouveau groupe"
     },
-    "message.uploading":"Votre donnée est en train d'être importée..."
+    "message.uploading":"Votre donnée est en train d'être importée...",
+    "alert.style.noname":"Veuillez renseigner un nom de style"
 }

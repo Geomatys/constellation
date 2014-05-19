@@ -977,5 +977,6 @@
         "users.back":"Back",
         "new":"New group"
     },
-    "message.uploading":"Your data is uploading..."
+    "message.uploading":"Your data is uploading...",
+    "alert.style.noname":"Please fill in a style name"
 }
