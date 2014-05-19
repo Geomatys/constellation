@@ -63,19 +63,42 @@ cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', '$
         };
     }]);
 
-cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modalInstance', 'style', '$cookies', 'dataListing', 'provider', '$growl', 'textService','pageSld','newStyle', 'selectedLayer', 'serviceName', 'exclude',
-    function ($scope, $dashboard, $modalInstance, style, $cookies, dataListing, provider, $growl, textService, pageSld, newStyle, selectedLayer, serviceName, exclude) {
+cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modalInstance', 'style', '$cookies', 'dataListing', 'provider', '$growl', 'textService','newStyle', 'selectedLayer', 'serviceName', 'exclude',
+    function ($scope, $dashboard, $modalInstance, style, $cookies, dataListing, provider, $growl, textService, newStyle, selectedLayer, serviceName, exclude) {
         $scope.xmlStyle = '<xml></xml>';
         $scope.exclude = exclude;
+        $scope.selectedLayer = selectedLayer || null;
+        $scope.sldName = '';
 
         $scope.stylechooser = 'new';
-        $scope.chooseType = false;
-        $scope.pageSld = pageSld;
+        $scope.page = {
+            pageSld: 'views/style/chooseType.html'
+        };
+
+        function initSldPage() {
+            $scope.chooseType = false;
+
+            if ($scope.selectedLayer != null) {
+                $scope.sldName = $scope.selectedLayer.Name + '-sld';
+                if ($scope.selectedLayer.Type && ($scope.selectedLayer.Type.toLowerCase() === 'coverage' || $scope.selectedLayer.Type.toLowerCase() === 'coverage-store')) {
+                    $scope.page.pageSld = 'views/style/raster.html';
+                } else if ($scope.selectedLayer.Type && ($scope.selectedLayer.Type.toLowerCase() === 'vector' || $scope.selectedLayer.Type.toLowerCase() === 'feature-store')) {
+                    $scope.page.pageSld = 'views/style/vectors.html';
+                } else {
+                    $scope.page.pageSld = 'views/style/chooseType.html';
+                }
+            } else {
+                $scope.page.pageSld = 'views/style/chooseType.html';
+            }
+        }
+        initSldPage();
 
         $scope.newStyle = newStyle;
-        $scope.sldName = '';
-        $scope.selectedLayer = selectedLayer || null;
         $scope.serviceName = serviceName || null;
+
+        $scope.goBack = function() {
+            initSldPage();
+        };
 
         $scope.refreshNewStyle = function(){
             $scope.newStyle = { "name": $scope.sldName,
@@ -142,12 +165,17 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             });
         };
 
+        $scope.isgeophys = false;
         $scope.initRaster1Band = function() {
             $scope.dataType = 'coverage';
             $scope.providerId = 'generic_world_tif';
             $scope.layerName = 'cloudsgrey';
             $scope.newStyle.rules[0].symbolizers[0]['@symbol'] = 'raster';
             $scope.initDataProperties();
+
+            provider.isGeophysic({providerId: $scope.providerId, dataId: $scope.layerName}, function(response) {
+                $scope.isgeophys = (response.value == 'true');
+            });
         };
 
         $scope.initRasterNBands = function() {
@@ -173,16 +201,10 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             });
         };
 
-        $scope.isgeophys = false;
         $scope.initScopeStyle = function() {
             style.listAll({}, function(response) {
                 $dashboard($scope, response.styles, true);
             });
-
-            provider.isGeophysic({providerId: $scope.providerId, dataId: $scope.layerName}, function(response) {
-                $scope.isgeophys = (response.value == 'true');
-            });
-
         };
 
         $scope.aceLoaded = function(_editor) {

@@ -370,8 +370,7 @@ cstlAdminApp.factory('StyleSharedService', ['$modal', 'style', 'webService', '$g
                             // For portraying
                             return null;
                         },
-                        newStyle: function() { return null },
-                        pageSld: function() {  return 'views/style/chooseType.html' }
+                        newStyle: function() { return null }
                     }
                 });
 
