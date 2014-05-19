@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.xml.bind.annotation.XmlTransient;
 import org.constellation.admin.EmbeddedDatabase;
 
 /**
@@ -98,6 +99,7 @@ public class SensorRecord extends Record {
         return owner;
     }
     
+    @XmlTransient
     public InputStream getMetadata() throws SQLException {
         ensureConnectionNotClosed();
         return session.readSensorMetadata(id);
