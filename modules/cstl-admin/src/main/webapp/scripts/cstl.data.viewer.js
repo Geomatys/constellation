@@ -82,7 +82,8 @@ DataViewer = {
         return layer;
     },
 
-    createLayerWithStyle : function(cstlUrlPrefix, layerName, providerId, style, filter){
+    createLayerWithStyle : function(cstlUrlPrefix, layerName, providerId, style, sldProvider, filter){
+        var sldProvName = (sldProvider) ? sldProvider : "sld";
         var layer = new OpenLayers.Layer.WMS(layerName,
                 cstlUrlPrefix +'api/1/portrayal/portray/style',
             {
@@ -92,7 +93,7 @@ DataViewer = {
                 sld_version: '1.1.0',
                 format:      'image/png',
                 SLDID:        style,
-                SLDPROVIDER:  "sld",
+                SLDPROVIDER:  sldProvName,
                 CQLFILTER:    filter
             },
             {

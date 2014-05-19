@@ -21,7 +21,7 @@ cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', '$
           templateUrl: 'views/modalLoader.html',
           controller: 'ModalInstanceCtrl'
         });
-        style.listAll({}, function(response) {
+        style.listAll({provider: 'sld'}, function(response) {
             $dashboard($scope, response.styles, true);
             $scope.filtertype = "";
             modalLoader.close();
@@ -33,7 +33,7 @@ cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', '$
                 var providerId = $scope.selected.Provider;
                 style.delete({provider: providerId, name: styleName}, {},
                     function() { $growl('success','Success','Style '+ styleName +' successfully deleted');
-                        style.listAll({}, function(response) {
+                        style.listAll({provider: 'sld'}, function(response) {
                             $scope.fullList = response.styles;
                         });
                     },
@@ -230,7 +230,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         };
 
         $scope.initScopeStyle = function() {
-            style.listAll({}, function(response) {
+            style.listAll({provider: 'sld'}, function(response) {
                 $dashboard($scope, response.styles, true);
             });
         };
@@ -475,13 +475,14 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             if ($scope.dataType.toLowerCase() === 'coverage' || $scope.dataType.toLowerCase() === 'raster') {
                 $scope.addPalette();
             }
+
             if($scope.newStyle.name==""){
                 $scope.noName=true;
             }
             else{
                 $scope.noName=false;
-                style.createjson({provider: 'sld'}, $scope.newStyle, function() {
-                    var layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName, $scope.providerId, $scope.newStyle.name);
+                style.createjson({provider: 'sld_temp'}, $scope.newStyle, function() {
+                    var layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName, $scope.providerId, $scope.newStyle.name, "sld_temp");
                     var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
                     if ($scope.layerName === 'CNTR_BN_60M_2006') {
                         DataViewer.layers = [layerData];

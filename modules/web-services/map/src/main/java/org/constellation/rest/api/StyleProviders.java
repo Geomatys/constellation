@@ -95,7 +95,7 @@ public final class StyleProviders {
     @GET
     @Path("{id}/style/available")
     public Response getAvailableStyles(final @PathParam("id") String id) throws Exception {
-        return ok(new StyleListBrief(StyleProviderConfig.getAvailableStyles(id)));
+        return ok(new StyleListBrief(StyleProviderConfig.getAvailableStyles(id, null)));
     }
 
     /**

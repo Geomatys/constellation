@@ -76,6 +76,7 @@ public class MapSetup implements ServletContextListener {
         }
 
         initializeDefaultStyles();
+        initializeDefaultTempStyles();
 
         initializeDefaultVectorData();
         initializeDefaultRasterData();
@@ -217,6 +218,49 @@ public class MapSetup implements ServletContextListener {
         } catch (ConfigurationException ex) {
             LOGGER.log(Level.WARNING, "An error occurred when creating default styles for default SLD provider.", ex);
         }
+    }
+
+    /**
+     * Initialize default temporary styles for generic data.
+     */
+    private void initializeDefaultTempStyles() {
+        // Create default SLD provider containing default styles.
+        StyleProvider provider = StyleProviders.getInstance().getProvider("sld_temp");
+        final String sldPath = ConfigDirectory.getStyleTempDirectory().getPath();
+        if (provider == null) {
+            // Acquire SLD provider service instance.
+            ProviderFactory sldService = null;
+            for (final ProviderFactory service : StyleProviders.getInstance().getFactories()) {
+                if (service.getName().equals("sld")) {
+                    sldService = service;
+                    break;
+                }
+            }
+            if (sldService == null) {
+                LOGGER.log(Level.WARNING, "SLD temp provider service not found.");
+                return;
+            }
+
+            // Prepare create provider process inputs.
+            final ParameterDescriptorGroup sourceDesc = sldService.getProviderDescriptor();
+            final ParameterValueGroup source = sourceDesc.createValue();
+            source.parameter("id").setValue("sld_temp");
+            source.parameter("providerType").setValue("sld");
+            source.groups("sldFolder").get(0).parameter("path").setValue(sldPath);
+
+            // Create SLD provider.
+            try {
+                final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateProviderDescriptor.NAME);
+                final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
+                inputs.parameter(CreateProviderDescriptor.PROVIDER_TYPE_NAME).setValue("sld");
+                inputs.parameter(CreateProviderDescriptor.SOURCE_NAME).setValue(source);
+                desc.createProcess(inputs).call();
+            } catch (NoSuchIdentifierException ignore) { // should never happen
+            } catch (ProcessException ex) {
+                LOGGER.log(Level.WARNING, "An error occurred when creating default SLD temp provider.", ex);
+            }
+        }
+
     }
 
     /**

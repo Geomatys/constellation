@@ -297,7 +297,7 @@ public final class ConfigDirectory {
 	}
     
     /**
-     * Give Metadata directory {@link java.io.File} defined on constellaiton.properties or
+     * Give Metadata directory {@link java.io.File} defined on constellation.properties or
      * by default on .constellation-data/metadata from user home directory
      *
      * @return metadata directory as {@link java.io.File}
@@ -323,10 +323,10 @@ public final class ConfigDirectory {
     }
 
     /**
-     * Give Metadata directory {@link java.io.File} defined on constellaiton.properties or
+     * Give styles directory {@link java.io.File} defined on constellation.properties or
      * by default on .constellation-data/metadata from user home directory
      *
-     * @return metadata directory as {@link java.io.File}
+     * @return styles directory as {@link java.io.File}
      */
     public static File getStyleDirectory() {
         final File constellationStyleFolder;
@@ -339,10 +339,24 @@ public final class ConfigDirectory {
                 LOGGER.log(Level.INFO, "The configuration path {0} is not a directory", STYLE_DIRECTORY);
             }
         } else {
-            constellationStyleFolder = new File(System.getProperty("user.home") + "/.constellation-data", "style");
+            constellationStyleFolder = new File(getDataDirectory(), "style");
             if(constellationStyleFolder.mkdirs()){
                 LOGGER.log(Level.INFO, "style folder created");
             }
+        }
+
+        return constellationStyleFolder;
+    }
+
+    /**
+     * Give temporary styles directory.
+     *
+     * @return temporary styles directory as {@link java.io.File}
+     */
+    public static File getStyleTempDirectory() {
+        final File constellationStyleFolder = new File(getDataDirectory(), "style_temp");
+        if(constellationStyleFolder.mkdirs()){
+            LOGGER.log(Level.INFO, "style folder created");
         }
 
         return constellationStyleFolder;

@@ -163,7 +163,12 @@ public final class StyleProviderConfig extends Static {
         final List<StyleBrief> beans = new ArrayList<>();
         for (final String key : provider.getKeys()) {
             StyleRecord record = ConfigurationEngine.getStyle(key, providerId);
-            StyleType typeSearched = StyleType.valueOf(category.toUpperCase());
+            final StyleType typeSearched;
+            if (category == null) {
+                typeSearched = StyleType.ALL;
+            } else {
+                typeSearched = StyleType.valueOf(category.toUpperCase());
+            }
             if(typeSearched.equals(StyleType.ALL) || record.getType().equals(typeSearched)){
                 final StyleBrief bean = new StyleBrief();
                 bean.setName(key);

@@ -201,7 +201,7 @@ cstlAdminApp.factory('dataListing', ['$resource',
 
 cstlAdminApp.factory('style', ['$resource',
     function ($resource) {
-        return $resource('@cstl/api/1/SP/all/style/available;jsessionid=', {}, {
+        return $resource('@cstl/api/1/SP/:provider/style/available;jsessionid=', {}, {
             'listAll': { method: 'GET',    isArray: false },
             'get': {method:'GET', url: '@cstl/api/1/SP/:provider/style/:name;jsessionid='},
             'createjson':  { method: 'PUT',    url: '@cstl/api/1/SP/:provider/style/create;jsessionid='},
