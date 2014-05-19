@@ -53,7 +53,7 @@
 			<div class="col-md-4"></div>
 			<div class="col-md-4">
 				<h1 translate="login.title">Authentication</h1>
-
+				<div id="msg-error" style="visibility:hidden; border-color:rgb(216, 154, 154); background-color:pink;padding: 8px;" class="alert alert-data" translate="login.error">Login or password incorrect.</div>
 				<form class="form" role="form"
 					action="j_spring_security_check"
 					method="post">
@@ -80,7 +80,8 @@
 </div>
 
 <!-- build:js scripts/scripts.js -->
-
+<script type="text/javascript" src="scripts/jquery.js"></script>
+<script type="text/javascript" src="scripts/login.js"></script>
 <!-- endbuild -->
 </body>
 

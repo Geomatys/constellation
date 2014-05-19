@@ -621,7 +621,9 @@
                 "authentication": "<strong>Erreur d'authentification!</strong> Veuillez vérifier vos identifiants de connexion."
             }
         },
-        "title": "S'authentifier"
+        "title": "S'authentifier",
+        "error": "Identifiant ou mot de passe incorrect.",
+        "title": "Authentification"
     },
     "logs": {
         "filter": "Filtrer",

@@ -675,7 +675,8 @@
             "error": {
                 "authentication": "<strong>Authentication failed!</strong> Please check your credentials and try again."
             }
-        }
+        },
+        "error": "Login or password incorrect."
     },
     "settings": {
         "title": "User settings for [<b>{{username}}</b>]",
