@@ -933,7 +933,7 @@ public final class Session implements Closeable {
     public DataRecord readData(final QName name, final String providerId) throws SQLException {
         ensureNonNull("name",       name);
         ensureNonNull("providerId", providerId);
-        if (name.getNamespaceURI() != null) {
+        if (name.getNamespaceURI() != null && !name.getNamespaceURI().isEmpty()) {
             return new Query(READ_DATA_NMSP).with(name.getLocalPart(), name.getNamespaceURI(), providerId).select().getFirst(DataRecord.class);
         } else {
             return new Query(READ_DATA).with(name.getLocalPart(), providerId).select().getFirst(DataRecord.class);

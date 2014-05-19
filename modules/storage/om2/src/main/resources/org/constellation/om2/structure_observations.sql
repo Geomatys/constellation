@@ -21,9 +21,9 @@ CREATE TABLE "om"."mesures" (
     "id"                integer NOT NULL,
     "time"              timestamp,
     "value"             character varying(100),
-    "uom"               character varying(20),
+    "uom"               character varying(100),
     "field_type"        character varying(30),
-    "field_name"        character varying(30),
+    "field_name"        character varying(100),
     "field_definition"  character varying(200)
 );
 
