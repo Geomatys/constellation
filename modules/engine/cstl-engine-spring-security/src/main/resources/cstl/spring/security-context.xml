@@ -26,7 +26,7 @@
 
   <http request-matcher="ant" use-expressions="true">
     <intercept-url pattern="/sql.jsp" access="hasRole('cstl-admin')" />
-    <form-login  default-target-url="/spring/auth/loggedin" always-use-default-target="true" login-page="/login.html" />
+    <form-login  default-target-url="/spring/auth/loggedin" always-use-default-target="true" login-page="/login.html" authentication-failure-url="/login.html?failed"/>
     <logout invalidate-session="true" delete-cookies="JSESSIONID" logout-url="/logout" logout-success-url="/spring/auth/loggedout" />
     <session-management session-authentication-strategy-ref="sessionAuthenticationStrategy" />
   </http>
