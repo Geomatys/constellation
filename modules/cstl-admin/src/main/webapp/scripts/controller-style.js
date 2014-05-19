@@ -75,7 +75,23 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             pageSld: 'views/style/chooseType.html'
         };
 
+        $scope.newStyle = newStyle;
+        $scope.serviceName = serviceName || null;
+
         function initSldPage() {
+            if ($scope.newStyle) {
+                $scope.chooseType = true;
+                switch ($scope.newStyle.rules[0].symbolizers[0]['@symbol']){
+                    case "point": $scope.page.pageSld = 'views/style/point.html'; break;
+                    case "polygon": $scope.page.pageSld = 'views/style/polygone.html'; break;
+                    case "line": $scope.page.pageSld = 'views/style/ligne.html'; break;
+                    case "text": $scope.page.pageSld = 'views/style/texte.html'; break;
+                    case "raster": $scope.page.pageSld = 'views/style/raster.html'; break;
+                    default: $scope.page.pageSld = 'views/style/chooseType.html'; $scope.chooseType = false; break;
+                }
+                return;
+            }
+
             $scope.chooseType = false;
 
             if ($scope.selectedLayer != null) {
@@ -92,9 +108,6 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             }
         }
         initSldPage();
-
-        $scope.newStyle = newStyle;
-        $scope.serviceName = serviceName || null;
 
         $scope.goBack = function() {
             initSldPage();

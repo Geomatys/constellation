@@ -450,18 +450,11 @@ cstlAdminApp.factory('StyleSharedService', ['$modal', 'style', 'webService', '$g
             },
 
             showStyleEdit : function(scope, response) {
-
-                if(response.rules[0].symbolizers[0]['@symbol'] == 'line'){
-                    var typeURL = "views/style/ligne.html";
-                } else if(response.rules[0].symbolizers[0]['@symbol'] == 'point'){
-                    var typeURL = "views/style/point.html";
-                }
-                var modal = $modal.open({
+                $modal.open({
                     templateUrl: 'views/modalStyleEdit.html',
                     controller: 'StyleModalController',
                     resolve: {
                         newStyle: function() { return response},
-                        pageSld: function() {  return typeURL },
                         selectedLayer: function() {  return null },
                         serviceName: function() {  return null },
                         exclude: function() {  return null }
