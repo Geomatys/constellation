@@ -18,6 +18,7 @@
  */
 package org.constellation;
 
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -48,6 +49,22 @@ public final class GeotkInstaller implements ServletContextListener{
             //Initialize geotoolkit
             Installation.allowSystemPreferences = false;
             ImageIO.scanForPlugins();
+
+            /*
+             *TODO : Remove this hack when wf reader will be merged with Geotk Tiff reader.
+             * We are forced to invoke tiff service setup first to ensure tiff reader / writer will be priorize at wf reader initialization.
+             */
+            try {
+                Class.forName("org.geotoolkit.internal.image.io.SetupGeoTiff").getMethod("initialize", (Class[]) null).invoke(null, (Object[]) null);
+            } catch (ClassNotFoundException e) {
+                // Geotiff module not in Class-path. Ignore it
+                LOGGER.log(Level.INFO, "Geotiff package has not been found, it cannot be priorized.");
+            } catch (ReflectiveOperationException e) {
+                // Should never happen.
+                LOGGER.log(Level.INFO, "An error happened while Geotiff setup.", e);
+                throw new AssertionError(e);
+            }
+
             Setup.initialize(null);
 
             try {
