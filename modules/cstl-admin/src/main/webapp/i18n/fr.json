@@ -1248,7 +1248,7 @@
     "sensors.information.title":"Capteurs disponibles",
     "sensor.obervation":"Observation",
     "tasks.information.title":"Traitements disponibles",
-    "tasks.notask":"Pas de traitement en cours",
+    "tasks.notask":"Pas de traitement en cours d'execution",
     "mapcontext.information.title":"Compositions cartographiques disponibles",
     "group":{
         "title":"Gestion des groupes",
