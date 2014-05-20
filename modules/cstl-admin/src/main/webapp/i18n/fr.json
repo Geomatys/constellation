@@ -1246,7 +1246,7 @@
         "style.create":"Vous devez sélectionner une donnée afin de lui associer le style créé."
     },
     "sensors.information.title":"Capteurs disponibles",
-    "sensor.obervation":"Observation capteur",
+    "sensor.obervation":"Observation",
     "tasks.information.title":"Traitements disponibles",
     "mapcontext.information.title":"Compositions cartographiques disponibles",
     "group":{
