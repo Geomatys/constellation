@@ -375,6 +375,10 @@ ul.unstyled {
     border-bottom-color: transparent;
 }
 @media (max-width: 767px){
+    .accueil_logo img{
+        width:100%;
+        max-width:400px;
+    }
     .new-service-form-label{
         margin-top:7px;
     }

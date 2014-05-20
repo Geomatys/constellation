@@ -394,7 +394,7 @@
                 "label": "Statistiques du serveur"
             }
         },
-        "title": "Bienvenue dans Constellation !",
+        "title": "Bienvenue !",
         "webservices": {
             "button": {
                 "label": "Créer un service web"

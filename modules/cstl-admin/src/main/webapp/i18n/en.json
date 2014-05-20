@@ -269,7 +269,7 @@
             "button.label": "Show statistics",
             "title.label": "Server statistics"
         },
-        "title": "Welcome on Constellation!",
+        "title": "Welcome!",
         "webservices": {
             "button.label": "Create web service",
             "summary": "<p>You can create a new service and after, add data on it.</p><p>Constellation managed services : </p>",
