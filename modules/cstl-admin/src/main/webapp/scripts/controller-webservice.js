@@ -678,11 +678,10 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
                     .success(function (data, status, headers, config) {
                         // Build map
                         var capabilities = WmtsViewer.format.read(data);
-                        WmtsViewer.initMap('dataMap', capabilities);
+                        WmtsViewer.initMap('dataMap');
                         var layerData = WmtsViewer.createLayer(layerName, $scope.service.identifier, capabilities);
                         WmtsViewer.map.addLayer(layerData);
-                        var maxExtent = capabilities.contents.layers[0].bounds;
-                        WmtsViewer.map.zoomToExtent(maxExtent, true);
+                        WmtsViewer.map.zoomToMaxExtent();
                         modalLoader.close();
                     });
             } else {
