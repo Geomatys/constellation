@@ -6,8 +6,10 @@
     </div>
 
     <div>
+        <span ng-if="tt==null" translate="tasks.notask" style="margin-left:20px;">No current process</span>
         <div class="panel panel-default"
              ng-repeat="(id,tt) in tasks">
+
             <div class="panel-heading">
                 <h4 class="panel-title">
                     {{tt.title}} {{tt.status}}

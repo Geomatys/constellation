@@ -962,6 +962,7 @@
     "sensors.information.title":"Available sensors",
     "sensor.obervation":"Sensor observation",
     "tasks.information.title":"Available tasks",
+    "tasks.notask":"No current process",
     "mapcontext.information.title":"Available map context",
     "group":{
         "title":"Roles Dashboard",
