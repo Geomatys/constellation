@@ -86,43 +86,36 @@
           <form class="form-horizontal" role="form">
               <div class="form-group">
                   <label  class="col-xs-3 col-md-2 control-label" translate="sldeditor.edition.join">Join</label>
-
                   <div class="col-sm-9 col-md-10 btn-group" data-toggle="buttons">
-                      <label class="btn btn-default" ng-click="newStyle.rules[0].symbolizers[0].stroke.lineCap = 'square'">
-                          <input name="lineCap" type="radio" ng-model="$newStyle.rules[0].symbolizers[0].stroke.lineCap"
-                                 value="square"><img src="images/jointure2.png">
+                      <label class="btn btn-default" ng-model="newStyle.rules[0].symbolizers[0].stroke.lineCap" btn-radio="'square'">
+                          <img src="images/jointure2.png">
                       </label>
-                      <label class="btn btn-default" ng-click="newStyle.rules[0].symbolizers[0].stroke.lineCap = 'round'">
-                          <input name="lineCap" type="radio" ng-model="newStyle.rules[0].symbolizers[0].stroke.lineCap"
-                                 value="round"><img src="images/jointure3.png">
+                      <label class="btn btn-default" ng-model="newStyle.rules[0].symbolizers[0].stroke.lineCap" btn-radio="'round'">
+                          <img src="images/jointure3.png">
                       </label>
-                      <label class="btn btn-default" ng-click="newStyle.rules[0].symbolizers[0].stroke.lineCap = 'butt'">
-                          <input name="lineCap" type="radio" ng-model="newStyle.rules[0].symbolizers[0].stroke.lineCap"
-                                 value="butt"><img src="images/jointure1.png">
+                      <label class="btn btn-default" ng-model="newStyle.rules[0].symbolizers[0].stroke.lineCap" btn-radio="'butt'">
+                          <img src="images/jointure1.png">
                       </label>
                   </div>
               </div>
               <div class="form-group">
                   <label  class="col-xs-3 col-md-2 control-label" translate="sldeditor.edition.cap">Cap</label>
                   <div class="col-sm-9 col-md-10 btn-group" data-toggle="buttons">
-                      <label class="btn btn-default" ng-click="newStyle.rules[0].symbolizers[0].stroke.lineJoin = 'miter'">
-                          <input name="lineJoin" type="radio" ng-model="newStyle.rules[0].symbolizers[0].stroke.lineJoin"
-                                 value="miter"><img src="images/angle1.png">
+                      <label class="btn btn-default" ng-model="newStyle.rules[0].symbolizers[0].stroke.lineJoin" btn-radio="'miter'">
+                          <img src="images/angle1.png">
                       </label>
-                      <label class="btn btn-default" ng-click="newStyle.rules[0].symbolizers[0].stroke.lineJoin = 'round'">
-                          <input name="lineJoin" type="radio" ng-model="newStyle.rules[0].symbolizers[0].stroke.lineJoin"
-                                 value="round"><img src="images/angle2.png">
+                      <label class="btn btn-default" ng-model="newStyle.rules[0].symbolizers[0].stroke.lineJoin" btn-radio="'round'">
+                          <img src="images/angle2.png">
                       </label>
-                      <label class="btn btn-default" ng-click="newStyle.rules[0].symbolizers[0].stroke.lineJoin = 'bevel'">
-                          <input name="lineJoin" type="radio" ng-model="newStyle.rules[0].symbolizers[0].stroke.lineJoin"
-                                 value="bevel"><img src="images/angle3.png">
+                      <label class="btn btn-default" ng-model="newStyle.rules[0].symbolizers[0].stroke.lineJoin" btn-radio="'bevel'">
+                          <img src="images/angle3.png">
                       </label>
                   </div>
               </div>
             <div class="form-group">
               <label class="col-sm-4 col-md-2 control-label" translate="sldeditor.edition.offset">Offset</label>
               <div class="col-sm-4">
-                <input type="text" class="form-control" ng-model="newStyle.rules[0].symbolizers[0].stroke.dashOffset">
+                <input type="number" class="form-control" ng-model="newStyle.rules[0].symbolizers[0].stroke.dashOffset">
               </div>
             </div>
           </form>

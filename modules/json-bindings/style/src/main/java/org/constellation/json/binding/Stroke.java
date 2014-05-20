@@ -40,7 +40,7 @@ public final class Stroke implements StyleElement<org.opengis.style.Stroke> {
     private String lineJoin = "round";
     private String lineCap = "round";
     private float[] dashArray;
-    private String dashOffset;
+    private double dashOffset;
 
     public Stroke() {
     }
@@ -55,7 +55,7 @@ public final class Stroke implements StyleElement<org.opengis.style.Stroke> {
         lineJoin = stroke.getLineJoin().evaluate(null, String.class);
         lineCap = stroke.getLineCap().evaluate(null, String.class);
         dashArray = stroke.getDashArray();
-        dashOffset = stroke.getDashOffset().evaluate(null, String.class);
+        dashOffset = Double.parseDouble(stroke.getDashOffset().evaluate(null, String.class));
     }
 
     public String getColor() {
@@ -94,12 +94,12 @@ public final class Stroke implements StyleElement<org.opengis.style.Stroke> {
         this.dashArray = dashArray;
     }
 
-    public String getDashOffset() {
+    public double getDashOffset() {
         return dashOffset;
     }
 
     public void setDashOffset(String dashOffset) {
-        this.dashOffset = dashOffset;
+        this.dashOffset = Double.parseDouble(dashOffset);
     }
 
     public String getLineJoin() {
