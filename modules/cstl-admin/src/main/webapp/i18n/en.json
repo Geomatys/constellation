@@ -378,7 +378,8 @@
                 "select.label": "Choose file",
                 "sensor.label": "Sensor data",
                 "title": "Upload data",
-                "vector.label": "Vector data"
+                "vector.label": "Vector data",
+                "associate":"Associate with a sensor"
             }
         },
         "layer.label": "layers",

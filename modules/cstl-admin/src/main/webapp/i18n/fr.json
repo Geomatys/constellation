@@ -556,7 +556,8 @@
                     "title": "Envoyer une donnée",
                     "vector": {
                         "label": "Donnée vecteur"
-                    }
+                    },
+                    "associate":"Associer à un capteur"
                 }
             },
             "layer": {
