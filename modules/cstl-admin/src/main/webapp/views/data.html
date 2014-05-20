@@ -79,12 +79,17 @@
                                     <span class="item-title">{{data.Name}}</span>
                                     <span class="pull-right text-right item-list-style" style="font-size:14px;">{{data.Type}}</span>
                                     <span ng-if="data.Type=='COVERAGE' && data.subtype=='multiDimentions'" class="pull-right coverage-type-nd item-list-style" style="color:#30718c;">nD </span>
-                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Point' || data.Subtype=='MultiPoint') && data!=selected" src="images/vector-point.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
+                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Point') && data!=selected" src="images/vector-point.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
+                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='MultiPoint') && data!=selected" src="images/vector-multipoint.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
                                     <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Polygon' || data.Subtype=='MultiPolygon') && data!=selected" src="images/vector-poly.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
-                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='LineString' || data.Subtype=='MultiLineString') && data!=selected" src="images/vector-line.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
-                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Point' || data.Subtype=='MultiPoint') && data==selected" src="images/vector-point-selected.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
+                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='LineString') && data!=selected" src="images/vector-line.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
+                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='MultiLineString') && data!=selected" src="images/vector-polyline.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
+
+                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Point') && data==selected" src="images/vector-point-selected.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
+                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='MultiPoint') && data==selected" src="images/vector-multipoint-selected.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
                                     <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Polygon' || data.Subtype=='MultiPolygon') && data==selected" src="images/vector-poly-selected.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
-                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='LineString' || data.Subtype=='MultiLineString') && data==selected" src="images/vector-line-selected.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
+                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='LineString') && data==selected" src="images/vector-line-selected.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
+                                    <img ng-if="data.Type=='VECTOR' && (data.Subtype=='MultiLineString') && data==selected" src="images/vector-polyline-selected.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
                                 </div>
                                 <div class="bottom">
                                     <div class="block">

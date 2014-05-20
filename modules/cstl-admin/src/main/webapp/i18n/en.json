@@ -894,6 +894,7 @@
         "tasks":"Tasks",
         "sensors":"Sensors Dashboard",
         "tasks":"Tasks Dashboard",
+        "task":"Current tasks",
         "mapcontext":"Map Context Dashboard"
     },
     "com.codahale.metrics.servlet.AbstractInstrumentedFilter.requests": "Metrics",

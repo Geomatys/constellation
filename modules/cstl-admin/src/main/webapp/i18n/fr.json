@@ -1179,7 +1179,7 @@
         "create.service.source":"Source",
         "edit.service":"Edition du service",
         "process":"Processus",
-        "tasks":"Tâches",
+        "task":"Tâches en cours",
         "sensors":"Gestion des capteurs",
         "tasks":"Gestion des traitements",
         "mapcontext":"Gestion des compositions cartographiques"
