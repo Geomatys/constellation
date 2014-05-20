@@ -53,6 +53,7 @@ import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
+import org.geotoolkit.image.io.metadata.SpatialMetadataFormat;
 import org.geotoolkit.style.MutableFeatureTypeStyle;
 import org.geotoolkit.style.MutableRule;
 import org.geotoolkit.style.MutableStyle;
@@ -203,8 +204,7 @@ public final class DefaultConfigurator implements Configurator {
                                 final GridCoverageReader reader = fcr.acquireReader();
                                 final SpatialMetadata sm = reader.getCoverageMetadata(i);
                                 if (sm != null) {
-                                    final String rootNodeName = sm.getNativeMetadataFormatName();
-                                    final Node coverageRootNode = sm.getAsTree(rootNodeName);
+                                    final Node coverageRootNode = sm.getAsTree(SpatialMetadataFormat.GEOTK_FORMAT_NAME);
                                     MetadataMapBuilder.setCounter(0);
                                     final List<SimplyMetadataTreeNode> coverageMetadataList = MetadataMapBuilder.createSpatialMetadataList(coverageRootNode, null, 11, i);
                                     final CoverageMetadataBean coverageMetadataBean = new CoverageMetadataBean(coverageMetadataList);
