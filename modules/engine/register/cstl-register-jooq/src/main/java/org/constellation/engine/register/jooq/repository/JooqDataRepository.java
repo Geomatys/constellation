@@ -21,7 +21,6 @@ package org.constellation.engine.register.jooq.repository;
 import static org.constellation.engine.register.jooq.Tables.DATA;
 
 import org.constellation.engine.register.Data;
-import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.tables.records.DataRecord;
 import org.constellation.engine.register.repository.DataRepository;
 import org.springframework.stereotype.Component;
@@ -47,7 +46,24 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
 
     @Override
     public Data save(Data data) {
-        return null;
+        DataRecord newRecord = dsl.newRecord(DATA);
+        newRecord.setDate(data.getDate());
+        newRecord.setDescription(data.getDescription());
+        newRecord.setIsoMetadata(data.getIsoMetadata());
+        newRecord.setMetadata(data.getMetadata());
+        newRecord.setName(data.getName());
+        newRecord.setNamespace(data.getNamespace());
+        newRecord.setOwner(data.getOwner());
+        newRecord.setProvider(data.getProviderId());
+        newRecord.setType(data.getType());
+        newRecord.setTitle(data.getTitle());
+        newRecord.store();
+        return newRecord.into(Data.class);
+    }
+
+    @Override
+    public int delete(int id) {
+        return dsl.delete(DATA).where(DATA.ID.eq(id)).execute();
     }
 
 }

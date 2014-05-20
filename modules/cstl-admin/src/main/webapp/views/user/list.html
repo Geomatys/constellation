@@ -38,13 +38,13 @@
 				</tr>
 			</thead>
 
-			<tr ng-click="details($index)" style='cursor:pointer'
+			<tr  style='cursor:pointer'
 				ng-repeat="user in list | filter:filter | orderBy:predicate:reverse">
-				<td>{{user.login}}</td>
-				<td>{{user.firstname}}</td>
-				<td>{{user.lastname}}</td>
-				<td>{{user.email}}</td>
-				<td><span ng-repeat="role in user.roles">{{role}}</span>
+				<td ng-click="details($index)">{{user.login}}</td>
+				<td ng-click="details($index)">{{user.firstname}}</td>
+				<td ng-click="details($index)">{{user.lastname}}</td>
+				<td ng-click="details($index)">{{user.email}}</td>
+				<td ng-click="details($index)"><span ng-repeat="role in user.roles">{{role}}</span>
 				</td>
 				<td class="user-delete" ng-click="delete($index)"><span class="glyphicon glyphicon-trash"></span></td>
 

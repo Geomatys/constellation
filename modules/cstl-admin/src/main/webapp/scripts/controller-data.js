@@ -277,7 +277,7 @@ cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','data
         };
 
         $scope.getCurrentLang = function() {
-            return $translate.uses();
+            return $translate.use();
         };
 
         $scope.createMetadataTree = function(parentDivId, isCoverageMetadata){

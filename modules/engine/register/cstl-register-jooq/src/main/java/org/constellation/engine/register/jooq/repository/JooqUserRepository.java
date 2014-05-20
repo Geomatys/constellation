@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.constellation.engine.register.DomainUser;
 import org.constellation.engine.register.User;
 import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.tables.Domain;
@@ -39,6 +40,7 @@ import org.constellation.engine.register.repository.UserRepository;
 import org.jooq.DeleteConditionStep;
 import org.jooq.InsertSetMoreStep;
 import org.jooq.Record;
+import org.jooq.Record1;
 import org.jooq.Result;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectJoinStep;
@@ -67,20 +69,17 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
         super(User.class, USER);
     }
 
+    
     @Override
-    public List<User> all() {
-        return findAll();
-    }
-
-    public List<User> findAll() {
-
+    public List<DomainUser> findAllWithDomainAndRole() {
+     
         SelectJoinStep<Record> records = getSelectWithRolesAndDomains();
 
         records.execute();
 
         Result<Record> result = records.getResult();
 
-        List<User> dtos = mapUsers(result);
+        List<DomainUser> dtos = mapUsers(result);
 
         return dtos;
 
@@ -94,19 +93,19 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
         return records;
     }
 
-    private List<User> mapUsers(Result<Record> result) {
-        List<User> dtos = new ArrayList<User>();
+    private List<DomainUser> mapUsers(Result<Record> result) {
+        List<DomainUser> dtos = new ArrayList<>();
         Map<Record, Result<Record>> users = result.intoGroups(userTable.fields());
         for (Entry<Record, Result<Record>> record : users.entrySet()) {
-            User userDTO = mapUser(record);
+            DomainUser userDTO = mapUser(record);
 
             dtos.add(userDTO);
         }
         return dtos;
     }
 
-    private User mapUser(Entry<Record, Result<Record>> record) {
-        User userDTO = record.getKey().into(User.class);
+    private DomainUser mapUser(Entry<Record, Result<Record>> record) {
+        DomainUser userDTO = record.getKey().into(DomainUser.class);
 
         Map<Record, Result<Record>> roles = record.getValue().intoGroups(userXroleTable.fields());
         for (Record roleRecord : roles.keySet()) {
@@ -129,7 +128,7 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
 
     @Override
     @Transactional
-    public void update(User user) {
+    public User update(User user, List<String> roles) {
 
         UpdateConditionStep<UserRecord> update = dsl.update(USER).set(USER.EMAIL, user.getEmail())
                 .set(USER.LASTNAME, user.getLastname()).set(USER.FIRSTNAME, user.getFirstname())
@@ -142,21 +141,14 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
 
         deleteRoles.execute();
 
-        insertRoles(user);
+        insertRoles(user, roles);
 
-    }
-
-    private void insertRoles(User user) {
-        for (String role : user.getRoles()) {
-            InsertSetMoreStep<UserXRoleRecord> insertRole = dsl.insertInto(USER_X_ROLE)
-                    .set(USER_X_ROLE.LOGIN, user.getLogin()).set(USER_X_ROLE.ROLE, role);
-            insertRole.execute();
-        }
+        return user;
     }
 
     @Override
     @Transactional
-    public void insert(User user) {
+    public User insert(User user, List<String> roles) {
 
         InsertSetMoreStep<UserRecord> update = dsl.insertInto(USER).set(USER.EMAIL, user.getEmail())
                 .set(USER.LASTNAME, user.getLastname()).set(USER.FIRSTNAME, user.getFirstname())
@@ -164,12 +156,21 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
 
         update.execute();
 
-        insertRoles(user);
+        insertRoles(user, roles);
 
+        return user;
+    }
+
+    private void insertRoles(User user, List<String> roles) {
+        for (String role : roles) {
+            InsertSetMoreStep<UserXRoleRecord> insertRole = dsl.insertInto(USER_X_ROLE)
+                    .set(USER_X_ROLE.LOGIN, user.getLogin()).set(USER_X_ROLE.ROLE, role);
+            insertRole.execute();
+        }
     }
 
     @Override
-    public void delete(String userId) {
+    public int delete(String userId) {
         int deleteRole = deleteRole(userId);
 
         int removeUserFromAllDomain = domainRepository.removeUserFromAllDomain(userId);
@@ -177,7 +178,7 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
 
         LOGGER.debug("Delete " + deleteRole + " role references");
 
-        dsl.delete(USER).where(USER.LOGIN.eq(userId)).execute();
+        return dsl.delete(USER).where(USER.LOGIN.eq(userId)).execute();
 
     }
 
@@ -187,13 +188,36 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
     }
 
     @Override
-    public User findOneWithRolesAndDomains(String login) {
+    public DomainUser findOneWithRolesAndDomains(String login) {
         SelectConditionStep<Record> records = getSelectWithRolesAndDomains().where(userTable.LOGIN.eq(login));
         records.execute();
-        List<User> result = mapUsers(records.getResult());
+        List<DomainUser> result = mapUsers(records.getResult());
         if (result.size() == 0)
             return null;
         return result.get(0);
+    }
+
+    @Override
+    public boolean isLastAdmin(String login) {
+        Record1<Integer> where = dsl.selectCount().from(USER).join(USER_X_ROLE).onKey()
+                .where(USER_X_ROLE.ROLE.eq("cstl-admin").and(USER.LOGIN.ne(login))).fetchOne();
+        return where.value1() == 0;
+    }
+
+    @Override
+    public User findOne(String username) {
+        return dsl.select(USER.fields()).where(USER.LOGIN.eq(username)).fetchOneInto(User.class);
+    }
+
+    @Override
+    public List<String> getRoles(String login) {
+        return dsl.select().from(USER).where(USER_X_ROLE.LOGIN.eq(login)).fetch(USER_X_ROLE.ROLE);
+    }
+
+
+    @Override
+    public int countUser() {
+        return dsl.selectCount().from(USER).fetchOne(0, int.class);
     }
 
 }

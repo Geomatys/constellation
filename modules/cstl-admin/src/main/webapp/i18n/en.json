@@ -1,6 +1,7 @@
 {
 	"city": "City",
 	"country": "Country",
+	"Error": "Error",
 	"fax": "fax",
 	"name": "Name",
 	"organization": "Organization",
@@ -33,6 +34,7 @@
         }
     },
     "admin.contact.title": "Contact",
+    "admin.user.delete.error": "Could not delete this user.",
     "confirm.delete.style": "Do you really want to delete this style?",
     "create": {
         "accessconstraint": {

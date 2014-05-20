@@ -25,11 +25,19 @@ import static org.constellation.engine.register.jooq.Tables.PROVIDER;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Domain;
+import org.constellation.engine.register.User;
 import org.constellation.engine.register.jooq.AbstractJooqTestTestCase;
 import org.constellation.engine.register.jooq.Tables;
+import org.constellation.engine.register.jooq.TestSamples;
+import org.constellation.engine.register.Provider;
+import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.DomainRepository;
+import org.constellation.engine.register.repository.ProviderRepository;
+import org.constellation.engine.register.repository.UserRepository;
 import org.jooq.DSLContext;
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -37,6 +45,15 @@ public class JooqDomainRespositoryTestCase extends AbstractJooqTestTestCase {
 
     @Autowired
     private DomainRepository domainRepository;
+    
+    @Autowired
+    private DataRepository dataRepository;
+    
+    @Autowired
+    private UserRepository userRepository;
+    
+    @Autowired
+    private ProviderRepository providerRepository;
 
     @Autowired
     private DSLContext dsl;
@@ -46,44 +63,52 @@ public class JooqDomainRespositoryTestCase extends AbstractJooqTestTestCase {
         dump(domainRepository.findAll());
     }
 
-    // @Test
-    public void save() {
+    @Test
+    public void crude() {
         Domain domainDTO = new Domain("cadastre", "Domaine du cadastre");
         Domain save = domainRepository.save(domainDTO);
-        LOGGER.debug("New domains: " + domainDTO);
-    }
-
-    // @Test
-    public void update() {
-        Domain domainDTO = new Domain(3, "cadastre mec", "Domaine du cadastre");
-        domainRepository.update(domainDTO);
-        LOGGER.debug("New domains: " + domainDTO);
-
-    }
-
-    // @Test
-    public void delete() {
-        int n = domainRepository.delete(3);
-        LOGGER.debug("Delete " + n + " domains");
-    }
-
-    // @Test
-    public void testAddUserToDomain() {
-        Set<String> roles = new HashSet<String>();
-        roles.add("manager");
-        domainRepository.addUserToDomain("olivier", 2, roles);
-    }
-
-    // @Test
-    public void testRemoveUserFromDomain() {
-        int removeUserFromDomain = domainRepository.removeUserFromDomain("zozoz", 1);
-        LOGGER.debug("Removed: " + removeUserFromDomain);
+        Assert.assertNotNull("Should return saved object", save);
+        String description = "New description";
+        domainDTO.setDescription(description);
+        Domain update = domainRepository.update(domainDTO);
+        Assert.assertEquals("Sould have new decription", description, update.getDescription());
+        Assert.assertEquals("Should have deleted 1 record", 1, domainRepository.delete(save.getId()));
+        
     }
 
     @Test
+    public void testAddUserToDomain() {
+        User user = userRepository.insert(TestSamples.newAdminUser(), TestSamples.adminRoles());
+        Domain domain = domainRepository.save(TestSamples.newDomain());
+        Set<String> roles = new HashSet<String>();
+        roles.add("manager");
+        
+        int[] added = domainRepository.addUserToDomain(user.getLogin(), domain.getId(), roles);
+        
+        Assert.assertArrayEquals(new int[]{1}, added);
+        
+        domainRepository.removeUserFromDomain(user.getLogin(), domain.getId());
+        
+        userRepository.delete(user.getLogin());
+    }
+
+   
+
+    @Test
     public void addDataToDomain() {
-        int i = domainRepository.addDataToDomain(1, 1);
-        LOGGER.debug("Added " + i);
+        Domain domain = domainRepository.save(TestSamples.newDomain());
+        User user = userRepository.insert(TestSamples.newAdminUser(), TestSamples.adminRoles());
+        Provider provider = providerRepository.insert(TestSamples.newProvider(user));
+        Data data = dataRepository.save(TestSamples.newData(user, provider));
+        
+        int i = domainRepository.addDataToDomain(data.getId(), domain.getId());
+        Assert.assertEquals("Should have inserted 1 record", 1, i);
+        int j = domainRepository.removeDataFromDomain(data.getId(), domain.getId());
+        Assert.assertEquals("Should have deleted 1 record", 1, i);
+        domainRepository.delete(domain.getId());
+        dataRepository.delete(data.getId());
+        providerRepository.delete(provider.getId());
+        userRepository.delete(user.getLogin());
     }
 
     @Test
@@ -110,7 +135,7 @@ public class JooqDomainRespositoryTestCase extends AbstractJooqTestTestCase {
         dump(domain);
     }
     
-    @Test
+    //@Test
     public void test() {
         dump(dsl.select().from(Tables.DATA_X_DOMAIN).fetch());
         dump(dsl.select().from(Tables.DATA).fetch());

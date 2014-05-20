@@ -27,14 +27,10 @@ import static org.constellation.engine.register.jooq.Tables.SERVICE;
 import java.util.List;
 
 import org.constellation.engine.register.Provider;
-import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.tables.Data;
 import org.constellation.engine.register.jooq.tables.DataXDomain;
 import org.constellation.engine.register.jooq.tables.records.ProviderRecord;
 import org.constellation.engine.register.repository.ProviderRepository;
-import org.jooq.Record;
-import org.jooq.Record1;
-import org.jooq.SelectConditionStep;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -84,5 +80,25 @@ public class JooqProviderRepository extends AbstractJooqRespository<ProviderReco
                 .on(LAYER.DATA.eq(data.ID)).join(SERVICE).on(SERVICE.ID.eq(LAYER.SERVICE))
                 .where(LAYER.NAME.eq(layerid).and(SERVICE.IDENTIFIER.eq(serviceId)).and(SERVICE.TYPE.eq(serviceType)))
                 .fetchOneInto(Provider.class);
+    }
+
+    @Override
+    public Provider insert(Provider provider) {
+        ProviderRecord newRecord = dsl.newRecord(PROVIDER);
+        newRecord.setConfig(provider.getConfig());
+        newRecord.setIdentifier(provider.getIdentifier());
+        newRecord.setImpl(provider.getImpl());
+        newRecord.setMetadata(provider.getMetadata());
+        newRecord.setMetadataId(provider.getMetadataId());
+        newRecord.setOwner(provider.getOwner());
+        newRecord.setType(provider.getType());
+        newRecord.setParent(provider.getParent());
+        newRecord.store();
+        return newRecord.into(Provider.class);
+    }
+
+    @Override
+    public int delete(int id) {
+        return dsl.delete(PROVIDER).where(PROVIDER.ID.eq(id)).execute();
     }
 }

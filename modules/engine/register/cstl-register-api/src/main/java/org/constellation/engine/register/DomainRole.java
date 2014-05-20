@@ -18,12 +18,56 @@
  */
 package org.constellation.engine.register;
 
-public interface DomainRole {
+import java.util.HashSet;
+import java.util.Set;
 
-    int getId();
+public class DomainRole {
+
+    private String name;
+
+    private String description;
     
-    String getName();
+    private Set<String> permissions = new HashSet<String>();
+
+    public DomainRole() {
+    }
+
+    public DomainRole(String name, String description, Set<String> roles) {
+        super();
+        this.name = name;
+        this.description = description;
+        this.permissions = roles;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        return "DomainRole [name=" + name + ", description=" + description + "]";
+    }
+
+    public Set<String> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(Set<String> roles) {
+        this.permissions = roles;
+    }
     
-    String getDescription();
     
+
 }

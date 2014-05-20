@@ -29,29 +29,21 @@ public class Domain implements Serializable {
     private static final long serialVersionUID = 1L;
     
     
-    private int id;
+    private Integer id;
     private String name;
     private String description;
 
-    
-    private Set<Integer> layers;
-    
-    private Set<Integer> services;
-    
-    private Set<Integer> datas;
-    
-    private Set<Integer> styles;
     
     public Domain() {
     }
     
     public Domain(String name, String description) {
-        this(0, name, description);
-    }
-    public Domain(int id, String name, String description) {
-        this.id = id;
         this.name = name;
         this.description = description;
+    }
+    public Domain(int id, String name, String description) {
+        this(name, description);
+        this.id = id;
     }
 
     public void setId(int id) {
@@ -81,28 +73,7 @@ public class Domain implements Serializable {
     }
 
 
-    public Set<Integer> getLayers() {
-        return layers;
-    }
-
-    public Set<Integer> getServices() {
-        return this.services;
-    }
-
-    public Set<Integer> getDatas() {
-        return this.datas;
-    }
-
-
-    public Set<Integer> getStyles() {
-        return this.styles;
-    }
-
-
-    public void setServices(Set<Integer> services) {
-        this.services = services;
-        
-    }
+   
 
     @Override
     public String toString() {

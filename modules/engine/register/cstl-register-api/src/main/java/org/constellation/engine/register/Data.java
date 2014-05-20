@@ -22,7 +22,7 @@ import java.util.List;
 
 public class Data {
 
-    private int id;
+    private Integer id;
     private String name;
     private String namespace;
     private int providerId;
@@ -33,14 +33,15 @@ public class Data {
     private String owner;
     private List<Integer> styleIds;
     private String metadata;
+    private String isoMetaData;
 
     
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
     
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;        
     }
 
@@ -127,13 +128,24 @@ public class Data {
         this.metadata = metaData;
     }
 
+    
+    public String getIsoMetadata() {
+        return isoMetaData;
+    }
+
+   public void setIsoMetaData(String isoMetaData) {
+    this.isoMetaData = isoMetaData;
+}
 
     @Override
     public String toString() {
         return "Data [id=" + id + ", name=" + name + ", namespace=" + namespace + ", providerId=" + providerId
                 + ", type=" + type + ", date=" + date + ", title=" + title + ", description=" + description
-                + ", owner=" + owner + ", styleIds=" + styleIds + ", metadata=" + metadata + "]";
+                + ", owner=" + owner + ", styleIds=" + styleIds + ", metadata=" + metadata + ", isoMetaData="
+                + isoMetaData + "]";
     }
+
+
 
     
     

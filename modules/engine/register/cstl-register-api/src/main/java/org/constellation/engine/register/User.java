@@ -24,19 +24,15 @@ import java.util.Set;
 public class User {
 
     private String lastname;
-    
+
     private String firstname;
-    
+
     private String email;
-    
+
     private String login;
 
     private String password;
 
-    private Set<String> roles = new HashSet<String>();
-    
-    private Set<Integer> domains = new HashSet<Integer>();
-    
     public String getLogin() {
         return login;
     }
@@ -77,46 +73,10 @@ public class User {
         this.email = email;
     }
 
-
-    public Set<String> getRoles() {
-        return roles;
-    }
-    
-    public void setRoles(Set<String> roles) {
-        this.roles = roles;
-    }
-
-    
-    public boolean addRole(String role) {
-        return roles.add(role);
-    }
-    
-
-    public boolean removeRole(String role) {
-        return roles.remove(role);
-    }
-    
-    
-    public Set<Integer> getDomains() {
-        return domains;
-    }
-    
-    public void setDomains(Set<Integer> domains) {
-        this.domains = domains;
-    }
-
-    public void addDomain(int domainId) {
-        domains.add(domainId);
-    }
-
     @Override
     public String toString() {
         return "User [lastname=" + lastname + ", firstname=" + firstname + ", email=" + email + ", login=" + login
-                + ", password=" + password + ", roles=" + roles + ", domains=" + domains + "]";
+                + ", password=" + password + "]";
     }
-    
-  
-
-    
 
 }

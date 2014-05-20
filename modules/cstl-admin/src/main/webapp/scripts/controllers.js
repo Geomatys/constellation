@@ -30,8 +30,8 @@ cstlAdminApp.controller('HeaderController', ['$scope','$http',
 	      });
 }]);
 
-cstlAdminApp.controller('MainController', ['$scope','$location','webService','dataListing','ProcessService','$growl', 'UserResource', 'TaskService',
-    function ($scope, $location, webService, dataListing, Process, $growl, UserResource, task) {
+cstlAdminApp.controller('MainController', ['$scope','$location','webService','dataListing','ProcessService','$growl', 'UserResource', 'GeneralResource', 'TaskService',
+    function ($scope, $location, webService, dataListing, Process, $growl, UserResource, GeneralResource, task) {
         $scope.countStats = function() {
             webService.listAll({}, function(response) {
                 var count = 0;
@@ -61,8 +61,8 @@ cstlAdminApp.controller('MainController', ['$scope','$location','webService','da
                 $growl('error', 'Error', 'Unable to count process');
             });
 
-            UserResource.query(function(response) {
-                $scope.nbusers = response.length;
+            GeneralResource.counts(function(response) {
+                $scope.nbusers = response.nbuser;
             }, function() {
                 $scope.nbusers = 1;
                 $growl('error', 'Error', 'Unable to count users');
@@ -73,7 +73,7 @@ cstlAdminApp.controller('MainController', ['$scope','$location','webService','da
 cstlAdminApp.controller('LanguageController', ['$scope', '$translate',
     function ($scope, $translate) {
         $scope.changeLanguage = function (languageKey) {
-            $translate.uses(languageKey);
+            $translate.use(languageKey);
         };
     }]);
 
@@ -158,9 +158,9 @@ cstlAdminApp.controller('SettingsController', ['$scope', 'resolvedAccount', 'Acc
         };
     }]);
 
-cstlAdminApp.controller('UserController', ['$scope', 'UserResource', '$modal',
-  function ($scope, UserResource, $modal) {
-    $scope.list = UserResource.query();
+cstlAdminApp.controller('UserController', ['$scope', 'UserResource', '$modal', '$growl', '$translate', 
+  function ($scope, UserResource, $modal, $growl, $translate) {
+    $scope.list = UserResource.query({"withDomainAndRoles": true});
     $scope.details = function(i) {
         $modal.open({
             templateUrl: 'views/user/details.html',
@@ -192,8 +192,13 @@ cstlAdminApp.controller('UserController', ['$scope', 'UserResource', '$modal',
         });
     };
     $scope.delete = function(i){
-    	UserResource.delete({id: $scope.list[i].login});
-    	$scope.list.splice(i, 1);
+    	UserResource.delete({id: $scope.list[i].login}, {} , function(resp){
+    	  $scope.list.splice(i, 1);
+    	}, function(err){
+    	  $translate(['Error','admin.user.delete.error']).then(function (translations) {
+    	    $growl('error', translations.Error,  translations['admin.user.delete.error']);
+    	  });
+    	});
     };
 }]);
 

@@ -137,6 +137,15 @@ cstlAdminApp.factory('LogsService', ['$resource',
     }]);
 
 
+cstlAdminApp.factory('GeneralResource', ['$resource', '$cookies',
+     function ($resource, $cookies) {
+        return $resource('@cstl/api/1/general/jsessionid=', null,
+          {
+           'counts': {url: "@cstl/api/1/general/counts;jsessionid="}
+          });
+}]);
+
+
 cstlAdminApp.factory('UserResource', ['$resource', '$cookies',
    function ($resource, $cookies) {
         return $resource('@cstl/api/1/user/:id;jsessionid=', null,

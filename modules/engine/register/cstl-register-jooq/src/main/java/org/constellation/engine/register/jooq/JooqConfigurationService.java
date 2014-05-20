@@ -32,7 +32,6 @@ import org.constellation.ServiceDef;
 import org.constellation.configuration.DataBrief;
 import org.constellation.dto.Service;
 import org.constellation.engine.register.ConfigurationService;
-import org.constellation.engine.register.Property;
 import org.constellation.engine.register.ServiceExtraConfig;
 import org.constellation.engine.register.repository.PropertyRepository;
 import org.constellation.engine.register.repository.ServiceRepository;

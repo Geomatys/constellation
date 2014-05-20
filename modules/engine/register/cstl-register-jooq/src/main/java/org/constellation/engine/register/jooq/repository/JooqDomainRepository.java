@@ -25,7 +25,6 @@ import static org.constellation.engine.register.jooq.Tables.PROVIDER;
 import static org.constellation.engine.register.jooq.Tables.SERVICE_X_DOMAIN;
 import static org.constellation.engine.register.jooq.Tables.USER_X_DOMAIN_X_DOMAINROLE;
 
-import java.text.NumberFormat.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -42,14 +41,11 @@ import org.constellation.engine.register.jooq.tables.records.ServiceXDomainRecor
 import org.constellation.engine.register.jooq.tables.records.UserXDomainXDomainroleRecord;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
-import org.constellation.engine.register.repository.UserRepository;
 import org.jooq.Batch;
-import org.jooq.DeleteWhereStep;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
 import org.jooq.Result;
-import org.jooq.SelectHavingStep;
-import org.jooq.SelectJoinStep;
+import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -90,8 +86,11 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
         newRecord.setDescription(domain.getDescription());
         newRecord.setName(domain.getName());
         if (newRecord.store() > 0) {
-            domain.setId(newRecord.getId());
-            return domain;
+            Domain result = new Domain();
+            result.setDescription(domain.getDescription());
+            result.setName(domain.getName());
+            result.setId(newRecord.getId());
+            return result;
         }
         return null;
     }
@@ -122,9 +121,10 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
 
     }
 
-    public void update(Domain domainDTO) {
+    public Domain update(Domain domainDTO) {
         dsl.update(DOMAIN).set(DOMAIN.NAME, domainDTO.getName()).set(DOMAIN.DESCRIPTION, domainDTO.getDescription())
                 .where(DOMAIN.ID.eq(domainDTO.getId())).execute();
+        return new Domain(domainDTO.getId(), domainDTO.getName(), domainDTO.getDescription());
     }
 
     public int delete(int domainId) {
@@ -191,12 +191,13 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
     @Override
     public List<User> findUsers(int domainId) {
         List<User> result = new ArrayList<User>();
-        SelectJoinStep<Record> groupBy = dsl.select().from(Tables.USER).join(USER_X_DOMAIN_X_DOMAINROLE).onKey();
+        SelectConditionStep<Record> groupBy = dsl.select().from(Tables.USER).join(USER_X_DOMAIN_X_DOMAINROLE).onKey()
+                .where(USER_X_DOMAIN_X_DOMAINROLE.DOMAIN_ID.eq(domainId));
         groupBy.execute();
         Map<Record, Result<Record>> intoGroups = groupBy.getResult().intoGroups(Tables.USER.fields());
         for (Entry<Record, Result<Record>> userRecord : intoGroups.entrySet()) {
             User user = userRecord.getKey().into(User.class);
-            
+
             result.add(user);
         }
         return result;

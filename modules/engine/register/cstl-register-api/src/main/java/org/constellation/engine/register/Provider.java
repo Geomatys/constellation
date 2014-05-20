@@ -45,6 +45,8 @@ public class Provider implements Serializable {
 
     private String parent;
 
+    private String metadataId;
+
     public int getId() {
         return id;
     }
@@ -113,11 +115,20 @@ public class Provider implements Serializable {
         return StringUtils.isNotBlank(parent);
     }
 
+    public void setMetadataId(String metadataId) {
+        this.metadataId = metadataId;
+    }
+    
+    public String getMetadataId() {
+        return metadataId;
+    }
     @Override
     public String toString() {
         return "Provider [id=" + id + ", identifier=" + identifier + ", metadata=" + metadata + ", owner=" + owner
-                + ", config=" + config + ", impl=" + impl + ", type=" + type + ", parent=" + parent + "]";
+                + ", config=" + config + ", impl=" + impl + ", type=" + type + ", parent=" + parent + ", metadataId="
+                + metadataId + "]";
     }
+
 
     
     

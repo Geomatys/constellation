@@ -31,5 +31,7 @@ public interface DataRepository {
     Data fromLayer(String layerAlias, String providerId);
 
     Data save(Data data);
+
+    int delete(int id);
     
 }

@@ -20,19 +20,30 @@ package org.constellation.engine.register.repository;
 
 import java.util.List;
 
+import org.constellation.engine.register.DomainUser;
 import org.constellation.engine.register.User;
 
 
 public interface UserRepository {
 
-    List<User> all();
-
-    void insert(User user);
-
-    void update(User user);
+    List<User> findAll();
     
-    void delete(String string);
+    List<DomainUser> findAllWithDomainAndRole();
     
-    User findOneWithRolesAndDomains(String login);
+    User insert(User user, List<String> roles);
+
+    User update(User user, List<String> roles);
+    
+    int delete(String string);
+    
+    DomainUser findOneWithRolesAndDomains(String login);
+
+    boolean isLastAdmin(String login);
+
+    User findOne(String username);
+
+    List<String> getRoles(String login);
+
+    int countUser();
     
 }

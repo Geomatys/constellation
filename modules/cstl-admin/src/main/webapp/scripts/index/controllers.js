@@ -33,7 +33,7 @@ cstlIndexApp.controller('MainController', [ '$scope', '$location',
 cstlIndexApp.controller('LanguageController', [ '$scope', '$translate',
     function($scope, $translate) {
       $scope.changeLanguage = function(languageKey) {
-        $translate.uses(languageKey);
+        $translate.use(languageKey);
       };
     } ]);
 

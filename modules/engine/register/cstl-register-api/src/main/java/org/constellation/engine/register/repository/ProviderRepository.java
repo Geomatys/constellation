@@ -38,6 +38,10 @@ import org.constellation.engine.register.Provider;
 
     Provider getProviderParentIdOfLayer(String serviceType, String serviceId, String layerid);
 
+    Provider insert(Provider newProvider);
+
+    int delete(int id);
+
 
     
 }

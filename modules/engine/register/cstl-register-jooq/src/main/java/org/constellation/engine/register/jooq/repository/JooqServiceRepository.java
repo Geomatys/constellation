@@ -29,10 +29,7 @@ import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.tables.records.ServiceRecord;
 import org.constellation.engine.register.repository.ServiceRepository;
 import org.jooq.Record;
-import org.jooq.Record1;
-import org.jooq.Result;
 import org.jooq.SelectConditionStep;
-import org.jooq.SelectJoinStep;
 import org.springframework.stereotype.Component;
 
 @Component

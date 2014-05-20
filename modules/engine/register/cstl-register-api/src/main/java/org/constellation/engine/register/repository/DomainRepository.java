@@ -32,7 +32,7 @@ public interface DomainRepository {
     
     Domain save(Domain domain);
 
-    void update(Domain domain);
+    Domain update(Domain domain);
 
     int delete(int domainId);
 
