@@ -533,7 +533,8 @@
             "dashboard.tabs": {
                 "data": "Data",
                 "description": "Service Description",
-                "metadata": "Service Metadata"
+                "metadata": "Service Metadata",
+                "rights": "Service Rights"
             },
             "dashboard.data.title": "Data list",
             "dashboard.header.title": "Title",

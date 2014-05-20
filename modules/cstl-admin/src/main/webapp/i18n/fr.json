@@ -1001,7 +1001,8 @@
             "dashboard.tabs": {
                 "data": "Données",
                 "description": "Description du service",
-                "metadata": "Métadonnées du service"
+                "metadata": "Métadonnées du service", 
+                "rights": "Gestion des droits"
             },
             "dashboard.data.title": "Liste des données",
             "dashboard.header.title": "Titre",

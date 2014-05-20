@@ -372,20 +372,29 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
         $scope.tabdata = true;
         $scope.tabdesc = false;
         $scope.tabmetadata = false;
+        $scope.tabrights = false;
 
         $scope.selectTab = function(item) {
             if (item === 'tabdata') {
                 $scope.tabdata = true;
                 $scope.tabdesc = false;
                 $scope.tabmetadata = false;
+                $scope.tabrights = false;
             } else if (item === 'tabdesc') {
                 $scope.tabdata = false;
                 $scope.tabdesc = true;
                 $scope.tabmetadata = false;
-            } else {
+                $scope.tabrights = false;
+            } else if (item === 'tabmetadata') {
                 $scope.tabdata = false;
                 $scope.tabdesc = false;
                 $scope.tabmetadata = true;
+                $scope.tabrights = false;
+            } else {
+                $scope.tabdata = false;
+                $scope.tabdesc = false;
+                $scope.tabmetadata = false;
+                $scope.tabrights = true;
             }
         };
 
