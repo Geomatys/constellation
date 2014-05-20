@@ -19,16 +19,22 @@
 
 package org.constellation.ws.rest;
 
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.io.WKTWriter;
 import java.io.File;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.Consumes;
@@ -48,10 +54,14 @@ import javax.xml.namespace.QName;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.dao.DataRecord;
 import org.constellation.admin.dao.SensorRecord;
 import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.StringList;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SensorMLTree;
+import org.constellation.dto.SimpleValue;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.coveragestore.CoverageStoreProvider;
 import org.constellation.provider.observationstore.ObservationStoreProvider;
@@ -59,12 +69,15 @@ import org.constellation.sos.configuration.SensorMLGenerator;
 import org.constellation.sos.ws.SOSUtils;
 import org.constellation.util.Util;
 import static org.constellation.utils.RESTfulUtilities.ok;
+import org.geotoolkit.observation.ObservationReader;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
 
 import static org.geotoolkit.sml.xml.SensorMLUtilities.*;
 import org.geotoolkit.sos.netcdf.ExtractionResult;
 import org.geotoolkit.sos.netcdf.ExtractionResult.ProcedureTree;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.util.FactoryException;
 
 /**
  *
@@ -80,6 +93,11 @@ public class SensorRest {
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
     public Response getSensorList() {
+        final SensorMLTree result = getFullSensorMLTree();
+        return Response.ok(result).build();
+    }
+    
+    private SensorMLTree getFullSensorMLTree() {
         final List<SensorMLTree> values = new ArrayList<>();
         final List<SensorRecord> sensors = ConfigurationEngine.getSensors();
         for (final SensorRecord sensor : sensors) {
@@ -92,8 +110,7 @@ public class SensorRest {
             t.setChildren(children);
             values.add(t);
         }
-        final SensorMLTree result = SensorMLTree.buildTree(values);
-        return Response.ok(result).build();
+        return SensorMLTree.buildTree(values);
     }
     
     @DELETE
@@ -241,6 +258,148 @@ public class SensorRest {
         return Response.ok(sensorsImported).build();
     }
     
+    @GET
+    @Path("observedProperties/identifiers")
+    public Response getObservedPropertiesIds() throws Exception {
+        try {
+            final Set<String> phenomenons = new HashSet<>();
+            final List<SensorRecord> records = ConfigurationEngine.getSensors();
+            for (SensorRecord record : records) {
+                final List<DataRecord> datas = ConfigurationEngine.getDataLinkedSensor(record.getIdentifier());
+                
+                // look for provider ids
+                final Set<String> providerIDs = new HashSet<>();
+                for (DataRecord data : datas) {
+                    providerIDs.add(data.getProvider().getIdentifier());
+                }
+                
+                for (String providerId : providerIDs) {
+                    final ObservationReader reader = getObservationReader(providerId);
+                    phenomenons.addAll(reader.getPhenomenonNames());
+                }
+            }
+            return ok(new StringList(phenomenons));
+        } catch (DataStoreException | SQLException ex) {
+            throw new ConfigurationException(ex);
+        }
+    }
+    
+    @GET
+    @Path("sensors/identifiers/{observedProperty}")
+    public Response getSensorIdsForObservedProperty(final @PathParam("observedProperty") String observedProperty) throws Exception {
+        try {
+            final Set<String> sensorIDS = new HashSet<>();
+            final List<SensorRecord> records = ConfigurationEngine.getSensors();
+            for (SensorRecord record : records) {
+                final List<DataRecord> datas = ConfigurationEngine.getDataLinkedSensor(record.getIdentifier());
+
+                // look for provider ids
+                final Set<String> providerIDs = new HashSet<>();
+                for (DataRecord data : datas) {
+                    providerIDs.add(data.getProvider().getIdentifier());
+                }
+
+                for (String providerId : providerIDs) {
+                    final ObservationReader reader = getObservationReader(providerId);
+                    if (reader.existPhenomenon(observedProperty)) {
+                        sensorIDS.addAll(reader.getProcedureNames());
+                    }
+                }
+            }
+            return ok(new StringList(sensorIDS));
+            
+        } catch (DataStoreException | SQLException ex) {
+            throw new ConfigurationException(ex);
+        }
+    }
+    
+    @GET
+    @Path("observedProperty/identifiers/{sensorID}")
+    public Response getObservedPropertiesForSensor(final @PathParam("sensorID") String sensorID) throws ConfigurationException {
+        try {
+            final SensorRecord sensor = ConfigurationEngine.getSensor(sensorID);
+            if (sensor != null) {
+                final Set<String> phenomenons = new HashSet<>();
+                final List<DataRecord> datas = ConfigurationEngine.getDataLinkedSensor(sensorID);
+                
+                // look for provider ids
+                final Set<String> providerIDs = new HashSet<>();
+                for (DataRecord data : datas) {
+                    providerIDs.add(data.getProvider().getIdentifier());
+                }
+                
+                for (String providerId : providerIDs) {
+                    final ObservationReader reader = getObservationReader(providerId);
+                    phenomenons.addAll(reader.getPhenomenonNames());
+                }
+
+                return ok(new StringList(phenomenons));
+            } else {
+                return Response.status(404).build();
+            }
+        } catch (DataStoreException | SQLException ex) {
+            throw new ConfigurationException(ex);
+        }
+    }
+    
+    @GET
+    @Path("location/{sensorID}")
+    public Response getWKTSensorLocation(final @PathParam("sensorID") String sensorID) throws ConfigurationException {
+        try {
+            final SensorRecord sensor = ConfigurationEngine.getSensor(sensorID);
+            if (sensor != null) {
+                final List<DataRecord> datas = ConfigurationEngine.getDataLinkedSensor(sensorID);
+
+                // look for provider ids
+                final Set<String> providerIDs = new HashSet<>();
+                for (DataRecord data : datas) {
+                    providerIDs.add(data.getProvider().getIdentifier());
+                }
+
+                final List<Geometry> jtsGeometries = new ArrayList<>();
+                final SensorMLTree root            = getFullSensorMLTree();
+                final SensorMLTree current         = root.find(sensorID);
+                for (String providerId : providerIDs) {
+                    final ObservationReader reader = getObservationReader(providerId);
+                    jtsGeometries.addAll(SOSUtils.getJTSGeometryFromSensor(current, reader));
+                }
+
+                if (jtsGeometries.size() == 1) {
+                    final WKTWriter writer = new WKTWriter();
+                    return ok(new SimpleValue(writer.write(jtsGeometries.get(0))));
+                } else if (!jtsGeometries.isEmpty()) {
+                    final Geometry[] geometries   = jtsGeometries.toArray(new Geometry[jtsGeometries.size()]);
+                    final GeometryCollection coll = new GeometryCollection(geometries, new GeometryFactory());
+                    final WKTWriter writer        = new WKTWriter();
+                    return ok(new SimpleValue(writer.write(coll)));
+                }
+                return ok(new SimpleValue(""));
+                
+            } else {
+                return Response.status(404).build();
+            }
+        } catch (DataStoreException | FactoryException | TransformException | SQLException ex) {
+            throw new ConfigurationException(ex);
+        }
+    }
+    
+    private ObservationReader getObservationReader(final String providerID) throws ConfigurationException {
+        final org.constellation.provider.Provider provider = DataProviders.getInstance().getProvider(providerID);
+        if (provider instanceof ObservationStoreProvider) {
+            final ObservationStoreProvider omProvider = (ObservationStoreProvider) provider;
+            return omProvider.getObservationStore().getReader();
+        } else if (provider instanceof CoverageStoreProvider) {
+            final CoverageStoreProvider covProvider = (CoverageStoreProvider) provider;
+            if (covProvider.isSensorAffectable()) {
+                return covProvider.getObservationStore().getReader();
+            } else {
+                throw new ConfigurationException("Only available on netCDF file for coverage for now");
+            }
+        } else {
+            throw new ConfigurationException("Available only on Observation provider (and netCDF coverage) for now");
+        }
+    }
+
     private List<File> getFiles(final File directory) {
         final List<File> results = new ArrayList<>();
         if (directory.isDirectory()) {

@@ -56,8 +56,6 @@ import org.constellation.sos.ws.SOSConstants;
 import org.constellation.sos.ws.SOSUtils;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.factory.FactoryNotFoundException;
-import org.geotoolkit.geometry.jts.JTS;
-import org.geotoolkit.gml.GeometrytoJTS;
 import org.geotoolkit.gml.xml.AbstractGeometry;
 import org.geotoolkit.gml.xml.v321.TimeInstantType;
 import org.geotoolkit.gml.xml.v321.TimePeriodType;
@@ -65,14 +63,11 @@ import org.geotoolkit.observation.ObservationFilterReader;
 import org.geotoolkit.observation.ObservationReader;
 import org.geotoolkit.observation.ObservationWriter;
 import org.geotoolkit.observation.xml.AbstractObservation;
-import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.observation.Observation;
 import org.opengis.observation.ObservationCollection;
 import org.opengis.observation.Phenomenon;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.temporal.Instant;
 import org.opengis.temporal.Period;
@@ -91,15 +86,6 @@ import static org.geotoolkit.sml.xml.SensorMLUtilities.*;
  */
 public class SOSConfigurer extends OGCConfigurer {
 
-    private static CoordinateReferenceSystem WGS84; 
-    static {
-        try {
-            WGS84 = CRS.decode("CRS:84");
-        } catch (FactoryException ex) {
-            LOGGER.log(Level.WARNING, "Unable to retrieve CRS:84", ex);
-        }
-    }
-    
     /**
      * Create a new {@link SOSConfigurer} instance.
      */
@@ -403,7 +389,7 @@ public class SOSConfigurer extends OGCConfigurer {
         try {
             final SensorMLTree root          = getSensorTree(id);
             final SensorMLTree current       = root.find(sensorID);
-            final List<Geometry> jtsGeometries = getJTSGeometryFromSensor(current, reader);
+            final List<Geometry> jtsGeometries = SOSUtils.getJTSGeometryFromSensor(current, reader);
             if (jtsGeometries.size() == 1) {
                 final WKTWriter writer = new WKTWriter();
                 return writer.write(jtsGeometries.get(0));
@@ -417,25 +403,6 @@ public class SOSConfigurer extends OGCConfigurer {
         } catch (DataStoreException | FactoryException | TransformException ex) {
             throw new ConfigurationException(ex);
         }
-    }
-    
-    private List<Geometry> getJTSGeometryFromSensor(final SensorMLTree sensor, final ObservationReader reader) throws DataStoreException, FactoryException, TransformException {
-        if ("Component".equals(sensor.getType())) {
-            final AbstractGeometry geom = reader.getSensorLocation(sensor.getId(), "2.0.0");
-            if (geom != null) {
-                Geometry jtsGeometry = GeometrytoJTS.toJTS(geom);
-                // reproject to CRS:84
-                final MathTransform mt = CRS.findMathTransform(geom.getCoordinateReferenceSystem(), WGS84);
-                return Arrays.asList(JTS.transform(jtsGeometry, mt));
-            }
-        } else {
-            final List<Geometry> geometries = new ArrayList<>();
-            for (SensorMLTree child : sensor.getChildren()) {
-                geometries.addAll(getJTSGeometryFromSensor(child, reader));
-            }
-            return geometries;
-        }
-        return new ArrayList<>();
     }
     
     public String getObservationsCsv(final String id, final String sensorID, final List<String> observedProperties, final Date start, final Date end) throws ConfigurationException {

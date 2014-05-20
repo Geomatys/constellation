@@ -19,6 +19,7 @@
 
 package org.constellation.sos.ws;
 
+import com.vividsolutions.jts.geom.Geometry;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,12 +39,16 @@ import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.dto.SensorMLTree;
 import org.constellation.util.ReflectionUtilities;
+import org.geotoolkit.geometry.jts.JTS;
+import org.geotoolkit.gml.GeometrytoJTS;
 import org.geotoolkit.gml.xml.AbstractFeature;
 import org.geotoolkit.gml.xml.AbstractGeometry;
 import org.geotoolkit.gml.xml.BoundingShape;
 import org.geotoolkit.gml.xml.Envelope;
+import org.geotoolkit.observation.ObservationReader;
 import org.geotoolkit.observation.ObservationStoreException;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.sml.xml.AbstractClassification;
 import org.geotoolkit.sml.xml.AbstractClassifier;
 import org.geotoolkit.sml.xml.AbstractComponents;
@@ -65,8 +70,12 @@ import org.geotoolkit.swe.xml.TextBlock;
 import org.geotoolkit.temporal.object.ISODateParser;
 import org.opengis.geometry.primitive.Point;
 import org.opengis.observation.Observation;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 import org.opengis.temporal.Period;
 import org.opengis.temporal.Position;
+import org.opengis.util.FactoryException;
 
 /**
  *
@@ -79,6 +88,15 @@ public final class SOSUtils {
      */
     private static final Logger LOGGER = Logging.getLogger("org.constellation.sos");
 
+    private static CoordinateReferenceSystem WGS84; 
+    static {
+        try {
+            WGS84 = CRS.decode("CRS:84");
+        } catch (FactoryException ex) {
+            LOGGER.log(Level.WARNING, "Unable to retrieve CRS:84", ex);
+        }
+    }
+    
     private SOSUtils() {}
     
     /**
@@ -528,6 +546,25 @@ public final class SOSUtils {
             }
         }
         return results;
+    }
+    
+    public static List<Geometry> getJTSGeometryFromSensor(final SensorMLTree sensor, final ObservationReader reader) throws DataStoreException, FactoryException, TransformException {
+        if ("Component".equals(sensor.getType())) {
+            final AbstractGeometry geom = reader.getSensorLocation(sensor.getId(), "2.0.0");
+            if (geom != null) {
+                Geometry jtsGeometry = GeometrytoJTS.toJTS(geom);
+                // reproject to CRS:84
+                final MathTransform mt = CRS.findMathTransform(geom.getCoordinateReferenceSystem(), WGS84);
+                return Arrays.asList(JTS.transform(jtsGeometry, mt));
+            }
+        } else {
+            final List<Geometry> geometries = new ArrayList<>();
+            for (SensorMLTree child : sensor.getChildren()) {
+                geometries.addAll(getJTSGeometryFromSensor(child, reader));
+            }
+            return geometries;
+        }
+        return new ArrayList<>();
     }
     
     public static AbstractSensorML unmarshallSensor(final File f) throws JAXBException, DataStoreException {
