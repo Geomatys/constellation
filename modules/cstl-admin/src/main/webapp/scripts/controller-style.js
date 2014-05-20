@@ -165,6 +165,11 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             $scope.providerId = 'generic_shp';
             $scope.layerName = 'CNTR_RG_60M_2006';
             $scope.newStyle.rules[0].symbolizers[0]['@symbol'] = 'polygon';
+            if (!$scope.newStyle.rules[0].symbolizers[0].stroke) {
+                $scope.newStyle.rules[0].symbolizers[0].stroke = {
+                    width: 1
+                };
+            }
         };
 
         $scope.initLine = function() {
@@ -172,6 +177,11 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             $scope.providerId = 'generic_shp';
             $scope.layerName = 'CNTR_BN_60M_2006';
             $scope.newStyle.rules[0].symbolizers[0]['@symbol'] = 'line';
+            if (!$scope.newStyle.rules[0].symbolizers[0].stroke) {
+                $scope.newStyle.rules[0].symbolizers[0].stroke = {
+                    width: 1
+                };
+            }
         };
 
         $scope.initPoint = function() {
@@ -186,6 +196,11 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             $scope.providerId = 'generic_shp';
             $scope.layerName = 'CNTR_BN_60M_2006';
             $scope.newStyle.rules[0].symbolizers[0]['@symbol'] = 'text';
+            if (!$scope.newStyle.rules[0].symbolizers[0].font) {
+                $scope.newStyle.rules[0].symbolizers[0].font = {
+                    size: 14
+                };
+            }
             provider.dataDesc({providerId: $scope.providerId, dataId: $scope.layerName}, function(response) {
                 $scope.dataProperties = response.properties;
             }, function() {
