@@ -181,7 +181,7 @@ public final class DefaultConfigurator implements Configurator {
                             LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
                         }
                         if (fType != null) {
-                            final String subtype = fType.getGeometryDescriptor().getType().getName().getLocalPart();
+                            final String subtype = fType.getGeometryDescriptor().getType().getBinding().getSimpleName();
                             ConfigurationEngine.updateDataSubtype(name, provider.getId(), subtype);
                         }
                     }
