@@ -84,34 +84,47 @@
 
         <div ng-show="display" class="style_bloc">
           <form class="form-horizontal" role="form">
-              <div class="form-group">
-                  <label  class="col-xs-3 col-md-2 control-label" translate="sldeditor.edition.join">Join</label>
-                  <div class="col-sm-9 col-md-10 btn-group" data-toggle="buttons">
-                      <label class="btn btn-default" ng-model="newStyle.rules[0].symbolizers[0].stroke.lineCap" btn-radio="'square'">
-                          <img src="images/jointure2.png">
-                      </label>
-                      <label class="btn btn-default" ng-model="newStyle.rules[0].symbolizers[0].stroke.lineCap" btn-radio="'round'">
-                          <img src="images/jointure3.png">
-                      </label>
-                      <label class="btn btn-default" ng-model="newStyle.rules[0].symbolizers[0].stroke.lineCap" btn-radio="'butt'">
-                          <img src="images/jointure1.png">
-                      </label>
-                  </div>
+              <label  class="col-xs-3 col-md-2 control-label" translate="sldeditor.edition.join">Join</label>
+
+              <div class="btn-group select select-block col-xs-9">
+                  <button class="btn dropdown-toggle btn-default" data-toggle="dropdown" ng-model="newStyle.rules[0].symbolizers[0].stroke.lineCap">
+                      <span class="filter-option pull-left"><img class="img_icone" src="images/icone_lineCap_{{newStyle.rules[0].symbolizers[0].stroke.lineCap}}.png"></span>&nbsp;
+                      <span class="caret"></span>
+                  </button>
+                  <span class="dropdown-arrow dropdown-arrow-inverse"></span>
+                  <ul class="dropdown-menu dropdown-inverse dropdown-images" role="menu" style="overflow-y: auto; min-width:60px; min-height: 108px;">
+                      <li ng-click="newStyle.rules[0].symbolizers[0].stroke.lineCap = 'square'">
+                          <a><img class="img_icone" src="images/icone_lineCap_square.png"></a>
+                      </li>
+                      <li ng-click="newStyle.rules[0].symbolizers[0].stroke.lineCap = 'round'">
+                          <a><img class="img_icone" src="images/icone_lineCap_round.png"></a>
+                      </li>
+                      <li ng-click="newStyle.rules[0].symbolizers[0].stroke.lineCap = 'butt'">
+                          <a><img class="img_icone" src="images/icone_lineCap_butt.png"></a>
+                      </li>
+                  </ul>
               </div>
-              <div class="form-group">
-                  <label  class="col-xs-3 col-md-2 control-label" translate="sldeditor.edition.cap">Cap</label>
-                  <div class="col-sm-9 col-md-10 btn-group" data-toggle="buttons">
-                      <label class="btn btn-default" ng-model="newStyle.rules[0].symbolizers[0].stroke.lineJoin" btn-radio="'miter'">
-                          <img src="images/angle1.png">
-                      </label>
-                      <label class="btn btn-default" ng-model="newStyle.rules[0].symbolizers[0].stroke.lineJoin" btn-radio="'round'">
-                          <img src="images/angle2.png">
-                      </label>
-                      <label class="btn btn-default" ng-model="newStyle.rules[0].symbolizers[0].stroke.lineJoin" btn-radio="'bevel'">
-                          <img src="images/angle3.png">
-                      </label>
-                  </div>
+
+              <label  class="col-xs-3 col-md-2 control-label" translate="sldeditor.edition.cap">Cap</label>
+              <div class="btn-group select select-bloc col-xs-9">
+                  <button class="btn dropdown-toggle btn-default" data-toggle="dropdown" ng-model="newStyle.rules[0].symbolizers[0].stroke.lineJoin">
+                      <span class="filter-option pull-left"><img class="img_icone" src="images/icone_lineJoin_{{newStyle.rules[0].symbolizers[0].stroke.lineJoin}}.png"></span>&nbsp;
+                      <span class="caret"></span>
+                  </button>
+                  <span class="dropdown-arrow dropdown-arrow-inverse"></span>
+                  <ul class="dropdown-menu dropdown-inverse dropdown-images" role="menu" style="overflow-y: auto; min-width:60px; min-height: 108px;">
+                      <li ng-click="newStyle.rules[0].symbolizers[0].stroke.lineJoin = 'miter'">
+                          <a><img class="img_icone" src="images/icone_lineJoin_miter.png"></a>
+                      </li>
+                      <li ng-click="newStyle.rules[0].symbolizers[0].stroke.lineJoin = 'round'">
+                          <a><img class="img_icone" src="images/icone_lineJoin_round.png"></a>
+                      </li>
+                      <li ng-click="newStyle.rules[0].symbolizers[0].stroke.lineJoin = 'bevel'">
+                          <a><img class="img_icone" src="images/icone_lineJoin_bevel.png"></a>
+                      </li>
+                  </ul>
               </div>
+
             <div class="form-group">
               <label class="col-sm-4 col-md-2 control-label" translate="sldeditor.edition.offset">Offset</label>
               <div class="col-sm-4">
