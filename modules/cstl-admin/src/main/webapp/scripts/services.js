@@ -460,7 +460,7 @@ cstlAdminApp.factory('StyleSharedService', ['$modal', 'style', 'webService', '$g
                 }
             },
 
-            showStyleCreate : function() {
+            showStyleCreate : function(scope) {
                 var modal = $modal.open({
                     templateUrl: 'views/modalStyleCreate.html',
                     controller: 'StyleModalController',
@@ -472,10 +472,15 @@ cstlAdminApp.factory('StyleSharedService', ['$modal', 'style', 'webService', '$g
                         exclude: function() {  return null }
                     }
                 });
+                modal.result.then(function(item) {
+                    if (scope) {
+                        scope.init();
+                    }
+                });
             },
 
             showStyleEdit : function(scope, response) {
-                $modal.open({
+                var modal = $modal.open({
                     templateUrl: 'views/modalStyleEdit.html',
                     controller: 'StyleModalController',
                     resolve: {
@@ -483,6 +488,11 @@ cstlAdminApp.factory('StyleSharedService', ['$modal', 'style', 'webService', '$g
                         selectedLayer: function() {  return null },
                         serviceName: function() {  return null },
                         exclude: function() {  return null }
+                    }
+                });
+                modal.result.then(function(item) {
+                    if (scope) {
+                        scope.init();
                     }
                 });
             }

@@ -17,15 +17,19 @@
 
 cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', '$growl', 'StyleSharedService','$modal',
     function ($scope, $dashboard, style, $growl, StyleSharedService, $modal) {
-        var modalLoader = $modal.open({
-          templateUrl: 'views/modalLoader.html',
-          controller: 'ModalInstanceCtrl'
-        });
-        style.listAll({provider: 'sld'}, function(response) {
-            $dashboard($scope, response.styles, true);
-            $scope.filtertype = "";
-            modalLoader.close();
-        });
+        $scope.init = function() {
+            var modalLoader = $modal.open({
+                templateUrl: 'views/modalLoader.html',
+                controller: 'ModalInstanceCtrl'
+            });
+            style.listAll({provider: 'sld'}, function (response) {
+                $dashboard($scope, response.styles, true);
+                $scope.filtertype = "";
+                modalLoader.close();
+            }, function() {
+                modalLoader.close();
+            });
+        };
 
         $scope.deleteStyle = function() {
             if (confirm("Are you sure?")) {
