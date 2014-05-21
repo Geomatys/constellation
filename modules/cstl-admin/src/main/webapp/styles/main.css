@@ -1368,3 +1368,15 @@ vertical-align: middle;
     pointer-events: none;
     -webkit-font-smoothing: antialiased;
 }
+/* SLD Editor */
+.modal-dialog-sld h2{
+    font-size: 18px;
+}
+.modal-dialog-sld h3{
+    margin-top: 0;
+    font-size: 15px;
+    font-weight: bold;
+}
+.modal-dialog-sld label{
+    font-size: 13px;
+}
