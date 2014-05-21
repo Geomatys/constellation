@@ -97,6 +97,7 @@ public class OM2DataStoreTest extends AbstractReadingTests{
 
             final FeatureTypeBuilder featureTypeBuilder = new FeatureTypeBuilder();
             featureTypeBuilder.setName(name);
+            featureTypeBuilder.add(new DefaultName(nsCstl, "id"),String.class,1,1,false,null);
             featureTypeBuilder.add(new DefaultName(nsCstl, "position"),Geometry.class,1,1,false,null);
             featureTypeBuilder.setDefaultGeometry(new DefaultName(nsCstl, "position"));
 
