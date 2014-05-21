@@ -76,7 +76,7 @@
         </div>
         <div class="style_bloc">
           <h3  translate="sldeditor.edition.stroke">Stroke</h3>
-          <form class="form-horizontal" role="form">
+          <form class="form-horizontal form-style" role="form">
             <div class="form-group">
               <label class="col-sm-3 col-md-2 control-label" translate="sldeditor.edition.color">Color</label>
               <div class="col-sm-9 col-md-10">
@@ -117,7 +117,7 @@
               </div>
             </div>
             <div class="row">
-              <div class="col-sm-10 col-sm-offset-2">
+              <div class="col-sm-10 col-sm-offset-3 col-md-offset-2">
                 <button type="button" ng-click="display = !display" class="btn btn-sm btn-primary">
                   <span class="glyphicon" ng-class="{'glyphicon-plus': !display, 'glyphicon-minus': display}"></span>
                 </button>
@@ -126,44 +126,52 @@
           </form>
         </div>
         <div ng-show="display" class="style_bloc">
-          <form class="form-horizontal" role="form">
+          <form class="form-horizontal form-style" role="form">
               <div class="form-group">
-                  <label  class="col-xs-3 col-md-2 control-label" translate="sldeditor.edition.join">Join</label>
-                  <div class="col-sm-9 col-md-10 btn-group" data-toggle="buttons">
-                      <label class="btn btn-default" ng-click="$parent.newStyle.rules[0].symbolizers[0].stroke.lineCap = 'square'">
-                          <input name="lineCap" type="radio" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.lineCap"
-                                 value="square"><img src="images/jointure2.png">
-                      </label>
-                      <label class="btn btn-default" ng-click="$parent.newStyle.rules[0].symbolizers[0].stroke.lineCap = 'round'">
-                          <input name="lineCap" type="radio" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.lineCap"
-                                 value="round"><img src="images/jointure3.png">
-                      </label>
-                      <label class="btn btn-default" ng-click="$parent.newStyle.rules[0].symbolizers[0].stroke.lineCap = 'butt'">
-                          <input name="lineCap" type="radio" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.lineCap"
-                                 value="butt"><img src="images/jointure1.png">
-                      </label>
-                  </div>
-              </div>
+                <label  class="col-xs-4 col-md-2 control-label" translate="sldeditor.edition.join">Join</label>
+                <div class="btn-group select select-block col-xs-8">
+                    <button class="btn dropdown-toggle btn-default" data-toggle="dropdown" ng-model="newStyle.rules[0].symbolizers[0].stroke.lineCap">
+                        <span class="filter-option pull-left"><img class="img_icone" src="images/icone_lineCap_{{newStyle.rules[0].symbolizers[0].stroke.lineCap}}.png"></span>&nbsp;
+                        <span class="caret"></span>
+                    </button>
+                    <span class="dropdown-arrow dropdown-arrow-inverse"></span>
+                    <ul class="dropdown-menu dropdown-inverse dropdown-images" role="menu" style="margin-left: 14px; overflow-y: auto; min-width:60px;">
+                        <li ng-click="newStyle.rules[0].symbolizers[0].stroke.lineCap = 'square'">
+                            <a><img class="img_icone" src="images/icone_lineCap_square.png"></a>
+                        </li>
+                        <li ng-click="newStyle.rules[0].symbolizers[0].stroke.lineCap = 'round'">
+                            <a><img class="img_icone" src="images/icone_lineCap_round.png"></a>
+                        </li>
+                        <li ng-click="newStyle.rules[0].symbolizers[0].stroke.lineCap = 'butt'">
+                            <a><img class="img_icone" src="images/icone_lineCap_butt.png"></a>
+                        </li>
+                    </ul>
+                </div>
+              </div>  
               <div class="form-group">
-                  <label  class="col-xs-3 col-md-2 control-label" translate="sldeditor.edition.cap">Cap</label>
-                  <div class="col-sm-9 col-md-10 btn-group" data-toggle="buttons">
-                      <label class="btn btn-default" ng-click="$parent.newStyle.rules[0].symbolizers[0].stroke.lineJoin = 'miter'">
-                          <input name="lineJoin" type="radio" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.lineJoin"
-                                 value="miter"><img src="images/angle1.png">
-                      </label>
-                      <label class="btn btn-default" ng-click="$parent.newStyle.rules[0].symbolizers[0].stroke.lineJoin = 'round'">
-                          <input name="lineJoin" type="radio" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.lineJoin"
-                                 value="round"><img src="images/angle2.png">
-                      </label>
-                      <label class="btn btn-default" ng-click="$parent.newStyle.rules[0].symbolizers[0].stroke.lineJoin = 'bevel'">
-                          <input name="lineJoin" type="radio" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.lineJoin"
-                                 value="bevel"><img src="images/angle3.png">
-                      </label>
-                  </div>
+              <label  class="col-xs-4 col-md-2 control-label" translate="sldeditor.edition.cap">Cap</label>
+                <div class="btn-group select select-bloc col-xs-8">
+                    <button class="btn dropdown-toggle btn-default" data-toggle="dropdown" ng-model="newStyle.rules[0].symbolizers[0].stroke.lineJoin">
+                        <span class="filter-option pull-left"><img class="img_icone" src="images/icone_lineJoin_{{newStyle.rules[0].symbolizers[0].stroke.lineJoin}}.png"></span>&nbsp;
+                        <span class="caret"></span>
+                    </button>
+                    <span class="dropdown-arrow dropdown-arrow-inverse"></span>
+                    <ul class="dropdown-menu dropdown-inverse dropdown-images" role="menu" style="margin-left: 14px; overflow-y: auto; min-width:60px;">
+                        <li ng-click="newStyle.rules[0].symbolizers[0].stroke.lineJoin = 'miter'">
+                            <a><img class="img_icone" src="images/icone_lineJoin_miter.png"></a>
+                        </li>
+                        <li ng-click="newStyle.rules[0].symbolizers[0].stroke.lineJoin = 'round'">
+                            <a><img class="img_icone" src="images/icone_lineJoin_round.png"></a>
+                        </li>
+                        <li ng-click="newStyle.rules[0].symbolizers[0].stroke.lineJoin = 'bevel'">
+                            <a><img class="img_icone" src="images/icone_lineJoin_bevel.png"></a>
+                        </li>
+                    </ul>
+                </div>
               </div>
             <div class="form-group">
-              <label class="col-sm-3 col-md-2 control-label" translate="sldeditor.edition.offset">Offset</label>
-              <div class="col-sm-9 col-md-4">
+              <label class="col-sm-4 col-md-2 control-label" translate="sldeditor.edition.offset">Offset</label>
+              <div class="col-sm-4">
                 <input type="number" class="form-control" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.dashOffset">
               </div>
             </div>
@@ -351,15 +359,15 @@
                   <div class="col-sm-9 col-md-10 btn-group" data-toggle="buttons">
                       <label class="btn btn-default">
                           <input type="radio" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.lineCap"
-                                 value="square"><img src="images/jointure2.png">
+                                 value="square">
                       </label>
                       <label class="btn btn-default">
                           <input type="radio" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.lineCap"
-                                 value="round"><img src="images/jointure3.png">
+                                 value="round">
                       </label>
                       <label class="btn btn-default">
                           <input type="radio" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.lineCap"
-                                 value="butt"><img src="images/jointure1.png">
+                                 value="butt">
                       </label>
                   </div>
               </div>
@@ -368,15 +376,15 @@
                   <div class="col-sm-9 col-md-10 btn-group" data-toggle="buttons">
                       <label class="btn btn-default">
                           <input type="radio" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.lineJoin"
-                                 value="miter"><img src="images/angle1.png">
+                                 value="miter">
                       </label>
                       <label class="btn btn-default">
                           <input type="radio" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.lineJoin"
-                                 value="round"><img src="images/angle2.png">
+                                 value="round">
                       </label>
                       <label class="btn btn-default">
                           <input type="radio" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.lineJoin"
-                                 value="bevel"><img src="images/angle3.png">
+                                 value="bevel">
                       </label>
                   </div>
               </div>

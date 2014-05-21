@@ -110,6 +110,9 @@ a.choix_type:hover{
 	width: 100%;
 	margin-top: 9px;
 }
+.form-style .form-group{
+	margin-bottom: 10px;
+}
 /*raster*/
 .bande_rouge{
     background-color: rgba(221, 81, 81, 0.5) ;
@@ -201,7 +204,7 @@ img.img_palette{
 	height: 20px;
 }
 ul.dropdown-images li{
-	padding: 5px 0;
+	padding: 2px 0;
 	text-align: center;
 }
 ul.dropdown-images li a:hover{
@@ -244,6 +247,9 @@ ul.dropdown-images li a:hover{
 	.bloc_apercu{
 		width:305px;
 	}
+	.dashed-pb{
+		margin-top:40px;
+	}
 }
 
 /* Medium devices (desktops, 992px and up) */
@@ -278,7 +284,7 @@ ul.dropdown-images li a:hover{
 	}
 	.dashed-pb{
 		height:30px;
-		margin-top:30px;
+		margin-top:40px;
 	}
 }
 
