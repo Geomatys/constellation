@@ -1,9 +1,4 @@
 /*general*/
-body{
-	font-family: arial, sans-serif;
-	color: #222;
-	font-size: 13px;
-}
 .breadcrumb{
 	background-color: transparent;
 	font-size: 18px;
@@ -15,14 +10,6 @@ body{
 }
 .breadcrumb>li+li:before{
 	content: ">\00a0";
-}
-h2{
-	font-size: 18px;
-}
-h3{
-	margin-top: 0;
-	font-size: 15px;
-	font-weight: bold;
 }
 .frame-sldEditor{
     box-shadow: none;
