@@ -66,14 +66,13 @@ public class JooqDomainRespositoryTestCase extends AbstractJooqTestTestCase {
     @Test
     public void crude() {
         Domain domainDTO = new Domain("cadastre", "Domaine du cadastre");
-        Domain save = domainRepository.save(domainDTO);
-        Assert.assertNotNull("Should return saved object", save);
+        Domain saved = domainRepository.save(domainDTO);
+        Assert.assertNotNull("Should return saved object", saved);
         String description = "New description";
-        domainDTO.setDescription(description);
-        Domain update = domainRepository.update(domainDTO);
+        saved.setDescription(description);
+        Domain update = domainRepository.update(saved);
         Assert.assertEquals("Sould have new decription", description, update.getDescription());
-        Assert.assertEquals("Should have deleted 1 record", 1, domainRepository.delete(save.getId()));
-        
+        Assert.assertEquals("Should have deleted 1 record", 1, domainRepository.delete(saved.getId()));
     }
 
     @Test
