@@ -288,7 +288,9 @@ public class SOSConfigurer extends OGCConfigurer {
     public Collection<String> getObservedPropertiesForSensorId(final String id, final String sensorID) throws ConfigurationException {
         final ObservationReader reader = getObservationReader(id);
         try {
-            return reader.getPhenomenonsForProcedure(sensorID);
+            final SensorMLTree root          = getSensorTree(id);
+            final SensorMLTree current       = root.find(sensorID);
+            return SOSUtils.getPhenomenonFromSensor(current, reader);
         } catch (DataStoreException ex) {
             throw new ConfigurationException(ex);
         }

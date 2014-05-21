@@ -27,8 +27,11 @@ import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -565,6 +568,19 @@ public final class SOSUtils {
             return geometries;
         }
         return new ArrayList<>();
+    }
+    
+    public static Collection<String> getPhenomenonFromSensor(final SensorMLTree sensor, final ObservationReader reader) throws DataStoreException {
+        if ("Component".equals(sensor.getType())) {
+            return reader.getPhenomenonsForProcedure(sensor.getId());
+            
+        } else {
+            final Set<String> phenomenons = new HashSet<>();
+            for (SensorMLTree child : sensor.getChildren()) {
+                phenomenons.addAll(getPhenomenonFromSensor(child, reader));
+            }
+            return phenomenons;
+        }
     }
     
     public static AbstractSensorML unmarshallSensor(final File f) throws JAXBException, DataStoreException {
