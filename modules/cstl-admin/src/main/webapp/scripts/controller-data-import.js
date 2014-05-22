@@ -296,6 +296,11 @@ cstlAdminApp.controller('ModalImportDataStep1ServerController', ['$scope', 'data
         };
     }]);
 
+cstlAdminApp.controller('ModalImportDataStep1DatabaseController', ['$scope',
+    function($scope) {
+
+    }]);
+
 cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$cookies',
     function($scope, $cookies) {
         $scope.import.next = function() {

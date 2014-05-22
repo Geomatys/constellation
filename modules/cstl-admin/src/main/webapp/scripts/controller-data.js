@@ -185,6 +185,15 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
                 }
             });
         };
+         $scope.showDatabasePopup = function() {
+            $modal.open({
+                templateUrl: 'views/data/modalImportData.html',
+                controller: 'ModalImportDataController',
+                resolve: {
+                    'firstStep': function() { return 'step1Database'; }
+                }
+            });
+        };
     }]);
 
 cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','dataListing','$location', '$translate', '$uploadFiles', '$modal',

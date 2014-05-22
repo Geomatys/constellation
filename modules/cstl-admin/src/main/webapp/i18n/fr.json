@@ -175,11 +175,14 @@
             "choose.tile.format": "Fomat de sortie du tuilage",
             "choose.uppercornerx": "Coin haut X",
             "choose.uppercornery": "Coin haut Y",
+            "choose.type":"Choix du type",
+            "choose.sensor":"Associer un capteur",
             "close": "Fermer",
             "data": "Données",
             "end": "Terminer",
             "local.title": "Fichier local",
             "metadata": "Métadonnées",
+            "netcdf":"Fichier netCDF",
             "next": "Suivant",
             "remove": "Enlever",
             "select": "Sélectionner",
@@ -455,7 +458,8 @@
         "error": "Erreur",
         "file": {
             "local": "Fichier local",
-            "server": "Fichier serveur"
+            "server": "Fichier serveur",
+            "db":"Base de données"
         },
         "fields.required":"Tous les champs sont obligatoires.",
         "finish": "Terminer",
