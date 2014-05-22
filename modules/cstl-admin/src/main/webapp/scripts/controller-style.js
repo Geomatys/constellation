@@ -294,12 +294,13 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             }
         };
 
-        $scope.addFontFamilies = function(font) {
+        $scope.initFontFamilies = function() {
             if ($scope.newStyle.rules[0].symbolizers[0].font == undefined) {
                 $scope.newStyle.rules[0].symbolizers[0].font = {};
             }
-            $scope.newStyle.rules[0].symbolizers[0].font.family = [];
-            $scope.newStyle.rules[0].symbolizers[0].font.family[0] = font;
+            if ($scope.newStyle.rules[0].symbolizers[0].font.family == undefined){
+                $scope.newStyle.rules[0].symbolizers[0].font.family = [];
+            }
         };
 
         $scope.palette = {
