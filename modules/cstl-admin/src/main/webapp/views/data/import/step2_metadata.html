@@ -1,0 +1,19 @@
+<div id="part2Metadata" ng-controller="ModalImportDataStep2MetadataController">
+    <form id="uploadMetadataForm" class="form-horizontal">
+        <!-- Upload metadata -->
+        <div translate="data.modal.metadata">Metadata</div>
+        <div class="fileinput fileinput-new" data-provides="fileinput">
+            <div class="input-group">
+                <div class="form-control uneditable-input" data-trigger="fileinput">
+                    <i class="glyphicon glyphicon-file fileinput-exists"></i>
+                    <span class="fileinput-filename"></span>
+                </div>
+                                <span class="input-group-addon btn btn-default btn-file">
+                                    <span class="fileinput-new" translate="data.modal.select">Select file</span>
+                                    <span class="fileinput-exists" translate="data.modal.change">Change</span>
+                                    <input type="file" name="metadata" onchange="angular.element(this).scope().metadataChosen(this);"></span>
+                <a class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput" translate="data.modal.remove">Remove</a>
+            </div>
+        </div>
+    </form>
+</div>

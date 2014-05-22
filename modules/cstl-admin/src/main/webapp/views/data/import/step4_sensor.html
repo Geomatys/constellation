@@ -1,0 +1,111 @@
+<div id="part4Sensor" ng-controller="ModalImportDataStep4SensorController">
+    <div role="form row">
+        <div class="form-group">
+            <label class="control-label">Association type</label>
+            <select class="form-control" ng-model="sensor.mode">
+                <option value="existing">Existing sensor</option>
+                <option value="sensorml">Import sensorML</option>
+                <option value="automatic">Automatic</option>
+            </select>
+        </div>
+
+        <div>
+            <div ng-if="sensor.mode === 'existing'" style="border-top: solid 1px #ddd; padding-top: 10px;">
+                <div class="frame dashboard list-sos-modal" ng-init="initDashboardSensor()">
+                    <div class="navbar sort-navbar">
+                        <div class="navbar-inner">
+                            <div class="col-xs-6" style="margin-top:9px;">
+                                <strong><span class="nb-results pull-left"><strong>{{countdata}}&nbsp;</span><span class="nb-results" translate="label.count.sensors">available sensors</span></strong>
+                            </div>
+                            <div class="pull-right">
+                                <div style="position:relative;">
+                                    <div class="ajax-loader" style="right:0;position:absolute;"></div>
+                                    <input type="text" ng-model="$parent.filtertext" class="searchbox search-query form-control" placeholder="..." />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dash-inner">
+                        <div id="list" data-role="list">
+                            <div class="pagination-wrapper pagination-sos">
+
+                                <select class="nb-per-page input-small form-control pull-right" ng-model="$parent.nbbypage">
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                                <div class="pull-right" page-switcher="{page:$parent.currentpage,size:$parent.nbbypage,count:$parent.countdata}" on-select-page="displayPage(page)"></div>
+                            </div>
+                            <div class="item-list">
+                                <div ng-repeat="sosdata in dataList">
+                                    <div class="item" ng-class="{'sensor-sos':sosdata.type!=='System','sensor-system':sosdata.type==='System','selected':sosdata==selected}" ng-click="select(sosdata);selectSensorsChild(null);">
+                                        <div class="top">
+                                            <span class="item-title">{{sosdata.id}}</span>
+                                            <span ng-if="sosdata.type==='System'" class="pull-right text-right item-list-style"  style="font-size:14px;" translate="label.sensor.system">sensor system</span>
+                                            <span ng-if="sosdata.type!=='System'" class="pull-right text-right item-list-style"  style="font-size:14px;" translate="label.sensor">sensor</span>
+                                        </div>
+                                        <div class="bottom">
+                                            <div class="block">
+                                                <i class="icon-calendar"></i>{{sosdata.createDate | date:'yyyy-MM-dd'}}
+                                            </div>
+                                            <div class="block">
+                                                <i class="icon-user"></i>{{sosdata.creator}}
+                                            </div>
+                                            <div class="block pull-right">
+                                                <i class="icon-paper-clip"></i>
+                                                <span ng-if="sosdata.children == null || sosdata.children.length == 0" translate="md.listing.no.data">No</span>
+                                                <span ng-if="sosdata.children.length > 0">{{sosdata.children.length}}</span>
+                                                <span translate="service.edit.dashboard.sensors.list.associated">associated sensors</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="item child sensor-sos" ng-if="sosdata==selected" ng-repeat="soschild in sosdata.children" ng-class="{'selected':soschild===selectedSensorsChild}" ng-click="selectSensorsChild(soschild)">
+                                        <div class="top">
+                                            <span class="item-title">{{soschild.id}}</span>
+                                            <span class="pull-right text-right item-list-style" style="font-size:14px;" translate="label.sensor">sensor</span>
+                                        </div>
+                                        <div class="bottom">
+                                            <div class="block">
+                                                <i class="icon-calendar"></i>{{soschild.createDate | date:'yyyy-MM-dd'}}
+                                            </div>
+                                            <div class="block">
+                                                <i class="icon-user"></i>{{soschild.creator}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div ng-if="sensor.mode === 'sensorml'" style="border-top: solid 1px #ddd; padding-top: 10px;">
+                <form id="uploadSensor" class="form-horizontal">
+                    <!-- Upload data -->
+                    <label class="col-sm-2 col-xs-3" translate="label.sensor">Sensor</label>
+                    <div class="btn-lg tooltipicon">
+                        <span type="button" class="glyphicon glyphicon-info-sign" tooltip data-placement="right" title="{{'tooltip.sensor.add' | translate }}" ></span>
+                    </div>
+                    <div class="fileinput fileinput-new" style="margin-top:5px;"  data-provides="fileinput">
+                        <div class="input-group">
+                            <div class="form-control uneditable-input" data-trigger="fileinput">
+                                <i class="glyphicon glyphicon-file fileinput-exists"></i>
+                                <span class="fileinput-filename"></span>
+                            </div>
+                                <span class="input-group-addon btn btn-default btn-file">
+                                    <span class="fileinput-new" translate="data.modal.select">Select file</span>
+                                    <span class="fileinput-exists" translate="data.modal.change">Change</span>
+                                    <input type="file" name="data"></span>
+                            <a class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput" translate="data.modal.remove">Remove</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div ng-if="sensor.mode === 'automatic'">
+            </div>
+        </div>
+    </div>
+</div>

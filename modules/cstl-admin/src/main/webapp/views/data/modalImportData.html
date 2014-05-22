@@ -1,0 +1,24 @@
+<div id="importDataModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" ng-click="close()">×</button>
+                <h4 class="modal-title" translate="data.modal.local.title">Local file</h4>
+            </div>
+            <div class="modal-body">
+                <div ng-if="import.currentStep === 'step1DataLocal'"><div ng-include="'views/data/import/step1_data_local.html'"></div></div>
+                <div ng-if="import.currentStep === 'step1DataServer'"><div ng-include="'views/data/import/step1_data_server.html'"></div></div>
+                <div ng-if="import.currentStep === 'step2Metadata'"><div ng-include="'views/data/import/step2_metadata.html'"></div></div>
+                <div ng-if="import.currentStep === 'step3Type'"><div ng-include="'views/data/import/step3_type.html'"></div></div>
+                <div ng-if="import.currentStep === 'step4Sensor'"><div ng-include="'views/data/import/step4_sensor.html'"></div></div>
+                <div ng-if="import.currentStep === 'step4Netcdf'"><div ng-include="'views/data/import/step4_netcdf.html'"></div></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="cancelButton" class="btn btn-default" ng-click="close()" translate="data.modal.cancel">Cancel</button>
+                <button ng-disabled="loader.upload" ng-show="import.allowNext" type="button" id="nextButton" class="btn btn-primary" ng-click="import.next();" translate="data.modal.next">Next</button>
+                <button ng-show="import.allowSensorChoose" type="button" id="sensorChoose" class="btn btn-primary" ng-click="uploaded()" translate="data.modal.next">Next</button>
+                <button ng-show="import.allowSubmit" type="button" id="submitButton" class="btn btn-primary" ng-click="import.finish()" translate="data.modal.end">Finish</button>
+            </div>
+        </div>
+    </div>
+</div>

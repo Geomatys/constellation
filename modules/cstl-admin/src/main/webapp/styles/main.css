@@ -1013,10 +1013,10 @@ p.error-select-one{
 /*
  * Upload form
  */
-#uploadForm .modal-dialog.mapview {
+#importDataModal .modal-dialog.mapview {
     width: 1024px;
 }
-#uploadForm .modal-dialog ul {
+#importDataModal .modal-dialog ul {
     list-style: none;
 }
 
