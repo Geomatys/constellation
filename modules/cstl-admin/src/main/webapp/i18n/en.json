@@ -1,4 +1,13 @@
 {
+    "admin": {
+      
+      "contact.title": "Contact",
+      "user": {
+        "delete.error": "Could not delete this user.",
+        "last.admin": "Last admistrator cannot be deleted",
+        "save.error": "Could not save this user"
+       }
+    },
 	"city": "City",
 	"country": "Country",
 	"Error": "Error",
@@ -33,8 +42,6 @@
             "title": "Add data"
         }
     },
-    "admin.contact.title": "Contact",
-    "admin.user.delete.error": "Could not delete this user.",
     "confirm.delete.style": "Do you really want to delete this style?",
     "create": {
         "accessconstraint": {
@@ -722,6 +729,7 @@
                     "maxlength": "Your e-mail cannot be longer than 50 characters"
                 },
                 "login": {
+                    "inUse": "This login is already used.",
                     "required": "Your login is required.",
                     "invalid": "Your login is invalid.",
                     "minlength": "Your login is required to be at least 3 character",

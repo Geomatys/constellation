@@ -19,14 +19,14 @@ public class UserXDomainService {
 
     @POST
     @Path("/{domainId}/{userId}")
-    public Response insert(@PathParam("userId") String userId,@PathParam("domainId") int domainId, Set<String> roles) {
+    public Response insert(@PathParam("userId") int userId,@PathParam("domainId") int domainId, Set<String> roles) {
         domainRepository.addUserToDomain(userId, domainId, roles);
         return Response.noContent().build();
     }
 
     @DELETE
     @Path("/{domainId}/{userId}")
-    public Response delete(@PathParam("userId") String userId, @PathParam("domainId") int domainId) {
+    public Response delete(@PathParam("userId") int userId, @PathParam("domainId") int domainId) {
         domainRepository.removeUserFromDomain(userId, domainId);
         return Response.noContent().build();
     }

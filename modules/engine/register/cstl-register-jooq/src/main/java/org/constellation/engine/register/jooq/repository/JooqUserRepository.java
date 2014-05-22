@@ -87,8 +87,8 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
 
     private SelectJoinStep<Record> getSelectWithRolesAndDomains() {
         SelectJoinStep<Record> records = dsl.select().from(userTable).leftOuterJoin(UDD)
-                .on(userTable.LOGIN.eq(UDD.LOGIN)).leftOuterJoin(userXroleTable)
-                .on(userTable.LOGIN.eq(userXroleTable.LOGIN)).leftOuterJoin(domainTable)
+                .on(userTable.ID.eq(UDD.USER_ID)).leftOuterJoin(userXroleTable)
+                .on(userTable.ID.eq(userXroleTable.USER_ID)).leftOuterJoin(domainTable)
                 .on(domainTable.ID.eq(UDD.DOMAIN_ID));
         return records;
     }
@@ -132,12 +132,12 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
 
         UpdateConditionStep<UserRecord> update = dsl.update(USER).set(USER.EMAIL, user.getEmail())
                 .set(USER.LASTNAME, user.getLastname()).set(USER.FIRSTNAME, user.getFirstname())
-                .set(USER.PASSWORD, user.getPassword()).where(USER.LOGIN.eq(user.getLogin()));
+                .where(USER.LOGIN.eq(user.getLogin()));
 
         update.execute();
 
         DeleteConditionStep<UserXRoleRecord> deleteRoles = dsl.delete(USER_X_ROLE).where(
-                USER_X_ROLE.LOGIN.eq(user.getLogin()));
+                USER_X_ROLE.USER_ID.eq(user.getId()));
 
         deleteRoles.execute();
 
@@ -150,12 +150,19 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
     @Transactional
     public User insert(User user, List<String> roles) {
 
-        InsertSetMoreStep<UserRecord> update = dsl.insertInto(USER).set(USER.EMAIL, user.getEmail())
-                .set(USER.LASTNAME, user.getLastname()).set(USER.FIRSTNAME, user.getFirstname())
-                .set(USER.PASSWORD, user.getPassword()).set(USER.LOGIN, user.getLogin());
-
-        update.execute();
-
+        UserRecord newRecord = dsl.newRecord(USER);
+        
+        newRecord.setActive(true);
+        newRecord.setEmail(user.getEmail());
+        newRecord.setLastname(user.getLastname());
+        newRecord.setFirstname(user.getFirstname());
+        newRecord.setLogin(user.getLogin());
+        newRecord.setPassword(user.getPassword());
+        
+        if(newRecord.store() > 0) {
+            user.setId(newRecord.getId());
+        }
+        
         insertRoles(user, roles);
 
         return user;
@@ -164,13 +171,13 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
     private void insertRoles(User user, List<String> roles) {
         for (String role : roles) {
             InsertSetMoreStep<UserXRoleRecord> insertRole = dsl.insertInto(USER_X_ROLE)
-                    .set(USER_X_ROLE.LOGIN, user.getLogin()).set(USER_X_ROLE.ROLE, role);
+                    .set(USER_X_ROLE.USER_ID, user.getId()).set(USER_X_ROLE.ROLE, role);
             insertRole.execute();
         }
     }
 
     @Override
-    public int delete(String userId) {
+    public int delete(int userId) {
         int deleteRole = deleteRole(userId);
 
         int removeUserFromAllDomain = domainRepository.removeUserFromAllDomain(userId);
@@ -178,12 +185,12 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
 
         LOGGER.debug("Delete " + deleteRole + " role references");
 
-        return dsl.delete(USER).where(USER.LOGIN.eq(userId)).execute();
+        return dsl.delete(USER).where(USER.ID.eq(userId)).execute();
 
     }
 
-    private int deleteRole(String userId) {
-        return dsl.delete(USER_X_ROLE).where(USER_X_ROLE.LOGIN.eq(userId)).execute();
+    private int deleteRole(int userId) {
+        return dsl.delete(USER_X_ROLE).where(USER_X_ROLE.USER_ID.eq(userId)).execute();
 
     }
 
@@ -198,9 +205,9 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
     }
 
     @Override
-    public boolean isLastAdmin(String login) {
+    public boolean isLastAdmin(int userId) {
         Record1<Integer> where = dsl.selectCount().from(USER).join(USER_X_ROLE).onKey()
-                .where(USER_X_ROLE.ROLE.eq("cstl-admin").and(USER.LOGIN.ne(login))).fetchOne();
+                .where(USER_X_ROLE.ROLE.eq("cstl-admin").and(USER.ID.ne(userId))).fetchOne();
         return where.value1() == 0;
     }
 
@@ -210,14 +217,20 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
     }
 
     @Override
-    public List<String> getRoles(String login) {
-        return dsl.select().from(USER).where(USER_X_ROLE.LOGIN.eq(login)).fetch(USER_X_ROLE.ROLE);
+    public List<String> getRoles(int userId) {
+        return dsl.select().from(USER).where(USER_X_ROLE.USER_ID.eq(userId)).fetch(USER_X_ROLE.ROLE);
     }
 
 
     @Override
     public int countUser() {
         return dsl.selectCount().from(USER).fetchOne(0, int.class);
+    }
+
+
+    @Override
+    public boolean loginAvailable(String login) {
+        return dsl.selectCount().from(USER).where(USER.LOGIN.eq(login)).fetchOne().value1() == 0;
     }
 
 }

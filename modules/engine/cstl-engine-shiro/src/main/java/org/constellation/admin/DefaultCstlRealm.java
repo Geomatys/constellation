@@ -84,7 +84,7 @@ public final class DefaultCstlRealm extends AuthorizingRealm {
         final User user = userRepository.findOne(username);
         final HashSet<String> roles = new HashSet<>();
         final HashSet<String> permissions = new HashSet<>();
-        for (String role : userRepository.getRoles(user.getLogin())) {
+        for (String role : userRepository.getRoles(user.getId())) {
             roles.add(role);
             permissions.addAll(MDwebRole.getPermissionListFromRole(role));
 

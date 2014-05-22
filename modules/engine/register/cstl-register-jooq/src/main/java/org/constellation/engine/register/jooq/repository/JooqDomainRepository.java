@@ -95,14 +95,14 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
         return null;
     }
 
-    public int[] addUserToDomain(String userId, int domainId, Set<String> roles) {
+    public int[] addUserToDomain(int userId, int domainId, Set<String> roles) {
 
         Collection<UserXDomainXDomainroleRecord> records = new ArrayList<UserXDomainXDomainroleRecord>();
 
         for (String role : roles) {
             UserXDomainXDomainroleRecord newRecord = dsl.newRecord(USER_X_DOMAIN_X_DOMAINROLE);
             newRecord.setDomainId(domainId);
-            newRecord.setLogin(userId);
+            newRecord.setUserId(userId);
             newRecord.setDomainrole(role);
             records.add(newRecord);
         }
@@ -112,11 +112,11 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
 
     }
 
-    public int removeUserFromDomain(String userId, int domainId) {
+    public int removeUserFromDomain(int userId, int domainId) {
 
         return dsl
                 .delete(USER_X_DOMAIN_X_DOMAINROLE)
-                .where(USER_X_DOMAIN_X_DOMAINROLE.LOGIN.eq(userId).and(
+                .where(USER_X_DOMAIN_X_DOMAINROLE.USER_ID.eq(userId).and(
                         USER_X_DOMAIN_X_DOMAINROLE.DOMAIN_ID.eq(domainId))).execute();
 
     }
@@ -148,8 +148,8 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
     }
 
     @Override
-    public int removeUserFromAllDomain(String userId) {
-        return dsl.delete(USER_X_DOMAIN_X_DOMAINROLE).where(USER_X_DOMAIN_X_DOMAINROLE.LOGIN.eq(userId)).execute();
+    public int removeUserFromAllDomain(int userId) {
+        return dsl.delete(USER_X_DOMAIN_X_DOMAINROLE).where(USER_X_DOMAIN_X_DOMAINROLE.USER_ID.eq(userId)).execute();
     }
 
     @Override

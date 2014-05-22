@@ -30,8 +30,8 @@ cstlAdminApp.controller('HeaderController', ['$scope','$http',
 	      });
 }]);
 
-cstlAdminApp.controller('MainController', ['$scope','$location','webService','dataListing','ProcessService','$growl', 'UserResource', 'GeneralResource', 'TaskService',
-    function ($scope, $location, webService, dataListing, Process, $growl, UserResource, GeneralResource, task) {
+cstlAdminApp.controller('MainController', ['$scope','$location','webService','dataListing','ProcessService','$growl', 'UserResource', 'GeneralService', 'TaskService',
+    function ($scope, $location, webService, dataListing, Process, $growl, UserResource, GeneralService, task) {
         $scope.countStats = function() {
             webService.listAll({}, function(response) {
                 var count = 0;
@@ -61,9 +61,9 @@ cstlAdminApp.controller('MainController', ['$scope','$location','webService','da
                 $growl('error', 'Error', 'Unable to count process');
             });
 
-            GeneralResource.counts(function(response) {
+            GeneralService.counts().success(function(response) {
                 $scope.nbusers = response.nbuser;
-            }, function() {
+            }).error(function() {
                 $scope.nbusers = 1;
                 $growl('error', 'Error', 'Unable to count users');
             });
@@ -192,18 +192,19 @@ cstlAdminApp.controller('UserController', ['$scope', 'UserResource', '$modal', '
         });
     };
     $scope.delete = function(i){
-    	UserResource.delete({id: $scope.list[i].login}, {} , function(resp){
+    	UserResource.delete({id: $scope.list[i].id}, {} , function(resp){
     	  $scope.list.splice(i, 1);
     	}, function(err){
-    	  $translate(['Error','admin.user.delete.error']).then(function (translations) {
-    	    $growl('error', translations.Error,  translations['admin.user.delete.error']);
+    	  var errorCode = err.data
+    	  $translate(['Error',errorCode]).then(function (translations) {
+    	    $growl('error', translations.Error,  translations[errorCode]);
     	  });
     	});
     };
 }]);
 
-cstlAdminApp.controller('UserDetailsController', ['$scope', '$modalInstance', 'user', 'isUpdate', 'UserResource',
-  function ($scope, $modalInstance, user, isUpdate, UserResource) {
+cstlAdminApp.controller('UserDetailsController', ['$scope', '$modalInstance', 'GeneralService', 'user', 'isUpdate', 'UserResource', '$growl', '$translate', 
+  function ($scope, $modalInstance, GeneralService, user, isUpdate, UserResource, $growl, $translate) {
     $scope.user = user;
 
     $scope.close = function() {
@@ -224,14 +225,38 @@ cstlAdminApp.controller('UserDetailsController', ['$scope', '$modalInstance', 'u
 
     	$scope.user.roles[$scope.user.roles.length]=role
     };
+    var timeout=null;
+    $scope.checkLogin = function(login){
+      if(timeout != null){
+        window.clearTimeout(timeout)
+        timeout = null;
+      }
+      timeout = setTimeout(function(){
+        if($scope.user.login && $scope.user.login.length > 2)
+          GeneralService.checkLogin($scope.user.login).success(function(res){
+            $scope.loginInUse=res.available=="false"
+          }).error(function(){
+          })
+      }, 400)
+    };
 
     $scope.save = function(){
     	var userResource = new UserResource($scope.user);
     	if(isUpdate)
-    	  userResource.$update();
+    	  userResource.$update(function(){
+          $modalInstance.close($scope.user);
+        }, function(){
+          $translate(['Error','admin.user.save.error']).then(function (translations) {
+            $growl('error', translations.Error,  translations['admin.user.save.error']);
+          })});
     	else
-    	  userResource.$save();
-    	$modalInstance.close($scope.user);
+    	  userResource.$save(function(){
+    	    $modalInstance.close($scope.user);
+    	  }, function(){
+    	    $translate(['Error','admin.user.save.error']).then(function (translations) {
+            $growl('error', translations.Error,  translations['admin.user.save.error']);
+          });
+    	  });
     }
 }]);
 

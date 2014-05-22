@@ -36,15 +36,15 @@ public interface DomainRepository {
 
     int delete(int domainId);
 
-    int[] addUserToDomain(String userId, int domainId, Set<String> roles);
+    int[] addUserToDomain(int userId, int domainId, Set<String> roles);
 
-    int removeUserFromDomain(String userId, int domainId);
+    int removeUserFromDomain(int userId, int domainId);
     
     void addServiceToDomain(int serviceId, int domainId);
     
     int removeServiceFromDomain(int serviceId, int domainId);
 
-    int removeUserFromAllDomain(String userId);
+    int removeUserFromAllDomain(int userId);
 
     int addDataToDomain(int dataId, int domainId);
     

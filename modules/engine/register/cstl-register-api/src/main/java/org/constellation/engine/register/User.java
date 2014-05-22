@@ -18,11 +18,11 @@
  */
 package org.constellation.engine.register;
 
-import java.util.HashSet;
-import java.util.Set;
 
 public class User {
 
+    private Integer id;
+    
     private String lastname;
 
     private String firstname;
@@ -33,6 +33,15 @@ public class User {
 
     private String password;
 
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+    
     public String getLogin() {
         return login;
     }
@@ -78,5 +87,6 @@ public class User {
         return "User [lastname=" + lastname + ", firstname=" + firstname + ", email=" + email + ", login=" + login
                 + ", password=" + password + "]";
     }
+
 
 }

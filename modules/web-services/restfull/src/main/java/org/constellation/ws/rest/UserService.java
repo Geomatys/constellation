@@ -68,16 +68,16 @@ public class UserService  {
 
     @GET
     @Path("/{id}")
-    public Response findOne(@PathParam("id") String login) {
+    public Response findOne(@PathParam("login") String login) {
         return Response.ok(userRepository.findOneWithRolesAndDomains(login)).build();
     }
 
 
     @DELETE
     @Path("/{id}")
-    public Response delete(@PathParam("id") String id) {
+    public Response delete(@PathParam("id") int id) {
         if(userRepository.isLastAdmin(id))
-            return Response.serverError().build();
+            return Response.serverError().entity("admin.user.last.admin").build();
         userRepository.delete(id);
         return Response.noContent().build();
     }
@@ -99,9 +99,6 @@ public class UserService  {
     @Path("/")
     @Transactional
     public Response put(DomainUser userDTO) {
-        if (StringUtils.hasText(userDTO.getPassword()))
-            userDTO.setPassword(StringUtilities.MD5encode(userDTO.getPassword()));
-
         userRepository.update(userDTO, userDTO.getRoles());
 
         return Response.ok(userDTO).build();

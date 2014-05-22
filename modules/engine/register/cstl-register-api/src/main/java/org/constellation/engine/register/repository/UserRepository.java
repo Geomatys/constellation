@@ -32,18 +32,26 @@ public interface UserRepository {
     
     User insert(User user, List<String> roles);
 
+    /**
+     * Update user, should not update password.
+     * @param user
+     * @param roles
+     * @return
+     */
     User update(User user, List<String> roles);
     
-    int delete(String string);
+    int delete(int userId);
     
     DomainUser findOneWithRolesAndDomains(String login);
 
-    boolean isLastAdmin(String login);
+    boolean isLastAdmin(int userId);
 
     User findOne(String username);
 
-    List<String> getRoles(String login);
+    List<String> getRoles(int userId);
 
     int countUser();
+    
+    boolean loginAvailable(String login);
     
 }

@@ -53,8 +53,8 @@
   <beans:bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
 
   <jdbc-user-service id="cstlUserService" data-source-ref="dataSource"
-    users-by-username-query='select "login" as "username", "password" as "password", true as "enabled" from "admin"."user" where "login" = ?'
-    authorities-by-username-query='select "login" as "username", "role" as "authority" from "admin"."user_x_role" where "login" = ?' />
+    users-by-username-query='select "login" as "username", "password" as "password", "active" as "enabled" from "admin"."user" where "login" = ?'
+    authorities-by-username-query='select "u"."login" as "username", "uXr"."role" as "authority" from "admin"."user" "u" join "admin"."user_x_role" "uXr" on "u"."id" = "uXr"."user_id" where "u"."login" = ?' />
 
   <authentication-manager alias="authenticationManager">
     <authentication-provider user-service-ref="cstlUserService">

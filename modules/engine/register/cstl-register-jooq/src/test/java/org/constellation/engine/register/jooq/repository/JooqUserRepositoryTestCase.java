@@ -43,7 +43,7 @@ public class JooqUserRepositoryTestCase extends AbstractJooqTestTestCase {
         User insert = userRepository.insert(TestSamples.newAdminUser(), TestSamples.adminRoles());
         Assert.assertNotNull(insert);
         
-        Assert.assertEquals("Should have deleled 1 record",1, userRepository.delete(insert.getLogin()));
+        Assert.assertEquals("Should have deleled 1 record",1, userRepository.delete(insert.getId()));
         
     }
 

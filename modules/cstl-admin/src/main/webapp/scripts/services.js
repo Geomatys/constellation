@@ -64,7 +64,7 @@ function Topic(stompClient, path){
   this.path = path;
   this.unsubscribe = function(){
     stompClient.unsubscribe(self.id);
-    console.log('Unsubscribed from ' + path + ' (' + self.id + ')')
+    console.log('Unsubscribed from ' + path + ' (' + self.id + ')');
   }
 }
 
@@ -137,13 +137,18 @@ cstlAdminApp.factory('LogsService', ['$resource',
     }]);
 
 
-cstlAdminApp.factory('GeneralResource', ['$resource', '$cookies',
-     function ($resource, $cookies) {
-        return $resource('@cstl/api/1/general/jsessionid=', null,
-          {
-           'counts': {url: "@cstl/api/1/general/counts;jsessionid="}
-          });
+cstlAdminApp.factory('GeneralService', ['$http',
+     function ($http) {
+       return {
+        "counts": function(){
+          return $http({ method: 'GET', url:'@cstl/api/1/general/counts;jsessionid='})
+        },
+        "checkLogin":function(login){
+          return $http({method: 'POST', url: "@cstl/api/1/general/logincheck;jsessionid=", data: login})
+        }
+     }
 }]);
+
 
 
 cstlAdminApp.factory('UserResource', ['$resource', '$cookies',

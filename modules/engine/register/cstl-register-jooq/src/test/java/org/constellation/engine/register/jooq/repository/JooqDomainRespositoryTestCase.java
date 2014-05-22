@@ -82,13 +82,13 @@ public class JooqDomainRespositoryTestCase extends AbstractJooqTestTestCase {
         Set<String> roles = new HashSet<String>();
         roles.add("manager");
         
-        int[] added = domainRepository.addUserToDomain(user.getLogin(), domain.getId(), roles);
+        int[] added = domainRepository.addUserToDomain(user.getId(), domain.getId(), roles);
         
         Assert.assertArrayEquals(new int[]{1}, added);
         
-        domainRepository.removeUserFromDomain(user.getLogin(), domain.getId());
+        domainRepository.removeUserFromDomain(user.getId(), domain.getId());
         
-        userRepository.delete(user.getLogin());
+        userRepository.delete(user.getId());
     }
 
    
@@ -107,7 +107,7 @@ public class JooqDomainRespositoryTestCase extends AbstractJooqTestTestCase {
         domainRepository.delete(domain.getId());
         dataRepository.delete(data.getId());
         providerRepository.delete(provider.getId());
-        userRepository.delete(user.getLogin());
+        userRepository.delete(user.getId());
     }
 
     @Test
