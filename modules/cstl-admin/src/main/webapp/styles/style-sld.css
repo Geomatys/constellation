@@ -1,18 +1,29 @@
 /*general*/
-.breadcrumb{
+.modal-dialog-sld .breadcrumb{
 	background-color: transparent;
 	font-size: 18px;
 	margin-bottom:0;
     margin-top: 0;
 }
-.breadcrumb > li.active{
+.modal-dialog-sld .breadcrumb > li.active{
 	color:#222;
 }
-.breadcrumb>li+li:before{
+.modal-dialog-sld .breadcrumb>li+li:before{
 	content: ">\00a0";
 }
 .frame-sldEditor{
     box-shadow: none;
+}
+.modal-dialog-sld h2{
+    font-size: 18px;
+}
+.modal-dialog-sld h3{
+    margin-top: 0;
+    font-size: 15px;
+    font-weight: bold;
+}
+.modal-dialog-sld label{
+    font-size: 13px;
 }
 /*choix type*/
 .choix_type{

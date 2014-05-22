@@ -860,6 +860,20 @@ cstlAdminApp.controller('ServerFileModalController', ['$scope', '$dashboard', '$
         };
 
         $scope.load($scope.currentPath);
+
+        $scope.shownColumn=1;
+
+        $scope.navServer = function() {
+            var tab= $scope.currentPath.split('/');
+            
+            if(tab.length>3) {
+                $(".block-folders").slice(0,tab.length-3).hide();
+                $(".block-folders").slice(tab.length-3,tab.length-1).show();
+            }
+            else
+                $(".block-folders").show();
+        };
+
     }]);
 
 cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webService', 'sos', 'sensor', '$dashboard', '$modalInstance', 'service', 'exclude', '$growl', '$modal',
