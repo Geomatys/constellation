@@ -1,4 +1,4 @@
-<div ng-show="!finished" class="container" id="folderPart" ng-controller="ModalImportDataStep1ServerController">
+<div class="container" id="folderPart" ng-controller="ModalImportDataStep1ServerController">
     <ul class="breadcrumb col-sm-12">
         <li class="active"><span class="divider">{{currentPath}}</span></li>
     </ul>
@@ -7,8 +7,8 @@
             <input type="text" style="margin-bottom:10px;" placeholder="filter" class="col-sm-12" ng-model="search">
             <ul class="unstyled">
                 <li ng-repeat="item in col | filter:search">
-                    <i ng-class="{'icon-folder-close-alt':item.folder && !startWith(item.subPath),'icon-folder-open-alt':item.folder && startWith(item.subPath),'icon-file':!item.folder}"></i>
-                    <a ng-class="{'link-sel':startWith(item.subPath)}" class="trim-name" title="{{item.name}}" type="button" ng-click="select(item,$parent.$index)">{{item.name}}</a>
+                    <i ng-class="{'icon-folder-close-alt':item.folder && !startWith(item.path),'icon-folder-open-alt':item.folder && startWith(item.path),'icon-file':!item.folder}"></i>
+                    <a ng-class="{'link-sel':startWith(item.path)}" class="trim-name" title="{{item.name}}" type="button" ng-click="select(item,$parent.$index)">{{item.name}}</a>
                 </li>
             </ul>
         </div>

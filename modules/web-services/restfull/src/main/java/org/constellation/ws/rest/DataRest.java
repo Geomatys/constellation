@@ -42,7 +42,6 @@ import java.util.TreeMap;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.Adler32;
 import java.util.zip.CRC32;
 
 import javax.inject.Inject;
@@ -228,39 +227,37 @@ public class DataRest {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getDataFolder(String path) {
-        final List<FileBean> listBean = new ArrayList<>(0);
-        File[] children;
+        final List<FileBean> listBean = new ArrayList<>();
         final Set<String> extensions = GeotoolkitFileExtensionAvailable.getAvailableFileExtension().keySet();
 
         final File root = ConfigDirectory.getUserHomeDirectory();
+        final File[] children;
         if ("root".equalsIgnoreCase(path)) {
-            path = "";
             children = root.listFiles();
-
         } else {
-            final File nextRoot = new File(root, path);
+            final File nextRoot = new File(path);
             children = nextRoot.listFiles();
         }
 
         //loop on subfiles/folders to create bean
         if (children != null) {
             for (File child : children) {
-                
-                if (child.isFile()) {
-                    int lastIndexPoint = child.getName().lastIndexOf('.');
-                    String extension = child.getName().substring(lastIndexPoint + 1);
+                final FileBean bean = new FileBean(child.getName(), child.isDirectory(), child.getAbsolutePath(), child.getParentFile().getAbsolutePath());
+
+                if (!child.isDirectory()) {
+                    final int lastIndexPoint = child.getName().lastIndexOf('.');
+                    final String extension = child.getName().substring(lastIndexPoint + 1);
 
                     if (extensions.contains(extension.toLowerCase())) {
-                        final FileBean bean = new FileBean(child.getName(), child.isDirectory(), root.getAbsolutePath(), path + "/" + child.getName());
                         listBean.add(bean);
                     }
 
                 } else {
-                    final FileBean bean = new FileBean(child.getName(), child.isDirectory(), root.getAbsolutePath(), path + "/" + child.getName());
                     listBean.add(bean);
                 }
             }
         }
+        Collections.sort(listBean);
         return Response.status(200).entity(listBean).build();
     }
 

@@ -18,35 +18,34 @@
  */
 package org.constellation.dto;
 
+import java.io.Serializable;
+
 /**
  * Bean for file information : name and boolean to define folder
  *
  * @author Benjamin Garcia (Geomatys)
+ * @author Cédric Briançon (Geomatys)
  * @version 0.9
  * @since 0.9
  */
-public class FileBean {
+public class FileBean implements Serializable,Comparable<FileBean> {
 
     private String name;
 
     private Boolean folder;
 
-    private String subPath;
+    private String path;
 
-    private String prefixPath;
+    private String parentPath;
 
     public FileBean() {
     }
 
-    public FileBean(final String name, final Boolean folder, final String subPath) {
-        this(name, folder, null, subPath);
-    }
-
-    public FileBean(final String name, final Boolean folder, final String prefixPath, final String subPath) {
+    public FileBean(final String name, final Boolean folder, final String path, final String parentPath) {
         this.name = name;
         this.folder = folder;
-        this.prefixPath = prefixPath;
-        this.subPath = subPath;
+        this.path = path;
+        this.parentPath = parentPath;
     }
 
     public String getName() {
@@ -65,19 +64,24 @@ public class FileBean {
         this.folder = folder;
     }
 
-    public String getPrefixPath() {
-        return prefixPath;
+    public String getPath() {
+        return path;
     }
 
-    public void setPrefixPath(final String prefixPath) {
-        this.prefixPath = prefixPath;
+    public void setPath(final String path) {
+        this.path = path;
     }
 
-    public String getSubPath() {
-        return subPath;
+    public String getParentPath() {
+        return parentPath;
     }
 
-    public void setSubPath(final String subPath) {
-        this.subPath = subPath;
+    public void setParentPath(String parentPath) {
+        this.parentPath = parentPath;
+    }
+
+    @Override
+    public int compareTo(FileBean o) {
+        return name.compareTo(o.getName());
     }
 }

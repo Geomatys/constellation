@@ -239,17 +239,17 @@ cstlAdminApp.controller('ModalImportDataStep1ServerController', ['$scope', 'data
     function($scope, dataListing) {
         $scope.columns = [];
         // current path chosen in server data dir
-        $scope.currentPath = '/';
-        // path of the server data dir
-        $scope.prefixPath = '';
+        $scope.currentPath = 'root';
         $scope.hasSelectedSomething = false;
 
         $scope.load = function(path){
             $scope.currentPath = path;
-            if (path === '/') {
-                path = "root";
-            }
-            $scope.columns.push(dataListing.dataFolder({}, path));
+            $scope.columns.push(dataListing.dataFolder({}, path, function(files) {
+                if ($scope.currentPath === 'root') {
+                    // When initializing popup, get the default directory
+                    $scope.currentPath = files[0].parentPath;
+                }
+            }));
         };
 
         $scope.open = function(path, depth) {
@@ -267,12 +267,11 @@ cstlAdminApp.controller('ModalImportDataStep1ServerController', ['$scope', 'data
         };
 
         $scope.select = function(item,depth) {
-            $scope.prefixPath = item.prefixPath;
             $scope.hasSelectedSomething = true;
             if (item.folder) {
-                $scope.open(item.subPath, depth);
+                $scope.open(item.path, depth);
             } else {
-                $scope.chooseFile(item.subPath, depth);
+                $scope.chooseFile(item.path, depth);
             }
         };
 
@@ -282,17 +281,29 @@ cstlAdminApp.controller('ModalImportDataStep1ServerController', ['$scope', 'data
 
         $scope.load($scope.currentPath);
 
-        $scope.shownColumn=1;
-
         $scope.navServer = function() {
-            var tab= $scope.currentPath.split('/');
-
-            if(tab.length>3) {
-                $(".block-folders").slice(0,tab.length-3).hide();
-                $(".block-folders").slice(tab.length-3,tab.length-1).show();
-            }
-            else
+            if($scope.columns.length>3) {
+                $(".block-folders").slice(0,$scope.columns.length-3).hide();
+                $(".block-folders").slice($scope.columns.length-3,$scope.columns.length-1).show();
+            } else {
                 $(".block-folders").show();
+            }
+        };
+
+        $scope.import.next = function() {
+            var lastPointIndex = $scope.currentPath.lastIndexOf(".");
+            var extension = $scope.currentPath.substring(lastPointIndex+1, $scope.currentPath.length);
+            dataListing.extension({}, {value: extension},
+                function(response) {
+                    if (response.dataType!="") {
+                        $scope.import.uploadType = response.dataType;
+                    }
+                });
+
+            // Use selected data
+            $scope.import.dataPath = $scope.currentPath;
+            $scope.import.currentStep = 'step2Metadata';
+            $scope.import.allowNext = true;
         };
     }]);
 
