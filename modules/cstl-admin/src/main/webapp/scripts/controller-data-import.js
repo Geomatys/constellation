@@ -235,9 +235,65 @@ cstlAdminApp.controller('ModalImportDataStep1LocalController', ['$scope', 'dataL
         };
     }]);
 
-cstlAdminApp.controller('ModalImportDataStep1ServerController', ['$scope',
-    function($scope) {
+cstlAdminApp.controller('ModalImportDataStep1ServerController', ['$scope', 'dataListing',
+    function($scope, dataListing) {
+        $scope.columns = [];
+        // current path chosen in server data dir
+        $scope.currentPath = '/';
+        // path of the server data dir
+        $scope.prefixPath = '';
+        $scope.hasSelectedSomething = false;
 
+        $scope.load = function(path){
+            $scope.currentPath = path;
+            if (path === '/') {
+                path = "root";
+            }
+            $scope.columns.push(dataListing.dataFolder({}, path));
+        };
+
+        $scope.open = function(path, depth) {
+            if (depth < $scope.columns.length) {
+                $scope.columns.splice(depth + 1, $scope.columns.length - depth);
+            }
+            $scope.load(path);
+        };
+
+        $scope.chooseFile = function(path, depth) {
+            if (depth < $scope.columns.length) {
+                $scope.columns.splice(depth + 1, $scope.columns.length - depth);
+            }
+            $scope.currentPath = path;
+        };
+
+        $scope.select = function(item,depth) {
+            $scope.prefixPath = item.prefixPath;
+            $scope.hasSelectedSomething = true;
+            if (item.folder) {
+                $scope.open(item.subPath, depth);
+            } else {
+                $scope.chooseFile(item.subPath, depth);
+            }
+        };
+
+        $scope.startWith = function(path) {
+            return $scope.currentPath.indexOf(path) === 0;
+        };
+
+        $scope.load($scope.currentPath);
+
+        $scope.shownColumn=1;
+
+        $scope.navServer = function() {
+            var tab= $scope.currentPath.split('/');
+
+            if(tab.length>3) {
+                $(".block-folders").slice(0,tab.length-3).hide();
+                $(".block-folders").slice(tab.length-3,tab.length-1).show();
+            }
+            else
+                $(".block-folders").show();
+        };
     }]);
 
 cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$cookies',

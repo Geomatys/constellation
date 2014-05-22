@@ -1,5 +1,5 @@
 <div id="importDataModal">
-    <div class="modal-dialog">
+    <div class="modal-dialog" ng-class="{'modal-dialog-responsive': import.currentStep === 'step1DataServer', 'modal-dialog-resp-height' : import.currentStep === 'step1DataServer'}">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" ng-click="close()">×</button>
