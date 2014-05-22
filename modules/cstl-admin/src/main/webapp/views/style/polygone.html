@@ -35,10 +35,14 @@
           <h3 translate="sldeditor.edition.fill">Fill</h3>
           <form class="form-horizontal" role="form">
             <div class="form-group">
-              <label class="col-sm-3 col-md-2 control-label" translate="sldeditor.edition.color">Color</label>
-              <div class="col-sm-9 col-md-10">
-                <input type='text' name="picker" class="picker" spectrum ng-model="$parent.newStyle.rules[0].symbolizers[0].fill.color"/>
+              <label class="col-sm-3 col-md-3 control-label" translate="sldeditor.edition.color">Color</label>
+              <div class="col-sm-3 col-md-3">
+                <input type='text' name="picker" class="picker" spectrum oncolorchanged="affectAlpha(value, newStyle.rules[0].symbolizers[0].fill)" ng-model="newStyle.rules[0].symbolizers[0].fill.color"/>
               </div>
+                <label class="col-sm-3 col-md-3 control-label" translate="sldeditor.edition.opacity">Opacity</label>
+                <div class="col-sm-3 col-md-3">
+                    {{newStyle.rules[0].symbolizers[0].fill.opacity}}
+                </div>
             </div>
             <!--<div class="form-group">
               <label class="col-sm-3 col-md-2 control-label">Type</label>
@@ -78,10 +82,14 @@
           <h3  translate="sldeditor.edition.stroke">Stroke</h3>
           <form class="form-horizontal form-style" role="form">
             <div class="form-group">
-              <label class="col-sm-3 col-md-2 control-label" translate="sldeditor.edition.color">Color</label>
-              <div class="col-sm-9 col-md-10">
-                <input type='text' name="picker" class="picker" spectrum ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.color"/>
+              <label class="col-sm-3 col-md-3 control-label" translate="sldeditor.edition.color">Color</label>
+              <div class="col-sm-3 col-md-3">
+                <input type='text' name="picker" class="picker" spectrum oncolorchanged="affectAlpha(value, newStyle.rules[0].symbolizers[0].stroke)"  ng-model="newStyle.rules[0].symbolizers[0].stroke.color"/>
               </div>
+                <label class="col-sm-3 col-md-3 control-label" translate="sldeditor.edition.opacity">Opacity</label>
+                <div class="col-sm-3 col-md-3">
+                    {{newStyle.rules[0].symbolizers[0].stroke.opacity}}
+                </div>
             </div>
             <div class="form-group">
               <label class="col-sm-3 col-md-2 control-label" translate="sldeditor.edition.size">Size</label>
@@ -126,37 +134,15 @@
           </form>
         </div>
         <div ng-show="display" class="style_bloc">
-          <form class="form-horizontal form-style" role="form">
-              <div class="form-group">
-                <label  class="col-xs-4 col-md-2 control-label" translate="sldeditor.edition.join">Join</label>
-                <div class="btn-group select select-block col-xs-8">
-                    <button class="btn dropdown-toggle btn-default" data-toggle="dropdown" ng-model="newStyle.rules[0].symbolizers[0].stroke.lineCap">
-                        <span class="filter-option pull-left"><img class="img_icone" src="images/icone_lineCap_{{newStyle.rules[0].symbolizers[0].stroke.lineCap}}.png"></span>&nbsp;
-                        <span class="caret"></span>
-                    </button>
-                    <span class="dropdown-arrow dropdown-arrow-inverse"></span>
-                    <ul class="dropdown-menu dropdown-inverse dropdown-images" role="menu" style="margin-left: 14px; overflow-y: auto; min-width:60px;">
-                        <li ng-click="newStyle.rules[0].symbolizers[0].stroke.lineCap = 'square'">
-                            <a><img class="img_icone" src="images/icone_lineCap_square.png"></a>
-                        </li>
-                        <li ng-click="newStyle.rules[0].symbolizers[0].stroke.lineCap = 'round'">
-                            <a><img class="img_icone" src="images/icone_lineCap_round.png"></a>
-                        </li>
-                        <li ng-click="newStyle.rules[0].symbolizers[0].stroke.lineCap = 'butt'">
-                            <a><img class="img_icone" src="images/icone_lineCap_butt.png"></a>
-                        </li>
-                    </ul>
-                </div>
-              </div>  
-              <div class="form-group">
-              <label  class="col-xs-4 col-md-2 control-label" translate="sldeditor.edition.cap">Cap</label>
-                <div class="btn-group select select-bloc col-xs-8">
+            <form class="form-horizontal" role="form">
+                <label  class="col-xs-3 col-md-2 control-label" translate="sldeditor.edition.join">Join</label>
+                <div class="btn-group select select-bloc col-xs-9">
                     <button class="btn dropdown-toggle btn-default" data-toggle="dropdown" ng-model="newStyle.rules[0].symbolizers[0].stroke.lineJoin">
                         <span class="filter-option pull-left"><img class="img_icone" src="images/icone_lineJoin_{{newStyle.rules[0].symbolizers[0].stroke.lineJoin}}.png"></span>&nbsp;
                         <span class="caret"></span>
                     </button>
                     <span class="dropdown-arrow dropdown-arrow-inverse"></span>
-                    <ul class="dropdown-menu dropdown-inverse dropdown-images" role="menu" style="margin-left: 14px; overflow-y: auto; min-width:60px;">
+                    <ul class="dropdown-menu dropdown-inverse dropdown-images" role="menu" style="overflow-y: auto; min-width:60px; min-height: 108px;">
                         <li ng-click="newStyle.rules[0].symbolizers[0].stroke.lineJoin = 'miter'">
                             <a><img class="img_icone" src="images/icone_lineJoin_miter.png"></a>
                         </li>
@@ -168,14 +154,32 @@
                         </li>
                     </ul>
                 </div>
-              </div>
-            <div class="form-group">
-              <label class="col-sm-4 col-md-2 control-label" translate="sldeditor.edition.offset">Offset</label>
-              <div class="col-sm-4">
-                <input type="number" class="form-control" ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.dashOffset">
-              </div>
-            </div>
-          </form>
+                <label  class="col-xs-3 col-md-2 control-label" translate="sldeditor.edition.cap">Cap</label>
+                <div class="btn-group select select-block col-xs-9">
+                    <button class="btn dropdown-toggle btn-default" data-toggle="dropdown" ng-model="newStyle.rules[0].symbolizers[0].stroke.lineCap">
+                        <span class="filter-option pull-left"><img class="img_icone" src="images/icone_lineCap_{{newStyle.rules[0].symbolizers[0].stroke.lineCap}}.png"></span>&nbsp;
+                        <span class="caret"></span>
+                    </button>
+                    <span class="dropdown-arrow dropdown-arrow-inverse"></span>
+                    <ul class="dropdown-menu dropdown-inverse dropdown-images" role="menu" style="overflow-y: auto; min-width:60px; min-height: 108px;">
+                        <li ng-click="newStyle.rules[0].symbolizers[0].stroke.lineCap = 'square'">
+                            <a><img class="img_icone" src="images/icone_lineCap_square.png"></a>
+                        </li>
+                        <li ng-click="newStyle.rules[0].symbolizers[0].stroke.lineCap = 'round'">
+                            <a><img class="img_icone" src="images/icone_lineCap_round.png"></a>
+                        </li>
+                        <li ng-click="newStyle.rules[0].symbolizers[0].stroke.lineCap = 'butt'">
+                            <a><img class="img_icone" src="images/icone_lineCap_butt.png"></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-4 col-md-2 control-label" translate="sldeditor.edition.offset">Offset</label>
+                    <div class="col-sm-4">
+                        <input type="number" class="form-control" ng-model="newStyle.rules[0].symbolizers[0].stroke.dashOffset">
+                    </div>
+                </div>
+            </form>
         </div>
 
 

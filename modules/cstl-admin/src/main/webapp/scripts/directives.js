@@ -131,7 +131,10 @@ angular.module('cstlAdminApp')
                     allowEmpty: true,
                     showAlpha: true,
                     preferredFormat: "hex",
-                    showButtons: false
+                    showButtons: false,
+                    change: function(color) {
+                        scope.$eval(attrs['oncolorchanged'] || '', { value: color });
+                    }
                 });
 
                 $element.on('$destroy', function() {

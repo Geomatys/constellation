@@ -79,6 +79,11 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             pageSld: 'views/style/chooseType.html'
         };
 
+        $scope.affectAlpha = function(value, param) {
+            //param.color = value.toHexString();
+            param.opacity =value.getAlpha();
+        };
+
         $scope.newStyle = newStyle;
         $scope.serviceName = serviceName || null;
 
