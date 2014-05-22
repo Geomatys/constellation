@@ -38,7 +38,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
         };
 
         $scope.close = function() {
-            if ($scope.import.currentStep = 'step4Netcdf') {
+            if ($scope.import.currentStep === 'step4Netcdf') {
                 $modalInstance.close({type: $scope.import.uploadType, file: $scope.import.providerId, missing: $scope.import.metadata == null});
             } else {
                 $modalInstance.dismiss('close');

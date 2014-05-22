@@ -168,29 +168,51 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
                     'firstStep': function() { return 'step1DataLocal'; }
                 }
             });
-
             modal.result.then(function(result) {
-                dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}}, function() {
-                    $location.path('/description/'+ result.type +"/"+ result.file +"/"+ result.missing);
-                }, function() { $growl('error','Error','Unable to save metadata'); });
+                if (result) {
+                    dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}}, function () {
+                        $location.path('/description/' + result.type + "/" + result.file + "/" + result.missing);
+                    }, function () {
+                        $growl('error', 'Error', 'Unable to save metadata');
+                    });
+                }
             });
         };
 
         $scope.showServerFilePopup = function() {
-            $modal.open({
+            var modal = $modal.open({
                 templateUrl: 'views/data/modalImportData.html',
                 controller: 'ModalImportDataController',
                 resolve: {
                     'firstStep': function() { return 'step1DataServer'; }
                 }
             });
+            modal.result.then(function(result) {
+                if (result) {
+                    dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}}, function () {
+                        $location.path('/description/' + result.type + "/" + result.file + "/" + result.missing);
+                    }, function () {
+                        $growl('error', 'Error', 'Unable to save metadata');
+                    });
+                }
+            });
         };
-         $scope.showDatabasePopup = function() {
-            $modal.open({
+
+        $scope.showDatabasePopup = function() {
+            var modal = $modal.open({
                 templateUrl: 'views/data/modalImportData.html',
                 controller: 'ModalImportDataController',
                 resolve: {
                     'firstStep': function() { return 'step1Database'; }
+                }
+            });
+            modal.result.then(function(result) {
+                if (result) {
+                    dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}}, function () {
+                        $location.path('/description/' + result.type + "/" + result.file + "/" + result.missing);
+                    }, function () {
+                        $growl('error', 'Error', 'Unable to save metadata');
+                    });
                 }
             });
         };

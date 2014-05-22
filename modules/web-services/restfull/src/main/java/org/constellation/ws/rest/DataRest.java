@@ -220,13 +220,14 @@ public class DataRest {
      * Give subfolder list from a server file path
      *
      * @param path server file path
+     * @param filtered {@code True} if we want to keep only known files.
      * @return a {@link javax.ws.rs.core.Response} which contain file list
      */
     @POST
-    @Path("datapath")
+    @Path("datapath/{filtered}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getDataFolder(String path) {
+    public Response getDataFolder(@PathParam("filtered") final Boolean filtered, String path) {
         final List<FileBean> listBean = new ArrayList<>();
         final Set<String> extensions = GeotoolkitFileExtensionAvailable.getAvailableFileExtension().keySet();
 
@@ -248,7 +249,7 @@ public class DataRest {
                     final int lastIndexPoint = child.getName().lastIndexOf('.');
                     final String extension = child.getName().substring(lastIndexPoint + 1);
 
-                    if (extensions.contains(extension.toLowerCase())) {
+                    if (extensions.contains(extension.toLowerCase()) || !filtered) {
                         listBean.add(bean);
                     }
 
