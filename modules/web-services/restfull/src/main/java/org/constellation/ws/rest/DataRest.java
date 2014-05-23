@@ -245,11 +245,11 @@ public class DataRest {
             for (File child : children) {
                 final FileBean bean = new FileBean(child.getName(), child.isDirectory(), child.getAbsolutePath(), child.getParentFile().getAbsolutePath());
 
-                if (!child.isDirectory()) {
+                if (!child.isDirectory() || !filtered) {
                     final int lastIndexPoint = child.getName().lastIndexOf('.');
                     final String extension = child.getName().substring(lastIndexPoint + 1);
 
-                    if (extensions.contains(extension.toLowerCase()) || !filtered) {
+                    if (extensions.contains(extension.toLowerCase()) || "zip".equalsIgnoreCase(extension)) {
                         listBean.add(bean);
                     }
 
@@ -278,34 +278,18 @@ public class DataRest {
                                @Context HttpServletRequest request) {
     	final String sessionId = request.getSession(false).getId();
     	final File uploadDirectory = ConfigDirectory.getUploadDirectory(sessionId);
-    	boolean isArchive =false;
-        File newFile = new File(uploadDirectory, fileDetail.getFileName());
-        File OriginalFile = new File(uploadDirectory, fileDetail.getFileName());
+        final File newFile = new File(uploadDirectory, fileDetail.getFileName());
         try {
             if (fileIs != null) {
                 Files.copy(fileIs, newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 fileIs.close();
-                if (newFile.getName().endsWith(".zip")) {
-                    final String fileNameWithoutExt = newFile.getName().substring(0, newFile.getName().indexOf("."));
-                    final File zipDir = new File(uploadDirectory, fileNameWithoutExt);
-                    FileUtilities.unzip(newFile, zipDir, new CRC32());
-                    newFile = zipDir;
-                    isArchive = true;
-                }
             }
-
-            
         } catch (IOException ex) {
             LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             return Response.status(500).entity("failed").build();
-        } finally {
-            if (isArchive){
-                OriginalFile.delete();
-            }
         }
 
-        String result = newFile.getAbsolutePath();
-        return Response.ok(result).build();
+        return Response.ok(newFile.getAbsolutePath()).build();
     }
 
     /**
@@ -368,26 +352,43 @@ public class DataRest {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response importData(final ParameterValues values, @Context HttpServletRequest request) {
-        final String filePath = values.getValues().get("filePath");
+        String filePath = values.getValues().get("filePath");
         final String metadataFilePath = values.getValues().get("metadataFilePath");
         final String dataType = values.getValues().get("dataType");
 
         try{
-            File dataIntegratedDirectory = ConfigDirectory.getDataIntegratedDirectory();
-            if (filePath!= null){
-                recursiveDelete(new File(new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(filePath).getName()).getAbsolutePath()));
-                truncateZipFolder(filePath);
-                Files.move(Paths.get(filePath), Paths.get(new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(filePath).getName()).getAbsolutePath()),StandardCopyOption.REPLACE_EXISTING);
-            }
-            if (metadataFilePath!= null){
-                Files.move(Paths.get(metadataFilePath), Paths.get(new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(metadataFilePath).getName()).getAbsolutePath()),StandardCopyOption.REPLACE_EXISTING);
-            }
-            ImportedData importedData = new ImportedData();
+            final File dataIntegratedDirectory = ConfigDirectory.getDataIntegratedDirectory();
+            final File uploadFolder = new File(ConfigDirectory.getDataDirectory(), "upload");
+            final ImportedData importedData = new ImportedData();
             if (filePath != null) {
-                importedData.setDataFile(new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(filePath).getName()).getAbsolutePath());
+                if (filePath.endsWith(".zip")) {
+                    final File zipFile = new File(filePath);
+                    final String fileNameWithoutExt = zipFile.getName().substring(0, zipFile.getName().indexOf("."));
+                    final File zipDir = new File(dataIntegratedDirectory, fileNameWithoutExt);
+                    if (zipDir.exists()) {
+                        recursiveDelete(zipDir);
+                    }
+                    FileUtilities.unzip(zipFile, zipDir, new CRC32());
+                    filePath = zipDir.getAbsolutePath();
+                }
+
+                if (filePath.startsWith(uploadFolder.getAbsolutePath())) {
+                    final File destFile = new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(filePath).getName());
+                    Files.move(Paths.get(filePath), Paths.get(destFile.getAbsolutePath()),StandardCopyOption.REPLACE_EXISTING);
+                    importedData.setDataFile(destFile.getAbsolutePath());
+                } else {
+                    importedData.setDataFile(filePath);
+                }
             }
-            if (metadataFilePath != null) {
-                importedData.setMetadataFile(new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(metadataFilePath).getName()).getAbsolutePath());
+
+            if (metadataFilePath != null){
+                if (metadataFilePath.startsWith(uploadFolder.getAbsolutePath())) {
+                    final File destMd = new File(dataIntegratedDirectory.getAbsolutePath() + File.separator + new File(metadataFilePath).getName());
+                    Files.move(Paths.get(metadataFilePath), Paths.get(destMd.getAbsolutePath()), StandardCopyOption.REPLACE_EXISTING);
+                    importedData.setMetadataFile(destMd.getAbsolutePath());
+                } else {
+                    importedData.setMetadataFile(metadataFilePath);
+                }
             }
 
             return Response.ok(importedData).build();
