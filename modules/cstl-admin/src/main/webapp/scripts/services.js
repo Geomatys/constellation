@@ -479,7 +479,9 @@ cstlAdminApp.factory('StyleSharedService', ['$modal', 'style', 'webService', '$g
                 });
                 modal.result.then(function(item) {
                     if (scope) {
-                        scope.init();
+                        style.listAll({provider: 'sld'}, function(response) {
+                            scope.fullList = response.styles;
+                        });
                     }
                 });
             },
@@ -497,7 +499,9 @@ cstlAdminApp.factory('StyleSharedService', ['$modal', 'style', 'webService', '$g
                 });
                 modal.result.then(function(item) {
                     if (scope) {
-                        scope.init();
+                        style.listAll({provider: 'sld'}, function(response) {
+                            scope.fullList = response.styles;
+                        });
                     }
                 });
             }

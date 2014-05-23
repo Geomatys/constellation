@@ -25,6 +25,7 @@ cstlAdminApp.controller('StylesController', ['$scope', '$dashboard', 'style', '$
             style.listAll({provider: 'sld'}, function (response) {
                 $dashboard($scope, response.styles, true);
                 $scope.filtertype = "";
+                $scope.ordertype = "Name";
                 modalLoader.close();
             }, function() {
                 modalLoader.close();
