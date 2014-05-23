@@ -331,7 +331,7 @@
         "fields.required":"All fields are required.",
         "file.local": "Local file",
         "file.server": "Server file",
-        "file.db":"Base de données",
+        "file.db":"Database",
         "finish": "Finish",
         "import.style": "Import a style",
         "list.style": "Style list",

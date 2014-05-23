@@ -3,7 +3,7 @@
         <li class="active"><span class="divider">{{currentPath}}</span></li>
     </ul>
     <div class="row">
-        <div ng-repeat="col in columns" ng-click="navServer()" class="col-sm-5 col-md-3 well block-folders" style="overflow:auto; height:275px; margin-bottom:20px; margin-left:20px;">
+        <div ng-repeat="col in columns" ng-click="navServer()" class="col-sm-3 well block-folders" style="overflow:auto; height:275px; margin-bottom:20px; margin-left:20px;">
             <input type="text" style="margin-bottom:10px;" placeholder="filter" class="col-sm-12" ng-model="search">
             <ul class="unstyled">
                 <li ng-repeat="item in col | filter:search">
