@@ -217,7 +217,7 @@ public final class Provider {
                             omParams.parameter("sgbdtype").setValue(inParams.get("sgbdtype"));
                             omParams.parameter("namespace").setValue("no namespace");
                             break;
-                        default:
+                        case "postgresql":
                             final ParameterValueGroup pgParams = sources.groups("choice").get(0).addGroup("PostgresParameters");
                             final int port = Integer.parseInt(inParams.get("port"));
                             pgParams.parameter("identifier").setValue("postgresql");
@@ -226,7 +226,21 @@ public final class Provider {
                             pgParams.parameter("user").setValue(inParams.get("user"));
                             pgParams.parameter("password").setValue(inParams.get("password"));
                             pgParams.parameter("database").setValue(inParams.get("database"));
+                            pgParams.parameter("namespace").setValue("no namespace");
                             pgParams.parameter("simple types").setValue(true);
+                            break;
+                        default:
+                            final ParameterValueGroup defParams = sources.groups("choice").get(0).addGroup("PostgresParameters");
+                            final int defPort = Integer.parseInt(inParams.get("port"));
+                            defParams.parameter("identifier").setValue("postgresql");
+                            defParams.parameter("host").setValue(inParams.get("host"));
+                            defParams.parameter("port").setValue(defPort);
+                            defParams.parameter("user").setValue(inParams.get("user"));
+                            defParams.parameter("password").setValue(inParams.get("password"));
+                            defParams.parameter("database").setValue(inParams.get("database"));
+                            defParams.parameter("namespace").setValue("no namespace");
+                            defParams.parameter("simple types").setValue(true);
+                            break;
                     }
                 }
                 break;

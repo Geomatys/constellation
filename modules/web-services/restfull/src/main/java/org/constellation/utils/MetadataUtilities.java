@@ -383,23 +383,28 @@ public final class MetadataUtilities {
      * @param dataProvider
      * @param dataName
      * @return
-     * @throws CoverageStoreException
+     * @throws DataStoreException
      */
     public static DefaultMetadata getVectorMetadata(final DataProvider dataProvider, final Name dataName) throws DataStoreException{
     	
     	final DataStore dataStore = dataProvider.getMainStore();
     	final FeatureStore featureStore =(FeatureStore)dataStore;
-    	
-        final Envelope env = featureStore.getEnvelope(QueryBuilder.all(dataName));
+
 
         final DefaultMetadata md = new DefaultMetadata();
         final DefaultDataIdentification ident = new DefaultDataIdentification();
+        md.getIdentificationInfo().add(ident);
+
+        final Envelope env = featureStore.getEnvelope(QueryBuilder.all(dataName));
+        if (env == null) {
+            return md;
+        }
+
         final DefaultGeographicBoundingBox bbox = new DefaultGeographicBoundingBox(
                 env.getMinimum(0), env.getMaximum(0), env.getMinimum(1), env.getMaximum(1)
         );
         final DefaultExtent extent = new DefaultExtent("", bbox, null, null);
         ident.getExtents().add(extent);
-        md.getIdentificationInfo().add(ident);
         return md;
     }
 

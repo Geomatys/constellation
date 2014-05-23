@@ -29,7 +29,8 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
             finish: angular.noop,
             metadata: null,
             providerId: null,
-            layer: null
+            layer: null,
+            db: {}
         };
 
         $scope.sensor = {
@@ -49,6 +50,30 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
             $scope.import.currentStep = 'step4Sensor';
             $scope.import.allowSensorChoose = false;
             $scope.import.allowSubmit = true;
+        };
+
+        $scope.importDb = function() {
+            var providerId = "postgis-"+ $scope.import.db.name;
+            provider.create({
+                id: providerId
+            }, {
+                type: "feature-store",
+                subType: "postgresql",
+                parameters: {
+                    host: $scope.import.db.url,
+                    port: $scope.import.db.port,
+                    user: $scope.import.db.user,
+                    password: $scope.import.db.password,
+                    database: $scope.import.db.name
+                }
+            }, function() {
+                if ($scope.import.metadata) {
+                    dataListing.setUpMetadata({values: {'providerId': providerId, 'mdPath': $scope.import.metadata}});
+                }
+
+                $growl('success','Success','Postgis database successfully added');
+                $modalInstance.close({type: "vector", file: providerId, missing: $scope.import.metadata == null});
+            });
         };
 
         $scope.uploaded = function() {
@@ -309,7 +334,10 @@ cstlAdminApp.controller('ModalImportDataStep1ServerController', ['$scope', 'data
 
 cstlAdminApp.controller('ModalImportDataStep1DatabaseController', ['$scope',
     function($scope) {
-
+        $scope.import.next = function() {
+            $scope.import.currentStep = 'step2Metadata';
+            $scope.import.allowNext = true;
+        };
     }]);
 
 cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$cookies',
@@ -320,7 +348,9 @@ cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$c
             }
 
             $scope.import.allowNext = false;
-            if ($scope.import.uploadType == null) {
+            if ($scope.import.db.url) {
+                $scope.importDb();
+            } else if ($scope.import.uploadType == null) {
                 $scope.import.currentStep = 'step3Type';
                 $scope.import.allowSubmit = true;
             } else {

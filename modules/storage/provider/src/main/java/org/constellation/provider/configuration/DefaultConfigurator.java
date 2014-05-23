@@ -181,9 +181,14 @@ public final class DefaultConfigurator implements Configurator {
                         } catch (DataStoreException ex) {
                             LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
                         }
-                        if (fType != null) {
+                        if (fType != null && fType.getGeometryDescriptor() != null && fType.getGeometryDescriptor().getType() != null &&
+                                fType.getGeometryDescriptor().getType().getBinding() != null)
+                        {
                             final String subtype = fType.getGeometryDescriptor().getType().getBinding().getSimpleName();
                             ConfigurationEngine.updateDataSubtype(name, provider.getId(), subtype);
+                        } else {
+                            // A feature that does not contain geometry, we hide it
+                            ConfigurationEngine.updateDataVisibility(name, provider.getId(), false);
                         }
                     }
 
