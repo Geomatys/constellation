@@ -1,11 +1,10 @@
-<ol class="breadcrumb">
+<ol class="breadcrumb col-sm-12 col-md-6">
     <li><a ng-click="goBack()"><span translate="sldeditor.breadcrumb.type">Type selection</span></a></li>
     <li class="active"><span translate="sldeditor.breadcrumb.edition">Style Edition</span></li>
 </ol>
 
-<div class="row">
   <div class="col-sm-12 col-md-6">
-    <div class="style_bloc">
+    <div class="style_bloc style_bloc_name">
       <div class="form-group col-xs-12" style="margin: 6px 0; height:35px;">
         <label class="col-xs-4 col-sm-3 col-md-4 control-label" style="margin-top: 8px;" translate="sldeditor.name">Style name</label>
         <div class="col-xs-7 col-sm-9 col-md-8">
@@ -13,11 +12,11 @@
         </div>
       </div>
     </div>
-  </div>
-  <div class="col-sm-12 col-md-6">
+
+  <div class="col-sm-12">
       <div ng-if="noName" class="alert alert-style" translate="alert.style.noname">Veuillez renseigner un nom de style</div>
     </div>
-</div>
+  </div>
 
   <ul class="nav nav-tabs" ng-init="chosenTab = 'simple'">
       <li ng-class="{active: chosenTab==='simple'}"><a ng-click="chosenTab = 'simple'" data-toggle="tab"><span translate="sldeditor.tab.simple" >Simple editor</span></a></li>
@@ -27,11 +26,19 @@
 
 <!-- Tab panes -->
 <div class="tab-content" ng-init="initText()">
-  <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='simple'}">
+  <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='simple'}" ng-init="edit='text'">
     <div class="row">
       <div class="col-xs-12 col-sm-6">
-        <h2 translate="sldeditor.breadcrumb.edition">Style Edition</h2>
-        <div class="style_bloc">
+
+        <div class="row">
+          <div class="col-xs-12" style="margin-top:8px;">
+            <button type="button" class="btn-edit-style col-xs-5 btn btn-primary" style="border-radius:5px 0 0 0;" ng-class="{selected:edit=='text'}" ng-click="edit='text'"><span translate="sldeditor.edition.text.style">Text style</span></button>
+            <button type="button" class="btn-edit-style col-xs-4 btn btn-primary" style="border-radius:0 5px 0 0;" ng-class="{selected:edit=='label'}" ng-click="edit='label'"><span translate="sldeditor.edition.label">Label</span></button>
+          </div> 
+        </div>
+
+
+        <div class="style_bloc" ng-show="edit=='text'">
            <form class="form-horizontal form-style" role="form">
               <div class="form-group">
                 <label class="col-sm-4 col-md-3 control-label" translate="sldeditor.edition.font">Font</label>
@@ -74,17 +81,17 @@
               </div>
             </form>
         </div>
-        <div class="style_bloc">
+        <div class="style_bloc" ng-show="edit=='label'">
            <form class="form-horizontal form-style" role="form">
               <div class="form-group">
                    <label class="col-sm-4 col-md-3 control-label" translate="sldeditor.edition.label">Label</label>
-                   <div class="col-sm-8 col-md-4" style="margin-bottom:8px;">
+                   <div class="col-sm-8 col-md-6" style="margin-bottom:8px;">
                        <input type="text" class="form-control" ng-model="$parent.newStyle.rules[0].symbolizers[0].label">
                    </div>
-                   <div class="col-sm-offset-4 col-sm-1 col-md-offset-0" style="padding-left:0;">
+                   <div class="col-sm-offset-4 col-sm-1 col-md-offset-0">
                         <button type="button" class="btn btn-default" ng-click="dispPropNames = true"><span class="icon-link"></span></button>
                    </div>
-                   <div class="col-sm-6 col-md-4" ng-show="dispPropNames">
+                   <div class="col-sm-6 col-md-offset-4 col-md-6" ng-show="dispPropNames" style="margin-left:20px;">
                        <select class="form-control" ng-model="newStyle.rules[0].symbolizers[0].label">
                            <option ng-value="'{'+dp.name+'}'" ng-repeat="dp in $parent.dataProperties">{{dp.name}}</option>
                        </select>
@@ -95,9 +102,8 @@
 
       </div>
       <div class="col-xs-12 col-sm-6">
-        <h2 translate="sldeditor.apercu.titre">Style preview</h2>
-        <div class="bloc_apercu" id="styledMapOL" style="height: 299px;"></div>
         <button type="button" class="btn-apercu col-xs-12 btn btn-primary" ng-click="displayCurrentStyle()"><span translate="sldeditor.apercu.data">Data preview</span></button>
+        <div class="bloc_apercu" id="styledMapOL" style="height: 299px;"></div>
       </div>
     </div>
   </div>

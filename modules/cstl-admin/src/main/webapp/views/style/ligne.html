@@ -1,8 +1,8 @@
-<ol class="breadcrumb">
+<ol class="breadcrumb col-sm-12 col-md-6">
     <li><a ng-click="goBack()"><span translate="sldeditor.breadcrumb.type">Type selection</span></a></li>
     <li class="active"><span translate="sldeditor.breadcrumb.edition">Style Edition</span></li>
 </ol>
-<div class="row">
+
     <div class="col-sm-12 col-md-6">
       <div class="style_bloc style_bloc_name">
         <div class="form-group col-xs-12" style="margin: 6px 0; height:35px;">
@@ -12,11 +12,11 @@
           </div>
         </div>
       </div>
-    </div>
-    <div class="col-sm-12 col-md-6">
+
+    <div class="col-sm-12">
       <div ng-if="noName" class="alert alert-style" translate="alert.style.noname">Veuillez renseigner un nom de style</div>
     </div>
-  </div>
+    </div>
 
     <ul class="nav nav-tabs" ng-init="chosenTab = 'simple'">
         <li ng-class="{active: chosenTab==='simple'}"><a ng-click="chosenTab = 'simple'" data-toggle="tab"><span translate="sldeditor.tab.simple" >Simple editor</span></a></li>
@@ -25,30 +25,36 @@
 
 <!-- Tab panes -->
 <div class="tab-content" ng-init="initLine()">
-  <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='simple'}">
+  <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='simple'}" ng-init="edit='line'">
     <div class="row">
       <div class="col-xs-12 col-sm-6">
-        <h2 translate="sldeditor.breadcrumb.edition">Style Edition</h2>
-        <div class="style_bloc">
+        <div class="row">
+          <div class="col-xs-12" style="margin-top:8px;">
+            <button type="button" class="btn-edit-style col-xs-5 btn btn-primary" style="border-radius:5px 0 0 0;" ng-class="{selected:edit=='line'}" ng-click="edit='line'"><span translate="sldeditor.edition.line">Line</span></button>
+            <button type="button" class="btn-edit-style col-xs-2 btn btn-primary" style="border-radius:0 5px 0 0;" ng-class="{selected:edit=='plus'}" ng-click="edit='plus'"><span class="glyphicon-plus glyphicon"></span></button>
+          </div> 
+        </div>
+
+        <div class="style_bloc" ng-show="edit=='line'">
           <form class="form-horizontal form-style" role="form">
             <div class="form-group">
-              <label class="col-sm-3 col-md-2 control-label" translate="sldeditor.edition.color">Color</label>
-              <div class="col-sm-3 col-md-5">
+              <label class="col-sm-3 control-label" translate="sldeditor.edition.color">Color</label>
+              <div class="col-sm-3">
                 <input type='text' name="picker" class="picker" spectrum oncolorchanged="affectAlpha(value, newStyle.rules[0].symbolizers[0].stroke)" ng-model="newStyle.rules[0].symbolizers[0].stroke.color"/>
               </div>
-              <label class="col-sm-3 col-md-3 control-label" translate="sldeditor.edition.opacity">Opacity</label>
-                <div class="col-sm-3 col-md-2" style="margin-top: 7px;">
+              <label class="col-sm-3 control-label" translate="sldeditor.edition.opacity">Opacity</label>
+                <div class="col-sm-3" style="margin-top: 7px;">
                     {{newStyle.rules[0].symbolizers[0].stroke.opacity}}
                 </div>
             </div>
             <div class="form-group">
-              <label class="col-sm-3 col-md-2 control-label" translate="sldeditor.edition.size">Size</label>
+              <label class="col-sm-3 control-label" translate="sldeditor.edition.size">Size</label>
               <div class="col-sm-9 col-md-4">
                 <input type="number" class="form-control" ng-model="newStyle.rules[0].symbolizers[0].stroke.width">
               </div>
             </div>
             <div class="form-group">
-              <label class="col-sm-3 col-md-2 control-label">Type</label>
+              <label class="col-sm-3 control-label">Type</label>
                 <div class="col-sm-9 col-lg-4">
                     <select ng-model="traitType" class="form-control" ng-change="$parent.addStrokeDashArray(traitType)">
                         <option value="" translate="sldeditor.edition.full">Full</option>
@@ -56,12 +62,12 @@
                         <!--<option value="graphic">Graphic stroke</option>-->
                     </select>
                 </div>
-                <div class="col-sm-12 col-lg-6 pointille" ng-show=" traitType=='pointille' ">
+                <div class="col-sm-12 col-lg-11 pointille" ng-show=" traitType=='pointille' "style="margin-top:10px;">
                     <div class="row dashed-pb">
-                        <div class="col-sm-2 col-xs-12"><label class="control-label" translate="sldeditor.edition.line">line</label></div>
-                        <div class="col-sm-4 col-xs-6"><input type="number" class="form-control" ng-model="newStyle.rules[0].symbolizers[0].stroke.dashArray[0]"></div>
-                        <div class="col-sm-2 col-xs-12"><label class="control-label" translate="sldeditor.edition.space">Space</label></div>
-                        <div class="col-sm-4 col-xs-6"><input type="number" class="form-control" ng-model="newStyle.rules[0].symbolizers[0].stroke.dashArray[1]"></div>
+                        <div class="col-sm-3 col-xs-12"><label class="pull-right control-label" translate="sldeditor.edition.line">line</label></div>
+                        <div class="col-sm-9 col-md-3 col-xs-6"><input type="number" class="form-control" ng-model="newStyle.rules[0].symbolizers[0].stroke.dashArray[0]"></div>
+                        <div class="col-sm-3 col-lg-2 col-xs-12"><label class="control-label" translate="sldeditor.edition.space">Space</label></div>
+                        <div class="col-sm-9 col-md-3 col-xs-6"><input type="number" class="form-control" ng-model="newStyle.rules[0].symbolizers[0].stroke.dashArray[1]"></div>
                     </div>
                 </div>
               <div class="col-sm-12 col-md-6" ng-show=" traitType=='graphic' ">
@@ -75,20 +81,13 @@
 
               </div>
             </div>
-            <div class="row">
-              <div class="col-sm-10 col-sm-offset-3 col-md-offset-2">
-                <button type="button" ng-click="display = !display" class="btn btn-sm btn-primary">
-                  <span class="glyphicon" ng-class="{'glyphicon-plus': !display, 'glyphicon-minus': display}"></span>
-                </button>
-              </div>
-            </div>
           </form>
         </div>
 
-        <div ng-show="display" class="style_bloc">
+        <div ng-show="edit=='plus'" class="style_bloc">
           <form class="form-horizontal form-style" role="form">
               <div class="form-group">
-                <label  class="col-xs-4 col-md-2 control-label" translate="sldeditor.edition.join">Join</label>
+                <label  class="col-xs-4 col-md-3 control-label" translate="sldeditor.edition.join">Join</label>
                   <div class="btn-group select select-bloc col-xs-8">
                       <button class="btn dropdown-toggle btn-default" data-toggle="dropdown" ng-model="newStyle.rules[0].symbolizers[0].stroke.lineJoin">
                           <span class="filter-option pull-left"><img class="img_icone" src="images/icone_lineJoin_{{newStyle.rules[0].symbolizers[0].stroke.lineJoin}}.png"></span>&nbsp;
@@ -110,7 +109,7 @@
 
               </div>    
               <div class="form-group">
-              <label  class="col-xs-4 col-md-2 control-label" translate="sldeditor.edition.cap">Cap</label>
+              <label  class="col-xs-4 col-md-3 control-label" translate="sldeditor.edition.cap">Cap</label>
                   <div class="btn-group select select-block col-xs-8">
                       <button class="btn dropdown-toggle btn-default" data-toggle="dropdown" ng-model="newStyle.rules[0].symbolizers[0].stroke.lineCap">
                           <span class="filter-option pull-left"><img class="img_icone" src="images/icone_lineCap_{{newStyle.rules[0].symbolizers[0].stroke.lineCap}}.png"></span>&nbsp;
@@ -132,7 +131,7 @@
               </div>
 
             <div class="form-group">
-              <label class="col-sm-4 col-md-2 control-label" translate="sldeditor.edition.offset">Offset</label>
+              <label class="col-sm-4 col-md-3 control-label" translate="sldeditor.edition.offset">Offset</label>
               <div class="col-sm-4">
                 <input type="number" class="form-control" ng-model="newStyle.rules[0].symbolizers[0].stroke.dashOffset">
               </div>
@@ -143,9 +142,8 @@
 
       </div>
       <div class="col-xs-12 col-sm-6">
-        <h2 translate="sldeditor.apercu.titre">Style preview</h2>
-        <div class="bloc_apercu" id="styledMapOL" style="height: 299px;"></div>
         <button type="button" class="btn-apercu col-xs-12 btn btn-primary" ng-click="displayCurrentStyle()"><span translate="sldeditor.apercu.data">Data preview</span></button>
+        <div class="bloc_apercu" id="styledMapOL" style="height: 299px;"></div>
       </div>
     </div>
   </div>

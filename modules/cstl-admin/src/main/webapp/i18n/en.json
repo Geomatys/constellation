@@ -958,7 +958,9 @@
             "opacity":"Opacity",
             "font":"Font",
             "label":"Label",
-            "reversecolors":"Reverse colors"
+            "reversecolors":"Reverse colors", 
+            "point":"Point",
+            "text.style":"Text style"
         },
         "button":{
             "cancel":"Cancel",

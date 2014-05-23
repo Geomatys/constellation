@@ -1,5 +1,4 @@
 /*general*/
-
 .frame-sldEditor{
     box-shadow: none;
 }
@@ -13,6 +12,9 @@
 }
 .modal-dialog-sld label{
     font-size: 13px;
+}
+.modal-dialog-sld .breadcrumb{
+	margin-top: 8px;
 }
 /*choix type*/
 .choix_type{
@@ -88,7 +90,7 @@ a.choix_type:hover{
 	margin-bottom: 0;
 }
 .form_classification{
-	margin-top: 20px;
+	margin-top: 15px;
 }
 .btn-generer{
 	float: right;
@@ -103,6 +105,20 @@ a.choix_type:hover{
 }
 .form-style .form-group{
 	margin-bottom: 10px;
+}
+.btn-edit-style{
+	background-color: #eee;
+	color: #555;
+	border: solid 1px #bbb;
+	border-bottom: none;
+}
+.btn-edit-style.selected{
+	color: #ffffff;
+	background-color: #428bca;
+	border-color: #357ebd;
+}
+.tab-style-edition .style_bloc{
+	padding:15px 10px 0 10px;	
 }
 /*raster*/
 .bande_rouge{

@@ -1233,7 +1233,9 @@
             "opacity":"Opacité",
             "font":"Police",
             "label":"Libellé",
-            "reversecolors":"Inverser les couleurs"
+            "reversecolors":"Inverser les couleurs",
+            "point":"Point",
+            "text.style":"Style du texte"
         },
         "button":{
             "cancel":"Annuler",

@@ -1,10 +1,10 @@
-<ol class="breadcrumb">
+<ol class="breadcrumb col-sm-12 col-md-6">
     <li><a ng-click="goBack()"><span translate="sldeditor.breadcrumb.type">Type selection</span></a></li>
     <li class="active" translate="sldeditor.breadcrumb.edition">Style Edition</li>
 </ol>
-<div class="row">
+
   <div class="col-sm-12 col-md-6">
-    <div class="style_bloc">
+    <div class="style_bloc style_bloc_name">
       <div class="form-group col-xs-12" style="margin: 6px 0; height:35px;">
         <label class="col-xs-4 col-sm-3 col-md-4 control-label" style="margin-top: 8px;" translate="sldeditor.name">Style name</label>
         <div class="col-xs-7 col-sm-9 col-md-8">
@@ -12,11 +12,11 @@
         </div>
       </div>
     </div>
-  </div>
-  <div class="col-sm-12 col-md-6">
+
+  <div class="col-sm-12">
       <div ng-if="noName" class="alert alert-style" translate="alert.style.noname">Veuillez renseigner un nom de style</div>
     </div>
-</div>
+  </div>
 <!-- Tab nav -->
 
   <ul class="nav nav-tabs" ng-init="chosenTab = 'colorMap'">
@@ -29,8 +29,7 @@
 <div class="tab-content" ng-init="initRaster1Band()">
   <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='simple'}">
     <div class="row">
-      <div class="col-xs-12 col-sm-6 col-md-8">
-        <h2 translate="sldeditor.breadcrumb.edition">Style Edition</h2>
+      <div class="col-xs-12 col-sm-6" style="margin-top:10px;" >
         <div class="style_bloc" style="min-height:60px;">
           <div class="col-sm-12 btn-group" ng-init="bandes='triple'" data-toggle="buttons">
             <label ng-class="{active: bandes==='triple'}" ng-click="bandes='triple'" type="button" class="btn btn-default"><input type="radio" value="triple">Triples bandes</label>
@@ -96,20 +95,18 @@
         </div>
 
       </div>
-      <div class="col-xs-12 col-sm-6 col-md-4">
-        <h2 translate="sldeditor.apercu.titre">Style preview</h2>
-        <div class="bloc_apercu" id="styledMapO" style="width: 299px; height: 299px;"></div>
+      <div class="col-xs-12 col-sm-6">
         <button type="button" class="btn-apercu col-xs-12 btn btn-primary" ng-click="displayCurrentStyle()"><span translate="sldeditor.apercu.data">Data preview</span></button>
+        <div class="bloc_apercu" id="styledMapO" style="height: 299px;"></div>
       </div>
     </div>
   </div>
 
   <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='colorMap'}">
     <div class="row">
-      <div class="col-xs-12 col-sm-6">
-        <h2 translate="sldeditor.breadcrumb.edition">Style Edition</h2>
+      <div class="col-xs-12 col-sm-6" style="margin-top:10px;" >
         <div class="style_bloc">
-          <form class="form_classification form-horizontal form-style" role="form">
+          <form class="form-horizontal form-style" role="form">
              <div class="form-group col-xs-12">
                 <label class="col-sm-3 col-md-2 control-label">Palette</label>
                 <div class="col-sm-9 col-md-10">
@@ -248,9 +245,8 @@
 
       </div>
       <div class="col-xs-12 col-sm-6">
-        <h2 translate="sldeditor.apercu.titre">Style preview</h2>
-        <div class="bloc_apercu" id="styledMapOL" style="height: 299px;"></div>
         <button type="button" class="btn-apercu col-xs-12 btn btn-primary" ng-click="displayCurrentStyle()"><span translate="sldeditor.apercu.data">Data preview</span></button>
+        <div class="bloc_apercu" id="styledMapOL" style="height: 299px;"></div>
       </div>
     </div>
   </div>

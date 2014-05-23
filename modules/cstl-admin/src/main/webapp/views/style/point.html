@@ -1,11 +1,11 @@
-<ol class="breadcrumb">
+<ol class="breadcrumb col-sm-12 col-md-6">
   <li><a ng-click="goBack()"><span translate="sldeditor.breadcrumb.type">Type selection</span></a></li>
   <li class="active"><span translate="sldeditor.breadcrumb.edition">Style Edition</span></li>
 </ol>
 
-  <div class="row">
+
     <div class="col-sm-12 col-md-6">
-      <div class="style_bloc">
+      <div class="style_bloc style_bloc_name">
         <div class="form-group col-xs-12" style="margin: 6px 0; height:35px;">
           <label class="col-xs-4 col-sm-3 col-md-4 control-label" style="margin-top: 8px;"  translate="sldeditor.name">Style name</label>
           <div class="col-xs-7 col-sm-9 col-md-8">
@@ -13,11 +13,11 @@
           </div>
         </div>
       </div>
-    </div>
-    <div class="col-sm-12 col-md-6">
+   
+    <div class="col-sm-12">
       <div ng-if="noName" class="alert alert-style" translate="alert.style.noname">Veuillez renseigner un nom de style</div>
     </div>
-  </div>
+ </div>
 <!-- Tab nav -->
 
     <ul class="nav nav-tabs" ng-init="chosenTab = 'simple'">
@@ -26,11 +26,18 @@
     </ul>
 <!-- Tab panes -->
 <div class="tab-content" ng-init="initPoint()">
-  <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='simple'}">
+  <div class="tab-pane tab-style-edition" ng-init="edit='point'" ng-class="{active:chosenTab==='simple'}">
     <div class="row">
       <div class="col-xs-12 col-sm-6">
-        <h2 translate="sldeditor.breadcrumb.edition">Style Edition</h2>
-        <div class="style_bloc">
+        <div class="row">
+          <div class="col-xs-12" style="margin-top:8px;">
+            <button type="button" class="btn-edit-style col-xs-5 btn btn-primary" style="border-radius:5px 0 0 0;" ng-class="{selected:edit=='point'}" ng-click="edit='point'"><span translate="sldeditor.edition.point">Point</span></button>
+            <button type="button" class="btn-edit-style col-xs-2 btn btn-primary" style="border-radius:0 5px 0 0;" ng-class="{selected:edit=='plus'}" ng-click="edit='plus'"><span class="glyphicon-plus glyphicon"></span></button>
+          </div> 
+        </div>
+
+
+        <div class="style_bloc" ng-show="edit=='point'">
           <form class="form-horizontal form-style" role="form">
             <div class="form-group">
               <label class="col-sm-4 col-md-3 control-label" translate="sldeditor.edition.icon">Icon</label>
@@ -88,7 +95,7 @@
             </div>
           </form>
         </div>
-        <div class="style_bloc">
+        <div class="style_bloc" ng-show="edit=='plus'">
           <form class="form-horizontal form-style" role="form">
             <div class="form-group">
               <label class="col-sm-4 col-md-3 control-label" translate="sldeditor.edition.size">Size</label>
@@ -125,9 +132,8 @@
 
       </div>
       <div class="col-xs-12 col-sm-6">
-        <h2 translate="sldeditor.apercu.titre">Style preview</h2>
-        <div class="bloc_apercu" id="styledMapOL" style="height: 299px;"></div>
         <button type="button" class="btn-apercu col-xs-12 btn btn-primary" ng-click="displayCurrentStyle()"><span translate="sldeditor.apercu.data">Data preview</span></button>
+        <div class="bloc_apercu" id="styledMapOL" style="height: 299px;"></div>
       </div>
     </div>
   </div>
