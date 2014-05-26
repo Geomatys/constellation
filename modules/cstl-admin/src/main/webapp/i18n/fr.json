@@ -1211,7 +1211,10 @@
         "tab":{
             "simple":"Editeur simple",
             "xml":"Editeur XML",
-            "xmledit":"editer votre style xml"
+            "xmledit":"editer votre style xml",
+            "rules":"Editeur de règles",
+            "unique":"Valeur unique",
+            "interval":"Intervalle"
         },
         "apercu":{
             "titre": "Aperçu du style",
@@ -1235,7 +1238,9 @@
             "label":"Libellé",
             "reversecolors":"Inverser les couleurs",
             "point":"Point",
-            "text.style":"Style du texte"
+            "text.style":"Style du texte",
+            "method":"Méthode",
+            "intervals":"Intervalles"
         },
         "button":{
             "cancel":"Annuler",

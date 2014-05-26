@@ -936,7 +936,10 @@
         "tab":{
             "simple":"Simple editor",
             "xml":"XML editor",
-            "xmledit":"edit your xml style"
+            "xmledit":"edit your xml style",
+            "rules":"Rules editor",
+            "unique":"Unique value",
+            "interval":"Interval"
         },
         "apercu":{
             "titre": "Style preview",
@@ -960,7 +963,9 @@
             "label":"Label",
             "reversecolors":"Reverse colors", 
             "point":"Point",
-            "text.style":"Text style"
+            "text.style":"Text style",
+            "method":"Method",
+            "intervals":"Intervals"
         },
         "button":{
             "cancel":"Cancel",
