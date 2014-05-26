@@ -134,7 +134,7 @@
                                                 </div>
                                             </div>
                                             <div ng-if="type === 'csw'">
-                                                <div ng-repeat="cswdata in dataList">
+                                                <div ng-repeat="cswdata in dataList" ng-class="{'col-xs-6':small==true}" style="padding-left:0;">
                                                     <div class="item" ng-class="{'selected':cswdata==selected, 'metadata-service':cswdata.identifier.split('_')[0]==='serv','metadata':cswdata.identifier.split('_')[0]!=='serv'}" ng-click="select(cswdata);selectMetadataChild(null), 'col-xs-6':small==true">
                                                         <div class="top">
                                                             <span class="item-title">{{cswdata.title ? cswdata.title : cswdata.identifier}}</span>
@@ -153,8 +153,8 @@
                                                         </div>
                                                     </div>
 
-                                                    <div class="item child" ng-if="cswdata==selected" ng-repeat="relatedData in relatedDatas[cswdata.identifier]"
-                                                         ng-click="selectMetadataChild(relatedData)" ng-class="{selected:relatedData==selectedMetadataChild,'metadata-product-vector':relatedData.Type.toLowerCase()=='vector','metadata-product-coverage':relatedData.Type.toLowerCase()=='coverage','metadata-product-sensor':relatedData.Type.toLowerCase()=='sensor', 'col-xs-6':small==true}">
+                                                    <div class="item" style="margin-top:0;" ng-if="cswdata==selected" ng-repeat="relatedData in relatedDatas[cswdata.identifier]"
+                                                         ng-click="selectMetadataChild(relatedData)" ng-class="{selected:relatedData==selectedMetadataChild,'metadata-product-vector':relatedData.Type.toLowerCase()=='vector','metadata-product-coverage':relatedData.Type.toLowerCase()=='coverage','metadata-product-sensor':relatedData.Type.toLowerCase()=='sensor', 'child':small==false, 'col-xs-11':small==true, 'col-sm-offset-1':small==true}">
                                                         <div class="top">
                                                             <span class="item-title">{{relatedData.Name}}</span>
                                                             <span class="pull-right text-right item-list-style" style="font-size:14px;">{{relatedData.Type}}</span>
@@ -171,8 +171,8 @@
                                                 </div>
                                             </div>
                                             <div ng-if="type === 'sos'">
-                                                <div ng-repeat="sosdata in dataList">
-                                                    <div class="item" ng-class="{'sensor-sos':sosdata.type!=='System','sensor-system':sosdata.type==='System','selected':sosdata==selected, 'col-xs-6':small==true}" ng-click="select(sosdata);selectSensorsChild(null);">
+                                                <div ng-repeat="sosdata in dataList" ng-class="{'col-xs-6':small==true}" style="padding-left:0;">
+                                                    <div class="item" ng-class="{'sensor-sos':sosdata.type!=='System','sensor-system':sosdata.type==='System','selected':sosdata==selected}" ng-click="select(sosdata);selectSensorsChild(null);">
                                                         <div class="top">
                                                             <span class="item-title">{{sosdata.id}}</span>
                                                             <span ng-if="sosdata.type==='System'" class="pull-right text-right item-list-style"  style="font-size:14px;" translate="label.sensor.system">sensor system</span>
@@ -194,7 +194,7 @@
                                                         </div>
                                                     </div>
 
-                                                    <div class="item child sensor-sos" ng-if="sosdata==selected" ng-repeat="soschild in sosdata.children" ng-class="{'selected':soschild===selectedSensorsChild, 'col-xs-6':small==true}" ng-click="selectSensorsChild(soschild)">
+                                                    <div class="item sensor-sos" style="margin-top:0;" ng-if="sosdata==selected" ng-repeat="soschild in sosdata.children" ng-class="{'selected':soschild===selectedSensorsChild, 'child':small==false, 'col-xs-11':small==true, 'col-sm-offset-1':small==true}" ng-click="selectSensorsChild(soschild)">
                                                         <div class="top">
                                                             <span class="item-title">{{soschild.id}}</span>
                                                             <span class="pull-right text-right item-list-style" style="font-size:14px;" translate="label.sensor">sensor</span>

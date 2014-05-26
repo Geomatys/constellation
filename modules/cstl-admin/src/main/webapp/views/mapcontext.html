@@ -67,11 +67,11 @@
                                 <option value="50">50</option>
                                 <option value="100">100</option>
                             </select>
-                            <div class="pull-right" page-switcher="{page:currentpage,size:nbbypage,count:countdata, 'col-xs-6':small==true}" on-select-page="displayPage(page)"></div>
+                            <div class="pull-right" page-switcher="{page:currentpage,size:nbbypage,count:countdata}" on-select-page="displayPage(page)"></div>
                         </div>
                         
                         <div class="item-list">
-                            <div ng-repeat="context in dataList">
+                            <div ng-repeat="context in dataList" ng-class="{'col-xs-6':small==true}" style="padding-left:0;">
                                 <div class="item mapcontext" ng-class="{'selected':context==selected}" ng-click="select(context);selectContextChild(null);">
                                     <div class="top">
                                         <span class="item-title" title="{{context.id}}">{{context.id}}</span>
@@ -93,7 +93,7 @@
                                     </div>
                                 </div>
 
-                                <div class="item child {{service.Type | lowercase}}" ng-if="context==selected" ng-repeat="contextchild in context.children" ng-class="{'selected':contextchild===selectedSensorsChild}" ng-click="selectMapcontextChild(contextchild)">
+                                <div class="item {{service.Type | lowercase}}" style="margin-top:0;" ng-if="context==selected" ng-repeat="contextchild in context.children" ng-class="{'selected':contextchild===selectedSensorsChild, 'child':small==false, 'col-xs-11':small==true, 'col-sm-offset-1':small==true}" ng-click="selectMapcontextChild(contextchild)">
                                     <div class="top">
                                         <span class="item-title">{{contextchild.id}}</span>
                                         <span class="pull-right text-right item-list-style" style="font-size:14px;" translate="label.sensor">{{contextchild.type}}</span>

@@ -65,7 +65,7 @@
                             <div class="pull-right" page-switcher="{page:currentpage,size:nbbypage,count:countdata}" on-select-page="displayPage(page)"></div>
                         </div>
                         <div class="item-list">
-                            <div ng-repeat="sosdata in dataList" ng-class="{'col-xs-6':small==true}" >
+                            <div ng-repeat="sosdata in dataList" ng-class="{'col-xs-6':small==true}" style="padding-left:0;">
                                 <div class="item" ng-class="{'sensor-sos':sosdata.type!=='System','sensor-system':sosdata.type==='System','selected':sosdata==selected}" ng-click="select(sosdata);selectSensorsChild(null);">
                                     <div class="top">
                                         <span class="item-title" title="{{sosdata.id}}">{{sosdata.id}}</span>
@@ -88,7 +88,7 @@
                                     </div>
                                 </div>
 
-                                <div class="item child sensor-sos" ng-if="sosdata==selected" ng-repeat="soschild in sosdata.children" ng-class="{'selected':soschild===selectedSensorsChild}" ng-click="selectSensorsChild(soschild)">
+                                <div class="item sensor-sos" style="margin-top:0;" ng-if="sosdata==selected" ng-repeat="soschild in sosdata.children" ng-class="{'selected':soschild===selectedSensorsChild, 'child':small==false, 'col-xs-11':small==true, 'col-sm-offset-1':small==true}" ng-click="selectSensorsChild(soschild)">
                                     <div class="top">
                                         <span class="item-title">{{soschild.id}}</span>
                                         <span class="pull-right text-right item-list-style" style="font-size:14px;" translate="label.sensor">sensor</span>
