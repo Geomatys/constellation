@@ -516,7 +516,8 @@
         "count.sensors": "capteur(s) disponible(s)",
         "count.style": "styles(s) disponible(s)",
         "count.tasks": "traitement(s) disponible(s)",
-        "count.mapcontext": "composition(s) cartographique(s) disponible(s)"
+        "count.mapcontext": "composition(s) cartographique(s) disponible(s)",
+        "reduced.display":"Affichage réduit"
     },
     "layer": {
         "listing": {

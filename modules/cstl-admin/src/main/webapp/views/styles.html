@@ -61,10 +61,13 @@
                 </div>
             </div>
             <div class="dash-inner row">
-                <div class="pull-left" style="width: 60%;">
+                <div class="pull-left" style="width: 60%; margin-bottom: 5px;" ng-init="small=false">
                     <div id="list" data-role="list">
                         <div class="pagination-wrapper pagination-style">
                             <strong><span class="nb-results pull-left">{{countdata}}&nbsp;</span><span class="nb-results" translate="label.count.style">available styles</span></strong>
+
+                            <button type="button" ng-click="small=!small" class="hidden-sm hidden-xs pull-right btn btn-xs btn-info btn-style" ng-class="{'btn-small-selected':small==true}" style="margin-left: 10px; margin-top: 5px;"><span translate="label.reduced.display">Reduced display</span></button>
+
                             <select class="nb-per-page input-small form-control pull-right" ng-model="nbbypage">
                                 <option value="5">5</option>
                                 <option value="10">10</option>
@@ -75,9 +78,9 @@
                             <div class="pull-right" page-switcher="{page:currentpage,size:nbbypage,count:countdata}" on-select-page="displayPage(page)"></div>
                         </div>
                         <div class="item-list">
-                            <div class="item style-{{style.Type | lowercase}}" ng-repeat="style in dataList" ng-class="{selected:style==selected}" ng-click="select(style)">
+                            <div class="item style-{{style.Type | lowercase}}" ng-repeat="style in dataList" ng-class="{selected:style==selected, 'col-xs-6':small==true}" ng-click="select(style)">
                                 <div class="top">
-                                    <span class="item-title">{{style.Name}}</span>
+                                    <span class="item-title" title="{{style.Name}}">{{style.Name}}</span>
                                     <span class="pull-right text-right item-list-style" style="font-size:14px;"> {{style.Type}}</span>
                                     <img ng-if="style.Type=='VECTOR' && style.subtype=='point'" src="images/vector-point.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
                                     <img ng-if="style.Type=='VECTOR' && style.subtype=='polygon'" src="images/vector-poly.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >

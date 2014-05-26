@@ -94,10 +94,13 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="dash-inner row dashboard">
+                                <div class="dash-inner row dashboard" ng-init="small=false">
                                     <div id="list" data-role="list">
                                         <div class="pagination-wrapper pagination-data" ng-class="{'pagination-csw':type==='csw','pagination-sos':type==='sos'}">
                                             <strong><span class="nb-results pull-left">{{countdata}}&nbsp;</span><span class="nb-results" translate="label.count.data">available data</span></strong>
+
+                                            <button type="button" ng-click="small=!small" class="hidden-sm hidden-xs pull-right btn btn-xs btn-info btn-data" ng-class="{'btn-small-selected':small==true}" style="margin-left: 10px; margin-top: 5px;"><span translate="label.reduced.display">Reduced display</span></button>
+                                            
                                             <select class="nb-per-page input-small form-control pull-right" ng-model="nbbypage">
                                                 <option value="5">5</option>
                                                 <option value="10">10</option>
@@ -109,9 +112,9 @@
                                         </div>
                                         <div class="item-list">
                                             <div ng-if="type !== 'csw' && type!== 'sos'">
-                                                <div class="item" ng-repeat="layer in dataList" ng-class="{selected:layer==selected,coverage:layer.Type==='coverage-store'||layer.Type==='raster',vector:layer.Type==='feature-store'||layer.Type==='observation-store'||layer.Type==='vector'}" ng-click="select(layer)">
+                                                <div class="item" ng-repeat="layer in dataList" ng-class="{selected:layer==selected,coverage:layer.Type==='coverage-store'||layer.Type==='raster',vector:layer.Type==='feature-store'||layer.Type==='observation-store'||layer.Type==='vector', 'col-xs-6':small==true}" ng-click="select(layer)">
                                                     <div class="top">
-                                                        <span class="item-title">{{layer.Name}}</span>
+                                                        <span class="item-title" title="{{layer.Name}}">{{layer.Name}}</span>
                                                         <span class="pull-right text-right item-list-style" style="font-size:14px;">{{layer.Type==='coverage-store'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector':layer.Type}}</span>
                                                         <img ng-if="(layer.Type=='vector' || layer.Type=='feature-store') && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer!=selected" src="images/vector-multipoint.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
                                                         <img ng-if="(layer.Type=='vector' || layer.Type=='feature-store') && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon') && layer!=selected" src="images/vector-poly.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
@@ -132,7 +135,7 @@
                                             </div>
                                             <div ng-if="type === 'csw'">
                                                 <div ng-repeat="cswdata in dataList">
-                                                    <div class="item" ng-class="{'selected':cswdata==selected, 'metadata-service':cswdata.identifier.split('_')[0]==='serv','metadata':cswdata.identifier.split('_')[0]!=='serv'}" ng-click="select(cswdata);selectMetadataChild(null)">
+                                                    <div class="item" ng-class="{'selected':cswdata==selected, 'metadata-service':cswdata.identifier.split('_')[0]==='serv','metadata':cswdata.identifier.split('_')[0]!=='serv'}" ng-click="select(cswdata);selectMetadataChild(null), 'col-xs-6':small==true">
                                                         <div class="top">
                                                             <span class="item-title">{{cswdata.title ? cswdata.title : cswdata.identifier}}</span>
                                                             <span class="pull-right text-right item-list-style"  style="font-size:14px;">METADATA</span>
@@ -151,7 +154,7 @@
                                                     </div>
 
                                                     <div class="item child" ng-if="cswdata==selected" ng-repeat="relatedData in relatedDatas[cswdata.identifier]"
-                                                         ng-click="selectMetadataChild(relatedData)" ng-class="{selected:relatedData==selectedMetadataChild,'metadata-product-vector':relatedData.Type.toLowerCase()=='vector','metadata-product-coverage':relatedData.Type.toLowerCase()=='coverage','metadata-product-sensor':relatedData.Type.toLowerCase()=='sensor'}">
+                                                         ng-click="selectMetadataChild(relatedData)" ng-class="{selected:relatedData==selectedMetadataChild,'metadata-product-vector':relatedData.Type.toLowerCase()=='vector','metadata-product-coverage':relatedData.Type.toLowerCase()=='coverage','metadata-product-sensor':relatedData.Type.toLowerCase()=='sensor', 'col-xs-6':small==true}">
                                                         <div class="top">
                                                             <span class="item-title">{{relatedData.Name}}</span>
                                                             <span class="pull-right text-right item-list-style" style="font-size:14px;">{{relatedData.Type}}</span>
@@ -169,7 +172,7 @@
                                             </div>
                                             <div ng-if="type === 'sos'">
                                                 <div ng-repeat="sosdata in dataList">
-                                                    <div class="item" ng-class="{'sensor-sos':sosdata.type!=='System','sensor-system':sosdata.type==='System','selected':sosdata==selected}" ng-click="select(sosdata);selectSensorsChild(null);">
+                                                    <div class="item" ng-class="{'sensor-sos':sosdata.type!=='System','sensor-system':sosdata.type==='System','selected':sosdata==selected, 'col-xs-6':small==true}" ng-click="select(sosdata);selectSensorsChild(null);">
                                                         <div class="top">
                                                             <span class="item-title">{{sosdata.id}}</span>
                                                             <span ng-if="sosdata.type==='System'" class="pull-right text-right item-list-style"  style="font-size:14px;" translate="label.sensor.system">sensor system</span>
@@ -191,7 +194,7 @@
                                                         </div>
                                                     </div>
 
-                                                    <div class="item child sensor-sos" ng-if="sosdata==selected" ng-repeat="soschild in sosdata.children" ng-class="{'selected':soschild===selectedSensorsChild}" ng-click="selectSensorsChild(soschild)">
+                                                    <div class="item child sensor-sos" ng-if="sosdata==selected" ng-repeat="soschild in sosdata.children" ng-class="{'selected':soschild===selectedSensorsChild, 'col-xs-6':small==true}" ng-click="selectSensorsChild(soschild)">
                                                         <div class="top">
                                                             <span class="item-title">{{soschild.id}}</span>
                                                             <span class="pull-right text-right item-list-style" style="font-size:14px;" translate="label.sensor">sensor</span>

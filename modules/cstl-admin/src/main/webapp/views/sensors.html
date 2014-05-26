@@ -48,10 +48,13 @@
                 </div>
             </div>
             <div class="dash-inner row">
-                <div class="pull-left" style="width: 60%;">
+                <div class="pull-left" style="width: 60%; margin-bottom: 5px;" ng-init="small=false">
                     <div id="list" data-role="list">
                         <div class="pagination-wrapper pagination-data pagination-sos">
                             <strong><span class="nb-results pull-left">{{countdata}}&nbsp;</span><span class="nb-results" translate="label.count.sensors">available sensors</span></strong>
+
+                            <button type="button" ng-click="small=!small" class="hidden-sm hidden-xs pull-right btn btn-xs btn-info btn-data btn-sos" ng-class="{'btn-small-selected':small==true}" style="margin-left: 10px; margin-top: 5px;"><span translate="label.reduced.display">Reduced display</span></button>
+
                             <select class="nb-per-page input-small form-control pull-right" ng-model="nbbypage">
                                 <option value="5">5</option>
                                 <option value="10">10</option>
@@ -62,10 +65,10 @@
                             <div class="pull-right" page-switcher="{page:currentpage,size:nbbypage,count:countdata}" on-select-page="displayPage(page)"></div>
                         </div>
                         <div class="item-list">
-                            <div ng-repeat="sosdata in dataList">
+                            <div ng-repeat="sosdata in dataList" ng-class="{'col-xs-6':small==true}" >
                                 <div class="item" ng-class="{'sensor-sos':sosdata.type!=='System','sensor-system':sosdata.type==='System','selected':sosdata==selected}" ng-click="select(sosdata);selectSensorsChild(null);">
                                     <div class="top">
-                                        <span class="item-title">{{sosdata.id}}</span>
+                                        <span class="item-title" title="{{sosdata.id}}">{{sosdata.id}}</span>
                                         <span ng-if="sosdata.type==='System'" class="pull-right text-right item-list-style"  style="font-size:14px;" translate="label.sensor.system">sensor system</span>
                                         <span ng-if="sosdata.type!=='System'" class="pull-right text-right item-list-style"  style="font-size:14px;" translate="label.sensor">sensor</span>
                                     </div>

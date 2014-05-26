@@ -374,7 +374,8 @@
         "count.sensors": "available sensors",
         "count.style": "available style(s)",
         "count.tasks": "available task(s)",
-        "count.mapcontext": "available map context(s)"
+        "count.mapcontext": "available map context(s)",
+        "reduced.display":"Reduced display"
     },
     "layer.listing": {
         "data": {

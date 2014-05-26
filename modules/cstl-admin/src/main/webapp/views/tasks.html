@@ -26,10 +26,13 @@
             </div>
 
             <div class="dash-inner row">
-                <div class="pull-left" style="width: 60%;">
+                <div class="pull-left" style="width: 60%; margin-bottom: 5px;" ng-init="small=false">
                     <div id="list" data-role="list">
                         <div class="pagination-wrapper pagination-data pagination-task">
                             <strong><span class="nb-results pull-left">{{countdata}}&nbsp;</span><span class="nb-results" translate="label.count.tasks">available tasks</span></strong>
+
+                            <button type="button" ng-click="small=!small" class="hidden-sm hidden-xs pull-right btn btn-xs btn-info btn-task" ng-class="{'btn-small-selected':small==true}" style="margin-left: 10px; margin-top: 5px;"><span translate="label.reduced.display">Reduced display</span></button>
+                            
                             <select class="nb-per-page input-small form-control pull-right" ng-model="nbbypage">
                                 <option value="5">5</option>
                                 <option value="10">10</option>
@@ -41,10 +44,10 @@
                         </div>
 
                         <div class="item-list">
-                            <div ng-repeat="registry in dataList"> 
+                            <div ng-repeat="registry in dataList" ng-class="{'col-xs-6':small==true}" style="padding-left:0;"> 
                                 <div class="item registry" ng-class="{selected:registry==selected}" ng-click="select(registry);selectProcessChild(null);">
                                     <div class="top">
-                                        <span class="item-title">{{registry.name}} </span>
+                                        <span class="item-title" title="{{registry.name}}">{{registry.name}} </span>
                                     </div>
                                     <div class="bottom">
                                         <div class="block pull-right">
@@ -56,9 +59,9 @@
                                     </div>
                                 </div>
 
-                                <div class="item child process-child" ng-if="registry==selected" ng-repeat="process in registry.processes" ng-class="{'selected':process===selectedProcessChild}" ng-click="selectProcessChild(process)">
+                                <div class="item process-child" style="margin-top:0;" ng-if="registry==selected" ng-repeat="process in registry.processes" ng-class="{'selected':process===selectedProcessChild, 'child':small==false, 'col-xs-11':small==true, 'col-sm-offset-1':small==true}" ng-click="selectProcessChild(process)">
                                     <div class="top">
-                                        <span class="item-title">{{process.id}}</span>
+                                        <span class="item-title" title="{{process.id}}">{{process.id}}</span>
                                     </div>
                                 </div>
                             </div>

@@ -560,7 +560,14 @@ p.error-select-one{
     margin-top:8px; 
     font-weight:bold;
 }
-
+.btn-info.btn-small-selected{
+    background-color: #6c6c6c;
+    border: solid 1px #545454;
+}
+.btn-info.btn-small-selected:hover, .btn-info.btn-small-selected:focus{
+    background-color: #545454;
+    border: solid 1px #474747;
+}
 /*
  * Dashboard pagination.
  */
@@ -577,7 +584,37 @@ p.error-select-one{
 .dashboard .pagination-wrapper .pagination {
     margin: 0 5px 0 0;
 }
-
+.item-title{
+    width: 500px;
+    overflow:hidden;
+    float:left;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+}
+.col-xs-6 .item-title{
+    width: 190px;
+}
+@media (min-width: 992px)  and (max-width: 1199px) { 
+   .item-title{
+        width: 425px;
+    }
+    .col-xs-6 .item-title{
+    width: 135px;
+}
+}
+@media (min-width: 768px)  and (max-width: 991px) { 
+   .item-title{
+        width: 300px;
+    }
+    .col-xs-6 .item-title{
+    width: 75px;
+}
+}
+@media (max-width: 767px) { 
+   .item-title{
+        width: 250px;
+    }
+}
 /*
  * Dashboard selected item
  */
