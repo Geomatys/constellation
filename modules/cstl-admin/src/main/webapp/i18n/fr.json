@@ -290,6 +290,7 @@
             "admin": {
                 "about":"A propos de Constellation",
                 "contact": "Contact",
+                "domains":"Gestion des domaines",
                 "group":"Gestion des groupes",
                 "image_classes":"Classes d'images",
                 "logout": "Déconnexion",

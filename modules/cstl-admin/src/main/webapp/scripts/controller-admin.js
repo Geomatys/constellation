@@ -32,7 +32,8 @@ cstlAdminApp.controller('AdminController', ['$scope', '$location', '$dashboard',
             'planification' :       {name:'planification',      url:'views/admin/planification.html'},
             'security_settings' :   {name:'security_settings',  url:'views/admin/security_settings.html'},
             'users' :               {name:'users',              url:'views/admin/users.html'},
-            'groups' :              {name:'groups',             url:'views/admin/groups.html'}};
+            'groups' :              {name:'groups',             url:'views/admin/groups.html'},
+            'domains' :             {name:'domains',            url:'views/admin/domains.html'}};
 
         $scope.currentView = $scope.viewUrls['system_state'];
 
@@ -293,3 +294,158 @@ cstlAdminApp.controller('LogsController', ['$scope', 'LogsService',
     }
 ]);
 
+cstlAdminApp.controller('DomainController', ['$scope', '$modal', 'DomainResource',
+    function ($scope, $modal, DomainResource) {
+
+        $scope.add = dataNotReady;
+        $scope.details = dataNotReady;
+        $scope.members = dataNotReady;
+        $scope.deleteDomain = dataNotReady;
+
+        DomainResource.query({withMembers:true}, function(domains){
+
+            $scope.domains = domains;
+
+            $scope.add = function(i) {
+                $modal.open({
+                    templateUrl: 'views/admin/domain/details.html',
+                    controller: 'DomainDetailsController',
+                    resolve: {
+                        'domain': function(){ return {}}
+                    }
+                }).result.then(function(domain){
+                        if(domain != null)
+                            $scope.domains[$scope.domains.length] = domain;
+                    });
+            };
+
+            $scope.deleteDomain = function(i){
+                DomainResource.delete({id: $scope.domains[i].id}, {} , function(resp){
+                    $scope.domains.splice(i, 1);
+                }, function(err){
+                    var errorCode = err.data
+                    $translate(['Error',errorCode]).then(function (translations) {
+                        $growl('error', translations.Error,  translations[errorCode]);
+                    });
+                });
+            }
+
+            $scope.details = function(i) {
+                $modal.open({
+                    templateUrl: 'views/admin/domain/details.html',
+                    controller: 'DomainDetailsController',
+                    resolve: {
+                        domain: function(){return DomainResource.get({id: $scope.domains[i].id})}
+                    }
+                }).result.then(function(domain){
+                        if(domain != null)
+                            $scope.domains[i] = domain;
+                    });
+            };
+
+            $scope.members = function(i) {
+                $modal.open({
+                    templateUrl: 'views/admin/domain/members.html',
+                    controller: 'DomainMembersController',
+                    resolve: {
+                        domain: function(){return DomainResource.get({id: $scope.domains[i].id}).$promise},
+                        members: function(){return DomainResource.members({id: $scope.domains[i].id}).$promise}
+                    }
+                }).result.then(function(domain){
+                        if(domain != null)
+                            $scope.domains[$scope.domains.length] = domain;
+                    });
+            };
+
+
+        });
+    }
+]);
+
+
+cstlAdminApp.controller('DomainDetailsController', ['$scope', '$modalInstance', 'domain', 'DomainResource',
+    function ($scope, $modalInstance, domain, DomainResource) {
+        $scope.domain = domain;
+
+        $scope.close = function() {
+            $modalInstance.dismiss('close');
+        };
+
+        $scope.save = function(){
+            var domainResource = new DomainResource($scope.domain);
+            if($scope.domain.id)
+                domainResource.$update({id: $scope.domain.id }, function(updated){
+                    $modalInstance.close(updated);
+                }, function(){
+                    $translate(['Error','admin.domain.save.error']).then(function (translations) {
+                        $growl('error', translations.Error,  translations['admin.domain.save.error']);
+                    })});
+            else
+                domainResource.$save(function(saved){
+                    $modalInstance.close(saved);
+                }, function(){
+                    $translate(['Error','admin.domain.save.error']).then(function (translations) {
+                        $growl('error', translations.Error,  translations['admin.domain.save.error']);
+                    });
+                });
+        }
+
+    }
+]);
+
+
+cstlAdminApp.controller('DomainMembersController', ['$scope', '$routeParams', 'DomainResource', 'DomainRoleResource', '$modal',
+    function ($scope, $routeParams, DomainResource, DomainRoleResource, $modal) {
+        DomainResource.get({id: $routeParams.domainId}, function(domain){
+            $scope.domain = domain
+        })
+        DomainResource.members({id: $routeParams.domainId}, function(members){
+            $scope.members = members
+        })
+
+        $scope.addMembers = function(i) {
+            $modal.open({
+                templateUrl: 'views/admin/domain/addMembers.html',
+                controller: 'DomainAddMembersController',
+                resolve: {
+                    'domain': function(){ return $scope.domain.$promise},
+                    'users': function(){ return DomainResource.nonmembers({id: $routeParams.domainId}).$promise}
+                }
+            }).result.then(function(domain){
+                    DomainResource.members({id: $routeParams.domainId}, function(members){
+                        $scope.members = members
+                    })
+                });
+        }
+        $scope.removeMemberFromDomain = function(i){
+            DomainResource.removeMemberFromDomain({domainId: $scope.domain.id, userId: $scope.members[i].id}, function(){
+                $scope.members.splice(i, 1);
+            })
+        };
+
+
+    }
+]);
+
+cstlAdminApp.controller('DomainAddMembersController', ['$scope', '$modalInstance', 'domain', 'users', 'DomainResource',
+    function ($scope, $modalInstance, domain, users, DomainResource) {
+        $scope.domain = domain
+        $scope.users = users
+
+        $scope.close = function() {
+            $modalInstance.dismiss('close');
+        }
+
+        $scope.addToDomain = function(i, roles){
+            var user = $scope.users[i]
+            DomainResource.addMemberToDomain({userId: user.id, domainId: $scope.domain.id}, [1], function(){
+                $scope.users.splice(i, 1);
+                if($scope.users.length==0){
+                    $modalInstance.close('close');
+                }
+            });
+        };
+
+
+    }
+]);

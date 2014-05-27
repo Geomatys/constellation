@@ -106,11 +106,6 @@ cstlAdminApp
                     controller: 'MapcontextController'
                 })
 
-            .when('/domain', {
-                templateUrl: 'views/domain/list.html',
-                controller: 'DomainController'
-            })
-
             .when('/domainmembers/:domainId', {
                 templateUrl: 'views/domain/members.html',
                 controller: 'DomainMembersController'

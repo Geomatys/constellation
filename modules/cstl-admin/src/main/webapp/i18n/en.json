@@ -657,7 +657,7 @@
             "admin": {
                 "about":"About Constellation",
                 "contact": "Contact",
-				"domains": "Domains",
+                "domains":"Domains Settings",
                 "group":"Groups Settings",
                 "image_classes":"Images class",
                 "logout": "Log out",

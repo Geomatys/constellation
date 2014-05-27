@@ -8,6 +8,7 @@
             "admin": {
                 "about":"Über Constellation",
                 "contact":"Kontakt",
+                "domains":"Domain-Einstellungen",
                 "group":"Gruppen-Einstellungen",
                 "image_classes":"Klassen Bild",
                 "logout": "Abmelden",
