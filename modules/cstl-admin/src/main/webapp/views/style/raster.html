@@ -2,6 +2,17 @@
     <li><a ng-click="goBack()"><span translate="sldeditor.breadcrumb.type">Type selection</span></a></li>
     <li class="active" translate="sldeditor.breadcrumb.edition">Style Edition</li>
 </ol>
+<<<<<<< mine
+<div class="row">
+    <div class="col-sm-12 col-md-6">
+        <div class="style_bloc">
+            <div class="form-group col-xs-12" style="margin: 6px 0; height:35px;">
+                <label class="col-xs-4 col-sm-3 col-md-4 control-label" style="margin-top: 8px;" translate="sldeditor.name">Style name</label>
+                <div class="col-xs-7 col-sm-9 col-md-8">
+                    <input type="text" class="form-control" ng-model="$parent.newStyle.name" >
+                </div>
+            </div>
+=======
 
   <div class="col-sm-12 col-md-6">
     <div class="style_bloc style_bloc_name" style="margin-bottom: 10px;">
@@ -9,24 +20,174 @@
         <label class="col-xs-4 col-sm-3 col-md-4 control-label" style="margin-top: 8px;" translate="sldeditor.name">Style name</label>
         <div class="col-xs-7 col-sm-9 col-md-8">
             <input type="text" class="form-control" ng-model="$parent.newStyle.name" >
+>>>>>>> theirs
         </div>
-      </div>
     </div>
+<<<<<<< mine
+    <div class="col-sm-12 col-md-6">
+        <div ng-if="noName" class="alert alert-style" translate="alert.style.noname">Veuillez renseigner un nom de style</div>
+    </div>
+</div>
+=======
 
   <div class="col-sm-12">
       <div ng-if="noName" class="alert alert-style" style="padding-top:8px; padding-bottom:8px; margin-bottom:0;" translate="alert.style.noname">Veuillez renseigner un nom de style</div>
     </div>
   </div>
+>>>>>>> theirs
 <!-- Tab nav -->
 
-  <ul class="nav nav-tabs" ng-init="chosenTab = 'colorMap'">
-      <li ng-class="{active: chosenTab==='simple'}"><a ng-click="chosenTab = 'simple'" data-toggle="tab"><span translate="sldeditor.tab.simple" >Simple editor</span></a></li>
-      <li ng-class="{active: chosenTab==='colorMap'}"><a ng-click="chosenTab = 'colorMap'" data-toggle="tab">ColorMap</a></li>
-      <li ng-class="{active: chosenTab==='xml'}"><a ng-click="chosenTab = 'xml'" data-toggle="tab"><span translate="sldeditor.tab.xml" >XML Editor</span></a></li>
-  </ul>
+<ul class="nav nav-tabs" ng-init="chosenTab = 'simple'">
+    <li ng-class="{active: chosenTab === 'simple'}"><a ng-click="chosenTab = 'simple'" data-toggle="tab"><span translate="sldeditor.tab.simple" >Simple editor</span></a></li>
+    <!--      <li ng-class="{active: chosenTab==='colorMap'}"><a ng-click="chosenTab = 'colorMap'" data-toggle="tab">ColorMap</a></li>-->
+    <li ng-class="{active: chosenTab === 'xml'}"><a ng-click="chosenTab = 'xml'" data-toggle="tab"><span translate="sldeditor.tab.xml" >XML Editor</span></a></li>
+</ul>
 
 <!-- Tab panes -->
 <div class="tab-content" ng-init="initRaster1Band()">
+<<<<<<< mine
+    <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab === 'simple'}">
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-8">
+                <h2 translate="sldeditor.breadcrumb.edition">Style Edition</h2>
+                <div class="style_bloc" style="min-height:60px;">
+                    <div class="col-sm-12 btn-group" ng-init="bandes = 'triple'" data-toggle="buttons">
+                        <label ng-class="{active: bandes === 'triple'}" ng-click="bandes = 'triple'" type="button" class="btn btn-default"><input type="radio" value="triple"><span translate="sldeditor.raster.1band.titleTab" >Triple bands</span></label>
+                        <label ng-class="{active: bandes === 'unique'}" ng-click="bandes = 'unique'" type="button" class="btn btn-default"><input type="radio" value="unique"><span translate="sldeditor.raster.1band.titleTab" >Unique band</span></label>
+                    </div>
+                    <div ng-show="bandes == 'triple'">
+                        <form class="form_classification form-horizontal" role="form">
+                            <div class="form-group bande_rouge">
+                                <label class="col-sm-3 control-label">Bande rouge</label>
+                                <div class="col-sm-9">
+                                    <select class="form-control">
+                                        <option>Bande 1</option>
+                                        <option>Bande 2</option>
+                                        <option>Bande 3</option>
+                                        <option>Bande 4</option>
+                                        <option>Bande 5</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group bande_verte">
+                                <label class="col-sm-3 control-label">Bande verte</label>
+                                <div class="col-sm-9">
+                                    <select class="form-control">
+                                        <option>Bande 1</option>
+                                        <option>Bande 2</option>
+                                        <option>Bande 3</option>
+                                        <option>Bande 4</option>
+                                        <option>Bande 5</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group bande_bleue">
+                                <label class="col-sm-3 control-label">Bande bleue</label>
+                                <div class="col-sm-9">
+                                    <select class="form-control">
+                                        <option>Bande 1</option>
+                                        <option>Bande 2</option>
+                                        <option>Bande 3</option>
+                                        <option>Bande 4</option>
+                                        <option>Bande 5</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div ng-show="bandes == 'unique'">
+                        <form class="form_classification form-horizontal" role="form">
+                            <div class="form-group col-xs-12">
+                                <label class="col-sm-3 control-label" translate="sldeditor.raster.1band.grayBand">Gray band</label>
+                                <div class="col-sm-9">
+                                    <select class="form-control">
+                                        <option translate="sldeditor.raster.1band.band1">Band 1</option>
+                                        <option translate="sldeditor.raster.1band.band2">Band 2</option>
+                                        <option translate="sldeditor.raster.1band.band3">Band 3</option>
+                                        <option translate="sldeditor.raster.1band.band4">Band 4</option>
+                                        <option translate="sldeditor.raster.1band.band5">Band 5</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                        <form name="paletteForm" class="form_classification form-horizontal form-style" role="form" novalidate >
+                            <div class="form-group col-xs-12">
+                                <label class="col-sm-3 col-md-2 control-label" translate="sldeditor.raster.1band.Palette">Palette</label>
+                                <div class="col-sm-9 col-md-10">
+                                    <div class="btn-group select select-block">
+                                        <button class="btn dropdown-toggle btn-default" data-toggle="dropdown">
+                                            <span class="filter-option pull-left"><img class="img_palette" src={{palette.img_palette}}></span>&nbsp;
+                                            <span class="caret"></span>
+                                        </button>
+                                        <span class="dropdown-arrow dropdown-arrow-inverse"></span>
+                                        <ul class="dropdown-menu dropdown-inverse dropdown-images" role="menu" style="overflow-y: auto; min-width:70px; min-height: 108px;">
+                                            <li ng-click="$parent.choosePalette(1)">
+                                                <a><img class="img_palette" src="images/palette1.png"></a>
+                                            </li>
+                                            <li ng-click="$parent.choosePalette(2)">
+                                                <a><img class="img_palette" src="images/palette2.png"></a>
+                                            </li>
+                                            <li ng-click="$parent.choosePalette(3)">
+                                                <a><img class="img_palette" src="images/palette3.png"></a>
+                                            </li>
+                                            <li ng-click="$parent.choosePalette(4)">
+                                                <a><img class="img_palette" src="images/palette4.png"></a>
+                                            </li>
+                                            <li ng-click="$parent.choosePalette(5)">
+                                                <a><img class="img_palette" src="images/palette5.png"></a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="checkbox" style="margin-bottom:20px; padding-top:0;">
+                                <div class="checkbox col-sm-offset-3 col-md-offset-2">
+                                    <label>
+                                        <input type="checkbox" ng-model="palette.inverse" translate="sldeditor.edition.reversecolors"> Reverse colors
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group col-xs-12">
+                                <div class="row" ng-class="{'has-error': paletteForm.minValue.$error.required, 'has-success': !paletteForm.minValuel.$error.required}">
+                                    <label class="col-sm-3 col-md-2 control-label" translate="sldeditor.raster.1band.Min">Min.</label>
+                                    <div class="col-sm-9 col-md-4">
+                                        <input type="number" class="form-control" ng-model="palette.rasterMinValue" id="minValue" required max="{{dataBands[0].maxValue}}" min="{{dataBands[0].minValue}}" >
+                                        <p class="help-block error"  ng-show="paletteForm.minValue.$error.required">Required!</p>
+                                        <p class="help-block error"  ng-show="paletteForm.minValue.$error.number || paletteForm.minValue.$error.max || paletteForm.minValue.$error.min">Not valid number!</p>
+                                        
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="form-group col-xs-12">
+                                <div class="row">
+                                    <label class="col-sm-3 col-md-2 control-label"translate="sldeditor.raster.1band.Max">Max.</label>
+                                    <div class="col-sm-9 col-md-4">
+                                        <input type="number" class="form-control" ng-model="palette.rasterMaxValue" required  max="{{dataBands[0].maxValue}}" min="{{dataBands[0].minValue}}" >
+                                    </div>
+                                </div>
+                            </div>
+                            <!--<div class="form-group col-xs-12">-->
+                            <!--<label class="col-sm-3 col-md-2 control-label">Intervalles</label>-->
+                            <!--<div class="col-sm-9 col-md-4">-->
+                            <!--<input type="number" class="form-control" ng-model="palette.intervalles">-->
+                            <!--</div>-->
+                            <!--</div>-->
+                            <div class="form-group col-xs-12" >
+                                <div class="checkbox col-sm-offset-3 col-md-offset-2 col-xs-1">
+                                    <label translate="sldeditor.raster.1band.NaN">NaN</label>
+                                    <div class="col-sm-9 col-md-4">
+                                        <input type="checkbox" ng-model="palette.nan"> 
+                                    </div>
+                                </div>
+                                <div class="col-xs-5" ng-if="palette.nan">
+                                    <input type='text' name="picker" class="picker" spectrum ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.color"/>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+=======
   <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='simple'}">
     <div class="row">
       <div class="col-xs-12 col-sm-6" style="margin-top:10px;" >
@@ -71,37 +232,63 @@
                     <option>Bande 4</option>
                     <option>Bande 5</option>
                   </select>
+>>>>>>> theirs
                 </div>
-              </div>
-            </form>
-          </div>
 
-          <div ng-show="bandes=='unique'">
-            <form class="form_classification form-horizontal" role="form">
-              <div class="form-group col-xs-12">
-                <label class="col-sm-3 control-label">Bande grise</label>
-                <div class="col-sm-9">
-                  <select class="form-control">
-                    <option>Bande 1</option>
-                    <option>Bande 2</option>
-                    <option>Bande 3</option>
-                    <option>Bande 4</option>
-                    <option>Bande 5</option>
-                  </select>
-                </div>
-              </div>
-            </form>
-          </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-4">
+                <h2 translate="sldeditor.apercu.titre">Style preview</h2>
+                <div class="bloc_apercu" id="styledMapOL" style="height: 299px;"></div>
+                <button type="button" class="btn-apercu col-xs-12 btn btn-primary" ng-click="displayCurrentStyle()"><span translate="sldeditor.apercu.data">Data preview</span></button>
+            </div>
         </div>
+<<<<<<< mine
+=======
 
       </div>
       <div class="col-xs-12 col-sm-6">
         <button type="button" class="btn-apercu col-xs-12 btn btn-primary" ng-click="displayCurrentStyle()"><span translate="sldeditor.apercu.data">Data preview</span></button>
         <div class="bloc_apercu" id="styledMapO" style="height: 299px;"></div>
       </div>
+>>>>>>> theirs
     </div>
-  </div>
 
+<<<<<<< mine
+    <!--  <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='colorMap'}">
+        <div class="row">
+          <div class="col-xs-12 col-sm-6">
+            <h2 translate="sldeditor.breadcrumb.edition">Style Edition</h2>
+            <div class="style_bloc">
+              <form class="form_classification form-horizontal form-style" role="form">
+                 <div class="form-group col-xs-12">
+                    <label class="col-sm-3 col-md-2 control-label">Palette</label>
+                    <div class="col-sm-9 col-md-10">
+                      <div class="btn-group select select-block">
+                      <button class="btn dropdown-toggle btn-default" data-toggle="dropdown">
+                        <span class="filter-option pull-left"><img class="img_palette" src={{palette.img_palette}}></span>&nbsp;
+                        <span class="caret"></span>
+                      </button>
+                      <span class="dropdown-arrow dropdown-arrow-inverse"></span>
+                      <ul class="dropdown-menu dropdown-inverse dropdown-images" role="menu" style="overflow-y: auto; min-width:70px; min-height: 108px;">
+                        <li ng-click="$parent.choosePalette(1)">
+                            <a><img class="img_palette" src="images/palette1.png"></a>
+                        </li>
+                        <li ng-click="$parent.choosePalette(2)">
+                          <a><img class="img_palette" src="images/palette2.png"></a>
+                        </li>
+                        <li ng-click="$parent.choosePalette(3)">
+                          <a><img class="img_palette" src="images/palette3.png"></a>
+                        </li>
+                        <li ng-click="$parent.choosePalette(4)">
+                          <a><img class="img_palette" src="images/palette4.png"></a>
+                        </li>
+                        <li ng-click="$parent.choosePalette(5)">
+                          <a><img class="img_palette" src="images/palette5.png"></a>
+                        </li>
+                      </ul>
+                    </div>
+                    </div>
+=======
   <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='colorMap'}">
     <div class="row">
       <div class="col-xs-12 col-sm-6" style="margin-top:10px;" >
@@ -133,116 +320,128 @@
                       <a><img class="img_palette" src="images/palette5.png"></a>
                     </li>
                   </ul>
+>>>>>>> theirs
                 </div>
-                </div>
-            </div>
-            <div class="checkbox" style="margin-bottom:20px; padding-top:0;">  
-              <div class="checkbox col-sm-offset-3 col-md-offset-2">
-                  <label>
-                      <input type="checkbox" ng-model="palette.inverse" translate="sldeditor.edition.reversecolors"> Reverse colors
-                  </label>
-              </div>
-            </div>
-            <div class="form-group col-xs-12"  ng-class="{'has-error':invalideMin}">
-              <div class="row">
-                  <label class="col-sm-3 col-md-2 control-label">Min.</label>
-                  <div class="col-sm-9 col-md-4">
-                    <input type="number" class="form-control" ng-model="palette.rasterMinValue" required >
+                <div class="checkbox" style="margin-bottom:20px; padding-top:0;">  
+                  <div class="checkbox col-sm-offset-3 col-md-offset-2">
+                      <label>
+                          <input type="checkbox" ng-model="palette.inverse" translate="sldeditor.edition.reversecolors"> Reverse colors
+                      </label>
                   </div>
-              </div>
-              <div class="row">
-                <div class=" error col-xs-11  col-xs-offset-1  col-md-6" ng-show="invalideMin">
-                    <small class="error">Veuillez renseigner une valeur Min.</small> 
                 </div>
-              </div>
-            </div>
-            <div class="form-group col-xs-12" ng-class="{'has-error':invalideMax}">
-              <div class="row">
-                <label class="col-sm-3 col-md-2 control-label">Max.</label>
-                <div class="col-sm-9 col-md-4">
-                  <input type="number" class="form-control" ng-model="palette.rasterMaxValue" required>
+                <div class="form-group col-xs-12"  ng-class="{'has-error':invalideMin}">
+                  <div class="row">
+                      <label class="col-sm-3 col-md-2 control-label">Min.</label>
+                      <div class="col-sm-9 col-md-4">
+                        <input type="number" class="form-control" ng-model="palette.rasterMinValue" required >
+                      </div>
+                  </div>
+                  <div class="row">
+                    <div class=" error col-xs-11  col-xs-offset-1  col-md-6" ng-show="invalideMin">
+                        <small class="error">Veuillez renseigner une valeur Min.</small> 
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div class="row">
-                <div class="error col-xs-11  col-xs-offset-1 col-md-6" ng-show="invalideMax">
-                  <small class="error">Veuillez renseigner une valeur Max.</small> 
+                <div class="form-group col-xs-12" ng-class="{'has-error':invalideMax}">
+                  <div class="row">
+                    <label class="col-sm-3 col-md-2 control-label">Max.</label>
+                    <div class="col-sm-9 col-md-4">
+                      <input type="number" class="form-control" ng-model="palette.rasterMaxValue" required>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="error col-xs-11  col-xs-offset-1 col-md-6" ng-show="invalideMax">
+                      <small class="error">Veuillez renseigner une valeur Max.</small> 
+                    </div>
+                  </div>
                 </div>
-              </div>
+                  <div class="form-group col-xs-12">
+                      <label class="col-sm-3 col-md-2 control-label">Intervalles</label>
+                      <div class="col-sm-9 col-md-4">
+                        <input type="number" class="form-control" ng-model="palette.intervalles">
+                      </div>
+                  </div>
+                <div class="checkbox" style="margin-bottom:20px; padding-top:0;">  
+                  <div class="checkbox col-sm-offset-3 col-md-offset-2 col-xs-1">
+                    <label>
+                      <input type="checkbox" ng-model="palette.nan"> NaN
+                    </label>
+                  </div>
+                  <div class="col-xs-5" ng-if="palette.nan">
+                    <input type='text' name="picker" class="picker" spectrum ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.color"/>
+                  </div>
+                </div>
+              </form>
+    
             </div>
-              <!--<div class="form-group col-xs-12">-->
-                  <!--<label class="col-sm-3 col-md-2 control-label">Intervalles</label>-->
-                  <!--<div class="col-sm-9 col-md-4">-->
-                    <!--<input type="number" class="form-control" ng-model="palette.intervalles">-->
-                  <!--</div>-->
-              <!--</div>-->
-            <div class="checkbox" style="margin-bottom:20px; padding-top:0;">  
-              <div class="checkbox col-sm-offset-3 col-md-offset-2 col-xs-1">
-                <label>
-                  <input type="checkbox" ng-model="palette.nan"> NaN
-                </label>
+    
+            <button type="button" ng-click="displayIntervalles=true" class="btn btn-generer btn-default">Générer la palette</button>
+              <div class="style_bloc" ng-show="displayIntervalles==true">
+                  <table class="table">
+                      <tr>
+                          <td><img src="images/polygone_mini.png"></td>
+                          <td><input type='text' class="text_transparent" value='0  >  100' /></td>
+                          <td>
+                              <button type="button" class="btn btn-default btn-xs btn-remove">
+                                  <span class="glyphicon glyphicon-remove"></span>
+                              </button>
+                          </td>
+                      </tr>
+                      <tr>
+                          <td><img src="images/polygone_mini.png"></td>
+                          <td><input type='text' class="text_transparent" value='100  >  200' /></td>
+                          <td>
+                              <button type="button" class="btn btn-default btn-xs btn-remove">
+                                  <span class="glyphicon glyphicon-remove"></span>
+                              </button>
+                          </td>
+                      </tr>
+                      <tr>
+                          <td><img src="images/polygone_mini.png"></td>
+                          <td><input type='text' class="text_transparent" value='200  >  300' /></td>
+                          <td>
+                              <button type="button" class="btn btn-default btn-xs btn-remove">
+                                  <span class="glyphicon glyphicon-remove"></span>
+                              </button>
+                          </td>
+                      </tr>
+                      <tr>
+                          <td><img src="images/polygone_mini.png"></td>
+                          <td><input type='text' class="text_transparent" value='300  >  400' /></td>
+                          <td>
+                              <button type="button" class="btn btn-default btn-xs btn-remove">
+                                  <span class="glyphicon glyphicon-remove"></span>
+                              </button>
+                          </td>
+                      </tr>
+                      <tr>
+                          <td><img src="images/polygone_mini.png"></td>
+                          <td><input type='text' class="text_transparent" value='400  >  500' /></td>
+                          <td>
+                              <button type="button" class="btn btn-default btn-xs btn-remove">
+                                  <span class="glyphicon glyphicon-remove"></span>
+                              </button>
+                          </td>
+                      </tr>
+                  </table>
               </div>
-              <div class="col-xs-5" ng-if="palette.nan">
-                <input type='text' name="picker" class="picker" spectrum ng-model="$parent.newStyle.rules[0].symbolizers[0].stroke.color"/>
+              <div class="col-xs-12 div-btn-add" ng-show="displayIntervalles==true">
+                  <button type="button" class="btn-apercu btn btn-default">Ajouter une valeur</button>
               </div>
-            </div>
-          </form>
-
+    
+          </div>
+          <div class="col-xs-12 col-sm-6">
+            <h2 translate="sldeditor.apercu.titre">Style preview</h2>
+            <div class="bloc_apercu" id="styledMapOL" style="height: 299px;"></div>
+            <button type="button" class="btn-apercu col-xs-12 btn btn-primary" ng-click="displayCurrentStyle()"><span translate="sldeditor.apercu.data">Data preview</span></button>
+          </div>
         </div>
+      </div>-->
 
-        <!--<button type="button" ng-click="displayIntervalles=true" class="btn btn-generer btn-default">Générer la palette</button>-->
-          <div class="style_bloc" ng-show="displayIntervalles==true">
-              <table class="table">
-                  <tr>
-                      <td><img src="images/polygone_mini.png"></td>
-                      <td><input type='text' class="text_transparent" value='0  >  100' /></td>
-                      <td>
-                          <button type="button" class="btn btn-default btn-xs btn-remove">
-                              <span class="glyphicon glyphicon-remove"></span>
-                          </button>
-                      </td>
-                  </tr>
-                  <tr>
-                      <td><img src="images/polygone_mini.png"></td>
-                      <td><input type='text' class="text_transparent" value='100  >  200' /></td>
-                      <td>
-                          <button type="button" class="btn btn-default btn-xs btn-remove">
-                              <span class="glyphicon glyphicon-remove"></span>
-                          </button>
-                      </td>
-                  </tr>
-                  <tr>
-                      <td><img src="images/polygone_mini.png"></td>
-                      <td><input type='text' class="text_transparent" value='200  >  300' /></td>
-                      <td>
-                          <button type="button" class="btn btn-default btn-xs btn-remove">
-                              <span class="glyphicon glyphicon-remove"></span>
-                          </button>
-                      </td>
-                  </tr>
-                  <tr>
-                      <td><img src="images/polygone_mini.png"></td>
-                      <td><input type='text' class="text_transparent" value='300  >  400' /></td>
-                      <td>
-                          <button type="button" class="btn btn-default btn-xs btn-remove">
-                              <span class="glyphicon glyphicon-remove"></span>
-                          </button>
-                      </td>
-                  </tr>
-                  <tr>
-                      <td><img src="images/polygone_mini.png"></td>
-                      <td><input type='text' class="text_transparent" value='400  >  500' /></td>
-                      <td>
-                          <button type="button" class="btn btn-default btn-xs btn-remove">
-                              <span class="glyphicon glyphicon-remove"></span>
-                          </button>
-                      </td>
-                  </tr>
-              </table>
-          </div>
-          <div class="col-xs-12 div-btn-add" ng-show="displayIntervalles==true">
-              <button type="button" class="btn-apercu btn btn-default">Ajouter une valeur</button>
-          </div>
-
+<<<<<<< mine
+    <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab === 'xml'}">
+        <h2 translate="sldeditor.tab.xmledit" >XML Editor</h2>
+=======
       </div>
       <div class="col-xs-12 col-sm-6">
         <button type="button" class="btn-apercu col-xs-12 btn btn-primary" ng-click="displayCurrentStyle()"><span translate="sldeditor.apercu.data">Data preview</span></button>
@@ -250,17 +449,15 @@
       </div>
     </div>
   </div>
+>>>>>>> theirs
 
-  <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='xml'}">
-    <h2 translate="sldeditor.tab.xmledit" >XML Editor</h2>
+        <div ui-ace="{
+             mode: 'xml',
+             onLoad: aceLoaded,
+             onChange: aceChanged
+             }"></div>
 
-      <div ui-ace="{
-                 mode: 'xml',
-                 onLoad: aceLoaded,
-                 onChange: aceChanged
-                }"></div>
-
-      <button type="button" class="btn btn-info"ng-click="saveXml()" translate="data.modal.change">Change</button>
-  </div>
+        <button type="button" class="btn btn-info"ng-click="saveXml()" translate="data.modal.change">Change</button>
+    </div>
 
 </div>
