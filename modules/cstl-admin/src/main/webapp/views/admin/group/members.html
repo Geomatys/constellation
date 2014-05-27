@@ -2,15 +2,15 @@
 	<div class="modal-content">
 		<div class="modal-header">
 			<button type="button" class="close" ng-click="close()">×</button>
-			<h4 class="modal-title">{{group.name}}</h4>
+			<h4 class="modal-title">{{admin.group.name}}</h4>
 		</div>
 		<div class="modal-body" style="height: 510px; overflow-y: auto;">
 			<div class="container" style="height: 470px; ">
 				<div class="row">
 					<div class="col-sm-7 user-count-bloc" style="padding: 10px 5px;">
-						<p class="col-sm-4" style="margin-top: 8px; margin-bottom: 0;" translate="group.members.count" translate-values="{total: '{{ list.length }}'}">{{list.length }} users.</p>
+						<p class="col-sm-4" style="margin-top: 8px; margin-bottom: 0;" translate="admin.group.members.count" translate-values="{total: '{{ list.length }}'}">{{list.length }} users.</p>
 						<div class="col-sm-8">
-							<input type="text" ng-model="filter" class="form-control" maxlength="10" placeholder="{{'group.users.filter' | translate}}">
+							<input type="text" ng-model="filter" class="form-control" maxlength="10" placeholder="{{'admin.group.users.filter' | translate}}">
 						</div>
 					</div>
 					<div class="col-sm-5">
@@ -22,7 +22,7 @@
 				        </div>
 				        <div ng-if="user.adduser=='choice'" class="pull-right">
 				            <a  ng-click="user.adduser='normal'" class="btn btn-default btn-md" style="margin-top:3px;padding:15px 19px;">
-				                <span translate="group.users.back">Back</span>
+				                <span translate="admin.group.users.back">Back</span>
 				            </a>
 				        </div>
 					</div>

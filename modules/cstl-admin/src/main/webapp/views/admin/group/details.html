@@ -4,24 +4,24 @@
 		<div class="modal-header">
 			<button type="button" class="close" ng-click="close()">×</button>
 			<h4 ng-if="domainrole.name!=null" class="modal-title">{{domainrole.name}}</h4>
-			<h4 ng-if="domainrole.name==null" class="modal-title" translate="group.new">New group</h4>
+			<h4 ng-if="domainrole.name==null" class="modal-title" translate="admin.group.new">New group</h4>
 		</div>
 		<div class="modal-body" style="height: 310px; overflow-y: auto;">
 			<div class="container" style="height: 270px; ">
 				<form name="form" role="form" novalidate
 					class="ng-scope ng-invalid ng-invalid-required ng-dirty ng-valid-minlength">				
 					<div class="form-group">
-						<label class="col-sm-12" translate="group.tab.name" style="font-size:18px;">Group name</label> 
+						<label class="col-sm-12" translate="admin.group.tab.name" style="font-size:18px;">Group name</label>
 						<div class="col-sm-6">
 						<input
 							type="text" class="form-control" name="name"
-							placeholder="{{'group.tab.name' | translate}}"
+							placeholder="{{'admin.group.tab.name' | translate}}"
 							ng-model="domainrole.name" ng-minlength=3 ng-maxlength=100 required>
 						</div>
 					</div>	
 
-					<label class="col-sm-12" translate="group.rights" style="font-size:18px;margin-top: 25px;">Group rights</label>
-					<multi-select ng-model="domainrole.permissions" available="allPermissions" selected-label="{{'group.multi.current' | translate}}" available-label="{{'group.multi.available' | translate}}" display-attr="name"></multi-select>
+					<label class="col-sm-12" translate="admin.group.rights" style="font-size:18px;margin-top: 25px;">Group rights</label>
+					<multi-select ng-model="domainrole.permissions" available="allPermissions" selected-label="{{'admin.group.multi.current' | translate}}" available-label="{{'admin.group.multi.available' | translate}}" display-attr="name"></multi-select>
 				</form>
 
 			</div>

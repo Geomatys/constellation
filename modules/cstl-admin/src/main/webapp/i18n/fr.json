@@ -1,4 +1,40 @@
 {
+    "admin": {
+
+        "contact.title": "Contact",
+        "user": {
+            "delete.error": "Impossible de supprimer l'utilsateur.",
+            "last.admin": "Impossible de supprimer l'utilisateur car il faut au moins un administrateur.",
+            "save.error": "Impossible de sauvegarder l'utilisateur"
+        },
+        "group":{
+            "title":"Gestion des groupes",
+            "add":"Ajouter un groupe",
+            "count": "Il y a {{ total }} groupes.",
+            "filter":"Filtrer :",
+            "tab.name":"Nom du groupe",
+            "tab.members":"Membres",
+            "multi.current":"Permissions actuelles",
+            "multi.available":"Permissions disponibles",
+            "rights":"Permissions du groupe",
+            "members.count": "{{ total }} utilisateurs",
+            "users.filter":"Filtrer",
+            "users.back":"Retour",
+            "new":"Nouveau groupe"
+        },
+        "domain": {
+            "addmembers": "Ajouter des membres",
+            "memberscount": "Total des membres",
+            "title": "Domaines",
+            "add": "Ajouter un domaine",
+            "count":  "{{ NUM }} domaine(s)",
+            "new": "Nouveau domaine",
+            "tab": {
+                "name": "Nom",
+                "description": "Description du domaine."
+            }
+        }
+    },
     "city": "Ville",
     "country": "Pays",
     "fax": "Fax",
@@ -1291,21 +1327,6 @@
     "tasks.information.title":"Traitements disponibles",
     "tasks.notask":"Pas de traitement en cours d'execution",
     "mapcontext.information.title":"Compositions cartographiques disponibles",
-    "group":{
-        "title":"Gestion des groupes",
-        "add":"Ajouter un groupe",
-        "count": "Il y a {{ total }} groupes.",
-        "filter":"Filtrer :",
-        "tab.name":"Nom du groupe",
-        "tab.members":"Membres",
-        "multi.current":"Permissions actuelles",
-        "multi.available":"Permissions disponibles",
-        "rights":"Permissions du groupe",
-        "members.count": "{{ total }} utilisateurs",
-        "users.filter":"Filtrer",
-        "users.back":"Retour",
-        "new":"Nouveau groupe"
-    },
     "message.uploading":"Votre donnée est en train d'être importée...",
     "alert.style.noname":"Veuillez renseigner un nom de style"
 }

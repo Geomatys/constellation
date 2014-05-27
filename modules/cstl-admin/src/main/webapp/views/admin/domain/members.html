@@ -18,7 +18,7 @@
 			<p class="col-sm-4" style="margin-top: 8px; margin-bottom: 0;" translate="admin.domain.memberscount" translate-values="{total: '{{ users.length }}'}">{{users.length
 				}} users.</p>
 			<div class="col-sm-8">
-				<input type="text" ng-model="filter" class="form-control" maxlength="10" placeholder="{{'group.users.filter' | translate}}">
+				<input type="text" ng-model="filter" class="form-control" maxlength="10" placeholder="{{'admin.group.users.filter' | translate}}">
 			</div>
 		</div>
 		<div class="col-sm-5">
@@ -28,7 +28,7 @@
 				</a>
 			</div>
 			<div ng-if="user.adduser=='choice'" class="pull-right">
-				<a ng-click="user.adduser='normal'" class="btn btn-default btn-md" style="margin-top: 3px; padding: 15px 19px;"> <span translate="group.users.back">Back</span>
+				<a ng-click="user.adduser='normal'" class="btn btn-default btn-md" style="margin-top: 3px; padding: 15px 19px;"> <span translate="label.return">Back</span>
 				</a>
 			</div>
 		</div>
