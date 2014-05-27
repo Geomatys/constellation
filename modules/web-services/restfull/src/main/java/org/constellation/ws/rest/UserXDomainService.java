@@ -19,7 +19,7 @@ public class UserXDomainService {
 
     @POST
     @Path("/{domainId}/{userId}")
-    public Response insert(@PathParam("userId") int userId,@PathParam("domainId") int domainId, Set<String> roles) {
+    public Response insert(@PathParam("userId") int userId,@PathParam("domainId") int domainId, Set<Integer> roles) {
         domainRepository.addUserToDomain(userId, domainId, roles);
         return Response.noContent().build();
     }

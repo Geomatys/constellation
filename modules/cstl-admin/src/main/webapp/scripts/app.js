@@ -15,6 +15,7 @@
  */
 'use strict';
 
+var cstlSession = {};
 
 function findWebappContext(){
     var path = window.location.pathname;
@@ -133,9 +134,19 @@ cstlAdminApp
                 controller: 'UserController'
             });
             $routeProvider
+            .when('/domain', {
+                templateUrl: 'views/domain/list.html',
+                controller: 'DomainController'
+            });
+            $routeProvider
+            .when('/domainmembers/:domainId', {
+                templateUrl: 'views/domain/members.html',
+                controller: 'DomainMembersController'
+            });
+            $routeProvider
             .when('/group', {
                 templateUrl: 'views/group/list.html',
-                controller: 'GroupController'
+                controller: 'DomainRoleController'
             });
             $routeProvider
             .when('/contact', {
@@ -181,6 +192,11 @@ cstlAdminApp
            $rootScope.$on('event:auth-authConfirmed', function() {
                $rootScope.authenticated = true;
                $rootScope.account = Account.get();
+               
+               Account.get(function(sessionData){
+                $rootScope.cstlSession=sessionData;
+                cstlSession = sessionData;
+               })
 
                // If the login page has been requested and the user is already logged in
                // the user is redirected to the home page

@@ -22,6 +22,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -42,12 +43,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 
+
 @Path("/1/domain")
+@RolesAllowed("cstl-admin")
 public class DomainService {
 
-    
     public static class DomainUserWrapper extends Domain {
-        
+
         /**
          * 
          */
@@ -55,7 +57,7 @@ public class DomainService {
 
         public DomainUserWrapper() {
         }
-        
+
         public DomainUserWrapper(Domain domain, List<User> users) {
             setId(domain.getId());
             setName(domain.getName());
@@ -68,66 +70,87 @@ public class DomainService {
         public List<User> getUsers() {
             return users;
         }
+
         public void setUsers(List<User> users) {
             this.users = users;
         }
-        
+
     }
-    
+
     @Inject
     private DomainRepository domainRepository;
-    
-    
-    @Path("/")
+
     @GET
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response  all(@QueryParam("withUsers") boolean withUsers){;
-        if(withUsers) {
-            List<DomainUserWrapper> result = new ArrayList<DomainService.DomainUserWrapper>();            
+    @Path("/")
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    public Response all(@QueryParam("withMembers") boolean withMembers) {
+        if (withMembers) {
+            List<DomainUserWrapper> result = new ArrayList<DomainService.DomainUserWrapper>();
             List<Domain> domains = domainRepository.findAll();
             for (Domain domain : domains) {
                 List<User> users = domainRepository.findUsers(domain.getId());
                 result.add(new DomainUserWrapper(domain, users));
             }
-            return  Response.ok(result).build();
+            return Response.ok(result).build();
         }
-        return  Response.ok(domainRepository.findAll()).build();
+        return Response.ok(domainRepository.findAll()).build();
     }
-    
 
-    
-    @Path("/")
+    @GET
+    @Path("/{id}")
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    public Response get(@PathParam("id") int id) {
+        Domain domain = domainRepository.findOne(id);
+        if (domain == null)
+            return Response.status(404).build();
+        return Response.ok(domain).build();
+
+    }
+
     @POST
-    @Consumes({MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_JSON})
+    @Path("/")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
     public Response insert(Domain domain) {
         Domain saved = domainRepository.save(domain);
         return Response.ok(saved).build();
     }
-    
-    @Path("/{id}")
+
     @PUT
-    @Consumes({MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_JSON})
+    @Path("/{id}")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
     public Response update(@PathParam("id") int id, Domain domain) {
         domain.setId(id);
         Domain saved = domainRepository.update(domain);
         return Response.ok(saved).build();
     }
-    
-    @Path("/{id}")
+
     @DELETE
+    @Path("/{id}")
     public Response delete(@PathParam("id") int id) {
         try {
             domainRepository.delete(id);
-        }catch(DataIntegrityViolationException e) {
+        } catch (DataIntegrityViolationException e) {
             Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
             LOGGER.warn(e.getMessage());
             return Response.serverError().entity("Domain is in use.").build();
         }
         return Response.noContent().build();
     }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/members/{id}")
+    public Response members(@PathParam("id") int domainId) {
+        return Response.ok(domainRepository.findUsers(domainId)).build();
+    }
     
-    
-    
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/nonmembers/{id}")
+    public Response notMembers(@PathParam("id") int domainId) {
+        return Response.ok(domainRepository.findUsersNotInDomain(domainId)).build();
+    }
+
 }

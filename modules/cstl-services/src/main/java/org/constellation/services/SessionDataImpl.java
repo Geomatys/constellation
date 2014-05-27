@@ -19,7 +19,12 @@
 package org.constellation.services;
 
 import org.constellation.ws.rest.SessionData;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.stereotype.Component;
 
+@Component
+@Scope(value="session", proxyMode=ScopedProxyMode.INTERFACES)
 public class SessionDataImpl implements SessionData {
 
     /**
@@ -31,16 +36,16 @@ public class SessionDataImpl implements SessionData {
      * Active domainId, this domain will be linked to new resources (data,
      * layer, provider or service).
      */
-    private int activeDomain = 1;
+    private int activeDomainId = 0;
 
     @Override
     public int getActiveDomainId() {
-        return activeDomain;
+        return activeDomainId;
     }
 
     @Override
-    public void setActiveDomain(int activeDomain) {
-        this.activeDomain = activeDomain;
+    public void setActiveDomain(int activeDomainId) {
+        this.activeDomainId = activeDomainId;
     }
 
 }

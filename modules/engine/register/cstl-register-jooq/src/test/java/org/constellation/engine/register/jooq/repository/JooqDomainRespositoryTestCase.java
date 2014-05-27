@@ -79,8 +79,8 @@ public class JooqDomainRespositoryTestCase extends AbstractJooqTestTestCase {
     public void testAddUserToDomain() {
         User user = userRepository.insert(TestSamples.newAdminUser(), TestSamples.adminRoles());
         Domain domain = domainRepository.save(TestSamples.newDomain());
-        Set<String> roles = new HashSet<String>();
-        roles.add("manager");
+        Set<Integer> roles = new HashSet<>();
+        roles.add(1);
         
         int[] added = domainRepository.addUserToDomain(user.getId(), domain.getId(), roles);
         
@@ -148,4 +148,5 @@ public class JooqDomainRespositoryTestCase extends AbstractJooqTestTestCase {
                                 .where(DATA_X_DOMAIN.DOMAIN_ID.eq(11)))).fetch());
     }
 
+   
 }

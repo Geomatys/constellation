@@ -18,22 +18,27 @@
  */
 package org.constellation.engine.register;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class DomainRole {
 
+    private Integer id;
+    
     private String name;
 
     private String description;
     
-    private Set<String> permissions = new HashSet<String>();
+    private List<Permission> permissions = new ArrayList<>();
 
     public DomainRole() {
     }
 
-    public DomainRole(String name, String description, Set<String> roles) {
+    public DomainRole(Integer id, String name, String description, List<Permission> roles) {
         super();
+        this.id = id;
         this.name = name;
         this.description = description;
         this.permissions = roles;
@@ -55,19 +60,28 @@ public class DomainRole {
         this.description = description;
     }
 
-    @Override
-    public String toString() {
-        return "DomainRole [name=" + name + ", description=" + description + "]";
-    }
 
-    public Set<String> getPermissions() {
+    public List<Permission> getPermissions() {
         return permissions;
     }
 
-    public void setPermissions(Set<String> roles) {
-        this.permissions = roles;
+    public void setPermissions(List<Permission> permissions) {
+        this.permissions = permissions;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
     
+    @Override
+    public String toString() {
+        return "DomainRole [id=" + id + ", name=" + name + ", description=" + description + ", permissions="
+                + permissions + "]";
+    }
     
 
 }

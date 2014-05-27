@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.constellation.engine.register.Domain;
+import org.constellation.engine.register.Permission;
 import org.constellation.engine.register.User;
 
 public interface DomainRepository {
@@ -36,7 +37,7 @@ public interface DomainRepository {
 
     int delete(int domainId);
 
-    int[] addUserToDomain(int userId, int domainId, Set<String> roles);
+    int[] addUserToDomain(int userId, int domainId, Set<Integer> roles);
 
     int removeUserFromDomain(int userId, int domainId);
     
@@ -56,5 +57,8 @@ public interface DomainRepository {
 
     List<User> findUsers(int id);
 
+    Domain findDefaultByUserId(Integer id);
+
+    List<User> findUsersNotInDomain(int domainId);
 
 }

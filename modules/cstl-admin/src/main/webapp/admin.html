@@ -73,7 +73,7 @@
                             class="glyphicon glyphicon-log-in"></span> &nbsp;<span
                             translate="global.menu.account.login">Authenticate</span></a></li>
                 </ul>
-                <ul ng-show="authenticated" class="nav nav-pills nav-header-mob pull-right  ng-cloak" ng-controller="navCtrl">
+                <ul class="nav nav-pills nav-header-mob pull-right  ng-cloak" ng-controller="navCtrl">
                     <li>
                         <a ng-class="navClass('home')" class="hidden-xs hidden-lg hidden-md" href="#"> 
                             <span class="glyphicon glyphicon-home"></span>
@@ -83,11 +83,11 @@
                             <span translate="global.menu.home">Accueil</span>
                         </a>
                     </li>
-                    <li class="hidden-sm hidden-md"><a ng-show="authenticated" ng-class="navClass('webservice')" href="#/webservice"> <span
+                    <li class="hidden-sm hidden-md"><a ng-class="navClass('webservice')" href="#/webservice"> <span
                             class="glyphicon glyphicon-cloud"></span> <span
                             translate="global.menu.web-service">Services web</span>
                     </a></li>
-                            <li class="hidden-xs hidden-lg"><a ng-show="authenticated" ng-class="navClass('webservice')" href="#/webservice"> <span
+                            <li class="hidden-xs hidden-lg"><a ng-class="navClass('webservice')" href="#/webservice"> <span
                                     class="glyphicon glyphicon-cloud"></span> <span
                                     translate="global.menu.web-service.min">Services web</span>
                             </a></li>
@@ -128,24 +128,27 @@
                             </span>
                         </a>
                         <ul class="dropdown-menu" ng-controller="MenuController">
-                            <li ng-show="authenticated"><a href="#/user"><span
+                            <li><a href="#/user"><span
                                     class="glyphicon glyphicon-user"></span> &nbsp;<span
                                     translate="global.menu.admin.users">Users</span></a></li>
-                            <li ng-show="authenticated"><a href="#/group" ng-mouseenter="grouphover = true" ng-mouseleave="grouphover = false" > <img ng-show="!grouphover" src="images/icon-groups.svg"><img ng-show="grouphover" src="images/icon-groups-hover.svg">
+                            <li><a href="#/domain"><span
+                                    class="glyphicon glyphicon-th"></span> &nbsp;<span
+                                    translate="global.menu.admin.domains">Domains</span></a></li>
+                            <li><a href="#/group" ng-mouseenter="grouphover = true" ng-mouseleave="grouphover = false" > <img ng-show="!grouphover" src="images/icon-groups.svg"><img ng-show="grouphover" src="images/icon-groups-hover.svg">
                                     <span translate="global.menu.admin.group">Groups</span></a></li>
-                            <li ng-show="authenticated"><a href="#/contact"><span
+                            <li><a href="#/contact"><span
                                     class="glyphicon glyphicon-envelope"></span> &nbsp;<span
                                     translate="global.menu.admin.contact">Contact</span></a></li>
-                            <li ng-show="authenticated"><a href="#/metrics"><span
+                            <li><a href="#/metrics"><span
                                     class="glyphicon glyphicon-tasks"></span> &nbsp;<span
                                     translate="global.menu.admin.metrics">Metrics</span></a></li>
-                            <li ng-show="authenticated"><a href="#/task"><span
+                            <li><a href="#/task"><span
                                     class="glyphicon glyphicon-wrench"></span> &nbsp;<span
                                     translate="global.menu.admin.tasks">Tasks</span></a></li>
-                            <li ng-show="authenticated"><a href="#/logs"><span
+                            <li><a href="#/logs"><span
                                     class="glyphicon glyphicon-list-alt"></span> &nbsp;<span
                                     translate="global.menu.admin.logs">Logs</span></a></li>
-                            <li ng-show="authenticated"><a href="{{cstlLogoutUrl}}"><span
+                            <li><a href="{{cstlLogoutUrl}}"><span
                                     class="glyphicon glyphicon-log-out"></span> &nbsp;<span
                                     translate="global.menu.admin.logout">Log out</span></a></li>
                             <li ng-hide="authenticated"><a href="#/login"><span

@@ -39,10 +39,16 @@ public class HomeController {
     }
     
     @RequestMapping(value = "/cstl", method = RequestMethod.GET)
-    public String cstl(HttpServletRequest request, HttpServletResponse response, @RequestParam("cstlSessionId") String csltSessionId) {
+    public String cstl(HttpServletRequest request, HttpServletResponse response, @RequestParam("cstlSessionId") String csltSessionId, @RequestParam("cstlActiveDomainId") int cstlActiveDomainId) {
     	Cookie cookie = new Cookie("cstlSessionId", csltSessionId);
     	cookie.setPath(request.getContextPath());
 		response.addCookie(cookie);
+		
+		Cookie activeDomainId = new Cookie("cstlActiveDomainId", String.valueOf(cstlActiveDomainId));
+		activeDomainId.setPath(request.getContextPath());
+        response.addCookie(activeDomainId);
+        
+		
         return "redirect:/admin.html";
     }
     

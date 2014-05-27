@@ -230,7 +230,7 @@ cstlAdminApp.controller('ModalImportDataStep1LocalController', ['$scope', 'dataL
             var formData = new FormData($form[0]);
             $scope.loader.upload = true;
             $.ajax({
-                url: $cookies.cstlUrl + "api/1/data/upload/data;jsessionid="+ $cookies.cstlSessionId,
+                url: $cookies.cstlUrl + "api/1/domain/"+ $cookies.cstlActiveDomainId + "/data/upload/data;jsessionid="+ $cookies.cstlSessionId,
                 type: 'POST',
                 data: formData,
                 cache: false,
@@ -364,7 +364,7 @@ cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$c
             var formData = new FormData($form[0]);
 
             $.ajax({
-                url: $cookies.cstlUrl + "api/1/data/upload/metadata;jsessionid="+ $cookies.cstlSessionId,
+                url: $cookies.cstlUrl + "api/1/domain/"+ $cookies.cstlActiveDomainId + "/data/upload/metadata;jsessionid="+ $cookies.cstlSessionId,
                 type: 'POST',
                 data: formData,
                 async: false,
@@ -445,7 +445,7 @@ cstlAdminApp.controller('ModalImportDataStep4SensorController', ['$scope', 'sens
             var formData = new FormData($form[0]);
 
             $.ajax({
-                url: $cookies.cstlUrl + "api/1/data/upload/data;jsessionid="+ $cookies.cstlSessionId,
+                url: $cookies.cstlUrl + "api/1/domain/"+ $cookies.cstlActiveDomainId + "/data/upload/data;jsessionid="+ $cookies.cstlSessionId,
                 type: 'POST',
                 data: formData,
                 async: false,

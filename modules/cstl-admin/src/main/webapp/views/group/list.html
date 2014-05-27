@@ -24,22 +24,19 @@
 		<table class="table table-condensed table-striped table-bordered table-responsive user-table">
 			<thead>
 				<tr title="click to order">
-					<td ng-click="predicate = 'roles'; reverse=!reverse"
+					<td ng-click="predicate = 'name'; reverse=!reverse"
 						translate="group.tab.name">Roles name</td>
-					<td ng-click="predicate = 'members'; reverse=!reverse"
-						translate="group.tab.members">Members</td>
+					<td translate="group.tab.members">Members</td>
 				</tr>
+
+			</tr>
 			</thead>
-
-			
-			
-
-
-			<tr ng-click="details($index)" style='cursor:pointer'
-				ng-repeat="user in list | filter:filter | orderBy:predicate:reverse">
-				<td>{{group.name}}</td>
-				<td>{{group.members}}</td>
+				<tr  style='cursor:pointer'
+				ng-repeat="domainrole in domainroles | filter:filter | orderBy:predicate:reverse">
+				<td ng-click="details($index)">{{domainrole.name}}</td>
+				<td ng-click="details($index)"><span>{{domainrole.memberList}}</span>
 				</td>
+				<td class="user-delete" ng-click="deleteDomain($index)"><span class="glyphicon glyphicon-trash"></span></td>
 
 				<td class="user-delete" style="width:20px;" ng-click="details($index)"><span class="glyphicon glyphicon-user"></span></td>
 				<td class="user-delete" style="width:20px;" ng-click="members($index)"><span class="glyphicon glyphicon-cog"></span></td>

@@ -6,9 +6,9 @@
 			http://www.springframework.org/schema/security/spring-security-3.2.xsd">
 
 
+  <global-method-security   secured-annotations="enabled" jsr250-annotations="enabled" />
+
   <beans:alias name="springSecurityFilterChain" alias="securityFilter" />
-
-
 
   <beans:bean id="nop" class="org.constellation.security.spring.NOPAuthenticationEntryPoint" />
 
@@ -17,7 +17,7 @@
     <intercept-url pattern="/WS/*/admin/**" access="hasRole('cstl-admin')" />
   </http>
   <http pattern="/api/**" request-matcher="ant" use-expressions="true" auto-config="false" entry-point-ref="nop">
-    <intercept-url pattern="/api/**" access="hasRole('cstl-admin')" />
+    <intercept-url pattern="/api/**" access="isAuthenticated()" />
   </http>
   <http pattern="/spring/admin/**" request-matcher="ant" use-expressions="true" auto-config="false" entry-point-ref="nop">
     <intercept-url pattern="/spring/admin/**" access="hasRole('cstl-admin')" />
@@ -54,7 +54,7 @@
 
   <jdbc-user-service id="cstlUserService" data-source-ref="dataSource"
     users-by-username-query='select "login" as "username", "password" as "password", "active" as "enabled" from "admin"."user" where "login" = ?'
-    authorities-by-username-query='select "u"."login" as "username", "uXr"."role" as "authority" from "admin"."user" "u" join "admin"."user_x_role" "uXr" on "u"."id" = "uXr"."user_id" where "u"."login" = ?' />
+    authorities-by-username-query='select "u"."login" as "username", "uXr"."role" as "authority" from "admin"."user" "u"  left join "admin"."user_x_role" "uXr" on "u"."id" = "uXr"."user_id" where "u"."login" = ?' />
 
   <authentication-manager alias="authenticationManager">
     <authentication-provider user-service-ref="cstlUserService">

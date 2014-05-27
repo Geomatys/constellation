@@ -18,6 +18,7 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -42,6 +43,20 @@ public abstract class AbstractJooqRespository<T extends Record, U> {
         this.table = table;
     }
 
+    
+     interface Predicate<U> {
+         boolean match(U t);
+     }
+    
+   <V> List<V> filter(List<V> list, Predicate<V> p) {
+        List<V> ret = new ArrayList<V>();
+        for (V t : list) {
+            if(p.match(t))
+                ret.add(t);
+        }
+        return ret;        
+    }
+    
     List<? extends U> mapResult(SelectQuery<T> selectQuery) {
         if (selectQuery.execute() > 0)
             return selectQuery.getResult().map(getDTOMapper());

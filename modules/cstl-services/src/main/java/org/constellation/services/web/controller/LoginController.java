@@ -22,6 +22,11 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.constellation.engine.register.Domain;
+import org.constellation.engine.register.User;
+import org.constellation.engine.register.repository.DomainRepository;
+import org.constellation.engine.register.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -29,6 +34,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 @RequestMapping("/auth")
 public class LoginController {
+   
+    @Autowired
+    private UserRepository userRepository;
+    
+    @Autowired
+    private DomainRepository domainRepository;
+    
+   
 
 	@RequestMapping(value="/form", method = RequestMethod.GET)
 	public String get(HttpServletRequest request, HttpServletResponse response) {
@@ -41,9 +54,12 @@ public class LoginController {
 	public String loggedin(HttpServletRequest httpServletRequest) {
 		String sessionId = httpServletRequest.getSession().getId();
 		String adminUrl = retrieveCstlAdmin(httpServletRequest);
+		User user = userRepository.findOne(httpServletRequest.getUserPrincipal().getName());
+		Domain defaultDomain = domainRepository.findDefaultByUserId(user.getId());
+		int domainId = defaultDomain==null?0:defaultDomain.getId();
 		if(adminUrl==null)
 			return "redirect:/";
-		return "redirect:" + adminUrl + "app/cstl?cstlSessionId=" + sessionId;
+		return "redirect:" + adminUrl + "app/cstl?cstlSessionId=" + sessionId + "&cstlActiveDomainId=" + domainId;
 	}
 
 	@RequestMapping("/loggedout")

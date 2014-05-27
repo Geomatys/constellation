@@ -149,7 +149,7 @@ import org.opengis.util.NoSuchIdentifierException;
  *
  * @author Benjamin Garcia (Geomatys)
  */
-@Path("/1/data/")
+@Path("/1/domain/{domainId}/data/")
 public class DataRest {
 
     private final XMLInputFactory xif = XMLInputFactory.newFactory();
@@ -1344,21 +1344,21 @@ public class DataRest {
     }
 
     @GET
-    @Path("list/top")
+    @Path("/list/top")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
-    public Response getTopDataList() {
-        return getTopDataList(null);
+    public Response getTopDataList(@PathParam("domainId") int domainId) {
+        return getTopDataList(domainId, null);
     }
 
     @GET
-    @Path("list/top/{type}")
+    @Path("/list/top/{type}")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
-    public Response getTopDataList(@PathParam("type") String type) {
+    public Response getTopDataList(@PathParam("domainId") int domainId, @PathParam("type") String type) {
         final List<DataBrief> briefs = new ArrayList<>();
 
-        final List<String> providerIds = providerRepository.getProviderIdsForDomain(sessionData.getActiveDomainId());
+        final List<String> providerIds = providerRepository.getProviderIdsForDomain(domainId);
         for (final String providerId : providerIds) {
             final ProviderRecord provider = ConfigurationEngine.getProvider(providerId);
             final String parent = provider.getParentIdentifier();

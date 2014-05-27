@@ -99,7 +99,7 @@ cstlAdminApp.controller('SensorAddModalController', ['$scope', '$modalInstance',
             var formData = new FormData($form[0]);
 
             $.ajax({
-                url: $cookies.cstlUrl + "api/1/data/upload/data;jsessionid="+ $cookies.cstlSessionId,
+                url: $cookies.cstlUrl + "api/1/domain/"+ $cookies.cstlActiveDomainId + "/data/upload/data;jsessionid="+ $cookies.cstlSessionId,
                 type: 'POST',
                 data: formData,
                 async: false,

@@ -23,6 +23,7 @@ import static org.constellation.engine.register.jooq.Tables.DATA_X_DOMAIN;
 import static org.constellation.engine.register.jooq.Tables.DOMAIN;
 import static org.constellation.engine.register.jooq.Tables.PROVIDER;
 import static org.constellation.engine.register.jooq.Tables.SERVICE_X_DOMAIN;
+import static org.constellation.engine.register.jooq.Tables.USER;
 import static org.constellation.engine.register.jooq.Tables.USER_X_DOMAIN_X_DOMAINROLE;
 
 import java.util.ArrayList;
@@ -95,15 +96,15 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
         return null;
     }
 
-    public int[] addUserToDomain(int userId, int domainId, Set<String> roles) {
+    public int[] addUserToDomain(int userId, int domainId, Set<Integer> roles) {
 
         Collection<UserXDomainXDomainroleRecord> records = new ArrayList<UserXDomainXDomainroleRecord>();
 
-        for (String role : roles) {
+        for (Integer role : roles) {
             UserXDomainXDomainroleRecord newRecord = dsl.newRecord(USER_X_DOMAIN_X_DOMAINROLE);
             newRecord.setDomainId(domainId);
             newRecord.setUserId(userId);
-            newRecord.setDomainrole(role);
+            newRecord.setDomainroleId(role);
             records.add(newRecord);
         }
 
@@ -191,7 +192,7 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
     @Override
     public List<User> findUsers(int domainId) {
         List<User> result = new ArrayList<User>();
-        SelectConditionStep<Record> groupBy = dsl.select().from(Tables.USER).join(USER_X_DOMAIN_X_DOMAINROLE).onKey()
+        SelectConditionStep<Record> groupBy = dsl.select().from(USER).join(USER_X_DOMAIN_X_DOMAINROLE).onKey()
                 .where(USER_X_DOMAIN_X_DOMAINROLE.DOMAIN_ID.eq(domainId));
         groupBy.execute();
         Map<Record, Result<Record>> intoGroups = groupBy.getResult().intoGroups(Tables.USER.fields());
@@ -202,4 +203,21 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
         }
         return result;
     }
+
+    @Override
+    public Domain findDefaultByUserId(Integer id) {
+        return dsl.select().from(DOMAIN).join(USER_X_DOMAIN_X_DOMAINROLE).onKey().orderBy(DOMAIN.ID).limit(1)
+                .fetchOneInto(Domain.class);
+    }
+
+    @Override
+    public List<User> findUsersNotInDomain(int domainId) {
+        return dsl
+                .select()
+                .from(USER)
+                .where(USER.ID.notIn(dsl.selectDistinct(USER_X_DOMAIN_X_DOMAINROLE.USER_ID)
+                        .from(USER_X_DOMAIN_X_DOMAINROLE).where(USER_X_DOMAIN_X_DOMAINROLE.DOMAIN_ID.eq(domainId))))
+                .fetchInto(User.class);
+    }
+
 }

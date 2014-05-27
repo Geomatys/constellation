@@ -6,7 +6,19 @@
         "delete.error": "Could not delete this user.",
         "last.admin": "Last admistrator cannot be deleted",
         "save.error": "Could not save this user"
-       }
+       },
+      "domain": {
+        "addmembers": "Add members",
+        "memberscount": "Members count",
+        "title": "Domains",
+        "add": "Add a domain",
+        "count":  "{{ NUM }} domain(s)",
+        "new": "New domain",
+        "tab": {
+          "name": "Name",
+          "description": "Description of this domain."
+        }
+      }
     },
 	"city": "City",
 	"country": "Country",
@@ -14,6 +26,7 @@
 	"fax": "fax",
 	"name": "Name",
 	"organization": "Organization",
+	"description": "Description",
 	"phone": "Phone",
 	"position": "Position",
 	"zip": "ZIP",
@@ -642,6 +655,7 @@
             "tasks":"Tasks",
             "account.login": "Authenticate",
             "admin": {
+                "domains": "Domains",
                 "main": "Administration",
                 "users": "Users",
                 "password": "Password",

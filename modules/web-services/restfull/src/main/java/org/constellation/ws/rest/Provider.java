@@ -88,15 +88,13 @@ import org.opengis.util.NoSuchIdentifierException;
  * @version 0.9
  * @since 0.9
  */
-@Path("/1/provider")
+@Path("/1/domain/{domainId}/provider")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public final class Provider {
 
     private static final Logger LOGGER = Logging.getLogger(Provider.class);
 
-    @Inject
-    private SessionData sessionData;
     
     @Inject
     private DomainRepository domainRepository;
@@ -105,8 +103,8 @@ public final class Provider {
      * Create a new provider from the given configuration.
      */
     @PUT
-    @Path("{id}")
-    public Response create(final @PathParam("id") String id, final ProviderConfiguration config) {
+    @Path("/{id}")
+    public Response create(final @PathParam("domainId") int domainId, final @PathParam("id") String id, final ProviderConfiguration config) {
         final String type = config.getType();
         final String subType = config.getSubType();
         final Map<String,String> inParams = config.getParameters();
@@ -325,8 +323,8 @@ public final class Provider {
         } else {
             try {
                 DataProvider dataProvider = DataProviders.getInstance().createProvider(id, providerService, sources);
-                int count = domainRepository.addProviderDataToDomain(id, sessionData.getActiveDomainId());
-                LOGGER.info("Added " + count + " data to domain " + sessionData.getActiveDomainId());
+                int count = domainRepository.addProviderDataToDomain(id, domainId );
+                LOGGER.info("Added " + count + " data to domain " + domainId);
             } catch (ConfigurationException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
                 return Response.status(500).build();
@@ -356,7 +354,7 @@ public final class Provider {
      */
     @GET
     @Path("{id}/{layerName}/dataDescription")
-    public Response dataDescription(final @PathParam("id") String id,
+    public Response dataDescription(final @PathParam("domainId") int domainId, final @PathParam("id") String id,
                                     final @PathParam("layerName") String layerName) {
         try {
             return Response.ok(LayerProviders.getDataDescription(id, layerName)).build();
@@ -370,7 +368,7 @@ public final class Provider {
      */
     @GET
     @Path("{id}/{layerName}/{property}/propertyValues")
-    public Response propertyValues(final @PathParam("id") String id,
+    public Response propertyValues(final @PathParam("domainId") int domainId, final @PathParam("id") String id,
                                    final @PathParam("layerName") String layerName,
                                    final @PathParam("property") String property) {
         try {
@@ -385,7 +383,7 @@ public final class Provider {
      */
     @GET
     @Path("{id}/{layerName}/isGeophysic")
-    public Response isGeophysic(final @PathParam("id") String id,
+    public Response isGeophysic(final @PathParam("domainId") int domainId, final @PathParam("id") String id,
                                 final @PathParam("layerName") String layerName) {
         
         boolean isGeophysic = false;
@@ -412,7 +410,7 @@ public final class Provider {
      */
     @GET
     @Path("{id}/{layerName}/listPyramidChoice")
-    public Response listPyramids(final @PathParam("id") String id,
+    public Response listPyramids(final @PathParam("domainId") int domainId, final @PathParam("id") String id,
                                 final @PathParam("layerName") String layerName) {
         
         final ProviderPyramidChoiceList choices = new ProviderPyramidChoiceList();
@@ -456,7 +454,7 @@ public final class Provider {
      */
     @GET
     @Path("{id}/{layerName}/{bandIndex}/bandValues")
-    public Response bandValues(final @PathParam("id") String id,
+    public Response bandValues(final @PathParam("domainId") int domainId, final @PathParam("id") String id,
                                final @PathParam("layerName") String layerName,
                                final @PathParam("bandIndex") int bandIndex) {
         try {
@@ -470,7 +468,7 @@ public final class Provider {
     @Path("metadata/{providerId}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getMetadata(final @PathParam("providerId") String providerId) throws SQLException, NotRunningServiceException, CoverageStoreException, NoSuchIdentifierException, ProcessException, JAXBException {
+    public Response getMetadata(final @PathParam("domainId") int domainId, final @PathParam("providerId") String providerId) throws SQLException, NotRunningServiceException, CoverageStoreException, NoSuchIdentifierException, ProcessException, JAXBException {
         final DefaultMetadata metadata = ConfigurationEngine.loadProviderMetadata(providerId, CSWMarshallerPool.getInstance());
         metadata.prune();
         return Response.ok(metadata).build();
@@ -480,7 +478,7 @@ public final class Provider {
     @Path("metadata/{providerId}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response setMetadata(final @PathParam("providerId") String providerId, final DefaultMetadata metadata) throws SQLException, NotRunningServiceException, CoverageStoreException, NoSuchIdentifierException, ProcessException, JAXBException {
+    public Response setMetadata(final @PathParam("domainId") int domainId, final @PathParam("providerId") String providerId, final DefaultMetadata metadata) throws SQLException, NotRunningServiceException, CoverageStoreException, NoSuchIdentifierException, ProcessException, JAXBException {
         ConfigurationEngine.saveProviderMetadata(metadata, providerId);
         return Response.status(200).build();
     }
