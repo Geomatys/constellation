@@ -703,6 +703,7 @@
                 "type": "METADONNEES"
             },
             "no.data": "Pas de",
+            "no.sensor": "0",
             "no": {
                 "available": {
                     "md": "Pas de métadonnées disponibles"

@@ -81,7 +81,7 @@
                                         </div>
                                         <div class="block pull-right">
                                             <i class="icon-paper-clip"></i>
-                                            <span ng-if="sosdata.children == null || sosdata.children.length == 0" translate="md.listing.no.data">No</span>
+                                            <span ng-if="sosdata.children == null || sosdata.children.length == 0" translate="md.listing.no.sensor">No</span>
                                             <span ng-if="sosdata.children.length > 0">{{sosdata.children.length}}</span>
                                             <span translate="service.edit.dashboard.sensors.list.associated">associated sensors</span>
                                         </div>
@@ -115,7 +115,7 @@
                         </div>
                         <div class="selected-item" id="selected-item" ng-class="{hide: selected == null}">
                             <div class="block-header" ng-click="toggleUpDownSelected()">
-                                <strong>{{selected.id}}</strong><i class="icon-chevron-up pull-right"></i>
+                                <strong class="item-title title-bloc" title="{{selected.id}}">{{selected.id}}</strong><i class="icon-chevron-up pull-right"></i>
                             </div>
                             <div>
                                 <div class="block-content">

@@ -99,7 +99,7 @@
                                         <div class="pagination-wrapper pagination-data" ng-class="{'pagination-csw':type==='csw','pagination-sos':type==='sos'}">
                                             <strong><span class="nb-results pull-left">{{countdata}}&nbsp;</span><span class="nb-results" translate="label.count.data">available data</span></strong>
 
-                                            <button type="button" ng-click="small=!small" class="hidden-sm hidden-xs pull-right btn btn-xs btn-info btn-data" ng-class="{'btn-small-selected':small==true}" style="margin-left: 10px; margin-top: 5px;"><span translate="label.reduced.display">Reduced display</span></button>
+                                            <button type="button" ng-click="small=!small" class="hidden-sm hidden-xs pull-right btn btn-xs btn-info btn-data btn-csw" ng-class="{'btn-small-selected':small==true}" style="margin-left: 10px; margin-top: 5px;"><span translate="label.reduced.display">Reduced display</span></button>
                                             
                                             <select class="nb-per-page input-small form-control pull-right" ng-model="nbbypage">
                                                 <option value="5">5</option>
@@ -135,9 +135,9 @@
                                             </div>
                                             <div ng-if="type === 'csw'">
                                                 <div ng-repeat="cswdata in dataList" ng-class="{'col-xs-6':small==true}" style="padding-left:0;">
-                                                    <div class="item" ng-class="{'selected':cswdata==selected, 'metadata-service':cswdata.identifier.split('_')[0]==='serv','metadata':cswdata.identifier.split('_')[0]!=='serv'}" ng-click="select(cswdata);selectMetadataChild(null), 'col-xs-6':small==true">
+                                                    <div class="item" ng-class="{'selected':cswdata==selected, 'metadata-service':cswdata.identifier.split('_')[0]==='serv','metadata':cswdata.identifier.split('_')[0]!=='serv'}" ng-click="select(cswdata);selectMetadataChild(null)>
                                                         <div class="top">
-                                                            <span class="item-title">{{cswdata.title ? cswdata.title : cswdata.identifier}}</span>
+                                                            <span class="item-title csw-title">{{cswdata.title ? cswdata.title : cswdata.identifier}}</span>
                                                             <span class="pull-right text-right item-list-style"  style="font-size:14px;">METADATA</span>
                                                         </div>
                                                         <div class="bottom">
@@ -148,7 +148,7 @@
                                                                 <i class="icon-user"></i>{{cswdata.creator}}
                                                             </div>
                                                             <div class="block pull-right">
-                                                                <i class="icon-paper-clip"></i><span ng-if="relatedDatas[cswdata.identifier] == null || relatedDatas[cswdata.identifier].length == 0" translate="md.listing.no.data">No</span><span ng-if="relatedDatas[cswdata.identifier].length > 0">{{relatedDatas[cswdata.identifier].length}}</span> <span translate="md.listing.data.associated">associated data</span>
+                                                                <i class="icon-paper-clip"></i><span ng-if="relatedDatas[cswdata.identifier] == null || relatedDatas[cswdata.identifier].length == 0" translate="md.listing.no.data">No</span><span ng-if="relatedDatas[cswdata.identifier].length > 0">{{relatedDatas[cswdata.identifier].length}}</span> <span ng-class="{hide:small==true}" translate="md.listing.data.associated">associated data</span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -215,7 +215,7 @@
                                 </div>
                             </div>
                         <!--end list -->
-                        </div>
+
 
                         <div class="col-sm-4">
                             <!-- begin add data button -->
@@ -229,7 +229,7 @@
                             <!-- end  add data button  -->
                             <div>
                                 <!-- begin details -->
-
+                    </div>
 
                                 <div id="selection">
                                     <div class="alert alert-info alert-data" ng-class="{'alert-csw':type==='csw','alert-sos':type==='sos'}" ng-show="selected == null">
@@ -240,7 +240,7 @@
                                     <div class="selected-item" id="selected-item" ng-hide="selected == null">
                                         <div ng-if="service.type.toLowerCase() !== 'csw' && service.type.toLowerCase() !== 'sos'">
                                             <div class="block-header" ng-click="toggleUpDownSelected()">
-                                                <strong>{{selected.Name}}</strong><i class="icon-chevron-up pull-right"></i>
+                                                <strong class="item-title title-bloc-service" title="{{selected.Name}}">{{selected.Name}}</strong><i class="icon-chevron-up pull-right"></i>
                                             </div>
                                             <div class="block-content">
                                                 <h6 translate="label.owner">Owner</h6>
@@ -319,7 +319,7 @@
                                         </div>
                                         <div ng-if="service.type.toLowerCase() === 'csw'">
                                             <div class="block-header" ng-click="toggleUpDownSelected()">
-                                                <strong>{{selected.title ? selected.title : selected.identifier}}</strong><i class="icon-chevron-up pull-right"></i>
+                                                <strong class="item-title title-bloc-service" title="{{selected.title ? selected.title : selected.identifier}}">{{selected.title ? selected.title : selected.identifier}}</strong><i class="icon-chevron-up pull-right"></i>
                                             </div>
                                             <div>
                                                 <div class="block-content">

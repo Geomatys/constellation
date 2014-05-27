@@ -438,6 +438,7 @@
             "data.associated": "associated data",
             "metadata.type": "METADATA",
             "no.data": "No",
+            "no.sensor": "No",
             "selected": {
                 "delete.button": "Delete",
                 "duplicate.button": "Duplicate",
