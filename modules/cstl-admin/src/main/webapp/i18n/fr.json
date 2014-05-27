@@ -8,7 +8,7 @@
     "position": "Position",
     "zip": "Code postal",
     "save": "Enregistrer",
-    "address": "Adresse",
+    "address":"Adresse",
     "adddata": {
         "popup": {
             "datalist": {
@@ -175,14 +175,14 @@
             "choose.tile.format": "Fomat de sortie du tuilage",
             "choose.uppercornerx": "Coin haut X",
             "choose.uppercornery": "Coin haut Y",
-            "choose.type": "Choix du type",
-            "choose.sensor": "Associer un capteur",
+            "choose.type":"Choix du type",
+            "choose.sensor":"Associer un capteur",
             "close": "Fermer",
             "data": "Données",
             "end": "Terminer",
             "local.title": "Fichier local",
             "metadata": "Métadonnées",
-            "netcdf": "Fichier netCDF",
+            "netcdf":"Fichier netCDF",
             "next": "Suivant",
             "remove": "Enlever",
             "select": "Sélectionner",
@@ -288,17 +288,27 @@
         "menu": {
             "account.login": "S'authentifier",
             "admin": {
+                "about":"A propos de Constellation",
                 "contact": "Contact",
+                "group":"Gestion des groupes",
+                "image_classes":"Classes d'images",
                 "logout": "Déconnexion",
                 "logs": "Logs",
                 "main": "Administration",
                 "metrics": "Métriques",
                 "password": "Mot de passe",
+                "planning":"Planification",
+                "process":"Processus",
+                "processing":"Processing",
+                "security":"Sécurité",
+                "security_settings":"Paramètres de sécurité",
                 "sessions": "Sessions",
-                "users": "Utilisateurs",
-                "processes": "Processus",
-                "tasks": "Tâches",
-                "group": "Groupes"
+                "settings":"Paramètres",
+                "statistics":"Statistiques",
+                "system":"Système",
+                "system_state":"État des services",
+                "tasks":"Gestionnaire des tâches",
+                "users": "Gestion des utilisateurs"
             },
             "data": "Données",
             "sensor": "Capteurs",
@@ -308,7 +318,7 @@
             "mapcontext-min": "Carto.",
             "style": "Styles",
             "viewer": "Visualiseur",
-            "tasks": "Traitements",
+            "tasks":"Traitements",
             "web-service": "Services web",
             "web-service.min": "Services"
         },
@@ -407,18 +417,18 @@
                 "label": "Services web"
             }
         },
-        "satistics": {
-            "title": "Statistiques",
-            "services": "Services actifs",
-            "data": "Données intégrées",
+        "satistics" :{
+            "title":"Statistiques",
+            "services":"Services actifs",
+            "data":"Données intégrées",
             "users": "Utilisateurs créés",
             "process": "Processus"
         },
-        "text": {
-            "intro": "<b>Constellation-SDI</b> permet de créer et de gérer simplement une Infrastructure de Données Spatiales complète.",
-            "services": "Vous pouvez créer des <b>services web</b> pour ensuite y ajouter des données",
-            "data": "Vous pouvez gérer vos <b>données</b>",
-            "stat": "Vous pouvez gérer des <b>capteurs</b> et les utiliser dans un context géospatial"
+        "text":{
+            "intro":"<b>Constellation-SDI</b> permet de créer et de gérer simplement une Infrastructure de Données Spatiales complète.",
+            "services":"Vous pouvez créer des <b>services web</b> pour ensuite y ajouter des données",
+            "data":"Vous pouvez gérer vos <b>données</b>",
+            "stat":"Vous pouvez gérer des <b>capteurs</b> et les utiliser dans un context géospatial"
         }
     },
     "label": {
@@ -427,7 +437,7 @@
         "add.sensors": "Ajouter un capteur",
         "add.style": "Ajouter un style",
         "add.task": "Ajouter un traitement",
-        "add.mapcontext": "Ajouter une composition cartographique",
+        "add.mapcontext" : "Ajouter une composition cartographique",
         "all": "Tous",
         "all_fem": "Toutes",
         "categories": "Catégories",
@@ -459,9 +469,9 @@
         "file": {
             "local": "Fichier local",
             "server": "Fichier serveur",
-            "db": "Base de données"
+            "db":"Base de données"
         },
-        "fields.required": "Tous les champs sont obligatoires.",
+        "fields.required":"Tous les champs sont obligatoires.",
         "finish": "Terminer",
         "import": {
             "style": "Importer un style"
@@ -470,7 +480,7 @@
             "style": "Liste des styles"
         },
         "logical": "Logique",
-        "mapcontext.system": "Composition cartographique",
+        "mapcontext.system":"Composition cartographique",
         "name": "Nom",
         "no": {
             "association": "Aucune association.",
@@ -512,7 +522,7 @@
         "unknown": "Inconnu",
         "validate": "Valider",
         "vector": "Vecteur",
-        "count.data": "donnée(s) disponible(s)",
+        "count.data":"donnée(s) disponible(s)",
         "count.sensors": "capteur(s) disponible(s)",
         "count.style": "styles(s) disponible(s)",
         "count.tasks": "traitement(s) disponible(s)",
@@ -562,7 +572,7 @@
                     "vector": {
                         "label": "Donnée vecteur"
                     },
-                    "associate": "Associer à un capteur"
+                    "associate":"Associer à un capteur"
                 }
             },
             "layer": {
@@ -610,7 +620,7 @@
                 "metadataedit.button": "Editer"
             },
             "title": "Liste des couches",
-            "modal.dataviewer": "Visualisation de la donnée"
+            "modal.dataviewer":"Visualisation de la donnée"
         }
     },
     "login": {
@@ -898,8 +908,8 @@
         },
         "config": {
             "source": "Source",
-            "source.sos": "Source des Métadonnées",
-            "source.sos.data": "Source des données",
+            "source.sos":"Source des Métadonnées",
+            "source.sos.data":"Source des données",
             "source.choose": "Choisir la source",
             "source.choose.sos": "Choisir la source de Métadonnées",
             "source.choose.sos.data": "Choisir la source de données",
@@ -922,7 +932,7 @@
             "source.internal": "Interne",
             "source.internal.description": "Base de données des métadonnées de Constellation, décrivant les données publiées par les services",
             "source.internal.title": "Interne (SGBDR)",
-            "source.sos.title": "Données de capteurs (SOS)"
+            "source.sos.title":"Données de capteurs (SOS)"
         },
         "create": {
             "end": {
@@ -995,12 +1005,12 @@
                 }
             }
         },
-        "rights": "Gestion des droits",
+        "rights":"Gestion des droits",
         "rights.group": {
-            "list": "Liste des groupes",
-            "group": "Groupe",
-            "read": "Lecture",
-            "write": "Ecriture"
+            "list":"Liste des groupes",
+            "group":"Groupe",
+            "read":"Lecture",
+            "write":"Ecriture"            
         },
         "edit": {
             "dashboard.layer.title": "Liste des couches",
@@ -1008,7 +1018,7 @@
             "dashboard.tabs": {
                 "data": "Données",
                 "description": "Description du service",
-                "metadata": "Métadonnées du service",
+                "metadata": "Métadonnées du service", 
                 "rights": "Gestion des droits"
             },
             "dashboard.data.title": "Liste des données",
@@ -1019,19 +1029,19 @@
             "dashboard.action.add.button": "Ajouter",
             "dashboard.action.add.data": "Ajouter une donnée",
             "dashboard.action.add.layer": "Ajouter une couche",
-            "dashboard.sensors.list": "Capteurs disponibles",
+            "dashboard.sensors.list":"Capteurs disponibles",
             "dashboard.sensors.list.associated": "capteurs associés",
             "dashboard.tasks.list.associated": "traitements associés",
             "dashboard.tasks.list": "Traitements disponibles",
             "dashboard.mapcontext.list.associated": "données associées",
             "dashboard.mapcontext.list": "Compositions cartographiques disponibles",
-            "dashboard.measures.list": "Mesures possibles",
-            "dashboard.measures.error.select.one": "Vous devez sélectionner une mesure dans la liste précédente",
-            "dashboard.area": "Zone géographique",
-            "dashboard.date.to": "au",
-            "dashboard.date.from": "Du",
-            "dashboard.button.graph.hide": "Cacher le graphique",
-            "dashboard.button.graph.show": "Afficher le graphique"
+            "dashboard.measures.list":"Mesures possibles",
+            "dashboard.measures.error.select.one" : "Vous devez sélectionner une mesure dans la liste précédente",
+            "dashboard.area":"Zone géographique",
+            "dashboard.date.to":"au",
+            "dashboard.date.from":"Du",
+            "dashboard.button.graph.hide":"Cacher le graphique",
+            "dashboard.button.graph.show":"Afficher le graphique"
         },
         "menu": {
             "delete": {
@@ -1080,15 +1090,15 @@
             "firstname": "Prénom",
             "lastname": "Nom",
             "password": "Mot de passe",
-            "login": "Identifiant",
-            "roles": "Rôles",
-            "roles.admin": "Ajouter le rôle administrateur",
+            "login":"Identifiant",
+            "roles":"Rôles",
+            "roles.admin":"Ajouter le rôle administrateur",
             "login.placeholder": "Votre identifiant",
             "password.placeholder": "Votre mot de passe",
             "firstname.placeholder": "Votre prénom",
             "lastname.placeholder": "Votre Nom",
             "email.placeholder": "Votre e-mail",
-            "button.close": "Annuler",
+            "button.close":"Annuler",
             "modal.title": "Nouvel utilisateur"
         },
         "messages": {
@@ -1176,26 +1186,26 @@
         },
         "title": "Services disponibles"
     },
-    "page.header.title": {
-        "webservices": "Gestion des services",
-        "data": "Gestion des données",
-        "style": "Gestion des styles",
+    "page.header.title":{
+        "webservices":"Gestion des services",
+        "data":"Gestion des données",
+        "style":"Gestion des styles",
         "contact": "Contact",
-        "create.service": "Nouveau service",
-        "create.service.source": "Source",
-        "edit.service": "Edition du service",
-        "process": "Processus",
-        "task": "Tâches en cours",
-        "sensors": "Gestion des capteurs",
-        "tasks": "Gestion des traitements",
-        "mapcontext": "Gestion des compositions cartographiques"
+        "create.service":"Nouveau service",
+        "create.service.source":"Source",
+        "edit.service":"Edition du service",
+        "process":"Processus",
+        "task":"Tâches en cours",
+        "sensors":"Gestion des capteurs",
+        "tasks":"Gestion des traitements",
+        "mapcontext":"Gestion des compositions cartographiques"
     },
-    "style.information.title": "Styles disponibles",
+    "style.information.title":"Styles disponibles",
     "users": {
-        "add": "Ajouter un utilisateur",
-        "title": "Gestion des utilisateurs",
-        "count": "Il y a {{ total }} Utilisateurs.",
-        "filter": "Filtrer: "
+      "add": "Ajouter un utilisateur",
+      "title": "Gestion des utilisateurs",
+      "count": "Il y a {{ total }} Utilisateurs.",
+      "filter": "Filtrer: "
     },
     "sldeditor": {
         "raster": {
@@ -1235,66 +1245,66 @@
         },
         "apercu": {
             "titre": "Aperçu du style",
-            "data": "Aperçu de la donnée"
+            "data":"Aperçu de la donnée"
         },
-        "edition": {
+        "edition":{
             "fill": "Remplissage",
             "color": "Couleur",
-            "stroke": "Contour",
-            "size": "Taille",
-            "stipple": "Pointillés",
-            "full": "Plein",
+            "stroke":"Contour",
+            "size":"Taille",
+            "stipple":"Pointillés",
+            "full":"Plein",
             "line": "Trait",
-            "space": "Espace",
-            "join": "Angle",
-            "cap": "Extrémité",
-            "offset": "Décalage",
-            "icon": "Icône",
-            "opacity": "Opacité",
-            "font": "Police",
-            "label": "Libellé",
-            "reversecolors": "Inverser les couleurs",
+            "space":"Espace",
+            "join":"Angle",
+            "cap":"Extrémité",
+            "offset":"Décalage",
+            "icon":"Icône",
+            "opacity":"Opacité",
+            "font":"Police",
+            "label":"Libellé",
+            "reversecolors":"Inverser les couleurs",
             "point":"Point",
             "text.style":"Style du texte",
             "method":"Méthode",
             "intervals":"Intervalles"
         },
-        "button": {
-            "cancel": "Annuler",
-            "validate": "Valider",
-            "create": "Créer"
+        "button":{
+            "cancel":"Annuler",
+            "validate":"Valider",
+            "create":"Créer"
         }
     },
-    "tooltip": {
-        "service.create.name": "L'identifiant peut être le même que le nom",
-        "service.create.version": "Au moins une version doit être sélectionnée",
-        "service.source.url": "Renseignez uniquement le nom de domaine",
-        "service.source.connexion": "Connexion entre plusieurs bases",
-        "service.source.sensormlfolder": "TODO",
-        "data.add.choicedata": "Formats supportés : shp (dans un fichier .zip), NetCDF, tif",
-        "sensor.add": "Formats supportés : un fichier sensorML (*.xml) ou un fichier zip.",
-        "style.create": "Vous devez sélectionner une donnée afin de lui associer le style créé."
+    "tooltip":{
+        "service.create.name":"L'identifiant peut être le même que le nom",
+        "service.create.version":"Au moins une version doit être sélectionnée",
+        "service.source.url":"Renseignez uniquement le nom de domaine",
+        "service.source.connexion":"Connexion entre plusieurs bases",
+        "service.source.sensormlfolder":"TODO",
+        "data.add.choicedata":"Formats supportés : shp (dans un fichier .zip), NetCDF, tif",
+        "sensor.add":"Formats supportés : un fichier sensorML (*.xml) ou un fichier zip.",
+        "style.create":"Vous devez sélectionner une donnée afin de lui associer le style créé."
     },
-    "sensors.information.title": "Capteurs disponibles",
-    "sensor.obervation": "Observation",
-    "tasks.information.title": "Traitements disponibles",
-    "tasks.notask": "Pas de traitement en cours d'execution",
-    "mapcontext.information.title": "Compositions cartographiques disponibles",
-    "group": {
-        "title": "Gestion des groupes",
-        "add": "Ajouter un groupe",
+    "sensors.information.title":"Capteurs disponibles",
+    "sensor.obervation":"Observation",
+    "tasks.information.title":"Traitements disponibles",
+    "tasks.notask":"Pas de traitement en cours d'execution",
+    "mapcontext.information.title":"Compositions cartographiques disponibles",
+    "group":{
+        "title":"Gestion des groupes",
+        "add":"Ajouter un groupe",
         "count": "Il y a {{ total }} groupes.",
-        "filter": "Filtrer :",
-        "tab.name": "Nom du groupe",
-        "tab.members": "Membres",
-        "multi.current": "Permissions actuelles",
-        "multi.available": "Permissions disponibles",
-        "rights": "Permissions du groupe",
+        "filter":"Filtrer :",
+        "tab.name":"Nom du groupe",
+        "tab.members":"Membres",
+        "multi.current":"Permissions actuelles",
+        "multi.available":"Permissions disponibles",
+        "rights":"Permissions du groupe",
         "members.count": "{{ total }} utilisateurs",
-        "users.filter": "Filtrer",
-        "users.back": "Retour",
-        "new": "Nouveau groupe"
+        "users.filter":"Filtrer",
+        "users.back":"Retour",
+        "new":"Nouveau groupe"
     },
-    "message.uploading": "Votre donnée est en train d'être importée...",
-    "alert.style.noname": "Veuillez renseigner un nom de style"
+    "message.uploading":"Votre donnée est en train d'être importée...",
+    "alert.style.noname":"Veuillez renseigner un nom de style"
 }

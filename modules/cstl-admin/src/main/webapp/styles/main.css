@@ -213,8 +213,8 @@ ul.unstyled {
     text-align: center;
 }
 .accueil_text_welcome h2{
-    font-size: 40px; 
-    font-family: arial; 
+    font-size: 30px;
+    font-family: Verdana,Arial,Helvetica,sans-serif;
     font-weight: bold; 
     color: #5E5E5E;
     line-height:40px;
@@ -225,9 +225,9 @@ ul.unstyled {
     margin-top: 80px;
 }
 .accueil_bloc_text{
-    line-height: 31px; 
-    font-size: 20px; 
-    font-family: calibri;
+    line-height: 26px;
+    font-size: 15px;
+    font-family: Verdana,Arial,Helvetica,sans-serif;
 }
 .accueil_bloc_images{
         margin-top: 0; 

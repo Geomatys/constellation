@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="styles/bootstrap-datepicker.css">
     <link rel="stylesheet" href="styles/github.min.css">
     <link rel="stylesheet" href="styles/bootstrap-datetimepicker.css">
+    <link rel="stylesheet" href="styles/admin.css">
 
     <!-- endbuild -->
 </head>
@@ -32,13 +33,13 @@
 <![endif]-->
 <div class="header" ng-controller="HeaderController">
     <div class="row" style="margin:0;">
-        <div class="col-xs-2 ng-cloak">
+        <div class="col-xs-1 ng-cloak">
             <a href="#" class="brand"
                style="padding-bottom: 5px; padding-top: 5px"> <img id="brand"
                                                                    src="images/constellation-menu.png"/>
             </a>
         </div>
-        <div class="col-xs-10 ">
+        <div class="col-xs-11">
             <div class="navbar-header  ng-cloak">
               <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                 <span class="sr-only">Toggle navigation</span>
@@ -49,7 +50,7 @@
             </div>
             <div class="collapse navbar-right navbar-collapse nav-header  ng-cloak">
                 <ul class="nav nav-pills nav-header-mob pull-right hidden-sm hidden-md">
-                    <li class="dropdown pointer" ng-controller="LanguageController">
+                    <li style="margin-left:2px;" class="dropdown pointer" ng-controller="LanguageController">
                         <a class="dropdown-toggle" data-toggle="dropdown"> <span>
                                     <span class="glyphicon glyphicon-flag"></span> <span
                                 class="hidden-tablet" translate="global.menu.language">Language</span>
@@ -109,13 +110,28 @@
                                 <span ng-class="navClass('mapcontext')" class="icon-menu-mapcontext"></span>
                                 <span translate="global.menu.mapcontext-min">Map context</span>
                             </a></li>
-                    <li><a ng-class="navClass('tasks')" href="#/tasks"> <span class="glyphicon glyphicon-cog"></span>
+                    <!--li><a ng-class="navClass('tasks')" href="#/tasks"> <span class="glyphicon glyphicon-cog"></span>
                         <span translate="global.menu.tasks">Tasks</span>
-                    </a></li>
+                    </a></li-->
                     <!--         <li><a href="#/viewer"> <span class="glyphicon glyphicon-picture"></span> -->
                     <!--             <span translate="global.menu.viewer">visualiseur</span> -->
                     <!--         </a></li> -->
-                    <li class="dropdown pointer">
+
+                    <li>
+                        <a ng-class="navClass('admin')" href="#/admin">
+                            <span ng-class="navClass('admin')" class="glyphicon glyphicon-wrench"></span>
+                            <span translate="global.menu.admin.main">Administration</span>
+                        </a>
+                    </li>
+
+                    <li ng-show="authenticated">
+                        <a href="{{cstlLogoutUrl}}">
+                            <span class="glyphicon glyphicon-log-out"></span>&nbsp;
+                            <span translate="global.menu.admin.logout">Log out</span>
+                        </a>
+                    </li>
+
+                    <!--li class="dropdown pointer">
                         <a ng-class="navClassAdmin()" class="dropdown-toggle" data-toggle="dropdown"> 
                             <span class="hidden-tablet hidden-sm hidden-md"> 
                                 <span class="glyphicon glyphicon-wrench"></span> 
@@ -154,7 +170,8 @@
                             <li ng-hide="authenticated"><a href="#/login"><span
                                     class="glyphicon glyphicon-log-in"></span> &nbsp;<span
                                     translate="global.menu.admin.login">Authenticate</span></a></li>
-                        </ul></li>
+                        </ul>
+                    </li-->
                 </ul>
 
             </div>
@@ -226,6 +243,7 @@
 <script src="scripts/controller-webservice.js"></script>
 <script src="scripts/controller-process.js"></script>
 <script src="scripts/controller-mapcontext.js"></script>
+<script src="scripts/controller-admin.js"></script>
 <script src="scripts/services.js"></script>
 <script src="scripts/directives.js"></script>
 <script src="scripts/openlayers-fix-wmts.js"></script>

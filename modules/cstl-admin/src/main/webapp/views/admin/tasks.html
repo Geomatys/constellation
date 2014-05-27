@@ -1,0 +1,42 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Tasks</h3>
+    </div>
+    <div class="panel-body" ng-controller="TaskController">
+        <div>
+            <div class="logo-wrapper row">
+                <div class="col-sm-12">
+                    <h3 class="header-title" translate="page.header.title.task">Tasks</h3>
+                </div>
+            </div>
+
+            <div>
+                <span ng-if="tt==null" translate="tasks.notask" style="margin-left:20px;">No current process</span>
+                <div class="panel panel-default"
+                     ng-repeat="(id,tt) in tasks">
+
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            {{tt.title}} {{tt.status}}
+                        </h4>
+                    </div>
+                    <div>
+                        <div class="progress progress-striped">
+                            <div class="progress-bar progress-bar-success" role="progressbar"
+                                 aria-valuenow="0"
+                                 aria-valuemin="0"
+                                 aria-valuemax="200"
+                                 style="width: {{tt.percent}}%">
+                                {{tt.percent}}%
+                            </div>
+                        </div>
+                        <div>
+                            {{tt.message}}<br/>
+                            {{tt.schedule}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -119,26 +119,6 @@ cstlAdminApp.controller('ModalInstanceCtrl', ['$scope', '$modalInstance', functi
 }]);
 
 
-cstlAdminApp.controller('ContactController', ['$scope', 'Contact',
-                                               function ($scope, Contact) {
-	$scope.data = Contact.get();
-    $scope.save = function () {
-       Contact.save($scope.data,
-           function (value, responseHeaders) {
-              $scope.error = null;
-              $scope.success = 'OK';
-              $scope.data = Contact.get();
-           },
-       function (httpResponse) {
-           $scope.success = null;
-           $scope.error = "ERROR";
-       });
-    };
-}]);
-
-
-
-
 cstlAdminApp.controller('SettingsController', ['$scope', 'resolvedAccount', 'Account',
     function ($scope, resolvedAccount, Account) {
         $scope.success = null;
@@ -159,106 +139,16 @@ cstlAdminApp.controller('SettingsController', ['$scope', 'resolvedAccount', 'Acc
         };
     }]);
 
-cstlAdminApp.controller('UserController', ['$scope', 'UserResource', '$modal', '$growl', '$translate', 
-  function ($scope, UserResource, $modal, $growl, $translate) {
-    $scope.list = UserResource.query({"withDomainAndRoles": true});
-    $scope.details = function(i) {
-        $modal.open({
-            templateUrl: 'views/user/details.html',
-            controller: 'UserDetailsController',
-            resolve: {
-                'isUpdate': function() {return true},
-                'user': function(){
-                    return angular.copy($scope.list[i]);
-                }
-            }
-        }).result.then(function(user){
-        	if(user != null)
-        	$scope.list[i] = user;
-        });
-    };
-    $scope.add = function(i) {
-        $modal.open({
-            templateUrl: 'views/user/add.html',
-            controller: 'UserDetailsController',
-            resolve: {
-                'isUpdate': function() {return false},
-                'user': function(){
-                    return {roles:[]};
-                }
-            }
-        }).result.then(function(user){
-        	if(user != null)
-        	$scope.list[$scope.list.length] = user;
-        });
-    };
-    $scope.deleteUser = function(i){
-    	UserResource.delete({id: $scope.list[i].id}, {} , function(resp){
-    	  $scope.list.splice(i, 1);
-    	}, function(err){
-    	  var errorCode = err.data
-    	  $translate(['Error',errorCode]).then(function (translations) {
-    	    $growl('error', translations.Error,  translations[errorCode]);
-    	  });
-    	});
-    };
-}]);
-
-cstlAdminApp.controller('UserDetailsController', ['$scope', '$modalInstance', 'GeneralService', 'user', 'isUpdate', 'UserResource', '$growl', '$translate', 
-  function ($scope, $modalInstance, GeneralService, user, isUpdate, UserResource, $growl, $translate) {
+cstlAdminApp.controller('GroupMembersController', ['$scope', '$modalInstance', 'user', 'isUpdate', 'UserResource',
+  function ($scope, $modalInstance, user, isUpdate, UserResource) {
     $scope.user = user;
 
     $scope.close = function() {
         $modalInstance.dismiss('close');
     };
-    $scope.deleteTag = function(role){
-        var newRoles = [];
-        for(var i=0; i<user.roles.length; i++)
-           if(user.roles[i] != role)
-               newRoles[newRoles.length] = user.roles[i];
-        user.roles = newRoles;
+    $scope.user={
+        adduser:"normal"
     };
-
-    $scope.addRole = function(role){
-    	for(var i=0; i < $scope.user.roles.length; i++)
-    	   if(role === $scope.user.roles[i])
-    		   return
-
-    	$scope.user.roles[$scope.user.roles.length]=role
-    };
-    var timeout=null;
-    $scope.checkLogin = function(login){
-      if(timeout != null){
-        window.clearTimeout(timeout)
-        timeout = null;
-      }
-      timeout = setTimeout(function(){
-        if($scope.user.login && $scope.user.login.length > 2)
-          GeneralService.checkLogin($scope.user.login).success(function(res){
-            $scope.loginInUse=res.available=="false"
-          }).error(function(){
-          })
-      }, 400)
-    };
-
-    $scope.save = function(){
-    	var userResource = new UserResource($scope.user);
-    	if(isUpdate)
-    	  userResource.$update(function(updated){
-          $modalInstance.close(updated);
-        }, function(){
-          $translate(['Error','admin.user.save.error']).then(function (translations) {
-            $growl('error', translations.Error,  translations['admin.user.save.error']);
-          })});
-    	else
-    	  userResource.$save(function(saved){
-    	    $modalInstance.close(saved);
-    	  }, function(){
-    	    $translate(['Error','admin.user.save.error']).then(function (translations) {
-            $growl('error', translations.Error,  translations['admin.user.save.error']);
-          });
-    	  });
-    }
 }]);
 
 //  BEGIN Domain 
@@ -522,40 +412,6 @@ cstlAdminApp.controller('DomainRoleDetailsController', ['$scope', '$modalInstanc
     
 }]);
 
-
-
-cstlAdminApp.controller('TaskController', ['$scope', 'TaskService','$timeout','StompService', 
-       function ($scope, TaskService, $timeout, StompService) {
-
-   $scope.tasks = TaskService.list();      
-
-   var topic = StompService.subscribe('/topic/taskevents', function(data){
-     var event = JSON.parse(data.body)
-     var task = $scope.tasks[event.id]
-     if(task!=null){
-       task.percent = event.percent
-       if(task.percent > 99)
-         delete $scope.tasks[event.id]
-       $scope.$digest();
-     }else{
-       //new task
-       $scope.tasks[event.id] = {
-         id: event.id,
-         status: event.status,
-         message: event.message,
-         percent: event.percent
-       }
-       $scope.$digest();
-     }
- })
-          //connect();
-    $scope.$on('$destroy', function () { 
-        topic.unsubscribe();
-    });
-          
-}]);
-
-                                     
 cstlAdminApp.controller('SessionsController', ['$scope', 'resolvedSessions', 'Sessions',
     function ($scope, resolvedSessions, Sessions) {
         $scope.success = null;
@@ -575,48 +431,11 @@ cstlAdminApp.controller('SessionsController', ['$scope', 'resolvedSessions', 'Se
         };
     }]);
 
-cstlAdminApp.controller('MetricsController', ['$scope', 'resolvedMetrics','Metrics','$window', '$http',
-    function ($scope, resolvedMetrics,Metrics, $window, $http) {
-        $scope.metrics = resolvedMetrics;
-        $scope.init = function(){
-        	$scope.metrics= Metrics.get()
-        };
-        $scope.rungc = function(){
-        	$http.get("@cstl/spring/admin/jvm/rungc;jsessionid=").then(function(){
-        		$scope.metrics= Metrics.get()
-        	});
-        };
-    }]);
 
-cstlAdminApp.controller('LogsController', ['$scope', 'resolvedLogs', 'LogsService',
-    function ($scope, resolvedLogs, LogsService) {
-        $scope.loggers = resolvedLogs;
-
-        $scope.changeLevel = function (name, level) {
-            LogsService.changeLevel({name: name, level: level}, function () {
-                $scope.loggers = LogsService.findAll();
-            });
-        };
-    }]);
 
 cstlAdminApp.controller('navCtrl', ['$scope', '$location', function ($scope, $location) {
     $scope.navClass = function (page) {
         var currentRoute = $location.path().split('/')[1] || 'home';
         return page === currentRoute ? 'menu-selected' : '';
-    };   
-    $scope.navClassAdmin = function () {
-        var currentRouteAdmin = $location.path().substring(1) || 'home';
-        if(currentRouteAdmin=='user')
-            return 'menu-selected';
-        else if(currentRouteAdmin=='group')
-            return 'menu-selected';
-        else if(currentRouteAdmin=='metrics')
-            return 'menu-selected';
-        else if(currentRouteAdmin=='logs')
-            return 'menu-selected';
-        else if(currentRouteAdmin=='contact')
-            return 'menu-selected';
-        else if(currentRouteAdmin=='task')
-            return 'menu-selected';
-    };       
+    };
 }]);

@@ -39,6 +39,10 @@ cstlAdminApp
 
 
             $routeProvider
+                .when('/admin', {
+                    templateUrl: 'views/admin/main.html',
+                    controller: 'AdminController'
+                })
                 .when('/settings', {
                     templateUrl: 'views/settings.html',
                     controller: 'SettingsController',
@@ -58,24 +62,6 @@ cstlAdminApp
                     resolve:{
                         resolvedSessions:['Sessions', function (Sessions) {
                             return Sessions.get();
-                        }]
-                    }
-                })
-                .when('/metrics', {
-                    templateUrl: 'views/metrics.html',
-                    controller: 'MetricsController',
-                    resolve:{
-                        resolvedMetrics:['Metrics', function (Metrics) {
-                            return Metrics.get();
-                        }]
-                    }
-                })
-                .when('/logs', {
-                    templateUrl: 'views/logs.html',
-                    controller: 'LogsController',
-                    resolve:{
-                        resolvedLogs:['LogsService', function (LogsService) {
-                            return LogsService.findAll();
                         }]
                     }
                 })
@@ -119,47 +105,20 @@ cstlAdminApp
                     templateUrl: 'views/mapcontext.html',
                     controller: 'MapcontextController'
                 })
-                .when('/tasks', {
-                    templateUrl: 'views/tasks.html',
-                    controller: 'ProcessController'
-                })
+
+            .when('/domain', {
+                templateUrl: 'views/domain/list.html',
+                controller: 'DomainController'
+            })
+
+            .when('/domainmembers/:domainId', {
+                templateUrl: 'views/domain/members.html',
+                controller: 'DomainMembersController'
+            })
                 .otherwise({
                     templateUrl: 'views/main.html',
                     controller: 'MainController'
                 });
-
-            $routeProvider
-            .when('/user', {
-                templateUrl: 'views/user/list.html',
-                controller: 'UserController'
-            });
-            $routeProvider
-            .when('/domain', {
-                templateUrl: 'views/domain/list.html',
-                controller: 'DomainController'
-            });
-            $routeProvider
-            .when('/domainmembers/:domainId', {
-                templateUrl: 'views/domain/members.html',
-                controller: 'DomainMembersController'
-            });
-            $routeProvider
-            .when('/group', {
-                templateUrl: 'views/group/list.html',
-                controller: 'DomainRoleController'
-            });
-            $routeProvider
-            .when('/contact', {
-                templateUrl: 'views/contact.html',
-                controller: 'ContactController'
-            });
-
-            //Process routes
-            $routeProvider
-            .when('/task', {
-                templateUrl: 'views/task/list.html',
-                controller: 'TaskController'
-            });
 
             // Initialize angular-translate
             $translateProvider.useStaticFilesLoader({

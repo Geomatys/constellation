@@ -1,0 +1,40 @@
+#platformAdmin {
+    padding: 40pt 0;
+}
+.menuLeft .list-group-item:first-child{
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+}
+.menuLeft .list-group-item:last-child{
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+.menuLeft .list-group{
+    margin-bottom:0;
+}
+.menuLeft .list-group-item{
+    cursor:pointer;
+}
+a.list-group-item{
+    color:#428BCA;
+}
+.menuLeft .panel-title{
+    color:#919191;
+}
+.menuLeft .panel{
+    margin-bottom: -2px;
+}
+
+.menuLeft
+.list-group-item.active, .list-group-item.active:hover, .list-group-item.active:focus{
+    background-color: #5BC0DE;
+    border-color: #5BC0DE;
+}
+
+.well-header {
+    background-color: #F8F8F8;
+    background-image: linear-gradient(to bottom, #FFFFFF, #EEEEEE);
+    background-repeat: repeat-x;
+    padding:15px;
+}
+

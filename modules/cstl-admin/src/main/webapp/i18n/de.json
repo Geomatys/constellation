@@ -6,13 +6,27 @@
             "home": "Startseite",
             "account.login": "Anmelden",
             "admin": {
-                "main": "Administration",
-                "settings": "Einstellungen",
-                "password": "Passwort",
-                "sessions": "Sitzungen",
-                "metrics": "Metriken",
+                "about":"Über Constellation",
+                "contact":"Kontakt",
+                "group":"Gruppen-Einstellungen",
+                "image_classes":"Klassen Bild",
+                "logout": "Abmelden",
                 "logs": "Protokoll",
-                "logout": "Abmelden"
+                "main": "Administration",
+                "metrics": "Metriken",
+                "password": "Passwort",
+                "planning":"Planung",
+                "process":"Prozess",
+                "processing":"Verarbeitung",
+                "security":"Sicherheit",
+                "security_settings":"Sicherheitseinstellungen"
+                "sessions": "Sitzungen",
+                "settings": "Einstellungen",
+                "statistics":"Statistik",
+                "system":"System",
+                "system_state":"Service-Status",
+                "tasks":"Tasks Manager",
+                "users": "Benutzer"
             },
             "language": "Sprache"
         },

@@ -1,0 +1,95 @@
+<div id="platformAdmin">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="menuLeft">
+                    <div class="panel panel-default">
+                        <div class="panel-heading well-header">
+                            <h3 class="panel-title" translate="global.menu.admin.system">System</h3>
+                        </div>
+                        <div class="panel-body" style="padding:0pt;">
+                            <div class="list-group">
+                                <a class="list-group-item" ng-class="{active:currentView.name=='system_state'}"
+                                   ng-click="changeView('system_state')" translate="global.menu.admin.system_state">
+                                    Service-Status
+                                </a>
+                                <a class="list-group-item" ng-class="{active:currentView.name=='system_settings'}"
+                                   ng-click="changeView('system_settings')" translate="global.menu.admin.settings">
+                                    Settings
+                                </a>
+                                <a class="list-group-item" ng-class="{active:currentView.name=='system_class_image'}"
+                                   ng-click="changeView('system_class_image')" translate="global.menu.admin.image_classes">
+                                    Images Class
+                                </a>
+                                <a class="list-group-item" ng-class="{active:currentView.name=='system_stats'}"
+                                   ng-click="changeView('system_stats')" translate="global.menu.admin.statistics">
+                                    Statistics
+                                </a>
+                                <a class="list-group-item" ng-class="{active:currentView.name=='system_logs'}"
+                                   ng-click="changeView('system_logs')" translate="global.menu.admin.logs">
+                                    Logs
+                                </a>
+                                <a class="list-group-item" ng-class="{active:currentView.name=='system_contact'}"
+                                   ng-click="changeView('system_contact')" translate="global.menu.admin.contact">
+                                    Contact
+                                </a>
+                                <a class="list-group-item" ng-class="{active:currentView.name=='system_about'}"
+                                   ng-click="changeView('system_about')" translate="global.menu.admin.about">
+                                    About Constellation
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading well-header">
+                            <h3 class="panel-title" translate="global.menu.admin.processing">Processing</h3>
+                        </div>
+                        <div class="panel-body" style="padding:0pt;">
+                            <div class="list-group">
+                                <a class="list-group-item" ng-class="{active:currentView.name=='process'}"
+                                   ng-click="changeView('process')" translate="global.menu.admin.process">
+                                    Process
+                                </a>
+                                <a class="list-group-item" ng-class="{active:currentView.name=='tasks'}"
+                                   ng-click="changeView('tasks')" translate="global.menu.admin.tasks">
+                                    Tasks manager
+                                </a>
+                                <a class="list-group-item" ng-class="{active:currentView.name=='planification'}"
+                                   ng-click="changeView('planification')" translate="global.menu.admin.planning">
+                                    Planning
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading well-header">
+                            <h3 class="panel-title" translate="global.menu.admin.security">Security</h3>
+                        </div>
+                        <div class="panel-body" style="padding:0pt;">
+                            <div class="list-group">
+                                <a class="list-group-item" ng-class="{active:currentView.name=='security_settings'}"
+                                   ng-click="changeView('security_settings')" translate="global.menu.admin.security_settings">
+                                    Security Settings
+                                </a>
+                                <a class="list-group-item" ng-class="{active:currentView.name=='users'}"
+                                   ng-click="changeView('users')" translate="global.menu.admin.users">
+                                    Users Settings
+                                </a>
+                                <a class="list-group-item" ng-class="{active:currentView.name=='groups'}"
+                                   ng-click="changeView('groups')" translate="global.menu.admin.group">
+                                    Groups Settings
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="rightPanel">
+                    <ng-include src="currentView.url"></ng-include>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
