@@ -105,9 +105,13 @@ cstlAdminApp
                     templateUrl: 'views/mapcontext.html',
                     controller: 'MapcontextController'
                 })
+                .when('/tasks', {
+                    templateUrl: 'views/tasks.html',
+                    controller: 'ProcessController'
+                })
 
             .when('/domainmembers/:domainId', {
-                templateUrl: 'views/domain/members.html',
+                templateUrl: 'views/admin/domain/members.html',
                 controller: 'DomainMembersController'
             })
                 .otherwise({
