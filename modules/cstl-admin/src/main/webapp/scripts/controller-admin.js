@@ -435,23 +435,6 @@ cstlAdminApp.controller('DomainRoleController', ['$scope', '$modal', 'DomainRole
                     });
             };
 
-            $scope.members = function(i) {
-                $modal.open({
-                    templateUrl: 'views/admin/group/members.html',
-                    controller: 'GroupMembersController',
-                    resolve: {
-                        'isUpdate': function() {return false},
-                        'domainrole': function(){
-                            return $scope.domain
-                        }
-                    }
-                }).result.then(function(domain){
-                        if(domain != null)
-                            $scope.domains[$scope.domains.length] = domain;
-                    });
-            };
-
-
         });
     }
 ]);
