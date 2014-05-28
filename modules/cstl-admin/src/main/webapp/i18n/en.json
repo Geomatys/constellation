@@ -7,6 +7,21 @@
         "last.admin": "Last admistrator cannot be deleted",
         "save.error": "Could not save this user"
        },
+       "group":{
+        "title":"Groups Settings",
+        "add":"Add new group",
+        "count": "There are {{ total }} groups.",
+        "filter":"Filter :",
+        "tab.name":"Group name",
+        "tab.members":"Members",
+        "multi.current":"Current permissions",
+        "multi.available":"Available permissions",
+        "rights":"Group permissions",
+        "members.count": "{{ total }} users",
+        "users.filter":"Filter",
+        "users.back":"Back",
+        "new":"New group"
+       },
       "domain": {
         "addmembers": "Add members",
         "memberscount": "Members count",
