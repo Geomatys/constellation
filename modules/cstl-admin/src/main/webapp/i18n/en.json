@@ -45,6 +45,7 @@
     "adddata.popup.title":"Add data",
 
     "confirm.delete.style": "Do you really want to delete this style?",
+
     "create.accessconstraint.fees.label":"Fees",
     "create.accessconstraint.label":"Access constraints",
     "create.accessconstraint.layerlimit.label":"Layer limit number",
@@ -307,6 +308,7 @@
     "label.count.style": "available style(s)",
     "label.count.tasks": "available task(s)",
     "label.count.mapcontext": "available map context(s)",
+
     "label.reduced.display":"Reduced display",
     "layer.listing.data.add.button.label": "Add data",
     "layer.listing.data.create.button.label": "Create data",
@@ -359,8 +361,10 @@
     "md.listing.selected.duplicate.button": "Duplicate",
     "md.listing.selected.edit.button": "Edit",
     "md.listing.selected.export.button": "Export",
+
     "listing.title": "Metadata list",
     "listing.no.available.md": "No available metadata",
+
     "menu.administration.label": "Administration",
     "menu.data.label": "Data",
     "menu.geoviewer.label": "Geoviewer",
@@ -389,7 +393,6 @@
     "server.next.button": "Next",
 
     "service.abstract.label": "Service description",
-
     "service.config.source": "Source",
     "service.config.source.sos":"Metadata source",
     "service.config.source.sos.data":"Data source",
@@ -491,7 +494,6 @@
     "style.listing.numberbypage.20.label": "20 layers",
     "style.listing.selected.delete.button": "Delete",
     "style.listing.selected.edit.button": "Edit",
-
     "style.information.title":"Available styles",
 
     "webservicepage.button.create.label": "Create a service",
@@ -707,7 +709,8 @@
     "page.header.title.mapcontext":"Map Context Dashboard",
 
     "com.codahale.metrics.servlet.AbstractInstrumentedFilter.requests": "Metrics",
-    "org.constellation.map.ws.DefaultWMSWorker.getCapabilities": "WMS(getCapabilies)",
+
+    "org.constellation.map.ws.DefaultWMSWorker.getCapabilities": "WMS(getCapabilities)",
     "org.constellation.map.ws.DefaultWMSWorker.getMap": "WMS(getMap)",
 
     "users.add": "Add user",
@@ -778,6 +781,7 @@
     "tooltip.style.create":"You must select a data to associate the style created.",
 
     "sensors.information.title":"Available sensors",
+
     "sensor.obervation":"Sensor observation",
 
     "tasks.information.title":"Available tasks",
