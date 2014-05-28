@@ -207,7 +207,8 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
 
     @Override
     public Domain findDefaultByUserId(Integer id) {
-        return dsl.select().from(DOMAIN).join(USER_X_DOMAIN_X_DOMAINROLE).onKey().orderBy(DOMAIN.ID).limit(1)
+        return dsl.select().from(DOMAIN).join(USER_X_DOMAIN_X_DOMAINROLE).onKey()
+                .where(USER_X_DOMAIN_X_DOMAINROLE.USER_ID.eq(id)).orderBy(DOMAIN.ID).limit(1)
                 .fetchOneInto(Domain.class);
     }
 
@@ -225,8 +226,7 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
     @Transactional
     public Set<Integer> updateUserInDomain(int userId, int domainId, Set<Integer> roles) {
         dsl.delete(USER_X_DOMAIN_X_DOMAINROLE).where(
-                USER_X_DOMAIN_X_DOMAINROLE.USER_ID.eq(userId).and(
-                        USER_X_DOMAIN_X_DOMAINROLE.DOMAIN_ID.eq(domainId)));
+                USER_X_DOMAIN_X_DOMAINROLE.USER_ID.eq(userId).and(USER_X_DOMAIN_X_DOMAINROLE.DOMAIN_ID.eq(domainId)));
         addUserToDomain(userId, domainId, roles);
         return roles;
     }

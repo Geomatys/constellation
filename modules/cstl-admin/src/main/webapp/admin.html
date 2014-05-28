@@ -121,14 +121,14 @@
                     <!--             <span translate="global.menu.viewer">visualiseur</span> -->
                     <!--         </a></li> -->
 
-                    <li>
+                    <li ng-show="hasRole('cstl-admin')">
                         <a ng-class="navClass('admin')" href="#/admin">
                             <span ng-class="navClass('admin')" class="glyphicon glyphicon-wrench"></span>
                             <span translate="global.menu.admin.main">Administration</span>
                         </a>
                     </li>
 
-                    <li ng-show="authenticated">
+                    <li>
                         <a href="{{cstlLogoutUrl}}">
                             <span class="glyphicon glyphicon-log-out"></span>&nbsp;
                             <span translate="global.menu.admin.logout">Log out</span>
