@@ -248,6 +248,20 @@ cstlAdminApp.controller('LogsController', ['$scope', 'LogsService',
     }
 ]);
 
+cstlAdminApp.controller('DomainSwitcherController', ['Account', '$scope', '$cookies', '$window',
+  function(Account, $scope, $cookies, $window){
+    Account.get(function(account){
+      $scope.domains = account.domains;
+      $scope.changeDomain = function(i){
+       if($cookies.cstlActiveDomainId != account.domains[i].id){
+         $cookies.cstlActiveDomainId= ""+account.domains[i].id;
+         console.log("Change to domain: " + account.domains[i].id)
+         $window.location.reload();
+       }
+      };
+    }) 
+}]);
+
 cstlAdminApp.controller('DomainController', ['$scope', '$modal', 'DomainResource',
     function ($scope, $modal, DomainResource) {
 

@@ -27,10 +27,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.DomainUser;
 import org.constellation.engine.register.User;
 import org.constellation.engine.register.jooq.Tables;
-import org.constellation.engine.register.jooq.tables.Domain;
 import org.constellation.engine.register.jooq.tables.UserXDomainXDomainrole;
 import org.constellation.engine.register.jooq.tables.UserXRole;
 import org.constellation.engine.register.jooq.tables.records.UserRecord;
@@ -61,7 +61,7 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
 
     private org.constellation.engine.register.jooq.tables.User userTable = USER.as("u");
     private UserXRole userXroleTable = Tables.USER_X_ROLE.as("uXr");
-    private Domain domainTable = Tables.DOMAIN.as("d");
+    private org.constellation.engine.register.jooq.tables.Domain domainTable = Tables.DOMAIN.as("d");
 
     private UserXDomainXDomainrole UDD = Tables.USER_X_DOMAIN_X_DOMAINROLE.as("uxdr");
 
@@ -116,11 +116,11 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
         }
 
         Map<Record, Result<Record>> domains = record.getValue().intoGroups(domainTable.fields());
-        for (Entry<Record, Result<Record>> domain : domains.entrySet()) {
+        for (Entry<Record, Result<Record>> domainEntry : domains.entrySet()) {
 
-            Integer value = domain.getKey().getValue(Tables.DOMAIN.ID);
-            if (value != null) {
-                userDTO.addDomain(value);
+            Domain domain = domainEntry.getKey().into(Domain.class);
+            if (domain.getId()!= null) {
+                userDTO.addDomain(domain);
             }
         }
         return userDTO;
@@ -199,9 +199,12 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
         SelectConditionStep<Record> records = getSelectWithRolesAndDomains().where(userTable.LOGIN.eq(login));
         records.execute();
         List<DomainUser> result = mapUsers(records.getResult());
+        
         if (result.size() == 0)
             return null;
-        return result.get(0);
+        DomainUser domainUser = result.get(0);
+        domainUser.setPassword(null);
+        return domainUser;
     }
 
     @Override

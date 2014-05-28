@@ -198,6 +198,9 @@ cstlAdminApp
                  $rootScope.hasRole = function(role){
                    return account.roles.indexOf(role) != -1
                  }
+                 $rootScope.hasMultipleDomains = function(){
+                   return account.domains.length > 1
+                 }
                  
                });
                

@@ -75,14 +75,17 @@
                             translate="global.menu.account.login">Authenticate</span></a></li>
                 </ul>
                 <ul class="nav nav-pills nav-header-mob pull-right  ng-cloak" ng-controller="navCtrl">
-                    <li>
-                        <a ng-class="navClass('home')" class="hidden-xs hidden-lg hidden-md" href="#"> 
-                            <span class="glyphicon glyphicon-home"></span>
+                    <li ng-show="hasMultipleDomains()" class="dropdown pointer" ng-controller="DomainSwitcherController">
+                        <a class="dropdown-toggle" data-toggle="dropdown"> <span>
+                                    <span class="glyphicon glyphicon-flag"></span> <span
+                                class="hidden-tablet" translate="global.menu.domains">domains</span>
+                                    <b class="caret"></b>
+                            </span>
                         </a>
-                        <a ng-class="navClass('home')" class="hidden-sm" href="#"> 
-                            <span class="glyphicon glyphicon-home"></span>
-                            <span translate="global.menu.home">Accueil</span>
-                        </a>
+                        <ul class="dropdown-menu">
+                            <li ng-repeat="domain in domains" active-menu="en"><a
+                                    ng-click="changeDomain($index)"><span>{{domain.name}}</span></a></li>
+                        </ul>
                     </li>
                     <li class="hidden-sm hidden-md"><a ng-class="navClass('webservice')" href="#/webservice"> <span
                             class="glyphicon glyphicon-cloud"></span> <span

@@ -512,6 +512,7 @@
     "global.title": "JHipster",
     "global.browsehappy": "You are using an <strong>outdated</strong> browser. Please <a href=\"http://browsehappy.com/\">upgrade your browser</a> to improve your experience.",
     "global.menu.home": "Home",
+    "global.menu.domains": "Domains",
     "global.menu.web-service": "Web Services",
     "global.menu.web-service.min": "Services",
     "global.menu.data": "Data",

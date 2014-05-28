@@ -5,18 +5,12 @@ import java.util.List;
 
 public class DomainUser extends User {
 
-    private List<Integer> domainIds = new ArrayList<Integer>();
+    private List<Domain> domains = new ArrayList<Domain>();
     
     private List<String> roles = new ArrayList<String>();
 
-    public List<Integer> getDomainIds() {
-        return domainIds;
-    }
-
-    public void setDomainIds(List<Integer> domainIds) {
-        this.domainIds = domainIds;
-    }
-
+   
+   
     public List<String> getRoles() {
         return roles;
     }
@@ -30,10 +24,20 @@ public class DomainUser extends User {
         
     }
 
-    public void addDomain(Integer domainId) {
-        domainIds.add(domainId);
+    public List<Domain> getDomains() {
+        return domains;
+    }
+
+    public void setDomains(List<Domain> domains) {
+        this.domains = domains;
+    }
+
+    public void addDomain(Domain domain) {
+        domains.add(domain);
         
     }
+
+   
     
     
     
