@@ -284,6 +284,7 @@
     "label.no.selected.task": "No selected task.",
     "label.observation": "Observation",
     "label.owner": "Owner",
+    "label.published":"Published",
     "label.raster": "Raster",
     "label.related.data": "Related data",
     "label.related.mapcontext": "Related map context",
@@ -310,6 +311,8 @@
     "label.count.mapcontext": "available map context(s)",
 
     "label.reduced.display":"Reduced display",
+    "label.yes":"Yes",
+    "label.no":"No",
     "layer.listing.data.add.button.label": "Add data",
     "layer.listing.data.create.button.label": "Create data",
     "layer.listing.data.upload.button": "Upload file",
