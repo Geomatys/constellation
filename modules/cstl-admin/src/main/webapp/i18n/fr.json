@@ -1,40 +1,30 @@
 {
-    "admin": {
+    "admin.contact.title": "Contact",
+    "admin.user.delete.error": "Impossible de supprimer l'utilsateur.",
+    "admin.user.last.admin": "Impossible de supprimer l'utilisateur car il faut au moins un administrateur.",
+    "admin.user.save.error": "Impossible de sauvegarder l'utilisateur",
+    "admin.group.title":"Gestion des groupes",
+    "admin.group.add":"Ajouter un groupe",
+    "admin.group.count": "Il y a {{ total }} groupes.",
+    "admin.group.filter":"Filtrer :",
+    "admin.group.tab.name":"Nom du groupe",
+    "admin.group.tab.members":"Membres",
+    "admin.group.multi.current":"Permissions actuelles",
+    "admin.group.multi.available":"Permissions disponibles",
+    "admin.group.rights":"Permissions du groupe",
+    "admin.group.members.count": "{{ total }} utilisateurs",
+    "admin.group.users.filter":"Filtrer",
+    "admin.group.users.back":"Retour",
+    "admin.group.new":"Nouveau groupe",
+    "admin.domain.addmembers": "Ajouter des membres",
+    "admin.domain.memberscount": "Total des membres",
+    "admin.domain.title": "Domaines",
+    "admin.domain.add": "Ajouter un domaine",
+    "admin.domain.count":  "{{ NUM }} domaine(s)",
+    "admin.domain.new": "Nouveau domaine",
+    "admin.domain.tab.name": "Nom",
+    "admin.domain.tab.description": "Description du domaine.",
 
-        "contact.title": "Contact",
-        "user": {
-            "delete.error": "Impossible de supprimer l'utilsateur.",
-            "last.admin": "Impossible de supprimer l'utilisateur car il faut au moins un administrateur.",
-            "save.error": "Impossible de sauvegarder l'utilisateur"
-        },
-        "group":{
-            "title":"Gestion des groupes",
-            "add":"Ajouter un groupe",
-            "count": "Il y a {{ total }} groupes.",
-            "filter":"Filtrer :",
-            "tab.name":"Nom du groupe",
-            "tab.members":"Membres",
-            "multi.current":"Permissions actuelles",
-            "multi.available":"Permissions disponibles",
-            "rights":"Permissions du groupe",
-            "members.count": "{{ total }} utilisateurs",
-            "users.filter":"Filtrer",
-            "users.back":"Retour",
-            "new":"Nouveau groupe"
-        },
-        "domain": {
-            "addmembers": "Ajouter des membres",
-            "memberscount": "Total des membres",
-            "title": "Domaines",
-            "add": "Ajouter un domaine",
-            "count":  "{{ NUM }} domaine(s)",
-            "new": "Nouveau domaine",
-            "tab": {
-                "name": "Nom",
-                "description": "Description du domaine."
-            }
-        }
-    },
     "city": "Ville",
     "country": "Pays",
     "fax": "Fax",
@@ -45,1291 +35,725 @@
     "zip": "Code postal",
     "save": "Enregistrer",
     "address":"Adresse",
-    "adddata": {
-        "popup": {
-            "datalist": {
-                "subtitle": {
-                    "label": "Sélectionnez la donnée à importer puis cliquez sur continuer."
-                }
-            },
-            "informations": {
-                "name": {
-                    "label": "Alias"
-                },
-                "subtitle": {
-                    "label": "Ajoutez un alias à la donnée."
-                }
-            },
-            "style": {
-                "subtitle": {
-                    "label": "Sélectionnez le style par défaut de la donnée."
-                }
-            },
-            "title": "Ajout d'une donnée"
-        }
-    },
-    "confirm": {
-        "delete": {
-            "style": "Voulez-vous réellement supprimer ce style ?"
-        }
-    },
-    "create": {
-        "accessconstraint": {
-            "fees": {
-                "label": "Frais"
-            },
-            "label": "Contraintes d'accès",
-            "layerlimit": {
-                "label": "Nombre maximum de couches",
-                "tooltip": "Nombre maximum de couches qu'un client peut inclure dans un GetMap."
-            },
-            "legend": "Contraintes d'accès au service",
-            "maxheight": {
-                "label": "Hauteur maximale",
-                "tooltip": "Valeur d'hauteur maximale qu'un client peut spécifier dans une requête GetMap."
-            },
-            "maxwidth": {
-                "label": "Largeur maximale",
-                "tooltip": "Valeur de largeur maximale qu'un client peut spécifier dans une requête GetMap."
-            }
-        },
-        "cancel": {
-            "label": "Annuler"
-        },
-        "contact": {
-            "address": {
-                "city": {
-                    "label": "Ville"
-                },
-                "country": {
-                    "label": "Pays"
-                },
-                "label": "Adresse",
-                "legend": "Adresse du contact",
-                "postcode": {
-                    "label": "Code postal"
-                },
-                "state": {
-                    "label": "Province"
-                }
-            },
-            "email": {
-                "label": "Email"
-            },
-            "fax": {
-                "label": "Fax"
-            },
-            "firstname": {
-                "label": "Prénom"
-            },
-            "lastname": {
-                "label": "Nom"
-            },
-            "legend": "Information du contact",
-            "name": {
-                "label": "Nom"
-            },
-            "organisation": {
-                "label": "Organisation"
-            },
-            "phone": {
-                "label": "Téléphone"
-            },
-            "position": {
-                "label": "Fonction dans l'organisation"
-            }
-        },
-        "description": {
-            "metadata": {
-                "subtitle": "Service en création:",
-                "title": "Métadonnées de service"
-            },
-            "next": {
-                "label": "Suivant"
-            },
-            "previous": {
-                "label": "Précédent"
-            },
-            "protocol": {
-                "title": "Protocole"
-            },
-            "save": {
-                "label": "Sauver"
-            },
-            "service": {
-                "description": {
-                    "label": "Description"
-                },
-                "identifier": {
-                    "label": "Identifiant"
-                },
-                "keywords": {
-                    "label": "Mots clefs"
-                },
-                "legend": "Description du service",
-                "name": {
-                    "label": "Nom"
-                }
-            },
-            "text": {
-                "csw": "CS-W (Catalogue Service for the Web) permet la diffusion de métadonnées de données et de services.",
-                "sos": "SOS (Sensor Observation Service) permet de publier des données de capteurs, en temps réel.",
-                "wcs": "WCS (Web Coverage Service) permet l'échange de données raster continues. Cette norme est conçue pour l'échange d'informations, telles que des valeurs de pixels, dans une photographie aérienne par exemple.",
-                "wfs": "WFS (Web Feature Service) permet de diffuser des données vectorielles géoréférencées sous différents formats tels que GML, Shape, ...",
-                "wms": "WMS (Web Mapping Service) est destiné à l'échange de données géographiques sous la forme d'images géoréférencées.",
-                "wmts": "WMTS (Web Mapping Tile Service) permet de diffuser des données géoréférencées sous forme d'images tuilées (précalculées)",
-                "wps": "WPS (Web Processing Service) permet d'exposer des modèles de géotraitement en tant que services Web."
-            },
-            "title": {
-                "label": "Configurer le service"
-            },
-            "transactional": "Transactionnel",
-            "version": {
-                "title": "Version"
-            }
-        }
-    },
-    "data": {
-        "information": {
-            "page": {
-                "title": "Information sur la donnée"
-            },
-            "tab": {
-                "missing": {
-                    "title": "Métadonnées manquantes"
-                },
-                "title": "Information sur l'image"
-            },
-            "title": "Données disponibles"
-        },
-        "modal": {
-            "cancel": "Annuler",
-            "change": "Changer",
-            "choose": "Choisir",
-            "choose.pyramid.conform": "Générer une pyramide sur la donnée",
-            "choose.scales": "Echelles",
-            "choose.tile.format": "Fomat de sortie du tuilage",
-            "choose.uppercornerx": "Coin haut X",
-            "choose.uppercornery": "Coin haut Y",
-            "choose.type":"Choix du type",
-            "choose.sensor":"Associer un capteur",
-            "close": "Fermer",
-            "data": "Données",
-            "end": "Terminer",
-            "local.title": "Fichier local",
-            "metadata": "Métadonnées",
-            "netcdf":"Fichier netCDF",
-            "next": "Suivant",
-            "remove": "Enlever",
-            "select": "Sélectionner",
-            "sensor.title": "Vue du capteur",
-            "server.title": "Fichier serveur",
-            "validate": "Valider",
-            "view.metadata": {
-                "title": "Voir la métadonnée"
-            }
-        }
-    },
-    "edition": {
-        "style": {
-            "label": {
-                "attribute": "Attribut",
-                "auto": {
-                    "intervals": "Par intervalles",
-                    "unique": "Par valeurs uniques"
-                },
-                "cancel": "Annuler",
-                "channel": {
-                    "blue": "Canal bleu",
-                    "green": "Canal vert",
-                    "grey": "Canal gris",
-                    "red": "Canal rouge"
-                },
-                "channels": "Canaux",
-                "circle": "Cercle",
-                "color": "Couleur",
-                "continuous": "Continue",
-                "cross": "Croix",
-                "dashed": "Pointillés",
-                "delete": "Supprimer",
-                "description": "Description",
-                "edit": "Editer",
-                "fill": "Remplissage",
-                "filters": "Filtres",
-                "font": "Police",
-                "general": "Général",
-                "grey": {
-                    "scale": "Niveaux de gris"
-                },
-                "label": "Label",
-                "line": "Ligne",
-                "manual": "Manuelle",
-                "marker": "Icône",
-                "max": {
-                    "scale": "Echelle max"
-                },
-                "min": {
-                    "scale": "Echelle min"
-                },
-                "name": "Nom",
-                "new": {
-                    "rules": "Nouvelle(s) règle(s)",
-                    "symbolizer": "Nouveau symbole"
-                },
-                "opacity": "Opacité",
-                "overview": "Aperçu",
-                "point": "Point",
-                "polygon": "Polygone",
-                "raster": "Raster",
-                "rgb": "RVB",
-                "rotation": "Rotation",
-                "rules": "Règles",
-                "scale": "Echelle",
-                "see": {
-                    "layer": "Voir la couche"
-                },
-                "size": "Taille",
-                "square": "Carré",
-                "star": "Etoile",
-                "stroke": "Contour",
-                "style": "Style",
-                "symbolizers": "Symboles",
-                "text": "Texte",
-                "title": "Titre",
-                "type": "Type",
-                "update": "Mettre à jour",
-                "validate": "Valider",
-                "viewer": "Sélection du Style",
-                "width": "Largeur",
-                "choice": {
-                    "new": "Creer un nouveau style",
-                    "existing": "Utiliser un style existant"
-                }
-            },
-            "placeholder": {
-                "name": "Entrez un nom...",
-                "number": "Entrez un nombre entier...",
-                "value": "Entrez une valeur..."
-            }
-        }
-    },
+
+    "adddata.popup.datalist.subtitle.label": "Sélectionnez la donnée à importer puis cliquez sur continuer.",
+    "adddata.popup.informations.name.label": "Alias",
+    "adddata.popup.informations.subtitle.label": "Ajoutez un alias à la donnée.",
+    "adddata.popup.style.subtitle.label": "Sélectionnez le style par défaut de la donnée.",
+    "adddata.popup.title": "Ajout d'une donnée",
+
+    "confirm.delete.style": "Voulez-vous réellement supprimer ce style ?",
+
+    "create.accessconstraint.fees.label": "Frais",
+    "create.accessconstraint.label": "Contraintes d'accès",
+    "create.accessconstraint.layerlimit.label": "Nombre maximum de couches",
+    "create.accessconstraint.layerlimit.tooltip": "Nombre maximum de couches qu'un client peut inclure dans un GetMap.",
+    "create.accessconstraint.legend": "Contraintes d'accès au service",
+    "create.accessconstraint.maxheight.label": "Hauteur maximale",
+    "create.accessconstraint.maxheight.tooltip": "Valeur d'hauteur maximale qu'un client peut spécifier dans une requête GetMap.",
+    "create.accessconstraint.maxwidth.label": "Largeur maximale",
+    "create.accessconstraint.maxwidth.tooltip": "Valeur de largeur maximale qu'un client peut spécifier dans une requête GetMap.",
+    "create.cancel.label": "Annuler",
+    "create.contact.address.city.label": "Ville",
+    "create.contact.address.country.label": "Pays",
+    "create.contact.address.label": "Adresse",
+    "create.contact.address.legend": "Adresse du contact",
+    "create.contact.address.postcode.label": "Code postal",
+    "create.contact.address.state.label": "Province",
+    "create.contact.email.label": "Email",
+    "create.contact.fax.label": "Fax",
+    "create.contact.firstname.label": "Prénom",
+    "create.contact.lastname.label": "Nom",
+    "create.contact.legend": "Information du contact",
+    "create.contact.name.label": "Nom",
+    "create.contact.organisation.label": "Organisation",
+    "create.contact.phone.label": "Téléphone",
+    "create.contact.position.label": "Fonction dans l'organisation",
+    "create.description.metadata.subtitle": "Service en création:",
+    "create.description.metadata.title": "Métadonnées de service",
+    "create.description.next.label": "Suivant",
+    "create.description.previous.label": "Précédent",
+    "create.description.protocol.title": "Protocole",
+    "create.description.save.label": "Sauver",
+    "create.description.service.description.label": "Description",
+    "create.description.service.identifier.label": "Identifiant",
+    "create.description.service.keywords.label": "Mots clefs",
+    "create.description.service.legend": "Description du service",
+    "create.description.service.name.label": "Nom",
+    "create.description.text.csw": "CS-W (Catalogue Service for the Web) permet la diffusion de métadonnées de données et de services.",
+    "create.description.text.sos": "SOS (Sensor Observation Service) permet de publier des données de capteurs, en temps réel.",
+    "create.description.text.wcs": "WCS (Web Coverage Service) permet l'échange de données raster continues. Cette norme est conçue pour l'échange d'informations, telles que des valeurs de pixels, dans une photographie aérienne par exemple.",
+    "create.description.text.wfs": "WFS (Web Feature Service) permet de diffuser des données vectorielles géoréférencées sous différents formats tels que GML, Shape, ...",
+    "create.description.text.wms": "WMS (Web Mapping Service) est destiné à l'échange de données géographiques sous la forme d'images géoréférencées.",
+    "create.description.text.wmts": "WMTS (Web Mapping Tile Service) permet de diffuser des données géoréférencées sous forme d'images tuilées (précalculées)",
+    "create.description.text.wps": "WPS (Web Processing Service) permet d'exposer des modèles de géotraitement en tant que services Web.",
+    "create.description.title.label": "Configurer le service",
+    "create.description.transactional": "Transactionnel",
+    "create.description.version.title": "Version",
+
+    "data.information.page.title": "Information sur la donnée",
+    "data.information.tab.missing.title": "Métadonnées manquantes",
+    "data.information.tab.title": "Information sur l'image",
+    "data.information.title": "Données disponibles",
+    "data.modal.cancel": "Annuler",
+    "data.modal.change": "Changer",
+    "data.modal.choose": "Choisir",
+    "data.modal.choose.pyramid.conform": "Générer une pyramide sur la donnée",
+    "data.modal.choose.scales": "Echelles",
+    "data.modal.choose.tile.format": "Fomat de sortie du tuilage",
+    "data.modal.choose.uppercornerx": "Coin haut X",
+    "data.modal.choose.uppercornery": "Coin haut Y",
+    "data.modal.choose.type":"Choix du type",
+    "data.modal.choose.sensor":"Associer un capteur",
+    "data.modal.close": "Fermer",
+    "data.modal.data": "Données",
+    "data.modal.end": "Terminer",
+    "data.modal.local.title": "Fichier local",
+    "data.modal.metadata": "Métadonnées",
+    "data.modal.netcdf":"Fichier netCDF",
+    "data.modal.next": "Suivant",
+    "data.modal.remove": "Enlever",
+    "data.modal.select": "Sélectionner",
+    "data.modal.sensor.title": "Vue du capteur",
+    "data.modal.server.title": "Fichier serveur",
+    "data.modal.validate": "Valider",
+    "data.modal.view.metadata.title": "Voir la métadonnée",
+
+    "edition.style.label.attribute": "Attribut",
+    "edition.style.label.auto.intervals": "Par intervalles",
+    "edition.style.label.auto.unique": "Par valeurs uniques",
+    "edition.style.label.cancel": "Annuler",
+    "edition.style.label.channel.blue": "Canal bleu",
+    "edition.style.label.channel.green": "Canal vert",
+    "edition.style.label.channel.grey": "Canal gris",
+    "edition.style.label.channel.red": "Canal rouge",
+    "edition.style.label.channels": "Canaux",
+    "edition.style.label.circle": "Cercle",
+    "edition.style.label.color": "Couleur",
+    "edition.style.label.continuous": "Continue",
+    "edition.style.label.cross": "Croix",
+    "edition.style.label.dashed": "Pointillés",
+    "edition.style.label.delete": "Supprimer",
+    "edition.style.label.description": "Description",
+    "edition.style.label.edit": "Editer",
+    "edition.style.label.fill": "Remplissage",
+    "edition.style.label.filters": "Filtres",
+    "edition.style.label.font": "Police",
+    "edition.style.label.general": "Général",
+    "edition.style.label.grey.scale": "Niveaux de gris",
+    "edition.style.label.label": "Label",
+    "edition.style.label.line": "Ligne",
+    "edition.style.label.manual": "Manuelle",
+    "edition.style.label.marker": "Icône",
+    "edition.style.label.max.scale": "Echelle max",
+    "edition.style.label.min.scale": "Echelle min",
+    "edition.style.label.name": "Nom",
+    "edition.style.label.new.rules": "Nouvelle(s) règle(s)",
+    "edition.style.label.new.symbolizer": "Nouveau symbole",
+    "edition.style.label.opacity": "Opacité",
+    "edition.style.label.overview": "Aperçu",
+    "edition.style.label.point": "Point",
+    "edition.style.label.polygon": "Polygone",
+    "edition.style.label.raster": "Raster",
+    "edition.style.label.rgb": "RVB",
+    "edition.style.label.rotation": "Rotation",
+    "edition.style.label.rules": "Règles",
+    "edition.style.label.scale": "Echelle",
+    "edition.style.label.see.layer": "Voir la couche",
+    "edition.style.label.size": "Taille",
+    "edition.style.label.square": "Carré",
+    "edition.style.label.star": "Etoile",
+    "edition.style.label.stroke": "Contour",
+    "edition.style.label.style": "Style",
+    "edition.style.label.symbolizers": "Symboles",
+    "edition.style.label.text": "Texte",
+    "edition.style.label.title": "Titre",
+    "edition.style.label.type": "Type",
+    "edition.style.label.update": "Mettre à jour",
+    "edition.style.label.validate": "Valider",
+    "edition.style.label.viewer": "Sélection du Style",
+    "edition.style.label.width": "Largeur",
+    "edition.style.label.choice.new": "Creer un nouveau style",
+    "edition.style.label.choice.existing": "Utiliser un style existant",
+    "edition.style.placeholder.name": "Entrez un nom...",
+    "edition.style.placeholder.number": "Entrez un nombre entier...",
+    "edition.style.placeholder.value": "Entrez une valeur...",
+
     "footer": "Ceci est votre pied de page",
-    "global": {
-        "browsehappy": "Vous utilisez un <strong>ancien</strong> navigateur. Veuillez <a href=\"http://browsehappy.com/\">mettre à jour votre navigateur</a> pour une meilleure expérience.",
-        "language": {
-            "de": "Allemand",
-            "en": "Anglais",
-            "fr": "Français"
-        },
-        "menu": {
-            "account.login": "S'authentifier",
-            "admin": {
-                "about":"A propos de Constellation",
-                "contact": "Contact",
-                "domains":"Gestion des domaines",
-                "group":"Gestion des groupes",
-                "image_classes":"Classes d'images",
-                "logout": "Déconnexion",
-                "logs": "Logs",
-                "main": "Administration",
-                "metrics": "Métriques",
-                "password": "Mot de passe",
-                "planning":"Planification",
-                "process":"Processus",
-                "processing":"Processing",
-                "security":"Sécurité",
-                "security_settings":"Paramètres de sécurité",
-                "sessions": "Sessions",
-                "settings":"Paramètres",
-                "statistics":"Statistiques",
-                "system":"Système",
-                "system_state":"État des services",
-                "tasks":"Gestionnaire des tâches",
-                "users": "Gestion des utilisateurs"
-            },
-            "data": "Données",
-            "sensor": "Capteurs",
-            "home": "Accueil",
-            "language": "Langue",
-            "mapcontext": "Cartographie",
-            "mapcontext-min": "Carto.",
-            "style": "Styles",
-            "viewer": "Visualiseur",
-            "tasks":"Traitements",
-            "web-service": "Services web",
-            "web-service.min": "Services"
-        },
-        "title": "JHipster"
-    },
-    "growl": {
-        "error": {
-            "data": {
-                "import": {
-                    "no": {
-                        "geographic": "L'image ne contient pas d'information géographique."
-                    }
-                }
-            },
-            "service": {
-                "delete": "Impossible de supprimer le service.",
-                "description": "Impossible de mettre à jour la description du service.",
-                "metadata": "Impossible de mettre à jour les métadonnées du service.",
-                "restart": "Impossible de redémarrer le service.",
-                "start": "Impossible de démarrer le service. Le service est peut être déjà démarré.",
-                "stop": "Impossible d'arrêter le service. Le service n'est peut être pas démarré."
-            },
-            "style": {
-                "delete": "Impossible de supprimer le style.",
-                "link": {
-                    "data": "Impossible d'associer le style à la donnée."
-                },
-                "unlink": {
-                    "data": "Impossible de dissocier le style de cette donnée."
-                }
-            }
-        },
-        "success": {
-            "service": {
-                "delete": "Service supprimé avec succès.",
-                "description": "Description du service mise à jour avec succès.",
-                "metadata": "Métadonnées du service modifiée avec succès.",
-                "restart": "Service redémarré avec succès.",
-                "start": "Service démarré avec succès.",
-                "stop": "Service arrêté avec succès."
-            },
-            "style": {
-                "delete": "Style supprimé avec succès.",
-                "link": {
-                    "data": "Style associé à la donnée avec succès."
-                },
-                "unlink": {
-                    "data": "Style dissocié de la donnée avec succès."
-                }
-            }
-        }
-    },
-    "homepage": {
-        "data": {
-            "button": {
-                "label": "Ajouter une donnée"
-            },
-            "summary": "<p>Vous pouvez créer une nouvelle donnée.</p><p>Vous pourrez ensuite la publier dans un service web.</p>",
-            "title": {
-                "label": "Données"
-            }
-        },
-        "geoviewer": {
-            "button": {
-                "label": "Visualiser les couches"
-            },
-            "summary": "<p>Vous pouvez visualiser les couches disponibles sur les différents services.</p>",
-            "title": {
-                "label": "Visualisation de couches"
-            }
-        },
-        "mapcontext": {
-            "button": {
-                "label": "Créer une composition"
-            },
-            "summary": "<p>Vous pouvez assembler plusieurs données, leur donner un style et ainsi créer vos propres compositions cartographiques.</p>",
-            "title": {
-                "label": "Compositions cartographiques"
-            }
-        },
-        "stat": {
-            "button": {
-                "label": "Voir les statistiques"
-            },
-            "title": {
-                "label": "Statistiques du serveur"
-            }
-        },
-        "title": "Bienvenue !",
-        "webservices": {
-            "button": {
-                "label": "Créer un service web"
-            },
-            "summary": "<p>Vous pouvez créer un nouveau service pour ensuite y ajouter des données.</p><p>Services gérés par Constellation :</p>",
-            "title": {
-                "label": "Services web"
-            }
-        },
-        "statistics" :{
-            "title":"Statistiques",
-            "services":"Services actifs",
-            "data":"Données intégrées",
-            "users": "Utilisateurs créés",
-            "process": "Processus"
-        },
-        "text":{
-            "intro":"<b>Constellation-SDI</b> permet de créer et de gérer simplement une Infrastructure de Données Spatiales complète.",
-            "services":"Vous pouvez créer des <b>services web</b> pour ensuite y ajouter des données",
-            "data":"Vous pouvez gérer vos <b>données</b>",
-            "stat":"Vous pouvez gérer des <b>capteurs</b> et les utiliser dans un context géospatial"
-        }
-    },
-    "label": {
-        "add": "Ajouter",
-        "add.data": "Ajouter une donnée",
-        "add.sensors": "Ajouter un capteur",
-        "add.style": "Ajouter un style",
-        "add.task": "Ajouter un traitement",
-        "add.mapcontext" : "Ajouter une composition cartographique",
-        "all": "Tous",
-        "all_fem": "Toutes",
-        "categories": "Catégories",
-        "close": "Fermer",
-        "comparison": "Comparaison",
-        "create": {
-            "new": {
-                "style": "Créer un nouveau style"
-            }
-        },
-        "data": {
-            "list": "Liste des données",
-            "processed": "Données traitées",
-            "pyramidal": "Données pyramidées",
-            "raster": "Données rasters",
-            "raw": "Données brutes",
-            "sensor": "Données capteurs",
-            "vector": "Données vectorielles",
-            "virtual": {
-                "sensor": "Capteurs virtuels"
-            }
-        },
-        "database": "Base de données",
-        "date": "Date",
-        "delete": "Supprimer",
-        "description": "Description",
-        "edit": "Editer",
-        "error": "Erreur",
-        "file": {
-            "local": "Fichier local",
-            "server": "Fichier serveur",
-            "db":"Base de données"
-        },
-        "fields.required":"Tous les champs sont obligatoires.",
-        "finish": "Terminer",
-        "import": {
-            "style": "Importer un style"
-        },
-        "list": {
-            "style": "Liste des styles"
-        },
-        "logical": "Logique",
-        "mapcontext.system":"Composition cartographique",
-        "name": "Nom",
-        "no": {
-            "association": "Aucune association.",
-            "available": {
-                "data": "Aucune donnée disponible.",
-                "layer": "Aucune couche disponible.",
-                "style": "Aucun style disponible."
-            },
-            "description": "Aucune description disponible.",
-            "selected": {
-                "data": "Aucune donnée sélectionnée.",
-                "sensor": "Aucun capteur sélectionné.",
-                "layer": "Aucune couche sélectionnée.",
-                "metadata": "Aucune métadonnée sélectionnée.",
-                "style": "Aucun style sélectionné.",
-                "task": "Aucun traitement sélectionné."
-            }
-        },
-        "observation": "Observation",
-        "owner": "Propriétaire",
-        "raster": "Raster",
-        "related": {
-            "data": "Donnée(s) associée(s)",
-            "mapcontext": "Composition(s) cartographique(s) associée(s)",
-            "service": "Service(s) associé(s)",
-            "style": "Style(s) associé(s)",
-            "sensors": "Capteur(s) associé(s)"
-        },
-        "results": "résultat(s)",
-        "return": "Retour",
-        "save": "Sauvegarder",
-        "search": "Rechercher",
-        "sensor": "Sensor",
-        "sensor.system": "Système de capteurs",
-        "success": "Succès",
-        "symbols": "Symboles",
-        "title": "Titre",
-        "type": "Type",
-        "unknown": "Inconnu",
-        "validate": "Valider",
-        "vector": "Vecteur",
-        "count.data":"donnée(s) disponible(s)",
-        "count.sensors": "capteur(s) disponible(s)",
-        "count.style": "styles(s) disponible(s)",
-        "count.tasks": "traitement(s) disponible(s)",
-        "count.mapcontext": "composition(s) cartographique(s) disponible(s)",
-        "reduced.display":"Affichage réduit"
-    },
-    "layer": {
-        "listing": {
-            "data": {
-                "add": {
-                    "button": {
-                        "label": "Ajouter une donnée"
-                    }
-                },
-                "create": {
-                    "button": {
-                        "label": "Créer une donnée"
-                    }
-                },
-                "upload": {
-                    "button": "Envoyer le fichier",
-                    "change": {
-                        "label": "Changer"
-                    },
-                    "close": {
-                        "button": "Fermer"
-                    },
-                    "continue": {
-                        "button": "Continuer"
-                    },
-                    "name": {
-                        "label": "Nom"
-                    },
-                    "raster": {
-                        "label": "Donnée raster"
-                    },
-                    "remove": {
-                        "label": "Enlever"
-                    },
-                    "select": {
-                        "label": "Choisir un fichier"
-                    },
-                    "sensor": {
-                        "label": "Donnée capteur"
-                    },
-                    "title": "Envoyer une donnée",
-                    "vector": {
-                        "label": "Donnée vecteur"
-                    },
-                    "associate":"Associer à un capteur"
-                }
-            },
-            "layer": {
-                "label": "couches"
-            },
-            "numberbypage": {
-                "10": {
-                    "label": "10 couches"
-                },
-                "100": {
-                    "label": "100 couches"
-                },
-                "20": {
-                    "label": "20 couches"
-                }
-            },
-            "orderBy": {
-                "date": "Date",
-                "owner": "Propriétaire",
-                "title": "Titre"
-            },
-            "reduce": {
-                "button": {
-                    "label": "réduire ou agrandir"
-                }
-            },
-            "selectall": {
-                "button": "sélectionner toutes les couches"
-            },
-            "selected": {
-                "data": {
-                    "button": "Voir"
-                },
-                "delete": {
-                    "button": "Supprimer"
-                },
-                "export": {
-                    "button": "Exporter"
-                },
-                "metadata": {
-                    "button": "Métadonnées"
-                },
-                "edit.button": "Editer",
-                "dataview.button": "View data",
-                "metadataedit.button": "Editer"
-            },
-            "title": "Liste des couches",
-            "modal.dataviewer":"Visualisation de la donnée"
-        }
-    },
-    "login": {
-        "form": {
-            "button": "Connexion",
-            "password": "Mot de passe",
-            "password.placeholder": "Votre mot de passe",
-            "rememberme": "Garder ma connexion ouverte",
-            "username": "Nom d'utilisateur",
-            "username.placeholder": "Votre nom d'utilisateur"
-        },
-        "messages": {
-            "error": {
-                "authentication": "<strong>Erreur d'authentification!</strong> Veuillez vérifier vos identifiants de connexion."
-            }
-        },
-        "title": "S'authentifier",
-        "error": "Identifiant ou mot de passe incorrect.",
-        "title": "Authentification"
-    },
-    "logs": {
-        "filter": "Filtrer",
-        "nbloggers": "Total de {{ total }} \"loggers\".",
-        "table": {
-            "level": "Niveau",
-            "name": "Nom"
-        },
-        "title": "Logs"
-    },
-    "main": {
-        "menu": {
-            "data": {
-                "create": {
-                    "detail": "<p>Vous pouvez créer une nouvelle donnée.</p><p>Vous pourrez ensuite la publier dans un service web.</p>",
-                    "subtitle": "Ajouter une donnée",
-                    "title": "Données"
-                }
-            },
-            "map-composition": {
-                "create": {
-                    "detail": "<p>Vous pouvez assembler plusieurs données, leur donner un style et ainsi créer vos propres compositions cartographiques.</p>",
-                    "subtitle": "Créer une composition",
-                    "title": "Compositions cartographiques"
-                }
-            },
-            "stat": {
-                "subtitle": "Voir les statistiques",
-                "title": "Statistiques du serveur"
-            },
-            "viewer": {
-                "create": {
-                    "detail": "<p>Vous pouvez visualiser les couches disponibles sur les différents services.</p>",
-                    "subtitle": "Visualiser les couches",
-                    "title": "Visualisation de couches"
-                }
-            },
-            "ws": {
-                "create": {
-                    "detail": "<p>Vous pouvez créer un nouveau service pour ensuite y ajouter des données.</p><p>Services gérés par Constellation :</p>",
-                    "subtitle": "Créer un service web",
-                    "title": "Services web"
-                }
-            }
-        }
-    },
-    "md": {
-        "iso": {
-            "abstract": "Résumé",
-            "data": {
-                "date": "Date des données"
-            },
-            "date": {
-                "type": "Type de date"
-            },
-            "keywords": "Mots clefs",
-            "locale": {
-                "data": "Locale des données"
-            },
-            "organization": "Organisation",
-            "role": "Rôle",
-            "title": "Titre",
-            "topic": {
-                "category": "Catégorie de sujet"
-            },
-            "username": "Nom de l'utilisateur"
-        },
-        "listing": {
-            "data.associated": "donnée(s) associée(s)",
-            "metadata": {
-                "type": "METADONNEES"
-            },
-            "no.data": "Pas de",
-            "no.sensor": "0",
-            "no": {
-                "available": {
-                    "md": "Pas de métadonnées disponibles"
-                }
-            },
-            "selected": {
-                "delete": {
-                    "button": "Supprimer"
-                },
-                "duplicate": {
-                    "button": "Dupliquer"
-                },
-                "edit": {
-                    "button": "Editer"
-                },
-                "export": {
-                    "button": "Exporter"
-                }
-            },
-            "title": "Liste des métadonnées"
-        }
-    },
-    "menu": {
-        "administration": {
-            "label": "Administration"
-        },
-        "data": {
-            "label": "Données"
-        },
-        "geoviewer": {
-            "label": "Visualiseur"
-        },
-        "homepage": {
-            "label": "Accueil"
-        },
-        "mapcontext": {
-            "label": "Compositions cartographiques"
-        },
-        "style": {
-            "label": "Styles"
-        },
-        "webservices": {
-            "label": "Services web"
-        }
-    },
-    "metadata": {
-        "information": {
-            "tab": {
-                "title": "Métadonnées de l'image"
-            }
-        }
-    },
-    "metrics": {
-        "jvm": {
-            "rungc": "Lancer le ramasse miette",
-            "gc": {
-                "marksweepcount": "Total de \"Mark Sweep\"",
-                "marksweeptime": "Temps \"Mark Sweep\"",
-                "scavengecount": "Total \"Scavenge\"",
-                "scavengetime": "Temps \"Scavenge\"",
-                "title": "Garbage collections"
-            },
-            "http": {
-                "active": "Requêtes actives :",
-                "code": {
-                    "notfound": "Non trouvé",
-                    "ok": "Ok",
-                    "servererror": "Erreur serveur"
-                },
-                "table": {
-                    "average": "Moyenne",
-                    "code": "Code",
-                    "count": "Total",
-                    "mean": "Médian"
-                },
-                "title": "Requêtes HTTP requests (évènements par seconde)",
-                "total": "Requêtes totales :"
-            },
-            "memory": {
-                "heap": "Mémoire \"Heap\"",
-                "nonheap": "Mémoire \"Non-Heap\"",
-                "title": "Mémoire",
-                "total": "Mémoire totale"
-            },
-            "threads": {
-                "blocked": "Bloqué",
-                "runnable": "Executable",
-                "timewaiting": "Temps d'attente",
-                "title": "Threads",
-                "waiting": "En attente"
-            },
-            "title": "Métriques de la JVM"
-        },
-        "refresh": {
-            "button": "Rafraichir"
-        },
-        "servicesstats": {
-            "table": {
-                "count": "Total",
-                "max": "Max",
-                "mean": "Médian",
-                "min": "Min",
-                "name": "Nom du server",
-                "p50": "p50",
-                "p75": "p75",
-                "p95": "p95",
-                "p99": "p99"
-            },
-            "title": "Statistiques des services (Temps en milliseconde)"
-        },
-        "title": "Métriques de l'application"
-    },
-    "msg": {
-        "add": {
-            "data": {
-                "mapcontext": {
-                    "association": "Associer une composition cartographique à la donnée sélectionnée."
-                },
-                "service": {
-                    "association": "Associer un service à la donnée sélectionnée"
-                },
-                "style": {
-                    "association": "Associer le style à donnée sélectionnée."
-                }
-            },
-            "style": {
-                "association": "Associer une donnée au style selectionné."
-            }
-        },
-        "delete": {
-            "style": {
-                "selected": "Supprimer définitivement le style selectionné."
-            }
-        },
-        "edit": {
-            "style": {
-                "selected": "Editer le style selectionné."
-            }
-        },
-        "no": {
-            "selected": {
-                "data": "Cliquez sur une donnée ci-contre pour afficher plus d'informations.",
-                "sensor": "Cliquez sur un capteur ci-contre pour afficher plus d'informations.",
-                "layer": "Cliquez sur une couche ci-contre pour afficher plus d'informations.",
-                "metadata": "Cliquez sur une fiche de métadonnées ci-contre pour afficher plus d'informations.",
-                "style": "Cliquez sur un style ci-contre pour afficher plus d'informations.",
-                "task": "Cliquez sur un traitement ci-contre pour afficher plus d'informations."
-            }
-        }
-    },
-    "password": {
-        "form": {
-            "button": "Sauvegarder",
-            "confirmpassword": "Confirmation du nouveau mot de passe",
-            "newpassword": "Nouveau mot de passe"
-        },
-        "messages": {
-            "error": {
-                "dontmatch": "Le nouveau mot de passe et sa confirmation ne sont pas égaux !",
-                "global": "<strong>Une erreur est survenue !</strong> Le mot de passe n'a pas pu être modifié."
-            },
-            "success": "<strong>La mot de passe a été modifié !</strong>",
-            "validate": {
-                "confirmpassword": {
-                    "maxlength": "Votre confirmation du mot de passe ne doit pas comporter plus de 20 caractères",
-                    "minlength": "Votre confirmation du mot de passe doit comporter au moins 5 caractères",
-                    "required": "Votre confirmation du mot de passe est requis."
-                },
-                "newpassword": {
-                    "maxlength": "Votre mot de passe ne doit pas comporter plus de 20 caractères",
-                    "minlength": "Votre mot de passe doit comporter au moins 5 caractères",
-                    "required": "Votre mot de passe est requis."
-                }
-            }
-        },
-        "title": "Changer le mot de passe pour [<b>{{username}}</b>]"
-    },
-    "server": {
-        "choose": {
-            "file": "Choisir un fichier sur le serveur"
-        },
-        "create": {
-            "button": "Créer"
-        },
-        "next": {
-            "button": "Suivant"
-        }
-    },
-    "service": {
-        "abstract": {
-            "label": "Description du service"
-        },
-        "config": {
-            "source": "Source",
-            "source.sos":"Source des Métadonnées",
-            "source.sos.data":"Source des données",
-            "source.choose": "Choisir la source",
-            "source.choose.sos": "Choisir la source de Métadonnées",
-            "source.choose.sos.data": "Choisir la source de données",
-            "source.csw.title": "Service de catalogues (CSW)",
-            "source.database": "Base de données",
-            "source.database.description": "Base de données de type MDWeb, contenant des métadonnées géoréférencées",
-            "source.database.name": "Nom de la base de données",
-            "source.database.password": "Mot de passe",
-            "source.database.port": "Port de la base de données",
-            "source.database.shared": "Connexion partagée",
-            "source.database.title": "Base de données (SGBDR)",
-            "source.database.type": "Type de base de données",
-            "source.database.url": "URL de la base de données",
-            "source.database.username": "Nom d'utilisateur",
-            "source.file": "Système de fichiers",
-            "source.file.description": "Jeu de métadonnées stocké dans le système de fichiers local",
-            "source.file.sml": "Dossier contenant des fichiers SensorML",
-            "source.file.title": "Système de fichiers",
-            "source.file.path": "Chemin du dossier",
-            "source.internal": "Interne",
-            "source.internal.description": "Base de données des métadonnées de Constellation, décrivant les données publiées par les services",
-            "source.internal.title": "Interne (SGBDR)",
-            "source.sos.title":"Données de capteurs (SOS)"
-        },
-        "create": {
-            "end": {
-                "addlayers": {
-                    "label": "Ajouter des couches au service"
-                },
-                "addmetadata": {
-                    "label": "Voir les métadonnées"
-                },
-                "description": {
-                    "label": "Description du service"
-                },
-                "error": {
-                    "alert": {
-                        "label": "Erreur. Votre service n'a pas été créé."
-                    },
-                    "title": "Le service n'a pas été créé"
-                },
-                "success": {
-                    "alert": {
-                        "label": "Félicitations ! Votre service a été créé avec succès !"
-                    },
-                    "title": "Service créé avec succès"
-                },
-                "type": {
-                    "label": "Type"
-                },
-                "version": {
-                    "label": "Version"
-                }
-            }
-        },
-        "data": {
-            "label": "Données publiées sur le service",
-            "label.sos": "Capteurs disponibles sur le service"
-        },
-        "description": {
-            "getcapabilities": {
-                "button": "GetCapabilities"
-            },
-            "logs": {
-                "button": "Logs"
-            },
-            "reload": {
-                "button": "Recharger"
-            },
-            "start": {
-                "button": "Démarrer"
-            },
-            "stop": {
-                "button": "Arrêter"
-            },
-            "tab": {
-                "data": {
-                    "title": "Données"
-                },
-                "description": {
-                    "title": "Description du service"
-                },
-                "description.name": "Nom",
-                "description.identifier": "Identifiant",
-                "description.tags": "Etiquettes",
-                "description.description": "Description",
-                "description.version": "Versions",
-                "metadata": {
-                    "data": {
-                        "title": "Gestion des métadonnées"
-                    },
-                    "title": "Métadonnées du service"
-                }
-            }
-        },
-        "rights":"Gestion des droits",
-        "rights.group": {
-            "list":"Liste des groupes",
-            "group":"Groupe",
-            "read":"Lecture",
-            "write":"Ecriture"            
-        },
-        "edit": {
-            "dashboard.layer.title": "Liste des couches",
-            "dashboard.metadata.title": "Liste des métadonnées",
-            "dashboard.tabs": {
-                "data": "Données",
-                "description": "Description du service",
-                "metadata": "Métadonnées du service", 
-                "rights": "Gestion des droits"
-            },
-            "dashboard.data.title": "Liste des données",
-            "dashboard.header.title": "Titre",
-            "dashboard.header.date": "Date",
-            "dashboard.header.owner": "Propriétaire",
-            "dashboard.header.type": "Type",
-            "dashboard.action.add.button": "Ajouter",
-            "dashboard.action.add.data": "Ajouter une donnée",
-            "dashboard.action.add.layer": "Ajouter une couche",
-            "dashboard.sensors.list":"Capteurs disponibles",
-            "dashboard.sensors.list.associated": "capteurs associés",
-            "dashboard.tasks.list.associated": "traitements associés",
-            "dashboard.tasks.list": "Traitements disponibles",
-            "dashboard.mapcontext.list.associated": "données associées",
-            "dashboard.mapcontext.list": "Compositions cartographiques disponibles",
-            "dashboard.measures.list":"Mesures possibles",
-            "dashboard.measures.error.select.one" : "Vous devez sélectionner une mesure dans la liste précédente",
-            "dashboard.area":"Zone géographique",
-            "dashboard.date.to":"au",
-            "dashboard.date.from":"Du",
-            "dashboard.button.graph.hide":"Cacher le graphique",
-            "dashboard.button.graph.show":"Afficher le graphique"
-        },
-        "menu": {
-            "delete": {
-                "label": "Supprimer le service"
-            },
-            "edit": {
-                "label": "Editer"
-            },
-            "getcapabilities": {
-                "label": "GetCapabilities"
-            },
-            "getcapabilities.modal.title": "Détails du GetCapabilities",
-            "getcapabilities.modal.close": "Fermer",
-            "log": {
-                "label": "Log du service"
-            },
-            "log.modal.title": "Détails de la log ",
-            "log.modal.close": "Fermer",
-            "refresh.label": "Rafraîchir",
-            "show": {
-                "label": "Visualiser"
-            },
-            "url": {
-                "label": "URL du service"
-            },
-            "loader.modal.title": "Chargement"
-        }
-    },
-    "sessions": {
-        "messages": {
-            "error": "<strong>Une erreur est survenue !</strong> La session ne peut pas être invalidée.",
-            "success": "<strong>La session a été invalidée !</strong>"
-        },
-        "table": {
-            "button": "Invalider",
-            "date": "Date",
-            "ipaddress": "Adresse IP",
-            "useragent": "User Agent"
-        },
-        "title": "Sessions actives de [<b>{{username}}</b>]"
-    },
-    "settings": {
-        "form": {
-            "button": "Sauvegarder",
-            "email": "Email",
-            "firstname": "Prénom",
-            "lastname": "Nom",
-            "password": "Mot de passe",
-            "login":"Identifiant",
-            "roles":"Rôles",
-            "roles.admin":"Ajouter le rôle administrateur",
-            "login.placeholder": "Votre identifiant",
-            "password.placeholder": "Votre mot de passe",
-            "firstname.placeholder": "Votre prénom",
-            "lastname.placeholder": "Votre Nom",
-            "email.placeholder": "Votre e-mail",
-            "button.close":"Annuler",
-            "modal.title": "Nouvel utilisateur"
-        },
-        "messages": {
-            "error": "<strong>Une erreur est survenue !</strong> Votre profil ne peut pas être sauvegardé.",
-            "success": "<strong>Votre profil a été sauvegardé !</strong>",
-            "validate": {
-                "email": {
-                    "invalid": "Votre email n'est pas valide.",
-                    "maxlength": "Votre email ne doit pas comporter plus de 50 caractères",
-                    "minlength": "Votre email doit comporter au moins 5 caractères",
-                    "required": "Votre email est requis."
-                },
-                "firstname": {
-                    "maxlength": "Votre prénom ne doit pas comporter plus de 50 caractères",
-                    "minlength": "Votre prénom doit comporter au moins un caractère",
-                    "required": "Votre prénom est requis."
-                },
-                "lastname": {
-                    "maxlength": "Votre nom ne doit pas comporter plus de 50 caractères",
-                    "minlength": "Votre nom doit comporter au moins un caractère",
-                    "required": "Votre nom est requis."
-                },
-                "password": {
-                    "required": "Votre mot de passe est requis.",
-                    "invalid": "Votre mot de passe est invalide.",
-                    "minlength": "Votre mot de passe doit comporter au moins 6 caractères",
-                    "maxlength": "Votre mot de passe ne peux pas dépasser 62 caractères"
-                }
-            }
-        },
-        "title": "Profil de l'utilisateur [{{username}}]"
-    },
-    "style": {
-        "listing": {
-            "numberbypage": {
-                "10": {
-                    "label": "10 styles"
-                },
-                "100": {
-                    "label": "100 styles"
-                },
-                "20": {
-                    "label": "20 styles"
-                }
-            },
-            "selected": {
-                "delete.button": "Supprimer",
-                "edit.button": "Editer"
-            }
-        }
-    },
-    "webservicepage": {
-        "button": {
-            "create": {
-                "label": "Créer un service"
-            },
-            "dropdown": {
-                "csw": {
-                    "label": "Catalogues (CSW)"
-                },
-                "label": "Carte (WMS)",
-                "wcs": {
-                    "label": "Grille de données (WCS)"
-                },
-                "wfs": {
-                    "label": "Données vectorielles (WFS)"
-                },
-                "wms": {
-                    "label": "Cartes (WMS)"
-                },
-                "wmts": {
-                    "label": "Cartes tuilées (WMTS)"
-                },
-                "wps": {
-                    "label": "Géotraitements (WPS)"
-                },
-                "sos": {
-                    "label": "Données capteur (SOS)"
-                }
-            },
-            "modal.select.version": "Sélectionner la version du service souhaitée"
-        },
-        "tab": {
-            "all": "Tous"
-        },
-        "title": "Services disponibles"
-    },
-    "page.header.title":{
-        "webservices":"Gestion des services",
-        "data":"Gestion des données",
-        "style":"Gestion des styles",
-        "contact": "Contact",
-        "create.service":"Nouveau service",
-        "create.service.source":"Source",
-        "edit.service":"Edition du service",
-        "process":"Processus",
-        "task":"Tâches en cours",
-        "sensors":"Gestion des capteurs",
-        "tasks":"Gestion des traitements",
-        "mapcontext":"Gestion des compositions cartographiques"
-    },
+
+    "global.browsehappy": "Vous utilisez un <strong>ancien</strong> navigateur. Veuillez <a href=\"http://browsehappy.com/\">mettre à jour votre navigateur</a> pour une meilleure expérience.",
+    "global.language.de": "Allemand",
+    "global.language.en": "Anglais",
+    "global.language.fr": "Français",
+    "global.menu.account.login": "S'authentifier",
+    "global.menu.admin.about":"A propos de Constellation",
+    "global.menu.admin.contact": "Contact",
+    "global.menu.admin.domains":"Gestion des domaines",
+    "global.menu.admin.group":"Gestion des groupes",
+    "global.menu.admin.image_classes":"Classes d'images",
+    "global.menu.admin.logout": "Déconnexion",
+    "global.menu.admin.logs": "Logs",
+    "global.menu.admin.main": "Administration",
+    "global.menu.admin.metrics": "Métriques",
+    "global.menu.admin.password": "Mot de passe",
+    "global.menu.admin.planning":"Planification",
+    "global.menu.admin.process":"Processus",
+    "global.menu.admin.processing":"Processing",
+    "global.menu.admin.security":"Sécurité",
+    "global.menu.admin.security_settings":"Paramètres de sécurité",
+    "global.menu.admin.sessions": "Sessions",
+    "global.menu.admin.settings":"Paramètres",
+    "global.menu.admin.statistics":"Statistiques",
+    "global.menu.admin.system":"Système",
+    "global.menu.admin.system_state":"État des services",
+    "global.menu.admin.tasks":"Gestionnaire des tâches",
+    "global.menu.admin.users": "Gestion des utilisateurs",
+    "global.menu.data": "Données",
+    "global.menu.sensor": "Capteurs",
+    "global.menu.home": "Accueil",
+    "global.menu.language": "Langue",
+    "global.menu.mapcontext": "Cartographie",
+    "global.menu.mapcontext-min": "Carto.",
+    "global.menu.style": "Styles",
+    "global.menu.viewer": "Visualiseur",
+    "global.menu.tasks":"Traitements",
+    "global.menu.web-service": "Services web",
+    "global.menu.web-service.min": "Services",
+    "global.title": "JHipster",
+
+    "growl.error.data.import.no.geographic": "L'image ne contient pas d'information géographique.",
+    "growl.error.service.delete": "Impossible de supprimer le service.",
+    "growl.error.service.description": "Impossible de mettre à jour la description du service.",
+    "growl.error.service.metadata": "Impossible de mettre à jour les métadonnées du service.",
+    "growl.error.service.restart": "Impossible de redémarrer le service.",
+    "growl.error.service.start": "Impossible de démarrer le service. Le service est peut être déjà démarré.",
+    "growl.error.service.stop": "Impossible d'arrêter le service. Le service n'est peut être pas démarré.",
+    "growl.error.style.delete": "Impossible de supprimer le style.",
+    "growl.error.style.link.data": "Impossible d'associer le style à la donnée.",
+    "growl.error.style.unlink.data": "Impossible de dissocier le style de cette donnée.",
+    "growl.success.service.delete": "Service supprimé avec succès.",
+    "growl.success.service.description": "Description du service mise à jour avec succès.",
+    "growl.success.service.metadata": "Métadonnées du service modifiée avec succès.",
+    "growl.success.service.restart": "Service redémarré avec succès.",
+    "growl.success.service.start": "Service démarré avec succès.",
+    "growl.success.service.stop": "Service arrêté avec succès.",
+    "growl.success.style.delete": "Style supprimé avec succès.",
+    "growl.success.style.link.data": "Style associé à la donnée avec succès.",
+    "growl.success.style.unlink.data": "Style dissocié de la donnée avec succès.",
+
+    "homepage.data.button.label": "Ajouter une donnée",
+    "homepage.data.summary": "<p>Vous pouvez créer une nouvelle donnée.</p><p>Vous pourrez ensuite la publier dans un service web.</p>",
+    "homepage.data.title.label": "Données",
+    "homepage.geoviewer.button.label": "Visualiser les couches",
+    "homepage.geoviewer.summary": "<p>Vous pouvez visualiser les couches disponibles sur les différents services.</p>",
+    "homepage.geoviewer.title.label": "Visualisation de couches",
+    "homepage.mapcontext.button.label": "Créer une composition",
+    "homepage.mapcontext.summary": "<p>Vous pouvez assembler plusieurs données, leur donner un style et ainsi créer vos propres compositions cartographiques.</p>",
+    "homepage.mapcontext.title.label": "Compositions cartographiques",
+    "homepage.stat.button.label": "Voir les statistiques",
+    "homepage.stat.title.label": "Statistiques du serveur",
+    "homepage.title": "Bienvenue !",
+    "homepage.webservices.button.label": "Créer un service web",
+    "homepage.webservices.summary": "<p>Vous pouvez créer un nouveau service pour ensuite y ajouter des données.</p><p>Services gérés par Constellation :</p>",
+    "homepage.webservices.title.label": "Services web",
+    "homepage.statistics.title":"Statistiques",
+    "homepage.statistics.services":"Services actifs",
+    "homepage.statistics.data":"Données intégrées",
+    "homepage.statistics.users": "Utilisateurs créés",
+    "homepage.statistics.process": "Processus",
+    "homepage.text.intro":"<b>Constellation-SDI</b> permet de créer et de gérer simplement une Infrastructure de Données Spatiales complète.",
+    "homepage.text.services":"Vous pouvez créer des <b>services web</b> pour ensuite y ajouter des données",
+    "homepage.text.data":"Vous pouvez gérer vos <b>données</b>",
+    "homepage.text.stat":"Vous pouvez gérer des <b>capteurs</b> et les utiliser dans un context géospatial",
+
+    "label.add": "Ajouter",
+    "label.add.data": "Ajouter une donnée",
+    "label.add.sensors": "Ajouter un capteur",
+    "label.add.style": "Ajouter un style",
+    "label.add.task": "Ajouter un traitement",
+    "label.add.mapcontext" : "Ajouter une composition cartographique",
+    "label.all": "Tous",
+    "label.all_fem": "Toutes",
+    "label.categories": "Catégories",
+    "label.close": "Fermer",
+    "label.comparison": "Comparaison",
+    "label.create.new.style": "Créer un nouveau style",
+    "label.data.list": "Liste des données",
+    "label.data.processed": "Données traitées",
+    "label.data.pyramidal": "Données pyramidées",
+    "label.data.raster": "Données rasters",
+    "label.data.raw": "Données brutes",
+    "label.data.sensor": "Données capteurs",
+    "label.data.vector": "Données vectorielles",
+    "label.data.virtual.sensor": "Capteurs virtuels",
+    "label.database": "Base de données",
+    "label.date": "Date",
+    "label.delete": "Supprimer",
+    "label.description": "Description",
+    "label.edit": "Editer",
+    "label.error": "Erreur",
+    "label.file.local": "Fichier local",
+    "label.file.server": "Fichier serveur",
+    "label.file.db":"Base de données",
+    "label.fields.required":"Tous les champs sont obligatoires.",
+    "label.finish": "Terminer",
+    "label.import.style": "Importer un style",
+    "label.list.style": "Liste des styles",
+    "label.logical": "Logique",
+    "label.mapcontext.system":"Composition cartographique",
+    "label.name": "Nom",
+    "label.no.association": "Aucune association.",
+    "label.no.available.data": "Aucune donnée disponible.",
+    "label.no.available.layer": "Aucune couche disponible.",
+    "label.no.available.style": "Aucun style disponible.",
+    "label.no.description": "Aucune description disponible.",
+    "label.no.selected.data": "Aucune donnée sélectionnée.",
+    "label.no.selected.sensor": "Aucun capteur sélectionné.",
+    "label.no.selected.layer": "Aucune couche sélectionnée.",
+    "label.no.selected.metadata": "Aucune métadonnée sélectionnée.",
+    "label.no.selected.style": "Aucun style sélectionné.",
+    "label.no.selected.task": "Aucun traitement sélectionné.",
+    "label.observation": "Observation",
+    "label.owner": "Propriétaire",
+    "label.raster": "Raster",
+    "label.related.data": "Donnée(s) associée(s)",
+    "label.related.mapcontext": "Composition(s) cartographique(s) associée(s)",
+    "label.related.service": "Service(s) associé(s)",
+    "label.related.style": "Style(s) associé(s)",
+    "label.related.sensors": "Capteur(s) associé(s)",
+    "label.results": "résultat(s)",
+    "label.return": "Retour",
+    "label.save": "Sauvegarder",
+    "label.search": "Rechercher",
+    "label.sensor": "Sensor",
+    "label.sensor.system": "Système de capteurs",
+    "label.success": "Succès",
+    "label.symbols": "Symboles",
+    "label.title": "Titre",
+    "label.type": "Type",
+    "label.unknown": "Inconnu",
+    "label.validate": "Valider",
+    "label.vector": "Vecteur",
+    "label.count.data":"donnée(s) disponible(s)",
+    "label.count.sensors": "capteur(s) disponible(s)",
+    "label.count.style": "styles(s) disponible(s)",
+    "label.count.tasks": "traitement(s) disponible(s)",
+    "label.count.mapcontext": "composition(s) cartographique(s) disponible(s)",
+    "label.reduced.display":"Affichage réduit",
+    "layer.listing.data.add.button.label": "Ajouter une donnée",
+    "layer.listing.data.create.button.label": "Créer une donnée",
+    "layer.listing.data.upload.button": "Envoyer le fichier",
+    "layer.listing.data.upload.change.label": "Changer",
+    "layer.listing.data.upload.close.button": "Fermer",
+    "layer.listing.data.upload.continue.button": "Continuer",
+    "layer.listing.data.upload.name.label": "Nom",
+    "layer.listing.data.upload.raster.label": "Donnée raster",
+    "layer.listing.data.upload.remove.label": "Enlever",
+    "layer.listing.data.upload.select.label": "Choisir un fichier",
+    "layer.listing.data.upload.sensor.label": "Donnée capteur",
+    "layer.listing.data.upload.title": "Envoyer une donnée",
+    "layer.listing.data.upload.vector.label": "Donnée vecteur",
+    "layer.listing.data.upload.associate":"Associer à un capteur",
+    "layer.listing.layer.label": "couches",
+    "layer.listing.numberbypage.10.label": "10 couches",
+    "layer.listing.numberbypage.100.label": "100 couches",
+    "layer.listing.numberbypage.20.label": "20 couches",
+    "layer.listing.orderBy.date": "Date",
+    "layer.listing.orderBy.owner": "Propriétaire",
+    "layer.listing.orderBy.title": "Titre",
+    "layer.listing.reduce.button.label": "réduire ou agrandir",
+    "layer.listing.selectall.button": "sélectionner toutes les couches",
+    "layer.listing.selected.data.button": "Voir",
+    "layer.listing.selected.delete.button": "Supprimer",
+    "layer.listing.selected.export.button": "Exporter",
+    "layer.listing.selected.metadata.button": "Métadonnées",
+    "layer.listing.selected.edit.button": "Editer",
+    "layer.listing.selected.dataview.button": "View data",
+    "layer.listing.selected.metadataedit.button": "Editer",
+    "layer.listing.title": "Liste des couches",
+    "layer.listing.modal.dataviewer":"Visualisation de la donnée",
+
+    "login.form.button": "Connexion",
+    "login.form.password": "Mot de passe",
+    "login.form.password.placeholder": "Votre mot de passe",
+    "login.form.rememberme": "Garder ma connexion ouverte",
+    "login.form.username": "Nom d'utilisateur",
+    "login.form.username.placeholder": "Votre nom d'utilisateur",
+    "login.messages.error.authentication": "<strong>Erreur d'authentification!</strong> Veuillez vérifier vos identifiants de connexion.",
+    "login.title": "S'authentifier",
+    "login.error": "Identifiant ou mot de passe incorrect.",
+
+    "logs.filter": "Filtrer",
+    "logs.nbloggers": "Total de {{ total }} \"loggers\".",
+    "logs.table.level": "Niveau",
+    "logs.table.name": "Nom",
+    "logs.title": "Logs",
+
+    "main.menu.data.create.detail": "<p>Vous pouvez créer une nouvelle donnée.</p><p>Vous pourrez ensuite la publier dans un service web.</p>",
+    "main.menu.data.create.subtitle": "Ajouter une donnée",
+    "main.menu.data.create.title": "Données",
+    "main.menu.map-composition.create.detail": "<p>Vous pouvez assembler plusieurs données, leur donner un style et ainsi créer vos propres compositions cartographiques.</p>",
+    "main.menu.map-composition.create.subtitle": "Créer une composition",
+    "main.menu.map-composition.create.title": "Compositions cartographiques",
+    "main.menu.stat.subtitle": "Voir les statistiques",
+    "main.menu.stat.title": "Statistiques du serveur",
+    "main.menu.viewer.create.detail": "<p>Vous pouvez visualiser les couches disponibles sur les différents services.</p>",
+    "main.menu.viewer.create.subtitle": "Visualiser les couches",
+    "main.menu.viewer.create.title": "Visualisation de couches",
+    "main.menu.ws.create.detail": "<p>Vous pouvez créer un nouveau service pour ensuite y ajouter des données.</p><p>Services gérés par Constellation :</p>",
+    "main.menu.ws.create.subtitle": "Créer un service web",
+    "main.menu.ws.create.title": "Services web",
+
+    "md.iso.abstract": "Résumé",
+    "md.iso.data.date": "Date des données",
+    "md.iso.date.type": "Type de date",
+    "md.iso.keywords": "Mots clefs",
+    "md.iso.locale.data": "Locale des données",
+    "md.iso.organization": "Organisation",
+    "md.iso.role": "Rôle",
+    "md.iso.title": "Titre",
+    "md.iso.topic.category": "Catégorie de sujet",
+    "md.iso.username": "Nom de l'utilisateur",
+    "md.listing.data.associated": "donnée(s) associée(s)",
+    "md.listing.metadata.type": "METADONNEES",
+    "md.listing.no.data": "Pas de",
+    "md.listing.no.sensor": "0",
+    "md.listing.no.available.md": "Pas de métadonnées disponibles",
+    "md.listing.selected.delete.button": "Supprimer",
+    "md.listing.selected.duplicate.button": "Dupliquer",
+    "md.listing.selected.edit.button": "Editer",
+    "md.listing.selected.export.button": "Exporter",
+    "md.listing.title": "Liste des métadonnées",
+
+    "menu.administration.label": "Administration",
+    "menu.data.label": "Données",
+    "menu.geoviewer.label": "Visualiseur",
+    "menu.homepage.label": "Accueil",
+    "menu.mapcontext.label": "Compositions cartographiques",
+    "menu.style.label": "Styles",
+    "menu.webservices.label": "Services web",
+
+    "metadata.information.tab.title": "Métadonnées de l'image",
+
+    "metrics.jvm.rungc": "Lancer le ramasse miette",
+    "metrics.jvm.gc.marksweepcount": "Total de \"Mark Sweep\"",
+    "metrics.jvm.gc.marksweeptime": "Temps \"Mark Sweep\"",
+    "metrics.jvm.gc.scavengecount": "Total \"Scavenge\"",
+    "metrics.jvm.gc.scavengetime": "Temps \"Scavenge\"",
+    "metrics.jvm.gc.title": "Garbage collections",
+    "metrics.jvm.http.active": "Requêtes actives :",
+    "metrics.jvm.http.code.notfound": "Non trouvé",
+    "metrics.jvm.http.code.ok": "Ok",
+    "metrics.jvm.http.code.servererror": "Erreur serveur",
+    "metrics.jvm.http.table.average": "Moyenne",
+    "metrics.jvm.http.table.code": "Code",
+    "metrics.jvm.http.table.count": "Total",
+    "metrics.jvm.http.table.mean": "Médian",
+    "metrics.jvm.http.title": "Requêtes HTTP requests (évènements par seconde)",
+    "metrics.jvm.http.total": "Requêtes totales :",
+    "metrics.jvm.memory.heap": "Mémoire \"Heap\"",
+    "metrics.jvm.memory.nonheap": "Mémoire \"Non-Heap\"",
+    "metrics.jvm.memory.title": "Mémoire",
+    "metrics.jvm.memory.total": "Mémoire totale",
+    "metrics.jvm.threads.blocked": "Bloqué",
+    "metrics.jvm.threads.runnable": "Executable",
+    "metrics.jvm.threads.timewaiting": "Temps d'attente",
+    "metrics.jvm.threads.title": "Threads",
+    "metrics.jvm.threads.waiting": "En attente",
+    "metrics.jvm.title": "Métriques de la JVM",
+    "metrics.refresh.button": "Rafraichir",
+    "metrics.servicesstats.table.count": "Total",
+    "metrics.servicesstats.table.max": "Max",
+    "metrics.servicesstats.table.mean": "Médian",
+    "metrics.servicesstats.table.min": "Min",
+    "metrics.servicesstats.table.name": "Nom du server",
+    "metrics.servicesstats.table.p50": "p50",
+    "metrics.servicesstats.table.p75": "p75",
+    "metrics.servicesstats.table.p95": "p95",
+    "metrics.servicesstats.table.p99": "p99",
+    "metrics.servicesstats.title": "Statistiques des services (Temps en milliseconde)",
+    "metrics.title": "Métriques de l'application",
+
+    "msg.add.data.mapcontext.association": "Associer une composition cartographique à la donnée sélectionnée.",
+    "msg.add.data.service.association": "Associer un service à la donnée sélectionnée",
+    "msg.add.data.style.association": "Associer le style à donnée sélectionnée.",
+    "msg.add.style.association": "Associer une donnée au style selectionné.",
+    "msg.delete.style.selected": "Supprimer définitivement le style selectionné.",
+    "msg.edit.style.selected": "Editer le style selectionné.",
+    "msg.no.selected.data": "Cliquez sur une donnée ci-contre pour afficher plus d'informations.",
+    "msg.no.selected.sensor": "Cliquez sur un capteur ci-contre pour afficher plus d'informations.",
+    "msg.no.selected.layer": "Cliquez sur une couche ci-contre pour afficher plus d'informations.",
+    "msg.no.selected.metadata": "Cliquez sur une fiche de métadonnées ci-contre pour afficher plus d'informations.",
+    "msg.no.selected.style": "Cliquez sur un style ci-contre pour afficher plus d'informations.",
+    "msg.no.selected.task": "Cliquez sur un traitement ci-contre pour afficher plus d'informations.",
+
+    "password.form.button": "Sauvegarder",
+    "password.form.confirmpassword": "Confirmation du nouveau mot de passe",
+    "password.form.newpassword": "Nouveau mot de passe",
+    "password.messages.error.dontmatch": "Le nouveau mot de passe et sa confirmation ne sont pas égaux !",
+    "password.messages.error.global": "<strong>Une erreur est survenue !</strong> Le mot de passe n'a pas pu être modifié.",
+    "password.messages.success": "<strong>La mot de passe a été modifié !</strong>",
+    "password.messages.validate.confirmpassword.maxlength": "Votre confirmation du mot de passe ne doit pas comporter plus de 20 caractères",
+    "password.messages.validate.confirmpassword.minlength": "Votre confirmation du mot de passe doit comporter au moins 5 caractères",
+    "password.messages.validate.confirmpassword.required": "Votre confirmation du mot de passe est requis.",
+    "password.messages.validate.newpassword.maxlength": "Votre mot de passe ne doit pas comporter plus de 20 caractères",
+    "password.messages.validate.newpassword.minlength": "Votre mot de passe doit comporter au moins 5 caractères",
+    "password.messages.validate.newpassword.required": "Votre mot de passe est requis.",
+    "password.title": "Changer le mot de passe pour [<b>{{username}}</b>]",
+
+    "server.choose.file": "Choisir un fichier sur le serveur",
+    "server.create.button": "Créer",
+    "server.next.button": "Suivant",
+
+    "service.abstract.label": "Description du service",
+    "service.config.source": "Source",
+    "service.config.source.sos":"Source des Métadonnées",
+    "service.config.source.sos.data":"Source des données",
+    "service.config.source.choose": "Choisir la source",
+    "service.config.source.choose.sos": "Choisir la source de Métadonnées",
+    "service.config.source.choose.sos.data": "Choisir la source de données",
+    "service.config.source.csw.title": "Service de catalogues (CSW)",
+    "service.config.source.database": "Base de données",
+    "service.config.source.database.description": "Base de données de type MDWeb, contenant des métadonnées géoréférencées",
+    "service.config.source.database.name": "Nom de la base de données",
+    "service.config.source.database.password": "Mot de passe",
+    "service.config.source.database.port": "Port de la base de données",
+    "service.config.source.database.shared": "Connexion partagée",
+    "service.config.source.database.title": "Base de données (SGBDR)",
+    "service.config.source.database.type": "Type de base de données",
+    "service.config.source.database.url": "URL de la base de données",
+    "service.config.source.database.username": "Nom d'utilisateur",
+    "service.config.source.file": "Système de fichiers",
+    "service.config.source.file.description": "Jeu de métadonnées stocké dans le système de fichiers local",
+    "service.config.source.file.sml": "Dossier contenant des fichiers SensorML",
+    "service.config.source.file.title": "Système de fichiers",
+    "service.config.source.file.path": "Chemin du dossier",
+    "service.config.source.internal": "Interne",
+    "service.config.source.internal.description": "Base de données des métadonnées de Constellation, décrivant les données publiées par les services",
+    "service.config.source.internal.title": "Interne (SGBDR)",
+    "service.config.source.sos.title":"Données de capteurs (SOS)",
+    "service.create.end.addlayers.label": "Ajouter des couches au service",
+    "service.create.end.addmetadata.label": "Voir les métadonnées",
+    "service.create.end.description.label": "Description du service",
+    "service.create.end.error.alert.label": "Erreur. Votre service n'a pas été créé.",
+    "service.create.end.error.title": "Le service n'a pas été créé",
+    "service.create.end.success.alert.label": "Félicitations ! Votre service a été créé avec succès !",
+    "service.create.end.success.title": "Service créé avec succès",
+    "service.create.end.type.label": "Type",
+    "service.create.end.version.label": "Version",
+    "service.data.label": "Données publiées sur le service",
+    "service.data.label.sos": "Capteurs disponibles sur le service",
+    "service.description.getcapabilities.button": "GetCapabilities",
+    "service.description.logs.button": "Logs",
+    "service.description.reload.button": "Recharger",
+    "service.description.start.button": "Démarrer",
+    "service.description.stop.button": "Arrêter",
+    "service.description.tab.data.title": "Données",
+    "service.description.tab.description.title": "Description du service",
+    "service.description.tab.description.name": "Nom",
+    "service.description.tab.description.identifier": "Identifiant",
+    "service.description.tab.description.tags": "Etiquettes",
+    "service.description.tab.description.description": "Description",
+    "service.description.tab.description.version": "Versions",
+    "service.description.tab.metadata.data.title": "Gestion des métadonnées",
+    "service.description.tab.metadata.title": "Métadonnées du service",
+    "service.rights":"Gestion des droits",
+    "service.rights.group.list":"Liste des groupes",
+    "service.rights.group.group":"Groupe",
+    "service.rights.group.read":"Lecture",
+    "service.rights.group.write":"Ecriture",
+    "service.edit.dashboard.layer.title": "Liste des couches",
+    "service.edit.dashboard.metadata.title": "Liste des métadonnées",
+    "service.edit.dashboard.tabs.data": "Données",
+    "service.edit.dashboard.tabs.description": "Description du service",
+    "service.edit.dashboard.tabs.metadata": "Métadonnées du service",
+    "service.edit.dashboard.tabs.rights": "Gestion des droits",
+    "service.edit.dashboard.data.title": "Liste des données",
+    "service.edit.dashboard.header.title": "Titre",
+    "service.edit.dashboard.header.date": "Date",
+    "service.edit.dashboard.header.owner": "Propriétaire",
+    "service.edit.dashboard.header.type": "Type",
+    "service.edit.dashboard.action.add.button": "Ajouter",
+    "service.edit.dashboard.action.add.data": "Ajouter une donnée",
+    "service.edit.dashboard.action.add.layer": "Ajouter une couche",
+    "service.edit.dashboard.sensors.list":"Capteurs disponibles",
+    "service.edit.dashboard.sensors.list.associated": "capteurs associés",
+    "service.edit.dashboard.tasks.list.associated": "traitements associés",
+    "service.edit.dashboard.tasks.list": "Traitements disponibles",
+    "service.edit.dashboard.mapcontext.list.associated": "données associées",
+    "service.edit.dashboard.mapcontext.list": "Compositions cartographiques disponibles",
+    "service.edit.dashboard.measures.list":"Mesures possibles",
+    "service.edit.dashboard.measures.error.select.one" : "Vous devez sélectionner une mesure dans la liste précédente",
+    "service.edit.dashboard.area":"Zone géographique",
+    "service.edit.dashboard.date.to":"au",
+    "service.edit.dashboard.date.from":"Du",
+    "service.edit.dashboard.button.graph.hide":"Cacher le graphique",
+    "service.edit.dashboard.button.graph.show":"Afficher le graphique",
+    "service.menu.delete.label": "Supprimer le service",
+    "service.menu.edit.label": "Editer",
+    "service.menu.getcapabilities.label": "GetCapabilities",
+    "service.menu.getcapabilities.modal.title": "Détails du GetCapabilities",
+    "service.menu.getcapabilities.modal.close": "Fermer",
+    "service.menu.log.label": "Log du service",
+    "service.menu.log.modal.title": "Détails de la log ",
+    "service.menu.log.modal.close": "Fermer",
+    "service.menu.refresh.label": "Rafraîchir",
+    "service.menu.show.label": "Visualiser",
+    "service.menu.url.label": "URL du service",
+    "service.menu.loader.modal.title": "Chargement",
+
+    "sessions.messages.error": "<strong>Une erreur est survenue !</strong> La session ne peut pas être invalidée.",
+    "sessions.messages.success": "<strong>La session a été invalidée !</strong>",
+    "sessions.table.button": "Invalider",
+    "sessions.table.date": "Date",
+    "sessions.table.ipaddress": "Adresse IP",
+    "sessions.table.useragent": "User Agent",
+    "sessions.title": "Sessions actives de [<b>{{username}}</b>]",
+
+    "settings.form.button": "Sauvegarder",
+    "settings.form.email": "Email",
+    "settings.form.firstname": "Prénom",
+    "settings.form.lastname": "Nom",
+    "settings.form.password": "Mot de passe",
+    "settings.form.login":"Identifiant",
+    "settings.form.roles":"Rôles",
+    "settings.form.roles.admin":"Ajouter le rôle administrateur",
+    "settings.form.login.placeholder": "Votre identifiant",
+    "settings.form.password.placeholder": "Votre mot de passe",
+    "settings.form.firstname.placeholder": "Votre prénom",
+    "settings.form.lastname.placeholder": "Votre Nom",
+    "settings.form.email.placeholder": "Votre e-mail",
+    "settings.form.button.close":"Annuler",
+    "settings.form.modal.title": "Nouvel utilisateur",
+    "settings.messages.error": "<strong>Une erreur est survenue !</strong> Votre profil ne peut pas être sauvegardé.",
+    "settings.messages.success": "<strong>Votre profil a été sauvegardé !</strong>",
+    "settings.messages.validate.email.invalid": "Votre email n'est pas valide.",
+    "settings.messages.validate.email.maxlength": "Votre email ne doit pas comporter plus de 50 caractères",
+    "settings.messages.validate.email.minlength": "Votre email doit comporter au moins 5 caractères",
+    "settings.messages.validate.email.required": "Votre email est requis.",
+    "settings.messages.validate.firstname.maxlength": "Votre prénom ne doit pas comporter plus de 50 caractères",
+    "settings.messages.validate.firstname.minlength": "Votre prénom doit comporter au moins un caractère",
+    "settings.messages.validate.firstname.required": "Votre prénom est requis.",
+    "settings.messages.validate.lastname.maxlength": "Votre nom ne doit pas comporter plus de 50 caractères",
+    "settings.messages.validate.lastname.minlength": "Votre nom doit comporter au moins un caractère",
+    "settings.messages.validate.lastname.required": "Votre nom est requis.",
+    "settings.messages.validate.password.required": "Votre mot de passe est requis.",
+    "settings.messages.validate.password.invalid": "Votre mot de passe est invalide.",
+    "settings.messages.validate.password.minlength": "Votre mot de passe doit comporter au moins 6 caractères",
+    "settings.messages.validate.password.maxlength": "Votre mot de passe ne peux pas dépasser 62 caractères",
+    "settings.title": "Profil de l'utilisateur [{{username}}]",
+
+    "style.listing.numberbypage.10.label": "10 styles",
+    "style.listing.numberbypage.100.label": "100 styles",
+    "style.listing.numberbypage.20.label": "20 styles",
+    "style.listing.selected.delete.button": "Supprimer",
+    "style.listing.selected.edit.button": "Editer",
+
+    "webservicepage.button.create.label": "Créer un service",
+    "webservicepage.button.dropdown.csw.label": "Catalogues (CSW)",
+    "webservicepage.button.dropdown.label": "Carte (WMS)",
+    "webservicepage.button.dropdown.wcs.label": "Grille de données (WCS)",
+    "webservicepage.button.dropdown.wfs.label": "Données vectorielles (WFS)",
+    "webservicepage.button.dropdown.wms.label": "Cartes (WMS)",
+    "webservicepage.button.dropdown.wmts.label": "Cartes tuilées (WMTS)",
+    "webservicepage.button.dropdown.wps.label": "Géotraitements (WPS)",
+    "webservicepage.button.dropdown.sos.label": "Données capteur (SOS)",
+    "webservicepage.button.modal.select.version": "Sélectionner la version du service souhaitée",
+    "webservicepage.tab.all": "Tous",
+    "webservicepage.title": "Services disponibles",
+
+    "page.header.title.webservices":"Gestion des services",
+    "page.header.title.data":"Gestion des données",
+    "page.header.title.style":"Gestion des styles",
+    "page.header.title.contact": "Contact",
+    "page.header.title.create.service":"Nouveau service",
+    "page.header.title.create.service.source":"Source",
+    "page.header.title.edit.service":"Edition du service",
+    "page.header.title.process":"Processus",
+    "page.header.title.task":"Tâches en cours",
+    "page.header.title.sensors":"Gestion des capteurs",
+    "page.header.title.tasks":"Gestion des traitements",
+    "page.header.title.mapcontext":"Gestion des compositions cartographiques",
+
     "style.information.title":"Styles disponibles",
-    "users": {
-      "add": "Ajouter un utilisateur",
-      "title": "Gestion des utilisateurs",
-      "count": "Il y a {{ total }} Utilisateurs.",
-      "filter": "Filtrer: "
-    },
-    "sldeditor": {
-        "raster": {
-            "1band": {
-                "titleTab": "Bande Unique",
-                "grayBand": "Bande grise",
-                "band1": "Bande 1",
-                "band2": "Bande 2",
-                "band3": "Bande 3",
-                "band4": "Bande 4",
-                "band5": "Bande 5",
-                "Palette": "Palette",
-                "Min": "Min.",
-                "Max": "Max.",
-                "NaN": "NaN"
-            },
-            "3bands":{
-               "titleTab": "Triples bandes"
-            }
-        },
-        "vector": {
-            "polygon": "Polygone",
-            "line": "Ligne",
-            "point": "Point",
-            "text": "Texte",
-            "raster": "Raster"
-        },
-        "breadcrumb": {
-            "type": "Choix du type",
-            "edition": "Edition du style"
-        },
-        "name": "Nom du style",
-        "tab": {
-            "simple": "Editeur simple",
-            "xml": "Editeur XML",
-            "xmledit":"editer votre style xml",
-            "rules":"Editeur de règles",
-            "unique":"Valeur unique",
-            "interval":"Intervalle"
-        },
-        "apercu": {
-            "titre": "Aperçu du style",
-            "data":"Aperçu de la donnée"
-        },
-        "edition":{
-            "fill": "Remplissage",
-            "color": "Couleur",
-            "stroke":"Contour",
-            "size":"Taille",
-            "stipple":"Pointillés",
-            "full":"Plein",
-            "line": "Trait",
-            "space":"Espace",
-            "join":"Angle",
-            "cap":"Extrémité",
-            "offset":"Décalage",
-            "icon":"Icône",
-            "opacity":"Opacité",
-            "font":"Police",
-            "label":"Libellé",
-            "reversecolors":"Inverser les couleurs",
-            "point":"Point",
-            "text.style":"Style du texte",
-            "method":"Méthode",
-            "intervals":"Intervalles"
-        },
-        "button":{
-            "cancel":"Annuler",
-            "validate":"Valider",
-            "create":"Créer"
-        }
-    },
-    "tooltip":{
-        "service.create.name":"L'identifiant peut être le même que le nom",
-        "service.create.version":"Au moins une version doit être sélectionnée",
-        "service.source.url":"Renseignez uniquement le nom de domaine",
-        "service.source.connexion":"Connexion entre plusieurs bases",
-        "service.source.sensormlfolder":"TODO",
-        "data.add.choicedata":"Formats supportés : shp (dans un fichier .zip), NetCDF, tif",
-        "sensor.add":"Formats supportés : un fichier sensorML (*.xml) ou un fichier zip.",
-        "style.create":"Vous devez sélectionner une donnée afin de lui associer le style créé."
-    },
+
+    "users.add": "Ajouter un utilisateur",
+    "users.title": "Gestion des utilisateurs",
+    "users.count": "Il y a {{ total }} Utilisateurs.",
+    "users.filter": "Filtrer: ",
+
+    "sldeditor.raster.1band.titleTab": "Bande Unique",
+    "sldeditor.raster.1band.grayBand": "Bande grise",
+    "sldeditor.raster.1band.band1": "Bande 1",
+    "sldeditor.raster.1band.band2": "Bande 2",
+    "sldeditor.raster.1band.band3": "Bande 3",
+    "sldeditor.raster.1band.band4": "Bande 4",
+    "sldeditor.raster.1band.band5": "Bande 5",
+    "sldeditor.raster.1band.Palette": "Palette",
+    "sldeditor.raster.1band.Min": "Min.",
+    "sldeditor.raster.1band.Max": "Max.",
+    "sldeditor.raster.1band.NaN": "NaN",
+    "sldeditor.raster.3bands.titleTab": "Triples bandes",
+    "sldeditor.vector.polygon": "Polygone",
+    "sldeditor.vector.line": "Ligne",
+    "sldeditor.vector.point": "Point",
+    "sldeditor.vector.text": "Texte",
+    "sldeditor.vector.raster": "Raster",
+    "sldeditor.breadcrumb.type": "Choix du type",
+    "sldeditor.breadcrumb.edition": "Edition du style",
+    "sldeditor.name": "Nom du style",
+    "sldeditor.tab.simple": "Editeur simple",
+    "sldeditor.tab.xml": "Editeur XML",
+    "sldeditor.tab.xmledit":"editer votre style xml",
+    "sldeditor.tab.rules":"Editeur de règles",
+    "sldeditor.tab.unique":"Valeur unique",
+    "sldeditor.tab.interval":"Intervalle",
+    "sldeditor.apercu.titre": "Aperçu du style",
+    "sldeditor.apercu.data":"Aperçu de la donnée",
+    "sldeditor.edition.fill": "Remplissage",
+    "sldeditor.edition.color": "Couleur",
+    "sldeditor.edition.stroke":"Contour",
+    "sldeditor.edition.size":"Taille",
+    "sldeditor.edition.stipple":"Pointillés",
+    "sldeditor.edition.full":"Plein",
+    "sldeditor.edition.line": "Trait",
+    "sldeditor.edition.space":"Espace",
+    "sldeditor.edition.join":"Angle",
+    "sldeditor.edition.cap":"Extrémité",
+    "sldeditor.edition.offset":"Décalage",
+    "sldeditor.edition.icon":"Icône",
+    "sldeditor.edition.opacity":"Opacité",
+    "sldeditor.edition.font":"Police",
+    "sldeditor.edition.label":"Libellé",
+    "sldeditor.edition.reversecolors":"Inverser les couleurs",
+    "sldeditor.edition.point":"Point",
+    "sldeditor.edition.text.style":"Style du texte",
+    "sldeditor.edition.method":"Méthode",
+    "sldeditor.edition.intervals":"Intervalles",
+    "sldeditor.button.cancel":"Annuler",
+    "sldeditor.button.validate":"Valider",
+    "sldeditor.button.create":"Créer",
+
+    "tooltip.service.create.name":"L'identifiant peut être le même que le nom",
+    "tooltip.service.create.version":"Au moins une version doit être sélectionnée",
+    "tooltip.service.create.port":"Numéro du port de la base de donnée",
+    "tooltip.service.source.url":"Renseignez uniquement le nom de domaine",
+    "tooltip.service.source.connexion":"Connexion entre plusieurs bases",
+    "tooltip.service.source.sensormlfolder":"TODO",
+    "tooltip.data.add.choicedata":"Formats supportés : shp (dans un fichier .zip), NetCDF, tif",
+    "tooltip.sensor.add":"Formats supportés : un fichier sensorML (*.xml) ou un fichier zip.",
+    "tooltip.style.create":"Vous devez sélectionner une donnée afin de lui associer le style créé.",
+
     "sensors.information.title":"Capteurs disponibles",
+
     "sensor.obervation":"Observation",
+
     "tasks.information.title":"Traitements disponibles",
     "tasks.notask":"Pas de traitement en cours d'execution",
+
     "mapcontext.information.title":"Compositions cartographiques disponibles",
+
     "message.uploading":"Votre donnée est en train d'être importée...",
+
     "alert.style.noname":"Veuillez renseigner un nom de style"
 }
