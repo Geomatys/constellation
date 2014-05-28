@@ -18,6 +18,7 @@
  */
 package org.constellation.ws.rest;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -29,6 +30,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import org.constellation.engine.register.DomainUser;
+import org.constellation.engine.register.repository.UserRepository;
 
 /**
  * RestFull user configuration service
@@ -43,6 +47,9 @@ import javax.ws.rs.core.Response;
 @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 public class SessionService {
 
+    @Inject
+    private UserRepository userRepository;
+    
 	@GET
 	@Path("/logout")
 	public Response findOne(@PathParam("id") String login, @Context HttpServletRequest req) {
@@ -50,6 +57,12 @@ public class SessionService {
 		if(session!=null)
 			session.invalidate();
 		return Response.ok("OK").build();
+	}
+	
+	@GET
+	@Path("/account")
+	public DomainUser account( @Context HttpServletRequest req) {
+	    return userRepository.findOneWithRolesAndDomains(req.getUserPrincipal().getName());
 	}
 
 

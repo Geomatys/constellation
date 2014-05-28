@@ -146,10 +146,19 @@ cstlAdminApp
               window.location.href="index.html";
             });
 
+           $rootScope.hasRole = function(){return false}
+            
             // Call when the user is authenticated
            $rootScope.$on('event:auth-authConfirmed', function() {
                $rootScope.authenticated = true;
-               $rootScope.account = Account.get();
+               Account.get(function(account){
+                 $rootScope.account=account
+                 $rootScope.hasRole = function(role){
+                   return account.roles.indexOf(role) != -1
+                 }
+                 
+               });
+               
                
                Account.get(function(sessionData){
                 $rootScope.cstlSession=sessionData;
