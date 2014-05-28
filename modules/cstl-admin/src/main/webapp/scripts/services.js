@@ -87,18 +87,17 @@ function Stomper(url){
   var self = this;
   var socket = new SockJS(url);
   var stompClient = Stomp.over(socket);
-  var connected = false;
+
   this.subscribe = function(path, cb){
       var topic = new Topic(stompClient, path)    
-      if(connected){
+      if(stompClient.connected){
         topic.id = stompClient.subscribe(topic.path, cb)
-        console.log('Subscribed to ' + topic.path + ' with already connected: ' + topic.id)
+        console.log('Subscribed to ' + topic.path + ' (' + topic.id  + ').')
       }else {
         stompClient.connect('','', function(frame) {
           console.log('Connected to ' + url)
           topic.id = stompClient.subscribe(topic.path, cb)
-          self.connected = true;
-          console.log('Subscribed to ' + topic.path + ' with newly: ' + topic.id)
+          console.log('Subscribed to ' + topic.path + ' (' + topic.id  + ').')
         });
       }
       return topic;
@@ -128,7 +127,7 @@ cstlAdminApp.factory('StompService', ['$cookies', function($cookies){
 
 cstlAdminApp.factory('Account', ['$resource',
     function ($resource) {
-        return $resource('@cstl/spring/account;jsessionid=', {}, {
+        return $resource('@cstl/api/1/session/account', {}, {
         });
     }]);
 

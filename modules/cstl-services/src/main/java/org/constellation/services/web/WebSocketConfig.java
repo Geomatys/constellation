@@ -22,14 +22,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 @Configuration
 @EnableWebSocketMessageBroker
 @EnableScheduling
-public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
@@ -59,17 +59,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         config.setApplicationDestinationPrefixes("/app");
     }
 
-    /**
-     * 
-     * Configure the {@link org.springframework.messaging.MessageChannel} used
-     * for incoming messages from WebSocket clients. By default the channel is
-     * backed by a thread pool of size 1. It is recommended to customize thread
-     * pool settings for production use.
-     */
-    @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
-
-    }
+    
 
     /**
      * Configure the {@link org.springframework.messaging.MessageChannel} used
