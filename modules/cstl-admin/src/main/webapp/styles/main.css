@@ -1298,11 +1298,8 @@ table.user-table tbody>tr>td.user-delete{
 }
 /*contact*/
 .contact-form{
-    background-color: #e3e3e3;
     padding: 20px;
-    border-radius: 5px;
     margin-bottom:20px;
-    border: solid 2px #dddddd;
 }
 @media (max-width: 991px)  {
     .service-button{

@@ -454,7 +454,7 @@
                 "label": "Services web"
             }
         },
-        "satistics" :{
+        "statistics" :{
             "title":"Statistiques",
             "services":"Services actifs",
             "data":"Données intégrées",
@@ -1278,7 +1278,10 @@
         "tab": {
             "simple": "Editeur simple",
             "xml": "Editeur XML",
-            "xmledit": "editer votre style xml"
+            "xmledit":"editer votre style xml",
+            "rules":"Editeur de règles",
+            "unique":"Valeur unique",
+            "interval":"Intervalle"
         },
         "apercu": {
             "titre": "Aperçu du style",

@@ -194,88 +194,21 @@ cstlAdminApp.controller('UserDetailsController', ['$scope', '$modalInstance', 'G
         $scope.save = function(){
             var userResource = new UserResource($scope.user);
             if(isUpdate)
-                userResource.$update(function(){
-                    $modalInstance.close($scope.user);
+                userResource.$update(function(updated){
+                    $modalInstance.close(updated);
                 }, function(){
                     $translate(['Error','admin.user.save.error']).then(function (translations) {
                         $growl('error', translations.Error,  translations['admin.user.save.error']);
                     })});
             else
-                userResource.$save(function(){
-                    $modalInstance.close($scope.user);
+                userResource.$save(function(saved){
+                    $modalInstance.close(saved);
                 }, function(){
                     $translate(['Error','admin.user.save.error']).then(function (translations) {
                         $growl('error', translations.Error,  translations['admin.user.save.error']);
                     });
                 });
         }
-    }
-]);
-
-cstlAdminApp.controller('GroupController', ['$scope', '$modal',
-    function ($scope, $modal) {
-
-        $scope.add = function(i) {
-            $modal.open({
-                templateUrl: 'views/admin/group/details.html',
-                controller: 'GroupDetailsController',
-                resolve: {
-                    'isUpdate': function() {return false},
-                    'user': function(){
-                        return {roles:[]};
-                    }
-                }
-            }).result.then(function(user){
-                    if(user != null)
-                        $scope.list[$scope.list.length] = user;
-                });
-        };
-
-        $scope.details = function(i) {
-            $modal.open({
-                templateUrl: 'views/admin/group/details.html',
-                controller: 'GroupDetailsController',
-                resolve: {
-                    'isUpdate': function() {return false},
-                    'user': function(){
-                        return {roles:[]};
-                    }
-                }
-            }).result.then(function(user){
-                    if(user != null)
-                        $scope.list[$scope.list.length] = user;
-                });
-        };
-
-        $scope.members = function(i) {
-            $modal.open({
-                templateUrl: 'views/admin/group/members.html',
-                controller: 'GroupMembersController',
-                resolve: {
-                    'isUpdate': function() {return false},
-                    'user': function(){
-                        return {roles:[]};
-                    }
-                }
-            }).result.then(function(user){
-                    if(user != null)
-                        $scope.list[$scope.list.length] = user;
-                });
-        };
-
-    }
-]);
-
-cstlAdminApp.controller('GroupDetailsController', ['$scope', '$modalInstance', 'user', 'isUpdate', 'UserResource',
-    function ($scope, $modalInstance, user, isUpdate, UserResource) {
-        $scope.user = user;
-
-        $scope.close = function() {
-            $modalInstance.dismiss('close');
-        };
-        $scope.user={
-            adduser:"normal"
-        };
     }
 ]);
 
@@ -446,6 +379,112 @@ cstlAdminApp.controller('DomainAddMembersController', ['$scope', '$modalInstance
             });
         };
 
+
+    }
+]);
+
+cstlAdminApp.controller('DomainRoleController', ['$scope', '$modal', 'DomainRoleResource', 'PermissionService',
+    function ($scope, $modal, DomainRoleResource, PermissionService) {
+
+        $scope.domainroles = DomainRoleResource.query({withMembers:true});
+
+        $scope.add = dataNotReady;
+        $scope.details = dataNotReady;
+        $scope.members = dataNotReady;
+        $scope.deleteDomain = dataNotReady;
+
+        PermissionService.all().success(function(data){
+            $scope.allPermissions = data;
+
+            $scope.add = function(i) {
+                $modal.open({
+                    templateUrl: 'views/admin/group/details.html',
+                    controller: 'DomainRoleDetailsController',
+                    resolve: {
+                        'domainrole': function(){ return {permissions:[]}},
+                        'allPermissions': function(){ return $scope.allPermissions }
+                    }
+                }).result.then(function(domainrole){
+                        if(domainrole != null)
+                            $scope.domainroles[$scope.domainroles.length] = domainrole;
+                    });
+            };
+
+            $scope.deleteDomain = function(i){
+                DomainRoleResource.delete({id: $scope.domainroles[i].id}, {} , function(resp){
+                    $scope.domainroles.splice(i, 1);
+                }, function(err){
+                    var errorCode = err.data
+                    $translate(['Error',errorCode]).then(function (translations) {
+                        $growl('error', translations.Error,  translations[errorCode]);
+                    });
+                });
+            }
+
+            $scope.details = function(i) {
+                $modal.open({
+                    templateUrl: 'views/admin/group/details.html',
+                    controller: 'DomainRoleDetailsController',
+                    resolve: {
+                        'domainrole': function(){return DomainRoleResource.get({id: $scope.domainroles[i].id})},
+                        'allPermissions': function(){ return $scope.allPermissions }
+                    }
+                }).result.then(function(domainrole){
+                        if(domainrole != null)
+                            $scope.domainroles[i] = domainrole;
+                    });
+            };
+
+            $scope.members = function(i) {
+                $modal.open({
+                    templateUrl: 'views/admin/group/members.html',
+                    controller: 'GroupMembersController',
+                    resolve: {
+                        'isUpdate': function() {return false},
+                        'domainrole': function(){
+                            return $scope.domain
+                        }
+                    }
+                }).result.then(function(domain){
+                        if(domain != null)
+                            $scope.domains[$scope.domains.length] = domain;
+                    });
+            };
+
+
+        });
+    }
+]);
+
+cstlAdminApp.controller('DomainRoleDetailsController', ['$scope', '$modalInstance', 'domainrole', 'allPermissions', 'DomainRoleResource',
+    function ($scope, $modalInstance, domainrole, allPermissions, DomainResource) {
+        $scope.domainrole = domainrole;
+
+        $scope.allPermissions = allPermissions;
+
+        $scope.close = function() {
+            $modalInstance.dismiss('close');
+        };
+
+
+        $scope.save = function(){
+            var domainResource = new DomainResource($scope.domainrole);
+            if($scope.domainrole.id)
+                domainResource.$update({id: $scope.domainrole.id }, function(updated){
+                    $modalInstance.close(updated);
+                }, function(){
+                    $translate(['Error','admin.domain.save.error']).then(function (translations) {
+                        $growl('error', translations.Error,  translations['admin.domain.save.error']);
+                    })});
+            else
+                domainResource.$save(function(saved){
+                    $modalInstance.close(saved);
+                }, function(){
+                    $translate(['Error','admin.domain.save.error']).then(function (translations) {
+                        $growl('error', translations.Error,  translations['admin.domain.save.error']);
+                    });
+                });
+        }
 
     }
 ]);
