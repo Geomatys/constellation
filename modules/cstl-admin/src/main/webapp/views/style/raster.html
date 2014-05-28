@@ -1,8 +1,7 @@
-<ol class="breadcrumb col-sm-12 col-md-6">
+<ol class="breadcrumb">
     <li><a ng-click="goBack()"><span translate="sldeditor.breadcrumb.type">Type selection</span></a></li>
     <li class="active" translate="sldeditor.breadcrumb.edition">Style Edition</li>
 </ol>
-<<<<<<< mine
 <div class="row">
     <div class="col-sm-12 col-md-6">
         <div class="style_bloc">
@@ -12,29 +11,12 @@
                     <input type="text" class="form-control" ng-model="$parent.newStyle.name" >
                 </div>
             </div>
-=======
-
-  <div class="col-sm-12 col-md-6">
-    <div class="style_bloc style_bloc_name" style="margin-bottom: 10px;">
-      <div class="form-group col-xs-12" style="margin: 6px 0; height:35px;">
-        <label class="col-xs-4 col-sm-3 col-md-4 control-label" style="margin-top: 8px;" translate="sldeditor.name">Style name</label>
-        <div class="col-xs-7 col-sm-9 col-md-8">
-            <input type="text" class="form-control" ng-model="$parent.newStyle.name" >
->>>>>>> theirs
         </div>
     </div>
-<<<<<<< mine
     <div class="col-sm-12 col-md-6">
         <div ng-if="noName" class="alert alert-style" translate="alert.style.noname">Veuillez renseigner un nom de style</div>
     </div>
 </div>
-=======
-
-  <div class="col-sm-12">
-      <div ng-if="noName" class="alert alert-style" style="padding-top:8px; padding-bottom:8px; margin-bottom:0;" translate="alert.style.noname">Veuillez renseigner un nom de style</div>
-    </div>
-  </div>
->>>>>>> theirs
 <!-- Tab nav -->
 
 <ul class="nav nav-tabs" ng-init="chosenTab = 'simple'">
@@ -45,7 +27,6 @@
 
 <!-- Tab panes -->
 <div class="tab-content" ng-init="initRaster1Band()">
-<<<<<<< mine
     <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab === 'simple'}">
         <div class="row">
             <div class="col-xs-12 col-sm-6 col-md-8">
@@ -149,7 +130,7 @@
                                 </div>
                             </div>
                             <div class="form-group col-xs-12">
-                                <div class="row" ng-class="{'has-error': paletteForm.minValue.$error.required, 'has-success': !paletteForm.minValuel.$error.required}">
+                                <div class="row" ng-class="{'has-error': paletteForm.minValue.$error.required, 'has-success': !paletteForm.minValuel.$error}">
                                     <label class="col-sm-3 col-md-2 control-label" translate="sldeditor.raster.1band.Min">Min.</label>
                                     <div class="col-sm-9 col-md-4">
                                         <input type="number" class="form-control" ng-model="palette.rasterMinValue" id="minValue" required max="{{dataBands[0].maxValue}}" min="{{dataBands[0].minValue}}" >
@@ -187,52 +168,6 @@
                             </div>
                         </form>
                     </div>
-=======
-  <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='simple'}">
-    <div class="row">
-      <div class="col-xs-12 col-sm-6" style="margin-top:10px;" >
-        <div class="style_bloc" style="min-height:60px;">
-          <div class="col-sm-12 btn-group" ng-init="bandes='triple'" data-toggle="buttons">
-            <label ng-class="{active: bandes==='triple'}" ng-click="bandes='triple'" type="button" class="btn btn-default"><input type="radio" value="triple">Triples bandes</label>
-            <label ng-class="{active: bandes==='unique'}" ng-click="bandes='unique'" type="button" class="btn btn-default"><input type="radio" value="unique">Bande unique</label>
-          </div>
-          <div ng-show="bandes=='triple'">
-            <form class="form_classification form-horizontal" role="form">
-             <div class="form-group bande_rouge">
-                <label class="col-sm-3 control-label">Bande rouge</label>
-                <div class="col-sm-9">
-                  <select class="form-control">
-                    <option>Bande 1</option>
-                    <option>Bande 2</option>
-                    <option>Bande 3</option>
-                    <option>Bande 4</option>
-                    <option>Bande 5</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-group bande_verte">
-                <label class="col-sm-3 control-label">Bande verte</label>
-                <div class="col-sm-9">
-                  <select class="form-control">
-                    <option>Bande 1</option>
-                    <option>Bande 2</option>
-                    <option>Bande 3</option>
-                    <option>Bande 4</option>
-                    <option>Bande 5</option>
-                  </select>
-                </div>
-              </div>
-                <div class="form-group bande_bleue">
-                <label class="col-sm-3 control-label">Bande bleue</label>
-                <div class="col-sm-9">
-                  <select class="form-control">
-                    <option>Bande 1</option>
-                    <option>Bande 2</option>
-                    <option>Bande 3</option>
-                    <option>Bande 4</option>
-                    <option>Bande 5</option>
-                  </select>
->>>>>>> theirs
                 </div>
 
             </div>
@@ -242,18 +177,8 @@
                 <button type="button" class="btn-apercu col-xs-12 btn btn-primary" ng-click="displayCurrentStyle()"><span translate="sldeditor.apercu.data">Data preview</span></button>
             </div>
         </div>
-<<<<<<< mine
-=======
-
-      </div>
-      <div class="col-xs-12 col-sm-6">
-        <button type="button" class="btn-apercu col-xs-12 btn btn-primary" ng-click="displayCurrentStyle()"><span translate="sldeditor.apercu.data">Data preview</span></button>
-        <div class="bloc_apercu" id="styledMapO" style="height: 299px;"></div>
-      </div>
->>>>>>> theirs
     </div>
 
-<<<<<<< mine
     <!--  <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='colorMap'}">
         <div class="row">
           <div class="col-xs-12 col-sm-6">
@@ -288,39 +213,6 @@
                       </ul>
                     </div>
                     </div>
-=======
-  <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='colorMap'}">
-    <div class="row">
-      <div class="col-xs-12 col-sm-6" style="margin-top:10px;" >
-        <div class="style_bloc">
-          <form class="form-horizontal form-style" role="form">
-             <div class="form-group col-xs-12">
-                <label class="col-sm-3 col-md-2 control-label">Palette</label>
-                <div class="col-sm-9 col-md-10">
-                  <div class="btn-group select select-block">
-                  <button class="btn dropdown-toggle btn-default" data-toggle="dropdown">
-                    <span class="filter-option pull-left"><img class="img_palette" src={{palette.img_palette}}></span>&nbsp;
-                    <span class="caret"></span>
-                  </button>
-                  <span class="dropdown-arrow dropdown-arrow-inverse"></span>
-                  <ul class="dropdown-menu dropdown-inverse dropdown-images" role="menu" style="overflow-y: auto; min-width:70px; min-height: 108px;">
-                    <li ng-click="$parent.choosePalette(1)">
-                        <a><img class="img_palette" src="images/palette1.png"></a>
-                    </li>
-                    <li ng-click="$parent.choosePalette(2)">
-                      <a><img class="img_palette" src="images/palette2.png"></a>
-                    </li>
-                    <li ng-click="$parent.choosePalette(3)">
-                      <a><img class="img_palette" src="images/palette3.png"></a>
-                    </li>
-                    <li ng-click="$parent.choosePalette(4)">
-                      <a><img class="img_palette" src="images/palette4.png"></a>
-                    </li>
-                    <li ng-click="$parent.choosePalette(5)">
-                      <a><img class="img_palette" src="images/palette5.png"></a>
-                    </li>
-                  </ul>
->>>>>>> theirs
                 </div>
                 <div class="checkbox" style="margin-bottom:20px; padding-top:0;">  
                   <div class="checkbox col-sm-offset-3 col-md-offset-2">
@@ -438,18 +330,8 @@
         </div>
       </div>-->
 
-<<<<<<< mine
     <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab === 'xml'}">
         <h2 translate="sldeditor.tab.xmledit" >XML Editor</h2>
-=======
-      </div>
-      <div class="col-xs-12 col-sm-6">
-        <button type="button" class="btn-apercu col-xs-12 btn btn-primary" ng-click="displayCurrentStyle()"><span translate="sldeditor.apercu.data">Data preview</span></button>
-        <div class="bloc_apercu" id="styledMapOL" style="height: 299px;"></div>
-      </div>
-    </div>
-  </div>
->>>>>>> theirs
 
         <div ui-ace="{
              mode: 'xml',
