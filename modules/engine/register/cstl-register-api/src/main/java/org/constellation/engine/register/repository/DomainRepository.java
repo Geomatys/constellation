@@ -61,4 +61,6 @@ public interface DomainRepository {
 
     List<User> findUsersNotInDomain(int domainId);
 
+    Set<Integer> updateUserInDomain(int userId, int domainId, Set<Integer> roles);
+
 }

@@ -5,6 +5,7 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
@@ -19,8 +20,15 @@ public class UserXDomainService {
 
     @POST
     @Path("/{domainId}/{userId}")
-    public Response insert(@PathParam("userId") int userId,@PathParam("domainId") int domainId, Set<Integer> roles) {
+    public Response post(@PathParam("userId") int userId,@PathParam("domainId") int domainId, Set<Integer> roles) {
         domainRepository.addUserToDomain(userId, domainId, roles);
+        return Response.noContent().build();
+    }
+    
+    @PUT
+    @Path("/{domainId}/{userId}")
+    public Response put(@PathParam("userId") int userId,@PathParam("domainId") int domainId, Set<Integer> roles) {
+        domainRepository.updateUserInDomain(userId, domainId, roles);
         return Response.noContent().build();
     }
 

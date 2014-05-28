@@ -392,7 +392,7 @@ cstlAdminApp.controller('DomainAddMembersController', ['$scope', '$modalInstance
 
         $scope.addToDomain = function(i, roles){
             var user = $scope.users[i]
-            DomainResource.addMemberToDomain({userId: user.id, domainId: $scope.domain.id}, [1], function(){
+            DomainResource.addMemberToDomain({userId: user.id, domainId: $scope.domain.id}, [0], function(){
                 $scope.users.splice(i, 1);
                 if($scope.users.length==0){
                     $modalInstance.close('close');
@@ -404,8 +404,8 @@ cstlAdminApp.controller('DomainAddMembersController', ['$scope', '$modalInstance
     }
 ]);
 
-cstlAdminApp.controller('DomainRoleController', ['$scope', '$modal', 'DomainRoleResource', 'PermissionService',
-    function ($scope, $modal, DomainRoleResource, PermissionService) {
+cstlAdminApp.controller('DomainRoleController', ['$scope', '$modal', '$growl', '$translate', 'DomainRoleResource', 'PermissionService',
+    function ($scope, $modal, $growl, $translate, DomainRoleResource, PermissionService) {
 
         $scope.domainroles = DomainRoleResource.query({withMembers:true});
 
@@ -451,8 +451,10 @@ cstlAdminApp.controller('DomainRoleController', ['$scope', '$modal', 'DomainRole
                         'allPermissions': function(){ return $scope.allPermissions }
                     }
                 }).result.then(function(domainrole){
-                        if(domainrole != null)
-                            $scope.domainroles[i] = domainrole;
+                        if(domainrole != null){
+                          domainrole.memberList = $scope.domainroles[i].memberList             
+                          $scope.domainroles[i] = domainrole;
+                        }
                     });
             };
 
@@ -460,8 +462,8 @@ cstlAdminApp.controller('DomainRoleController', ['$scope', '$modal', 'DomainRole
     }
 ]);
 
-cstlAdminApp.controller('DomainRoleDetailsController', ['$scope', '$modalInstance', 'domainrole', 'allPermissions', 'DomainRoleResource',
-    function ($scope, $modalInstance, domainrole, allPermissions, DomainResource) {
+cstlAdminApp.controller('DomainRoleDetailsController', ['$scope', '$translate', '$modalInstance', 'domainrole', 'allPermissions', 'DomainRoleResource',
+    function ($scope, $translate, $modalInstance, domainrole, allPermissions, DomainResource) {
         $scope.domainrole = domainrole;
 
         $scope.allPermissions = allPermissions;
@@ -473,21 +475,22 @@ cstlAdminApp.controller('DomainRoleDetailsController', ['$scope', '$modalInstanc
 
         $scope.save = function(){
             var domainResource = new DomainResource($scope.domainrole);
-            if($scope.domainrole.id)
-                domainResource.$update({id: $scope.domainrole.id }, function(updated){
-                    $modalInstance.close(updated);
-                }, function(){
-                    $translate(['Error','admin.domain.save.error']).then(function (translations) {
-                        $growl('error', translations.Error,  translations['admin.domain.save.error']);
-                    })});
-            else
-                domainResource.$save(function(saved){
-                    $modalInstance.close(saved);
-                }, function(){
-                    $translate(['Error','admin.domain.save.error']).then(function (translations) {
-                        $growl('error', translations.Error,  translations['admin.domain.save.error']);
-                    });
+            if($scope.domainrole.id == undefined){
+              domainResource.$save(function(saved){
+                $modalInstance.close(saved);
+              }, function(){
+                $translate(['Error','admin.domain.save.error']).then(function (translations) {
+                  $growl('error', translations.Error,  translations['admin.domain.save.error']);
                 });
+              });
+            } else {
+              domainResource.$update({id: $scope.domainrole.id }, function(updated){
+                $modalInstance.close(updated);
+              }, function(){
+                $translate(['Error','admin.domain.save.error']).then(function (translations) {
+                  $growl('error', translations.Error,  translations['admin.domain.save.error']);
+                })});
+            }
         }
 
     }

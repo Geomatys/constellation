@@ -19,9 +19,7 @@
 package org.constellation.engine.register;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class DomainRole {
 
@@ -31,16 +29,19 @@ public class DomainRole {
 
     private String description;
     
+    private boolean system;
+    
     private List<Permission> permissions = new ArrayList<>();
 
     public DomainRole() {
     }
 
-    public DomainRole(Integer id, String name, String description, List<Permission> roles) {
+    public DomainRole(Integer id, String name, String description, boolean system, List<Permission> roles) {
         super();
         this.id = id;
         this.name = name;
         this.description = description;
+        this.system = system;
         this.permissions = roles;
     }
 
@@ -79,8 +80,16 @@ public class DomainRole {
     
     @Override
     public String toString() {
-        return "DomainRole [id=" + id + ", name=" + name + ", description=" + description + ", permissions="
+        return "DomainRole [id=" + id + ", name=" + name + ", system: " + system + ", description=" + description + ", permissions="
                 + permissions + "]";
+    }
+
+    public boolean isSystem() {
+        return system;
+    }
+
+    public void setSystem(boolean system) {
+        this.system = system;
     }
     
 

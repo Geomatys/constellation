@@ -12,18 +12,23 @@ import org.constellation.engine.register.User;
 public interface DomainRoleRepository {
 
     List<DomainRole> findAll();
-    
+
     DomainRole save(DomainRole group);
 
     DomainRole update(DomainRole group);
 
-    void delete(int id);
+    /**
+     * Does not delete system entries.
+     * 
+     * @param id
+     * @return 
+     */
+    int delete(int id);
 
     DomainRole findOneWithPermission(int id);
-    
+
     List<Permission> allPermission();
-   
+
     Map<DomainRole, List<Pair<User, List<Domain>>>> findAllWithMembers();
-    
 
 }

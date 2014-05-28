@@ -39,8 +39,7 @@
                         <td ng-click="details($index)">{{domainrole.name}}</td>
                         <td ng-click="details($index)"><span>{{domainrole.memberList}}</span>
                         </td>
-
-                        <td class="user-delete" ng-click="deleteDomain($index)"><span class="glyphicon glyphicon-trash"></span></td>
+                        <td ng-hide="domainrole.system" class="user-delete" ng-click="deleteDomain($index)"><span class="glyphicon glyphicon-trash"></span></td>
                     </tr>
                 </table>
             </div>

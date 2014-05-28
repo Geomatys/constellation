@@ -50,6 +50,7 @@ import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, Domain> implements DomainRepository {
@@ -220,4 +221,13 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
                 .fetchInto(User.class);
     }
 
+    @Override
+    @Transactional
+    public Set<Integer> updateUserInDomain(int userId, int domainId, Set<Integer> roles) {
+        dsl.delete(USER_X_DOMAIN_X_DOMAINROLE).where(
+                USER_X_DOMAIN_X_DOMAINROLE.USER_ID.eq(userId).and(
+                        USER_X_DOMAIN_X_DOMAINROLE.DOMAIN_ID.eq(domainId)));
+        addUserToDomain(userId, domainId, roles);
+        return roles;
+    }
 }

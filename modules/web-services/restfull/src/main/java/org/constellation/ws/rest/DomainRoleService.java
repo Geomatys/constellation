@@ -22,7 +22,6 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.tuple.Pair;
 import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.DomainRole;
-import org.constellation.engine.register.Permission;
 import org.constellation.engine.register.User;
 import org.constellation.engine.register.repository.DomainRoleRepository;
 import org.slf4j.Logger;
@@ -62,6 +61,7 @@ public class DomainRoleService {
 
             for (Entry<DomainRole, List<Pair<User, List<Domain>>>> domainEntry : findAllWithMembers.entrySet()) {
                 DomainRoleWithMembers domainRoleWithMember = new DomainRoleWithMembers();
+                domainRoleWithMember.setSystem(domainEntry.getKey().isSystem());
                 domainRoleWithMember.setId(domainEntry.getKey().getId());
                 domainRoleWithMember.setName(domainEntry.getKey().getName());
                 domainRoleWithMember.setDescription(domainEntry.getKey().getDescription());
@@ -128,7 +128,9 @@ public class DomainRoleService {
     @Path("/{id}")
     public Response delete(@PathParam("id") int id) {
         try {
-            domainRoleRepository.delete(id);
+            if(domainRoleRepository.delete(id) == 0) {
+                return Response.serverError().entity("admin.domainrole.delete.failed.").build();
+            }
         } catch (DataIntegrityViolationException e) {
             Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
             LOGGER.warn(e.getMessage());

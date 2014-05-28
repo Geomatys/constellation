@@ -6,7 +6,6 @@ import static org.constellation.engine.register.jooq.Tables.DOMAINROLE_X_PERMISS
 import static org.constellation.engine.register.jooq.Tables.USER;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,13 +75,13 @@ public class JooqDomainRoleRepository extends AbstractJooqRespository<Domainrole
         newRecord.setDescription(group.getDescription());
 
         newRecord.store();
-        
+
         saved.setId(newRecord.getId());
         saved.setName(group.getName());
         saved.setDescription(group.getDescription());
 
         insertPermissions(saved);
-        
+
         saved.setPermissions(group.getPermissions());
 
         return saved;
@@ -92,8 +91,9 @@ public class JooqDomainRoleRepository extends AbstractJooqRespository<Domainrole
     @Transactional
     public DomainRole update(DomainRole domainRole) {
 
-        dsl.update(DOMAINROLE).set(DOMAINROLE.DESCRIPTION, domainRole.getDescription())
-                .where(DOMAINROLE.NAME.eq(domainRole.getName())).execute();
+        dsl.update(DOMAINROLE).set(DOMAINROLE.NAME, domainRole.getName())
+                .set(DOMAINROLE.DESCRIPTION, domainRole.getDescription()).where(DOMAINROLE.ID.eq(domainRole.getId()))
+                .execute();
 
         dsl.delete(DOMAINROLE_X_PERMISSION).where(DOMAINROLE_X_PERMISSION.DOMAINROLE_ID.eq(domainRole.getId()))
                 .execute();
@@ -115,9 +115,12 @@ public class JooqDomainRoleRepository extends AbstractJooqRespository<Domainrole
         dsl.batchInsert(records).execute();
     }
 
+    /**
+     * Does not delete system entries.
+     */
     @Override
-    public void delete(int id) {
-        dsl.delete(DOMAINROLE).where(DOMAINROLE.ID.eq(id)).execute();
+    public int delete(int id) {
+        return dsl.delete(DOMAINROLE).where(DOMAINROLE.ID.eq(id).and(DOMAINROLE.SYSTEM.eq(false))).execute();
     }
 
     @Override

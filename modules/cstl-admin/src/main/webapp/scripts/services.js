@@ -186,12 +186,13 @@ cstlAdminApp.factory('UserResource', ['$resource', '$cookies',
 
 cstlAdminApp.factory('DomainResource', ['$resource',
   function ($resource) {
-    return $resource('@cstl/api/1/domain/:id;jsessionid=', null, {
+    return $resource('@cstl/api/1/domain/:id', null, {
      'update': { method:'PUT' },
-     'members' : {url: '@cstl/api/1/domain/members/:id;jsessionid=', isArray:true},
-     'nonmembers' : {url: '@cstl/api/1/domain/nonmembers/:id;jsessionid=', isArray:true},
-     'addMemberToDomain' : {method: 'POST', url: '@cstl/api/1/userXdomain/:domainId/:userId;jsessionid='},
-     'removeMemberFromDomain' : {method: 'DELETE', url: '@cstl/api/1/userXdomain/:domainId/:userId;jsessionid='}
+     'members' : {url: '@cstl/api/1/domain/members/:id', isArray:true},
+     'nonmembers' : {url: '@cstl/api/1/domain/nonmembers/:id', isArray:true},
+     'addMemberToDomain' : {method: 'POST', url: '@cstl/api/1/userXdomain/:domainId/:userId'},
+     'updateMemberInDomain' : {method: 'PUT', url: '@cstl/api/1/userXdomain/:domainId/:userId'},
+     'removeMemberFromDomain' : {method: 'DELETE', url: '@cstl/api/1/userXdomain/:domainId/:userId'}
     });
 }]);
 
