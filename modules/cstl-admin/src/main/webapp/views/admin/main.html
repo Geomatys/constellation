@@ -10,23 +10,23 @@
                         <div class="panel-body" style="padding:0pt;">
                             <div class="list-group">
                                 <a class="list-group-item" ng-class="{active:currentView.name=='system_state'}"
-                                   ng-click="changeView('system_state')" translate="global.menu.admin.system_state">
+                                   href="#/admin/system_state" translate="global.menu.admin.system_state">
                                     Service-Status
                                 </a>
                                 <a class="list-group-item" ng-class="{active:currentView.name=='system_settings'}"
-                                   ng-click="changeView('system_settings')" translate="global.menu.admin.settings">
+                                   href="#/admin/system_settings" translate="global.menu.admin.settings">
                                     Settings
                                 </a>
                                 <a class="list-group-item" ng-class="{active:currentView.name=='system_logs'}"
-                                   ng-click="changeView('system_logs')" translate="global.menu.admin.logs">
+                                   href="#/admin/system_logs" translate="global.menu.admin.logs">
                                     Logs
                                 </a>
                                 <a class="list-group-item" ng-class="{active:currentView.name=='system_contact'}"
-                                   ng-click="changeView('system_contact')" translate="global.menu.admin.contact">
+                                   href="#/admin/system_contact" translate="global.menu.admin.contact">
                                     Contact
                                 </a>
                                 <a class="list-group-item" ng-class="{active:currentView.name=='system_about'}"
-                                   ng-click="changeView('system_about')" translate="global.menu.admin.about">
+                                   href="#/admin/system_about" translate="global.menu.admin.about">
                                     About Constellation
                                 </a>
                             </div>
@@ -39,11 +39,11 @@
                         <div class="panel-body" style="padding:0pt;">
                             <div class="list-group">
                                 <a class="list-group-item" ng-class="{active:currentView.name=='tasks_manager'}"
-                                   ng-click="changeView('tasks_manager')" translate="global.menu.admin.tasks">
+                                   href="#/admin/tasks_manager" translate="global.menu.admin.tasks">
                                     Tasks manager
                                 </a>
                                 <a class="list-group-item" ng-class="{active:currentView.name=='planning'}"
-                                   ng-click="changeView('planning')" translate="global.menu.admin.planning">
+                                   href="#/admin/planning" translate="global.menu.admin.planning">
                                     Planning
                                 </a>
                             </div>
@@ -56,15 +56,15 @@
                         <div class="panel-body" style="padding:0pt;">
                             <div class="list-group">
                                 <a class="list-group-item" ng-class="{active:currentView.name=='users'}"
-                                   ng-click="changeView('users')" translate="global.menu.admin.users">
+                                   href="#/admin/users" translate="global.menu.admin.users">
                                     Users Settings
                                 </a>
                                 <a class="list-group-item" ng-class="{active:currentView.name=='groups'}"
-                                   ng-click="changeView('groups')" translate="global.menu.admin.group">
+                                   href="#/admin/groups" translate="global.menu.admin.group">
                                     Groups Settings
                                 </a>
-                                <a class="list-group-item" ng-class="{active:currentView.name=='domains'}"
-                                   ng-click="changeView('domains')" translate="global.menu.admin.domains">
+                                <a class="list-group-item" ng-class="{active:currentView.name=='domains' || currentView.name =='domainmembers'}"
+                                   href="#/admin/domains" translate="global.menu.admin.domains">
                                     Domains Settings
                                 </a>
                             </div>

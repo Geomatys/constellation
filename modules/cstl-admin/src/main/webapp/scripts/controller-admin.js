@@ -29,13 +29,38 @@ cstlAdminApp.controller('AdminController', ['$scope', '$location', '$dashboard',
             'planning' :            {name:'planning',           url:'views/admin/planning.html'},
             'users' :               {name:'users',              url:'views/admin/users.html'},
             'groups' :              {name:'groups',             url:'views/admin/groups.html'},
-            'domains' :             {name:'domains',            url:'views/admin/domains.html'}};
+            'domains' :             {name:'domains',            url:'views/admin/domains.html'},
+            'domainmembers' :       {name:'domainmembers',      url:'views/admin/domain/members.html'}};
 
         $scope.currentView = $scope.viewUrls['system_state'];
 
         $scope.changeView = function(page) {
             $scope.currentView = $scope.viewUrls[page];
         };
+
+        if($location.url()==='/admin/system_state'){
+            $scope.changeView('system_state');
+        }else if($location.url()==='/admin/system_settings'){
+            $scope.changeView('system_settings');
+        }else if($location.url()==='/admin/system_logs'){
+            $scope.changeView('system_logs');
+        }else if($location.url()==='/admin/system_contact'){
+            $scope.changeView('system_contact');
+        }else if($location.url()==='/admin/system_about'){
+            $scope.changeView('system_about');
+        }else if($location.url()==='/admin/tasks_manager'){
+            $scope.changeView('tasks_manager');
+        }else if($location.url()==='/admin/planning'){
+            $scope.changeView('planning');
+        }else if($location.url()==='/admin/users'){
+            $scope.changeView('users');
+        }else if($location.url()==='/admin/groups'){
+            $scope.changeView('groups');
+        }else if($location.url()==='/admin/domains'){
+            $scope.changeView('domains');
+        }else if($location.url().indexOf('/admin/domainmembers/') != -1){
+            $scope.changeView('domainmembers');
+        }
     }
 ]);
 
