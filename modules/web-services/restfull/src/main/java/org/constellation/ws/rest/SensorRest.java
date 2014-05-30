@@ -147,15 +147,15 @@ public class SensorRest {
         final QName dataId      = Util.parseQName(pv.get("dataId"));
         
         final org.constellation.provider.Provider provider = DataProviders.getInstance().getProvider(providerId);
-        final ExtractionResult result;
+        final List<ProcedureTree> procedures;
         try {
             if (provider instanceof ObservationStoreProvider) {
                 final ObservationStoreProvider omProvider = (ObservationStoreProvider) provider;
-                result = omProvider.getObservationStore().getResults();
+                procedures = omProvider.getObservationStore().getProcedures();
             } else if (provider instanceof CoverageStoreProvider) {
                 final CoverageStoreProvider covProvider = (CoverageStoreProvider) provider;
                 if (covProvider.isSensorAffectable()) {
-                    result = covProvider.getObservationStore().getResults();
+                    procedures = covProvider.getObservationStore().getProcedures();
                 } else {
                     return ok(new AcknowlegementType("Failure", "Only available on netCDF file for coverage for now"));
                 }
@@ -169,8 +169,8 @@ public class SensorRest {
         
         // SensorML generation
         try {
-            for (ProcedureTree process : result.procedures) {
-                generateSensorML(dataId, providerId, process, result, null);
+            for (ProcedureTree process : procedures) {
+                generateSensorML(dataId, providerId, process, null);
             }
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, "Error while writng sensorML", ex);
@@ -179,7 +179,7 @@ public class SensorRest {
         return ok(new AcknowlegementType("Success", "The sensors has been succesfully generated"));
     }
     
-    private void generateSensorML(final QName dataID, final String providerID, final ProcedureTree process, final ExtractionResult result, final String parentID) throws SQLException {
+    private void generateSensorML(final QName dataID, final String providerID, final ProcedureTree process, final String parentID) throws SQLException {
         final Properties prop = new Properties();
         prop.put("id",         process.id);
         if (process.spatialBound.dateStart != null) {
@@ -194,11 +194,11 @@ public class SensorRest {
         if (process.spatialBound.miny != null) {
             prop.put("latitude",   process.spatialBound.miny);
         }
-        prop.put("phenomenon", result.fields);
+        prop.put("phenomenon", process.fields);
         final List<String> component = new ArrayList<>();
         for (ProcedureTree child : process.children) {
             component.add(child.id);
-            generateSensorML(dataID, providerID, child, result, process.id);
+            generateSensorML(dataID, providerID, child, process.id);
         }
         prop.put("component", component);
         final String sml = SensorMLGenerator.getTemplateSensorMLString(prop, process.type);
