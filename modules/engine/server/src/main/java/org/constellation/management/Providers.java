@@ -27,10 +27,10 @@ import java.util.logging.Logger;
 
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.StyleProviders;
-import org.geotoolkit.feature.DefaultName;
+import org.geotoolkit.feature.type.DefaultName;
 import org.apache.sis.util.logging.Logging;
 
-import org.opengis.feature.type.Name;
+import org.geotoolkit.feature.type.Name;
 
 /**
  * Providers MBean implementation.

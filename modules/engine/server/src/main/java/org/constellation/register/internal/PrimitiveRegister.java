@@ -28,7 +28,7 @@ import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.register.PrimitiveRegisterIF;
 import org.constellation.register.RegisterException;
-import org.opengis.feature.type.Name;
+import org.geotoolkit.feature.type.Name;
 
 /**
  * First attempt at a Register, we merely want something functional for now.

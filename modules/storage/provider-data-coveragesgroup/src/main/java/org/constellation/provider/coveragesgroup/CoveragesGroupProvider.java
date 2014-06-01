@@ -27,11 +27,11 @@ import java.util.*;
 import java.util.logging.Level;
 import org.apache.sis.storage.DataStore;
 
-import org.opengis.feature.type.Name;
+import org.geotoolkit.feature.type.Name;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 
-import org.geotoolkit.feature.DefaultName;
+import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.util.FileUtilities;
 

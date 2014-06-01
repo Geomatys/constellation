@@ -27,7 +27,7 @@ import org.constellation.ServiceDef;
 import org.constellation.dto.DataMetadata;
 import org.constellation.dto.Service;
 import static org.constellation.utils.CstlMetadataTemplate.*;
-import org.opengis.feature.type.Name;
+import org.geotoolkit.feature.type.Name;
 
 /**
  *

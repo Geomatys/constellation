@@ -18,7 +18,7 @@
  */
 package org.constellation.provider;
 
-import org.opengis.feature.type.Name;
+import org.geotoolkit.feature.type.Name;
 import org.opengis.parameter.ParameterValueGroup;
 
 

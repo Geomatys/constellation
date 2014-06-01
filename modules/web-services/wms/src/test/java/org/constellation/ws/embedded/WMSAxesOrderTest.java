@@ -55,7 +55,7 @@ import static org.constellation.provider.configuration.ProviderParameters.*;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
 import org.constellation.test.ImageTesting;
 import static org.constellation.ws.embedded.AbstractGrizzlyServer.finish;
-import org.geotoolkit.feature.DefaultName;
+import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.image.jai.Registry;
 import org.geotoolkit.test.Commons;

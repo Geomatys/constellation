@@ -24,7 +24,7 @@ import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Source;
 import org.constellation.map.security.LayerSecurityFilter;
 import org.constellation.provider.DataProviders;
-import org.opengis.feature.type.Name;
+import org.geotoolkit.feature.type.Name;
 import org.opengis.parameter.ParameterValueGroup;
 
 import javax.xml.namespace.QName;

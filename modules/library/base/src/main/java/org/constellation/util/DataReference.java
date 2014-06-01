@@ -19,8 +19,8 @@
 package org.constellation.util;
 
 import javax.xml.bind.annotation.XmlValue;
-import org.geotoolkit.feature.DefaultName;
-import org.opengis.feature.type.Name;
+import org.geotoolkit.feature.type.DefaultName;
+import org.geotoolkit.feature.type.Name;
 
 import java.util.Date;
 

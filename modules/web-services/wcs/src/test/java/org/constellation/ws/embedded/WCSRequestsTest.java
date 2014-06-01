@@ -48,7 +48,7 @@ import static org.constellation.provider.coveragesql.CoverageSQLProviderService.
 import org.constellation.test.ImageTesting;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.TestRunner;
-import org.geotoolkit.feature.DefaultName;
+import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.image.jai.Registry;
 import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;

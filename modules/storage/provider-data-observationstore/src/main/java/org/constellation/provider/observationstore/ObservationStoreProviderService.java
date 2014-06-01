@@ -32,7 +32,7 @@ import static org.constellation.provider.configuration.ProviderParameters.create
 import org.geotoolkit.observation.ObservationStoreFactory;
 import org.geotoolkit.observation.ObservationStoreFinder;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
-import org.opengis.feature.type.Name;
+import org.geotoolkit.feature.type.Name;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;

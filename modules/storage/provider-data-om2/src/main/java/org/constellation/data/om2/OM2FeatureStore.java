@@ -36,13 +36,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.geotoolkit.data.AbstractFeatureStore;
 import org.geotoolkit.data.FeatureStoreFactory;
 import org.geotoolkit.data.FeatureStoreFinder;
 import org.apache.sis.storage.DataStoreException;
-import org.apache.sis.util.logging.Logging;
 import static org.constellation.data.om2.OM2FeatureStoreFactory.SGBDTYPE;
 import org.geotoolkit.data.FeatureStoreRuntimeException;
 import org.geotoolkit.data.FeatureReader;
@@ -50,11 +48,9 @@ import org.geotoolkit.data.FeatureWriter;
 import org.geotoolkit.data.query.DefaultQueryCapabilities;
 import org.geotoolkit.data.query.Query;
 import org.geotoolkit.data.query.QueryCapabilities;
-import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
-import org.geotoolkit.feature.DefaultName;
+import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.FeatureTypeBuilder;
-import org.geotoolkit.feature.LenientFeatureFactory;
 import org.geotoolkit.feature.simple.DefaultSimpleFeatureType;
 import org.geotoolkit.feature.type.DefaultGeometryDescriptor;
 import org.geotoolkit.filter.identity.DefaultFeatureId;
@@ -62,13 +58,13 @@ import org.geotoolkit.jdbc.ManageableDataSource;
 import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.referencing.CRS;
 
-import org.opengis.feature.Feature;
+import org.geotoolkit.feature.Feature;
 import org.geotoolkit.feature.FeatureFactory;
-import org.opengis.feature.Property;
-import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.feature.type.FeatureType;
-import org.opengis.feature.type.Name;
-import org.opengis.feature.type.PropertyDescriptor;
+import org.geotoolkit.feature.Property;
+import org.geotoolkit.feature.type.AttributeDescriptor;
+import org.geotoolkit.feature.type.FeatureType;
+import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.feature.type.PropertyDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.identity.FeatureId;
 import org.opengis.parameter.ParameterValueGroup;
@@ -84,8 +80,7 @@ import org.opengis.util.FactoryException;
  */
 public class OM2FeatureStore extends AbstractFeatureStore {
     /** the feature factory */
-    private static final FeatureFactory FF = FactoryFinder.getFeatureFactory(
-                        new Hints(Hints.FEATURE_FACTORY,LenientFeatureFactory.class));
+    private static final FeatureFactory FF = FeatureFactory.LENIENT;
 
     private static final String CSTL_NAMESPACE = "http://constellation.org/om2";
     private static final Name CSTL_TN_SENSOR = new DefaultName(CSTL_NAMESPACE, "Sensor");
@@ -210,7 +205,7 @@ public class OM2FeatureStore extends AbstractFeatureStore {
      * {@inheritDoc }
      */
     @Override
-    public List<FeatureId> addFeatures(final Name groupName, final Collection<? extends Feature> newFeatures, 
+    public List<FeatureId> addFeatures(final Name groupName, final Collection<? extends Feature> newFeatures,
             final Hints hints) throws DataStoreException {
         final FeatureType featureType = getFeatureType(groupName); //raise an error if type doesn't exist
         final List<FeatureId> result = new ArrayList<>();
@@ -237,11 +232,11 @@ public class OM2FeatureStore extends AbstractFeatureStore {
                     final int SRID = geom.getSRID();
                     stmtWrite.setBytes(2, writer.write(geom));
                     stmtWrite.setInt(3, SRID);
-                    
+
                 } else {
                     stmtWrite.setNull(2, Types.VARCHAR);
                     stmtWrite.setNull(3, Types.INTEGER);
-                    
+
                 }
                 stmtWrite.executeUpdate();
                 result.add(identifier);
@@ -528,6 +523,6 @@ public class OM2FeatureStore extends AbstractFeatureStore {
 
 	@Override
 	public void refreshMetaModel() {
-		
+
 	}
 }

@@ -64,7 +64,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // GeoAPI dependencies
 import org.opengis.coverage.Coverage;
-import org.opengis.feature.type.Name;
+import org.geotoolkit.feature.type.Name;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.operation.TransformException;
 

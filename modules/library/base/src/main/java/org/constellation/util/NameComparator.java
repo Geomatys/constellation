@@ -19,7 +19,7 @@
 package org.constellation.util;
 
 import java.util.Comparator;
-import org.opengis.feature.type.Name;
+import org.geotoolkit.feature.type.Name;
 
 /**
  *

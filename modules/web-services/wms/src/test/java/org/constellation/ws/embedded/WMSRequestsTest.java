@@ -59,7 +59,7 @@ import org.constellation.test.utils.Order;
 import org.constellation.test.utils.TestRunner;
 import static org.constellation.ws.embedded.AbstractGrizzlyServer.initDataDirectory;
 import static org.constellation.ws.embedded.WMSAxesOrderTest.hasLocalDatabase;
-import org.geotoolkit.feature.DefaultName;
+import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.image.jai.Registry;
 import org.geotoolkit.inspire.xml.vs.ExtendedCapabilitiesType;

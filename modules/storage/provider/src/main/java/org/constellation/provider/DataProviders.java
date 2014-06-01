@@ -34,9 +34,9 @@ import java.util.logging.Level;
 import org.constellation.configuration.ConfigurationException;
 import static org.constellation.provider.Provider.RELOAD_TIME_PROPERTY;
 import org.constellation.provider.configuration.Configurator.ProviderInformation;
-import org.geotoolkit.feature.DefaultName;
+import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.map.ElevationModel;
-import org.opengis.feature.type.Name;
+import org.geotoolkit.feature.type.Name;
 import org.opengis.parameter.ParameterValueGroup;
 
 /**

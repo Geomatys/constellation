@@ -131,7 +131,7 @@ import org.geotoolkit.wms.xml.GetFeatureInfo;
 import org.geotoolkit.wms.xml.GetMap;
 import org.geotoolkit.wms.xml.WMSMarshallerPool;
 //Geoapi dependencies
-import org.opengis.feature.type.Name;
+import org.geotoolkit.feature.type.Name;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.FactoryException;

@@ -29,9 +29,9 @@ import org.geotoolkit.display2d.service.ViewDef;
 
 import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.ows.xml.GetFeatureInfo;
-import org.opengis.feature.Feature;
-import org.opengis.feature.Property;
-import org.opengis.feature.type.PropertyDescriptor;
+import org.geotoolkit.feature.Feature;
+import org.geotoolkit.feature.Property;
+import org.geotoolkit.feature.type.PropertyDescriptor;
 
 import java.awt.Rectangle;
 import java.lang.reflect.Array;
@@ -39,8 +39,8 @@ import java.util.*;
 import javax.measure.unit.Unit;
 import org.geotoolkit.coverage.GridSampleDimension;
 import org.geotoolkit.display2d.primitive.ProjectedCoverage;
-import org.opengis.feature.ComplexAttribute;
-import org.opengis.feature.type.FeatureType;
+import org.geotoolkit.feature.ComplexAttribute;
+import org.geotoolkit.feature.type.FeatureType;
 import org.opengis.util.InternationalString;
 
 /**

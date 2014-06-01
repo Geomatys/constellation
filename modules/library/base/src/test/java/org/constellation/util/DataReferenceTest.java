@@ -18,7 +18,7 @@
  */
 package org.constellation.util;
 
-import org.geotoolkit.feature.DefaultName;
+import org.geotoolkit.feature.type.DefaultName;
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 

@@ -38,7 +38,7 @@ import org.geotoolkit.ows.xml.GetFeatureInfo;
 
 import org.apache.sis.util.logging.Logging;
 import org.opengis.display.primitive.Graphic;
-import org.opengis.feature.type.Name;
+import org.geotoolkit.feature.type.Name;
 
 import javax.xml.bind.JAXBException;
 import java.awt.*;

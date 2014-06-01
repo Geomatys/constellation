@@ -36,7 +36,7 @@ import org.geotoolkit.map.MapItem;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.DateRange;
-import org.opengis.feature.type.Name;
+import org.geotoolkit.feature.type.Name;
 
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;

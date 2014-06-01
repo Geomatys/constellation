@@ -34,7 +34,7 @@ import org.geotoolkit.data.FeatureStoreFinder;
 import org.geotoolkit.observation.ObservationStore;
 import org.geotoolkit.observation.ObservationStoreFinder;
 import org.geotoolkit.parameter.ParametersExt;
-import org.opengis.feature.type.Name;
+import org.geotoolkit.feature.type.Name;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 

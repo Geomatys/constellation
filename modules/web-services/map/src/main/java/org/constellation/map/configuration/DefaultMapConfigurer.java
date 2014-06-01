@@ -50,7 +50,7 @@ import org.constellation.scheduler.CstlScheduler;
 import org.constellation.scheduler.Task;
 import org.constellation.ws.CstlServiceException;
 
-import org.geotoolkit.feature.DefaultName;
+import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
@@ -62,7 +62,7 @@ import org.apache.sis.util.Classes;
 import org.constellation.admin.ConfigurationEngine;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 
-import org.opengis.feature.type.Name;
+import org.geotoolkit.feature.type.Name;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.GeneralParameterDescriptor;

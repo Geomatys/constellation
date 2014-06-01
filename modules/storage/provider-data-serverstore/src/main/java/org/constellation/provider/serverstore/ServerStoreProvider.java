@@ -31,7 +31,7 @@ import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.version.VersionControl;
 import org.geotoolkit.version.VersioningException;
-import org.opengis.feature.type.Name;
+import org.geotoolkit.feature.type.Name;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 

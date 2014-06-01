@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.constellation.ServiceDef;
 import org.constellation.provider.Data;
-import org.opengis.feature.type.Name;
+import org.geotoolkit.feature.type.Name;
 
 /**
  * This interface does *not* aim to be a general abstraction of the register but 

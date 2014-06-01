@@ -60,7 +60,7 @@ import org.geotoolkit.util.DateRange;
 import org.apache.sis.measure.MeasurementRange;
 import org.geotoolkit.style.RandomStyleBuilder;
 
-import org.opengis.feature.type.Name;
+import org.geotoolkit.feature.type.Name;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.operation.TransformException;

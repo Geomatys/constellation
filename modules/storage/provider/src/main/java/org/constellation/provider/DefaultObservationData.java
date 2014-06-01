@@ -32,7 +32,7 @@ import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.map.MapItem;
 import org.geotoolkit.style.MutableStyle;
-import org.opengis.feature.type.Name;
+import org.geotoolkit.feature.type.Name;
 import org.opengis.geometry.Envelope;
 
 /**

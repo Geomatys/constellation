@@ -24,7 +24,7 @@ import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviders;
 import org.constellation.util.DataReference;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
-import org.opengis.feature.type.Name;
+import org.geotoolkit.feature.type.Name;
 import org.opengis.style.Description;
 import org.opengis.style.FeatureTypeStyle;
 import org.opengis.style.Style;

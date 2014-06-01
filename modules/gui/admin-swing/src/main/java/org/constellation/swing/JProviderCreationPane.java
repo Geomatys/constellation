@@ -32,7 +32,7 @@ import org.constellation.configuration.ProvidersReport;
 import org.geotoolkit.gui.swing.propertyedit.JFeatureOutLine;
 import org.geotoolkit.parameter.Parameters;
 import org.jdesktop.swingx.combobox.ListComboBoxModel;
-import org.opengis.feature.Property;
+import org.geotoolkit.feature.Property;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;

@@ -42,8 +42,8 @@ import org.constellation.provider.StyleProviders;
 import org.constellation.util.DataReference;
 import org.constellation.ws.rs.MapUtilities;
 import org.geotoolkit.factory.FactoryNotFoundException;
-import org.geotoolkit.feature.DefaultName;
-import org.opengis.feature.type.Name;
+import org.geotoolkit.feature.type.DefaultName;
+import org.geotoolkit.feature.type.Name;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.style.MutableStyle;
 

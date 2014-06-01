@@ -18,7 +18,7 @@
  */
 package org.constellation.map.security;
 
-import org.opengis.feature.type.Name;
+import org.geotoolkit.feature.type.Name;
 
 /**
  *
