@@ -1149,7 +1149,7 @@ public class OM2ObservationWriter implements ObservationWriter {
                     } else if (field.getValue() instanceof AbstractTime) {
                         final AbstractTime q = (AbstractTime)field.getValue();
                         final String desc = q.getDefinition();
-                        fields.add(new Field("Text", field.getName(), desc, null));
+                        fields.add(new Field("Time", field.getName(), desc, null));
                         sb.append("timestamp,");
                     } else {
                         throw new SQLException("Only Quantity, Text AND Time is supported for now");

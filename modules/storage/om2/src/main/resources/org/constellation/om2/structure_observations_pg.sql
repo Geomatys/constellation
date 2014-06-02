@@ -53,16 +53,16 @@ CREATE TABLE "om"."observed_properties" (
 );
 
 CREATE TABLE "om"."procedures" (
-    "id"     character varying(100) NOT NULL,
+    "id"     character varying(200) NOT NULL,
     "shape"  postgis.geometry,
     "crs"    integer,
     "pid"    integer NOT NULL
 );
 
 CREATE TABLE "om"."procedure_descriptions" (
-    "procedure"         character varying(100) NOT NULL,
+    "procedure"         character varying(200) NOT NULL,
     "order"             integer NOT NULL,
-    "field_name"        character varying(30),
+    "field_name"        character varying(30) NOT NULL,
     "field_type"        character varying(30),
     "field_definition"  character varying(200),
     "uom"               character varying(20)

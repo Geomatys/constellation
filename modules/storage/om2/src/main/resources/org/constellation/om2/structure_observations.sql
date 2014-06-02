@@ -61,9 +61,9 @@ CREATE TABLE "om"."procedures" (
 );
 
 CREATE TABLE "om"."procedure_descriptions" (
-    "procedure"         character varying(100) NOT NULL,
+    "procedure"         character varying(200) NOT NULL,
     "order"             integer NOT NULL,
-    "field_name"        character varying(30),
+    "field_name"        character varying(30) NOT NULL,
     "field_type"        character varying(30),
     "field_definition"  character varying(200),
     "uom"               character varying(20)

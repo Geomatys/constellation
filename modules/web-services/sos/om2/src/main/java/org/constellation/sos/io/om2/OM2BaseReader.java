@@ -25,17 +25,6 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKBReader;
-import org.apache.sis.storage.DataStoreException;
-import org.apache.sis.util.logging.Logging;
-import org.constellation.sos.factory.OMFactory;
-import org.geotoolkit.gml.JTStoGeometry;
-import org.geotoolkit.gml.xml.Envelope;
-import org.geotoolkit.gml.xml.FeatureProperty;
-import org.geotoolkit.referencing.CRS;
-import org.opengis.observation.Phenomenon;
-import org.opengis.observation.sampling.SamplingFeature;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.util.FactoryException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -48,14 +37,23 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildCompositePhenomenon;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildFeatureProperty;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildPhenomenon;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildSamplingCurve;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildSamplingFeature;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildSamplingPoint;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildSamplingPolygon;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.getGMLVersion;
+import org.apache.sis.storage.DataStoreException;
+import org.apache.sis.util.logging.Logging;
+import org.constellation.sos.factory.OMFactory;
+import org.geotoolkit.gml.JTStoGeometry;
+import org.geotoolkit.gml.xml.Envelope;
+import org.geotoolkit.gml.xml.FeatureProperty;
+import org.geotoolkit.referencing.CRS;
+
+import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
+import org.geotoolkit.swe.xml.AbstractDataComponent;
+
+import org.geotoolkit.swe.xml.AnyScalar;
+import org.geotoolkit.swe.xml.UomProperty;
+import org.opengis.observation.Phenomenon;
+import org.opengis.observation.sampling.SamplingFeature;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.util.FactoryException;
 
 /**
  *
@@ -234,7 +232,7 @@ public class OM2BaseReader {
     
     protected List<Field> readFields(final String procedureID, final Connection c) throws SQLException {
         final List<Field> results = new ArrayList<>();
-        final PreparedStatement stmt = c.prepareStatement("SELECT  FROM \"om\".\"procedure_descriptions\" WHERE \"procedure\"=? ORDER BY \"order\"");
+        final PreparedStatement stmt = c.prepareStatement("SELECT * FROM \"om\".\"procedure_descriptions\" WHERE \"procedure\"=? ORDER BY \"order\"");
         stmt.setString(1, procedureID);
         final ResultSet rs = stmt.executeQuery();
         while (rs.next()) {
@@ -244,6 +242,32 @@ public class OM2BaseReader {
                       rs.getString("uom")));
         }
         return results;
+    }
+    
+    protected int getPIDFromObservation(final String obsIdentifier, final Connection c) throws SQLException {
+        final PreparedStatement stmt = c.prepareStatement("SELECT \"pid\" FROM \"om\".\"observations\", \"om\".\"procedures\" p WHERE \"identifier\"=? AND \"procedure\"=p.\"id\"");
+        stmt.setString(1, obsIdentifier);
+        final ResultSet rs = stmt.executeQuery();
+        int pid = -1;
+        if (rs.next()) {
+            pid = rs.getInt(1);
+        }
+        rs.close();
+        stmt.close();
+        return pid;
+    }
+    
+    protected String getProcedureFromObservation(final String obsIdentifier, final Connection c) throws SQLException {
+        final PreparedStatement stmt = c.prepareStatement("SELECT \"procedure\" FROM \"om\".\"observations\" WHERE \"identifier\"=?");
+        stmt.setString(1, obsIdentifier);
+        final ResultSet rs = stmt.executeQuery();
+        String pid = null;
+        if (rs.next()) {
+            pid = rs.getString(1);
+        }
+        rs.close();
+        stmt.close();
+        return pid;
     }
     
     protected static class Field {
@@ -258,6 +282,21 @@ public class OM2BaseReader {
             this.fieldName = fieldName;
             this.fieldType = fieldType;
             this.fieldUom  = fieldUom;
+        }
+        
+        public AnyScalar getScalar(final String version) {
+            final AbstractDataComponent compo;
+            if ("Quantity".equals(fieldType)) {
+                final UomProperty uomCode = buildUomProperty(version, fieldUom, null);
+                compo = buildQuantity(version, fieldDesc, uomCode, null);
+            } else if ("Text".equals(fieldType)) {
+                compo = buildText(version, fieldDesc, null);
+            } else if ("Time".equals(fieldType)) {
+                compo = buildTime(version, fieldDesc, null);
+            } else {
+                throw new IllegalArgumentException("Unexpected field Type:" + fieldType);
+            }
+            return buildAnyScalar(version, null, fieldName, compo);
         }
     }
 }

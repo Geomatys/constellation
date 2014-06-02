@@ -644,7 +644,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
         if (resultModel.equals(MEASUREMENT_QNAME)) {
             return buildMeasureResult(identifier, version, c);
         } else {
-            return buildComplexResult(identifier, version, c);
+            return buildComplexResult2(identifier, version, c);
         }
     }
     
@@ -722,15 +722,23 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
     }
     
     private DataArrayProperty buildComplexResult2(final String identifier, final String version, final Connection c) throws DataStoreException, SQLException {
-        final List<String> value      = new ArrayList<>();
-        final List<String> uom        = new ArrayList<>();
-        final List<String> fieldType  = new ArrayList<>();
-        final List<Timestamp> time    = new ArrayList<>();
-        final List<String> fieldDef   = new ArrayList<>();
-        final List<String> fieldNames = new ArrayList<>();
         
-        final PreparedStatement stmt  = c.prepareStatement("SELECT \"value\", \"field_type\", \"uom\", \"time\" ,\"field_definition\", \"field_name\" "
-                                                         + "FROM \"om\".\"mesures\" m, \"om\".\"observations\" o "
+        final int pid              = getPIDFromObservation(identifier, c);
+        final String procedure     = getProcedureFromObservation(identifier, c);
+        final List<Field> fields   = readFields(procedure, c);
+        final String arrayID       = "dataArray-1"; // TODO
+        final String recordID      = "datarecord-0"; // TODO
+        final TextBlock encoding   = getDefaultTextEncoding(version);
+        final List<AnyScalar> scal = new ArrayList<>();
+        for (Field f : fields) {
+            scal.add(f.getScalar(version));
+        }
+        
+        int nbValue                = 0;
+        final StringBuilder values = new StringBuilder();
+        
+        
+        final PreparedStatement stmt  = c.prepareStatement("SELECT * FROM \"mesures\".\"mesure" + pid + "\" m, \"om\".\"observations\" o "
                                                          + "WHERE \"id_observation\" = o.\"id\" "
                                                          + "AND o.\"identifier\"=?"
                                                          + "ORDER BY m.\"id\"");
@@ -738,58 +746,24 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
         stmt.setString(1, identifier);
         final ResultSet rs = stmt.executeQuery();
         while (rs.next()) {
-            value.add(rs.getString(1));
-            fieldType.add(rs.getString(2));
-            uom.add(rs.getString(3));
-            time.add(rs.getTimestamp(4));
-            fieldDef.add(rs.getString(5));
-            fieldNames.add(rs.getString(6));
+            for (int i = 0; i < fields.size(); i++) {
+                String value = rs.getString(i + 3);
+                Field field = fields.get(i);
+                // for time TODO remove when field will be typed
+                if (field.fieldType.equals("Time")) {
+                    value = value.replace(' ', 'T'); 
+                    value = value.substring(0, value.length() - 2);
+                }
+                values.append(value).append(encoding.getTokenSeparator());
+            }
+            values.deleteCharAt(values.length() - 1);
+            values.append(encoding.getBlockSeparator());
+            nbValue++;
         }
         rs.close();
         stmt.close();
         
-        final TextBlock encoding = getDefaultTextEncoding(version);
-        final String arrayID =  "dataArray-1"; // TODO
-        final String recordID = "datarecord-0"; // TODO
-        final Map<String, AnyScalar> fields = new HashMap<>();
-        fields.put("Time", getDefaultTimeField(version));
-        final StringBuilder values = new StringBuilder();
-        int nbValue = 0;
-        Timestamp oldTime = null;
-        int nbFieldWritten = 0;
-        int totalField = 0;
-        for (int i = 0; i < uom.size(); i++) {
-            final String fieldName = fieldNames.get(i);
-            if (!fields.containsKey(fieldName)) {
-                final AbstractDataComponent compo;
-                if ("Quantity".equals(fieldType.get(i))) {
-                    final UomProperty uomCode = buildUomProperty(version, uom.get(i), null);
-                    compo = buildQuantity(version, fieldDef.get(i), uomCode, null);
-                } else if ("Text".equals(fieldType.get(i))) {
-                    compo = buildText(version, fieldDef.get(i), null);
-                } else {
-                    throw new IllegalArgumentException("Unexpected field Type:" + fieldType);
-                }
-                final AnyScalar scalar = buildAnyScalar(version, null, fieldName, compo);
-                fields.put(fieldName, scalar);
-                totalField++;
-            }
-            final Timestamp currentTime = time.get(i);
-            if (currentTime.equals(oldTime) && nbFieldWritten != totalField) {
-                values.append(encoding.getTokenSeparator()).append(value.get(i));
-            } else {
-                nbValue++;
-                if (oldTime != null) {
-                    values.append(encoding.getBlockSeparator());
-                }
-                values.append(format.format(currentTime)).append(encoding.getTokenSeparator()).append(value.get(i));
-                nbFieldWritten = 0;
-            }
-            nbFieldWritten ++;
-            oldTime = currentTime;
-        }
-        values.append(encoding.getBlockSeparator());
-        final AbstractDataRecord record = buildSimpleDatarecord(version, null, recordID, null, false, new ArrayList<>(fields.values()));
+        final AbstractDataRecord record = buildSimpleDatarecord(version, null, recordID, null, false, scal);
 
         return buildDataArrayProperty(version, arrayID, nbValue, arrayID, record, encoding, values.toString());
     }
