@@ -38,7 +38,7 @@ public class TempDatabase {
 
         String path = args[0];
         
-        if(!path.startsWith("/tmp/") && !path.startsWith("target/"))
+        if(!path.startsWith("/tmp/") && !path.contains("target/"))
             throw new IOException("tmp files must be located in /tmp or target folder: " +path);
         
         File dbDir = new File(path);

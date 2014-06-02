@@ -116,7 +116,7 @@
             <argument>-classpath</argument>
             <classpath/>
             <argument>org.constellation.admin.util.TempDatabase</argument>
-            <argument>target/builddb</argument>
+            <argument>${basedir}/target/builddb</argument>
           </arguments>
         </configuration>
       </plugin>
