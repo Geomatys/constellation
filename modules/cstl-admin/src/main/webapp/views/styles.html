@@ -81,7 +81,7 @@
                             <div class="item style-{{style.Type | lowercase}}" ng-repeat="style in dataList" ng-class="{selected:style==selected, 'col-xs-6':small==true}" ng-click="select(style)">
                                 <div class="top">
                                     <span class="item-title" title="{{style.Name}}">{{style.Name}}</span>
-                                    <span class="pull-right text-right item-list-style" style="font-size:14px;"> {{style.Type}}</span>
+                                    <span class="pull-right text-right item-list-style"> {{style.Type}}</span>
                                     <img ng-if="style.Type=='VECTOR' && style.subtype=='point'" src="images/vector-point.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
                                     <img ng-if="style.Type=='VECTOR' && style.subtype=='polygon'" src="images/vector-poly.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
                                     <img ng-if="style.Type=='VECTOR' && style.subtype=='line'" src="images/vector-line.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >

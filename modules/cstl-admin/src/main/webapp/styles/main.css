@@ -591,6 +591,9 @@ p.error-select-one{
     white-space:nowrap;
     text-overflow:ellipsis;
 }
+.item-title.title-sensorSystem{
+    width: 469px;
+}
 .col-xs-6 .item-title{
     width: 200px;
 }
@@ -605,48 +608,6 @@ p.error-select-one{
 }
 .item-title.title-bloc-service{
     width: 320px;
-}
-@media (min-width: 992px)  and (max-width: 1199px) { 
-   .item-title{
-        width: 425px;
-    }
-   .col-xs-6 .item-title{
-        width: 136px;
-   }
-   .col-xs-6 .item-title.data-title{
-        width: 130px;
-   }
-   .item-title.csw-title{
-        width: 455px;
-   }
-   .item-title.title-bloc{
-       width: 310px;
-   }
-   .item-title.title-bloc-service{
-       width: 250px;
-   }
-}
-@media (min-width: 768px)  and (max-width: 991px) { 
-   .item-title{
-        width: 300px;
-    }
-   .item-title.csw-title{
-        width: 310px;
-   }
-    .col-xs-6 .item-title{
-        width: 75px;
-    }
-    .item-title.title-bloc{
-        width: 220px;
-    }
-    .item-title.title-bloc-service{
-        width: 180px;
-    }
-}
-@media (max-width: 767px) { 
-   .item-title{
-        width: 250px;
-    }
 }
 /*
  * Dashboard selected item
@@ -857,7 +818,7 @@ p.error-select-one{
 }
 .dashboard .item-list .item .top .item-title, .dashboard .item-list .item .top .text-right {
     font-weight: bold;
-    font-size: 15px;
+    font-size: 13px;
     line-height: 35px;
 }
 .dashboard .item-list .item .top .text-right {
@@ -1069,6 +1030,66 @@ p.error-select-one{
  .pagination-task .pagination > li > a, .pagination-task .pagination > li > span{
     color:#7dbc6c;
  }
+
+ /*Dashboard responsive*/
+@media (min-width: 992px)  and (max-width: 1199px) {
+    .item-title{
+        width: 425px;
+    }
+    .col-xs-6 .item-title{
+        width: 136px;
+    }
+    .col-xs-6 .item-title.data-title{
+        width: 130px;
+    }
+    .item-title.csw-title{
+        width: 455px;
+    }
+    .item-title.title-bloc{
+        width: 310px;
+    }
+    .item-title.title-bloc-service{
+        width: 250px;
+    }
+    .item-title.title-sensorSystem{
+        width: 349px;
+    }
+}
+@media (min-width: 768px)  and (max-width: 991px) {
+    .item-title{
+        width: 300px;
+    }
+    .item-title.csw-title{
+        width: 315px;
+    }
+    .col-xs-6 .item-title{
+        width: 75px;
+    }
+    .item-title.title-bloc{
+        width: 220px;
+    }
+    .item-title.title-bloc-service{
+        width: 180px;
+    }
+    .item-title.title-sensorSystem{
+        width: 215px;
+    }
+    .dashboard .item-list .item .top .item-title, .dashboard .item-list .item .top .text-right {
+        font-size: 12px;
+    }
+}
+@media (max-width: 767px) {
+    .item-title{
+        width: 250px;
+    }
+    .item-title.title-sensorSystem{
+        width: 200px;
+    }
+    .dashboard .item-list .item .top .item-title, .dashboard .item-list .item .top .text-right {
+        font-size: 12px;
+    }
+}
+
 /*
  * Data Viewer
  */

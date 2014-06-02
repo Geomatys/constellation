@@ -75,7 +75,7 @@
                                 <div class="item mapcontext" ng-class="{'selected':context==selected}" ng-click="select(context);selectContextChild(null);">
                                     <div class="top">
                                         <span class="item-title" title="{{context.id}}">{{context.id}}</span>
-                                        <span class="pull-right text-right item-list-style"  style="font-size:14px;" translate="label.mapcontext.system">mapcontext dashboard</span>
+                                        <span class="pull-right text-right item-list-style" translate="label.mapcontext.system">mapcontext dashboard</span>
                                     </div>
                                     <div class="bottom">
                                         <div class="block">
@@ -96,7 +96,7 @@
                                 <div class="item {{service.Type | lowercase}}" style="margin-top:0;" ng-if="context==selected" ng-repeat="contextchild in context.children" ng-class="{'selected':contextchild===selectedSensorsChild, 'child':small==false, 'col-xs-11':small==true, 'col-sm-offset-1':small==true}" ng-click="selectMapcontextChild(contextchild)">
                                     <div class="top">
                                         <span class="item-title">{{contextchild.id}}</span>
-                                        <span class="pull-right text-right item-list-style" style="font-size:14px;" translate="label.sensor">{{contextchild.type}}</span>
+                                        <span class="pull-right text-right item-list-style" translate="label.sensor">{{contextchild.type}}</span>
                                     </div>
                                     <div class="bottom">
                                         <div class="block">
