@@ -41,8 +41,6 @@ public class TempDatabase {
         if(!path.startsWith("/tmp/") && !path.startsWith("target/"))
             throw new IOException("tmp files must be located in /tmp or target folder: " +path);
         
-        path = path.replaceAll("/", File.separator);
-        
         File dbDir = new File(path);
         if (dbDir.exists()) {
             FileUtils.deleteDirectory(dbDir);

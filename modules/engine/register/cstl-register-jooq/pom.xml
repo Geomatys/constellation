@@ -152,7 +152,7 @@
           <!-- JDBC connection parameters -->
           <jdbc>
             <driver>org.apache.derby.jdbc.EmbeddedDriver</driver>
-            <url>jdbc:derby:target/builddb</url>
+            <url>jdbc:derby:${basedir}/target/builddb</url>
             <user>geoadmin</user>
             <password>g3o4dmin</password>
           </jdbc>
