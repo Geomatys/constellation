@@ -116,7 +116,7 @@
             <argument>-classpath</argument>
             <classpath/>
             <argument>org.constellation.admin.util.TempDatabase</argument>
-            <argument>target/builddb/constellation-build/admin-db</argument>
+            <argument>target/builddb</argument>
           </arguments>
         </configuration>
       </plugin>
@@ -152,7 +152,7 @@
           <!-- JDBC connection parameters -->
           <jdbc>
             <driver>org.apache.derby.jdbc.EmbeddedDriver</driver>
-            <url>jdbc:derby:target/builddb/constellation-build/admin-db</url>
+            <url>jdbc:derby:target/builddb</url>
             <user>geoadmin</user>
             <password>g3o4dmin</password>
           </jdbc>
