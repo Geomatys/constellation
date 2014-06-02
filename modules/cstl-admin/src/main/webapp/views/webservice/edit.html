@@ -115,7 +115,7 @@
                                                 <div class="item" ng-repeat="layer in dataList" ng-class="{selected:layer==selected,coverage:layer.Type==='coverage-store'||layer.Type==='raster',vector:layer.Type==='feature-store'||layer.Type==='observation-store'||layer.Type==='vector', 'col-xs-6':small==true}" ng-click="select(layer)">
                                                     <div class="top">
                                                         <span class="item-title" title="{{layer.Name}}">{{layer.Name}}</span>
-                                                        <span class="pull-right text-right item-list-style" style="font-size:14px;">{{layer.Type==='coverage-store'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector':layer.Type}}</span>
+                                                        <span class="pull-right text-right item-list-style">{{layer.Type==='coverage-store'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector':layer.Type}}</span>
                                                         <img ng-if="(layer.Type=='vector' || layer.Type=='feature-store') && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer!=selected" src="images/vector-multipoint.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
                                                         <img ng-if="(layer.Type=='vector' || layer.Type=='feature-store') && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon') && layer!=selected" src="images/vector-poly.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
                                                         <img ng-if="(layer.Type=='vector' || layer.Type=='feature-store') && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString') && layer!=selected" src="images/vector-polyline.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
@@ -135,10 +135,10 @@
                                             </div>
                                             <div ng-if="type === 'csw'">
                                                 <div ng-repeat="cswdata in dataList" ng-class="{'col-xs-6':small==true}" style="padding-left:0;">
-                                                    <div class="item" ng-class="{'selected':cswdata==selected, 'metadata-service':cswdata.identifier.split('_')[0]==='serv','metadata':cswdata.identifier.split('_')[0]!=='serv'}" ng-click="select(cswdata);selectMetadataChild(null)>
+                                                    <div class="item" ng-class="{'selected':cswdata==selected, 'metadata-service':cswdata.identifier.split('_')[0]==='serv','metadata':cswdata.identifier.split('_')[0]!=='serv'}" ng-click="select(cswdata);selectMetadataChild(null)">
                                                         <div class="top">
                                                             <span class="item-title csw-title" title="{{cswdata.title ? cswdata.title : cswdata.identifier}}">{{cswdata.title ? cswdata.title : cswdata.identifier}}</span>
-                                                            <span class="pull-right text-right item-list-style"  style="font-size:14px;">METADATA</span>
+                                                            <span class="pull-right text-right item-list-style">METADATA</span>
                                                         </div>
                                                         <div class="bottom">
                                                             <div class="block">
@@ -175,8 +175,8 @@
                                                     <div class="item" ng-class="{'sensor-sos':sosdata.type!=='System','sensor-system':sosdata.type==='System','selected':sosdata==selected}" ng-click="select(sosdata);selectSensorsChild(null);">
                                                         <div class="top">
                                                             <span class="item-title" title="{{sosdata.id}}">{{sosdata.id}}</span>
-                                                            <span ng-if="sosdata.type==='System'" class="pull-right text-right item-list-style"  style="font-size:14px;" translate="label.sensor.system">sensor system</span>
-                                                            <span ng-if="sosdata.type!=='System'" class="pull-right text-right item-list-style"  style="font-size:14px;" translate="label.sensor">sensor</span>
+                                                            <span ng-if="sosdata.type==='System'" class="pull-right text-right item-list-style" translate="label.sensor.system">sensor system</span>
+                                                            <span ng-if="sosdata.type!=='System'" class="pull-right text-right item-list-style" translate="label.sensor">sensor</span>
                                                         </div>
                                                         <div class="bottom">
                                                             <div class="block">
@@ -216,7 +216,7 @@
                             </div>
                         <!--end list -->
 
-
+                        </div>
                         <div class="col-sm-4">
                             <!-- begin add data button -->
                             <div style="margin-bottom:10px;" ng-if="service.type.toLowerCase() !== 'csw' && service.type.toLowerCase() !== 'wps'">
