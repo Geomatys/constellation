@@ -222,7 +222,7 @@ ul.unstyled {
 .accueil-well{
     padding-bottom: 0px; 
     padding-top: 0px; 
-    margin-top: 80px;
+    margin-top: 40px;
 }
 .accueil_bloc_text{
     line-height: 26px;
@@ -234,7 +234,7 @@ ul.unstyled {
         margin-left: 0;
         text-align: center;
     }
-@media (min-width:991px){
+@media screen and (min-width:991px){
 .accueil_bloc_images{
     margin-top: 30px; 
     margin-left: 15px;
@@ -242,7 +242,7 @@ ul.unstyled {
 }
 }
 
-@media (max-width: 991px){
+@media screen and (max-width: 991px){
     .accueil_bloc_text{
         margin-top: 15px; 
     }
@@ -369,7 +369,7 @@ ul.unstyled {
     border: 1px solid #ddd;
     border-bottom-color: transparent;
 }
-@media (max-width: 767px){
+@media screen and (max-width: 767px){
     .accueil_logo img{
         width:100%;
         max-width:400px;
@@ -386,17 +386,17 @@ ul.unstyled {
         margin-top: -3px;
     }
 }
-@media (min-width:768px) and (max-width: 890px){
+@media screen and (min-width:768px) and (max-width: 890px){
     .nav-header-mob>li>a{
         padding: 10px;
     }
 }
-@media (max-width: 1199px){
+@media screen and (max-width: 1199px){
     .nav-header{
         width:851px;
     }
 }
-@media (max-width: 1365px){
+@media screen and (max-width: 1365px){
     .header .nav.btn-language>li>a{
         margin-top:4px;
     }
@@ -404,12 +404,12 @@ ul.unstyled {
         font-size:13px;
     }
 }
-@media (min-width:1200px) and (max-width: 1272px){
+@media screen and (min-width:1200px) and (max-width: 1272px){
     .nav-header-mob>li>a{
         padding: 10px;
     }
 }
-@media (min-width:768px) and (max-width: 800px){
+@media screen and (min-width:768px) and (max-width: 800px){
     .nav-header-mob>li>a{
         padding: 8px;
     }
@@ -1032,7 +1032,7 @@ p.error-select-one{
  }
 
  /*Dashboard responsive*/
-@media (min-width: 992px)  and (max-width: 1199px) {
+@media screen and (min-width: 992px)  and (max-width: 1199px) {
     .item-title{
         width: 425px;
     }
@@ -1055,7 +1055,7 @@ p.error-select-one{
         width: 349px;
     }
 }
-@media (min-width: 768px)  and (max-width: 991px) {
+@media screen and (min-width: 768px)  and (max-width: 991px) {
     .item-title{
         width: 300px;
     }
@@ -1078,7 +1078,7 @@ p.error-select-one{
         font-size: 12px;
     }
 }
-@media (max-width: 767px) {
+@media screen and (max-width: 767px) {
     .item-title{
         width: 250px;
     }
@@ -1322,7 +1322,7 @@ table.user-table tbody>tr>td.user-delete{
     padding: 20px;
     margin-bottom:20px;
 }
-@media (max-width: 991px)  {
+@media screen and (max-width: 991px)  {
     .service-button{
         margin-bottom: 10px;
     }
@@ -1407,25 +1407,25 @@ vertical-align: middle;
         padding-top:2px;
         padding-bottom:2px;
     }
-@media (min-width: 768px) and (max-width: 991px) { 
+@media screen and (min-width: 768px) and (max-width: 991px) {
     /*choix type*/
     .modal-dialog-responsive{
         width:700px;
     }
 }
-@media (min-width: 992px)  and (max-width: 1199px) { 
+@media screen and (min-width: 992px)  and (max-width: 1199px) {
     /*choix type*/
     .modal-dialog-responsive{
         width:950px;
     }
 }
-@media (min-width: 1200px) { 
+@media screen and (min-width: 1200px) {
     /*choix type*/
     .modal-dialog-responsive{
         width:1024px;
     }
 }
-@media(max-height:900px){
+@media screen and (max-height:900px){
     .modal-dialog-resp-height .modal-content{
         max-height:645px;
     }
