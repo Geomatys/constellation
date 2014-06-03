@@ -15,9 +15,10 @@
  */
 'use strict';
 
-cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', 'ProcessService', '$growl', '$modal',
-    function ($scope, $dashboard, process, $growl, $modal){
+cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', 'ProcessService', '$growl', '$modal', '$cookies',
+    function ($scope, $dashboard, process, $growl, $modal, $cookies){
         var lastOpened = null;
+        $scope.domainId = $cookies.cstlActiveDomainId;
 
         $scope.init = function() {
 

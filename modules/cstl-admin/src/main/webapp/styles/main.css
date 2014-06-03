@@ -1427,10 +1427,10 @@ vertical-align: middle;
 }
 @media(max-height:900px){
     .modal-dialog-resp-height .modal-content{
-        max-height:552px;
+        max-height:645px;
     }
     .modal-dialog-resp-height .modal-body{
-        max-height:405px;
+        max-height:495px;
     }
     .list-style-modal{
     height:350px;

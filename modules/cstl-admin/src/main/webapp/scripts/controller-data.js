@@ -15,10 +15,13 @@
  */
 'use strict';
 
-cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 'webService', 'dataListing', 'provider', 'style', 'textService', '$modal', '$growl', 'StyleSharedService', '$cookies',
-    function ($scope, $location, $dashboard, webService, dataListing, provider, style, textService, $modal, $growl, StyleSharedService, $cookies) {
+cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 'webService', 'dataListing', 'provider',
+    'style', 'textService', '$modal', '$growl', 'StyleSharedService', '$cookies',
+    function ($scope, $location, $dashboard, webService, dataListing, provider, style, textService, $modal, $growl,
+              StyleSharedService, $cookies) {
         $scope.cstlUrl = $cookies.cstlUrl;
         $scope.cstlSessionId = $cookies.cstlSessionId;
+        $scope.domainId = $cookies.cstlActiveDomainId;
 
         $scope.init = function() {
             var modalLoader = $modal.open({

@@ -355,6 +355,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
         $scope.cstlUrl = $cookies.cstlUrl;
         $scope.cstlSessionId = $cookies.cstlSessionId;
         $scope.urlBoxSize = Math.min($scope.url.length,100);
+        $scope.domainId = $cookies.cstlActiveDomainId;
 
         var client = new ZeroClipboard( document.getElementById("copy-button") );
 

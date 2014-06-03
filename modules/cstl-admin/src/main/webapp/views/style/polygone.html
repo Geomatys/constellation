@@ -1,29 +1,46 @@
 <ol class="breadcrumb col-sm-12 col-md-6">
-    <li><a ng-click="goBack()"><span translate="sldeditor.breadcrumb.type">Type selection</span></a></li>
-    <li class="active"><span translate="sldeditor.breadcrumb.edition">Style Edition</span></li>
+    <li>
+        <a ng-click="goBack()">
+            <span translate="sldeditor.breadcrumb.type">Type selection</span>
+        </a>
+    </li>
+    <li class="active">
+        <span translate="sldeditor.breadcrumb.edition">Style Edition</span>
+    </li>
 </ol>
 
 
-    <div class="col-sm-12 col-md-6">
-      <div class="style_bloc style_bloc_name" style="margin-bottom: 10px;">
+<div class="col-sm-12 col-md-6">
+    <div class="style_bloc style_bloc_name" style="margin-bottom: 10px;">
         <div class="form-group col-xs-12" style="margin: 6px 0; height:35px;">
-          <label class="col-xs-4 col-sm-3 col-md-4 control-label" style="margin-top: 8px;" translate="sldeditor.name">Style name</label>
-          <div class="col-xs-7 col-sm-9 col-md-8">
-              <input type="text" class="form-control" ng-model="$parent.newStyle.name">
-          </div>
+            <label class="col-xs-4 col-sm-3 col-md-4 control-label" style="margin-top: 8px;" translate="sldeditor.name">Style name</label>
+            <div class="col-xs-7 col-sm-9 col-md-8">
+                <input type="text" class="form-control" ng-model="$parent.newStyle.name">
+            </div>
         </div>
-      </div>
-
-    <div class="col-sm-12">
-      <div ng-if="noName" class="alert alert-style" style="padding-top:8px; padding-bottom:8px; margin-bottom:0;" translate="alert.style.noname">Veuillez renseigner un nom de style</div>
     </div>
-  </div>
+    <div class="col-sm-12">
+        <div ng-if="noName" class="alert alert-style" style="padding-top:8px; padding-bottom:8px; margin-bottom:0;" translate="alert.style.noname">Veuillez renseigner un nom de style</div>
+    </div>
+</div>
 
-    <ul class="nav nav-tabs" ng-init="chosenTab = 'simple'">
-        <li ng-class="{active: chosenTab==='simple'}"><a ng-click="chosenTab = 'simple'" data-toggle="tab"><span translate="sldeditor.tab.simple" >Simple editor</span></a></li>
-        <li ng-class="{active: chosenTab==='classif'}"><a ng-click="chosenTab = 'classif'" data-toggle="tab"><span translate="sldeditor.tab.rules" >Rules edition</span></a></li>
-        <li ng-class="{active: chosenTab==='xml'}"><a ng-click="chosenTab = 'xml'" data-toggle="tab"><span translate="sldeditor.tab.xml" >XML Editor</span></a></li>
-    </ul>
+<ul class="nav nav-tabs" ng-init="chosenTab = 'simple'">
+    <li ng-class="{active: chosenTab==='simple'}">
+        <a ng-click="chosenTab = 'simple'" data-toggle="tab">
+            <span translate="sldeditor.tab.simple" >Simple editor</span>
+        </a>
+    </li>
+    <li ng-class="{active: chosenTab==='classif'}">
+        <a ng-click="chosenTab = 'classif'" data-toggle="tab">
+            <span translate="sldeditor.tab.rules" >Rules edition</span>
+        </a>
+    </li>
+    <li ng-class="{active: chosenTab==='xml'}">
+        <a ng-click="chosenTab = 'xml'" data-toggle="tab">
+            <span translate="sldeditor.tab.xml" >XML Editor</span>
+        </a>
+    </li>
+</ul>
 
 
 <!-- Tab panes -->
@@ -33,10 +50,19 @@
       <div class="col-xs-12 col-sm-6">
         <div class="row">
           <div class="col-xs-12" style="margin-top:8px;">
-            <button type="button" class="btn-edit-style col-xs-5 btn btn-primary" style="border-radius:5px 0 0 0;" ng-class="{selected:edit=='fill'}" ng-click="edit='fill'"><span translate="sldeditor.edition.fill">Fill</span></button>
-            <button type="button" class="btn-edit-style col-xs-5 btn btn-primary" style="border-left:none; border-right:none; border-radius:0;" ng-class="{selected:edit=='stroke'}" ng-click="edit='stroke'"><span translate="sldeditor.edition.stroke">Stroke</span></button>
-            <button type="button" class="btn-edit-style col-xs-2 btn btn-primary" style="border-radius:0 5px 0 0;" ng-class="{selected:edit=='plus'}" ng-click="edit='plus'"><span class="glyphicon-plus glyphicon"></span></button>
-          </div> 
+            <button type="button" class="btn-edit-style col-xs-5 btn btn-primary" style="border-radius:5px 0 0 0;"
+                    ng-class="{selected:edit=='fill'}" ng-click="edit='fill'">
+                <span translate="sldeditor.edition.fill">Fill</span>
+            </button>
+            <button type="button" class="btn-edit-style col-xs-5 btn btn-primary" style="border-left:none; border-right:none; border-radius:0;"
+                    ng-class="{selected:edit=='stroke'}" ng-click="edit='stroke'">
+                <span translate="sldeditor.edition.stroke">Stroke</span>
+            </button>
+            <button type="button" class="btn-edit-style col-xs-2 btn btn-primary" style="border-radius:0 5px 0 0;"
+                    ng-class="{selected:edit=='plus'}" ng-click="edit='plus'">
+                <span class="glyphicon-plus glyphicon"></span>
+            </button>
+          </div>
         </div>
 
         <div class="style_bloc" style="padding:15px 10px 0 10px;" ng-show="edit=='fill'">
@@ -44,45 +70,14 @@
             <div class="form-group">
               <label class="col-sm-3 col-md-3 control-label" translate="sldeditor.edition.color">Color</label>
               <div class="col-sm-3 col-md-3">
-                <input type='text' name="picker" class="picker" spectrum oncolorchanged="affectAlpha(value, newStyle.rules[0].symbolizers[0].fill)" ng-model="newStyle.rules[0].symbolizers[0].fill.color"/>
+                <input type='text' name="picker" class="picker" spectrum oncolorchanged="affectAlpha(value, newStyle.rules[0].symbolizers[0].fill)"
+                       ng-model="newStyle.rules[0].symbolizers[0].fill.color"/>
               </div>
                 <label class="col-sm-3 col-md-3 control-label" translate="sldeditor.edition.opacity">Opacity</label>
                 <div class="col-sm-3 col-md-3" style="margin-top: 7px;">
                     {{newStyle.rules[0].symbolizers[0].fill.opacity}}
                 </div>
             </div>
-            <!--<div class="form-group">
-              <label class="col-sm-3 col-md-2 control-label">Type</label>
-              <div class="col-sm-3 col-md-2">
-                <div class="btn-group select select-block">
-                  <button class="btn dropdown-toggle btn-default" data-toggle="dropdown" ng-init="img_remplissage='images/pattern-plein.png'">
-                    <span class="filter-option pull-left"><img class="remplissage_type" src={{img_remplissage}}></span>&nbsp;
-                    <span class="caret"></span>
-                  </button>
-                  <span class="dropdown-arrow dropdown-arrow-inverse"></span>
-                  <ul class="dropdown-menu dropdown-inverse dropdown-images" role="menu" style="overflow-y: auto; min-width:70px; min-height: 108px;">
-                    <li ng-click="img_remplissage='images/pattern-plein.png'">
-                        <a><img class="remplissage_type" src="images/pattern-plein.png"></a>
-                    </li>
-                    <li ng-click="img_remplissage='images/pattern-rayures-horiz.png'">
-                      <a><img class="remplissage_type" src="images/pattern-rayures-horiz.png"></a>
-                    </li>
-                    <li ng-click="img_remplissage='images/pattern-rayures-vert.png'">
-                      <a><img class="remplissage_type" src="images/pattern-rayures-vert.png"></a>
-                    </li>
-                    <li ng-click="img_remplissage='images/pattern-rayures-diago.png'">
-                      <a><img class="remplissage_type" src="images/pattern-rayures-diago.png"></a>
-                    </li>
-                    <li ng-click="img_remplissage='images/pattern-carreaux.png'">
-                      <a><img class="remplissage_type" src="images/pattern-carreaux.png"></a>
-                    </li>
-                    <li ng-click="img_remplissage='images/pattern-cases.png'">
-                      <a><img class="remplissage_type" src="images/pattern-cases.png"></a>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>-->
           </form>
         </div>
         <div class="style_bloc" ng-show="edit=='stroke'">
@@ -137,8 +132,11 @@
               <div class="form-group">
                 <label  class="col-xs-3 control-label" translate="sldeditor.edition.join">Join</label>
                 <div class="btn-group select select-bloc col-xs-9">
-                    <button class="btn dropdown-toggle btn-default" data-toggle="dropdown" ng-model="newStyle.rules[0].symbolizers[0].stroke.lineJoin">
-                        <span class="filter-option pull-left"><img class="img_icone" src="images/icone_lineJoin_{{newStyle.rules[0].symbolizers[0].stroke.lineJoin}}.png"></span>&nbsp;
+                    <button class="btn dropdown-toggle btn-default" data-toggle="dropdown"
+                            ng-model="newStyle.rules[0].symbolizers[0].stroke.lineJoin">
+                        <span class="filter-option pull-left">
+                            <img class="img_icone" src="images/icone_lineJoin_{{newStyle.rules[0].symbolizers[0].stroke.lineJoin}}.png"/>
+                        </span>&nbsp;
                         <span class="caret"></span>
                     </button>
                     <span class="dropdown-arrow dropdown-arrow-inverse"></span>
@@ -190,7 +188,7 @@
       <div class="col-xs-12 col-sm-6">
         <button type="button" class="btn-apercu col-xs-12 btn btn-primary" ng-click="displayCurrentStyle()"><span translate="sldeditor.apercu.titre">Data preview</span></button>
         <div class="bloc_apercu" id="styledMapOL" style="height: 299px;"></div>
-        
+
       </div>
     </div>
   </div>
@@ -417,7 +415,7 @@
           <div class="col-xs-12" style="margin-top:8px;">
             <button type="button" class="btn-edit-style col-xs-5 btn btn-primary" style="border-radius:5px 0 0 0;" ng-class="{selected:edit_classif=='unique'}" ng-click="edit_classif='unique'"><span translate="sldeditor.tab.unique">Unique value</span></button>
             <button type="button" class="btn-edit-style col-xs-5 btn btn-primary" style="border-radius:0 5px 0 0;" ng-class="{selected:edit_classif=='intervalle'}" ng-click="edit_classif='intervalle'"><span translate="sldeditor.tab.interval">Interval</span></button>
-          </div> 
+          </div>
         </div>
           <div class="style_bloc" style="min-height:60px;">
           <div ng-show="edit_classif=='unique'">

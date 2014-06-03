@@ -160,6 +160,8 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         }
         initSldPage();
 
+
+
         $scope.goBack = function() {
             $scope.refreshNewStyle();
             if ($scope.selectedLayer && $scope.selectedLayer.Type && ($scope.selectedLayer.Type.toLowerCase() === 'vector' || $scope.selectedLayer.Type.toLowerCase() === 'feature-store')) {
@@ -208,7 +210,9 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             $scope.newStyle.rules[0].symbolizers[0]['@symbol'] = 'polygon';
             if (!$scope.newStyle.rules[0].symbolizers[0].stroke) {
                 $scope.newStyle.rules[0].symbolizers[0].stroke = {
-                    width: 1
+                    width: 1,
+                    lineJoin : "round",
+                    lineCap : "round"
                 };
             }
         };
@@ -220,7 +224,9 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             $scope.newStyle.rules[0].symbolizers[0]['@symbol'] = 'line';
             if (!$scope.newStyle.rules[0].symbolizers[0].stroke) {
                 $scope.newStyle.rules[0].symbolizers[0].stroke = {
-                    width: 1
+                    width: 1,
+                    lineJoin : "round",
+                    lineCap : "round"
                 };
             }
         };
@@ -554,7 +560,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         };
 
         $scope.StyleisSelected = function() {
-            if ($scope.selected !== null) {
+            if ($scope.selected) {
                 $scope.showLayerWithStyle($scope.selected.Name);
                 return true;
             } else {
