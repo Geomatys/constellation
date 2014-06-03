@@ -252,11 +252,17 @@ cstlAdminApp.controller('DomainSwitcherController', ['Account', '$scope', '$cook
   function(Account, $scope, $cookies, $window){
     Account.get(function(account){
       $scope.domains = account.domains;
+      for(var d in account.domains){
+        if(account.domains[d].id == $cookies.cstlActiveDomainId){
+          $scope.activeDomain=account.domains[d].name;
+          break;
+        }
+      }
       $scope.changeDomain = function(i){
        if($cookies.cstlActiveDomainId != account.domains[i].id){
+         $scope.activeDomain=account.domains[i].name
          $cookies.cstlActiveDomainId= ""+account.domains[i].id;
-         console.log("Change to domain: " + account.domains[i].id)
-         $window.location.reload();
+         $window.location.href="admin.html";
        }
       };
     }) 

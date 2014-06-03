@@ -78,12 +78,12 @@
                     <li ng-show="hasMultipleDomains()" class="dropdown pointer" ng-controller="DomainSwitcherController">
                         <a class="dropdown-toggle" data-toggle="dropdown"> <span>
                                     <span class="glyphicon glyphicon-flag"></span> <span
-                                class="hidden-tablet" translate="global.menu.domains">domains</span>
+                                class="hidden-tablet">{{activeDomain}}</span>
                                     <b class="caret"></b>
                             </span>
                         </a>
                         <ul class="dropdown-menu">
-                            <li ng-repeat="domain in domains" active-menu="en"><a
+                            <li ng-repeat="domain in domains" active-menu="{{domain.name}}"><a
                                     ng-click="changeDomain($index)"><span>{{domain.name}}</span></a></li>
                         </ul>
                     </li>

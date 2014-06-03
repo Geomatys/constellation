@@ -23,6 +23,7 @@ import static org.constellation.engine.register.jooq.Tables.DATA;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.jooq.tables.records.DataRecord;
 import org.constellation.engine.register.repository.DataRepository;
+import org.jooq.Condition;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -64,6 +65,20 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
     @Override
     public int delete(int id) {
         return dsl.delete(DATA).where(DATA.ID.eq(id)).execute();
+    }
+
+    @Override
+    public int delete(String namespaceURI, String localPart, int providerId) {
+        Condition whereClause = buildDeleteWhereClause(namespaceURI, localPart, providerId);
+        return dsl.delete(DATA).where(whereClause).execute();
+        
+    }
+
+    private Condition buildDeleteWhereClause(String namespaceURI, String localPart, int providerId) {
+        Condition whereClause = DATA.NAME.eq(localPart).and(DATA.PROVIDER.eq(providerId));
+        if(namespaceURI!=null)
+            return whereClause.and(DATA.NAMESPACE.eq(namespaceURI));
+        return whereClause;
     }
 
 }

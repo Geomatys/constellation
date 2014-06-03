@@ -32,8 +32,11 @@ import org.constellation.ServiceDef;
 import org.constellation.configuration.DataBrief;
 import org.constellation.dto.Service;
 import org.constellation.engine.register.ConfigurationService;
+import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.ServiceExtraConfig;
+import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.PropertyRepository;
+import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -44,10 +47,18 @@ public class JooqConfigurationService implements ConfigurationService {
 
     
     @Autowired
-    PropertyRepository propertyRepository;
+    private PropertyRepository propertyRepository;
     
     @Autowired
-    ServiceRepository serviceRepository;
+    private ServiceRepository serviceRepository;
+    
+    @Autowired
+    private DataRepository dataRepository;
+    
+    @Autowired
+    private ProviderRepository providerRepository;
+    
+    
     
     
     @Transactional
@@ -117,7 +128,6 @@ public class JooqConfigurationService implements ConfigurationService {
     @Override
     public Service readServiceMetadata(String identifier, String serviceType, String language) throws JAXBException,
             IOException {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -125,6 +135,23 @@ public class JooqConfigurationService implements ConfigurationService {
     public List<String> getProviderIdentifiers() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public void deleteData(String namespaceURI, String localPart, String providerIdentifier) {
+        Provider provider = providerRepository.findByIdentifie(providerIdentifier);
+        if(provider == null) {
+            
+        }else {
+            dataRepository.delete(namespaceURI, localPart, provider.getId());
+        }
+        
+    }
+
+    @Override
+    public void deleteProvider(String providerID) {
+        providerRepository.deleteByIdentifier(providerID);
+        
     }
 
 }

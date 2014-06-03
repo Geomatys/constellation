@@ -19,6 +19,7 @@
 package org.constellation.engine.register.repository;
 
 import java.util.List;
+import java.util.Set;
 
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.ServiceExtraConfig;
@@ -39,4 +40,6 @@ public interface ServiceRepository {
     ServiceMetaData findMetaDataForLangByIdentifierAndType(String identifier, String serviceType, String language);
 
     List<ServiceExtraConfig> getExtraConfig(int id);
+
+    java.util.Map<String, Set<String>> getAccessiblesServicesByType(int domainId, String name);
 }

@@ -20,14 +20,18 @@ package org.constellation.ws.rest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -42,6 +46,7 @@ import org.constellation.configuration.ServiceReport;
 import org.constellation.configuration.ws.rs.ConfigurationUtilities;
 import org.constellation.dto.Configuration;
 import org.constellation.dto.SimpleValue;
+import org.constellation.engine.register.repository.ServiceRepository;
 import org.constellation.ogc.configuration.OGCConfigurer;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.WSEngine;
@@ -53,18 +58,22 @@ import org.constellation.ws.WSEngine;
  * @version 0.9
  * @since 0.9
  */
-@Path("/1/admin/")
+@Path("/1/admin")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public class Admin {
 
+    
+    
+    @Inject
+    private ServiceRepository serviceRepository;
     /**
      * service to return available service list
      *
      * @return
      */
     @GET
-    @Path("serviceType")
+    @Path("/serviceType")
     public Response serviceType() {
         final ServiceReport response = new ServiceReport(WSEngine.getRegisteredServices());
         return Response.ok(response).build();
@@ -76,7 +85,7 @@ public class Admin {
      * @throws CstlServiceException
      */
     @GET
-    @Path("configurationLocation")
+    @Path("/configurationLocation")
     public Response configurationPath() throws CstlServiceException {
         return Response.ok(ConfigurationUtilities.getConfigPath()).build();
     }
@@ -88,7 +97,7 @@ public class Admin {
      * @throws CstlServiceException
      */
     @POST
-    @Path("configurationLocation")
+    @Path("/configurationLocation")
     public Response configurationPath(final Configuration configuration) throws CstlServiceException {
         return Response.ok(ConfigurationUtilities.setConfigPath(configuration.getPath())).build();
     }
@@ -99,7 +108,7 @@ public class Admin {
      * @throws CstlServiceException
      */
     @GET
-    @Path("property/{key}")
+    @Path("/property/{key}")
     public Response getKey(@PathParam("key") String key) throws CstlServiceException {
         return Response.ok(new SimpleValue(ConfigurationUtilities.getProperty(key))).build();
     }
@@ -111,7 +120,7 @@ public class Admin {
      * @throws CstlServiceException
      */
     @POST
-    @Path("property/{key}")
+    @Path("/property/{key}")
     public Response setKey(@PathParam("key") String key, final SimpleValue value) throws CstlServiceException {
         ConfigurationUtilities.setProperty(key, value.getValue());
         return Response.ok(new AcknowlegementType(CommonConstants.SUCCESS, "the key have been set")).build();
@@ -122,15 +131,26 @@ public class Admin {
      * @return
      */
     @GET
-    @Path("instances")
-    public Response listInstances(){
+    @Path("/domain/{domainId}/instances")
+    public Response listInstances(@PathParam("domainId") int domainId, @Context HttpServletRequest httpServletRequest){
         final List<Instance> instances = new ArrayList<>();
         final Set<String> services = WSEngine.getRegisteredServices().keySet();
+        
+        Map<String, Set<String>> servicesByType = serviceRepository.getAccessiblesServicesByType(domainId, httpServletRequest.getUserPrincipal().getName()); 
+        
         for (final String service : services) {
             try {
                 final Specification spec = Specification.fromShortName(service);
-                final OGCConfigurer configurer = (OGCConfigurer) ServiceConfigurer.newInstance(spec);
-                instances.addAll(configurer.getInstances());
+                Set<String> serviceIdentifiers = servicesByType.get(spec.name());
+                
+                if(serviceIdentifiers != null) {
+                    final OGCConfigurer configurer = (OGCConfigurer) ServiceConfigurer.newInstance(spec);
+                    for(Instance instance: configurer.getInstances()) {
+                        if(serviceIdentifiers.contains(instance.getIdentifier()))
+                        instances.add(instance);
+                    }
+                    
+                }
             } catch (NotRunningServiceException ignore) {
             }
         }

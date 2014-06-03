@@ -845,17 +845,9 @@ public class ConfigurationEngine {
     }
 
     public static void deleteProvider(final String providerID) {
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            session.deleteProvider(providerID);
-
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
-        } finally {
-            if (session != null)
-                session.close();
-        }
+        
+        configurationService.deleteProvider(providerID);
+      
     }
 
     public static ProviderRecord writeProvider(final String identifier, final String parent,
@@ -1029,16 +1021,10 @@ public class ConfigurationEngine {
     }
 
     public static void deleteData(final QName name, final String providerId) {
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            session.deleteData(name, providerId);
-        } catch (SQLException e) {
-            LOGGER.log(Level.WARNING, "error when try to delete data", e);
-        } finally {
-            if (session != null)
-                session.close();
-        }
+        
+        configurationService.deleteData(name.getNamespaceURI(), name.getLocalPart(), providerId);
+        
+     
     }
 
     public static DataRecord writeData(final QName name, final ProviderRecord provider, final DataRecord.DataType type, final boolean sensorable) {

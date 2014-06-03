@@ -118,7 +118,6 @@ public final class Session implements Closeable {
     private static final String UPDATE_PROVIDER             = "provider.update";
     private static final String UPDATE_PROVIDER_CONFIG      = "provider.update.config";
     private static final String UPDATE_PROVIDER_METADATA    = "provider.update.metadata";
-    private static final String DELETE_PROVIDER             = "provider.delete";
     
     private static final String READ_SENSOR                 = "sensor.read";
     private static final String READ_SENSOR_FROM_ID         = "sensor.read.from.id";
@@ -158,8 +157,6 @@ public final class Session implements Closeable {
     private static final String UPDATE_DATA_VISIBLE         = "data.update.visible";
     private static final String UPDATE_DATA_SENSORABLE      = "data.update.sensorable";
     private static final String UPDATE_DATA_SUBTYPE         = "data.update.subtype";
-    private static final String DELETE_DATA                 = "data.delete";
-    private static final String DELETE_DATA_NMSP            = "data.delete.nmsp";
     private static final String SEARCH_DATA_ISO_METADATA    = "data.search.iso_metadata";
 
     private static final String WRITE_STYLED_DATA           = "styled_data.write";
@@ -605,16 +602,7 @@ public final class Session implements Closeable {
 
 
 
-    /**
-     * Deletes the provider with the specified {@code identifier}.
-     *
-     * @param identifier the provider identifier
-     * @throws SQLException if a database access error occurs
-     */
-    public void deleteProvider(final String identifier) throws SQLException {
-        ensureNonNull("identifier", identifier);
-        new Query(DELETE_PROVIDER).with(identifier).update();
-    }
+    
     
     /**************************************************************************
      *                        sensor table queries                          *
@@ -1007,15 +995,7 @@ public final class Session implements Closeable {
         new Query(UPDATE_DATA_SUBTYPE).with(subtype, dataId).update();
     }
 
-    public void deleteData(final QName name, final String providerId) throws SQLException {
-        ensureNonNull("name",       name);
-        ensureNonNull("providerId", providerId);
-        if (name.getNamespaceURI() != null) {
-            new Query(DELETE_DATA_NMSP).with(name.getLocalPart(), name.getNamespaceURI(), providerId).update();
-        } else {
-            new Query(DELETE_DATA).with(name.getLocalPart(), providerId).update();
-        }
-    }
+  
     
     /**
      * look for existence of the data metadata with the specified {@code generatedId}.

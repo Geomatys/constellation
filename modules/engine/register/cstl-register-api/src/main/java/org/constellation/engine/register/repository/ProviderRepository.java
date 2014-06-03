@@ -42,6 +42,8 @@ import org.constellation.engine.register.Provider;
 
     int delete(int id);
 
+    int deleteByIdentifier(String providerID);
+
 
     
 }

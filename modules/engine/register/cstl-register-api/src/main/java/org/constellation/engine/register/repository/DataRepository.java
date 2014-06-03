@@ -33,5 +33,7 @@ public interface DataRepository {
     Data save(Data data);
 
     int delete(int id);
+
+    int delete(String namespaceURI, String localPart, int providerId);
     
 }

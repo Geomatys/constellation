@@ -24,6 +24,8 @@ import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.*;
 import org.constellation.dto.Service;
 import org.constellation.dto.SimpleValue;
+import org.constellation.engine.register.repository.DomainRepository;
+import org.constellation.engine.register.repository.ServiceRepository;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.ogc.configuration.OGCConfigurer;
@@ -32,6 +34,8 @@ import org.glassfish.jersey.jettison.JettisonConfig;
 import org.glassfish.jersey.jettison.JettisonJaxbContext;
 import org.glassfish.jersey.jettison.JettisonUnmarshaller;
 
+import javax.annotation.security.RolesAllowed;
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -69,6 +73,13 @@ import static org.constellation.utils.RESTfulUtilities.ok;
 public final class OGCServices {
     private static final Logger LOGGER = Logging.getLogger(OGCServices.class);
 
+    
+    @Inject
+    private DomainRepository domainRepository;
+    
+    @Inject
+    private ServiceRepository serviceRepository;
+    
     /**
      * @see OGCConfigurer#getInstance(String)
      */
@@ -101,14 +112,24 @@ public final class OGCServices {
      * @see OGCConfigurer#createInstance(String, Service, Object)
      */
     @PUT
-    @Path("/")
-    public Response addInstance(final @PathParam("spec") String spec, final Service metadata) throws Exception {
+    @Path("/domain/{domainId}")
+    public Response addInstance(@PathParam("domainId") int domainId, final @PathParam("spec") String spec, final Service metadata) throws Exception {
+        
+        if(serviceRepository.findByIdentifierAndType(metadata.getIdentifier(), spec) != null) {
+            return Response.serverError().entity("admin.error.service.exist").build();
+        }
+        
         try {
             getConfigurer(spec).createInstance(metadata.getIdentifier(), metadata, null);
         } catch (ConfigurationException e) {
             LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
             throw e;
         }
+        
+        org.constellation.engine.register.Service service = serviceRepository.findByIdentifierAndType(metadata.getIdentifier(), spec);
+        
+        domainRepository.addServiceToDomain(service.getId(), domainId);
+        
         return created(AcknowlegementType.success(spec.toUpperCase() + " service \"" + metadata.getIdentifier() + "\" successfully created."));
     }
 

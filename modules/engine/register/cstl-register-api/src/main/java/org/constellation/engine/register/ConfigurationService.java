@@ -49,4 +49,8 @@ public interface ConfigurationService {
 
     List<String> getProviderIdentifiers();
 
+    void deleteData(String namespaceURI, String localPart, String providerIdentifier);
+
+    void deleteProvider(String providerID);
+
 }

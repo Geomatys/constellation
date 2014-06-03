@@ -216,10 +216,10 @@ cstlAdminApp.factory('PermissionService', ['$http',
 
 cstlAdminApp.factory('webService', ['$resource',
                                      function ($resource) {
-                                         return $resource('@cstl/api/1/admin/instances;jsessionid=', {}, {
+                                         return $resource('@cstl/api/1/admin/domain/$domainId/instances;jsessionid=', {}, {
                                              'listAll':      {method: 'GET', isArray: false},
                                              'get':          {method: 'GET', url: '@cstl/api/1/OGC/:type/:id;jsessionid='},
-                                             'create':       {method: 'PUT', url: '@cstl/api/1/OGC/:type;jsessionid='},
+                                             'create':       {method: 'PUT', url: '@cstl/api/1/OGC/:type/domain/$domainId'},
                                              'delete':       {method: 'DELETE', url: '@cstl/api/1/OGC/:type/:id;jsessionid='},
                                              'restart':      {method: 'POST', url: '@cstl/api/1/OGC/:type/:id/restart;jsessionid='},
                                              'start':        {method: 'POST', url: '@cstl/api/1/OGC/:type/:id/start;jsessionid='},
