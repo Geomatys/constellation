@@ -1070,12 +1070,32 @@ public abstract class SOS2WorkerTest implements ApplicationContextAware {
                                       "text/xml; subtype=\"om/1.0.0\"");
         
         result = (GetObservationResponseType) worker.getObservation(request);
-        assertEquals(1, result.getMember().size());
-        obsResult = (OMObservationType) result.getMember().iterator().next();
+        assertEquals(2, result.getMember().size());
+        final Iterator it = result.getMember().iterator();
+        obsResult = (OMObservationType) it.next();
 
         obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/v200/observation6.xml"));
         expResult = (OMObservationType)obj.getValue();
 
+        assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
+        assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
+        assertEquals(expResult.getProcedure(), obsResult.getProcedure());
+        
+         // do not compare datarray name (ID) because it depends on the implementation
+        expArray = (DataArrayPropertyType) expResult.getResult();
+        resArray = (DataArrayPropertyType) obsResult.getResult();
+        emptyNameAndId(expArray.getDataArray(),  resArray.getDataArray());
+        
+        assertEquals(expResult.getResult(), obsResult.getResult());
+        assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
+        assertEquals(expResult, obsResult);
+        
+        obsResult = (OMObservationType) it.next();
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/v200/observation7.xml"));
+        expResult = (OMObservationType)obj.getValue();
+        
+        expResult.getPropertyFeatureOfInterest().setToHref();
+        
         assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
         assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
         assertEquals(expResult.getProcedure(), obsResult.getProcedure());

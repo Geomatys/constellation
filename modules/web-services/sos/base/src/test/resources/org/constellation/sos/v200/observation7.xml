@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<om:OM_Observation xmlns:sos="http://www.opengis.net/sos/2.0"
+                   xmlns:swe="http://www.opengis.net/swe/2.0" 
+                   xmlns:gml="http://www.opengis.net/gml/3.2" 
+                   xmlns:om="http://www.opengis.net/om/2.0" 
+                   xmlns:sams="http://www.opengis.net/samplingSpatial/2.0"
+                   xmlns:sf="http://www.opengis.net/sampling/2.0" 
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns:xlink="http://www.w3.org/1999/xlink"
+                   gml:id="obs-901">
+    <gml:name>urn:ogc:object:observation:GEOM:901</gml:name>
+    <om:type xlink:href="http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_ComplexObservation"/>
+    <om:phenomenonTime>
+        <gml:TimePeriod gml:id="time-901">
+            <gml:beginPosition>2009-05-01T13:47:00.0</gml:beginPosition>
+            <gml:endPosition>2009-05-01T13:47:00.0</gml:endPosition>
+        </gml:TimePeriod>
+    </om:phenomenonTime>
+    <om:resultTime/>
+    <om:procedure xlink:href="urn:ogc:object:sensor:GEOM:9"/>
+    <om:observedProperty xlink:href="urn:ogc:def:phenomenon:GEOM:depth"/>
+    <om:featureOfInterest>
+        <sams:SF_SpatialSamplingFeature gml:id="station-006">
+            <gml:description>Geology traverse</gml:description>
+            <gml:name>cycle1</gml:name>
+            <gml:boundedBy>
+                <gml:Envelope gml:id="bound-1" srsName="urn:ogc:def:crs:epsg:7.9:27582">
+                    <gml:lowerCorner>-30.711 134.196</gml:lowerCorner>
+                    <gml:upperCorner>-30.702 134.205</gml:upperCorner>
+                </gml:Envelope>
+            </gml:boundedBy>
+            <sf:type xlink:href="http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingCurve"/>
+            <sams:shape>
+                <gml:LineString gml:id="pr1_ls1" srsName="urn:ogc:def:crs:epsg:7.9:27582">
+                    <gml:pos>-30.711 134.205</gml:pos>
+                    <gml:pos>-30.710 134.204</gml:pos>
+                    <gml:pos>-30.709 134.203</gml:pos>
+                    <gml:pos>-30.708 134.201</gml:pos>
+                    <gml:pos>-30.706 134.196</gml:pos>
+                    <gml:pos>-30.703 134.197</gml:pos>
+                    <gml:pos>-30.702 134.199</gml:pos>
+                </gml:LineString>
+            </sams:shape>
+        </sams:SF_SpatialSamplingFeature>
+    </om:featureOfInterest>
+    <om:result xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="swe:DataArrayPropertyType">
+        <swe:DataArray id="dataArray-4">
+            <swe:elementCount>
+                <swe:Count>
+                    <swe:value>1</swe:value>
+                </swe:Count>
+            </swe:elementCount>
+            <swe:elementType name="dataArray-4">
+                <swe:DataRecord id="datarecord-1" fixed="false">
+                    <swe:field name="depth">
+                        <swe:Quantity definition="urn:ogc:def:phenomenon:GEOM:depth">
+                            <swe:uom code="m"/>
+                        </swe:Quantity>
+                    </swe:field>
+                </swe:DataRecord>
+            </swe:elementType>
+            <swe:encoding>
+                <swe:TextEncoding blockSeparator="@@" decimalSeparator="." tokenSeparator="," id="encoding-1"/>
+            </swe:encoding>
+            <swe:values>18.5@@</swe:values>
+        </swe:DataArray>
+    </om:result>
+</om:OM_Observation>

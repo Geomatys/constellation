@@ -326,8 +326,8 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                     final SamplingFeature feature = getFeatureOfInterest(featureID, version, c);
                     final FeatureProperty prop    = buildFeatureProperty(version, feature); 
                     final Phenomenon phen         = getPhenomenon(version, observedProperty, c);
-                    String firstTime              = null;
-                    String lastTime               = null;
+                    String firstTime              = formatTime(rs.getString("time_begin"));
+                    String lastTime               = formatTime(rs.getString("time_end"));
                     boolean first                 = true;
                     final List<AnyScalar> scal    = new ArrayList<>();
                     for (Field f : fields) {
@@ -417,6 +417,13 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
         } catch (DataStoreException ex) {
             throw new DataStoreException("the service has throw a Datastore Exception:" + ex.getMessage(), ex);
         }
+    }
+    
+    private String formatTime(String s) {
+        if (s != null) {
+            s = s.replace(' ', 'T'); 
+        }
+        return s;
     }
     
     private DataArrayProperty buildComplexResult(final String version, final Collection<AnyScalar> fields, final int nbValue, 

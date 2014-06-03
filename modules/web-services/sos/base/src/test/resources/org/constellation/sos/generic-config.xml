@@ -29,7 +29,7 @@
                         <sql>count(*)</sql>
                     </col>
                 </select>
-                <from>"observation"."observations"</from>
+                <from>"om"."observations"</from>
                 <where>"name" LIKE '%:$%'</where>
             </query>
             <!-- Observation id already exist (not needed in discovery profile)-->
@@ -40,7 +40,7 @@
                         <sql>"name"</sql>
                     </col>
                 </select>
-                <from>"observation"."observations"</from>
+                <from>"om"."observations"</from>
                 <where>"name"=:$</where>
             </query>
             <!-- minimal time event for offering -->
@@ -51,7 +51,7 @@
                         <sql>MIN("event_time_begin")</sql>
                     </col>
                 </select>
-                <from>"sos"."observation_offerings"</from>
+                <from>"om"."observation_offerings"</from>
             </query>
             <!-- verify that the offering exist -->
             <query>
@@ -61,7 +61,7 @@
                         <sql>"id"</sql>
                     </col>
                 </select>
-                <from>"sos"."observation_offerings"</from>
+                <from>"om"."observation_offerings"</from>
                 <where>"id"=:$</where>
             </query>
             <!-- time bound for an offering -->
@@ -76,7 +76,7 @@
                         <sql>"event_time_end"</sql>
                     </col>
                 </select>
-                <from>"sos"."observation_offerings"</from>
+                <from>"om"."observation_offerings"</from>
                 <where>"id"=:$</where>
             </query>
             <!-- phenomenon exist? -->
@@ -87,7 +87,7 @@
                         <sql>"id"</sql>
                     </col>
                 </select>
-                <from>"observation"."phenomenons"</from>
+                <from>"om"."phenomenons"</from>
                 <where>"id"=:$</where>
             </query>
             <!-- composite phenomenon exist? -->
@@ -98,7 +98,7 @@
                         <sql>"id"</sql>
                     </col>
                 </select>
-                <from>"observation"."composite_phenomenons"</from>
+                <from>"om"."composite_phenomenons"</from>
                 <where>"id"=:$</where>
             </query>
             <!-- simple phenomenon -->
@@ -113,7 +113,7 @@
                         <sql>"description"</sql>
                     </col>
                 </select>
-                <from>"observation"."phenomenons"</from>
+                <from>"om"."phenomenons"</from>
                 <where>"id"=:$</where>
             </query>
             <!-- composite phenomenon -->
@@ -128,7 +128,7 @@
                         <sql>"description"</sql>
                     </col>
                 </select>
-                <from>"observation"."composite_phenomenons"</from>
+                <from>"om"."composite_phenomenons"</from>
                 <where>"id"=:$</where>
             </query>
             <!-- feature of interest (samplingPoint) exist-->
@@ -139,7 +139,7 @@
                         <sql>"id"</sql>
                     </col>
                 </select>
-                <from>"observation"."sampling_points"</from>
+                <from>"om"."sampling_features"</from>
                 <where>"id"=:$</where>
             </query>
             <!-- feature of interest (samplingPoint)-->
@@ -170,7 +170,7 @@
                         <sql>"point_srsdimension"</sql>
                     </col>
                 </select>
-                <from>"observation"."sampling_points"</from>
+                <from>"om"."sampling_features"</from>
                 <where>"id"=:$</where>
             </query>
             <!-- feature of interest (samplingCurve) exist-->
@@ -181,7 +181,7 @@
                         <sql>"id"</sql>
                     </col>
                 </select>
-                <from>"observation"."sampling_curves"</from>
+                <from>"om"."sampling_features"</from>
                 <where>"id"=:$</where>
             </query>
             <!-- feature of interest (samplingCurve)-->
@@ -240,7 +240,7 @@
                         <sql>env."id"</sql>
                     </col>
                 </select>
-                <from>"observation"."sampling_curves" sc, "sos"."envelopes" env</from>
+                <from>"om"."sampling_curves" sc, "sos"."envelopes" env</from>
                 <where>sc."id"=:$
                     AND sc."boundedby" = env."id"</where>
             </query>
@@ -280,7 +280,7 @@
                         <sql>"result"</sql>
                     </col>
                 </select>
-                <from>"observation"."observations"</from>
+                <from>"om"."observations"</from>
                 <where>"name"=:$</where>
             </query>
             <!-- measurement -->
@@ -319,7 +319,7 @@
                         <sql>"result"</sql>
                     </col>
                 </select>
-                <from>"observation"."measurements"</from>
+                <from>"om"."measurements"</from>
                 <where>"name"=:$</where>
             </query>
             <!-- result -->
@@ -482,7 +482,7 @@
                         <sql>"id"</sql>
                     </col>
                 </select>
-                <from>"observation"."sampling_points"</from>
+                <from>"om"."sampling_features"</from>
             </query>
             <query>
                 <select>
@@ -491,7 +491,7 @@
                         <sql>"id"</sql>
                     </col>
                 </select>
-                <from>"observation"."sampling_curves"</from>
+                <from>"om"."sampling_features"</from>
             </query>
             <!-- observation offering -->
             <query>
@@ -501,7 +501,7 @@
                         <sql>"srs_name"</sql>
                     </col>
                 </select>
-                <from>"sos"."observation_offerings"</from>
+                <from>"om"."observation_offerings"</from>
                 <where>"id"=:$</where>
             </query>
             <!-- procedure for an offering -->

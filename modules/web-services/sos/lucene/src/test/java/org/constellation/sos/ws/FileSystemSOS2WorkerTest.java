@@ -114,6 +114,7 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
         writeDataFile(observationsDirectory, "v200/observation4.xml", "urn:ogc:object:observation:GEOM:307");
         writeDataFile(observationsDirectory, "v200/observation5.xml", "urn:ogc:object:observation:GEOM:507");
         writeDataFile(observationsDirectory, "v200/observation6.xml", "urn:ogc:object:observation:GEOM:801");
+        writeDataFile(observationsDirectory, "v200/observation7.xml", "urn:ogc:object:observation:GEOM:901");
 
         File observationTemplatesDirectory = new File(instDirectory, "observationTemplates");
         observationTemplatesDirectory.mkdir();

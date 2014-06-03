@@ -54,10 +54,13 @@ INSERT INTO "om"."offering_observed_properties" VALUES ('offering-8','urn:ogc:de
 INSERT INTO "om"."offering_observed_properties" VALUES ('offering-8','urn:ogc:def:phenomenon:GEOM:depth');
 INSERT INTO "om"."offering_observed_properties" VALUES ('offering-8','urn:ogc:def:phenomenon:GEOM:temperature');
 
+INSERT INTO "om"."offering_observed_properties" VALUES ('offering-9','urn:ogc:def:phenomenon:GEOM:depth');
+
 INSERT INTO "om"."offering_foi" VALUES ('offering-3','station-001');
 INSERT INTO "om"."offering_foi" VALUES ('offering-4','station-001');
 INSERT INTO "om"."offering_foi" VALUES ('offering-5','station-002');
 INSERT INTO "om"."offering_foi" VALUES ('offering-8','station-006');
+INSERT INTO "om"."offering_foi" VALUES ('offering-9','station-006');
 
 INSERT INTO "om"."observations"  VALUES ('urn:ogc:object:observation:GEOM:406', 406, '2007-05-01 12:59:00.0', '2007-05-01 16:59:00.0', 'urn:ogc:def:phenomenon:GEOM:depth',               'urn:ogc:object:sensor:GEOM:4', 'station-001');
 INSERT INTO "om"."observations"  VALUES ('urn:ogc:object:observation:GEOM:304', 304, '2007-05-01 02:59:00.0', '2007-05-01 06:59:00.0', 'urn:ogc:def:phenomenon:GEOM:depth',               'urn:ogc:object:sensor:GEOM:3', 'station-001');
@@ -66,6 +69,7 @@ INSERT INTO "om"."observations"  VALUES ('urn:ogc:object:observation:GEOM:307', 
 INSERT INTO "om"."observations"  VALUES ('urn:ogc:object:observation:GEOM:507', 507, '2007-05-01 12:59:00.0', '2007-05-01 16:59:00.0', 'urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon', 'urn:ogc:object:sensor:GEOM:5', 'station-002');
 INSERT INTO "om"."observations"  VALUES ('urn:ogc:object:observation:GEOM:801', 801, '2007-05-01 12:59:00.0', '2007-05-01 16:59:00.0', 'urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon', 'urn:ogc:object:sensor:GEOM:8', 'station-006');
 INSERT INTO "om"."observations"  VALUES ('urn:ogc:object:observation:GEOM:802', 802,  NULL,                   NULL,                    'urn:ogc:def:phenomenon:GEOM:temperature',         'urn:ogc:object:sensor:GEOM:7', 'station-002');
+INSERT INTO "om"."observations"  VALUES ('urn:ogc:object:observation:GEOM:901', 901, '2009-05-01 13:47:00.0', '2009-05-01 13:47:00.0', 'urn:ogc:def:phenomenon:GEOM:depth',         'urn:ogc:object:sensor:GEOM:9', 'station-006');
 
 
 INSERT INTO "om"."procedure_descriptions"  VALUES ('urn:ogc:object:sensor:GEOM:3', 1, 'Time',        'Time',     'urn:ogc:data:time:iso8601',                 NULL);
@@ -79,6 +83,7 @@ INSERT INTO "om"."procedure_descriptions"  VALUES ('urn:ogc:object:sensor:GEOM:8
 INSERT INTO "om"."procedure_descriptions"  VALUES ('urn:ogc:object:sensor:GEOM:8', 3, 'temperature', 'Quantity', 'urn:ogc:def:phenomenon:GEOM:temperature',  '°C');
 INSERT INTO "om"."procedure_descriptions"  VALUES ('urn:ogc:object:sensor:GEOM:7', 1, 'Time',        'Time',     'urn:ogc:data:time:iso8601',                 NULL);
 INSERT INTO "om"."procedure_descriptions"  VALUES ('urn:ogc:object:sensor:GEOM:7', 2, 'temperature', 'Quantity', 'urn:ogc:def:phenomenon:GEOM:temperature',  '°C');
+INSERT INTO "om"."procedure_descriptions"  VALUES ('urn:ogc:object:sensor:GEOM:9', 1, 'depth',       'Quantity', 'urn:ogc:def:phenomenon:GEOM:depth',        'm');
 
 CREATE TABLE "mesures"."mesure3"("id_observation" integer NOT NULL,
                                  "id"             integer NOT NULL,
@@ -143,3 +148,9 @@ CREATE TABLE "mesures"."mesure7"("id_observation" integer NOT NULL,
                                  "temperature"    character varying(1000));
 
 INSERT INTO "mesures"."mesure7" VALUES (802, 1,  '2007-05-01 16:59:00','6.56');
+
+CREATE TABLE "mesures"."mesure9"("id_observation" integer NOT NULL,
+                                 "id"             integer NOT NULL,
+                                 "depth"          character varying(1000));
+
+INSERT INTO "mesures"."mesure9" VALUES (901, 1,  '18.5');

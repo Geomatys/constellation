@@ -51,8 +51,8 @@ import org.junit.runner.RunWith;
  *
  * @author Guilhem Legal (Geomatys)
  */
-@RunWith(SpringTestRunner.class)
 @Ignore
+@RunWith(SpringTestRunner.class)
 public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
 
     private static DefaultDataSource ds = null;
@@ -69,8 +69,33 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
 
         Connection con = ds.getConnection();
         DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
-        sr.run(Util.getResourceAsStream("org/constellation/data/om2/structure_observations.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/om2/structure_observations.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data-om2.sql"));
+
+
+        MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+
+        //we write the configuration file
+        Automatic SMLConfiguration = new Automatic();
+        SMLConfiguration.setFormat("nosml");
+
+        Automatic OMConfiguration = (Automatic) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/generic-config.xml"));
+        pool.recycle(unmarshaller);
+
+        OMConfiguration.getBdd().setConnectURL(url);
+
+        SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
+        configuration.setObservationReaderType(DataSourceType.GENERIC);
+        configuration.setObservationWriterType(DataSourceType.NONE);
+        configuration.setSMLType(DataSourceType.NONE);
+        configuration.setObservationFilterType(DataSourceType.GENERIC);
+        configuration.setPhenomenonIdBase("urn:ogc:def:phenomenon:GEOM:");
+        configuration.setProfile("discovery");
+        configuration.setObservationTemplateIdBase("urn:ogc:object:observation:template:GEOM:");
+        configuration.setObservationIdBase("urn:ogc:object:observation:GEOM:");
+        configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
+        configuration.getParameters().put("transactionSecurized", "false");
 
         ConfigDirectory.setupTestEnvironement("GPGSOSWorkerTest");
 
