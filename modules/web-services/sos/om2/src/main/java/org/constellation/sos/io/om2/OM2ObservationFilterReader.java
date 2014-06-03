@@ -22,31 +22,8 @@ package org.constellation.sos.io.om2;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKBReader;
-import org.apache.sis.storage.DataStoreException;
-import org.constellation.generic.database.Automatic;
-import org.geotoolkit.gml.xml.Envelope;
-import org.geotoolkit.gml.xml.FeatureProperty;
-import org.geotoolkit.observation.ObservationFilterReader;
-import org.geotoolkit.observation.ObservationStoreException;
-import org.geotoolkit.observation.xml.AbstractObservation;
-import org.geotoolkit.observation.xml.OMXmlFactory;
-import org.geotoolkit.referencing.CRS;
-import org.geotoolkit.swe.xml.AbstractDataComponent;
-import org.geotoolkit.swe.xml.AbstractDataRecord;
-import org.geotoolkit.swe.xml.AnyScalar;
-import org.geotoolkit.swe.xml.DataArrayProperty;
-import org.geotoolkit.swe.xml.TextBlock;
-import org.geotoolkit.swe.xml.UomProperty;
-import org.opengis.observation.Observation;
-import org.opengis.observation.Phenomenon;
-import org.opengis.observation.sampling.SamplingFeature;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.temporal.Instant;
-import org.opengis.temporal.Period;
-import org.opengis.temporal.TemporalGeometricPrimitive;
-import org.opengis.util.FactoryException;
-
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -59,26 +36,42 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-
+import org.apache.sis.storage.DataStoreException;
+import org.constellation.generic.database.Automatic;
 import static org.constellation.sos.ws.SOSConstants.EVENT_TIME;
 import static org.constellation.sos.ws.SOSConstants.MEASUREMENT_QNAME;
 import static org.constellation.sos.ws.SOSConstants.RESPONSE_MODE;
 import static org.constellation.sos.ws.SOSUtils.getTimeValue;
+import org.geotoolkit.gml.xml.Envelope;
+import org.geotoolkit.gml.xml.FeatureProperty;
+import org.geotoolkit.observation.ObservationFilterReader;
+import org.geotoolkit.observation.ObservationStoreException;
+import org.geotoolkit.observation.xml.AbstractObservation;
+import org.geotoolkit.observation.xml.OMXmlFactory;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildAnyScalar;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildBoolean;
+import org.geotoolkit.referencing.CRS;
 import static org.geotoolkit.sos.xml.SOSXmlFactory.buildDataArrayProperty;
 import static org.geotoolkit.sos.xml.SOSXmlFactory.buildFeatureProperty;
 import static org.geotoolkit.sos.xml.SOSXmlFactory.buildMeasure;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildQuantity;
 import static org.geotoolkit.sos.xml.SOSXmlFactory.buildSimpleDatarecord;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildText;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildTimePeriod;
 import static org.geotoolkit.sos.xml.SOSXmlFactory.buildTimeInstant;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildUomProperty;
 import static org.geotoolkit.sos.xml.SOSXmlFactory.getCsvTextEncoding;
 import static org.geotoolkit.sos.xml.SOSXmlFactory.getDefaultTextEncoding;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.getDefaultTimeField;
+import org.geotoolkit.swe.xml.AbstractDataRecord;
+import org.geotoolkit.swe.xml.AnyScalar;
+import org.geotoolkit.swe.xml.DataArray;
+import org.geotoolkit.swe.xml.DataArrayProperty;
+import org.geotoolkit.swe.xml.TextBlock;
+import org.opengis.observation.Observation;
+import org.opengis.observation.Phenomenon;
+import org.opengis.observation.sampling.SamplingFeature;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.temporal.Instant;
+import org.opengis.temporal.Period;
+import org.opengis.temporal.TemporalGeometricPrimitive;
+import org.opengis.util.FactoryException;
 
 
 /**
@@ -134,7 +127,8 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
         if (time instanceof Instant) {
             final Instant ti      = (Instant) time;
             final String position = getTimeValue(ti.getPosition());
-            sqlRequest.append("AND (\"time\"<='").append(position).append("')");
+            sqlRequest.append("AND (\"time_begin\"<='").append(position).append("')");
+            sqlMeasureRequest.append("AND (\"time\"<='").append(position).append("')");
 
         } else {
             throw new ObservationStoreException("TM_Before operation require timeInstant!",
@@ -151,7 +145,8 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
         if (time instanceof Instant) {
             final Instant ti      = (Instant) time;
             final String position = getTimeValue(ti.getPosition());
-            sqlRequest.append("AND (\"time\">='").append(position).append("')");
+            sqlRequest.append("AND (\"time_end\">='").append(position).append("')");
+            sqlMeasureRequest.append("AND (\"time\">='").append(position).append("')");
         } else {
             throw new ObservationStoreException("TM_After operation require timeInstant!",
                     INVALID_PARAMETER_VALUE, EVENT_TIME);
@@ -167,8 +162,24 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             final Period tp    = (Period) time;
             final String begin = getTimeValue(tp.getBeginning().getPosition());
             final String end   = getTimeValue(tp.getEnding().getPosition());
+            sqlRequest.append("AND (");
+
+            // the multiple observations included in the period
+            sqlRequest.append(" (\"time_begin\">='").append(begin).append("' AND \"time_end\"<='").append(end).append("')");
+            sqlRequest.append("OR");
+            // the single observations included in the period
+            sqlRequest.append(" (\"time_begin\">='").append(begin).append("' AND \"time_begin\">='").append(end).append("' AND \"time_end\" IS NULL)");
+            sqlRequest.append("OR");
+            // the multiple observations which overlaps the first bound
+            sqlRequest.append(" (\"time_begin\"<='").append(begin).append("' AND \"time_end\"<='").append(end).append("' AND \"time_end\">='").append(begin).append("')");
+            sqlRequest.append("OR");
+            // the multiple observations which overlaps the second bound
+            sqlRequest.append(" (\"time_begin\">='").append(begin).append("' AND \"time_end\">='").append(end).append("' AND \"time_begin\"<='").append(end).append("')");
+            sqlRequest.append("OR");
+            // the multiple observations which overlaps the whole period
+            sqlRequest.append(" (\"time_begin\"<='").append(begin).append("' AND \"time_end\">='").append(end).append("'))");
             
-            sqlRequest.append("AND (\"time\">='").append(begin).append("' AND \"time\"<= '").append(end).append("')");
+            sqlMeasureRequest.append("AND (\"time\">='").append(begin).append("' AND \"time\"<= '").append(end).append("')");
         } else {
             throw new ObservationStoreException("TM_During operation require TimePeriod!",
                     INVALID_PARAMETER_VALUE, EVENT_TIME);
@@ -187,21 +198,12 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             final Statement currentStatement            = c.createStatement();
             final ResultSet rs                          = currentStatement.executeQuery(sqlRequest.toString());
             final TextBlock encoding                    = getDefaultTextEncoding(version);
-            final Map<String, AnyScalar> fields         = new HashMap<>();
-            Observation currentObservation              = null;
             
             while (rs.next()) {
-                final String procedure        = rs.getString("procedure");
-                final Observation observation = observations.get(procedure);
+                final String procedure  = rs.getString("procedure");
+                Observation observation = observations.get(procedure);
                 
                 if (observation == null) {
-                    
-                    // update Last observation result
-                    if (currentObservation != null) {
-                        final Object result = buildComplexResult(version, fields.values(), 0, encoding, null, observations.size() -1);
-                        ((AbstractObservation)currentObservation).setResult(result);
-                        fields.clear();
-                    }
                     
                     final String procedureID      = procedure.substring(sensorIdBase.length());
                     final String obsID           = "obs-" + procedureID;
@@ -211,44 +213,19 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                     final SamplingFeature feature = getFeatureOfInterest(featureID, version, c);
                     final FeatureProperty prop    = buildFeatureProperty(version, feature); 
                     final Phenomenon phen         = getPhenomenon(version, observedProperty, c);
-                    
+                    List<Field> fields            = readFields(procedure, c);
                     /*
                      *  BUILD RESULT
                      */
-                    final String uom        = rs.getString("uom");
-                    final String fieldType  = rs.getString("field_type");
-                    final String fieldDef   = rs.getString("field_definition");
-                    final String fieldName  = rs.getString("field_name");
-                    
-                    fields.put("Time", getDefaultTimeField(version));
-                    
-                    final AnyScalar scalar = buildField(version, fieldName, fieldType, uom, fieldDef);
-                    fields.put(fieldName, scalar);
-                        
-                    currentObservation = OMXmlFactory.buildObservation(version, obsID, name, null, prop, phen, procedure, null, null);
-                    observations.put(procedure, currentObservation);
-                } else {
-                    
-                    /*
-                     * UPDATE FIELDS 
-                     */
-                    final String fieldName  = rs.getString("field_name");
-                    if (!fields.containsKey(fieldName)) {
-                        final String uom        = rs.getString("uom");
-                        final String fieldType  = rs.getString("field_type");
-                        final String fieldDef   = rs.getString("field_definition");
-                        final AnyScalar scalar  = buildField(version, fieldName, fieldType, uom, fieldDef);
-                        fields.put(fieldName, scalar);
+                    final List<AnyScalar> scal    = new ArrayList<>();
+                    for (Field f : fields) {
+                        scal.add(f.getScalar(version));
                     }
+                    final Object result = buildComplexResult(version, scal, 0, encoding, null, observations.size() -1);
+                    observation = OMXmlFactory.buildObservation(version, obsID, name, null, prop, phen, procedure, result, null);
+                    observations.put(procedure, observation);
                 }
             }
-            
-            // update Last observation result
-            if (currentObservation != null) {
-                final Object result = buildComplexResult(version, fields.values(), 0, encoding, null, observations.size());
-                ((AbstractObservation)currentObservation).setResult(result);
-            }
-            
             
             rs.close();
             currentStatement.close();
@@ -256,9 +233,9 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             return new ArrayList<>(observations.values());
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
-            throw new DataStoreException("the service has throw a SQL Exception:" + ex.getMessage());
+            throw new DataStoreException("the service has throw a SQL Exception:" + ex.getMessage(), ex);
         } catch (DataStoreException ex) {
-            throw new DataStoreException("the service has throw a Datastore Exception:" + ex.getMessage());
+            throw new DataStoreException("the service has throw a Datastore Exception:" + ex.getMessage(), ex);
         }
     }
     
@@ -288,9 +265,9 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                     /*
                      *  BUILD RESULT
                      */
-                    final String uom        = rs.getString("uom");
+                    final List<Field> fields = readFields(procedure, c);
                     
-                    final Object result = buildMeasureResult(version, 0, uom, "1");
+                    final Object result = buildMeasureResult(version, 0, fields.get(1).fieldUom, "1");
                     observations.put(procedure, OMXmlFactory.buildMeasurement(version, obsID, name, null, prop, phen, procedure, result, null));
                 } else {
                     
@@ -317,45 +294,31 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
         }
         try {
             // add orderby to the query
-            sqlRequest.append(" ORDER BY o.\"id\", m.\"id\"");
+            sqlRequest.append(" ORDER BY o.\"id\"");
             final Map<String, Observation> observations = new HashMap<>();
             final Connection c                          = source.getConnection();
             final Statement currentStatement            = c.createStatement();
             c.setReadOnly(true);
             final ResultSet rs                          = currentStatement.executeQuery(sqlRequest.toString());
             final TextBlock encoding                    = getDefaultTextEncoding(version);
-            Timestamp oldTime                           = null;
-            StringBuilder values                        = new StringBuilder();
-            int nbValue                                 = 0;
-            final Map<String, AnyScalar> fields         = new LinkedHashMap<>();
-            Observation currentObservation              = null;
-            int nbFieldWritten                          = 0;
-            int totalField                              = 0;
+            final Map<String, List<Field>> fieldMap     = new LinkedHashMap<>();
             
             while (rs.next()) {
+                int nbValue                   = 0;
+                StringBuilder values          = new StringBuilder();
                 final String procedure        = rs.getString("procedure");
                 final String featureID        = rs.getString("foi");
-                final Timestamp currentTime   = rs.getTimestamp("time");
-                final String value            = rs.getString("value");
-                final Observation observation = observations.get(procedure + '-' + featureID);
+                final int oid                 = rs.getInt("id");
+                Observation observation       = observations.get(procedure + '-' + featureID);
+                final int pid                 = getPIDFromProcedure(procedure, c);
+                List<Field> fields            = fieldMap.get(procedure);
+                if (fields == null) {
+                    fields = readFields(procedure, c);
+                    fieldMap.put(procedure, fields);
+                }
                 
                 if (observation == null) {
                     
-                    // update Last observation result
-                    if (currentObservation != null) {
-                        
-                        values.append(encoding.getBlockSeparator());
-                        final Object result = buildComplexResult(version, fields.values(), nbValue, encoding, values.toString(), observations.size() -1);
-                        ((AbstractObservation)currentObservation).setResult(result);
-                        ((AbstractObservation)currentObservation).extendSamplingTime(format.format(oldTime));
-                        values         = new StringBuilder();
-                        nbValue        = 0;
-                        totalField     = 0;
-                        nbFieldWritten = 0;
-                        fields.clear();
-                    }
-                    
-                    final int oid                 = rs.getInt("id");
                     final String obsID            = "obs-"  + oid;
                     final String timeID           = "time-" + oid;
                     final String name             = rs.getString("identifier");
@@ -363,68 +326,86 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                     final SamplingFeature feature = getFeatureOfInterest(featureID, version, c);
                     final FeatureProperty prop    = buildFeatureProperty(version, feature); 
                     final Phenomenon phen         = getPhenomenon(version, observedProperty, c);
-                    final TemporalGeometricPrimitive time = buildTimeInstant(version, timeID, format2.format(currentTime));
+                    String firstTime              = null;
+                    String lastTime               = null;
+                    boolean first                 = true;
+                    final List<AnyScalar> scal    = new ArrayList<>();
+                    for (Field f : fields) {
+                        scal.add(f.getScalar(version));
+                    }
                     
                     /*
                      *  BUILD RESULT
                      */
-                    final String uom        = rs.getString("uom");
-                    final String fieldType  = rs.getString("field_type");
-                    final String fieldDef   = rs.getString("field_definition");
-                    final String fieldName  = rs.getString("field_name");
+                    final PreparedStatement stmt  = c.prepareStatement("SELECT * FROM \"mesures\".\"mesure" + pid + "\" m "
+                                                         + "WHERE \"id_observation\" = ? " + sqlMeasureRequest.toString() 
+                                                         + "ORDER BY m.\"id\"");
                     
-                    fields.put("Time", getDefaultTimeField(version));
-                    
-                    final AnyScalar scalar = buildField(version, fieldName, fieldType, uom, fieldDef);
-                    fields.put(fieldName, scalar);
-                    totalField++;
-                        
-                    values.append(format.format(currentTime)).append(encoding.getTokenSeparator()).append(value);
-                    nbValue++;
-                    nbFieldWritten++;
-                    
-                    currentObservation = OMXmlFactory.buildObservation(version, obsID, name, null, prop, phen, procedure, null, time);
-                    observations.put(procedure + '-' + featureID, currentObservation);
-                } else {
-                    
-                    /*
-                     * UPDATE FIELDS 
-                     */
-                    final String fieldName  = rs.getString("field_name");
-                    if (!fields.containsKey(fieldName)) {
-                        final String uom        = rs.getString("uom");
-                        final String fieldType  = rs.getString("field_type");
-                        final String fieldDef   = rs.getString("field_definition");
-                        final AnyScalar scalar  = buildField(version, fieldName, fieldType, uom, fieldDef);
-                        fields.put(fieldName, scalar);
-                        totalField++;
-                    }
-                    
-                    /*
-                     *  UPDATE RESULT
-                     */
-                    if (!currentTime.equals(oldTime) || nbFieldWritten == totalField) {
-                        values.append(encoding.getBlockSeparator()).append(format.format(currentTime)).append(encoding.getTokenSeparator()).append(value);
+                    stmt.setInt(1, oid);
+                    final ResultSet rs2 = stmt.executeQuery();
+                    while (rs2.next()) {
+                        for (int i = 0; i < fields.size(); i++) {
+                            String value = rs2.getString(i + 3);
+                            Field field = fields.get(i);
+                            // for time TODO remove when field will be typed
+                            if (field.fieldType.equals("Time")) {
+                                value = value.replace(' ', 'T'); 
+                                if (first) {
+                                    firstTime = value;
+                                    first = false;
+                                }
+                                lastTime  = value;
+                                value = value.substring(0, value.length() - 2);
+                            }
+                            values.append(value).append(encoding.getTokenSeparator());
+                        }
+                        values.deleteCharAt(values.length() - 1);
+                        values.append(encoding.getBlockSeparator());
                         nbValue++;
-                        nbFieldWritten = 0;
-                    } else {
-                        values.append(encoding.getTokenSeparator()).append(value);
                     }
-                    nbFieldWritten++;
+                    rs2.close();
+                    stmt.close();    
                     
+                    
+                    final TemporalGeometricPrimitive time = buildTimePeriod(version, timeID, firstTime, lastTime);
+                    final Object result = buildComplexResult(version, scal, nbValue, encoding, values.toString(), observations.size() -1);
+                    observation = OMXmlFactory.buildObservation(version, obsID, name, null, prop, phen, procedure, result, time);
+                    observations.put(procedure + '-' + featureID, observation);
+                } else {
+                    String lastTime = null;
+                    final PreparedStatement stmt  = c.prepareStatement("SELECT * FROM \"mesures\".\"mesure" + pid + "\" m "
+                                                         + "WHERE \"id_observation\" = ? " + sqlMeasureRequest.toString() 
+                                                         + "ORDER BY m.\"id\"");
+                    
+                    stmt.setInt(1, oid);
+                    final ResultSet rs2 = stmt.executeQuery();
+                    while (rs2.next()) {
+                        for (int i = 0; i < fields.size(); i++) {
+                            String value = rs2.getString(i + 3);
+                            Field field = fields.get(i);
+                            // for time TODO remove when field will be typed
+                            if (field.fieldType.equals("Time")) {
+                                value = value.replace(' ', 'T'); 
+                                value = value.substring(0, value.length() - 2);
+                                lastTime = value;
+                            }
+                            values.append(value).append(encoding.getTokenSeparator());
+                        }
+                        values.deleteCharAt(values.length() - 1);
+                        values.append(encoding.getBlockSeparator());
+                        nbValue++;
+                    }
+                    rs2.close();
+                    stmt.close();
+                    
+                    // UPDATE RESULTS
+                    final DataArrayProperty result = (DataArrayProperty) ((AbstractObservation)observation).getResult();
+                    final DataArray array = result.getDataArray();
+                    array.setElementCount(array.getElementCount().getCount().getValue() + nbValue);
+                    array.setValues(array.getValues() + values.toString());
+                    ((AbstractObservation)observation).extendSamplingTime(lastTime);
                 }
-            
-                oldTime = currentTime;
             }
-            
-            // update Last observation result
-            if (currentObservation != null) {
-                values.append(encoding.getBlockSeparator());
-                final Object result = buildComplexResult(version, fields.values(), nbValue, encoding, values.toString(), observations.size());
-                ((AbstractObservation)currentObservation).setResult(result);
-                ((AbstractObservation)currentObservation).extendSamplingTime(format2.format(oldTime));
-            }
-            
             
             rs.close();
             currentStatement.close();
@@ -432,25 +413,9 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             return new ArrayList<>(observations.values());
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
-            throw new DataStoreException("the service has throw a SQL Exception:" + ex.getMessage());
+            throw new DataStoreException("the service has throw a SQL Exception:" + ex.getMessage(), ex);
         } catch (DataStoreException ex) {
-            throw new DataStoreException("the service has throw a Datastore Exception:" + ex.getMessage());
-        }
-    }
-    
-    private AnyScalar buildField(final String version, final String fieldName, final String fieldType, final String uom, final String fieldDef) throws DataStoreException {
-        if ("Quantity".equals(fieldType)) {
-            final UomProperty uomCode     = buildUomProperty(version, uom, null);
-            final AbstractDataComponent c = buildQuantity(version, fieldDef, uomCode, null);
-            return buildAnyScalar(version, null, fieldName, c);
-        } else if ("Boolean".equals(fieldType)) {
-            final AbstractDataComponent c = buildBoolean(version, fieldDef, null);
-            return buildAnyScalar(version, null, fieldName, c);
-        } else if ("Text".equals(fieldType)) {
-            final AbstractDataComponent c = buildText(version, fieldDef, null);
-            return buildAnyScalar(version, null, fieldName, c);
-        } else {
-            throw new DataStoreException("Unsupported field Type:" + fieldType);
+            throw new DataStoreException("the service has throw a Datastore Exception:" + ex.getMessage(), ex);
         }
     }
     
@@ -509,9 +474,9 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             return observations;
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
-            throw new DataStoreException("the service has throw a SQL Exception:" + ex.getMessage());
+            throw new DataStoreException("the service has throw a SQL Exception:" + ex.getMessage(), ex);
         } catch (DataStoreException ex) {
-            throw new DataStoreException("the service has throw a Datastore Exception:" + ex.getMessage());
+            throw new DataStoreException("the service has throw a Datastore Exception:" + ex.getMessage(), ex);
         }
     }
     
@@ -525,6 +490,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
         try {
             // add orderby to the query
             final String fieldRequest = sqlRequest.toString();
+            sqlRequest.append(sqlMeasureRequest);
             sqlRequest.append(" ORDER BY  o.\"id\", m.\"id\"");
             
             final Connection c                          = source.getConnection();
@@ -532,9 +498,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             final Statement currentStatement            = c.createStatement();
             LOGGER.info(sqlRequest.toString());
             final ResultSet rs                          = currentStatement.executeQuery(sqlRequest.toString());
-            Timestamp oldTime                           = null;
             final StringBuilder values                  = new StringBuilder();
-            boolean first                               = true;
             final TextBlock encoding;
             if ("text/csv".equals(responseFormat)) {
                 encoding = getCsvTextEncoding("2.0.0");
@@ -549,41 +513,31 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                 encoding = getDefaultTextEncoding("2.0.0");
             }
 
-            final List<String> writtenFields = new ArrayList<>();
+            final List<Field> fields   = readFields(currentProcedure, c);
+            
             while (rs.next()) {
-                final Timestamp currentTime   = rs.getTimestamp("time");
-                final String value            = rs.getString("value");
-                final String fieldName        = rs.getString("field_name");
-
-                boolean newRound = false;
-                if (writtenFields.contains(fieldName)) {
-                    newRound = true;
-                    writtenFields.clear();
-                }
-                writtenFields.add(fieldName);
                 
-                if (!currentTime.equals(oldTime) || newRound) {
-                    if (!first) {
-                        values.append(encoding.getBlockSeparator());
+                for (int i = 0; i < fields.size(); i++) {
+                    String value = rs.getString(i + 3);
+                    Field field = fields.get(i);
+                    // for time TODO remove when field will be typed
+                    if (field.fieldType.equals("Time")) {
+                        value = value.replace(' ', 'T');
+                        value = value.substring(0, value.length() - 2);
                     }
-                    values.append(format.format(currentTime)).append(encoding.getTokenSeparator()).append(value);
-                } else {
-                    values.append(encoding.getTokenSeparator()).append(value);
-                }                    
-                first = false;
-                oldTime = currentTime;
-            }
-            // empty result 
-            if (!first) {
+                    values.append(value).append(encoding.getTokenSeparator());
+                }
+                values.deleteCharAt(values.length() - 1);
                 values.append(encoding.getBlockSeparator());
             }
+            
             rs.close();
             currentStatement.close();
             c.close();
             return values.toString();
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
-            throw new DataStoreException("the service has throw a SQL Exception:" + ex.getMessage());
+            throw new DataStoreException("the service has throw a SQL Exception:" + ex.getMessage(), ex);
         }
     }
     
@@ -662,7 +616,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             return values.toString();
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
-            throw new DataStoreException("the service has throw a SQL Exception:" + ex.getMessage());
+            throw new DataStoreException("the service has throw a SQL Exception:" + ex.getMessage(), ex);
         }
     }
     

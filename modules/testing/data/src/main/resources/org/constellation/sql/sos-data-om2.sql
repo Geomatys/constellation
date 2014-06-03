@@ -70,7 +70,7 @@ INSERT INTO "om"."observations"  VALUES ('urn:ogc:object:observation:GEOM:802', 
 
 INSERT INTO "om"."procedure_descriptions"  VALUES ('urn:ogc:object:sensor:GEOM:3', 1, 'Time',        'Time',     'urn:ogc:data:time:iso8601',                 NULL);
 INSERT INTO "om"."procedure_descriptions"  VALUES ('urn:ogc:object:sensor:GEOM:3', 2, 'depth',       'Quantity', 'urn:ogc:def:phenomenon:GEOM:depth',        'm');
-INSERT INTO "om"."procedure_descriptions"  VALUES ('urn:ogc:object:sensor:GEOM:4', 1, 'time',        'Time',     'urn:ogc:data:time:iso8601',                 NULL);
+INSERT INTO "om"."procedure_descriptions"  VALUES ('urn:ogc:object:sensor:GEOM:4', 1, 'Time',        'Time',     'urn:ogc:data:time:iso8601',                 NULL);
 INSERT INTO "om"."procedure_descriptions"  VALUES ('urn:ogc:object:sensor:GEOM:4', 2, 'depth',       'Quantity', 'urn:ogc:def:phenomenon:GEOM:depth',        'm');
 INSERT INTO "om"."procedure_descriptions"  VALUES ('urn:ogc:object:sensor:GEOM:5', 1, 'Time',        'Time',     'urn:ogc:data:time:iso8601',                 NULL);
 INSERT INTO "om"."procedure_descriptions"  VALUES ('urn:ogc:object:sensor:GEOM:5', 2, 'depth',       'Quantity', 'urn:ogc:def:phenomenon:GEOM:depth',        'm');

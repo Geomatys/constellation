@@ -904,7 +904,7 @@ public abstract class SOSWorkerTest implements ApplicationContextAware {
         obsResult =  (ObservationType) result.getMember().iterator().next();
         assertTrue(obsResult.getResult() instanceof DataArrayPropertyType);
         obsR      = (DataArrayPropertyType) obsResult.getResult();
-        assertTrue(obsR.getDataArray().getElementCount().getCount().getValue() == 15.0);
+        assertEquals(obsR.getDataArray().getElementCount().getCount().getValue(), (Object)15);
 
         /**
          *  Test 5: getObservation with procedure urn:ogc:object:sensor:GEOM:3

@@ -62,6 +62,7 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
 
 
     protected StringBuilder sqlRequest;
+    protected StringBuilder sqlMeasureRequest = new StringBuilder();
 
     protected final DataSource source;
 
@@ -72,6 +73,10 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
     protected QName resultModel;
     
     protected boolean getFOI = false;
+    
+    protected String currentProcedure = null;
+    
+    protected List<String> currentFields = new ArrayList<>();
 
     /**
      * Clone a new Observation Filter.
@@ -118,16 +123,14 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
      */
     @Override
     public void initFilterObservation(final ResponseModeType requestMode, final QName resultModel) {
-        firstFilter = false;
+        firstFilter = true;
         if (ResponseModeType.RESULT_TEMPLATE.equals(requestMode)) {
-             sqlRequest = new StringBuilder("SELECT distinct \"observed_property\", \"procedure\", \"foi\", \"uom\", \"field_type\", \"field_name\", \"field_definition\" "
-                                          + "FROM \"om\".\"observations\" o, \"om\".\"mesures\" m "
-                                          + "WHERE o.\"id\" = m.\"id_observation\"");
+             sqlRequest = new StringBuilder("SELECT distinct \"observed_property\", \"procedure\", \"foi\" "
+                                          + "FROM \"om\".\"observations\" o WHERE");
             template = true;
         } else {
-            sqlRequest = new StringBuilder("SELECT o.\"id\", o.\"identifier\", m.\"id\" as resultid, \"observed_property\", \"procedure\", \"foi\", \"time\", \"value\", \"uom\", \"field_type\", \"field_name\", \"field_definition\" "
-                                         + "FROM \"om\".\"observations\" o, \"om\".\"mesures\" m "
-                                         + "WHERE o.\"id\" = m.\"id_observation\"");
+            sqlRequest = new StringBuilder("SELECT o.\"id\", o.\"identifier\", \"observed_property\", \"procedure\", \"foi\" "
+                                         + "FROM \"om\".\"observations\" o WHERE ");
         }
         this.resultModel = resultModel;
     }
@@ -138,12 +141,21 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
     @Override
     public void initFilterGetResult(final String procedure, final QName resultModel) {
         firstFilter = false;
-        sqlRequest = new StringBuilder("SELECT \"time\", \"value\", \"field_name\""
-                                     + "FROM \"om\".\"observations\" o, \"om\".\"mesures\" m "
-                                     + "WHERE o.\"id\" = m.\"id_observation\"");
-        
-        //we add to the request the property of the template
-        sqlRequest.append(" AND \"procedure\"='").append(procedure).append("'");
+        currentProcedure = procedure;
+        try {
+            final Connection c                          = source.getConnection();
+            c.setReadOnly(true);
+            final int pid = getPIDFromProcedure(procedure, c);
+            sqlRequest = new StringBuilder("SELECT m.* "
+                                         + "FROM \"om\".\"observations\" o, \"mesures\".\"mesure" + pid + "\" m "
+                                         + "WHERE o.\"id\" = m.\"id_observation\"");
+
+            //we add to the request the property of the template
+            sqlRequest.append(" AND \"procedure\"='").append(procedure).append("'");
+            c.close();
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, "Error while initailizing getResultFilter", ex);
+        }
     }
     
     /**
@@ -212,24 +224,18 @@ public class OM2ObservationFilter extends OM2BaseReader implements ObservationFi
             sbPheno.delete(sbPheno.length() - 3, sbPheno.length());
             sbCompo.delete(sbCompo.length() - 3, sbCompo.length());
             sbCompo.append(')');
-            final StringBuilder sbField;
             if (!getFOI) {
-                sbField = new StringBuilder(" AND (");
                 for (String field : fields) {
                     if (field.startsWith(phenomenonIdBase)) {
                         field = field.substring(phenomenonIdBase.length());
                     }
-                    sbField.append(" \"field_name\"='").append(field).append("' OR ");
+                    currentFields.add(field);
                 }
-                sbField.delete(sbField.length() - 3, sbField.length());
-                sbField.append(')');
-            } else {
-                sbField = new StringBuilder();
             }
             if (!firstFilter) {
-                sqlRequest.append(" AND( ").append(sbPheno).append(sbCompo).append(") ").append(sbField);
+                sqlRequest.append(" AND( ").append(sbPheno).append(sbCompo).append(") ");
             } else {
-                sqlRequest.append(sbPheno).append(sbCompo).append(sbField);
+                sqlRequest.append(sbPheno).append(sbCompo);
                 firstFilter = false;
             }
         }

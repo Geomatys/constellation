@@ -257,6 +257,19 @@ public class OM2BaseReader {
         return pid;
     }
     
+    protected int getPIDFromProcedure(final String procedure, final Connection c) throws SQLException {
+        final PreparedStatement stmt = c.prepareStatement("SELECT \"pid\" FROM \"om\".\"procedures\" WHERE \"id\"=?");
+        stmt.setString(1, procedure);
+        final ResultSet rs = stmt.executeQuery();
+        int pid = -1;
+        if (rs.next()) {
+            pid = rs.getInt(1);
+        }
+        rs.close();
+        stmt.close();
+        return pid;
+    }
+    
     protected String getProcedureFromObservation(final String obsIdentifier, final Connection c) throws SQLException {
         final PreparedStatement stmt = c.prepareStatement("SELECT \"procedure\" FROM \"om\".\"observations\" WHERE \"identifier\"=?");
         stmt.setString(1, obsIdentifier);
