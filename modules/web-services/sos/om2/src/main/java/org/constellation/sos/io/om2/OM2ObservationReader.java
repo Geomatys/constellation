@@ -696,19 +696,22 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
     }
     
     private Object buildMeasureResult(final String identifier, final String version, final Connection c) throws DataStoreException, SQLException {
+        final int pid              = getPIDFromObservation(identifier, c);
+        final String procedure     = getProcedureFromObservation(identifier, c);
+        final List<Field> fields   = readFields(procedure, c);
+        final String uom           = fields.get(0).fieldUom;
         final double value;
-        final String uom;
         final String name;
         try {
-            final PreparedStatement stmt  = c.prepareStatement("SELECT \"id\", \"value\", \"uom\", \"time\" ,\"field_definition\", \"field_name\""
-                                                             + "FROM \"om\".\"mesures\" "
-                                                             + "WHERE \"id_observation\"=?");
+            final PreparedStatement stmt  = c.prepareStatement("SELECT * FROM \"mesures\".\"mesure" + pid + "\" m, \"om\".\"observations\" o "
+                                                             + "WHERE \"id_observation\" = o.\"id\" "
+                                                             + "AND o.\"identifier\"=?"
+                                                             + "ORDER BY m.\"id\"");
             stmt.setString(1, identifier);
             final ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                name   = "measure-00" + rs.getString(1);
-                value  = Double.parseDouble(rs.getString(2));
-                uom    = rs.getString(3);
+                name   = "measure-00" + rs.getString("id");
+                value  = Double.parseDouble(rs.getString(3));
             } else {
                 return null;
             }

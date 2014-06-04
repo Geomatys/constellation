@@ -51,14 +51,8 @@ import org.geotoolkit.observation.xml.OMXmlFactory;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
 import org.geotoolkit.referencing.CRS;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildDataArrayProperty;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildFeatureProperty;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildMeasure;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildSimpleDatarecord;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildTimePeriod;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.buildTimeInstant;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.getCsvTextEncoding;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.getDefaultTextEncoding;
+
+import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
 import org.geotoolkit.swe.xml.AbstractDataRecord;
 import org.geotoolkit.swe.xml.AnyScalar;
 import org.geotoolkit.swe.xml.DataArray;
@@ -437,7 +431,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
     public List<Observation> getMesurements(final String version) throws DataStoreException {
         try {
             // add orderby to the query
-            sqlRequest.append(" ORDER BY o.\"id\", m.\"id\"");
+            sqlRequest.append(" ORDER BY o.\"id\"");
             
             final List<Observation> observations        = new ArrayList<>();
             final Connection c                          = source.getConnection();
@@ -447,10 +441,9 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             final ResultSet rs                          = currentStatement.executeQuery(sqlRequest.toString());
             while (rs.next()) {
                 final String procedure        = rs.getString("procedure");
-                final Timestamp currentTime   = rs.getTimestamp("time");
-                final String value            = rs.getString("value");
+                final Timestamp startTime     = rs.getTimestamp("time_begin");
+                final Timestamp endTime       = rs.getTimestamp("time_end");
                 final int oid                 = rs.getInt("id");
-                final String rid              = rs.getString("resultid");
                 final String name             = rs.getString("identifier");
                 final String obsID            = "obs-"  + oid;
                 final String timeID           = "time-" + oid;
@@ -459,18 +452,32 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                 final SamplingFeature feature = getFeatureOfInterest(featureID, version, c);
                 final FeatureProperty prop    = buildFeatureProperty(version, feature); 
                 final Phenomenon phen         = getPhenomenon(version, observedProperty, c);
-                final TemporalGeometricPrimitive time = buildTimeInstant(version, timeID, format2.format(currentTime));
-
+                final TemporalGeometricPrimitive time = buildTimePeriod(version, timeID, format2.format(startTime), format2.format(endTime));
+                final int pid                 = getPIDFromProcedure(procedure, c);
+                final List<Field> fields      = readFields(procedure, c);
+                final String uom              = fields.get(0).fieldUom;
+                
                 /*
                  *  BUILD RESULT
                  */
-                final String uom        = rs.getString("uom");
-                final Double dValue;
-                try {
-                    dValue = Double.parseDouble(value);
-                } catch (NumberFormatException ex) {
-                    throw new DataStoreException("Unable ta parse the result value as a double");
+                final PreparedStatement stmt  = c.prepareStatement("SELECT * FROM \"mesures\".\"mesure" + pid + "\" m "
+                                                     + "WHERE \"id_observation\" = ? " + sqlMeasureRequest.toString() 
+                                                     + "ORDER BY m.\"id\"");
+                stmt.setInt(1, oid);
+                final ResultSet rs2 = stmt.executeQuery();
+                Double dValue       = null;
+                String rid          = null;
+                if (rs2.next()) {
+                    rid                = rs2.getString("id");
+                    final String value = rs2.getString(3);
+                    try {
+                        dValue = Double.parseDouble(value);
+                    } catch (NumberFormatException ex) {
+                        throw new DataStoreException("Unable ta parse the result value as a double");
+                    }
                 }
+                rs2.close();
+                stmt.close();
                 final Object result = buildMeasureResult(version, dValue, uom, rid);
                 observations.add(OMXmlFactory.buildMeasurement(version, obsID, name, null, prop, phen, procedure, result, time));
 

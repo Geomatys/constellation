@@ -949,7 +949,7 @@ public class SOSworker extends AbstractWorker {
                     }
                     throw new CstlServiceException("Empty observation id", MISSING_PARAMETER_VALUE, locator);
                 }
-                observation.add(omReader.getObservation(oid, OBSERVATION_QNAME, INLINE, currentVersion));
+                observation.add(omReader.getObservation(oid, request.getResultModel(), INLINE, currentVersion));
             }
         } catch (DataStoreException ex) {
             throw new CstlServiceException(ex);

@@ -1384,49 +1384,7 @@ public abstract class SOSWorkerTest implements ApplicationContextAware {
         assertEquals(collExpResult, result);
 
         /**
-         *  Test 17: getObservation with procedure urn:ogc:object:sensor:GEOM:7
-         *           with resultTemplate mode
-         *  => measurement type
-         */
-        request  = new GetObservation("1.0.0",
-                                      "offering-7",
-                                      null,
-                                      Arrays.asList("urn:ogc:object:sensor:GEOM:7"),
-                                      Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
-                                      new GetObservation.FeatureOfInterest(Arrays.asList("station-002")),
-                                      null,
-                                      "text/xml; subtype=\"om/1.0.0\"",
-                                      MEASUREMENT_QNAME,
-                                      ResponseModeType.RESULT_TEMPLATE,
-                                      null);
-        result = (ObservationCollectionType) worker.getObservation(request);
-
-        assertTrue(result.getMember().iterator().next() instanceof MeasurementType);
-
-        MeasurementType measResult =  (MeasurementType) result.getMember().iterator().next();
-        assertTrue(measResult != null);
-
-        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-7.xml"));
-
-        expResult = (ObservationType)obj.getValue();
-
-        period = new TimePeriodType(new TimePositionType("1900-01-01T00:00:00"));
-        expResult.setSamplingTime(period);
-        expResult.setName("urn:ogc:object:observation:template:GEOM:7-0");
-
-        assertEquals(expResult.getName(), measResult.getName());
-
-        assertTrue(measResult.getResult() instanceof MeasureType);
-        MeasureType resMeas = (MeasureType) measResult.getResult();
-        MeasureType expMeas = (MeasureType) expResult.getResult();
-        
-        assertEquals(expMeas, resMeas);
-        assertEquals(expResult.getResult(), measResult.getResult());
-        assertEquals(expResult, measResult);
-
-
-        /**
-         *  Test 18: getObservation with procedure urn:ogc:object:sensor:GEOM:4 AND BBOX Filter
+         *  Test 17: getObservation with procedure urn:ogc:object:sensor:GEOM:4 AND BBOX Filter
          */
         request  = new GetObservation("1.0.0",
                                       "offering-4",
@@ -1466,7 +1424,7 @@ public abstract class SOSWorkerTest implements ApplicationContextAware {
         assertEquals(expResult, obsResult);
 
         /**
-         *  Test 19: getObservation with procedure urn:ogc:object:sensor:GEOM:4 AND BBOX Filter (no result expected)
+         *  Test 18: getObservation with procedure urn:ogc:object:sensor:GEOM:4 AND BBOX Filter (no result expected)
          */
         request  = new GetObservation("1.0.0",
                                       "offering-4",
@@ -1488,6 +1446,95 @@ public abstract class SOSWorkerTest implements ApplicationContextAware {
         marshallerPool.recycle(unmarshaller);
     }
 
+     /**
+     * Tests the GetObservation method
+     *
+     * @throws java.lang.Exception
+     */
+    public void GetObservationMeasurementTest() throws Exception {
+        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+        
+        /**
+         *  Test 1: getObservation with procedure urn:ogc:object:sensor:GEOM:7
+         *           with resultTemplate mode
+         *  => measurement type
+         */
+        GetObservation request  = new GetObservation("1.0.0",
+                                      "offering-7",
+                                      null,
+                                      Arrays.asList("urn:ogc:object:sensor:GEOM:7"),
+                                      Arrays.asList("urn:ogc:def:phenomenon:GEOM:ALL"),
+                                      new GetObservation.FeatureOfInterest(Arrays.asList("station-002")),
+                                      null,
+                                      "text/xml; subtype=\"om/1.0.0\"",
+                                      MEASUREMENT_QNAME,
+                                      ResponseModeType.RESULT_TEMPLATE,
+                                      null);
+        ObservationCollectionType result = (ObservationCollectionType) worker.getObservation(request);
+
+        assertTrue(result.getMember().iterator().next() instanceof MeasurementType);
+
+        MeasurementType measResult =  (MeasurementType) result.getMember().iterator().next();
+        assertTrue(measResult != null);
+
+        JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-7.xml"));
+
+        ObservationType expResult = (ObservationType)obj.getValue();
+
+        TimePeriodType period = new TimePeriodType(new TimePositionType("1900-01-01T00:00:00"));
+        expResult.setSamplingTime(period);
+        expResult.setName("urn:ogc:object:observation:template:GEOM:7-0");
+
+        assertEquals(expResult.getName(), measResult.getName());
+
+        assertTrue(measResult.getResult() instanceof MeasureType);
+        MeasureType resMeas = (MeasureType) measResult.getResult();
+        MeasureType expMeas = (MeasureType) expResult.getResult();
+        
+        assertEquals(expMeas, resMeas);
+        assertEquals(expResult.getResult(), measResult.getResult());
+        assertEquals(expResult, measResult);
+        
+        /**
+         *  Test 2: getObservation with procedure urn:ogc:object:sensor:GEOM:9
+         *
+         *  => measurement type
+         */
+        request  = new GetObservation("1.0.0",
+                                      "offering-9",
+                                      null,
+                                      Arrays.asList("urn:ogc:object:sensor:GEOM:9"),
+                                      Arrays.asList("urn:ogc:def:phenomenon:GEOM:depth"),
+                                      new GetObservation.FeatureOfInterest(Arrays.asList("station-006")),
+                                      null,
+                                      "text/xml; subtype=\"om/1.0.0\"",
+                                      MEASUREMENT_QNAME,
+                                      ResponseModeType.INLINE,
+                                      null);
+        result = (ObservationCollectionType) worker.getObservation(request);
+
+        assertTrue(result.getMember().iterator().next() instanceof MeasurementType);
+
+        measResult =  (MeasurementType) result.getMember().iterator().next();
+        assertTrue(measResult != null);
+
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/v100/measure1.xml"));
+
+        expResult = (MeasurementType)obj.getValue();
+
+        assertEquals(expResult.getName(), measResult.getName());
+
+        assertTrue(measResult.getResult() instanceof MeasureType);
+        resMeas = (MeasureType) measResult.getResult();
+        expMeas = (MeasureType) expResult.getResult();
+        
+        assertEquals(expMeas, resMeas);
+        assertEquals(expResult.getResult(), measResult.getResult());
+        assertEquals(expResult, measResult);
+        
+        marshallerPool.recycle(unmarshaller);
+    }
+    
      /**
      * Tests the GetObservation method
      *
@@ -1645,9 +1692,9 @@ public abstract class SOSWorkerTest implements ApplicationContextAware {
         
         GetObservationById request = new GetObservationById("1.0.0", "urn:ogc:object:observation:GEOM:304", "text/xml; subtype=\"om/1.0.0\"", OBSERVATION_QNAME, ResponseModeType.INLINE, "EPSG:4326");
         
-        final ObservationCollectionType response = (ObservationCollectionType) worker.getObservationById(request);
+        ObservationCollectionType response = (ObservationCollectionType) worker.getObservationById(request);
         
-        final ObservationType result = (ObservationType) response.getMember().get(0);
+        ObservationType result = (ObservationType) response.getMember().get(0);
         
         java.io.Reader ioReader = new InputStreamReader(Util.getResourceAsStream("org/constellation/sos/v100/observation1.xml"), "UTF-8");
         JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(ioReader);
@@ -1674,6 +1721,29 @@ public abstract class SOSWorkerTest implements ApplicationContextAware {
         assertEquals(expResult.getResult(), result.getResult());
         assertEquals(expResult.getSamplingTime(), result.getSamplingTime());
         assertEquals(expResult, result);
+        
+        request = new GetObservationById("1.0.0", "urn:ogc:object:observation:GEOM:901", "text/xml; subtype=\"om/1.0.0\"", MEASUREMENT_QNAME, ResponseModeType.INLINE, "EPSG:4326");
+        
+        response = (ObservationCollectionType) worker.getObservationById(request);
+
+        assertTrue(response.getMember().iterator().next() instanceof MeasurementType);
+
+        MeasurementType measResult =  (MeasurementType) response.getMember().iterator().next();
+        assertTrue(measResult != null);
+
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/v100/measure1.xml"));
+
+        expResult = (MeasurementType)obj.getValue();
+
+        assertEquals(expResult.getName(), measResult.getName());
+
+        assertTrue(measResult.getResult() instanceof MeasureType);
+        MeasureType resMeas = (MeasureType) measResult.getResult();
+        MeasureType expMeas = (MeasureType) expResult.getResult();
+        
+        assertEquals(expMeas, resMeas);
+        assertEquals(expResult.getResult(), measResult.getResult());
+        assertEquals(expResult, measResult);
         
         marshallerPool.recycle(unmarshaller);
     }

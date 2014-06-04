@@ -21,10 +21,8 @@ package org.constellation.sos.io.om2;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKBWriter;
 import org.apache.sis.storage.DataStoreException;
-import org.apache.sis.util.logging.Logging;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.constellation.sos.factory.OMFactory;
 import org.constellation.sos.io.om2.OM2BaseReader.Field;
 import org.geotoolkit.gml.GeometrytoJTS;
 import org.geotoolkit.gml.xml.AbstractGeometry;
@@ -80,24 +78,10 @@ import java.util.logging.Logger;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class OM2ObservationWriter implements ObservationWriter {
-
-    /**
-     * use for debugging purpose
-     */
-    protected static final Logger LOGGER = Logging.getLogger("org.constellation.sos");
-
-    /**
-     * A flag indicating if the dataSource is a postgreSQL SGBD
-     */
-    private final boolean isPostgres;
+public class OM2ObservationWriter extends OM2BaseReader implements ObservationWriter {
 
     protected final DataSource source;
     
-    protected final String observationIdBase;
-    
-    protected final String sensorIdBase;
-
     /**
      * Build a new Observation writer for postgrid dataSource.
      *
@@ -107,18 +91,7 @@ public class OM2ObservationWriter implements ObservationWriter {
      * @throws org.apache.sis.storage.DataStoreException
      */
     public OM2ObservationWriter(final Automatic configuration, final Map<String, Object> properties) throws DataStoreException {
-        final String oidBase = (String) properties.get(OMFactory.OBSERVATION_ID_BASE);
-        if (oidBase == null) {
-            this.observationIdBase = "";
-        } else {
-            this.observationIdBase = oidBase;
-        }
-        final String sidBase = (String) properties.get(OMFactory.SENSOR_ID_BASE);
-        if (sidBase == null) {
-            this.sensorIdBase = "";
-        } else {
-            this.sensorIdBase = sidBase;
-        }
+        super(properties);
         if (configuration == null) {
             throw new DataStoreException("The configuration object is null");
         }
@@ -145,19 +118,7 @@ public class OM2ObservationWriter implements ObservationWriter {
      * @throws org.apache.sis.storage.DataStoreException
      */
     public OM2ObservationWriter(final DataSource source, final boolean isPostgres, final Map<String, Object> properties) throws DataStoreException {
-        final String oidBase = (String) properties.get(OMFactory.OBSERVATION_ID_BASE);
-        if (oidBase == null) {
-            this.observationIdBase = "";
-        } else {
-            this.observationIdBase = oidBase;
-        }
-        final String sidBase = (String) properties.get(OMFactory.SENSOR_ID_BASE);
-        if (sidBase == null) {
-            this.sensorIdBase = "";
-        } else {
-            this.sensorIdBase = sidBase;
-        }
-
+        super(properties);
         if (source == null) {
             throw new DataStoreException("The source object is null");
         }
@@ -428,16 +389,11 @@ public class OM2ObservationWriter implements ObservationWriter {
     
     private void writeResult(final int oid, final int pid, final String procedureID, final Object result, final TemporalObject samplingTime, final Connection c) throws SQLException, DataStoreException {
         if (result instanceof Measure) {
-            final PreparedStatement stmt = c.prepareStatement("INSERT INTO \"om\".\"mesures\" VALUES(?,?,?,?,?,?,?,?)");
+            final PreparedStatement stmt = c.prepareStatement("INSERT INTO \"mesures\".\"mesure" + pid + "\" VALUES(?,?,?)");
             final Measure measure = (Measure) result;
             stmt.setInt(1, oid);
             stmt.setInt(2, 1);
-            stmt.setNull(3, java.sql.Types.TIMESTAMP);
             stmt.setString(4, Double.toString(measure.getValue()));
-            stmt.setString(5, measure.getUom().getUnitsSystem());
-            stmt.setNull(6, java.sql.Types.VARCHAR);
-            stmt.setNull(7, java.sql.Types.VARCHAR);
-            stmt.setNull(8, java.sql.Types.VARCHAR);
             stmt.executeUpdate();
             stmt.close();
         } else if (result instanceof DataArrayProperty) {
@@ -516,117 +472,12 @@ public class OM2ObservationWriter implements ObservationWriter {
             final String values = array.getValues();
             fillMesureTable(c, oid, pid, fields2, values, encoding);
             
-            final StringTokenizer tokenizer = new StringTokenizer(values, encoding.getBlockSeparator());
-            int n = 1;
-            int sqlCpt = 0;
-            Timestamp lastDate = null;
-            final Statement stmtSQL = c.createStatement();
-            StringBuilder sql = new StringBuilder("INSERT INTO \"om\".\"mesures\" VALUES ");
-            while (tokenizer.hasMoreTokens()) {
-                String block       = tokenizer.nextToken();
-                
-                // time field
-                final Timestamp realTime;
-                if (hasTime) {
-                    final int next;
-                    int tokenIndex     = block.indexOf(encoding.getTokenSeparator());
-                    if (tokenIndex == -1) {
-                        tokenIndex     = block.length();
-                        next = tokenIndex;
-                    } else {
-                        next = tokenIndex + 1;
-                    }
-                    final String first = block.substring(0, tokenIndex);
-                    try {
-                        final long millis = new ISODateParser().parseToMillis(first);
-                        realTime = new Timestamp(millis);
-                    } catch (IllegalArgumentException ex) {
-                        throw new DataStoreException("Bad format of timestamp for:" + first);
-                    }
-                    block = block.substring(next);
-                } else {
-                    if (samplingTime instanceof Period) {
-                        LOGGER.warning("expecting a timeInstant for observation with no time field.");
-                        final Period period = (Period) samplingTime;
-                        final Date beginDate = period.getBeginning().getPosition().getDate();
-                        final Date endDate = period.getEnding().getPosition().getDate();
-                        if (beginDate != null) {
-                            realTime = new Timestamp(beginDate.getTime());
-                        } else if (endDate != null) {
-                            realTime = new Timestamp(endDate.getTime());
-                        } else {
-                            realTime = null;
-                        }
-                    } else if (samplingTime instanceof Instant) {
-                        final Instant instant = (Instant) samplingTime;
-                        final Date date = instant.getPosition().getDate();
-                        if (date != null) {
-                            realTime = new Timestamp(date.getTime());
-                        } else {
-                            realTime = null;
-                        }
-                    } else {
-                        realTime = null;
-                    }
-                }
-                
-                for (int i = 0; i < fields.size(); i++) {
-                    final String value;
-                    if (i == fields.size() - 1) {
-                        value     = block;
-                        lastDate  = realTime;
-                    } else {
-                        int separator = block.indexOf(encoding.getTokenSeparator());
-                        value = block.substring(0, separator);
-                        block = block.substring(separator + 1);
-                    }
-
-                    sql.append('(').append(oid).append(',').append(n).append(',');
-                    if (realTime != null) {
-                        sql.append("'").append(realTime.toString()).append("',");
-                    } else {
-                        sql.append("NULL,");
-                    }
-                    
-                    sql.append("'").append(value).append("',");
-                    sql.append("'").append(fields.get(i).fieldUom).append("',");
-                    sql.append("'").append(fields.get(i).fieldType).append("',");
-                    sql.append("'").append(fields.get(i).fieldName).append("',");
-                    sql.append("'").append(fields.get(i).fieldDesc).append("'),\n");
-                    n++;
-                    sqlCpt++;
-                }
-                if (sqlCpt > 99) {
-                    sql.setCharAt(sql.length() - 2, ' ');
-                    if (isPostgres){
-                        sql.setCharAt(sql.length() - 1, ';');
-                    } else {
-                        sql.setCharAt(sql.length() - 1, ' ');
-                    }
-                    
-                    stmtSQL.addBatch(sql.toString());
-                    sqlCpt = 0;
-                    sql = new StringBuilder("INSERT INTO \"om\".\"mesures\" VALUES ");
-                }
-            }
-            if (sqlCpt > 0) {
-                sql.setCharAt(sql.length() - 2, ' ');
-               if (isPostgres){
-                    sql.setCharAt(sql.length() - 1, ';');
-                } else {
-                    sql.setCharAt(sql.length() - 1, ' ');
-                }
-                stmtSQL.addBatch(sql.toString());
-            }
-            stmtSQL.executeBatch();
-            stmtSQL.close();
-            
-            if (lastDate != null) {
+            /*if (lastDate != null) {
                 final PreparedStatement stmt2 = c.prepareStatement("UPDATE \"om\".\"observations\" SET \"time_end\"=? WHERE \"id\"=?");
                 stmt2.setTimestamp(1, lastDate);
                 stmt2.setInt(2, oid);
                 stmt2.executeUpdate();
-            }
+            }*/
         }
     }
     
@@ -972,16 +823,11 @@ public class OM2ObservationWriter implements ObservationWriter {
             }
             //NEW
             final PreparedStatement stmtMes  = c.prepareStatement("DELETE FROM \"mesures\".\"mesure" + pid + "\" WHERE \"id_observation\" IN (SELECT \"id\" FROM \"om\".\"observations\" WHERE \"procedure\"=?)");
-            // OLD
-            final PreparedStatement stmtMes2 = c.prepareStatement("DELETE FROM \"om\".\"mesures\" WHERE \"id_observation\" IN (SELECT \"id\" FROM \"om\".\"observations\" WHERE \"procedure\"=?)");
             final PreparedStatement stmtObs  = c.prepareStatement("DELETE FROM \"om\".\"observations\" WHERE \"procedure\"=?");
             
             stmtMes.setString(1, procedureID);
             stmtMes.executeUpdate();
             stmtMes.close();
-            stmtMes2.setString(1, procedureID);
-            stmtMes2.executeUpdate();
-            stmtMes2.close();
             stmtObs.setString(1, procedureID);
             stmtObs.executeUpdate();
             stmtObs.close();
@@ -1071,7 +917,8 @@ public class OM2ObservationWriter implements ObservationWriter {
         try {
             final Connection c              = source.getConnection();
             c.setAutoCommit(false);
-            final PreparedStatement stmtMes = c.prepareStatement("DELETE FROM \"om\".\"mesures\" WHERE id_observation IN (SELECT \"id\" FROM \"om\".\"observations\" WHERE identifier=?)");
+            final int pid                   = getPIDFromObservation(observationID, c);
+            final PreparedStatement stmtMes = c.prepareStatement("DELETE FROM \"mesures\".\"mesure" + pid + "\" WHERE id_observation IN (SELECT \"id\" FROM \"om\".\"observations\" WHERE identifier=?)");
             final PreparedStatement stmtObs = c.prepareStatement("DELETE FROM \"om\".\"observations\" WHERE identifier=?");
             
             stmtMes.setString(1, observationID);

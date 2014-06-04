@@ -124,6 +124,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
         writeDataFile(observationsDirectory, "v100/observation4.xml", "urn:ogc:object:observation:GEOM:307");
         writeDataFile(observationsDirectory, "v100/observation5.xml", "urn:ogc:object:observation:GEOM:507");
         writeDataFile(observationsDirectory, "v100/observation6.xml", "urn:ogc:object:observation:GEOM:801");
+        writeDataFile(observationsDirectory, "v100/measure1.xml",     "urn:ogc:object:observation:GEOM:901");
 
         File observationTemplatesDirectory = new File(instDirectory, "observationTemplates");
         observationTemplatesDirectory.mkdir();
@@ -330,6 +331,13 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
         super.GetObservationSamplingCurveTest();
     }
     
+    @Test
+    @Override
+    @Order(order=6)
+    public void GetObservationMeasurementTest() throws Exception {
+        super.GetObservationMeasurementTest();
+    }
+            
     /**
      * Tests the GetObservationById method
      *
@@ -337,7 +345,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
-    @Order(order=6)
+    @Order(order=7)
     public void GetObservationByIdTest() throws Exception {
         super.GetObservationByIdTest();
     }
@@ -349,7 +357,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
-    @Order(order=7)
+    @Order(order=8)
     public void GetResultErrorTest() throws Exception {
         super.GetResultErrorTest();
     }
@@ -361,7 +369,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
-    @Order(order=8)
+    @Order(order=9)
     public void GetResultTest() throws Exception {
         super.GetResultTest();
     }
@@ -373,7 +381,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
-    @Order(order=9)
+    @Order(order=10)
     public void insertObservationTest() throws Exception {
         super.insertObservationTest();
     }
@@ -385,7 +393,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
-    @Order(order=10)
+    @Order(order=11)
     public void GetFeatureOfInterestErrorTest() throws Exception {
         super.GetFeatureOfInterestErrorTest();
     }
@@ -397,7 +405,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
-    @Order(order=11)
+    @Order(order=12)
     public void GetFeatureOfInterestTest() throws Exception {
         super.GetFeatureOfInterestTest();
     }
@@ -409,7 +417,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
-    @Order(order=12)
+    @Order(order=13)
     public void destroyTest() throws Exception {
         super.destroyTest();
     }

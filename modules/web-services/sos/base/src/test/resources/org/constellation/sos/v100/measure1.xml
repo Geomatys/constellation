@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<om:Measurement name="obsTest1" xmlns:swe="http://www.opengis.net/swe/1.0.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:sa="http://www.opengis.net/sampling/1.0" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <gml:name>urn:ogc:object:observation:GEOM:901</gml:name>
+    <om:samplingTime>
+        <gml:TimePeriod>
+            <gml:beginPosition>2009-05-01T13:47:00.0</gml:beginPosition>
+            <gml:endPosition>2009-05-01T13:47:00.0</gml:endPosition>
+        </gml:TimePeriod>
+    </om:samplingTime>
+    <om:procedure xlink:href="urn:ogc:object:sensor:GEOM:9"/>
+    <om:observedProperty>
+        <swe:Phenomenon gml:id="depth">
+            <gml:name>urn:ogc:def:phenomenon:GEOM:depth</gml:name>
+        </swe:Phenomenon>
+    </om:observedProperty>
+    <om:featureOfInterest>
+         <sa:SamplingCurve gml:id="station-006">
+            <gml:description>Geology traverse</gml:description>
+            <gml:name>cycle1</gml:name>
+            <gml:boundedBy>
+                <gml:Envelope srsName="urn:ogc:def:crs:epsg:7.9:27582" gml:id="bound-1">
+                    <gml:lowerCorner>-30.711 134.196</gml:lowerCorner>
+                    <gml:upperCorner>-30.702 134.205</gml:upperCorner>
+                </gml:Envelope>
+            </gml:boundedBy>
+            <sa:shape>
+                <gml:LineString gml:id="pr1_ls1" srsName="urn:ogc:def:crs:epsg:7.9:27582">
+                    <gml:pos>-30.711 134.205</gml:pos>
+                    <gml:pos>-30.710 134.204</gml:pos>
+                    <gml:pos>-30.709 134.203</gml:pos>
+                    <gml:pos>-30.708 134.201</gml:pos>
+                    <gml:pos>-30.706 134.196</gml:pos>
+                    <gml:pos>-30.703 134.197</gml:pos>
+                    <gml:pos>-30.702 134.199</gml:pos>
+                </gml:LineString>
+            </sa:shape>
+            <sa:length/>
+        </sa:SamplingCurve>
+    </om:featureOfInterest>
+    <om:result xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="om:Measure">
+        <om:name>measure-001</om:name>
+        <om:uom id="meters">
+            <gml:unitsSystem>m</gml:unitsSystem>
+        </om:uom>
+        <om:value>18.5</om:value>
+    </om:result>
+</om:Measurement>

@@ -84,9 +84,19 @@ public class OM2BaseReader {
         } else {
             this.phenomenonIdBase      = phenID;
         }
-        this.sensorIdBase              = (String) properties.get(OMFactory.SENSOR_ID_BASE);
+        final String sidBase = (String) properties.get(OMFactory.SENSOR_ID_BASE);
+        if (sidBase == null) {
+            this.sensorIdBase = "";
+        } else {
+            this.sensorIdBase = sidBase;
+        }
         this.observationTemplateIdBase = (String) properties.get(OMFactory.OBSERVATION_TEMPLATE_ID_BASE);
-        this.observationIdBase         = (String) properties.get(OMFactory.OBSERVATION_ID_BASE);
+        final String oidBase           = (String) properties.get(OMFactory.OBSERVATION_ID_BASE);
+        if (oidBase == null) {
+            this.observationIdBase = "";
+        } else {
+            this.observationIdBase = oidBase;
+        }
     }
     
     public OM2BaseReader(final OM2BaseReader that) {

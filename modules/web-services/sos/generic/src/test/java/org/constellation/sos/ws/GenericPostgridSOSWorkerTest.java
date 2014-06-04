@@ -201,6 +201,13 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
         super.GetObservationSamplingCurveTest();
     }
 
+    @Test
+    @Override
+    @Order(order=6)
+    public void GetObservationMeasurementTest() throws Exception {
+        super.GetObservationMeasurementTest();
+    }
+    
     /**
      * Tests the GetObservationById method
      *
@@ -208,7 +215,7 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
-    @Order(order=6)
+    @Order(order=7)
     public void GetObservationByIdTest() throws Exception {
         super.GetObservationByIdTest();
     }
@@ -220,7 +227,7 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
-    @Order(order=7)
+    @Order(order=8)
     public void GetResultErrorTest() throws Exception {
         super.GetResultErrorTest();
     }
@@ -232,7 +239,7 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
-    @Order(order=8)
+    @Order(order=9)
     public void GetResultTest() throws Exception {
         super.GetResultTest();
     }
@@ -244,7 +251,7 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
-    @Order(order=9)
+    @Order(order=10)
     public void GetFeatureOfInterestErrorTest() throws Exception {
         super.GetFeatureOfInterestErrorTest();
     }
@@ -256,7 +263,7 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
-    @Order(order=10)
+    @Order(order=11)
     public void GetFeatureOfInterestTest() throws Exception {
         super.GetFeatureOfInterestTest();
     }
@@ -269,7 +276,7 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
-    @Order(order=11)
+    @Order(order=12)
     public void destroyTest() throws Exception {
         super.destroyTest();
     }
