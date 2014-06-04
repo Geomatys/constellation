@@ -228,6 +228,7 @@
     "global.menu.tasks":"Processus",
     "global.menu.web-service": "Services web",
     "global.menu.web-service.min": "Services",
+    "global.menu.other":"Autres",
     "global.title": "JHipster",
 
     "growl.error.data.import.no.geographic": "L'image ne contient pas d'information géographique.",

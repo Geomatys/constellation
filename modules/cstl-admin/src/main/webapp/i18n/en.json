@@ -548,6 +548,7 @@
     "global.menu.admin.tasks":"Tasks Manager",
     "global.menu.admin.users": "Users Settings",
     "global.menu.language": "Language",
+    "global.menu.other":"Other",
     "global.language.en": "English",
     "global.language.fr": "French",
     "global.language.de": "German",

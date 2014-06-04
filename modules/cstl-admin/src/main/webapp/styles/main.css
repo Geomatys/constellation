@@ -75,16 +75,16 @@ li>a {
 }
 .icon-menu-sensor{
     background:url("../images/icon-menu-sensor.svg") no-repeat;
-    width:15px;
-    height:15px;
+    width:12px;
+    height:12px;
 }
 .icon-menu-sensor.menu-selected, a:hover .icon-menu-sensor{
     background:url("../images/icon-menu-sensor-selected.svg") no-repeat;
 }
 .icon-menu-mapcontext{
     background:url("../images/icon-menu-compo.svg") no-repeat;
-    width:15px;
-    height:15px;
+    width:12px;
+    height:12px;
 }
 .icon-menu-mapcontext.menu-selected, a:hover .icon-menu-mapcontext{
     background:url("../images/icon-menu-compo-selected.svg") no-repeat;
@@ -385,23 +385,21 @@ ul.unstyled {
         background-color: #3C3C3C;
         margin-top: -3px;
     }
-}
-@media screen and (min-width:768px) and (max-width: 890px){
-    .nav-header-mob>li>a{
-        padding: 10px;
+    .nav-header-mob>li {
+        float:none !important;
+    }
+    .nav-header{
+        width:100%;
     }
 }
-@media screen and (max-width: 1199px){
+@media screen and (min-width: 767px) and (max-width: 1199px){
     .nav-header{
-        width:851px;
+        width:1000px;
     }
 }
 @media screen and (max-width: 1365px){
     .header .nav.btn-language>li>a{
-        margin-top:4px;
-    }
-    .nav-header-mob>li>a{
-        font-size:13px;
+        margin-top:7px;
     }
 }
 @media screen and (min-width:1200px) and (max-width: 1272px){
@@ -410,14 +408,11 @@ ul.unstyled {
     }
 }
 @media screen and (min-width:768px) and (max-width: 800px){
-    .nav-header-mob>li>a{
-        padding: 8px;
-    }
     .nav-header{
         margin-top:2px;
     }
     .header .nav.btn-language>li>a{
-        margin-top:6px;
+        margin-top:5px;
     }
 }
 .sos_edit_checkboxlist{
