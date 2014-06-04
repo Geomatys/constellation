@@ -113,4 +113,12 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
         
         return resultM;
     }
+
+	@Override
+	public Service findById(int id) {
+		Record one = dsl.select().from(SERVICE).where(SERVICE.ID.eq(id)).fetchOne();
+        if (one == null)
+            return null;
+        return one.into(Service.class);
+	}
 }

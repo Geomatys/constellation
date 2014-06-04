@@ -29,6 +29,8 @@ public interface ServiceRepository {
 
     List<Service> findAll();
     
+    Service findById(int id);
+    
     List<Service> findByDataId(int dataId);
     
     Service findByIdentifierAndType(String id, String type);
