@@ -34,86 +34,112 @@
 <div class="header" ng-controller="HeaderController">
     <div class="row" style="margin:0;">
         <div class="col-xs-1 ng-cloak">
-            <a href="#" class="brand"
-               style="padding-bottom: 5px; padding-top: 5px"> <img id="brand"
-                                                                   src="images/constellation-menu.png"/>
+            <a href="#" class="brand" style="padding-bottom: 5px; padding-top: 5px">
+                <img id="brand" src="images/constellation-menu.png"/>
             </a>
         </div>
         <div class="col-xs-11">
             <div class="navbar-header  ng-cloak">
-              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
             </div>
             <div class="collapse navbar-right navbar-collapse nav-header  ng-cloak">
                 <ul class="nav nav-pills nav-header-mob pull-right hidden-sm hidden-md">
                     <li style="margin-left:2px;" class="dropdown pointer" ng-controller="LanguageController">
-                        <a class="dropdown-toggle" data-toggle="dropdown"> <span>
-                                    <span class="glyphicon glyphicon-flag"></span> <span
-                                class="hidden-tablet" translate="global.menu.language">Language</span>
-                                    <b class="caret"></b>
+                        <a class="dropdown-toggle" data-toggle="dropdown">
+                            <span>
+                                <span class="glyphicon glyphicon-flag"></span>
+                                <span class="hidden-tablet" translate="global.menu.language">Language</span>
+                                <b class="caret"></b>
                             </span>
                         </a>
                         <ul class="dropdown-menu">
-                            <li active-menu="en"><a
-                                    ng-click="changeLanguage(&apos;en&apos;)"><span
-                                    class="famfamfam-flag-gb"></span> &nbsp;<span
-                                    translate="global.language.en">English</span></a></li>
-                            <li active-menu="fr"><a
-                                    ng-click="changeLanguage(&apos;fr&apos;)"><span
-                                    class="famfamfam-flag-fr"></span> &nbsp;<span
-                                    translate="global.language.fr">French</span></a></li>
+                            <li active-menu="en">
+                                <a ng-click="changeLanguage(&apos;en&apos;)">
+                                    <span class="famfamfam-flag-gb"></span> &nbsp;
+                                    <span translate="global.language.en">English</span>
+                                </a>
+                            </li>
+                            <li active-menu="fr">
+                                <a ng-click="changeLanguage(&apos;fr&apos;)">
+                                    <span class="famfamfam-flag-fr"></span> &nbsp;
+                                    <span translate="global.language.fr">French</span>
+                                </a>
+                            </li>
                         </ul>
                     </li>
                 </ul>
                 <ul ng-hide="authenticated" class="nav nav-pills pull-right">
-                    <li ng-hide="authenticated"><a href="/cstl-admin/" id="authenticateLink"><span
-                            class="glyphicon glyphicon-log-in"></span> &nbsp;<span
-                            translate="global.menu.account.login">Authenticate</span></a></li>
+                    <li ng-hide="authenticated">
+                        <a href="/cstl-admin/" id="authenticateLink">
+                            <span class="glyphicon glyphicon-log-in"></span> &nbsp;
+                            <span translate="global.menu.account.login">Authenticate</span>
+                        </a>
+                    </li>
                 </ul>
                 <ul class="nav nav-pills nav-header-mob pull-right  ng-cloak" ng-controller="navCtrl">
                     <li ng-show="hasMultipleDomains()" class="dropdown pointer" ng-controller="DomainSwitcherController">
-                        <a class="dropdown-toggle" data-toggle="dropdown"> <span>
-                                    <span class="glyphicon glyphicon-flag"></span> <span
-                                class="hidden-tablet">{{activeDomain}}</span>
-                                    <b class="caret"></b>
+                        <a class="dropdown-toggle" data-toggle="dropdown">
+                            <span>
+                                <span class="glyphicon glyphicon-flag"></span>
+                                <span class="hidden-tablet">{{activeDomain}}</span>
+                                <b class="caret"></b>
                             </span>
                         </a>
                         <ul class="dropdown-menu">
-                            <li ng-repeat="domain in domains" active-menu="{{domain.name}}"><a
-                                    ng-click="changeDomain($index)"><span>{{domain.name}}</span></a></li>
+                            <li ng-repeat="domain in domains" active-menu="{{domain.name}}">
+                                <a ng-click="changeDomain($index)">
+                                    <span>{{domain.name}}</span>
+                                </a>
+                            </li>
                         </ul>
                     </li>
-                    <li class="hidden-sm hidden-md"><a ng-class="navClass('webservice')" href="#/webservice"> <span
-                            class="glyphicon glyphicon-cloud"></span> <span
-                            translate="global.menu.web-service">Services web</span>
-                    </a></li>
-                            <li class="hidden-xs hidden-lg"><a ng-class="navClass('webservice')" href="#/webservice"> <span
-                                    class="glyphicon glyphicon-cloud"></span> <span
-                                    translate="global.menu.web-service.min">Services web</span>
-                            </a></li>
-                    <li><a ng-class="navClass('data')" href="#/data"> <span class="glyphicon glyphicon-file"></span>
-                        <span translate="global.menu.data">Données</span>
-                    </a></li>
-                    <li><a ng-class="navClass('sensors')" href="#/sensors">
-                        <span ng-class="navClass('sensors')" class="icon-menu-sensor"></span>
-                        <span translate="global.menu.sensor">Sensor</span>
-                    </a></li>
-                    <li><a ng-class="navClass('styles')" href="#/styles"> <span class="glyphicon glyphicon-pencil"></span>
-                        <span translate="global.menu.style">Styles</span>
-                    </a></li>
-                    <li class="hidden-sm"><a ng-class="navClass('mapcontext')" href="#/mapcontext">
-                        <span ng-class="navClass('mapcontext')" class="icon-menu-mapcontext"></span>
-                        <span translate="global.menu.mapcontext">Map context</span>
-                    </a></li>
-                     <li class="hidden-xs hidden-md hidden-lg"><a ng-class="navClass('mapcontext')" href="#/mapcontext">
-                        <span ng-class="navClass('mapcontext')" class="icon-menu-mapcontext"></span>
-                        <span translate="global.menu.mapcontext-min">Map context</span>
-                    </a></li>
-
+                    <li class="hidden-sm hidden-md">
+                        <a ng-class="navClass('webservice')" href="#/webservice">
+                            <span class="glyphicon glyphicon-cloud"></span>
+                            <span translate="global.menu.web-service">Services web</span>
+                        </a>
+                    </li>
+                    <li class="hidden-xs hidden-lg">
+                        <a ng-class="navClass('webservice')" href="#/webservice">
+                            <span class="glyphicon glyphicon-cloud"></span>
+                            <span translate="global.menu.web-service.min">Services web</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a ng-class="navClass('data')" href="#/data">
+                            <span class="glyphicon glyphicon-file"></span>
+                            <span translate="global.menu.data">Données</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a ng-class="navClass('sensors')" href="#/sensors">
+                            <span ng-class="navClass('sensors')" class="icon-menu-sensor"></span>
+                            <span translate="global.menu.sensor">Sensor</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a ng-class="navClass('styles')" href="#/styles">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                            <span translate="global.menu.style">Styles</span>
+                        </a>
+                    </li>
+                    <li class="hidden-sm">
+                        <a ng-class="navClass('mapcontext')" href="#/mapcontext">
+                            <span ng-class="navClass('mapcontext')" class="icon-menu-mapcontext"></span>
+                            <span translate="global.menu.mapcontext">Map context</span>
+                        </a>
+                    </li>
+                    <li class="hidden-xs hidden-md hidden-lg">
+                        <a ng-class="navClass('mapcontext')" href="#/mapcontext">
+                            <span ng-class="navClass('mapcontext')" class="icon-menu-mapcontext"></span>
+                            <span translate="global.menu.mapcontext-min">Map context</span>
+                        </a>
+                    </li>
                     <li>
                         <a ng-class="navClass('tasks')" href="#/tasks">
                             <span class="glyphicon glyphicon-cog"></span>
@@ -130,7 +156,6 @@
                             <span translate="global.menu.admin.main">Administration</span>
                         </a>
                     </li>
-
                     <li>
                         <a href="{{cstlLogoutUrl}}">
                             <span class="glyphicon glyphicon-log-out"></span>&nbsp;
@@ -141,26 +166,26 @@
 
             </div>
             <ul class="nav nav-pills nav-header-mob pull-right btn-language hidden-xs hidden-lg">
-                    <li class="dropdown pointer" ng-controller="LanguageController">
-                        <a class="dropdown-toggle" data-toggle="dropdown"> <span>
+                <li class="dropdown pointer" ng-controller="LanguageController">
+                    <a class="dropdown-toggle" data-toggle="dropdown"> <span>
                                     <span class="glyphicon glyphicon-flag"></span> <span
-                                class="hidden-tablet" translate="global.menu.language">Language</span>
+                            class="hidden-tablet" translate="global.menu.language">Language</span>
                                     <b class="caret"></b>
                             </span>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li active-menu="en"><a
-                                    ng-click="changeLanguage(&apos;en&apos;)"><span
-                                    class="famfamfam-flag-gb"></span> &nbsp;<span
-                                    translate="global.language.en">English</span></a></li>
-                            <li active-menu="fr"><a
-                                    ng-click="changeLanguage(&apos;fr&apos;)"><span
-                                    class="famfamfam-flag-fr"></span> &nbsp;<span
-                                    translate="global.language.fr">French</span></a></li>
-                        </ul>
-                    </li>
-                </ul>
-    </div>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li active-menu="en"><a
+                                ng-click="changeLanguage(&apos;en&apos;)"><span
+                                class="famfamfam-flag-gb"></span> &nbsp;<span
+                                translate="global.language.en">English</span></a></li>
+                        <li active-menu="fr"><a
+                                ng-click="changeLanguage(&apos;fr&apos;)"><span
+                                class="famfamfam-flag-fr"></span> &nbsp;<span
+                                translate="global.language.fr">French</span></a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
     </div>
 </div>
 
@@ -191,7 +216,7 @@
 <script src="bower_components/angular-translate-loader-static-files/angular-translate-loader-static-files.js"></script>
 <script type="text/javascript" src="scripts/ws/sockjs.min.js"></script>
 <script type="text/javascript" src="scripts/ws/stomp.js"></script>
-<script type="text/javascript" src="scripts/ws/angular-stomp.js"></script>        
+<script type="text/javascript" src="scripts/ws/angular-stomp.js"></script>
 <script src="scripts/zeroclipboard/ZeroClipboard.min.js"></script>
 <script src="scripts/http-auth-interceptor.js"></script>
 <script src="scripts/app.js"></script>

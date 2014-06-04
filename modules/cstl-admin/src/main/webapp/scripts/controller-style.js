@@ -78,7 +78,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         $scope.selectedLayer = selectedLayer || null;
         $scope.sldName = '';
 
-        $scope.stylechooser = 'new';
+        $scope.stylechooser = 'existing';
         $scope.page = {
             pageSld: 'views/style/chooseType.html'
         };
@@ -87,6 +87,19 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             //param.color = value.toHexString();
             param.opacity = value.getAlpha();
         };
+
+        $scope.clickFilter = function(ordType){
+            $scope.ordertype = ordType;
+            $scope.orderreverse = !$scope.orderreverse;
+        };
+
+        //There is a bug in angular for uiModal we cannot fix it with a simple call $parent
+        //the following is a fix to wrap the variable from the good scope.
+        $scope.wrapScope = {filterText : $scope.filtertext};
+        $scope.$watch('wrapScope.filterText', function() {
+            $scope.filtertext =$scope.wrapScope.filterText;
+        });
+
 
         $scope.newStyle = newStyle;
         $scope.serviceName = serviceName || null;
