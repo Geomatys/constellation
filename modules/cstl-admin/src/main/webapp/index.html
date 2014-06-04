@@ -35,9 +35,8 @@
 <div class="header" ng-controller="HeaderController">
     <div class="row" style="margin:0;">
         <div class="col-xs-1 ng-cloak">
-            <a href="#" class="brand"
-               style="padding-bottom: 5px; padding-top: 5px"> <img id="brand"
-                                                                   src="images/constellation-menu.png"/>
+            <a href="#" class="brand" style="padding-bottom: 5px; padding-top: 5px">
+                <img id="brand" src="images/constellation-menu.png"/>
             </a>
         </div>
         <div class="col-xs-11">
@@ -52,28 +51,36 @@
             <div class="collapse navbar-collapse nav-header  ng-cloak">
                 <ul class="nav nav-pills nav-header-mob pull-right">
                     <li class="dropdown pointer" ng-controller="LanguageController">
-                        <a class="dropdown-toggle" data-toggle="dropdown"> <span>
-                                    <span class="glyphicon glyphicon-flag"></span> <span
-                                class="hidden-tablet" translate="global.menu.language">Language</span>
-                                    <b class="caret"></b>
+                        <a class="dropdown-toggle" data-toggle="dropdown">
+                            <span>
+                                <span class="glyphicon glyphicon-flag"></span>
+                                <span class="hidden-tablet" translate="global.menu.language">Language</span>
+                                <b class="caret"></b>
                             </span>
                         </a>
-                        <ul class="dropdown-menu">
-                            <li active-menu="en"><a
-                                    ng-click="changeLanguage(&apos;en&apos;)"><span
-                                    class="famfamfam-flag-gb"></span> &nbsp;<span
-                                    translate="global.language.en">English</span></a></li>
-                            <li active-menu="fr"><a
-                                    ng-click="changeLanguage(&apos;fr&apos;)"><span
-                                    class="famfamfam-flag-fr"></span> &nbsp;<span
-                                    translate="global.language.fr">French</span></a></li>
+                        <ul class="dropdown-menu" style="font-size: 13px;margin-left: -35px;">
+                            <li active-menu="en">
+                                <a ng-click="changeLanguage('en')">
+                                    <span class="famfamfam-flag-gb"></span> &nbsp;
+                                    <span translate="global.language.en">English</span>
+                                </a>
+                            </li>
+                            <li active-menu="fr">
+                                <a ng-click="changeLanguage('fr')">
+                                    <span class="famfamfam-flag-fr"></span> &nbsp;
+                                    <span translate="global.language.fr">French</span>
+                                </a>
+                            </li>
                         </ul>
                     </li>
                 </ul>
                 <ul class="nav nav-pills pull-right">
-                    <li ><a href="{{cstlLoginUrl}}" id="authenticateLink"><span
-                            class="glyphicon glyphicon-log-in"></span> &nbsp;<span
-                            translate="global.menu.account.login">Authenticate</span></a></li>
+                    <li >
+                        <a href="{{cstlLoginUrl}}" id="authenticateLink">
+                            <span class="glyphicon glyphicon-log-in"></span> &nbsp;
+                            <span translate="global.menu.account.login">Authenticate</span>
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -94,10 +101,8 @@
 <script src="bower_components/angular-cookies/angular-cookies.js"></script>
 <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
 <script src="bower_components/angular-translate/angular-translate.js"></script>
-<script
-        src="bower_components/angular-translate-storage-cookie/angular-translate-storage-cookie.js"></script>
-<script
-        src="bower_components/angular-translate-loader-static-files/angular-translate-loader-static-files.js"></script>
+<script src="bower_components/angular-translate-storage-cookie/angular-translate-storage-cookie.js"></script>
+<script src="bower_components/angular-translate-loader-static-files/angular-translate-loader-static-files.js"></script>
 <script src="scripts/http-auth-interceptor.js"></script>
 <script src="scripts/index.js"></script>
 <script src="scripts/index/controllers.js"></script>

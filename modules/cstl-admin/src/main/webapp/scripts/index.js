@@ -27,18 +27,19 @@ function findWebappContext(){
 
 /* App Module */
 
-var cstlIndexApp = angular.module('cstlIndexApp', ['http-auth-interceptor', 'ngResource', 'ngRoute', 'ngCookies', 'pascalprecht.translate']);
+var cstlIndexApp = angular.module('cstlIndexApp',
+    ['http-auth-interceptor', 'ngResource', 'ngRoute', 'ngCookies', 'pascalprecht.translate']);
 
 cstlIndexApp
     .config(['$routeProvider', '$httpProvider', '$translateProvider',
         function ($routeProvider, $httpProvider, $translateProvider) {
-      $routeProvider.otherwise({
-        templateUrl: 'views/main.html',
-        controller: 'MainController'
-    });
+            $routeProvider.otherwise({
+                templateUrl: 'views/main.html',
+                controller: 'MainController'
+            });
 
-    	 $httpProvider.defaults.useXDomain = true;
-    	 $httpProvider.interceptors.push('AuthInterceptor');
+            $httpProvider.defaults.useXDomain = true;
+            $httpProvider.interceptors.push('AuthInterceptor');
             // Initialize angular-translate
             $translateProvider.useStaticFilesLoader({
                 prefix: findWebappContext() + '/i18n/',
@@ -48,6 +49,6 @@ cstlIndexApp
             // remember language
             $translateProvider.useCookieStorage();
         }])
-        .run(['$rootScope', '$location', 
-            function($rootScope, $location){
+    .run(['$rootScope', '$location',
+        function($rootScope, $location){
         }]);
