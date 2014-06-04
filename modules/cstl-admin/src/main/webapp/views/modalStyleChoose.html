@@ -28,10 +28,10 @@
         
         <div class="modal-body modal-body-style" style="overflow-y: auto;">
 
-            <div class="frame dashboard frame-sldEditor" ng-if="isSelected('new')">
+            <div class="frame dashboard frame-sldEditor" ng-show="isSelected('new')">
                 <div ng-include="page.pageSld"/>
             </div>
-            <div class="row"  ng-if="isSelected('existing')">
+            <div class="row"  ng-show="isSelected('existing')">
                 <div class="col-sm-6" style="padding-left: 0;padding-right: 0;">
                     <div class="dashboard list-style-modal">
                         <div class="navbar sort-navbar">
@@ -62,7 +62,7 @@
                                     </li>
                                     <li class="divider-vertical"></li>
                                 </ul>
-                                <button type="button" ng-click="$parent.ordertype='Name';$parent.orderreverse=false" class="btn btn-xs btn-style">
+                                <button type="button" ng-click="clickFilter('Name');" class="btn btn-xs btn-style">
                                     <i class="icon-remove icon-white"></i>
                                 </button>
                                 <div class="pull-right">
@@ -80,20 +80,22 @@
                                         <span class="nb-results pull-left">{{countdata}}&nbsp;</span>
                                         <span class="nb-results" translate="label.count.style">available data</span>
                                     </strong>
-                                    <select class="nb-per-page input-small form-control pull-right" ng-model="$parent.nbbypage">
+                                    <select class="nb-per-page input-small form-control pull-right" ng-model="wrapScope.nbbypage">
                                         <option value="5">5</option>
                                         <option value="10">10</option>
                                         <option value="20">20</option>
                                         <option value="50">50</option>
                                         <option value="100">100</option>
                                     </select>
-                                    <div class="pull-right" page-switcher="{page:$parent.currentpage,size:$parent.nbbypage,count:$parent.countdata}" on-select-page="displayPage(page)"></div>
+                                    <div class="pull-right"
+                                         page-switcher="{page:$parent.currentpage,size:$parent.nbbypage,count:$parent.countdata}"
+                                         on-select-page="displayPage(page)"/>
                                 </div>
                                 <div class="item-list" style="margin-top:40px;">
                                     <div class="item style-{{style.Type | lowercase}}"
                                          ng-repeat="style in dataList"
                                          ng-class="{selected:style==selected}"
-                                         ng-click="select(style)">
+                                         ng-click="select(style);">
                                         <div class="top">
                                             <span class="item-title" style="width: 100%;">{{style.Name}}</span>
                                             <span class="pull-right text-right item-list-style">{{style.Type}}</span>
@@ -112,8 +114,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-6" ng-show="true || StyleisSelected()">
-                    <div class="col-sm-6" id="styledMapOL" style="height: 500px; width:100%;padding: 0;"></div>
+                <div class="col-sm-6" ng-show="StyleisSelected('styledMapOL1')">
+                    <div class="col-sm-6" id="styledMapOL1" style="height: 500px; width:100%;padding: 0;"></div>
                 </div>
             </div>
         </div>

@@ -95,9 +95,15 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
 
         //There is a bug in angular for uiModal we cannot fix it with a simple call $parent
         //the following is a fix to wrap the variable from the good scope.
-        $scope.wrapScope = {filterText : $scope.filtertext};
+        $scope.wrapScope = {
+            filterText : $scope.filtertext,
+            nbbypage : $scope.nbbypage || 10
+        };
         $scope.$watch('wrapScope.filterText', function() {
             $scope.filtertext =$scope.wrapScope.filterText;
+        });
+        $scope.$watch('wrapScope.nbbypage', function() {
+            $scope.nbbypage =$scope.wrapScope.nbbypage;
         });
 
 
@@ -195,8 +201,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
 
         if ($scope.newStyle === null) {
             $scope.refreshNewStyle();
-        }
-        else {
+        } else {
             $scope.sldName = $scope.newStyle.name;
 
             if ($scope.newStyle.rules[0].symbolizers[0]['@symbol'] == 'line') {
@@ -531,8 +536,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             }
         };
 
-        $scope.showLayerWithStyle = function(style) {
-
+        $scope.showLayerWithStyle = function(style,mapId) {
             var layerData;
             if (serviceName) {
                 layerData = DataViewer.createLayerWMSWithStyle($cookies.cstlUrl, $scope.layerName, $scope.serviceName, style);
@@ -541,7 +545,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             }
             var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
             DataViewer.layers = [layerData, layerBackground];
-            DataViewer.initMap('styledMapOL');
+            DataViewer.initMap(mapId || 'styledMapOL');
         };
 
         $scope.displayCurrentStyle = function() {
@@ -572,9 +576,9 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             }
         };
 
-        $scope.StyleisSelected = function() {
+        $scope.StyleisSelected = function(mapId) {
             if ($scope.selected) {
-                $scope.showLayerWithStyle($scope.selected.Name);
+                $scope.showLayerWithStyle($scope.selected.Name,mapId);
                 return true;
             } else {
                 return false;
