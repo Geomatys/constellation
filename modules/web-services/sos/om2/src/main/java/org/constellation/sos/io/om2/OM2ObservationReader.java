@@ -770,9 +770,10 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
     public TemporalPrimitive getFeatureOfInterestTime(final String samplingFeatureName, final String version) throws DataStoreException {
         try {
             final Connection c           = source.getConnection();
-            final PreparedStatement stmt = c.prepareStatement("SELECT max(\"time_begin\"), min(\"time_end\") "
-                                                            + "FROM \"om\".\"mesures\""
+            final PreparedStatement stmt = c.prepareStatement("SELECT min(\"time_begin\"), max(\"time_end\") "
+                                                            + "FROM \"om\".\"observations\""
                                                             + "WHERE \"foi\"=?");
+            stmt.setString(1, samplingFeatureName);
             final ResultSet rs           = stmt.executeQuery();
             final TemporalGeometricPrimitive time;
             if (rs.next()) {

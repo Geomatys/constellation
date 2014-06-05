@@ -270,13 +270,25 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
 
 
     /**
-     * Tests the destroy method
+     * Tests the GetFeatureOfInterest method
      *
      * @throws java.lang.Exception
      */
     @Test
     @Override
     @Order(order=12)
+    public void GetFeatureOfInterestTimeTest() throws Exception {
+        super.GetFeatureOfInterestTimeTest();
+    }
+    
+    /**
+     * Tests the destroy method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    @Override
+    @Order(order=13)
     public void destroyTest() throws Exception {
         super.destroyTest();
     }

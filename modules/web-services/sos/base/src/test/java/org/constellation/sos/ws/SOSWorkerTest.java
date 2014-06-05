@@ -19,7 +19,23 @@
 
 package org.constellation.sos.ws;
 
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
 import org.apache.sis.xml.MarshallerPool;
+import static org.constellation.sos.ws.SOSConstants.MEASUREMENT_QNAME;
+import static org.constellation.sos.ws.SOSConstants.OBSERVATION_QNAME;
+import static org.constellation.sos.ws.SOSConstants.OBSERVATION_TEMPLATE;
+import static org.constellation.sos.ws.SOSConstants.OFFERING;
+import static org.constellation.sos.ws.SOSConstants.PROCEDURE;
+import static org.constellation.sos.ws.SOSConstants.RESPONSE_FORMAT;
+import static org.constellation.sos.ws.SOSConstants.RESPONSE_MODE;
 import org.constellation.test.utils.MetadataUtilities;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
@@ -40,6 +56,11 @@ import org.geotoolkit.ogc.xml.v110.TimeAfterType;
 import org.geotoolkit.ogc.xml.v110.TimeBeforeType;
 import org.geotoolkit.ogc.xml.v110.TimeDuringType;
 import org.geotoolkit.ogc.xml.v110.TimeEqualsType;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.OPERATION_NOT_SUPPORTED;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.SectionsType;
@@ -54,6 +75,7 @@ import org.geotoolkit.sos.xml.v100.DescribeSensor;
 import org.geotoolkit.sos.xml.v100.EventTime;
 import org.geotoolkit.sos.xml.v100.GetCapabilities;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
+import org.geotoolkit.sos.xml.v100.GetFeatureOfInterestTime;
 import org.geotoolkit.sos.xml.v100.GetObservation;
 import org.geotoolkit.sos.xml.v100.GetObservationById;
 import org.geotoolkit.sos.xml.v100.GetResult;
@@ -67,40 +89,21 @@ import org.geotoolkit.swe.xml.v101.DataArrayType;
 import org.geotoolkit.swe.xml.v101.SimpleDataRecordType;
 import org.geotoolkit.swe.xml.v101.TimeType;
 import org.geotoolkit.swes.xml.InsertSensorResponse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 import org.opengis.observation.sampling.SamplingPoint;
+import org.opengis.temporal.TemporalPrimitive;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-
-import static org.constellation.sos.ws.SOSConstants.MEASUREMENT_QNAME;
-import static org.constellation.sos.ws.SOSConstants.OBSERVATION_QNAME;
-import static org.constellation.sos.ws.SOSConstants.OBSERVATION_TEMPLATE;
-import static org.constellation.sos.ws.SOSConstants.OFFERING;
-import static org.constellation.sos.ws.SOSConstants.PROCEDURE;
-import static org.constellation.sos.ws.SOSConstants.RESPONSE_FORMAT;
-import static org.constellation.sos.ws.SOSConstants.RESPONSE_MODE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.OPERATION_NOT_SUPPORTED;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-// JUnit dependencies
 
 /**
  *
@@ -2457,6 +2460,44 @@ public abstract class SOSWorkerTest implements ApplicationContextAware {
 
         marshallerPool.recycle(unmarshaller);
     }
+    
+    /**
+     * Tests the RegisterSensor method
+     *
+     * @throws java.lang.Exception
+     */
+    public void GetFeatureOfInterestTimeTest() throws Exception {
+        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+
+        /**
+         * Test 1 : getFeatureOfInterestTime with featureID filter
+         */
+        TimePeriodType expResult = new TimePeriodType(null, "2007-05-01T02:59:00", "2007-06-01T03:00:00");
+
+        GetFeatureOfInterestTime request = new GetFeatureOfInterestTime("1.0.0", "station-001");
+
+        TemporalPrimitive result = worker.getFeatureOfInterestTime(request);
+
+        assertTrue (result instanceof TimePeriodType);
+
+        assertEquals(expResult, result);
+
+        /**
+         * Test 2 : getFeatureOfInterestTime with featureID filter  (SamplingCurve)
+         */
+        expResult = new TimePeriodType(null, "2007-05-01T12:59:00", "2009-05-01T13:47:00");
+
+        request = new GetFeatureOfInterestTime("1.0.0", "station-006");
+
+        result = worker.getFeatureOfInterestTime(request);
+
+        assertTrue (result instanceof TimePeriodType);
+
+        assertEquals(expResult, result);
+
+        marshallerPool.recycle(unmarshaller);
+    }
+    
     /**
      * Tests the destroy method
      *
