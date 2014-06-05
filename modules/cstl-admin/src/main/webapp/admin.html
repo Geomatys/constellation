@@ -48,33 +48,7 @@
                 </button>
             </div>
             <div class="collapse navbar-right navbar-collapse nav-header ng-cloak">
-                <ul class="nav nav-pills nav-header-mob pull-right hidden-xs hidden-sm hidden-md">
-                    <li style="margin-left:2px;" class="dropdown pointer" ng-controller="LanguageController">
-                        <a class="dropdown-toggle" data-toggle="dropdown">
-                            <span>
-                                <span class="glyphicon glyphicon-flag"></span>
-                                <span class="hidden-tablet" translate="global.menu.language">Language</span>
-                                <b class="caret"></b>
-                            </span>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li active-menu="en">
-                                <a ng-click="changeLanguage(&apos;en&apos;)">
-                                    <span class="famfamfam-flag-gb"></span> &nbsp;
-                                    <span translate="global.language.en">English</span>
-                                </a>
-                            </li>
-                            <li active-menu="fr">
-                                <a ng-click="changeLanguage(&apos;fr&apos;)">
-                                    <span class="famfamfam-flag-fr"></span> &nbsp;
-                                    <span translate="global.language.fr">French</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-
-                <ul style="float:none !important" class="nav nav-pills nav-header-mob pull-right hidden-sm hidden-md hidden-lg">
+                <ul class="nav nav-pills nav-header-mob pull-right nav-pas-pullright hidden-sm hidden-md">
                     <li style="margin-left:2px;" class="dropdown pointer" ng-controller="LanguageController">
                         <a class="dropdown-toggle" data-toggle="dropdown">
                             <span>
@@ -108,7 +82,7 @@
                         </a>
                     </li>
                 </ul>
-                <ul class="nav nav-pills nav-header-mob pull-right  ng-cloak" ng-controller="navCtrl">
+                <ul class="nav nav-pills nav-header-mob pull-right nav-pas-pullright ng-cloak" ng-controller="navCtrl">
                     <li ng-show="hasMultipleDomains()" class="dropdown pointer" ng-controller="DomainSwitcherController">
                         <a class="dropdown-toggle" data-toggle="dropdown">
                             <span>
