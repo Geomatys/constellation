@@ -40,10 +40,6 @@ import javax.xml.namespace.QName;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef;
-import org.constellation.admin.EmbeddedDatabase;
-import org.constellation.admin.dao.DataRecord;
-import org.constellation.admin.dao.ServiceRecord;
-import org.constellation.admin.dao.Session;
 //import org.constellation.admin.util.IOUtilities;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.Layer;
@@ -52,6 +48,7 @@ import org.constellation.configuration.Source;
 import org.constellation.engine.register.ConfigurationService;
 import org.constellation.engine.register.ConstellationPersistenceException;
 import org.constellation.engine.register.Data;
+import org.constellation.engine.register.MetadataIOUtils;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.ServiceExtraConfig;
@@ -185,9 +182,9 @@ public class JooqConfigurationService implements ConfigurationService {
             }
             if (service.hasIsoMetadata()) {
                 try {
-                    final DefaultMetadata servMeta = IOUtilities.unmarshallMetadata(service.getMetadata());
+                    final DefaultMetadata servMeta = MetadataIOUtils.unmarshallMetadata(service.getMetadata());
                     CstlMetadatas.updateServiceMetadataLayer(servMeta, layerIds);
-                    final String srm = IOUtilities.marshallMetadataToString(servMeta);
+                    final String srm = MetadataIOUtils.marshallMetadataToString(servMeta);
                     serviceRepository.updateIsoMetadata(service, servMeta.getFileIdentifier(), srm.toString());
                 } catch (JAXBException e) {
                     throw new ConstellationPersistenceException(e);

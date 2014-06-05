@@ -24,7 +24,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import org.apache.commons.io.FileUtils;
-import org.constellation.util.Util;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 
@@ -52,7 +51,7 @@ public class TempDatabase {
         Connection con = ds.getConnection();
 
         DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
-        sr.run(Util.getResourceAsStream("org/constellation/sql/v1/create-admin-db.sql"));
+        sr.run(TempDatabase.class.getResourceAsStream("/org/constellation/sql/v1/create-admin-db.sql"));
         sr.close(true);
         
         con.close();

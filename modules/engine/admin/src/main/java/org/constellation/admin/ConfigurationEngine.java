@@ -63,6 +63,7 @@ import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.Service;
 import org.constellation.engine.register.ConfigurationService;
 import org.constellation.engine.register.ConstellationPersistenceException;
+import org.constellation.engine.register.MetadataIOUtils;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.security.NoSecurityManagerException;
@@ -106,28 +107,7 @@ public class ConfigurationEngine {
 
     // End of spring managed component.
 
-    private static GeneralParameterValue unmarshallGeneralParameterValue(String xml,
-            GeneralParameterDescriptor descriptor) {
-        final ParameterValueReader reader = new ParameterValueReader(descriptor);
-        try {
-            reader.setInput(xml);
-            return reader.read();
-        } catch (IOException | XMLStreamException e) {
-            throw new ConstellationPersistenceException(e);
-        }
-    }
-
-    private static Object unmarshall(String xml, MarshallerPool pool) {
-
-        try (StringReader reader = new StringReader(xml)) {
-            Unmarshaller u = pool.acquireUnmarshaller();
-            final Object config = u.unmarshal(reader);
-            pool.recycle(u);
-            return config;
-        } catch (JAXBException e) {
-            throw new ConstellationPersistenceException(e);
-        }
-    }
+   
 
     public static Object getConfiguration(final String serviceType, final String serviceID) throws JAXBException,
             FileNotFoundException {
@@ -269,7 +249,7 @@ public class ConfigurationEngine {
                 String url = getConstellationProperty(SERVICES_URL_KEY, null);
                 final DefaultMetadata isoMetadata = CstlMetadatas.defaultServiceMetadata(identifier, serviceType, url,
                         metadata);
-                final StringReader srIso = IOUtilities.marshallMetadata(isoMetadata);
+                final StringReader srIso = MetadataIOUtils.marshallMetadata(isoMetadata);
 
                 service.setIsoMetadata(isoMetadata.getFileIdentifier(), srIso);
             }
@@ -397,10 +377,10 @@ public class ConfigurationEngine {
             final List<ServiceRecord> records = session.readServices();
             for (ServiceRecord record : records) {
                 if (record.hasIsoMetadata()) {
-                    final DefaultMetadata servMeta = IOUtilities.unmarshallMetadata(record.getIsoMetadata());
+                    final DefaultMetadata servMeta = MetadataIOUtils.unmarshallMetadata(record.getIsoMetadata());
                     CstlMetadatas.updateServiceMetadataURL(record.getIdentifier(), record.getType().name(), url,
                             servMeta);
-                    final StringReader sr = IOUtilities.marshallMetadata(servMeta);
+                    final StringReader sr = MetadataIOUtils.marshallMetadata(servMeta);
                     record.setIsoMetadata(servMeta.getFileIdentifier(), sr);
                 }
             }
@@ -426,7 +406,7 @@ public class ConfigurationEngine {
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
-            final StringReader sr = IOUtilities.marshallMetadata(metadata);
+            final StringReader sr = MetadataIOUtils.marshallMetadata(metadata);
             final ProviderRecord provider = session.readProvider(dataName);
             if (provider != null) {
                 provider.setMetadata(metadata.getFileIdentifier(), sr);
@@ -454,7 +434,7 @@ public class ConfigurationEngine {
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
-            final StringReader sr = IOUtilities.marshallMetadata(metadata);
+            final StringReader sr = MetadataIOUtils.marshallMetadata(metadata);
             final DataRecord data = session.readData(dataName, providerId);
             if (data != null) {
                 data.setIsoMetadata(metadata.getFileIdentifier(), sr);
