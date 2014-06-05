@@ -20,6 +20,10 @@ package org.constellation.engine.register;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
+import org.apache.commons.lang3.StringUtils;
+
 public class Data {
 
     private Integer id;
@@ -33,7 +37,9 @@ public class Data {
     private String owner;
     private List<Integer> styleIds;
     private String metadata;
+    private String metadataId;
     private String isoMetaData;
+    private boolean sensorable;
 
     
     public Integer getId() {
@@ -146,7 +152,29 @@ public class Data {
     }
 
 
+    public boolean isSensorable() {
+        return sensorable;
+    }
 
-    
+
+    public void setSensorable(boolean sensorable) {
+        this.sensorable = sensorable;
+    }
+
+
+    public boolean hasIsoMetadata() {
+        return StringUtils.isNotBlank(isoMetaData);
+    }
+
+
+
+    public String getMetadataId() {
+        return metadataId;
+    }
+
+
+    public void setMetadataId(String metadataId) {
+        this.metadataId = metadataId;
+    }
     
 }

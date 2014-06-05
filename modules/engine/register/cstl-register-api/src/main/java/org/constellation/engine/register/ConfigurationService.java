@@ -27,9 +27,10 @@ import javax.xml.namespace.QName;
 
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.configuration.DataBrief;
-import org.constellation.dto.Service;
 
 public interface ConfigurationService {
+
+    void storeConfiguration(String serviceType, String serviceID, String fileName, Object obj, MarshallerPool pool);
 
     Object getConfiguration(String serviceType, String serviceID, String fileName, MarshallerPool pool) throws JAXBException, FileNotFoundException ;
 
@@ -52,5 +53,10 @@ public interface ConfigurationService {
     void deleteData(String namespaceURI, String localPart, String providerIdentifier);
 
     void deleteProvider(String providerID);
+
+    List<Provider> findProvidersByImpl(String serviceName);
+
+    Service findServiceByIdentifierAndType(String serviceID, String serviceType);
+
 
 }

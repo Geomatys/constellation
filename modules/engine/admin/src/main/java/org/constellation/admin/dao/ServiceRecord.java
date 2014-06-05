@@ -130,6 +130,7 @@ public final class ServiceRecord extends Record {
         return session.readServiceConfig(id);
     }
 
+    @Deprecated
     public void setConfig(final StringReader config) throws SQLException {
         ensureConnectionNotClosed();
         session.updateServiceConfig(id, config);
@@ -140,6 +141,7 @@ public final class ServiceRecord extends Record {
         return session.readExtraServiceConfig(id, fileName);
     }
 
+    @Deprecated
     public void setExtraFile(final String fileName, final StringReader config) throws SQLException {
         ensureConnectionNotClosed();
         final InputStream is = session.readExtraServiceConfig(id, fileName);

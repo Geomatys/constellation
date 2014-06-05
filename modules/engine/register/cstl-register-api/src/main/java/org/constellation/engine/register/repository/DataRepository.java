@@ -35,5 +35,7 @@ public interface DataRepository {
     int delete(int id);
 
     int delete(String namespaceURI, String localPart, int providerId);
+
+    Data findDataFromProvider(String namespaceURI, String localPart, String providerId);
     
 }

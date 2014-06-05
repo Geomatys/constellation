@@ -65,7 +65,6 @@ public class ConfigurationServiceInit implements ApplicationContextAware {
         
         ConfigurationEngine.setSecurityManager(SecurityManagerHolder.getInstance());
         ConfigurationEngine.setConfigurationService(configurationService);
-        ConfigurationEngine.setProviderRepository(providerRepository);
         
         WSEngine.setWorkerFactory(new DIEnhancer() {
 

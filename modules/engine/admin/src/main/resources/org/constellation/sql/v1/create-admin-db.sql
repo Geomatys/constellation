@@ -3,13 +3,15 @@ CREATE SCHEMA "admin";
 
 -- i18n
 
-CREATE SEQUENCE "admin"."i18n_id" AS INTEGER START WITH 0;
+CREATE SEQUENCE "admin"."i18n_id" AS INTEGER START WITH 1;
 
 CREATE TABLE "admin"."i18n"(
   "id"    INTEGER     NOT NULL,
   "lang"  VARCHAR(7)  NOT NULL,
   "value" CLOB        NOT NULL
 );
+
+insert into "admin"."i18n" ("id", "lang", "value") value(0, "none", "empty");
 
 ALTER TABLE "admin"."i18n" ADD CONSTRAINT i18n_pk PRIMARY KEY ("id","lang");
 

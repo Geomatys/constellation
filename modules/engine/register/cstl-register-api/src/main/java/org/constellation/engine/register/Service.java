@@ -18,6 +18,7 @@
  */
 package org.constellation.engine.register;
 
+import org.apache.commons.lang3.StringUtils;
 
 public class Service {
 
@@ -29,6 +30,10 @@ public class Service {
     private int description;
     private String config;
     private String owner;
+
+    private String metadata;
+
+    private String metadata;
 
     public int getId() {
         return id;
@@ -93,6 +98,30 @@ public class Service {
 
     public void setOwner(String owner) {
         this.owner = owner;
+    }
+
+    public String getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(String metadata) {
+        this.metadata = metadata;
+    }
+
+    public boolean hasIsoMetadata() {
+        return StringUtils.isNotBlank(metadata);
+    }
+
+    public String getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(String metadata) {
+        this.metadata = metadata;
+    }
+
+    public boolean hasIsoMetadata() {
+        return StringUtils.isNotBlank(metadata);
     }
 
     @Override

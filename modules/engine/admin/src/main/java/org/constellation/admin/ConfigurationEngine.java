@@ -19,6 +19,8 @@
 
 package org.constellation.admin;
 
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -30,19 +32,18 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 
 import org.apache.sis.metadata.iso.DefaultMetadata;
-import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
-import org.apache.sis.xml.XML;
 import org.constellation.ServiceDef;
 import org.constellation.admin.dao.DataRecord;
 import org.constellation.admin.dao.LayerRecord;
@@ -53,28 +54,26 @@ import org.constellation.admin.dao.ServiceRecord;
 import org.constellation.admin.dao.Session;
 import org.constellation.admin.dao.StyleRecord;
 import org.constellation.admin.dao.TaskRecord;
+import org.constellation.admin.util.IOUtilities;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.DataBrief;
-import org.constellation.configuration.Layer;
-import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.ServiceProtocol;
-import org.constellation.configuration.Source;
 import org.constellation.configuration.StyleBrief;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.Service;
 import org.constellation.engine.register.ConfigurationService;
+import org.constellation.engine.register.ConstellationPersistenceException;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.security.NoSecurityManagerException;
 import org.constellation.security.SecurityManager;
 import org.constellation.util.Util;
 import org.constellation.utils.CstlMetadatas;
-import org.constellation.utils.ISOMarshallerPool;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.FileUtilities;
+import org.geotoolkit.xml.parameter.ParameterValueReader;
+import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterValueGroup;
 
 /**
  * @author Guilhem Legal (Geomatys)
@@ -89,14 +88,12 @@ public class ConfigurationEngine {
      * TODO Temporary hack to activate JPA daos.
      */
 
-    
-    //Spring managed component 
-    
+    // Spring managed component
+
     private static SecurityManager securityManager;
 
     private static ConfigurationService configurationService;
-    
-    private static ProviderRepository providerRepository;
+
 
     public static void setSecurityManager(SecurityManager securityManager) {
         ConfigurationEngine.securityManager = securityManager;
@@ -106,38 +103,30 @@ public class ConfigurationEngine {
         ConfigurationEngine.configurationService = configurationService;
     }
 
-    public static void setProviderRepository(ProviderRepository providerRepository) {
-        ConfigurationEngine.providerRepository = providerRepository;
-    }
 
-    //End of spring managed component.
-    
-    public static ParameterValueGroup getProviderConfiguration(final String serviceName,
-            final ParameterDescriptorGroup desc) {
+    // End of spring managed component.
 
-        final ParameterValueGroup params = desc.createValue();
-        Session session = null;
+    private static GeneralParameterValue unmarshallGeneralParameterValue(String xml,
+            GeneralParameterDescriptor descriptor) {
+        final ParameterValueReader reader = new ParameterValueReader(descriptor);
         try {
-            session = EmbeddedDatabase.createSession();
-            final List<ProviderRecord> records = session.readProviders(serviceName);
-            for (ProviderRecord record : records) {
-                params.values().add(record.getConfig(desc.descriptor("source")));
-            }
-            return params;
-
-        } catch (IOException | SQLException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred while updating provider database", ex);
-        } finally {
-            if (session != null)
-                session.close();
+            reader.setInput(xml);
+            return reader.read();
+        } catch (IOException | XMLStreamException e) {
+            throw new ConstellationPersistenceException(e);
         }
-        return null;
     }
 
-   
+    private static Object unmarshall(String xml, MarshallerPool pool) {
 
-    public static void storePoviderConfiguration(final String serviceName, final ParameterValueGroup params) {
-        // TODO move from Configurator
+        try (StringReader reader = new StringReader(xml)) {
+            Unmarshaller u = pool.acquireUnmarshaller();
+            final Object config = u.unmarshal(reader);
+            pool.recycle(u);
+            return config;
+        } catch (JAXBException e) {
+            throw new ConstellationPersistenceException(e);
+        }
     }
 
     public static Object getConfiguration(final String serviceType, final String serviceID) throws JAXBException,
@@ -153,35 +142,8 @@ public class ConfigurationEngine {
     public static Object getConfiguration(final String serviceType, final String serviceID, final String fileName,
             final MarshallerPool pool) throws JAXBException, FileNotFoundException {
 
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            final ServiceRecord rec = session.readService(serviceID,
-                    ServiceDef.Specification.fromShortName(serviceType));
-            if (rec != null) {
-                final InputStream is;
-                if (fileName == null) {
-                    is = rec.getConfig();
-                } else {
-                    is = rec.getExtraFile(fileName);
-                }
-                if (is != null) {
-                    final Unmarshaller u = pool.acquireUnmarshaller();
-                    final Object config = u.unmarshal(is);
-                    pool.recycle(u);
-                    return config;
-                }
-            }
+        return configurationService.getConfiguration(serviceType, serviceID, fileName, pool);
 
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred while updating provider database", ex);
-        } finally {
-            if (session != null)
-                session.close();
-        }
-
-        throw new FileNotFoundException("The configuration (" + (fileName != null ? fileName : "default")
-                + ") has not been found.");
     }
 
     public static void storeConfiguration(final String serviceType, final String serviceID, final Object obj,
@@ -199,82 +161,7 @@ public class ConfigurationEngine {
 
     public static void storeConfiguration(final String serviceType, final String serviceID, final String fileName,
             final Object obj, final MarshallerPool pool) throws JAXBException {
-        final ServiceDef.Specification spec = ServiceDef.Specification.fromShortName(serviceType);
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-
-            final StringReader sr;
-            if (obj != null) {
-                final StringWriter sw = new StringWriter();
-                final Marshaller m = pool.acquireMarshaller();
-                m.marshal(obj, sw);
-                pool.recycle(m);
-                sr = new StringReader(sw.toString());
-
-            } else {
-                sr = null;
-            }
-
-            final String login = securityManager.getCurrentUserLogin();
-            ServiceRecord service = session.readService(serviceID, spec);
-            if (service == null) {
-                if (fileName == null) {
-                    service = session.writeService(serviceID, spec, sr, login);
-                } else {
-                    session.writeServiceExtraConfig(serviceID, spec, sr, fileName);
-                }
-            } else {
-                if (obj instanceof LayerContext) {
-                    session.deleteServiceLayer(service);
-                    // save Layers
-                    LayerContext context = (LayerContext) obj;
-                    for (Source source : context.getLayers()) {
-                        for (Layer layer : source.getInclude()) {
-                            final QName dataName = layer.getName();
-                            final DataRecord data = session.readData(dataName, source.getId());
-                            session.writeLayer(dataName, layer.getAlias(), service, data, "", login);
-                        }
-                    }
-                }
-
-                if (fileName == null) {
-                    service.setConfig(sr);
-                } else {
-                    service.setExtraFile(fileName, sr);
-                }
-            }
-
-            // update service metadata for a WxS
-            if (obj instanceof LayerContext) {
-                final LayerContext context = (LayerContext) obj;
-                final List<String> layerIds = new ArrayList<>();
-                for (Source src : context.getLayers()) {
-                    if (src.getLoadAll()) {
-                        // TODO
-                    } else {
-                        for (Layer layer : src.getInclude()) {
-                            final DataRecord record = session.readData(layer.getName(), src.getId());
-                            if (record != null && record.hasIsoMetadata()) {
-                                layerIds.add(record.getMetadataId());
-                            }
-                        }
-                    }
-                }
-                if (service.hasIsoMetadata()) {
-                    final DefaultMetadata servMeta = unmarshallMetadata(service.getIsoMetadata());
-                    CstlMetadatas.updateServiceMetadataLayer(servMeta, layerIds);
-                    final StringReader srm = marshallMetadata(servMeta);
-                    service.setIsoMetadata(servMeta.getFileIdentifier(), srm);
-                }
-            }
-
-        } catch (SQLException | IOException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
-        } finally {
-            if (session != null)
-                session.close();
-        }
+            configurationService.storeConfiguration(serviceType, serviceID, fileName, obj, pool);
     }
 
     public static List<String> getServiceConfigurationIds(final String serviceType) {
@@ -382,7 +269,7 @@ public class ConfigurationEngine {
                 String url = getConstellationProperty(SERVICES_URL_KEY, null);
                 final DefaultMetadata isoMetadata = CstlMetadatas.defaultServiceMetadata(identifier, serviceType, url,
                         metadata);
-                final StringReader srIso = marshallMetadata(isoMetadata);
+                final StringReader srIso = IOUtilities.marshallMetadata(isoMetadata);
 
                 service.setIsoMetadata(isoMetadata.getFileIdentifier(), srIso);
             }
@@ -510,10 +397,10 @@ public class ConfigurationEngine {
             final List<ServiceRecord> records = session.readServices();
             for (ServiceRecord record : records) {
                 if (record.hasIsoMetadata()) {
-                    final DefaultMetadata servMeta = unmarshallMetadata(record.getIsoMetadata());
+                    final DefaultMetadata servMeta = IOUtilities.unmarshallMetadata(record.getIsoMetadata());
                     CstlMetadatas.updateServiceMetadataURL(record.getIdentifier(), record.getType().name(), url,
                             servMeta);
-                    final StringReader sr = marshallMetadata(servMeta);
+                    final StringReader sr = IOUtilities.marshallMetadata(servMeta);
                     record.setIsoMetadata(servMeta.getFileIdentifier(), sr);
                 }
             }
@@ -539,7 +426,7 @@ public class ConfigurationEngine {
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
-            final StringReader sr = marshallMetadata(metadata);
+            final StringReader sr = IOUtilities.marshallMetadata(metadata);
             final ProviderRecord provider = session.readProvider(dataName);
             if (provider != null) {
                 provider.setMetadata(metadata.getFileIdentifier(), sr);
@@ -567,7 +454,7 @@ public class ConfigurationEngine {
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
-            final StringReader sr = marshallMetadata(metadata);
+            final StringReader sr = IOUtilities.marshallMetadata(metadata);
             final DataRecord data = session.readData(dataName, providerId);
             if (data != null) {
                 data.setIsoMetadata(metadata.getFileIdentifier(), sr);
@@ -800,7 +687,7 @@ public class ConfigurationEngine {
         }
         return new ArrayList<>();
     }
-    
+
     public static List<ProviderRecord> getProviders(final String serviceName) {
         Session session = null;
         try {
@@ -845,9 +732,9 @@ public class ConfigurationEngine {
     }
 
     public static void deleteProvider(final String providerID) {
-        
+
         configurationService.deleteProvider(providerID);
-      
+
     }
 
     public static ProviderRecord writeProvider(final String identifier, final String parent,
@@ -891,7 +778,7 @@ public class ConfigurationEngine {
                 session.close();
         }
     }
-    
+
     public static List<SensorRecord> getSensors() {
         Session session = null;
         try {
@@ -905,7 +792,7 @@ public class ConfigurationEngine {
         }
         return new ArrayList<>();
     }
-    
+
     public static List<SensorRecord> getSensorChildren(final String parentIdentififer) {
         Session session = null;
         try {
@@ -934,7 +821,7 @@ public class ConfigurationEngine {
         }
         return null;
     }
-    
+
     public static void deleteSensor(final String sensorID) {
         Session session = null;
         try {
@@ -975,7 +862,7 @@ public class ConfigurationEngine {
         }
         return null;
     }
-    
+
     /**
      * Load a metadata for a provider.
      * 
@@ -1021,13 +908,13 @@ public class ConfigurationEngine {
     }
 
     public static void deleteData(final QName name, final String providerId) {
-        
+
         configurationService.deleteData(name.getNamespaceURI(), name.getLocalPart(), providerId);
-        
-     
+
     }
 
-    public static DataRecord writeData(final QName name, final ProviderRecord provider, final DataRecord.DataType type, final boolean sensorable) {
+    public static DataRecord writeData(final QName name, final ProviderRecord provider, final DataRecord.DataType type,
+            final boolean sensorable) {
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
@@ -1461,19 +1348,4 @@ public class ConfigurationEngine {
         }
     }
 
-    private static DefaultMetadata unmarshallMetadata(final InputStream stream) throws JAXBException {
-        final Unmarshaller um = ISOMarshallerPool.getInstance().acquireUnmarshaller();
-        final DefaultMetadata meta = (DefaultMetadata) um.unmarshal(stream);
-        ISOMarshallerPool.getInstance().recycle(um);
-        return meta;
-    }
-
-    private static StringReader marshallMetadata(final DefaultMetadata meta) throws JAXBException {
-        final StringWriter swIso = new StringWriter();
-        final Marshaller mi = ISOMarshallerPool.getInstance().acquireMarshaller();
-        mi.setProperty(XML.TIMEZONE, TimeZone.getTimeZone("GMT+2:00"));
-        mi.marshal(meta, swIso);
-        ISOMarshallerPool.getInstance().recycle(mi);
-        return new StringReader(swIso.toString());
-    }
 }

@@ -23,13 +23,20 @@ import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.TimeZone;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamException;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.Static;
+import org.apache.sis.xml.XML;
+import org.constellation.utils.ISOMarshallerPool;
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
 import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.style.MutableStyle;
@@ -47,133 +54,151 @@ import org.slf4j.Logger;
  */
 public final class IOUtilities extends Static {
 
-	private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(IOUtilities.class);
+    private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(IOUtilities.class);
 
-	/**
-	 * Transform a {@link MutableStyle} instance into a {@link String} instance.
-	 *
-	 * @param style
-	 *            the style to be written
-	 * @return a {@link String} instance
-	 * @throws IOException
-	 *             on error while writing {@link MutableStyle} XML
-	 */
-	public static String writeStyle(final MutableStyle style)
-			throws IOException {
-		ensureNonNull("style", style);
-		final StyleXmlIO util = new StyleXmlIO();
-		try {
-			final StringWriter sw = new StringWriter();
-			util.writeStyle(sw, style, StyledLayerDescriptor.V_1_1_0);
-			return sw.toString();
-		} catch (JAXBException ex) {
-			throw new IOException(
-					"An error occurred while writing MutableStyle XML.", ex);
-		}
-	}
+    /**
+     * Transform a {@link MutableStyle} instance into a {@link String} instance.
+     *
+     * @param style
+     *            the style to be written
+     * @return a {@link String} instance
+     * @throws IOException
+     *             on error while writing {@link MutableStyle} XML
+     */
+    public static String writeStyle(final MutableStyle style) throws IOException {
+        ensureNonNull("style", style);
+        final StyleXmlIO util = new StyleXmlIO();
+        try {
+            final StringWriter sw = new StringWriter();
+            util.writeStyle(sw, style, StyledLayerDescriptor.V_1_1_0);
+            return sw.toString();
+        } catch (JAXBException ex) {
+            throw new IOException("An error occurred while writing MutableStyle XML.", ex);
+        }
+    }
 
-	/**
-	 * Transform a {@link GeneralParameterValue} instance into a {@link String}
-	 * instance.
-	 *
-	 * @param parameter
-	 *            the parameter to be written
-	 * @return a {@link String} instance
-	 * @throws IOException
-	 *             on error while writing {@link GeneralParameterValue} XML
-	 */
-	public static String writeParameter(final GeneralParameterValue parameter)
-			throws IOException {
-		ensureNonNull("parameter", parameter);
-		try {
-			final StringWriter sw = new StringWriter();
-			final ParameterValueWriter writer = new ParameterValueWriter();
-			writer.setOutput(sw);
-			writer.write(parameter);
-			return sw.toString();
-		} catch (XMLStreamException ex) {
-			throw new IOException(
-					"An error occurred while writing ParameterDescriptorGroup XML.",
-					ex);
-		}
-	}
+    /**
+     * Transform a {@link GeneralParameterValue} instance into a {@link String}
+     * instance.
+     *
+     * @param parameter
+     *            the parameter to be written
+     * @return a {@link String} instance
+     * @throws IOException
+     *             on error while writing {@link GeneralParameterValue} XML
+     */
+    public static String writeParameter(final GeneralParameterValue parameter) throws IOException {
+        ensureNonNull("parameter", parameter);
+        try {
+            final StringWriter sw = new StringWriter();
+            final ParameterValueWriter writer = new ParameterValueWriter();
+            writer.setOutput(sw);
+            writer.write(parameter);
+            return sw.toString();
+        } catch (XMLStreamException ex) {
+            throw new IOException("An error occurred while writing ParameterDescriptorGroup XML.", ex);
+        }
+    }
 
-	/**
-	 * Reads an {@link InputStream} to build a {@link GeneralParameterValue}
-	 * instance according the specified {@link ParameterDescriptorGroup}.
-	 *
-	 * @param stream
-	 *            the stream to read
-	 * @param descriptor
-	 *            the parameter descriptor
-	 * @return a {@link GeneralParameterValue} instance
-	 * @throws IOException
-	 *             on error while reading {@link GeneralParameterValue} XML
-	 */
-	public static GeneralParameterValue readParameter(final InputStream stream,
-			final ParameterDescriptorGroup descriptor) throws IOException {
-		ensureNonNull("stream", stream);
-		ensureNonNull("descriptor", descriptor);
-		try {
-			final ParameterValueReader reader = new ParameterValueReader(
-					descriptor);
-			reader.setInput(stream);
-			return reader.read();
-		} catch (XMLStreamException ex) {
-			throw new IOException(
-					"An error occurred while parsing ParameterDescriptorGroup XML.",
-					ex);
-		} finally {
-			try {
-				stream.close();
-			} catch (IOException ex) {
-				LOGGER.warn("Error while closing stream", ex);
-			}
-		}
-	}
+    /**
+     * Reads an {@link InputStream} to build a {@link GeneralParameterValue}
+     * instance according the specified {@link ParameterDescriptorGroup}.
+     *
+     * @param stream
+     *            the stream to read
+     * @param descriptor
+     *            the parameter descriptor
+     * @return a {@link GeneralParameterValue} instance
+     * @throws IOException
+     *             on error while reading {@link GeneralParameterValue} XML
+     */
+    public static GeneralParameterValue readParameter(final InputStream stream,
+            final ParameterDescriptorGroup descriptor) throws IOException {
+        ensureNonNull("stream", stream);
+        ensureNonNull("descriptor", descriptor);
+        try {
+            final ParameterValueReader reader = new ParameterValueReader(descriptor);
+            reader.setInput(stream);
+            return reader.read();
+        } catch (XMLStreamException ex) {
+            throw new IOException("An error occurred while parsing ParameterDescriptorGroup XML.", ex);
+        } finally {
+            try {
+                stream.close();
+            } catch (IOException ex) {
+                LOGGER.warn("Error while closing stream", ex);
+            }
+        }
+    }
 
-	public static GeneralParameterValue readParameter(final InputStream stream,
-			final GeneralParameterDescriptor descriptor) throws IOException {
-		ensureNonNull("stream", stream);
-		ensureNonNull("descriptor", descriptor);
-		try {
-			final ParameterValueReader reader = new ParameterValueReader(
-					descriptor);
-			reader.setInput(stream);
-			return reader.read();
-		} catch (XMLStreamException ex) {
-			throw new IOException(
-					"An error occurred while parsing ParameterDescriptorGroup XML.",
-					ex);
-		} finally {
-			try {
-				stream.close();
-			} catch (IOException ex) {
-				LOGGER.warn("Error while closing stream", ex);
-			}
-		}
-	}
+    public static GeneralParameterValue readParameter(final InputStream stream,
+            final GeneralParameterDescriptor descriptor) throws IOException {
+        ensureNonNull("stream", stream);
+        ensureNonNull("descriptor", descriptor);
+        try {
+            final ParameterValueReader reader = new ParameterValueReader(descriptor);
+            reader.setInput(stream);
+            return reader.read();
+        } catch (XMLStreamException ex) {
+            throw new IOException("An error occurred while parsing ParameterDescriptorGroup XML.", ex);
+        } finally {
+            try {
+                stream.close();
+            } catch (IOException ex) {
+                LOGGER.warn("Error while closing stream", ex);
+            }
+        }
+    }
 
-	/**
-	 * Reads a {@link String} instance from the specified {@link InputStream}.
-	 *
-	 * @return a {@link String} instance
-	 * @throws IOException
-	 *             if an I/O error occurs
-	 */
-	public static String readString(final InputStream stream)
-			throws IOException {
-		ensureNonNull("stream", stream);
-		try {
-			final StringWriter writer = new StringWriter();
-			IOUtils.copy(stream, writer);
-			return writer.toString();
-		} finally {
-			try {
-				stream.close();
-			} catch (IOException ex) {
-				LOGGER.warn("Error while closing stream", ex);
-			}
-		}
-	}
+    /**
+     * Reads a {@link String} instance from the specified {@link InputStream}.
+     *
+     * @return a {@link String} instance
+     * @throws IOException
+     *             if an I/O error occurs
+     */
+    public static String readString(final InputStream stream) throws IOException {
+        ensureNonNull("stream", stream);
+        try {
+            final StringWriter writer = new StringWriter();
+            IOUtils.copy(stream, writer);
+            return writer.toString();
+        } finally {
+            try {
+                stream.close();
+            } catch (IOException ex) {
+                LOGGER.warn("Error while closing stream", ex);
+            }
+        }
+    }
+
+    public static DefaultMetadata unmarshallMetadata(final String xml) throws JAXBException {
+        final Unmarshaller um = ISOMarshallerPool.getInstance().acquireUnmarshaller();
+        try (StringReader reader = new StringReader(xml)) {
+            final DefaultMetadata meta = (DefaultMetadata) um.unmarshal(reader);
+            ISOMarshallerPool.getInstance().recycle(um);
+            return meta;
+        }
+    }
+
+    public static DefaultMetadata unmarshallMetadata(final InputStream stream) throws JAXBException {
+        final Unmarshaller um = ISOMarshallerPool.getInstance().acquireUnmarshaller();
+        final DefaultMetadata meta = (DefaultMetadata) um.unmarshal(stream);
+        ISOMarshallerPool.getInstance().recycle(um);
+        return meta;
+    }
+
+    public static StringReader marshallMetadata(final DefaultMetadata meta) throws JAXBException {
+        return new StringReader(marshallMetadataToString(meta));
+    }
+
+    
+    public static String marshallMetadataToString(final DefaultMetadata meta) throws JAXBException {
+        final StringWriter swIso = new StringWriter();
+        final Marshaller mi = ISOMarshallerPool.getInstance().acquireMarshaller();
+        mi.setProperty(XML.TIMEZONE, TimeZone.getTimeZone("GMT+2:00"));
+        mi.marshal(meta, swIso);
+        ISOMarshallerPool.getInstance().recycle(mi);
+        return swIso.toString();
+    }
 }

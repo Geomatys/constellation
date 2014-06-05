@@ -26,7 +26,12 @@ public class ConstellationPersistenceException extends RuntimeException {
      */
     private static final long serialVersionUID = 1L;
 
+    public ConstellationPersistenceException(String message) {
+        super(message);
+    }
+
     public ConstellationPersistenceException(Exception e) {
         super(e);
     }
+
 }

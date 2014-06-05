@@ -21,9 +21,20 @@ package org.constellation.engine.register.repository;
 import java.util.List;
 
 import org.constellation.engine.register.Layer;
+import org.constellation.engine.register.Service;
 
 public interface LayerRepository {
 
-    List<? extends Layer> findAll();
+    List<Layer> findAll();
+
+    int deleteServiceLayer(Service service);
+
+    Layer save(Layer storeLayer);
+
+    List<Layer> getLayer(Service service);
+
+    int update(Layer storeLayer);
+
+    void delete(Layer layer);
     
 }

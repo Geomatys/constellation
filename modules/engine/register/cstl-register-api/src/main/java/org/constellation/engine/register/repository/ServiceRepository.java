@@ -42,6 +42,16 @@ public interface ServiceRepository {
     ServiceMetaData findMetaDataForLangByIdentifierAndType(String identifier, String serviceType, String language);
 
     List<ServiceExtraConfig> getExtraConfig(int id);
+    
+    ServiceExtraConfig getExtraConfig(int id, String filename);
 
     java.util.Map<String, Set<String>> getAccessiblesServicesByType(int domainId, String name);
+
+    Service save(Service service);
+
+    Service updateConfig(Service service);
+
+    void updateExtraFile(Service service, String fileName, String config);
+
+    int updateIsoMetadata(Service service, String fileIdentifier, String string);
 }

@@ -1087,7 +1087,7 @@ public final class Session implements Closeable {
     /* internal */ ServiceRecord readService(final int generatedId) throws SQLException {
         return new Query(READ_SERVICE_FROM_ID).with(generatedId).select().getFirst(ServiceRecord.class);
     }
-
+//ZOZO
     public ServiceRecord readService(final String identifier, final Specification spec) throws SQLException {
         ensureNonNull("identifier", identifier);
         ensureNonNull("spec",       spec);

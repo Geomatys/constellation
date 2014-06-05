@@ -7,11 +7,12 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
 
   
-
+  
+   
 <!--    <metrics:annotation-driven /> -->
 
    <bean class="org.constellation.services.admin.ConfigurationServiceInit" init-method="init" autowire="byType"/>
-   <bean class="org.constellation.security.SecurityManagerHolder" factory-method="getInstance" />
+   <bean id="securityManager" class="org.constellation.security.SecurityManagerHolder" factory-method="getInstance" />
   
    <bean class="org.constellation.services.SessionDataImpl" />
    
