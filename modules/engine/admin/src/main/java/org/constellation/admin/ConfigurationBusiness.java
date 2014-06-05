@@ -6,13 +6,13 @@ import org.constellation.configuration.ConfigDirectory;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ConfigurationAdmin {
-	
-	File getConfigurationDirectory(){
+public class ConfigurationBusiness {
+
+	File getConfigurationDirectory() {
 		return ConfigDirectory.getConfigDirectory();
 	}
-	
-	File getDataDirectory(){
+
+	File getDataDirectory() {
 		return ConfigDirectory.getDataDirectory();
 	}
 

@@ -132,7 +132,6 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
             newRecord.setFilename(fileName);
             newRecord.setId(service.getId());
             newRecord.store();
-
         }
 
     }
@@ -141,7 +140,6 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
     public int updateIsoMetadata(Service service, String metadataId, String metadata) {
         return dsl.update(SERVICE).set(SERVICE.METADATA_ID, metadataId).set(SERVICE.METADATA, metadata)
                 .where(SERVICE.ID.eq(service.getId())).execute();
-
     }
 
     @Override
@@ -157,12 +155,10 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
 
         Map<String, Result<Record2<String, String>>> services = result.intoGroups(SERVICE.TYPE);
         for (Entry<String, Result<Record2<String, String>>> serviceEntry : services.entrySet()) {
-
             resultM.put(serviceEntry.getKey(), new HashSet<String>(serviceEntry.getValue()
                     .getValues(SERVICE.IDENTIFIER)));
 
         }
-
         return resultM;
     }
 
@@ -172,5 +168,19 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
         if (one == null)
             return null;
         return one.into(Service.class);
-    }
+	}
+
+	@Override
+	public int create(Service service) {
+		ServiceRecord serviceRecord = dsl.newRecord(SERVICE);
+		serviceRecord.setConfig(service.getConfig());
+		serviceRecord.setDate(service.getDate());
+		serviceRecord.setDescription(service.getDescription());
+		serviceRecord.setIdentifier(service.getIdentifier());
+		serviceRecord.setMetadata(service.getMetadata());
+		serviceRecord.setMetadataId(service.getMetadataId());
+		serviceRecord.store();
+		return serviceRecord.getId().intValue();
+	}
+
 }

@@ -33,6 +33,7 @@ import org.springframework.stereotype.Component;
 public class JooqLayerRepository extends AbstractJooqRespository<LayerRecord, Layer> implements LayerRepository {
 
     public JooqLayerRepository() {
+
         super(Layer.class, LAYER);
     }
 
@@ -85,5 +86,10 @@ public class JooqLayerRepository extends AbstractJooqRespository<LayerRecord, La
     public void delete(Layer layer) {
         dsl.delete(LAYER).where(LAYER.ID.eq(layer.getId()));
     }
+
+	@Override
+	public List<Layer> findByServiceId(int serviceId) {
+		return dsl.select().from(LAYER).where(LAYER.SERVICE.eq(serviceId)).fetchInto(Layer.class);
+	}
 
 }

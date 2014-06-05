@@ -26,6 +26,8 @@ import org.constellation.engine.register.Service;
 public interface LayerRepository {
 
     List<Layer> findAll();
+    
+    List<Layer> findByServiceId(int serviceId);
 
     int deleteServiceLayer(Service service);
 
@@ -36,5 +38,6 @@ public interface LayerRepository {
     int update(Layer storeLayer);
 
     void delete(Layer layer);
+
     
 }

@@ -30,8 +30,8 @@ public class Service {
     private int description;
     private String config;
     private String owner;
-
     private String metadata;
+    private String metadataId;
 
     public int getId() {
         return id;
@@ -98,18 +98,28 @@ public class Service {
         this.owner = owner;
     }
 
-
+    
     public String getMetadata() {
-        return metadata;
-    }
+		return metadata;
+	}
 
-    public void setMetadata(String metadata) {
-        this.metadata = metadata;
-    }
+	public void setMetadata(String metadata) {
+		this.metadata = metadata;
+	}
+	
+	public String getMetadataId() {
+		return metadataId;
+	}
+
+	public void setMetadataId(String metadataId) {
+		this.metadataId = metadataId;
+	}
 
     public boolean hasIsoMetadata() {
         return StringUtils.isNotBlank(metadata);
     }
+
+
 
     @Override
     public String toString() {
@@ -117,4 +127,5 @@ public class Service {
                 + title + ", description=" + description + ", config=" + config + ", owner=" + owner + "]";
     }
 
+	
 }

@@ -26,7 +26,9 @@ import org.constellation.engine.register.ServiceExtraConfig;
 import org.constellation.engine.register.ServiceMetaData;
 
 public interface ServiceRepository {
-
+	
+	int create(Service service);
+	
     List<Service> findAll();
     
     Service findById(int id);

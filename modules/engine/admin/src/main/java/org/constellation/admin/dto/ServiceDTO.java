@@ -4,7 +4,7 @@ import java.util.Date;
 
 
 
-public class Service {
+public class ServiceDTO {
 	
 	private int id;
 	private String identifier;
