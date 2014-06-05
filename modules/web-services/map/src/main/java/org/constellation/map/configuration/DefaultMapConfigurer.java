@@ -146,9 +146,6 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         return super.unmarshall(request, parameters, stream);
     }
 
-    /**
-     * {@inheritDoc }
-     */
     @Override
     public Object treatRequest(final String request, final MultivaluedMap<String, String> parameters, final Object objectRequest) throws CstlServiceException {
 
@@ -156,9 +153,11 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         if (REQUEST_LIST_SERVICES.equalsIgnoreCase(request)) {
             return listProviderServices();
         } else if (REQUEST_GET_SERVICE_DESCRIPTOR.equalsIgnoreCase(request)) {
-            return getServiceDescriptor(parameters);
+            final String serviceName = getParameter("serviceName", true, parameters);
+            return getServiceDescriptor(serviceName);
         } else if (REQUEST_GET_SOURCE_DESCRIPTOR.equalsIgnoreCase(request)) {
-            return getSourceDescriptor(parameters);
+            final String serviceName = getParameter("serviceName", true, parameters);
+            return getSourceDescriptor(serviceName);
         }
 
         //Provider operations
@@ -167,56 +166,91 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         } else if (REQUEST_RESTART_ALL_STYLE_PROVIDERS.equalsIgnoreCase(request)) {
             return restartStyleProviders();
         } else if (REQUEST_CREATE_PROVIDER.equalsIgnoreCase(request)) {
-            return createProvider(parameters, objectRequest);
+            final String serviceName = getParameter("serviceName", true, parameters);
+            return createProvider(serviceName, objectRequest);
         } else if (REQUEST_UPDATE_PROVIDER.equalsIgnoreCase(request)) {
-            return updateProvider(parameters, objectRequest);
+            final String serviceName = getParameter("serviceName", true, parameters);
+            final String currentId = getParameter("id", true, parameters);
+            return updateProvider(serviceName, currentId, objectRequest);
         } else if (REQUEST_GET_PROVIDER_CONFIG.equalsIgnoreCase(request)) {
-            return getProviderConfiguration(parameters);
+            final String id = getParameter("id", true, parameters);
+            return getProviderConfiguration(id);
         } else if (REQUEST_DELETE_PROVIDER.equalsIgnoreCase(request)) {
-            return deleteProvider(parameters);
+            final String providerId = getParameter("id", true, parameters);
+            final boolean deleteData = getBooleanParameter("deleteData", false, parameters);
+            return deleteProvider(providerId, deleteData);
         } else if (REQUEST_RESTART_PROVIDER.equalsIgnoreCase(request)) {
-            return restartProvider(parameters);
+            final String providerId = getParameter("id", true, parameters);
+            return restartProvider(providerId);
         }
 
         //Layer operations
         else if (REQUEST_CREATE_LAYER.equalsIgnoreCase(request)) {
-            return createLayer(parameters, objectRequest);
+            final String sourceId = getParameter("id", true, parameters);
+            return createLayer(sourceId, objectRequest);
         } else if (REQUEST_UPDATE_LAYER.equalsIgnoreCase(request)) {
-            return updateLayer(parameters, objectRequest);
+            final String sourceId = getParameter("id", true, parameters);
+            final String layerName = getParameter("layerName", true, parameters);
+            return updateLayer(sourceId, layerName, objectRequest);
         } else if (REQUEST_DELETE_LAYER.equalsIgnoreCase(request)) {
-            return deleteLayer(parameters);
+            final String sourceId = getParameter("id", true, parameters);
+            final String layerName = getParameter("layerName", true, parameters);
+            return deleteLayer(sourceId, layerName);
         }
 
         //Style operations
         else if (REQUEST_DOWNLOAD_STYLE.equalsIgnoreCase(request)) {
-            return downloadStyle(parameters);
+            final String id = getParameter("id", true, parameters);
+            final String styleId = getParameter("styleName", true, parameters);
+            return downloadStyle(id, styleId);
         } else if (REQUEST_CREATE_STYLE.equalsIgnoreCase(request)) {
-            return createStyle(parameters, objectRequest);
+            final String sourceId = getParameter("id", true, parameters);
+            final String styleId = getParameter("styleName", true, parameters);
+            return createStyle(sourceId, styleId, objectRequest);
         } else if (REQUEST_UPDATE_STYLE.equalsIgnoreCase(request)) {
-            return updateStyle(parameters, objectRequest);
+            final String sourceId = getParameter("id", true, parameters);
+            final String styleId = getParameter("styleName", true, parameters);
+            return updateStyle(sourceId, styleId, objectRequest);
         } else if (REQUEST_DELETE_STYLE.equalsIgnoreCase(request)) {
-            return deleteStyle(parameters);
+            final String sourceId = getParameter("id", true, parameters);
+            final String styleId = getParameter("styleName", true, parameters);
+            return deleteStyle(sourceId, styleId);
         }
 
         //Tasks operations
         else if (REQUEST_LIST_PROCESS.equalsIgnoreCase(request)) {
             return listProcess();
         } else if (REQUEST_LIST_PROCESS_FOR_FACTO.equalsIgnoreCase(request)) {
-            return listProcessForFactory(parameters);
+            final String authorityCode = getParameter("authorityCode", true, parameters);
+            return listProcessForFactory(authorityCode);
         } else if (REQUEST_LIST_PROCESS_FACTORIES.equalsIgnoreCase(request)) {
             return listProcessFactories();
         } else if (REQUEST_LIST_TASKS.equalsIgnoreCase(request)) {
             return listTasks();
         } else if (REQUEST_GET_PROCESS_DESC.equalsIgnoreCase(request)) {
-            return getProcessDescriptor(parameters);
+            final String authority = getParameter("authority", true, parameters);
+            final String code = getParameter("code", true, parameters);
+            return getProcessDescriptor(authority, code);
         } else if (REQUEST_GET_TASK_PARAMS.equalsIgnoreCase(request)) {
-            return getTaskParameters(parameters);
+            final String id = getParameter("id", true, parameters);
+            return getTaskParameters(id);
         } else if (REQUEST_CREATE_TASK.equalsIgnoreCase(request)) {
-            return createTask(parameters, objectRequest);
+            final String authority = getParameter("authority", true, parameters);
+            final String code = getParameter("code", true, parameters);
+            String title = getParameter("title", false, parameters);
+            final int step = Integer.valueOf(getParameter("step", true, parameters));
+            final String id = getParameter("id", true, parameters);
+            return createTask(authority, code, title, step, id, objectRequest);
         } else if (REQUEST_UPDATE_TASK.equalsIgnoreCase(request)) {
-            return updateTask(parameters, objectRequest);
+            final String authority = getParameter("authority", true, parameters);
+            final String code      = getParameter("code", true, parameters);
+            final String title     = getParameter("title", false, parameters);
+            final int step         = Integer.valueOf(getParameter("step", true, parameters));
+            final String id        = getParameter("id", true, parameters);
+            return updateTask(authority, code, title, step, id, objectRequest);
         } else if (REQUEST_DELETE_TASK.equalsIgnoreCase(request)) {
-            return deleteTask(parameters);
+            final String id = getParameter("id", true, parameters);
+            return deleteTask(id);
         }
 
         return null;
@@ -252,9 +286,8 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      * @return An acknowledgment informing if the request have been successfully treated or not.
      * @throws CstlServiceException
      */
-    private AcknowlegementType createProvider(final MultivaluedMap<String, String> parameters,
+    private AcknowlegementType createProvider(final String serviceName,
             final Object objectRequest) throws CstlServiceException{
-        final String serviceName = getParameter("serviceName", true, parameters);
         final ProviderFactory service = this.services.get(serviceName);
         if (service != null) {
 
@@ -301,10 +334,8 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      * @return An acknowledgment informing if the request have been successfully treated or not.
      * @throws CstlServiceException
      */
-    private AcknowlegementType updateProvider(final MultivaluedMap<String, String> parameters,
+    private AcknowlegementType updateProvider(final String serviceName, final String currentId,
             final Object objectRequest) throws CstlServiceException{
-        final String serviceName = getParameter("serviceName", true, parameters);
-        final String currentId = getParameter("id", true, parameters);
         final ProviderFactory service = services.get(serviceName);
         if (service != null) {
 
@@ -352,9 +383,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      * @return The configuration object  of the specified source.
      * @throws CstlServiceException
      */
-    private Object getProviderConfiguration(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
-        final String id = getParameter("id", true, parameters);
-
+    private Object getProviderConfiguration(final String id) throws CstlServiceException{
          try {
 
             final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, GetConfigProviderDescriptor.NAME);
@@ -386,10 +415,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      * @return An acknowledgment informing if the request have been successfully treated or not.
      * @throws CstlServiceException
      */
-    private AcknowlegementType deleteProvider(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
-        final String providerId = getParameter("id", true, parameters);
-        final boolean deleteData = getBooleanParameter("deleteData", false, parameters);
-
+    private AcknowlegementType deleteProvider(final String providerId, final boolean deleteData) throws CstlServiceException{
         try {
 
             final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteProviderDescriptor.NAME);
@@ -447,9 +473,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      * @return An acknowledgment informing if the request have been successfully treated or not.
      * @throws CstlServiceException
      */
-    private AcknowlegementType restartProvider(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
-        final String providerId = getParameter("id", true, parameters);
-
+    private AcknowlegementType restartProvider(final String providerId) throws CstlServiceException{
          try {
 
             final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartProviderDescriptor.NAME);
@@ -483,10 +507,9 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      * @return An acknowledgment informing if the request have been successfully treated or not.
      * @throws CstlServiceException
      */
-    private AcknowlegementType createLayer(final MultivaluedMap<String, String> parameters,
+    private AcknowlegementType createLayer(final String sourceId,
             final Object objectRequest) throws CstlServiceException{
 
-        final String sourceId = getParameter("id", true, parameters);
         final ParameterValueReader reader = new ParameterValueReader(ProviderParameters.LAYER_DESCRIPTOR);
 
         try {
@@ -549,10 +572,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      * @return An acknowledgment informing if the request have been successfully treated or not.
      * @throws CstlServiceException
      */
-    private AcknowlegementType deleteLayer(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
-        final String sourceId = getParameter("id", true, parameters);
-        final String layerName = getParameter("layerName", true, parameters);
-
+    private AcknowlegementType deleteLayer(final String sourceId, final String layerName) throws CstlServiceException{
         final Collection<DataProvider> providers = DataProviders.getInstance().getProviders();
         for (DataProvider p : providers) {
             if (p.getId().equals(sourceId)) {
@@ -604,11 +624,8 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      * @return An acknowledgment informing if the request have been successfully treated or not.
      * @throws CstlServiceException
      */
-    private AcknowlegementType updateLayer(final MultivaluedMap<String, String> parameters,
+    private AcknowlegementType updateLayer(final String sourceId, final String layerName,
             final Object objectRequest) throws CstlServiceException{
-
-        final String sourceId = getParameter("id", true, parameters);
-        final String layerName = getParameter("layerName", true, parameters);
 
         final ParameterValueReader reader = new ParameterValueReader(ProviderParameters.LAYER_DESCRIPTOR);
 
@@ -681,10 +698,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      * @return
      * @throws CstlServiceException
      */
-    private Object downloadStyle(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
-        final String id = getParameter("id", true, parameters);
-        final String styleId = getParameter("styleName", true, parameters);
-
+    private Object downloadStyle(final String id, final String styleId) throws CstlServiceException{
         final Collection<StyleProvider> providers = StyleProviders.getInstance().getProviders();
         for (Provider p : providers) {
             if (p.getId().equals(id)) {
@@ -708,11 +722,8 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      * @return An acknowledgment informing if the request have been successfully treated or not.
      * @throws CstlServiceException
      */
-    private AcknowlegementType createStyle(final MultivaluedMap<String, String> parameters,
+    private AcknowlegementType createStyle(final String sourceId, final String styleId,
             final Object objectRequest) throws CstlServiceException{
-
-        final String sourceId = getParameter("id", true, parameters);
-        final String styleId = getParameter("styleName", true, parameters);
 
         if(objectRequest instanceof MutableStyle){
             // we read the style to add
@@ -755,10 +766,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      * @return An acknowledgment informing if the request have been successfully treated or not.
      * @throws CstlServiceException
      */
-    private AcknowlegementType deleteStyle(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
-        final String sourceId = getParameter("id", true, parameters);
-        final String styleId = getParameter("styleName", true, parameters);
-
+    private AcknowlegementType deleteStyle(final String sourceId, final String styleId) throws CstlServiceException{
         try {
             // we read the soruce parameter to add
 
@@ -793,11 +801,8 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      * @return An acknowledgment informing if the request have been successfully treated or not.
      * @throws CstlServiceException
      */
-    private AcknowlegementType updateStyle(final MultivaluedMap<String, String> parameters,
+    private AcknowlegementType updateStyle(final String sourceId, final String styleId,
             final Object objectRequest) throws CstlServiceException{
-
-        final String sourceId = getParameter("id", true, parameters);
-        final String styleId = getParameter("styleName", true, parameters);
 
         if(objectRequest instanceof MutableStyle){
             // we read the style to add
@@ -841,8 +846,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      * @return The descriptor of the specified provider type.
      * @throws CstlServiceException
      */
-    private ParameterDescriptorGroup getServiceDescriptor(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
-        final String serviceName = getParameter("serviceName", true, parameters);
+    private ParameterDescriptorGroup getServiceDescriptor(final String serviceName) throws CstlServiceException{
         final ProviderFactory service = services.get(serviceName);
         if (service != null) {
             return service.getProviderDescriptor();
@@ -858,8 +862,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
      * @return The descriptor of the specified provider type.
      * @throws CstlServiceException
      */
-    private GeneralParameterDescriptor getSourceDescriptor(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
-        final String serviceName = getParameter("serviceName", true, parameters);
+    private GeneralParameterDescriptor getSourceDescriptor(final String serviceName) throws CstlServiceException{
         final ProviderFactory service = services.get(serviceName);
         if (service != null) {
             return service.getStoreDescriptor();
@@ -929,8 +932,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     /**
      * Returns a list of all process available for the specified factory.
      */
-    private StringList listProcessForFactory(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
-        final String authorityCode = getParameter("authorityCode", true, parameters);
+    private StringList listProcessForFactory(final String authorityCode) throws CstlServiceException{
         return new StringList(Tasks.listProcessForFactory(authorityCode));
     }
 
@@ -976,10 +978,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     /**
      * Returns a description of the process parameters.
      */
-    private GeneralParameterDescriptor getProcessDescriptor(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
-        final String authority = getParameter("authority", true, parameters);
-        final String code = getParameter("code", true, parameters);
-
+    private GeneralParameterDescriptor getProcessDescriptor(final String authority, final String code) throws CstlServiceException{
         final ProcessDescriptor desc;
         try {
             desc = ProcessFinder.getProcessDescriptor(authority,code);
@@ -1002,9 +1001,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     /**
      * Returns task parameters.
      */
-    private Object getTaskParameters(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
-        final String id = getParameter("id", true, parameters);
-
+    private Object getTaskParameters(final String id) throws CstlServiceException{
         final Task task = CstlScheduler.getInstance().getTask(id);
 
         if(task == null){
@@ -1026,19 +1023,13 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     /**
      * Create a new task.
      */
-    private AcknowlegementType createTask(final MultivaluedMap<String, String> parameters,
-            final Object objectRequest) throws CstlServiceException{
-        final String authority = getParameter("authority", true, parameters);
-        final String code = getParameter("code", true, parameters);
-        String title = getParameter("title", false, parameters);
-        final int step = Integer.valueOf(getParameter("step", true, parameters));
-        final String id = getParameter("id", true, parameters);
-
+    private AcknowlegementType createTask(final String authority, final String code, String title,
+            final int step, final String id, final Object objectRequest) throws CstlServiceException{
         if(title == null || title.trim().isEmpty()){
             title = id;
         }
 
-        final GeneralParameterDescriptor retypedDesc = getProcessDescriptor(parameters);
+        final GeneralParameterDescriptor retypedDesc = getProcessDescriptor(authority, code);
 
 
         final ParameterValueGroup params;
@@ -1085,19 +1076,14 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     /**
      * Update a task.
      */
-    private Object updateTask(final MultivaluedMap<String, String> parameters,
-            final Object objectRequest) throws CstlServiceException{
-        final String authority = getParameter("authority", true, parameters);
-        final String code = getParameter("code", true, parameters);
-        String title = getParameter("title", false, parameters);
-        final int step = Integer.valueOf(getParameter("step", true, parameters));
-        final String id = getParameter("id", true, parameters);
+    private Object updateTask(final String authority, final String code, String title, 
+            final int step, final String id, final Object objectRequest) throws CstlServiceException{
 
         if(title == null || title.trim().isEmpty()){
             title = id;
         }
 
-        final GeneralParameterDescriptor retypedDesc = getProcessDescriptor(parameters);
+        final GeneralParameterDescriptor retypedDesc = getProcessDescriptor(authority, code);
 
 
         final ParameterValueGroup params;
@@ -1146,9 +1132,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     /**
      * Delete a task;
      */
-    private Object deleteTask(final MultivaluedMap<String, String> parameters) throws CstlServiceException{
-        final String id = getParameter("id", true, parameters);
-
+    private Object deleteTask(final String id) throws CstlServiceException{
         try{
             if( CstlScheduler.getInstance().removeTask(id)){
                 return new AcknowlegementType("Success", "The task has been deleted");
