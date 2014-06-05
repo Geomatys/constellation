@@ -90,6 +90,7 @@
       <groupId>org.constellation.engine</groupId>
       <artifactId>cstl-engine-admin</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
 
 

@@ -44,7 +44,7 @@ import org.constellation.admin.EmbeddedDatabase;
 import org.constellation.admin.dao.DataRecord;
 import org.constellation.admin.dao.ServiceRecord;
 import org.constellation.admin.dao.Session;
-import org.constellation.admin.util.IOUtilities;
+//import org.constellation.admin.util.IOUtilities;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
