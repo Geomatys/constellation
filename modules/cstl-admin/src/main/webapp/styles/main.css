@@ -385,6 +385,10 @@ ul.unstyled {
         background-color: #3C3C3C;
         margin-top: -3px;
     }
+    .header .navbar-right{
+        position: relative;
+        z-index: 5000;
+    }
     .nav-header-mob>li {
         float:none !important;
     }
