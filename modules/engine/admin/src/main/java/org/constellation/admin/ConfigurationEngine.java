@@ -141,7 +141,7 @@ public class ConfigurationEngine {
 
     public static void storeConfiguration(final String serviceType, final String serviceID, final String fileName,
             final Object obj, final MarshallerPool pool) throws JAXBException {
-            configurationService.storeConfiguration(serviceType, serviceID, fileName, obj, pool);
+            configurationService.storeConfiguration(serviceType, serviceID, fileName, obj, pool, securityManager.getCurrentUserLogin());
     }
 
     public static List<String> getServiceConfigurationIds(final String serviceType) {

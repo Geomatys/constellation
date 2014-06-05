@@ -129,7 +129,7 @@ public final class EmbeddedTestDatabase extends Static {
 
             DerbySqlScriptRunner derbySqlScriptRunner = new DerbySqlScriptRunner(conn);
             derbySqlScriptRunner.run(EmbeddedTestDatabase.class
-                    .getResourceAsStream("org/constellation/sql/v1/create-admin-db.sql"));
+                    .getResourceAsStream("/org/constellation/sql/v1/create-admin-db.sql"));
         }
     }
 

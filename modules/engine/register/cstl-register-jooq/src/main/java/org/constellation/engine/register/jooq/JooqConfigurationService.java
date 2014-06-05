@@ -76,9 +76,6 @@ public class JooqConfigurationService implements ConfigurationService {
     private final static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Autowired
-    private SecurityManager securityManager;
-
-    @Autowired
     private PropertyRepository propertyRepository;
 
     @Autowired
@@ -101,7 +98,7 @@ public class JooqConfigurationService implements ConfigurationService {
     @Override
     @Transactional
     public void storeConfiguration(String serviceType, String serviceID, String fileName, Object obj,
-            MarshallerPool pool) {
+            MarshallerPool pool, String login) {
         final ServiceDef.Specification spec = ServiceDef.Specification.fromShortName(serviceType);
 
         String config = null;
@@ -118,7 +115,7 @@ public class JooqConfigurationService implements ConfigurationService {
 
         }
 
-        final String login = securityManager.getCurrentUserLogin();
+       
         Service service = serviceRepository.findByIdentifierAndType(serviceID, spec.name());
         if (service == null) {
             throw new ConstellationPersistenceException("This service does not exist: " + serviceID + " ("
