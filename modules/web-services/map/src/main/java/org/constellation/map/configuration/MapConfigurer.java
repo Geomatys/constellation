@@ -30,6 +30,7 @@ import java.awt.*;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.StyleBusiness;
 import org.constellation.admin.dao.LayerRecord;
 import org.constellation.configuration.ConfigProcessException;
 import org.constellation.configuration.ConfigurationException;
@@ -76,11 +77,13 @@ import org.opengis.style.Symbolizer;
 
 import javax.measure.unit.NonSI;
 import javax.measure.unit.Unit;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
+
 import javax.xml.namespace.QName;
 
 import static org.geotoolkit.style.StyleConstants.DEFAULT_CATEGORIZE_LOOKUP;
@@ -155,7 +158,7 @@ public class MapConfigurer extends OGCConfigurer {
         // Declare the style as "applicable" for the layer data.
         try {
             final QName layerID = new QName(layerProviderReference.getLayerId().getNamespaceURI(), layerProviderReference.getLayerId().getLocalPart());
-            StyleProviderConfig.linkToData(
+            StyleBusiness.linkToData(
                     styleProviderReference.getProviderId(),
                     styleProviderReference.getLayerId().getLocalPart(),
                     layerProviderReference.getProviderId(),

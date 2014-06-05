@@ -19,16 +19,11 @@
 
 package org.constellation.rest.api;
 
-import org.constellation.configuration.AcknowlegementType;
-import org.constellation.dto.ParameterValues;
-import org.constellation.dto.StyleListBrief;
-import org.constellation.json.binding.Style;
-import org.constellation.json.util.StyleUtilities;
-import org.constellation.map.configuration.StyleProviderConfig;
-import org.geotoolkit.sld.xml.StyleXmlIO;
-import org.geotoolkit.style.DefaultMutableStyle;
-import org.geotoolkit.style.MutableStyle;
+import static org.constellation.utils.RESTfulUtilities.ok;
 
+import java.util.Locale;
+
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -41,14 +36,15 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import java.util.Locale;
-import java.util.logging.Level;
-
 import javax.xml.namespace.QName;
 
-import org.constellation.configuration.ConfigurationException;
-import static org.constellation.utils.RESTfulUtilities.ok;
+import org.constellation.admin.StyleBusiness;
+import org.constellation.configuration.AcknowlegementType;
+import org.constellation.dto.ParameterValues;
+import org.constellation.dto.StyleListBrief;
+import org.constellation.json.binding.Style;
+import org.geotoolkit.style.DefaultMutableStyle;
+import org.geotoolkit.style.MutableStyle;
 
 /**
  * RESTful API for style providers configuration.
@@ -61,121 +57,122 @@ import static org.constellation.utils.RESTfulUtilities.ok;
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public final class StyleProviders {
+    
+    @Inject
+    private StyleBusiness styleBusiness;
 
     /**
-     * @see StyleProviderConfig#createStyle(String, MutableStyle)
+     * @see StyleBusiness#createStyle(String, MutableStyle)
      */
     @PUT
     @Path("{id}/style")
     public Response createStyle(final @PathParam("id") String id, final DefaultMutableStyle style) throws Exception {
-        StyleProviderConfig.createStyle(id, style);
+        styleBusiness.createStyle(id, style);
         return ok(AcknowlegementType.success("Style named \"" + style.getName() + "\" successfully added to provider with id \"" + id + "\"."));
     }
 
     /**
-     * @see StyleProviderConfig#createStyle(String, MutableStyle)
+     * @see StyleBusiness#createStyle(String, MutableStyle)
      */
     @PUT
     @Path("{id}/style/create")
     public Response createStyleJson(final @PathParam("id") String id, final Style style) throws Exception {
-        StyleProviderConfig.createStyle(id, style.toType());
+        styleBusiness.createStyle(id, style.toType());
         return ok(AcknowlegementType.success("Style named \"" + style.getName() + "\" successfully added to provider with id \"" + id + "\"."));
     }
 
     /**
-     * @see StyleProviderConfig#getStyle(String, String)
+     * @see StyleBusiness#getStyle(String, String)
      */
     @GET
     @Path("{id}/style/{styleId}")
     public Response getStyle(final @PathParam("id") String id, final @PathParam("styleId") String styleId) throws Exception {
-    	return ok(new Style(StyleProviderConfig.getStyle(id, styleId)));
-        //return ok(StyleProviderConfig.getStyle(id, styleId));
-        //return ok(new StyleXmlIO().getTransformerXMLv110().);
+    	return ok(new Style(styleBusiness.getStyle(id, styleId)));
     }
 
     /**
-     * @see StyleProviderConfig#getAvailableStyles(String)
+     * @see StyleBusiness#getAvailableStyles(String)
      */
     @GET
     @Path("{id}/style/available")
     public Response getAvailableStyles(final @PathParam("id") String id) throws Exception {
-        return ok(new StyleListBrief(StyleProviderConfig.getAvailableStyles(id, null)));
+        return ok(new StyleListBrief(styleBusiness.getAvailableStyles(id, null)));
     }
 
     /**
-     * @see StyleProviderConfig#getAvailableStyles(String)
+     * @see StyleBusiness#getAvailableStyles(String)
      */
     @GET
     @Path("all/style/available")
     public Response getAvailableStyles() throws Exception {
-        return ok(new StyleListBrief(StyleProviderConfig.getAvailableStyles("ALL")));
+        return ok(new StyleListBrief(styleBusiness.getAvailableStyles("ALL")));
     }
 
     /**
-     * @see StyleProviderConfig#getAvailableStyles(String)
+     * @see StyleBusiness#getAvailableStyles(String)
      */
     @GET
     @Path("all/style/available/{category}")
     public Response getCategoryAvailableStyles(@PathParam("category") String category) throws Exception {
-        return ok(new StyleListBrief(StyleProviderConfig.getAvailableStyles(category)));
+        return ok(new StyleListBrief(styleBusiness.getAvailableStyles(category)));
     }
 
     /**
-     * @see StyleProviderConfig#setStyle(String, String, MutableStyle)
+     * @see StyleBusiness#setStyle(String, String, MutableStyle)
      */
     @POST
     @Path("{id}/style/{styleId}")
     public Response updateStyle(final @PathParam("id") String id, final @PathParam("styleId") String styleId, final MutableStyle style) throws Exception {
-        StyleProviderConfig.setStyle(id, styleId, style);
+        styleBusiness.setStyle(id, styleId, style);
         return ok(AcknowlegementType.success("Style named \"" + styleId + "\" successfully updated."));
     }
 
     /**
-     * @see StyleProviderConfig#createStyle(String, MutableStyle)
+     * @see StyleBusiness#createStyle(String, MutableStyle)
      */
     @PUT
     @Path("{id}/style/{styleId}/update")
     public Response updateStyleJson(final @PathParam("id") String id, final @PathParam("styleId") String styleId, final Style style) throws Exception {
-        StyleProviderConfig.setStyle(id, styleId, style.toType());
+        styleBusiness.setStyle(id, styleId, style.toType());
         return ok(AcknowlegementType.success("Style named \"" + style.getName() + "\" successfully updated to provider with id \"" + id + "\"."));
     }
 
     /**
-     * @see StyleProviderConfig#deleteStyle(String, String)
+     * @see StyleBusiness#deleteStyle(String, String)
      */
     @DELETE
     @Path("{id}/style/{styleId}")
     public Response deleteStyle(final @PathParam("id") String id, final @PathParam("styleId") String styleId) throws Exception {
-        StyleProviderConfig.deleteStyle(id, styleId);
+        styleBusiness.deleteStyle(id, styleId);
         return ok(AcknowlegementType.success("Style named \"" + styleId + "\" successfully removed from provider with id \"" + id + "\"."));
     }
 
     /**
-     * @see StyleProviderConfig#getStyleReport(String, String,Locale)
+     * @see StyleBusiness#getStyleReport(String, String,Locale)
      */
     @GET
     @Path("{id}/style/{styleId}/report")
     public Response getStyleReport(final @Context HttpServletRequest request, final @PathParam("id") String id, final @PathParam("styleId") String styleId) throws Exception {
-        return ok(StyleProviderConfig.getStyleReport(id, styleId, request.getLocale()));
+        return ok(styleBusiness.getStyleReport(id, styleId, request.getLocale()));
     }
 
     /**
-     * @see StyleProviderConfig#linkToData(String, String, String, String)
+     * @see StyleBusiness#linkToData(String, String, String, String)
      */
     @POST
     @Path("{id}/style/{styleId}/linkData")
     public Response linkToData(final @PathParam("id") String id, final @PathParam("styleId") String styleId, final ParameterValues values) throws Exception {
-        StyleProviderConfig.linkToData(id, styleId, values.get("dataProvider"), new QName(values.get("dataNamespace"), values.get("dataId")));
+        styleBusiness.linkToData(id, styleId, values.get("dataProvider"), new QName(values.get("dataNamespace"), values.get("dataId")));
         return ok(AcknowlegementType.success("Style named \"" + styleId + "\" successfully linked to data named \"" + values.get("dataId") + "\"."));
     }
 
     /**
-     * @see StyleProviderConfig#unlinkFromData(String, String, String, String)
+     * @see StyleBusiness#unlinkFromData(String, String, String, String)
      */
     @POST
     @Path("{id}/style/{styleId}/unlinkData")
     public Response unlinkFromData(final @PathParam("id") String id, final @PathParam("styleId") String styleId, final ParameterValues values) throws Exception {
-        StyleProviderConfig.unlinkFromData(id, styleId, values.get("dataProvider"), new QName(values.get("dataNamespace"), values.get("dataId")));
+        styleBusiness.unlinkFromData(id, styleId, values.get("dataProvider"), new QName(values.get("dataNamespace"), values.get("dataId")));
         return ok(AcknowlegementType.success("Style named \"" + styleId + "\" successfully unlinked from data named \"" + values.get("dataId") + "\"."));
     }
     

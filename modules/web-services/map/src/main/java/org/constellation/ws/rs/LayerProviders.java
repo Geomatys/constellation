@@ -29,14 +29,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.measure.unit.NonSI;
 import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBException;
+
 import org.apache.sis.geometry.GeneralEnvelope;
 import org.apache.sis.storage.DataStoreException;
+
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.apache.sis.util.ArgumentChecks.ensurePositive;
+
 import org.apache.sis.util.Static;
+import org.constellation.admin.StyleBusiness;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.BandDescription;
 import org.constellation.dto.CoverageDataDescription;
@@ -44,7 +49,6 @@ import org.constellation.dto.DataDescription;
 import org.constellation.dto.FeatureDataDescription;
 import org.constellation.dto.PortrayalContext;
 import org.constellation.dto.PropertyDescription;
-import org.constellation.map.configuration.StyleProviderConfig;
 import org.constellation.portrayal.internal.PortrayalResponse;
 import org.constellation.provider.Data;
 import org.constellation.provider.DataProvider;
@@ -79,11 +83,13 @@ import org.geotoolkit.sld.xml.Specification;
 import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.MutableStyleFactory;
+
 import static org.geotoolkit.style.StyleConstants.DEFAULT_CATEGORIZE_LOOKUP;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_DESCRIPTION;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_FALLBACK;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_GEOM;
 import static org.geotoolkit.style.StyleConstants.LITERAL_ONE_FLOAT;
+
 import org.geotoolkit.style.function.InterpolationPoint;
 import org.geotoolkit.style.function.Method;
 import org.geotoolkit.style.function.Mode;
@@ -293,7 +299,7 @@ public final class LayerProviders extends Static {
         if (sldProvider == null || styleId == null) {
             return portray(providerId, layerName, crsCode, bbox, width, height, null, sldVersion, filter);
         }
-    	MutableStyle style = StyleProviderConfig.getStyle(sldProvider, styleId);
+    	MutableStyle style = StyleBusiness.getStyle(sldProvider, styleId);
     	StyleXmlIO styleXmlIO = new StyleXmlIO();
     	final StringWriter sw = new StringWriter();
     	styleXmlIO.writeStyle(sw, style, Specification.StyledLayerDescriptor.V_1_1_0);

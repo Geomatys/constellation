@@ -25,8 +25,16 @@ import org.constellation.engine.register.Style;
 
 public interface StyleRepository {
 
-    List<? extends Style> findAll();
+    List<Style> findAll();
+    
+    Style findByName(String name);
+    
+    Style findById(int id);
 
     List<Style> findByData(Data data);
+    
+    void linkStyleToData(int styleId, int dataid);
+
+    void unlinkStyleToData(int styleId, int dataid);
     
 }
