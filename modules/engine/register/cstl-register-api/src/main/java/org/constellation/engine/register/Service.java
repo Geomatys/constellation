@@ -33,8 +33,6 @@ public class Service {
 
     private String metadata;
 
-    private String metadata;
-
     public int getId() {
         return id;
     }
@@ -100,17 +98,6 @@ public class Service {
         this.owner = owner;
     }
 
-    public String getMetadata() {
-        return metadata;
-    }
-
-    public void setMetadata(String metadata) {
-        this.metadata = metadata;
-    }
-
-    public boolean hasIsoMetadata() {
-        return StringUtils.isNotBlank(metadata);
-    }
 
     public String getMetadata() {
         return metadata;

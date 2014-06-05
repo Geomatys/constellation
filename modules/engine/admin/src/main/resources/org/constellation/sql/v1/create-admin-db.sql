@@ -11,7 +11,7 @@ CREATE TABLE "admin"."i18n"(
   "value" CLOB        NOT NULL
 );
 
-insert into "admin"."i18n" ("id", "lang", "value") value(0, "none", "empty");
+insert into "admin"."i18n" ("id", "lang", "value") values(0, 'none', 'empty');
 
 ALTER TABLE "admin"."i18n" ADD CONSTRAINT i18n_pk PRIMARY KEY ("id","lang");
 
