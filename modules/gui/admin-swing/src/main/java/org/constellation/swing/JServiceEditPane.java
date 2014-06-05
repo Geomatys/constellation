@@ -20,6 +20,7 @@
 package org.constellation.swing;
 
 import java.awt.BorderLayout;
+import org.constellation.admin.service.ConstellationClient;
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.Instance;
 
@@ -31,12 +32,14 @@ import org.constellation.configuration.Instance;
 public class JServiceEditPane extends javax.swing.JPanel {
 
     private final ConstellationServer server;
+    private final ConstellationClient serverV2;
     private final String serviceType;
     private final Instance serviceInstance;
     private final JServiceEditionPane serviceEditionPanel;
 
-    public JServiceEditPane(final ConstellationServer server, final String serviceType, final Instance serviceInstance) {
+    public JServiceEditPane(final ConstellationServer server, final ConstellationClient serverV2, final String serviceType, final Instance serviceInstance) {
         this.server = server;
+        this.serverV2 = serverV2;
         this.serviceType = serviceType;
         this.serviceInstance = serviceInstance;
         Object configuration = server.services.getInstanceconfiguration(serviceType, serviceInstance.getIdentifier());
@@ -46,7 +49,7 @@ public class JServiceEditPane extends javax.swing.JPanel {
             serviceEditionPanel =  new JServiceMapEditPane(server, serviceType, configuration);
             guiInternalPane.add(BorderLayout.CENTER, serviceEditionPanel);
         } else if ("CSW".equals(serviceType)){
-            serviceEditionPanel =  new JServiceCswEditPane(server, serviceInstance, configuration);
+            serviceEditionPanel =  new JServiceCswEditPane(server, serverV2, serviceInstance, configuration);
             guiInternalPane.add(BorderLayout.CENTER, serviceEditionPanel);
         } else if ("WPS".equals(serviceType)){
             serviceEditionPanel =  new JServiceWpsPane(server, configuration);

@@ -30,7 +30,6 @@ import org.glassfish.jersey.media.multipart.MultiPart;
 import org.apache.sis.util.ArgumentChecks;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.admin.service.ConstellationServer.Csws;
 import org.constellation.admin.service.ConstellationServer.Providers;
 import org.constellation.admin.service.ConstellationServer.Services;
 import org.constellation.admin.service.ConstellationServer.Tasks;
@@ -57,7 +56,6 @@ import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
 import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
 import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.style.MutableStyle;
-import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.xml.parameter.ParameterDescriptorReader;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.geotoolkit.xml.parameter.ParameterValueWriter;
@@ -87,8 +85,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -109,7 +105,7 @@ import static org.constellation.api.QueryConstants.*;
  * @author Benjamin Garcia (Geomatys)
  * @version 0.9
  */
-public class ConstellationServer<S extends Services, P extends Providers, C extends Csws, T extends Tasks> extends AbstractClient {
+public class ConstellationServer<S extends Services, P extends Providers, T extends Tasks> extends AbstractClient {
 
     protected static final Logger LOGGER = Logging.getLogger("org.constellation.admin.service");
     private static final MarshallerPool POOL = GenericDatabaseMarshallerPool.getInstance();
@@ -118,7 +114,6 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
     public final S services;
     public final P providers;
-    public final C csws;
     public final T tasks;
 
     public final String currentUser;
@@ -129,7 +124,6 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         super(create(ConstellationServerFactory.PARAMETERS, server, null));
         this.services = createServiceManager();
         this.providers = createProviderManager();
-        this.csws = createCswManager();
         this.tasks = createTaskManager();
         this.securityType = "Basic";
         Parameters.getOrCreate(ConstellationServerFactory.USER, parameters).setValue(user);
@@ -142,7 +136,6 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         super(params);
         this.services = createServiceManager();
         this.providers = createProviderManager();
-        this.csws = createCswManager();
         this.tasks = createTaskManager();
         this.currentUser = Parameters.value(ConstellationServerFactory.USER, parameters);
         this.securityType = Parameters.value(ConstellationServerFactory.SECURITY_TYPE, params);
@@ -169,10 +162,6 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
     protected T createTaskManager() {
         return (T) new Tasks();
-    }
-
-    protected C createCswManager() {
-        return (C) new Csws();
     }
 
     protected P createProviderManager() {
@@ -1353,123 +1342,6 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         }
 
     }
-
-    /**
-     * Configuration methods for csw
-     */
-    public class Csws {
-
-        public boolean refreshIndex(final String id, final boolean asynchrone) {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_REFRESH_INDEX + "&id=" + id + "&asynchrone=" + asynchrone;
-                return sendRequestAck(url, null);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-        public boolean addToIndex(final String id, final List<String> identifiers) {
-            try {
-                final String idList = StringUtilities.toCommaSeparatedValues(identifiers);
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_ADD_TO_INDEX + "&id=" + id + "&identifiers=" + idList;
-                return sendRequestAck(url, null);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-        public boolean removeFromIndex(final String id, final List<String> identifiers) {
-            try {
-                final String idList = StringUtilities.toCommaSeparatedValues(identifiers);
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_REMOVE_FROM_INDEX + "&id=" + id + "&identifiers=" + idList;
-                return sendRequestAck(url, null);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-        public boolean clearCache(final String id) {
-            try {
-                final String url = getURLWithEndSlash() + "csw/admin?request=" + REQUEST_CLEAR_CACHE + "&id=" + id;
-                return sendRequestAck(url, null);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-        public boolean importFile(final String id, final File importFile, final String fileName) {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_IMPORT_RECORDS + "&id=" + id + "&filename=" + fileName;
-                return sendRequestAck(url, importFile, null, null, true);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-        public boolean metadataExist(final String id, final String metadataName) {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_METADATA_EXIST + "&id=" + id + "&metadata=" + metadataName;
-                Object response = sendRequest(url, null);
-                if (response instanceof AcknowlegementType) {
-                    final AcknowlegementType ack = (AcknowlegementType) response;
-                    if ("Exist".equals(ack.getStatus())) {
-                        return true;
-                    } else if ("Not Exist".equals(ack.getStatus())) {
-                        return false;
-                    } else {
-                        LOGGER.log(Level.WARNING, "Failure:{0}", ack.getMessage());
-                    }
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-        public boolean deleteMetadata(final String id, final String metadataName) {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_DELETE_RECORDS + "&id=" + id + "&metadata=" + metadataName;
-                return sendRequestAck(url, null);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-         public boolean deleteAllMetadata(final String id) {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_DELETE_ALL_RECORDS + "&id=" + id;
-                return sendRequestAck(url, null);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-        public Collection<String> getAvailableDataSourceType() {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_AVAILABLE_SOURCE_TYPE;
-                Object response = sendRequest(url, null);
-                if (response instanceof StringList) {
-                    final StringList sl = (StringList) response;
-                    return sl.getList();
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return new ArrayList<>();
-        }
-    }
-
 
     // convinient methods //////////////////////////////////////////////////////
 

@@ -83,6 +83,10 @@ public class CSWConfigurer extends OGCConfigurer {
     public AcknowlegementType removeRecords(final String id, final String identifierList) throws ConfigurationException {
         return CSWConfigurationManager.getInstance().deleteMetadata(id, identifierList);
     }
+    
+    public AcknowlegementType removeAllRecords(final String id) throws ConfigurationException {
+        return CSWConfigurationManager.getInstance().deleteAllMetadata(id);
+    }
 
     public AcknowlegementType metadataExist(final String id, final String identifier) throws ConfigurationException {
         return CSWConfigurationManager.getInstance().metadataExist(id, identifier);

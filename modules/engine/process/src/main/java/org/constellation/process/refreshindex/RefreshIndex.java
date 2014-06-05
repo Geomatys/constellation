@@ -21,18 +21,19 @@ package org.constellation.process.refreshindex;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.constellation.admin.service.ConstellationServer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.constellation.ServiceDef;
+import org.constellation.admin.service.ConstellationClient;
+import org.constellation.admin.service.ConstellationServerFactory;
 import org.constellation.process.AbstractCstlProcess;
-
-
-import org.opengis.parameter.ParameterValueGroup;
-
-import static org.geotoolkit.io.X364.*;
 import static org.constellation.process.refreshindex.RefreshIndexDescriptor.*;
+import static org.geotoolkit.io.X364.*;
 import org.geotoolkit.process.ProcessDescriptor;
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
  * @author Guilhem Legal (Geomatys)
@@ -60,8 +61,10 @@ public class RefreshIndex extends AbstractCstlProcess {
 
     //// parametres ////////////////////////////////////////////////////////////
     
-    private ConstellationServer createConstellationClient() throws MalformedURLException {
-        return new ConstellationServer(CSTL_CONFIG);
+    private ConstellationClient createConstellationClient() throws MalformedURLException {
+        final URL url = (URL) CSTL_CONFIG.parameter(ConstellationServerFactory.URL.getName().getCode()).getValue();
+        final String version = "1";
+        return new ConstellationClient(url.toString(), version);
     }
 
     
@@ -100,16 +103,23 @@ public class RefreshIndex extends AbstractCstlProcess {
      * Verify constellation accesibility
      */
     private boolean constellationRunning() {
-        final ConstellationServer cstlServer = ConstellationServer.login(CSTL_CONFIG);
-        return cstlServer != null;
+        try {
+            final String login  = CSTL_CONFIG.parameter(ConstellationServerFactory.USER.getName().getCode()).stringValue();
+            final String passw  = CSTL_CONFIG.parameter(ConstellationServerFactory.PASSWORD.getName().getCode()).stringValue();
+            final ConstellationClient cstlClient = createConstellationClient().auth(login, passw);
+            return cstlClient != null;
+        } catch (MalformedURLException ex) {
+            LOGGER.log(Level.WARNING, "Error while login to cstl server", ex);
+            return false;
+        }
     }
     
     
     private void refreshIndex() {
         try {
-            final ConstellationServer cstl = createConstellationClient();
-            cstl.csws.refreshIndex(CSW_INSTANCE, ASYNCHRONOUS);
-            cstl.services.restartInstance("CSW", CSW_INSTANCE);
+            final ConstellationClient cstl = createConstellationClient();
+            cstl.csw.refreshIndex(CSW_INSTANCE, ASYNCHRONOUS, false);
+            cstl.services.restart(ServiceDef.Specification.CSW, CSW_INSTANCE, false);
 
             console(FOREGROUND_GREEN, "OK", FOREGROUND_DEFAULT, "\n");
         } catch (MalformedURLException ex) {

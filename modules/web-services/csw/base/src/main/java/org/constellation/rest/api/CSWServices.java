@@ -86,9 +86,7 @@ public class CSWServices {
         return ok(getConfigurer().stopIndexation(id));
     }
 
-    /**
-     * TODO change fileName into dataType parameter
-     */
+    // TODO change fileName into dataType parameter
     @PUT
     @Path("{id}/records/{fileName}")
     public Response importRecord(final @PathParam("id") String id, final @PathParam("fileName") String fileName, final File record) throws Exception {
@@ -107,11 +105,23 @@ public class CSWServices {
     public Response removeMetadata(final @PathParam("id") String id, final @PathParam("metaID") String metaID) throws Exception {
         return ok(getConfigurer().removeRecords(id, metaID));
     }
+    
+    @DELETE
+    @Path("{id}/records")
+    public Response removeAllMetadata(final @PathParam("id") String id) throws Exception {
+        return ok(getConfigurer().removeAllRecords(id));
+    }
 
     @GET
     @Path("{id}/record/{metaID}")
     public Response getMetadata(final @PathParam("id") String id, final @PathParam("metaID") String metaID) throws Exception {
         return ok(getConfigurer().getMetadata(id, metaID));
+    }
+    
+    @GET
+    @Path("{id}/record/exist/{metaID}")
+    public Response metadataExist(final @PathParam("id") String id, final @PathParam("metaID") String metaID) throws Exception {
+        return ok(getConfigurer().metadataExist(id, metaID));
     }
 
     @GET

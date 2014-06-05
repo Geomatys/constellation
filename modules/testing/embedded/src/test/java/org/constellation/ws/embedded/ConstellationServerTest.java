@@ -18,24 +18,24 @@
  */
 package org.constellation.ws.embedded;
 
-import org.constellation.admin.service.ConstellationServer;
-import org.apache.sis.xml.MarshallerPool;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import javax.xml.bind.JAXBContext;
+import org.apache.sis.xml.MarshallerPool;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.service.ConstellationClient;
+import org.constellation.admin.service.ConstellationServer;
+import org.constellation.generic.database.Automatic;
 import org.constellation.sos.ws.soap.SOService;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.TestRunner;
+import static org.constellation.ws.embedded.ConfigurationRequestTest.writeDataFile;
 import org.geotoolkit.util.FileUtilities;
 import org.junit.*;
-import org.opengis.parameter.GeneralParameterDescriptor;
 import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
-
-import javax.xml.bind.JAXBContext;
-import org.constellation.admin.ConfigurationEngine;
-import org.constellation.generic.database.Automatic;
-import static org.constellation.ws.embedded.ConfigurationRequestTest.writeDataFile;
+import org.opengis.parameter.GeneralParameterDescriptor;
 
 /**
  *
@@ -124,20 +124,21 @@ public class ConstellationServerTest extends AbstractGrizzlyServer {
     @Order(order=2)
     public void testImportFile() throws Exception {
 
-        final ConstellationServer administrator = ConstellationServer.login("http://localhost:" + grizzly.getCurrentPort(), "", "");
+        final ConstellationClient client = new ConstellationClient("http://localhost:" + grizzly.getCurrentPort());
+        final ConstellationClient administrator = client.auth("", "");
         assertNotNull(administrator);
         final File f = FileUtilities.getFileFromResource("org.constellation.embedded.test.urn-uuid-e8df05c2-d923-4a05-acce-2b20a27c0e58.xml");
 
-        final boolean inserted = administrator.csws.importFile("default", f, "urn-uuid-e8df05c2-d923-4a05-acce-2b20a27c0e58.xml");
+        final boolean inserted = administrator.csw.importMetadata("default", f);
         assertTrue(inserted);
 
-        boolean exist = administrator.csws.metadataExist("default", "urn:uuid:e8df05c2-d923-4a05-acce-2b20a27c0e58");
+        boolean exist = administrator.csw.metadataExist("default", "urn:uuid:e8df05c2-d923-4a05-acce-2b20a27c0e58");
         assertTrue(exist);
 
-        final boolean deleted = administrator.csws.deleteMetadata("default", "urn:uuid:e8df05c2-d923-4a05-acce-2b20a27c0e58");
+        final boolean deleted = administrator.csw.deleteMetadata("default", "urn:uuid:e8df05c2-d923-4a05-acce-2b20a27c0e58");
         assertTrue(deleted);
 
-        exist = administrator.csws.metadataExist("default", "urn:uuid:e8df05c2-d923-4a05-acce-2b20a27c0e58");
+        exist = administrator.csw.metadataExist("default", "urn:uuid:e8df05c2-d923-4a05-acce-2b20a27c0e58");
         assertFalse(exist);
 
     }

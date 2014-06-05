@@ -85,7 +85,7 @@ public class ServiceEditAction extends Action {
                 @Override
                 public void run() {
 
-                    final JServiceEditPane edit = new JServiceEditPane(server, type, inst);
+                    final JServiceEditPane edit = new JServiceEditPane(server, serverV2, type, inst);
                     edit.setName(BUNDLE.getString("data") +" - "+ BUNDLE.getString("edit") +" - "+ inst.getIdentifier());
                     final PropertyChangeListener cl = new PropertyChangeListener() {
                         @Override

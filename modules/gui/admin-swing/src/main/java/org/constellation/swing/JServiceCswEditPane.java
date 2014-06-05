@@ -25,6 +25,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.IOException;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import javax.swing.DefaultComboBoxModel;
@@ -35,11 +36,13 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.LayoutStyle;
+import org.constellation.admin.service.ConstellationClient;
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.Instance;
 import org.constellation.generic.database.Automatic;
 import static org.constellation.swing.JServiceEditionPane.LOGGER;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -48,6 +51,7 @@ import static org.constellation.swing.JServiceEditionPane.LOGGER;
 public class JServiceCswEditPane extends JServiceEditionPane {
 
     private ConstellationServer server;
+    private ConstellationClient serverV2;
     private Instance serviceInstance;
     private Automatic configuration;
     private JServiceEditionPane specificPane;
@@ -63,11 +67,13 @@ public class JServiceCswEditPane extends JServiceEditionPane {
      * Creates new form JServiceMapEditPane
      *
      * @param server
+     * @param serverV2
      * @param serviceInstance
      * @param configuration
      */
-    public JServiceCswEditPane(final ConstellationServer server, final Instance serviceInstance, final Object configuration) {
+    public JServiceCswEditPane(final ConstellationServer server, final ConstellationClient serverV2, final Instance serviceInstance, final Object configuration) {
         this.server = server;
+        this.serverV2 = serverV2;
         this.serviceInstance = serviceInstance;
         this.configuration = (configuration instanceof Automatic) ? (Automatic) configuration : null;
         initComponents();
@@ -217,7 +223,11 @@ public class JServiceCswEditPane extends JServiceEditionPane {
     }//GEN-LAST:event_guiDataSourceComboItemStateChanged
 
     private void refreshIndexButtonActionPerformed(ActionEvent evt) {//GEN-FIRST:event_refreshIndexButtonActionPerformed
-        server.csws.refreshIndex(serviceInstance.getIdentifier(), false);
+        try {
+            serverV2.csw.refreshIndex(serviceInstance.getIdentifier(), false, false);
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
     }//GEN-LAST:event_refreshIndexButtonActionPerformed
 
     private void purgeDbButtonActionPerformed(ActionEvent evt) {//GEN-FIRST:event_purgeDbButtonActionPerformed
@@ -225,14 +235,17 @@ public class JServiceCswEditPane extends JServiceEditionPane {
         final String message = bundle.getString("purgeWarning");
         final String title = bundle.getString("purgeWarningTitle");
         final int result = JOptionPane.showConfirmDialog(this, message, title, JOptionPane.OK_CANCEL_OPTION);
-        
-        switch (result) {
-            case JOptionPane.OK_OPTION:
-                server.csws.deleteAllMetadata(serviceInstance.getIdentifier());
-                server.csws.refreshIndex(serviceInstance.getIdentifier(), false);
-                break;
-            case JOptionPane.CANCEL_OPTION:
-                break;
+        try {
+            switch (result) {
+                case JOptionPane.OK_OPTION:
+                    serverV2.csw.deleteAllMetadata(serviceInstance.getIdentifier());
+                    serverV2.csw.refreshIndex(serviceInstance.getIdentifier(), false, false);
+                    break;
+                case JOptionPane.CANCEL_OPTION:
+                    break;
+            }
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
         }
     }//GEN-LAST:event_purgeDbButtonActionPerformed
 
