@@ -288,4 +288,16 @@ public final class ProvidersAPI {
     public void saveMetadata(final String providerId, final DefaultMetadata metadata) throws IOException {
         client.post("provider/metadata/"+providerId, MediaType.APPLICATION_XML_TYPE, metadata);
     }
+    
+    public void reloadProvider(final String providerId) throws IOException {
+        client.get("DP/" + providerId + "/restart", MediaType.APPLICATION_XML_TYPE);
+    }
+    
+    public void restartAllLayerProviders() throws IOException {
+        client.get("DP/restart", MediaType.APPLICATION_XML_TYPE);
+    }
+    
+    public void restartAllStyleProviders() throws IOException {
+        client.get("SP/restart", MediaType.APPLICATION_XML_TYPE);
+    }
 }

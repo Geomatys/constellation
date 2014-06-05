@@ -161,11 +161,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         }
 
         //Provider operations
-        else if (REQUEST_RESTART_ALL_LAYER_PROVIDERS.equalsIgnoreCase(request)) {
-            return restartLayerProviders();
-        } else if (REQUEST_RESTART_ALL_STYLE_PROVIDERS.equalsIgnoreCase(request)) {
-            return restartStyleProviders();
-        } else if (REQUEST_CREATE_PROVIDER.equalsIgnoreCase(request)) {
+          else if (REQUEST_CREATE_PROVIDER.equalsIgnoreCase(request)) {
             final String serviceName = getParameter("serviceName", true, parameters);
             return createProvider(serviceName, objectRequest);
         } else if (REQUEST_UPDATE_PROVIDER.equalsIgnoreCase(request)) {
@@ -179,10 +175,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             final String providerId = getParameter("id", true, parameters);
             final boolean deleteData = getBooleanParameter("deleteData", false, parameters);
             return deleteProvider(providerId, deleteData);
-        } else if (REQUEST_RESTART_PROVIDER.equalsIgnoreCase(request)) {
-            final String providerId = getParameter("id", true, parameters);
-            return restartProvider(providerId);
-        }
+        } 
 
         //Layer operations
         else if (REQUEST_CREATE_LAYER.equalsIgnoreCase(request)) {
@@ -264,18 +257,6 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         StyleProviders.getInstance().dispose();
         DataProviders.getInstance().dispose();
     }
-
-    private AcknowlegementType restartLayerProviders(){
-        DataProviders.getInstance().reload();
-        return new AcknowlegementType("Success", "All layer providers have been restarted.");
-    }
-
-    private AcknowlegementType restartStyleProviders(){
-        StyleProviders.getInstance().reload();
-        return new AcknowlegementType("Success", "All style providers have been restarted.");
-
-    }
-
 
     /**
      * Add a new source to the specified provider.
@@ -464,39 +445,6 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         }
 
     }
-
-    /**
-     * Restart a provider in the specified service.
-     *
-     * @param parameters The GET KVP parameters send in the request.
-     *
-     * @return An acknowledgment informing if the request have been successfully treated or not.
-     * @throws CstlServiceException
-     */
-    private AcknowlegementType restartProvider(final String providerId) throws CstlServiceException{
-         try {
-
-            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, RestartProviderDescriptor.NAME);
-            final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
-            inputs.parameter(RestartProviderDescriptor.PROVIDER_ID_NAME).setValue(providerId);
-
-            try {
-                final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
-                process.call();
-
-            } catch (ProcessException ex) {
-                return new AcknowlegementType("Failure", ex.getLocalizedMessage());
-            }
-
-            return new AcknowlegementType("Success", "The source has been deleted");
-
-        } catch (NoSuchIdentifierException ex) {
-           throw new CstlServiceException(ex);
-        } catch (InvalidParameterValueException ex) {
-           throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
-        }
-    }
-
 
     /**
      * Add a layer to the specified provider.

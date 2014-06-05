@@ -43,9 +43,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import java.util.Locale;
+import java.util.logging.Level;
 
 import javax.xml.namespace.QName;
 
+import org.constellation.configuration.ConfigurationException;
 import static org.constellation.utils.RESTfulUtilities.ok;
 
 /**
@@ -175,5 +177,12 @@ public final class StyleProviders {
     public Response unlinkFromData(final @PathParam("id") String id, final @PathParam("styleId") String styleId, final ParameterValues values) throws Exception {
         StyleProviderConfig.unlinkFromData(id, styleId, values.get("dataProvider"), new QName(values.get("dataNamespace"), values.get("dataId")));
         return ok(AcknowlegementType.success("Style named \"" + styleId + "\" successfully unlinked from data named \"" + values.get("dataId") + "\"."));
+    }
+    
+    @GET
+    @Path("restart")
+    public Response restartStyleProviders() throws Exception {
+        org.constellation.provider.StyleProviders.getInstance().reload();
+        return ok(new AcknowlegementType("Success", "All style providers have been restarted."));
     }
 }

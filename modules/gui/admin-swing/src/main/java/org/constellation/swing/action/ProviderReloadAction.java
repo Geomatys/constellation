@@ -19,6 +19,7 @@
 package org.constellation.swing.action;
 
 import java.awt.Color;
+import java.io.IOException;
 import java.util.Map;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
@@ -26,6 +27,7 @@ import org.constellation.configuration.ProviderReport;
 import org.constellation.security.ActionPermissions;
 import org.constellation.swing.JServicesPane;
 import org.constellation.swing.LayerRowModel;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -79,7 +81,11 @@ public class ProviderReloadAction extends Action {
             final Map.Entry entry = (Map.Entry) target;
             final ProviderReport inst = (ProviderReport) entry.getValue();
 
-             server.providers.restartProvider(inst.getId());
+            try {
+                serverV2.providers.reloadProvider(inst.getId());
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            }
              SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {

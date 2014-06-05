@@ -677,36 +677,6 @@ public class ConstellationServer<S extends Services, P extends Providers, T exte
     public final class Providers {
 
         /**
-         * Restart all layer providers.
-         *
-         * @return True if the operation succeed.
-         */
-        public boolean restartAllLayerProviders() {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_RESTART_ALL_LAYER_PROVIDERS;
-                return sendRequestAck(url, null);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-        /**
-         * Restart all layer providers.
-         *
-         * @return True if the operation succeed.
-         */
-        public boolean restartAllStyleProviders() {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_RESTART_ALL_STYLE_PROVIDERS;
-                return sendRequestAck(url, null);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-        /**
          * Add a new source provider to the service.
          *
          * @param serviceName The provider service name (shapefile, coverage-sql, ...)
@@ -830,23 +800,6 @@ public class ConstellationServer<S extends Services, P extends Providers, T exte
             }
             return false;
         }
-
-        /**
-         * Reload a source provider in the service.
-         *
-         * @param id The identifier of the source
-         * @return
-         */
-        public boolean restartProvider(final String id) {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_RESTART_PROVIDER + "&id=" + id;
-                return sendRequestAck(url, null);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
 
         // LAYER PROVIDERS ACTIONS /////////////////////////////////////////////
 
