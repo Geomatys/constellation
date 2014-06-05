@@ -74,9 +74,6 @@ import org.opengis.util.NoSuchIdentifierException;
 import static org.constellation.ws.ExceptionCode.*;
 import static org.constellation.api.QueryConstants.*;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.provider.CreateProviderDescriptor;
-import org.constellation.process.provider.GetConfigProviderDescriptor;
-import org.constellation.process.provider.UpdateProviderDescriptor;
 import org.constellation.process.provider.style.SetStyleToStyleProviderDescriptor;
 import org.constellation.process.provider.style.DeleteStyleToStyleProviderDescriptor;
 import org.constellation.configuration.ConfigurationException;
@@ -153,16 +150,6 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             final String serviceName = getParameter("serviceName", true, parameters);
             return getSourceDescriptor(serviceName);
         }
-
-        //Provider operations
-          else if (REQUEST_UPDATE_PROVIDER.equalsIgnoreCase(request)) {
-            final String serviceName = getParameter("serviceName", true, parameters);
-            final String currentId = getParameter("id", true, parameters);
-            return updateProvider(serviceName, currentId, objectRequest);
-        } else if (REQUEST_GET_PROVIDER_CONFIG.equalsIgnoreCase(request)) {
-            final String id = getParameter("id", true, parameters);
-            return getProviderConfiguration(id);
-        } 
 
         //Layer operations
         else if (REQUEST_CREATE_LAYER.equalsIgnoreCase(request)) {
@@ -243,88 +230,6 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     public void beforeRestart() {
         StyleProviders.getInstance().dispose();
         DataProviders.getInstance().dispose();
-    }
-
-    /**
-     * Modify a source in the specified provider.
-     *
-     * @param parameters The GET KVP parameters send in the request.
-     * @param objectRequest The POST parameters send in the request.
-     *
-     * @return An acknowledgment informing if the request have been successfully treated or not.
-     * @throws CstlServiceException
-     */
-    private AcknowlegementType updateProvider(final String serviceName, final String currentId,
-            final Object objectRequest) throws CstlServiceException{
-        final ProviderFactory service = services.get(serviceName);
-        if (service != null) {
-
-            ParameterDescriptorGroup desc = service.getProviderDescriptor();
-            desc = (ParameterDescriptorGroup) desc.descriptor("source");
-            final ParameterValueReader reader = new ParameterValueReader(desc);
-
-            try {
-                // we read the source parameter to add
-                reader.setInput(objectRequest);
-                final ParameterValueGroup sourceToModify = (ParameterValueGroup) reader.read();
-
-                final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateProviderDescriptor.NAME);
-
-                final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
-                inputs.parameter(UpdateProviderDescriptor.PROVIDER_ID_NAME).setValue(currentId);
-                inputs.parameter(UpdateProviderDescriptor.SOURCE_NAME).setValue(sourceToModify);
-
-                try {
-                    final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
-                    process.call();
-                    providerListener.fireProvidedModified(currentId);
-                } catch (ProcessException ex) {
-                    return new AcknowlegementType("Failure", ex.getLocalizedMessage());
-                }
-
-                reader.dispose();
-                return new AcknowlegementType("Success", "The source has been updated");
-
-            } catch (NoSuchIdentifierException | XMLStreamException | IOException ex) {
-                throw new CstlServiceException(ex);
-            } catch (InvalidParameterValueException ex) {
-                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
-            }
-        } else {
-            throw new CstlServiceException("No descriptor for: " + serviceName + " has been found", INVALID_PARAMETER_VALUE);
-        }
-    }
-
-    /**
-     * Return the configuration object  of the specified source.
-     *
-     * @param parameters The GET KVP parameters send in the request.
-     *
-     * @return The configuration object  of the specified source.
-     * @throws CstlServiceException
-     */
-    private Object getProviderConfiguration(final String id) throws CstlServiceException{
-         try {
-
-            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, GetConfigProviderDescriptor.NAME);
-            final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
-            inputs.parameter(GetConfigProviderDescriptor.PROVIDER_ID_NAME).setValue(id);
-
-            try {
-
-                final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
-                final ParameterValueGroup outputs = process.call();
-                return outputs.parameter(GetConfigProviderDescriptor.CONFIG_NAME).getValue();
-
-            } catch (ProcessException ex) {
-                return new AcknowlegementType("Failure", ex.getLocalizedMessage());
-            }
-
-        } catch (NoSuchIdentifierException ex) {
-           throw new CstlServiceException(ex);
-        } catch (InvalidParameterValueException ex) {
-            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
-        }
     }
 
     /**

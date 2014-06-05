@@ -676,58 +676,6 @@ public class ConstellationServer<S extends Services, P extends Providers, T exte
      */
     public final class Providers {
 
-
-        /**
-         * Get the source provider configuration.
-         *
-         * @param id The identifier of the source
-         * @param descriptor The descriptor allowing to read the configuration Object.
-         * @return
-         */
-        public GeneralParameterValue getProviderConfiguration(final String id, final ParameterDescriptorGroup descriptor) {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_GET_PROVIDER_CONFIG + "&id=" + id;
-                Object response = sendRequest(url, null, descriptor, null, false);
-                if (response instanceof GeneralParameterValue) {
-                    return (GeneralParameterValue) response;
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return null;
-        }
-
-        /**
-         * Modify a source provider in the service.
-         *
-         * @param serviceName The provider type (shapefile, coverage-sql, ...)
-         * @param id          The identifier of the source to update.
-         * @param config      The configuration Object to modify on the specific provider file.
-         * @return
-         */
-        public boolean updateProvider(final String serviceName, final String id, final ParameterValueGroup config) {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_UPDATE_PROVIDER + "&serviceName=" + serviceName + "&id=" + id;
-                final Object response = sendRequest(url, config);
-                if (response instanceof AcknowlegementType) {
-                    final AcknowlegementType ack = (AcknowlegementType) response;
-                    if ("Success".equals(ack.getStatus())) {
-                        fireProviderUpdated(serviceName, id, config);
-                        return true;
-                    } else {
-                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
-                    }
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
         // LAYER PROVIDERS ACTIONS /////////////////////////////////////////////
 
         /**

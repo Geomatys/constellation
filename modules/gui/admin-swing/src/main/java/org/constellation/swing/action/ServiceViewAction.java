@@ -88,7 +88,7 @@ public class ServiceViewAction extends Action {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    getDisplayer().display(server, type, inst);
+                    getDisplayer().display(server, serverV2, type, inst);
                 }
             });
 

@@ -20,6 +20,7 @@ package org.constellation.swing;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
@@ -27,7 +28,11 @@ import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.xml.stream.XMLStreamException;
 import org.apache.sis.storage.DataStoreException;
+import org.apache.sis.util.iso.SimpleInternationalString;
+import org.apache.sis.util.logging.Logging;
+import org.constellation.admin.service.ConstellationClient;
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.ObjectFactory;
@@ -38,12 +43,13 @@ import org.geotoolkit.client.ClientFinder;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.coverage.CoverageStoreFinder;
+import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.FeatureStoreFinder;
-import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.data.session.Session;
 import org.geotoolkit.display2d.GO2Utilities;
+import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.gui.swing.render2d.JMap2DFrame;
 import org.geotoolkit.map.CoverageMapLayer;
 import org.geotoolkit.map.FeatureMapLayer;
@@ -55,9 +61,6 @@ import org.geotoolkit.style.DefaultStyleFactory;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.RandomStyleBuilder;
 import org.geotoolkit.style.StyleConstants;
-import org.apache.sis.util.iso.SimpleInternationalString;
-import org.apache.sis.util.logging.Logging;
-import org.geotoolkit.feature.type.Name;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
@@ -94,7 +97,7 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
     }
 
     @Override
-    public void display(final ConstellationServer cstl, final String serviceType, final Instance service) {
+    public void display(final ConstellationServer cstl, final ConstellationClient serverV2, final String serviceType, final Instance service) {
         try {
             final String url = cstl.services.getInstanceURL(serviceType, service.getIdentifier());
             final ClientFactory factory = ClientFinder.getFactoryById(serviceType);
@@ -121,7 +124,7 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
     }
 
     @Override
-    public void display(final ConstellationServer server, final String providerType, final ProviderReport pr) {
+    public void display(final ConstellationServer server, final ConstellationClient serverV2, final String providerType, final ProviderReport pr) {
         final GeneralParameterDescriptor desc = server.providers.getServiceDescriptor(providerType);
         if(!(desc instanceof ParameterDescriptorGroup)) {
             return;
@@ -129,12 +132,13 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
 
         // parameters needed to build the store.
         final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup) ((ParameterDescriptorGroup) desc).descriptor(ObjectFactory.SOURCE_QNAME.getLocalPart());
-        final ParameterValueGroup gpv = (ParameterValueGroup) server.providers.getProviderConfiguration(pr.getId(), sourceDesc);
-
+        final ParameterValueGroup gpv;
         try {
+            gpv = (ParameterValueGroup) serverV2.providers.getProviderConfiguration(pr.getId(), sourceDesc);
+        
             MapContext context = getProviderLayers(gpv);
             display(context);
-        } catch (DataStoreException ex) {
+        } catch (IOException | XMLStreamException | DataStoreException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(),ex);
         }
 

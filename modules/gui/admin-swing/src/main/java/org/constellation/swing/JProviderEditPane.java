@@ -36,6 +36,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
+import javax.xml.stream.XMLStreamException;
 import org.constellation.admin.service.ConstellationClient;
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.DataBrief;
@@ -103,7 +104,13 @@ public class JProviderEditPane extends javax.swing.JPanel {
             sourceCandidate = configDesc;
         }
         sourceDesc = sourceCandidate;
-        sourceParam = (ParameterValueGroup) server.providers.getProviderConfiguration(providerReport.getId(), sourceDesc);
+        ParameterValueGroup source = null;
+        try {
+            source = (ParameterValueGroup) serverV2.providers.getProviderConfiguration(providerReport.getId(), sourceDesc);
+        } catch (IOException | XMLStreamException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        sourceParam = source;
         dataDesc = (ParameterDescriptorGroup) server.providers.getSourceDescriptor(providerType);
         final List<ParameterValueGroup> dataGroups = sourceParam.groups(dataDesc.getName().getCode());
         dataParam = (dataGroups.isEmpty()) ? null : dataGroups.get(0);
@@ -491,7 +498,11 @@ public class JProviderEditPane extends javax.swing.JPanel {
             Parameters.copy(config, subdataParam);
         }
 
-        server.providers.updateProvider(providerType, id, sourceParam);
+        try {
+            serverV2.providers.updateProvider(providerType, id, sourceParam);
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
 
         firePropertyChange("update", 0, 1);
     }//GEN-LAST:event_guiSaveActionPerformed

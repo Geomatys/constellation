@@ -32,10 +32,6 @@ public final class QueryConstants {
     public static final String REQUEST_GET_SERVICE_DESCRIPTOR       = "getServiceDescriptor";
     public static final String REQUEST_GET_SOURCE_DESCRIPTOR        = "getSourceDescriptor";
     
-    //Provider operations
-    public static final String REQUEST_UPDATE_PROVIDER              = "updateProvider";
-    public static final String REQUEST_GET_PROVIDER_CONFIG          = "getProviderConfiguration";
-    
     //Layer operations
     public static final String REQUEST_CREATE_LAYER            = "createLayer";
     public static final String REQUEST_UPDATE_LAYER            = "updateLayer";

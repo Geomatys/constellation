@@ -27,6 +27,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBElement;
+import javax.xml.stream.XMLStreamException;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import org.constellation.configuration.AcknowlegementType;
@@ -40,6 +41,9 @@ import org.constellation.dto.MetadataLists;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
 import org.constellation.dto.StyleListBrief;
+import org.geotoolkit.xml.parameter.ParameterValueReader;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 /**
@@ -308,4 +312,16 @@ public final class ProvidersAPI {
     public AcknowlegementType createProvider(final String serviceName, final ParameterValueGroup config) throws IOException {
         return client.post("DP/" + serviceName, MediaType.APPLICATION_XML_TYPE, config).getEntity(AcknowlegementType.class);
     }
+    
+    public AcknowlegementType updateProvider(final String serviceName, final String id, final ParameterValueGroup config) throws IOException {
+        return client.put("DP/" + serviceName + "/" + id, MediaType.APPLICATION_XML_TYPE, config).getEntity(AcknowlegementType.class);
+    }
+    
+    public GeneralParameterValue getProviderConfiguration(final String id, final ParameterDescriptorGroup descriptor) throws IOException, XMLStreamException {
+        final Object object = client.get("DP/" + id + "/configuration", MediaType.APPLICATION_XML_TYPE).getEntity(Object.class);
+        final ParameterValueReader reader = new ParameterValueReader(descriptor);
+        reader.setInput(object);
+        return reader.read();    
+    }
+
 }

@@ -47,7 +47,9 @@ import org.constellation.map.configuration.ProviderOperationListener;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.provider.CreateProviderDescriptor;
 import org.constellation.process.provider.DeleteProviderDescriptor;
+import org.constellation.process.provider.GetConfigProviderDescriptor;
 import org.constellation.process.provider.RestartProviderDescriptor;
+import org.constellation.process.provider.UpdateProviderDescriptor;
 import org.constellation.provider.DataProviderFactory;
 import org.constellation.provider.ProviderFactory;
 import org.constellation.provider.StyleProviderFactory;
@@ -61,6 +63,7 @@ import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.opengis.parameter.InvalidParameterValueException;
+import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.NoSuchIdentifierException;
 
@@ -173,7 +176,7 @@ public class DataProviders {
     
     @POST
     @Path("{serviceName}")
-    public Response createProvider(final String serviceName, final Object providerConfig) throws ConfigurationException {
+    public Response createProvider(final @PathParam("serviceName") String serviceName, final Object providerConfig) throws ConfigurationException {
         final ProviderFactory service = this.services.get(serviceName);
         if (service != null) {
 
@@ -206,6 +209,70 @@ public class DataProviders {
             }
         } else {
             throw new ConfigurationException("No provider service for: " + serviceName + " has been found");
+        }
+    }
+    
+    @POST
+    @Path("{serviceName}/{id}")
+    public Response updateProvider(final @PathParam("serviceName") String serviceName, final @PathParam("id") String currentId, final Object objectRequest) throws ConfigurationException{
+        final ProviderFactory service = services.get(serviceName);
+        if (service != null) {
+
+            ParameterDescriptorGroup desc = service.getProviderDescriptor();
+            desc = (ParameterDescriptorGroup) desc.descriptor("source");
+            final ParameterValueReader reader = new ParameterValueReader(desc);
+
+            try {
+                // we read the source parameter to add
+                reader.setInput(objectRequest);
+                final ParameterValueGroup sourceToModify = (ParameterValueGroup) reader.read();
+
+                final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, UpdateProviderDescriptor.NAME);
+
+                final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
+                inputs.parameter(UpdateProviderDescriptor.PROVIDER_ID_NAME).setValue(currentId);
+                inputs.parameter(UpdateProviderDescriptor.SOURCE_NAME).setValue(sourceToModify);
+
+                try {
+                    final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
+                    process.call();
+                    providerListener.fireProvidedModified(currentId);
+                } catch (ProcessException ex) {
+                    return ok(new AcknowlegementType("Failure", ex.getLocalizedMessage()));
+                }
+
+                reader.dispose();
+                return ok(new AcknowlegementType("Success", "The source has been updated"));
+
+            } catch (NoSuchIdentifierException | XMLStreamException | IOException | InvalidParameterValueException ex) {
+                throw new ConfigurationException(ex);
+            } 
+        } else {
+            throw new ConfigurationException("No descriptor for: " + serviceName + " has been found");
+        }
+    }
+    
+    
+    @GET
+    @Path("{id}/configuration")
+    public Object getProviderConfiguration(final @PathParam("id") String id) throws ConfigurationException {
+         try {
+
+            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, GetConfigProviderDescriptor.NAME);
+            final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
+            inputs.parameter(GetConfigProviderDescriptor.PROVIDER_ID_NAME).setValue(id);
+            try {
+
+                final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
+                final ParameterValueGroup outputs = process.call();
+                return outputs.parameter(GetConfigProviderDescriptor.CONFIG_NAME).getValue();
+
+            } catch (ProcessException ex) {
+                return new AcknowlegementType("Failure", ex.getLocalizedMessage());
+            }
+
+        } catch (NoSuchIdentifierException | InvalidParameterValueException ex) {
+            throw new ConfigurationException(ex);
         }
     }
 }
