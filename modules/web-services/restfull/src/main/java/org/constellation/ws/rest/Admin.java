@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -34,8 +33,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
 import org.constellation.ServiceDef.Specification;
+import org.constellation.admin.ConfigurationBusiness;
 import org.constellation.api.CommonConstants;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.Instance;
@@ -43,7 +42,6 @@ import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.configuration.ServiceConfigurer;
 import org.constellation.configuration.ServiceReport;
-import org.constellation.configuration.ws.rs.ConfigurationUtilities;
 import org.constellation.dto.Configuration;
 import org.constellation.dto.SimpleValue;
 import org.constellation.engine.register.repository.ServiceRepository;
@@ -87,7 +85,8 @@ public class Admin {
     @GET
     @Path("/configurationLocation")
     public Response configurationPath() throws CstlServiceException {
-        return Response.ok(ConfigurationUtilities.getConfigPath()).build();
+        final String path = ConfigurationBusiness.getConfigPath();
+        return Response.ok(new AcknowlegementType(true, path)).build();
     }
 
     /**
@@ -99,7 +98,9 @@ public class Admin {
     @POST
     @Path("/configurationLocation")
     public Response configurationPath(final Configuration configuration) throws CstlServiceException {
-        return Response.ok(ConfigurationUtilities.setConfigPath(configuration.getPath())).build();
+        final String path = configuration.getPath();
+        final boolean result = ConfigurationBusiness.setConfigPath(path);
+        return Response.ok(new AcknowlegementType(result, path)).build();
     }
     
     /**
@@ -110,7 +111,7 @@ public class Admin {
     @GET
     @Path("/property/{key}")
     public Response getKey(@PathParam("key") String key) throws CstlServiceException {
-        return Response.ok(new SimpleValue(ConfigurationUtilities.getProperty(key))).build();
+        return Response.ok(new SimpleValue(ConfigurationBusiness.getProperty(key))).build();
     }
 
     /**
@@ -122,7 +123,7 @@ public class Admin {
     @POST
     @Path("/property/{key}")
     public Response setKey(@PathParam("key") String key, final SimpleValue value) throws CstlServiceException {
-        ConfigurationUtilities.setProperty(key, value.getValue());
+        ConfigurationBusiness.setProperty(key, value.getValue());
         return Response.ok(new AcknowlegementType(CommonConstants.SUCCESS, "the key have been set")).build();
     }
 

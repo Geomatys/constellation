@@ -25,16 +25,7 @@ package org.constellation.api;
 public final class QueryConstants {
     
     //Constellation configuration
-    public static final String REQUEST_GET_CONFIG_PATH = "getConfigurationPath"; 
-    public static final String REQUEST_SET_CONFIG_PATH = "setConfigurationPath"; 
-    public static final String REQUEST_FULL_RESTART    = "Restart";
-    public static final String REQUEST_DOWNLOAD        = "Download";
     public static final String REQUEST_LIST_SERVICE    = "ListAvailableService";
-    public static final String REQUEST_UPDATE_USER     = "updateUser";
-    public static final String REQUEST_DELETE_USER     = "deleteUser";
-    public static final String REQUEST_GET_USER_NAME   = "getUserName";
-    public static final String REQUEST_ACCESS          = "access";
-    
     
     //Provider services operations
     public static final String REQUEST_LIST_SERVICES                = "listServices"; 

@@ -44,7 +44,6 @@ import org.constellation.configuration.ServiceReport;
 import org.constellation.configuration.StringList;
 import org.constellation.configuration.StringTreeNode;
 import org.constellation.dto.DataDescription;
-import org.constellation.dto.DataMetadata;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.dto.DataInformation;
@@ -222,30 +221,8 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
      */
     protected boolean authenticate() {
         if ("Basic".equals(securityType)) {
-            final String str = this.getURLWithEndSlash() + "configuration?request=" + REQUEST_ACCESS;
-            InputStream stream = null;
-            HttpURLConnection cnx = null;
-            try {
-                final URL url = new URL(str);
-                cnx = (HttpURLConnection) url.openConnection();
-                getClientSecurity().secure(cnx);
-                stream = AbstractRequest.openRichException(cnx, getClientSecurity());
-            } catch (Exception ex) {
-                LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
-                return false;
-            } finally {
-                if (stream != null) {
-                    try {
-                        stream.close();
-                    } catch (IOException ex) {
-                        LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-                    }
-                }
-                if (cnx != null) {
-                    cnx.disconnect();
-                }
-            }
-            return true;
+            throw new UnsupportedOperationException("Basic auth is no longer implemented");
+            
         } else if ("Form".equals(securityType)) {
             final int index = getURLWithEndSlash().lastIndexOf("WS");
             String str = getURLWithEndSlash().substring(0, index) + "j_spring_security_check?";
@@ -294,56 +271,6 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         }
     }
 
-    /**
-     * @return configuration path used by constellation, null if failed to get path.
-     */
-    public String getConfigurationPath() {
-        try {
-            final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_GET_CONFIG_PATH;
-            final Object response = sendRequest(url, null);
-            if (response instanceof AcknowlegementType) {
-                final AcknowlegementType ak = (AcknowlegementType) response;
-                if ("Success".equalsIgnoreCase(ak.getStatus())) {
-                    return ak.getMessage();
-                } else {
-                    return null;
-                }
-            } else if (response instanceof ExceptionReport) {
-                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                return null;
-            } else {
-                LOGGER.warning("The service respond uncorrectly");
-                return null;
-            }
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-        }
-        return null;
-    }
-
-    /**
-     * @param path
-     * @return true if succeed
-     */
-    public boolean setConfigurationPath(final String path) {
-        try {
-
-            final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_SET_CONFIG_PATH + "&path=" + URLEncoder.encode(path);
-            final Object response = sendRequest(url, null);
-            if (response instanceof AcknowlegementType) {
-                return "Success".equals(((AcknowlegementType) response).getStatus());
-            } else if (response instanceof ExceptionReport) {
-                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                return false;
-            } else {
-                LOGGER.warning("The service respond uncorrectly");
-                return false;
-            }
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-        }
-        return false;
-    }
 
     public boolean deleteUser(final String userName) {
         try {
@@ -467,21 +394,6 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
                 LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return new HashMap<>();
-        }
-
-        /**
-         * Restart all the web-service (wms, wfs, csw,...)
-         *
-         * @return true if the operation succeed
-         */
-        public boolean restartAll() {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_FULL_RESTART;
-                return sendRequestAck(url, null);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
         }
 
         /**

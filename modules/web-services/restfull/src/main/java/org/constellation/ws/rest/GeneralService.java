@@ -26,7 +26,7 @@ public class GeneralService {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/counts")
     public Map<String, Integer> usercount() {
-        Map<String, Integer> map = new HashMap<String, Integer>();
+        Map<String, Integer> map = new HashMap<>();
         map.put("nbuser", userRepository.countUser());
         return map;
     }
@@ -35,7 +35,7 @@ public class GeneralService {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/logincheck")
     public Map<String, String> loginAvailable(String login) {
-        Map<String, String> ret = new HashMap<String, String>();
+        Map<String, String> ret = new HashMap<>();
         if(userRepository.loginAvailable(login)) {
             ret.put("available", "true");
         }else {

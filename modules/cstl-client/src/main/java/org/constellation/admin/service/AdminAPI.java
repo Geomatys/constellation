@@ -22,6 +22,8 @@ package org.constellation.admin.service;
 import java.io.IOException;
 import javax.ws.rs.core.MediaType;
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import org.constellation.configuration.AcknowlegementType;
+import org.constellation.dto.Configuration;
 import org.constellation.dto.SimpleValue;
 
 /**
@@ -57,6 +59,20 @@ public class AdminAPI {
 
         final String path = "admin/property/" + key;
         client.post(path, MediaType.APPLICATION_XML_TYPE, new SimpleValue(value));
+    }
+    
+    public String getConfigurationPath() throws HttpResponseException, IOException {
+
+        final String path = "admin//configurationLocation";
+        final AcknowlegementType value = client.get(path, MediaType.APPLICATION_XML_TYPE).getEntity(AcknowlegementType.class);
+        return value.getMessage();
+    }
+    
+    public void setConfigurationPath(final String configPath) throws HttpResponseException, IOException {
+        ensureNonNull("configPath",  configPath);
+
+        final String path = "admin//configurationLocation";
+        client.post(path, MediaType.APPLICATION_XML_TYPE, new Configuration(configPath));
     }
 
 }

@@ -57,7 +57,7 @@ public class AcknowlegementType {
      * Empty constructor, by default status is set to "success".
      */
     public AcknowlegementType() {
-        status  = "succeed";
+        status  = "Success";
         message = null;
     }
 
@@ -66,8 +66,17 @@ public class AcknowlegementType {
      * @param status
      * @param message
      */
-    public AcknowlegementType(String status, String message) {
+    public AcknowlegementType(final String status, final String message) {
         this.status  = status;
+        this.message = message;
+    }
+    
+    public AcknowlegementType(final boolean status, final String message) {
+        if (status) {
+            this.status  = "Success";
+        } else {
+            this.status  = "Failure";
+        }
         this.message = message;
     }
 
