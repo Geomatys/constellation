@@ -20,11 +20,6 @@
 
   <mvc:annotation-driven>
     <mvc:message-converters>
-      <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
-        <property name="objectMapper">
-          <bean class="org.constellation.web.HibernateAwareObjectMapper" />
-        </property>
-      </bean>
       <bean class="org.springframework.http.converter.xml.MarshallingHttpMessageConverter">
         <property name="marshaller" ref="xml.xstream.marshaller" />
         <property name="unmarshaller" ref="xml.xstream.marshaller" />

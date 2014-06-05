@@ -23,16 +23,9 @@ import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 
-import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
-
 public class RestApplication extends ResourceConfig {
     public RestApplication() {
          super(JacksonFeature.class, MultiPartFeature.class, RolesAllowedDynamicFeature.class);
-         
-         register(new Hibernate4Module());
-         
-       
-         
-         
+                  
     }
 }
