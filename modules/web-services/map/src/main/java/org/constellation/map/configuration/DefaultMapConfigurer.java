@@ -20,8 +20,6 @@
 package org.constellation.map.configuration;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.io.IOException;
 import java.util.Collection;
@@ -30,19 +28,14 @@ import java.util.Map;
 import java.util.logging.Level;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.JAXBException;
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
-import org.constellation.configuration.DataBrief;
 import org.constellation.provider.*;
 import org.quartz.TriggerBuilder;
 import org.quartz.SimpleScheduleBuilder;
 
-import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.AbstractConfigurer;
 import org.constellation.configuration.AcknowlegementType;
-import org.constellation.configuration.ProviderReport;
-import org.constellation.configuration.ProvidersReport;
 import org.constellation.configuration.StringList;
 import org.constellation.configuration.StringTreeNode;
 import org.constellation.provider.configuration.ProviderParameters;
@@ -59,7 +52,6 @@ import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
 import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.style.MutableStyle;
 import org.apache.sis.util.Classes;
-import org.constellation.admin.ConfigurationEngine;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 
 import org.geotoolkit.feature.type.Name;
@@ -141,9 +133,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     public Object treatRequest(final String request, final MultivaluedMap<String, String> parameters, final Object objectRequest) throws CstlServiceException {
 
         //Provider services operations
-        if (REQUEST_LIST_SERVICES.equalsIgnoreCase(request)) {
-            return listProviderServices();
-        } else if (REQUEST_GET_SERVICE_DESCRIPTOR.equalsIgnoreCase(request)) {
+        if (REQUEST_GET_SERVICE_DESCRIPTOR.equalsIgnoreCase(request)) {
             final String serviceName = getParameter("serviceName", true, parameters);
             return getServiceDescriptor(serviceName);
         } else if (REQUEST_GET_SOURCE_DESCRIPTOR.equalsIgnoreCase(request)) {
@@ -603,53 +593,6 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         }
         throw new CstlServiceException("No provider service for: " + serviceName + " has been found", INVALID_PARAMETER_VALUE);
     }
-
-    /**
-     * Return a description of the available providers.
-     *
-     * @return A description of the available providers.
-     */
-    private ProvidersReport listProviderServices(){
-        final List<ProviderServiceReport> providerServ = new ArrayList<>();
-
-        final Collection<DataProvider> layerProviders = DataProviders.getInstance().getProviders();
-        final Collection<StyleProvider> styleProviders = StyleProviders.getInstance().getProviders();
-        for (ProviderFactory service : services.values()) {
-
-            final List<ProviderReport> providerReports = new ArrayList<>();
-            for (final DataProvider p : layerProviders) {
-                if (p.getFactory().equals(service)) {
-                    final List<DataBrief> keys = new ArrayList<>();
-                    for(Name n : p.getKeys()){
-                        final QName name = new QName(n.getNamespaceURI(), n.getLocalPart());
-                        final DataBrief db = ConfigurationEngine.getData(name, p.getId());
-                        keys.add(db);
-                    }
-                    final Date date = (Date) p.getSource().parameter("date").getValue();
-                    final String providerType = (String) p.getSource().parameter("providerType").getValue();
-                    providerReports.add(new ProviderReport(p.getId(), service.getName(), keys, date, providerType));
-                }
-            }
-            for (final StyleProvider p : styleProviders) {
-                if (p.getFactory().equals(service)) {
-                    final List<DataBrief> keys = new ArrayList<>();
-                    for(String n : p.getKeys()){
-                        final DataBrief db = new DataBrief();
-                        db.setName(n);
-                        keys.add(db);
-                    }
-                    final Date date = (Date) p.getSource().parameter("date").getValue();
-                    final String providerType = (String) p.getSource().parameter("providerType").getValue();
-                    providerReports.add(new ProviderReport(p.getId(), service.getName(), keys, date, providerType));
-                }
-            }
-            providerServ.add(new ProviderServiceReport(service.getName(),
-                    service instanceof StyleProviderFactory, providerReports));
-        }
-
-        return new ProvidersReport(providerServ);
-    }
-
 
     /**
      * Returns a list of all process available in the current factories.

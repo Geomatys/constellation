@@ -32,6 +32,7 @@ import org.apache.sis.metadata.iso.DefaultMetadata;
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.DataBrief;
+import org.constellation.configuration.ProvidersReport;
 import org.constellation.configuration.StyleReport;
 import org.constellation.dto.DataInformation;
 import org.constellation.dto.DataMetadata;
@@ -324,4 +325,7 @@ public final class ProvidersAPI {
         return reader.read();    
     }
 
+    public ProvidersReport listProviders() throws IOException {
+        return client.get("SP/providers", MediaType.APPLICATION_XML_TYPE).getEntity(ProvidersReport.class);  
+    }
 }

@@ -142,100 +142,104 @@ public class JProviderEditPane extends javax.swing.JPanel {
     }
 
     private void updateDataModel(){
-        providerReport = server.providers.listProviders().getProviderService(providerType).getProvider(providerReport.getId());
-        final boolean styleType = "sld".equals(providerType);
+        try {
+            providerReport = serverV2.providers.listProviders().getProviderService(providerType).getProvider(providerReport.getId());
+            final boolean styleType = "sld".equals(providerType);
 
-        final Font fontBig = new Font("Monospaced", Font.BOLD, 16);
-        final Font fontNormal = new Font("Monospaced", Font.PLAIN, 12);
-        final ImageIcon editIcon = new ImageIcon(JServicesPane.createImage("",
-                ICON_EDIT, Color.BLACK, fontNormal, Color.DARK_GRAY));
-        final ImageIcon copyIcon = new ImageIcon(JServicesPane.createImage("",
-                ICON_COPY, Color.BLACK, fontNormal, Color.DARK_GRAY));
-        final ImageIcon deleteIcon = new ImageIcon(JServicesPane.createImage("",
-                ICON_DELETE, Color.WHITE, fontNormal, Color.DARK_GRAY));
+            final Font fontBig = new Font("Monospaced", Font.BOLD, 16);
+            final Font fontNormal = new Font("Monospaced", Font.PLAIN, 12);
+            final ImageIcon editIcon = new ImageIcon(JServicesPane.createImage("",
+                    ICON_EDIT, Color.BLACK, fontNormal, Color.DARK_GRAY));
+            final ImageIcon copyIcon = new ImageIcon(JServicesPane.createImage("",
+                    ICON_COPY, Color.BLACK, fontNormal, Color.DARK_GRAY));
+            final ImageIcon deleteIcon = new ImageIcon(JServicesPane.createImage("",
+                    ICON_DELETE, Color.WHITE, fontNormal, Color.DARK_GRAY));
 
-        final List<DataBrief> layers = providerReport.getItems();
+            final List<DataBrief> layers = providerReport.getItems();
 
-        Collections.sort(layers, new Comparator<DataBrief>() {
-            @Override
-            public int compare(DataBrief o1, DataBrief o2) {
-                String l1 = o1.getName();
-                String l2 = o2.getName();
-                return l1.toLowerCase().compareTo(l2.toLowerCase());
+            Collections.sort(layers, new Comparator<DataBrief>() {
+                @Override
+                public int compare(DataBrief o1, DataBrief o2) {
+                    String l1 = o1.getName();
+                    String l2 = o2.getName();
+                    return l1.toLowerCase().compareTo(l2.toLowerCase());
+                }
+            });
+
+            final List<String> itemNames = new ArrayList<>(0);
+            for (DataBrief dataBrief : layers) {
+                itemNames.add(dataBrief.getName());
             }
-        });
 
-        final List<String> itemNames = new ArrayList<>(0);
-        for (DataBrief dataBrief : layers) {
-            itemNames.add(dataBrief.getName());
+            guiData.setModel(new DataModel(itemNames,styleType));
+
+            if(styleType){
+                guiData.getColumn(1).setCellRenderer(new ActionCell.Renderer(editIcon));
+                guiData.getColumn(1).setCellEditor(new ActionCell.Editor(editIcon) {
+                    @Override
+                    public void actionPerformed(final ActionEvent e, Object value) {
+                        final String styleName = (String) value;
+                        MutableStyle style = server.providers.downloadStyle(providerReport.getId(), styleName);
+                        editStyle(style, styleName,false);
+
+                    }
+                });
+                guiData.getColumn(1).setMaxWidth(40);
+                guiData.getColumn(1).setWidth(40);
+                guiData.getColumn(1).setPreferredWidth(40);
+
+                guiData.getColumn(2).setCellRenderer(new ActionCell.Renderer(copyIcon));
+                guiData.getColumn(2).setCellEditor(new ActionCell.Editor(copyIcon) {
+                    @Override
+                    public void actionPerformed(final ActionEvent e, Object value) {
+                        final String styleName = (String) value;
+                        final MutableStyle style = server.providers.downloadStyle(providerReport.getId(), styleName);
+                        final String newName = styleName+"(copy)";
+                        style.setName(newName);
+                        server.providers.createStyle(providerReport.getId(), newName, style);
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                updateDataModel();
+                            }
+                        });
+                    }
+                });
+                guiData.getColumn(2).setMaxWidth(40);
+                guiData.getColumn(2).setWidth(40);
+                guiData.getColumn(2).setPreferredWidth(40);
+
+                guiData.getColumn(3).setCellRenderer(new ActionCell.Renderer(deleteIcon));
+                guiData.getColumn(3).setCellEditor(new ActionCell.Editor(deleteIcon) {
+                    @Override
+                    public void actionPerformed(final ActionEvent e, Object value) {
+                        final String styleName = (String) value;
+                        server.providers.deleteStyle(providerReport.getId(), styleName);
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                updateDataModel();
+                            }
+                        });
+                    }
+                });
+                guiData.getColumn(3).setMaxWidth(40);
+                guiData.getColumn(3).setWidth(40);
+                guiData.getColumn(3).setPreferredWidth(40);
+            }
+
+            guiData.setTableHeader(null);
+            guiData.setRowHeight(37);
+            guiData.setFillsViewportHeight(true);
+            guiData.setBackground(Color.WHITE);
+            guiData.setShowGrid(true);
+            guiData.setShowHorizontalLines(true);
+            guiData.setShowVerticalLines(false);
+            guiData.revalidate();
+            guiData.repaint();
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
         }
-
-        guiData.setModel(new DataModel(itemNames,styleType));
-
-        if(styleType){
-            guiData.getColumn(1).setCellRenderer(new ActionCell.Renderer(editIcon));
-            guiData.getColumn(1).setCellEditor(new ActionCell.Editor(editIcon) {
-                @Override
-                public void actionPerformed(final ActionEvent e, Object value) {
-                    final String styleName = (String) value;
-                    MutableStyle style = server.providers.downloadStyle(providerReport.getId(), styleName);
-                    editStyle(style, styleName,false);
-
-                }
-            });
-            guiData.getColumn(1).setMaxWidth(40);
-            guiData.getColumn(1).setWidth(40);
-            guiData.getColumn(1).setPreferredWidth(40);
-            
-            guiData.getColumn(2).setCellRenderer(new ActionCell.Renderer(copyIcon));
-            guiData.getColumn(2).setCellEditor(new ActionCell.Editor(copyIcon) {
-                @Override
-                public void actionPerformed(final ActionEvent e, Object value) {
-                    final String styleName = (String) value;
-                    final MutableStyle style = server.providers.downloadStyle(providerReport.getId(), styleName);
-                    final String newName = styleName+"(copy)";
-                    style.setName(newName);
-                    server.providers.createStyle(providerReport.getId(), newName, style);
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateDataModel();
-                        }
-                    });
-                }
-            });
-            guiData.getColumn(2).setMaxWidth(40);
-            guiData.getColumn(2).setWidth(40);
-            guiData.getColumn(2).setPreferredWidth(40);
-
-            guiData.getColumn(3).setCellRenderer(new ActionCell.Renderer(deleteIcon));
-            guiData.getColumn(3).setCellEditor(new ActionCell.Editor(deleteIcon) {
-                @Override
-                public void actionPerformed(final ActionEvent e, Object value) {
-                    final String styleName = (String) value;
-                    server.providers.deleteStyle(providerReport.getId(), styleName);
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateDataModel();
-                        }
-                    });
-                }
-            });
-            guiData.getColumn(3).setMaxWidth(40);
-            guiData.getColumn(3).setWidth(40);
-            guiData.getColumn(3).setPreferredWidth(40);
-        }
-
-        guiData.setTableHeader(null);
-        guiData.setRowHeight(37);
-        guiData.setFillsViewportHeight(true);
-        guiData.setBackground(Color.WHITE);
-        guiData.setShowGrid(true);
-        guiData.setShowHorizontalLines(true);
-        guiData.setShowVerticalLines(false);
-        guiData.revalidate();
-        guiData.repaint();
     }
 
     public String getProviderType() {

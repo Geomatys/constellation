@@ -28,7 +28,6 @@ public final class QueryConstants {
     public static final String REQUEST_LIST_SERVICE    = "ListAvailableService";
     
     //Provider services operations
-    public static final String REQUEST_LIST_SERVICES                = "listServices"; 
     public static final String REQUEST_GET_SERVICE_DESCRIPTOR       = "getServiceDescriptor";
     public static final String REQUEST_GET_SOURCE_DESCRIPTOR        = "getSourceDescriptor";
     

@@ -62,13 +62,17 @@ public class JProviderCreationPane extends javax.swing.JPanel {
         guiSubType.setRenderer(new DataRenderer());
         guiParameters.setViewportView(guiParameterEditor);
 
-        final List<Object> services = new ArrayList<Object>();
+        final List<Object> services = new ArrayList<>();
         services.add("-");
-        final ProvidersReport report = server.providers.listProviders();
-        for(ProviderServiceReport service : report.getProviderServices()){
-            services.add(service);
+        try {
+            final ProvidersReport report = serverV2.providers.listProviders();
+            for(ProviderServiceReport service : report.getProviderServices()){
+                services.add(service);
+            }
+            guiType.setModel(new ListComboBoxModel(services));
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
         }
-        guiType.setModel(new ListComboBoxModel(services));
     }
 
     public String getType(){

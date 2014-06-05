@@ -860,25 +860,6 @@ public class ConstellationServer<S extends Services, P extends Providers, T exte
             return null;
         }
 
-        public ProvidersReport listProviders() {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_LIST_SERVICES;
-                final Object response = sendRequest(url, null);
-                if (response instanceof ProvidersReport) {
-                    return (ProvidersReport) response;
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                    return null;
-                } else {
-                    LOGGER.warning("The service respond uncorrectly");
-                    return null;
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return null;
-        }
-
         /**
          * Send file on constellation server
          *

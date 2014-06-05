@@ -20,8 +20,11 @@
 package org.constellation.rest.api;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,13 +38,18 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.api.CommonConstants;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.ProviderReport;
+import org.constellation.configuration.ProviderServiceReport;
+import org.constellation.configuration.ProvidersReport;
 import org.constellation.map.configuration.DefaultProviderOperationListener;
 import org.constellation.map.configuration.ProviderOperationListener;
 import org.constellation.process.ConstellationProcessFactory;
@@ -50,14 +58,17 @@ import org.constellation.process.provider.DeleteProviderDescriptor;
 import org.constellation.process.provider.GetConfigProviderDescriptor;
 import org.constellation.process.provider.RestartProviderDescriptor;
 import org.constellation.process.provider.UpdateProviderDescriptor;
+import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviderFactory;
 import org.constellation.provider.ProviderFactory;
+import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviderFactory;
 import static org.constellation.utils.RESTfulUtilities.ok;
 import org.constellation.ws.CstlServiceException;
 import static org.constellation.ws.ExceptionCode.INVALID_PARAMETER_VALUE;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
+import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
@@ -274,5 +285,47 @@ public class DataProviders {
         } catch (NoSuchIdentifierException | InvalidParameterValueException ex) {
             throw new ConfigurationException(ex);
         }
+    }
+    
+    @GET
+    @Path("providers")
+    public Response listProviderServices(){
+        final List<ProviderServiceReport> providerServ = new ArrayList<>();
+
+        final Collection<DataProvider> layerProviders = org.constellation.provider.DataProviders.getInstance().getProviders();
+        final Collection<StyleProvider> styleProviders = org.constellation.provider.StyleProviders.getInstance().getProviders();
+        for (ProviderFactory service : services.values()) {
+
+            final List<ProviderReport> providerReports = new ArrayList<>();
+            for (final DataProvider p : layerProviders) {
+                if (p.getFactory().equals(service)) {
+                    final List<DataBrief> keys = new ArrayList<>();
+                    for(Name n : p.getKeys()){
+                        final QName name = new QName(n.getNamespaceURI(), n.getLocalPart());
+                        final DataBrief db = ConfigurationEngine.getData(name, p.getId());
+                        keys.add(db);
+                    }
+                    final Date date = (Date) p.getSource().parameter("date").getValue();
+                    final String providerType = (String) p.getSource().parameter("providerType").getValue();
+                    providerReports.add(new ProviderReport(p.getId(), service.getName(), keys, date, providerType));
+                }
+            }
+            for (final StyleProvider p : styleProviders) {
+                if (p.getFactory().equals(service)) {
+                    final List<DataBrief> keys = new ArrayList<>();
+                    for(String n : p.getKeys()){
+                        final DataBrief db = new DataBrief();
+                        db.setName(n);
+                        keys.add(db);
+                    }
+                    final Date date = (Date) p.getSource().parameter("date").getValue();
+                    final String providerType = (String) p.getSource().parameter("providerType").getValue();
+                    providerReports.add(new ProviderReport(p.getId(), service.getName(), keys, date, providerType));
+                }
+            }
+            providerServ.add(new ProviderServiceReport(service.getName(), service instanceof StyleProviderFactory, providerReports));
+        }
+
+        return ok(new ProvidersReport(providerServ));
     }
 }
