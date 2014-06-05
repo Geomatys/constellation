@@ -76,12 +76,12 @@
 			<artifactId>cstl-register-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.constellation.engine.register</groupId> -->
-<!-- 			<artifactId>cstl-register-jooq</artifactId> -->
-<!-- 			<version>${project.version}</version> -->
-<!-- 			<scope>test</scope> -->
-<!-- 		</dependency> -->
+		<dependency>
+			<groupId>org.constellation.engine.register</groupId>
+			<artifactId>cstl-register-jooq</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
 
 	</dependencies>
 </project>

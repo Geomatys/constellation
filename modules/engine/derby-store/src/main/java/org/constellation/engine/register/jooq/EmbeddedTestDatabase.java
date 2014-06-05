@@ -17,7 +17,12 @@ package org.constellation.engine.register.jooq;
  *    Lesser General Public License for more details.
  */
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
@@ -26,6 +31,7 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.sis.util.Static;
 import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.internal.sql.DefaultDataSource;
@@ -105,6 +111,10 @@ public final class EmbeddedTestDatabase extends Static {
         }
 
         String dbFolder = "target/test/admin-db";
+        File dbFile = new File(dbFolder);
+        if (dbFile.exists()){
+        	FileUtils.deleteDirectory(dbFile);
+        }
 
         /*
          * Browses Constellation configuration folder to obtain the admin

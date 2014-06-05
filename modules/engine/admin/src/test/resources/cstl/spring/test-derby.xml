@@ -14,8 +14,7 @@
 
   <tx:annotation-driven transaction-manager="transactionManager" />
 
-  <bean id="securityManager" class="org.constellation.security.SecurityManagerHolder" factory-method="getInstance" />
-  <bean id="dataSource" class="org.constellation.admin.util.TempDatabase" factory-method="getOrCreateDataSource"></bean>
+  <bean id="dataSource" class="org.constellation.engine.register.jooq.EmbeddedTestDatabase" factory-method="getOrCreateDataSource"></bean>
 
   <import resource="cstl-tx.xml" />
 

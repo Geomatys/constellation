@@ -28,9 +28,10 @@ public class ServiceBusinessTest {
 		serviceDTO.setDate(new Date());
 		serviceDTO.setIdentifier("test");
 		serviceDTO.setDescription("description test");
-		serviceDTO.setOwner("owner");
+		serviceDTO.setOwner("admin");
 		serviceDTO.setStatus("STARTED");
 		serviceDTO.setTitle("title test");
+		serviceDTO.setType("WMS");
 		serviceDTO = serviceBusiness.create(serviceDTO);
 		Assert.assertTrue(serviceDTO.getId()>0);
 	}

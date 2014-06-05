@@ -6,6 +6,7 @@ import java.util.Date;
 
 public class ServiceDTO {
 	
+	
 	private int id;
 	private String identifier;
     private String type;
@@ -15,6 +16,8 @@ public class ServiceDTO {
     private String config;
     private String owner;
     private String status;
+    private String metadata;
+    private String metadataId;
     
     
     public int getId() {
@@ -70,6 +73,27 @@ public class ServiceDTO {
 	}
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	public String getMetadata() {
+		return metadata;
+	}
+	public void setMetadata(String metadata) {
+		this.metadata = metadata;
+	}
+	public String getMetadataId() {
+		return metadataId;
+	}
+	public void setMetadataId(String metadataId) {
+		this.metadataId = metadataId;
+	}
+	
+	@Override
+	public String toString() {
+		return "ServiceDTO [id=" + id + ", identifier=" + identifier
+				+ ", type=" + type + ", date=" + date + ", title=" + title
+				+ ", description=" + description + ", config=" + config
+				+ ", owner=" + owner + ", status=" + status + ", metadata="
+				+ metadata + ", metadataId=" + metadataId + "]";
 	}
 
 }
