@@ -19,6 +19,17 @@
 
 package org.constellation.admin.service;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXBElement;
+import org.apache.sis.metadata.iso.DefaultMetadata;
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.StyleReport;
 import org.constellation.dto.DataInformation;
@@ -29,19 +40,7 @@ import org.constellation.dto.MetadataLists;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
 import org.constellation.dto.StyleListBrief;
-
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBElement;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import org.apache.sis.metadata.iso.DefaultMetadata;
-
-import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
  * Constellation RESTful API for providers management/configuration.
@@ -299,5 +298,14 @@ public final class ProvidersAPI {
     
     public void restartAllStyleProviders() throws IOException {
         client.get("SP/restart", MediaType.APPLICATION_XML_TYPE);
+    }
+    
+    public void deleteProvider(final String providerId, final boolean deleteData) throws IOException {
+        client.delete("DP/" + providerId + "/" + Boolean.toString(deleteData), MediaType.APPLICATION_XML_TYPE);
+    }
+    
+   
+    public AcknowlegementType createProvider(final String serviceName, final ParameterValueGroup config) throws IOException {
+        return client.post("DP/" + serviceName, MediaType.APPLICATION_XML_TYPE, config).getEntity(AcknowlegementType.class);
     }
 }

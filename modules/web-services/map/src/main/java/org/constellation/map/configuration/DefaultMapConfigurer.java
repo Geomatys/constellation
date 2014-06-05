@@ -76,17 +76,11 @@ import static org.constellation.api.QueryConstants.*;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.provider.CreateProviderDescriptor;
 import org.constellation.process.provider.GetConfigProviderDescriptor;
-import org.constellation.process.provider.DeleteProviderDescriptor;
-import org.constellation.process.provider.RestartProviderDescriptor;
 import org.constellation.process.provider.UpdateProviderDescriptor;
 import org.constellation.process.provider.style.SetStyleToStyleProviderDescriptor;
 import org.constellation.process.provider.style.DeleteStyleToStyleProviderDescriptor;
-import org.constellation.ws.WSEngine;
-import org.constellation.api.CommonConstants;
 import org.constellation.configuration.ConfigurationException;
-import org.constellation.configuration.LayerContext;
 import org.constellation.scheduler.Tasks;
-import org.constellation.ws.Worker;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.InvalidParameterValueException;
 
@@ -161,20 +155,13 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         }
 
         //Provider operations
-          else if (REQUEST_CREATE_PROVIDER.equalsIgnoreCase(request)) {
-            final String serviceName = getParameter("serviceName", true, parameters);
-            return createProvider(serviceName, objectRequest);
-        } else if (REQUEST_UPDATE_PROVIDER.equalsIgnoreCase(request)) {
+          else if (REQUEST_UPDATE_PROVIDER.equalsIgnoreCase(request)) {
             final String serviceName = getParameter("serviceName", true, parameters);
             final String currentId = getParameter("id", true, parameters);
             return updateProvider(serviceName, currentId, objectRequest);
         } else if (REQUEST_GET_PROVIDER_CONFIG.equalsIgnoreCase(request)) {
             final String id = getParameter("id", true, parameters);
             return getProviderConfiguration(id);
-        } else if (REQUEST_DELETE_PROVIDER.equalsIgnoreCase(request)) {
-            final String providerId = getParameter("id", true, parameters);
-            final boolean deleteData = getBooleanParameter("deleteData", false, parameters);
-            return deleteProvider(providerId, deleteData);
         } 
 
         //Layer operations
@@ -259,54 +246,6 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     }
 
     /**
-     * Add a new source to the specified provider.
-     *
-     * @param parameters The GET KVP parameters send in the request.
-     * @param objectRequest The POST parameters send in the request.
-     *
-     * @return An acknowledgment informing if the request have been successfully treated or not.
-     * @throws CstlServiceException
-     */
-    private AcknowlegementType createProvider(final String serviceName,
-            final Object objectRequest) throws CstlServiceException{
-        final ProviderFactory service = this.services.get(serviceName);
-        if (service != null) {
-
-            final ParameterValueReader reader = new ParameterValueReader(service.getProviderDescriptor());
-
-            try {
-                // we read the source parameter to add
-                reader.setInput(objectRequest);
-                final ParameterValueGroup sourceToAdd = (ParameterValueGroup) reader.read();
-
-                final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateProviderDescriptor.NAME);
-
-                final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-                inputs.parameter(CreateProviderDescriptor.PROVIDER_TYPE_NAME).setValue(serviceName);
-                inputs.parameter(CreateProviderDescriptor.SOURCE_NAME).setValue(sourceToAdd);
-
-                try {
-                    final org.geotoolkit.process.Process process = desc.createProcess(inputs);
-                    process.call();
-                    providerListener.fireProvidedAdded((String)sourceToAdd.parameter("id").getValue());
-                } catch (ProcessException ex) {
-                    return new AcknowlegementType("Failure", ex.getLocalizedMessage());
-                }
-
-                reader.dispose();
-                return new AcknowlegementType("Success", "The source has been added");
-
-            } catch (NoSuchIdentifierException | XMLStreamException | IOException ex) {
-                throw new CstlServiceException(ex);
-            } catch (InvalidParameterValueException ex) {
-                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
-            }
-        } else {
-            throw new CstlServiceException("No provider service for: " + serviceName + " has been found", INVALID_PARAMETER_VALUE);
-        }
-    }
-
-    /**
      * Modify a source in the specified provider.
      *
      * @param parameters The GET KVP parameters send in the request.
@@ -386,64 +325,6 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         } catch (InvalidParameterValueException ex) {
             throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
         }
-    }
-
-    /**
-     * Remove a source in the specified provider.
-     *
-     * @param parameters The GET KVP parameters send in the request.
-     *
-     * @return An acknowledgment informing if the request have been successfully treated or not.
-     * @throws CstlServiceException
-     */
-    private AcknowlegementType deleteProvider(final String providerId, final boolean deleteData) throws CstlServiceException{
-        try {
-
-            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteProviderDescriptor.NAME);
-            final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
-            inputs.parameter(DeleteProviderDescriptor.PROVIDER_ID_NAME).setValue(providerId);
-            if (deleteData) {
-                inputs.parameter(DeleteProviderDescriptor.DELETE_DATA_NAME).setValue(deleteData);
-            }
-
-            try {
-                final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
-                process.call();
-
-                //update the layer context using this provider
-                for (String specification : CommonConstants.WXS) {
-                    final Map<String, Worker> instances = WSEngine.getWorkersMap(specification);
-                    if (instances != null) {
-                        for (Worker w : instances.values()) {
-                            if (w.getConfiguration() instanceof LayerContext) {
-                                final LayerContext configuration = (LayerContext) w.getConfiguration();
-                                if (configuration.hasSource(providerId)) {
-                                    configuration.removeSource(providerId);
-                                    // save new Configuration
-                                    LOGGER.log(Level.INFO, "Updating service {0}-{1} for deleted provider", new Object[]{specification, w.getId()});
-                                    try {
-                                        ConfigurationEngine.storeConfiguration(specification, w.getId(), configuration);
-                                    } catch (JAXBException ex) {
-                                        throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                providerListener.fireProvidedDeleted(providerId);
-            } catch (ProcessException ex) {
-                return new AcknowlegementType("Failure", ex.getLocalizedMessage());
-            }
-
-            return new AcknowlegementType("Success", "The provider has been deleted");
-
-        } catch (NoSuchIdentifierException ex) {
-           throw new CstlServiceException(ex);
-        } catch (InvalidParameterValueException ex) {
-           throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
-        }
-
     }
 
     /**

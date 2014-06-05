@@ -676,36 +676,6 @@ public class ConstellationServer<S extends Services, P extends Providers, T exte
      */
     public final class Providers {
 
-        /**
-         * Add a new source provider to the service.
-         *
-         * @param serviceName The provider service name (shapefile, coverage-sql, ...)
-         * @param config      The configuration Object to add to the specific provider file.
-         * @return
-         */
-        public AcknowlegementType createProvider(final String serviceName, final ParameterValueGroup config) {
-            ArgumentChecks.ensureNonNull("service name", serviceName);
-            ArgumentChecks.ensureNonNull("config", config);
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_CREATE_PROVIDER + "&serviceName=" + serviceName;
-                Object response = sendRequest(url, config);
-                if (response instanceof AcknowlegementType) {
-                    final AcknowlegementType ack = (AcknowlegementType) response;
-                    if ("Success".equals(ack.getStatus())) {
-                        fireProviderCreated(serviceName, config);
-                        return null;
-                    } else {
-                        return ack;
-                    }
-                } else if (response instanceof ExceptionReport) {
-                    return new AcknowlegementType("Failure", ((ExceptionReport) response).getMessage());
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-                return new AcknowlegementType("Failure", ex.getMessage());
-            }
-            return null;
-        }
 
         /**
          * Get the source provider configuration.
@@ -727,49 +697,6 @@ public class ConstellationServer<S extends Services, P extends Providers, T exte
                 LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return null;
-        }
-
-        /**
-         * Remove a source provider in the service.
-         *
-         * @param id The identifier of the source
-         * @return
-         */
-        public boolean deleteProvider(final String id) {
-            return deleteProvider(id, false);
-        }
-
-        /**
-         * Remove a source provider in the service and eventually delete data.
-         *
-         * @param id The identifier of the source
-         * @param deleteData {@code True} to delete the data.
-         * @return
-         */
-        public boolean deleteProvider(final String id, final boolean deleteData) {
-            try {
-                final StringBuilder url = new StringBuilder();
-                url.append(getURLWithEndSlash()).append("configuration?request=").append(REQUEST_DELETE_PROVIDER)
-                        .append("&id=").append(id);
-                if (deleteData) {
-                    url.append("&deleteData=").append(deleteData);
-                }
-                Object response = sendRequest(url.toString(), null);
-                if (response instanceof AcknowlegementType) {
-                    final AcknowlegementType ack = (AcknowlegementType) response;
-                    if ("Success".equals(ack.getStatus())) {
-                        fireProviderDeleted(id);
-                        return true;
-                    } else {
-                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
-                    }
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
         }
 
         /**

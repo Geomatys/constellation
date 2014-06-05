@@ -19,23 +19,47 @@
 
 package org.constellation.rest.api;
 
+import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBException;
+import javax.xml.stream.XMLStreamException;
+import org.apache.sis.util.logging.Logging;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.api.CommonConstants;
 import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.LayerContext;
+import org.constellation.map.configuration.DefaultProviderOperationListener;
+import org.constellation.map.configuration.ProviderOperationListener;
 import org.constellation.process.ConstellationProcessFactory;
+import org.constellation.process.provider.CreateProviderDescriptor;
+import org.constellation.process.provider.DeleteProviderDescriptor;
 import org.constellation.process.provider.RestartProviderDescriptor;
+import org.constellation.provider.DataProviderFactory;
+import org.constellation.provider.ProviderFactory;
+import org.constellation.provider.StyleProviderFactory;
 import static org.constellation.utils.RESTfulUtilities.ok;
 import org.constellation.ws.CstlServiceException;
 import static org.constellation.ws.ExceptionCode.INVALID_PARAMETER_VALUE;
+import org.constellation.ws.WSEngine;
+import org.constellation.ws.Worker;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
+import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.NoSuchIdentifierException;
@@ -48,6 +72,24 @@ import org.opengis.util.NoSuchIdentifierException;
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public class DataProviders {
+    
+    private static final Logger LOGGER = Logging.getLogger(DataProviders.class);
+    
+    private final ProviderOperationListener providerListener = new DefaultProviderOperationListener(); // TODO overrding mecanism
+    
+    private final Map<String, ProviderFactory> services = new HashMap<>();
+
+    public DataProviders() {
+        
+        final Collection<DataProviderFactory> availableLayerServices = org.constellation.provider.DataProviders.getInstance().getFactories();
+        for (DataProviderFactory service: availableLayerServices) {
+            this.services.put(service.getName(), service);
+        }
+        final Collection<StyleProviderFactory> availableStyleServices = org.constellation.provider.StyleProviders.getInstance().getFactories();
+        for (StyleProviderFactory service: availableStyleServices) {
+            this.services.put(service.getName(), service);
+        }
+    }
     
     @GET
     @Path("restart")
@@ -77,6 +119,93 @@ public class DataProviders {
 
         } catch (NoSuchIdentifierException | InvalidParameterValueException ex) {
            throw new CstlServiceException(ex);
+        }
+    }
+    
+    @DELETE
+    @Path("{id}/{deleteData}")
+    public Response deleteProvider(final @PathParam("id") String providerId, final @PathParam("deleteData") boolean deleteData) throws ConfigurationException {
+        try {
+
+            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteProviderDescriptor.NAME);
+            final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
+            inputs.parameter(DeleteProviderDescriptor.PROVIDER_ID_NAME).setValue(providerId);
+            if (deleteData) {
+                inputs.parameter(DeleteProviderDescriptor.DELETE_DATA_NAME).setValue(deleteData);
+            }
+
+            try {
+                final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
+                process.call();
+
+                //update the layer context using this provider
+                for (String specification : CommonConstants.WXS) {
+                    final Map<String, Worker> instances = WSEngine.getWorkersMap(specification);
+                    if (instances != null) {
+                        for (Worker w : instances.values()) {
+                            if (w.getConfiguration() instanceof LayerContext) {
+                                final LayerContext configuration = (LayerContext) w.getConfiguration();
+                                if (configuration.hasSource(providerId)) {
+                                    configuration.removeSource(providerId);
+                                    // save new Configuration
+                                    LOGGER.log(Level.INFO, "Updating service {0}-{1} for deleted provider", new Object[]{specification, w.getId()});
+                                    try {
+                                        ConfigurationEngine.storeConfiguration(specification, w.getId(), configuration);
+                                    } catch (JAXBException ex) {
+                                        throw new ConfigurationException(ex);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                providerListener.fireProvidedDeleted(providerId);
+            } catch (ProcessException ex) {
+                return ok(new AcknowlegementType("Failure", ex.getLocalizedMessage()));
+            }
+
+            return ok(new AcknowlegementType("Success", "The provider has been deleted"));
+
+        } catch (NoSuchIdentifierException | InvalidParameterValueException ex) {
+           throw new ConfigurationException(ex);
+        }
+    }
+    
+    @POST
+    @Path("{serviceName}")
+    public Response createProvider(final String serviceName, final Object providerConfig) throws ConfigurationException {
+        final ProviderFactory service = this.services.get(serviceName);
+        if (service != null) {
+
+            final ParameterValueReader reader = new ParameterValueReader(service.getProviderDescriptor());
+
+            try {
+                // we read the source parameter to add
+                reader.setInput(providerConfig);
+                final ParameterValueGroup sourceToAdd = (ParameterValueGroup) reader.read();
+
+                final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateProviderDescriptor.NAME);
+
+                final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
+                inputs.parameter(CreateProviderDescriptor.PROVIDER_TYPE_NAME).setValue(serviceName);
+                inputs.parameter(CreateProviderDescriptor.SOURCE_NAME).setValue(sourceToAdd);
+
+                try {
+                    final org.geotoolkit.process.Process process = desc.createProcess(inputs);
+                    process.call();
+                    providerListener.fireProvidedAdded((String)sourceToAdd.parameter("id").getValue());
+                } catch (ProcessException ex) {
+                    return ok(new AcknowlegementType("Failure", ex.getLocalizedMessage()));
+                }
+
+                reader.dispose();
+                return ok(new AcknowlegementType("Success", "The source has been added"));
+
+            } catch (NoSuchIdentifierException | XMLStreamException | InvalidParameterValueException | IOException ex) {
+                throw new ConfigurationException(ex);
+            }
+        } else {
+            throw new ConfigurationException("No provider service for: " + serviceName + " has been found");
         }
     }
 }

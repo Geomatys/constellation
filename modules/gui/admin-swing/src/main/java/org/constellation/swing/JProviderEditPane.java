@@ -25,6 +25,7 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.util.*;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -60,6 +61,7 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
+import org.openide.util.Exceptions;
 
 /**
  * Edit a provider.
@@ -495,7 +497,11 @@ public class JProviderEditPane extends javax.swing.JPanel {
     }//GEN-LAST:event_guiSaveActionPerformed
 
     private void guiDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiDeleteActionPerformed
-        server.providers.deleteProvider(providerReport.getId());
+        try {
+            serverV2.providers.deleteProvider(providerReport.getId(), false);
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
         firePropertyChange("update", 0, 1);
     }//GEN-LAST:event_guiDeleteActionPerformed
 

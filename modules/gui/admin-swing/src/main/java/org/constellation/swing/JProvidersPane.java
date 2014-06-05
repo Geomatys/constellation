@@ -73,7 +73,8 @@ public final class JProvidersPane extends JPanel implements ActionListener, Prop
 
     private final List<Action> actions = new ArrayList<>();
     private final JXTable guiTable = new JXTable();
-    private final ConstellationServer cstl;
+    private final ConstellationServer server;
+    private final ConstellationClient serverV2;
     private final FrameDisplayer displayer;
 
     public JProvidersPane(final ConstellationServer cstl, final ConstellationClient cstlV2, final FrameDisplayer displayer) {
@@ -84,7 +85,8 @@ public final class JProvidersPane extends JPanel implements ActionListener, Prop
             RoleController roleController, final Action ... actions) {
         initComponents();
 
-        this.cstl = cstl;
+        this.server = cstl;
+        this.serverV2 = cstlV2;
         if(displayer == null){
             this.displayer = new DefaultFrameDisplayer();
         } else {
@@ -165,7 +167,7 @@ public final class JProvidersPane extends JPanel implements ActionListener, Prop
         }
 
         //list all providers
-        final ProvidersReport providersReport = cstl.providers.listProviders();
+        final ProvidersReport providersReport = server.providers.listProviders();
         if (providersReport != null) {
             final List<ProviderServiceReport> servicesReport = providersReport.getProviderServices();
             final List<Entry<String,ProviderReport>> instances = new ArrayList<> ();
@@ -296,7 +298,7 @@ public final class JProvidersPane extends JPanel implements ActionListener, Prop
 
     private void guiNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiNewActionPerformed
 
-        JProviderCreationPane.showDialog(cstl);
+        JProviderCreationPane.showDialog(server, serverV2);
         updateInstanceList();
 
     }//GEN-LAST:event_guiNewActionPerformed

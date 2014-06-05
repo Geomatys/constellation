@@ -19,6 +19,7 @@
 package org.constellation.swing.action;
 
 import java.awt.Color;
+import java.io.IOException;
 import java.util.Map;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -26,6 +27,7 @@ import javax.swing.SwingUtilities;
 import org.constellation.configuration.ProviderReport;
 import org.constellation.security.ActionPermissions;
 import org.constellation.swing.LayerRowModel;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -82,7 +84,11 @@ public class ProviderDeleteAction extends Action {
                     ,getDisplayName(),JOptionPane.YES_NO_OPTION);
             
             if(res == JOptionPane.YES_OPTION){
-                server.providers.deleteProvider(inst.getId());
+                try {
+                    serverV2.providers.deleteProvider(inst.getId(), false);
+                } catch (IOException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
                 SwingUtilities.invokeLater(new Runnable() {
                    @Override
                    public void run() {
