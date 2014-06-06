@@ -664,60 +664,6 @@ public class ConstellationServer<S extends Services, P extends Providers> extend
         // LAYER PROVIDERS ACTIONS /////////////////////////////////////////////
 
         /**
-         * Add a new layer to a source provider in the service.
-         *
-         * @param id The identifier of the provider
-         * @param config the configuration object of the layer.
-         * @return
-         */
-        public boolean createLayer(final String id, final ParameterValueGroup config) {
-            ArgumentChecks.ensureNonNull("id", id);
-            ArgumentChecks.ensureNonNull("config", config);
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_CREATE_LAYER + "&id=" + id;
-                return sendRequestAck(url, config);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-        /**
-         * Remove a source provider in the service.
-         *
-         * @param id The identifier of the provider
-         * @param layerName The name of the layer to delete.
-         * @return
-         */
-        public boolean deleteLayer(final String id, final String layerName) {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_DELETE_LAYER + "&id=" + id + "&layerName=" + layerName;
-                return sendRequestAck(url, null);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-        /**
-         * Add a new layer to a source provider in the service.
-         *
-         * @param id The identifier of the provider
-         * @param layerName The name of the layer to update.
-         * @param layer the new configuration object of the layer.
-         * @return
-         */
-        public boolean updateLayer(final String id, final String layerName, final ParameterValueGroup layer) {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_UPDATE_LAYER + "&id=" + id + "&layerName=" + layerName;
-                return sendRequestAck(url, layer);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-        /**
          * Send file on constellation server
          *
          * @param file file to sent
