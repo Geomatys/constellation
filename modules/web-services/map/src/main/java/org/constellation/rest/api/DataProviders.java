@@ -65,7 +65,6 @@ import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviderFactory;
 import static org.constellation.utils.RESTfulUtilities.ok;
 import org.constellation.ws.CstlServiceException;
-import static org.constellation.ws.ExceptionCode.INVALID_PARAMETER_VALUE;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
 import org.geotoolkit.feature.type.Name;
@@ -327,5 +326,26 @@ public class DataProviders {
         }
 
         return ok(new ProvidersReport(providerServ));
+    }
+    
+  
+    @GET
+    @Path("service/descriptor/{serviceName}")
+    public Response getServiceDescriptor(final String serviceName) throws ConfigurationException {
+        final ProviderFactory service = services.get(serviceName);
+        if (service != null) {
+            return ok(service.getProviderDescriptor());
+        }
+        throw new ConfigurationException("No provider service for: " + serviceName + " has been found");
+    }
+
+    @GET
+    @Path("source/descriptor/{serviceName}")
+    public Response getSourceDescriptor(final String serviceName) throws ConfigurationException {
+        final ProviderFactory service = services.get(serviceName);
+        if (service != null) {
+            return ok(service.getStoreDescriptor());
+        }
+        throw new ConfigurationException("No provider service for: " + serviceName + " has been found");
     }
 }

@@ -27,10 +27,6 @@ public final class QueryConstants {
     //Constellation configuration
     public static final String REQUEST_LIST_SERVICE    = "ListAvailableService";
     
-    //Provider services operations
-    public static final String REQUEST_GET_SERVICE_DESCRIPTOR       = "getServiceDescriptor";
-    public static final String REQUEST_GET_SOURCE_DESCRIPTOR        = "getSourceDescriptor";
-    
     //Layer operations
     public static final String REQUEST_CREATE_LAYER            = "createLayer";
     public static final String REQUEST_UPDATE_LAYER            = "updateLayer";

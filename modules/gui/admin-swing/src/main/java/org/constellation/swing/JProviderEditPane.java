@@ -90,13 +90,13 @@ public class JProviderEditPane extends javax.swing.JPanel {
     private ParameterValueGroup subdataParam;
     private final JFeatureOutLine guiParameterEditor = new JFeatureOutLine();
 
-    public JProviderEditPane(final ConstellationServer server, final ConstellationClient serverV2, final String serviceType, final ProviderReport providerReport) {
+    public JProviderEditPane(final ConstellationServer server, final ConstellationClient serverV2, final String serviceType, final ProviderReport providerReport) throws IOException, XMLStreamException, ClassNotFoundException {
         this.server         = server;
         this.serverV2       = serverV2;
         this.providerType   = serviceType;
         this.providerReport = providerReport;
 
-        configDesc = (ParameterDescriptorGroup) server.providers.getServiceDescriptor(providerType);
+        configDesc = (ParameterDescriptorGroup) serverV2.providers.getServiceDescriptor(providerType);
         ParameterDescriptorGroup sourceCandidate = null; 
         try {
             sourceCandidate = (ParameterDescriptorGroup) configDesc.descriptor("source");
@@ -111,7 +111,7 @@ public class JProviderEditPane extends javax.swing.JPanel {
             Exceptions.printStackTrace(ex);
         }
         sourceParam = source;
-        dataDesc = (ParameterDescriptorGroup) server.providers.getSourceDescriptor(providerType);
+        dataDesc = (ParameterDescriptorGroup) serverV2.providers.getSourceDescriptor(providerType);
         final List<ParameterValueGroup> dataGroups = sourceParam.groups(dataDesc.getName().getCode());
         dataParam = (dataGroups.isEmpty()) ? null : dataGroups.get(0);
 

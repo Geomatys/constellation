@@ -21,15 +21,18 @@ package org.constellation.swing.action;
 import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.util.Map;
 import java.util.ResourceBundle;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
+import javax.xml.stream.XMLStreamException;
 import org.constellation.configuration.ProviderReport;
 import org.constellation.security.ActionPermissions;
 import org.constellation.swing.JProviderEditPane;
 import org.constellation.swing.JServicesPane;
 import org.constellation.swing.LayerRowModel;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -90,21 +93,25 @@ public class ProviderEditAction extends Action {
                 @Override
                 public void run() {
 
-                    final JProviderEditPane edit = new JProviderEditPane(server, serverV2, type, inst);
-                    edit.setName(BUNDLE.getString("data") +" - "+ BUNDLE.getString("edit") +" - "+ inst.getId());
-                    final PropertyChangeListener cl = new PropertyChangeListener() {
-                        @Override
-                        public void propertyChange(PropertyChangeEvent evt) {
-                            if ("update".equals(evt.getPropertyName())) {
-                                edit.removePropertyChangeListener(this);
-                                fireUpdate();
+                    try {
+                        final JProviderEditPane edit = new JProviderEditPane(server, serverV2, type, inst);
+                        edit.setName(BUNDLE.getString("data") +" - "+ BUNDLE.getString("edit") +" - "+ inst.getId());
+                        final PropertyChangeListener cl = new PropertyChangeListener() {
+                            @Override
+                            public void propertyChange(PropertyChangeEvent evt) {
+                                if ("update".equals(evt.getPropertyName())) {
+                                    edit.removePropertyChangeListener(this);
+                                    fireUpdate();
+                                }
                             }
-                        }
-                    };
-
-                    edit.addPropertyChangeListener(cl);
-
-                    getDisplayer().display(edit);
+                        };
+                        
+                        edit.addPropertyChangeListener(cl);
+                        
+                        getDisplayer().display(edit);
+                    } catch (IOException | XMLStreamException | ClassNotFoundException ex) {
+                        Exceptions.printStackTrace(ex);
+                    }
                 }
             });
 

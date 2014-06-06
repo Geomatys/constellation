@@ -26,6 +26,7 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.xml.stream.XMLStreamException;
 import org.constellation.admin.service.ConstellationClient;
 import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.AcknowlegementType;
@@ -84,30 +85,35 @@ public class JProviderCreationPane extends javax.swing.JPanel {
 
     public ParameterValueGroup getParameters(){
 
-        final String type = getType();
-        final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup) server.providers.getServiceDescriptor(type);
-        ParameterValueGroup sources = sourceDesc.createValue();
-        sources.parameter("id").setValue(guiId.getText().trim());
-        sources.parameter("providerType").setValue(guiCategory.getSelectedItem());
-
-        final ParameterValueGroup params;
-        if(guiSubType.isEnabled()){
-            //we have a subtype
-            final ParameterDescriptorGroup desc = (ParameterDescriptorGroup) guiSubType.getSelectedItem();
-            params = guiParameterEditor.getEditedAsParameter(desc);
-            sources.groups("choice").get(0).values().add(params);
-
-        }else if(guiType.getSelectedItem() instanceof ProviderServiceReport){
-            final ProviderServiceReport rep = (ProviderServiceReport) guiType.getSelectedItem();
-            final ParameterDescriptorGroup desc = (ParameterDescriptorGroup) server.providers.getSourceDescriptor(rep.getType());
-            params = guiParameterEditor.getEditedAsParameter(desc);
-            Parameters.copy(params, sources.groups(params.getDescriptor().getName().getCode()).get(0));
-        }else{
-            //no type selected
-            return null;
+        try {
+            final String type = getType();
+            final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup) serverV2.providers.getServiceDescriptor(type);
+            ParameterValueGroup sources = sourceDesc.createValue();
+            sources.parameter("id").setValue(guiId.getText().trim());
+            sources.parameter("providerType").setValue(guiCategory.getSelectedItem());
+            
+            final ParameterValueGroup params;
+            if(guiSubType.isEnabled()){
+                //we have a subtype
+                final ParameterDescriptorGroup desc = (ParameterDescriptorGroup) guiSubType.getSelectedItem();
+                params = guiParameterEditor.getEditedAsParameter(desc);
+                sources.groups("choice").get(0).values().add(params);
+                
+            }else if(guiType.getSelectedItem() instanceof ProviderServiceReport){
+                final ProviderServiceReport rep = (ProviderServiceReport) guiType.getSelectedItem();
+                final ParameterDescriptorGroup desc = (ParameterDescriptorGroup) serverV2.providers.getSourceDescriptor(rep.getType());
+                params = guiParameterEditor.getEditedAsParameter(desc);
+                Parameters.copy(params, sources.groups(params.getDescriptor().getName().getCode()).get(0));
+            }else{
+                //no type selected
+                return null;
+            }
+            
+            return sources;
+        } catch (IOException |XMLStreamException | ClassNotFoundException ex ) {
+            Exceptions.printStackTrace(ex);
         }
-
-        return sources;
+        return null;
     }
 
     /**
@@ -209,24 +215,27 @@ public class JProviderCreationPane extends javax.swing.JPanel {
         guiSubType.setModel(new ListComboBoxModel(new ArrayList()));
 
         if (candidate instanceof ProviderServiceReport) {
-            final ProviderServiceReport report = (ProviderServiceReport) candidate;
-            final ParameterDescriptorGroup desc = (ParameterDescriptorGroup) server.providers.getSourceDescriptor(report.getType());
-
-            guiParameterEditor.setEdited((Property)null);
-
-            if("choice".equalsIgnoreCase(desc.getName().getCode())){
-                guiSubType.setModel(new ListComboBoxModel(desc.descriptors()));
-                guiLblSubType.setEnabled(true);
-                guiSubType.setEnabled(true);
-            }else{
-                guiLblSubType.setEnabled(false);
-                guiSubType.setEnabled(false);
-                guiParameterEditor.setEdited(desc.createValue());
+            try {
+                final ProviderServiceReport report = (ProviderServiceReport) candidate;
+                final ParameterDescriptorGroup desc = (ParameterDescriptorGroup) serverV2.providers.getSourceDescriptor(report.getType());
+                
+                guiParameterEditor.setEdited((Property)null);
+                
+                if("choice".equalsIgnoreCase(desc.getName().getCode())){
+                    guiSubType.setModel(new ListComboBoxModel(desc.descriptors()));
+                    guiLblSubType.setEnabled(true);
+                    guiSubType.setEnabled(true);
+                }else{
+                    guiLblSubType.setEnabled(false);
+                    guiSubType.setEnabled(false);
+                    guiParameterEditor.setEdited(desc.createValue());
+                }
+                
+                guiSubType.setSelectedIndex(-1);
+            } catch (IOException | XMLStreamException | ClassNotFoundException ex) {
+                Exceptions.printStackTrace(ex);
             }
-
-            guiSubType.setSelectedIndex(-1);
         }
-
     }//GEN-LAST:event_guiTypeItemStateChanged
 
     private void guiSubTypeItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_guiSubTypeItemStateChanged

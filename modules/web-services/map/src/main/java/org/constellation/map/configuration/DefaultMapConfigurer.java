@@ -132,17 +132,8 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     @Override
     public Object treatRequest(final String request, final MultivaluedMap<String, String> parameters, final Object objectRequest) throws CstlServiceException {
 
-        //Provider services operations
-        if (REQUEST_GET_SERVICE_DESCRIPTOR.equalsIgnoreCase(request)) {
-            final String serviceName = getParameter("serviceName", true, parameters);
-            return getServiceDescriptor(serviceName);
-        } else if (REQUEST_GET_SOURCE_DESCRIPTOR.equalsIgnoreCase(request)) {
-            final String serviceName = getParameter("serviceName", true, parameters);
-            return getSourceDescriptor(serviceName);
-        }
-
         //Layer operations
-        else if (REQUEST_CREATE_LAYER.equalsIgnoreCase(request)) {
+        if (REQUEST_CREATE_LAYER.equalsIgnoreCase(request)) {
             final String sourceId = getParameter("id", true, parameters);
             return createLayer(sourceId, objectRequest);
         } else if (REQUEST_UPDATE_LAYER.equalsIgnoreCase(request)) {
@@ -561,38 +552,6 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
         return new AcknowlegementType("Failure", "Passed object is not a style:" + Classes.getShortClassName(objectRequest));
     }
 
-
-    /**
-     * Return the service descriptor of the specified type.
-     *
-     * @param parameters The GET KVP parameters send in the request.
-     *
-     * @return The descriptor of the specified provider type.
-     * @throws CstlServiceException
-     */
-    private ParameterDescriptorGroup getServiceDescriptor(final String serviceName) throws CstlServiceException{
-        final ProviderFactory service = services.get(serviceName);
-        if (service != null) {
-            return service.getProviderDescriptor();
-        }
-        throw new CstlServiceException("No provider service for: " + serviceName + " has been found", INVALID_PARAMETER_VALUE);
-    }
-
-    /**
-     * Return the service source descriptor of the specified type.
-     *
-     * @param parameters The GET KVP parameters send in the request.
-     *
-     * @return The descriptor of the specified provider type.
-     * @throws CstlServiceException
-     */
-    private GeneralParameterDescriptor getSourceDescriptor(final String serviceName) throws CstlServiceException{
-        final ProviderFactory service = services.get(serviceName);
-        if (service != null) {
-            return service.getStoreDescriptor();
-        }
-        throw new CstlServiceException("No provider service for: " + serviceName + " has been found", INVALID_PARAMETER_VALUE);
-    }
 
     /**
      * Returns a list of all process available in the current factories.

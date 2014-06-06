@@ -65,6 +65,7 @@ import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -125,23 +126,27 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
 
     @Override
     public void display(final ConstellationServer server, final ConstellationClient serverV2, final String providerType, final ProviderReport pr) {
-        final GeneralParameterDescriptor desc = server.providers.getServiceDescriptor(providerType);
-        if(!(desc instanceof ParameterDescriptorGroup)) {
-            return;
-        }
-
-        // parameters needed to build the store.
-        final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup) ((ParameterDescriptorGroup) desc).descriptor(ObjectFactory.SOURCE_QNAME.getLocalPart());
-        final ParameterValueGroup gpv;
         try {
-            gpv = (ParameterValueGroup) serverV2.providers.getProviderConfiguration(pr.getId(), sourceDesc);
-        
-            MapContext context = getProviderLayers(gpv);
-            display(context);
-        } catch (IOException | XMLStreamException | DataStoreException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(),ex);
+            final GeneralParameterDescriptor desc = serverV2.providers.getServiceDescriptor(providerType);
+            if(!(desc instanceof ParameterDescriptorGroup)) {
+                return;
+            }
+            
+            // parameters needed to build the store.
+            final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup) ((ParameterDescriptorGroup) desc).descriptor(ObjectFactory.SOURCE_QNAME.getLocalPart());
+            final ParameterValueGroup gpv;
+            try {
+                gpv = (ParameterValueGroup) serverV2.providers.getProviderConfiguration(pr.getId(), sourceDesc);
+                
+                MapContext context = getProviderLayers(gpv);
+                display(context);
+            } catch (IOException | XMLStreamException | DataStoreException ex) {
+                LOGGER.log(Level.WARNING, ex.getMessage(),ex);
+            }
+            
+        } catch (IOException | XMLStreamException | ClassNotFoundException ex) {
+            Exceptions.printStackTrace(ex);
         }
-
     }
 
     protected MapContext getProviderLayers(final ParameterValueGroup providerParameters) throws DataStoreException {

@@ -38,7 +38,6 @@ import org.constellation.configuration.ExceptionReport;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.LayerList;
 import org.constellation.configuration.ObjectFactory;
-import org.constellation.configuration.ProvidersReport;
 import org.constellation.configuration.ServiceReport;
 import org.constellation.configuration.StringList;
 import org.constellation.configuration.StringTreeNode;
@@ -812,52 +811,6 @@ public class ConstellationServer<S extends Services, P extends Providers, T exte
                 LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
             return false;
-        }
-
-        /**
-         * Get the provider service configuration description.
-         *
-         * @param serviceName name of the provider service.
-         * @return
-         */
-        public GeneralParameterDescriptor getServiceDescriptor(final String serviceName) {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_GET_SERVICE_DESCRIPTOR + "&serviceName=" + serviceName;
-                Object response = sendDescriptorRequest(url, null);
-                if (response instanceof GeneralParameterDescriptor) {
-                    return (GeneralParameterDescriptor) response;
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                } else {
-                    LOGGER.log(Level.WARNING, "Unexpected response type :{0}", response);
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return null;
-        }
-
-        /**
-         * Get the provider service source configuration description.
-         *
-         * @param serviceName name of the provider service.
-         * @return
-         */
-        public GeneralParameterDescriptor getSourceDescriptor(final String serviceName) {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_GET_SOURCE_DESCRIPTOR + "&serviceName=" + serviceName;
-                Object response = sendDescriptorRequest(url, null);
-                if (response instanceof GeneralParameterDescriptor) {
-                    return (GeneralParameterDescriptor) response;
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                } else {
-                    LOGGER.log(Level.WARNING, "Unexpected response type :{0}", response);
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return null;
         }
 
         /**

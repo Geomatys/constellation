@@ -42,7 +42,9 @@ import org.constellation.dto.MetadataLists;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
 import org.constellation.dto.StyleListBrief;
+import org.geotoolkit.xml.parameter.ParameterDescriptorReader;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
+import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
@@ -327,5 +329,36 @@ public final class ProvidersAPI {
 
     public ProvidersReport listProviders() throws IOException {
         return client.get("SP/providers", MediaType.APPLICATION_XML_TYPE).getEntity(ProvidersReport.class);  
+    }
+    
+    public GeneralParameterDescriptor getServiceDescriptor(final String serviceName) throws IOException, XMLStreamException, ClassNotFoundException {
+        
+        final Object object = client.get("DP/service/descriptor/" + serviceName, MediaType.APPLICATION_XML_TYPE).getEntity(Object.class);
+        final ParameterDescriptorReader reader = new ParameterDescriptorReader();
+        reader.setInput(object);
+        reader.read();
+        Object response = reader.getDescriptorsRoot();
+        if (response instanceof GeneralParameterDescriptor) {
+            return (GeneralParameterDescriptor) response;
+        }
+        return null;
+    }
+ 
+    /**
+     * Get the provider service source configuration description.
+     *
+     * @param serviceName name of the provider service.
+     * @return
+     */
+    public GeneralParameterDescriptor getSourceDescriptor(final String serviceName) throws IOException, XMLStreamException, ClassNotFoundException {
+        final Object object = client.get("DP/source/descriptor/" + serviceName, MediaType.APPLICATION_XML_TYPE).getEntity(Object.class);
+        final ParameterDescriptorReader reader = new ParameterDescriptorReader();
+        reader.setInput(object);
+        reader.read();
+        Object response = reader.getDescriptorsRoot();
+        if (response instanceof GeneralParameterDescriptor) {
+            return (GeneralParameterDescriptor) response;
+        }
+        return null;
     }
 }

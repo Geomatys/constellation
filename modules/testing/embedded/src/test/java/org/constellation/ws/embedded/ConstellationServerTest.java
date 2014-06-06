@@ -25,7 +25,6 @@ import javax.xml.bind.JAXBContext;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.service.ConstellationClient;
-import org.constellation.admin.service.ConstellationServer;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.ws.soap.SOService;
 import org.constellation.test.utils.Order;
@@ -114,7 +113,8 @@ public class ConstellationServerTest extends AbstractGrizzlyServer {
 
         waitForStart();
 
-        final ConstellationServer administrator = ConstellationServer.login("http://localhost:" + grizzly.getCurrentPort(), "", "");
+        final ConstellationClient client = new ConstellationClient("http://localhost:" + grizzly.getCurrentPort());
+        final ConstellationClient administrator = client.auth("", "");
         assertNotNull(administrator);
         GeneralParameterDescriptor desc = administrator.providers.getServiceDescriptor("feature-store");
         assertNotNull(desc);
