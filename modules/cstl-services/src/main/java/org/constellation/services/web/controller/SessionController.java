@@ -34,8 +34,9 @@ public class SessionController {
 	@Autowired
 	private UserRepository userRepository;
 
-	@RequestMapping(value = "/status", method = RequestMethod.GET)
+	@RequestMapping(value = "/status", method = RequestMethod.GET,produces = "text/plain")
 	public void form(HttpServletResponse response) {
+        response.setContentType("text/plain");
 		if (SecurityManagerHolder.getInstance().isAuthenticated())
 			response.setStatus(HttpServletResponse.SC_NO_CONTENT);
 		else
