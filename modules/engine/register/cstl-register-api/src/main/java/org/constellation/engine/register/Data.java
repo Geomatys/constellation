@@ -29,8 +29,9 @@ public class Data {
     private Integer id;
     private String name;
     private String namespace;
-    private int providerId;
+    private int provider;
     private String type;
+    private String subtype;
     private long date;
     private int title;
     private int description;
@@ -59,8 +60,8 @@ public class Data {
         return namespace;
     }
 
-    public int getProviderId() {
-        return providerId;
+    public int getProvider() {
+        return provider;
     }
 
 
@@ -103,7 +104,7 @@ public class Data {
     }
 
     public void setProviderId(int provider) {
-        this.providerId = provider;
+        this.provider = provider;
     }
 
     public void setType(String type) {
@@ -145,7 +146,7 @@ public class Data {
 
     @Override
     public String toString() {
-        return "Data [id=" + id + ", name=" + name + ", namespace=" + namespace + ", providerId=" + providerId
+        return "Data [id=" + id + ", name=" + name + ", namespace=" + namespace + ", provider=" + provider
                 + ", type=" + type + ", date=" + date + ", title=" + title + ", description=" + description
                 + ", owner=" + owner + ", styleIds=" + styleIds + ", metadata=" + metadata + ", isoMetaData="
                 + isoMetaData + "]";
@@ -175,6 +176,16 @@ public class Data {
 
     public void setMetadataId(String metadataId) {
         this.metadataId = metadataId;
+    }
+
+
+    public String getSubtype() {
+        return subtype;
+    }
+
+
+    public void setSubtype(String subtype) {
+        this.subtype = subtype;
     }
     
 }

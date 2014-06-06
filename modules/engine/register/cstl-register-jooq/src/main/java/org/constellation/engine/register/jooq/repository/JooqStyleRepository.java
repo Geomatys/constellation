@@ -13,7 +13,6 @@ import org.constellation.engine.register.repository.StyleRepository;
 import org.jooq.InsertSetMoreStep;
 import org.springframework.stereotype.Component;
 
-
 @Component
 public class JooqStyleRepository extends AbstractJooqRespository<StyleRecord, Style> implements StyleRepository {
 
@@ -23,8 +22,8 @@ public class JooqStyleRepository extends AbstractJooqRespository<StyleRecord, St
 
     @Override
     public List<Style> findByData(Data data) {
-        // TODO Auto-generated method stub
-        return null;
+        return dsl.select(STYLE.fields()).from(STYLE).join(STYLED_DATA).onKey()
+                .where(STYLED_DATA.DATA.eq(data.getId())).fetchInto(Style.class);
     }
 
     @Override

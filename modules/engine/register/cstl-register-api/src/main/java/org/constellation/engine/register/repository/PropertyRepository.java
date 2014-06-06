@@ -39,7 +39,5 @@ public interface PropertyRepository {
 
     String getValue(String key, String defaultValue);
 
-
-
 	
 }

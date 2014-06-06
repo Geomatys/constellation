@@ -20,21 +20,21 @@ package org.constellation.engine.register;
 
 public class Style {
 
-    private User owner;
+    private String owner;
     private String body;
     private int description;
     private int title;
     private long date;
     private String type;
-    private Provider provider;
+    private int provider;
     private String name;
     private int id;
 
-    public void setOwner(User owner) {
+    public void setOwner(String owner) {
         this.owner = owner;
     }
 
-    public User getOwner() {
+    public String getOwner() {
         return owner;
     }
 
@@ -87,12 +87,12 @@ public class Style {
     }
 
 
-    public void setProvider(Provider provider) {
+    public void setProvider(int provider) {
         this.provider = provider;
     }
 
 
-    public Provider getProvider() {
+    public int getProvider() {
         return provider;
     }
 

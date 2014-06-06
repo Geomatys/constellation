@@ -27,6 +27,8 @@ import org.constellation.engine.register.Provider;
     List<Provider> findAll();
 
     Provider findOne(Integer id);
+    
+    Provider findByMetadataId(String metadataId);
 
     List<Provider> findByImpl(String serviceName);
 

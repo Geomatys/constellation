@@ -106,4 +106,9 @@ public class JooqProviderRepository extends AbstractJooqRespository<ProviderReco
     public int deleteByIdentifier(String providerID) {
         return dsl.delete(PROVIDER).where(PROVIDER.IDENTIFIER.eq(providerID)).execute();
     }
+
+    @Override
+    public Provider findByMetadataId(String metadataId) {
+        return dsl.select().from(PROVIDER).where(PROVIDER.METADATA_ID.eq(metadataId)).fetchOneInto(Provider.class);
+    }
 }

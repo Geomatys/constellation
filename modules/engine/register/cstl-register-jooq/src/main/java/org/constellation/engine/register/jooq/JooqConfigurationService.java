@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 
+import javax.print.attribute.standard.Severity;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -118,9 +119,15 @@ public class JooqConfigurationService implements ConfigurationService {
        
         Service service = serviceRepository.findByIdentifierAndType(serviceID, spec.name());
         if (service == null) {
-            throw new ConstellationPersistenceException("This service does not exist: " + serviceID + " ("
-                    + spec.name() + ")");
+            service = new Service();
+            service.setConfig(config);
+            service.setDate(new Date().getTime());
+            service.setType(spec.name());
+            service.setOwner(login);
+            service.setIdentifier(serviceID);
+            serviceRepository.create(service);
         }
+         
 
         if (obj instanceof LayerContext) {
 

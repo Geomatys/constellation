@@ -56,7 +56,7 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
         newRecord.setName(data.getName());
         newRecord.setNamespace(data.getNamespace());
         newRecord.setOwner(data.getOwner());
-        newRecord.setProvider(data.getProviderId());
+        newRecord.setProvider(data.getProvider());
         newRecord.setType(data.getType());
         newRecord.setTitle(data.getTitle());
         newRecord.store();
