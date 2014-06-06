@@ -19,6 +19,7 @@
 
 package org.constellation.ws.rest;
 
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -50,6 +51,10 @@ import java.util.logging.Logger;
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Produces("image/png")
 public final class Portrayal {
+    
+    @Inject
+    LayerProviders layerProviders;
+    
     private static final Logger LOGGER = Logging.getLogger(Portrayal.class);
 
     /**
@@ -94,7 +99,7 @@ public final class Portrayal {
                             @QueryParam("CQLFILTER") final String filter) {
                            
         try {
-            return Response.ok(LayerProviders.portray(providerId, dataName, crs, bbox, width, height, sldVersion, sldProvider, styleId, filter)).build();
+            return Response.ok(layerProviders.portray(providerId, dataName, crs, bbox, width, height, sldVersion, sldProvider, styleId, filter)).build();
         } catch (CstlServiceException | TargetNotFoundException | JAXBException ex) {
             LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
             return Response.ok(new AcknowlegementType("Failure", ex.getLocalizedMessage()), MediaType.APPLICATION_XML).build();

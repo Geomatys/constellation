@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.inject.Inject;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -64,6 +65,9 @@ import static org.geotoolkit.style.StyleConstants.*;
 public class MapSetup implements ServletContextListener {
 
     private static final Logger LOGGER = Logging.getLogger(MapSetup.class);
+    
+    @Inject
+    StyleBusiness styleBusiness;
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
@@ -160,7 +164,7 @@ public class MapSetup implements ServletContextListener {
                 final MutableStyle style = sf.style(DEFAULT_POINT_SYMBOLIZER);
                 style.setName("default-point");
                 style.featureTypeStyles().get(0).rules().get(0).setName("default-point");
-                StyleBusiness.createStyle("sld", style);
+                styleBusiness.createStyle("sld", style);
             }
             if (provider.get("default-point-sensor") == null) {
                 final MutableStyle style = sf.style(DEFAULT_POINT_SYMBOLIZER);
@@ -178,7 +182,7 @@ public class MapSetup implements ServletContextListener {
                 final DefaultPointSymbolizer pointSymbolizer = new DefaultPointSymbolizer(graphic, null, "", "default-point-sensor", null);
                 style.featureTypeStyles().get(0).rules().get(0).symbolizers().clear();
                 style.featureTypeStyles().get(0).rules().get(0).symbolizers().add(pointSymbolizer);
-                StyleBusiness.createStyle("sld", style);
+                styleBusiness.createStyle("sld", style);
             }
             if (provider.get("default-point-sensor-selected") == null) {
                 final MutableStyle style = sf.style(DEFAULT_POINT_SYMBOLIZER);
@@ -196,25 +200,25 @@ public class MapSetup implements ServletContextListener {
                 final DefaultPointSymbolizer pointSymbolizer = new DefaultPointSymbolizer(graphic, null, "", "default-point-sensor-selected", null);
                 style.featureTypeStyles().get(0).rules().get(0).symbolizers().clear();
                 style.featureTypeStyles().get(0).rules().get(0).symbolizers().add(pointSymbolizer);
-                StyleBusiness.createStyle("sld", style);
+                styleBusiness.createStyle("sld", style);
             }
             if (provider.get("default-line") == null) {
                 final MutableStyle style = sf.style(DEFAULT_LINE_SYMBOLIZER);
                 style.setName("default-line");
                 style.featureTypeStyles().get(0).rules().get(0).setName("default-line");
-                StyleBusiness.createStyle("sld", style);
+                styleBusiness.createStyle("sld", style);
             }
             if (provider.get("default-polygon") == null) {
                 final MutableStyle style = sf.style(DEFAULT_POLYGON_SYMBOLIZER);
                 style.setName("default-polygon");
                 style.featureTypeStyles().get(0).rules().get(0).setName("default-polygon");
-                StyleBusiness.createStyle("sld", style);
+                styleBusiness.createStyle("sld", style);
             }
             if (provider.get("default-raster") == null) {
                 final MutableStyle style = sf.style(DEFAULT_RASTER_SYMBOLIZER);
                 style.setName("default-raster");
                 style.featureTypeStyles().get(0).rules().get(0).setName("default-raster");
-                StyleBusiness.createStyle("sld", style);
+                styleBusiness.createStyle("sld", style);
             }
         } catch (ConfigurationException ex) {
             LOGGER.log(Level.WARNING, "An error occurred when creating default styles for default SLD provider.", ex);

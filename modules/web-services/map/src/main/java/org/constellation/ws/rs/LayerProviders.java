@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.measure.unit.NonSI;
 import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBException;
@@ -111,6 +112,7 @@ import org.opengis.style.RasterSymbolizer;
 import org.opengis.style.ShadedRelief;
 import org.opengis.style.Symbolizer;
 import org.opengis.util.FactoryException;
+import org.springframework.stereotype.Component;
 
 /**
  * Utility class for layer provider management/configuration.
@@ -119,7 +121,11 @@ import org.opengis.util.FactoryException;
  * @version 0.9
  * @since 0.9
  */
-public final class LayerProviders extends Static {
+@Component
+public final class LayerProviders {
+    
+    @Inject
+    StyleBusiness styleBusiness;
 
     /**
      * Default rendering options.
@@ -292,14 +298,14 @@ public final class LayerProviders extends Static {
      * @throws TargetNotFoundException CstlServiceException
      * @throws JAXBException
      */
-    public static PortrayalResponse portray(final String providerId, final String layerName, final String crsCode,
+    public PortrayalResponse portray(final String providerId, final String layerName, final String crsCode,
                                             final String bbox, final int width, final int height, final String sldVersion,
                                             final String sldProvider, final String styleId, final String filter)
                                             throws CstlServiceException, TargetNotFoundException, JAXBException {
         if (sldProvider == null || styleId == null) {
             return portray(providerId, layerName, crsCode, bbox, width, height, null, sldVersion, filter);
         }
-    	MutableStyle style = StyleBusiness.getStyle(sldProvider, styleId);
+    	MutableStyle style = styleBusiness.getStyle(sldProvider, styleId);
     	StyleXmlIO styleXmlIO = new StyleXmlIO();
     	final StringWriter sw = new StringWriter();
     	styleXmlIO.writeStyle(sw, style, Specification.StyledLayerDescriptor.V_1_1_0);

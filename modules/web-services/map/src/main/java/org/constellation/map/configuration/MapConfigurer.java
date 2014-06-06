@@ -75,6 +75,7 @@ import org.opengis.style.RasterSymbolizer;
 import org.opengis.style.ShadedRelief;
 import org.opengis.style.Symbolizer;
 
+import javax.inject.Inject;
 import javax.measure.unit.NonSI;
 import javax.measure.unit.Unit;
 
@@ -102,6 +103,9 @@ import static org.geotoolkit.style.StyleConstants.LITERAL_ONE_FLOAT;
  * @since 0.9
  */
 public class MapConfigurer extends OGCConfigurer {
+    
+    @Inject
+    StyleBusiness styleBusiness;
 
     /**
      * Create a new {@link MapConfigurer} instance.
@@ -158,7 +162,7 @@ public class MapConfigurer extends OGCConfigurer {
         // Declare the style as "applicable" for the layer data.
         try {
             final QName layerID = new QName(layerProviderReference.getLayerId().getNamespaceURI(), layerProviderReference.getLayerId().getLocalPart());
-            StyleBusiness.linkToData(
+            styleBusiness.linkToData(
                     styleProviderReference.getProviderId(),
                     styleProviderReference.getLayerId().getLocalPart(),
                     layerProviderReference.getProviderId(),
