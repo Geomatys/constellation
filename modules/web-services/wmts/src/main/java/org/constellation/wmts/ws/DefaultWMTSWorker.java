@@ -23,6 +23,9 @@ import java.awt.Rectangle;
 import java.text.ParseException;
 import java.util.*;
 import java.util.logging.Level;
+
+import javax.inject.Named;
+
 import org.apache.sis.storage.DataStoreException;
 
 // Constellation dependencies
@@ -67,6 +70,7 @@ import org.opengis.coverage.Coverage;
 import org.geotoolkit.feature.type.Name;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.operation.TransformException;
+import org.springframework.context.annotation.Scope;
 
 /**
  * Working part of the WMTS service.
@@ -79,6 +83,8 @@ import org.opengis.referencing.operation.TransformException;
  * @author Guilhem Legal (Geomatys)
  * @since 0.3
  */
+@Named("WTMSWorker")
+@Scope("prototype")
 public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
 
     /**

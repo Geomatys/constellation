@@ -7,7 +7,10 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
 
   
-  
+   <import resource="classpath:cstl/spring/cstl-web-base-context.xml"/>
+   <!-- Detection of deployed modules -->
+   <import resource="classpath*:/cstl/spring/auto/*-context.xml"/>
+   
    
 <!--    <metrics:annotation-driven /> -->
 
@@ -17,8 +20,7 @@
    <bean class="org.constellation.services.SessionDataImpl" />
    
    <context:component-scan base-package="org.constellation.conf"  />
-   <context:component-scan base-package="org.constellation.map.ws"  />
-   <context:component-scan base-package="org.constellation.metadata"  />
+   
 
   
 </beans>
