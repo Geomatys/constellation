@@ -146,6 +146,10 @@
                                          src="images/vector-multipoint.svg"
                                          class="pull-right"
                                          style="margin-top:6px; margin-right:10px;" >
+                                    <img ng-if="data.Type=='VECTOR' && data.Subtype=='Geometry' && data!=selected"
+                                         src="images/vector-multigeometry.svg"
+                                         class="pull-right"
+                                         style="margin-top:6px; margin-right:10px; width:22px;" >
                                     <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Polygon' || data.Subtype=='MultiPolygon') && data!=selected"
                                          src="images/vector-poly.svg"
                                          class="pull-right"
@@ -159,6 +163,10 @@
                                          src="images/vector-multipoint-selected.svg"
                                          class="pull-right"
                                          style="margin-top:6px; margin-right:10px;" >
+                                    <img ng-if="data.Type=='VECTOR' && data.Subtype=='Geometry' && data==selected"
+                                         src="images/vector-multigeometry-selected.svg"
+                                         class="pull-right"
+                                         style="margin-top:6px; margin-right:10px; width:22px;" >
                                     <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Polygon' || data.Subtype=='MultiPolygon') && data==selected"
                                          src="images/vector-poly-selected.svg"
                                          class="pull-right"
