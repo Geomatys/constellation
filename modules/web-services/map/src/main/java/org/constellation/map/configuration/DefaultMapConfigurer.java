@@ -35,27 +35,12 @@ import org.constellation.configuration.AcknowlegementType;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.ws.CstlServiceException;
 
-import org.geotoolkit.process.ProcessDescriptor;
-import org.geotoolkit.process.ProcessFinder;
-import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
-import org.geotoolkit.sld.xml.StyleXmlIO;
-import org.geotoolkit.style.MutableStyle;
-import org.apache.sis.util.Classes;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.util.FactoryException;
-import org.opengis.util.NoSuchIdentifierException;
-
-import static org.constellation.ws.ExceptionCode.*;
 import static org.constellation.api.QueryConstants.*;
-import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.provider.style.SetStyleToStyleProviderDescriptor;
-import org.constellation.process.provider.style.DeleteStyleToStyleProviderDescriptor;
-import org.geotoolkit.process.ProcessException;
-import org.opengis.parameter.InvalidParameterValueException;
 
 /**
  *
@@ -87,10 +72,10 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     @Override
     public boolean needCustomUnmarshall(final String request, MultivaluedMap<String, String> parameters) {
 
-        if ( REQUEST_CREATE_STYLE.equalsIgnoreCase(request)
+       /* if ( REQUEST_CREATE_STYLE.equalsIgnoreCase(request)
           || REQUEST_UPDATE_STYLE.equalsIgnoreCase(request)) {
             return true;
-        }
+        }*/
 
         return super.needCustomUnmarshall(request,parameters);
     }
@@ -99,7 +84,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
     public Object unmarshall(final String request, final MultivaluedMap<String, String> parameters,
             final InputStream stream) throws JAXBException, CstlServiceException {
 
-        if ( REQUEST_CREATE_STYLE.equalsIgnoreCase(request)
+        /*if ( REQUEST_CREATE_STYLE.equalsIgnoreCase(request)
           || REQUEST_UPDATE_STYLE.equalsIgnoreCase(request)) {
 
             final StyleXmlIO util = new StyleXmlIO();
@@ -108,7 +93,7 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             } catch (FactoryException ex) {
                 throw new JAXBException(ex.getMessage(),ex);
             }
-        }
+        }*/
 
         return super.unmarshall(request, parameters, stream);
     }
@@ -128,25 +113,6 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
             final String sourceId = getParameter("id", true, parameters);
             final String layerName = getParameter("layerName", true, parameters);
             return deleteLayer(sourceId, layerName);
-        }
-
-        //Style operations
-        else if (REQUEST_DOWNLOAD_STYLE.equalsIgnoreCase(request)) {
-            final String id = getParameter("id", true, parameters);
-            final String styleId = getParameter("styleName", true, parameters);
-            return downloadStyle(id, styleId);
-        } else if (REQUEST_CREATE_STYLE.equalsIgnoreCase(request)) {
-            final String sourceId = getParameter("id", true, parameters);
-            final String styleId = getParameter("styleName", true, parameters);
-            return createStyle(sourceId, styleId, objectRequest);
-        } else if (REQUEST_UPDATE_STYLE.equalsIgnoreCase(request)) {
-            final String sourceId = getParameter("id", true, parameters);
-            final String styleId = getParameter("styleName", true, parameters);
-            return updateStyle(sourceId, styleId, objectRequest);
-        } else if (REQUEST_DELETE_STYLE.equalsIgnoreCase(request)) {
-            final String sourceId = getParameter("id", true, parameters);
-            final String styleId = getParameter("styleName", true, parameters);
-            return deleteStyle(sourceId, styleId);
         }
 
         return null;
@@ -353,151 +319,4 @@ public class DefaultMapConfigurer extends AbstractConfigurer {
 //            throw new CstlServiceException(ex);
 //        }
     }
-
-    /**
-     * Download a complete style definition.
-     *
-     * @param parameters
-     * @return
-     * @throws CstlServiceException
-     */
-    private Object downloadStyle(final String id, final String styleId) throws CstlServiceException{
-        final Collection<StyleProvider> providers = StyleProviders.getInstance().getProviders();
-        for (Provider p : providers) {
-            if (p.getId().equals(id)) {
-                Object style = p.get(styleId);
-                if(style != null){
-                    return style;
-                }
-                return new AcknowlegementType("Failure", "Unable to find a style named : " + id);
-            }
-        }
-
-        return new AcknowlegementType("Failure", "Unable to find a provider named : " + id);
-    }
-
-    /**
-     * Add a style to the specified provider.
-     *
-     * @param parameters The GET KVP parameters send in the request.
-     * @param objectRequest The POST parameters send in the request.
-     *
-     * @return An acknowledgment informing if the request have been successfully treated or not.
-     * @throws CstlServiceException
-     */
-    private AcknowlegementType createStyle(final String sourceId, final String styleId,
-            final Object objectRequest) throws CstlServiceException{
-
-        if(objectRequest instanceof MutableStyle){
-            // we read the style to add
-            final MutableStyle style = (MutableStyle) objectRequest;
-
-            try {
-                // we read the soruce parameter to add
-
-                final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, SetStyleToStyleProviderDescriptor.NAME);
-                final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
-                inputs.parameter(SetStyleToStyleProviderDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
-                inputs.parameter(SetStyleToStyleProviderDescriptor.STYLE_ID_NAME).setValue(styleId);
-                inputs.parameter(SetStyleToStyleProviderDescriptor.STYLE_NAME).setValue(style);
-
-                try {
-                    final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
-                    process.call();
-
-                } catch (ProcessException ex) {
-                    return new AcknowlegementType("Failure", ex.getLocalizedMessage());
-                }
-
-                return new AcknowlegementType("Success", "The layer has been added");
-
-            } catch (NoSuchIdentifierException ex) {
-                throw new CstlServiceException(ex);
-            } catch (InvalidParameterValueException ex) {
-                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
-            }
-        }
-        return new AcknowlegementType("Failure", "Passed object is not a style:" + Classes.getShortClassName(objectRequest));
-
-    }
-
-    /**
-     * Remove a style in the specified provider.
-     *
-     * @param parameters The GET KVP parameters send in the request.
-     *
-     * @return An acknowledgment informing if the request have been successfully treated or not.
-     * @throws CstlServiceException
-     */
-    private AcknowlegementType deleteStyle(final String sourceId, final String styleId) throws CstlServiceException{
-        try {
-            // we read the soruce parameter to add
-
-            final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, DeleteStyleToStyleProviderDescriptor.NAME);
-            final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
-            inputs.parameter(DeleteStyleToStyleProviderDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
-            inputs.parameter(DeleteStyleToStyleProviderDescriptor.STYLE_ID_NAME).setValue(styleId);
-
-            try {
-                final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
-                process.call();
-
-            } catch (ProcessException ex) {
-                return new AcknowlegementType("Failure", ex.getLocalizedMessage());
-            }
-
-            return new AcknowlegementType("Success", "The layer has been removed");
-
-        } catch (NoSuchIdentifierException ex) {
-            throw new CstlServiceException(ex);
-        } catch (InvalidParameterValueException ex) {
-                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
-        }
-    }
-
-    /**
-     * Modify a Style to the specified provider.
-     *
-     * @param parameters The GET KVP parameters send in the request.
-     * @param objectRequest The POST parameters send in the request.
-     *
-     * @return An acknowledgment informing if the request have been successfully treated or not.
-     * @throws CstlServiceException
-     */
-    private AcknowlegementType updateStyle(final String sourceId, final String styleId,
-            final Object objectRequest) throws CstlServiceException{
-
-        if(objectRequest instanceof MutableStyle){
-            // we read the style to add
-            final MutableStyle style = (MutableStyle) objectRequest;
-
-            try {
-                // we read the soruce parameter to add
-
-                final ProcessDescriptor procDesc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, SetStyleToStyleProviderDescriptor.NAME);
-                final ParameterValueGroup inputs = procDesc.getInputDescriptor().createValue();
-                inputs.parameter(SetStyleToStyleProviderDescriptor.PROVIDER_ID_NAME).setValue(sourceId);
-                inputs.parameter(SetStyleToStyleProviderDescriptor.STYLE_ID_NAME).setValue(styleId);
-                inputs.parameter(SetStyleToStyleProviderDescriptor.STYLE_NAME).setValue(style);
-
-                try {
-                    final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
-                    process.call();
-
-                } catch (ProcessException ex) {
-                    return new AcknowlegementType("Failure", ex.getLocalizedMessage());
-                }
-
-                return new AcknowlegementType("Success", "The layer has been added");
-
-            } catch (NoSuchIdentifierException ex) {
-                throw new CstlServiceException(ex);
-            } catch (InvalidParameterValueException ex) {
-                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
-            }
-        }
-
-        return new AcknowlegementType("Failure", "Passed object is not a style:" + Classes.getShortClassName(objectRequest));
-    }
-
 }

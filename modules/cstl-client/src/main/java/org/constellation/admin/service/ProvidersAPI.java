@@ -42,6 +42,8 @@ import org.constellation.dto.MetadataLists;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
 import org.constellation.dto.StyleListBrief;
+import org.geotoolkit.style.DefaultMutableStyle;
+import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.xml.parameter.ParameterDescriptorReader;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.opengis.parameter.GeneralParameterDescriptor;
@@ -136,7 +138,20 @@ public final class ProvidersAPI {
         final String path = "SP/" + providerId + "/style/" + styleName + "/report";
         return client.get(path, MediaType.APPLICATION_XML_TYPE).getEntity(StyleReport.class);
     }
+    
+    public MutableStyle getStyle(final String providerId, final String styleName) throws HttpResponseException, IOException {
+        ensureNonNull("providerId", providerId);
+        ensureNonNull("styleName", styleName);
 
+        final String path = "SP/" + providerId + "/style/" + styleName;
+        return client.get(path, MediaType.APPLICATION_XML_TYPE).getEntity(MutableStyle.class);
+    }
+
+    public void createStyle(final String providerId, final MutableStyle style) throws IOException {
+        final String path = "SP/" + providerId + "/style";
+        client.put(path, MediaType.APPLICATION_XML_TYPE, style);
+    }
+    
     /**
      * Links a style resource to an existing data resource.
      *

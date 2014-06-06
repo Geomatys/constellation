@@ -49,9 +49,7 @@ import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.security.BasicAuthenticationSecurity;
 import org.geotoolkit.security.FormSecurity;
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
-import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
 import org.geotoolkit.sld.xml.StyleXmlIO;
-import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.xml.parameter.ParameterDescriptorReader;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.geotoolkit.xml.parameter.ParameterValueWriter;
@@ -59,7 +57,6 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.style.Style;
-import org.opengis.util.FactoryException;
 
 import javax.swing.event.EventListenerList;
 import javax.ws.rs.core.MediaType;
@@ -714,88 +711,6 @@ public class ConstellationServer<S extends Services, P extends Providers> extend
             try {
                 final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_UPDATE_LAYER + "&id=" + id + "&layerName=" + layerName;
                 return sendRequestAck(url, layer);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-        // STYLE PROVIDERS ACTIONS /////////////////////////////////////////////
-
-        public MutableStyle downloadStyle(final String id, final String styleName) {
-            ArgumentChecks.ensureNonNull("id", id);
-            ArgumentChecks.ensureNonNull("styleName", styleName);
-
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_DOWNLOAD_STYLE + "&id=" + id + "&styleName=" + styleName;
-                Object response = sendRequest(url, null, null, StyleXmlIO.getJaxbContext110(), false);
-
-                if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                } else {
-                    final StyleXmlIO utils = new StyleXmlIO();
-                    return utils.readStyle(response, SymbologyEncoding.V_1_1_0);
-                }
-            } catch (IOException | JAXBException | FactoryException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return null;
-        }
-
-        /**
-         * @param id name of the SLD provider
-         * @param styleName name of the new style.
-         * @param style : SLD or other
-         * @return null if successful, AcknowlegementType if failed
-         */
-        public boolean createStyle(final String id, final String styleName, final Object style) {
-            ArgumentChecks.ensureNonNull("id", id);
-            ArgumentChecks.ensureNonNull("styleName", styleName);
-            ArgumentChecks.ensureNonNull("style", style);
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_CREATE_STYLE + "&id=" + id + "&styleName=" + styleName;
-                return sendRequestAck(url, style);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-        /**
-         * Remove a style in the specified provider.
-         *
-         * @param id provider id.
-         * @param styleName style id.
-         * @return true if successful.
-         */
-        public boolean deleteStyle(final String id, final String styleName) {
-            ArgumentChecks.ensureNonNull("id", id);
-            ArgumentChecks.ensureNonNull("styleName", styleName);
-
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_DELETE_STYLE + "&id=" + id + "&styleName=" + styleName;
-                return sendRequestAck(url, null);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-        /**
-         * Update a style
-         *
-         * @param id        The identifier of the provider
-         * @param styleName The identifier of the style
-         * @param style     The new style definition
-         * @return
-         */
-        public boolean updateStyle(final String id, final String styleName, final Object style) {
-            ArgumentChecks.ensureNonNull("id", id);
-            ArgumentChecks.ensureNonNull("styleName", styleName);
-            ArgumentChecks.ensureNonNull("style", style);
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_UPDATE_STYLE + "&id=" + id + "&styleName=" + styleName;
-                return sendRequestAck(url, style);
             } catch (IOException ex) {
                 LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }

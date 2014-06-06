@@ -178,9 +178,13 @@ public class JProviderEditPane extends javax.swing.JPanel {
                 guiData.getColumn(1).setCellEditor(new ActionCell.Editor(editIcon) {
                     @Override
                     public void actionPerformed(final ActionEvent e, Object value) {
-                        final String styleName = (String) value;
-                        MutableStyle style = server.providers.downloadStyle(providerReport.getId(), styleName);
-                        editStyle(style, styleName,false);
+                        try {
+                            final String styleName = (String) value;
+                            MutableStyle style = serverV2.providers.getStyle(providerReport.getId(), styleName);
+                            editStyle(style, styleName,false);
+                        } catch (IOException ex) {
+                            Exceptions.printStackTrace(ex);
+                        }
 
                     }
                 });
@@ -192,17 +196,21 @@ public class JProviderEditPane extends javax.swing.JPanel {
                 guiData.getColumn(2).setCellEditor(new ActionCell.Editor(copyIcon) {
                     @Override
                     public void actionPerformed(final ActionEvent e, Object value) {
-                        final String styleName = (String) value;
-                        final MutableStyle style = server.providers.downloadStyle(providerReport.getId(), styleName);
-                        final String newName = styleName+"(copy)";
-                        style.setName(newName);
-                        server.providers.createStyle(providerReport.getId(), newName, style);
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                updateDataModel();
-                            }
-                        });
+                        try {
+                            final String styleName = (String) value;
+                            final MutableStyle style = serverV2.providers.getStyle(providerReport.getId(), styleName);
+                            final String newName = styleName+"(copy)";
+                            style.setName(newName);
+                            serverV2.providers.createStyle(providerReport.getId(), style);
+                            SwingUtilities.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    updateDataModel();
+                                }
+                            });
+                        } catch (IOException ex) {
+                            Exceptions.printStackTrace(ex);
+                        }
                     }
                 });
                 guiData.getColumn(2).setMaxWidth(40);
@@ -213,14 +221,18 @@ public class JProviderEditPane extends javax.swing.JPanel {
                 guiData.getColumn(3).setCellEditor(new ActionCell.Editor(deleteIcon) {
                     @Override
                     public void actionPerformed(final ActionEvent e, Object value) {
-                        final String styleName = (String) value;
-                        server.providers.deleteStyle(providerReport.getId(), styleName);
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                updateDataModel();
-                            }
-                        });
+                        try {
+                            final String styleName = (String) value;
+                            serverV2.providers.deleteStyle(providerReport.getId(), styleName);
+                            SwingUtilities.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    updateDataModel();
+                                }
+                            });
+                        } catch (IOException ex) {
+                            Exceptions.printStackTrace(ex);
+                        }
                     }
                 });
                 guiData.getColumn(3).setMaxWidth(40);
@@ -304,12 +316,20 @@ public class JProviderEditPane extends javax.swing.JPanel {
             }
         } else {
             if (providerReport.getItems().contains(oldName)) {
-                //delete previous if it existed
-                server.providers.deleteStyle(providerReport.getId(), oldName);
+                try {
+                    //delete previous if it existed
+                    serverV2.providers.deleteStyle(providerReport.getId(), oldName);
+                } catch (IOException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
             }
         }
 
-        server.providers.createStyle(providerReport.getId(), styleName, style);
+        try {
+            serverV2.providers.createStyle(providerReport.getId(), style);
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
         updateDataModel();
 
     }

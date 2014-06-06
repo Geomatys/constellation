@@ -32,12 +32,6 @@ public final class QueryConstants {
     public static final String REQUEST_UPDATE_LAYER            = "updateLayer";
     public static final String REQUEST_DELETE_LAYER            = "deleteLayer";
     
-    //Style operations
-    public static final String REQUEST_DOWNLOAD_STYLE   = "downloadStyle";
-    public static final String REQUEST_CREATE_STYLE     = "createStyle"; 
-    public static final String REQUEST_UPDATE_STYLE     = "updateStyle"; 
-    public static final String REQUEST_DELETE_STYLE     = "deleteStyle";
-    
     //Service operations
     public static final String REQUEST_UPDATE_CAPABILITIES   = "updateCapabilities";
     public static final String REQUEST_LIST_INSTANCE         = "listInstance";
