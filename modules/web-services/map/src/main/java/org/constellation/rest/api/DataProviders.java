@@ -331,7 +331,7 @@ public class DataProviders {
   
     @GET
     @Path("service/descriptor/{serviceName}")
-    public Response getServiceDescriptor(final String serviceName) throws ConfigurationException {
+    public Response getServiceDescriptor(final @PathParam("serviceName") String serviceName) throws ConfigurationException {
         final ProviderFactory service = services.get(serviceName);
         if (service != null) {
             return ok(service.getProviderDescriptor());
@@ -341,7 +341,7 @@ public class DataProviders {
 
     @GET
     @Path("source/descriptor/{serviceName}")
-    public Response getSourceDescriptor(final String serviceName) throws ConfigurationException {
+    public Response getSourceDescriptor(final @PathParam("serviceName") String serviceName) throws ConfigurationException {
         final ProviderFactory service = services.get(serviceName);
         if (service != null) {
             return ok(service.getStoreDescriptor());

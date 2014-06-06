@@ -23,6 +23,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -47,15 +48,17 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import org.apache.sis.util.logging.Logging;
+import org.constellation.admin.service.ConstellationClient;
 import org.constellation.admin.service.ConstellationServer;
-import org.constellation.configuration.ProcessFactory;
 import org.constellation.configuration.Process;
+import org.constellation.configuration.ProcessFactory;
 import org.geotoolkit.gui.swing.resource.IconBundle;
 import org.jdesktop.swingx.combobox.ListComboBoxModel;
 import org.netbeans.swing.outline.DefaultOutlineModel;
 import org.netbeans.swing.outline.Outline;
 import org.netbeans.swing.outline.RenderDataProvider;
 import org.netbeans.swing.outline.RowModel;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
@@ -73,18 +76,24 @@ public class JEditProcessFactoryPane extends javax.swing.JPanel {
     private List<ProcessModel> processModelList;
 
     private final ConstellationServer server;
+    private final ConstellationClient serverV2;
 
     /**
      * Creates new form JEditProcessFactoryPane
      * @param server
      * @param processFactoryModel
      */
-    public JEditProcessFactoryPane(final ConstellationServer server, final ProcessFactoryModel processFactoryModel) {
+    public JEditProcessFactoryPane(final ConstellationServer server, final ConstellationClient serverV2, final ProcessFactoryModel processFactoryModel) {
         this.processFactoryModel = processFactoryModel;
         this.server = server;
+        this.serverV2 = serverV2;
         initComponents();
 
-        processFactoryComboBox.setModel(new ListComboBoxModel(new ArrayList<>(server.tasks.listProcessFactories().getList())));
+        try {
+            processFactoryComboBox.setModel(new ListComboBoxModel(new ArrayList<>(serverV2.tasks.listProcessFactories())));
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
         guiProcessTable.setDefaultRenderer(ProcessRowModel.SelectProcess.class, new SelectionRenderer());
         guiProcessTable.setDefaultEditor(ProcessRowModel.SelectProcess.class, new SelectionEditor());
 
@@ -119,24 +128,28 @@ public class JEditProcessFactoryPane extends javax.swing.JPanel {
      */
     private void initProcessList() {
         processModelList = new ArrayList<>();
-        if (processFactoryModel != null) {
-            final ProcessFactory factory = processFactoryModel.getFactory();
-            final Collection<String> processes = server.tasks.listProcessForFactory(processFactoryModel.getFactory().getAutorityCode()).getList();
-            if (factory.getLoadAll()) {
-                for (final String process : processes) {
-                    processModelList.add(new ProcessModel(new Process(process), !factory.getExclude().contains(process)));
+        try {
+            if (processFactoryModel != null) {
+                final ProcessFactory factory = processFactoryModel.getFactory();
+                final Collection<String> processes = serverV2.tasks.listProcessForFactory(processFactoryModel.getFactory().getAutorityCode());
+                if (factory.getLoadAll()) {
+                    for (final String process : processes) {
+                        processModelList.add(new ProcessModel(new Process(process), !factory.getExclude().contains(process)));
+                    }
+                } else {
+                    for (final String process : processes) {
+                        processModelList.add(new ProcessModel(new Process(process), factory.getInclude().contains(process)));
+                    }
                 }
             } else {
+                final String authorityCode = (String)processFactoryComboBox.getSelectedItem();
+                final Collection<String> processes = serverV2.tasks.listProcessForFactory(authorityCode);
                 for (final String process : processes) {
-                    processModelList.add(new ProcessModel(new Process(process), factory.getInclude().contains(process)));
+                    processModelList.add(new ProcessModel(new Process(process), true));
                 }
             }
-        } else {
-            final String authorityCode = (String)processFactoryComboBox.getSelectedItem();
-            final Collection<String> processes = server.tasks.listProcessForFactory(authorityCode).getList();
-            for (final String process : processes) {
-                processModelList.add(new ProcessModel(new Process(process), true));
-            }
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
         }
     }
 
@@ -260,9 +273,9 @@ public class JEditProcessFactoryPane extends javax.swing.JPanel {
      * @param processFactory
      * @return 
      */
-    public static ProcessFactoryModel showDialog(final ConstellationServer server, final ProcessFactoryModel processFactory){
+    public static ProcessFactoryModel showDialog(final ConstellationServer server, final ConstellationClient serverV2, final ProcessFactoryModel processFactory){
         
-        final JEditProcessFactoryPane pane = new JEditProcessFactoryPane(server, processFactory);
+        final JEditProcessFactoryPane pane = new JEditProcessFactoryPane(server, serverV2, processFactory);
                 
         int res = JOptionPane.showOptionDialog(null, new Object[]{pane}, 
                 ProcessFactoryRowModel.BUNDLE.getString("createProcessFactoryMsg"),

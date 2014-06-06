@@ -52,7 +52,7 @@ public class JServiceEditPane extends javax.swing.JPanel {
             serviceEditionPanel =  new JServiceCswEditPane(server, serverV2, serviceInstance, configuration);
             guiInternalPane.add(BorderLayout.CENTER, serviceEditionPanel);
         } else if ("WPS".equals(serviceType)){
-            serviceEditionPanel =  new JServiceWpsPane(server, configuration);
+            serviceEditionPanel =  new JServiceWpsPane(server, serverV2, configuration);
             guiInternalPane.add(BorderLayout.CENTER, serviceEditionPanel);
         } else if ("WEBDAV".equals(serviceType)){
             serviceEditionPanel =  new JServiceWebDavPane(configuration);

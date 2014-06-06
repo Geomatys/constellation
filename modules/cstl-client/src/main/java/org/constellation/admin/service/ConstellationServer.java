@@ -32,15 +32,12 @@ import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.service.ConstellationServer.Providers;
 import org.constellation.admin.service.ConstellationServer.Services;
-import org.constellation.admin.service.ConstellationServer.Tasks;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ExceptionReport;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.LayerList;
 import org.constellation.configuration.ObjectFactory;
 import org.constellation.configuration.ServiceReport;
-import org.constellation.configuration.StringList;
-import org.constellation.configuration.StringTreeNode;
 import org.constellation.dto.DataDescription;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
@@ -58,7 +55,6 @@ import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.xml.parameter.ParameterDescriptorReader;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.geotoolkit.xml.parameter.ParameterValueWriter;
-import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
@@ -104,7 +100,7 @@ import static org.constellation.api.QueryConstants.*;
  * @author Benjamin Garcia (Geomatys)
  * @version 0.9
  */
-public class ConstellationServer<S extends Services, P extends Providers, T extends Tasks> extends AbstractClient {
+public class ConstellationServer<S extends Services, P extends Providers> extends AbstractClient {
 
     protected static final Logger LOGGER = Logging.getLogger("org.constellation.admin.service");
     private static final MarshallerPool POOL = GenericDatabaseMarshallerPool.getInstance();
@@ -113,7 +109,6 @@ public class ConstellationServer<S extends Services, P extends Providers, T exte
 
     public final S services;
     public final P providers;
-    public final T tasks;
 
     public final String currentUser;
 
@@ -123,7 +118,6 @@ public class ConstellationServer<S extends Services, P extends Providers, T exte
         super(create(ConstellationServerFactory.PARAMETERS, server, null));
         this.services = createServiceManager();
         this.providers = createProviderManager();
-        this.tasks = createTaskManager();
         this.securityType = "Basic";
         Parameters.getOrCreate(ConstellationServerFactory.USER, parameters).setValue(user);
         Parameters.getOrCreate(ConstellationServerFactory.PASSWORD, parameters).setValue(password);
@@ -135,7 +129,6 @@ public class ConstellationServer<S extends Services, P extends Providers, T exte
         super(params);
         this.services = createServiceManager();
         this.providers = createProviderManager();
-        this.tasks = createTaskManager();
         this.currentUser = Parameters.value(ConstellationServerFactory.USER, parameters);
         this.securityType = Parameters.value(ConstellationServerFactory.SECURITY_TYPE, params);
         if ("Basic".equals(securityType)) {
@@ -157,10 +150,6 @@ public class ConstellationServer<S extends Services, P extends Providers, T exte
 
     protected S createServiceManager() {
         return (S) new Services();
-    }
-
-    protected T createTaskManager() {
-        return (T) new Tasks();
     }
 
     protected P createProviderManager() {
@@ -872,237 +861,6 @@ public class ConstellationServer<S extends Services, P extends Providers, T exte
             }
             return null;
         }
-    }
-
-    /**
-     * Configuration methods for task scheduler.
-     */
-    public final class Tasks {
-
-        /**
-         * Ask for a list of all available process.
-         * @return A list of process identifier.
-         */
-        public StringList listProcess() {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_LIST_PROCESS;
-                final Object response = sendRequest(url, null);
-                if (response instanceof StringList) {
-                    return (StringList) response;
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                    return null;
-                } else {
-                    LOGGER.warning("The service respond uncorrectly");
-                    return null;
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return null;
-        }
-
-        /**
-         * Ask for a list of all available process in the specified factory.
-         *
-         * @param authorityCode
-         * @return A list of process identifier.
-         */
-        public StringList listProcessForFactory(final String authorityCode) {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_LIST_PROCESS_FOR_FACTO + "&authorityCode=" + authorityCode;
-                final Object response = sendRequest(url, null);
-                if (response instanceof StringList) {
-                    return (StringList) response;
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                    return null;
-                } else {
-                    LOGGER.warning("The service respond uncorrectly");
-                    return null;
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return null;
-        }
-
-        /**
-         * Ask for a list of all available process factories.
-         * @return A list of process factories authority code.
-         */
-        public StringList listProcessFactories() {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_LIST_PROCESS_FACTORIES;
-                final Object response = sendRequest(url, null);
-                if (response instanceof StringList) {
-                    return (StringList) response;
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                    return null;
-                } else {
-                    LOGGER.warning("The service respond uncorrectly");
-                    return null;
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return null;
-        }
-
-        /**
-         * Ask for a list of all tasks.
-         * @return A tree representing the registered tasks.
-         */
-        public StringTreeNode listTasks() {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_LIST_TASKS;
-                final Object response = sendRequest(url, null);
-                if (response instanceof StringTreeNode) {
-                    return (StringTreeNode) response;
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                    return null;
-                } else {
-                    LOGGER.warning("The service respond uncorrectly");
-                    return null;
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return null;
-        }
-
-        /**
-         * Get the parameters description for the given process.
-         * @param authority
-         * @param code
-         * @return
-         */
-        public GeneralParameterDescriptor getProcessDescriptor(final String authority, final String code) {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_GET_PROCESS_DESC + "&authority=" + authority + "&code=" + code;
-                Object response = sendDescriptorRequest(url, null);
-                if (response instanceof GeneralParameterDescriptor) {
-                    return (GeneralParameterDescriptor) response;
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                } else {
-                    LOGGER.log(Level.WARNING, "Unexpected response type :{0}", response);
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return null;
-        }
-
-        /**
-         * Get the parameters for the given task
-         *
-         * @param id
-         * @param desc
-         * @return
-         */
-        public GeneralParameterValue getTaskParameters(final String id, ParameterDescriptorGroup desc) {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_GET_TASK_PARAMS + "&id=" + id;
-                Object response = sendRequest(url, null, desc, null, false);
-                if (response instanceof GeneralParameterValue) {
-                    return (GeneralParameterValue) response;
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                } else {
-                    LOGGER.log(Level.WARNING, "Unexpected response type :{0}", response);
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return null;
-        }
-
-        /**
-         * Create a new task.
-         *
-         * @param authority
-         * @param code
-         * @param id
-         * @param title
-         * @param step
-         * @param parameters
-         * @return
-         */
-        public boolean createTask(final String authority, final String code, final String id,
-                                  final String title, final int step, final GeneralParameterValue parameters) {
-            ArgumentChecks.ensureNonNull("authority", authority);
-            ArgumentChecks.ensureNonNull("code", code);
-            ArgumentChecks.ensureNonNull("id", id);
-            ArgumentChecks.ensureNonNull("title", title);
-            ArgumentChecks.ensureNonNull("step", step);
-            ArgumentChecks.ensureNonNull("parameters", parameters);
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_CREATE_TASK
-                        + "&authority=" + authority
-                        + "&code=" + code
-                        + "&id=" + id
-                        + "&title=" + URLEncoder.encode(title, "UTF-8")
-                        + "&step=" + step;
-                return sendRequestAck(url, parameters);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-
-        /**
-         * Update a task.
-         *
-         * @param authority
-         * @param code
-         * @param id
-         * @param title
-         * @param step
-         * @param parameters
-         * @return
-         */
-        public boolean updateTask(final String authority, final String code, final String id,
-                                  final String title, final int step, final GeneralParameterValue parameters) {
-            ArgumentChecks.ensureNonNull("authority", authority);
-            ArgumentChecks.ensureNonNull("code", code);
-            ArgumentChecks.ensureNonNull("id", id);
-            ArgumentChecks.ensureNonNull("title", title);
-            ArgumentChecks.ensureNonNull("step", step);
-            ArgumentChecks.ensureNonNull("parameters", parameters);
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_UPDATE_TASK
-                        + "&authority=" + authority
-                        + "&code=" + code
-                        + "&id=" + id
-                        + "&title=" + title
-                        + "&step=" + step;
-                return sendRequestAck(url, parameters);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-
-        /**
-         * Delete an existing task.
-         * @param id
-         */
-        public boolean deleteTask(final String id) {
-            ArgumentChecks.ensureNonNull("id", id);
-            try {
-                final String url = getURLWithEndSlash().toString() + "configuration?request=" + REQUEST_DELETE_TASK + "&id=" + id;
-                return sendRequestAck(url, null);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
     }
 
     // convinient methods //////////////////////////////////////////////////////
