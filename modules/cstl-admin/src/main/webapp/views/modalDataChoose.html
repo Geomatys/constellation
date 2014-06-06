@@ -64,7 +64,7 @@
                             <div ng-if="service.type.toLowerCase() !== 'sos'">
                                 <div class="item {{data.Type.toLowerCase()}}" ng-repeat="data in dataList" ng-class="{selected:data==selected}" ng-click="select(data)">
                                     <div class="top">
-                                        <span class="item-title">{{data.Name}}</span>
+                                        <span class="item-title title-modal">{{data.Name}}</span>
                                         <span class="pull-right text-right item-list-style"  style="font-size:14px;">{{data.Type}}</span>
                                         <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Point' || data.Subtype=='MultiPoint') && data!=selected" src="images/vector-multipoint.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
                                         <img ng-if="data.Type=='VECTOR' && (data.Subtype=='Polygon' || data.Subtype=='MultiPolygon') && data!=selected" src="images/vector-poly.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >

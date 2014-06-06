@@ -626,6 +626,9 @@ p.error-select-one{
 .item-title.title-bloc-service{
     width: 320px;
 }
+.item-title.title-modal{
+    width: 350px;
+}
 /*
  * Dashboard selected item
  */
