@@ -56,7 +56,7 @@ import org.geotoolkit.style.MutableStyle;
 @Path("/1/SP")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-public final class StyleProviders {
+public final class StyleRest {
     
     @Inject
     private StyleBusiness styleBusiness;

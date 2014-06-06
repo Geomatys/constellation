@@ -49,8 +49,8 @@ import static org.constellation.utils.RESTfulUtilities.ok;
 @Path("/1/MAP/{spec}")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-public final class MapServices {
-    private static final Logger LOGGER = Logging.getLogger(MapServices.class);
+public final class MapRest {
+    private static final Logger LOGGER = Logging.getLogger(MapRest.class);
 
     /**
      * @see MapConfigurer#getLayers(String)
