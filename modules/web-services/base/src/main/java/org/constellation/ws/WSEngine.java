@@ -38,10 +38,10 @@ public final class WSEngine {
     /**
      * Default value, changes nothing, just using reflection to instantiate the worker.
      */
-    private static DIEnhancer workerFactory = new DIEnhancer() {
-
+    private static WorkerFactory workerFactory = new WorkerFactory() {
+        
         @Override
-        public Worker enhance(Class<? extends Worker> workerClass, String identifier) {
+        public Worker build(Class<? extends Worker> workerClass, String identifier) {
             return (Worker) ReflectionUtilities.newInstance(workerClass, identifier);
         }
         
@@ -75,7 +75,7 @@ public final class WSEngine {
     private static final List<String> TO_RESTART = new ArrayList<>();
 
     
-    public static void setWorkerFactory(DIEnhancer workerFactory) {
+    public static void setWorkerFactory(WorkerFactory workerFactory) {
         WSEngine.workerFactory = workerFactory;
     }
     
@@ -246,7 +246,7 @@ public final class WSEngine {
      */
     public static Worker buildWorker(final String serviceType, final String identifier) {
         final Class<? extends Worker> workerClass = getServiceWorkerClass(serviceType);
-        return workerFactory.enhance(workerClass, identifier);
+        return workerFactory.build(workerClass, identifier);
     }
 
     /**

@@ -23,7 +23,7 @@ package org.constellation.ws;
  * @author Olivier NOUGUIER
  *
  */
-public interface DIEnhancer {
+public interface WorkerFactory {
 
 	/**
 	 * Instantiate a new worker
@@ -31,6 +31,6 @@ public interface DIEnhancer {
 	 * @param id of the worker
 	 * @return newly instantiated worker
 	 */
-    Worker enhance(Class<? extends Worker> worker, String id);
+    Worker build(Class<? extends Worker> worker, String id);
     
 }

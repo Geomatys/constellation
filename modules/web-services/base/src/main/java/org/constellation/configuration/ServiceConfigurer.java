@@ -20,10 +20,13 @@
 package org.constellation.configuration;
 
 import java.util.logging.Logger;
+
 import org.apache.sis.util.logging.Logging;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.util.ReflectionUtilities;
 import org.constellation.ws.WSEngine;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.context.ApplicationContext;
 
 /**
  * @author Bernard Fabien (Geomatys).
@@ -33,6 +36,8 @@ import org.constellation.ws.WSEngine;
 public abstract class ServiceConfigurer {
 
     protected static final Logger LOGGER = Logging.getLogger(ServiceConfigurer.class);
+
+    private static AutowireCapableBeanFactory autowirer;
 
     /**
      * Gets the {@link ServiceConfigurer} implementation from the service {@link Specification}.
@@ -47,7 +52,9 @@ public abstract class ServiceConfigurer {
             throw new NotRunningServiceException(specification);
         }
         final Class c = WSEngine.getServiceConfigurerClass(specification.name());
-        return (ServiceConfigurer) ReflectionUtilities.newInstance(c);
+        ServiceConfigurer instance =  (ServiceConfigurer) ReflectionUtilities.newInstance(c);
+        autowirer.autowireBean(instance);
+        return instance;
     }
 
 
@@ -71,5 +78,10 @@ public abstract class ServiceConfigurer {
     protected ServiceConfigurer(final Specification specification, final Class configClass, final String configFileName) {
         this.specification  = specification;
         this.configClass    = configClass;
+    }
+
+    public static void setApplicationContext(ApplicationContext applicationContext) {
+        ServiceConfigurer.autowirer = applicationContext.getAutowireCapableBeanFactory();
+        
     }
 }

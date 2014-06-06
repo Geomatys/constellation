@@ -23,23 +23,23 @@ import java.lang.invoke.MethodHandles;
 import javax.inject.Inject;
 
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ServiceConfigurer;
 import org.constellation.engine.register.ConfigurationService;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.security.SecurityManagerHolder;
 import org.constellation.util.ReflectionUtilities;
-import org.constellation.ws.DIEnhancer;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
+import org.constellation.ws.WorkerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 /**
  * This class wires spring managed beans with legacy code.
- * {@link ConfigurationServiceInit#init()} method will inject a {@link DIEnhancer} to {@link WSEngine}
+ * {@link ConfigurationServiceInit#init()} method will inject a {@link WorkerFactory} to {@link WSEngine}
  * to allow Spring instantiation of OGC Workers.
  * 
  * @author Olivier NOUGUIER
@@ -66,10 +66,10 @@ public class ConfigurationServiceInit implements ApplicationContextAware {
         ConfigurationEngine.setSecurityManager(SecurityManagerHolder.getInstance());
         ConfigurationEngine.setConfigurationService(configurationService);
         
-        WSEngine.setWorkerFactory(new DIEnhancer() {
+        WSEngine.setWorkerFactory(new WorkerFactory() {
 
             @Override
-            public Worker enhance(Class<? extends Worker> workerClass, String identifier) {
+            public Worker build(Class<? extends Worker> workerClass, String identifier) {
                 String[] beanNames = applicationContext.getBeanNamesForType(workerClass);
                 if(beanNames==null || beanNames.length == 0) {
                     LOGGER.info(workerClass.getName() + " is not managed by spring" );
@@ -85,6 +85,10 @@ public class ConfigurationServiceInit implements ApplicationContextAware {
 
             
         });
+        
+        
+        ServiceConfigurer.setApplicationContext(applicationContext);
+        
 
     }
 
