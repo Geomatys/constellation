@@ -20,9 +20,11 @@
 package org.constellation.swing;
 
 import java.awt.BorderLayout;
+import java.io.IOException;
+import org.constellation.ServiceDef;
 import org.constellation.admin.service.ConstellationClient;
-import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.Instance;
+import org.openide.util.Exceptions;
 
 /**
  * Edit a service.
@@ -31,34 +33,32 @@ import org.constellation.configuration.Instance;
  */
 public class JServiceEditPane extends javax.swing.JPanel {
 
-    private final ConstellationServer server;
     private final ConstellationClient serverV2;
     private final String serviceType;
     private final Instance serviceInstance;
     private final JServiceEditionPane serviceEditionPanel;
 
-    public JServiceEditPane(final ConstellationServer server, final ConstellationClient serverV2, final String serviceType, final Instance serviceInstance) {
-        this.server = server;
+    public JServiceEditPane(final ConstellationClient serverV2, final String serviceType, final Instance serviceInstance) throws IOException {
         this.serverV2 = serverV2;
         this.serviceType = serviceType;
         this.serviceInstance = serviceInstance;
-        Object configuration = server.services.getInstanceconfiguration(serviceType, serviceInstance.getIdentifier());
+        Object configuration = serverV2.services.getInstanceConfiguration(ServiceDef.Specification.valueOf(serviceType), serviceInstance.getIdentifier());
         initComponents();
         guiName.setText(serviceInstance.getIdentifier());
         if ("WMS".equals(serviceType) || "WMTS".equals(serviceType) || "WCS".equals(serviceType) || "WFS".equals(serviceType)) {
-            serviceEditionPanel =  new JServiceMapEditPane(server, serverV2, serviceType, configuration);
+            serviceEditionPanel =  new JServiceMapEditPane(serverV2, serviceType, configuration);
             guiInternalPane.add(BorderLayout.CENTER, serviceEditionPanel);
         } else if ("CSW".equals(serviceType)){
-            serviceEditionPanel =  new JServiceCswEditPane(server, serverV2, serviceInstance, configuration);
+            serviceEditionPanel =  new JServiceCswEditPane(serverV2, serviceInstance, configuration);
             guiInternalPane.add(BorderLayout.CENTER, serviceEditionPanel);
         } else if ("WPS".equals(serviceType)){
-            serviceEditionPanel =  new JServiceWpsPane(server, serverV2, configuration);
+            serviceEditionPanel =  new JServiceWpsPane(serverV2, configuration);
             guiInternalPane.add(BorderLayout.CENTER, serviceEditionPanel);
         } else if ("WEBDAV".equals(serviceType)){
             serviceEditionPanel =  new JServiceWebDavPane(configuration);
             guiInternalPane.add(BorderLayout.CENTER, serviceEditionPanel);
         } else if ("SOS".equals(serviceType)){
-            serviceEditionPanel =  new JServiceSosEditPane(server, serviceInstance, configuration);
+            serviceEditionPanel =  new JServiceSosEditPane(serverV2, serviceInstance, configuration);
             guiInternalPane.add(BorderLayout.CENTER, serviceEditionPanel);
         } else {
             serviceEditionPanel = null;
@@ -164,19 +164,27 @@ public class JServiceEditPane extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void guiSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiSaveActionPerformed
-        correctName();
-        server.services.renameInstance(serviceType, serviceInstance.getIdentifier(), guiName.getText());
-        serviceInstance.setName(guiName.getText());
-        if (serviceEditionPanel != null) {
-            server.services.configureInstance(serviceType, serviceInstance.getIdentifier(), serviceEditionPanel.getConfiguration());
+        try {
+            correctName();
+            serverV2.services.rename(ServiceDef.Specification.valueOf(serviceType), serviceInstance.getIdentifier(), guiName.getText());
+            serviceInstance.setName(guiName.getText());
+            if (serviceEditionPanel != null) {
+                serverV2.services.setInstanceConfiguration(ServiceDef.Specification.fromShortName(serviceType), serviceInstance.getIdentifier(), serviceEditionPanel.getConfiguration());
+            }
+            serverV2.services.start(ServiceDef.Specification.valueOf(serviceType), serviceInstance.getIdentifier());
+            firePropertyChange("update", 0, 1);
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
         }
-        server.services.startInstance(serviceType, serviceInstance.getIdentifier());
-        firePropertyChange("update", 0, 1);
     }//GEN-LAST:event_guiSaveActionPerformed
 
     private void guiDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiDeleteActionPerformed
-        server.services.deleteInstance(serviceType, serviceInstance.getIdentifier());
-        firePropertyChange("update", 0, 1);
+        try {
+            serverV2.services.delete(ServiceDef.Specification.valueOf(serviceType), serviceInstance.getIdentifier());
+            firePropertyChange("update", 0, 1);
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
     }//GEN-LAST:event_guiDeleteActionPerformed
 
     private void guiNameKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_guiNameKeyTyped

@@ -38,7 +38,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import javax.xml.stream.XMLStreamException;
 import org.constellation.admin.service.ConstellationClient;
-import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.ProviderReport;
 import org.geotoolkit.gui.swing.style.JColorMapPane;
@@ -77,7 +76,6 @@ public class JProviderEditPane extends javax.swing.JPanel {
 
     private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("org/constellation/swing/Bundle");
 
-    private final ConstellationServer server;
     private final ConstellationClient serverV2;
     private final String providerType;
     private ProviderReport providerReport;
@@ -90,8 +88,7 @@ public class JProviderEditPane extends javax.swing.JPanel {
     private ParameterValueGroup subdataParam;
     private final JFeatureOutLine guiParameterEditor = new JFeatureOutLine();
 
-    public JProviderEditPane(final ConstellationServer server, final ConstellationClient serverV2, final String serviceType, final ProviderReport providerReport) throws IOException, XMLStreamException, ClassNotFoundException {
-        this.server         = server;
+    public JProviderEditPane(final ConstellationClient serverV2, final String serviceType, final ProviderReport providerReport) throws IOException, XMLStreamException, ClassNotFoundException {
         this.serverV2       = serverV2;
         this.providerType   = serviceType;
         this.providerReport = providerReport;

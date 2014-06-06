@@ -49,7 +49,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.service.ConstellationClient;
-import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.Process;
 import org.constellation.configuration.ProcessFactory;
 import org.geotoolkit.gui.swing.resource.IconBundle;
@@ -75,7 +74,6 @@ public class JEditProcessFactoryPane extends javax.swing.JPanel {
 
     private List<ProcessModel> processModelList;
 
-    private final ConstellationServer server;
     private final ConstellationClient serverV2;
 
     /**
@@ -83,9 +81,8 @@ public class JEditProcessFactoryPane extends javax.swing.JPanel {
      * @param server
      * @param processFactoryModel
      */
-    public JEditProcessFactoryPane(final ConstellationServer server, final ConstellationClient serverV2, final ProcessFactoryModel processFactoryModel) {
+    public JEditProcessFactoryPane(final ConstellationClient serverV2, final ProcessFactoryModel processFactoryModel) {
         this.processFactoryModel = processFactoryModel;
-        this.server = server;
         this.serverV2 = serverV2;
         initComponents();
 
@@ -273,9 +270,9 @@ public class JEditProcessFactoryPane extends javax.swing.JPanel {
      * @param processFactory
      * @return 
      */
-    public static ProcessFactoryModel showDialog(final ConstellationServer server, final ConstellationClient serverV2, final ProcessFactoryModel processFactory){
+    public static ProcessFactoryModel showDialog(final ConstellationClient serverV2, final ProcessFactoryModel processFactory){
         
-        final JEditProcessFactoryPane pane = new JEditProcessFactoryPane(server, serverV2, processFactory);
+        final JEditProcessFactoryPane pane = new JEditProcessFactoryPane(serverV2, processFactory);
                 
         int res = JOptionPane.showOptionDialog(null, new Object[]{pane}, 
                 ProcessFactoryRowModel.BUNDLE.getString("createProcessFactoryMsg"),

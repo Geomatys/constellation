@@ -31,7 +31,6 @@ import javax.swing.JOptionPane;
 import javax.swing.LayoutStyle;
 import javax.swing.SwingConstants;
 import org.constellation.admin.service.ConstellationClient;
-import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.ProviderReport;
 import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.ProvidersReport;
@@ -53,7 +52,7 @@ public class JEditSourcePane extends javax.swing.JPanel {
      * @param serviceType
      * @param sourceModel
      */
-    public JEditSourcePane(final ConstellationServer server, final ConstellationClient serverV2, final String serviceType, final SourceModel sourceModel) {
+    public JEditSourcePane(final ConstellationClient serverV2, final String serviceType, final SourceModel sourceModel) {
         this.sourceModel = sourceModel;
         initComponents();
 
@@ -179,9 +178,9 @@ public class JEditSourcePane extends javax.swing.JPanel {
     }
 
 
-    public static SourceModel showDialog(final ConstellationServer server, final ConstellationClient serverV2, final String serviceType, final SourceModel source) {
+    public static SourceModel showDialog(final ConstellationClient serverV2, final String serviceType, final SourceModel source) {
 
-        final JEditSourcePane pane = new JEditSourcePane(server, serverV2, serviceType, source);
+        final JEditSourcePane pane = new JEditSourcePane(serverV2, serviceType, source);
 
         int res = JOptionPane.showOptionDialog(null, new Object[]{pane},
                 LayerRowModel.BUNDLE.getString("createSourceMsg"),

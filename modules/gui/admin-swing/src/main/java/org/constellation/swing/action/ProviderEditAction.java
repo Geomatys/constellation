@@ -94,7 +94,7 @@ public class ProviderEditAction extends Action {
                 public void run() {
 
                     try {
-                        final JProviderEditPane edit = new JProviderEditPane(server, serverV2, type, inst);
+                        final JProviderEditPane edit = new JProviderEditPane(serverV2, type, inst);
                         edit.setName(BUNDLE.getString("data") +" - "+ BUNDLE.getString("edit") +" - "+ inst.getId());
                         final PropertyChangeListener cl = new PropertyChangeListener() {
                             @Override

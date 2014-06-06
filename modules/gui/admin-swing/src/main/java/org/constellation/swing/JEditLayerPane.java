@@ -34,7 +34,6 @@ import javax.swing.ListCellRenderer;
 import javax.xml.namespace.QName;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.service.ConstellationClient;
-import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.ProviderReport;
@@ -68,7 +67,7 @@ public class JEditLayerPane extends javax.swing.JPanel {
      * @param serviceType
      * @param layerModel
      */
-    public JEditLayerPane(final ConstellationServer server, final ConstellationClient serverV2, final String serviceType, final LayerModel layerModel) {
+    public JEditLayerPane(final ConstellationClient serverV2, final String serviceType, final LayerModel layerModel) {
         this.layerModel = layerModel;
         initComponents();
         
@@ -343,9 +342,9 @@ public class JEditLayerPane extends javax.swing.JPanel {
      * @param layer
      * @return 
      */
-    public static LayerModel showDialog(final ConstellationServer server, final ConstellationClient serverV2, final String serviceType, final LayerModel layer){
+    public static LayerModel showDialog(final ConstellationClient serverV2, final String serviceType, final LayerModel layer){
         
-        final JEditLayerPane pane = new JEditLayerPane(server, serverV2, serviceType, layer);
+        final JEditLayerPane pane = new JEditLayerPane(serverV2, serviceType, layer);
                 
         int res = JOptionPane.showOptionDialog(null, new Object[]{pane}, 
                 LayerRowModel.BUNDLE.getString("createLayerMsg"), 

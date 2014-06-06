@@ -30,7 +30,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.xml.namespace.QName;
 import org.constellation.admin.service.ConstellationClient;
-import org.constellation.admin.service.ConstellationServer;
+import org.constellation.configuration.AbstractConfigurationObject;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.Layer;
@@ -52,7 +52,6 @@ import org.openide.util.Exceptions;
  */
 public class JServiceMapEditPane extends JServiceEditionPane {
 
-    private final ConstellationServer server;
     private final ConstellationClient serverV2;
     private final String serviceType;
     private final LayerContext configuration;
@@ -66,8 +65,7 @@ public class JServiceMapEditPane extends JServiceEditionPane {
      * @param serviceType
      * @param configuration
      */
-    public JServiceMapEditPane(final ConstellationServer server, final ConstellationClient serverV2, final String serviceType, final Object configuration) {
-        this.server = server;
+    public JServiceMapEditPane(final ConstellationClient serverV2, final String serviceType, final Object configuration) {
         this.serverV2 = serverV2;
         this.serviceType = serviceType;
         this.configuration = (configuration instanceof LayerContext) ? (LayerContext) configuration : null;
@@ -84,7 +82,7 @@ public class JServiceMapEditPane extends JServiceEditionPane {
                 
                 if (value instanceof LayerModel) {
                     final LayerModel oldLayerModel = (LayerModel) value;
-                    final  LayerModel updateLayerModel = JEditLayerPane.showDialog(server, serverV2, serviceType, oldLayerModel);
+                    final  LayerModel updateLayerModel = JEditLayerPane.showDialog(serverV2, serviceType, oldLayerModel);
                     if (updateLayerModel != null) {
                         final int pos = layerModelList.indexOf(oldLayerModel);
                         layerModelList.remove(pos);
@@ -124,7 +122,7 @@ public class JServiceMapEditPane extends JServiceEditionPane {
 
                 if (value instanceof SourceModel) {
                     final SourceModel oldSourceModel = (SourceModel) value;
-                    final SourceModel updateSourceModel = JEditSourcePane.showDialog(server, serverV2, serviceType, oldSourceModel);
+                    final SourceModel updateSourceModel = JEditSourcePane.showDialog(serverV2, serviceType, oldSourceModel);
                     if (updateSourceModel != null) {
                         final int pos = sourceModelList.indexOf(oldSourceModel);
                         sourceModelList.remove(pos);
@@ -346,7 +344,7 @@ public class JServiceMapEditPane extends JServiceEditionPane {
      * {@inheritDoc }
      */
     @Override
-    public Object getConfiguration() {
+    public AbstractConfigurationObject getConfiguration() {
         updateConfiguration();
         return configuration;
     }
@@ -432,7 +430,7 @@ public class JServiceMapEditPane extends JServiceEditionPane {
     }// </editor-fold>//GEN-END:initComponents
 
     private void guiAddLayerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiAddLayerActionPerformed
-        final  LayerModel layerModel = JEditLayerPane.showDialog(server, serverV2, serviceType, null);
+        final  LayerModel layerModel = JEditLayerPane.showDialog(serverV2, serviceType, null);
         if (layerModel != null) {
             layerModelList.add(layerModel);
             updateLayerTableModel();
@@ -440,7 +438,7 @@ public class JServiceMapEditPane extends JServiceEditionPane {
     }//GEN-LAST:event_guiAddLayerActionPerformed
 
     private void guiAddSourceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiAddSourceActionPerformed
-        final  SourceModel sourceModel = JEditSourcePane.showDialog(server, serverV2, serviceType, null);
+        final  SourceModel sourceModel = JEditSourcePane.showDialog(serverV2, serviceType, null);
         if (sourceModel != null) {
             sourceModelList.add(sourceModel);
             updateSourceTableModel();

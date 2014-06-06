@@ -28,7 +28,6 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.xml.stream.XMLStreamException;
 import org.constellation.admin.service.ConstellationClient;
-import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.ProvidersReport;
@@ -47,15 +46,13 @@ import org.openide.util.Exceptions;
  */
 public class JProviderCreationPane extends javax.swing.JPanel {
 
-    private final ConstellationServer server;
     private final ConstellationClient serverV2;
     private final JFeatureOutLine guiParameterEditor = new JFeatureOutLine();
 
     /**
      * Creates new form JProviderCreationPane
      */
-    public JProviderCreationPane(final ConstellationServer server, final ConstellationClient serverV2) {
-        this.server = server;
+    public JProviderCreationPane(final ConstellationClient serverV2) {
         this.serverV2 = serverV2;
         initComponents();
 
@@ -289,9 +286,9 @@ public class JProviderCreationPane extends javax.swing.JPanel {
      * @param server
      * @return
      */
-    public static void showDialog(final ConstellationServer server, final ConstellationClient serverV2){
+    public static void showDialog(final ConstellationClient serverV2){
 
-        final JProviderCreationPane pane = new JProviderCreationPane(server,serverV2);
+        final JProviderCreationPane pane = new JProviderCreationPane(serverV2);
 
         final int res = JOptionPane.showOptionDialog(null, new Object[]{pane},
                 LayerRowModel.BUNDLE.getString("createProviderMsg"),

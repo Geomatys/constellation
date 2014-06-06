@@ -19,20 +19,13 @@
 
 package org.constellation.rest.api;
 
-import org.apache.sis.util.logging.Logging;
-import org.constellation.ServiceDef.Specification;
-import org.constellation.configuration.*;
-import org.constellation.dto.Service;
-import org.constellation.dto.SimpleValue;
-import org.constellation.engine.register.repository.DomainRepository;
-import org.constellation.engine.register.repository.ServiceRepository;
-import org.constellation.generic.database.Automatic;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.ogc.configuration.OGCConfigurer;
-import org.geotoolkit.util.FileUtilities;
-import org.glassfish.jersey.jettison.JettisonConfig;
-import org.glassfish.jersey.jettison.JettisonJaxbContext;
-import org.glassfish.jersey.jettison.JettisonUnmarshaller;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
@@ -48,17 +41,23 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import org.apache.sis.util.logging.Logging;
+import org.constellation.ServiceDef.Specification;
+import org.constellation.configuration.*;
+import org.constellation.dto.Service;
+import org.constellation.dto.SimpleValue;
+import org.constellation.engine.register.repository.DomainRepository;
+import org.constellation.engine.register.repository.ServiceRepository;
+import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.ogc.configuration.OGCConfigurer;
 import static org.constellation.utils.RESTfulUtilities.created;
 import static org.constellation.utils.RESTfulUtilities.ok;
+import org.constellation.ws.WSEngine;
+import org.geotoolkit.util.FileUtilities;
+import org.glassfish.jersey.jettison.JettisonConfig;
+import org.glassfish.jersey.jettison.JettisonJaxbContext;
+import org.glassfish.jersey.jettison.JettisonUnmarshaller;
 
 /**
  * RESTful API for generic OGC services configuration.
@@ -108,6 +107,14 @@ public final class OGCServices {
         }
     }
 
+    // TODO move elsewhere / rename
+    @GET
+    @Path("list")
+    public Response listService() {
+        final ServiceReport response = new ServiceReport(WSEngine.getRegisteredServices());
+        return Response.ok(response).build();
+    }
+    
     /**
      * @see OGCConfigurer#createInstance(String, Service, Object)
      */

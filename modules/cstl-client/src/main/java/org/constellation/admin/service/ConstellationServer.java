@@ -97,6 +97,7 @@ import static org.constellation.api.QueryConstants.*;
  * @author Benjamin Garcia (Geomatys)
  * @version 0.9
  */
+@Deprecated
 public class ConstellationServer<S extends Services, P extends Providers> extends AbstractClient {
 
     protected static final Logger LOGGER = Logging.getLogger("org.constellation.admin.service");

@@ -18,12 +18,14 @@
  */
 package org.constellation.swing;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JOptionPane;
-import org.constellation.admin.service.ConstellationServer;
+import org.constellation.admin.service.ConstellationClient;
 import org.jdesktop.swingx.combobox.ListComboBoxModel;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -31,13 +33,12 @@ import org.jdesktop.swingx.combobox.ListComboBoxModel;
  */
 public class JServiceCreationPane extends javax.swing.JPanel {
 
-    private final ConstellationServer server;
+    private final ConstellationClient server;
     private final Map<String,List<String>> services;
     
-    public JServiceCreationPane(final ConstellationServer server) {
+    public JServiceCreationPane(final ConstellationClient server) throws IOException {
         initComponents();
         this.server = server;
-        
         services = server.services.getAvailableService();        
         guiType.setModel(new ListComboBoxModel(new ArrayList(services.keySet())));
     }
@@ -140,17 +141,21 @@ public class JServiceCreationPane extends javax.swing.JPanel {
      * @param server
      * @return 
      */
-    public static String[] showDialog(final ConstellationServer server){
-        
-        final JServiceCreationPane pane = new JServiceCreationPane(server);
-                
-        final int res = JOptionPane.showOptionDialog(null, new Object[]{pane}, 
-                LayerRowModel.BUNDLE.getString("createServiceMsg"), 
-                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, null, 
-                null);
-                
-        pane.correctName();
-        return new String[]{pane.getServiceType(),pane.getInstanceName()};
+    public static String[] showDialog(final ConstellationClient server){
+        try {
+            final JServiceCreationPane pane = new JServiceCreationPane(server);
+            
+            final int res = JOptionPane.showOptionDialog(null, new Object[]{pane},
+                    LayerRowModel.BUNDLE.getString("createServiceMsg"),
+                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, null,
+                    null);
+            
+            pane.correctName();
+            return new String[]{pane.getServiceType(),pane.getInstanceName()};
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        return null;
     }
 
 }

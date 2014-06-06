@@ -19,14 +19,11 @@
 package org.constellation.swing;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 import org.constellation.admin.service.ConstellationClient;
 
-import org.constellation.admin.service.ConstellationServer;
-import org.constellation.admin.service.ConstellationServerFactory;
 import org.constellation.security.RoleController;
 import org.constellation.swing.action.ProviderDeleteAction;
 import org.constellation.swing.action.ProviderEditAction;
@@ -37,8 +34,6 @@ import org.constellation.swing.action.ServiceEditAction;
 import org.constellation.swing.action.ServiceReloadAction;
 import org.constellation.swing.action.ServiceStartStopAction;
 import org.constellation.swing.action.ServiceViewAction;
-import org.geotoolkit.parameter.Parameters;
-import org.opengis.parameter.ParameterValueGroup;
 
 /**
  *
@@ -46,10 +41,9 @@ import org.opengis.parameter.ParameterValueGroup;
  */
 public final class JConstellationFrame extends JFrame{
     
-    public JConstellationFrame(final ConstellationServer server, final ConstellationClient serverV2){
+    public JConstellationFrame(final ConstellationClient serverV2){
         final JTabbedPane pane = new JTabbedPane();
         pane.add("Services", new JServicesPane(
-                server,
                 serverV2,
                 (FrameDisplayer)null,
                 (RoleController)null,
@@ -59,7 +53,6 @@ public final class JConstellationFrame extends JFrame{
                 new ServiceStartStopAction(),
                 new ServiceDeleteAction()));
         pane.add("Providers", new JProvidersPane(
-                server,
                 serverV2,
                 (FrameDisplayer)null,
                 (RoleController)null,
@@ -68,7 +61,6 @@ public final class JConstellationFrame extends JFrame{
                 new ProviderReloadAction(),
                 new ProviderDeleteAction()));
         pane.add("Utils", new JUtilsPane(
-                server,
                 serverV2,
                 (FrameDisplayer)null));
         setContentPane(pane);
@@ -91,14 +83,6 @@ public final class JConstellationFrame extends JFrame{
             authType = dialog.getAuthType();
         }
                 
-        final ParameterValueGroup param = ConstellationServerFactory.PARAMETERS.createValue();
-        Parameters.getOrCreate(ConstellationServerFactory.URL, param).setValue(new URL(url));
-        Parameters.getOrCreate(ConstellationServerFactory.USER, param).setValue(login);
-        Parameters.getOrCreate(ConstellationServerFactory.PASSWORD, param).setValue(password);
-        Parameters.getOrCreate(ConstellationServerFactory.SECURITY_TYPE, param).setValue(authType);
-
-        // old API
-        final ConstellationServer server   = new ConstellationServer(param);
         // new API
         if (url.endsWith("/")) {
             url = url.substring(0, url.length() - 3);
@@ -107,7 +91,7 @@ public final class JConstellationFrame extends JFrame{
         }
         final ConstellationClient serverV2 = new ConstellationClient(url).auth(login, password);
         
-        final JConstellationFrame frame = new JConstellationFrame(server, serverV2);
+        final JConstellationFrame frame = new JConstellationFrame(serverV2);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 600);
         frame.setLocationRelativeTo(null);

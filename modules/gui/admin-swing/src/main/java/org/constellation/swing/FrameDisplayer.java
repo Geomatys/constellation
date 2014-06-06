@@ -20,7 +20,6 @@ package org.constellation.swing;
 
 import javax.swing.JComponent;
 import org.constellation.admin.service.ConstellationClient;
-import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.ProviderReport;
 
@@ -32,8 +31,8 @@ public interface FrameDisplayer {
     
     void display(JComponent edit);
         
-    void display(ConstellationServer server, ConstellationClient serverV2, String serviceType, Instance service);
+    void display(ConstellationClient serverV2, String serviceType, Instance service);
     
-    void display(ConstellationServer server, ConstellationClient serverV2, String providerType, ProviderReport provider);
+    void display(ConstellationClient serverV2, String providerType, ProviderReport provider);
     
 }

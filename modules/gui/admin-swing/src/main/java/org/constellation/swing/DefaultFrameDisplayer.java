@@ -33,7 +33,6 @@ import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.iso.SimpleInternationalString;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.service.ConstellationClient;
-import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.ObjectFactory;
 import org.constellation.configuration.ProviderReport;
@@ -98,14 +97,14 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
     }
 
     @Override
-    public void display(final ConstellationServer cstl, final ConstellationClient serverV2, final String serviceType, final Instance service) {
+    public void display(final ConstellationClient serverV2, final String serviceType, final Instance service) {
         try {
-            final String url = cstl.services.getInstanceURL(serviceType, service.getIdentifier());
+            final String url = serverV2.services.getInstanceURL(serviceType, service.getIdentifier());
             final ClientFactory factory = ClientFinder.getFactoryById(serviceType);
             if (factory != null) {
                 final ParameterValueGroup params = factory.getParametersDescriptor().createValue();
                 params.parameter("url").setValue(new URL(url));
-                params.parameter("security").setValue(cstl.getClientSecurity());
+                // TODO params.parameter("security").setValue(cstl.getClientSecurity());
                 try {
                     params.parameter("post").setValue(true);
                 } catch(ParameterNotFoundException ex) {
@@ -125,7 +124,7 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
     }
 
     @Override
-    public void display(final ConstellationServer server, final ConstellationClient serverV2, final String providerType, final ProviderReport pr) {
+    public void display(final ConstellationClient serverV2, final String providerType, final ProviderReport pr) {
         try {
             final GeneralParameterDescriptor desc = serverV2.providers.getServiceDescriptor(providerType);
             if(!(desc instanceof ParameterDescriptorGroup)) {

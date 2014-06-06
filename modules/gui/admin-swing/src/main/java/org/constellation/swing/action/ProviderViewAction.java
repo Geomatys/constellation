@@ -79,7 +79,7 @@ public class ProviderViewAction extends Action {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    getDisplayer().display(server, serverV2, type, inst);
+                    getDisplayer().display(serverV2, type, inst);
                 }
             });
 

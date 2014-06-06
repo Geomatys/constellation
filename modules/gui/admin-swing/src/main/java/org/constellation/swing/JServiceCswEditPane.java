@@ -37,7 +37,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.LayoutStyle;
 import org.constellation.admin.service.ConstellationClient;
-import org.constellation.admin.service.ConstellationServer;
+import org.constellation.configuration.AbstractConfigurationObject;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.Instance;
 import org.constellation.generic.database.Automatic;
@@ -50,7 +50,6 @@ import org.openide.util.Exceptions;
  */
 public class JServiceCswEditPane extends JServiceEditionPane {
 
-    private ConstellationServer server;
     private ConstellationClient serverV2;
     private Instance serviceInstance;
     private Automatic configuration;
@@ -66,13 +65,11 @@ public class JServiceCswEditPane extends JServiceEditionPane {
     /**
      * Creates new form JServiceMapEditPane
      *
-     * @param server
      * @param serverV2
      * @param serviceInstance
      * @param configuration
      */
-    public JServiceCswEditPane(final ConstellationServer server, final ConstellationClient serverV2, final Instance serviceInstance, final Object configuration) {
-        this.server = server;
+    public JServiceCswEditPane(final ConstellationClient serverV2, final Instance serviceInstance, final Object configuration) {
         this.serverV2 = serverV2;
         this.serviceInstance = serviceInstance;
         this.configuration = (configuration instanceof Automatic) ? (Automatic) configuration : null;
@@ -268,7 +265,7 @@ public class JServiceCswEditPane extends JServiceEditionPane {
     }
     
     @Override
-    public Object getConfiguration() {
+    public AbstractConfigurationObject getConfiguration() {
         updateConfiguration();
         return configuration;
     }

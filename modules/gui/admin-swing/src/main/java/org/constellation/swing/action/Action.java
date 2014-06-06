@@ -24,7 +24,6 @@ import java.beans.PropertyChangeListener;
 import javax.swing.ImageIcon;
 import javax.swing.event.EventListenerList;
 import org.constellation.admin.service.ConstellationClient;
-import org.constellation.admin.service.ConstellationServer;
 import org.constellation.swing.FrameDisplayer;
 
 /**
@@ -37,7 +36,6 @@ public abstract class Action {
 
     private final String name;
 
-    protected ConstellationServer server;
     protected ConstellationClient serverV2;
     protected Object target;
     protected FrameDisplayer displayer;
@@ -48,14 +46,6 @@ public abstract class Action {
 
     public String getName() {
         return name;
-    }
-
-    public ConstellationServer getServer() {
-        return server;
-    }
-
-    public void setServer(ConstellationServer server) {
-        this.server = server;
     }
 
     public ConstellationClient getServerV2() {

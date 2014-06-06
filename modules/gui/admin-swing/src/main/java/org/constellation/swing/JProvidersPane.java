@@ -45,7 +45,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.constellation.admin.service.ConstellationClient;
-import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.ProviderReport;
 import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.ProvidersReport;
@@ -75,19 +74,17 @@ public final class JProvidersPane extends JPanel implements ActionListener, Prop
 
     private final List<Action> actions = new ArrayList<>();
     private final JXTable guiTable = new JXTable();
-    private final ConstellationServer server;
     private final ConstellationClient serverV2;
     private final FrameDisplayer displayer;
 
-    public JProvidersPane(final ConstellationServer cstl, final ConstellationClient cstlV2, final FrameDisplayer displayer) {
-        this(cstl, cstlV2, displayer, null);
+    public JProvidersPane(final ConstellationClient cstlV2, final FrameDisplayer displayer) {
+        this(cstlV2, displayer, null);
     }
 
-    public JProvidersPane(final ConstellationServer cstl, final ConstellationClient cstlV2, final FrameDisplayer displayer,
+    public JProvidersPane(final ConstellationClient cstlV2, final FrameDisplayer displayer,
             RoleController roleController, final Action ... actions) {
         initComponents();
 
-        this.server = cstl;
         this.serverV2 = cstlV2;
         if(displayer == null){
             this.displayer = new DefaultFrameDisplayer();
@@ -126,8 +123,8 @@ public final class JProvidersPane extends JPanel implements ActionListener, Prop
 
 
         final Font fontBig = new Font("Monospaced", Font.BOLD, 16);
-        guiTable.setDefaultRenderer(Action.class, new ActionRenderer(cstl, cstlV2));
-        guiTable.setDefaultEditor(Action.class, new ActionEditor(cstl, cstlV2));
+        guiTable.setDefaultRenderer(Action.class, new ActionRenderer(cstlV2));
+        guiTable.setDefaultEditor(Action.class, new ActionEditor(cstlV2));
         guiTable.setDefaultRenderer(Entry.class, new DefaultTableCellRenderer(){
 
             @Override
@@ -308,7 +305,7 @@ public final class JProvidersPane extends JPanel implements ActionListener, Prop
 
     private void guiNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiNewActionPerformed
 
-        JProviderCreationPane.showDialog(server, serverV2);
+        JProviderCreationPane.showDialog(serverV2);
         updateInstanceList();
 
     }//GEN-LAST:event_guiNewActionPerformed
