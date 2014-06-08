@@ -25,8 +25,9 @@ public class ConstellationOGCRegistry {
     public void init() {
         LOGGER.info(constellationOGCModules.size() + " Constellation OGC module"
                 + (constellationOGCModules.size() > 1 ? "s" : "") + " detected.");
+        
         for (Entry<String, ? extends ConstellationOGCModule> moduleEntry : constellationOGCModules.entrySet()) {
-            LOGGER.info(moduleEntry.getKey() + ": " + moduleEntry.getValue().getName());
+            LOGGER.info(String.format("\t* %-5s (%s)", moduleEntry.getValue().getName() , moduleEntry.getKey()));
         }
     }
 

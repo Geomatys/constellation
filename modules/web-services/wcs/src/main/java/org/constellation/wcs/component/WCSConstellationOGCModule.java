@@ -16,18 +16,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.constellation.metadata;
+package org.constellation.wcs.component;
 
 import javax.inject.Named;
 
 import org.constellation.ws.ConstellationOGCModule;
 
 @Named
-public class CSWConstellationOGCModule implements ConstellationOGCModule {
+public class WCSConstellationOGCModule implements ConstellationOGCModule {
 
     @Override
     public String getName() {
-        return "CSW";
+        return "WCS";
     }
 
 }
