@@ -57,14 +57,13 @@ import org.constellation.ws.WSEngine;
  * @since 0.9
  */
 @Path("/1/admin")
-@Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-@Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+@Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+@Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 public class Admin {
 
-    
-    
     @Inject
     private ServiceRepository serviceRepository;
+
     /**
      * service to return available service list
      *
@@ -91,8 +90,11 @@ public class Admin {
 
     /**
      * Reset configuration path
-     * @param configuration contain new path
-     * @return an {@link AcknowlegementType} on {@link Response} to know operation state
+     * 
+     * @param configuration
+     *            contain new path
+     * @return an {@link AcknowlegementType} on {@link Response} to know
+     *         operation state
      * @throws CstlServiceException
      */
     @POST
@@ -102,7 +104,7 @@ public class Admin {
         final boolean result = ConfigurationBusiness.setConfigPath(path);
         return Response.ok(new AcknowlegementType(result, path)).build();
     }
-    
+
     /**
      *
      * @return the value of the constellation property
@@ -117,7 +119,8 @@ public class Admin {
     /**
      * Set a constellation property
      * 
-     * @return an {@link AcknowlegementType} on {@link Response} to know operation state
+     * @return an {@link AcknowlegementType} on {@link Response} to know
+     *         operation state
      * @throws CstlServiceException
      */
     @POST
@@ -133,24 +136,26 @@ public class Admin {
      */
     @GET
     @Path("/domain/{domainId}/instances")
-    public Response listInstances(@PathParam("domainId") int domainId, @Context HttpServletRequest httpServletRequest){
+    public Response listInstances(@PathParam("domainId") int domainId, @Context HttpServletRequest httpServletRequest) {
         final List<Instance> instances = new ArrayList<>();
         final Set<String> services = WSEngine.getRegisteredServices().keySet();
-        
-        Map<String, Set<String>> servicesByType = serviceRepository.getAccessiblesServicesByType(domainId, httpServletRequest.getUserPrincipal().getName()); 
-        
+
+        Map<String, Set<String>> servicesByType = serviceRepository.getAccessiblesServicesByType(domainId,
+                httpServletRequest.getUserPrincipal().getName());
+
         for (final String service : services) {
             try {
                 final Specification spec = Specification.fromShortName(service);
                 Set<String> serviceIdentifiers = servicesByType.get(spec.name());
-                
-                if(serviceIdentifiers != null) {
+
+                if (serviceIdentifiers != null) {
                     final OGCConfigurer configurer = (OGCConfigurer) ServiceConfigurer.newInstance(spec);
-                    for(Instance instance: configurer.getInstances()) {
-                        if(serviceIdentifiers.contains(instance.getIdentifier()))
-                        instances.add(instance);
+                    for (Instance instance : configurer.getInstances()) {
+                        if (serviceIdentifiers.contains(instance.getIdentifier())) {
+                            instances.add(instance);
+                        }
                     }
-                    
+
                 }
             } catch (NotRunningServiceException ignore) {
             }
