@@ -20,7 +20,14 @@
    <bean class="org.constellation.services.SessionDataImpl" />
    
    <context:component-scan base-package="org.constellation.conf"  />
+
+   <context:component-scan base-package="org.constellation.map.ws"  />
+   <context:component-scan base-package="org.constellation.metadata"  />
    
+   <context:component-scan base-package="org.constellation.admin"  />
+   
+   <context:component-scan base-package="org.constellation.ws.rs"/>
+
 
   
 </beans>

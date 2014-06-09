@@ -49,6 +49,10 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.style.GraphicalSymbol;
 import org.opengis.util.NoSuchIdentifierException;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import static org.geotoolkit.parameter.ParametersExt.createGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
@@ -62,12 +66,14 @@ import static org.geotoolkit.style.StyleConstants.*;
  * @author Alexis Manin (Geomatys)
  * @author Cédric Briançon (Geomatys)
  */
+
 public class MapSetup implements ServletContextListener {
 
     private static final Logger LOGGER = Logging.getLogger(MapSetup.class);
     
+    
     @Inject
-    StyleBusiness styleBusiness;
+    private StyleBusiness styleBusiness;
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
@@ -79,7 +85,11 @@ public class MapSetup implements ServletContextListener {
         } catch (ClassNotFoundException ex) {
             LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
         }
-
+        WebApplicationContextUtils
+        .getRequiredWebApplicationContext(servletContextEvent.getServletContext())
+        .getAutowireCapableBeanFactory()
+        .autowireBean(this);
+        
         initializeDefaultStyles();
         initializeDefaultTempStyles();
 
