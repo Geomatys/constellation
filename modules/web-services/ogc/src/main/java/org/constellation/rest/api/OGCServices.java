@@ -122,7 +122,8 @@ public final class OGCServices {
     @Path("/domain/{domainId}")
     public Response addInstance(@PathParam("domainId") int domainId, final @PathParam("spec") String spec, final Service metadata) throws Exception {
         
-        if(serviceRepository.findByIdentifierAndType(metadata.getIdentifier(), spec) != null) {
+        org.constellation.engine.register.Service service = serviceRepository.findByIdentifierAndType(metadata.getIdentifier(), spec);
+        if(service != null) {
             return Response.serverError().entity("admin.error.service.exist").build();
         }
         
@@ -133,7 +134,6 @@ public final class OGCServices {
             throw e;
         }
         
-        org.constellation.engine.register.Service service = serviceRepository.findByIdentifierAndType(metadata.getIdentifier(), spec);
         
         domainRepository.addServiceToDomain(service.getId(), domainId);
         
