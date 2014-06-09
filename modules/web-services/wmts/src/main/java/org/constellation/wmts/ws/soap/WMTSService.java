@@ -18,7 +18,6 @@
  */
 package org.constellation.wmts.ws.soap;
 
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Map;
@@ -33,14 +32,13 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.ws.BindingType;
 import org.constellation.ServiceDef.Specification;
-import org.constellation.configuration.ServiceConfigurer;
+import org.constellation.ws.ServiceConfigurer;
 import org.constellation.wmts.configuration.WMTSConfigurer;
 import org.constellation.wmts.ws.DefaultWMTSWorker;
 import org.constellation.wmts.ws.WMTSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.soap.OGCWebService;
-import org.geotoolkit.util.ImageIOUtilities;
 import org.geotoolkit.wmts.xml.v100.BinaryPayload;
 import org.geotoolkit.wmts.xml.v100.Capabilities;
 import org.geotoolkit.wmts.xml.v100.GetCapabilities;

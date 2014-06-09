@@ -24,7 +24,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.sis.util.logging.Logging;
-import org.constellation.configuration.ServiceConfigurer;
 import org.constellation.util.ReflectionUtilities;
 
 /**

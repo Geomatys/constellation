@@ -19,11 +19,17 @@
 
 package org.constellation.ogc.configuration;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.xml.bind.JAXBException;
 import org.constellation.ServiceDef.Specification;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.ConfigProcessException;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Instance;
-import org.constellation.configuration.ServiceConfigurer;
 import org.constellation.configuration.ServiceStatus;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.Service;
@@ -36,20 +42,13 @@ import org.constellation.process.service.RestartServiceDescriptor;
 import org.constellation.process.service.SetConfigServiceDescriptor;
 import org.constellation.process.service.StartServiceDescriptor;
 import org.constellation.process.service.StopServiceDescriptor;
+import org.constellation.ws.ServiceConfigurer;
 import org.constellation.ws.WSEngine;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.NoSuchIdentifierException;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.xml.bind.JAXBException;
-import org.constellation.admin.ConfigurationEngine;
 
 /**
  * Describe methods which need to be specify by an implementation to manage

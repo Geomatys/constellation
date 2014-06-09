@@ -20,7 +20,7 @@ package org.constellation.wps.ws.rs;
 
 import javax.inject.Singleton;
 import org.constellation.ServiceDef;
-import org.constellation.configuration.ServiceConfigurer;
+import org.constellation.ws.ServiceConfigurer;
 import org.constellation.wps.configuration.WPSConfigurer;
 import org.constellation.wps.ws.WPSWorker;
 import org.constellation.ws.CstlServiceException;

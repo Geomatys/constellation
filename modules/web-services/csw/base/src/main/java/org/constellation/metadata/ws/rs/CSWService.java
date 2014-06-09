@@ -19,42 +19,40 @@
 package org.constellation.metadata.ws.rs;
 
 // java se dependencies
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.Duration;
-import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
-
-// jersey dependencies
+import javax.inject.Singleton;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.inject.Singleton;
-
-// Constellation dependencies
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.Duration;
+import javax.xml.namespace.QName;
+import org.apache.sis.xml.Namespaces;
 import org.constellation.ServiceDef;
 import org.constellation.ServiceDef.Specification;
-import org.constellation.configuration.ServiceConfigurer;
+
+import static org.constellation.api.QueryConstants.*;
 import org.constellation.jaxb.CstlXMLSerializer;
+import static org.constellation.metadata.CSWConstants.*;
+
+// Geotoolkit dependencies
 import org.constellation.metadata.CSWworker;
 import org.constellation.metadata.configuration.CSWConfigurer;
+import org.constellation.metadata.utils.CSWUtils;
 import org.constellation.metadata.utils.SerializerResponse;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
+import org.constellation.ws.ServiceConfigurer;
 import org.constellation.ws.UnauthorizedException;
 import org.constellation.ws.WebServiceUtilities;
 import org.constellation.ws.Worker;
 import org.constellation.ws.rs.OGCWebService;
-
-import static org.constellation.api.QueryConstants.*;
-import static org.constellation.metadata.CSWConstants.*;
-
-// Geotoolkit dependencies
 import org.geotoolkit.csw.xml.CSWResponse;
 import org.geotoolkit.csw.xml.CswXmlFactory;
 import org.geotoolkit.csw.xml.DescribeRecord;
@@ -77,14 +75,12 @@ import org.geotoolkit.ogc.xml.v110.SortOrderType;
 import org.geotoolkit.ogc.xml.v110.SortPropertyType;
 import org.geotoolkit.ows.xml.AcceptFormats;
 import org.geotoolkit.ows.xml.AcceptVersions;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ows.xml.Sections;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
 import org.geotoolkit.ows.xml.v100.SectionsType;
-import org.apache.sis.xml.Namespaces;
-import org.constellation.metadata.utils.CSWUtils;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
  * RestFul CSW service.

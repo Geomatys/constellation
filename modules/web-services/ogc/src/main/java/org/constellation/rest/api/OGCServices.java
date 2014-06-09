@@ -53,6 +53,7 @@ import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.ogc.configuration.OGCConfigurer;
 import static org.constellation.utils.RESTfulUtilities.created;
 import static org.constellation.utils.RESTfulUtilities.ok;
+import org.constellation.ws.ServiceConfigurer;
 import org.constellation.ws.WSEngine;
 import org.geotoolkit.util.FileUtilities;
 import org.glassfish.jersey.jettison.JettisonConfig;

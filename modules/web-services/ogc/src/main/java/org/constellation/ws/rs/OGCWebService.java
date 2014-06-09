@@ -22,24 +22,16 @@ package org.constellation.ws.rs;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
-
-import net.iharder.Base64;
-
-// Jersey dependencies
 import javax.annotation.PreDestroy;
 import javax.ws.rs.core.Response;
-
-// JAXB dependencies
 import javax.xml.bind.JAXBElement;
 import javax.xml.validation.Schema;
-
-// Shiro dependencies
-//import org.apache.shiro.authc.IncorrectCredentialsException;
-//import org.apache.shiro.authc.UnknownAccountException;
-
-// Constellation dependencies
+import net.iharder.Base64;
+import org.apache.sis.util.iso.Types;
+import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef;
-import org.constellation.configuration.ServiceConfigurer;
+import org.constellation.ServiceDef.Specification;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.service.StartServiceDescriptor;
@@ -47,25 +39,18 @@ import org.constellation.security.IncorrectCredentialsException;
 import org.constellation.security.SecurityManagerHolder;
 import org.constellation.security.UnknownAccountException;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.ServiceConfigurer;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
-import org.constellation.ServiceDef.Specification;
-import org.constellation.admin.ConfigurationEngine;
-
-// Geotoolkit dependencies
 import org.geotoolkit.ows.xml.OWSExceptionCode;
-import org.geotoolkit.util.StringUtilities;
-import org.geotoolkit.process.ProcessDescriptor;
-import org.geotoolkit.process.ProcessException;
-import org.geotoolkit.process.ProcessFinder;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // Apache SIS dependencies
-import org.apache.sis.xml.MarshallerPool;
-import org.apache.sis.util.iso.Types;
-
-// GeoAPI dependencies
+import org.geotoolkit.process.ProcessDescriptor;
+import org.geotoolkit.process.ProcessException;
+import org.geotoolkit.process.ProcessFinder;
+import org.geotoolkit.util.StringUtilities;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.CodeList;
 import org.opengis.util.NoSuchIdentifierException;

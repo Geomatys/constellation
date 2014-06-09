@@ -31,19 +31,17 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
 import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.BriefNode;
 import org.constellation.configuration.BriefNodeList;
 import org.constellation.configuration.NotRunningServiceException;
-import org.constellation.configuration.ServiceConfigurer;
 import org.constellation.dto.ParameterValues;
-import org.constellation.metadata.configuration.CSWConfigurer;
 import org.constellation.dto.SimpleValue;
-import org.w3c.dom.Node;
-
+import org.constellation.metadata.configuration.CSWConfigurer;
 import static org.constellation.utils.RESTfulUtilities.ok;
+import org.constellation.ws.ServiceConfigurer;
+import org.w3c.dom.Node;
 
 /**
  *

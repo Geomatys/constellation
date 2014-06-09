@@ -37,6 +37,7 @@ import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
 import org.constellation.map.configuration.MapConfigurer;
 import static org.constellation.utils.RESTfulUtilities.ok;
+import org.constellation.ws.ServiceConfigurer;
 
 /**
  * RESTful API for map services configuration.

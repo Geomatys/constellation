@@ -23,7 +23,7 @@ import java.lang.invoke.MethodHandles;
 import javax.inject.Inject;
 
 import org.constellation.admin.ConfigurationEngine;
-import org.constellation.configuration.ServiceConfigurer;
+import org.constellation.ws.ServiceConfigurer;
 import org.constellation.engine.register.ConfigurationService;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.security.SecurityManagerHolder;

@@ -40,7 +40,7 @@ import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.NotRunningServiceException;
-import org.constellation.configuration.ServiceConfigurer;
+import org.constellation.ws.ServiceConfigurer;
 import org.constellation.configuration.ServiceReport;
 import org.constellation.dto.Configuration;
 import org.constellation.dto.SimpleValue;
