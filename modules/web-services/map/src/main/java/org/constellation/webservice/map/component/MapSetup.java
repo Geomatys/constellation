@@ -16,7 +16,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.constellation.map.setup;
+package org.constellation.webservice.map.component;
+
+import static org.geotoolkit.parameter.ParametersExt.createGroup;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
+import static org.geotoolkit.style.StyleConstants.DEFAULT_LINE_SYMBOLIZER;
+import static org.geotoolkit.style.StyleConstants.DEFAULT_POINT_SYMBOLIZER;
+import static org.geotoolkit.style.StyleConstants.DEFAULT_POLYGON_SYMBOLIZER;
+import static org.geotoolkit.style.StyleConstants.DEFAULT_RASTER_SYMBOLIZER;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,11 +33,12 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import javax.inject.Named;
 
-import org.constellation.admin.StyleBusiness;
+import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.process.ConstellationProcessFactory;
@@ -39,25 +48,20 @@ import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviders;
-import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
-import org.geotoolkit.style.*;
+import org.geotoolkit.style.DefaultExternalGraphic;
+import org.geotoolkit.style.DefaultGraphic;
+import org.geotoolkit.style.DefaultOnlineResource;
+import org.geotoolkit.style.DefaultPointSymbolizer;
+import org.geotoolkit.style.DefaultStyleFactory;
+import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.style.GraphicalSymbol;
 import org.opengis.util.NoSuchIdentifierException;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.web.context.support.WebApplicationContextUtils;
-
-import static org.geotoolkit.parameter.ParametersExt.createGroup;
-import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
-import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
-import static org.geotoolkit.style.StyleConstants.*;
 
 /**
  * Specific setup for map service
@@ -66,8 +70,8 @@ import static org.geotoolkit.style.StyleConstants.*;
  * @author Alexis Manin (Geomatys)
  * @author Cédric Briançon (Geomatys)
  */
-
-public class MapSetup implements ServletContextListener {
+@Named
+public class MapSetup  {
 
     private static final Logger LOGGER = Logging.getLogger(MapSetup.class);
     
@@ -75,8 +79,8 @@ public class MapSetup implements ServletContextListener {
     @Inject
     private StyleBusiness styleBusiness;
 
-    @Override
-    public void contextInitialized(ServletContextEvent servletContextEvent) {
+    @PostConstruct
+    public void contextInitialized() {
         LOGGER.log(Level.INFO, "=== Activating Native Codec ===");
 
         try {
@@ -85,11 +89,6 @@ public class MapSetup implements ServletContextListener {
         } catch (ClassNotFoundException ex) {
             LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
         }
-        WebApplicationContextUtils
-        .getRequiredWebApplicationContext(servletContextEvent.getServletContext())
-        .getAutowireCapableBeanFactory()
-        .autowireBean(this);
-        
         initializeDefaultStyles();
         initializeDefaultTempStyles();
 
@@ -100,8 +99,8 @@ public class MapSetup implements ServletContextListener {
     /**
      * Invoked when the module needs to be shutdown.
      */
-    @Override
-    public void contextDestroyed(ServletContextEvent servletContextEvent) {
+    @PreDestroy
+    public void contextDestroyed() {
         DataProviders.getInstance().dispose();
         StyleProviders.getInstance().dispose();
     }

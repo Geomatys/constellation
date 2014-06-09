@@ -42,7 +42,6 @@ import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.apache.sis.util.ArgumentChecks.ensurePositive;
 
 import org.apache.sis.util.Static;
-import org.constellation.admin.StyleBusiness;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.BandDescription;
 import org.constellation.dto.CoverageDataDescription;
@@ -56,6 +55,7 @@ import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.FeatureData;
 import org.constellation.provider.ObservationData;
+import org.constellation.webservice.map.component.StyleBusiness;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.GridSampleDimension;

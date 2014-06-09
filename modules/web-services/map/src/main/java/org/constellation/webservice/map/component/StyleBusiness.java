@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-package org.constellation.admin;
+package org.constellation.webservice.map.component;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 
 import org.apache.sis.util.logging.Logging;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.dao.DataRecord;
 import org.constellation.admin.dao.StyleRecord;
 import org.constellation.admin.dao.StyleRecord.StyleType;
