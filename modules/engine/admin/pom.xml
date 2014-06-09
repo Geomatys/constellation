@@ -1,87 +1,92 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.constellation</groupId>
-		<artifactId>engine</artifactId>
-		<version>0.9-SNAPSHOT</version>
-	</parent>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.constellation</groupId>
+        <artifactId>engine</artifactId>
+        <version>0.9-SNAPSHOT</version>
+    </parent>
 
-	<!-- Module description. -->
-	<groupId>org.constellation.engine</groupId>
-	<artifactId>cstl-engine-admin</artifactId>
-	<packaging>jar</packaging>
-	<name>Constellation Administration Database Engine</name>
+    <!-- Module description. -->
+    <groupId>org.constellation.engine</groupId>
+    <artifactId>cstl-engine-admin</artifactId>
+    <packaging>jar</packaging>
+    <name>Constellation Administration Database Engine</name>
 
-	<!-- Required dependencies for building. These dependencies wil be included 
-		into the JARs list that Maven will put into the directory "target/binaries". -->
-	<dependencies>
-		<dependency>
-			<groupId>org.mdweb.metamodel</groupId>
-			<artifactId>mdweb-metamodel-lib-auth</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.constellation.library</groupId>
-			<artifactId>cstl-lib-base</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.constellation.xml-bindings</groupId>
-			<artifactId>cstl-xml-configuration</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-		</dependency>
-		<!-- for provider config -->
-		<dependency>
-			<groupId>org.geotoolkit</groupId>
-			<artifactId>geotk-jaxp-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>net.java.dev.stax-utils</groupId>
-			<artifactId>stax-utils</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.geotoolkit</groupId>
-			<artifactId>geotk-xml-sld</artifactId>
-		</dependency>
+    <!-- Required dependencies for building. These dependencies wil be included 
+    into the JARs list that Maven will put into the directory "target/binaries". -->
+    <dependencies>
+        <dependency>
+            <groupId>org.mdweb.metamodel</groupId>
+            <artifactId>mdweb-metamodel-lib-auth</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.library</groupId>
+            <artifactId>cstl-lib-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.xml-bindings</groupId>
+            <artifactId>cstl-xml-configuration</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+        </dependency>
+        <!-- for provider config -->
+        <dependency>
+            <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-jaxp-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.java.dev.stax-utils</groupId>
+            <artifactId>stax-utils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-xml-sld</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-tx</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
-			<version>${spring.version}</version>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring.version}</version>
+            <scope>test</scope>
+        </dependency>
 
-		<dependency>
-			<groupId>org.constellation.engine.register</groupId>
-			<artifactId>cstl-register-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.constellation.engine.register</groupId>
-			<artifactId>cstl-register-jooq</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>org.constellation.engine.register</groupId>
+            <artifactId>cstl-register-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.engine.register</groupId>
+            <artifactId>cstl-register-jooq</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.library</groupId>
+            <artifactId>cstl-lib-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-	</dependencies>
+    </dependencies>
 </project>

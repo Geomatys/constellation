@@ -503,6 +503,13 @@
                <version>${mdweb-meta.version}</version>
             </dependency>
 
+            <!-- SIS version -->
+            <dependency>
+                <groupId>org.apache.sis.core</groupId>
+                <artifactId>sis-utility</artifactId>
+                <version>${sis.version}</version>
+            </dependency>
+            
             <!-- Geotoolkit version -->
             <dependency>
                 <groupId>org.geotoolkit</groupId>

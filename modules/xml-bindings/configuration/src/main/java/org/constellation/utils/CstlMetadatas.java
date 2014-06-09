@@ -23,8 +23,6 @@ import java.util.Date;
 import java.util.List;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.ArgumentChecks;
-import org.constellation.ServiceDef;
-import org.constellation.dto.DataMetadata;
 import org.constellation.dto.Service;
 import static org.constellation.utils.CstlMetadataTemplate.*;
 import org.geotoolkit.feature.type.Name;
@@ -118,14 +116,5 @@ public class CstlMetadatas {
         metadata.setDateStamp(creationDate);
 
         return metadata;
-    }
-    
-    public static ServiceDef.Specification getSpecification(final String metadataID) {
-        // remove prefix
-        String tmp = metadataID.substring(SERVICE.getPrefix().length() + 1);
-        // remove specification
-        final int index = tmp.indexOf('_');
-        tmp = tmp.substring(0, index);
-        return ServiceDef.Specification.valueOf(tmp);
     }
 }
