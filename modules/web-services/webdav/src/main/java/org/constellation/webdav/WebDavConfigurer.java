@@ -33,7 +33,7 @@ public class WebDavConfigurer extends OGCConfigurer {
      * Create a new {@link CSWConfigurer} instance.
      */
     public WebDavConfigurer() {
-        super(Specification.WEBDAV, WebdavContext.class, "webDav.xml");
+        super(Specification.WEBDAV, WebdavContext.class);
     }
 
 }

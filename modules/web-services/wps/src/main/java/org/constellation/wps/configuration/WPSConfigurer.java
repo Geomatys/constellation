@@ -41,7 +41,7 @@ public class WPSConfigurer extends OGCConfigurer {
      * Create a new {@link WPSConfigurer} instance.
      */
     protected WPSConfigurer() {
-        super(Specification.WPS, ProcessContext.class, "processContext.xml");
+        super(Specification.WPS, ProcessContext.class);
     }
 
     /**

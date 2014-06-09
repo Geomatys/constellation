@@ -46,7 +46,7 @@ public class CSWConfigurer extends OGCConfigurer {
      * Create a new {@link CSWConfigurer} instance.
      */
     public CSWConfigurer() {
-        super(Specification.CSW, Automatic.class, "config.xml");
+        super(Specification.CSW, Automatic.class);
     }
 
     /**

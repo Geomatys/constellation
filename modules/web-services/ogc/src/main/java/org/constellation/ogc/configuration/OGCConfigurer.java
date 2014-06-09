@@ -66,10 +66,9 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      *
      * @param specification  the target service specification
      * @param configClass    the target service config class
-     * @param configFileName the target service config file name
      */
-    protected OGCConfigurer(final Specification specification, final Class configClass, final String configFileName) {
-        super(specification, configClass, configFileName);
+    protected OGCConfigurer(final Specification specification, final Class configClass) {
+        super(specification, configClass);
     }
 
     /**

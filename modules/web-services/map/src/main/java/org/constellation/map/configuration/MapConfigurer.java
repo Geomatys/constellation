@@ -113,7 +113,7 @@ public class MapConfigurer extends OGCConfigurer {
      * @param specification  the target service specification
      */
     public MapConfigurer(final Specification specification) {
-        super(specification, LayerContext.class, "layerContext.xml");
+        super(specification, LayerContext.class);
     }
 
     /**

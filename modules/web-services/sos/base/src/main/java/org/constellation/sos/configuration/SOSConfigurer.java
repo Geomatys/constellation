@@ -90,7 +90,7 @@ public class SOSConfigurer extends OGCConfigurer {
      * Create a new {@link SOSConfigurer} instance.
      */
     public SOSConfigurer() {
-        super(Specification.SOS, SOSConfiguration.class, "config.xml");
+        super(Specification.SOS, SOSConfiguration.class);
     }
 
     /**

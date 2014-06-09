@@ -72,9 +72,8 @@ public abstract class ServiceConfigurer {
      *
      * @param specification  the target service specification
      * @param configClass    the target service config class
-     * @param configFileName the target service config file name
      */
-    protected ServiceConfigurer(final Specification specification, final Class configClass, final String configFileName) {
+    protected ServiceConfigurer(final Specification specification, final Class configClass) {
         this.specification  = specification;
         this.configClass    = configClass;
     }
