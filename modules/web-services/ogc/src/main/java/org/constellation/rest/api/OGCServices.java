@@ -135,6 +135,7 @@ public final class OGCServices {
             throw e;
         }
         
+        service = serviceRepository.findByIdentifierAndType(metadata.getIdentifier(), spec);
         
         domainRepository.addServiceToDomain(service.getId(), domainId);
         
