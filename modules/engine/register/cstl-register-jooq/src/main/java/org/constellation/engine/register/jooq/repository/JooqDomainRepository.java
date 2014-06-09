@@ -44,7 +44,6 @@ import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.jooq.Batch;
 import org.jooq.Record;
-import org.jooq.RecordMapper;
 import org.jooq.Result;
 import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
@@ -62,16 +61,9 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
         super(Domain.class, DOMAIN);
     }
 
-    private RecordMapper<DomainRecord, Domain> mapper = new RecordMapper<DomainRecord, Domain>() {
-        @Override
-        public Domain map(DomainRecord record) {
-            return record.into(Domain.class);
-        }
-    };
-
     @Override
-    RecordMapper<? super DomainRecord, Domain> getDTOMapper() {
-        return mapper;
+    public List<Domain> findAll() {
+        return dsl.select().from(Tables.DOMAIN).where(DOMAIN.ID.gt(0)).fetchInto(Domain.class);
     }
 
     @Override
