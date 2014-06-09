@@ -24,13 +24,6 @@ package org.constellation.api;
  */
 public final class QueryConstants {
     
-    //Constellation configuration
-    public static final String REQUEST_LIST_SERVICE    = "ListAvailableService";
-    
-    //Service operations
-    public static final String REQUEST_UPDATE_CAPABILITIES   = "updateCapabilities";
-    public static final String REQUEST_LIST_INSTANCE         = "listInstance";
-    
     //basic parameters
     public static final String REQUEST_PARAMETER = "REQUEST";
     public static final String SERVICE_PARAMETER = "SERVICE";

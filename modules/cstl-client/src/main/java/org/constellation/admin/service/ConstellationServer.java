@@ -37,7 +37,6 @@ import org.constellation.configuration.ExceptionReport;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.LayerList;
 import org.constellation.configuration.ObjectFactory;
-import org.constellation.configuration.ServiceReport;
 import org.constellation.dto.DataDescription;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
@@ -77,16 +76,10 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.text.ParseException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static org.constellation.api.QueryConstants.*;
-
 
 
 /**
@@ -352,25 +345,6 @@ public class ConstellationServer<S extends Services, P extends Providers> extend
      */
     public final class Services {
 
-        public Map<String, List<String>> getAvailableService() {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_LIST_SERVICE;
-                final Object response = sendRequest(url, null);
-                if (response instanceof ServiceReport) {
-                    return ((ServiceReport) response).getAvailableServices();
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                    return new HashMap<>();
-                } else {
-                    LOGGER.warning("The service respond uncorrectly");
-                    return new HashMap<>();
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return new HashMap<>();
-        }
-
         /**
          * Restart all the instance of a specific web-service (wms, wfs, csw,...)
          *
@@ -584,27 +558,6 @@ public class ConstellationServer<S extends Services, P extends Providers> extend
             }
             return false;
         }
-
-        public boolean updateCapabilities(final String service, final String instanceId, final File importFile, final String fileName) {
-            try {
-                final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=" + REQUEST_UPDATE_CAPABILITIES + "&id=" + instanceId + "&filename=" + fileName;
-                Object response = sendRequest(url, importFile, null, null, true);
-                if (response instanceof AcknowlegementType) {
-                    final AcknowlegementType ack = (AcknowlegementType) response;
-                    if ("Success".equals(ack.getStatus())) {
-                        return true;
-                    } else {
-                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
-                    }
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
 
         /**
          * Return a complete URL for the specified service  (wms, wfs, csw,...) and instance identifier.
