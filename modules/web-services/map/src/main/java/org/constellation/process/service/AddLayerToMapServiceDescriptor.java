@@ -162,17 +162,14 @@ public class AddLayerToMapServiceDescriptor extends AbstractProcessDescriptor {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Process createProcess(ParameterValueGroup input) {
-        AddLayerToMapService addLayerToMapService = new AddLayerToMapService(this, input);
-        
-        SpringHelper.injectDependencies(addLayerToMapService);
-        
-        return addLayerToMapService;
-    }
-
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Process createProcess(ParameterValueGroup input) {
+		AddLayerToMapService addLayerToMapService = new AddLayerToMapService(this, input);
+		SpringHelper.injectDependencies(addLayerToMapService);
+		return addLayerToMapService;
+	}
 
 }

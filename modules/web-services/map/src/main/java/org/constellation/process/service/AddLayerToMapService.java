@@ -53,9 +53,9 @@ import org.opengis.util.NoSuchIdentifierException;
  * @author Cédric Briançon (Geomatys)
  */
 public class AddLayerToMapService extends AbstractProcess {
-	
+
 	@Inject
-	ServiceBusiness serviceBusiness;
+	ServiceBusiness	serviceBusiness;
 
     AddLayerToMapService(final ProcessDescriptor desc, final ParameterValueGroup input) {
         super(desc, input);
