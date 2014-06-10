@@ -71,9 +71,9 @@ import org.opengis.util.NoSuchIdentifierException;
  * @author Cédric Briançon (Geomatys)
  */
 @Named
-public class MapSetup  {
+public class SetupBusiness  {
 
-    private static final Logger LOGGER = Logging.getLogger(MapSetup.class);
+    private static final Logger LOGGER = Logging.getLogger(SetupBusiness.class);
     
     
     @Inject
@@ -81,7 +81,7 @@ public class MapSetup  {
 
     @PostConstruct
     public void contextInitialized() {
-        LOGGER.log(Level.INFO, "=== Activating Native Codec ===");
+        LOGGER.log(Level.INFO, "=== Initialize Application ===");
 
         try {
             // Try to load postgresql driver for further use
