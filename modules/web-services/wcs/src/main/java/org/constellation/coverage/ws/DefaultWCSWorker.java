@@ -19,8 +19,6 @@
 package org.constellation.coverage.ws;
 
 // J2SE dependencies
-import java.util.logging.Level;
-import java.util.Arrays;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
@@ -29,38 +27,52 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
+import java.util.logging.Level;
+import org.apache.sis.geometry.GeneralEnvelope;
 import org.apache.sis.storage.DataStoreException;
-
-// Constellation dependencies
+import org.apache.sis.xml.MarshallerPool;
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
+import org.constellation.api.QueryConstants;
+import org.constellation.configuration.Layer;
+import static org.constellation.coverage.ws.WCSConstant.*;
+import org.constellation.dto.Service;
 import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.provider.CoverageData;
 import org.constellation.provider.Data;
+import org.constellation.util.DataReference;
 import org.constellation.util.WCSUtils;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.MimeType;
-import org.constellation.configuration.Layer;
 import org.constellation.ws.LayerWorker;
-import static org.constellation.query.Query.*;
-import static org.constellation.coverage.ws.WCSConstant.*;
-import org.constellation.util.DataReference;
-
-// Geotoolkit dependencies
+import org.constellation.ws.MimeType;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
-import org.apache.sis.geometry.GeneralEnvelope;
+import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
+import org.geotoolkit.gml.xml.v311.EnvelopeType;
+import org.geotoolkit.gml.xml.v311.GridType;
+import org.geotoolkit.gml.xml.v311.RectifiedGridType;
+import org.geotoolkit.image.io.metadata.SpatialMetadata;
 import org.geotoolkit.map.MapContext;
+import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
+import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
+import org.geotoolkit.ows.xml.AbstractServiceIdentification;
+import org.geotoolkit.ows.xml.AbstractServiceProvider;
+import org.geotoolkit.ows.xml.AcceptFormats;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
+// GeoAPI dependencies
+import org.geotoolkit.ows.xml.Sections;
 import org.geotoolkit.ows.xml.v110.BoundingBoxType;
 import org.geotoolkit.ows.xml.v110.SectionsType;
 import org.geotoolkit.ows.xml.v110.WGS84BoundingBoxType;
@@ -70,54 +82,36 @@ import org.geotoolkit.resources.Errors;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.TimeParser;
-import org.geotoolkit.wcs.xml.WCSMarshallerPool;
-import org.geotoolkit.wcs.xml.DescribeCoverage;
-import org.geotoolkit.wcs.xml.DescribeCoverageResponse;
-import org.geotoolkit.wcs.xml.GetCoverage;
-import org.geotoolkit.wcs.xml.GetCapabilities;
-import org.geotoolkit.wcs.xml.GetCapabilitiesResponse;
 import org.geotoolkit.wcs.xml.Content;
 import org.geotoolkit.wcs.xml.CoverageInfo;
+import org.geotoolkit.wcs.xml.DescribeCoverage;
+import org.geotoolkit.wcs.xml.DescribeCoverageResponse;
+import org.geotoolkit.wcs.xml.GetCapabilities;
+import org.geotoolkit.wcs.xml.GetCapabilitiesResponse;
+import org.geotoolkit.wcs.xml.GetCoverage;
+import org.geotoolkit.wcs.xml.WCSMarshallerPool;
 import org.geotoolkit.wcs.xml.WCSXmlFactory;
 import org.geotoolkit.wcs.xml.v100.CoverageOfferingType;
 import org.geotoolkit.wcs.xml.v100.DomainSetType;
+import org.geotoolkit.wcs.xml.v100.InterpolationMethod;
 import org.geotoolkit.wcs.xml.v100.LonLatEnvelopeType;
 import org.geotoolkit.wcs.xml.v100.RangeSetType;
 import org.geotoolkit.wcs.xml.v100.SupportedCRSsType;
 import org.geotoolkit.wcs.xml.v100.SupportedFormatsType;
 import org.geotoolkit.wcs.xml.v100.SupportedInterpolationsType;
-import org.geotoolkit.wcs.xml.v111.GridCrsType;
 import org.geotoolkit.wcs.xml.v111.CoverageDescriptionType;
 import org.geotoolkit.wcs.xml.v111.CoverageDomainType;
 import org.geotoolkit.wcs.xml.v111.FieldType;
+import org.geotoolkit.wcs.xml.v111.GridCrsType;
 import org.geotoolkit.wcs.xml.v111.InterpolationMethods;
 import org.geotoolkit.wcs.xml.v111.RangeType;
-import org.apache.sis.xml.MarshallerPool;
-import org.constellation.dto.Service;
-import org.geotoolkit.wcs.xml.v100.InterpolationMethod;
-import org.geotoolkit.gml.xml.v311.RectifiedGridType;
-import org.geotoolkit.gml.xml.v311.GridType;
-import org.geotoolkit.gml.xml.v311.EnvelopeType;
-import org.geotoolkit.image.io.metadata.SpatialMetadata;
-import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
-import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
-import org.geotoolkit.ows.xml.AbstractServiceIdentification;
-import org.geotoolkit.ows.xml.AbstractServiceProvider;
-import org.geotoolkit.ows.xml.AcceptFormats;
-import org.geotoolkit.ows.xml.Sections;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-
-
-
-// GeoAPI dependencies
+import org.opengis.coverage.grid.RectifiedGrid;
 import org.opengis.geometry.Envelope;
-import org.geotoolkit.feature.type.Name;
 import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.opengis.util.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.coverage.grid.RectifiedGrid;
+import org.opengis.util.FactoryException;
 
 
 /**
@@ -174,7 +168,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         final String userLogin = getUserLogin();
         if (version.isEmpty()) {
             throw new CstlServiceException("The parameter VERSION must be specified.",
-                           MISSING_PARAMETER_VALUE, KEY_VERSION.toLowerCase());
+                           MISSING_PARAMETER_VALUE, QueryConstants.VERSION_PARAMETER.toLowerCase());
         }
 
         if (request.getIdentifier().isEmpty()) {
@@ -221,7 +215,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                 coverageOfferings.add(describeCoverage111(coverageName, coverageRef));
             } else {
                 throw new CstlServiceException("The version number specified for this GetCoverage request " +
-                        "is not handled.", NO_APPLICABLE_CODE, KEY_VERSION.toLowerCase());
+                        "is not handled.", NO_APPLICABLE_CODE, QueryConstants.VERSION_PARAMETER.toLowerCase());
             }
         }
         return WCSXmlFactory.createDescribeCoverageResponse(version, coverageOfferings);
@@ -474,7 +468,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                     co = getCoverageInfo111(layer, configLayer);
                 } else {
                     throw new CstlServiceException("The version number specified for this request " +
-                            "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
+                            "is not handled.", VERSION_NEGOTIATION_FAILED, QueryConstants.VERSION_PARAMETER.toLowerCase());
                 }
                 /*
                 * coverage brief customisation
@@ -593,10 +587,10 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         final String userLogin    = getUserLogin();
         if (inputVersion == null) {
             throw new CstlServiceException("The parameter version must be specified",
-                           MISSING_PARAMETER_VALUE, KEY_VERSION.toLowerCase());
+                           MISSING_PARAMETER_VALUE, QueryConstants.VERSION_PARAMETER.toLowerCase());
         } else if (!"1.0.0".equals(inputVersion) && !"1.1.1".equals(inputVersion)) {
             throw new CstlServiceException("The version number specified for this request " + inputVersion +
-                    " is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
+                    " is not handled.", VERSION_NEGOTIATION_FAILED, QueryConstants.VERSION_PARAMETER.toLowerCase());
         }
 
         Date date = null;

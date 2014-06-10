@@ -46,7 +46,6 @@ import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Style;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.StyleRepository;
-import org.constellation.map.configuration.DataProviderConfig;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviders;
 import org.geotoolkit.style.MutableFeatureTypeStyle;
@@ -78,7 +77,7 @@ public final class StyleBusiness {
     /**
      * Logger used for debugging and event notification.
      */
-    private final Logger LOGGER = Logging.getLogger(StyleBusiness.class);
+    private static final Logger LOGGER = Logging.getLogger(StyleBusiness.class);
 
     /**
      * Ensures that a style provider with the specified identifier really
@@ -261,7 +260,7 @@ public final class StyleBusiness {
                 report.setTargetData(new ArrayList<DataBrief>());
                 final List<DataRecord> data = record.getLinkedData();
                 for (final DataRecord r : data) {
-                    report.getTargetData().add(DataProviderConfig.getBriefFromRecord(r, locale));
+                    report.getTargetData().add(getBriefFromRecord(r, locale));
                 }
             } else {
                 LOGGER.log(Level.WARNING, "Style named \"" + styleId + "\" from provider with id \"" + providerId
@@ -292,6 +291,26 @@ public final class StyleBusiness {
         }
 
         return report;
+    }
+    
+    /**
+     * Builds a {@link DataBrief} instance from a {@link DataRecord} instance.
+     *
+     * @param record the record to be converted
+     * @param locale the locale for internationalized text
+     * @return a {@link DataBrief} instance
+     * @throws SQLException if a database access error occurs
+     */
+    private static DataBrief getBriefFromRecord(final DataRecord record, final Locale locale) throws SQLException {
+        final DataBrief brief = new DataBrief();
+        brief.setName(record.getName());
+        brief.setNamespace(record.getNamespace());
+        brief.setProvider(record.getProvider().getIdentifier());
+        brief.setTitle(record.getTitle(locale));
+        brief.setDate(record.getDate());
+        brief.setType(record.getType().name());
+        brief.setOwner(record.getOwnerLogin());
+        return brief;
     }
 
     /**

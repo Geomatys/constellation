@@ -20,23 +20,8 @@ package org.constellation.map.ws;
 
 //J2SE dependencies
 import static org.constellation.api.CommonConstants.DEFAULT_CRS;
-import static org.constellation.map.ws.WMSConstant.EXCEPTION_111_BLANK;
-import static org.constellation.map.ws.WMSConstant.EXCEPTION_111_INIMAGE;
-import static org.constellation.map.ws.WMSConstant.EXCEPTION_130_BLANK;
-import static org.constellation.map.ws.WMSConstant.EXCEPTION_130_INIMAGE;
-import static org.constellation.query.wms.WMSQuery.KEY_BBOX;
-import static org.constellation.query.wms.WMSQuery.KEY_INFO_FORMAT;
-import static org.constellation.query.wms.WMSQuery.KEY_LAYER;
-import static org.constellation.query.wms.WMSQuery.KEY_LAYERS;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.CURRENT_UPDATE_SEQUENCE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_FORMAT;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_POINT;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_UPDATE_SEQUENCE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.LAYER_NOT_DEFINED;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.LAYER_NOT_QUERYABLE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.STYLE_NOT_DEFINED;
+import static org.constellation.map.ws.WMSConstant.*;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.wms.xml.WmsXmlFactory.createBoundingBox;
 import static org.geotoolkit.wms.xml.WmsXmlFactory.createDimension;
 import static org.geotoolkit.wms.xml.WmsXmlFactory.createGeographicBoundingBox;
@@ -45,7 +30,6 @@ import static org.geotoolkit.wms.xml.WmsXmlFactory.createLegendURL;
 import static org.geotoolkit.wms.xml.WmsXmlFactory.createLogoURL;
 import static org.geotoolkit.wms.xml.WmsXmlFactory.createOnlineResource;
 import static org.geotoolkit.wms.xml.WmsXmlFactory.createStyle;
-import groovy.transform.TimedInterrupt;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -72,7 +56,6 @@ import org.apache.sis.measure.MeasurementRange;
 import org.apache.sis.measure.Range;
 import org.apache.sis.referencing.crs.DefaultEngineeringCRS;
 import org.apache.sis.referencing.cs.AbstractCS;
-import org.apache.sis.referencing.datum.AbstractDatum;
 import org.apache.sis.referencing.datum.DefaultEngineeringDatum;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.xml.MarshallerPool;
@@ -89,7 +72,6 @@ import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.portrayal.internal.PortrayalResponse;
 import org.constellation.provider.CoverageData;
 import org.constellation.provider.Data;
-import org.constellation.query.wms.WMSQuery;
 import org.constellation.util.DataReference;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.LayerWorker;
@@ -990,9 +972,9 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         final Double elevation                 = getFI.getElevation();
         final List<Date> time                  = getFI.getTime();
         final Map<String, Object> params       = new HashMap<>();
-        params.put(WMSQuery.KEY_ELEVATION, elevation);
-        params.put(WMSQuery.KEY_TIME, time);
-        params.put(WMSQuery.KEY_EXTRA_PARAMETERS, getFI.getParameters());
+        params.put(KEY_ELEVATION, elevation);
+        params.put(KEY_TIME, time);
+        params.put(KEY_EXTRA_PARAMETERS, getFI.getParameters());
         final SceneDef sdef = new SceneDef();
 
         try {
@@ -1242,7 +1224,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         }
         //       -- create the rendering parameter Map
         final Map<String, Object> params = new HashMap<>();
-        params.put(WMSQuery.KEY_EXTRA_PARAMETERS, getMap.getParameters());
+        params.put(KEY_EXTRA_PARAMETERS, getMap.getParameters());
         final SceneDef sdef = new SceneDef();
         sdef.extensions().add(mapPortrayal.getExtension());
         final Hints hints = mapPortrayal.getHints();

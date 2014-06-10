@@ -22,7 +22,6 @@ package org.constellation.coverage.ws.rs;
 import javax.inject.Singleton;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 
 // J2SE dependencies
 import java.util.logging.Level;
@@ -47,7 +46,6 @@ import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.Worker;
 
 import static org.constellation.coverage.ws.WCSConstant.*;
-import static org.constellation.query.Query.*;
 import static org.constellation.api.QueryConstants.*;
 
 // Geotoolkit dependencies
@@ -63,6 +61,7 @@ import org.geotoolkit.client.RequestsUtilities;
 import org.geotoolkit.resources.Errors;
 import org.geotoolkit.util.StringUtilities;
 import java.util.Objects;
+import org.constellation.api.QueryConstants;
 import org.geotoolkit.wcs.xml.DescribeCoverage;
 import org.geotoolkit.wcs.xml.DescribeCoverageResponse;
 import org.geotoolkit.wcs.xml.GetCapabilities;
@@ -198,7 +197,7 @@ public class WCSService extends GridWebService<WCSWorker> {
             }
 
             throw new CstlServiceException("This service can not handle the requested operation: " + request + ".",
-                                           OPERATION_NOT_SUPPORTED, KEY_REQUEST.toLowerCase());
+                                           OPERATION_NOT_SUPPORTED, QueryConstants.REQUEST_PARAMETER.toLowerCase());
 
         } catch (CstlServiceException ex) {
             /*
@@ -299,16 +298,16 @@ public class WCSService extends GridWebService<WCSWorker> {
      * @throws CstlServiceException
      */
     private GetCapabilities adaptKvpGetCapabilitiesRequest() throws CstlServiceException {
-        final String service = getParameter(KEY_SERVICE, true);
+        final String service = getParameter(QueryConstants.SERVICE_PARAMETER, true);
         if (!service.equalsIgnoreCase("WCS")) {
             throw new CstlServiceException("The parameter SERVICE must be specified as WCS",
-                    MISSING_PARAMETER_VALUE, KEY_SERVICE.toLowerCase());
+                    MISSING_PARAMETER_VALUE, QueryConstants.SERVICE_PARAMETER.toLowerCase());
         }
 
         // TODO: find the best version when the WCS 1.1.1 will be fully implemented.
         //       For the moment, the version chosen is always the 1.0.0.
 
-//        String inputVersion = getParameter(KEY_VERSION, false);
+//        String inputVersion = getParameter(QueryConstants.VERSION_PARAMETER, false);
 //        if (inputVersion == null) {
 //            inputVersion = getParameter("acceptversions", false);
 //            if (inputVersion == null) {
@@ -356,7 +355,7 @@ public class WCSService extends GridWebService<WCSWorker> {
             return WCSXmlFactory.createGetCapabilities(finalVersion, versions, sections, formats, updateSequence, service);
         } else {
             throw new CstlServiceException("The version number specified for this request " +
-                    "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
+                    "is not handled.", VERSION_NEGOTIATION_FAILED, QueryConstants.VERSION_PARAMETER.toLowerCase());
         }
     }
 
@@ -368,7 +367,7 @@ public class WCSService extends GridWebService<WCSWorker> {
      * @throws CstlServiceException
      */
     private DescribeCoverage adaptKvpDescribeCoverageRequest(final Worker w) throws CstlServiceException {
-        final String strVersion = getParameter(KEY_VERSION, true);
+        final String strVersion = getParameter(QueryConstants.VERSION_PARAMETER, true);
         w.checkVersionSupported(strVersion, false);
         final String coverage;
         if ("1.0.0".equals(strVersion)) {
@@ -377,7 +376,7 @@ public class WCSService extends GridWebService<WCSWorker> {
             coverage = getParameter(KEY_IDENTIFIER, true);
         } else {
             throw new CstlServiceException("The version number specified for this request " +
-                    "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
+                    "is not handled.", VERSION_NEGOTIATION_FAILED, QueryConstants.VERSION_PARAMETER.toLowerCase());
         }
         return WCSXmlFactory.createDescribeCoverage(strVersion, Arrays.asList(coverage));
     }
@@ -398,7 +397,7 @@ public class WCSService extends GridWebService<WCSWorker> {
             return adaptKvpGetCoverageRequest111();
          } else {
             throw new CstlServiceException("The version number specified for this request " +
-                    "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
+                    "is not handled.", VERSION_NEGOTIATION_FAILED, QueryConstants.VERSION_PARAMETER.toLowerCase());
          }
     }
 
