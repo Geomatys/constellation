@@ -18,15 +18,19 @@
  */
 package org.constellation.process.service;
 
+import org.constellation.admin.ServiceBusiness;
 import org.constellation.configuration.*;
 import org.geotoolkit.process.AbstractProcess;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
+
 import static org.geotoolkit.parameter.Parameters.*;
 import static org.constellation.process.service.AddLayerToMapServiceDescriptor.*;
 import static org.constellation.process.service.WSProcessUtils.*;
 
 import java.util.*;
+
+import javax.inject.Inject;
 import javax.xml.namespace.QName;
 
 import org.constellation.process.ConstellationProcessFactory;
@@ -49,6 +53,9 @@ import org.opengis.util.NoSuchIdentifierException;
  * @author Cédric Briançon (Geomatys)
  */
 public class AddLayerToMapService extends AbstractProcess {
+	
+	@Inject
+	ServiceBusiness serviceBusiness;
 
     AddLayerToMapService(final ProcessDescriptor desc, final ParameterValueGroup input) {
         super(desc, input);

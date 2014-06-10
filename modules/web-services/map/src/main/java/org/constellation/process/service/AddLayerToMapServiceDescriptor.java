@@ -19,13 +19,16 @@
 package org.constellation.process.service;
 
 import org.apache.sis.util.iso.ResourceInternationalString;
+import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.GetFeatureInfoCfg;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.util.DataReference;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
+
 import static org.constellation.process.service.WSProcessUtils.*;
+
 import org.geotoolkit.parameter.ExtendedParameterDescriptor;
 import org.geotoolkit.process.AbstractProcessDescriptor;
 import org.geotoolkit.process.Process;
@@ -164,7 +167,11 @@ public class AddLayerToMapServiceDescriptor extends AbstractProcessDescriptor {
      */
     @Override
     public Process createProcess(ParameterValueGroup input) {
-        return new AddLayerToMapService(this, input);
+        AddLayerToMapService addLayerToMapService = new AddLayerToMapService(this, input);
+        
+        SpringHelper.injectDependencies(addLayerToMapService);
+        
+        return addLayerToMapService;
     }
 
 
