@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.constellation.process.refreshindex;
+package org.constellation.process.client;
 
 
 import java.io.IOException;
@@ -29,7 +29,7 @@ import org.constellation.ServiceDef;
 import org.constellation.admin.service.ConstellationClient;
 import org.constellation.admin.service.ConstellationServerFactory;
 import org.constellation.process.AbstractCstlProcess;
-import static org.constellation.process.refreshindex.RefreshIndexDescriptor.*;
+import static org.constellation.process.client.RefreshIndexDescriptor.*;
 import static org.geotoolkit.io.X364.*;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.opengis.parameter.ParameterValueGroup;

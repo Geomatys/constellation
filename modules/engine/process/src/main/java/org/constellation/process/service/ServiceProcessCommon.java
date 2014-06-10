@@ -20,6 +20,7 @@ package org.constellation.process.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.sis.internal.util.UnmodifiableArrayList;
 import org.constellation.ServiceDef;
 
 /**
@@ -31,6 +32,8 @@ public final class ServiceProcessCommon {
     private ServiceProcessCommon() {
     }
 
+    public static final List<String> SUPPORTED_SERVICE_TYPE = UnmodifiableArrayList.wrap(new String[] {"WMS", "WFS", "WMTS", "WCS", "CSW", "SOS", "WPS", "WEBDAV"});
+    
     public static String[] servicesAvaible() {
 
         final List<String> validValues = new ArrayList<>();

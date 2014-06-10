@@ -19,6 +19,7 @@
 package org.constellation.process.refreshindex;
 
 import org.constellation.process.AbstractProcessTest;
+import org.constellation.process.client.RefreshIndexDescriptor;
 
 /**
  *

@@ -117,6 +117,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
     private void startAllInstance() {
         final List<String> serviceIDs = ConfigurationEngine.getServiceConfigurationIds(serviceName);
         for (String serviceID : serviceIDs) {
+            
             try {
                 ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StartServiceDescriptor.NAME);
                 ParameterValueGroup inputs = desc.getInputDescriptor().createValue();

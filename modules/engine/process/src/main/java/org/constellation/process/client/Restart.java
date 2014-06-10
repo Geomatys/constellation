@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.constellation.process.restart;
+package org.constellation.process.client;
 
 
 import java.io.IOException;
@@ -30,7 +30,7 @@ import org.constellation.process.AbstractCstlProcess;
 import org.opengis.parameter.ParameterValueGroup;
 
 import static org.geotoolkit.io.X364.*;
-import static org.constellation.process.restart.RestartDescriptor.*;
+import static org.constellation.process.client.RestartDescriptor.*;
 import org.geotoolkit.process.ProcessDescriptor;
 
 /**

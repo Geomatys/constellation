@@ -7,76 +7,96 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.constellation</groupId>
-    <artifactId>engine</artifactId>
-    <version>0.9-SNAPSHOT</version>
-  </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.constellation</groupId>
+        <artifactId>engine</artifactId>
+        <version>0.9-SNAPSHOT</version>
+    </parent>
 
 
 
-  <!--  Module description.  -->
-  <groupId>org.constellation.engine</groupId>
-  <artifactId>cstl-engine-process</artifactId>
-  <packaging>jar</packaging>
-  <name>Constellation Process Engine</name>
-  <description>
-    Provide the various constellation tasks.
-  </description>
+    <!--  Module description.  -->
+    <groupId>org.constellation.engine</groupId>
+    <artifactId>cstl-engine-process</artifactId>
+    <packaging>jar</packaging>
+    <name>Constellation Process Engine</name>
+    <description>
+        Provide the various constellation tasks.
+    </description>
 
 
 
-  <!--  Developers and contributors.  -->
-  <developers>
-    <developer>
-      <id>glegal</id>
-      <name>Guilhem Legal</name>
-      <email>guilhem.legal@geomatys.com</email>
-      <organization>Geomatys</organization>
-      <organizationUrl>http://www.geomatys.com/</organizationUrl>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-    <developer>
-      <id>qboileau</id>
-      <name>Quentin Boileau</name>
-      <email>quentin.boileau@geomatys.com</email>
-      <organization>Geomatys</organization>
-      <organizationUrl>http://www.geomatys.com/</organizationUrl>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-  </developers>
+    <!--  Developers and contributors.  -->
+    <developers>
+        <developer>
+            <id>glegal</id>
+            <name>Guilhem Legal</name>
+            <email>guilhem.legal@geomatys.com</email>
+            <organization>Geomatys</organization>
+            <organizationUrl>http://www.geomatys.com/</organizationUrl>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+        <developer>
+            <id>qboileau</id>
+            <name>Quentin Boileau</name>
+            <email>quentin.boileau@geomatys.com</email>
+            <organization>Geomatys</organization>
+            <organizationUrl>http://www.geomatys.com/</organizationUrl>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
 
-  <!--
-    Required dependencies for building. These dependencies wil be included into
-    the JARs list that Maven will put into the directory "target/binaries".
-  -->
-  <dependencies>
-    <dependency>
-       <groupId>org.constellation.engine</groupId>
-       <artifactId>cstl-engine-process-core</artifactId>
-       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-       <groupId>org.constellation</groupId>
-       <artifactId>cstl-client</artifactId>
-       <version>${project.version}</version>
-    </dependency>
+    <!--
+      Required dependencies for building. These dependencies wil be included into
+      the JARs list that Maven will put into the directory "target/binaries".
+    -->
+    <dependencies>
+        <dependency>
+            <groupId>org.constellation.engine</groupId>
+            <artifactId>cstl-engine-process-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation</groupId>
+            <artifactId>cstl-client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-    <dependency>
-       <groupId>org.constellation.engine</groupId>
-       <artifactId>cstl-engine-process-core</artifactId>
-       <version>${project.version}</version>
-       <type>test-jar</type>
-       <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.constellation.engine</groupId>
+            <artifactId>cstl-engine-process-core</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.testing</groupId>
+            <artifactId>cstl-test-data</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
-  </dependencies>
-
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

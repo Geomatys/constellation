@@ -138,8 +138,8 @@
         <scope>test</scope>
     </dependency>
     <dependency>
-        <groupId>org.constellation.web-services</groupId>
-        <artifactId>cstl-web-ogc</artifactId>
+        <groupId>org.constellation.engine</groupId>
+        <artifactId>cstl-engine-process</artifactId>
         <version>${project.version}</version>
         <type>test-jar</type>
         <scope>test</scope>
