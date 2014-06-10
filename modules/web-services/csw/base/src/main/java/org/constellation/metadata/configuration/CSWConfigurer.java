@@ -53,11 +53,11 @@ public class CSWConfigurer extends OGCConfigurer {
      * {@inheritDoc}
      */
     @Override
-    public void createInstance(final String identifier, final Service metadata, Object configuration) throws ConfigurationException {
+    public void createInstance(final String serviceType, final String identifier, final Service metadata, Object configuration) throws ConfigurationException {
         if (configuration == null) {
             configuration = new Automatic("filesystem", new BDD());
         }
-        super.createInstance(identifier, metadata, configuration);
+        super.createInstance(serviceType, identifier, metadata, configuration);
     }
 
     public AcknowlegementType refreshIndex(final String id, final boolean asynchrone, final boolean forced) throws ConfigurationException {
@@ -112,8 +112,8 @@ public class CSWConfigurer extends OGCConfigurer {
      * {@inheritDoc}
      */
     @Override
-    public Instance getInstance(final String identifier) throws ConfigurationException {
-        final Instance instance = super.getInstance(identifier);
+    public Instance getInstance(final String serviceType, final String identifier) throws ConfigurationException {
+        final Instance instance = super.getInstance(serviceType, identifier);
         try {
             instance.setLayersNumber(getMetadataCount(identifier));
         } catch (ConfigurationException ex) {

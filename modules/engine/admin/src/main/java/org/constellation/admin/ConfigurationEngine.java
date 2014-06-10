@@ -39,7 +39,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
 
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.logging.Logging;
@@ -54,7 +53,6 @@ import org.constellation.admin.dao.ServiceRecord;
 import org.constellation.admin.dao.Session;
 import org.constellation.admin.dao.StyleRecord;
 import org.constellation.admin.dao.TaskRecord;
-import org.constellation.admin.util.IOUtilities;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.ServiceProtocol;
@@ -62,9 +60,7 @@ import org.constellation.configuration.StyleBrief;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.Service;
 import org.constellation.engine.register.ConfigurationService;
-import org.constellation.engine.register.ConstellationPersistenceException;
 import org.constellation.engine.register.MetadataIOUtils;
-import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.security.NoSecurityManagerException;
 import org.constellation.security.SecurityManager;
@@ -72,8 +68,6 @@ import org.constellation.util.Util;
 import org.constellation.utils.CstlMetadatas;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.FileUtilities;
-import org.geotoolkit.xml.parameter.ParameterValueReader;
-import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 
 /**
@@ -166,12 +160,10 @@ public class ConfigurationEngine {
     }
 
     public static boolean serviceConfigurationExist(final String serviceType, final String identifier) {
-
-        final ServiceDef.Specification spec = ServiceDef.Specification.fromShortName(serviceType);
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
-            return session.readService(identifier, spec) != null;
+            return session.readService(identifier, serviceType) != null;
 
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, "An error occurred while get services in database", ex);
@@ -183,19 +175,17 @@ public class ConfigurationEngine {
     }
 
     public static boolean deleteConfiguration(final String serviceType, final String identifier) {
-
-        final ServiceDef.Specification spec = ServiceDef.Specification.fromShortName(serviceType);
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
             // look fr existence
-            final ServiceRecord serv = session.readService(identifier, spec);
+            final ServiceRecord serv = session.readService(identifier, serviceType);
             if (serv != null) {
                 final File instanceDir = ConfigDirectory.getInstanceDirectory(serviceType, identifier);
                 if (instanceDir.isDirectory()) {
                     FileUtilities.deleteDirectory(instanceDir);
                 }
-                session.deleteService(identifier, spec);
+                session.deleteService(identifier, serviceType);
                 return true;
             }
 
@@ -209,11 +199,10 @@ public class ConfigurationEngine {
     }
 
     public static boolean renameConfiguration(final String serviceType, final String identifier, final String newID) {
-        final ServiceDef.Specification spec = ServiceDef.Specification.fromShortName(serviceType);
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
-            final ServiceRecord service = session.readService(identifier, spec);
+            final ServiceRecord service = session.readService(identifier, serviceType);
             service.setIdentifier(newID);
             return true;
         } catch (SQLException ex) {
@@ -232,11 +221,10 @@ public class ConfigurationEngine {
         if (language == null) {
             language = "eng";
         }
-        final ServiceDef.Specification spec = ServiceDef.Specification.fromShortName(serviceType);
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
-            final ServiceRecord service = session.readService(identifier, spec);
+            final ServiceRecord service = session.readService(identifier, serviceType);
             if (service != null) {
                 final StringWriter sw = new StringWriter();
                 final Marshaller m = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
@@ -272,8 +260,7 @@ public class ConfigurationEngine {
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
-            final ServiceRecord rec = session.readService(identifier,
-                    ServiceDef.Specification.fromShortName(serviceType));
+            final ServiceRecord rec = session.readService(identifier,serviceType);
             if (rec != null) {
                 final InputStream is = rec.getMetadata(language);
                 if (is != null) {
@@ -1152,7 +1139,7 @@ public class ConfigurationEngine {
     }
 
     // FIXME LayerRecord should not be exposed!
-    public static LayerRecord getLayer(final String identifier, final ServiceDef.Specification specification,
+    public static LayerRecord getLayer(final String identifier, final String specification,
             final QName name) {
 
         Session session = null;
@@ -1173,7 +1160,7 @@ public class ConfigurationEngine {
         return null;
     }
 
-    public static void deleteLayer(final String identifier, final ServiceDef.Specification specification,
+    public static void deleteLayer(final String identifier, final String specification,
             final QName name) {
         Session session = null;
 

@@ -1088,10 +1088,10 @@ public final class Session implements Closeable {
         return new Query(READ_SERVICE_FROM_ID).with(generatedId).select().getFirst(ServiceRecord.class);
     }
 //ZOZO
-    public ServiceRecord readService(final String identifier, final Specification spec) throws SQLException {
+    public ServiceRecord readService(final String identifier, final String spec) throws SQLException {
         ensureNonNull("identifier", identifier);
         ensureNonNull("spec",       spec);
-        return new Query(READ_SERVICE).with(identifier, spec.name()).select().getFirst(ServiceRecord.class);
+        return new Query(READ_SERVICE).with(identifier, spec).select().getFirst(ServiceRecord.class);
     }
 
     /* internal */ InputStream readServiceConfig(final int generatedId) throws SQLException {
@@ -1142,7 +1142,7 @@ public final class Session implements Closeable {
         ensureNonNull("identifier", identifier);
         ensureNonNull("spec",       spec);
 
-        final ServiceRecord record = readService(identifier, spec);
+        final ServiceRecord record = readService(identifier, spec.name());
 
         // Proceed to insertion.
         new Query(WRITE_SERVICE_EXTRA_CONFIG).with(record.id, fileName, config).insert();
@@ -1152,7 +1152,7 @@ public final class Session implements Closeable {
         ensureNonNull("identifier", identifier);
         ensureNonNull("spec",       spec);
 
-        final ServiceRecord record = readService(identifier, spec);
+        final ServiceRecord record = readService(identifier, spec.name());
 
         // Proceed to insertion.
         new Query(WRITE_SERVICE_METADATA).with(record.id, lang, metadata).insert();
@@ -1162,7 +1162,7 @@ public final class Session implements Closeable {
         ensureNonNull("identifier", identifier);
         ensureNonNull("spec",       spec);
 
-        final ServiceRecord record = readService(identifier, spec);
+        final ServiceRecord record = readService(identifier, spec.name());
 
         new Query(UPDATE_SERVICE_ISO_METADATA).with(metadataId, isoMetadata, record.id).update();
     }
@@ -1183,14 +1183,14 @@ public final class Session implements Closeable {
         new Query(UPDATE_SERVICE_METADATA).with(newMetadata, generatedId, lang).update();
     }
 
-    public void deleteService(final String identifier, final Specification spec) throws SQLException {
+    public void deleteService(final String identifier, final String spec) throws SQLException {
         ensureNonNull("identifier", identifier);
         ensureNonNull("spec",       spec);
         final ServiceRecord record = readService(identifier, spec);
         if (record != null) {
             new Query(DELETE_SERVICE_METADATA).with(record.id).update();
             new Query(DELETE_SERVICE_EXTRA_CONFIG).with(record.id).update();
-            new Query(DELETE_SERVICE).with(identifier, spec.name()).update();
+            new Query(DELETE_SERVICE).with(identifier, spec).update();
         }
     }
 

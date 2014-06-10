@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -87,7 +86,7 @@ public final class OGCServices {
     @Path("{id}")
     public Response getInstance(final @PathParam("spec") String spec, final @PathParam("id") String id) throws Exception {
         try {
-            return ok(getConfigurer(spec).getInstance(id));
+            return ok(getConfigurer(spec).getInstance(spec, id));
         } catch (ConfigurationException e) {
             LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
             throw e;
@@ -101,7 +100,7 @@ public final class OGCServices {
     @Path("all")
     public Response getInstances(final @PathParam("spec") String spec) throws Exception {
         try {
-            return ok(new InstanceReport(getConfigurer(spec).getInstances()));
+            return ok(new InstanceReport(getConfigurer(spec).getInstances(spec)));
         } catch (ConfigurationException e) {
             LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
             throw e;
@@ -129,7 +128,7 @@ public final class OGCServices {
         }
         
         try {
-            getConfigurer(spec).createInstance(metadata.getIdentifier(), metadata, null);
+            getConfigurer(spec).createInstance(spec, metadata.getIdentifier(), metadata, null);
         } catch (ConfigurationException e) {
             LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
             throw e;
@@ -149,7 +148,7 @@ public final class OGCServices {
     @Path("{id}/start")
     public Response start(final @PathParam("spec") String spec, final @PathParam("id") String id) throws Exception {
         try {
-            getConfigurer(spec).startInstance(id);
+            getConfigurer(spec).startInstance(spec, id);
         } catch (ConfigurationException e) {
             LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
             throw e;
@@ -164,7 +163,7 @@ public final class OGCServices {
     @Path("{id}/stop")
     public Response stop(final @PathParam("spec") String spec, final @PathParam("id") String id) throws Exception {
         try {
-            getConfigurer(spec).stopInstance(id);
+            getConfigurer(spec).stopInstance(spec, id);
         } catch (ConfigurationException e) {
             LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
             throw e;
@@ -179,7 +178,7 @@ public final class OGCServices {
     @Path("{id}/restart")
     public Response restart(final @PathParam("spec") String spec, final @PathParam("id") String id, final SimpleValue stopFirst) throws Exception {
         try {
-            getConfigurer(spec).restartInstance(id, stopFirst.getAsBoolean());
+            getConfigurer(spec).restartInstance(spec, id, stopFirst.getAsBoolean());
         } catch (ConfigurationException e) {
             LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
             throw e;
@@ -194,7 +193,7 @@ public final class OGCServices {
     @Path("{id}/rename")
     public Response rename(final @PathParam("spec") String spec, final @PathParam("id") String id, final SimpleValue newId) throws Exception {
         try {
-            getConfigurer(spec).renameInstance(id, newId.getValue());
+            getConfigurer(spec).renameInstance(spec, id, newId.getValue());
         } catch (ConfigurationException e) {
             LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
             throw e;
@@ -209,7 +208,7 @@ public final class OGCServices {
     @Path("{id}")
     public Response delete(final @PathParam("spec") String spec, final @PathParam("id") String id) throws Exception {
         try {
-            getConfigurer(spec).deleteInstance(id);
+            getConfigurer(spec).deleteInstance(spec, id);
         } catch (ConfigurationException e) {
             LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
             throw e;
@@ -224,7 +223,7 @@ public final class OGCServices {
     @Path("{id}/config")
     public Response getConfiguration(final @PathParam("spec") String spec, final @PathParam("id") String id) throws Exception {
         try {
-            return ok(getConfigurer(spec).getInstanceConfiguration(id));
+            return ok(getConfigurer(spec).getInstanceConfiguration(spec, id));
         } catch (ConfigurationException e) {
             LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
             throw e;
@@ -242,7 +241,7 @@ public final class OGCServices {
             final Unmarshaller um = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
             final Object config = um.unmarshal(is);
             GenericDatabaseMarshallerPool.getInstance().recycle(um);
-            getConfigurer(spec).setInstanceConfiguration(id, config);
+            getConfigurer(spec).setInstanceConfiguration(spec, id, config);
         } catch (ConfigurationException | JAXBException e) {
             LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
             throw e;
@@ -284,7 +283,7 @@ public final class OGCServices {
                 return ok(AcknowlegementType.failure("Unknown configuration object given, unable to update service configuration"));
             }
             final Object configObj = jsonUnmarshaller.unmarshalFromJSON(new StringReader(json), c);
-            getConfigurer(spec).setInstanceConfiguration(id, configObj);
+            getConfigurer(spec).setInstanceConfiguration(spec, id, configObj);
         } catch (ConfigurationException | JAXBException | IOException e) {
             LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
             throw e;
@@ -299,7 +298,7 @@ public final class OGCServices {
     @Path("{id}/metadata")
     public Response getMetadata(final @PathParam("spec") String spec, final @PathParam("id") String id) throws Exception {
         try {
-            return ok(getConfigurer(spec).getInstanceMetadata(id));
+            return ok(getConfigurer(spec).getInstanceMetadata(spec, id));
         } catch (ConfigurationException e) {
             LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
             throw e;
@@ -313,7 +312,7 @@ public final class OGCServices {
     @Path("{id}/metadata")
     public Response setMetadata(final @PathParam("spec") String spec, final @PathParam("id") String id, final Service metadata) throws Exception {
         try {
-            getConfigurer(spec).setInstanceMetadata(id, metadata);
+            getConfigurer(spec).setInstanceMetadata(spec, id, metadata);
         } catch (ConfigurationException e) {
             LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
             throw e;

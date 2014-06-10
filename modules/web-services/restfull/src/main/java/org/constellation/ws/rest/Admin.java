@@ -150,7 +150,7 @@ public class Admin {
 
                 if (serviceIdentifiers != null) {
                     final OGCConfigurer configurer = (OGCConfigurer) ServiceConfigurer.newInstance(spec);
-                    for (Instance instance : configurer.getInstances()) {
+                    for (Instance instance : configurer.getInstances(spec.name())) {
                         if (serviceIdentifiers.contains(instance.getIdentifier())) {
                             instances.add(instance);
                         }

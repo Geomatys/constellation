@@ -97,7 +97,7 @@ public class SOSConfigurer extends OGCConfigurer {
      * {@inheritDoc}
      */
     @Override
-    public void createInstance(final String identifier, final Service metadata, Object configuration) throws ConfigurationException {
+    public void createInstance(final String spec, final String identifier, final Service metadata, Object configuration) throws ConfigurationException {
         if (configuration == null) {
             final SOSConfiguration baseConfig = new SOSConfiguration(new Automatic(null, new BDD()), new Automatic(null, new BDD()));
             baseConfig.setObservationReaderType(DataSourceType.FILESYSTEM);
@@ -106,12 +106,12 @@ public class SOSConfigurer extends OGCConfigurer {
             baseConfig.setSMLType(DataSourceType.FILESYSTEM);
             configuration = baseConfig;
         }
-        super.createInstance(identifier, metadata, configuration);
+        super.createInstance(spec, identifier, metadata, configuration);
     }
 
     @Override
-    public Instance getInstance(String identifier) throws ConfigurationException {
-        final Instance instance = super.getInstance(identifier);
+    public Instance getInstance(final String spec, final String identifier) throws ConfigurationException {
+        final Instance instance = super.getInstance(spec, identifier);
         try {
             instance.setLayersNumber(getSensorIds(identifier).size());
         } catch (ConfigurationException ex) {

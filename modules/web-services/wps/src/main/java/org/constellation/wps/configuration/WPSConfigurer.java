@@ -48,10 +48,10 @@ public class WPSConfigurer extends OGCConfigurer {
      * {@inheritDoc}
      */
     @Override
-    public void createInstance(final String identifier, final Service metadata, Object configuration) throws ConfigurationException {
+    public void createInstance(final String serviceType, final String identifier, final Service metadata, Object configuration) throws ConfigurationException {
         if (configuration == null) {
             configuration = new ProcessContext(new Processes(true));
         }
-        super.createInstance(identifier, metadata, configuration);
+        super.createInstance(serviceType, identifier, metadata, configuration);
     }
 }

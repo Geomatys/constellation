@@ -61,7 +61,7 @@ public class CSWServices {
         final CSWConfigurer conf = getConfigurer();
         final AcknowlegementType ack = conf.refreshIndex(id, asynchrone, forced);
         if (asynchrone && ack.getStatus().equals("Sucess")) {
-            conf.restartInstance(id, false);
+            conf.restartInstance("CSW", id, false);
         }
         return ok(ack);
    }

@@ -60,7 +60,7 @@ public final class MapRest {
     @Path("{id}/layer/all")
     public Response getLayers(final @PathParam("spec") String spec, final @PathParam("id") String id) throws Exception {
         try {
-            return ok(new LayerList(getConfigurer(spec).getLayers(id)));
+            return ok(new LayerList(getConfigurer(spec).getLayers(spec, id)));
         } catch (ConfigurationException e) {
             LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
             throw e;
@@ -72,7 +72,7 @@ public final class MapRest {
     public Response getLayersSummary(final @PathParam("spec") String spec, final @PathParam("id") String id) throws Exception {
         final List<Layer> layers;
         try {
-            layers = getConfigurer(spec).getLayers(id);
+            layers = getConfigurer(spec).getLayers(spec, id);
         } catch (ConfigurationException e) {
             LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
             throw e;
@@ -113,7 +113,7 @@ public final class MapRest {
             } else {
                 layerName = new QName(layerid);
             }
-            getConfigurer(spec).removeLayer(serviceId, layerName);
+            getConfigurer(spec).removeLayer(spec, serviceId, layerName);
         } catch (ConfigurationException e) {
             LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
             throw e;
@@ -125,7 +125,7 @@ public final class MapRest {
     @Path("{id}/updatestyle")
     public Response updateLayerStyleForService(final @PathParam("spec") String spec, final @PathParam("id") String serviceId, final ParameterValues params) throws Exception {
         try {
-            getConfigurer(spec).updateLayerStyle(serviceId, params.get("layerId"), params.get("spId"), params.get("styleName"));
+            getConfigurer(spec).updateLayerStyle(spec, serviceId, params.get("layerId"), params.get("spId"), params.get("styleName"));
         } catch (ConfigurationException e) {
             LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
             throw e;
@@ -137,7 +137,7 @@ public final class MapRest {
     @Path("{id}/removestyle")
     public Response removeLayerStyleForService(final @PathParam("spec") String spec, final @PathParam("id") String serviceId, final ParameterValues params) throws Exception {
         try {
-            getConfigurer(spec).removeLayerStyle(serviceId, params.get("layerId"), params.get("spId"), params.get("styleName"));
+            getConfigurer(spec).removeLayerStyle(spec, serviceId, params.get("layerId"), params.get("spId"), params.get("styleName"));
         } catch (ConfigurationException e) {
             LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
             throw e;

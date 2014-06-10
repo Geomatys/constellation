@@ -124,7 +124,7 @@ public class MapConfigurer extends OGCConfigurer {
      * @throws ConfigurationException if the operation has failed for any reason
      */
     public void addLayer(final AddLayer addLayerData) throws ConfigurationException {
-        this.ensureExistingInstance(addLayerData.getServiceId());
+        this.ensureExistingInstance(addLayerData.getServiceType(), addLayerData.getServiceId());
 
         final DataProvider provider = DataProviders.getInstance().getProvider(addLayerData.getProviderId());
         final String namespace;
@@ -254,15 +254,15 @@ public class MapConfigurer extends OGCConfigurer {
      * @throws TargetNotFoundException if the service with specified identifier does not exist
      * @throws ConfigurationException if the operation has failed for any reason
      */
-    public List<Layer> getLayers(final String identifier) throws ConfigurationException {
-        this.ensureExistingInstance(identifier);
+    public List<Layer> getLayers(final String spec, final String identifier) throws ConfigurationException {
+        this.ensureExistingInstance(spec, identifier);
 
         // Extracts the layer list from service configuration.
-        final LayerContext layerContext = (LayerContext) this.getInstanceConfiguration(identifier);
+        final LayerContext layerContext = (LayerContext) this.getInstanceConfiguration(spec, identifier);
         List<Layer> layers = MapUtilities.getConfigurationLayers(layerContext, null, null);
 
         for (Layer layer : layers) {
-            final LayerRecord record = ConfigurationEngine.getLayer(identifier, this.specification, layer.getName());
+            final LayerRecord record = ConfigurationEngine.getLayer(identifier, spec, layer.getName());
             if (record != null) {
                 layer.setDate(record.getDate());
                 layer.setOwner(record.getOwnerLogin());
@@ -276,9 +276,9 @@ public class MapConfigurer extends OGCConfigurer {
      * {@inheritDoc}
      */
     @Override
-    public Instance getInstance(String identifier) throws ConfigurationException {
-        final Instance instance = super.getInstance(identifier);
-        instance.setLayersNumber(getLayers(identifier).size());
+    public Instance getInstance(String spec, String identifier) throws ConfigurationException {
+        final Instance instance = super.getInstance(spec, identifier);
+        instance.setLayersNumber(getLayers(spec, identifier).size());
         return instance;
     }
     /**
@@ -286,26 +286,27 @@ public class MapConfigurer extends OGCConfigurer {
      * Add default FeatureInfoFormat for LayerContext configuration.
      */
     @Override
-    public void createInstance(String identifier, Service metadata, Object configuration) throws ConfigurationException {
+    public void createInstance(String spec, String identifier, Service metadata, Object configuration) throws ConfigurationException {
 
         if (configuration == null) {
             configuration = new LayerContext();
             ((LayerContext)configuration).setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
         }
 
-        super.createInstance(identifier, metadata, configuration);
+        super.createInstance(spec, identifier, metadata, configuration);
     }
 
     /**
      * Remove a layer from a service.
      *
+     * @param spec service type.
      * @param serviceId the service identifier
      * @param layerId the layer to remove
      * @throws ConfigurationException
      */
-    public void removeLayer(final String serviceId, final QName layerId) throws ConfigurationException {
+    public void removeLayer(final String spec, final String serviceId, final QName layerId) throws ConfigurationException {
         try {
-            final LayerContext layerContext = (LayerContext) ConfigurationEngine.getConfiguration(specification.name(), serviceId);
+            final LayerContext layerContext = (LayerContext) ConfigurationEngine.getConfiguration(spec, serviceId);
             final List<Source> sources = layerContext.getLayers();
             QName name = null;
             boolean found = false;
@@ -326,9 +327,9 @@ public class MapConfigurer extends OGCConfigurer {
             }
 
             if(found){
-                ConfigurationEngine.storeConfiguration(specification.name(), serviceId, layerContext);
-                ConfigurationEngine.deleteLayer(serviceId, specification, name);
-                restartInstance(serviceId, true);
+                ConfigurationEngine.storeConfiguration(spec, serviceId, layerContext);
+                ConfigurationEngine.deleteLayer(serviceId, spec, name);
+                restartInstance(spec, serviceId, true);
             }
 
         } catch (Exception e) {
@@ -344,9 +345,9 @@ public class MapConfigurer extends OGCConfigurer {
      * @param styleName
      * @throws ConfigurationException
      */
-    public void updateLayerStyle(final String serviceId, final String layerId, final String spId, final String styleName) throws ConfigurationException {
+    public void updateLayerStyle(final String spec, final String serviceId, final String layerId, final String spId, final String styleName) throws ConfigurationException {
         try {
-            final LayerContext layerContext = (LayerContext) ConfigurationEngine.getConfiguration(specification.name(), serviceId);
+            final LayerContext layerContext = (LayerContext) ConfigurationEngine.getConfiguration(spec, serviceId);
             final List<Source> sources = layerContext.getLayers();
             boolean found = false;
 
@@ -365,8 +366,8 @@ public class MapConfigurer extends OGCConfigurer {
             }
 
             if(found){
-                ConfigurationEngine.storeConfiguration(specification.name(), serviceId, layerContext);
-                restartInstance(serviceId, true);
+                ConfigurationEngine.storeConfiguration(spec, serviceId, layerContext);
+                restartInstance(spec, serviceId, true);
             }
 
         } catch (Exception e) {
@@ -382,9 +383,9 @@ public class MapConfigurer extends OGCConfigurer {
      * @param styleName
      * @throws ConfigurationException
      */
-    public void removeLayerStyle(final String serviceId, final String layerId, final String spId, final String styleName) throws ConfigurationException {
+    public void removeLayerStyle(final String spec, final String serviceId, final String layerId, final String spId, final String styleName) throws ConfigurationException {
         try {
-            final LayerContext layerContext = (LayerContext) ConfigurationEngine.getConfiguration(specification.name(), serviceId);
+            final LayerContext layerContext = (LayerContext) ConfigurationEngine.getConfiguration(spec, serviceId);
             final List<Source> sources = layerContext.getLayers();
             boolean found = false;
 
@@ -403,8 +404,8 @@ public class MapConfigurer extends OGCConfigurer {
             }
 
             if(found){
-                ConfigurationEngine.storeConfiguration(specification.name(), serviceId, layerContext);
-                restartInstance(serviceId, true);
+                ConfigurationEngine.storeConfiguration(spec, serviceId, layerContext);
+                restartInstance(spec, serviceId, true);
             }
 
         } catch (Exception e) {
