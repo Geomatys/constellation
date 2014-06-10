@@ -39,7 +39,7 @@ public final class WebServiceUtilities {
      * @throws CstlServiceException if the parameter namespace is malformed.
      */
     public static Map<String,String> extractNamespace(String namespace) throws CstlServiceException {
-        final Map<String, String> namespaces = new HashMap<String, String>();
+        final Map<String, String> namespaces = new HashMap<>();
         if (namespace != null) {
             final StringTokenizer tokens = new StringTokenizer(namespace, ",;");
             while (tokens.hasMoreTokens()) {
@@ -87,7 +87,7 @@ public final class WebServiceUtilities {
     /*
      * This map is temporary while we don't know how to extract the request mapping from JAX-WS
      */
-    public static final Map<String, String> DUMMY_MAPPING = new HashMap<String, String>();
+    public static final Map<String, String> DUMMY_MAPPING = new HashMap<>();
     static {
         DUMMY_MAPPING.put("swes", "http://www.opengis.net/swes/2.0");
         DUMMY_MAPPING.put("sos", "http://www.opengis.net/sos/2.0");

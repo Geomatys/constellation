@@ -27,28 +27,19 @@ import java.util.Map;
 import javax.xml.bind.JAXBException;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.ConfigurationEngine;
-import org.constellation.configuration.ConfigProcessException;
+import org.constellation.admin.ServiceBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.ServiceStatus;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.Service;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.service.CreateServiceDescriptor;
-import org.constellation.process.service.DeleteServiceDescriptor;
-import org.constellation.process.service.GetConfigServiceDescriptor;
-import org.constellation.process.service.RenameServiceDescriptor;
-import org.constellation.process.service.RestartServiceDescriptor;
-import org.constellation.process.service.SetConfigServiceDescriptor;
-import org.constellation.process.service.StartServiceDescriptor;
-import org.constellation.process.service.StopServiceDescriptor;
 import org.constellation.ws.ServiceConfigurer;
 import org.constellation.ws.WSEngine;
 import org.geotoolkit.process.ProcessDescriptor;
-import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
-import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.NoSuchIdentifierException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Describe methods which need to be specify by an implementation to manage
@@ -61,6 +52,9 @@ import org.opengis.util.NoSuchIdentifierException;
  */
 public abstract class OGCConfigurer extends ServiceConfigurer {
 
+    @Autowired
+    private ServiceBusiness serviceBusiness;
+    
     /**
      * Create a new {@link OGCConfigurer} instance.
      *
@@ -80,18 +74,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
     public void createInstance(final String identifier, final Service metadata, final Object configuration) throws ConfigurationException {
-        final ProcessDescriptor desc = getProcessDescriptor(CreateServiceDescriptor.NAME);
-        final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-        inputs.parameter(CreateServiceDescriptor.SERVICE_TYPE_NAME).setValue(specification.name());
-        inputs.parameter(CreateServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
-        inputs.parameter(CreateServiceDescriptor.CONFIG_NAME).setValue(configuration);
-        inputs.parameter(CreateServiceDescriptor.SERVICE_METADATA_NAME).setValue(metadata);
-        inputs.parameter(CreateServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(configClass);
-        try {
-            desc.createProcess(inputs).call();
-        } catch (ProcessException ex) {
-            throw new ConfigProcessException("Process to create a service instance has reported an error.", ex);
-        }
+        serviceBusiness.createInstance(specification.name(), identifier, configuration, metadata, configClass);
     }
 
     /**
@@ -103,15 +86,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      */
     public void startInstance(final String identifier) throws ConfigurationException {
         this.ensureExistingInstance(identifier);
-        final ProcessDescriptor desc = getProcessDescriptor(StartServiceDescriptor.NAME);
-        final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-        inputs.parameter(StartServiceDescriptor.SERVICE_TYPE_NAME).setValue(specification.name());
-        inputs.parameter(StartServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
-        try {
-            desc.createProcess(inputs).call();
-        } catch (ProcessException ex) {
-            throw new ConfigProcessException("Process to start a service instance has reported an error.", ex);
-        }
+        serviceBusiness.startInstance(specification.name(), identifier);
     }
 
     /**
@@ -123,15 +98,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      */
     public void stopInstance(final String identifier) throws ConfigurationException {
         this.ensureExistingInstance(identifier);
-        final ProcessDescriptor desc = getProcessDescriptor(StopServiceDescriptor.NAME);
-        final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-        inputs.parameter(StopServiceDescriptor.SERVICE_TYPE_NAME).setValue(specification.name());
-        inputs.parameter(StopServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
-        try {
-            desc.createProcess(inputs).call();
-        } catch (ProcessException ex) {
-            throw new ConfigProcessException("Process to stop a service instance has reported an error.", ex);
-        }
+        serviceBusiness.stopInstance(specification.name(), identifier);
     }
 
     /**
@@ -144,16 +111,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      */
     public void restartInstance(final String identifier, final boolean closeFirst) throws ConfigurationException {
         this.ensureExistingInstance(identifier);
-        final ProcessDescriptor desc = getProcessDescriptor(RestartServiceDescriptor.NAME);
-        final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-        inputs.parameter(RestartServiceDescriptor.SERVICE_TYPE_NAME).setValue(specification.name());
-        inputs.parameter(RestartServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
-        inputs.parameter(RestartServiceDescriptor.CLOSE_NAME).setValue(closeFirst);
-        try {
-            desc.createProcess(inputs).call();
-        } catch (ProcessException ex) {
-            throw new ConfigProcessException("Process to restart a service instance has reported an error.", ex);
-        }
+        serviceBusiness.restartInstance(specification.name(), identifier, closeFirst);
     }
 
     /**
@@ -166,16 +124,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      */
     public void renameInstance(final String identifier, final String newIdentifier) throws ConfigurationException {
         this.ensureExistingInstance(identifier);
-        final ProcessDescriptor desc = getProcessDescriptor(RenameServiceDescriptor.NAME);
-        final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-        inputs.parameter(RenameServiceDescriptor.SERVICE_TYPE_NAME).setValue(specification.name());
-        inputs.parameter(RenameServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
-        inputs.parameter(RenameServiceDescriptor.NEW_NAME_NAME).setValue(newIdentifier);
-        try {
-            desc.createProcess(inputs).call();
-        } catch (ProcessException ex) {
-            throw new ConfigProcessException("Process to rename a service instance has reported an error.", ex);
-        }
+        serviceBusiness.renameInstance(specification.name(), identifier, newIdentifier);
     }
 
     /**
@@ -187,15 +136,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      */
     public void deleteInstance(final String identifier) throws ConfigurationException {
         this.ensureExistingInstance(identifier);
-        final ProcessDescriptor desc = getProcessDescriptor(DeleteServiceDescriptor.NAME);
-        final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-        inputs.parameter(DeleteServiceDescriptor.SERVICE_TYPE_NAME).setValue(specification.name());
-        inputs.parameter(DeleteServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
-        try {
-            desc.createProcess(inputs).call();
-        } catch (ProcessException ex) {
-            throw new ConfigProcessException("Process to delete a service instance has reported an error.", ex);
-        }
+        serviceBusiness.deleteInstance(specification.name(), identifier);
     }
 
     /**
@@ -209,18 +150,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      */
     public void configureInstance(final String identifier, final Service metadata, final Object configuration) throws ConfigurationException {
         this.ensureExistingInstance(identifier);
-        final ProcessDescriptor desc = getProcessDescriptor(SetConfigServiceDescriptor.NAME);
-        final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-        inputs.parameter(SetConfigServiceDescriptor.SERVICE_TYPE_NAME).setValue(specification.name());
-        inputs.parameter(SetConfigServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
-        inputs.parameter(SetConfigServiceDescriptor.CONFIG_NAME).setValue(configuration);
-        inputs.parameter(SetConfigServiceDescriptor.SERVICE_METADATA_NAME).setValue(metadata);
-        inputs.parameter(SetConfigServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(configClass);
-        try {
-            desc.createProcess(inputs).call();
-        } catch (ProcessException ex) {
-            throw new ConfigProcessException("Process to configure a service instance has reported an error.", ex);
-        }
+        serviceBusiness.configureInstance(specification.name(), identifier, metadata, configuration, configClass);
         if (metadata != null && !identifier.equals(metadata.getIdentifier())) { // rename if necessary
             renameInstance(identifier, metadata.getIdentifier());
         }
@@ -236,17 +166,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      */
     public Object getInstanceConfiguration(final String identifier) throws ConfigurationException {
         this.ensureExistingInstance(identifier);
-        final ProcessDescriptor desc = getProcessDescriptor(GetConfigServiceDescriptor.NAME);
-        final ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-        inputs.parameter(GetConfigServiceDescriptor.SERVICE_TYPE_NAME).setValue(specification.name());
-        inputs.parameter(GetConfigServiceDescriptor.IDENTIFIER_NAME).setValue(identifier);
-        inputs.parameter(SetConfigServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(configClass);
-        try {
-            final ParameterValueGroup outputs = desc.createProcess(inputs).call();
-            return outputs.parameter(GetConfigServiceDescriptor.CONFIG_NAME).getValue();
-        } catch (ProcessException ex) {
-            throw new ConfigProcessException("Process to get a service instance configuration has reported an error.", ex);
-        }
+        return serviceBusiness.getInstanceConfiguration(specification.name(), identifier, configClass);
     }
 
     /**
