@@ -258,7 +258,7 @@ public enum ServiceDef {
             return this.equals(Specification.WMS)  ||this.equals(Specification.WMTS)
                  ||this.equals(Specification.WFS)  ||this.equals(Specification.CSW)
                  ||this.equals(Specification.WCS)  ||this.equals(Specification.SOS)
-                 ||this.equals(Specification.WPS);
+                 ||this.equals(Specification.WPS)  ||this.equals(Specification.WEBDAV) ;
         }
 
         public boolean supportedWXS() {

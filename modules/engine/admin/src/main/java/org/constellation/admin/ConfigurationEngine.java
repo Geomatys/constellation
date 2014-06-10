@@ -214,7 +214,7 @@ public class ConfigurationEngine {
         try {
             session = EmbeddedDatabase.createSession();
             final ServiceRecord service = session.readService(identifier, spec);
-            service.setIdentifier(identifier);
+            service.setIdentifier(newID);
             return true;
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, "An error occurred while deleting service in database", ex);

@@ -167,7 +167,7 @@ public class JServiceEditPane extends javax.swing.JPanel {
         try {
             correctName();
             serverV2.services.rename(ServiceDef.Specification.valueOf(serviceType), serviceInstance.getIdentifier(), guiName.getText());
-            serviceInstance.setName(guiName.getText());
+            serviceInstance.setIdentifier(guiName.getText());
             if (serviceEditionPanel != null) {
                 serverV2.services.setInstanceConfiguration(ServiceDef.Specification.fromShortName(serviceType), serviceInstance.getIdentifier(), serviceEditionPanel.getConfiguration());
             }

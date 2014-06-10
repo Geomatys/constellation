@@ -343,7 +343,7 @@ public final class ProvidersAPI {
     }
 
     public ProvidersReport listProviders() throws IOException {
-        return client.get("SP/providers", MediaType.APPLICATION_XML_TYPE).getEntity(ProvidersReport.class);  
+        return client.get("DP/providers", MediaType.APPLICATION_XML_TYPE).getEntity(ProvidersReport.class);  
     }
     
     public GeneralParameterDescriptor getServiceDescriptor(final String serviceName) throws IOException, XMLStreamException, ClassNotFoundException {

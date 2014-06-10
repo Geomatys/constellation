@@ -117,7 +117,8 @@ public final class ServicesAPI {
         ensureNonNull("serviceType", serviceType);
         ensureNonNull("metadata",    metadata);
 
-        final String path = "OGC/" + serviceType;
+        final String domain = "0";// TODO
+        final String path = "OGC/" + serviceType + "/domain/" + domain;
         client.put(path, MediaType.APPLICATION_XML_TYPE, metadata).ensure2xxStatus();
     }
 

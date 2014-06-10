@@ -126,7 +126,7 @@ public final class ConstellationClient {
         ensureNonNull("version", version);
 
         // Initialize Jersey client.
-        final Configuration config = new ClientConfig(NodeReader.class);
+        final Configuration config = new ClientConfig(NodeReader.class, ParameterValueGroupWriter.class);
         this.client = ClientBuilder.newClient(config);
         connectTimeout(5000);
         readTimeout(20000);

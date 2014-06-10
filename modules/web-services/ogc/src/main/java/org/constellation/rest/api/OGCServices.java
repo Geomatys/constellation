@@ -120,7 +120,7 @@ public final class OGCServices {
      * @see OGCConfigurer#createInstance(String, Service, Object)
      */
     @PUT
-    @Path("/domain/{domainId}")
+    @Path("domain/{domainId}")
     public Response addInstance(@PathParam("domainId") int domainId, final @PathParam("spec") String spec, final Service metadata) throws Exception {
         
         org.constellation.engine.register.Service service = serviceRepository.findByIdentifierAndType(metadata.getIdentifier(), spec);

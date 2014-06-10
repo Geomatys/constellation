@@ -20,6 +20,7 @@
 package org.constellation.rest.api;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -186,7 +187,7 @@ public class ProviderRest {
     
     @POST
     @Path("{serviceName}")
-    public Response createProvider(final @PathParam("serviceName") String serviceName, final Object providerConfig) throws ConfigurationException {
+    public Response createProvider(final @PathParam("serviceName") String serviceName, final InputStream providerConfig) throws ConfigurationException {
         final ProviderFactory service = this.services.get(serviceName);
         if (service != null) {
 
