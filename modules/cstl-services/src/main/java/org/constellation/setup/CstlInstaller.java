@@ -31,10 +31,6 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.ServletRegistration;
 
 import org.apache.sis.util.logging.Logging;
-import org.constellation.admin.ConfigurationEngine;
-import org.constellation.admin.SecurityManagerAdapter;
-import org.constellation.configuration.ws.rs.ConfigurationUtilities;
-import org.geotoolkit.factory.Hints;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -66,19 +62,6 @@ public class CstlInstaller implements ServletContextListener {
 
         LOGGER.log(Level.INFO, "=== Configuring Constellation ===");
 
-        try {
-            ConfigurationEngine.setSecurityManager(new SecurityManagerAdapter() {
-                @Override
-                public String getCurrentUserLogin() {
-                    return "admin";
-                }
-            });
-
-            ConfigurationUtilities.FileToDBConfig(null);
-
-        } catch (Exception e) {
-            LOGGER.info( "Failed to copy file-system configuration. "+e.getLocalizedMessage());
-        }
         EnumSet<DispatcherType> disps = EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD, DispatcherType.ASYNC);
 
         initMetrics(servletContextEvent.getServletContext(), disps);

@@ -19,19 +19,17 @@
 
 package org.constellation.rest.api;
 
-import com.sun.istack.logging.Logger;
 import java.util.logging.Level;
-import org.apache.sis.util.NullArgumentException;
-import org.constellation.configuration.AcknowlegementType;
-import org.constellation.configuration.ConfigProcessException;
-import org.constellation.configuration.NotRunningServiceException;
-import org.constellation.configuration.TargetNotFoundException;
-
+import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
-
+import org.apache.sis.util.NullArgumentException;
+import org.apache.sis.util.logging.Logging;
+import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.ConfigProcessException;
+import org.constellation.configuration.TargetNotFoundException;
 import static org.constellation.utils.RESTfulUtilities.badRequest;
 import static org.constellation.utils.RESTfulUtilities.internalError;
 import static org.constellation.utils.RESTfulUtilities.notFound;
@@ -47,7 +45,8 @@ import static org.constellation.utils.RESTfulUtilities.notFound;
 @Provider
 public class GenericExceptionMapper implements ExceptionMapper<Exception> {
     
-    public static Logger LOGGER = Logger.getLogger(GenericExceptionMapper.class);
+    public static final Logger LOGGER = Logging.getLogger(GenericExceptionMapper.class);
+    
     /**
      * {@inheritDoc}
      */

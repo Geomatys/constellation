@@ -641,11 +641,6 @@
     </dependency>
     <dependency>
       <groupId>org.constellation.web-services</groupId>
-      <artifactId>cstl-web-configuration</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.web-services</groupId>
       <artifactId>cstl-web-webdav</artifactId>
       <version>${project.version}</version>
       <exclusions>

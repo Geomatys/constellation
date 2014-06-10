@@ -57,11 +57,6 @@
         </dependency>
         <dependency>
             <groupId>org.constellation.web-services</groupId>
-            <artifactId>cstl-web-configuration</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.constellation.web-services</groupId>
             <artifactId>cstl-web-ogc</artifactId>
             <version>${project.version}</version>
         </dependency>
