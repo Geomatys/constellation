@@ -20,12 +20,12 @@ package org.constellation.process.service;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.sis.util.iso.SimpleInternationalString;
+import org.constellation.process.AbstractCstlProcess;
+import org.constellation.process.AbstractCstlProcessDescriptor;
 import org.constellation.process.ConstellationProcessFactory;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
-import org.geotoolkit.process.AbstractProcessDescriptor;
-import org.geotoolkit.process.Process;
-import org.apache.sis.util.iso.SimpleInternationalString;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -37,7 +37,7 @@ import org.opengis.util.InternationalString;
  *
  * @author Quentin Boileau (Geomatys).
  */
-public final class StartServiceDescriptor extends AbstractProcessDescriptor {
+public final class StartServiceDescriptor extends AbstractCstlProcessDescriptor {
 
     public static final String NAME = "service.start";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Start a new instance for the specified service identifier.");
@@ -76,7 +76,7 @@ public final class StartServiceDescriptor extends AbstractProcessDescriptor {
     }
 
     @Override
-    public Process createProcess(ParameterValueGroup input) {
+    public AbstractCstlProcess buildProcess(final ParameterValueGroup input) {
         return new StartService(this, input);
     }
 

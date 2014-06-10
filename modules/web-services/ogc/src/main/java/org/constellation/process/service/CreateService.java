@@ -18,19 +18,15 @@
  */
 package org.constellation.process.service;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import javax.xml.bind.JAXBException;
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.Service;
-import org.constellation.util.ReflectionUtilities;
+import org.constellation.process.AbstractCstlProcess;
 import static org.constellation.process.service.CreateServiceDescriptor.*;
 
-import org.geotoolkit.process.AbstractProcess;
-import org.geotoolkit.process.ProcessDescriptor;
-import org.geotoolkit.process.ProcessException;
 import static org.geotoolkit.parameter.Parameters.*;
 
+import org.geotoolkit.process.ProcessDescriptor;
+import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 
 /**
@@ -40,7 +36,7 @@ import org.opengis.parameter.ParameterValueGroup;
  * a configuration file already exist fo this instance name.
  * @author Quentin Boileau (Geomatys).
  */
-public class CreateService extends AbstractProcess {
+public class CreateService extends AbstractCstlProcess {
 
     public CreateService(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
@@ -62,37 +58,10 @@ public class CreateService extends AbstractProcess {
         final Service serviceMetadata  = value(SERVICE_METADATA, inputParameters);
         final Class configurationClass = value(CONFIGURATION_CLASS, inputParameters);
 
-        if (identifier == null || identifier.isEmpty()) {
-            throw new ProcessException("Service instance identifier can't be null or empty.", this, null);
-        }
-
-        if (configuration == null) {
-            configuration = ReflectionUtilities.newInstance(configurationClass);
-        }
-
-        boolean createConfig = false;
         try {
-            final Object obj = ConfigurationEngine.getConfiguration(serviceType, identifier);
-            if (obj.getClass().isAssignableFrom(configurationClass)) {
-                configuration = obj;
-            } else {
-                throw new ProcessException("The configuration does not contain a " + configurationClass.getName() + " object", this, null);
-            }
-        } catch (JAXBException ex) {
+            configuration = serviceBusiness.createInstance(serviceType, identifier, configuration, serviceMetadata, configurationClass);
+        } catch (ConfigurationException ex) {
             throw new ProcessException(ex.getMessage(), this, ex);
-        } catch (FileNotFoundException ex) {
-            createConfig = true;
-        }
-
-        if (createConfig) {
-            //create config file for the default configuration.
-            try {
-                ConfigurationEngine.storeConfiguration(serviceType, identifier, configuration, serviceMetadata);
-            } catch (JAXBException ex) {
-                throw new ProcessException(ex.getMessage(), this, ex);
-            } catch (IOException ex) {
-                throw new ProcessException("An error occurred while trying to write serviceMetadata.xml file.", this, null);
-            }
         }
 
         getOrCreate(OUT_CONFIGURATION, outputParameters).setValue(configuration);

@@ -18,6 +18,9 @@
  */
 package org.constellation.process.service;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.ws.WSEngine;
 import org.geotoolkit.process.ProcessDescriptor;
@@ -41,16 +44,10 @@ public class StopService extends AbstractCstlProcess {
     protected void execute() throws ProcessException {
         final String service = value(SERVICE_TYPE, inputParameters);
         final String identifier = value(IDENTIFIER, inputParameters);
-
-        if (identifier == null || identifier.isEmpty()) {
-            throw new ProcessException("Service instance identifier can't be null or empty.", this, null);
-        }
-
-        if (WSEngine.serviceInstanceExist(service, identifier)) {
-            WSEngine.shutdownInstance(service, identifier);
-        } else {
-            throw new ProcessException("Instance "+identifier+" doesn't exist.", this, null);
+        try {
+            serviceBusiness.stopInstance(service, identifier);
+        } catch (ConfigurationException ex) {
+            throw new ProcessException(ex.getMessage(), this, ex);
         }
     }
-
 }

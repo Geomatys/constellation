@@ -18,32 +18,27 @@
  */
 package org.constellation.process.service;
 
-import org.constellation.admin.ServiceBusiness;
+import java.util.*;
+import javax.xml.namespace.QName;
 import org.constellation.configuration.*;
-import org.geotoolkit.process.AbstractProcess;
-import org.geotoolkit.process.ProcessException;
-import org.opengis.parameter.ParameterValueGroup;
-
-import static org.geotoolkit.parameter.Parameters.*;
+import org.constellation.process.AbstractCstlProcess;
+import org.constellation.process.ConstellationProcessFactory;
 import static org.constellation.process.service.AddLayerToMapServiceDescriptor.*;
 import static org.constellation.process.service.WSProcessUtils.*;
 
-import java.util.*;
-
-import javax.inject.Inject;
-import javax.xml.namespace.QName;
-
-import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.util.DataReference;
+import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.parameter.Parameters;
+import static org.geotoolkit.parameter.Parameters.*;
 import org.geotoolkit.process.ProcessDescriptor;
+import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.sld.xml.StyleXmlIO;
-import org.geotoolkit.feature.type.Name;
 import org.opengis.filter.Filter;
+import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.NoSuchIdentifierException;
 
 /**
@@ -52,11 +47,8 @@ import org.opengis.util.NoSuchIdentifierException;
  * @author Quentin Boileau (Geomatys)
  * @author Cédric Briançon (Geomatys)
  */
-public class AddLayerToMapService extends AbstractProcess {
-
-	@Inject
-	ServiceBusiness	serviceBusiness;
-
+public class AddLayerToMapService extends AbstractCstlProcess {
+	
     AddLayerToMapService(final ProcessDescriptor desc, final ParameterValueGroup input) {
         super(desc, input);
     }

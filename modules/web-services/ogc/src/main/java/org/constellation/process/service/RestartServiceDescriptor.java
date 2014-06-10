@@ -20,12 +20,12 @@ package org.constellation.process.service;
 
 import java.util.HashMap;
 import java.util.Map;
-
+import org.apache.sis.util.iso.SimpleInternationalString;
+import org.constellation.process.AbstractCstlProcess;
+import org.constellation.process.AbstractCstlProcessDescriptor;
 import org.constellation.process.ConstellationProcessFactory;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
-import org.geotoolkit.process.AbstractProcessDescriptor;
-import org.apache.sis.util.iso.SimpleInternationalString;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -37,7 +37,7 @@ import org.opengis.util.InternationalString;
  * Restart an instance for the specified service identifier. Or all service instances if identifier is not specified.
  * @author Quentin Boileau (Geomatys).
  */
-public class RestartServiceDescriptor  extends AbstractProcessDescriptor {
+public class RestartServiceDescriptor  extends AbstractCstlProcessDescriptor {
 
     public static final String NAME = "service.restart";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Restart an instance for the specified service instance. "
@@ -82,7 +82,7 @@ public class RestartServiceDescriptor  extends AbstractProcessDescriptor {
     }
 
     @Override
-    public org.geotoolkit.process.Process createProcess(ParameterValueGroup input) {
+    public AbstractCstlProcess buildProcess(final ParameterValueGroup input) {
         return new RestartService(this, input);
     }
 }

@@ -18,9 +18,8 @@
  */
 package org.constellation.process.service;
 
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.process.AbstractCstlProcess;
-import org.constellation.ws.WSEngine;
-import org.constellation.ws.Worker;
 
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
@@ -43,22 +42,9 @@ public final class StartService extends AbstractCstlProcess {
     protected void execute() throws ProcessException {
         final String identifier = value(IDENTIFIER, inputParameters);
         final String serviceType = value(SERVICE_TYPE, inputParameters);
-
-        if (identifier == null || identifier.isEmpty()) {
-            throw new ProcessException("Service instance identifier can't be null or empty.", this, null);
-        }
-        
         try {
-            final Worker worker = WSEngine.buildWorker(serviceType, identifier);
-            if (worker != null) {
-                WSEngine.addServiceInstance(serviceType, identifier, worker);
-                if (!worker.isStarted()) {
-                    throw new ProcessException("Unable to start the instance " + identifier + ".", this, null);
-                }
-            } else {
-                throw new ProcessException("The instance " + identifier + " can not be instanciated.", this, null);
-            }
-        } catch (IllegalArgumentException ex) {
+            serviceBusiness.startInstance(serviceType, identifier);
+        } catch (ConfigurationException ex) {
             throw new ProcessException(ex.getMessage(), this, ex);
         }
     }

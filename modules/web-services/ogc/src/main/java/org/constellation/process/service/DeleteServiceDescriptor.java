@@ -20,11 +20,12 @@ package org.constellation.process.service;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.sis.util.iso.SimpleInternationalString;
+import org.constellation.process.AbstractCstlProcess;
+import org.constellation.process.AbstractCstlProcessDescriptor;
 import org.constellation.process.ConstellationProcessFactory;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
-import org.geotoolkit.process.AbstractProcessDescriptor;
-import org.apache.sis.util.iso.SimpleInternationalString;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -36,8 +37,7 @@ import org.opengis.util.InternationalString;
  *
  * @author Quentin Boileau (Geomatys)
  */
-public class DeleteServiceDescriptor extends AbstractProcessDescriptor {
-
+public class DeleteServiceDescriptor extends AbstractCstlProcessDescriptor {
 
     public static final String NAME = "service.delete";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Delete a service instance in constellation.");
@@ -79,9 +79,7 @@ public class DeleteServiceDescriptor extends AbstractProcessDescriptor {
     }
 
     @Override
-    public org.geotoolkit.process.Process createProcess(ParameterValueGroup input) {
+    public AbstractCstlProcess buildProcess(ParameterValueGroup input) {
         return new DeleteService(this, input);
     }
-
-
 }

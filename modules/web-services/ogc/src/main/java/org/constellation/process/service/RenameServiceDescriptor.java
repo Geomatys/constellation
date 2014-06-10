@@ -20,13 +20,13 @@
 package org.constellation.process.service;
 
 import org.apache.sis.util.iso.SimpleInternationalString;
+import org.constellation.process.AbstractCstlProcess;
+import org.constellation.process.AbstractCstlProcessDescriptor;
 import org.constellation.process.ConstellationProcessFactory;
 import static org.constellation.process.service.WSProcessUtils.*;
-import org.geotoolkit.process.Process;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.parameter.ExtendedParameterDescriptor;
-import org.geotoolkit.process.AbstractProcessDescriptor;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -37,7 +37,7 @@ import org.opengis.util.InternationalString;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class RenameServiceDescriptor extends AbstractProcessDescriptor {
+public class RenameServiceDescriptor extends AbstractCstlProcessDescriptor {
 
     public static final String NAME = "service.rename";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("rename a new ogc service in constellation.");
@@ -75,7 +75,7 @@ public class RenameServiceDescriptor extends AbstractProcessDescriptor {
     }
 
     @Override
-    public Process createProcess(ParameterValueGroup input) {
+    public AbstractCstlProcess buildProcess(ParameterValueGroup input) {
         return new RenameService(this, input);
     }
 }

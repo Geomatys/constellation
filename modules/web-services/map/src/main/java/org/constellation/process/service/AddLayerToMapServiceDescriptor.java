@@ -19,19 +19,19 @@
 package org.constellation.process.service;
 
 import org.apache.sis.util.iso.ResourceInternationalString;
-import org.constellation.admin.SpringHelper;
-import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.GetFeatureInfoCfg;
+import org.constellation.configuration.LayerContext;
+import org.constellation.process.AbstractCstlProcess;
+import org.constellation.process.AbstractCstlProcessDescriptor;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.util.DataReference;
-import org.geotoolkit.parameter.DefaultParameterDescriptor;
-import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 
 import static org.constellation.process.service.WSProcessUtils.*;
 
+import org.constellation.util.DataReference;
+import org.geotoolkit.parameter.DefaultParameterDescriptor;
+import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.parameter.ExtendedParameterDescriptor;
-import org.geotoolkit.process.AbstractProcessDescriptor;
-import org.geotoolkit.process.Process;
+
 import org.opengis.filter.Filter;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
@@ -55,7 +55,7 @@ import org.opengis.util.InternationalString;
  * @author Quentin Boileau (Geomatys)
  * @author Cédric Briançon (Geomatys)
  */
-public class AddLayerToMapServiceDescriptor extends AbstractProcessDescriptor {
+public class AddLayerToMapServiceDescriptor extends AbstractCstlProcessDescriptor {
 
     /*
      * Bundle path and keys
@@ -162,14 +162,12 @@ public class AddLayerToMapServiceDescriptor extends AbstractProcessDescriptor {
         super(NAME, ConstellationProcessFactory.IDENTIFICATION, ABSTRACT, INPUT_DESC, OUTPUT_DESC);
     }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Process createProcess(ParameterValueGroup input) {
-		AddLayerToMapService addLayerToMapService = new AddLayerToMapService(this, input);
-		SpringHelper.injectDependencies(addLayerToMapService);
-		return addLayerToMapService;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AbstractCstlProcess buildProcess(final ParameterValueGroup input) {
+        return new AddLayerToMapService(this, input);
+    }
 
 }

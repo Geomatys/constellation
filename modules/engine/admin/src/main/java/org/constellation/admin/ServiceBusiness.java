@@ -17,7 +17,6 @@ import org.constellation.engine.register.repository.ServiceRepository;
 import org.constellation.util.ReflectionUtilities;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
-import static org.geotoolkit.parameter.Parameters.getOrCreate;
 import org.geotoolkit.process.ProcessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -57,11 +56,14 @@ public class ServiceBusiness {
      *
      * @param serviceType
      * @param identifier    The identifier of the service.
-     * @param metadata      the service metadata (can be null)
-     * @param configuration the service configuration (can be null)
+     * @param metadata      the service metadata (can be null).
+     * @param configuration the service configuration (can be null).
+     * @param configurationClass Class of the configuration object expected.
+     * 
+     * @return the configuration object just setted.
      * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
-    public void createInstance(final String serviceType, final String identifier, Object configuration, final org.constellation.dto.Service metadata, final Class configurationClass) throws ConfigurationException {
+    public Object createInstance(final String serviceType, final String identifier, Object configuration, final org.constellation.dto.Service metadata, final Class configurationClass) throws ConfigurationException {
 
         if (identifier == null || identifier.isEmpty()) {
             throw new ConfigurationException("Service instance identifier can't be null or empty.");
@@ -95,6 +97,7 @@ public class ServiceBusiness {
                 throw new ConfigurationException("An error occurred while trying to write service Metadata.", ex);
             }
         }
+        return configuration;
     }
     
     /**
@@ -228,9 +231,10 @@ public class ServiceBusiness {
      * Configures a service instance.
      *
      * @param serviceType The service type (WMS, WFS, ...)
-     * @param identifier    the service identifier
-     * @param configuration the service configuration (depending on implementation)
-     * @param metadata      the service metadata
+     * @param identifier    the service identifier.
+     * @param configuration the service configuration (depending on implementation).
+     * @param metadata      the service metadata.
+     * @param configurationClass Class of the configuration object expected.
      * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
      public void configureInstance(final String serviceType, final String identifier, final org.constellation.dto.Service metadata, Object configuration, final Class configurationClass) throws ConfigurationException {
@@ -257,7 +261,7 @@ public class ServiceBusiness {
      *
      * @param serviceType The service type (WMS, WFS, ...)
      * @param identifier the service
-     * @param configurationClass Class of the configuration object expected
+     * @param configurationClass Class of the configuration object expected.
      * @return a configuration {@link Object} (depending on implementation)
      * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */

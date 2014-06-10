@@ -18,16 +18,16 @@
  */
 package org.constellation.process.service;
 
+import org.apache.sis.util.iso.SimpleInternationalString;
 import org.constellation.configuration.LayerContext;
 import org.constellation.dto.Service;
+import org.constellation.process.AbstractCstlProcess;
+import org.constellation.process.AbstractCstlProcessDescriptor;
 import org.constellation.process.ConstellationProcessFactory;
 import static org.constellation.process.service.WSProcessUtils.*;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.parameter.ExtendedParameterDescriptor;
-import org.geotoolkit.process.AbstractProcessDescriptor;
-import org.geotoolkit.process.Process;
-import org.apache.sis.util.iso.SimpleInternationalString;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -40,7 +40,7 @@ import org.opengis.util.InternationalString;
  * @author Benjamin Garcia (Geomatys).
  *
  */
-public class CreateServiceDescriptor extends AbstractProcessDescriptor {
+public class CreateServiceDescriptor extends AbstractCstlProcessDescriptor {
 
 
     public static final String NAME = "service.create";
@@ -99,7 +99,7 @@ public class CreateServiceDescriptor extends AbstractProcessDescriptor {
     }
 
     @Override
-    public Process createProcess(ParameterValueGroup input) {
+    public AbstractCstlProcess buildProcess(ParameterValueGroup input) {
         return new CreateService(this, input);
     }
 

@@ -25,7 +25,6 @@ import java.net.URL;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.constellation.ServiceDef;
 import org.constellation.admin.service.ConstellationClient;
 import org.constellation.admin.service.ConstellationServerFactory;

@@ -20,11 +20,13 @@ package org.constellation.process;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
+import org.constellation.admin.ServiceBusiness;
 import org.geotoolkit.io.X364;
 import org.geotoolkit.process.AbstractProcess;
 import org.geotoolkit.process.ProcessDescriptor;
-import org.apache.sis.util.logging.Logging;
 import org.opengis.parameter.ParameterValueGroup;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
@@ -35,6 +37,9 @@ public abstract class AbstractCstlProcess extends AbstractProcess {
     protected static final Logger LOGGER = Logging.getLogger(AbstractCstlProcess.class);
     
     protected static final boolean X364_SUPPORTED = X364.isSupported();
+    
+    @Autowired
+    protected ServiceBusiness serviceBusiness;
     
     public AbstractCstlProcess(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);

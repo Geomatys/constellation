@@ -19,22 +19,21 @@
 
 package org.constellation.process.service;
 
-import java.util.List;
-import org.constellation.admin.ConfigurationEngine;
-import org.constellation.ws.WSEngine;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.constellation.configuration.ConfigurationException;
+import org.constellation.process.AbstractCstlProcess;
 import static org.constellation.process.service.RenameServiceDescriptor.*;
-import org.constellation.ws.Worker;
-import org.geotoolkit.process.AbstractProcess;
+import static org.geotoolkit.parameter.Parameters.*;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
-import static org.geotoolkit.parameter.Parameters.*;
 import org.opengis.parameter.ParameterValueGroup;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class RenameService extends AbstractProcess {
+public class RenameService extends AbstractCstlProcess {
 
     public RenameService(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
@@ -42,35 +41,13 @@ public class RenameService extends AbstractProcess {
 
     @Override
     protected void execute() throws ProcessException {
-        final String serviceType      = value(SERVICE_TYPE, inputParameters);
-        final String identifier = value(IDENTIFIER, inputParameters);
-        final String newName    = value(NEW_NAME, inputParameters);
-        
-        final List<String> existingService = ConfigurationEngine.getServiceConfigurationIds(serviceType);
-        if (existingService.contains(identifier)) {
-            if (!existingService.contains(newName)) {
-                if (ConfigurationEngine.renameConfiguration(serviceType, identifier, newName)) {
-                    // we stop the current worker
-                    WSEngine.shutdownInstance(serviceType, identifier);
-
-                    // start the new one
-                    final Worker newWorker = WSEngine.buildWorker(serviceType, newName);
-                    if (newWorker == null) {
-                        throw new ProcessException("The instance " + newName + " can be started, maybe there is no configuration directory with this name.", this, null);
-                    } else {
-                        WSEngine.addServiceInstance(serviceType, newName, newWorker);
-                        if (!newWorker.isStarted()) {
-                            throw new ProcessException("unable to start the renamed instance", this, null);
-                        }
-                    }
-                } else {
-                    throw new ProcessException("Unable to rename the directory", this, null);
-                }
-            } else {
-                throw new ProcessException("already existing instance:" + newName, this, null);
-            }
-        } else {
-            throw new ProcessException("no existing instance:" + identifier, this, null);
+        final String serviceType   = value(SERVICE_TYPE, inputParameters);
+        final String identifier    = value(IDENTIFIER, inputParameters);
+        final String newIdentifier = value(NEW_NAME, inputParameters);
+        try {
+            serviceBusiness.renameInstance(serviceType, identifier, newIdentifier);
+        } catch (ConfigurationException ex) {
+            throw new ProcessException(ex.getMessage(), this, ex);
         }
     }
 }

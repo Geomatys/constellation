@@ -18,22 +18,20 @@
  */
 package org.constellation.process.service;
 
-import java.io.FileNotFoundException;
-import javax.xml.bind.JAXBException;
-import org.constellation.admin.ConfigurationEngine;
-import org.geotoolkit.process.AbstractProcess;
-import org.geotoolkit.process.ProcessDescriptor;
-import org.geotoolkit.process.ProcessException;
-import org.opengis.parameter.ParameterValueGroup;
+import org.constellation.configuration.ConfigurationException;
+import org.constellation.process.AbstractCstlProcess;
 
 import static org.constellation.process.service.GetConfigServiceDescriptor.*;
 import static org.geotoolkit.parameter.Parameters.*;
+import org.geotoolkit.process.ProcessDescriptor;
+import org.geotoolkit.process.ProcessException;
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
  *
  * @author Quentin Boileau (Geoamtys)
  */
-public class GetConfigService extends AbstractProcess {
+public class GetConfigService extends AbstractCstlProcess {
 
     public GetConfigService(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
@@ -49,26 +47,14 @@ public class GetConfigService extends AbstractProcess {
      */
     @Override
     protected void execute() throws ProcessException {
-
         final String serviceType       = value(SERVICE_TYPE, inputParameters);
         final String identifier        = value(IDENTIFIER, inputParameters);
         final Class configurationClass = value(CONFIGURATION_CLASS, inputParameters);
-
-        if (identifier == null || identifier.isEmpty()) {
-            throw new ProcessException("Service instance identifier can't be null or empty.", this, null);
-        }
-
         try {
-            final Object obj = ConfigurationEngine.getConfiguration(serviceType, identifier);
-            if (obj.getClass().isAssignableFrom(configurationClass)) {
-                getOrCreate(CONFIGURATION, outputParameters).setValue(obj);
-            } else {
-                throw new ProcessException("The configuration does not contain a " + configurationClass.getName() + " object.", this, null);
-            }
-        } catch (JAXBException ex) {
+            final Object obj = serviceBusiness.getInstanceConfiguration(serviceType, identifier, configurationClass);
+            getOrCreate(CONFIGURATION, outputParameters).setValue(obj);
+        } catch (ConfigurationException ex) {
             throw new ProcessException(ex.getMessage(), this, ex);
-        } catch (FileNotFoundException ex) {
-            throw new ProcessException("Service instance " + identifier + " doesn't exist.", this, null);
-       }
+        }
     }
 }

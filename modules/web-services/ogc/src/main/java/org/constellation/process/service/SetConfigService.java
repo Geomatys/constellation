@@ -18,23 +18,20 @@
  */
 package org.constellation.process.service;
 
-import java.io.IOException;
-import javax.xml.bind.JAXBException;
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.Service;
-import org.geotoolkit.process.AbstractProcess;
+import org.constellation.process.AbstractCstlProcess;
+import static org.constellation.process.service.SetConfigServiceDescriptor.*;
+import static org.geotoolkit.parameter.Parameters.*;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
-import static org.geotoolkit.parameter.Parameters.*;
-import static org.constellation.process.service.SetConfigServiceDescriptor.*;
-import org.constellation.util.ReflectionUtilities;
 
 /**
  *
  * @author Quentin Boileau (Geomatys).
  */
-public class SetConfigService extends AbstractProcess {
+public class SetConfigService extends AbstractCstlProcess {
 
     public SetConfigService(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
@@ -57,21 +54,10 @@ public class SetConfigService extends AbstractProcess {
         final Service serviceMetadata  = value(SERVICE_METADATA, inputParameters);
         final Class configurationClass = value(CONFIGURATION_CLASS, inputParameters);
 
-        if (identifier == null || identifier.isEmpty()) {
-            throw new ProcessException("Service instance identifier can't be null or empty.", this, null);
-        }
-
-        if (configuration == null) {
-            configuration = ReflectionUtilities.newInstance(configurationClass);
-        }
-
-        //write configuration file.
         try {
-            ConfigurationEngine.storeConfiguration(serviceType, identifier, configuration, serviceMetadata);
-        } catch (JAXBException ex) {
+            serviceBusiness.configureInstance(serviceType, identifier, serviceMetadata, configuration, configurationClass);
+        } catch (ConfigurationException ex) {
             throw new ProcessException(ex.getMessage(), this, ex);
-        } catch (IOException ex) {
-            throw new ProcessException("An error occurred while trying to write serviceMetadata.xml file.", this, null);
         }
     }
 }

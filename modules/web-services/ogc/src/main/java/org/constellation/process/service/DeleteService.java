@@ -18,7 +18,10 @@
  */
 package org.constellation.process.service;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.ws.WSEngine;
 import org.geotoolkit.process.ProcessDescriptor;
@@ -48,19 +51,10 @@ public class DeleteService extends AbstractCstlProcess {
     protected void execute() throws ProcessException {
         final String serviceType = value(SERVICE_TYPE, inputParameters);
         final String identifier = value(IDENTIFIER, inputParameters);
-
-        if (identifier == null || identifier.isEmpty()) {
-            throw new ProcessException("Service instance identifier can't be null or empty.", this, null);
-        }
-
-        //unregister the service instance if exist
-        if (WSEngine.serviceInstanceExist(serviceType, identifier)) {
-            WSEngine.shutdownInstance(serviceType, identifier);
-        }
-
-        //delete folder
-        if (!ConfigurationEngine.deleteConfiguration(serviceType, identifier)) {
-            throw new ProcessException("Service instance directory " + identifier + " can't be deleted.", this, null);
+        try {
+            serviceBusiness.deleteInstance(serviceType, identifier);
+        } catch (ConfigurationException ex) {
+            throw new ProcessException(ex.getMessage(), this, ex);
         }
     }
 }

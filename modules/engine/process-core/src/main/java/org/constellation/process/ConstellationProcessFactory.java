@@ -69,7 +69,7 @@ public class ConstellationProcessFactory extends AbstractProcessingRegistry {
      */
     private static synchronized ProcessDescriptor[] findDescriptors() {
         final Iterator<ProcessDescriptor> ite = ServiceRegistry.lookupProviders(ProcessDescriptor.class);
-        final List<ProcessDescriptor> descriptors = new ArrayList<ProcessDescriptor>();
+        final List<ProcessDescriptor> descriptors = new ArrayList<>();
         while (ite.hasNext()) {
             descriptors.add(ite.next());
         }
