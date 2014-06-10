@@ -23,6 +23,7 @@ import java.lang.invoke.MethodHandles;
 import javax.inject.Inject;
 
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.SpringHelper;
 import org.constellation.ws.ServiceConfigurer;
 import org.constellation.engine.register.ConfigurationService;
 import org.constellation.engine.register.repository.ProviderRepository;
@@ -63,6 +64,7 @@ public class ConfigurationServiceInit implements ApplicationContextAware {
 
     public void init() {
         
+    	SpringHelper.setApplicationContext(applicationContext);
         ConfigurationEngine.setSecurityManager(SecurityManagerHolder.getInstance());
         ConfigurationEngine.setConfigurationService(configurationService);
         
