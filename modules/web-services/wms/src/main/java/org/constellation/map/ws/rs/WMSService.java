@@ -52,7 +52,6 @@ import static org.constellation.map.ws.WMSConstant.*;
 import org.constellation.map.ws.WMSWorker;
 import org.constellation.portrayal.internal.PortrayalResponse;
 import org.constellation.util.Util;
-import org.constellation.wms.configuration.WMSConfigurer;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.Worker;
@@ -122,15 +121,6 @@ public class WMSService extends GridWebService<WMSWorker> {
     protected Class getWorkerClass() {
         return DefaultWMSWorker.class;
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Class<? extends MapConfigurer> getConfigurerClass() {
-        return WMSConfigurer.class;
-    }
-
 
     /**
      * {@inheritDoc}

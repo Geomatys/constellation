@@ -58,11 +58,10 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
     /**
      * Create a new {@link OGCConfigurer} instance.
      *
-     * @param specification  the target service specification
      * @param configClass    the target service config class
      */
-    protected OGCConfigurer(final Specification specification, final Class configClass) {
-        super(specification, configClass);
+    protected OGCConfigurer(final Class configClass) {
+        super(configClass);
     }
 
     /**

@@ -39,7 +39,6 @@ import java.util.logging.Level;
 import javax.imageio.spi.ServiceRegistry;
 import javax.xml.bind.JAXBException;
 import org.apache.sis.storage.DataStoreException;
-import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.*;
 import org.constellation.dto.SensorMLTree;
@@ -90,7 +89,7 @@ public class SOSConfigurer extends OGCConfigurer {
      * Create a new {@link SOSConfigurer} instance.
      */
     public SOSConfigurer() {
-        super(Specification.SOS, SOSConfiguration.class);
+        super(SOSConfiguration.class);
     }
 
     /**

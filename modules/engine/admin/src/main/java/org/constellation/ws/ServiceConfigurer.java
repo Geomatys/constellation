@@ -58,11 +58,6 @@ public abstract class ServiceConfigurer {
 
 
     /**
-     * Service to configure specification.
-     */
-    protected final Specification specification;
-
-    /**
      * Configuration object class.
      */
     protected final Class configClass;
@@ -70,11 +65,9 @@ public abstract class ServiceConfigurer {
     /**
      * Create a new {@link ServiceConfigurer} instance.
      *
-     * @param specification  the target service specification
      * @param configClass    the target service config class
      */
-    protected ServiceConfigurer(final Specification specification, final Class configClass) {
-        this.specification  = specification;
+    protected ServiceConfigurer(final Class configClass) {
         this.configClass    = configClass;
     }
 

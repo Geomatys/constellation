@@ -19,7 +19,6 @@
 
 package org.constellation.wps.configuration;
 
-import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.ProcessContext;
 import org.constellation.configuration.Processes;
@@ -41,7 +40,7 @@ public class WPSConfigurer extends OGCConfigurer {
      * Create a new {@link WPSConfigurer} instance.
      */
     protected WPSConfigurer() {
-        super(Specification.WPS, ProcessContext.class);
+        super(ProcessContext.class);
     }
 
     /**

@@ -22,7 +22,6 @@ package org.constellation.metadata.configuration;
 import java.io.File;
 import java.util.List;
 import java.util.logging.Level;
-import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.*;
 import org.constellation.dto.Service;
 import org.constellation.generic.database.Automatic;
@@ -46,7 +45,7 @@ public class CSWConfigurer extends OGCConfigurer {
      * Create a new {@link CSWConfigurer} instance.
      */
     public CSWConfigurer() {
-        super(Specification.CSW, Automatic.class);
+        super(Automatic.class);
     }
 
     /**

@@ -51,7 +51,6 @@ import javax.ws.rs.core.MultivaluedMap;
 
 // constellation dependencies
 import org.constellation.map.configuration.MapConfigurer;
-import org.constellation.wfs.configuration.WFSConfigurer;
 import org.constellation.ws.rs.GridWebService;
 import org.constellation.ws.WebServiceUtilities;
 import org.constellation.ServiceDef;
@@ -127,14 +126,6 @@ public class WFSService extends GridWebService<WFSWorker> {
     @Override
     protected Class getWorkerClass() {
         return DefaultWFSWorker.class;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Class<? extends MapConfigurer> getConfigurerClass() {
-        return WFSConfigurer.class;
     }
 
     /**

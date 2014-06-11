@@ -32,12 +32,12 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.ws.BindingType;
 import org.constellation.ServiceDef.Specification;
-import org.constellation.ws.ServiceConfigurer;
-import org.constellation.wmts.configuration.WMTSConfigurer;
+import org.constellation.map.configuration.MapConfigurer;
 import org.constellation.wmts.ws.DefaultWMTSWorker;
 import org.constellation.wmts.ws.WMTSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.ExceptionCode;
+import org.constellation.ws.ServiceConfigurer;
 import org.constellation.ws.soap.OGCWebService;
 import org.geotoolkit.wmts.xml.v100.BinaryPayload;
 import org.geotoolkit.wmts.xml.v100.Capabilities;
@@ -91,7 +91,7 @@ public class WMTSService extends OGCWebService<WMTSWorker>{
      */
     @Override
     protected Class<? extends ServiceConfigurer> getConfigurerClass() {
-        return WMTSConfigurer.class;
+        return MapConfigurer.class;
     }
 
     /**

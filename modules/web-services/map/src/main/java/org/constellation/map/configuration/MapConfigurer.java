@@ -28,7 +28,6 @@ import com.vividsolutions.jts.geom.Polygon;
 import java.awt.*;
 
 import org.apache.sis.storage.DataStoreException;
-import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.dao.LayerRecord;
 import org.constellation.configuration.ConfigProcessException;
@@ -81,7 +80,6 @@ import javax.measure.unit.Unit;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -110,10 +108,9 @@ public class MapConfigurer extends OGCConfigurer {
     /**
      * Create a new {@link MapConfigurer} instance.
      *
-     * @param specification  the target service specification
      */
-    public MapConfigurer(final Specification specification) {
-        super(specification, LayerContext.class);
+    public MapConfigurer() {
+        super(LayerContext.class);
     }
 
     /**
