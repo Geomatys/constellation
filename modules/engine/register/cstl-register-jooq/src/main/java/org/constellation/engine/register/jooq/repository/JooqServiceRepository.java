@@ -192,16 +192,18 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
     }
 
     @Override
-    public Map<Domain, Boolean> getDomainLinks(int serviceId) {
-        List<Integer> fetch = dsl.select(SERVICE_X_DOMAIN.DOMAIN_ID).from(SERVICE_X_DOMAIN)
+    public Map<Domain, Boolean> getLinkedDomains(int serviceId) {
+        List<Integer> domainIds = dsl.select(SERVICE_X_DOMAIN.DOMAIN_ID).from(SERVICE_X_DOMAIN)
                 .where(SERVICE_X_DOMAIN.SERVICE_ID.eq(serviceId)).fetch(SERVICE_X_DOMAIN.DOMAIN_ID);
         Map<Domain, Boolean> result = new LinkedHashMap<>();
-        for (Domain domain : domainRepository.findByIds(fetch)) {
+        for (Domain domain : domainRepository.findByIds(domainIds)) {
             result.put(domain, true);
         }
-        domainRepository.findByIdsNotIn(fetch);
-
-        return null;
+        
+        for (Domain domain : domainRepository.findByIdsNotIn(domainIds)) {
+            result.put(domain, false);
+        }
+        return result;
     }
 
     @Override

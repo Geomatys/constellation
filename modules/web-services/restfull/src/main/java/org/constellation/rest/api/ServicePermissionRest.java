@@ -65,7 +65,8 @@ public class ServicePermissionRest {
         private boolean linked;
 
         public LinkedDomain(Domain key, Boolean value) {
-            // TODO Auto-generated constructor stub
+            super(key.getId(), key.getName(), key.getDescription());
+            this.linked = value;
         }
 
         public boolean isLinked() {
@@ -114,7 +115,7 @@ public class ServicePermissionRest {
     public List<LinkedDomain> linkedDomains(@PathParam("userId") int userId, @PathParam("serviceId") int serviceId) {
 
         List<LinkedDomain> result = new ArrayList<>();
-        for (Entry<Domain, Boolean> e : serviceRepository.getDomainLinks(serviceId).entrySet()) {
+        for (Entry<Domain, Boolean> e : serviceRepository.getLinkedDomains(serviceId).entrySet()) {
             result.add(new LinkedDomain(e.getKey(), e.getValue()));
         }
         return result;

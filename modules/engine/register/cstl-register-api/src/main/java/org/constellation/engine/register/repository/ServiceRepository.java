@@ -61,7 +61,7 @@ public interface ServiceRepository {
 
     int updateIsoMetadata(Service service, String fileIdentifier, String string);
 
-    Map<Domain, Boolean> getDomainLinks(int serviceId);
+    Map<Domain, Boolean> getLinkedDomains(int serviceId);
 
    
 }
