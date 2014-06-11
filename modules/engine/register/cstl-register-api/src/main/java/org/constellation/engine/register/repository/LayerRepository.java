@@ -33,11 +33,11 @@ public interface LayerRepository {
 
     Layer save(Layer storeLayer);
 
-    List<Layer> getLayer(Service service);
-
     int update(Layer storeLayer);
 
     void delete(Layer layer);
+
+	Layer findByServiceIdAndLayerName(int serviceId, String layerName);
 
     
 }

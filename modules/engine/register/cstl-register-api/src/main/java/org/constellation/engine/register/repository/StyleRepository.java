@@ -21,6 +21,7 @@ package org.constellation.engine.register.repository;
 import java.util.List;
 
 import org.constellation.engine.register.Data;
+import org.constellation.engine.register.Layer;
 import org.constellation.engine.register.Style;
 
 public interface StyleRepository {
@@ -36,5 +37,9 @@ public interface StyleRepository {
     void linkStyleToData(int styleId, int dataid);
 
     void unlinkStyleToData(int styleId, int dataid);
+    
+    void linkStyleToLayer(int styleId, int layerid);
+
+    void unlinkStyleToLayer(int styleId, int layerId);
     
 }

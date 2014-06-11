@@ -2,6 +2,7 @@ package org.constellation.engine.register.jooq.repository;
 
 import static org.constellation.engine.register.jooq.Tables.STYLE;
 import static org.constellation.engine.register.jooq.Tables.STYLED_DATA;
+import static org.constellation.engine.register.jooq.Tables.STYLED_LAYER;
 
 import java.util.List;
 
@@ -9,6 +10,7 @@ import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Style;
 import org.constellation.engine.register.jooq.tables.records.StyleRecord;
 import org.constellation.engine.register.jooq.tables.records.StyledDataRecord;
+import org.constellation.engine.register.jooq.tables.records.StyledLayerRecord;
 import org.constellation.engine.register.repository.StyleRepository;
 import org.jooq.InsertSetMoreStep;
 import org.springframework.stereotype.Component;
@@ -45,7 +47,31 @@ public class JooqStyleRepository extends AbstractJooqRespository<StyleRecord, St
 
     @Override
     public void unlinkStyleToData(int styleId, int dataid) {
-        dsl.delete(STYLED_DATA).where(STYLED_DATA.DATA.eq(dataid).and(STYLED_DATA.STYLE.eq(styleId))).execute();
+    	dsl.delete(STYLED_DATA).where(STYLED_DATA.DATA.eq(dataid).and(STYLED_DATA.STYLE.eq(styleId))).execute();
     }
+
+	@Override
+	public void linkStyleToLayer(int styleId, int layerid) {
+		StyledLayerRecord styledLayerRecord = dsl.select().from(STYLED_LAYER).where(STYLED_LAYER.LAYER.eq(layerid)).and(STYLED_LAYER.STYLE.eq(styleId))
+		        .fetchOneInto(StyledLayerRecord.class);
+		if (styledLayerRecord == null) {
+			InsertSetMoreStep<StyledLayerRecord> insert = dsl.insertInto(STYLED_LAYER).set(STYLED_LAYER.LAYER, layerid).set(STYLED_LAYER.STYLE, styleId);
+			insert.execute();
+		}
+	}
+	
+	public void setDefaultStyleToLayer(int styleId, int layerId) {
+		StyledLayerRecord styledLayerRecord = dsl.select().from(STYLED_LAYER).where(STYLED_LAYER.LAYER.eq(layerId)).and(STYLED_LAYER.DEFAULT.eq(true)).fetchOneInto(StyledLayerRecord.class);
+		if (styledLayerRecord!=null) {
+			dsl.update(STYLED_LAYER).set(STYLED_LAYER.DEFAULT, false).where(STYLED_LAYER.LAYER.eq(layerId)).execute();
+		}
+		dsl.update(STYLED_LAYER).set(STYLED_LAYER.DEFAULT, true).where(STYLED_LAYER.LAYER.eq(layerId)).and(STYLED_LAYER.STYLE.eq(styleId)).execute();
+	}
+
+	@Override
+	public void unlinkStyleToLayer(int styleId, int layerid) {
+		dsl.delete(STYLED_LAYER).where(STYLED_LAYER.LAYER.eq(layerid).and(STYLED_LAYER.STYLE.eq(styleId))).execute();
+		
+	}
 
 }

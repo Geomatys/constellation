@@ -22,6 +22,7 @@ package org.constellation.webservice.map.component;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
+import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,13 +30,18 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.inject.Inject;
 import javax.xml.namespace.QName;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.dao.DataRecord;
 import org.constellation.admin.dao.StyleRecord;
 import org.constellation.admin.dao.StyleRecord.StyleType;
+import org.constellation.admin.dto.LayerDTO;
+import org.constellation.admin.dto.StyleDTO;
+import org.constellation.admin.exception.ConstellationException;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.StyleBrief;
@@ -43,8 +49,12 @@ import org.constellation.configuration.StyleReport;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.StyleBean;
 import org.constellation.engine.register.Data;
+import org.constellation.engine.register.Layer;
+import org.constellation.engine.register.Service;
 import org.constellation.engine.register.Style;
 import org.constellation.engine.register.repository.DataRepository;
+import org.constellation.engine.register.repository.LayerRepository;
+import org.constellation.engine.register.repository.ServiceRepository;
 import org.constellation.engine.register.repository.StyleRepository;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviders;
@@ -68,11 +78,17 @@ import org.springframework.stereotype.Component;
 @Component
 public final class StyleBusiness {
     
-    @Autowired
+    @Inject
     StyleRepository styleRepository;
     
-    @Autowired
+    @Inject
     DataRepository dataRepository;
+    
+    @Inject
+    LayerRepository layerRepository;
+    
+    @Inject
+    ServiceRepository serviceRepository;
 
     /**
      * Logger used for debugging and event notification.
@@ -204,6 +220,30 @@ public final class StyleBusiness {
         }
         return beans;
     }
+    
+    /**
+     * Returns the list of available styles for dataId.
+     *
+     * @return a {@link List} of {@link StyleDTO} instances
+     */
+    public List<StyleDTO> findStyleByDataId(final QName dataname, final String providerId){
+    	
+    	List<StyleDTO> returnlist = new ArrayList<StyleDTO>();
+    	Data data = dataRepository.findByNameAndNamespaceAndProviderId(dataname.getLocalPart(), dataname.getNamespaceURI(), providerId);
+    	List<Style> styleList = styleRepository.findByData(data);
+		for (Style style : styleList) {
+			StyleDTO styleDTO = new StyleDTO();
+			try {
+				BeanUtils.copyProperties(styleDTO, style);
+			} catch (IllegalAccessException | InvocationTargetException e) {
+				throw new ConstellationException(e);
+			}
+			returnlist.add(styleDTO);
+		}
+		return returnlist;
+        
+    }
+    
 
     /**
      * Gets and returns the {@link MutableStyle} that matches with the specified
@@ -456,6 +496,24 @@ public final class StyleBusiness {
         }
         styleRepository.unlinkStyleToData(style.getId(), data.getId());
     }
+
+	public void removeStyleFromLayer(String serviceIdentifier,String serviceType, String layerName, String styleProviderId, String styleName) {
+		Service service = serviceRepository.findByIdentifierAndType(serviceIdentifier, serviceType);
+	    Layer layer = layerRepository.findByServiceIdAndLayerName(service.getId(), layerName);
+	    Style style = styleRepository.findByName(styleName);
+	    styleRepository.unlinkStyleToLayer(style.getId(), layer.getId());
+	    
+    }
+
+	public void createOrUpdateStyleFromLayer(String serviceType, String serviceIdentifier, String layerName, String styleProviderId, String styleName) {
+		Service service = serviceRepository.findByIdentifierAndType(serviceIdentifier, serviceType);
+	    Layer layer = layerRepository.findByServiceIdAndLayerName(service.getId(), layerName);
+	    Style style = styleRepository.findByName(styleName);
+	    styleRepository.linkStyleToLayer(style.getId(), layer.getId());
+    }
+
+	
+    
 
     
 }

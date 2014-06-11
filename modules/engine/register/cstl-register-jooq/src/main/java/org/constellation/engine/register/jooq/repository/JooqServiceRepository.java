@@ -22,7 +22,6 @@ import static org.constellation.engine.register.jooq.Tables.SERVICE;
 import static org.constellation.engine.register.jooq.Tables.SERVICE_EXTRA_CONFIG;
 import static org.constellation.engine.register.jooq.Tables.USER_X_DOMAIN_X_DOMAINROLE;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -33,18 +32,14 @@ import java.util.Set;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.ServiceExtraConfig;
 import org.constellation.engine.register.ServiceMetaData;
-import org.constellation.engine.register.jooq.Keys;
 import org.constellation.engine.register.jooq.Tables;
-import org.constellation.engine.register.jooq.tables.User;
 import org.constellation.engine.register.jooq.tables.records.ServiceExtraConfigRecord;
 import org.constellation.engine.register.jooq.tables.records.ServiceRecord;
 import org.constellation.engine.register.repository.ServiceRepository;
-import org.jooq.InsertSetMoreStep;
 import org.jooq.Record;
 import org.jooq.Record2;
 import org.jooq.Result;
 import org.jooq.SelectConditionStep;
-import org.jooq.SelectHavingStep;
 import org.springframework.stereotype.Component;
 
 @Component

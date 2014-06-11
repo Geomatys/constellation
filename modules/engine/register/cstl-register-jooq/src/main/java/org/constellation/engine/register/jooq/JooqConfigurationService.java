@@ -132,7 +132,7 @@ public class JooqConfigurationService implements ConfigurationService {
         if (obj instanceof LayerContext) {
 
             Map<String, org.constellation.engine.register.Layer> layersByKey = new HashMap<String, org.constellation.engine.register.Layer>();
-            layersByKey.putAll(Maps.uniqueIndex(layerRepository.getLayer(service),
+            layersByKey.putAll(Maps.uniqueIndex(layerRepository.findByServiceId(service.getId()),
                     new Function<org.constellation.engine.register.Layer, String>() {
 
                         @Override

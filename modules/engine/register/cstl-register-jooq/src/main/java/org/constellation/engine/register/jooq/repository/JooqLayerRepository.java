@@ -64,10 +64,6 @@ public class JooqLayerRepository extends AbstractJooqRespository<LayerRecord, La
         return null;
     }
 
-    @Override
-    public List<Layer> getLayer(Service service) {
-        return dsl.select().from(LAYER).where(LAYER.SERVICE.eq(service.getId())).fetchInto(Layer.class);
-    }
 
     @Override
     public int update(Layer layer) {
@@ -91,5 +87,10 @@ public class JooqLayerRepository extends AbstractJooqRespository<LayerRecord, La
 	public List<Layer> findByServiceId(int serviceId) {
 		return dsl.select().from(LAYER).where(LAYER.SERVICE.eq(serviceId)).fetchInto(Layer.class);
 	}
+
+	@Override
+    public Layer findByServiceIdAndLayerName(int serviceId, String layerName) {
+	    return dsl.select().from(LAYER).where(LAYER.SERVICE.eq(serviceId)).and(LAYER.NAME.eq(layerName)).fetchOneInto(Layer.class);
+    }
 
 }

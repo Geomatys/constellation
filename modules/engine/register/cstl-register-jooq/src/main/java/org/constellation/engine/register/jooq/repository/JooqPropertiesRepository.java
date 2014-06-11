@@ -23,7 +23,6 @@ import static org.constellation.engine.register.jooq.Tables.PROPERTIES;
 import java.util.List;
 
 import org.constellation.engine.register.Property;
-import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.tables.records.PropertiesRecord;
 import org.constellation.engine.register.repository.PropertyRepository;

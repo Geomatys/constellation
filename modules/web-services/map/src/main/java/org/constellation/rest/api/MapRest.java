@@ -24,10 +24,12 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
+
 import org.apache.sis.util.logging.Logging;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.ConfigurationEngine;
@@ -36,8 +38,12 @@ import org.constellation.dto.AddLayer;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
 import org.constellation.map.configuration.MapConfigurer;
+
 import static org.constellation.utils.RESTfulUtilities.ok;
+
+import org.constellation.webservice.map.component.StyleBusiness;
 import org.constellation.ws.ServiceConfigurer;
+import org.springframework.stereotype.Component;
 
 /**
  * RESTful API for map services configuration.
@@ -50,9 +56,12 @@ import org.constellation.ws.ServiceConfigurer;
 @Path("/1/MAP/{spec}")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+@Component
 public final class MapRest {
     private static final Logger LOGGER = Logging.getLogger(MapRest.class);
 
+    @Inject
+    private StyleBusiness styleBusiness;
     /**
      * @see MapConfigurer#getLayers(String)
      */
@@ -123,27 +132,19 @@ public final class MapRest {
 
     @POST
     @Path("{id}/updatestyle")
-    public Response updateLayerStyleForService(final @PathParam("spec") String spec, final @PathParam("id") String serviceId, final ParameterValues params) throws Exception {
-        try {
-            getConfigurer(spec).updateLayerStyle(spec, serviceId, params.get("layerId"), params.get("spId"), params.get("styleName"));
-        } catch (ConfigurationException e) {
-            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
-            throw e;
-        }
+    public Response updateLayerStyleForService(final @PathParam("spec") String serviceType, final @PathParam("id") String serviceIdentifier, final ParameterValues params) throws Exception {
+        styleBusiness.createOrUpdateStyleFromLayer(serviceType,serviceIdentifier,params.get("layerId"), params.get("spId"), params.get("styleName"));
         return Response.ok().build();
     }
 
-    @POST
-    @Path("{id}/removestyle")
-    public Response removeLayerStyleForService(final @PathParam("spec") String spec, final @PathParam("id") String serviceId, final ParameterValues params) throws Exception {
-        try {
-            getConfigurer(spec).removeLayerStyle(spec, serviceId, params.get("layerId"), params.get("spId"), params.get("styleName"));
-        } catch (ConfigurationException e) {
-            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
-            throw e;
-        }
-        return Response.ok().build();
-    }
+	@POST
+	@Path("{id}/removestyle")
+	public Response removeLayerStyleForService(final @PathParam("spec") String serviceType, final @PathParam("id") String serviceIdentifier,
+	        final ParameterValues params) throws Exception {
+		styleBusiness.removeStyleFromLayer(serviceIdentifier, serviceType, params.get("layerId"), params.get("spId"), params.get("styleName"));
+		return Response.ok().build();
+	}
+
 
     /**
      * Returns the {@link MapConfigurer} instance from its {@link Specification}.

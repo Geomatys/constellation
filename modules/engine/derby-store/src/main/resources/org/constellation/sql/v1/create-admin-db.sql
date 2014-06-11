@@ -217,14 +217,7 @@ CREATE TABLE "admin"."crs"(
 ALTER TABLE "admin"."crs" ADD CONSTRAINT crs_data_fk FOREIGN KEY ("dataid") REFERENCES "admin"."data"("id") ON DELETE CASCADE;
 
 
-CREATE TABLE "admin"."styled_data"(
-  "style"       INTEGER     NOT NULL,
-  "data"        INTEGER     NOT NULL
-);
 
-ALTER TABLE "admin"."styled_data" ADD CONSTRAINT style_data_pk PRIMARY KEY ("style","data");
-ALTER TABLE "admin"."styled_data" ADD CONSTRAINT style_fk      FOREIGN KEY ("style") REFERENCES "admin"."style"("id") ON DELETE CASCADE;
-ALTER TABLE "admin"."styled_data" ADD CONSTRAINT data_fk       FOREIGN KEY ("data")  REFERENCES "admin"."data"("id")  ON DELETE CASCADE;
 
 
 -- services
@@ -343,3 +336,26 @@ insert into "admin"."user" ("id", "login", "password", "firstname", "lastname", 
 insert into "admin"."user_x_role" ("user_id", "role") values(1, 'cstl-admin');
 
 insert into "admin"."user_x_domain_x_domainrole" ("user_id", "domainrole_id", "domain_id") values(1, 1, 1);
+
+
+CREATE TABLE "admin"."styled_data"(
+  "style"       INTEGER     NOT NULL,
+  "data"        INTEGER     NOT NULL
+);
+
+ALTER TABLE "admin"."styled_data" ADD CONSTRAINT styled_data_pk PRIMARY KEY ("style","data");
+ALTER TABLE "admin"."styled_data" ADD CONSTRAINT styled_data_style_fk      FOREIGN KEY ("style") REFERENCES "admin"."style"("id") ON DELETE CASCADE;
+ALTER TABLE "admin"."styled_data" ADD CONSTRAINT styled_data_data_fk       FOREIGN KEY ("data")  REFERENCES "admin"."data"("id")  ON DELETE CASCADE;
+
+
+CREATE TABLE "admin"."styled_layer"(
+  "style"       INTEGER     NOT NULL,
+  "layer"       INTEGER     NOT NULL,
+  "default"     BOOLEAN     NOT NULL
+);
+
+ALTER TABLE "admin"."styled_layer" ADD CONSTRAINT styled_layer_pk PRIMARY KEY ("style","layer");
+ALTER TABLE "admin"."styled_layer" ADD CONSTRAINT styled_layer_style_fk      FOREIGN KEY ("style") REFERENCES "admin"."style"("id") ON DELETE CASCADE;
+ALTER TABLE "admin"."styled_layer" ADD CONSTRAINT styled_layer_layer_fk       FOREIGN KEY ("layer")  REFERENCES "admin"."layer"("id")  ON DELETE CASCADE;
+
+
