@@ -35,9 +35,12 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.sis.util.logging.Logging;
+import org.constellation.engine.register.DomainUser;
 import org.constellation.engine.register.User;
 import org.constellation.engine.register.repository.UserRepository;
 import org.mdweb.model.auth.MDwebRole;
+
+import com.google.common.base.Optional;
 
 /**
  * 
@@ -64,12 +67,11 @@ public final class DefaultCstlRealm extends AuthorizingRealm {
         checkNotNull(username, "Null username are not allowed by this realm.");
 
         // Acquire user record.
-        User user = userRepository.findOneWithRolesAndDomains(username);
-        if (user == null)
-            throw new UnknownAccountException();
-
+        Optional<DomainUser> user = userRepository.findOneWithRolesAndDomains(username);
+        if (user.isPresent())
+            return new SimpleAuthenticationInfo(username, user.get().getPassword(), getName());
+        throw new UnknownAccountException();
         // Build and return authentication info.
-        return new SimpleAuthenticationInfo(username, user.getPassword(), getName());
     }
 
     /**
