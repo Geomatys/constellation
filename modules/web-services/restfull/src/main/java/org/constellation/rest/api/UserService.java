@@ -68,8 +68,8 @@ public class UserService  {
 
     @GET
     @Path("/{id}")
-    public Response findOne(@PathParam("login") String login) {
-        return Response.ok(userRepository.findOneWithRolesAndDomains(login)).build();
+    public Response findOne(@PathParam("id") int id) {
+        return Response.ok(userRepository.findOneWithRolesAndDomains(id)).build();
     }
 
 

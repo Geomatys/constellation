@@ -34,6 +34,8 @@ import javax.ws.rs.core.Response;
 import org.constellation.engine.register.DomainUser;
 import org.constellation.engine.register.repository.UserRepository;
 
+import com.google.common.base.Function;
+
 /**
  * RestFull user configuration service
  * 
@@ -59,11 +61,17 @@ public class SessionService {
 		return Response.ok("OK").build();
 	}
 	
-	@GET
-	@Path("/account")
-	public DomainUser account( @Context HttpServletRequest req) {
-	    return userRepository.findOneWithRolesAndDomains(req.getUserPrincipal().getName());
-	}
+	 @GET
+	    @Path("/account")
+	    public Response account(@Context HttpServletRequest req) {
+	        return userRepository.findOneWithRolesAndDomains(req.getUserPrincipal().getName())
+	                .transform(new Function<DomainUser, Response>() {
+	                    @Override
+	                    public Response apply(DomainUser domainUser) {
+	                        return Response.ok(domainUser).build();
+	                    }
+	                }).or(Response.status(404).build());
+	    }
 
 
 }

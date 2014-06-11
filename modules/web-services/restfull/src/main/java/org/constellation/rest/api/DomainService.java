@@ -26,6 +26,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -42,7 +43,6 @@ import org.constellation.engine.register.repository.DomainRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
-
 
 @Path("/1/domain")
 @RolesAllowed("cstl-admin")
@@ -83,17 +83,22 @@ public class DomainService {
     @GET
     @Path("/")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public Response all(@QueryParam("withMembers") boolean withMembers) {
+    public Response all(@QueryParam("withMembers") boolean withMembers,
+            @DefaultValue("0") @QueryParam("userId") int userId) {
+        List<Domain> domains;
+        if (userId == 0)
+            domains = domainRepository.findAll();
+        else
+            domains = domainRepository.findAllByUserId(userId);
         if (withMembers) {
             List<DomainUserWrapper> result = new ArrayList<DomainService.DomainUserWrapper>();
-            List<Domain> domains = domainRepository.findAll();
             for (Domain domain : domains) {
                 List<User> users = domainRepository.findUsers(domain.getId());
                 result.add(new DomainUserWrapper(domain, users));
             }
             return Response.ok(result).build();
         }
-        return Response.ok(domainRepository.findAll()).build();
+        return Response.ok(domains).build();
     }
 
     @GET
@@ -145,7 +150,7 @@ public class DomainService {
     public Response members(@PathParam("id") int domainId) {
         return Response.ok(domainRepository.findUsers(domainId)).build();
     }
-    
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/nonmembers/{id}")

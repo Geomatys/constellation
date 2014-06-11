@@ -28,6 +28,8 @@ import org.constellation.engine.register.User;
 public interface DomainRepository {
   
     List<Domain> findAll();
+    
+    List<Domain> findAllByUserId(int userId);
 
     Domain findOne(Integer id);
     
@@ -62,5 +64,9 @@ public interface DomainRepository {
     List<User> findUsersNotInDomain(int domainId);
 
     Set<Integer> updateUserInDomain(int userId, int domainId, Set<Integer> roles);
+
+    List<Domain> findByIdsNotIn(List<Integer> fetch);
+
+    List<Domain> findByIds(List<Integer> fetch);
 
 }

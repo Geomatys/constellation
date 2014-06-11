@@ -59,7 +59,7 @@ public class LoginController {
 		int domainId = defaultDomain==null?0:defaultDomain.getId();
 		if(adminUrl==null)
 			return "redirect:/";
-		return "redirect:" + adminUrl + "app/cstl?cstlSessionId=" + sessionId + "&cstlActiveDomainId=" + domainId;
+		return "redirect:" + adminUrl + "app/cstl?cstlSessionId=" + sessionId + "&cstlActiveDomainId=" + domainId + "&cstlUserId=" +user.getId() ;
 	}
 
 	@RequestMapping("/loggedout")

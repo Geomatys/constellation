@@ -31,4 +31,6 @@ public interface DomainRoleRepository {
 
     Map<DomainRole, List<Pair<User, List<Domain>>>> findAllWithMembers();
 
+    Map<DomainRole, List<Integer>> findAllWithPermissions(int ... serviceWriteAccessPermissionId);
+
 }

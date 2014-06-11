@@ -23,6 +23,8 @@ import java.util.List;
 import org.constellation.engine.register.DomainUser;
 import org.constellation.engine.register.User;
 
+import com.google.common.base.Optional;
+
 
 public interface UserRepository {
 
@@ -42,7 +44,9 @@ public interface UserRepository {
     
     int delete(int userId);
     
-    DomainUser findOneWithRolesAndDomains(String login);
+    Optional<DomainUser> findOneWithRolesAndDomains(String login);
+    
+    Optional<DomainUser> findOneWithRolesAndDomains(int id);
 
     boolean isLastAdmin(int userId);
 

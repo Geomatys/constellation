@@ -40,7 +40,10 @@ cstlAdminApp.factory('AuthInterceptor', function($rootScope, $cookies, CookiesSt
 	    	  }
 	    	  url = $cookies.cstlUrl + url.substring(cstlUrlPrefix.length);
 	    	  if($cookies.cstlActiveDomainId)
-	    	    url = url.replace('$domainId', $cookies.cstlActiveDomainId);
+            url = url.replace('$domainId', $cookies.cstlActiveDomainId);
+	    	  if($cookies.cstlUserId)
+            url = url.replace('$userId', $cookies.cstlUserId);
+	    	  
 	    	  var jsessionIdIndex = url.indexOf(";jsessionid=");
 	    	  if(jsessionIdIndex == -1){
 	    	    var cstlSessionId=$cookies.cstlSessionId;
@@ -217,6 +220,8 @@ cstlAdminApp.factory('PermissionService', ['$http',
 cstlAdminApp.factory('webService', ['$resource',
                                      function ($resource) {
                                          return $resource('@cstl/api/1/admin/domain/$domainId/instances;jsessionid=', {}, {
+                                             'permissionByDomainRole' : {method: 'GET', url: '@cstl/api/1/servicepermission/access', isArray: true},
+                                             'domains':      {method: 'GET', url: '@cstl/api/1/servicepermission/user/$userId/service/:id', isArray: true},
                                              'listAll':      {method: 'GET', isArray: false},
                                              'get':          {method: 'GET', url: '@cstl/api/1/OGC/:type/:id;jsessionid='},
                                              'create':       {method: 'PUT', url: '@cstl/api/1/OGC/:type/domain/$domainId'},
@@ -349,14 +354,20 @@ cstlAdminApp.factory('TaskService', ['$resource',
         });
     }]);
 
-cstlAdminApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'authService', '$base64','$cookieStore',
-    function ($rootScope, $http, authService, $base64, $cookieStore) {
+cstlAdminApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'Account' ,'authService', '$base64','$cookieStore',
+    function ($rootScope, $http, Account, authService, $base64, $cookieStore) {
         return {
             authenticate: function() {
-                $http.get('@cstl/spring/session/status;jsessionid=')
-                    .success(function (data, status, headers, config) {
-                        $rootScope.$broadcast('event:auth-authConfirmed');
-                    })
+                Account.get(function(account){
+                    $rootScope.account=account
+                    $rootScope.hasRole = function(role){
+                        return account.roles.indexOf(role) != -1
+                    }
+                    $rootScope.hasMultipleDomains = function(){
+                        return account.domains.length > 1
+                    }
+                    $rootScope.$broadcast('event:auth-authConfirmed');
+                });
             },
             logout: function () {
                 $rootScope.authenticationError = false;

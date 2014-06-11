@@ -20,30 +20,38 @@ package org.constellation.engine.register.jooq.repository;
 
 import static org.constellation.engine.register.jooq.Tables.SERVICE;
 import static org.constellation.engine.register.jooq.Tables.SERVICE_EXTRA_CONFIG;
+import static org.constellation.engine.register.jooq.Tables.SERVICE_X_DOMAIN;
 import static org.constellation.engine.register.jooq.Tables.USER_X_DOMAIN_X_DOMAINROLE;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.ServiceExtraConfig;
 import org.constellation.engine.register.ServiceMetaData;
 import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.tables.records.ServiceExtraConfigRecord;
 import org.constellation.engine.register.jooq.tables.records.ServiceRecord;
+import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
 import org.jooq.Record;
 import org.jooq.Record2;
 import org.jooq.Result;
 import org.jooq.SelectConditionStep;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord, Service> implements ServiceRepository {
+
+    @Autowired
+    private DomainRepository domainRepository;
 
     public JooqServiceRepository() {
         super(Service.class, SERVICE);
@@ -79,7 +87,9 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
         newRecord.setOwner(service.getOwner());
         newRecord.setType(service.getType());
         newRecord.setConfig(service.getConfig());
-
+        newRecord.setDate(service.getDate());
+        newRecord.setTitle(0);
+        newRecord.setDescription(0);
         if (newRecord.store() > 0) {
             return newRecord.into(Service.class);
         }
@@ -163,22 +173,41 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
         if (one == null)
             return null;
         return one.into(Service.class);
-	}
+    }
 
-	@Override
-	public int create(Service service) {
-		ServiceRecord serviceRecord = dsl.newRecord(SERVICE);
-		serviceRecord.setConfig(service.getConfig());
-		serviceRecord.setDate(service.getDate());
-		serviceRecord.setDescription(service.getDescription());
-		serviceRecord.setIdentifier(service.getIdentifier());
-		serviceRecord.setMetadata(service.getMetadata());
-		serviceRecord.setMetadataId(service.getMetadataId());
-		serviceRecord.setType(service.getType());
-		serviceRecord.setTitle(service.getTitle());
-		serviceRecord.setOwner(service.getOwner());
-		serviceRecord.store();
-		return serviceRecord.getId().intValue();
-	}
+    @Override
+    public int create(Service service) {
+        ServiceRecord serviceRecord = dsl.newRecord(SERVICE);
+        serviceRecord.setConfig(service.getConfig());
+        serviceRecord.setDate(service.getDate());
+        serviceRecord.setDescription(service.getDescription());
+        serviceRecord.setIdentifier(service.getIdentifier());
+        serviceRecord.setMetadata(service.getMetadata());
+        serviceRecord.setMetadataId(service.getMetadataId());
+        serviceRecord.setType(service.getType());
+        serviceRecord.setTitle(service.getTitle());
+        serviceRecord.setOwner(service.getOwner());
+        serviceRecord.store();
+        return serviceRecord.getId().intValue();
+    }
+
+    @Override
+    public Map<Domain, Boolean> getDomainLinks(int serviceId) {
+        List<Integer> fetch = dsl.select(SERVICE_X_DOMAIN.DOMAIN_ID).from(SERVICE_X_DOMAIN)
+                .where(SERVICE_X_DOMAIN.SERVICE_ID.eq(serviceId)).fetch(SERVICE_X_DOMAIN.DOMAIN_ID);
+        Map<Domain, Boolean> result = new LinkedHashMap<>();
+        for (Domain domain : domainRepository.findByIds(fetch)) {
+            result.put(domain, true);
+        }
+        domainRepository.findByIdsNotIn(fetch);
+
+        return null;
+    }
+
+    @Override
+    public List<Service> findByDomain(int domainId) {
+        return findBy(SERVICE.ID.in(dsl.select(Tables.SERVICE_X_DOMAIN.SERVICE_ID).from(SERVICE_X_DOMAIN)
+                .where(SERVICE_X_DOMAIN.DOMAIN_ID.eq(domainId))));
+    }
 
 }

@@ -28,10 +28,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.constellation.configuration.AcknowlegementType;
+import org.constellation.engine.register.DomainUser;
 import org.constellation.engine.register.User;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.security.SecurityManagerHolder;
 import org.springframework.util.StringUtils;
+
+import com.google.common.base.Function;
 
 /**
  * RestFull user configuration service
@@ -55,13 +58,13 @@ public class CurrentUserService {
     @GET
     @Path("/")
     public Response current() {
-        String login = SecurityManagerHolder.getInstance().getCurrentUserLogin();
-        if (StringUtils.hasText(login)) {
-            User user = userRepository.findOneWithRolesAndDomains(login);
-            
-            return Response.ok(user).build();
-        }
-        return Response.status(401).build();
+        return userRepository.findOneWithRolesAndDomains(SecurityManagerHolder.getInstance().getCurrentUserLogin())
+                .transform(new Function<DomainUser, Response>() {
+                    @Override
+                    public Response apply(DomainUser domainUser) {
+                        return Response.ok(domainUser).build();
+                    }
+                }).or(Response.status(404).build());
     }
 
     @GET

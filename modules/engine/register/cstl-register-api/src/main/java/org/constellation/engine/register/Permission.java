@@ -4,6 +4,11 @@ import java.io.Serializable;
 
 public class Permission implements Serializable {
     
+    
+    public final static int SERVICE_READ_ACCESS_PERMISSION_ID = 1; 
+    
+    public final static int SERVICE_WRITE_ACCESS_PERMISSION_ID = 2; 
+    
     /**
      * 
      */

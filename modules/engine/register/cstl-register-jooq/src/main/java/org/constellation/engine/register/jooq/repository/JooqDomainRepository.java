@@ -43,6 +43,7 @@ import org.constellation.engine.register.jooq.tables.records.UserXDomainXDomainr
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.jooq.Batch;
+import org.jooq.Condition;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.SelectConditionStep;
@@ -63,7 +64,26 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
 
     @Override
     public List<Domain> findAll() {
-        return dsl.select().from(Tables.DOMAIN).where(DOMAIN.ID.gt(0)).fetchInto(Domain.class);
+        return dsl.select().from(Tables.DOMAIN).where(DOMAIN.SYSTEM.eq(false)).fetchInto(Domain.class);
+    }
+    
+    @Override
+    public List<Domain> findByIds(List<Integer> fetch) {
+        return findBy(DOMAIN.ID.in(fetch));
+    }
+
+    
+    
+    @Override
+    public List<Domain> findByIdsNotIn(List<Integer> fetch) {
+        return findBy(DOMAIN.ID.notIn(fetch));
+    }
+
+    @Override
+    public List<Domain> findAllByUserId(int userId) {
+        return dsl.select().from(Tables.DOMAIN).join(Tables.USER_X_DOMAIN_X_DOMAINROLE).onKey()
+                .where(Tables.USER_X_DOMAIN_X_DOMAINROLE.USER_ID.eq(userId).and(DOMAIN.SYSTEM.eq(false)))
+                .fetchInto(Domain.class);
     }
 
     @Override
@@ -222,4 +242,8 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
         addUserToDomain(userId, domainId, roles);
         return roles;
     }
+
+    
+
+   
 }

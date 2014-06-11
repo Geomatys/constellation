@@ -19,8 +19,10 @@
 package org.constellation.engine.register.repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.ServiceExtraConfig;
 import org.constellation.engine.register.ServiceMetaData;
@@ -34,6 +36,8 @@ public interface ServiceRepository {
     Service findById(int id);
     
     List<Service> findByDataId(int dataId);
+    
+    List<Service> findByDomain(int domainId);
     
     Service findByIdentifierAndType(String id, String type);
 
@@ -56,4 +60,8 @@ public interface ServiceRepository {
     void updateExtraFile(Service service, String fileName, String config);
 
     int updateIsoMetadata(Service service, String fileIdentifier, String string);
+
+    Map<Domain, Boolean> getDomainLinks(int serviceId);
+
+   
 }

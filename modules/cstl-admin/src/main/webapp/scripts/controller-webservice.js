@@ -347,8 +347,8 @@ cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routePar
         }
     }]);
 
-cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'webService', 'dataListing', 'provider', 'csw', 'sos', '$modal','textService', '$dashboard', '$growl', '$filter', 'StyleSharedService','style','$cookies',
-    function ($scope, $routeParams , webService, dataListing, provider, csw, sos, $modal, textService, $dashboard, $growl, $filter, StyleSharedService, style, $cookies) {
+cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$routeParams', 'webService', 'dataListing', 'provider', 'csw', 'sos', '$modal','textService', '$dashboard', '$growl', '$filter', 'DomainResource' ,'StyleSharedService','style','$cookies',
+    function ($rootScope, $scope, $routeParams , webService, dataListing, provider, csw, sos, $modal, textService, $dashboard, $growl, $filter, DomainResource,StyleSharedService, style, $cookies) {
         $scope.tagText = '';
         $scope.type = $routeParams.type;
         $scope.url = $cookies.cstlUrl + "WS/" + $routeParams.type + "/" + $routeParams.id;
@@ -356,7 +356,20 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
         $scope.cstlSessionId = $cookies.cstlSessionId;
         $scope.urlBoxSize = Math.min($scope.url.length,100);
         $scope.domainId = $cookies.cstlActiveDomainId;
+        $scope.writeOperationAvailable = $scope.type == 'csw' || $scope.type == 'sos' || $scope.type == 'wfs';
+        
+        webService.get({type: $scope.type, id:$routeParams.id}, function(service){
+           $scope.service = service  
+           webService.permissionByDomainRole(function(domainroles){
+             $scope.domainroles = domainroles;          
+           })
+           webService.domains({id:service.id}, function(domains){
+             $scope.domains = domains;          
+           })
 
+        });
+
+        
         var client = new ZeroClipboard( document.getElementById("copy-button") );
 
         client.on( "load", function(client) {
@@ -367,7 +380,6 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
             } );
         } );
 
-        $scope.service = webService.get({type: $scope.type, id:$routeParams.id});
         $scope.metadata = webService.metadata({type: $scope.type, id:$routeParams.id});
 
         $scope.tabdata = true;

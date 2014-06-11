@@ -19,7 +19,6 @@
 package org.constellation.engine.register;
 
 import java.io.Serializable;
-import java.util.Set;
 
 public class Domain implements Serializable {
 
@@ -32,6 +31,7 @@ public class Domain implements Serializable {
     private Integer id;
     private String name;
     private String description;
+    private boolean system;
 
     
     public Domain() {
@@ -74,6 +74,14 @@ public class Domain implements Serializable {
 
 
    
+
+    public boolean isSystem() {
+        return system;
+    }
+
+    public void setSystem(boolean system) {
+        this.system = system;
+    }
 
     @Override
     public String toString() {

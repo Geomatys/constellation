@@ -37,6 +37,7 @@ import org.constellation.engine.register.jooq.tables.records.UserRecord;
 import org.constellation.engine.register.jooq.tables.records.UserXRoleRecord;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.UserRepository;
+import org.jooq.Condition;
 import org.jooq.DeleteConditionStep;
 import org.jooq.InsertSetMoreStep;
 import org.jooq.Record;
@@ -50,6 +51,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.google.common.base.Optional;
 
 @Component
 public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User> implements UserRepository {
@@ -69,10 +72,9 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
         super(User.class, USER);
     }
 
-    
     @Override
     public List<DomainUser> findAllWithDomainAndRole() {
-     
+
         SelectJoinStep<Record> records = getSelectWithRolesAndDomains();
 
         records.execute();
@@ -119,7 +121,7 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
         for (Entry<Record, Result<Record>> domainEntry : domains.entrySet()) {
 
             Domain domain = domainEntry.getKey().into(Domain.class);
-            if (domain.getId()!= null) {
+            if (domain.getId() != null) {
                 userDTO.addDomain(domain);
             }
         }
@@ -151,18 +153,18 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
     public User insert(User user, List<String> roles) {
 
         UserRecord newRecord = dsl.newRecord(USER);
-        
+
         newRecord.setActive(true);
         newRecord.setEmail(user.getEmail());
         newRecord.setLastname(user.getLastname());
         newRecord.setFirstname(user.getFirstname());
         newRecord.setLogin(user.getLogin());
         newRecord.setPassword(user.getPassword());
-        
-        if(newRecord.store() > 0) {
+
+        if (newRecord.store() > 0) {
             user.setId(newRecord.getId());
         }
-        
+
         insertRoles(user, roles);
 
         return user;
@@ -195,16 +197,24 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
     }
 
     @Override
-    public DomainUser findOneWithRolesAndDomains(String login) {
-        SelectConditionStep<Record> records = getSelectWithRolesAndDomains().where(userTable.LOGIN.eq(login));
-        records.execute();
-        List<DomainUser> result = mapUsers(records.getResult());
-        
-        if (result.size() == 0)
-            return null;
-        DomainUser domainUser = result.get(0);
-        domainUser.setPassword(null);
-        return domainUser;
+    public Optional<DomainUser> findOneWithRolesAndDomains(String login) {
+        return fetchUserWithRolesAndDomains(userTable.LOGIN.eq(login));
+    }
+
+    private Optional<DomainUser> fetchUserWithRolesAndDomains(Condition condition) {
+        SelectConditionStep<Record> records = getSelectWithRolesAndDomains().where(condition);
+        if (records.execute() > 0) {
+            List<DomainUser> result = mapUsers(records.getResult());
+            DomainUser domainUser = result.get(0);
+            domainUser.setPassword(null);
+            return Optional.of(domainUser);
+        }
+        return Optional.absent();
+    }
+
+    @Override
+    public Optional<DomainUser> findOneWithRolesAndDomains(int id) {
+        return fetchUserWithRolesAndDomains(userTable.ID.eq(id));
     }
 
     @Override
@@ -224,12 +234,10 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
         return dsl.select().from(USER).where(USER_X_ROLE.USER_ID.eq(userId)).fetch(USER_X_ROLE.ROLE);
     }
 
-
     @Override
     public int countUser() {
         return dsl.selectCount().from(USER).fetchOne(0, int.class);
     }
-
 
     @Override
     public boolean loginAvailable(String login) {

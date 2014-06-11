@@ -193,17 +193,6 @@ cstlAdminApp
             // Call when the user is authenticated
            $rootScope.$on('event:auth-authConfirmed', function() {
                $rootScope.authenticated = true;
-               Account.get(function(account){
-                 $rootScope.account=account
-                 $rootScope.hasRole = function(role){
-                   return account.roles.indexOf(role) != -1
-                 }
-                 $rootScope.hasMultipleDomains = function(){
-                   return account.domains.length > 1
-                 }
-                 
-               });
-               
                
                Account.get(function(sessionData){
                 $rootScope.cstlSession=sessionData;

@@ -6,6 +6,7 @@ import static org.constellation.engine.register.jooq.Tables.DOMAINROLE_X_PERMISS
 import static org.constellation.engine.register.jooq.Tables.USER;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,8 @@ import org.jooq.UpdatableRecord;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.google.common.primitives.Ints;
 
 @Component
 public class JooqDomainRoleRepository extends AbstractJooqRespository<DomainroleRecord, DomainRole> implements
@@ -164,4 +167,16 @@ public class JooqDomainRoleRepository extends AbstractJooqRespository<Domainrole
         return result;
     }
 
+    @Override
+    public Map<DomainRole, List<Integer>> findAllWithPermissions(int... serviceWriteAccessPermissionId) {
+        Map<DomainRole, List<Integer>> result = new HashMap<DomainRole, List<Integer>>();
+        Result<Record> fetch = dsl.select().from(DOMAINROLE).join(DOMAINROLE_X_PERMISSION).onKey()
+                .where(DOMAINROLE_X_PERMISSION.PERMISSION_ID.in(Ints.asList(serviceWriteAccessPermissionId))).fetch();
+        for(Entry<Record, Result<Record>> e : fetch.intoGroups(DOMAINROLE.fields()).entrySet()) {
+            DomainRole domainRole = e.getKey().into(DomainRole.class);
+            List<Integer> values = e.getValue().getValues(DOMAINROLE_X_PERMISSION.PERMISSION_ID);
+            result.put(domainRole, values);
+        }
+        return result;
+    }
 }
