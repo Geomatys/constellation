@@ -190,9 +190,9 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
 
         final List<Instance> instances = new ArrayList<>();
         final List<String> versions = Arrays.asList("1.1.1", "1.3.0");
-        instances.add(new Instance("default", "OGC:WMS", "Constellation Map Server", "WMS", versions, 12, ServiceStatus.WORKING));
-        instances.add(new Instance("wms1",    "OGC:WMS", "Constellation Map Server", "WMS", versions, 1,  ServiceStatus.WORKING));
-        instances.add(new Instance("wms2",    "OGC:WMS", "Constellation Map Server", "WMS", versions, 0,  ServiceStatus.NOT_STARTED));
+        instances.add(new Instance(1, "default", "OGC:WMS", "Constellation Map Server", "WMS", versions, 12, ServiceStatus.WORKING));
+        instances.add(new Instance(2, "wms1",    "OGC:WMS", "Constellation Map Server", "WMS", versions, 1,  ServiceStatus.WORKING));
+        instances.add(new Instance(3, "wms2",    "OGC:WMS", "Constellation Map Server", "WMS", versions, 0,  ServiceStatus.NOT_STARTED));
         InstanceReport expResult2 = new InstanceReport(instances);
         assertEquals(expResult2, obj);
 
@@ -246,9 +246,9 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
 
         List<Instance> instances = new ArrayList<>();
         final List<String> versions = Arrays.asList("1.1.1", "1.3.0");
-        instances.add(new Instance("default", "OGC:WMS", "Constellation Map Server", "WMS", versions, 12, ServiceStatus.WORKING));
-        instances.add(new Instance("wms1",    "OGC:WMS", "Constellation Map Server", "WMS", versions, 1,  ServiceStatus.WORKING));
-        instances.add(new Instance("wms2",    "OGC:WMS", "Constellation Map Server", "WMS", versions, 0,  ServiceStatus.WORKING));
+        instances.add(new Instance(1, "default", "OGC:WMS", "Constellation Map Server", "WMS", versions, 12, ServiceStatus.WORKING));
+        instances.add(new Instance(2, "wms1",    "OGC:WMS", "Constellation Map Server", "WMS", versions, 1,  ServiceStatus.WORKING));
+        instances.add(new Instance(3, "wms2",    "OGC:WMS", "Constellation Map Server", "WMS", versions, 0,  ServiceStatus.WORKING));
         InstanceReport expResult2 = new InstanceReport(instances);
         assertEquals(expResult2, obj);
 
@@ -342,9 +342,9 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
 
         final List<Instance> instances = new ArrayList<>();
         final List<String> versions = Arrays.asList("1.1.1", "1.3.0");
-        instances.add(new Instance("default", "OGC:WMS", "Constellation Map Server", "WMS", versions, 12, ServiceStatus.WORKING));
-        instances.add(new Instance("wms1",    "OGC:WMS", "Constellation Map Server", "WMS", versions, 1,  ServiceStatus.WORKING));
-        instances.add(new Instance("wms2",    "OGC:WMS", "Constellation Map Server", "WMS", versions, 12, ServiceStatus.NOT_STARTED));
+        instances.add(new Instance(1, "default", "OGC:WMS", "Constellation Map Server", "WMS", versions, 12, ServiceStatus.WORKING));
+        instances.add(new Instance(2, "wms1",    "OGC:WMS", "Constellation Map Server", "WMS", versions, 1,  ServiceStatus.WORKING));
+        instances.add(new Instance(3, "wms2",    "OGC:WMS", "Constellation Map Server", "WMS", versions, 12, ServiceStatus.NOT_STARTED));
         InstanceReport expResult2 = new InstanceReport(instances);
         assertEquals(expResult2, obj);
     }
@@ -383,8 +383,8 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
 
         final List<Instance> instances = new ArrayList<>();
         final List<String> versions = Arrays.asList("1.1.1", "1.3.0");
-        instances.add(new Instance("default", "OGC:WMS", "Constellation Map Server", "WMS", versions, 12, ServiceStatus.WORKING));
-        instances.add(new Instance("wms1",    "OGC:WMS", "Constellation Map Server", "WMS", versions, 1,  ServiceStatus.WORKING));
+        instances.add(new Instance(1, "default", "OGC:WMS", "Constellation Map Server", "WMS", versions, 12, ServiceStatus.WORKING));
+        instances.add(new Instance(2, "wms1",    "OGC:WMS", "Constellation Map Server", "WMS", versions, 1,  ServiceStatus.WORKING));
         InstanceReport expResult2 = new InstanceReport(instances);
         assertEquals(expResult2, obj);
     }

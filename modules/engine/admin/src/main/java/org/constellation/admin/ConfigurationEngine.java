@@ -269,7 +269,7 @@ public class ConfigurationEngine {
                     GenericDatabaseMarshallerPool.getInstance().recycle(u);
                     return config;
                 } else {
-                    final InputStream in = Util.getResourceAsStream("org/constellation/xml/" + serviceType
+                    final InputStream in = Util.getResourceAsStream("org/constellation/xml/" + serviceType.toUpperCase()
                             + "Capabilities.xml");
                     if (in != null) {
                         final Unmarshaller u = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();

@@ -200,10 +200,10 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
     public Service getInstanceMetadata(final String serviceType, final String identifier) throws ConfigurationException {
-        this.ensureExistingInstance(serviceType, identifier);
+        this.ensureExistingInstance(serviceType.toUpperCase(), identifier);
         try {
             // todo add language parameter
-            return ConfigurationEngine.readServiceMetadata(identifier, serviceType, null);
+            return ConfigurationEngine.readServiceMetadata(identifier, serviceType.toUpperCase(), null);
         } catch (JAXBException | IOException ex) {
             throw new ConfigurationException("The serviceMetadata.xml file can't be read.", ex);
         }
@@ -232,7 +232,8 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      * @return an {@link Instance} instance
      */
     public Instance getInstance(final String serviceType, final String identifier) throws ConfigurationException {
-        final Instance instance = new Instance(identifier, serviceType, getInstanceStatus(serviceType, identifier));
+        org.constellation.engine.register.Service service = serviceBusiness.getServiceByIdentifierAndType(serviceType, identifier);
+        final Instance instance = new Instance(service.getId(), identifier, serviceType, getInstanceStatus(serviceType, identifier));
         Service metadata = null;
         try {
             metadata = getInstanceMetadata(serviceType, identifier);
@@ -330,7 +331,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      * @throws TargetNotFoundException if the service with specified identifier does not exist
      */
     protected void ensureExistingInstance(final String spec, final String identifier) throws TargetNotFoundException {
-        if (!WSEngine.serviceInstanceExist(spec, identifier)) {
+        if (!WSEngine.serviceInstanceExist(spec.toUpperCase(), identifier)) {
             if (!ConfigurationEngine.serviceConfigurationExist(spec, identifier)) {
                 throw new TargetNotFoundException(spec + " service instance with identifier \"" + identifier +
                         "\" not found. There is not configuration in the database.");

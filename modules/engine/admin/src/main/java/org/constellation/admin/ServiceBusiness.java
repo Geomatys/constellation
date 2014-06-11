@@ -6,7 +6,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.xml.bind.JAXBException;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.constellation.admin.dto.ServiceDTO;
 import org.constellation.admin.exception.ConstellationException;
@@ -338,5 +340,9 @@ public class ServiceBusiness {
             }
             WSEngine.setServiceInstances(serviceType, workersMap);
         }
+    }
+
+    public org.constellation.engine.register.Service getServiceByIdentifierAndType(String serviceType, String identifier) {
+        return serviceRepository.findByIdentifierAndType(identifier, serviceType);
     }
 }

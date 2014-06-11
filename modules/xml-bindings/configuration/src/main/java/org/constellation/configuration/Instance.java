@@ -35,6 +35,9 @@ import java.util.Objects;
 public class Instance {
 
     @XmlAttribute
+    private int id;
+    
+    @XmlAttribute
     private String name;
 
     @XmlAttribute
@@ -59,21 +62,36 @@ public class Instance {
 
     }
 
-    public Instance(final String name, final String type, final ServiceStatus status) {
+    public Instance(final int id, final String name, final String type, final ServiceStatus status) {
+        this.id = id;
         this.name   = name;
         this.type   = type;
         this.status = status;
     }
 
-    public Instance(final String identifier, final String name, final String _abstract, final String type,
+    public Instance(final int id, final String identifier, final String name, final String _abstract, final String type,
             final List<String> versions, final Integer layerNumber, final ServiceStatus status) {
+        this(id, name, type, status);
         this.identifier   = identifier;
-        this.name         = name;
         this._abstract    = _abstract;
-        this.type         = type;
         this.versions     = versions;
         this.layersNumber = layerNumber;
-        this.status       = status;
+    }
+    
+    /**
+     * Set id;
+     * @param id
+     */
+    public void setId(int id) {
+        this.id = id;
+    }
+    
+    /**
+     * Return the id;
+     * @return
+     */
+    public int getId() {
+        return id;
     }
 
     /**
