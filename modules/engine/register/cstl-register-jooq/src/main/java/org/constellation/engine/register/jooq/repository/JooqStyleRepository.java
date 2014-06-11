@@ -51,12 +51,14 @@ public class JooqStyleRepository extends AbstractJooqRespository<StyleRecord, St
     }
 
 	@Override
-	public void linkStyleToLayer(int styleId, int layerid) {
-		StyledLayerRecord styledLayerRecord = dsl.select().from(STYLED_LAYER).where(STYLED_LAYER.LAYER.eq(layerid)).and(STYLED_LAYER.STYLE.eq(styleId))
+	public void linkStyleToLayer(int styleId, int layerId) {
+		StyledLayerRecord styledLayerRecord = dsl.select().from(STYLED_LAYER).where(STYLED_LAYER.LAYER.eq(layerId)).and(STYLED_LAYER.STYLE.eq(styleId))
 		        .fetchOneInto(StyledLayerRecord.class);
 		if (styledLayerRecord == null) {
-			InsertSetMoreStep<StyledLayerRecord> insert = dsl.insertInto(STYLED_LAYER).set(STYLED_LAYER.LAYER, layerid).set(STYLED_LAYER.STYLE, styleId);
+			
+			InsertSetMoreStep<StyledLayerRecord> insert = dsl.insertInto(STYLED_LAYER).set(STYLED_LAYER.LAYER, layerId).set(STYLED_LAYER.STYLE, styleId);
 			insert.execute();
+			setDefaultStyleToLayer(styleId, layerId);
 		}
 	}
 	

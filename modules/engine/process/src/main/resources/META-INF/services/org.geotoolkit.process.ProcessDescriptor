@@ -1,2 +1,2 @@
-org.constellation.process.refreshindex.RefreshIndexDescriptor
-org.constellation.process.restart.RestartDescriptor
+org.constellation.process.client.RefreshIndexDescriptor
+org.constellation.process.client.RestartDescriptor

@@ -160,5 +160,4 @@ public final class MapRest {
         return (MapConfigurer) ServiceConfigurer.newInstance(spec);
     }
 
-
 }

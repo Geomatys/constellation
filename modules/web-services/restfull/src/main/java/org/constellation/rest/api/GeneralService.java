@@ -1,4 +1,4 @@
-package org.constellation.ws.rest;
+package org.constellation.rest.api;
 
 import java.util.HashMap;
 import java.util.Map;

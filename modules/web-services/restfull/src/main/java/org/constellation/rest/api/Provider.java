@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-package org.constellation.ws.rest;
+package org.constellation.rest.api;
 
 import java.io.File;
 import java.net.MalformedURLException;

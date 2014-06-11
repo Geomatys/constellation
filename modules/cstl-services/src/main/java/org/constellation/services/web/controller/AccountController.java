@@ -20,8 +20,8 @@ package org.constellation.services.web.controller;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.constellation.rest.api.SessionData;
 import org.constellation.security.SecurityManagerHolder;
-import org.constellation.ws.rest.SessionData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

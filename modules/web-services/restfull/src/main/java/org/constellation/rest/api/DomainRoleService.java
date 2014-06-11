@@ -1,4 +1,4 @@
-package org.constellation.ws.rest;
+package org.constellation.rest.api;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;

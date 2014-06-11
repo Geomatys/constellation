@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-package org.constellation.ws.rest;
+package org.constellation.rest.api;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;

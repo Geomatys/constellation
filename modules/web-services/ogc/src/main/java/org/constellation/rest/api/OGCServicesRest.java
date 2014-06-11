@@ -69,8 +69,8 @@ import org.glassfish.jersey.jettison.JettisonUnmarshaller;
 @Path("/1/OGC/{spec}")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-public final class OGCServices {
-    private static final Logger LOGGER = Logging.getLogger(OGCServices.class);
+public final class OGCServicesRest {
+    private static final Logger LOGGER = Logging.getLogger(OGCServicesRest.class);
 
     
     @Inject

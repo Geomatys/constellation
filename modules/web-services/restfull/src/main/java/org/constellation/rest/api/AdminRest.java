@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.constellation.ws.rest;
+package org.constellation.rest.api;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +59,7 @@ import org.constellation.ws.WSEngine;
 @Path("/1/admin")
 @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-public class Admin {
+public class AdminRest {
 
     @Inject
     private ServiceRepository serviceRepository;
