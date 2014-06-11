@@ -63,5 +63,4 @@ public interface ServiceRepository {
 
     Map<Domain, Boolean> getLinkedDomains(int serviceId);
 
-   
 }

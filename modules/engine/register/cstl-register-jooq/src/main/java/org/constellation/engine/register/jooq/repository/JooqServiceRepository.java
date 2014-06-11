@@ -177,18 +177,19 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
 
     @Override
     public int create(Service service) {
-        ServiceRecord serviceRecord = dsl.newRecord(SERVICE);
-        serviceRecord.setConfig(service.getConfig());
-        serviceRecord.setDate(service.getDate());
-        serviceRecord.setDescription(service.getDescription());
-        serviceRecord.setIdentifier(service.getIdentifier());
-        serviceRecord.setMetadata(service.getMetadata());
-        serviceRecord.setMetadataId(service.getMetadataId());
-        serviceRecord.setType(service.getType());
-        serviceRecord.setTitle(service.getTitle());
-        serviceRecord.setOwner(service.getOwner());
-        serviceRecord.store();
-        return serviceRecord.getId().intValue();
+    	ServiceRecord serviceRecord = dsl.newRecord(SERVICE);
+		serviceRecord.setConfig(service.getConfig());
+		serviceRecord.setDate(service.getDate());
+		serviceRecord.setDescription(service.getDescription());
+		serviceRecord.setIdentifier(service.getIdentifier());
+		serviceRecord.setMetadata(service.getMetadata());
+		serviceRecord.setMetadataId(service.getMetadataId());
+		serviceRecord.setType(service.getType());
+		serviceRecord.setTitle(service.getTitle());
+		serviceRecord.setOwner(service.getOwner());
+		serviceRecord.setStatus(service.getStatus());
+		serviceRecord.store();
+		return serviceRecord.getId().intValue();
     }
 
     @Override

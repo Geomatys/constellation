@@ -125,6 +125,7 @@ public class JooqConfigurationService implements ConfigurationService {
             service.setType(spec.name());
             service.setOwner(login);
             service.setIdentifier(serviceID);
+            
             serviceRepository.create(service);
         }
          

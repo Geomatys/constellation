@@ -19,9 +19,11 @@
 package org.constellation.rest.api;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -33,6 +35,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.ConfigurationBusiness;
 import org.constellation.api.CommonConstants;
@@ -44,6 +47,8 @@ import org.constellation.ws.ServiceConfigurer;
 import org.constellation.configuration.ServiceReport;
 import org.constellation.dto.Configuration;
 import org.constellation.dto.SimpleValue;
+import org.constellation.engine.register.Service;
+import org.constellation.engine.register.repository.LayerRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
 import org.constellation.ogc.configuration.OGCConfigurer;
 import org.constellation.ws.CstlServiceException;
@@ -63,6 +68,8 @@ public class AdminRest {
 
     @Inject
     private ServiceRepository serviceRepository;
+    @Inject
+    private LayerRepository layerRepository;
 
     /**
      * service to return available service list
@@ -130,36 +137,59 @@ public class AdminRest {
         return Response.ok(new AcknowlegementType(CommonConstants.SUCCESS, "the key have been set")).build();
     }
 
+//    /**
+//     *
+//     * @return
+//     */
+//    @GET
+//    @Path("/domain/{domainId}/instances")
+//    public Response listInstances(@PathParam("domainId") int domainId, @Context HttpServletRequest httpServletRequest) {
+//        final List<Instance> instances = new ArrayList<>();
+//        final Set<String> services = WSEngine.getRegisteredServices().keySet();
+//
+//        Map<String, Set<String>> servicesByType = serviceRepository.getAccessiblesServicesByType(domainId,
+//                httpServletRequest.getUserPrincipal().getName());
+//
+//        for (final String service : services) {
+//            try {
+//                final Specification spec = Specification.fromShortName(service);
+//                Set<String> serviceIdentifiers = servicesByType.get(spec.name());
+//
+//                if (serviceIdentifiers != null) {
+//                    final OGCConfigurer configurer = (OGCConfigurer) ServiceConfigurer.newInstance(spec);
+//                    for (Instance instance : configurer.getInstances(spec.name())) {
+//                        if (serviceIdentifiers.contains(instance.getIdentifier())) {
+//                            instances.add(instance);
+//                        }
+//                    }
+//
+//                }
+//            } catch (NotRunningServiceException ignore) {
+//            }
+//        }
+//        return Response.ok(new InstanceReport(instances)).build();
+//    }
+    
     /**
-     *
-     * @return
-     */
-    @GET
-    @Path("/domain/{domainId}/instances")
-    public Response listInstances(@PathParam("domainId") int domainId, @Context HttpServletRequest httpServletRequest) {
-        final List<Instance> instances = new ArrayList<>();
-        final Set<String> services = WSEngine.getRegisteredServices().keySet();
-
-        Map<String, Set<String>> servicesByType = serviceRepository.getAccessiblesServicesByType(domainId,
-                httpServletRequest.getUserPrincipal().getName());
-
-        for (final String service : services) {
-            try {
-                final Specification spec = Specification.fromShortName(service);
-                Set<String> serviceIdentifiers = servicesByType.get(spec.name());
-
-                if (serviceIdentifiers != null) {
-                    final OGCConfigurer configurer = (OGCConfigurer) ServiceConfigurer.newInstance(spec);
-                    for (Instance instance : configurer.getInstances(spec.name())) {
-                        if (serviceIdentifiers.contains(instance.getIdentifier())) {
-                            instances.add(instance);
-                        }
-                    }
-
-                }
-            } catch (NotRunningServiceException ignore) {
-            }
-        }
-        return Response.ok(new InstanceReport(instances)).build();
+  *
+  * @return
+  */
+ @GET
+ @Path("/domain/{domainId}/instances")
+ public Response listInstances(@PathParam("domainId") int domainId, @Context HttpServletRequest httpServletRequest) {
+     final List<Instance> instances = new ArrayList<>();
+     List<Service> services = serviceRepository.findByDomain(domainId);
+     for (Service service : services) {
+	    Instance instance = new Instance();
+	    instance.set_abstract(""+service.getDescription());
+	    instance.setIdentifier(service.getIdentifier());
+	    int layersNumber = layerRepository.findByServiceId(service.getId()).size();
+	    instance.setLayersNumber(layersNumber);
+	    instance.setName(""+service.getTitle());
+	    instance.setType(service.getType());
+	    instance.setVersions(Arrays.asList(service.getVersions().split("|")));
+	    instances.add(instance);
     }
+     return Response.ok(new InstanceReport(instances)).build();
+ }
 }

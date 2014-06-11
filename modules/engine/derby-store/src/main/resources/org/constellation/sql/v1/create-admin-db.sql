@@ -233,7 +233,9 @@ CREATE TABLE "admin"."service"(
   "config"      CLOB,
   "owner"       VARCHAR(32),
   "metadata_id" VARCHAR(512),
-  "metadata"    CLOB
+  "metadata"    CLOB,
+  "status"		VARCHAR(32)	NOT NULL,
+  "versions"	VARCHAR(32) NOT NULL
 );
 
 ALTER TABLE "admin"."service" ADD CONSTRAINT service_pk       PRIMARY KEY ("id");

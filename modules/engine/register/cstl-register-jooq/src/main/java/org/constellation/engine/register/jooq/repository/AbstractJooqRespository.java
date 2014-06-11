@@ -18,13 +18,10 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
-import static org.constellation.engine.register.jooq.Tables.DOMAIN;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.constellation.engine.register.Domain;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record;

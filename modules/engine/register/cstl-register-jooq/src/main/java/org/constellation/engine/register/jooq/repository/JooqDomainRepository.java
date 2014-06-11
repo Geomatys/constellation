@@ -43,7 +43,6 @@ import org.constellation.engine.register.jooq.tables.records.UserXDomainXDomainr
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.jooq.Batch;
-import org.jooq.Condition;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.SelectConditionStep;

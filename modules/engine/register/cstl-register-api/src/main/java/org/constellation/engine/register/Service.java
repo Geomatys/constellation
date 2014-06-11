@@ -32,6 +32,8 @@ public class Service {
     private String owner;
     private String metadata;
     private String metadataId;
+    private String status;
+    private String versions;
 
     public int getId() {
         return id;
@@ -119,13 +121,31 @@ public class Service {
         return StringUtils.isNotBlank(metadata);
     }
 
+	public String getStatus() {
+	    return status;
+    }
 
+	public void setStatus(String status) {
+	    this.status = status;
+    }
 
-    @Override
+	
+
+    public String getVersions() {
+	    return versions;
+    }
+
+	public void setVersions(String versions) {
+	    this.versions = versions;
+    }
+
+	@Override
     public String toString() {
         return "ServiceDTO [id=" + id + ", identifier=" + identifier + ", type=" + type + ", date=" + date + ", title="
                 + title + ", description=" + description + ", config=" + config + ", owner=" + owner + "]";
     }
+
+
 
 	
 }
