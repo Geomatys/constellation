@@ -648,18 +648,21 @@
                             </div>
                              <div class="col-sm-5">
                                 <span class="searchicon glyphicon glyphicon-search" style="float:right; width:200px; right: 35px;">
-                                    <input type="text" ng-model="filter" class="form-control " maxlength="10">
+                                    <input type="text" ng-model="domainFilter" class="form-control " maxlength="10">
                                 </span>
                                 <table class="table table-condensed table-striped table-bordered table-responsive user-table">
                                     <thead>
                                         <tr title="click to order">
                                             <td ng-click="predicate = 'roles'; reverse=!reverse"
                                                 translate="service.domains.list">Liste des domaines</td>
+                                            <td ng-click="predicate = 'roles'; reverse=!reverse"
+                                                translate="service.domains.linked">Linked</td>
                                         </tr>
                                     </thead>
                                     <tr ng-click="details($index)" style='cursor:pointer'
-                                        ng-repeat="entry in domains | filter:filter | orderBy:predicate:reverse">
-                                        <td>{{entry.domainRole}}</td>
+                                        ng-repeat="entry in domains | filter:domainFilter | orderBy:predicate:reverse">
+                                        <td>{{entry.name}}</td>
+                                        <td><input type="checkbox" ng-checked="entry.linked" disabled="true"></td>
                                         <td class="user-delete" style="width:20px;" ng-click="details($index)"><span class="glyphicon glyphicon-plus"></span></td>
                                     </tr>
                                 </table>
