@@ -43,7 +43,7 @@ public final class StartService extends AbstractCstlProcess {
         final String identifier = value(IDENTIFIER, inputParameters);
         final String serviceType = value(SERVICE_TYPE, inputParameters);
         try {
-            serviceBusiness.startInstance(serviceType, identifier);
+            serviceBusiness.start(serviceType, identifier);
         } catch (ConfigurationException ex) {
             throw new ProcessException(ex.getMessage(), this, ex);
         }

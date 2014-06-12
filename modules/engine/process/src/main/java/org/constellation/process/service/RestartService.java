@@ -45,7 +45,7 @@ public final class RestartService extends AbstractCstlProcess {
         final Boolean closeFirst = value(CLOSE, inputParameters);
 
         try {
-            serviceBusiness.restartInstance(serviceName, identifier, closeFirst);
+            serviceBusiness.restart(serviceName, identifier, closeFirst);
         } catch (ConfigurationException ex) {
             throw new ProcessException(ex.getMessage(), this, ex);
         }

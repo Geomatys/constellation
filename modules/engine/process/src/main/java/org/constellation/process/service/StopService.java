@@ -45,7 +45,7 @@ public class StopService extends AbstractCstlProcess {
         final String service = value(SERVICE_TYPE, inputParameters);
         final String identifier = value(IDENTIFIER, inputParameters);
         try {
-            serviceBusiness.stopInstance(service, identifier);
+            serviceBusiness.stop(service, identifier);
         } catch (ConfigurationException ex) {
             throw new ProcessException(ex.getMessage(), this, ex);
         }

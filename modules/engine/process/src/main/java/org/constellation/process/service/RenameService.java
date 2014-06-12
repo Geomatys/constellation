@@ -45,7 +45,7 @@ public class RenameService extends AbstractCstlProcess {
         final String identifier    = value(IDENTIFIER, inputParameters);
         final String newIdentifier = value(NEW_NAME, inputParameters);
         try {
-            serviceBusiness.renameInstance(serviceType, identifier, newIdentifier);
+            serviceBusiness.rename(serviceType, identifier, newIdentifier);
         } catch (ConfigurationException ex) {
             throw new ProcessException(ex.getMessage(), this, ex);
         }

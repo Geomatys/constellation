@@ -52,7 +52,7 @@ public class DeleteService extends AbstractCstlProcess {
         final String serviceType = value(SERVICE_TYPE, inputParameters);
         final String identifier = value(IDENTIFIER, inputParameters);
         try {
-            serviceBusiness.deleteInstance(serviceType, identifier);
+            serviceBusiness.delete(serviceType, identifier);
         } catch (ConfigurationException ex) {
             throw new ProcessException(ex.getMessage(), this, ex);
         }

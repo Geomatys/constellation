@@ -54,7 +54,7 @@ public class SetConfigService extends AbstractCstlProcess {
         final Service serviceMetadata  = value(SERVICE_METADATA, inputParameters);
 
         try {
-            serviceBusiness.configureInstance(serviceType, identifier, serviceMetadata, configuration);
+            serviceBusiness.configure(serviceType, identifier, serviceMetadata, configuration);
         } catch (ConfigurationException ex) {
             throw new ProcessException(ex.getMessage(), this, ex);
         }

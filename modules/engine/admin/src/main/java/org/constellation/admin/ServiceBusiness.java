@@ -14,6 +14,7 @@ import org.constellation.admin.dto.ServiceDTO;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.admin.util.DefaultServiceConfiguration;
 import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.ServiceStatus;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.repository.LayerRepository;
@@ -33,11 +34,9 @@ public class ServiceBusiness {
     @Autowired
     private LayerRepository layerRepository;
 
-    ServiceDTO getService(int id) throws IllegalAccessException,
-            InvocationTargetException {
-        ServiceDTO returnService = new ServiceDTO();
-        org.constellation.engine.register.Service service = serviceRepository
-                .findById(id);
+    ServiceDTO getService(int id) throws IllegalAccessException, InvocationTargetException {
+        final ServiceDTO returnService = new ServiceDTO();
+        org.constellation.engine.register.Service service = serviceRepository.findById(id);
         BeanUtils.copyProperties(returnService, service);
         return returnService;
     }
@@ -65,7 +64,7 @@ public class ServiceBusiness {
      * @return the configuration object just setted.
      * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
-    public Object createInstance(final String serviceType, final String identifier, Object configuration, final org.constellation.dto.Service metadata) throws ConfigurationException {
+    public Object create(final String serviceType, final String identifier, Object configuration, final org.constellation.dto.Service metadata) throws ConfigurationException {
 
         if (identifier == null || identifier.isEmpty()) {
             throw new ConfigurationException("Service instance identifier can't be null or empty.");
@@ -93,7 +92,7 @@ public class ServiceBusiness {
      * @param identifier the service identifier
      * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
-    public void startInstance(final String serviceType, final String identifier) throws ConfigurationException {
+    public void start(final String serviceType, final String identifier) throws ConfigurationException {
         if (identifier == null || identifier.isEmpty()) {
             throw new ConfigurationException("Service instance identifier can't be null or empty.");
         }
@@ -120,7 +119,7 @@ public class ServiceBusiness {
      * @param identifier the service identifier
      * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
-    public void stopInstance(final String serviceType, final String identifier) throws ConfigurationException {
+    public void stop(final String serviceType, final String identifier) throws ConfigurationException {
         if (identifier == null || identifier.isEmpty()) {
             throw new ConfigurationException("Service instance identifier can't be null or empty.");
         }
@@ -140,7 +139,7 @@ public class ServiceBusiness {
      * @param closeFirst indicates if the service should be closed before trying to restart it
      * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
-    public void restartInstance(final String serviceType, final String identifier, final boolean closeFirst) throws ConfigurationException {
+    public void restart(final String serviceType, final String identifier, final boolean closeFirst) throws ConfigurationException {
 
         if (identifier == null || "".equals(identifier)) {
             buildWorkers(serviceType, null, closeFirst);
@@ -148,7 +147,7 @@ public class ServiceBusiness {
             if (WSEngine.serviceInstanceExist(serviceType, identifier)) {
                 buildWorkers(serviceType, identifier, closeFirst);
             } else {
-                startInstance(identifier, serviceType);
+                start(identifier, serviceType);
             }
         }
      }
@@ -161,7 +160,7 @@ public class ServiceBusiness {
      * @param newIdentifier the new service identifier
      * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
-     public void renameInstance(final String serviceType, final String identifier, final String newIdentifier) throws ConfigurationException {
+     public void rename(final String serviceType, final String identifier, final String newIdentifier) throws ConfigurationException {
         final List<String> existingService = ConfigurationEngine.getServiceConfigurationIds(serviceType);
         if (existingService.contains(identifier)) {
             if (!existingService.contains(newIdentifier)) {
@@ -197,7 +196,7 @@ public class ServiceBusiness {
      * @param identifier the service identifier
      * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
-     public void deleteInstance(final String serviceType, final String identifier) throws ConfigurationException {
+     public void delete(final String serviceType, final String identifier) throws ConfigurationException {
          if (identifier == null || identifier.isEmpty()) {
             throw new ConfigurationException("Service instance identifier can't be null or empty.");
         }
@@ -223,7 +222,7 @@ public class ServiceBusiness {
      * 
      * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
-     public void configureInstance(final String serviceType, final String identifier, final org.constellation.dto.Service metadata, Object configuration) throws ConfigurationException {
+     public void configure(final String serviceType, final String identifier, final org.constellation.dto.Service metadata, Object configuration) throws ConfigurationException {
          if (identifier == null || identifier.isEmpty()) {
             throw new ConfigurationException("Service instance identifier can't be null or empty.");
         }
@@ -251,8 +250,8 @@ public class ServiceBusiness {
      * @return a configuration {@link Object} (depending on implementation)
      * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
-     public Object getInstanceConfiguration(final String serviceType, final String identifier) throws ConfigurationException {
-         if (identifier == null || identifier.isEmpty()) {
+    public Object getConfiguration(final String serviceType, final String identifier) throws ConfigurationException {
+        if (identifier == null || identifier.isEmpty()) {
             throw new ConfigurationException("Service instance identifier can't be null or empty.");
         }
         try {
@@ -261,9 +260,30 @@ public class ServiceBusiness {
             throw new ConfigurationException(ex.getMessage(), ex);
         } catch (FileNotFoundException ex) {
             throw new ConfigurationException("Service instance " + identifier + " doesn't exist.");
-       }
-     }
+        }
+    }
      
+     
+     /**
+     * Returns all service instances (for current specification) status.
+     *
+     * @param spec
+     * @return a {@link Map} of {@link ServiceStatus} status
+     */
+    public Map<String, ServiceStatus> getStatus(final String spec) {
+        final Map<String, ServiceStatus> status = new HashMap<>();
+        for (Map.Entry<String, Boolean> entry : WSEngine.getEntriesStatus(spec)) {
+            status.put(entry.getKey(), entry.getValue() ? ServiceStatus.STARTED : ServiceStatus.ERROR);
+        }
+        final List<String> serviceIDs = ConfigurationEngine.getServiceConfigurationIds(spec);
+        for (String serviceID : serviceIDs) {
+            if (!WSEngine.serviceInstanceExist(spec, serviceID)) {
+                status.put(serviceID, ServiceStatus.STOPPED);
+            }
+        }
+        return status;
+    }
+    
      /**
      * Create new worker instance in service directory.
      *
@@ -354,8 +374,8 @@ public class ServiceBusiness {
      */
     public void setInstanceMetadata(final String serviceType, final String identifier, final org.constellation.dto.Service metadata) throws ConfigurationException {
         this.ensureExistingInstance(serviceType, identifier);
-        final Object config = getInstanceConfiguration(serviceType, identifier);
-        this.configureInstance(serviceType, identifier, metadata, config);
+        final Object config = getConfiguration(serviceType, identifier);
+        this.configure(serviceType, identifier, metadata, config);
     }
     
     /**

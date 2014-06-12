@@ -20,10 +20,8 @@
 package org.constellation.ogc.configuration;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Instance;
@@ -31,7 +29,6 @@ import org.constellation.configuration.ServiceStatus;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.Service;
 import org.constellation.ws.ServiceConfigurer;
-import org.constellation.ws.WSEngine;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -59,14 +56,13 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      */
     public Instance getInstance(final String serviceType, final String identifier) throws ConfigurationException {
         org.constellation.engine.register.Service service = serviceBusiness.getServiceByIdentifierAndType(serviceType, identifier);
-        final Instance instance = new Instance(service.getId(), identifier, serviceType, getInstanceStatus(serviceType, identifier));
+        final Instance instance = new Instance(service.getId(), identifier, serviceType, ServiceStatus.valueOf(service.getStatus()));
         Service metadata = null;
         try {
             metadata = serviceBusiness.getInstanceMetadata(serviceType, identifier);
         } catch (ConfigurationException ignore) {
             // Do nothing.
         }
-        instance.setIdentifier(identifier);
         if (metadata != null) {
             instance.setName(metadata.getName());
             instance.set_abstract(metadata.getDescription());
@@ -79,44 +75,6 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
     }
 
     /**
-     * Returns a service instance status.
-     *
-     * @param serviceType
-     * @param identifier the service identifier
-     * @return a {@link ServiceStatus} status
-     * @throws TargetNotFoundException if the service with specified identifier does not exist
-     */
-    public ServiceStatus getInstanceStatus(final String serviceType, final String identifier) throws TargetNotFoundException {
-        serviceBusiness.ensureExistingInstance(serviceType, identifier);
-        for (Map.Entry<String, Boolean> entry : WSEngine.getEntriesStatus(serviceType)) {
-            if (entry.getKey().equals(identifier)) {
-                return entry.getValue() ? ServiceStatus.STARTED : ServiceStatus.ERROR;
-            }
-        }
-        return ServiceStatus.STOPPED;
-    }
-
-    /**
-     * Returns all service instances (for current specification) status.
-     *
-     * @param spec
-     * @return a {@link Map} of {@link ServiceStatus} status
-     */
-    public Map<String, ServiceStatus> getInstancesStatus(final String spec) {
-        final Map<String, ServiceStatus> status = new HashMap<>();
-        for (Map.Entry<String, Boolean> entry : WSEngine.getEntriesStatus(spec)) {
-            status.put(entry.getKey(), entry.getValue() ? ServiceStatus.STARTED : ServiceStatus.ERROR);
-        }
-        final List<String> serviceIDs = ConfigurationEngine.getServiceConfigurationIds(spec);
-        for (String serviceID : serviceIDs) {
-            if (!WSEngine.serviceInstanceExist(spec, serviceID)) {
-                status.put(serviceID, ServiceStatus.STOPPED);
-            }
-        }
-        return status;
-    }
-
-    /**
      * Returns list of service {@link Instance}(s) related to the {@link OGCConfigurer}
      * implementation.
      *
@@ -125,7 +83,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      */
     public List<Instance> getInstances(final String spec) {
         final List<Instance> instances = new ArrayList<>();
-        final Map<String, ServiceStatus> statusMap = getInstancesStatus(spec);
+        final Map<String, ServiceStatus> statusMap = serviceBusiness.getStatus(spec);
         for (final String key : statusMap.keySet()) {
             try {
                 instances.add(getInstance(spec, key));

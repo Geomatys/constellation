@@ -263,7 +263,7 @@ public class MapConfigurer extends OGCConfigurer {
         serviceBusiness.ensureExistingInstance(spec, identifier);
 
         // Extracts the layer list from service configuration.
-        final LayerContext layerContext = (LayerContext) serviceBusiness.getInstanceConfiguration(spec, identifier);
+        final LayerContext layerContext = (LayerContext) serviceBusiness.getConfiguration(spec, identifier);
         List<Layer> layers = MapUtilities.getConfigurationLayers(layerContext, null, null);
 
         for (Layer layer : layers) {
@@ -320,7 +320,7 @@ public class MapConfigurer extends OGCConfigurer {
             if(found){
                 ConfigurationEngine.storeConfiguration(spec, serviceId, layerContext);
                 ConfigurationEngine.deleteLayer(serviceId, spec, name);
-                serviceBusiness.restartInstance(spec, serviceId, true);
+                serviceBusiness.restart(spec, serviceId, true);
             }
 
         } catch (Exception e) {

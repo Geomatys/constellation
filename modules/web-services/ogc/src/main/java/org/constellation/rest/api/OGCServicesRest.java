@@ -22,9 +22,10 @@ package org.constellation.rest.api;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -83,31 +84,38 @@ public final class OGCServicesRest {
     private ServiceBusiness serviceBusiness;
     
     /**
-     * @see OGCConfigurer#getInstance(String)
+     * Find and returns a service {@link Instance}.
+     *
+     * @param serviceType The type of the service.
+     * @param id the service identifier
+     * 
+     * @return an {@link Instance} instance
      */
     @GET
     @Path("{id}")
-    public Response getInstance(final @PathParam("spec") String spec, final @PathParam("id") String id) throws Exception {
-        try {
-            return ok(getConfigurer(spec).getInstance(spec, id));
-        } catch (ConfigurationException e) {
-            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
-            throw e;
-        }
+    public Response getInstance(final @PathParam("spec") String serviceType, final @PathParam("id") String id) throws ConfigurationException {
+        return ok(getConfigurer(serviceType).getInstance(serviceType, id));
     }
 
     /**
-     * @see OGCConfigurer#getInstances()
+     * Returns list of service {@link Instance}(s) related to the {@link OGCConfigurer}
+     * implementation.
+     *
+     * @param serviceType The type of the service.
+     * @return the {@link Instance} list
+     * 
+     * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
     @GET
     @Path("all")
-    public Response getInstances(final @PathParam("spec") String spec) throws Exception {
-        try {
-            return ok(new InstanceReport(getConfigurer(spec).getInstances(spec)));
-        } catch (ConfigurationException e) {
-            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
-            throw e;
+    public Response getInstances(final @PathParam("spec") String serviceType) throws ConfigurationException {
+        final OGCConfigurer configurer = getConfigurer(serviceType);
+        final List<Instance> instances = new ArrayList<>();
+        final Map<String, ServiceStatus> statusMap = serviceBusiness.getStatus(serviceType);
+        for (final String key : statusMap.keySet()) {
+            instances.add(configurer.getInstance(serviceType, key));
         }
+        return ok(new InstanceReport(instances));
     }
 
     // TODO move elsewhere / rename
@@ -136,7 +144,7 @@ public final class OGCServicesRest {
             return Response.serverError().entity("admin.error.service.exist").build();
         }
         
-        serviceBusiness.createInstance(spec, metadata.getIdentifier(), null, metadata);
+        serviceBusiness.create(spec, metadata.getIdentifier(), null, metadata);
         
         service = serviceRepository.findByIdentifierAndType(metadata.getIdentifier(), spec);
         
@@ -157,7 +165,7 @@ public final class OGCServicesRest {
     @Path("{id}/start")
     public Response start(final @PathParam("spec") String serviceType, final @PathParam("id") String id) throws ConfigurationException {
         serviceBusiness.ensureExistingInstance(serviceType, id);
-        serviceBusiness.startInstance(serviceType, id);
+        serviceBusiness.start(serviceType, id);
         
         return ok(AcknowlegementType.success(serviceType.toUpperCase() + " service \"" + id + "\" successfully started."));
     }
@@ -174,7 +182,7 @@ public final class OGCServicesRest {
     @Path("{id}/stop")
     public Response stop(final @PathParam("spec") String serviceType, final @PathParam("id") String id) throws ConfigurationException {
         serviceBusiness.ensureExistingInstance(serviceType, id);
-        serviceBusiness.stopInstance(serviceType, id);
+        serviceBusiness.stop(serviceType, id);
         return ok(AcknowlegementType.success(serviceType.toUpperCase() + " service \"" + id + "\" successfully stopped."));
     }
 
@@ -191,7 +199,7 @@ public final class OGCServicesRest {
     @Path("{id}/restart")
     public Response restart(final @PathParam("spec") String serviceType, final @PathParam("id") String id, final SimpleValue stopFirst) throws ConfigurationException {
         serviceBusiness.ensureExistingInstance(serviceType, id);
-        serviceBusiness.restartInstance(serviceType, id, stopFirst.getAsBoolean());
+        serviceBusiness.restart(serviceType, id, stopFirst.getAsBoolean());
         return ok(AcknowlegementType.success(serviceType.toUpperCase() + " service \"" + id + "\" successfully restarted."));
     }
 
@@ -208,7 +216,7 @@ public final class OGCServicesRest {
     @Path("{id}/rename")
     public Response rename(final @PathParam("spec") String serviceType, final @PathParam("id") String id, final SimpleValue newId) throws ConfigurationException {
         serviceBusiness.ensureExistingInstance(serviceType, id);
-        serviceBusiness.renameInstance(serviceType, id, newId.getValue());
+        serviceBusiness.rename(serviceType, id, newId.getValue());
         return ok(AcknowlegementType.success(serviceType.toUpperCase() + " service \"" + id + "\" successfully renamed."));
     }
 
@@ -224,7 +232,7 @@ public final class OGCServicesRest {
     @Path("{id}")
     public Response delete(final @PathParam("spec") String serviceType, final @PathParam("id") String id) throws ConfigurationException {
         serviceBusiness.ensureExistingInstance(serviceType, id);
-        serviceBusiness.deleteInstance(serviceType, id);
+        serviceBusiness.delete(serviceType, id);
         return ok(AcknowlegementType.success(serviceType.toUpperCase() + " service \"" + id + "\" successfully deleted."));
     }
 
@@ -241,7 +249,7 @@ public final class OGCServicesRest {
     @Path("{id}/config")
     public Response getConfiguration(final @PathParam("spec") String serviceType, final @PathParam("id") String id) throws ConfigurationException {
         serviceBusiness.ensureExistingInstance(serviceType, id);
-        return ok(serviceBusiness.getInstanceConfiguration(serviceType, id));
+        return ok(serviceBusiness.getConfiguration(serviceType, id));
     }
 
     /**
@@ -263,7 +271,7 @@ public final class OGCServicesRest {
             GenericDatabaseMarshallerPool.getInstance().recycle(um);
             
             final Service metadata = serviceBusiness.getInstanceMetadata(serviceType, id);
-            serviceBusiness.configureInstance(serviceType, id, metadata, config);
+            serviceBusiness.configure(serviceType, id, metadata, config);
         } catch (JAXBException ex) {
             throw new ConfigurationException("Error while unmarshalling configuration object.", ex);
         }
@@ -312,7 +320,7 @@ public final class OGCServicesRest {
             }
             final Object configObj = jsonUnmarshaller.unmarshalFromJSON(new StringReader(json), c);
             final Service metadata = serviceBusiness.getInstanceMetadata(serviceType, id);
-            serviceBusiness.configureInstance(serviceType, id, metadata, configObj);
+            serviceBusiness.configure(serviceType, id, metadata, configObj);
         } catch (JAXBException | IOException e) {
             throw new ConfigurationException(e);
         }
@@ -349,8 +357,8 @@ public final class OGCServicesRest {
     @Path("{id}/metadata")
     public Response setMetadata(final @PathParam("spec") String serviceType, final @PathParam("id") String id, final Service metadata) throws ConfigurationException {
         serviceBusiness.ensureExistingInstance(serviceType, id);
-        final Object config = serviceBusiness.getInstanceConfiguration(serviceType, id);
-        serviceBusiness.configureInstance(serviceType, id, metadata, config);
+        final Object config = serviceBusiness.getConfiguration(serviceType, id);
+        serviceBusiness.configure(serviceType, id, metadata, config);
         return ok(AcknowlegementType.success(serviceType.toUpperCase() + " service \"" + id + "\" metadata successfully updated."));
     }
 
