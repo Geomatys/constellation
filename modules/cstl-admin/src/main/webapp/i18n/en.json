@@ -159,7 +159,13 @@
     "edition.style.label.min.scale": "Min scale",
     "edition.style.label.name": "Name",
     "edition.style.label.new.rules": "New rule(s)",
-    "edition.style.label.new.symbolizer": "New symbolizer",
+    "edition.style.label.new.rules.manual":"Manually create rules",
+    "edition.style.label.new.rules.auto_interval":"Automatically create by intervals",
+    "edition.style.label.new.rules.auto_values":"Automatically create by unique values",
+    "edition.style.label.new.rules.raster_palette":"Colors and Palette",
+    "edition.style.label.new.rules.raster_cellule":"Group of cells",
+    "edition.style.label.new.symbolizer": "Add new symbolizer",
+    "edition.style.label.new.select.type": "Select the style type",
     "edition.style.label.opacity": "Opacity",
     "edition.style.label.overview": "Overview",
     "edition.style.label.point": "Point",
@@ -183,6 +189,7 @@
     "edition.style.label.update": "Update",
     "edition.style.label.validate": " Validate",
     "edition.style.label.viewer": "Style Selection",
+    "edition.style.label.edition": "Style Edition",
     "edition.style.label.width": "Width",
     "edition.style.label.choice.new":"Create new style",
     "edition.style.label.choice.existing":"Use existing style",
@@ -739,8 +746,9 @@
     "sldeditor.vector.point":"Point",
     "sldeditor.vector.text":"Text",
     "sldeditor.vector.raster":"Raster",
-    "sldeditor.breadcrumb.type":"Type selection",
-    "sldeditor.breadcrumb.edition":"Style edition",
+    "sldeditor.breadcrumb.type":"Rules list",
+    "sldeditor.breadcrumb.backToListOfRules": "Back to the rules list",
+    "sldeditor.breadcrumb.edition":"Rule edition",
     "sldeditor.name":"Style name",
     "sldeditor.tab.simple":"Simple editor",
     "sldeditor.tab.xml":"XML editor",
@@ -750,6 +758,8 @@
     "sldeditor.tab.interval":"Interval",
     "sldeditor.apercu.titre": "Style preview",
     "sldeditor.apercu.data":"Data preview",
+    "sldeditor.apercu.autochecked":"Automatically preview",
+    "sldeditor.edition.filterEnabled": "Enable attributes filter",
     "sldeditor.edition.fill": "Fill",
     "sldeditor.edition.color": "Color",
     "sldeditor.edition.stroke":"Stroke",
@@ -772,7 +782,7 @@
     "sldeditor.edition.intervals":"Intervals",
     "sldeditor.button.cancel":"Cancel",
     "sldeditor.button.validate":"Validate",
-    "sldeditor.button.create":"Create",
+    "sldeditor.button.create":"Create the style",
 
     "tooltip.service.create.name":"The identifier can be the same as the name",
     "tooltip.service.create.version":"At least one version must be selected",
@@ -809,5 +819,5 @@
 
     "message.uploading":"Your data is uploading...",
 
-    "alert.style.noname":"Please fill in a style name"
+    "alert.style.noname":"The style name is required"
 }

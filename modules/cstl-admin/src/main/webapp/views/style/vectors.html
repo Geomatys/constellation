@@ -1,12 +1,327 @@
-<div class="col-xs-6">
-    <a ng-click="page.pageSld = 'views/style/polygone.html'; $parent.chooseType=true;" class="choix_type"><img src="images/polygone.png"><h2 translate="sldeditor.vector.polygon" >Polygon</h2></a>
-</div>
-<div class="col-xs-6">
-    <a ng-click="page.pageSld = 'views/style/ligne.html'; $parent.chooseType=true;" class="choix_type"><img src="images/ligne.png"><h2 translate="sldeditor.vector.line" >Line</h2></a>
-</div>
-<div class="col-xs-6">
-    <a ng-click="page.pageSld = 'views/style/point.html'; $parent.chooseType=true;" class="choix_type"><img src="images/point.png"><h2 translate="sldeditor.vector.point">Point</h2></a>
-</div>
-<div class="col-xs-6">
-    <a ng-click="page.pageSld = 'views/style/texte.html'; $parent.chooseType=true;" class="choix_type"><img src="images/texte.png"><h2 translate="sldeditor.vector.text">Text</h2></a>
+
+<div class="row">
+    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+        <div ng-if="!optionsSLD.enableRuleEditor">
+            <div style="margin-bottom:0px;">
+                <div class="form-group col-xs-12" style="margin: 3px 0; height:35px;padding: 0;">
+                    <label class="col-xs-5 col-sm-5 col-md-4 control-label"
+                           style="margin-top: 8px;"
+                           translate="sldeditor.name">Style name</label>
+                    <div class="col-xs-7 col-sm-7 col-md-8">
+                        <input type="text" class="form-control" ng-model="$parent.newStyle.name">
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12" ng-if="noName">
+                <div class="alert alert-danger"
+                     style="padding:3px; padding-bottom:2px; margin-bottom:6px;"
+                     translate="alert.style.noname">Please you must fill a style name</div>
+            </div>
+            <div class="row">
+                <div class="panel panel-default" style="margin-bottom: 0;">
+                    <div class="panel-heading well-header">
+                        <strong translate="edition.style.label.rules">Rules</strong>
+                        <div class="dropdown pull-right" style="margin-top: -5px;">
+                            <a data-toggle="dropdown" class="btn btn-info dropdown-toggle" style="font-size: 12px;">
+                                <span class="icon-plus icon-white" style="margin-right:5px;"></span>
+                                <span translate="edition.style.label.new.rules">Add rule(s)</span>
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu" style="font-size: 12px;">
+                                <li><a ng-click="createRules('manual')"
+                                       translate="edition.style.label.new.rules.manual">Manually create rules</a></li>
+                                <li><a ng-click="createRules('auto_interval')"
+                                       ng-disabled="true"
+                                       translate="edition.style.label.new.rules.auto_interval">Automatically create by intervals</a></li>
+                                <li><a ng-click="createRules('auto_values')"
+                                       ng-disabled="true"
+                                       translate="edition.style.label.new.rules.auto_values">Automatically create by unique values</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="panel-body" style="padding:0pt;">
+                        <div class="list-group" style="height: 350px;overflow-y: auto;margin: 0;">
+                            <a class="list-group-item"
+                               ng-class="{active:rule===optionsSLD.selectedRule}"
+                               ng-repeat="rule in newStyle.rules"
+                               ng-click="setSelectedRule(rule);">
+                                {{rule.name}}
+                            </a>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        <button class="btn btn-default" type="button" style="font-size: 12px;" ng-click="editSelectedRule();">Edit</button>
+                        <button class="btn btn-default" type="button" style="font-size: 12px;" ng-click="moveUpRule();">
+                            <span class="glyphicon glyphicon-chevron-up"></span>
+                        </button>
+                        <button class="btn btn-default" type="button" style="font-size: 12px;" ng-click="moveDownRule();">
+                            <span class="glyphicon glyphicon-chevron-down"></span>
+                        </button>
+                        <button class="btn btn-default" type="button" style="font-size: 12px;" ng-click="deleteSelectedRule();">Delete</button>
+                        <button class="btn btn-default" type="button" style="font-size: 12px;" ng-click="deleteAllRules();">Delete all</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div ng-if="optionsSLD.enableRuleEditor">
+            <ol class="breadcrumb col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <li>
+                    <a ng-click="goBack()">
+                        <span translate="sldeditor.breadcrumb.type">Back to rules list</span>
+                    </a>
+                </li>
+                <li class="active">
+                    <span translate="sldeditor.breadcrumb.edition">Rule edition</span>
+                </li>
+            </ol>
+            <ul class="nav nav-tabs" ng-init="chosenTab = 'description'">
+                <li ng-class="{active: chosenTab==='description'}">
+                    <a ng-click="chosenTab = 'description'" data-toggle="tab">
+                        <span translate="edition.style.label.description" >Description</span>
+                    </a>
+                </li>
+                <li ng-class="{active: chosenTab==='symbols'}">
+                    <a ng-click="chosenTab = 'symbols'" data-toggle="tab">
+                        <span translate="label.symbols" >Symbols</span>
+                    </a>
+                </li>
+                <li ng-class="{active: chosenTab==='filters'}">
+                    <a ng-click="chosenTab = 'filters'" data-toggle="tab">
+                        <span translate="edition.style.label.filters" >Filters</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='description'}">
+                    <form class="form-horizontal" role="form">
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-11 col-md-11 col-lg-11" style="margin-top: 20pt;">
+                                <div class="form-group">
+                                    <label for="inputrulename"
+                                           class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label"
+                                           translate="label.name">Name</label>
+                                    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+                                        <input type="text"
+                                               class="form-control"
+                                               id="inputrulename"
+                                               ng-model="optionsSLD.selectedRule.name"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputRuleTitle"
+                                           class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label"
+                                           translate="label.title">Title</label>
+                                    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+                                        <input type="text"
+                                               class="form-control"
+                                               id="inputRuleTitle"
+                                               ng-model="optionsSLD.selectedRule.title"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputRuleDesc"
+                                           class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label"
+                                           translate="description">Description</label>
+                                    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+                                        <textarea id="inputRuleDesc"
+                                                  class="form-control"
+                                                  rows="3"
+                                                  ng-model="optionsSLD.selectedRule.description"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='symbols'}">
+                    <form class="form-horizontal" role="form">
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-11 col-md-11 col-lg-11" style="margin-top: 20pt;">
+                                <div class="form-group">
+                                    <label for="selectsymbolizer"
+                                           class="col-xs-7"
+                                           style="margin-left: 40pt;"
+                                           translate="edition.style.label.new.symbolizer">Add new symbolizer</label>
+                                    <div class="col-xs-10" style="margin-left: 40pt; margin-top: 3pt;">
+                                        <select id="selectsymbolizer"
+                                                class="col-xs-8"
+                                                style="font-size: 14px; height: 30px;"
+                                                ng-model="optionsSLD.selectedSymbolizerType">
+                                            <option value=""></option>
+                                            <option value="point" translate="sldeditor.vector.point">Point</option>
+                                            <option value="line" translate="sldeditor.vector.line">Line</option>
+                                            <option value="polygon" translate="sldeditor.vector.polygon">Polygon</option>
+                                            <option value="text" translate="sldeditor.vector.text">Text</option>
+                                        </select>
+                                        <button class="col-xs-3 btn btn-default"
+                                                type="button"
+                                                style="font-size: 12px; margin-left: 7pt;"
+                                                ng-click="addSymbolizer();"
+                                                translate="label.add">Add</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" style="margin: 0pt;">
+                            <accordion close-others="false">
+                                <accordion-group ng-repeat="symbolizer in optionsSLD.selectedRule.symbolizers"
+                                                 is-open="status.open">
+                                    <accordion-heading>
+                                        <div style="text-transform: uppercase;cursor: pointer;">
+                                            <i class="pull-left glyphicon"
+                                               ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+                                            <span style="margin-left: 10pt;font-size: 14px;">{{symbolizer.name}}</span>
+                                            <button type="button"
+                                                    class="pull-right btn btn-default btn-xs btn-remove"
+                                                    ng-click="removeSymbolizer(symbolizer);">
+                                                <span class="glyphicon glyphicon-remove"></span>
+                                            </button>
+                                        </div>
+                                    </accordion-heading>
+                                    <div ng-if="symbolizer['@symbol'] === 'point'">
+                                        <div ng-include="'views/style/point.html'"></div>
+                                    </div>
+                                    <div ng-if="symbolizer['@symbol'] === 'line'">
+                                        <div ng-include="'views/style/line.html'"></div>
+                                    </div>
+                                    <div ng-if="symbolizer['@symbol'] === 'polygon'">
+                                        <div ng-include="'views/style/polygon.html'"></div>
+                                    </div>
+                                    <div ng-if="symbolizer['@symbol'] === 'text'">
+                                        <div ng-include="'views/style/text.html'"></div>
+                                    </div>
+                                </accordion-group>
+                            </accordion>
+                        </div>
+                    </form>
+                </div>
+                <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='filters'}">
+                    <div style="padding: 10pt;">
+                        <div class="row">
+                            <div class="col-xs-10">
+                                <strong style="font-size: 14px;">Echelle</strong>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 col-md-12">
+                                <form class="form-horizontal form-style" role="form">
+                                    <div class="form-group">
+                                        <label for="minScale" class="col-sm-5 col-md-4 control-label">Min.</label>
+                                        <div class="col-sm-7 col-md-8">
+                                            <input type="number"
+                                                   class="form-control"
+                                                   id="minScale"
+                                                   ng-model="optionsSLD.selectedRule.minScale"
+                                                   min="0"/>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="maxScale" class="col-sm-5 col-md-4 control-label">Max.</label>
+                                        <div class="col-sm-7 col-md-8">
+                                            <input type="number"
+                                                   class="form-control"
+                                                   id="maxScale"
+                                                   ng-model="optionsSLD.selectedRule.maxScale"
+                                                   min="0"/>
+                                        </div>
+                                    </div>
+                                    <hr/>
+                                    <div class="form-group">
+                                        <div class="col-sm-5 col-md-4">
+                                            <button type="button" class="btn btn-default btn-md btn-editer">
+                                                <span class="glyphicon glyphicon-pencil"></span> Editer
+                                            </button>
+                                        </div>
+                                        <div class="col-sm-7 col-md-8">
+                                            <textarea class="form-control" rows="3" ng-model="optionsSLD.selectedRule.filter"></textarea>
+                                        </div>
+                                    </div>
+                                    <!--div class="form-group">
+                                        <div class="col-xs-8">
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input type="checkbox"
+                                                           ng-model="optionsSLD.filtersEnabled"
+                                                           ng-click="optionsSLD.filtersEnabled = !optionsSLD.filtersEnabled; applyFilter();"
+                                                           translate="sldeditor.edition.filterEnabled">Enable attributes filter</input>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <table>
+                                            <tbody>
+                                                <tr ng-repeat="filter in optionsSLD.filters">
+                                                    <td>
+                                                        <select class="form-control"
+                                                                ng-init="loadDataProperties();"
+                                                                ng-model="filter.attribute">
+                                                            <option ng-value="'{'+dp.name+'}'" ng-repeat="dp in $parent.dataProperties">{{dp.name}}</option>
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <select class="form-control"
+                                                                ng-model="filter.operator"
+                                                                size="1">
+                                                            <option value="=">=</option>
+                                                            <option value="!=">!=</option>
+                                                            <option value=">">&gt;</option>
+                                                            <option value=">=">&gt;=</option>
+                                                            <option value="<">&lt;</option>
+                                                            <option value="<=">&lt;=</option>
+                                                            <option value="between">BETWEEN</option>
+                                                            <option value="like">LIKE</option>
+                                                            <option value="nil">NIL</option>
+                                                            <option value="null">NULL</option>
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <input type="text"
+                                                               class="form-control"
+                                                               ng-model="filter.value"/>
+                                                    </td>
+                                                    <td>
+                                                        <select class="form-control"
+                                                                ng-model="filter.connector"
+                                                                ng-click="addNewFilter(filter.connector);"
+                                                                size="1">
+                                                            <option value=""></option>
+                                                            <option value="AND">AND</option>
+                                                            <option value="OR">OR</option>
+                                                        </select>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div-->
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+        <div class="row" style="margin-top:5px;">
+            <div class="col-xs-8">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox"
+                               ng-model="optionsSLD.autoPreview"
+                               translate="sldeditor.apercu.autochecked">Automatically preview</input>
+                    </label>
+                </div>
+            </div>
+            <div class="col-xs-4">
+                <button type="button" class="pull-right btn btn-primary"
+                        ng-click="displayCurrentStyle('styledMapOL');"
+                        ng-show="! optionsSLD.autoPreview"
+                        style="font-size: 13px;">
+                    <span translate="sldeditor.apercu.titre">Data preview</span>
+                </button>
+            </div>
+        </div>
+        <div class="bloc_apercu" id="styledMapOL" style="height: 448px;"></div>
+    </div>
 </div>

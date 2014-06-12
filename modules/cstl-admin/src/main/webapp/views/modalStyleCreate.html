@@ -1,15 +1,31 @@
-<div class="modal-dialog modal-dialog-resp-height" ng-class="{'modal-dialog-sld':page.pageSld!=='views/style/chooseType.html'}">
+<div class="modal-dialog modal-dialog-resp-height"
+     ng-class="{'modal-dialog-sld':page.pageSld!=='views/style/chooseType.html'}">
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" ng-click="close()">×</button>
-            <h4 class="modal-title col-xs-7 col-sm-7" translate="edition.style.label.viewer">Style Selection</h4>
+            <h4 class="modal-title col-xs-7 col-sm-7" translate="label.create.new.style">Create new style</h4>
         </div>
         <div class="modal-body" style="padding-top:8px; overflow-y: auto;">
             <div ng-include="page.pageSld"/>
         </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-default" ng-click="close()" translate="edition.style.label.cancel">Annuler</button>
-            <button type="button" ng-show="chooseType===true" class="btn btn-primary" ng-click="createStyle();"><span translate="sldeditor.button.create">Create</span></button>
+        <div class="modal-footer" style="margin-top: 0;">
+            <button type="button"
+                    class="btn btn-default"
+                    ng-click="close()"
+                    ng-show="!optionsSLD.enableRuleEditor"
+                    translate="edition.style.label.cancel">Cancel</button>
+            <button type="button"
+                    ng-show="chooseType===true && !optionsSLD.enableRuleEditor"
+                    class="btn btn-primary"
+                    ng-click="createStyle();">
+                <span translate="sldeditor.button.create">Create</span>
+            </button>
+            <button type="button"
+                    class="btn btn-primary"
+                    ng-show="optionsSLD.enableRuleEditor"
+                    ng-click="goBack();">
+                <span translate="sldeditor.breadcrumb.backToListOfRules">Back to the rules list</span>
+            </button>
         </div>
     </div>
 </div>

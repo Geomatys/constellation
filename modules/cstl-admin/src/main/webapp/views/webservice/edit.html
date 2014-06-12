@@ -116,14 +116,38 @@
                                                     <div class="top">
                                                         <span class="item-title" title="{{layer.Name}}">{{layer.Name}}</span>
                                                         <span class="pull-right text-right item-list-style">{{layer.Type==='coverage-store'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector':layer.Type}}</span>
-                                                        <img ng-if="(layer.Type=='vector' || layer.Type=='feature-store') && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer!=selected" src="images/vector-multipoint.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
-                                                        <img ng-if="(layer.Type=='vector' || layer.Type=='feature-store') && layer.Subtype=='Geometry' && layer!=selected" src="images/vector-multigeometry.svg" class="pull-right" style="margin-top:6px; margin-right:10px; width:22px" >
-                                                        <img ng-if="(layer.Type=='vector' || layer.Type=='feature-store') && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon') && layer!=selected" src="images/vector-poly.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
-                                                        <img ng-if="(layer.Type=='vector' || layer.Type=='feature-store') && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString') && layer!=selected" src="images/vector-polyline.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
-                                                        <img ng-if="(layer.Type=='vector' || layer.Type=='feature-store') && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer==selected" src="images/vector-multipoint-selected.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
-                                                        <img ng-if="(layer.Type=='vector' || layer.Type=='feature-store') && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon') && layer==selected" src="images/vector-poly-selected.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
-                                                        <img ng-if="(layer.Type=='vector' || layer.Type=='feature-store') && layer.Subtype=='Geometry' && layer==selected" src="images/vector-multygeometry-selected.svg" class="pull-right" style="margin-top:6px; margin-right:10px; width:22px" >
-                                                        <img ng-if="(layer.Type=='vector' || layer.Type=='feature-store') && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString') && layer==selected" src="images/vector-polyline-selected.svg" class="pull-right" style="margin-top:6px; margin-right:10px;" >
+                                                        <img ng-if="(layer.Type=='vector' || layer.Type=='feature-store') && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer!=selected"
+                                                             src="images/vector-multipoint.svg"
+                                                             class="pull-right"
+                                                             style="margin-top:6px; margin-right:10px;" />
+                                                        <img ng-if="(layer.Type=='vector' || layer.Type=='feature-store') && layer.Subtype=='Geometry' && layer!=selected"
+                                                             src="images/vector-multigeometry.svg"
+                                                             class="pull-right"
+                                                             style="margin-top:6px; margin-right:10px; width:22px" />
+                                                        <img ng-if="(layer.Type=='vector' || layer.Type=='feature-store') && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon') && layer!=selected"
+                                                             src="images/vector-poly.svg"
+                                                             class="pull-right"
+                                                             style="margin-top:6px; margin-right:10px;" />
+                                                        <img ng-if="(layer.Type=='vector' || layer.Type=='feature-store') && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString') && layer!=selected"
+                                                             src="images/vector-polyline.svg"
+                                                             class="pull-right"
+                                                             style="margin-top:6px; margin-right:10px;" />
+                                                        <img ng-if="(layer.Type=='vector' || layer.Type=='feature-store') && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer==selected"
+                                                             src="images/vector-multipoint-selected.svg"
+                                                             class="pull-right"
+                                                             style="margin-top:6px; margin-right:10px;" />
+                                                        <img ng-if="(layer.Type=='vector' || layer.Type=='feature-store') && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon') && layer==selected"
+                                                             src="images/vector-poly-selected.svg"
+                                                             class="pull-right"
+                                                             style="margin-top:6px; margin-right:10px;" />
+                                                        <img ng-if="(layer.Type=='vector' || layer.Type=='feature-store') && layer.Subtype=='Geometry' && layer==selected"
+                                                             src="images/vector-multigeometry-selected.svg"
+                                                             class="pull-right"
+                                                             style="margin-top:6px; margin-right:10px; width:22px" />
+                                                        <img ng-if="(layer.Type=='vector' || layer.Type=='feature-store') && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString') && layer==selected"
+                                                             src="images/vector-polyline-selected.svg"
+                                                             class="pull-right"
+                                                             style="margin-top:6px; margin-right:10px;" />
                                                     </div>
                                                     <div class="bottom">
                                                         <div class="block">
@@ -290,8 +314,13 @@
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-sm-6">
-                                                        <button id="showData" class="btn btn-success" type="button" ng-click="showLayer()" ng-show="service.status=='WORKING'">
-                                                            <i class="icon-map-marker"></i> <span translate="layer.listing.selected.data.button">View</span>
+                                                        <button id="showData"
+                                                                class="btn btn-success"
+                                                                type="button"
+                                                                ng-click="showLayer()"
+                                                                ng-show="service.status=='WORKING'">
+                                                            <i class="icon-map-marker"></i>
+                                                            <span translate="layer.listing.selected.data.button">View</span>
                                                         </button>
                                                     </div>
                                                     <div class="col-sm-6">
@@ -353,13 +382,20 @@
                                             <div class="block-action">
                                                 <div class="row" style="padding-bottom: 5px">
                                                     <div class="col-sm-6">
-                                                        <a id="exportMD" class="btn btn-info" ng-href="{{cstlUrl}}api/1/domain/{{domainId}}/CSW/{{service.identifier}}/record/download/{{selected.identifier}};jsessionid={{cstlSessionId}}">
-                                                            <i class="icon-download-alt"></i> <span translate="layer.listing.selected.export.button">Export</span>
+                                                        <a id="exportMD"
+                                                           class="btn btn-info"
+                                                           ng-href="{{cstlUrl}}api/1/domain/{{domainId}}/CSW/{{service.identifier}}/record/download/{{selected.identifier}};jsessionid={{cstlSessionId}}">
+                                                            <i class="icon-download-alt"></i>
+                                                            <span translate="layer.listing.selected.export.button">Export</span>
                                                         </a>
                                                     </div>
                                                     <div class="col-sm-6">
-                                                        <button type="button" id="deleteMetadata" class="btn btn-danger" ng-click="deleteMetadata();">
-                                                            <i class="icon-trash"></i> <span translate="layer.listing.selected.delete.button">Delete</span>
+                                                        <button type="button"
+                                                                id="deleteMetadata"
+                                                                class="btn btn-danger"
+                                                                ng-click="deleteMetadata();">
+                                                            <i class="icon-trash"></i>
+                                                            <span translate="layer.listing.selected.delete.button">Delete</span>
                                                         </button>
                                                     </div>
                                                 </div>
@@ -367,7 +403,8 @@
                                         </div>
                                         <div ng-if="service.type.toLowerCase() === 'sos'">
                                             <div class="block-header" ng-click="toggleUpDownSelected()">
-                                                <strong>{{selected.id}}</strong><i class="icon-chevron-up pull-right"></i>
+                                                <strong>{{selected.id}}</strong>
+                                                <i class="icon-chevron-up pull-right"></i>
                                             </div>
                                             <div>
                                                 <div class="block-content">
@@ -395,13 +432,18 @@
                                             <div class="block-action">
                                                 <div class="row">
                                                     <div class="col-sm-6">
-                                                        <button class="btn btn-success" type="button" ng-click="showSensor()" ng-show="service.status=='WORKING'">
-                                                            <i class="icon-map-marker"></i> <span translate="layer.listing.selected.data.button">View</span>
+                                                        <button class="btn btn-success"
+                                                                type="button"
+                                                                ng-click="showSensor()"
+                                                                ng-show="service.status=='WORKING'">
+                                                            <i class="icon-map-marker"></i>
+                                                            <span translate="layer.listing.selected.data.button">View</span>
                                                         </button>
                                                     </div>
                                                     <div class="col-sm-6">
                                                         <button type="button" class="btn btn-danger" ng-click="deleteLayer();">
-                                                            <i class="icon-trash"></i> <span translate="layer.listing.selected.delete.button">Delete</span>
+                                                            <i class="icon-trash"></i>
+                                                            <span translate="layer.listing.selected.delete.button">Delete</span>
                                                         </button>
                                                     </div>
                                                 </div>
@@ -426,18 +468,23 @@
                             <legend><span translate="service.description.tab.description.title">Service description</span></legend>
                             <form role="form-horizontal" role="form">
                                 <div class="form-group row">
-                                    <label class="control-label col-sm-2 new-service-form-label" translate="service.description.tab.description.name">Name</label>
+                                    <label class="control-label col-sm-2 new-service-form-label"
+                                           translate="service.description.tab.description.name">Name</label>
                                     <div class="col-sm-8 col-md-6">
-                                        <input type="text" id="name" class="form-control" ng-model="metadata.name" value="">
+                                        <input type="text" id="name" class="form-control" ng-model="metadata.name" value=""/>
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <label class="control-label col-sm-2 new-service-form-label" translate="service.description.tab.description.identifier">Identifier</label>
+                                    <label class="control-label col-sm-2 new-service-form-label"
+                                           translate="service.description.tab.description.identifier">Identifier</label>
                                     <div class="col-sm-8 col-md-6">
-                                        <input type="text" readonly="" id="identifier" class="form-control" ng-model="metadata.identifier" value="">
+                                        <input type="text" readonly="" id="identifier" class="form-control" ng-model="metadata.identifier" value=""/>
                                     </div>
                                     <div class="btn-lg tooltipicon">
-                                        <span type="button" class="glyphicon glyphicon-info-sign" tooltip data-placement="right" title="{{'tooltip.service.create.name' | translate }}" ></span>
+                                        <span type="button"
+                                              class="glyphicon glyphicon-info-sign"
+                                              tooltip data-placement="right"
+                                              title="{{'tooltip.service.create.name' | translate }}" ></span>
                                     </div>
                                 </div>
                                 <div class="form-group row">
@@ -448,7 +495,7 @@
                                                 {{ tag }}
                                                 <div class="delete-tag" data-ng-click="deleteTag(key)">&times;</div>
                                             </div>
-                                            <input type="text" data-tag-input="" data-ng-model="tagText" data-new-tag="addTag()" data-delete-tag="deleteTag()">
+                                            <input type="text" data-tag-input="" data-ng-model="tagText" data-new-tag="addTag()" data-delete-tag="deleteTag()"/>
                                         </div>
                                     </div>
                                 </div>
@@ -466,20 +513,31 @@
                                             <div ng-repeat="version in versions" class="inline">
                                                 <div class="checkbox inline">
                                                 <div class="col-sm-8 col-md-6">
-                                                    <input type="checkbox"  id="{{version.id}}"  ng-model="version.checked" ng-change="selectedVersion()" ng-checked="versionIsSelected(version.id)"> {{version.id}}</div>
+                                                    <input type="checkbox"
+                                                           id="{{version.id}}"
+                                                           ng-model="version.checked"
+                                                           ng-change="selectedVersion()"
+                                                           ng-checked="versionIsSelected(version.id)"/> {{version.id}}</div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="btn-lg tooltipicon">
-                                        <span type="button" class="glyphicon glyphicon-info-sign" tooltip data-placement="right" title="{{'tooltip.service.create.version' | translate }}" ></span>
+                                        <span type="button"
+                                              class="glyphicon glyphicon-info-sign"
+                                              tooltip data-placement="right"
+                                              title="{{'tooltip.service.create.version' | translate }}" ></span>
                                     </div>
                                 </div>
                             </form>
                         </fieldset>
                     </div>
                     <div class="pull-right" style="margin: 20px;">
-                        <button class="btn btn-info" style="margin-left:20px;" type="button" ng-click="saveServiceMetadata()" translate="label.save">Save</button>
+                        <button class="btn btn-info"
+                                style="margin-left:20px;"
+                                type="button"
+                                ng-click="saveServiceMetadata()"
+                                translate="label.save">Save</button>
                     </div>
 
                     <!-- END Description Service Tab -->

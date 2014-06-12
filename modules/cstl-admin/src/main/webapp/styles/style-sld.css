@@ -14,7 +14,8 @@
     font-size: 13px;
 }
 .modal-dialog-sld .breadcrumb{
-	margin-top: 8px;
+	margin-top: 0px;
+    margin-bottom: 8px;
 }
 /*choix type*/
 .choix_type{
@@ -64,8 +65,7 @@ a.choix_type:hover{
 }
 .bloc_apercu{
 	border: solid 1px #eee;
-    background-color: #eee;
-	min-height: 300px;
+	min-height: 430px;
 }
 .btn-apercu{
 	margin-top: 10px;

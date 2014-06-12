@@ -447,6 +447,7 @@ cstlAdminApp.factory('StyleSharedService', ['$modal', 'style', 'webService', '$g
                     resolve: {
                         exclude: function() { return $scope.selected.TargetStyle },
                         selectedLayer: function() { return $scope.selected },
+                        selectedStyle: function() { return null },
                         serviceName: function() {
                             if ($scope.service) {
                                 // In WMS mode
@@ -528,6 +529,7 @@ cstlAdminApp.factory('StyleSharedService', ['$modal', 'style', 'webService', '$g
                         newStyle: function() { return null; },
                         pageSld: function() {  return 'views/style/chooseType.html'; },
                         selectedLayer: function() {  return null },
+                        selectedStyle: function() { return null },
                         serviceName: function() {  return null },
                         exclude: function() {  return null }
                     }
@@ -548,6 +550,7 @@ cstlAdminApp.factory('StyleSharedService', ['$modal', 'style', 'webService', '$g
                     resolve: {
                         newStyle: function() { return response},
                         selectedLayer: function() {  return null },
+                        selectedStyle: function() { return scope.selected },
                         serviceName: function() {  return null },
                         exclude: function() {  return null }
                     }

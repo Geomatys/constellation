@@ -56,6 +56,10 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
             } else {
                 layerData = DataViewer.createLayer($scope.cstlUrl, layerName, providerId);
             }
+
+            //to force the browser cache reloading styled layer.
+            layerData.mergeNewParams({ts:new Date().getTime()});
+
             var layerBackground = DataViewer.createLayer($scope.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
             DataViewer.layers = [layerData, layerBackground];
 

@@ -713,6 +713,10 @@ cstlAdminApp.controller('WebServiceEditController', ['$scope','$routeParams', 'w
                             var llbbox = capsLayer.llbbox;
                             var extent = new OpenLayers.Bounds(llbbox[0], llbbox[1], llbbox[2], llbbox[3]);
                             layerData = DataViewer.createLayerWMS($cookies.cstlUrl, layerName, $scope.service.identifier);
+
+                            //to force the browser cache reloading styled layer.
+                            layerData.mergeNewParams({ts:new Date().getTime()});
+
                             DataViewer.layers = [layerData, layerBackground];
                             DataViewer.initMap('dataMap');
                             DataViewer.map.zoomToExtent(extent, true);
