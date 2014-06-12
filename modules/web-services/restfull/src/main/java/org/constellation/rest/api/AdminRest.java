@@ -186,7 +186,7 @@ public class AdminRest {
 	    instance.setIdentifier(service.getIdentifier());
 	    int layersNumber = layerRepository.findByServiceId(service.getId()).size();
 	    instance.setLayersNumber(layersNumber);
-	    instance.setName("TODO");
+	    instance.setName(service.getIdentifier());
 	    instance.setType(service.getType());
 	    instance.setVersions(Arrays.asList(service.getVersions().split("|")));
 	    instances.add(instance);
