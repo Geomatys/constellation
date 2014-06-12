@@ -181,11 +181,12 @@ public class AdminRest {
      List<Service> services = serviceRepository.findByDomain(domainId);
      for (Service service : services) {
 	    Instance instance = new Instance();
-	    instance.set_abstract(""+service.getDescription());
+	    instance.setId(service.getId());
+	    instance.set_abstract("TODO");
 	    instance.setIdentifier(service.getIdentifier());
 	    int layersNumber = layerRepository.findByServiceId(service.getId()).size();
 	    instance.setLayersNumber(layersNumber);
-	    instance.setName(""+service.getTitle());
+	    instance.setName("TODO");
 	    instance.setType(service.getType());
 	    instance.setVersions(Arrays.asList(service.getVersions().split("|")));
 	    instances.add(instance);
