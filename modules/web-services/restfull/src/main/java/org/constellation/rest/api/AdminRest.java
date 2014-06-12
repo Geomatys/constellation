@@ -137,38 +137,7 @@ public class AdminRest {
         return Response.ok(new AcknowlegementType(CommonConstants.SUCCESS, "the key have been set")).build();
     }
 
-//    /**
-//     *
-//     * @return
-//     */
-//    @GET
-//    @Path("/domain/{domainId}/instances")
-//    public Response listInstances(@PathParam("domainId") int domainId, @Context HttpServletRequest httpServletRequest) {
-//        final List<Instance> instances = new ArrayList<>();
-//        final Set<String> services = WSEngine.getRegisteredServices().keySet();
-//
-//        Map<String, Set<String>> servicesByType = serviceRepository.getAccessiblesServicesByType(domainId,
-//                httpServletRequest.getUserPrincipal().getName());
-//
-//        for (final String service : services) {
-//            try {
-//                final Specification spec = Specification.fromShortName(service);
-//                Set<String> serviceIdentifiers = servicesByType.get(spec.name());
-//
-//                if (serviceIdentifiers != null) {
-//                    final OGCConfigurer configurer = (OGCConfigurer) ServiceConfigurer.newInstance(spec);
-//                    for (Instance instance : configurer.getInstances(spec.name())) {
-//                        if (serviceIdentifiers.contains(instance.getIdentifier())) {
-//                            instances.add(instance);
-//                        }
-//                    }
-//
-//                }
-//            } catch (NotRunningServiceException ignore) {
-//            }
-//        }
-//        return Response.ok(new InstanceReport(instances)).build();
-//    }
+
     
     /**
   *

@@ -50,12 +50,12 @@ import java.util.logging.Logger;
 @Path("/1/portrayal")
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Produces("image/png")
-public final class Portrayal {
+public final class PortrayalRest {
     
     @Inject
     LayerProviders layerProviders;
     
-    private static final Logger LOGGER = Logging.getLogger(Portrayal.class);
+    private static final Logger LOGGER = Logging.getLogger(PortrayalRest.class);
 
     /**
      * @see LayerProviders#portray(String, String, String, String, int, int, String, String, String)

@@ -13,7 +13,7 @@ import javax.ws.rs.core.Response;
 import org.constellation.engine.register.repository.DomainRepository;
 
 @Path("/1/userXdomain")
-public class UserXDomainService {
+public class UserXDomainRest {
 
     @Inject
     private DomainRepository domainRepository;

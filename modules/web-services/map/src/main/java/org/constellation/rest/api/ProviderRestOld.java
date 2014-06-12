@@ -85,15 +85,15 @@ import org.opengis.util.NoSuchIdentifierException;
 @Path("/1/DP")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-public class ProviderRest {
+public class ProviderRestOld {
     
-    private static final Logger LOGGER = Logging.getLogger(ProviderRest.class);
+    private static final Logger LOGGER = Logging.getLogger(ProviderRestOld.class);
     
     private final ProviderOperationListener providerListener = new DefaultProviderOperationListener(); // TODO overrding mecanism
     
     private final Map<String, ProviderFactory> services = new HashMap<>();
 
-    public ProviderRest() {
+    public ProviderRestOld() {
         
         final Collection<DataProviderFactory> availableLayerServices = org.constellation.provider.DataProviders.getInstance().getFactories();
         for (DataProviderFactory service: availableLayerServices) {

@@ -91,9 +91,9 @@ import org.opengis.util.NoSuchIdentifierException;
 @Path("/1/domain/{domainId}/provider")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-public final class Provider {
+public final class ProviderRest {
 
-    private static final Logger LOGGER = Logging.getLogger(Provider.class);
+    private static final Logger LOGGER = Logging.getLogger(ProviderRest.class);
 
     
     @Inject

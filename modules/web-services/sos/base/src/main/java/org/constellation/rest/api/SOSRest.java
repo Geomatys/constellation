@@ -66,7 +66,7 @@ import org.geotoolkit.sos.netcdf.ExtractionResult.ProcedureTree;
 @Path("/1/SOS")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-public class SOSServices {
+public class SOSRest {
     
     
     @PUT

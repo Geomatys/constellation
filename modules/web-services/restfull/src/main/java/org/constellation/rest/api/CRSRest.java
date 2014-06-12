@@ -57,9 +57,9 @@ import org.constellation.ws.rs.LayerProviders;
 @Path("/1/crs")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-public class CRSService {
+public class CRSRest {
 
-    private static final Logger LOGGER = Logging.getLogger(CRSService.class);
+    private static final Logger LOGGER = Logging.getLogger(CRSRest.class);
 
     /**
      * @return All EPSG CRS

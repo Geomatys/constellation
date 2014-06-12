@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 
 @Path("/1/domainrole")
-public class DomainRoleService {
+public class DomainRoleRest {
 
     public static class DomainRoleWithMembers extends DomainRole {
         
@@ -55,7 +55,7 @@ public class DomainRoleService {
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public Response all(@QueryParam("withMembers") boolean withMembers) {
         if (withMembers) {
-            List<DomainRoleWithMembers> result = new ArrayList<DomainRoleService.DomainRoleWithMembers>();
+            List<DomainRoleWithMembers> result = new ArrayList<DomainRoleRest.DomainRoleWithMembers>();
             Map<DomainRole, List<Pair<User, List<Domain>>>> findAllWithMembers = domainRoleRepository
                     .findAllWithMembers();
 

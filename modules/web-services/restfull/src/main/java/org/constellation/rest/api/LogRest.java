@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  * 
  */
 @Path("/1/log/")
-public class Log {
+public class LogRest {
 
     /**
      * File buffer size.

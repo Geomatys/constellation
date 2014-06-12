@@ -46,7 +46,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 
 @Path("/1/domain")
 @RolesAllowed("cstl-admin")
-public class DomainService {
+public class DomainRest {
 
     public static class DomainUserWrapper extends Domain {
 
@@ -91,7 +91,7 @@ public class DomainService {
         else
             domains = domainRepository.findAllByUserId(userId);
         if (withMembers) {
-            List<DomainUserWrapper> result = new ArrayList<DomainService.DomainUserWrapper>();
+            List<DomainUserWrapper> result = new ArrayList<DomainRest.DomainUserWrapper>();
             for (Domain domain : domains) {
                 List<User> users = domainRepository.findUsers(domain.getId());
                 result.add(new DomainUserWrapper(domain, users));

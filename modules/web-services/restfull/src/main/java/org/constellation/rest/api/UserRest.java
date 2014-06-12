@@ -21,9 +21,14 @@ package org.constellation.rest.api;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -31,10 +36,9 @@ import org.constellation.configuration.AcknowlegementType;
 import org.constellation.engine.register.DomainUser;
 import org.constellation.engine.register.User;
 import org.constellation.engine.register.repository.UserRepository;
-import org.constellation.security.SecurityManagerHolder;
+import org.geotoolkit.util.StringUtilities;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
-import com.google.common.base.Function;
 
 /**
  * RestFull user configuration service
@@ -44,29 +48,68 @@ import com.google.common.base.Function;
  * @since 0.9
  */
 @Named
-@Path("/1/account")
+@Path("/1/user")
 @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-public class CurrentUserService {
+public class UserRest  {
+
 
     @Inject
     private UserRepository userRepository;
-
-    /**
-     * @return a {@link Response} which contains requester user name
-     */
+    
     @GET
     @Path("/")
-    public Response current() {
-        return userRepository.findOneWithRolesAndDomains(SecurityManagerHolder.getInstance().getCurrentUserLogin())
-                .transform(new Function<DomainUser, Response>() {
-                    @Override
-                    public Response apply(DomainUser domainUser) {
-                        return Response.ok(domainUser).build();
-                    }
-                }).or(Response.status(404).build());
+    public Response findAll(@QueryParam("withDomainAndRoles") boolean withDomainAndRole) {
+        if(withDomainAndRole) {
+            return Response.ok(userRepository.findAllWithDomainAndRole()).build();
+        }
+        return Response.ok(userRepository.findAll()).build();
     }
 
+    @GET
+    @Path("/{id}")
+    public Response findOne(@PathParam("id") int id) {
+        return Response.ok(userRepository.findOneWithRolesAndDomains(id)).build();
+    }
+
+
+    @DELETE
+    @Path("/{id}")
+    public Response delete(@PathParam("id") int id) {
+        if(userRepository.isLastAdmin(id))
+            return Response.serverError().entity("admin.user.last.admin").build();
+        userRepository.delete(id);
+        return Response.noContent().build();
+    }
+
+    @POST
+    @Path("/")
+    @Transactional
+    public Response post(DomainUser userDTO) {
+        if (StringUtils.hasText(userDTO.getPassword()))
+            userDTO.setPassword(StringUtilities.MD5encode(userDTO.getPassword()));
+
+        userRepository.insert(userDTO, userDTO.getRoles());
+
+        return Response.ok(userDTO).build();
+    }
+    
+    
+    @PUT
+    @Path("/")
+    @Transactional
+    public Response put(DomainUser userDTO) {
+        userRepository.update(userDTO, userDTO.getRoles());
+
+        return Response.ok(userDTO).build();
+    }
+
+    /**
+     * Called on login. To know if login is granted to access to server
+     * 
+     * @return an {@link AcknowlegementType} on {@link Response} to know
+     *         operation state
+     */
     @GET
     @Path("/access")
     public Response access() {

@@ -12,7 +12,7 @@ import org.constellation.engine.register.Permission;
 import org.constellation.engine.register.repository.DomainRoleRepository;
 
 @Path("1/permission")
-public class PermissionRestService {
+public class PermissionRest {
     
     @Inject
     private DomainRoleRepository domainRoleRepository;

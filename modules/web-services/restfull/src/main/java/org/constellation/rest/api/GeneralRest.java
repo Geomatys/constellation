@@ -17,7 +17,7 @@ import org.constellation.engine.register.repository.UserRepository;
 
 
 @Path("/1/general")
-public class GeneralService {
+public class GeneralRest {
 
     @Inject
     private UserRepository userRepository;

@@ -47,7 +47,7 @@ import com.google.common.base.Function;
 @Path("/1/session")
 @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-public class SessionService {
+public class SessionRest {
 
     @Inject
     private UserRepository userRepository;
