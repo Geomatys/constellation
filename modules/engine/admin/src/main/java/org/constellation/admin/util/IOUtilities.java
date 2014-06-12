@@ -23,20 +23,13 @@ import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.TimeZone;
 
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamException;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.Static;
-import org.apache.sis.xml.XML;
-import org.constellation.utils.ISOMarshallerPool;
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
 import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.style.MutableStyle;

@@ -278,20 +278,6 @@ public class MapConfigurer extends OGCConfigurer {
         instance.setLayersNumber(getLayers(spec, identifier).size());
         return instance;
     }
-    /**
-     * {@inheritDoc}
-     * Add default FeatureInfoFormat for LayerContext configuration.
-     */
-    @Override
-    public void createInstance(String spec, String identifier, Service metadata, Object configuration) throws ConfigurationException {
-
-        if (configuration == null) {
-            configuration = new LayerContext();
-            ((LayerContext)configuration).setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
-        }
-
-        super.createInstance(spec, identifier, metadata, configuration);
-    }
 
     /**
      * Remove a layer from a service.

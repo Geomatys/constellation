@@ -19,10 +19,7 @@
 
 package org.constellation.wps.configuration;
 
-import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.ProcessContext;
-import org.constellation.configuration.Processes;
-import org.constellation.dto.Service;
 import org.constellation.ogc.configuration.OGCConfigurer;
 
 /**
@@ -41,16 +38,5 @@ public class WPSConfigurer extends OGCConfigurer {
      */
     protected WPSConfigurer() {
         super(ProcessContext.class);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void createInstance(final String serviceType, final String identifier, final Service metadata, Object configuration) throws ConfigurationException {
-        if (configuration == null) {
-            configuration = new ProcessContext(new Processes(true));
-        }
-        super.createInstance(serviceType, identifier, metadata, configuration);
     }
 }

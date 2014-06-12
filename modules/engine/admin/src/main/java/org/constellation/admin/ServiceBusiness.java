@@ -12,6 +12,7 @@ import javax.xml.bind.JAXBException;
 import org.apache.commons.beanutils.BeanUtils;
 import org.constellation.admin.dto.ServiceDTO;
 import org.constellation.admin.exception.ConstellationException;
+import org.constellation.admin.util.DefaultServiceConfiguration;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.repository.LayerRepository;
@@ -72,7 +73,7 @@ public class ServiceBusiness {
         }
 
         if (configuration == null) {
-            configuration = ReflectionUtilities.newInstance(configurationClass);
+            configuration = DefaultServiceConfiguration.getDefaultConfiguration(serviceType);
         }
 
         boolean createConfig = false;

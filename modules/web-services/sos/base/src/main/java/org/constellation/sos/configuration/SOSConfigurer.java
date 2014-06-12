@@ -42,9 +42,6 @@ import org.apache.sis.storage.DataStoreException;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.*;
 import org.constellation.dto.SensorMLTree;
-import org.constellation.dto.Service;
-import org.constellation.generic.database.Automatic;
-import org.constellation.generic.database.BDD;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.ogc.configuration.OGCConfigurer;
 import org.constellation.sos.factory.OMFactory;
@@ -90,22 +87,6 @@ public class SOSConfigurer extends OGCConfigurer {
      */
     public SOSConfigurer() {
         super(SOSConfiguration.class);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void createInstance(final String spec, final String identifier, final Service metadata, Object configuration) throws ConfigurationException {
-        if (configuration == null) {
-            final SOSConfiguration baseConfig = new SOSConfiguration(new Automatic(null, new BDD()), new Automatic(null, new BDD()));
-            baseConfig.setObservationReaderType(DataSourceType.FILESYSTEM);
-            baseConfig.setObservationFilterType(DataSourceType.LUCENE);
-            baseConfig.setObservationWriterType(DataSourceType.FILESYSTEM);
-            baseConfig.setSMLType(DataSourceType.FILESYSTEM);
-            configuration = baseConfig;
-        }
-        super.createInstance(spec, identifier, metadata, configuration);
     }
 
     @Override
