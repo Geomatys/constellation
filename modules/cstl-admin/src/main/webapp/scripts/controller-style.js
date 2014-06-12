@@ -579,7 +579,8 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
          * Binding action for select in filter expression to add a new filter object.
          * @param connector
          */
-        $scope.addNewFilter = function(connector) {
+        $scope.addNewFilter = function(connector,index) {
+            console.debug(index);
             if(connector !==''){
                 var filter = {
                     "attribute":"",
@@ -886,7 +887,6 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
          * Performs a preview of current style in map
          */
         $scope.displayCurrentStyle = function(mapId) {
-            console.debug('displayCurrentStyle>>>> $scope.layerName = '+$scope.layerName);
             if(! $scope.layerName){
                 return;
             }

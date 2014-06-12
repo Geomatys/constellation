@@ -283,7 +283,7 @@
                                                     <td>
                                                         <select class="form-control"
                                                                 ng-model="filter.connector"
-                                                                ng-click="addNewFilter(filter.connector);"
+                                                                ng-change="addNewFilter(filter.connector,$index);"
                                                                 size="1">
                                                             <option value=""></option>
                                                             <option value="AND">AND</option>
