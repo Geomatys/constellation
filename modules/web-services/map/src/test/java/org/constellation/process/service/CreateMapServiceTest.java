@@ -53,7 +53,6 @@ public abstract class CreateMapServiceTest extends AbstractMapServiceTest {
             ParameterValueGroup in = desc.getInputDescriptor().createValue();
             in.parameter(CreateServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
             in.parameter(CreateServiceDescriptor.IDENTIFIER_NAME).setValue("createInstance1");
-            in.parameter(CreateServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(LayerContext.class);
 
             org.geotoolkit.process.Process proc = desc.createProcess(in);
             proc.call();
@@ -80,7 +79,6 @@ public abstract class CreateMapServiceTest extends AbstractMapServiceTest {
             in.parameter(CreateServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
             in.parameter(CreateServiceDescriptor.IDENTIFIER_NAME).setValue("createInstance11");
             in.parameter(CreateServiceDescriptor.CONFIG_NAME).setValue(conf);
-            in.parameter(CreateServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(LayerContext.class);
 
 
             org.geotoolkit.process.Process proc = desc.createProcess(in);
@@ -109,7 +107,6 @@ public abstract class CreateMapServiceTest extends AbstractMapServiceTest {
             ParameterValueGroup in = desc.getInputDescriptor().createValue();
             in.parameter(CreateServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
             in.parameter(CreateServiceDescriptor.IDENTIFIER_NAME).setValue("createInstance15");
-            in.parameter(CreateServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(LayerContext.class);
 
 
             org.geotoolkit.process.Process proc = desc.createProcess(in);
@@ -132,7 +129,6 @@ public abstract class CreateMapServiceTest extends AbstractMapServiceTest {
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
         in.parameter(CreateServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
         in.parameter(CreateServiceDescriptor.IDENTIFIER_NAME).setValue("");
-        in.parameter(CreateServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(LayerContext.class);
 
         try {
             final org.geotoolkit.process.Process proc = desc.createProcess(in);

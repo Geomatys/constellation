@@ -56,21 +56,6 @@ public abstract class ServiceConfigurer {
         return instance;
     }
 
-
-    /**
-     * Configuration object class.
-     */
-    protected final Class configClass;
-
-    /**
-     * Create a new {@link ServiceConfigurer} instance.
-     *
-     * @param configClass    the target service config class
-     */
-    protected ServiceConfigurer(final Class configClass) {
-        this.configClass    = configClass;
-    }
-
     public static void setApplicationContext(ApplicationContext applicationContext) {
         ServiceConfigurer.autowirer = applicationContext.getAutowireCapableBeanFactory();
         

@@ -54,15 +54,10 @@ public class GetConfigServiceDescriptor extends AbstractCstlProcessDescriptor {
     public static final ParameterDescriptor<String> IDENTIFIER =
             new DefaultParameterDescriptor(IDENTIFIER_NAME, IDENTIFIER_REMARKS, String.class, "default", true);
 
-    public static final String CONFIGURATION_CLASS_NAME = "configurationClass";
-    private static final String CONFIGURATION_CLASS_REMARKS = "Configuration class of the object.";
-    public static final ParameterDescriptor<Class> CONFIGURATION_CLASS =
-            new DefaultParameterDescriptor(CONFIGURATION_CLASS_NAME, CONFIGURATION_CLASS_REMARKS, Class.class, null, true);
-
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC =
             new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{SERVICE_TYPE, IDENTIFIER, CONFIGURATION_CLASS});
+            new GeneralParameterDescriptor[]{SERVICE_TYPE, IDENTIFIER});
 
 
     public static final String CONFIG_NAME = "configuration";

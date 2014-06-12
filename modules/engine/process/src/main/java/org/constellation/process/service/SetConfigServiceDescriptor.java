@@ -67,15 +67,10 @@ public class SetConfigServiceDescriptor extends AbstractCstlProcessDescriptor {
     public static final ParameterDescriptor<Service> SERVICE_METADATA =
             new DefaultParameterDescriptor(SERVICE_METADATA_NAME, SERVICE_METADATA_REMARKS, Service.class, null, false);
 
-    public static final String CONFIGURATION_CLASS_NAME = "configurationClass";
-    private static final String CONFIGURATION_CLASS_REMARKS = "Configuration class of the object.";
-    public static final ParameterDescriptor<Class> CONFIGURATION_CLASS =
-            new DefaultParameterDescriptor(CONFIGURATION_CLASS_NAME, CONFIGURATION_CLASS_REMARKS, Class.class, null, true);
-
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC =
             new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{SERVICE_TYPE, IDENTIFIER, CONFIGURATION, SERVICE_METADATA, CONFIGURATION_CLASS});
+            new GeneralParameterDescriptor[]{SERVICE_TYPE, IDENTIFIER, CONFIGURATION, SERVICE_METADATA});
 
     /**Output parameters */
     public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");

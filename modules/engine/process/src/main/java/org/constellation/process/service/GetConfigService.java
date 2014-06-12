@@ -49,9 +49,8 @@ public class GetConfigService extends AbstractCstlProcess {
     protected void execute() throws ProcessException {
         final String serviceType       = value(SERVICE_TYPE, inputParameters);
         final String identifier        = value(IDENTIFIER, inputParameters);
-        final Class configurationClass = value(CONFIGURATION_CLASS, inputParameters);
         try {
-            final Object obj = serviceBusiness.getInstanceConfiguration(serviceType, identifier, configurationClass);
+            final Object obj = serviceBusiness.getInstanceConfiguration(serviceType, identifier);
             getOrCreate(CONFIGURATION, outputParameters).setValue(obj);
         } catch (ConfigurationException ex) {
             throw new ProcessException(ex.getMessage(), this, ex);

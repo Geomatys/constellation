@@ -60,7 +60,7 @@ public class ServiceStartStopAction extends Action {
     public String getDisplayName() {
         if(target instanceof Map.Entry){
             final Instance inst = (Instance) ((Map.Entry)target).getKey();
-            if(ServiceStatus.WORKING.equals(inst.getStatus())){
+            if(ServiceStatus.STARTED.equals(inst.getStatus())){
                 return LayerRowModel.BUNDLE.getString("stop");
             }else{
                 return LayerRowModel.BUNDLE.getString("start");
@@ -73,7 +73,7 @@ public class ServiceStartStopAction extends Action {
     public ImageIcon getIcon() {
         if(target instanceof Map.Entry){
             final Instance inst = (Instance) ((Map.Entry)target).getKey();
-            if(ServiceStatus.WORKING.equals(inst.getStatus())){
+            if(ServiceStatus.STARTED.equals(inst.getStatus())){
                 return ICON_SERVICE_STOP;
             }else{
                 return ICON_SERVICE_START;
@@ -91,7 +91,7 @@ public class ServiceStartStopAction extends Action {
     public Color getBackgroundColor() {
         if(target instanceof Map.Entry){
             final Instance inst = (Instance) ((Map.Entry)target).getKey();
-            if(ServiceStatus.WORKING.equals(inst.getStatus())){
+            if(ServiceStatus.STARTED.equals(inst.getStatus())){
                 return new Color(180,60,60);
             }else{
                 return new Color(130,160,50);
@@ -107,7 +107,7 @@ public class ServiceStartStopAction extends Action {
                 final Instance inst = (Instance) ((Map.Entry)target).getKey();
                 final String type = (String) ((Map.Entry)target).getValue();
 
-                if(ServiceStatus.WORKING.equals(inst.getStatus())){
+                if(ServiceStatus.STARTED.equals(inst.getStatus())){
                         serverV2.services.stop(ServiceDef.Specification.valueOf(type), inst.getIdentifier());
                 }else{
                     serverV2.services.start(ServiceDef.Specification.valueOf(type), inst.getIdentifier());

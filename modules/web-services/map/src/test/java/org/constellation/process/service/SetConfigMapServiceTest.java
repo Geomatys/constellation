@@ -60,7 +60,6 @@ public abstract class SetConfigMapServiceTest  extends AbstractMapServiceTest {
             in.parameter(SetConfigServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
             in.parameter(SetConfigServiceDescriptor.IDENTIFIER_NAME).setValue("updateInstance4");
             in.parameter(SetConfigServiceDescriptor.CONFIG_NAME).setValue(conf);
-            in.parameter(SetConfigServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(LayerContext.class);
 
 
             org.geotoolkit.process.Process proc = desc.createProcess(in);
@@ -88,7 +87,6 @@ public abstract class SetConfigMapServiceTest  extends AbstractMapServiceTest {
             in.parameter(SetConfigServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
             in.parameter(SetConfigServiceDescriptor.IDENTIFIER_NAME).setValue("instance10");
             in.parameter(SetConfigServiceDescriptor.CONFIG_NAME).setValue(conf);
-            in.parameter(SetConfigServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(LayerContext.class);
 
 
             org.geotoolkit.process.Process proc = desc.createProcess(in);

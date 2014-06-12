@@ -271,7 +271,6 @@ public class AddLayerToMapService extends AbstractCstlProcess {
             final ParameterValueGroup in = processDesc.getInputDescriptor().createValue();
             in.parameter(CreateServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceType);
             in.parameter(CreateServiceDescriptor.IDENTIFIER_NAME).setValue(serviceInstance);
-            in.parameter(CreateServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(LayerContext.class);
             final ParameterValueGroup out = processDesc.createProcess(in).call();
             return Parameters.value(CreateServiceDescriptor.OUT_CONFIGURATION, out);
         } else {
@@ -294,7 +293,6 @@ public class AddLayerToMapService extends AbstractCstlProcess {
             in.parameter(SetConfigServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceType);
             in.parameter(SetConfigServiceDescriptor.IDENTIFIER_NAME).setValue(serviceInstance);
             in.parameter(SetConfigServiceDescriptor.CONFIG_NAME).setValue(context);
-            in.parameter(SetConfigServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(LayerContext.class);
             processDesc.createProcess(in).call();
         } else {
             throw new ProcessException("Service name can't be null or empty but one of these (\"WMS\", \"WMTS\", \"WFS\", \"WCS\").", this, null);

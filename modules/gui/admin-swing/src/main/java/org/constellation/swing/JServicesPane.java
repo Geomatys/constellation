@@ -142,12 +142,14 @@ public final class JServicesPane extends JPanel implements ActionListener, Prope
                     final String type = (String) entry.getValue();
 
                     final Color bgColor;
-                    if(ServiceStatus.WORKING.equals(inst.getStatus())){
+                    if (ServiceStatus.STARTED.equals(inst.getStatus())) {
                         bgColor = new Color(130, 160, 50);
-                    }else if(ServiceStatus.NOT_STARTED.equals(inst.getStatus())){
+                    } else if (ServiceStatus.STOPPED.equals(inst.getStatus()) || ServiceStatus.ERROR.equals(inst.getStatus())) {
                         bgColor = Color.GRAY;
-                    }else{
-                        bgColor = new Color(180,60,60);
+                    } else if (ServiceStatus.STARTING.equals(inst.getStatus()) || ServiceStatus.STOPPING.equals(inst.getStatus())) {
+                        bgColor = Color.ORANGE;
+                    } else {
+                        bgColor = new Color(180, 60, 60);
                     }
 
                     final Font fontBig = new Font("Monospaced", Font.BOLD, 16);

@@ -82,12 +82,6 @@ import static org.geotoolkit.sml.xml.SensorMLUtilities.*;
  */
 public class SOSConfigurer extends OGCConfigurer {
 
-    /**
-     * Create a new {@link SOSConfigurer} instance.
-     */
-    public SOSConfigurer() {
-        super(SOSConfiguration.class);
-    }
 
     @Override
     public Instance getInstance(final String spec, final String identifier) throws ConfigurationException {

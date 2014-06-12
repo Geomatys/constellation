@@ -17,7 +17,6 @@ import org.constellation.configuration.ConfigurationException;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.repository.LayerRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
-import org.constellation.util.ReflectionUtilities;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
 import org.geotoolkit.process.ProcessException;
@@ -61,12 +60,11 @@ public class ServiceBusiness {
      * @param identifier    The identifier of the service.
      * @param metadata      the service metadata (can be null).
      * @param configuration the service configuration (can be null).
-     * @param configurationClass Class of the configuration object expected.
      * 
      * @return the configuration object just setted.
      * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
-    public Object createInstance(final String serviceType, final String identifier, Object configuration, final org.constellation.dto.Service metadata, final Class configurationClass) throws ConfigurationException {
+    public Object createInstance(final String serviceType, final String identifier, Object configuration, final org.constellation.dto.Service metadata) throws ConfigurationException {
 
         if (identifier == null || identifier.isEmpty()) {
             throw new ConfigurationException("Service instance identifier can't be null or empty.");
@@ -76,29 +74,13 @@ public class ServiceBusiness {
             configuration = DefaultServiceConfiguration.getDefaultConfiguration(serviceType);
         }
 
-        boolean createConfig = false;
+        //create config file for the default configuration.
         try {
-            final Object obj = ConfigurationEngine.getConfiguration(serviceType, identifier);
-            if (obj.getClass().isAssignableFrom(configurationClass)) {
-                configuration = obj;
-            } else {
-                throw new ConfigurationException("The configuration does not contain a " + configurationClass.getName() + " object");
-            }
+            ConfigurationEngine.storeConfiguration(serviceType, identifier, configuration, metadata);
         } catch (JAXBException ex) {
             throw new ConfigurationException(ex.getMessage(), ex);
-        } catch (FileNotFoundException ex) {
-            createConfig = true;
-        }
-
-        if (createConfig) {
-            //create config file for the default configuration.
-            try {
-                ConfigurationEngine.storeConfiguration(serviceType, identifier, configuration, metadata);
-            } catch (JAXBException ex) {
-                throw new ConfigurationException(ex.getMessage(), ex);
-            } catch (IOException ex) {
-                throw new ConfigurationException("An error occurred while trying to write service Metadata.", ex);
-            }
+        } catch (IOException ex) {
+            throw new ConfigurationException("An error occurred while trying to write service Metadata.", ex);
         }
         return configuration;
     }
@@ -237,16 +219,16 @@ public class ServiceBusiness {
      * @param identifier    the service identifier.
      * @param configuration the service configuration (depending on implementation).
      * @param metadata      the service metadata.
-     * @param configurationClass Class of the configuration object expected.
+     * 
      * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
-     public void configureInstance(final String serviceType, final String identifier, final org.constellation.dto.Service metadata, Object configuration, final Class configurationClass) throws ConfigurationException {
+     public void configureInstance(final String serviceType, final String identifier, final org.constellation.dto.Service metadata, Object configuration) throws ConfigurationException {
          if (identifier == null || identifier.isEmpty()) {
             throw new ConfigurationException("Service instance identifier can't be null or empty.");
         }
 
         if (configuration == null) {
-            configuration = ReflectionUtilities.newInstance(configurationClass);
+            configuration = DefaultServiceConfiguration.getDefaultConfiguration(serviceType);
         }
 
         //write configuration file.
@@ -264,22 +246,16 @@ public class ServiceBusiness {
      *
      * @param serviceType The service type (WMS, WFS, ...)
      * @param identifier the service
-     * @param configurationClass Class of the configuration object expected.
+     *
      * @return a configuration {@link Object} (depending on implementation)
      * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
-     public Object getInstanceConfiguration(final String serviceType, final String identifier, final Class configurationClass) throws ConfigurationException {
+     public Object getInstanceConfiguration(final String serviceType, final String identifier) throws ConfigurationException {
          if (identifier == null || identifier.isEmpty()) {
             throw new ConfigurationException("Service instance identifier can't be null or empty.");
         }
-
         try {
-            final Object obj = ConfigurationEngine.getConfiguration(serviceType, identifier);
-            if (obj.getClass().isAssignableFrom(configurationClass)) {
-                return obj;
-            } else {
-                throw new ConfigurationException("The configuration does not contain a " + configurationClass.getName() + " object.");
-            }
+            return ConfigurationEngine.getConfiguration(serviceType, identifier);
         } catch (JAXBException ex) {
             throw new ConfigurationException(ex.getMessage(), ex);
         } catch (FileNotFoundException ex) {

@@ -37,6 +37,5 @@ public class WPSConfigurer extends OGCConfigurer {
      * Create a new {@link WPSConfigurer} instance.
      */
     protected WPSConfigurer() {
-        super(ProcessContext.class);
     }
 }

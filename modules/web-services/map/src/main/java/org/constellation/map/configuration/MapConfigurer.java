@@ -38,7 +38,6 @@ import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Source;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.*;
-import org.constellation.map.featureinfo.FeatureInfoUtilities;
 import org.constellation.ogc.configuration.OGCConfigurer;
 import org.constellation.process.service.AddLayerToMapServiceDescriptor;
 import org.constellation.provider.DataProvider;
@@ -104,14 +103,6 @@ public class MapConfigurer extends OGCConfigurer {
     
     @Inject
     StyleBusiness styleBusiness;
-
-    /**
-     * Create a new {@link MapConfigurer} instance.
-     *
-     */
-    public MapConfigurer() {
-        super(LayerContext.class);
-    }
 
     /**
      * Adds a new layer to a "map" service instance.

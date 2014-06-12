@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.xml.bind.JAXBException;
-import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.configuration.ConfigurationException;
@@ -56,15 +55,6 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
     private ServiceBusiness serviceBusiness;
     
     /**
-     * Create a new {@link OGCConfigurer} instance.
-     *
-     * @param configClass    the target service config class
-     */
-    protected OGCConfigurer(final Class configClass) {
-        super(configClass);
-    }
-
-    /**
      * Creates a new service instance.
      *
      * @param serviceType   The type of the service.
@@ -74,7 +64,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
     public void createInstance(final String serviceType, final String identifier, final Service metadata, final Object configuration) throws ConfigurationException {
-        serviceBusiness.createInstance(serviceType, identifier, configuration, metadata, configClass);
+        serviceBusiness.createInstance(serviceType, identifier, configuration, metadata);
     }
 
     /**
@@ -156,7 +146,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      */
     public void configureInstance(final String serviceType, final String identifier, final Service metadata, final Object configuration) throws ConfigurationException {
         this.ensureExistingInstance(serviceType, identifier);
-        serviceBusiness.configureInstance(serviceType, identifier, metadata, configuration, configClass);
+        serviceBusiness.configureInstance(serviceType, identifier, metadata, configuration);
         if (metadata != null && !identifier.equals(metadata.getIdentifier())) { // rename if necessary
             renameInstance(serviceType, identifier, metadata.getIdentifier());
         }
@@ -173,7 +163,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
      */
     public Object getInstanceConfiguration(final String serviceType, final String identifier) throws ConfigurationException {
         this.ensureExistingInstance(serviceType, identifier);
-        return serviceBusiness.getInstanceConfiguration(serviceType, identifier, configClass);
+        return serviceBusiness.getInstanceConfiguration(serviceType, identifier);
     }
 
     /**

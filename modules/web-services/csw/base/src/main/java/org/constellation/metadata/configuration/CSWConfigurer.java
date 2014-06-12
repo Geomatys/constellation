@@ -78,7 +78,6 @@ public class CSWConfigurer extends OGCConfigurer {
      * Create a new {@link CSWConfigurer} instance.
      */
     public CSWConfigurer() {
-        super(Automatic.class);
         indexing = false;
     }
 
