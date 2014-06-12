@@ -59,9 +59,7 @@ import org.constellation.engine.register.repository.LayerRepository;
 import org.constellation.engine.register.repository.PropertyRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
-import org.constellation.security.SecurityManager;
 import org.constellation.utils.CstlMetadatas;
-import org.jaxen.FunctionCallException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +67,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Function;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
 @Component
@@ -102,7 +99,6 @@ public class JooqConfigurationService implements ConfigurationService {
     @Transactional
     public void storeConfiguration(String serviceType, String serviceID, String fileName, Object obj,
             MarshallerPool pool, String login) {
-        final ServiceDef.Specification spec = ServiceDef.Specification.fromShortName(serviceType);
 
         String config = null;
         if (obj != null) {
@@ -119,12 +115,12 @@ public class JooqConfigurationService implements ConfigurationService {
         }
 
        
-        Service service = serviceRepository.findByIdentifierAndType(serviceID, spec.name());
+        Service service = serviceRepository.findByIdentifierAndType(serviceID, serviceType);
         if (service == null) {
             service = new Service();
             service.setConfig(config);
             service.setDate(new Date().getTime());
-            service.setType(spec.name());
+            service.setType(serviceType);
             service.setOwner(login);
             service.setIdentifier(serviceID);
             service.setStatus(ServiceStatus.STOPPED.toString());

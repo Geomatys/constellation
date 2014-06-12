@@ -19,7 +19,9 @@
 package org.constellation.process.service;
 
 import java.util.UUID;
+import javax.inject.Inject;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.ServiceBusiness;
 import org.constellation.process.AbstractProcessTest;
 import org.constellation.util.ReflectionUtilities;
 import org.constellation.ws.WSEngine;
@@ -33,6 +35,9 @@ import org.junit.BeforeClass;
  */
 public abstract class ServiceProcessTest extends AbstractProcessTest {
 
+    @Inject
+    protected ServiceBusiness serviceBusiness;
+    
     private static String configName;
     protected static String serviceName;
     private static Class workerClass;

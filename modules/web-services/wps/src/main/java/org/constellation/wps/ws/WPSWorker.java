@@ -68,7 +68,6 @@ import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URL;
 import java.util.ArrayList;
@@ -84,6 +83,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
+import javax.inject.Inject;
+import org.constellation.admin.ServiceBusiness;
 
 import org.opengis.parameter.ParameterValue;
 import org.opengis.coverage.grid.GridCoverage;
@@ -106,6 +107,9 @@ import org.opengis.util.NoSuchIdentifierException;
  */
 public class WPSWorker extends AbstractWorker {
 
+    @Inject
+    private ServiceBusiness serviceBusiness;
+    
     /**
      * Supported CRS.
      */
@@ -181,7 +185,7 @@ public class WPSWorker extends AbstractWorker {
     public WPSWorker(final String id) {
         super(id, ServiceDef.Specification.WPS);
         try {
-            final Object obj = ConfigurationEngine.getConfiguration("WPS", id);
+            final Object obj = serviceBusiness.getConfiguration("WPS", id);
             if (obj instanceof ProcessContext) {
                 context = (ProcessContext) obj;
                 applySupportedVersion();
@@ -191,12 +195,8 @@ public class WPSWorker extends AbstractWorker {
                 isStarted = false;
                 LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, id);
             }
-        } catch (JAXBException ex) {
-            startError = "JAXBExeception while unmarshalling the process context File";
-            isStarted = false;
-            LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, ex);
-        }  catch (FileNotFoundException ex) {
-            startError = "The configuration file processContext.xml has not been found";
+        } catch (ConfigurationException ex) {
+            startError = ex.getMessage();
             isStarted = false;
             LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, id);
         } catch (CstlServiceException ex) {
@@ -369,8 +369,12 @@ public class WPSWorker extends AbstractWorker {
         super.destroy();
         //Delete recursively temporary directory.
         if (isTmpWebDav) {
-            FileUtilities.deleteDirectory(new File(webdavFolderPath));
-            ConfigurationEngine.deleteConfiguration("webdav", webdavName);
+            try {
+                FileUtilities.deleteDirectory(new File(webdavFolderPath));
+                serviceBusiness.delete("webdav", webdavName);
+            } catch (ConfigurationException ex) {
+                LOGGER.log(Level.WARNING, "Erro while deleting temporary webdav service", ex);
+            }
         }
     }
 
@@ -426,13 +430,13 @@ public class WPSWorker extends AbstractWorker {
 
         //configure webdav if not exist
         try {
-            ConfigurationEngine.getConfiguration("webdav", webdavName);
-        } catch (FileNotFoundException | JAXBException e) {
+            serviceBusiness.getConfiguration("webdav", webdavName);
+        } catch (ConfigurationException e) {
             final WebdavContext webdavCtx = new WebdavContext(webdavFolderPath);
             webdavCtx.setId(webdavName);
             try {
                 if (SecurityManagerHolder.getInstance().isAuthenticated()) {
-                    ConfigurationEngine.storeConfiguration("webdav", webdavName, webdavCtx, null);
+                    serviceBusiness.create("webdav", webdavName, webdavCtx, null);
                 } else {
                     try {
                         ConfigurationEngine.setSecurityManager(new SecurityManagerAdapter() {
@@ -441,8 +445,8 @@ public class WPSWorker extends AbstractWorker {
                                 return "admin";
                             }
                         });
-
-                        ConfigurationEngine.storeConfiguration("webdav", webdavName, webdavCtx, null);
+                        
+                        serviceBusiness.create("webdav", webdavName, webdavCtx, null);
                     } finally {
                         ConfigurationEngine.setSecurityManager(SecurityManagerHolder.getInstance());
                     }
@@ -450,7 +454,7 @@ public class WPSWorker extends AbstractWorker {
                 // /!\ CASE SENSITIVE /!\
                 final Worker worker = WSEngine.buildWorker("WEBDAV", webdavName);
                 WSEngine.addServiceInstance("WEBDAV", webdavName, worker);
-            } catch (JAXBException | IOException ex) {
+            } catch (ConfigurationException ex) {
                 LOGGER.log(Level.WARNING, "Error during WebDav configuration", ex);
                 return false;
             }

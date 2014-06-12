@@ -2,13 +2,14 @@ package org.constellation.admin;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.xml.bind.JAXBException;
-
+import javax.xml.bind.Marshaller;
 import org.apache.commons.beanutils.BeanUtils;
 import org.constellation.admin.dto.ServiceDTO;
 import org.constellation.admin.exception.ConstellationException;
@@ -16,18 +17,24 @@ import org.constellation.admin.util.DefaultServiceConfiguration;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.ServiceStatus;
 import org.constellation.configuration.TargetNotFoundException;
+import org.constellation.engine.register.ConstellationPersistenceException;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.repository.LayerRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
 import org.geotoolkit.process.ProcessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.constellation.security.SecurityManager;
 
 @Component
 public class ServiceBusiness {
 
+    @Autowired
+    private SecurityManager securityManager;
+            
     @Autowired
     private ServiceRepository serviceRepository;
 
@@ -74,14 +81,18 @@ public class ServiceBusiness {
             configuration = DefaultServiceConfiguration.getDefaultConfiguration(serviceType);
         }
 
-        //create config file for the default configuration.
-        try {
-            ConfigurationEngine.storeConfiguration(serviceType, identifier, configuration, metadata);
-        } catch (JAXBException ex) {
-            throw new ConfigurationException(ex.getMessage(), ex);
-        } catch (IOException ex) {
-            throw new ConfigurationException("An error occurred while trying to write service Metadata.", ex);
-        }
+        final String config   = getStringFromObject(configuration);
+        final Service service = new Service();
+        service.setConfig(config);
+        service.setDate(new Date().getTime());
+        service.setType(serviceType);
+        service.setOwner(securityManager.getCurrentUserLogin());
+        service.setIdentifier(identifier);
+        service.setStatus(ServiceStatus.STOPPED.toString());
+        // @TODO
+        service.setVersions("1.3.0");
+        serviceRepository.create(service);
+        
         return configuration;
     }
     
@@ -392,5 +403,21 @@ public class ServiceBusiness {
                         "\" not found. There is not configuration in the database.");
             }
         }
+    }
+    
+    private String getStringFromObject(final Object obj) {
+        String config = null;
+        if (obj != null) {
+            try {
+                final StringWriter sw = new StringWriter();
+                final Marshaller m = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+                m.marshal(obj, sw);
+                GenericDatabaseMarshallerPool.getInstance().recycle(m);
+                config = sw.toString();
+            } catch (JAXBException e) {
+                throw new ConstellationPersistenceException(e);
+            }
+        }
+        return config;
     }
 }

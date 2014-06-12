@@ -18,11 +18,8 @@
  */
 package org.constellation.process.service;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.logging.Level;
-import javax.xml.bind.JAXBException;
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
 
 /**
@@ -45,8 +42,8 @@ public abstract class AbstractMapServiceTest extends ServiceProcessTest {
     protected void createInstance(final String identifier, LayerContext context) {
         final LayerContext configuration = context != null ? context : new LayerContext();
         try {
-            ConfigurationEngine.storeConfiguration(serviceName, identifier, configuration, null);
-        } catch (JAXBException | IOException ex) {
+            serviceBusiness.create(serviceName, identifier, configuration, null);
+        } catch (ConfigurationException ex) {
             LOGGER.log(Level.SEVERE, "Error while creating instance", ex);
         }
     }
@@ -54,7 +51,12 @@ public abstract class AbstractMapServiceTest extends ServiceProcessTest {
     /** {@inheritDoc} */
     @Override
     protected boolean checkInstanceExist(final String identifier) {
-        return ConfigurationEngine.getServiceConfigurationIds(serviceName).contains(identifier);
+        try {
+            return serviceBusiness.getConfiguration(serviceName, identifier) != null;
+        } catch (ConfigurationException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+        }
+        return false;
     }
 
     /**
@@ -65,8 +67,8 @@ public abstract class AbstractMapServiceTest extends ServiceProcessTest {
      */
     protected void createCustomInstance(final String identifier, LayerContext context) {
         try {
-            ConfigurationEngine.storeConfiguration(serviceName, identifier, context, null);
-        }  catch (JAXBException | IOException ex) {
+            serviceBusiness.create(serviceName, identifier, context, null);
+        }  catch (ConfigurationException ex) {
             LOGGER.log(Level.SEVERE, "Error while creating custom instance", ex);
         }
     }
@@ -79,8 +81,8 @@ public abstract class AbstractMapServiceTest extends ServiceProcessTest {
     protected  LayerContext getConfig(final String identifier) {
         LayerContext context = null;
         try {
-            context = (LayerContext) ConfigurationEngine.getConfiguration(serviceName, identifier);
-        } catch (JAXBException | FileNotFoundException ex) {
+            context = (LayerContext) serviceBusiness.getConfiguration(serviceName, identifier);
+        } catch (ConfigurationException ex) {
             LOGGER.log(Level.SEVERE, "Error while getting configuration", ex);
         }
         return context;
