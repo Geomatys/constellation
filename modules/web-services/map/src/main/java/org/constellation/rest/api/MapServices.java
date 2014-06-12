@@ -117,7 +117,7 @@ public final class MapServices {
             LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
             throw e;
         }
-        return Response.ok().build();
+        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     @POST
@@ -129,7 +129,7 @@ public final class MapServices {
             LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
             throw e;
         }
-        return Response.ok().build();
+        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     @POST
@@ -141,7 +141,7 @@ public final class MapServices {
             LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
             throw e;
         }
-        return Response.ok().build();
+        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     /**
