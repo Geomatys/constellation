@@ -51,20 +51,16 @@ public final class StyleRecord extends Record {
     private int provider;
     private StyleType type;
     private final Date date;
-    private final int title;
-    private final int description;
     private String owner;
 
     StyleRecord(final Session session, final int id, final String name, final int provider, final StyleType type,
-                final Date date, final int title, final int description, final String owner) {
+                final Date date, final String owner) {
         this.session     = session;
         this.id          = id;
         this.name        = name;
         this.provider    = provider;
         this.type        = type;
         this.date        = date;
-        this.title       = title;
-        this.description = description;
         this.owner       = owner;
     }
 
@@ -74,8 +70,7 @@ public final class StyleRecord extends Record {
                 rs.getInt(3),
                 StyleType.valueOf(rs.getString(4)),
                 new Date(rs.getLong(5)),
-                rs.getInt(6),rs.getInt(7),
-                rs.getString(8));
+                rs.getString(6));
     }
 
     /**
@@ -122,25 +117,6 @@ public final class StyleRecord extends Record {
         return date;
     }
 
-    public String getTitle(final Locale locale) throws SQLException {
-        ensureConnectionNotClosed();
-        return session.readI18n(title, locale);
-    }
-
-    public void setTitle(final Locale locale, final String value) throws SQLException {
-        ensureConnectionNotClosed();
-        session.updateI18n(title, locale, value);
-    }
-
-    public String getDescription(final Locale locale) throws SQLException {
-        ensureConnectionNotClosed();
-        return session.readI18n(description, locale);
-    }
-
-    public void setDescription(final Locale locale, final String value) throws SQLException {
-        ensureConnectionNotClosed();
-        session.updateI18n(description, locale, value);
-    }
 
     public InputStream getBody() throws SQLException {
         ensureConnectionNotClosed();

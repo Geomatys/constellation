@@ -244,7 +244,7 @@ public final class WSEngine {
      * @return The new instancied {@link Worker}.
      */
     public static Worker buildWorker(final String serviceType, final String identifier) {
-        final Class<? extends Worker> workerClass = getServiceWorkerClass(serviceType);
+        final Class<? extends Worker> workerClass = getServiceWorkerClass(serviceType.toUpperCase());
         return workerFactory.build(workerClass, identifier);
     }
 

@@ -53,10 +53,6 @@ public class JooqLayerRepository extends AbstractJooqRespository<LayerRecord, La
         newRecord.setNamespace(layer.getNamespace());
         newRecord.setService(layer.getService());
         newRecord.setDate(layer.getDate());
-        // TODO REMOVE I18N
-        newRecord.setTitle(0);
-        newRecord.setDescription(0);
-        // END
 
         if (newRecord.store() > 0)
             return newRecord.into(Layer.class);

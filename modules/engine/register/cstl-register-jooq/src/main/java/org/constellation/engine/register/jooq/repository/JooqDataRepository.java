@@ -50,7 +50,6 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
     public Data save(Data data) {
         DataRecord newRecord = dsl.newRecord(DATA);
         newRecord.setDate(data.getDate());
-        newRecord.setDescription(data.getDescription());
         newRecord.setIsoMetadata(data.getIsoMetadata());
         newRecord.setMetadata(data.getMetadata());
         newRecord.setName(data.getName());
@@ -58,7 +57,6 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
         newRecord.setOwner(data.getOwner());
         newRecord.setProvider(data.getProvider());
         newRecord.setType(data.getType());
-        newRecord.setTitle(data.getTitle());
         newRecord.store();
         return newRecord.into(Data.class);
     }

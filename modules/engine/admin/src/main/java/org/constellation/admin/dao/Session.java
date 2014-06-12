@@ -289,19 +289,6 @@ public final class Session implements Closeable {
     }
 
 
-    /**************************************************************************
-     *                         i18n-id sequence query                         *
-     **************************************************************************/
-
-    /**
-     * Queries the next value for the {@code "admin"."i18n-id"} sequence.
-     *
-     * @return the generated id
-     * @throws SQLException if a database access error occurs
-     */
-    private Integer nextIdForI18n() throws SQLException {
-        return new Query(READ_NEXT_I18N_ID).select().getFirstAt(1, Integer.class);
-    }
 
 
     /**************************************************************************
@@ -852,16 +839,14 @@ public final class Session implements Closeable {
 
         // Prepare insertion.
         final Date date           = new Date();
-        final Integer title       = nextIdForI18n();
-        final int description     = nextIdForI18n();
         final StringReader reader = new StringReader(IOUtilities.writeStyle(body));
         final String login        = owner;
 
         // Proceed to insertion.
-        final int id = new Query(WRITE_STYLE).with(name, provider.id, type.name(), date.getTime(), title, description, reader, login).insert();
+        final int id = new Query(WRITE_STYLE).with(name, provider.id, type.name(), date.getTime(), reader, login).insert();
 
         // Return inserted line.
-        return new StyleRecord(this, id, name, provider.id, type, date, title, description, login);
+        return new StyleRecord(this, id, name, provider.id, type, date, login);
     }
 
     /**
@@ -961,14 +946,12 @@ public final class Session implements Closeable {
 
         // Prepare insertion.
         final Date date           = new Date();
-        final Integer title       = nextIdForI18n();
-        final int description     = nextIdForI18n();
         final String login        = owner;
         // Proceed to insertion.
-        final int id = new Query(WRITE_DATA).with(name.getLocalPart(), name.getNamespaceURI(), provider.id, type.name(), date.getTime(), title, description, login, sensorable).insert();
+        final int id = new Query(WRITE_DATA).with(name.getLocalPart(), name.getNamespaceURI(), provider.id, type.name(), date.getTime(), login, sensorable).insert();
 
         // Return inserted line.
-        return new DataRecord(this, id, name.getLocalPart(), name.getNamespaceURI(), provider.id, type, "", true, sensorable, date, title, description, login, null);
+        return new DataRecord(this, id, name.getLocalPart(), name.getNamespaceURI(), provider.id, type, "", true, sensorable, date, login, null);
     }
 
     /* internal */ void updateData(final int generatedId, final String newName, final String newNamespace, final int newProvider, final DataType newType, final String newSubtype, final String newOwner) throws SQLException {
@@ -1128,14 +1111,12 @@ public final class Session implements Closeable {
 
         // Prepare insertion.
         final Date date           = new Date();
-        final Integer title       = nextIdForI18n();
-        final int description     = nextIdForI18n();
         final String login        = owner;
         // Proceed to insertion.
-        final int id = new Query(WRITE_SERVICE).with(identifier, spec.name(), date.getTime(), title, description, config, login).insert();
+        final int id = new Query(WRITE_SERVICE).with(identifier, spec.name(), date.getTime(), config, login).insert();
 
         // Return inserted line.
-        return new ServiceRecord(this, id, identifier, spec, date, title, description, login, null);
+        return new ServiceRecord(this, id, identifier, spec, date, login, null);
     }
 
     public void writeServiceExtraConfig(final String identifier, final Specification spec, final StringReader config, final String fileName) throws SQLException {
@@ -1240,14 +1221,12 @@ public final class Session implements Closeable {
 
         // Prepare insertion.
         final Date date           = new Date();
-        final Integer title       = nextIdForI18n();
-        final int description     = nextIdForI18n();
         final String login        = owner;
         // Proceed to insertion.
-        final int id = new Query(WRITE_LAYER).with(name.getLocalPart(), name.getNamespaceURI(), alias, service.id, data.id, date.getTime(), title, description, config, login).insert();
+        final int id = new Query(WRITE_LAYER).with(name.getLocalPart(), name.getNamespaceURI(), alias, service.id, data.id, date.getTime(), config, login).insert();
 
         // Return inserted line.
-        return new LayerRecord(this, id, name.getLocalPart(), name.getNamespaceURI(), alias, service.id, data.id, date, title, description, login);
+        return new LayerRecord(this, id, name.getLocalPart(), name.getNamespaceURI(), alias, service.id, data.id, date,login);
     }
 
     /* internal */ void updateLayer(final int generatedId, final String newName, final String newNamespace, final String newAlias, final int newService, final int newData, final String newOwner) throws SQLException {
@@ -1297,15 +1276,13 @@ public final class Session implements Closeable {
 
         // Prepare insertion.
         final TaskState state = TaskState.PENDING;
-        final Integer title   = nextIdForI18n();
-        final int description = nextIdForI18n();
         final Date start      = new Date();
 
         // Proceed to insertion.
-        new Query(WRITE_TASK).with(identifier, state.name(), type, title, description, start, owner).insert();
+        new Query(WRITE_TASK).with(identifier, state.name(), type, start, owner).insert();
 
         // Return inserted line.
-        return new TaskRecord(this, identifier, state, type, title, description, start, null, owner);
+        return new TaskRecord(this, identifier, state, type, start, null, owner);
     }
 
     /* internal */ void updateTask(final String identifier, final TaskState newState) throws SQLException {

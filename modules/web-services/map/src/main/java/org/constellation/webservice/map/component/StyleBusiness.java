@@ -144,7 +144,8 @@ public final class StyleBusiness {
         final StyleBrief brief = new StyleBrief();
         brief.setName(record.getName());
         brief.setProvider(record.getProvider().getIdentifier());
-        brief.setTitle(record.getTitle(locale));
+        //FIXME I18N
+        brief.setTitle("TODO " + locale);
         brief.setDate(record.getDate());
         brief.setType(record.getType().name());
         brief.setOwner(record.getOwnerLogin());
@@ -296,7 +297,8 @@ public final class StyleBusiness {
             final StyleRecord record = ConfigurationEngine.getStyle(styleId, providerId);
             if (record != null) {
                 report.setBrief(getBriefFromRecord(record, locale));
-                report.setDescription(record.getDescription(locale));
+                //FIXME I18N
+                report.setDescription("TODO" + locale);
                 report.setTargetData(new ArrayList<DataBrief>());
                 final List<DataRecord> data = record.getLinkedData();
                 for (final DataRecord r : data) {
@@ -346,7 +348,8 @@ public final class StyleBusiness {
         brief.setName(record.getName());
         brief.setNamespace(record.getNamespace());
         brief.setProvider(record.getProvider().getIdentifier());
-        brief.setTitle(record.getTitle(locale));
+        //FIXME I18N
+        brief.setTitle("TODO " + locale);
         brief.setDate(record.getDate());
         brief.setType(record.getType().name());
         brief.setOwner(record.getOwnerLogin());

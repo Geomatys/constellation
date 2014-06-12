@@ -26,8 +26,6 @@ public class Service {
     private String identifier;
     private String type;
     private long date;
-    private int title;
-    private int description;
     private String config;
     private String owner;
     private String metadata;
@@ -67,22 +65,6 @@ public class Service {
         this.date = date;
     }
 
-    public int getTitle() {
-        return this.title;
-    }
-
-    public void setTitle(int title) {
-        this.title = title;
-    }
-
-    public int getDescription() {
-        return this.description;
-    }
-
-    public void setDescription(int description) {
-        this.description = description;
-    }
-
     public String getConfig() {
         return this.config;
     }
@@ -100,52 +82,46 @@ public class Service {
         this.owner = owner;
     }
 
-    
     public String getMetadata() {
-		return metadata;
-	}
+        return metadata;
+    }
 
-	public void setMetadata(String metadata) {
-		this.metadata = metadata;
-	}
-	
-	public String getMetadataId() {
-		return metadataId;
-	}
+    public void setMetadata(String metadata) {
+        this.metadata = metadata;
+    }
 
-	public void setMetadataId(String metadataId) {
-		this.metadataId = metadataId;
-	}
+    public String getMetadataId() {
+        return metadataId;
+    }
+
+    public void setMetadataId(String metadataId) {
+        this.metadataId = metadataId;
+    }
 
     public boolean hasIsoMetadata() {
         return StringUtils.isNotBlank(metadata);
     }
 
-	public String getStatus() {
-	    return status;
+    public String getStatus() {
+        return status;
     }
 
-	public void setStatus(String status) {
-	    this.status = status;
+    public void setStatus(String status) {
+        this.status = status;
     }
-
-	
 
     public String getVersions() {
-	    return versions;
+        return versions;
     }
 
-	public void setVersions(String versions) {
-	    this.versions = versions;
+    public void setVersions(String versions) {
+        this.versions = versions;
     }
 
-	@Override
+    @Override
     public String toString() {
-        return "ServiceDTO [id=" + id + ", identifier=" + identifier + ", type=" + type + ", date=" + date + ", title="
-                + title + ", description=" + description + ", config=" + config + ", owner=" + owner + "]";
+        return "ServiceDTO [id=" + id + ", identifier=" + identifier + ", type=" + type + ", date=" + date
+                + ", config=" + config + ", owner=" + owner + "]";
     }
 
-
-
-	
 }

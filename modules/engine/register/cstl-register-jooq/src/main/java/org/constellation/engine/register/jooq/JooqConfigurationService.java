@@ -91,7 +91,8 @@ public class JooqConfigurationService implements ConfigurationService {
 
     @Autowired
     private LayerRepository layerRepository;
-
+    
+    
     /**
      * Store configuration, this method is too "generic" and should be refactored/splited.
      * <br />
@@ -129,9 +130,6 @@ public class JooqConfigurationService implements ConfigurationService {
             service.setStatus(ServiceStatus.STOPPED.toString());
             // @TODO
             service.setVersions("1.3.0");
-
-            
-            
             serviceRepository.create(service);
         }
          

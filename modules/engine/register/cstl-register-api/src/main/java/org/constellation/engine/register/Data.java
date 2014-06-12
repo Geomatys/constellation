@@ -31,8 +31,6 @@ public class Data {
     private String type;
     private String subtype;
     private long date;
-    private int title;
-    private int description;
     private String owner;
     private List<Integer> styleIds;
     private String metadata;
@@ -40,14 +38,12 @@ public class Data {
     private String isoMetaData;
     private boolean sensorable;
 
-    
     public Integer getId() {
         return id;
     }
 
-    
     public void setId(Integer id) {
-        this.id = id;        
+        this.id = id;
     }
 
     public String getName() {
@@ -62,7 +58,6 @@ public class Data {
         return provider;
     }
 
-
     public String getType() {
         return type;
     }
@@ -71,23 +66,13 @@ public class Data {
         return date;
     }
 
-    public int getTitle() {
-        return title;
-    }
-
-    public int getDescription() {
-        return description;
-    }
-
     public String getOwner() {
         return owner;
     }
 
-
     public List<Integer> getStyles() {
         return styleIds;
     }
-
 
     public String getMetadata() {
         return metadata;
@@ -113,14 +98,6 @@ public class Data {
         this.date = date;
     }
 
-    public void setTitle(int title) {
-        this.title = title;
-    }
-
-    public void setDescription(int description) {
-        this.description = description;
-    }
-
     public void setOwner(String owner) {
         this.owner = owner;
     }
@@ -133,57 +110,47 @@ public class Data {
         this.metadata = metaData;
     }
 
-    
     public String getIsoMetadata() {
         return isoMetaData;
     }
 
-   public void setIsoMetaData(String isoMetaData) {
-    this.isoMetaData = isoMetaData;
-}
+    public void setIsoMetaData(String isoMetaData) {
+        this.isoMetaData = isoMetaData;
+    }
 
     @Override
     public String toString() {
-        return "Data [id=" + id + ", name=" + name + ", namespace=" + namespace + ", provider=" + provider
-                + ", type=" + type + ", date=" + date + ", title=" + title + ", description=" + description
-                + ", owner=" + owner + ", styleIds=" + styleIds + ", metadata=" + metadata + ", isoMetaData="
-                + isoMetaData + "]";
+        return "Data [id=" + id + ", name=" + name + ", namespace=" + namespace + ", provider=" + provider + ", type="
+                + type + ", date=" + date + ", owner=" + owner + ", styleIds=" + styleIds + ", metadata=" + metadata
+                + ", isoMetaData=" + isoMetaData + "]";
     }
-
 
     public boolean isSensorable() {
         return sensorable;
     }
 
-
     public void setSensorable(boolean sensorable) {
         this.sensorable = sensorable;
     }
-
 
     public boolean hasIsoMetadata() {
         return StringUtils.isNotBlank(isoMetaData);
     }
 
-
-
     public String getMetadataId() {
         return metadataId;
     }
-
 
     public void setMetadataId(String metadataId) {
         this.metadataId = metadataId;
     }
 
-
     public String getSubtype() {
         return subtype;
     }
 
-
     public void setSubtype(String subtype) {
         this.subtype = subtype;
     }
-    
+
 }

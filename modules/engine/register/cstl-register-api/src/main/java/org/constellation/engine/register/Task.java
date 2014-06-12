@@ -18,38 +18,72 @@
  */
 package org.constellation.engine.register;
 
-public interface Task {
+public class Task {
 
-    public abstract void setOwner(User owner);
+    private String identifier;
 
-    public abstract User getOwner();
+    private String owner;
 
-    public abstract void setEnd(int end);
+    private int end;
 
-    public abstract int getEnd();
+    private int start;
 
-    public abstract void setStart(long start);
+    private String type;
 
-    public abstract long getStart();
+    private String state;
 
-    public abstract void setDescription(int description);
+    public String getIdentifier() {
+        return identifier;
+    }
 
-    public abstract int getDescription();
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
 
-    public abstract void setTitle(int title);
+    public String getOwner() {
+        return owner;
+    }
 
-    public abstract int getTitle();
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
 
-    public abstract void setType(String type);
+    public int getEnd() {
+        return end;
+    }
 
-    public abstract String getType();
+    public void setEnd(int end) {
+        this.end = end;
+    }
 
-    public abstract void setState(String state);
+    public int getStart() {
+        return start;
+    }
 
-    public abstract String getState();
+    public void setStart(int start) {
+        this.start = start;
+    }
 
-    public abstract void setIdentifier(String identifier);
+    public String getType() {
+        return type;
+    }
 
-    public abstract String getIdentifier();
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    @Override
+    public String toString() {
+        return "Task [identifier=" + identifier + ", owner=" + owner + ", end=" + end + ", start=" + start + ", type="
+                + type + ", state=" + state + "]";
+    }
 
 }

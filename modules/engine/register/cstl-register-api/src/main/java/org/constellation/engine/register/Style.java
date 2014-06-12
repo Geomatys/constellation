@@ -22,8 +22,6 @@ public class Style {
 
     private String owner;
     private String body;
-    private int description;
-    private int title;
     private long date;
     private String type;
     private int provider;
@@ -46,25 +44,6 @@ public class Style {
         return body;
     }
 
-
-    public void setDescription(int description) {
-        this.description = description;
-    }
-
-
-    public int getDescription() {
-        return description;
-    }
-
-
-    public void setTitle(int title) {
-        this.title = title;
-    }
-
-
-    public int getTitle() {
-        return title;
-    }
 
 
     public void setDate(long date) {

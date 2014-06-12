@@ -43,20 +43,16 @@ public final class ServiceRecord extends Record {
     private String identifier;
     private Specification type;
     private final Date date;
-    private final int title;
-    private final int description;
     private String owner;
     private String metadataId;
 
     ServiceRecord(final Session session, final int id, final String identifier, final Specification type,
-                  final Date date, final int title, final int description, final String owner, final String metadataId) {
+                  final Date date, final String owner, final String metadataId) {
         this.session     = session;
         this.id          = id;
         this.identifier  = identifier;
         this.type        = type;
         this.date        = date;
-        this.title       = title;
-        this.description = description;
         this.owner       = owner;
         this.metadataId  = metadataId;
     }
@@ -66,10 +62,8 @@ public final class ServiceRecord extends Record {
                 rs.getString(2),
                 Specification.valueOf(rs.getString(3)),
                 new Date(rs.getLong(4)),
-                rs.getInt(5),
-                rs.getInt(6),
-                rs.getString(7),
-                rs.getString(8));
+                rs.getString(5),
+                rs.getString(6));
     }
 
     /**
@@ -105,26 +99,7 @@ public final class ServiceRecord extends Record {
         return date;
     }
 
-    public String getTitle(final Locale locale) throws SQLException {
-        ensureConnectionNotClosed();
-        return session.readI18n(title, locale);
-    }
-
-    public void setTitle(final Locale locale, final String value) throws SQLException {
-        ensureConnectionNotClosed();
-        session.updateI18n(title, locale, value);
-    }
-
-    public String getDescription(final Locale locale) throws SQLException {
-        ensureConnectionNotClosed();
-        return session.readI18n(description, locale);
-    }
-
-    public void setDescription(final Locale locale, final String value) throws SQLException {
-        ensureConnectionNotClosed();
-        session.updateI18n(description, locale, value);
-    }
-
+    
     public InputStream getConfig() throws SQLException {
         ensureConnectionNotClosed();
         return session.readServiceConfig(id);

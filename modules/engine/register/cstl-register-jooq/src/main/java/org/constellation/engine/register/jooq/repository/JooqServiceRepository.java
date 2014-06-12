@@ -88,8 +88,6 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
         newRecord.setType(service.getType());
         newRecord.setConfig(service.getConfig());
         newRecord.setDate(service.getDate());
-        newRecord.setTitle(0);
-        newRecord.setDescription(0);
         if (newRecord.store() > 0) {
             return newRecord.into(Service.class);
         }
@@ -180,12 +178,10 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
     	ServiceRecord serviceRecord = dsl.newRecord(SERVICE);
 		serviceRecord.setConfig(service.getConfig());
 		serviceRecord.setDate(service.getDate());
-		serviceRecord.setDescription(service.getDescription());
 		serviceRecord.setIdentifier(service.getIdentifier());
 		serviceRecord.setMetadata(service.getMetadata());
 		serviceRecord.setMetadataId(service.getMetadataId());
 		serviceRecord.setType(service.getType());
-		serviceRecord.setTitle(service.getTitle());
 		serviceRecord.setOwner(service.getOwner());
 		serviceRecord.setStatus(service.getStatus());
 		serviceRecord.setVersions(service.getVersions());

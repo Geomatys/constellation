@@ -43,12 +43,10 @@ public final class LayerRecord extends Record {
     private int service;
     private int data;
     private Date date;
-    private int title;
-    private int description;
     private String owner;
 
     LayerRecord(final Session session, final int id, final String name, final String namespace, final String alias, final int service, final int data,
-                       final Date date, final int title, final int description, final String owner) {
+                       final Date date, final String owner) {
         this.session     = session;
         this.id          = id;
         this.name        = name;
@@ -57,8 +55,6 @@ public final class LayerRecord extends Record {
         this.service     = service;
         this.data        = data;
         this.date        = date;
-        this.title       = title;
-        this.description = description;
         this.owner       = owner;
     }
 
@@ -70,9 +66,7 @@ public final class LayerRecord extends Record {
                 rs.getInt(5),
                 rs.getInt(6),
                 new Date(rs.getLong(7)),
-                rs.getInt(8),
-                rs.getInt(9),
-                rs.getString(10));
+                rs.getString(8));
     }
 
     public void ensureConnectionNotClosed() throws SQLException {
@@ -135,26 +129,6 @@ public final class LayerRecord extends Record {
         this.data = data.id;
         ensureConnectionNotClosed();
         session.updateLayer(id, name, namespace, alias, service, data.id, owner);
-    }
-
-    public String getTitle(final Locale locale) throws SQLException {
-        ensureConnectionNotClosed();
-        return session.readI18n(title, locale);
-    }
-
-    public void setTitle(final Locale locale, final String value) throws SQLException {
-        ensureConnectionNotClosed();
-        session.updateI18n(title, locale, value);
-    }
-
-    public String getDescription(final Locale locale) throws SQLException {
-        ensureConnectionNotClosed();
-        return session.readI18n(description, locale);
-    }
-
-    public void setDescription(final Locale locale, final String value) throws SQLException {
-        ensureConnectionNotClosed();
-        session.updateI18n(description, locale, value);
     }
 
     public Object getConfig() throws SQLException {

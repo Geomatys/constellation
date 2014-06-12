@@ -34,7 +34,6 @@ public class TestSamples {
     public static Data newData(User owner, Provider provider) {
         Data data = new Data();
         data.setDate(new Date().getTime());
-        data.setDescription(1);
         data.setName("testdata");
         data.setNamespace("");
         data.setOwner(owner.getLogin());
