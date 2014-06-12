@@ -339,9 +339,9 @@ public final class OGCServicesRest {
     @GET
     @Path("{id}/metadata")
     public Response getMetadata(final @PathParam("spec") String serviceType, final @PathParam("id") String id) throws ConfigurationException {
-        serviceBusiness.ensureExistingInstance(serviceType.toUpperCase(), id);
+        serviceBusiness.ensureExistingInstance(serviceType, id);
         // todo add language parameter
-        return ok(serviceBusiness.getInstanceMetadata(serviceType.toUpperCase(), id));
+        return ok(serviceBusiness.getInstanceMetadata(serviceType, id));
     }
 
     /**

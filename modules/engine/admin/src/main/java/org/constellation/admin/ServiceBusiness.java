@@ -400,10 +400,10 @@ public class ServiceBusiness {
      * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
     public org.constellation.dto.Service getInstanceMetadata(final String serviceType, final String identifier) throws ConfigurationException {
-        this.ensureExistingInstance(serviceType.toUpperCase(), identifier);
+        this.ensureExistingInstance(serviceType, identifier);
         try {
             // todo add language parameter
-            return ConfigurationEngine.readServiceMetadata(identifier, serviceType.toUpperCase(), null);
+            return ConfigurationEngine.readServiceMetadata(identifier, serviceType, null);
         } catch (JAXBException | IOException ex) {
             throw new ConfigurationException("The serviceMetadata.xml file can't be read.", ex);
         }
@@ -432,7 +432,7 @@ public class ServiceBusiness {
      * @throws TargetNotFoundException if the service with specified identifier does not exist
      */
     public void ensureExistingInstance(final String spec, final String identifier) throws TargetNotFoundException {
-        if (!WSEngine.serviceInstanceExist(spec.toUpperCase(), identifier)) {
+        if (!WSEngine.serviceInstanceExist(spec, identifier)) {
             if (!ConfigurationEngine.serviceConfigurationExist(spec, identifier)) {
                 throw new TargetNotFoundException(spec + " service instance with identifier \"" + identifier +
                         "\" not found. There is not configuration in the database.");

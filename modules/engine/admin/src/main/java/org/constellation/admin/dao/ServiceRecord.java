@@ -60,7 +60,7 @@ public final class ServiceRecord extends Record {
     public ServiceRecord(final Session s, final ResultSet rs) throws SQLException {
         this(s, rs.getInt(1),
                 rs.getString(2),
-                Specification.valueOf(rs.getString(3)),
+                Specification.valueOf(rs.getString(3).toUpperCase()),
                 new Date(rs.getLong(4)),
                 rs.getString(5),
                 rs.getString(6));

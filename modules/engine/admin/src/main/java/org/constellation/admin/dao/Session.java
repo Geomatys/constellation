@@ -1074,7 +1074,7 @@ public final class Session implements Closeable {
     public ServiceRecord readService(final String identifier, final String spec) throws SQLException {
         ensureNonNull("identifier", identifier);
         ensureNonNull("spec",       spec);
-        return new Query(READ_SERVICE).with(identifier, spec.toUpperCase()).select().getFirst(ServiceRecord.class);
+        return new Query(READ_SERVICE).with(identifier, spec).select().getFirst(ServiceRecord.class);
     }
 
     /* internal */ InputStream readServiceConfig(final int generatedId) throws SQLException {
@@ -1098,7 +1098,7 @@ public final class Session implements Closeable {
     }
 
     public List<ServiceRecord> readServices(final Specification spec) throws SQLException {
-        return new Query(LIST_SERVICES_FROM_TYPE).with(spec.name().toUpperCase()).select().getAll(ServiceRecord.class);
+        return new Query(LIST_SERVICES_FROM_TYPE).with(spec.name()).select().getAll(ServiceRecord.class);
     }
 
     public List<ServiceRecord> readDataServices(final DataRecord record) throws SQLException {
