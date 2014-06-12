@@ -83,12 +83,15 @@ import java.util.List;
 import java.util.logging.Level;
 
 import javax.xml.namespace.QName;
+import org.constellation.process.ConstellationProcessFactory;
+import org.geotoolkit.process.ProcessFinder;
 
 import static org.geotoolkit.style.StyleConstants.DEFAULT_CATEGORIZE_LOOKUP;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_DESCRIPTION;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_FALLBACK;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_GEOM;
 import static org.geotoolkit.style.StyleConstants.LITERAL_ONE_FLOAT;
+import org.opengis.util.NoSuchIdentifierException;
 
 /**
  * {@link org.constellation.configuration.ServiceConfigurer} base for "map" services.
@@ -105,6 +108,20 @@ public class MapConfigurer extends OGCConfigurer {
     StyleBusiness styleBusiness;
 
     /**
+     * Returns a Constellation {@link ProcessDescriptor} from its name.
+     *
+     * @param name the process descriptor name
+     * @return a {@link ProcessDescriptor} instance
+     */
+    protected ProcessDescriptor getProcessDescriptor(final String name) {
+        try {
+            return ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, name);
+        } catch (NoSuchIdentifierException ex) { // unexpected
+            throw new IllegalStateException("Unexpected error has occurred", ex);
+        }
+    }
+    
+    /**
      * Adds a new layer to a "map" service instance.
      *
      * @param addLayerData the layer to be added
@@ -112,7 +129,7 @@ public class MapConfigurer extends OGCConfigurer {
      * @throws ConfigurationException if the operation has failed for any reason
      */
     public void addLayer(final AddLayer addLayerData) throws ConfigurationException {
-        this.ensureExistingInstance(addLayerData.getServiceType(), addLayerData.getServiceId());
+        serviceBusiness.ensureExistingInstance(addLayerData.getServiceType(), addLayerData.getServiceId());
 
         final DataProvider provider = DataProviders.getInstance().getProvider(addLayerData.getProviderId());
         final String namespace;
@@ -243,10 +260,10 @@ public class MapConfigurer extends OGCConfigurer {
      * @throws ConfigurationException if the operation has failed for any reason
      */
     public List<Layer> getLayers(final String spec, final String identifier) throws ConfigurationException {
-        this.ensureExistingInstance(spec, identifier);
+        serviceBusiness.ensureExistingInstance(spec, identifier);
 
         // Extracts the layer list from service configuration.
-        final LayerContext layerContext = (LayerContext) this.getInstanceConfiguration(spec, identifier);
+        final LayerContext layerContext = (LayerContext) serviceBusiness.getInstanceConfiguration(spec, identifier);
         List<Layer> layers = MapUtilities.getConfigurationLayers(layerContext, null, null);
 
         for (Layer layer : layers) {
@@ -303,7 +320,7 @@ public class MapConfigurer extends OGCConfigurer {
             if(found){
                 ConfigurationEngine.storeConfiguration(spec, serviceId, layerContext);
                 ConfigurationEngine.deleteLayer(serviceId, spec, name);
-                restartInstance(spec, serviceId, true);
+                serviceBusiness.restartInstance(spec, serviceId, true);
             }
 
         } catch (Exception e) {

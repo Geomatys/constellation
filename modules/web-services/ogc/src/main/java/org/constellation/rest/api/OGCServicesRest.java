@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -42,6 +41,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.ServiceDef.Specification;
+import org.constellation.admin.ServiceBusiness;
 import org.constellation.configuration.*;
 import org.constellation.dto.Service;
 import org.constellation.dto.SimpleValue;
@@ -78,6 +78,9 @@ public final class OGCServicesRest {
     
     @Inject
     private ServiceRepository serviceRepository;
+    
+    @Inject
+    private ServiceBusiness serviceBusiness;
     
     /**
      * @see OGCConfigurer#getInstance(String)
@@ -116,23 +119,24 @@ public final class OGCServicesRest {
     }
     
     /**
-     * @see OGCConfigurer#createInstance(String, Service, Object)
+     * Creates a new service instance.
+     *
+     * @param domainId
+     * @param spec      The type of the service.
+     * @param metadata  The service metadata (can be null)
+     *
+     * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
     @PUT
     @Path("domain/{domainId}")
-    public Response addInstance(@PathParam("domainId") int domainId, final @PathParam("spec") String spec, final Service metadata) throws Exception {
+    public Response addInstance(@PathParam("domainId") int domainId, final @PathParam("spec") String spec, final Service metadata) throws ConfigurationException {
         
         org.constellation.engine.register.Service service = serviceRepository.findByIdentifierAndType(metadata.getIdentifier(), spec);
         if(service != null) {
             return Response.serverError().entity("admin.error.service.exist").build();
         }
         
-        try {
-            getConfigurer(spec).createInstance(spec, metadata.getIdentifier(), metadata, null);
-        } catch (ConfigurationException e) {
-            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
-            throw e;
-        }
+        serviceBusiness.createInstance(spec, metadata.getIdentifier(), null, metadata);
         
         service = serviceRepository.findByIdentifierAndType(metadata.getIdentifier(), spec);
         
@@ -142,121 +146,144 @@ public final class OGCServicesRest {
     }
 
     /**
-     * @see OGCConfigurer#startInstance(String)
+     * Starts a service instance.
+     *
+     * @param serviceType The type of the service.
+     * @param id          The service identifier
+     *
+     * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
     @POST
     @Path("{id}/start")
-    public Response start(final @PathParam("spec") String spec, final @PathParam("id") String id) throws Exception {
-        try {
-        	
-            getConfigurer(spec).startInstance(spec, id);
-        } catch (ConfigurationException e) {
-            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
-            throw e;
-        }
-        return ok(AcknowlegementType.success(spec.toUpperCase() + " service \"" + id + "\" successfully started."));
+    public Response start(final @PathParam("spec") String serviceType, final @PathParam("id") String id) throws ConfigurationException {
+        serviceBusiness.ensureExistingInstance(serviceType, id);
+        serviceBusiness.startInstance(serviceType, id);
+        
+        return ok(AcknowlegementType.success(serviceType.toUpperCase() + " service \"" + id + "\" successfully started."));
     }
 
     /**
-     * @see OGCConfigurer#stopInstance(String)
+     * Stops a service instance.
+     *
+     * @param serviceType The type of the service.
+     * @param id          The service identifier
+     *
+     * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
     @POST
     @Path("{id}/stop")
-    public Response stop(final @PathParam("spec") String spec, final @PathParam("id") String id) throws Exception {
-        try {
-            getConfigurer(spec).stopInstance(spec, id);
-        } catch (ConfigurationException e) {
-            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
-            throw e;
-        }
-        return ok(AcknowlegementType.success(spec.toUpperCase() + " service \"" + id + "\" successfully stopped."));
+    public Response stop(final @PathParam("spec") String serviceType, final @PathParam("id") String id) throws ConfigurationException {
+        serviceBusiness.ensureExistingInstance(serviceType, id);
+        serviceBusiness.stopInstance(serviceType, id);
+        return ok(AcknowlegementType.success(serviceType.toUpperCase() + " service \"" + id + "\" successfully stopped."));
     }
 
     /**
-     * @see OGCConfigurer#restartInstance(String, boolean)
+     * Restarts a service instance.
+     *
+     * @param serviceType The type of the service.
+     * @param id          The service identifier
+     * @param stopFirst   Indicates if the service should be closed before trying to restart it
+     *
+     * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
     @POST
     @Path("{id}/restart")
-    public Response restart(final @PathParam("spec") String spec, final @PathParam("id") String id, final SimpleValue stopFirst) throws Exception {
-        try {
-            getConfigurer(spec).restartInstance(spec, id, stopFirst.getAsBoolean());
-        } catch (ConfigurationException e) {
-            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
-            throw e;
-        }
-        return ok(AcknowlegementType.success(spec.toUpperCase() + " service \"" + id + "\" successfully restarted."));
+    public Response restart(final @PathParam("spec") String serviceType, final @PathParam("id") String id, final SimpleValue stopFirst) throws ConfigurationException {
+        serviceBusiness.ensureExistingInstance(serviceType, id);
+        serviceBusiness.restartInstance(serviceType, id, stopFirst.getAsBoolean());
+        return ok(AcknowlegementType.success(serviceType.toUpperCase() + " service \"" + id + "\" successfully restarted."));
     }
 
     /**
-     * @see OGCConfigurer#renameInstance(String, String)
+     * Renames a service instance.
+     *
+     * @param serviceType The type of the service.
+     * @param id          The current service identifier.
+     * @param newId       The new service identifier.
+     * 
+     * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
     @POST
     @Path("{id}/rename")
-    public Response rename(final @PathParam("spec") String spec, final @PathParam("id") String id, final SimpleValue newId) throws Exception {
-        try {
-            getConfigurer(spec).renameInstance(spec, id, newId.getValue());
-        } catch (ConfigurationException e) {
-            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
-            throw e;
-        }
-        return ok(AcknowlegementType.success(spec.toUpperCase() + " service \"" + id + "\" successfully renamed."));
+    public Response rename(final @PathParam("spec") String serviceType, final @PathParam("id") String id, final SimpleValue newId) throws ConfigurationException {
+        serviceBusiness.ensureExistingInstance(serviceType, id);
+        serviceBusiness.renameInstance(serviceType, id, newId.getValue());
+        return ok(AcknowlegementType.success(serviceType.toUpperCase() + " service \"" + id + "\" successfully renamed."));
     }
 
     /**
-     * @see OGCConfigurer#deleteInstance(String)
+     * Deletes a service instance.
+     *
+     * @param serviceType The type of the service.
+     * @param id          The service identifier.
+     * 
+     * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
     @DELETE
     @Path("{id}")
-    public Response delete(final @PathParam("spec") String spec, final @PathParam("id") String id) throws Exception {
-        try {
-            getConfigurer(spec).deleteInstance(spec, id);
-        } catch (ConfigurationException e) {
-            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
-            throw e;
-        }
-        return ok(AcknowlegementType.success(spec.toUpperCase() + " service \"" + id + "\" successfully deleted."));
+    public Response delete(final @PathParam("spec") String serviceType, final @PathParam("id") String id) throws ConfigurationException {
+        serviceBusiness.ensureExistingInstance(serviceType, id);
+        serviceBusiness.deleteInstance(serviceType, id);
+        return ok(AcknowlegementType.success(serviceType.toUpperCase() + " service \"" + id + "\" successfully deleted."));
     }
 
     /**
-     * @see OGCConfigurer#getInstanceConfiguration(String)
+     * Returns the configuration object of a service instance.
+     *
+     * @param serviceType The type of the service.
+     * @param id          The service identifier.
+     * 
+     * @return a configuration {@link Object} (depending on implementation)
+     * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
     @GET
     @Path("{id}/config")
-    public Response getConfiguration(final @PathParam("spec") String spec, final @PathParam("id") String id) throws Exception {
-        try {
-            return ok(getConfigurer(spec).getInstanceConfiguration(spec, id));
-        } catch (ConfigurationException e) {
-            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
-            throw e;
-        }
+    public Response getConfiguration(final @PathParam("spec") String serviceType, final @PathParam("id") String id) throws ConfigurationException {
+        serviceBusiness.ensureExistingInstance(serviceType, id);
+        return ok(serviceBusiness.getInstanceConfiguration(serviceType, id));
     }
 
     /**
-     * @see OGCConfigurer#setInstanceConfiguration(String, Object)
+     * Updates a service instance configuration object.
+     *
+     * @param serviceType The type of the service.
+     * @param id    the service identifier
+     * @param configuration the service configuration
+     * 
+     * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
     @POST
     @Consumes(MediaType.APPLICATION_XML)
     @Path("{id}/config")
-    public Response setConfiguration(final @PathParam("spec") String spec, final @PathParam("id") String id, final InputStream is) throws Exception {
+    public Response setConfiguration(final @PathParam("spec") String serviceType, final @PathParam("id") String id, final InputStream configuration) throws ConfigurationException {
         try {
             final Unmarshaller um = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-            final Object config = um.unmarshal(is);
+            final Object config = um.unmarshal(configuration);
             GenericDatabaseMarshallerPool.getInstance().recycle(um);
-            getConfigurer(spec).setInstanceConfiguration(spec, id, config);
-        } catch (ConfigurationException | JAXBException e) {
-            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
-            throw e;
+            
+            final Service metadata = serviceBusiness.getInstanceMetadata(serviceType, id);
+            serviceBusiness.configureInstance(serviceType, id, metadata, config);
+        } catch (JAXBException ex) {
+            throw new ConfigurationException("Error while unmarshalling configuration object.", ex);
         }
-        return ok(AcknowlegementType.success(spec.toUpperCase() + " service \"" + id + "\" configuration successfully updated."));
+        return ok(AcknowlegementType.success(serviceType.toUpperCase() + " service \"" + id + "\" configuration successfully updated."));
+        
     }
 
     /**
-     * @see OGCConfigurer#setInstanceConfiguration(String, Object)
+     * Updates a service instance configuration object.
+     *
+     * @param serviceType The type of the service.
+     * @param id    the service identifier
+     * @param configuration the service configuration
+     * 
+     * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("{id}/config")
-    public Response setConfigurationJson(final @PathParam("spec") String spec, final @PathParam("id") String id, final InputStream is) throws Exception {
+    public Response setConfigurationJson(final @PathParam("spec") String serviceType, final @PathParam("id") String id, final InputStream configuration) throws ConfigurationException {
         final Map<String, String> nSMap = new HashMap<>(0);
         nSMap.put("http://www.constellation.org/config", "constellation-config");
         final JettisonConfig config = JettisonConfig.mappedJettison().xml2JsonNs(nSMap).build();
@@ -269,7 +296,7 @@ public final class OGCServicesRest {
             final JettisonUnmarshaller jsonUnmarshaller = cxtx.createJsonUnmarshaller();
 
             final Class c;
-            final String json = FileUtilities.getStringFromStream(is);
+            final String json = FileUtilities.getStringFromStream(configuration);
             if (json.startsWith("{\"automatic\"")) {
                 c = Automatic.class;
             } else if (json.startsWith("{\"constellation-config.LayerContext\"")) {
@@ -284,41 +311,47 @@ public final class OGCServicesRest {
                 return ok(AcknowlegementType.failure("Unknown configuration object given, unable to update service configuration"));
             }
             final Object configObj = jsonUnmarshaller.unmarshalFromJSON(new StringReader(json), c);
-            getConfigurer(spec).setInstanceConfiguration(spec, id, configObj);
-        } catch (ConfigurationException | JAXBException | IOException e) {
-            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
-            throw e;
+            final Service metadata = serviceBusiness.getInstanceMetadata(serviceType, id);
+            serviceBusiness.configureInstance(serviceType, id, metadata, configObj);
+        } catch (JAXBException | IOException e) {
+            throw new ConfigurationException(e);
         }
-        return ok(AcknowlegementType.success(spec.toUpperCase() + " service \"" + id + "\" configuration successfully updated."));
+        return ok(AcknowlegementType.success(serviceType.toUpperCase() + " service \"" + id + "\" configuration successfully updated."));
     }
 
     /**
-     * @see OGCConfigurer#getInstanceMetadata(String)
+     * Returns a service instance metadata.
+     *
+     * @param serviceType The type of the service.
+     * @param id the service identifier
+     * @return 
+     * 
+     * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
     @GET
     @Path("{id}/metadata")
-    public Response getMetadata(final @PathParam("spec") String spec, final @PathParam("id") String id) throws Exception {
-        try {
-            return ok(getConfigurer(spec).getInstanceMetadata(spec, id));
-        } catch (ConfigurationException e) {
-            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
-            throw e;
-        }
+    public Response getMetadata(final @PathParam("spec") String serviceType, final @PathParam("id") String id) throws ConfigurationException {
+        serviceBusiness.ensureExistingInstance(serviceType.toUpperCase(), id);
+        // todo add language parameter
+        return ok(serviceBusiness.getInstanceMetadata(serviceType.toUpperCase(), id));
     }
 
     /**
-     * @see OGCConfigurer#setInstanceMetadata(String, Service)
+     * Updates a service instance metadata.
+     *
+     * @param serviceType The type of the service.
+     * @param id          The service identifier
+     * @param metadata    The service metadata
+     *
+     * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
     @POST
     @Path("{id}/metadata")
-    public Response setMetadata(final @PathParam("spec") String spec, final @PathParam("id") String id, final Service metadata) throws Exception {
-        try {
-            getConfigurer(spec).setInstanceMetadata(spec, id, metadata);
-        } catch (ConfigurationException e) {
-            LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
-            throw e;
-        }
-        return ok(AcknowlegementType.success(spec.toUpperCase() + " service \"" + id + "\" metadata successfully updated."));
+    public Response setMetadata(final @PathParam("spec") String serviceType, final @PathParam("id") String id, final Service metadata) throws ConfigurationException {
+        serviceBusiness.ensureExistingInstance(serviceType, id);
+        final Object config = serviceBusiness.getInstanceConfiguration(serviceType, id);
+        serviceBusiness.configureInstance(serviceType, id, metadata, config);
+        return ok(AcknowlegementType.success(serviceType.toUpperCase() + " service \"" + id + "\" metadata successfully updated."));
     }
 
     /**

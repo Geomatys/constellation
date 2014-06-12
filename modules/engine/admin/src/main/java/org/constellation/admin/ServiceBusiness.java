@@ -14,6 +14,7 @@ import org.constellation.admin.dto.ServiceDTO;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.admin.util.DefaultServiceConfiguration;
 import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.repository.LayerRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
@@ -321,5 +322,55 @@ public class ServiceBusiness {
 
     public org.constellation.engine.register.Service getServiceByIdentifierAndType(String serviceType, String identifier) {
         return serviceRepository.findByIdentifierAndType(identifier, serviceType);
+    }
+    
+    /**
+     * Returns a service instance metadata.
+     *
+     * @param serviceType The type of the service.
+     * @param identifier the service identifier
+     * @return 
+     * @throws TargetNotFoundException if the service with specified identifier does not exist
+     * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
+     */
+    public org.constellation.dto.Service getInstanceMetadata(final String serviceType, final String identifier) throws ConfigurationException {
+        this.ensureExistingInstance(serviceType.toUpperCase(), identifier);
+        try {
+            // todo add language parameter
+            return ConfigurationEngine.readServiceMetadata(identifier, serviceType.toUpperCase(), null);
+        } catch (JAXBException | IOException ex) {
+            throw new ConfigurationException("The serviceMetadata.xml file can't be read.", ex);
+        }
+    }
+    
+    /**
+     * Updates a service instance metadata.
+     *
+     * @param serviceType The type of the service.
+     * @param identifier the service identifier
+     * @param metadata   the service metadata
+     * @throws TargetNotFoundException if the service with specified identifier does not exist
+     * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
+     */
+    public void setInstanceMetadata(final String serviceType, final String identifier, final org.constellation.dto.Service metadata) throws ConfigurationException {
+        this.ensureExistingInstance(serviceType, identifier);
+        final Object config = getInstanceConfiguration(serviceType, identifier);
+        this.configureInstance(serviceType, identifier, metadata, config);
+    }
+    
+    /**
+     * Ensure that a service instance really exists.
+     *
+     * @param spec The service type.
+     * @param identifier the service identifier
+     * @throws TargetNotFoundException if the service with specified identifier does not exist
+     */
+    public void ensureExistingInstance(final String spec, final String identifier) throws TargetNotFoundException {
+        if (!WSEngine.serviceInstanceExist(spec.toUpperCase(), identifier)) {
+            if (!ConfigurationEngine.serviceConfigurationExist(spec, identifier)) {
+                throw new TargetNotFoundException(spec + " service instance with identifier \"" + identifier +
+                        "\" not found. There is not configuration in the database.");
+            }
+        }
     }
 }

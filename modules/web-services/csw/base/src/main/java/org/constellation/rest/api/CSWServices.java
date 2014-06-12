@@ -32,6 +32,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.constellation.ServiceDef.Specification;
+import org.constellation.admin.ServiceBusiness;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.BriefNode;
 import org.constellation.configuration.BriefNodeList;
@@ -41,6 +42,7 @@ import org.constellation.dto.SimpleValue;
 import org.constellation.metadata.configuration.CSWConfigurer;
 import static org.constellation.utils.RESTfulUtilities.ok;
 import org.constellation.ws.ServiceConfigurer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Node;
 
 /**
@@ -53,6 +55,9 @@ import org.w3c.dom.Node;
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public class CSWServices {
 
+    @Autowired
+    protected ServiceBusiness serviceBusiness;
+    
     @POST
     @Path("{id}/index/refresh")
     public Response refreshIndex(final @PathParam("id") String id, final ParameterValues values) throws Exception {
@@ -61,7 +66,7 @@ public class CSWServices {
         final CSWConfigurer conf = getConfigurer();
         final AcknowlegementType ack = conf.refreshIndex(id, asynchrone, forced);
         if (asynchrone && ack.getStatus().equals("Sucess")) {
-            conf.restartInstance("CSW", id, false);
+            serviceBusiness.restartInstance("CSW", id, false);
         }
         return ok(ack);
    }
