@@ -33,9 +33,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.ConfigurationException;
@@ -48,12 +52,16 @@ import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderFactory;
 import org.constellation.provider.configuration.AbstractConfigurator;
 import org.constellation.provider.configuration.Configurator;
+
 import static org.constellation.provider.configuration.ProviderParameters.*;
+
 import org.constellation.test.CstlDOMComparator;
 import org.constellation.test.utils.Order;
+import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.test.utils.TestRunner;
 import org.constellation.util.QNameComparator;
 import org.constellation.util.Util;
+import org.constellation.webservice.map.component.StyleBusiness;
 import org.constellation.wfs.ws.DefaultWFSWorker;
 import org.constellation.wfs.ws.WFSWorker;
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
@@ -81,8 +89,10 @@ import org.geotoolkit.ogc.xml.v200.SortByType;
 import org.geotoolkit.ogc.xml.v200.SortOrderType;
 import org.geotoolkit.ogc.xml.v200.SortPropertyType;
 import org.geotoolkit.ogc.xml.v200.SpatialOpsType;
+
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.parameter.ParametersExt.*;
+
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
@@ -99,29 +109,34 @@ import org.geotoolkit.wfs.xml.ValueCollection;
 import org.geotoolkit.wfs.xml.WFSCapabilities;
 import org.geotoolkit.wfs.xml.WFSMarshallerPool;
 import org.geotoolkit.wfs.xml.v200.*;
-import org.geotoolkit.wfs.xml.v200.Title;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.xsd.xml.v2001.TopLevelComplexType;
 import org.geotoolkit.xsd.xml.v2001.TopLevelElement;
 import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
-
 import org.junit.*;
+
 import static org.junit.Assert.*;
+
 import org.junit.runner.RunWith;
 import org.geotoolkit.feature.Feature;
 import org.geotoolkit.feature.type.FeatureType;
 import org.geotoolkit.feature.type.Name;
 import org.opengis.parameter.ParameterValueGroup;
+import org.springframework.test.context.ContextConfiguration;
 
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-@RunWith(TestRunner.class)
+@RunWith(SpringTestRunner.class)
+@ContextConfiguration("classpath:/test/wfs-context.xml")
 public class WFS2WorkerTest {
     private static MarshallerPool pool;
     private static WFSWorker worker ;
+    
+    @Inject
+    private StyleBusiness styleBusiness;
 
     private static final DefaultDataSource ds = null;
 
@@ -159,8 +174,8 @@ public class WFS2WorkerTest {
         Collections.sort(alltypes, new QNameComparator());
     }
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
+    @PostConstruct
+    public void setUpClass() throws Exception {
         ConfigurationEngine.setupTestEnvironement("WFS2WorkerTest");
 
         final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null),

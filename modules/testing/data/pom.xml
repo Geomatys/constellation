@@ -93,6 +93,11 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
+     <groupId>org.springframework</groupId>
+     <artifactId>spring-test</artifactId>
+     <version>${spring.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.glassfish.jersey.core</groupId>
       <artifactId>jersey-common</artifactId>
     </dependency>

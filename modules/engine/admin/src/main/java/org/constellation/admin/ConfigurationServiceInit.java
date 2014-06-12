@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.constellation.services.admin;
+package org.constellation.admin;
 
 import java.lang.invoke.MethodHandles;
 

@@ -22,11 +22,13 @@ package org.constellation.wfs.ws;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 
+import javax.inject.Named;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -35,6 +37,7 @@ import javax.xml.namespace.QName;
 
 // Constellation dependencies
 import javax.xml.stream.XMLStreamException;
+
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.ServiceDef;
 import org.constellation.ServiceDef.Version;
@@ -46,7 +49,9 @@ import org.constellation.security.SecurityManagerHolder;
 import org.constellation.util.QnameLocalComparator;
 import org.constellation.util.QNameComparator;
 import org.constellation.ws.CstlServiceException;
+
 import static org.constellation.wfs.ws.WFSConstants.*;
+
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
 import org.constellation.wfs.ws.rs.ValueCollectionWrapper;
 
@@ -124,6 +129,7 @@ import org.geotoolkit.wfs.xml.v200.PropertyName;
 
 import static org.geotoolkit.wfs.xml.WFSXmlFactory.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
 import org.geotoolkit.ows.xml.Sections;
 import org.geotoolkit.wfs.xml.*;
 import org.geotoolkit.wfs.xml.v200.ObjectFactory;
@@ -152,6 +158,7 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 
+import org.springframework.context.annotation.Scope;
 // W3c dependencies
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -163,6 +170,8 @@ import org.w3c.dom.NodeList;
  *
  * @author Guilhem Legal (Geomatys)
  */
+@Named
+@Scope("prototype")
 public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
     /**

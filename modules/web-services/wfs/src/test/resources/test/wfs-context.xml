@@ -1,0 +1,39 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:p="http://www.springframework.org/schema/p"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+  xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+  xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+        http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.0.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+
+
+
+
+ <context:component-scan base-package="org.constellation.engine.register.jooq" />
+
+  <tx:annotation-driven transaction-manager="transactionManager" />
+
+
+  <bean id="dataSource" class="org.constellation.engine.register.jooq.EmbeddedTestDatabase" factory-method="getOrCreateDataSource"></bean>
+
+
+
+
+  
+  <import resource="classpath:/cstl/spring/auto/cstl-web-map-context.xml"/>
+
+
+  <import resource="classpath:/cstl/spring/cstl-tx.xml"/>
+
+  
+<!--   <tx:annotation-driven transaction-manager="transactionManager" /> -->
+
+<!--   <context:component-scan base-package="org.constellation." /> -->
+
+ <bean class="org.constellation.admin.ConfigurationServiceInit" init-method="init" autowire="byType"/>
+
+
+</beans>
+
