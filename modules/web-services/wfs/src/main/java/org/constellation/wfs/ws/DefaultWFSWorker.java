@@ -22,68 +22,58 @@ package org.constellation.wfs.ws;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
-
 import javax.inject.Named;
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
-
-// Constellation dependencies
 import javax.xml.stream.XMLStreamException;
-
 import org.apache.sis.storage.DataStoreException;
+import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef;
 import org.constellation.ServiceDef.Version;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.FormatURL;
 import org.constellation.configuration.Layer;
-import org.constellation.provider.FeatureData;
+import org.constellation.dto.Service;
 import org.constellation.provider.Data;
+import org.constellation.provider.FeatureData;
 import org.constellation.security.SecurityManagerHolder;
-import org.constellation.util.QnameLocalComparator;
 import org.constellation.util.QNameComparator;
-import org.constellation.ws.CstlServiceException;
-
+import org.constellation.util.QnameLocalComparator;
 import static org.constellation.wfs.ws.WFSConstants.*;
-
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
 import org.constellation.wfs.ws.rs.ValueCollectionWrapper;
-
-// Geotoolkit dependencies
+import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.LayerWorker;
 import org.constellation.ws.UnauthorizedException;
-import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.FeatureStoreUtilities;
-import org.geotoolkit.feature.SchemaException;
-import org.geotoolkit.ows.xml.RequestBase;
-import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.memory.GenericReprojectFeatureIterator;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.factory.HintsPending;
+import org.geotoolkit.feature.Feature;
 import org.geotoolkit.feature.FeatureTypeUtilities;
-import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeWriter;
+import org.geotoolkit.feature.SchemaException;
+import org.geotoolkit.feature.type.FeatureType;
+import org.geotoolkit.feature.type.GeometryType;
+import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.feature.type.PropertyDescriptor;
+import org.geotoolkit.feature.type.PropertyType;
 import org.geotoolkit.feature.xml.Utils;
+import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureReader;
 import org.geotoolkit.filter.binding.Binding;
 import org.geotoolkit.filter.binding.Bindings;
-import org.geotoolkit.referencing.CRS;
-import org.geotoolkit.referencing.IdentifiedObjects;
-import org.geotoolkit.sld.xml.StyleXmlIO;
-import org.apache.sis.xml.MarshallerPool;
-import org.constellation.admin.ConfigurationEngine;
-import org.constellation.dto.Service;
-import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.filter.visitor.FillCrsVisitor;
-import org.geotoolkit.filter.visitor.ListingPropertyVisitor;
 import org.geotoolkit.filter.visitor.IsValidSpatialFilterVisitor;
+import org.geotoolkit.filter.visitor.ListingPropertyVisitor;
 import org.geotoolkit.geometry.jts.JTS;
 import org.geotoolkit.gml.GeometrytoJTS;
 import org.geotoolkit.gml.xml.AbstractGML;
@@ -99,51 +89,47 @@ import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
 import org.geotoolkit.ows.xml.AbstractServiceIdentification;
 import org.geotoolkit.ows.xml.AbstractServiceProvider;
 import org.geotoolkit.ows.xml.AcceptVersions;
-import org.geotoolkit.wfs.xml.GetPropertyValue;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.ows.xml.RequestBase;
+import org.geotoolkit.ows.xml.Sections;
+import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.referencing.IdentifiedObjects;
+import org.geotoolkit.sld.xml.StyleXmlIO;
+import org.geotoolkit.wfs.xml.*;
+import org.geotoolkit.wfs.xml.DeleteElement;
 import org.geotoolkit.wfs.xml.DescribeFeatureType;
 import org.geotoolkit.wfs.xml.DescribeStoredQueries;
 import org.geotoolkit.wfs.xml.DescribeStoredQueriesResponse;
-import org.geotoolkit.wfs.xml.ListStoredQueries;
-import org.geotoolkit.wfs.xml.ListStoredQueriesResponse;
+import org.geotoolkit.wfs.xml.FeatureTypeList;
 import org.geotoolkit.wfs.xml.GetCapabilities;
-import org.geotoolkit.wfs.xml.StoredQueryDescription;
-import org.geotoolkit.wfs.xml.StoredQueries;
-import org.geotoolkit.wfs.xml.WFSCapabilities;
-import org.geotoolkit.wfs.xml.ResultTypeType;
-import org.geotoolkit.wfs.xml.WFSMarshallerPool;
-import org.geotoolkit.wfs.xml.TransactionResponse;
-import org.geotoolkit.wfs.xml.Transaction;
-import org.geotoolkit.wfs.xml.Query;
 import org.geotoolkit.wfs.xml.GetFeature;
 import org.geotoolkit.wfs.xml.GetGmlObject;
-import org.geotoolkit.wfs.xml.LockFeatureResponse;
-import org.geotoolkit.wfs.xml.LockFeature;
-import org.geotoolkit.wfs.xml.DeleteElement;
-import org.geotoolkit.wfs.xml.InsertElement;
+import org.geotoolkit.wfs.xml.GetPropertyValue;
 import org.geotoolkit.wfs.xml.IdentifierGenerationOptionType;
+import org.geotoolkit.wfs.xml.InsertElement;
+import org.geotoolkit.wfs.xml.ListStoredQueries;
+import org.geotoolkit.wfs.xml.ListStoredQueriesResponse;
+import org.geotoolkit.wfs.xml.LockFeature;
+import org.geotoolkit.wfs.xml.LockFeatureResponse;
 import org.geotoolkit.wfs.xml.Property;
-import org.geotoolkit.wfs.xml.FeatureTypeList;
+import org.geotoolkit.wfs.xml.Query;
+import org.geotoolkit.wfs.xml.ResultTypeType;
+import org.geotoolkit.wfs.xml.StoredQueries;
+import org.geotoolkit.wfs.xml.StoredQueryDescription;
+import org.geotoolkit.wfs.xml.Transaction;
+import org.geotoolkit.wfs.xml.TransactionResponse;
 import org.geotoolkit.wfs.xml.UpdateElement;
-import org.geotoolkit.wfs.xml.v110.FeatureCollectionType;
-import org.geotoolkit.wfs.xml.v200.PropertyName;
+import org.geotoolkit.wfs.xml.WFSCapabilities;
+import org.geotoolkit.wfs.xml.WFSMarshallerPool;
 
 import static org.geotoolkit.wfs.xml.WFSXmlFactory.*;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-
-import org.geotoolkit.ows.xml.Sections;
-import org.geotoolkit.wfs.xml.*;
+import org.geotoolkit.wfs.xml.v110.FeatureCollectionType;
 import org.geotoolkit.wfs.xml.v200.ObjectFactory;
+import org.geotoolkit.wfs.xml.v200.PropertyName;
 import org.geotoolkit.wfs.xml.v200.QueryExpressionTextType;
 import org.geotoolkit.wfs.xml.v200.QueryType;
 import org.geotoolkit.wfs.xml.v200.StoredQueryDescriptionType;
-
-// GeoAPI dependencies
-import org.geotoolkit.feature.Feature;
-import org.geotoolkit.feature.type.FeatureType;
-import org.geotoolkit.feature.type.GeometryType;
-import org.geotoolkit.feature.type.Name;
-import org.geotoolkit.feature.type.PropertyDescriptor;
-import org.geotoolkit.feature.type.PropertyType;
+import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.opengis.filter.BinaryComparisonOperator;
 import org.opengis.filter.BinaryLogicOperator;
 import org.opengis.filter.Filter;
@@ -152,14 +138,12 @@ import org.opengis.filter.identity.FeatureId;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.spatial.BinarySpatialOperator;
 import org.opengis.geometry.Envelope;
-import org.opengis.util.FactoryException;
-import org.opengis.util.CodeList;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
-
+import org.opengis.util.CodeList;
+import org.opengis.util.FactoryException;
 import org.springframework.context.annotation.Scope;
-// W3c dependencies
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -206,17 +190,15 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
     private void loadStoredQueries() {
         try {
-            final Object obj = ConfigurationEngine.getConfiguration("WFS", getId(), "StoredQueries.xml", getMarshallerPool());
+            final Object obj = serviceBusiness.getExtraConfiguration("WFS", getId(), "StoredQueries.xml", getMarshallerPool());
             if (obj instanceof StoredQueries) {
                 StoredQueries candidate = (StoredQueries) obj;
                 this.storedQueries = candidate.getStoredQuery();
             } else {
                 LOGGER.log(Level.WARNING, "The storedQueries File does not contains proper object");
             }
-        } catch (JAXBException ex) {
-            LOGGER.log(Level.WARNING, "Exeception while unmarshalling the stored queries File", ex);
-        } catch (FileNotFoundException e) {
-            // there is no file continue
+        } catch (ConfigurationException ex) {
+            LOGGER.log(Level.WARNING, "ConfigurationException while unmarshalling the stored queries File", ex);
         }
             
         // we verify if the identifier query is loaded (if not we load it)
@@ -260,11 +242,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     }
 
     private void storedQueries() {
-        try {
-            ConfigurationEngine.storeConfiguration("WFS", getId(), "StoredQueries.xml", new StoredQueries(storedQueries), getMarshallerPool());
-        } catch (JAXBException ex) {
-           LOGGER.log(Level.WARNING, "JAXBExeception while marshalling the stored queries File", ex);
-        } 
+        serviceBusiness.setExtraConfiguration("WFS", getId(), "StoredQueries.xml", new StoredQueries(storedQueries), getMarshallerPool());
     }
 
     @Override

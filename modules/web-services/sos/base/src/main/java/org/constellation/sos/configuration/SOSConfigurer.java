@@ -25,7 +25,6 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.io.WKTWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -39,7 +38,6 @@ import java.util.logging.Level;
 import javax.imageio.spi.ServiceRegistry;
 import javax.xml.bind.JAXBException;
 import org.apache.sis.storage.DataStoreException;
-import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.*;
 import org.constellation.dto.SensorMLTree;
 import org.constellation.metadata.io.MetadataIoException;
@@ -495,15 +493,13 @@ public class SOSConfigurer extends OGCConfigurer {
     protected SOSConfiguration getServiceConfiguration(final String id) throws ConfigurationException {
         try {
             // we get the SOS configuration file
-            final SOSConfiguration config = (SOSConfiguration) ConfigurationEngine.getConfiguration("SOS", id);
+            final SOSConfiguration config = (SOSConfiguration) serviceBusiness.getConfiguration("SOS", id);
             return config;
 
-        } catch (JAXBException ex) {
-            throw new ConfigurationException("JAXBexception while getting the SOS configuration for:" + id, ex.getMessage());
+        } catch (ConfigurationException ex) {
+            throw new ConfigurationException("ConfigurationException while getting the SOS configuration for:" + id, ex.getMessage());
         } catch (IllegalArgumentException ex) {
             throw new ConfigurationException("IllegalArgumentException: " + ex.getMessage());
-        } catch (FileNotFoundException ex) {
-            throw new ConfigurationException("Unable to find the configuration file");
         }
     }
 

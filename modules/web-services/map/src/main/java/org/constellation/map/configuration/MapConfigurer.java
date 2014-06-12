@@ -297,7 +297,7 @@ public class MapConfigurer extends OGCConfigurer {
      */
     public void removeLayer(final String spec, final String serviceId, final QName layerId) throws ConfigurationException {
         try {
-            final LayerContext layerContext = (LayerContext) ConfigurationEngine.getConfiguration(spec, serviceId);
+            final LayerContext layerContext = (LayerContext) serviceBusiness.getConfiguration(spec, serviceId);
             final List<Source> sources = layerContext.getLayers();
             QName name = null;
             boolean found = false;
@@ -327,80 +327,4 @@ public class MapConfigurer extends OGCConfigurer {
             throw new ConfigurationException("Error when trying to remove a layer from the service "+ serviceId, e);
         }
     }
-
-//    /**
-//     * Update layer style for the given service.
-//     * @param serviceId
-//     * @param layerId
-//     * @param spId
-//     * @param styleName
-//     * @throws ConfigurationException
-//     */
-//    public void updateLayerStyle(final String spec, final String serviceId, final String layerId, final String spId, final String styleName) throws ConfigurationException {
-//        try {
-//            final LayerContext layerContext = (LayerContext) ConfigurationEngine.getConfiguration(spec, serviceId);
-//            final List<Source> sources = layerContext.getLayers();
-//            boolean found = false;
-//
-//            for (Source source : sources) {
-//                List<Layer> layers = source.getInclude();
-//                for (Layer layer : layers) {
-//                    if (layer.getName().getLocalPart().equals(layerId)) {
-//                        layer.setStyles(Collections.singletonList(DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, spId, styleName)));
-//                        found = true;
-//                        break;
-//                    }
-//                }
-//                if(found){
-//                    break;
-//                }
-//            }
-//
-//            if(found){
-//                ConfigurationEngine.storeConfiguration(spec, serviceId, layerContext);
-//                restartInstance(spec, serviceId, true);
-//            }
-//
-//        } catch (Exception e) {
-//            throw new ConfigurationException("Error when trying to remove a layer from the service "+ serviceId, e);
-//        }
-//    }
-
-//    /**
-//     * Remove layer style for the given service.
-//     * @param serviceId
-//     * @param layerId
-//     * @param spId
-//     * @param styleName
-//     * @throws ConfigurationException
-//     */
-//    public void removeLayerStyle(final String spec, final String serviceId, final String layerId, final String spId, final String styleName) throws ConfigurationException {
-//        try {
-//            final LayerContext layerContext = (LayerContext) ConfigurationEngine.getConfiguration(spec, serviceId);
-//            final List<Source> sources = layerContext.getLayers();
-//            boolean found = false;
-//
-//            for (Source source : sources) {
-//                List<Layer> layers = source.getInclude();
-//                for (Layer layer : layers) {
-//                    if (layer.getName().getLocalPart().equals(layerId)) {
-//                        layer.setStyles(new ArrayList<DataReference>());
-//                        found = true;
-//                        break;
-//                    }
-//                }
-//                if(found){
-//                    break;
-//                }
-//            }
-//
-//            if(found){
-//                ConfigurationEngine.storeConfiguration(spec, serviceId, layerContext);
-//                restartInstance(spec, serviceId, true);
-//            }
-//
-//        } catch (Exception e) {
-//            throw new ConfigurationException("Error when trying to remove a layer from the service "+ serviceId, e);
-//        }
-//    }
 }

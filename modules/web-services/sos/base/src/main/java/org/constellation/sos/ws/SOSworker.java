@@ -39,6 +39,7 @@ import org.constellation.admin.ConfigurationEngine;
 
 import static org.constellation.api.QueryConstants.*;
 import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.dto.Service;
@@ -304,7 +305,7 @@ public class SOSworker extends AbstractWorker {
         // Database configuration
         try {
                 
-            final Object object = ConfigurationEngine.getConfiguration("SOS", id);
+            final Object object = serviceBusiness.getConfiguration("SOS", id);
             if (object instanceof SOSConfiguration) {
                 configuration = (SOSConfiguration) object;
             } else {
@@ -456,8 +457,8 @@ public class SOSworker extends AbstractWorker {
             startError("MetadataIOException while initializing the sensor reader/writer:\n" + ex.getMessage(), ex);
         } catch (CstlServiceException | DataStoreException ex) {
             startError(ex.getMessage(), ex);
-        } catch (FileNotFoundException ex) {
-            startError("The configuration file can't be found.", null);
+        } catch (ConfigurationException ex) {
+            startError("The configuration file can't be found.", ex);
         }
     }
     
@@ -559,7 +560,7 @@ public class SOSworker extends AbstractWorker {
         //we fill the cachedCapabilities if we have to
         LOGGER.info("adding capabilities document in cache");
         try {
-            Object object = ConfigurationEngine.getConfiguration("SOS", getId(), "cached-offerings.xml", SOSMarshallerPool.getInstance());
+            Object object = serviceBusiness.getExtraConfiguration("SOS", getId(), "cached-offerings.xml", SOSMarshallerPool.getInstance());
             
             if (object instanceof JAXBElement) {
                 object = ((JAXBElement)object).getValue();
@@ -569,7 +570,7 @@ public class SOSworker extends AbstractWorker {
             } else {
                 LOGGER.severe("cached capabilities file does not contains Capablities object.");
             }
-        } catch (FileNotFoundException ex) {
+        } catch (ConfigurationException ex) {
             // file can be missing
         }
     }

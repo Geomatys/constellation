@@ -67,7 +67,6 @@ import javax.measure.converter.UnitConverter;
 import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBException;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.math.BigInteger;
 import java.net.URL;
 import java.util.ArrayList;
@@ -107,9 +106,6 @@ import org.opengis.util.NoSuchIdentifierException;
  */
 public class WPSWorker extends AbstractWorker {
 
-    @Inject
-    private ServiceBusiness serviceBusiness;
-    
     /**
      * Supported CRS.
      */

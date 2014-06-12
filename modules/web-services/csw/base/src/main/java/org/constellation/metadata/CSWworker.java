@@ -20,7 +20,6 @@ package org.constellation.metadata;
 
 // J2SE dependencies
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -98,8 +97,8 @@ import org.geotoolkit.util.StringUtilities;
 import org.apache.sis.xml.MarshallerPool;
 import org.apache.sis.xml.Namespaces;
 import org.constellation.dto.Service;
-import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.metadata.io.MetadataType;
 import org.constellation.metadata.utils.CSWUtils;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
@@ -211,7 +210,7 @@ public class CSWworker extends AbstractWorker {
         isStarted = true;
         try {
             //we look if the configuration have been specified
-            final Object obj = ConfigurationEngine.getConfiguration(CSW, getId());
+            final Object obj = serviceBusiness.getConfiguration(CSW, getId());
             if (obj instanceof Automatic) {
                 configuration = (Automatic) obj;
             } else {
@@ -266,7 +265,7 @@ public class CSWworker extends AbstractWorker {
             LOGGER.log(Level.WARNING, "\nThe CSW worker is not working!\nCause: {0}\n", startError);
             LOGGER.log(Level.FINER, e.getLocalizedMessage(), e);
             isStarted = false;
-        } catch (FileNotFoundException ex) {
+        } catch (ConfigurationException ex) {
             startError = "The configuration file has not been found";
             LOGGER.log(Level.WARNING, "\nThe CSW worker( {0}) is not working!\nCause: " + startError, serviceID);
             isStarted = false;

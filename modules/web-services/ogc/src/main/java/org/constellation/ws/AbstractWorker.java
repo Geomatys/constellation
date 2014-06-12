@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.inject.Inject;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.validation.Schema;
@@ -46,6 +47,7 @@ import org.apache.sis.internal.util.UnmodifiableArrayList;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.ServiceBusiness;
 import org.constellation.dto.Service;
 
 import org.constellation.security.SecurityManagerHolder;
@@ -134,6 +136,9 @@ public abstract class AbstractWorker implements Worker {
     private long currentUpdateSequence = System.currentTimeMillis();
     
 
+    @Inject
+    protected ServiceBusiness serviceBusiness;
+    
     public AbstractWorker(final String id, final Specification specification) {
         this.id = id;
         this.specification = specification;

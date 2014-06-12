@@ -20,12 +20,22 @@ package org.constellation.engine.register;
 
 public class ServiceExtraConfig {
 
- private int id;
-    
+    private int id;
+
     private String filename;
-    
+
     private String content;
 
+    public ServiceExtraConfig() {
+        
+    }
+    
+    public ServiceExtraConfig(final int id, final String filename, final String content) {
+        this.id = id;
+        this.filename = filename;
+        this.content = content;
+    }
+    
     public int getId() {
         return id;
     }

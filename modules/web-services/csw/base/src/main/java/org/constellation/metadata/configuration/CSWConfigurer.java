@@ -21,7 +21,6 @@ package org.constellation.metadata.configuration;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,11 +28,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import javax.imageio.spi.ServiceRegistry;
-import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.*;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.factory.AbstractCSWFactory;
@@ -447,16 +444,14 @@ public class CSWConfigurer extends OGCConfigurer {
         final File instanceDirectory = ConfigDirectory.getInstanceDirectory("CSW", id);
         try {
             // we get the CSW configuration file
-            final Automatic config = (Automatic) ConfigurationEngine.getConfiguration("CSW", id);
+            final Automatic config = (Automatic) serviceBusiness.getConfiguration("CSW", id);
             config.setConfigurationDirectory(instanceDirectory);
             return config;
 
-        } catch (JAXBException ex) {
-            throw new ConfigurationException("JAXBexception while getting the CSW configuration for:" + id, ex.getMessage());
+        } catch (ConfigurationException ex) {
+            throw new ConfigurationException("Configuration exception while getting the CSW configuration for:" + id, ex.getMessage());
         } catch (IllegalArgumentException ex) {
             throw new ConfigurationException("IllegalArgumentException: " + ex.getMessage());
-        } catch (FileNotFoundException ex) {
-            throw new ConfigurationException("Unable to find the configuration file");
         }
     }
 

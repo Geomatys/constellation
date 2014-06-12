@@ -69,7 +69,7 @@ public abstract class LayerWorker extends AbstractWorker {
         String defaultLanguageCandidate = null;
         
         try {
-            final Object obj = ConfigurationEngine.getConfiguration(specification.name(), id);
+            final Object obj = serviceBusiness.getConfiguration(specification.name(), id);
             if (obj instanceof LayerContext) {
                 layerContext = (LayerContext) obj;
                 final String sec = layerContext.getSecurity();
@@ -108,18 +108,10 @@ public abstract class LayerWorker extends AbstractWorker {
                 isStarted  = false;
                 LOGGER.log(Level.WARNING, startError);
             }
-        } catch (JAXBException ex) {
-            startError = "JAXBException while unmarshalling the layer context File";
-            isStarted  = false;
-            LOGGER.log(Level.WARNING, startError, ex);
         } catch (FactoryNotFoundException ex) {
             startError = ex.getMessage();
             isStarted  = false;
             LOGGER.log(Level.WARNING, startError, ex);
-        } catch (FileNotFoundException ex) {
-            startError = "The configuration file layerContext.xml has not been found";
-            isStarted = false;
-            LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, id);
         } catch (ClassNotFoundException | ConfigurationException ex) {
             startError = "Custom FeatureInfo configuration error : " + ex.getMessage();
             isStarted  = false;

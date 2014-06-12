@@ -62,7 +62,6 @@ import org.apache.sis.xml.MarshallerPool;
 //Constellation dependencies
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
-import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.*;
 import org.constellation.converter.DataReferenceConverter;
 import org.constellation.dto.Service;
@@ -216,12 +215,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
         mapPortrayal = new WMSPortrayal();
         try {
-            mapPortrayal = (WMSPortrayal) ConfigurationEngine.getConfiguration("WMS", id, "WMSPortrayal.xml");
-        } catch (JAXBException ex) {
+            mapPortrayal = (WMSPortrayal) serviceBusiness.getExtraConfiguration("WMS", id, "WMSPortrayal.xml");
+        } catch (ConfigurationException ex) {
             LOGGER.log(Level.WARNING, null, ex);
-        } catch (FileNotFoundException ex) {
-            // the file can be absent
-        }
+        } 
 
         if (isStarted) {
             LOGGER.log(Level.INFO, "WMS worker {0} running", id);

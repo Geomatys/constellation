@@ -102,17 +102,6 @@ public class ConfigurationEngine {
     // End of spring managed component.
 
    
-
-    public static Object getConfiguration(final String serviceType, final String serviceID) throws JAXBException,
-            FileNotFoundException {
-        return getConfiguration(serviceType, serviceID, null);
-    }
-
-    public static Object getConfiguration(final String serviceType, final String serviceID, final String fileName)
-            throws JAXBException, FileNotFoundException {
-        return getConfiguration(serviceType, serviceID, fileName, GenericDatabaseMarshallerPool.getInstance());
-    }
-
     public static Object getConfiguration(final String serviceType, final String serviceID, final String fileName,
             final MarshallerPool pool) throws JAXBException, FileNotFoundException {
 

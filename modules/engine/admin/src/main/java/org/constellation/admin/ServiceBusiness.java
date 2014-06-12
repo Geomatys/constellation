@@ -2,6 +2,7 @@ package org.constellation.admin;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
@@ -10,7 +11,9 @@ import java.util.List;
 import java.util.Map;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.dto.ServiceDTO;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.admin.util.DefaultServiceConfiguration;
@@ -19,15 +22,16 @@ import org.constellation.configuration.ServiceStatus;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.engine.register.ConstellationPersistenceException;
 import org.constellation.engine.register.Service;
+import org.constellation.engine.register.ServiceExtraConfig;
 import org.constellation.engine.register.repository.LayerRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.security.SecurityManager;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
 import org.geotoolkit.process.ProcessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.constellation.security.SecurityManager;
 
 @Component
 public class ServiceBusiness {
@@ -81,7 +85,7 @@ public class ServiceBusiness {
             configuration = DefaultServiceConfiguration.getDefaultConfiguration(serviceType);
         }
 
-        final String config   = getStringFromObject(configuration);
+        final String config   = getStringFromObject(configuration, GenericDatabaseMarshallerPool.getInstance());
         final Service service = new Service();
         service.setConfig(config);
         service.setDate(new Date().getTime());
@@ -266,14 +270,45 @@ public class ServiceBusiness {
             throw new ConfigurationException("Service instance identifier can't be null or empty.");
         }
         try {
-            return ConfigurationEngine.getConfiguration(serviceType, identifier);
+            final Service service = serviceRepository.findByIdentifierAndType(identifier, serviceType);
+            if (service != null) {
+                final String confXml = service.getConfig();
+                return getObjectFromString(confXml, GenericDatabaseMarshallerPool.getInstance());
+            }
         } catch (JAXBException ex) {
             throw new ConfigurationException(ex.getMessage(), ex);
-        } catch (FileNotFoundException ex) {
-            throw new ConfigurationException("Service instance " + identifier + " doesn't exist.");
+        }
+        return null;
+    }
+    
+    public Object getExtraConfiguration(final String serviceType, final String identifier, final String fileName) throws ConfigurationException {
+        return getExtraConfiguration(serviceType, identifier, fileName, GenericDatabaseMarshallerPool.getInstance());
+    }
+    
+    public Object getExtraConfiguration(final String serviceType, final String identifier, final String fileName, final MarshallerPool pool) throws ConfigurationException {
+        try {
+            final Service service = serviceRepository.findByIdentifierAndType(identifier, serviceType);
+            if (service != null) {
+                final ServiceExtraConfig conf = serviceRepository.getExtraConfig(service.getId(), fileName);
+                final String content = conf.getContent();
+                if (content != null) {
+                    return getObjectFromString(content, pool);
+                }
+            }
+        } catch (JAXBException ex) {
+            throw new ConfigurationException(ex.getMessage(), ex);
+        }
+        return null;
+    }
+    
+    public void setExtraConfiguration(final String serviceType, final String identifier, final String fileName, final Object config, final MarshallerPool pool) {
+        final Service service = serviceRepository.findByIdentifierAndType(identifier, serviceType);
+        if (service != null) {
+            final String content = getStringFromObject(config, pool);
+            final ServiceExtraConfig conf = new ServiceExtraConfig(service.getId(), fileName, content);
+            serviceRepository.updateExtraFile(service, fileName, content);
         }
     }
-     
      
      /**
      * Returns all service instances (for current specification) status.
@@ -405,19 +440,29 @@ public class ServiceBusiness {
         }
     }
     
-    private String getStringFromObject(final Object obj) {
+    private String getStringFromObject(final Object obj, final MarshallerPool pool) {
         String config = null;
         if (obj != null) {
             try {
                 final StringWriter sw = new StringWriter();
-                final Marshaller m = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+                final Marshaller m = pool.acquireMarshaller();
                 m.marshal(obj, sw);
-                GenericDatabaseMarshallerPool.getInstance().recycle(m);
+                pool.recycle(m);
                 config = sw.toString();
             } catch (JAXBException e) {
                 throw new ConstellationPersistenceException(e);
             }
         }
         return config;
+    }
+    
+    private Object getObjectFromString(final String xml, final MarshallerPool pool) throws JAXBException {
+        if (xml != null) {
+            final Unmarshaller u = pool.acquireUnmarshaller();
+            final Object config = u.unmarshal(new StringReader(xml));
+            pool.recycle(u);
+            return config;
+        }
+        return null;
     }
 }
