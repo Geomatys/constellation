@@ -264,10 +264,10 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
         this.ensureExistingInstance(serviceType, identifier);
         for (Map.Entry<String, Boolean> entry : WSEngine.getEntriesStatus(serviceType)) {
             if (entry.getKey().equals(identifier)) {
-                return entry.getValue() ? ServiceStatus.WORKING : ServiceStatus.ERROR;
+                return entry.getValue() ? ServiceStatus.STARTED : ServiceStatus.ERROR;
             }
         }
-        return ServiceStatus.NOT_STARTED;
+        return ServiceStatus.STOPPED;
     }
 
     /**
@@ -279,12 +279,12 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
     public Map<String, ServiceStatus> getInstancesStatus(final String spec) {
         final Map<String, ServiceStatus> status = new HashMap<>();
         for (Map.Entry<String, Boolean> entry : WSEngine.getEntriesStatus(spec)) {
-            status.put(entry.getKey(), entry.getValue() ? ServiceStatus.WORKING : ServiceStatus.ERROR);
+            status.put(entry.getKey(), entry.getValue() ? ServiceStatus.STARTED : ServiceStatus.ERROR);
         }
         final List<String> serviceIDs = ConfigurationEngine.getServiceConfigurationIds(spec);
         for (String serviceID : serviceIDs) {
             if (!WSEngine.serviceInstanceExist(spec, serviceID)) {
-                status.put(serviceID, ServiceStatus.NOT_STARTED);
+                status.put(serviceID, ServiceStatus.STOPPED);
             }
         }
         return status;

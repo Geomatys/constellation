@@ -117,8 +117,8 @@ public class ConfigurationXmlBindingTest {
     @Test
     public void instanceReportMarshalingTest() throws Exception {
         List<Instance> instances = new ArrayList<>();
-        instances.add(new Instance(1, "default", "WMS", ServiceStatus.WORKING));
-        instances.add(new Instance(2, "test1", "WMS", ServiceStatus.NOT_STARTED));
+        instances.add(new Instance(1, "default", "WMS", ServiceStatus.STARTED));
+        instances.add(new Instance(2, "test1", "WMS", ServiceStatus.STOPPED));
         InstanceReport report = new InstanceReport(instances);
 
         StringWriter sw = new StringWriter();
@@ -140,8 +140,8 @@ public class ConfigurationXmlBindingTest {
     @Test
     public void instanceReportUnMarshalingTest() throws Exception {
         List<Instance> instances = new ArrayList<>();
-        instances.add(new Instance(1, "default", "WMS", ServiceStatus.WORKING));
-        instances.add(new Instance(2, "test1", "WMS", ServiceStatus.NOT_STARTED));
+        instances.add(new Instance(1, "default", "WMS", ServiceStatus.STARTED));
+        instances.add(new Instance(2, "test1", "WMS", ServiceStatus.STOPPED));
         InstanceReport expResult = new InstanceReport(instances);
 
 

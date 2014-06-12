@@ -188,6 +188,7 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
 		serviceRecord.setTitle(service.getTitle());
 		serviceRecord.setOwner(service.getOwner());
 		serviceRecord.setStatus(service.getStatus());
+		serviceRecord.setVersions(service.getVersions());
 		serviceRecord.store();
 		return serviceRecord.getId().intValue();
     }

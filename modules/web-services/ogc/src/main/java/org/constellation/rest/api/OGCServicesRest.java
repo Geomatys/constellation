@@ -148,6 +148,7 @@ public final class OGCServicesRest {
     @Path("{id}/start")
     public Response start(final @PathParam("spec") String spec, final @PathParam("id") String id) throws Exception {
         try {
+        	
             getConfigurer(spec).startInstance(spec, id);
         } catch (ConfigurationException e) {
             LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);

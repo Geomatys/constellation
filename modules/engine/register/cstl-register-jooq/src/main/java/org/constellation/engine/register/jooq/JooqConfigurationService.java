@@ -45,6 +45,7 @@ import org.constellation.ServiceDef;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.ServiceStatus;
 import org.constellation.configuration.Source;
 import org.constellation.engine.register.ConfigurationService;
 import org.constellation.engine.register.ConstellationPersistenceException;
@@ -125,6 +126,11 @@ public class JooqConfigurationService implements ConfigurationService {
             service.setType(spec.name());
             service.setOwner(login);
             service.setIdentifier(serviceID);
+            service.setStatus(ServiceStatus.STOPPED.toString());
+            // @TODO
+            service.setVersions("1.3.0");
+
+            
             
             serviceRepository.create(service);
         }
