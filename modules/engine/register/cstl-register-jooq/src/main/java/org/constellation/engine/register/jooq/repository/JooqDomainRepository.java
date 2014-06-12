@@ -28,6 +28,8 @@ import static org.constellation.engine.register.jooq.Tables.USER_X_DOMAIN_X_DOMA
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -63,16 +65,14 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
 
     @Override
     public List<Domain> findAll() {
-        return dsl.select().from(Tables.DOMAIN).where(DOMAIN.SYSTEM.eq(false)).fetchInto(Domain.class);
+        return dsl.select().from(Tables.DOMAIN).fetchInto(Domain.class);
     }
-    
+
     @Override
     public List<Domain> findByIds(List<Integer> fetch) {
         return findBy(DOMAIN.ID.in(fetch));
     }
 
-    
-    
     @Override
     public List<Domain> findByIdsNotIn(List<Integer> fetch) {
         return findBy(DOMAIN.ID.notIn(fetch));
@@ -137,7 +137,7 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
     public Domain update(Domain domainDTO) {
         dsl.update(DOMAIN).set(DOMAIN.NAME, domainDTO.getName()).set(DOMAIN.DESCRIPTION, domainDTO.getDescription())
                 .where(DOMAIN.ID.eq(domainDTO.getId())).execute();
-        return new Domain(domainDTO.getId(), domainDTO.getName(), domainDTO.getDescription());
+        return new Domain(domainDTO.getId(), domainDTO.getName(), domainDTO.getDescription(), domainDTO.isSystem());
     }
 
     public int delete(int domainId) {
@@ -242,7 +242,17 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
         return roles;
     }
 
-    
-
-   
+    @Override
+    public Set<Integer> findUserDomainIdsWithPermission(int userId, int permissionId) {
+        List<Integer> fetch = dsl
+                .select(Tables.DOMAIN.ID)
+                .from(DOMAIN)
+                .join(USER_X_DOMAIN_X_DOMAINROLE)
+                .onKey()
+                .join(Tables.DOMAINROLE_X_PERMISSION)
+                .on(USER_X_DOMAIN_X_DOMAINROLE.DOMAINROLE_ID.eq(Tables.DOMAINROLE_X_PERMISSION.DOMAINROLE_ID))
+                .where(USER_X_DOMAIN_X_DOMAINROLE.USER_ID.eq(userId).and(
+                        Tables.DOMAINROLE_X_PERMISSION.PERMISSION_ID.eq(permissionId))).fetch(DOMAIN.ID);
+        return new HashSet<>(fetch);
+    }
 }

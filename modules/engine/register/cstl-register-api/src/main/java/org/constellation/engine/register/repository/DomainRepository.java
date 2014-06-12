@@ -69,4 +69,6 @@ public interface DomainRepository {
 
     List<Domain> findByIds(List<Integer> fetch);
 
+    Set<Integer> findUserDomainIdsWithPermission(int userId, int permissionId);
+
 }

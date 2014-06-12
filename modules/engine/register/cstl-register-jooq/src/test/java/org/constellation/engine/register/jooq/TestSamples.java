@@ -27,7 +27,7 @@ public class TestSamples {
     }
 
     public static Domain newDomain() {
-        return new Domain("Domain1", "Test domain");
+        return new Domain("Domain1", "Test domain", false);
     }
     
     

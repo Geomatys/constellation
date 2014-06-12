@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -13,13 +14,19 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.DomainRole;
+import org.constellation.engine.register.DomainUser;
 import org.constellation.engine.register.Permission;
+import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.DomainRoleRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
+import org.constellation.engine.register.repository.UserRepository;
 
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Maps.EntryTransformer;
 
@@ -63,10 +70,12 @@ public class ServicePermissionRest {
 
     public static class LinkedDomain extends Domain {
         private boolean linked;
+        private boolean canPublish;
 
-        public LinkedDomain(Domain key, Boolean value) {
-            super(key.getId(), key.getName(), key.getDescription());
-            this.linked = value;
+        public LinkedDomain(Domain key, boolean linked, boolean canPublish) {
+            super(key.getId(), key.getName(), key.getDescription(), key.isSystem());
+            this.linked = linked;
+            this.setCanPublish(canPublish);
         }
 
         public boolean isLinked() {
@@ -76,6 +85,14 @@ public class ServicePermissionRest {
         public void setLinked(boolean linked) {
             this.linked = linked;
         }
+
+        public boolean isCanPublish() {
+            return canPublish;
+        }
+
+        public void setCanPublish(boolean canPublish) {
+            this.canPublish = canPublish;
+        }
     }
 
     @Inject
@@ -83,6 +100,9 @@ public class ServicePermissionRest {
 
     @Inject
     private ServiceRepository serviceRepository;
+
+    @Inject
+    private DomainRepository domainRepository;
 
     @GET
     @Path("/access")
@@ -112,13 +132,16 @@ public class ServicePermissionRest {
 
     @GET
     @Path("/user/{userId}/service/{serviceId}")
-    public List<LinkedDomain> linkedDomains(@PathParam("userId") int userId, @PathParam("serviceId") int serviceId) {
+    public Response linkedDomains(@PathParam("userId") int userId, @PathParam("serviceId") int serviceId) {
 
+        Set<Integer> domainsById = domainRepository
+                .findUserDomainIdsWithPermission(userId, Permission.SERVICE_CREATION);
         List<LinkedDomain> result = new ArrayList<>();
         for (Entry<Domain, Boolean> e : serviceRepository.getLinkedDomains(serviceId).entrySet()) {
-            result.add(new LinkedDomain(e.getKey(), e.getValue()));
+            Domain domain = e.getKey();
+            result.add(new LinkedDomain(domain, e.getValue(), domainsById.contains(domain.getId())));
         }
-        return result;
+        return Response.ok(result).build();
     }
 
 }

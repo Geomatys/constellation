@@ -9,10 +9,12 @@ public class Permission implements Serializable {
     
     public final static int SERVICE_WRITE_ACCESS_PERMISSION_ID = 2; 
     
+    public static final int SERVICE_CREATION = 3;
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
+
 
     private int id;
     

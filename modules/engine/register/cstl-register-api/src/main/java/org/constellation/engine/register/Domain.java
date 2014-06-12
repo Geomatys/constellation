@@ -37,12 +37,13 @@ public class Domain implements Serializable {
     public Domain() {
     }
     
-    public Domain(String name, String description) {
+    public Domain(String name, String description, boolean system) {
         this.name = name;
         this.description = description;
+        this.system = system;
     }
-    public Domain(int id, String name, String description) {
-        this(name, description);
+    public Domain(int id, String name, String description, boolean system) {
+        this(name, description, system);
         this.id = id;
     }
 

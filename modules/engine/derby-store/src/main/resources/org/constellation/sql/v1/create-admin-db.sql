@@ -369,7 +369,7 @@ insert into "admin"."domain" ("id", "name", "description", "system") values(0, '
 -- Anonymous user can access to services linked with anonymous domain.
 insert into "admin"."domainrole_x_permission" ("domainrole_id", "permission_id") values(0, 1);
 
-insert into "admin"."domain" ("id", "name", "description") values(1, 'default', 'default domain');
+insert into "admin"."domain" ("id", "name", "description", "system") values(1, 'default', 'default domain', TRUE);
 
 insert into "admin"."domainrole_x_permission" ("domainrole_id", "permission_id") values(1, 1);
 insert into "admin"."domainrole_x_permission" ("domainrole_id", "permission_id") values(1, 2);

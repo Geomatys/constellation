@@ -276,7 +276,7 @@ cstlAdminApp.controller('DomainController', ['$scope', '$modal', 'DomainResource
         $scope.members = dataNotReady;
         $scope.deleteDomain = dataNotReady;
 
-        DomainResource.query({withMembers:true}, function(domains){
+        DomainResource.query(function(domains){
 
             $scope.domains = domains;
 
