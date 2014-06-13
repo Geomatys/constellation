@@ -199,14 +199,17 @@
                     <div style="padding: 10pt;">
                         <div class="row">
                             <div class="col-xs-10">
-                                <strong style="font-size: 14px;">Echelle</strong>
+                                <strong translate="edition.style.label.filterScale">Filter based on the zoom level</strong>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row" style="margin-top: 8pt;">
                             <div class="col-sm-12 col-md-12">
                                 <form class="form-horizontal form-style" role="form">
                                     <div class="form-group">
-                                        <label for="minScale" class="col-sm-5 col-md-4 control-label">Min.</label>
+                                        <label for="minScale"
+                                               class="col-sm-5 col-md-4 control-label"
+                                               style="font-size: 12px;font-weight: normal;"
+                                               translate="edition.style.label.filterScaleMin">Minimal scale</label>
                                         <div class="col-sm-7 col-md-8">
                                             <input type="number"
                                                    class="form-control"
@@ -216,7 +219,10 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label for="maxScale" class="col-sm-5 col-md-4 control-label">Max.</label>
+                                        <label for="maxScale"
+                                               class="col-sm-5 col-md-4 control-label"
+                                               style="font-size: 12px;font-weight: normal;"
+                                               translate="edition.style.label.filterScaleMax">Maximal scale</label>
                                         <div class="col-sm-7 col-md-8">
                                             <input type="number"
                                                    class="form-control"
@@ -225,8 +231,8 @@
                                                    min="0"/>
                                         </div>
                                     </div>
-                                    <hr/>
-                                    <div class="form-group">
+                                    <hr style="margin-bottom:10px;"/>
+                                    <!--div class="form-group">
                                         <div class="col-sm-5 col-md-4">
                                             <button type="button" class="btn btn-default btn-md btn-editer">
                                                 <span class="glyphicon glyphicon-pencil"></span> Editer
@@ -235,55 +241,58 @@
                                         <div class="col-sm-7 col-md-8">
                                             <textarea class="form-control" rows="3" ng-model="optionsSLD.selectedRule.filter"></textarea>
                                         </div>
-                                    </div>
-                                    <!--div class="form-group">
+                                    </div-->
+                                    <div class="form-group">
                                         <div class="col-xs-8">
-                                            <div class="checkbox">
-                                                <label>
+                                            <div>
+                                                <label style="cursor: pointer;">
+                                                    <strong translate="sldeditor.edition.filterEnabled">Filter by attribute field</strong>
                                                     <input type="checkbox"
+                                                           style="margin-left: 5pt;"
                                                            ng-model="optionsSLD.filtersEnabled"
-                                                           ng-click="optionsSLD.filtersEnabled = !optionsSLD.filtersEnabled; applyFilter();"
-                                                           translate="sldeditor.edition.filterEnabled">Enable attributes filter</input>
+                                                           ng-click="optionsSLD.filtersEnabled = !optionsSLD.filtersEnabled; applyFilter();"/>
                                                 </label>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                        <table>
+                                    <div class="form-group" ng-show="optionsSLD.filtersEnabled">
+                                        <table ng-init="restoreFilters();">
                                             <tbody>
                                                 <tr ng-repeat="filter in optionsSLD.filters">
                                                     <td>
                                                         <select class="form-control"
                                                                 ng-init="loadDataProperties();"
-                                                                ng-model="filter.attribute">
-                                                            <option ng-value="'{'+dp.name+'}'" ng-repeat="dp in $parent.dataProperties">{{dp.name}}</option>
+                                                                ng-model="filter.attribute"
+                                                                ng-change="applyFilter();">
+                                                            <option ng-value="dp.name"
+                                                                    ng-repeat="dp in $parent.dataProperties">{{dp.name}}</option>
                                                         </select>
                                                     </td>
                                                     <td>
                                                         <select class="form-control"
-                                                                ng-model="filter.operator"
-                                                                size="1">
+                                                                ng-model="filter.comparator"
+                                                                size="1"
+                                                                ng-change="applyFilter();">
                                                             <option value="=">=</option>
                                                             <option value="!=">!=</option>
                                                             <option value=">">&gt;</option>
                                                             <option value=">=">&gt;=</option>
                                                             <option value="<">&lt;</option>
                                                             <option value="<=">&lt;=</option>
-                                                            <option value="between">BETWEEN</option>
-                                                            <option value="like">LIKE</option>
-                                                            <option value="nil">NIL</option>
-                                                            <option value="null">NULL</option>
+                                                            <option value="BETWEEN">BETWEEN</option>
+                                                            <option value="LIKE">LIKE</option>
                                                         </select>
                                                     </td>
                                                     <td>
                                                         <input type="text"
                                                                class="form-control"
-                                                               ng-model="filter.value"/>
+                                                               ng-model="filter.value"
+                                                               ng-change="applyFilter();"/>
                                                     </td>
                                                     <td>
                                                         <select class="form-control"
-                                                                ng-model="filter.connector"
-                                                                ng-change="addNewFilter(filter.connector,$index);"
+                                                                ng-model="filter.operator"
+                                                                ng-change="addNewFilter(filter.operator,$index);"
                                                                 size="1">
                                                             <option value=""></option>
                                                             <option value="AND">AND</option>
@@ -293,7 +302,7 @@
                                                 </tr>
                                             </tbody>
                                         </table>
-                                    </div-->
+                                    </div>
                                 </form>
                             </div>
                         </div>

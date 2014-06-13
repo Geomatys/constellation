@@ -139,14 +139,17 @@
                     <div style="padding: 10pt;">
                         <div class="row">
                             <div class="col-xs-10">
-                                <strong style="font-size: 14px;">Echelle</strong>
+                                <strong translate="edition.style.label.filterScale">Filter based on the zoom level</strong>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row" style="margin-top: 8pt;">
                             <div class="col-sm-12 col-md-12">
                                 <form class="form-horizontal form-style" role="form">
                                     <div class="form-group">
-                                        <label for="minScale" class="col-sm-5 col-md-4 control-label">Min.</label>
+                                        <label for="minScale"
+                                               class="col-sm-5 col-md-4 control-label"
+                                               style="font-size: 12px;font-weight: normal;"
+                                               translate="edition.style.label.filterScaleMin">Minimal scale</label>
                                         <div class="col-sm-7 col-md-8">
                                             <input type="number"
                                                    class="form-control"
@@ -156,7 +159,10 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label for="maxScale" class="col-sm-5 col-md-4 control-label">Max.</label>
+                                        <label for="maxScale"
+                                               class="col-sm-5 col-md-4 control-label"
+                                               style="font-size: 12px;font-weight: normal;"
+                                               translate="edition.style.label.filterScaleMax">Maximal scale</label>
                                         <div class="col-sm-7 col-md-8">
                                             <input type="number"
                                                    class="form-control"
@@ -165,7 +171,8 @@
                                                    min="0"/>
                                         </div>
                                     </div>
-                                    <div class="form-group">
+                                    <hr style="margin-bottom:10px;"/>
+                                    <!--div class="form-group">
                                         <div class="col-sm-5 col-md-4">
                                             <button type="button" class="btn btn-default btn-md btn-editer">
                                                 <span class="glyphicon glyphicon-pencil"></span> Editer
@@ -174,7 +181,7 @@
                                         <div class="col-sm-7 col-md-8">
                                             <textarea class="form-control" rows="3" ng-model="optionsSLD.selectedRule.filter"></textarea>
                                         </div>
-                                    </div>
+                                    </div-->
                                 </form>
                             </div>
                         </div>

@@ -138,9 +138,9 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             filtersEnabled:false,
             filters:[{
                 "attribute":"",
-                "operator":"=",
+                "comparator":"=",
                 "value":"",
-                "connector":''
+                "operator":''
             }]
         };
 
@@ -337,6 +337,8 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                         "name": 'default',
                         "title":'',
                         "description":'',
+                        "minScale":0,
+                        "maxScale":1.7976931348623157E308,
                         "symbolizers": [],
                         "filter": null
                     };
@@ -352,6 +354,8 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                         "name": 'palette-rule',
                         "title":'',
                         "description":'',
+                        "minScale":0,
+                        "maxScale":1.7976931348623157E308,
                         "symbolizers": [],
                         "filter": null
                     };
@@ -363,6 +367,8 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                         "name": 'cell-rule',
                         "title":'',
                         "description":'',
+                        "minScale":0,
+                        "maxScale":1.7976931348623157E308,
                         "symbolizers": [],
                         "filter": null
                     };
@@ -370,7 +376,13 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                     $scope.setSelectedRule(rule);
                     $scope.editSelectedRule();
                 }
-
+                $scope.optionsSLD.filtersEnabled=false;
+                $scope.optionsSLD.filters=[{
+                    "attribute":"",
+                    "comparator":"=",
+                    "value":"",
+                    "operator":''
+                }];
             }
         };
 
@@ -564,31 +576,214 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
          * Binding action for checkbox to enable or disable filter in current rule.
          */
         $scope.applyFilter = function() {
-            console.debug($scope.optionsSLD.filtersEnabled);
             if($scope.optionsSLD.filtersEnabled){
                 //apply current filter to the model
-                $scope.optionsSLD.selectedRule.filter = "NAME = 'Island'";
+                var strQuery = '';
+                var operator = '';
+                for(var i=0;i<$scope.optionsSLD.filters.length;i++){
+                    var filter = $scope.optionsSLD.filters[i];
+                    if(filter.attribute !==''){
+                        if(filter.comparator === 'BETWEEN'){
+                            if(filter.value.indexOf(',')!=-1){
+                                var arr= filter.value.split(',');
+                                if(arr.length==2 && arr[0].trim()!=='' && arr[1].trim()!==''){
+                                    strQuery += operator+filter.attribute + ' ' + filter.comparator +' '+ arr[0]+ ' AND '+arr[1];
+                                }
+                            }
+                        }else {
+                            strQuery += operator+filter.attribute + ' ' + filter.comparator + ' \''+ filter.value +'\'';
+                        }
+                        if(filter.operator !== ''){
+                            operator = ' '+filter.operator+' ';
+                        }
+                    }
+                }
+                if(strQuery !== ''){
+                    $scope.optionsSLD.selectedRule.filter = strQuery;
+                }
             }else {
                 //remove filter for current model
                 $scope.optionsSLD.selectedRule.filter = null;
             }
-            console.debug($scope.optionsSLD.selectedRule);
+        };
+
+        /**
+         * Called at init the ng-repeat for filters to read the current rule's filter and affect the local variable.
+         */
+        $scope.restoreFilters = function() {
+            if($scope.optionsSLD.selectedRule.filter !== null){
+                var cql = $scope.optionsSLD.selectedRule.filter;
+                var format = new OpenLayers.Format.CQL();
+                var olfilter;
+                try {
+                    olfilter = format.read(cql);
+                } catch (err) {
+                    console.error(err);
+                }
+                if(olfilter){
+                    $scope.optionsSLD.filters = convertOLFilterToArray(olfilter);
+                    $scope.optionsSLD.filtersEnabled=true;
+                }
+            }else {
+                $scope.optionsSLD.filtersEnabled=false;
+                $scope.optionsSLD.filters=[{
+                    "attribute":"",
+                    "comparator":"=",
+                    "value":"",
+                    "operator":''
+                }];
+            }
+        };
+
+        /**
+         * build an array of query filters for given OpenLayers Filter object.
+         * @param olfilter
+         * @returns {Array}
+         */
+        var convertOLFilterToArray = function(olfilter){
+            var resultArray = [];
+            if(olfilter.CLASS_NAME ==='OpenLayers.Filter.Comparison'){
+                var comparator = convertOLComparatorToCQL(olfilter.type);
+                var value;
+                if(comparator === 'BETWEEN'){
+                    value = olfilter.lowerBoundary+','+olfilter.upperBoundary;
+                }else {
+                    value = olfilter.value;
+                }
+                var q = {
+                    "attribute":olfilter.property,
+                    "comparator":comparator,
+                    "value":value,
+                    "operator":''
+                };
+                resultArray.push(q);
+            }else if(olfilter.CLASS_NAME ==='OpenLayers.Filter.Logical'){
+                recursiveResolveFilter(olfilter,resultArray);
+            }
+            return resultArray;
+        };
+
+        /**
+         * recursive function to resolve OpenLayers filter to current model.
+         * @param obj
+         * @param arrayRes
+         */
+        var recursiveResolveFilter = function(obj,arrayRes){
+            if(obj.CLASS_NAME ==='OpenLayers.Filter.Logical'){
+                if(obj.filters && obj.filters.length==2){
+                    if(obj.filters[0].CLASS_NAME === 'OpenLayers.Filter.Comparison' &&
+                        obj.filters[1].CLASS_NAME === 'OpenLayers.Filter.Comparison'){
+                        var comparator1 = convertOLComparatorToCQL(obj.filters[0].type);
+                        var value1;
+                        if(comparator1 === 'BETWEEN'){
+                            value1 = obj.filters[0].lowerBoundary+','+obj.filters[0].upperBoundary;
+                        }else {
+                            value1 = obj.filters[0].value;
+                        }
+                        var comparator2 = convertOLComparatorToCQL(obj.filters[1].type);
+                        var value2;
+                        if(comparator2 === 'BETWEEN'){
+                            value2 = obj.filters[1].lowerBoundary+','+obj.filters[1].upperBoundary;
+                        }else {
+                            value2 = obj.filters[1].value;
+                        }
+                        var operator = convertOLOperatorToCQL(obj.type);
+                        arrayRes.push({
+                            "attribute":obj.filters[0].property,
+                            "comparator":comparator1,
+                            "value":value1,
+                            "operator":operator
+                        });
+                        arrayRes.push({
+                            "attribute":obj.filters[1].property,
+                            "comparator":comparator2,
+                            "value":value2,
+                            "operator":''
+                        });
+                    }else if(obj.filters[0].CLASS_NAME === 'OpenLayers.Filter.Logical' &&
+                        obj.filters[1].CLASS_NAME === 'OpenLayers.Filter.Comparison'){
+                        recursiveResolveFilter(obj.filters[0],arrayRes);
+                        var op = convertOLOperatorToCQL(obj.type);
+                        arrayRes[arrayRes.length-1].operator = op;
+                        var comparator = convertOLComparatorToCQL(obj.filters[1].type);
+                        var value;
+                        if(comparator === 'BETWEEN'){
+                            value = obj.filters[1].lowerBoundary+','+obj.filters[1].upperBoundary;
+                        }else {
+                            value = obj.filters[1].value;
+                        }
+                        arrayRes.push({
+                            "attribute":obj.filters[1].property,
+                            "comparator":comparator,
+                            "value":value,
+                            "operator":''
+                        });
+                    }
+                }
+            }
+        };
+
+        /**
+         * Utility function to convert OpenLayers comparison type to CQL comparator.
+         *
+         * This is the list of type of the comparison in OpenLayers
+         *
+         OpenLayers.Filter.Comparison.EQUAL_TO = “==”;
+         OpenLayers.Filter.Comparison.NOT_EQUAL_TO = “!=”;
+         OpenLayers.Filter.Comparison.LESS_THAN = “<”;
+         OpenLayers.Filter.Comparison.GREATER_THAN = “>”;
+         OpenLayers.Filter.Comparison.LESS_THAN_OR_EQUAL_TO = “<=”;
+         OpenLayers.Filter.Comparison.GREATER_THAN_OR_EQUAL_TO = “>=”;
+         OpenLayers.Filter.Comparison.BETWEEN = “..”;
+         OpenLayers.Filter.Comparison.LIKE = “~”;
+         OpenLayers.Filter.Comparison.IS_NULL = “NULL”;
+         */
+        var convertOLComparatorToCQL = function(olType){
+            var comparator;
+            if(olType =='=='){
+                comparator = '=';
+            }else if(olType =='..'){
+                comparator = 'BETWEEN';
+            }else if(olType =='~'){
+                comparator = 'LIKE';
+            }else {
+                comparator = olType;
+            }
+            return comparator;
+        };
+
+        /**
+         * Utility function to convert OpenLayers operator
+         * @param olType
+         * @returns {*}
+         */
+        var convertOLOperatorToCQL = function(olType){
+            var operator;
+            if(olType =='&&'){
+                operator = 'AND';
+            }else if(olType =='||'){
+                operator = 'OR';
+            }else if(olType =='!'){
+                operator = 'NOT';
+            }
+            return operator;
         };
 
         /**
          * Binding action for select in filter expression to add a new filter object.
-         * @param connector
+         * @param operator
          */
-        $scope.addNewFilter = function(connector,index) {
-            console.debug(index);
-            if(connector !==''){
+        $scope.addNewFilter = function(operator,index) {
+            if(operator !=='' && (index+1) === $scope.optionsSLD.filters.length){
                 var filter = {
                     "attribute":"",
-                    "operator":"=",
+                    "comparator":"=",
                     "value":"",
-                    "connector":''
+                    "operator":''
                 };
                 $scope.optionsSLD.filters.push(filter);
+            }else if(operator ==''){
+                $scope.optionsSLD.filters = $scope.optionsSLD.filters.slice(0,index+1);
             }
         };
 
