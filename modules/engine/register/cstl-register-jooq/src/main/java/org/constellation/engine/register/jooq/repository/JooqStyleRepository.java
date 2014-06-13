@@ -1,13 +1,12 @@
 package org.constellation.engine.register.jooq.repository;
 
+import java.util.List;
+import org.constellation.engine.register.Data;
+import org.constellation.engine.register.Layer;
+import org.constellation.engine.register.Style;
 import static org.constellation.engine.register.jooq.Tables.STYLE;
 import static org.constellation.engine.register.jooq.Tables.STYLED_DATA;
 import static org.constellation.engine.register.jooq.Tables.STYLED_LAYER;
-
-import java.util.List;
-
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Style;
 import org.constellation.engine.register.jooq.tables.records.StyleRecord;
 import org.constellation.engine.register.jooq.tables.records.StyledDataRecord;
 import org.constellation.engine.register.jooq.tables.records.StyledLayerRecord;
@@ -26,6 +25,12 @@ public class JooqStyleRepository extends AbstractJooqRespository<StyleRecord, St
     public List<Style> findByData(Data data) {
         return dsl.select(STYLE.fields()).from(STYLE).join(STYLED_DATA).onKey()
                 .where(STYLED_DATA.DATA.eq(data.getId())).fetchInto(Style.class);
+    }
+    
+    @Override
+    public List<Style> findByLayer(Layer layer) {
+        return dsl.select(STYLE.fields()).from(STYLE).join(STYLED_LAYER).onKey()
+                .where(STYLED_LAYER.LAYER.eq(layer.getId())).fetchInto(Style.class);
     }
 
     @Override

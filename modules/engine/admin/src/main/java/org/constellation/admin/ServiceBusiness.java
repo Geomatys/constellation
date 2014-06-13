@@ -24,7 +24,6 @@ import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.engine.register.ConstellationPersistenceException;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.ServiceExtraConfig;
-import org.constellation.engine.register.repository.LayerRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.security.SecurityManager;
@@ -43,9 +42,6 @@ public class ServiceBusiness {
             
     @Autowired
     private ServiceRepository serviceRepository;
-
-    @Autowired
-    private LayerRepository layerRepository;
 
     ServiceDTO getService(int id) throws IllegalAccessException, InvocationTargetException {
         final ServiceDTO returnService = new ServiceDTO();

@@ -44,7 +44,6 @@ import static org.constellation.api.QueryConstants.REQUEST_PARAMETER;
 import static org.constellation.api.QueryConstants.SERVICE_PARAMETER;
 import static org.constellation.api.QueryConstants.UPDATESEQUENCE_PARAMETER;
 import static org.constellation.api.QueryConstants.VERSION_PARAMETER;
-import org.constellation.map.configuration.MapConfigurer;
 import org.constellation.map.ws.DefaultWMSWorker;
 import org.constellation.map.ws.QueryContext;
 import org.constellation.map.ws.WMSConstant;

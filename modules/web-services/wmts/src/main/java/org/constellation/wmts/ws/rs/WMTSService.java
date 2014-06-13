@@ -34,7 +34,6 @@ import javax.ws.rs.core.Response;
 
 import org.constellation.ServiceDef;
 import org.constellation.ServiceDef.Specification;
-import org.constellation.map.configuration.MapConfigurer;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.GridWebService;

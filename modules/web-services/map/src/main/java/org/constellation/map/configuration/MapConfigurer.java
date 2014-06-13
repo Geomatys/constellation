@@ -128,6 +128,7 @@ public class MapConfigurer extends OGCConfigurer {
      * @throws TargetNotFoundException if the service with specified identifier does not exist
      * @throws ConfigurationException if the operation has failed for any reason
      */
+    @Deprecated
     public void addLayer(final AddLayer addLayerData) throws ConfigurationException {
         serviceBusiness.ensureExistingInstance(addLayerData.getServiceType(), addLayerData.getServiceId());
 
@@ -143,6 +144,7 @@ public class MapConfigurer extends OGCConfigurer {
         // Set layer provider reference.
         final DataReference layerProviderReference = DataReference.createProviderDataReference(DataReference.PROVIDER_LAYER_TYPE, addLayerData.getProviderId(), layerId);
 
+        
         // Set style provider reference.
         DataReference styleProviderReference;
         try {
@@ -295,6 +297,7 @@ public class MapConfigurer extends OGCConfigurer {
      * @param layerId the layer to remove
      * @throws ConfigurationException
      */
+    @Deprecated
     public void removeLayer(final String spec, final String serviceId, final QName layerId) throws ConfigurationException {
         try {
             final LayerContext layerContext = (LayerContext) serviceBusiness.getConfiguration(spec, serviceId);

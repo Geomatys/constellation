@@ -67,6 +67,11 @@ public class CstlMetadatas {
         feeder.setServiceMetadataIdForData(layerIds);
     }
     
+    public static void addServiceMetadataLayer(final DefaultMetadata metadata, final String layerId) {
+        final MetadataFeeder feeder = new MetadataFeeder(metadata);
+        feeder.addServiceMetadataIdForData(layerId);
+    }
+    
     public static String getMetadataIdForService(final String serviceName, final String serviceType){
         ArgumentChecks.ensureNonNull("serviceName", serviceName);
         ArgumentChecks.ensureNonNull("serviceType", serviceType);

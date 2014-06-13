@@ -50,7 +50,7 @@ public class LayerSummary {
     @XmlElement(name = "Provider")
     private String provider;
     @XmlElement(name = "TargetStyle")
-	private List<StyleBrief> targetStyle;
+    private List<StyleBrief> targetStyle;
 
     public LayerSummary() {}
 

@@ -44,6 +44,24 @@ public class Layer {
 
     private String owner;
 
+    public Layer() {
+        
+    }
+    
+    public Layer(final String name, final String namespace, final String alias, final int serviceId,
+            final int dataId, final long date, final int title, final int description, final String config, final String owner) {
+        this.name        = name;
+        this.namespace   = namespace;
+        this.alias       = alias;
+        this.serviceId   = serviceId;
+        this.dataId      = dataId;
+        this.date        = date;
+        this.title       = title;
+        this.description = description;
+        this.config      = config;
+        this.owner       = owner;
+    }
+    
     public int getId() {
         return id;
     }

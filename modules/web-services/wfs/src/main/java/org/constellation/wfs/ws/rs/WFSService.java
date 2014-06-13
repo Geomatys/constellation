@@ -50,7 +50,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 // constellation dependencies
-import org.constellation.map.configuration.MapConfigurer;
 import org.constellation.ws.rs.GridWebService;
 import org.constellation.ws.WebServiceUtilities;
 import org.constellation.ServiceDef;

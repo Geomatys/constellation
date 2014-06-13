@@ -816,6 +816,32 @@ public class MetadataFeeder {
         servIdent.setOperatesOn(resources);
     }
     
+    public void addServiceMetadataIdForData(final String layerId) {
+        final Collection<Identification> idents = eater.getIdentificationInfo();
+        ServiceIdentificationImpl servIdent = null;
+        for (Identification ident : idents) {
+            if (ident instanceof ServiceIdentificationImpl) {
+                servIdent = (ServiceIdentificationImpl) ident;
+            }
+        }
+        if (servIdent == null) {
+            servIdent = new ServiceIdentificationImpl();
+            eater.getIdentificationInfo().add(servIdent);
+        }
+
+        final Collection<DataIdentification> resources = servIdent.getOperatesOn();
+        for (DataIdentification did : resources) {
+            final DefaultDataIdentification dataIdent = (DefaultDataIdentification) did;
+            if (dataIdent.getIdentifierMap().getSpecialized(IdentifierSpace.HREF).equals(layerId)) {
+                return;
+            }
+        }
+        // add new resouce
+        final DefaultDataIdentification dataIdent = new DefaultDataIdentification();
+        dataIdent.getIdentifierMap().put(IdentifierSpace.HREF, layerId);
+        servIdent.getOperatesOn().add(dataIdent);
+    }
+    
     /**
      * Copy the elements of a source into a destination collection, without adding the elements
      * which are already present in the destination collection.

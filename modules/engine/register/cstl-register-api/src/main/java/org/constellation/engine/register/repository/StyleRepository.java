@@ -34,6 +34,8 @@ public interface StyleRepository {
 
     List<Style> findByData(Data data);
     
+    List<Style> findByLayer(Layer layer);
+    
     void linkStyleToData(int styleId, int dataid);
 
     void unlinkStyleToData(int styleId, int dataid);

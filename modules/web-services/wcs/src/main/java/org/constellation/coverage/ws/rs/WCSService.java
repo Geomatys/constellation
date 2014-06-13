@@ -34,7 +34,6 @@ import java.util.StringTokenizer;
 // Constellation dependencies
 import org.constellation.ServiceDef;
 import org.constellation.ServiceDef.Specification;
-import org.constellation.map.configuration.MapConfigurer;
 import org.constellation.coverage.ws.WCSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;

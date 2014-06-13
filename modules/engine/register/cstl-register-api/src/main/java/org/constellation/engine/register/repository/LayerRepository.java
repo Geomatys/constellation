@@ -35,9 +35,10 @@ public interface LayerRepository {
 
     int update(Layer storeLayer);
 
-    void delete(Layer layer);
-
-	Layer findByServiceIdAndLayerName(int serviceId, String layerName);
-
+    void delete(int layerId);
+    
+    Layer findByServiceIdAndLayerName(int serviceId, String layerName);
+    
+    Layer findByServiceIdAndLayerName(int serviceId, String layerName, String namespace);
     
 }

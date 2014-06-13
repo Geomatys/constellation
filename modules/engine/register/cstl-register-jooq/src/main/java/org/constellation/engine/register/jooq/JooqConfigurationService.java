@@ -179,7 +179,7 @@ public class JooqConfigurationService implements ConfigurationService {
                 }
             }
             for (Entry<String, org.constellation.engine.register.Layer> entry : layersByKey.entrySet()) {
-                layerRepository.delete(entry.getValue());
+                layerRepository.delete(entry.getValue().getId());
             }
             if (service.hasIsoMetadata()) {
                 try {
@@ -280,7 +280,7 @@ public class JooqConfigurationService implements ConfigurationService {
 
     @Override
     public void deleteData(String namespaceURI, String localPart, String providerIdentifier) {
-        Provider provider = providerRepository.findByIdentifie(providerIdentifier);
+        Provider provider = providerRepository.findByIdentifier(providerIdentifier);
         if (provider == null) {
 
         } else {

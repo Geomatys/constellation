@@ -75,18 +75,23 @@ public class JooqLayerRepository extends AbstractJooqRespository<LayerRecord, La
     }
 
     @Override
-    public void delete(Layer layer) {
-        dsl.delete(LAYER).where(LAYER.ID.eq(layer.getId()));
+    public void delete(int layerId) {
+        dsl.delete(LAYER).where(LAYER.ID.eq(layerId));
     }
 
-	@Override
-	public List<Layer> findByServiceId(int serviceId) {
-		return dsl.select().from(LAYER).where(LAYER.SERVICE.eq(serviceId)).fetchInto(Layer.class);
-	}
+    @Override
+    public List<Layer> findByServiceId(int serviceId) {
+        return dsl.select().from(LAYER).where(LAYER.SERVICE.eq(serviceId)).fetchInto(Layer.class);
+    }
 
-	@Override
+    @Override
     public Layer findByServiceIdAndLayerName(int serviceId, String layerName) {
-	    return dsl.select().from(LAYER).where(LAYER.SERVICE.eq(serviceId)).and(LAYER.NAME.eq(layerName)).fetchOneInto(Layer.class);
+        return dsl.select().from(LAYER).where(LAYER.SERVICE.eq(serviceId)).and(LAYER.NAME.eq(layerName)).fetchOneInto(Layer.class);
+    }
+    
+    @Override
+    public Layer findByServiceIdAndLayerName(int serviceId, String layerName, String namespace) {
+        return dsl.select().from(LAYER).where(LAYER.SERVICE.eq(serviceId)).and(LAYER.NAME.eq(layerName)).and(LAYER.NAMESPACE.eq(namespace)).fetchOneInto(Layer.class);
     }
 
 }

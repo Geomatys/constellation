@@ -39,6 +39,11 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
         dsl.insertInto(DATA).select(dsl.select().from(DATA).where(DATA.VISIBLE.eq(true))).execute();
         return null;
     }
+    
+    @Override
+    public Data findById(int id) {
+        return dsl.select().from(DATA).where(DATA.ID.eq(id)).fetchOneInto(Data.class);
+    }
 
     @Override
     public Data fromLayer(String layerAlias, String providerId) {
