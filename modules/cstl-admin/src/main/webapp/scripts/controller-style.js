@@ -337,7 +337,6 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                         "name": 'default',
                         "title":'',
                         "description":'',
-                        "minScale":0,
                         "maxScale":1.7976931348623157E308,
                         "symbolizers": [],
                         "filter": null
@@ -354,7 +353,6 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                         "name": 'palette-rule',
                         "title":'',
                         "description":'',
-                        "minScale":0,
                         "maxScale":1.7976931348623157E308,
                         "symbolizers": [],
                         "filter": null
@@ -367,7 +365,6 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                         "name": 'cell-rule',
                         "title":'',
                         "description":'',
-                        "minScale":0,
                         "maxScale":1.7976931348623157E308,
                         "symbolizers": [],
                         "filter": null
@@ -1168,8 +1165,23 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                             var extent = new OpenLayers.Bounds($scope.dataBbox[0], $scope.dataBbox[1], $scope.dataBbox[2], $scope.dataBbox[3]);
                             DataViewer.map.zoomToExtent(extent, true);
                         }
+                        DataViewer.map.events.register("moveend", DataViewer.map, function(){
+                            setCurrentScale();
+                        });
+                        setCurrentScale();
                     }
                 );
+            }
+        };
+
+        /**
+         * Utility function to set the current scale of OL map into page element.
+         */
+        var setCurrentScale = function(){
+            if(DataViewer.map) {
+                var currentScale=DataViewer.map.getScale();
+                //currentScale = Math.round(currentScale);
+                jQuery('.currentScale').html("1 / "+currentScale);
             }
         };
 

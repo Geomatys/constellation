@@ -736,6 +736,7 @@
     "sldeditor.apercu.data":"Aperçu de la donnée",
     "sldeditor.apercu.autochecked":"Aperçu automatique",
     "sldeditor.edition.filterEnabled": "Filtrer par champ attributaire",
+    "sldeditor.edition.currentScale": "Echelle courante de la carte",
     "sldeditor.edition.fill": "Remplissage",
     "sldeditor.edition.color": "Couleur",
     "sldeditor.edition.stroke":"Contour",

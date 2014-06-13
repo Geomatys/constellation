@@ -211,6 +211,9 @@
                                                style="font-size: 12px;font-weight: normal;"
                                                translate="edition.style.label.filterScaleMin">Minimal scale</label>
                                         <div class="col-sm-7 col-md-8">
+                                            <span class="pull-left"
+                                                  style="position:absolute"
+                                                  ng-if="optionsSLD.selectedRule.minScale != undefined && optionsSLD.selectedRule.minScale !== 0">1/</span>
                                             <input type="number"
                                                    class="form-control"
                                                    id="minScale"
@@ -224,12 +227,23 @@
                                                style="font-size: 12px;font-weight: normal;"
                                                translate="edition.style.label.filterScaleMax">Maximal scale</label>
                                         <div class="col-sm-7 col-md-8">
+                                            <span class="pull-left"
+                                                  style="position:absolute"
+                                                  ng-if="optionsSLD.selectedRule.maxScale != undefined && optionsSLD.selectedRule.maxScale !== 0">1/</span>
                                             <input type="number"
                                                    class="form-control"
                                                    id="maxScale"
                                                    ng-model="optionsSLD.selectedRule.maxScale"
                                                    min="0"/>
                                         </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-5 col-md-4"
+                                               style="font-size: 13px;font-weight:normal;margin-bottom:0;padding-left:15px;padding-right:15px;text-align:right;color:#808080;">
+                                            <em translate="sldeditor.edition.currentScale">Current scale of the map</em>
+                                        </label>
+                                        <em style="font-size: 13px;color:#808080;"
+                                              class="col-sm-7 col-md-8 currentScale"></em>
                                     </div>
                                     <hr style="margin-bottom:10px;"/>
                                     <!--div class="form-group">
@@ -317,8 +331,9 @@
                 <div class="checkbox">
                     <label>
                         <input type="checkbox"
-                               ng-model="optionsSLD.autoPreview"
-                               translate="sldeditor.apercu.autochecked">Automatically preview</input>
+                               ng-model="optionsSLD.autoPreview">
+                            <span translate="sldeditor.apercu.autochecked">Automatically preview</span>
+                        </input>
                     </label>
                 </div>
             </div>

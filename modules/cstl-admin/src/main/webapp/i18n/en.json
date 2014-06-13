@@ -763,6 +763,7 @@
     "sldeditor.apercu.data":"Data preview",
     "sldeditor.apercu.autochecked":"Automatically preview",
     "sldeditor.edition.filterEnabled": "Filter by attribute field",
+    "sldeditor.edition.currentScale": "Current scale of the map",
     "sldeditor.edition.fill": "Fill",
     "sldeditor.edition.color": "Color",
     "sldeditor.edition.stroke":"Stroke",
