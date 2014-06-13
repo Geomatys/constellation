@@ -39,6 +39,8 @@ public interface ServiceRepository {
     
     List<Service> findByDomain(int domainId);
     
+    List<Service> findByType(String type);
+    
     Service findByIdentifierAndType(String id, String type);
 
     void delete(Integer id);

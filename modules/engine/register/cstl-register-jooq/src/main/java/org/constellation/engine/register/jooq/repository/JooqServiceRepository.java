@@ -98,6 +98,12 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
     public List<String> findIdentifiersByType(String type) {
         return dsl.select(SERVICE.IDENTIFIER).from(SERVICE).where(SERVICE.TYPE.eq(type)).fetch(SERVICE.IDENTIFIER);
     }
+    
+    @Override
+    public List<Service> findByType(String type) {
+        SelectConditionStep<Record> from = dsl.select().from(SERVICE).where(SERVICE.TYPE.eq(type));
+        return from.fetchInto(Service.class);
+    }
 
     @Override
     public ServiceMetaData findMetaDataForLangByIdentifierAndType(String identifier, String serviceType, String language) {

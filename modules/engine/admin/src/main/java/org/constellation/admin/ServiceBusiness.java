@@ -1,6 +1,6 @@
 package org.constellation.admin;
 
-import java.io.FileNotFoundException;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -17,6 +17,7 @@ import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.dto.ServiceDTO;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.admin.util.DefaultServiceConfiguration;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.ServiceStatus;
 import org.constellation.configuration.TargetNotFoundException;
@@ -30,6 +31,7 @@ import org.constellation.security.SecurityManager;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
 import org.geotoolkit.process.ProcessException;
+import org.geotoolkit.util.FileUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -176,26 +178,27 @@ public class ServiceBusiness {
      * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
      public void rename(final String serviceType, final String identifier, final String newIdentifier) throws ConfigurationException {
-        final List<String> existingService = ConfigurationEngine.getServiceConfigurationIds(serviceType);
-        if (existingService.contains(identifier)) {
-            if (!existingService.contains(newIdentifier)) {
-                if (ConfigurationEngine.renameConfiguration(serviceType, identifier, newIdentifier)) {
-                    // we stop the current worker
-                    WSEngine.shutdownInstance(serviceType, identifier);
+         final Service service = serviceRepository.findByIdentifierAndType(identifier, serviceType);
+         if (service != null) {
+             final Service newService = serviceRepository.findByIdentifierAndType(newIdentifier, serviceType);
+            if (newService == null) {
+                service.setIdentifier(newIdentifier);
+                serviceRepository.save(service);
+                
+                // we stop the current worker
+                WSEngine.shutdownInstance(serviceType, identifier);
 
-                    // start the new one
-                    final Worker newWorker = WSEngine.buildWorker(serviceType, newIdentifier);
-                    if (newWorker == null) {
-                        throw new ConfigurationException("The instance " + newIdentifier + " can be started, maybe there is no configuration directory with this name.");
-                    } else {
-                        WSEngine.addServiceInstance(serviceType, newIdentifier, newWorker);
-                        if (!newWorker.isStarted()) {
-                            throw new ConfigurationException("unable to start the renamed instance");
-                        }
-                    }
+                // start the new one
+                final Worker newWorker = WSEngine.buildWorker(serviceType, newIdentifier);
+                if (newWorker == null) {
+                    throw new ConfigurationException("The instance " + newIdentifier + " can be started, maybe there is no configuration directory with this name.");
                 } else {
-                    throw new ConfigurationException("Unable to rename the directory");
+                    WSEngine.addServiceInstance(serviceType, newIdentifier, newWorker);
+                    if (!newWorker.isStarted()) {
+                        throw new ConfigurationException("unable to start the renamed instance");
+                    }
                 }
+                
             } else {
                 throw new ConfigurationException("already existing instance:" + newIdentifier);
             }
@@ -215,16 +218,23 @@ public class ServiceBusiness {
          if (identifier == null || identifier.isEmpty()) {
             throw new ConfigurationException("Service instance identifier can't be null or empty.");
         }
+         
+         final Service service = getServiceByIdentifierAndType(serviceType, identifier);
+         if (service != null) {
 
-        //unregister the service instance if exist
-        if (WSEngine.serviceInstanceExist(serviceType, identifier)) {
-            WSEngine.shutdownInstance(serviceType, identifier);
-        }
+            //unregister the service instance if exist
+            if (WSEngine.serviceInstanceExist(serviceType, identifier)) {
+                WSEngine.shutdownInstance(serviceType, identifier);
+            }
 
-        //delete folder
-        if (!ConfigurationEngine.deleteConfiguration(serviceType, identifier)) {
-            throw new ConfigurationException("Service instance directory " + identifier + " can't be deleted.");
-        }
+            // delete from database
+            serviceRepository.delete(service.getId());
+            //delete folder
+            final File instanceDir = ConfigDirectory.getInstanceDirectory(serviceType, identifier);
+            if (instanceDir.isDirectory()) {
+                FileUtilities.deleteDirectory(instanceDir);
+            }
+         }
      }
      
      /**
@@ -317,17 +327,16 @@ public class ServiceBusiness {
      * @return a {@link Map} of {@link ServiceStatus} status
      */
     public Map<String, ServiceStatus> getStatus(final String spec) {
+        final List<Service> services = serviceRepository.findByType(spec);
         final Map<String, ServiceStatus> status = new HashMap<>();
-        for (Map.Entry<String, Boolean> entry : WSEngine.getEntriesStatus(spec)) {
-            status.put(entry.getKey(), entry.getValue() ? ServiceStatus.STARTED : ServiceStatus.ERROR);
-        }
-        final List<String> serviceIDs = ConfigurationEngine.getServiceConfigurationIds(spec);
-        for (String serviceID : serviceIDs) {
-            if (!WSEngine.serviceInstanceExist(spec, serviceID)) {
-                status.put(serviceID, ServiceStatus.STOPPED);
-            }
+        for (Service service : services) {
+            status.put(service.getIdentifier(), ServiceStatus.valueOf(service.getStatus()));
         }
         return status;
+    }
+    
+    public List<String> getServiceIdentifiers(final String spec) {
+        return serviceRepository.findIdentifiersByType(spec);
     }
     
      /**
@@ -370,7 +379,7 @@ public class ServiceBusiness {
                 WSEngine.destroyInstances(serviceType);
             }
 
-            for (String instanceID : ConfigurationEngine.getServiceConfigurationIds(serviceType)) {
+            for (String instanceID : getServiceIdentifiers(serviceType)) {
                 try {
                     final Worker worker = WSEngine.buildWorker(serviceType, instanceID);
                     if (worker != null) {
@@ -433,7 +442,8 @@ public class ServiceBusiness {
      */
     public void ensureExistingInstance(final String spec, final String identifier) throws TargetNotFoundException {
         if (!WSEngine.serviceInstanceExist(spec, identifier)) {
-            if (!ConfigurationEngine.serviceConfigurationExist(spec, identifier)) {
+            final Service service = serviceRepository.findByIdentifierAndType(identifier, spec);
+            if (service == null) {
                 throw new TargetNotFoundException(spec + " service instance with identifier \"" + identifier +
                         "\" not found. There is not configuration in the database.");
             }

@@ -56,7 +56,7 @@ public abstract class DeleteServiceTest extends ServiceProcessTest {
             assertFalse(checkInstanceExist("deleteInstance1"));
             assertTrue(checkInstanceExist("deleteInstance2"));
         } finally {
-            deleteInstance("deleteInstance2");
+            deleteInstance(serviceBusiness, "deleteInstance2");
         }
     }
 

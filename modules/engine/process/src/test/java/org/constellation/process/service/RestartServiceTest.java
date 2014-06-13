@@ -20,11 +20,10 @@ package org.constellation.process.service;
 
 import java.util.List;
 import java.util.Set;
-import org.constellation.admin.ConfigurationEngine;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.test.utils.Order;
+import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.ws.WSEngine;
-import org.constellation.test.utils.TestRunner;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
@@ -38,7 +37,7 @@ import org.opengis.util.NoSuchIdentifierException;
  *
  * @author Quentin Boileau (Geomatys).
  */
-@RunWith(TestRunner.class)
+@RunWith(SpringTestRunner.class)
 public abstract class RestartServiceTest extends ServiceProcessTest {
 
     public RestartServiceTest(final String serviceName, final Class workerClass) {
@@ -50,7 +49,7 @@ public abstract class RestartServiceTest extends ServiceProcessTest {
      * Start all the existing  instance.
      */
     private void startAllInstance() {
-        final List<String> serviceIDs = ConfigurationEngine.getServiceConfigurationIds(serviceName);
+        final List<String> serviceIDs = serviceBusiness.getServiceIdentifiers(serviceName);
         for (String serviceID : serviceIDs) {
             startInstance(serviceID);
         }
@@ -78,7 +77,7 @@ public abstract class RestartServiceTest extends ServiceProcessTest {
             assertTrue(WSEngine.getInstanceSize(serviceName) == initSize);
             assertTrue(WSEngine.serviceInstanceExist(serviceName, "restartInstance1"));
         } finally {
-            deleteInstance("restartInstance1");
+            deleteInstance(serviceBusiness, "restartInstance1");
         }
     }
 
@@ -105,7 +104,7 @@ public abstract class RestartServiceTest extends ServiceProcessTest {
             assertTrue(WSEngine.getInstanceSize(serviceName) == initSize);
             assertTrue(WSEngine.serviceInstanceExist(serviceName, "restartInstance2"));
         } finally {
-            deleteInstance("restartInstance2");
+            deleteInstance(serviceBusiness, "restartInstance2");
         }
     }
 
@@ -141,8 +140,8 @@ public abstract class RestartServiceTest extends ServiceProcessTest {
             assertTrue(WSEngine.serviceInstanceExist(serviceName, "restartInstance4"));
 
         } finally {
-            deleteInstance("restartInstance3");
-            deleteInstance("restartInstance4");
+            deleteInstance(serviceBusiness, "restartInstance3");
+            deleteInstance(serviceBusiness, "restartInstance4");
         }
     }
 
@@ -174,8 +173,8 @@ public abstract class RestartServiceTest extends ServiceProcessTest {
             assertTrue(WSEngine.serviceInstanceExist(serviceName, "restartInstance5"));
             assertTrue(WSEngine.serviceInstanceExist(serviceName, "restartInstance6"));
         } finally {
-            deleteInstance("restartInstance5");
-            deleteInstance("restartInstance6");
+            deleteInstance(serviceBusiness, "restartInstance5");
+            deleteInstance(serviceBusiness, "restartInstance6");
         }
     }
 
@@ -202,7 +201,7 @@ public abstract class RestartServiceTest extends ServiceProcessTest {
 
             assertTrue(WSEngine.serviceInstanceExist(serviceName, "restartInstance40"));
         } finally {
-            deleteInstance("restartInstance40");
+            deleteInstance(serviceBusiness, "restartInstance40");
         }
     }
 

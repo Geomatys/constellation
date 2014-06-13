@@ -33,42 +33,39 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
-
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.ServiceBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.Layers;
 import org.constellation.configuration.Source;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.FeatureData;
-import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderFactory;
 import org.constellation.provider.configuration.AbstractConfigurator;
 import org.constellation.provider.configuration.Configurator;
-
-import static org.constellation.provider.configuration.ProviderParameters.*;
-
 import org.constellation.test.CstlDOMComparator;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.SpringTestRunner;
-import org.constellation.test.utils.TestRunner;
 import org.constellation.util.QNameComparator;
 import org.constellation.util.Util;
-import org.constellation.webservice.map.component.StyleBusiness;
 import org.constellation.wfs.ws.DefaultWFSWorker;
 import org.constellation.wfs.ws.WFSWorker;
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
 import org.constellation.wfs.ws.rs.ValueCollectionWrapper;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.data.FeatureCollection;
+import org.geotoolkit.feature.Feature;
 import org.geotoolkit.feature.type.DefaultName;
+import org.geotoolkit.feature.type.FeatureType;
+import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureReader;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
@@ -118,9 +115,6 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 import org.junit.runner.RunWith;
-import org.geotoolkit.feature.Feature;
-import org.geotoolkit.feature.type.FeatureType;
-import org.geotoolkit.feature.type.Name;
 import org.opengis.parameter.ParameterValueGroup;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -136,7 +130,7 @@ public class WFS2WorkerTest {
     private static WFSWorker worker ;
     
     @Inject
-    private StyleBusiness styleBusiness;
+    private ServiceBusiness serviceBusiness;
 
     private static final DefaultDataSource ds = null;
 
@@ -175,55 +169,59 @@ public class WFS2WorkerTest {
     }
 
     @PostConstruct
-    public void setUpClass() throws Exception {
-        ConfigurationEngine.setupTestEnvironement("WFS2WorkerTest");
+    public void setUpClass() {
+        try {
+            ConfigurationEngine.setupTestEnvironement("WFS2WorkerTest");
 
-        final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null),
-                                                   new Source("omSrc", true, null, null),
-                                                   new Source("shapeSrc", true, null, null),
-                                                   new Source("postgisSrc", true, null, null));
-        final Layers layers = new Layers(sources);
-        final LayerContext config = new LayerContext(layers);
-        config.getCustomParameters().put("shiroAccessible", "false");
-        config.getCustomParameters().put("transactionSecurized", "false");
-        config.getCustomParameters().put("transactionnal", "true");
+            final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null),
+                                                       new Source("omSrc", true, null, null),
+                                                       new Source("shapeSrc", true, null, null),
+                                                       new Source("postgisSrc", true, null, null));
+            final Layers layers = new Layers(sources);
+            final LayerContext config = new LayerContext(layers);
+            config.getCustomParameters().put("shiroAccessible", "false");
+            config.getCustomParameters().put("transactionSecurized", "false");
+            config.getCustomParameters().put("transactionnal", "true");
 
-        ConfigurationEngine.storeConfiguration("WFS", "default", config);
-        ConfigurationEngine.storeConfiguration("WFS", "test", config);
+            ConfigurationEngine.storeConfiguration("WFS", "default", config);
+            ConfigurationEngine.storeConfiguration("WFS", "test", config);
 
-        final List<Source> sources2 = Arrays.asList(new Source("shapeSrc", true, null, null),
-                                                   new Source("omSrc", true, null, null),
-                                                   new Source("smlSrc", true, null, null));
-        final Layers layers2 = new Layers(sources2);
-        final LayerContext config2 = new LayerContext(layers2);
-        config2.getCustomParameters().put("shiroAccessible", "false");
-        config2.getCustomParameters().put("transactionSecurized", "false");
-        config2.getCustomParameters().put("transactionnal", "true");
+            final List<Source> sources2 = Arrays.asList(new Source("shapeSrc", true, null, null),
+                                                       new Source("omSrc", true, null, null),
+                                                       new Source("smlSrc", true, null, null));
+            final Layers layers2 = new Layers(sources2);
+            final LayerContext config2 = new LayerContext(layers2);
+            config2.getCustomParameters().put("shiroAccessible", "false");
+            config2.getCustomParameters().put("transactionSecurized", "false");
+            config2.getCustomParameters().put("transactionnal", "true");
 
-        ConfigurationEngine.storeConfiguration("WFS", "test1", config2);
+            ConfigurationEngine.storeConfiguration("WFS", "test1", config2);
 
-        pool = WFSMarshallerPool.getInstance();
-        
-        final List<StoredQueryDescription> descriptions = new ArrayList<>();
-        final ParameterExpressionType param = new ParameterExpressionType("name", "name Parameter", "A parameter on the name of the feature", new QName("http://www.w3.org/2001/XMLSchema", "string", "xs"));
-        final List<QName> types = Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"));
-        final PropertyIsEqualToType pis = new PropertyIsEqualToType(new LiteralType("$name"), "name", true);
-        final FilterType filter = new FilterType(pis);
-        final QueryType query = new QueryType(filter, types, "2.0.0");
-        final QueryExpressionTextType queryEx = new QueryExpressionTextType("urn:ogc:def:queryLanguage:OGC-WFS::WFS_QueryExpression", null, types);
-        final ObjectFactory factory = new ObjectFactory();
-        queryEx.getContent().add(factory.createQuery(query));
-        final StoredQueryDescriptionType des1 = new StoredQueryDescriptionType("nameQuery", "Name query" , "filter on name for samplingPoint", param, queryEx);
-        descriptions.add(des1);
-        final StoredQueries queries = new StoredQueries(descriptions);
-        ConfigurationEngine.storeConfiguration("WFS", "test1", "StoredQueries.xml", queries, pool);
-        
-        EPSG_VERSION = CRS.getVersion("EPSG").toString();
-        initFeatureSource();
-        worker = new DefaultWFSWorker("test1");
-        worker.setLogLevel(Level.FINER);
-        worker.setServiceUrl("http://geomatys.com/constellation/WS/");
-        worker.setShiroAccessible(false);
+            pool = WFSMarshallerPool.getInstance();
+
+            final List<StoredQueryDescription> descriptions = new ArrayList<>();
+            final ParameterExpressionType param = new ParameterExpressionType("name", "name Parameter", "A parameter on the name of the feature", new QName("http://www.w3.org/2001/XMLSchema", "string", "xs"));
+            final List<QName> types = Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"));
+            final PropertyIsEqualToType pis = new PropertyIsEqualToType(new LiteralType("$name"), "name", true);
+            final FilterType filter = new FilterType(pis);
+            final QueryType query = new QueryType(filter, types, "2.0.0");
+            final QueryExpressionTextType queryEx = new QueryExpressionTextType("urn:ogc:def:queryLanguage:OGC-WFS::WFS_QueryExpression", null, types);
+            final ObjectFactory factory = new ObjectFactory();
+            queryEx.getContent().add(factory.createQuery(query));
+            final StoredQueryDescriptionType des1 = new StoredQueryDescriptionType("nameQuery", "Name query" , "filter on name for samplingPoint", param, queryEx);
+            descriptions.add(des1);
+            final StoredQueries queries = new StoredQueries(descriptions);
+            serviceBusiness.setExtraConfiguration("WFS", "test1", "StoredQueries.xml", queries, pool);
+
+            EPSG_VERSION = CRS.getVersion("EPSG").toString();
+            initFeatureSource();
+            worker = new DefaultWFSWorker("test1");
+            worker.setLogLevel(Level.FINER);
+            worker.setServiceUrl("http://geomatys.com/constellation/WS/");
+            worker.setShiroAccessible(false);
+        } catch (Exception ex) {
+            Logger.getAnonymousLogger().log(Level.SEVERE, "error while initializing test", ex);
+        }
     }
 
     @AfterClass
@@ -2124,7 +2122,7 @@ public class WFS2WorkerTest {
         
     }
 
-    private static void initFeatureSource() throws Exception {
+    private static void initFeatureSource() throws IOException  {
          final File outputDir = initDataDirectory();
 
          final Configurator config = new AbstractConfigurator() {

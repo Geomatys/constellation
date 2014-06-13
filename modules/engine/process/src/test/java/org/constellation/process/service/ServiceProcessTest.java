@@ -19,9 +19,11 @@
 package org.constellation.process.service;
 
 import java.util.UUID;
+import java.util.logging.Level;
 import javax.inject.Inject;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.ServiceBusiness;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.process.AbstractProcessTest;
 import org.constellation.util.ReflectionUtilities;
 import org.constellation.ws.WSEngine;
@@ -74,10 +76,14 @@ public abstract class ServiceProcessTest extends AbstractProcessTest {
      */
     protected abstract boolean checkInstanceExist(final String identifier);
 
-    protected static void deleteInstance(String identifier) {
-        ConfigurationEngine.deleteConfiguration(serviceName, identifier);
-        if (WSEngine.getWorkersMap(serviceName) != null) {
-            WSEngine.getWorkersMap(serviceName).remove(identifier);
+    protected static void deleteInstance(final ServiceBusiness serviceBusiness, String identifier) {
+        try {
+            serviceBusiness.delete(serviceName, identifier);
+            if (WSEngine.getWorkersMap(serviceName) != null) {
+                WSEngine.getWorkersMap(serviceName).remove(identifier);
+            }
+        } catch (ConfigurationException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
         }
     }
 

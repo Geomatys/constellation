@@ -57,7 +57,7 @@ public abstract class StopServiceTest extends ServiceProcessTest {
             assertTrue(WSEngine.getInstanceSize(serviceName) == initSize-1);
             assertFalse(WSEngine.serviceInstanceExist(serviceName, "stopInstance1"));
         } finally {
-            deleteInstance("stopInstance1");
+            deleteInstance(serviceBusiness, "stopInstance1");
         }
     }
 
@@ -95,7 +95,7 @@ public abstract class StopServiceTest extends ServiceProcessTest {
         } catch (ProcessException ex) {
             //do nothing
         } finally {
-            deleteInstance("stopInstance3");
+            deleteInstance(serviceBusiness, "stopInstance3");
         }
     }
 }

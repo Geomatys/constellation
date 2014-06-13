@@ -59,7 +59,7 @@ public abstract class CreateMapServiceTest extends AbstractMapServiceTest {
 
             assertTrue(checkInstanceExist("createInstance1"));
         } finally {
-            deleteInstance("createInstance1");
+            deleteInstance(serviceBusiness, "createInstance1");
         }
     }
 
@@ -87,7 +87,7 @@ public abstract class CreateMapServiceTest extends AbstractMapServiceTest {
             assertTrue(checkInstanceExist("createInstance11"));
             assertEquals(conf, getConfig("createInstance11"));
         } finally {
-            deleteInstance("createInstance11");
+            deleteInstance(serviceBusiness, "createInstance11");
         }
     }
     
@@ -117,7 +117,7 @@ public abstract class CreateMapServiceTest extends AbstractMapServiceTest {
             assertTrue(checkInstanceExist("createInstance15"));
             assertEquals(conf, outContext);
         } finally {
-            deleteInstance("createInstance15");
+            deleteInstance(serviceBusiness, "createInstance15");
         }
     }
 

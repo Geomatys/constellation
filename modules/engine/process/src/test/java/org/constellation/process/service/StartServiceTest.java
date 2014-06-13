@@ -56,7 +56,7 @@ public abstract class StartServiceTest extends ServiceProcessTest {
             assertTrue(WSEngine.getInstanceSize(serviceName) == initSize+1);
             assertTrue(WSEngine.serviceInstanceExist(serviceName, "startInstance1"));
         } finally {
-            deleteInstance("startInstance1");
+            deleteInstance(serviceBusiness, "startInstance1");
         }
     }
 

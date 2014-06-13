@@ -67,7 +67,7 @@ public abstract class SetConfigMapServiceTest  extends AbstractMapServiceTest {
 
             assertEquals(conf, getConfig("updateInstance4"));
         } finally {
-            deleteInstance("updateInstance4");
+            deleteInstance(serviceBusiness, "updateInstance4");
         }
     }
 
@@ -94,7 +94,7 @@ public abstract class SetConfigMapServiceTest  extends AbstractMapServiceTest {
 
             assertEquals(conf, getConfig("instance10"));
         } finally {
-            deleteInstance("instance10");
+            deleteInstance(serviceBusiness, "instance10");
         }
     }
 }

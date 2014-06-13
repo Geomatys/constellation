@@ -22,7 +22,6 @@ package org.constellation.admin;
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -102,13 +101,6 @@ public class ConfigurationEngine {
     // End of spring managed component.
 
    
-    public static Object getConfiguration(final String serviceType, final String serviceID, final String fileName,
-            final MarshallerPool pool) throws JAXBException, FileNotFoundException {
-
-        return configurationService.getConfiguration(serviceType, serviceID, fileName, pool);
-
-    }
-
     public static void storeConfiguration(final String serviceType, final String serviceID, final Object obj,
             final Service metadata) throws JAXBException, IOException {
         storeConfiguration(serviceType, serviceID, null, obj, GenericDatabaseMarshallerPool.getInstance());
@@ -146,61 +138,6 @@ public class ConfigurationEngine {
                 session.close();
         }
         return results;
-    }
-
-    public static boolean serviceConfigurationExist(final String serviceType, final String identifier) {
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            return session.readService(identifier, serviceType) != null;
-
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred while get services in database", ex);
-        } finally {
-            if (session != null)
-                session.close();
-        }
-        return false;
-    }
-
-    public static boolean deleteConfiguration(final String serviceType, final String identifier) {
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            // look fr existence
-            final ServiceRecord serv = session.readService(identifier, serviceType);
-            if (serv != null) {
-                final File instanceDir = ConfigDirectory.getInstanceDirectory(serviceType, identifier);
-                if (instanceDir.isDirectory()) {
-                    FileUtilities.deleteDirectory(instanceDir);
-                }
-                session.deleteService(identifier, serviceType);
-                return true;
-            }
-
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred while deleting service in database", ex);
-        } finally {
-            if (session != null)
-                session.close();
-        }
-        return false;
-    }
-
-    public static boolean renameConfiguration(final String serviceType, final String identifier, final String newID) {
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            final ServiceRecord service = session.readService(identifier, serviceType);
-            service.setIdentifier(newID);
-            return true;
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred while deleting service in database", ex);
-            return false;
-        } finally {
-            if (session != null)
-                session.close();
-        }
     }
 
     public static void writeServiceMetadata(final String identifier, final String serviceType, final Service metadata,

@@ -65,7 +65,7 @@ public abstract class GetConfigMapServiceTest extends AbstractMapServiceTest {
 
             assertEquals(conf, ouptuts.parameter(GetConfigServiceDescriptor.CONFIG_NAME).getValue());
         } finally {
-            deleteInstance( "getConfInstance5");
+            deleteInstance(serviceBusiness,  "getConfInstance5");
         }
     }
 
