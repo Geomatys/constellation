@@ -28,7 +28,6 @@ var cstlUrlPrefix = "@cstl/";
  * Injection of jessionid for csltSessionId cookie.
  */
 
-
 cstlAdminApp.factory('AuthInterceptor', function($rootScope, $cookies, CookiesStorageService) {
     return {
 	    'request': function(config) {
@@ -183,7 +182,8 @@ cstlAdminApp.factory('UserResource', ['$resource', '$cookies',
    function ($resource, $cookies) {
         return $resource('@cstl/api/1/user/:id', null,
             {
-          'update': { method:'PUT' }
+          'update': { method:'PUT' },
+          'domainRoles': {url: '@cstl/api/1/user/$userId/domainroles/:domainId', isArray:true}
       });
 }]);
 
@@ -193,9 +193,9 @@ cstlAdminApp.factory('DomainResource', ['$resource',
      'update': { method:'PUT' },
      'members' : {url: '@cstl/api/1/domain/members/:id', isArray:true},
      'nonmembers' : {url: '@cstl/api/1/domain/nonmembers/:id', isArray:true},
-     'addMemberToDomain' : {method: 'POST', url: '@cstl/api/1/userXdomain/:domainId/:userId'},
-     'updateMemberInDomain' : {method: 'PUT', url: '@cstl/api/1/userXdomain/:domainId/:userId'},
-     'removeMemberFromDomain' : {method: 'DELETE', url: '@cstl/api/1/userXdomain/:domainId/:userId'}
+     'addMemberToDomain' : {method: 'POST', url: '@cstl/api/1/userXdomain/:domainId/user/:userId'},
+     'updateMemberInDomain' : {method: 'PUT', url: '@cstl/api/1/userXdomain/:domainId/user/:userId'},
+     'removeMemberFromDomain' : {method: 'DELETE', url: '@cstl/api/1/userXdomain/:domainId/user/:userId'}
     });
 }]);
 
@@ -219,9 +219,11 @@ cstlAdminApp.factory('PermissionService', ['$http',
 
 cstlAdminApp.factory('webService', ['$resource',
                                      function ($resource) {
-                                         return $resource('@cstl/api/1/admin/domain/$domainId/instances;jsessionid=', {}, {
+                                         return $resource('@cstl/api/1/admin/domain/$domainId/instances', {}, {
                                              'permissionByDomainRole' : {method: 'GET', url: '@cstl/api/1/servicepermission/access', isArray: true},
                                              'domains':      {method: 'GET', url: '@cstl/api/1/servicepermission/user/$userId/service/:id', isArray: true},
+                                             'linkToDomain':      {method: 'POST',   url: '@cstl/api/1/serviceXdomain/:domainId/service/:serviceId'},
+                                             'unlinkFromDomain':  {method: 'DELETE', url: '@cstl/api/1/serviceXdomain/:domainId/service/:serviceId'},
                                              'listAll':      {method: 'GET', isArray: false},
                                              'get':          {method: 'GET', url: '@cstl/api/1/OGC/:type/:id;jsessionid='},
                                              'create':       {method: 'PUT', url: '@cstl/api/1/OGC/:type/domain/$domainId'},

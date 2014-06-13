@@ -21,15 +21,19 @@ package org.constellation.rest.api;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
+
 import org.apache.sis.util.NullArgumentException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigProcessException;
 import org.constellation.configuration.TargetNotFoundException;
+import org.constellation.engine.register.ConstellationRegistryRuntimeException;
+
 import static org.constellation.utils.RESTfulUtilities.badRequest;
 import static org.constellation.utils.RESTfulUtilities.internalError;
 import static org.constellation.utils.RESTfulUtilities.notFound;
@@ -60,6 +64,11 @@ public class GenericExceptionMapper implements ExceptionMapper<Exception> {
          */
         if (exception instanceof WebApplicationException) {
             return ((WebApplicationException) exception).getResponse();
+        }
+        
+        if(exception instanceof ConstellationRegistryRuntimeException) {
+            ConstellationRegistryRuntimeException registryRuntimeException = (ConstellationRegistryRuntimeException) exception;
+            return internalError(AcknowlegementType.failure(exception.getLocalizedMessage(), registryRuntimeException.getErrorCode()));
         }
         /*
          * Others. Simply return the response message with an appropriate HTTP status code.

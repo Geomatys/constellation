@@ -25,9 +25,23 @@ public class ConstellationRegistryRuntimeException extends RuntimeException {
      */
     private static final long serialVersionUID = 1L;
     
+    private String errorCode = "constellation.registry.error";
+    
+    public ConstellationRegistryRuntimeException(String message) {
+        super(message);
+    }
     
     public ConstellationRegistryRuntimeException(Throwable throwable) {
         super(throwable);
+    }
+
+    public ConstellationRegistryRuntimeException withErrorCode(String errorCode) {
+        this.errorCode = errorCode;
+        return this;
+    }
+    
+    public String getErrorCode() {
+        return errorCode;
     }
 
 }

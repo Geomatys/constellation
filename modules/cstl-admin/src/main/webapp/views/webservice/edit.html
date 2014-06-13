@@ -662,7 +662,7 @@
                                     <tr ng-click="details($index)" style='cursor:pointer'
                                         ng-repeat="domain in domains | filter:domainFilter | orderBy:predicate:reverse">
                                         <td>{{domain.name}}</td>
-                                        <td><input type="checkbox" ng-checked="domain.linked" ng-disabled="!domain.canPublish"></td>
+                                        <td><input type="checkbox" ng-click="toggleDomain($index)" ng-checked="domain.linked" ng-disabled="!domain.canPublish"></td>
                                         <td class="user-delete" style="width:20px;" ng-click="details($index)"><span class="glyphicon glyphicon-plus"></span></td>
                                     </tr>
                                 </table>

@@ -35,6 +35,7 @@ import javax.ws.rs.core.Response;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.engine.register.DomainUser;
 import org.constellation.engine.register.User;
+import org.constellation.engine.register.repository.DomainRoleRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.geotoolkit.util.StringUtilities;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,6 +58,9 @@ public class UserRest  {
     @Inject
     private UserRepository userRepository;
     
+    @Inject
+    private DomainRoleRepository domainRoleRepository;
+    
     @GET
     @Path("/")
     public Response findAll(@QueryParam("withDomainAndRoles") boolean withDomainAndRole) {
@@ -70,6 +74,13 @@ public class UserRest  {
     @Path("/{id}")
     public Response findOne(@PathParam("id") int id) {
         return Response.ok(userRepository.findOneWithRolesAndDomains(id)).build();
+    }
+    
+    
+    @GET
+    @Path("/{id}/domainroles/{domainId}")
+    public Response findDomainRoles(@PathParam("id") int id, @PathParam("domainId") int domainId) {
+        return Response.ok(domainRoleRepository.findUserDomainRoles(id, domainId)).build();
     }
 
 

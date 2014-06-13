@@ -30,12 +30,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import org.constellation.engine.register.Domain;
+import org.constellation.engine.register.DomainRole;
 import org.constellation.engine.register.User;
 import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.tables.records.DataXDomainRecord;
@@ -48,6 +50,7 @@ import org.jooq.Batch;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.SelectConditionStep;
+import org.jooq.SelectForUpdateOfStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -75,6 +78,8 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
 
     @Override
     public List<Domain> findByIdsNotIn(List<Integer> fetch) {
+        if (fetch.isEmpty())
+            return findBy(null);
         return findBy(DOMAIN.ID.notIn(fetch));
     }
 
@@ -202,21 +207,6 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
     }
 
     @Override
-    public List<User> findUsers(int domainId) {
-        List<User> result = new ArrayList<User>();
-        SelectConditionStep<Record> groupBy = dsl.select().from(USER).join(USER_X_DOMAIN_X_DOMAINROLE).onKey()
-                .where(USER_X_DOMAIN_X_DOMAINROLE.DOMAIN_ID.eq(domainId));
-        groupBy.execute();
-        Map<Record, Result<Record>> intoGroups = groupBy.getResult().intoGroups(Tables.USER.fields());
-        for (Entry<Record, Result<Record>> userRecord : intoGroups.entrySet()) {
-            User user = userRecord.getKey().into(User.class);
-
-            result.add(user);
-        }
-        return result;
-    }
-
-    @Override
     public Domain findDefaultByUserId(Integer id) {
         return dsl.select().from(DOMAIN).join(USER_X_DOMAIN_X_DOMAINROLE).onKey()
                 .where(USER_X_DOMAIN_X_DOMAINROLE.USER_ID.eq(id)).orderBy(DOMAIN.ID).limit(1)
@@ -224,20 +214,11 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
     }
 
     @Override
-    public List<User> findUsersNotInDomain(int domainId) {
-        return dsl
-                .select()
-                .from(USER)
-                .where(USER.ID.notIn(dsl.selectDistinct(USER_X_DOMAIN_X_DOMAINROLE.USER_ID)
-                        .from(USER_X_DOMAIN_X_DOMAINROLE).where(USER_X_DOMAIN_X_DOMAINROLE.DOMAIN_ID.eq(domainId))))
-                .fetchInto(User.class);
-    }
-
-    @Override
     @Transactional
     public Set<Integer> updateUserInDomain(int userId, int domainId, Set<Integer> roles) {
-        dsl.delete(USER_X_DOMAIN_X_DOMAINROLE).where(
-                USER_X_DOMAIN_X_DOMAINROLE.USER_ID.eq(userId).and(USER_X_DOMAIN_X_DOMAINROLE.DOMAIN_ID.eq(domainId)));
+        dsl.delete(USER_X_DOMAIN_X_DOMAINROLE)
+                .where(USER_X_DOMAIN_X_DOMAINROLE.USER_ID.eq(userId).and(
+                        USER_X_DOMAIN_X_DOMAINROLE.DOMAIN_ID.eq(domainId))).execute();
         addUserToDomain(userId, domainId, roles);
         return roles;
     }
@@ -255,4 +236,12 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
                         Tables.DOMAINROLE_X_PERMISSION.PERMISSION_ID.eq(permissionId))).fetch(DOMAIN.ID);
         return new HashSet<>(fetch);
     }
+
+    @Override
+    public List<Domain> findByLinkedService(int serviceId) {
+                
+        return findBy(DOMAIN.ID.in(dsl.select(SERVICE_X_DOMAIN.DOMAIN_ID).from(SERVICE_X_DOMAIN)
+                .where(SERVICE_X_DOMAIN.SERVICE_ID.eq(serviceId))));
+    }
+
 }

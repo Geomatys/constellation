@@ -4,6 +4,7 @@ import static org.constellation.engine.register.jooq.Tables.DOMAIN;
 import static org.constellation.engine.register.jooq.Tables.DOMAINROLE;
 import static org.constellation.engine.register.jooq.Tables.DOMAINROLE_X_PERMISSION;
 import static org.constellation.engine.register.jooq.Tables.USER;
+import static org.constellation.engine.register.jooq.Tables.USER_X_DOMAIN_X_DOMAINROLE;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -172,11 +173,20 @@ public class JooqDomainRoleRepository extends AbstractJooqRespository<Domainrole
         Map<DomainRole, List<Integer>> result = new HashMap<DomainRole, List<Integer>>();
         Result<Record> fetch = dsl.select().from(DOMAINROLE).join(DOMAINROLE_X_PERMISSION).onKey()
                 .where(DOMAINROLE_X_PERMISSION.PERMISSION_ID.in(Ints.asList(serviceWriteAccessPermissionId))).fetch();
-        for(Entry<Record, Result<Record>> e : fetch.intoGroups(DOMAINROLE.fields()).entrySet()) {
+        for (Entry<Record, Result<Record>> e : fetch.intoGroups(DOMAINROLE.fields()).entrySet()) {
             DomainRole domainRole = e.getKey().into(DomainRole.class);
             List<Integer> values = e.getValue().getValues(DOMAINROLE_X_PERMISSION.PERMISSION_ID);
             result.put(domainRole, values);
         }
         return result;
+    }
+
+    @Override
+    public List<DomainRole> findUserDomainRoles(int id, int domainId) {
+        return findBy(DOMAINROLE.ID.in(dsl
+                .select(USER_X_DOMAIN_X_DOMAINROLE.DOMAINROLE_ID)
+                .from(USER_X_DOMAIN_X_DOMAINROLE)
+                .where(USER_X_DOMAIN_X_DOMAINROLE.USER_ID.eq(id).and(
+                        USER_X_DOMAIN_X_DOMAINROLE.DOMAIN_ID.eq(domainId)))));
     }
 }

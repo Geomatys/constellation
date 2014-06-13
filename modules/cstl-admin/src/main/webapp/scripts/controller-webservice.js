@@ -366,6 +366,27 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
            webService.domains({id:service.id}, function(domains){
              $scope.domains = domains;          
            })
+           
+           $scope.toggleDomain = function(i){
+             var pathParams = {domainId: $scope.domains[i].id, serviceId:service.id};
+             if($scope.domains[i].linked){
+               webService.unlinkFromDomain(pathParams, function(){
+                 $scope.domains[i].linked = !$scope.domains[i].linked;
+                 $scope.domains[i].linked = false;
+               }, function(response){
+                 $growl('error','error', response.data.message );
+                  webService.domains({id:service.id}, function(domains){
+                    $scope.domains = domains;          
+                  })
+               }); 
+             }else{
+               webService.linkToDomain(pathParams, {}, function(){
+                 $scope.domains[i].linked = true;
+               }, function(){
+                 
+               }); 
+             }
+           }
 
         });
 

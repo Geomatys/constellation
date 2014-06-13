@@ -21,6 +21,7 @@ package org.constellation.rest.api;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
@@ -38,8 +39,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.constellation.engine.register.Domain;
+import org.constellation.engine.register.DomainRole;
 import org.constellation.engine.register.User;
 import org.constellation.engine.register.repository.DomainRepository;
+import org.constellation.engine.register.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -48,20 +51,18 @@ import org.springframework.dao.DataIntegrityViolationException;
 @RolesAllowed("cstl-admin")
 public class DomainRest {
 
-    public static class DomainUserWrapper extends Domain {
+    public static class DomainWithUsers extends Domain {
 
         /**
          * 
          */
         private static final long serialVersionUID = 1L;
 
-        public DomainUserWrapper() {
+        public DomainWithUsers() {
         }
 
-        public DomainUserWrapper(Domain domain, List<User> users) {
-            setId(domain.getId());
-            setName(domain.getName());
-            setDescription(domain.getDescription());
+        public DomainWithUsers(Domain domain, List<User> users) {
+            super(domain.getId(), domain.getName(), domain.getDescription(), domain.isSystem());
             this.users = users;
         }
 
@@ -76,9 +77,95 @@ public class DomainRest {
         }
 
     }
+    
+    public static class UserWithDomainRoles  {
+        private User user;
+        private List<DomainRole> domainRoles;
+
+        public UserWithDomainRoles(User user, List<DomainRole> domainRoles) {
+            this.user = user;
+            this.domainRoles = domainRoles; 
+        }
+
+        public List<DomainRole> getDomainRoles() {
+            return domainRoles;
+        }
+
+        public void setDomainRoles(List<DomainRole> domainRoles) {
+            this.domainRoles = domainRoles;
+        }
+
+        public Integer getId() {
+            return user.getId();
+        }
+
+        public void setId(Integer id) {
+            user.setId(id);
+        }
+
+        public String getLogin() {
+            return user.getLogin();
+        }
+
+        public void setLogin(String login) {
+            user.setLogin(login);
+        }
+
+        public String getPassword() {
+            return user.getPassword();
+        }
+
+        public void setPassword(String password) {
+            user.setPassword(password);
+        }
+
+        public String getLastname() {
+            return user.getLastname();
+        }
+
+        public void setLastname(String lastname) {
+            user.setLastname(lastname);
+        }
+
+        public String getFirstname() {
+            return user.getFirstname();
+        }
+
+        public int hashCode() {
+            return user.hashCode();
+        }
+
+        public void setFirstname(String firstname) {
+            user.setFirstname(firstname);
+        }
+
+        public String getEmail() {
+            return user.getEmail();
+        }
+
+        public void setEmail(String email) {
+            user.setEmail(email);
+        }
+
+        public String toString() {
+            return user.toString();
+        }
+
+        public boolean equals(Object obj) {
+            return user.equals(obj);
+        }
+        
+        
+        
+        
+    }
+        
 
     @Inject
     private DomainRepository domainRepository;
+    
+    @Inject
+    private UserRepository userRepository;
 
     @GET
     @Path("/")
@@ -91,10 +178,10 @@ public class DomainRest {
         else
             domains = domainRepository.findAllByUserId(userId);
         if (withMembers) {
-            List<DomainUserWrapper> result = new ArrayList<DomainRest.DomainUserWrapper>();
+            List<DomainWithUsers> result = new ArrayList<DomainWithUsers>();
             for (Domain domain : domains) {
-                List<User> users = domainRepository.findUsers(domain.getId());
-                result.add(new DomainUserWrapper(domain, users));
+                List<User> users = userRepository.findUsersByDomainId(domain.getId());
+                result.add(new DomainWithUsers(domain, users));
             }
             return Response.ok(result).build();
         }
@@ -148,14 +235,22 @@ public class DomainRest {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/members/{id}")
     public Response members(@PathParam("id") int domainId) {
-        return Response.ok(domainRepository.findUsers(domainId)).build();
+        Map<User, List<DomainRole>> findUsersWithDomainRoles = userRepository.findUsersWithDomainRoles(domainId);
+        
+        List<UserWithDomainRoles> result = new ArrayList<DomainRest.UserWithDomainRoles>();
+        
+        for (Map.Entry<User, List<DomainRole>> e : findUsersWithDomainRoles.entrySet()) {
+            result.add(new UserWithDomainRoles(e.getKey(), e.getValue()));
+        }
+        
+        return Response.ok(result).build();
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/nonmembers/{id}")
     public Response notMembers(@PathParam("id") int domainId) {
-        return Response.ok(domainRepository.findUsersNotInDomain(domainId)).build();
+        return Response.ok(userRepository.findUsersNotInDomain(domainId)).build();
     }
 
 }

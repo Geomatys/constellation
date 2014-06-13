@@ -19,21 +19,21 @@ public class UserXDomainRest {
     private DomainRepository domainRepository;
 
     @POST
-    @Path("/{domainId}/{userId}")
+    @Path("/{domainId}/user/{userId}")
     public Response post(@PathParam("userId") int userId,@PathParam("domainId") int domainId, Set<Integer> roles) {
         domainRepository.addUserToDomain(userId, domainId, roles);
         return Response.noContent().build();
     }
     
     @PUT
-    @Path("/{domainId}/{userId}")
+    @Path("/{domainId}/user/{userId}")
     public Response put(@PathParam("userId") int userId,@PathParam("domainId") int domainId, Set<Integer> roles) {
         domainRepository.updateUserInDomain(userId, domainId, roles);
         return Response.noContent().build();
     }
 
     @DELETE
-    @Path("/{domainId}/{userId}")
+    @Path("/{domainId}/user/{userId}")
     public Response delete(@PathParam("userId") int userId, @PathParam("domainId") int domainId) {
         domainRepository.removeUserFromDomain(userId, domainId);
         return Response.noContent().build();
