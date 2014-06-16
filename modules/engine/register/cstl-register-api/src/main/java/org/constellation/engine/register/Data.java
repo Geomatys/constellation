@@ -86,7 +86,7 @@ public class Data {
         this.namespace = namespace;
     }
 
-    public void setProviderId(int provider) {
+    public void setProvider(int provider) {
         this.provider = provider;
     }
 
