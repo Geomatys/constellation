@@ -79,7 +79,7 @@ public final class WSEngine {
     }
     
     public static Map<String, Worker> getWorkersMap(final String specification) {
-        return WORKERS_MAP.get(specification);
+        return WORKERS_MAP.get(specification.toLowerCase());
     }
 
     @Deprecated
@@ -94,7 +94,7 @@ public final class WSEngine {
      * @return
      */
     public static int getInstanceSize(final String specification) {
-        final Map<String, Worker> workersMap = WORKERS_MAP.get(specification);
+        final Map<String, Worker> workersMap = WORKERS_MAP.get(specification.toLowerCase());
         if (workersMap != null) {
             return workersMap.size();
         }
@@ -102,7 +102,7 @@ public final class WSEngine {
     }
 
     public static boolean serviceInstanceExist(final String specification, final String serviceID) {
-        final Map<String, Worker> workersMap = WORKERS_MAP.get(specification);
+        final Map<String, Worker> workersMap = WORKERS_MAP.get(specification.toLowerCase());
         if (workersMap != null) {
             return workersMap.containsKey(serviceID);
         }
@@ -110,7 +110,7 @@ public final class WSEngine {
     }
 
     public static Set<String> getInstanceNames(final String specification) {
-        final Map<String, Worker> workersMap = WORKERS_MAP.get(specification);
+        final Map<String, Worker> workersMap = WORKERS_MAP.get(specification.toLowerCase());
         if (workersMap != null) {
             return workersMap.keySet();
         }
@@ -118,7 +118,7 @@ public final class WSEngine {
     }
 
     public static Worker getInstance(final String specification, final String serviceID) {
-        final Map<String, Worker> workersMap = WORKERS_MAP.get(specification);
+        final Map<String, Worker> workersMap = WORKERS_MAP.get(specification.toLowerCase());
         if (workersMap != null) {
             return workersMap.get(serviceID);
         }
@@ -126,17 +126,17 @@ public final class WSEngine {
     }
 
     public static void destroyInstances(final String specification) {
-        if (TO_RESTART.contains(specification)) {
-            TO_RESTART.remove(specification);
+        if (TO_RESTART.contains(specification.toLowerCase())) {
+            TO_RESTART.remove(specification.toLowerCase());
             return;
         }
-        final Map<String, Worker> workersMap = WORKERS_MAP.get(specification);
+        final Map<String, Worker> workersMap = WORKERS_MAP.get(specification.toLowerCase());
         if (workersMap != null) {
             for (final Worker worker : workersMap.values()) {
                 worker.destroy();
             }
             workersMap.clear();
-            WORKERS_MAP.put(specification, null);
+            WORKERS_MAP.put(specification.toLowerCase(), null);
         }
     }
 
@@ -144,12 +144,12 @@ public final class WSEngine {
         if (TO_RESTART.contains(specification)) {
             return false;
         }
-        final Map<String, Worker> workersMap = WORKERS_MAP.get(specification);
+        final Map<String, Worker> workersMap = WORKERS_MAP.get(specification.toLowerCase());
         return workersMap != null;
     }
 
     public static void setServiceInstances(final String specification, final Map<String, Worker> instances) {
-        final Map<String, Worker> oldWorkersMap = WORKERS_MAP.put(specification, instances);
+        final Map<String, Worker> oldWorkersMap = WORKERS_MAP.put(specification.toLowerCase(), instances);
         if (oldWorkersMap != null && !oldWorkersMap.isEmpty()) {
             LOGGER.info("Destroying old workers");
             for (Worker oldWorker : oldWorkersMap.values()) {
@@ -159,21 +159,21 @@ public final class WSEngine {
     }
 
     public static void addServiceInstance(final String specification, final String serviceID, final Worker instance) {
-        Map<String, Worker> workersMap = WORKERS_MAP.get(specification);
+        Map<String, Worker> workersMap = WORKERS_MAP.get(specification.toLowerCase());
         if (workersMap == null) {
             workersMap = new HashMap<>();
-            WORKERS_MAP.put(specification, workersMap);
+            WORKERS_MAP.put(specification.toLowerCase(), workersMap);
         }
         final Worker oldWorker = workersMap.put(serviceID, instance);
         if (oldWorker != null) {
-            LOGGER.log(Level.INFO, "Destroying old worker: {0}({1})", new Object[]{specification, serviceID});
+            LOGGER.log(Level.INFO, "Destroying old worker: {0}({1})", new Object[]{specification.toLowerCase(), serviceID});
             oldWorker.destroy();
         }
     }
 
     public static Set<Entry<String, Boolean>> getEntriesStatus(final String specification) {
         final Set<Map.Entry<String, Boolean>> response = new HashSet<>();
-        final Map<String, Worker> workersMap = WORKERS_MAP.get(specification);
+        final Map<String, Worker> workersMap = WORKERS_MAP.get(specification.toLowerCase());
         if (workersMap != null) {
             for (Entry<String, Worker> entry : workersMap.entrySet()) {
                 response.add(new AbstractMap.SimpleEntry<>(entry.getKey(), entry.getValue().isStarted()));
@@ -183,7 +183,7 @@ public final class WSEngine {
     }
 
     public static void shutdownInstance(final String specification, final String serviceID) {
-        final Map<String, Worker> workersMap = WORKERS_MAP.get(specification);
+        final Map<String, Worker> workersMap = WORKERS_MAP.get(specification.toLowerCase());
         if (workersMap != null) {
             final Worker worker = workersMap.get(serviceID);
             if (worker != null) {
@@ -196,26 +196,26 @@ public final class WSEngine {
      /**
      * Add a service type to the list of registered service if it is not already registered.
      *
-     * @param serviceName A service type (CSW, SOS, WMS, ...).
+     * @param specification A service type (CSW, SOS, WMS, ...).
      * @param protocol
      * @param workerClass the class binding of the service worker.
      * @param configurerClass the class binding of the service configurer
      */
-    public static void registerService(final String serviceName, final String protocol, final Class <? extends Worker> workerClass,
+    public static void registerService(final String specification, final String protocol, final Class <? extends Worker> workerClass,
         final Class<? extends ServiceConfigurer> configurerClass) {
-        if (REGISTERED_SERVICE.containsKey(serviceName)) {
-            final List<String> protocols = REGISTERED_SERVICE.get(serviceName);
+        if (REGISTERED_SERVICE.containsKey(specification.toLowerCase())) {
+            final List<String> protocols = REGISTERED_SERVICE.get(specification.toLowerCase());
             if (!protocols.contains(protocol)) {
                 protocols.add(protocol);
             }
-            REGISTERED_SERVICE.put(serviceName, protocols);
+            REGISTERED_SERVICE.put(specification.toLowerCase(), protocols);
         } else {
             final List<String> protocols = new ArrayList<>();
             protocols.add(protocol);
-            REGISTERED_SERVICE.put(serviceName, protocols);
+            REGISTERED_SERVICE.put(specification.toLowerCase(), protocols);
         }
-        SERVICE_WORKER_CLASS.put(serviceName, workerClass);
-        SERVICE_CONFIGURER_CLASS.put(serviceName, configurerClass);
+        SERVICE_WORKER_CLASS.put(specification.toLowerCase(), workerClass);
+        SERVICE_CONFIGURER_CLASS.put(specification.toLowerCase(), configurerClass);
     }
 
     public static Map<String, List<String>> getRegisteredServices() {
@@ -225,12 +225,12 @@ public final class WSEngine {
     /**
      * Return the {@link Worker} implementation {@link Class} of a registered OGC service.
      *
-     * @param serviceType The OGC service type (WMS, CSW, WFS, ...).
+     * @param specification The OGC service type (WMS, CSW, WFS, ...).
      * @return the worker class of a registered service or null if service not registered.
      */
-    private static Class<? extends Worker> getServiceWorkerClass(final String serviceType) {
-        if (SERVICE_WORKER_CLASS.containsKey(serviceType)) {
-            return SERVICE_WORKER_CLASS.get(serviceType);
+    private static Class<? extends Worker> getServiceWorkerClass(final String specification) {
+        if (SERVICE_WORKER_CLASS.containsKey(specification.toLowerCase())) {
+            return SERVICE_WORKER_CLASS.get(specification.toLowerCase());
         }
         return null;
     }
@@ -238,13 +238,13 @@ public final class WSEngine {
     /**
      * Instanciate a new {@link Worker} for the specified OGC service.
      *
-     * @param serviceType The OGC service type (WMS, CSW, WFS, ...).
+     * @param specification The OGC service type (WMS, CSW, WFS, ...).
      * @param identifier The identifier of the new {@link Worker}.
      * 
      * @return The new instancied {@link Worker}.
      */
-    public static Worker buildWorker(final String serviceType, final String identifier) {
-        final Class<? extends Worker> workerClass = getServiceWorkerClass(serviceType.toUpperCase());
+    public static Worker buildWorker(final String specification, final String identifier) {
+        final Class<? extends Worker> workerClass = getServiceWorkerClass(specification.toLowerCase());
         return workerFactory.build(workerClass, identifier);
     }
 
@@ -256,8 +256,8 @@ public final class WSEngine {
      * @return the {@link ServiceConfigurer} implementation {@link Class} or null if service not registered
      */
     public static Class<? extends ServiceConfigurer> getServiceConfigurerClass(final String specification) {
-        if (SERVICE_CONFIGURER_CLASS.containsKey(specification)) {
-            return SERVICE_CONFIGURER_CLASS.get(specification);
+        if (SERVICE_CONFIGURER_CLASS.containsKey(specification.toLowerCase())) {
+            return SERVICE_CONFIGURER_CLASS.get(specification.toLowerCase());
         }
         return null;
     }

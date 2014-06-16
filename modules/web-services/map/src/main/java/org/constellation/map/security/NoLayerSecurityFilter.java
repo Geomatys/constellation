@@ -18,7 +18,7 @@
  */
 package org.constellation.map.security;
 
-import org.geotoolkit.feature.type.Name;
+import javax.xml.namespace.QName;
 
 /**
  *
@@ -27,7 +27,7 @@ import org.geotoolkit.feature.type.Name;
 public class NoLayerSecurityFilter implements LayerSecurityFilter {
 
     @Override
-    public boolean allowed(final String login, final Name layerName) {
+    public boolean allowed(final String login, final QName layerName) {
         return true;
     }
 

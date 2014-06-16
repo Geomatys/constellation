@@ -83,7 +83,7 @@ cstlAdminApp.controller('WebServiceController', ['$scope', 'webService', 'provid
             );
         };
         $scope.startOrStop = function(service){
-            if(service.status==='WORKING'){
+            if(service.status==='STARTED'){
                 webService.stop({type: service.type, id: service.identifier}, {}, function(response) {
                     if (response.status==="Success") {
                         $scope.services = webService.listAll();
@@ -614,7 +614,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
 
 
         $scope.startOrStop = function(service){
-            if(service.status==='WORKING'){
+            if(service.status==='STARTED'){
                 webService.stop({type: service.type, id: service.identifier}, {}, function(response) {
                     if (response.status==="Success") {
                         $scope.service.status = "NOT_STARTED";
@@ -624,7 +624,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
             }else{
                 webService.start({type: service.type, id: service.identifier}, {}, function(response) {
                     if (response.status==="Success") {
-                        $scope.service.status = "WORKING";
+                        $scope.service.status = "STARTED";
                         $growl('success','Success','Service '+ service.name +' successfully started');
                     }
                 }, function() { $growl('error','Error','Service '+ service.name +' start failed'); });

@@ -47,10 +47,11 @@ public abstract class ServiceConfigurer {
      * directory is missing
      */
     public static ServiceConfigurer newInstance(final Specification specification) throws NotRunningServiceException {
-        if (WSEngine.getRegisteredServices().get(specification.name()) == null) {
+        final String serviceType = specification.name().toLowerCase();
+        if (WSEngine.getRegisteredServices().get(serviceType) == null) {
             throw new NotRunningServiceException(specification);
         }
-        final Class c = WSEngine.getServiceConfigurerClass(specification.name());
+        final Class c = WSEngine.getServiceConfigurerClass(serviceType);
         ServiceConfigurer instance =  (ServiceConfigurer) ReflectionUtilities.newInstance(c);
         autowirer.autowireBean(instance);
         return instance;

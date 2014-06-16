@@ -28,14 +28,9 @@ import com.vividsolutions.jts.geom.Polygon;
 import java.awt.*;
 
 import org.apache.sis.storage.DataStoreException;
-import org.constellation.admin.ConfigurationEngine;
-import org.constellation.admin.dao.LayerRecord;
 import org.constellation.configuration.ConfigProcessException;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Instance;
-import org.constellation.configuration.Layer;
-import org.constellation.configuration.LayerContext;
-import org.constellation.configuration.Source;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.*;
 import org.constellation.ogc.configuration.OGCConfigurer;
@@ -49,7 +44,6 @@ import org.constellation.util.DataReference;
 import org.constellation.webservice.map.component.StyleBusiness;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.LayerProviders;
-import org.constellation.ws.rs.MapUtilities;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.process.ProcessDescriptor;
@@ -82,7 +76,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
-import javax.xml.namespace.QName;
 import org.constellation.process.ConstellationProcessFactory;
 import org.geotoolkit.process.ProcessFinder;
 
@@ -106,6 +99,9 @@ public class MapConfigurer extends OGCConfigurer {
     
     @Inject
     StyleBusiness styleBusiness;
+    
+    @Inject
+    LayerBusiness layerBusiness;
 
     /**
      * Returns a Constellation {@link ProcessDescriptor} from its name.
@@ -254,80 +250,12 @@ public class MapConfigurer extends OGCConfigurer {
     }
 
     /**
-     * Extracts and returns the list of {@link Layer}s available on a "map" service.
-     *
-     * @param identifier the service identifier
-     * @return the {@link Layer} list
-     * @throws TargetNotFoundException if the service with specified identifier does not exist
-     * @throws ConfigurationException if the operation has failed for any reason
-     */
-    public List<Layer> getLayers(final String spec, final String identifier) throws ConfigurationException {
-        serviceBusiness.ensureExistingInstance(spec, identifier);
-
-        // Extracts the layer list from service configuration.
-        final LayerContext layerContext = (LayerContext) serviceBusiness.getConfiguration(spec, identifier);
-        List<Layer> layers = MapUtilities.getConfigurationLayers(layerContext, null, null);
-
-        for (Layer layer : layers) {
-            final LayerRecord record = ConfigurationEngine.getLayer(identifier, spec, layer.getName());
-            if (record != null) {
-                layer.setDate(record.getDate());
-                layer.setOwner(record.getOwnerLogin());
-            }
-         }
-
-        return layers;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
     public Instance getInstance(String spec, String identifier) throws ConfigurationException {
         final Instance instance = super.getInstance(spec, identifier);
-        instance.setLayersNumber(getLayers(spec, identifier).size());
+        instance.setLayersNumber(layerBusiness.getLayers(spec, identifier, null).size());
         return instance;
-    }
-
-    /**
-     * Remove a layer from a service.
-     *
-     * @param spec service type.
-     * @param serviceId the service identifier
-     * @param layerId the layer to remove
-     * @throws ConfigurationException
-     */
-    @Deprecated
-    public void removeLayer(final String spec, final String serviceId, final QName layerId) throws ConfigurationException {
-        try {
-            final LayerContext layerContext = (LayerContext) serviceBusiness.getConfiguration(spec, serviceId);
-            final List<Source> sources = layerContext.getLayers();
-            QName name = null;
-            boolean found = false;
-
-            for (Source source : sources) {
-                List<Layer> layers = source.getInclude();
-                for (Layer layer : layers) {
-                    if(layer.getName().equals(layerId)){
-                        name = layer.getName();
-                        layers.remove(layer);
-                        found = true;
-                        break;
-                    }
-                }
-                if(found){
-                    break;
-                }
-            }
-
-            if(found){
-                ConfigurationEngine.storeConfiguration(spec, serviceId, layerContext);
-                ConfigurationEngine.deleteLayer(serviceId, spec, name);
-                serviceBusiness.restart(spec, serviceId, true);
-            }
-
-        } catch (Exception e) {
-            throw new ConfigurationException("Error when trying to remove a layer from the service "+ serviceId, e);
-        }
     }
 }

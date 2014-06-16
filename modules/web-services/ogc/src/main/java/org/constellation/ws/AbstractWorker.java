@@ -48,6 +48,7 @@ import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
 import org.constellation.dto.Service;
 
 import org.constellation.security.SecurityManagerHolder;
@@ -112,7 +113,7 @@ public abstract class AbstractWorker implements Worker {
     /**
      * The specification for this worker.
      */
-    private final Specification specification;
+    protected final Specification specification;
 
     protected UnmodifiableArrayList<ServiceDef> supportedVersions;
 
@@ -135,13 +136,13 @@ public abstract class AbstractWorker implements Worker {
 
     private long currentUpdateSequence = System.currentTimeMillis();
     
-
     @Inject
     protected ServiceBusiness serviceBusiness;
     
     public AbstractWorker(final String id, final Specification specification) {
         this.id = id;
         this.specification = specification;
+        SpringHelper.injectDependencies(this);
     }
 
     /**

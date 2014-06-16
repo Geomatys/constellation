@@ -21,26 +21,21 @@ package org.constellation.ws;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import org.constellation.configuration.*;
-import org.constellation.map.featureinfo.FeatureInfoUtilities;
-import org.constellation.ws.security.SimplePDP;
-import org.constellation.ServiceDef.Specification;
-
 import java.util.*;
-import java.io.FileNotFoundException;
 import java.util.logging.Level;
-import javax.imageio.spi.ServiceRegistry;
-import javax.xml.bind.JAXBException;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import javax.xml.namespace.QName;
-
-import org.constellation.admin.ConfigurationEngine;
-import org.constellation.map.factory.MapFactory;
-import org.constellation.map.security.LayerSecurityFilter;
+import org.constellation.ServiceDef.Specification;
+import org.constellation.admin.ServiceBusiness;
+import org.constellation.configuration.*;
+import org.constellation.map.configuration.LayerBusiness;
+import org.constellation.map.featureinfo.FeatureInfoUtilities;
 import org.constellation.provider.Data;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.StyleProviders;
 import org.constellation.util.DataReference;
-import org.constellation.ws.rs.MapUtilities;
+import org.constellation.ws.security.SimplePDP;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.Name;
@@ -54,13 +49,14 @@ import org.geotoolkit.style.MutableStyle;
  */
 public abstract class LayerWorker extends AbstractWorker {
 
+    @Inject
+    private LayerBusiness layerBusiness;
+    
     private LayerContext layerContext;
 
     protected final List<String> supportedLanguages = new ArrayList<>();
 
     protected final String defaultLanguage;
-
-    private LayerSecurityFilter securityFilter;
 
     public LayerWorker(final String id, final Specification specification) {
         super(id, specification);
@@ -96,8 +92,6 @@ public abstract class LayerWorker extends AbstractWorker {
                 if (cc != null && !cc.isEmpty()) {
                     cacheCapabilities = Boolean.parseBoolean(cc);
                 }
-                final MapFactory mapfactory = getMapFactory(layerContext.getImplementation());
-                securityFilter = mapfactory.getSecurityFilter();
 
                 //Check  FeatureInfo configuration (if exist)
                 FeatureInfoUtilities.checkConfiguration(layerContext);
@@ -133,22 +127,10 @@ public abstract class LayerWorker extends AbstractWorker {
             }
         });
     }
-
-    /**
-     * Select the good CSW factory in the available ones in function of the dataSource type.
-     *
-     * @param type
-     * @return
-     */
-    private MapFactory getMapFactory(final DataSourceType type) {
-        final Iterator<MapFactory> ite = ServiceRegistry.lookupProviders(MapFactory.class);
-        while (ite.hasNext()) {
-            MapFactory currentFactory = ite.next();
-            if (currentFactory.factoryMatchType(type)) {
-                return currentFactory;
-            }
-        }
-        throw new FactoryNotFoundException("No Map factory has been found for type:" + type);
+    
+    @PostConstruct
+    public void init(){
+        
     }
 
     protected List<Layer> getConfigurationLayers(final String login, final List<Name> layerNames) {
@@ -202,7 +184,12 @@ public abstract class LayerWorker extends AbstractWorker {
      * layer context.
      */
     public List<Layer> getConfigurationLayers(final String login) {
-        return MapUtilities.getConfigurationLayers(layerContext, securityFilter, login);
+        try {
+            return layerBusiness.getLayers(this.specification.name(), getId(), login);
+        } catch (ConfigurationException ex) {
+            LOGGER.log(Level.WARNING, "Erro while getting layers", ex);
+        }
+        return new ArrayList<>();
     }
 
     

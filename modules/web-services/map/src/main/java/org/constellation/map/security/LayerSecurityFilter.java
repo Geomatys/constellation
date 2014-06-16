@@ -18,7 +18,8 @@
  */
 package org.constellation.map.security;
 
-import org.geotoolkit.feature.type.Name;
+import javax.xml.namespace.QName;
+
 
 /**
  *
@@ -26,5 +27,5 @@ import org.geotoolkit.feature.type.Name;
  */
 public interface LayerSecurityFilter {
     
-    boolean allowed(final String login, final Name layerName);
+    boolean allowed(final String login, final QName layerName);
 }

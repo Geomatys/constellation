@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import javax.annotation.PreDestroy;
+import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
 import javax.xml.validation.Schema;
@@ -31,10 +32,10 @@ import org.apache.sis.util.iso.Types;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef;
 import org.constellation.ServiceDef.Specification;
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.service.StartServiceDescriptor;
 import org.constellation.security.IncorrectCredentialsException;
 import org.constellation.security.SecurityManagerHolder;
 import org.constellation.security.UnknownAccountException;
@@ -47,13 +48,8 @@ import org.geotoolkit.ows.xml.OWSExceptionCode;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // Apache SIS dependencies
-import org.geotoolkit.process.ProcessDescriptor;
-import org.geotoolkit.process.ProcessException;
-import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.util.StringUtilities;
-import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.CodeList;
-import org.opengis.util.NoSuchIdentifierException;
 
 
 /**
@@ -87,6 +83,9 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
 
     private final String serviceName;
     
+    @Inject
+    private ServiceBusiness serviceBusiness;
+    
     /**
      * Initialize the basic attributes of a web serviceType.
      *
@@ -97,7 +96,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
         if (specification == null){
             throw new IllegalArgumentException("It is compulsory for a web service to have a specification.");
         }
-
+        SpringHelper.injectDependencies(this);
         this.serviceName = specification.name();
 
         LOGGER.log(Level.INFO, "Starting the REST {0} service facade.\n", serviceName);
@@ -108,29 +107,13 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
          * service directory.
          */
         if (!WSEngine.isSetService(serviceName)) {
-            startAllInstance();
+            try {
+                serviceBusiness.start(serviceName);
+            } catch (ConfigurationException ex) {
+                LOGGER.log(Level.WARNING, "Error while starting services for :" + serviceName, ex);
+            }
         } else {
             LOGGER.log(Level.INFO, "Workers already set for {0}", serviceName);
-        }
-    }
-
-    private void startAllInstance() {
-        final List<String> serviceIDs = ConfigurationEngine.getServiceConfigurationIds(serviceName);
-        for (String serviceID : serviceIDs) {
-            
-            try {
-                ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StartServiceDescriptor.NAME);
-                ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-                inputs.parameter(StartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
-                inputs.parameter(StartServiceDescriptor.IDENTIFIER_NAME).setValue(serviceID);
-
-                org.geotoolkit.process.Process proc = desc.createProcess(inputs);
-                proc.call();
-            } catch (NoSuchIdentifierException ex) {
-                LOGGER.log(Level.WARNING, "StartService process is unreachable.");
-            } catch (ProcessException ex) {
-                LOGGER.log(Level.WARNING, "Error while starting all instances", ex);
-            }
         }
     }
 

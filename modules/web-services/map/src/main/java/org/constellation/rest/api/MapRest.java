@@ -26,7 +26,6 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.namespace.QName;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.*;
@@ -36,6 +35,7 @@ import org.constellation.dto.SimpleValue;
 import org.constellation.map.configuration.LayerBusiness;
 import static org.constellation.utils.RESTfulUtilities.ok;
 import org.constellation.webservice.map.component.StyleBusiness;
+import org.constellation.security.SecurityManager;
 import org.springframework.stereotype.Component;
 
 /**
@@ -59,19 +59,27 @@ public final class MapRest {
     @Inject
     private LayerBusiness layerBusiness;
     
+    @Inject
+    private SecurityManager securityManager;
+    
     /**
-     * @see MapConfigurer#getLayers(String)
+     * Extracts and returns the list of {@link Layer}s available on a "map" service.
+     *
+     * @param identifier the service identifier
+     * @return the {@link Layer} list
+     * @throws TargetNotFoundException if the service with specified identifier does not exist
+     * @throws ConfigurationException if the operation has failed for any reason
      */
     @GET
     @Path("{id}/layer/all")
     public Response getLayers(final @PathParam("spec") String spec, final @PathParam("id") String id) throws ConfigurationException {
-        return ok(new LayerList(layerBusiness.getLayers(spec, id)));
+        return ok(new LayerList(layerBusiness.getLayers(spec, id, securityManager.getCurrentUserLogin())));
     }
 
     @GET
     @Path("{id}/layersummary/all")
     public Response getLayersSummary(final @PathParam("spec") String spec, final @PathParam("id") String id) throws ConfigurationException {
-        final List<Layer> layers = layerBusiness.getLayers(spec, id);
+        final List<Layer> layers = layerBusiness.getLayers(spec, id, securityManager.getCurrentUserLogin());
         
         final List<LayerSummary> sumLayers = new ArrayList<>();
         for (final Layer lay : layers) {
@@ -105,14 +113,8 @@ public final class MapRest {
      */
     @POST
     @Path("{id}/delete/{layerid}")
-    public Response deleteLayer(final @PathParam("spec") String spec, final @PathParam("id") String serviceId, final @PathParam("layerid") String layerid, final SimpleValue layernmsp) throws ConfigurationException {
-        final QName layerName;
-        if (layernmsp != null) {
-            layerName = new QName(layernmsp.getValue(), layerid);
-        } else {
-            layerName = new QName(layerid);
-        }
-        layerBusiness.remove(spec, serviceId, layerName);
+    public Response deleteLayer(final @PathParam("spec") String spec, final @PathParam("id") String serviceId, final @PathParam("layerid") String layerId, final SimpleValue layernmsp) throws ConfigurationException {
+        layerBusiness.remove(spec, serviceId, layerId, layernmsp.getValue());
         return Response.ok().build();
     }
 

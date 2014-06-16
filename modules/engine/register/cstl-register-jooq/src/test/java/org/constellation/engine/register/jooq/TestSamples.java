@@ -38,7 +38,7 @@ public class TestSamples {
         data.setNamespace("");
         data.setOwner(owner.getLogin());
         data.setType("type");
-        data.setProviderId(provider.getId());
+        data.setProvider(provider.getId());
         return data;
     }
 

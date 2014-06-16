@@ -19,13 +19,19 @@
 
 package org.constellation.map.configuration;
 
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import javax.imageio.spi.ServiceRegistry;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.DataSourceType;
+import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.AddLayer;
 import org.constellation.engine.register.ConstellationPersistenceException;
@@ -40,11 +46,15 @@ import org.constellation.engine.register.repository.LayerRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
 import org.constellation.engine.register.repository.StyleRepository;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.map.factory.MapFactory;
+import org.constellation.map.security.LayerSecurityFilter;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.util.DataReference;
 import org.constellation.utils.CstlMetadatas;
+import org.geotoolkit.factory.FactoryNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -70,7 +80,7 @@ public class LayerBusiness {
     
     public void add(final AddLayer addLayerData) throws ConfigurationException {
         
-        final Service service = serviceRepository.findByIdentifierAndType(addLayerData.getServiceType(), addLayerData.getServiceId());
+        final Service service = serviceRepository.findByIdentifierAndType(addLayerData.getServiceId(), addLayerData.getServiceType());
         
         if (service !=null) {
             final String name       = addLayerData.getLayerId();
@@ -91,8 +101,10 @@ public class LayerBusiness {
             layer = layerRepository.save(layer);
             
             //style
-            for (int styleID : data.getStyles()) {
-                styleRepository.linkStyleToLayer(styleID, layer.getId());
+            if (data.getStyles() != null) {
+                for (int styleID : data.getStyles()) {
+                    styleRepository.linkStyleToLayer(styleID, layer.getId());
+                }
             }
             
             //update service ISO metadata
@@ -112,62 +124,98 @@ public class LayerBusiness {
         }
     }
     
-    public void remove(final String spec, final String serviceId, final QName layerId) throws ConfigurationException {
+    public void remove(final String spec, final String serviceId, final String name, final String namespace) throws ConfigurationException {
         final Service service = serviceRepository.findByIdentifierAndType(serviceId, spec);
         if (service != null) {
-            final Layer layer = layerRepository.findByServiceIdAndLayerName(service.getId(), layerId.getLocalPart(), layerId.getNamespaceURI());
+            final Layer layer = layerRepository.findByServiceIdAndLayerName(service.getId(), name, namespace);
             if (layer != null) {
                 layerRepository.delete(layer.getId());
             } else {
-                throw new TargetNotFoundException("Unable to find a layer: " + layerId);
+                throw new TargetNotFoundException("Unable to find a layer: {" + namespace + "}" + name);
             }
         } else {
             throw new TargetNotFoundException("Unable to find a service:" + serviceId);
         }
     }
     
-    public List<org.constellation.configuration.Layer> getLayers(final String spec, final String identifier) throws ConfigurationException {
+    public List<org.constellation.configuration.Layer> getLayers(final String spec, final String identifier, final String login) throws ConfigurationException {
         final List<org.constellation.configuration.Layer> response = new ArrayList<>();
         final Service service = serviceRepository.findByIdentifierAndType(identifier, spec);
+        
         if (service != null) {
-            final List<Layer> layers = layerRepository.findByServiceId(service.getId());
+            final LayerContext context = readMapConfiguration(service.getConfig());
+            final MapFactory mapfactory = getMapFactory(context.getImplementation());
+            final LayerSecurityFilter securityFilter = mapfactory.getSecurityFilter();
+            final List<Layer> layers   = layerRepository.findByServiceId(service.getId());
             for (Layer layer : layers) {
                 final Data data          = dataRepository.findById(layer.getData());
                 final Provider provider  = providerRepository.findOne(data.getProvider());
                 final QName name         = new QName(layer.getNamespace(), layer.getName());
                 final List<Style> styles = styleRepository.findByLayer(layer);
-                
-                final org.constellation.configuration.Layer layerDto = new org.constellation.configuration.Layer(name);
-                layerDto.setAlias(layer.getAlias());
-                // TODO layerDto.setAbstrac();
-                // TODO layerDto.setAttribution(null);
-                // TODO layerDto.setAuthorityURL(null);
-                // TODO layerDto.setCrs(null);
-                // TODO layerDto.setDataURL(null);
-                layerDto.setDate(new Date(layer.getDate()));
-                // TODO layerDto.setDimensions(null);
-                // TODO layerDto.setFilter(null);
-                // TODO layerDto.setGetFeatureInfoCfgs(null);
-                // TODO layerDto.setKeywords();
-                // TODO layerDto.setMetadataURL(null);
-                // TODO layerDto.setOpaque(Boolean.TRUE);
-                layerDto.setOwner(layer.getOwner());
-                layerDto.setProviderID(provider.getIdentifier());
-                layerDto.setProviderType(provider.getType());
-                
-                for (Style style : styles) {
-                    final Provider styleProvider = providerRepository.findOne(style.getProvider());
-                    DataReference styleProviderReference = DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, styleProvider.getIdentifier(), style.getName());
-                    layerDto.getStyles().add(styleProviderReference);
+                if (securityFilter.allowed(login, name)) {
+                    final org.constellation.configuration.Layer layerDto = new org.constellation.configuration.Layer(name);
+                    layerDto.setAlias(layer.getAlias());
+                    // TODO layerDto.setAbstrac();
+                    // TODO layerDto.setAttribution(null);
+                    // TODO layerDto.setAuthorityURL(null);
+                    // TODO layerDto.setCrs(null);
+                    // TODO layerDto.setDataURL(null);
+                    layerDto.setDate(new Date(layer.getDate()));
+                    // TODO layerDto.setDimensions(null);
+                    // TODO layerDto.setFilter(null);
+                    // TODO layerDto.setGetFeatureInfoCfgs(null);
+                    // TODO layerDto.setKeywords();
+                    // TODO layerDto.setMetadataURL(null);
+                    // TODO layerDto.setOpaque(Boolean.TRUE);
+                    layerDto.setOwner(layer.getOwner());
+                    layerDto.setProviderID(provider.getIdentifier());
+                    layerDto.setProviderType(provider.getType());
+
+                    for (Style style : styles) {
+                        final Provider styleProvider = providerRepository.findOne(style.getProvider());
+                        DataReference styleProviderReference = DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, styleProvider.getIdentifier(), style.getName());
+                        layerDto.getStyles().add(styleProviderReference);
+                    }
+
+                     // TODO layerDto.setTitle(null);
+                     // TODO layerDto.setVersion();
+                    response.add(layerDto);
                 }
-                
-                 // TODO layerDto.setTitle(null);
-                 // TODO layerDto.setVersion();
-                response.add(layerDto);
             }
         } else {
             throw new TargetNotFoundException("Unable to find a service:" + identifier);
         }
         return response;
+    }
+    
+    private LayerContext readMapConfiguration(final String xml) throws ConfigurationException {
+        try {
+            if (xml != null) {
+                final Unmarshaller u = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+                final Object config = u.unmarshal(new StringReader(xml));
+                GenericDatabaseMarshallerPool.getInstance().recycle(u);
+                return (LayerContext) config;
+            }
+            return null;
+        } catch (JAXBException ex) {
+            throw new ConfigurationException(ex);
+        }
+    }
+    
+    /**
+     * Select the good CSW factory in the available ones in function of the dataSource type.
+     *
+     * @param type
+     * @return
+     */
+    private MapFactory getMapFactory(final DataSourceType type) {
+        final Iterator<MapFactory> ite = ServiceRegistry.lookupProviders(MapFactory.class);
+        while (ite.hasNext()) {
+            MapFactory currentFactory = ite.next();
+            if (currentFactory.factoryMatchType(type)) {
+                return currentFactory;
+            }
+        }
+        throw new FactoryNotFoundException("No Map factory has been found for type:" + type);
     }
 }

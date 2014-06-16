@@ -150,6 +150,7 @@ import org.opengis.util.FactoryException;
 import org.springframework.context.annotation.Scope;
 
 import com.codahale.metrics.annotation.Timed;
+import org.constellation.admin.ServiceBusiness;
 
 /**
  * A WMS worker for a local WMS service which handles requests from either REST
@@ -189,16 +190,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     /**
      * List of FeatureInfo mimeTypes
      */
-    private final List<String> GFI_MIME_TYPES = new ArrayList<String>();
+    private final List<String> GFI_MIME_TYPES = new ArrayList<>();
 
     private WMSPortrayal mapPortrayal;
     
-    public static class Factory {
-        public static DefaultWMSWorker create(String id) {
-            return new DefaultWMSWorker(id);
-        }
-    }
-
     public DefaultWMSWorker(final String id) {
         super(id, ServiceDef.Specification.WMS);
 

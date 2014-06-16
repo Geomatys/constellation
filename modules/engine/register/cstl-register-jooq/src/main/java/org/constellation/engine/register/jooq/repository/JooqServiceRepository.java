@@ -67,7 +67,7 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
     @Override
     public Service findByIdentifierAndType(String identifier, String type) {
         Record one = dsl.select().from(SERVICE)
-                .where(SERVICE.IDENTIFIER.eq(identifier).and(SERVICE.TYPE.eq(type))).fetchOne();
+                .where(SERVICE.IDENTIFIER.eq(identifier).and(SERVICE.TYPE.eq(type.toLowerCase()))).fetchOne();
         if (one == null)
             return null;
         return one.into(Service.class);
@@ -80,18 +80,18 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
 
     @Override
     public Service save(Service service) {
-
-        ServiceRecord newRecord = dsl.newRecord(SERVICE);
-
-        newRecord.setIdentifier(service.getIdentifier());
-        newRecord.setOwner(service.getOwner());
-        newRecord.setType(service.getType());
-        newRecord.setConfig(service.getConfig());
-        newRecord.setDate(service.getDate());
-        if (newRecord.store() > 0) {
-            return newRecord.into(Service.class);
-        }
-        return null;
+        dsl.update(SERVICE)
+                .set(SERVICE.DATE, service.getDate())
+                .set(SERVICE.CONFIG, service.getConfig())
+                .set(SERVICE.IDENTIFIER, service.getIdentifier())
+                .set(SERVICE.METADATA, service.getMetadata())
+                .set(SERVICE.METADATA_ID, service.getMetadataId())
+                .set(SERVICE.OWNER, service.getOwner())
+                .set(SERVICE.STATUS, service.getStatus())
+                .set(SERVICE.TYPE, service.getType())
+                .set(SERVICE.VERSIONS, service.getVersions())
+                .where(SERVICE.ID.eq(service.getId())).execute();
+        return service;
     }
 
     @Override
@@ -101,7 +101,7 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
     
     @Override
     public List<Service> findByType(String type) {
-        SelectConditionStep<Record> from = dsl.select().from(SERVICE).where(SERVICE.TYPE.eq(type));
+        SelectConditionStep<Record> from = dsl.select().from(SERVICE).where(SERVICE.TYPE.eq(type.toLowerCase()));
         return from.fetchInto(Service.class);
     }
 

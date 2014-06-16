@@ -45,6 +45,7 @@ import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.ws.ServiceConfigurer;
 import org.constellation.configuration.ServiceReport;
+import org.constellation.configuration.ServiceStatus;
 import org.constellation.dto.Configuration;
 import org.constellation.dto.SimpleValue;
 import org.constellation.engine.register.Service;
@@ -158,6 +159,7 @@ public class AdminRest {
 	    instance.setName(service.getIdentifier());
 	    instance.setType(service.getType());
 	    instance.setVersions(Arrays.asList(service.getVersions().split("|")));
+            instance.setStatus(ServiceStatus.valueOf(service.getStatus()));
 	    instances.add(instance);
     }
      return Response.ok(new InstanceReport(instances)).build();

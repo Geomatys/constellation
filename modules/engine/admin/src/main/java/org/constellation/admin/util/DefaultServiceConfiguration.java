@@ -67,18 +67,18 @@ public class DefaultServiceConfiguration {
         final List<GetFeatureInfoCfg> featureInfos = new ArrayList<>();
 
         //HTML
-        featureInfos.add(new GetFeatureInfoCfg(MimeType.TEXT_HTML, "HTMLFeatureInfoFormat"));
+        featureInfos.add(new GetFeatureInfoCfg(MimeType.TEXT_HTML, "org.constellation.map.featureinfo.HTMLFeatureInfoFormat"));
 
         //CSV
-        featureInfos.add(new GetFeatureInfoCfg(MimeType.TEXT_PLAIN, "CSVFeatureInfoFormat"));
+        featureInfos.add(new GetFeatureInfoCfg(MimeType.TEXT_PLAIN, "org.constellation.map.featureinfo.CSVFeatureInfoFormat"));
 
         //GML
-        featureInfos.add(new GetFeatureInfoCfg(MimeType.APP_GML, "GMLFeatureInfoFormat"));//will return map server GML
-        featureInfos.add(new GetFeatureInfoCfg(MimeType.APP_GML_XML, "GMLFeatureInfoFormat"));//will return GML 3
+        featureInfos.add(new GetFeatureInfoCfg(MimeType.APP_GML, "org.constellation.map.featureinfo.GMLFeatureInfoFormat"));//will return map server GML
+        featureInfos.add(new GetFeatureInfoCfg(MimeType.APP_GML_XML, "org.constellation.map.featureinfo.GMLFeatureInfoFormat"));//will return GML 3
 
         //XML
-        featureInfos.add(new GetFeatureInfoCfg(MimeType.APP_XML, "XMLFeatureInfoFormat"));
-        featureInfos.add(new GetFeatureInfoCfg(MimeType.TEXT_XML, "XMLFeatureInfoFormat"));
+        featureInfos.add(new GetFeatureInfoCfg(MimeType.APP_XML, "org.constellation.map.featureinfo.XMLFeatureInfoFormat"));
+        featureInfos.add(new GetFeatureInfoCfg(MimeType.TEXT_XML, "org.constellation.map.featureinfo.XMLFeatureInfoFormat"));
         
         return featureInfos;
     }
