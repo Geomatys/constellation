@@ -126,7 +126,7 @@ public class JooqConfigurationService implements ConfigurationService {
         }
          
 
-        if (obj instanceof LayerContext) {
+        /*if (obj instanceof LayerContext) {
 
             Map<String, org.constellation.engine.register.Layer> layersByKey = new HashMap<String, org.constellation.engine.register.Layer>();
             layersByKey.putAll(Maps.uniqueIndex(layerRepository.findByServiceId(service.getId()),
@@ -191,7 +191,7 @@ public class JooqConfigurationService implements ConfigurationService {
                     throw new ConstellationPersistenceException(e);
                 }
             }
-        }
+        }*/
 
         if (fileName == null) {
             service.setConfig(config);

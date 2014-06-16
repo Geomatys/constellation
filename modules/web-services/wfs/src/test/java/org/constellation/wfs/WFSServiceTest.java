@@ -28,24 +28,25 @@ import java.net.URL;
 import java.sql.Connection;
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.ServiceBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
-import org.constellation.configuration.Layers;
-import org.constellation.configuration.Source;
+import org.constellation.map.configuration.LayerBusiness;
 import org.constellation.provider.DataProviders;
-import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderFactory;
 import org.constellation.provider.Providers;
 import org.constellation.provider.configuration.AbstractConfigurator;
 import org.constellation.provider.configuration.Configurator;
 
-import static org.constellation.provider.configuration.ProviderParameters.*;
 import org.constellation.test.utils.BasicMultiValueMap;
 import org.constellation.test.utils.BasicUriInfo;
 import org.constellation.util.Util;
@@ -71,6 +72,12 @@ import org.opengis.parameter.ParameterValueGroup;
  */
 public class WFSServiceTest {
 
+    @Inject
+    private ServiceBusiness serviceBusiness;
+    
+    @Inject
+    protected LayerBusiness layerBusiness;
+    
     private static WFSService service;
 
     private static DefaultDataSource ds = null;
@@ -82,33 +89,53 @@ public class WFSServiceTest {
     private static final MultivaluedMap<String,String> queryParameters = new BasicMultiValueMap<>();
     private static final MultivaluedMap<String,String> pathParameters = new BasicMultiValueMap<>();
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-        ConfigurationEngine.setupTestEnvironement("WFSServiceTest");
-
-        final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null),
-                                                   new Source("omSrc", true, null, null),
-                                                   new Source("shapeSrc", true, null, null),
-                                                   new Source("postgisSrc", true, null, null));
-        final Layers layers = new Layers(sources);
-        final LayerContext config = new LayerContext(layers);
-        config.getCustomParameters().put("shiroAccessible", "false");
-        config.getCustomParameters().put("transactionSecurized", "false");
-        config.getCustomParameters().put("transactionnal", "true");
-
-        ConfigurationEngine.storeConfiguration("WFS", "default", config);
-        
-        initFeatureSource();
-        service = new WFSService();
-
-        Field privateStringField = WebService.class.getDeclaredField("uriContext");
-        privateStringField.setAccessible(true);
-        privateStringField.set(service, info);
-
-        pathParameters.add("serviceId", "default");
-        queryParameters.add("serviceId", "default");
-        info.setPathParameters(pathParameters);
-        info.setQueryParameters(queryParameters);
+    @PostConstruct
+    public void setUpClass() {
+        try {
+            ConfigurationEngine.setupTestEnvironement("WFSServiceTest");
+            
+            final LayerContext config = new LayerContext();
+            config.getCustomParameters().put("shiroAccessible", "false");
+            config.getCustomParameters().put("transactionSecurized", "false");
+            config.getCustomParameters().put("transactionnal", "true");
+            
+            serviceBusiness.create("WFS", "default", config, null);
+            layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "WFS");
+            layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "WFS");
+            layerBusiness.add("EntitéGénérique",     "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "WFS");
+            layerBusiness.add("SamplingPoint",       "http://www.opengis.net/sampling/1.0",  "omSrc",      null, "default", "WFS");
+            layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS");
+            layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS");
+            layerBusiness.add("Bridges",             "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS");
+            layerBusiness.add("Streams",             "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS");
+            layerBusiness.add("Lakes",               "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS");
+            layerBusiness.add("NamedPlaces",         "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS");
+            layerBusiness.add("Buildings",           "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS");
+            layerBusiness.add("RoadSegments",        "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS");
+            layerBusiness.add("DividedRoutes",       "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS");
+            layerBusiness.add("Forests",             "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS");
+            layerBusiness.add("MapNeatline",         "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS");
+            layerBusiness.add("Ponds",               "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS");
+            layerBusiness.add("System",              "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "default", "WFS");
+            layerBusiness.add("Component",           "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "default", "WFS");
+            layerBusiness.add("DataSourceType",      "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "default", "WFS");
+            layerBusiness.add("ProcessModel",        "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "default", "WFS");
+            layerBusiness.add("ProcessChain",        "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "default", "WFS");
+            
+            initFeatureSource();
+            service = new WFSService();
+            
+            Field privateStringField = WebService.class.getDeclaredField("uriContext");
+            privateStringField.setAccessible(true);
+            privateStringField.set(service, info);
+            
+            pathParameters.add("serviceId", "default");
+            queryParameters.add("serviceId", "default");
+            info.setPathParameters(pathParameters);
+            info.setQueryParameters(queryParameters);
+        } catch (Exception ex) {
+            Logger.getLogger(WFSServiceTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
     }
 

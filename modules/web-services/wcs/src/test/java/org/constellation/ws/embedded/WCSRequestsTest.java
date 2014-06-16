@@ -25,19 +25,22 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.imageio.ImageIO;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.ImageWriterSpi;
+import javax.inject.Inject;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.ServiceBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
-import org.constellation.configuration.Layers;
-import org.constellation.configuration.Source;
+import org.constellation.map.configuration.LayerBusiness;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
 import org.constellation.provider.Providers;
@@ -79,6 +82,12 @@ import org.opengis.parameter.ParameterValueGroup;
 @RunWith(TestRunner.class)
 public class WCSRequestsTest extends AbstractGrizzlyServer {
 
+    @Inject
+    private ServiceBusiness serviceBusiness;
+    
+    @Inject
+    protected LayerBusiness layerBusiness;
+    
     /**
      * The layer to test.
      */
@@ -122,71 +131,76 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
-    @BeforeClass
-    public static void initLayerList() throws JAXBException {
-        ConfigurationEngine.setupTestEnvironement("WCSRequestsTest");
-
-        final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null));
-        final Layers layers = new Layers(sources);
-        final LayerContext config = new LayerContext(layers);
-        config.getCustomParameters().put("shiroAccessible", "false");
-
-        ConfigurationEngine.storeConfiguration("WCS", "default", config);
-        ConfigurationEngine.storeConfiguration("WCS", "test", config);
-
-        initServer(new String[] {
-            "org.constellation.coverage.ws.rs",
-            "org.constellation.configuration.ws.rs",
-            "org.constellation.ws.rs.provider"
-        }, null);
-
-        pool = WCSMarshallerPool.getInstance();
-
-        final Configurator configurator = new AbstractConfigurator() {
-
-            @Override
-            public List<Map.Entry<String, ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException {
-                final ArrayList<Map.Entry<String, ParameterValueGroup>> lst = new ArrayList<>();
+    @PostConstruct
+    public void initLayerList() {
+        try {
+            ConfigurationEngine.setupTestEnvironement("WCSRequestsTest");
+            
+            final LayerContext config = new LayerContext();
+            config.getCustomParameters().put("shiroAccessible", "false");
+            
+            serviceBusiness.create("WCS", "default", config, null);
+            layerBusiness.add("SST_tests", null, "coverageTestSrc", null, "default", "WCS");
+            
+            serviceBusiness.create("WCS", "test", config, null);
+            layerBusiness.add("SST_tests", null, "coverageTestSrc", null, "test",    "WCS");
+            
+            initServer(new String[] {
+                "org.constellation.coverage.ws.rs",
+                "org.constellation.configuration.ws.rs",
+                "org.constellation.ws.rs.provider"
+            }, null);
+            
+            pool = WCSMarshallerPool.getInstance();
+            
+            final Configurator configurator = new AbstractConfigurator() {
                 
-                final ProviderFactory factory = DataProviders.getInstance().getFactory("coverage-sql");
-                
-                if (hasLocalDatabase()) {
-                    final ParameterValueGroup config = factory.getProviderDescriptor().createValue();
-                    // Defines a PostGrid data provider
-                    final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                    final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
-                    srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://flupke.geomatys.com/coverages-test");
-                    srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
-                    final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
-                    srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
-                    srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
-                    srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
-                    srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
-                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
-                    lst.add(new AbstractMap.SimpleImmutableEntry<>("coverageTestSrc",config));
+                @Override
+                public List<Map.Entry<String, ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException {
+                    final ArrayList<Map.Entry<String, ParameterValueGroup>> lst = new ArrayList<>();
+                    
+                    final ProviderFactory factory = DataProviders.getInstance().getFactory("coverage-sql");
+                    
+                    if (hasLocalDatabase()) {
+                        final ParameterValueGroup config = factory.getProviderDescriptor().createValue();
+                        // Defines a PostGrid data provider
+                        final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
+                        final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
+                        srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://flupke.geomatys.com/coverages-test");
+                        srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
+                        final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
+                        srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
+                        srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
+                        srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
+                        srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
+                        source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
+                        lst.add(new AbstractMap.SimpleImmutableEntry<>("coverageTestSrc",config));
+                    }
+                    return lst;
                 }
-                return lst;
+                
+                @Override
+                public List<Configurator.ProviderInformation> getProviderInformations() throws ConfigurationException {
+                    throw new UnsupportedOperationException("Not supported yet.");
+                }
+            };
+            
+            DataProviders.getInstance().setConfigurator(configurator);
+            
+            WorldFileImageReader.Spi.registerDefaults(null);
+            
+            //reset values, only allow pure java readers
+            for(String jn : ImageIO.getReaderFormatNames()){
+                Registry.setNativeCodecAllowed(jn, ImageReaderSpi.class, false);
             }
             
-            @Override
-            public List<Configurator.ProviderInformation> getProviderInformations() throws ConfigurationException {
-                throw new UnsupportedOperationException("Not supported yet.");
+            //reset values, only allow pure java writers
+            for(String jn : ImageIO.getWriterFormatNames()){
+                Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, false);
             }
-        };
-
-        DataProviders.getInstance().setConfigurator(configurator);
-
-        WorldFileImageReader.Spi.registerDefaults(null);
-
-        //reset values, only allow pure java readers
-        for(String jn : ImageIO.getReaderFormatNames()){
-            Registry.setNativeCodecAllowed(jn, ImageReaderSpi.class, false);
-        }
-
-        //reset values, only allow pure java writers
-        for(String jn : ImageIO.getWriterFormatNames()){
-            Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, false);
+        } catch (Exception ex) {
+            Logger.getLogger(WCSRequestsTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

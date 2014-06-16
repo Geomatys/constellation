@@ -79,20 +79,25 @@ public class LayerBusiness {
     private org.constellation.security.SecurityManager securityManager;
     
     public void add(final AddLayer addLayerData) throws ConfigurationException {
+        final String name        = addLayerData.getLayerId();
+        final String namespace   = addLayerData.getLayerNamespace();
+        final String providerId  = addLayerData.getProviderId();
+        final String alias       = addLayerData.getLayerAlias();
+        final String serviceId   = addLayerData.getServiceId();
+        final String serviceType = addLayerData.getServiceType();
+        add(name, namespace, providerId, alias, serviceId, serviceType);
+    }
+    
+    public void add(final String name, String namespace, final String providerId, final String alias,
+            final String serviceId, final String serviceType) throws ConfigurationException {
         
-        final Service service = serviceRepository.findByIdentifierAndType(addLayerData.getServiceId(), addLayerData.getServiceType());
+        final Service service = serviceRepository.findByIdentifierAndType(serviceId, serviceType);
         
         if (service !=null) {
-            final String name       = addLayerData.getLayerId();
-            final String providerId = addLayerData.getProviderId();
-            final String alias      = addLayerData.getLayerAlias();
             
             // look for layer namespace
-            final String namespace;
-            if (addLayerData.getLayerNamespace() != null) {
-                namespace = addLayerData.getLayerNamespace();
-            } else {
-                final DataProvider provider = DataProviders.getInstance().getProvider(addLayerData.getProviderId());
+            if (namespace == null) {
+                final DataProvider provider = DataProviders.getInstance().getProvider(providerId);
                 namespace = ProviderParameters.getNamespace(provider);
             }
 
@@ -120,7 +125,7 @@ public class LayerBusiness {
             }
             
         } else {
-            throw new TargetNotFoundException("Unable to find a service:" + addLayerData.getServiceId());
+            throw new TargetNotFoundException("Unable to find a service:" + serviceId);
         }
     }
     

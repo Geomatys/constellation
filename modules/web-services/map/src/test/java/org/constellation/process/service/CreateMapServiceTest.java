@@ -18,11 +18,7 @@
  */
 package org.constellation.process.service;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.constellation.configuration.LayerContext;
-import org.constellation.configuration.Layers;
-import org.constellation.configuration.Source;
 import org.constellation.map.featureinfo.FeatureInfoUtilities;
 import org.constellation.process.ConstellationProcessFactory;
 import org.geotoolkit.process.ProcessDescriptor;
@@ -69,10 +65,7 @@ public abstract class CreateMapServiceTest extends AbstractMapServiceTest {
         try {
             final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateServiceDescriptor.NAME);
 
-            final List<Source> sources = new ArrayList<>();
-            sources.add(new Source("source1", Boolean.TRUE, null, null));
-            final Layers layers = new Layers(sources);
-            final LayerContext conf = new LayerContext(layers);
+            final LayerContext conf = new LayerContext();
 
             //WMS
             ParameterValueGroup in = desc.getInputDescriptor().createValue();
@@ -97,10 +90,7 @@ public abstract class CreateMapServiceTest extends AbstractMapServiceTest {
         try {
             final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateServiceDescriptor.NAME);
 
-            final List<Source> sources = new ArrayList<>();
-            sources.add(new Source("source1", Boolean.TRUE, null, null));
-            final Layers layers = new Layers(sources);
-            final LayerContext conf = new LayerContext(layers);
+            final LayerContext conf = new LayerContext();
             conf.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
             createCustomInstance("createInstance15", conf);
             //create

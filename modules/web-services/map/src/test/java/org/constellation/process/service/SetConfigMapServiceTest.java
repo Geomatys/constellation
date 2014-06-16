@@ -18,12 +18,7 @@
  */
 package org.constellation.process.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
-import org.constellation.configuration.Layers;
-import org.constellation.configuration.Source;
 import org.constellation.process.ConstellationProcessFactory;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
@@ -50,10 +45,7 @@ public abstract class SetConfigMapServiceTest  extends AbstractMapServiceTest {
         try {
             final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, SetConfigServiceDescriptor.NAME);
 
-            final List<Source> sources = new ArrayList<>();
-            sources.add(new Source("source1", Boolean.TRUE, new ArrayList<Layer>(), null));
-            final Layers layers = new Layers(sources);
-            final LayerContext conf = new LayerContext(layers);
+            final LayerContext conf = new LayerContext();
 
             //WMS
             ParameterValueGroup in = desc.getInputDescriptor().createValue();
@@ -78,10 +70,7 @@ public abstract class SetConfigMapServiceTest  extends AbstractMapServiceTest {
         try {
             final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, SetConfigServiceDescriptor.NAME);
 
-            final List<Source> sources = new ArrayList<>();
-            sources.add(new Source("source1", Boolean.TRUE, null, null));
-            final Layers layers = new Layers(sources);
-            final LayerContext conf = new LayerContext(layers);
+            final LayerContext conf = new LayerContext();
 
             final ParameterValueGroup in = desc.getInputDescriptor().createValue();
             in.parameter(SetConfigServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);

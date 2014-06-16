@@ -24,77 +24,91 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import javax.xml.namespace.QName;
-
-import org.constellation.provider.DataProviders;
-import org.constellation.provider.configuration.Configurator;
-import org.constellation.wfs.ws.WFSWorker;
-import org.constellation.wfs.ws.DefaultWFSWorker;
-
-import org.geotoolkit.data.FeatureCollection;
-import org.geotoolkit.feature.xml.XmlFeatureWriter;
-import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.apache.sis.geometry.GeneralDirectPosition;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.ServiceBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
-import org.constellation.configuration.Layers;
-import org.constellation.configuration.Source;
-import org.constellation.provider.Provider;
+import org.constellation.map.configuration.LayerBusiness;
+import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
 import org.constellation.provider.Providers;
 import org.constellation.provider.configuration.AbstractConfigurator;
+import org.constellation.provider.configuration.Configurator;
+import static org.constellation.provider.configuration.ProviderParameters.*;
+import static org.constellation.provider.featurestore.FeatureStoreProviderService.*;
+import org.constellation.test.utils.SpringTestRunner;
+import org.constellation.wfs.ws.DefaultWFSWorker;
+import org.constellation.wfs.ws.WFSWorker;
+import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
+import org.geotoolkit.data.FeatureCollection;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.*;
+import org.geotoolkit.db.postgres.PostgresFeatureStoreFactory;
+import org.geotoolkit.feature.xml.XmlFeatureWriter;
+import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.geotoolkit.gml.xml.v311.MultiPointType;
 import org.geotoolkit.gml.xml.v311.PointPropertyType;
 import org.geotoolkit.gml.xml.v311.PointType;
 import org.geotoolkit.ogc.xml.v110.EqualsType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
+import org.geotoolkit.wfs.xml.ResultTypeType;
 import org.geotoolkit.wfs.xml.v110.GetFeatureType;
 import org.geotoolkit.wfs.xml.v110.QueryType;
-import org.geotoolkit.wfs.xml.ResultTypeType;
-
 import org.junit.*;
-import org.opengis.parameter.ParameterValueGroup;
-
 import static org.junit.Assert.*;
-import static org.constellation.provider.featurestore.FeatureStoreProviderService.*;
-import static org.constellation.provider.configuration.ProviderParameters.*;
-import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.*;
-import org.geotoolkit.db.postgres.PostgresFeatureStoreFactory;
 import static org.junit.Assume.assumeTrue;
+import org.junit.runner.RunWith;
+import org.opengis.parameter.ParameterValueGroup;
 
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
+@RunWith(SpringTestRunner.class)
 public class WFSCIteWorkerTest {
 
     private static WFSWorker worker;
 
     private XmlFeatureWriter featureWriter;
+    
+    @Inject
+    protected ServiceBusiness serviceBusiness;
+    
+    @Inject
+    protected LayerBusiness layerBusiness;
 
     public static boolean hasLocalDatabase() {
         return false; // TODO
     }
     
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-        ConfigurationEngine.setupTestEnvironement("WFSCIteWorkerTest");
-
-        final List<Source> sources = Arrays.asList(new Source("postgisSrc", true, null, null));
-        final Layers layers = new Layers(sources);
-        final LayerContext config = new LayerContext(layers);
-        config.getCustomParameters().put("shiroAccessible", "false");
-        config.getCustomParameters().put("transactionSecurized", "false");
-        config.getCustomParameters().put("transactionnal", "true");
-
-        ConfigurationEngine.storeConfiguration("WFS", "default", config);
-
-        initFeatureSource();
-        worker = new DefaultWFSWorker("default");
-        worker.setLogLevel(Level.FINER);
+    @PostConstruct
+    public void setUpClass() {
+    
+        try {
+            ConfigurationEngine.setupTestEnvironement("WFSCiteWorkerTest");
+            
+            final LayerContext config = new LayerContext();
+            config.getCustomParameters().put("shiroAccessible", "false");
+            config.getCustomParameters().put("transactionSecurized", "false");
+            config.getCustomParameters().put("transactionnal", "true");
+            
+            serviceBusiness.create("WFS", "default", config, null);
+            layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "WFS");
+            layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "WFS");
+            layerBusiness.add("EntitéGénérique",     "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "WFS");
+            
+            initFeatureSource();
+            worker = new DefaultWFSWorker("default");
+            worker.setLogLevel(Level.FINER);
+            
+        } catch (Exception ex) {
+            Logger.getLogger(WFSCIteWorkerTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @AfterClass

@@ -29,22 +29,23 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.imageio.ImageIO;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.ImageWriterSpi;
-import javax.xml.bind.JAXBException;
-import javax.xml.namespace.QName;
+import javax.inject.Inject;
 
 // Constellation dependencies
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.ServiceBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Language;
 import org.constellation.configuration.Languages;
-import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
-import org.constellation.configuration.Layers;
-import org.constellation.configuration.Source;
 import org.constellation.configuration.WMSPortrayal;
+import org.constellation.map.configuration.LayerBusiness;
 import org.constellation.provider.Data;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
@@ -54,6 +55,7 @@ import org.constellation.provider.configuration.Configurator;
 import static org.constellation.provider.configuration.ProviderParameters.*;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
 import org.constellation.test.ImageTesting;
+import org.constellation.test.utils.TestRunner;
 import static org.constellation.ws.embedded.AbstractGrizzlyServer.finish;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.image.io.plugin.WorldFileImageReader;
@@ -64,6 +66,7 @@ import org.geotoolkit.test.Commons;
 import org.junit.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
+import org.junit.runner.RunWith;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -78,8 +81,15 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author Cédric Briançon (Geomatys)
  * @since 0.3
  */
+@RunWith(TestRunner.class)
 public class WMSAxesOrderTest extends AbstractGrizzlyServer {
 
+    @Inject
+    private ServiceBusiness serviceBusiness;
+    
+    @Inject
+    protected LayerBusiness layerBusiness;
+    
     /**
      * The layer to test.
      */
@@ -134,83 +144,88 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
-    @BeforeClass
-    public static void initLayerList() throws JAXBException {
-        ConfigurationEngine.setupTestEnvironement("WMSAxesOrderTest");
-
-        final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null));
-        final Layers layers1 = new Layers(sources);
-        final LayerContext config = new LayerContext(layers1);
-        config.getCustomParameters().put("shiroAccessible", "false");
-
-        ConfigurationEngine.storeConfiguration("WMS", "default", config);
-
-        final List<Source> sources2 = Arrays.asList(new Source("coverageTestSrc", true, null, Arrays.asList(new Layer(new QName("SST_tests")))));
-        final Layers layers2 = new Layers(sources2);
-        final LayerContext config2 = new LayerContext(layers2);
-        config2.setSupportedLanguages(new Languages(Arrays.asList(new Language("fre"), new Language("eng", true))));
-        config2.getCustomParameters().put("shiroAccessible", "false");
-
-        ConfigurationEngine.storeConfiguration("WMS", "wms1", config2);
-
-        initServer(new String[] {
-            "org.constellation.map.ws.rs",
-            "org.constellation.configuration.ws.rs",
-            "org.constellation.ws.rs.provider"
-        }, null);
-
-        final Configurator configurator = new AbstractConfigurator() {
-            @Override
-            public List<Map.Entry<String, ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException {
-
-                final ArrayList<Map.Entry<String, ParameterValueGroup>> lst = new ArrayList<>();
-                final ProviderFactory factory = DataProviders.getInstance().getFactory("coverage-sql");
-                
-                if (hasLocalDatabase()) {
-                    // Defines a PostGrid data provider
-                    final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
-                    final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
-                    srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://flupke.geomatys.com/coverages-test");
-                    srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
-                    final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
-                    srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
-                    srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
-                    srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
-                    srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
-                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
+    @PostConstruct
+    public void initLayerList() {
+        try {
+            ConfigurationEngine.setupTestEnvironement("WMSAxesOrderTest");
+            
+            
+            final LayerContext config = new LayerContext();
+            config.getCustomParameters().put("shiroAccessible", "false");
+            
+            serviceBusiness.create("WMS", "default", config, null);
+            layerBusiness.add("SST_tests", null, "coverageTestSrc", null, "default", "WMS");
+            
+            
+            final LayerContext config2 = new LayerContext();
+            config2.setSupportedLanguages(new Languages(Arrays.asList(new Language("fre"), new Language("eng", true))));
+            config2.getCustomParameters().put("shiroAccessible", "false");
+            
+            
+            serviceBusiness.create("WMS", "wms1", config2, null);
+            layerBusiness.add("SST_tests", null, "coverageTestSrc", null, "wms1", "WMS");
+            
+            initServer(new String[] {
+                "org.constellation.map.ws.rs",
+                "org.constellation.configuration.ws.rs",
+                "org.constellation.ws.rs.provider"
+            }, null);
+            
+            final Configurator configurator = new AbstractConfigurator() {
+                @Override
+                public List<Map.Entry<String, ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException {
                     
-                    lst.add(new AbstractMap.SimpleImmutableEntry<>("coverageTestSrc",source));
+                    final ArrayList<Map.Entry<String, ParameterValueGroup>> lst = new ArrayList<>();
+                    final ProviderFactory factory = DataProviders.getInstance().getFactory("coverage-sql");
+                    
+                    if (hasLocalDatabase()) {
+                        // Defines a PostGrid data provider
+                        final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                        final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
+                        srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://flupke.geomatys.com/coverages-test");
+                        srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
+                        final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
+                        srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
+                        srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
+                        srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
+                        srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
+                        source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
+                        
+                        lst.add(new AbstractMap.SimpleImmutableEntry<>("coverageTestSrc",source));
+                    }
+                    
+                    return lst;
                 }
                 
-                return lst;
+                @Override
+                public List<Configurator.ProviderInformation> getProviderInformations() throws ConfigurationException {
+                    throw new UnsupportedOperationException("Not supported yet.");
+                }
+                
+            };
+            
+            DataProviders.getInstance().setConfigurator(configurator);
+            
+            
+            WorldFileImageReader.Spi.registerDefaults(null);
+            WMSPortrayal.setEmptyExtension(true);
+            
+            //reset values, only allow pure java readers
+            for(String jn : ImageIO.getReaderFormatNames()){
+                Registry.setNativeCodecAllowed(jn, ImageReaderSpi.class, false);
             }
             
-            @Override
-            public List<Configurator.ProviderInformation> getProviderInformations() throws ConfigurationException {
-                throw new UnsupportedOperationException("Not supported yet.");
+            //reset values, only allow pure java writers
+            for(String jn : ImageIO.getWriterFormatNames()){
+                Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, false);
             }
-
-        };
-
-        DataProviders.getInstance().setConfigurator(configurator);
-
-
-        WorldFileImageReader.Spi.registerDefaults(null);
-        WMSPortrayal.setEmptyExtension(true);
-
-        //reset values, only allow pure java readers
-        for(String jn : ImageIO.getReaderFormatNames()){
-            Registry.setNativeCodecAllowed(jn, ImageReaderSpi.class, false);
+            
+            // Get the list of layers
+            layers = DataProviders.getInstance().getAll();
+        } catch (ConfigurationException ex) {
+            Logger.getLogger(WMSAxesOrderTest.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        //reset values, only allow pure java writers
-        for(String jn : ImageIO.getWriterFormatNames()){
-            Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, false);
-        }
-
-        // Get the list of layers
-        layers = DataProviders.getInstance().getAll();
     }
 
     /**

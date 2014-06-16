@@ -47,7 +47,7 @@ public class LayerContext extends AbstractConfigurationObject {
 
     private Languages supportedLanguages;
 
-    private final Map<String, String> customParameters = new HashMap<String, String>();
+    private final Map<String, String> customParameters = new HashMap<>();
 
     @XmlElementWrapper(name="featureInfos")
     @XmlElement(name="FeatureInfo")
@@ -55,15 +55,6 @@ public class LayerContext extends AbstractConfigurationObject {
 
     public LayerContext() {
 
-    }
-
-    public LayerContext(final Layers layers) {
-        this.layers = layers;
-    }
-
-    public LayerContext(final Layers layers, final String security) {
-        this.layers = layers;
-        this.security = security;
     }
 
     /**
@@ -125,6 +116,13 @@ public class LayerContext extends AbstractConfigurationObject {
         } else {
             return layers.getMainLayer();
         }
+    }
+    
+    public void setMainLayer(final Layer mainlayer) {
+        if (layers == null) {
+            layers = new Layers();
+        } 
+        layers.setMainLayer(mainlayer);
     }
 
     /**

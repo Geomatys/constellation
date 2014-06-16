@@ -44,8 +44,7 @@ import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
-import org.constellation.configuration.Layers;
-import org.constellation.configuration.Source;
+import org.constellation.map.configuration.LayerBusiness;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.FeatureData;
 import org.constellation.provider.ProviderFactory;
@@ -90,7 +89,6 @@ import org.geotoolkit.ogc.xml.v200.SpatialOpsType;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.parameter.ParametersExt.*;
 
-import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.geotoolkit.wfs.xml.AllSomeType;
@@ -131,6 +129,9 @@ public class WFS2WorkerTest {
     
     @Inject
     private ServiceBusiness serviceBusiness;
+    
+    @Inject
+    protected LayerBusiness layerBusiness;
 
     private static final DefaultDataSource ds = null;
 
@@ -173,29 +174,73 @@ public class WFS2WorkerTest {
         try {
             ConfigurationEngine.setupTestEnvironement("WFS2WorkerTest");
 
-            final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null),
-                                                       new Source("omSrc", true, null, null),
-                                                       new Source("shapeSrc", true, null, null),
-                                                       new Source("postgisSrc", true, null, null));
-            final Layers layers = new Layers(sources);
-            final LayerContext config = new LayerContext(layers);
+            final LayerContext config = new LayerContext();
             config.getCustomParameters().put("shiroAccessible", "false");
             config.getCustomParameters().put("transactionSecurized", "false");
             config.getCustomParameters().put("transactionnal", "true");
 
-            ConfigurationEngine.storeConfiguration("WFS", "default", config);
-            ConfigurationEngine.storeConfiguration("WFS", "test", config);
+            serviceBusiness.create("WFS", "default", config, null);
+            layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "WFS");
+            layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "WFS");
+            layerBusiness.add("EntitéGénérique",     "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "WFS");
+            layerBusiness.add("SamplingPoint",       "http://www.opengis.net/sampling/1.0",  "omSrc",      null, "default", "WFS");
+            layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS");
+            layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS");
+            layerBusiness.add("Bridges",             "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS");
+            layerBusiness.add("Streams",             "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS");
+            layerBusiness.add("Lakes",               "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS");
+            layerBusiness.add("NamedPlaces",         "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS");
+            layerBusiness.add("Buildings",           "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS");
+            layerBusiness.add("RoadSegments",        "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS");
+            layerBusiness.add("DividedRoutes",       "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS");
+            layerBusiness.add("Forests",             "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS");
+            layerBusiness.add("MapNeatline",         "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS");
+            layerBusiness.add("Ponds",               "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS");
 
-            final List<Source> sources2 = Arrays.asList(new Source("shapeSrc", true, null, null),
-                                                       new Source("omSrc", true, null, null),
-                                                       new Source("smlSrc", true, null, null));
-            final Layers layers2 = new Layers(sources2);
-            final LayerContext config2 = new LayerContext(layers2);
+            serviceBusiness.create("WFS", "test", config, null);
+            layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "test", "WFS");
+            layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "test", "WFS");
+            layerBusiness.add("EntitéGénérique",     "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "test", "WFS");
+            layerBusiness.add("SamplingPoint",       "http://www.opengis.net/sampling/1.0",  "omSrc",      null, "test", "WFS");
+            layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test", "WFS");
+            layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test", "WFS");
+            layerBusiness.add("Bridges",             "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test", "WFS");
+            layerBusiness.add("Streams",             "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test", "WFS");
+            layerBusiness.add("Lakes",               "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test", "WFS");
+            layerBusiness.add("NamedPlaces",         "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test", "WFS");
+            layerBusiness.add("Buildings",           "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test", "WFS");
+            layerBusiness.add("RoadSegments",        "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test", "WFS");
+            layerBusiness.add("DividedRoutes",       "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test", "WFS");
+            layerBusiness.add("Forests",             "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test", "WFS");
+            layerBusiness.add("MapNeatline",         "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test", "WFS");
+            layerBusiness.add("Ponds",               "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test", "WFS");
+            
+
+            final LayerContext config2 = new LayerContext();
             config2.getCustomParameters().put("shiroAccessible", "false");
             config2.getCustomParameters().put("transactionSecurized", "false");
             config2.getCustomParameters().put("transactionnal", "true");
 
-            ConfigurationEngine.storeConfiguration("WFS", "test1", config2);
+            serviceBusiness.create("WFS", "test1", config, null);
+            layerBusiness.add("SamplingPoint",       "http://www.opengis.net/sampling/1.0",  "omSrc",      null, "test1", "WFS");
+            layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test1", "WFS");
+            layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test1", "WFS");
+            layerBusiness.add("Bridges",             "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test1", "WFS");
+            layerBusiness.add("Streams",             "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test1", "WFS");
+            layerBusiness.add("Lakes",               "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test1", "WFS");
+            layerBusiness.add("NamedPlaces",         "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test1", "WFS");
+            layerBusiness.add("Buildings",           "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test1", "WFS");
+            layerBusiness.add("RoadSegments",        "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test1", "WFS");
+            layerBusiness.add("DividedRoutes",       "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test1", "WFS");
+            layerBusiness.add("Forests",             "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test1", "WFS");
+            layerBusiness.add("MapNeatline",         "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test1", "WFS");
+            layerBusiness.add("Ponds",               "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test1", "WFS");
+            layerBusiness.add("System",              "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "WFS");
+            layerBusiness.add("Component",           "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "WFS");
+            layerBusiness.add("DataSourceType",      "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "WFS");
+            layerBusiness.add("ProcessModel",        "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "WFS");
+            layerBusiness.add("ProcessChain",        "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "WFS");
+            
 
             pool = WFSMarshallerPool.getInstance();
 
@@ -213,8 +258,7 @@ public class WFS2WorkerTest {
             final StoredQueries queries = new StoredQueries(descriptions);
             serviceBusiness.setExtraConfiguration("WFS", "test1", "StoredQueries.xml", queries, pool);
 
-            EPSG_VERSION = CRS.getVersion("EPSG").toString();
-            initFeatureSource();
+            
             worker = new DefaultWFSWorker("test1");
             worker.setLogLevel(Level.FINER);
             worker.setServiceUrl("http://geomatys.com/constellation/WS/");

@@ -23,22 +23,26 @@ import java.lang.reflect.InvocationTargetException;
 import javax.ws.rs.core.MultivaluedMap;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
-import javax.xml.bind.JAXBException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.ServiceBusiness;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
-import org.constellation.configuration.Layers;
-import org.constellation.configuration.Source;
+import org.constellation.map.configuration.LayerBusiness;
 
 import org.constellation.map.ws.QueryContext;
 import org.constellation.ws.rs.WebService;
 import org.constellation.test.utils.BasicMultiValueMap;
 import org.constellation.test.utils.BasicUriInfo;
+import org.constellation.test.utils.TestRunner;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
 
@@ -57,34 +61,55 @@ import org.opengis.util.FactoryException;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
 
 /**
  * Testing wms service value parsing.
  * 
  * @author Johann Sorel (Geomatys)
  */
+@RunWith(TestRunner.class)
 public class WMSServiceTest {
 
+    @Inject
+    private ServiceBusiness serviceBusiness;
+    
+    @Inject
+    protected LayerBusiness layerBusiness;
+    
     private static final double DELTA = 0.00000001;
     private static WMSService service;
     private final BasicUriInfo info = new BasicUriInfo(null, null);
     private final MultivaluedMap<String,String> queryParameters = new BasicMultiValueMap<>();
     private final MultivaluedMap<String,String> pathParameters = new BasicMultiValueMap<>();
 
-    @BeforeClass
-    public static void init() throws JAXBException {
-        ConfigurationEngine.setupTestEnvironement("WMSServiceTest");
-
-        final List<Source> sources = Arrays.asList(new Source("coverageTestSrc", true, null, null),
-                                                   new Source("shapeSrc", true, null, null));
-        final Layers layers = new Layers(sources);
-        final LayerContext config = new LayerContext(layers);
-        config.getCustomParameters().put("shiroAccessible", "false");
-
-        ConfigurationEngine.storeConfiguration("WMS", "default", config);
-        
-        service = new WMSService();
+    @PostConstruct
+    public void init() {
+        try {
+            ConfigurationEngine.setupTestEnvironement("WMSServiceTest");
+            
+            final LayerContext config = new LayerContext();
+            config.getCustomParameters().put("shiroAccessible", "false");
+            
+            serviceBusiness.create("WMS", "default", config, null);
+            layerBusiness.add("SST_tests",            null,                                  "coverageTestSrc", null, "default", "WMS");
+            layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS");
+            layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS");
+            layerBusiness.add("Bridges",             "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS");
+            layerBusiness.add("Streams",             "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS");
+            layerBusiness.add("Lakes",               "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS");
+            layerBusiness.add("NamedPlaces",         "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS");
+            layerBusiness.add("Buildings",           "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS");
+            layerBusiness.add("RoadSegments",        "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS");
+            layerBusiness.add("DividedRoutes",       "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS");
+            layerBusiness.add("Forests",             "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS");
+            layerBusiness.add("MapNeatline",         "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS");
+            layerBusiness.add("Ponds",               "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS");
+            
+            service = new WMSService();
+        } catch (ConfigurationException ex) {
+            Logger.getLogger(WMSServiceTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     @AfterClass
