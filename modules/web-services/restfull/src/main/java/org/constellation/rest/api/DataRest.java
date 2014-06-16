@@ -73,6 +73,7 @@ import org.apache.sis.util.iso.Types;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.DataBusiness;
 import org.constellation.admin.dao.DataRecord;
 import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.configuration.ConfigDirectory;
@@ -159,6 +160,8 @@ public class DataRest {
     @Inject
     private SessionData sessionData;
 
+    @Inject
+    private DataBusiness dataBusiness;
     
     @Inject
     private ProviderRepository providerRepository;
@@ -545,13 +548,13 @@ public class DataRest {
         final DefaultMetadata metadata;
         if (dataName != null) {
             final QName name = Util.parseQName(dataName);
-            metadata =  ConfigurationEngine.loadIsoDataMetadata(providerId, name, ISOMarshallerPool.getInstance());
+            metadata = dataBusiness.loadIsoDataMetadata(providerId, name);
         } else {
             final DataProvider dataProvider = DataProviders.getInstance().getProvider(providerId);
             // multiple ?
             if (!dataProvider.getKeys().isEmpty()) {
                 final QName name = Utils.getQnameFromName(dataProvider.getKeys().iterator().next());
-                metadata =  ConfigurationEngine.loadIsoDataMetadata(providerId, name, ISOMarshallerPool.getInstance());
+                metadata =  dataBusiness.loadIsoDataMetadata(providerId, name);
             } else {
                 metadata = null;
             }
@@ -650,7 +653,7 @@ public class DataRest {
             final QName name = Utils.getQnameFromName(dataName);
             
             // Get previously saved metadata for the current data
-            final DefaultMetadata previous = ConfigurationEngine.loadIsoDataMetadata(providerId, name, ISOMarshallerPool.getInstance());
+            final DefaultMetadata previous = dataBusiness.loadIsoDataMetadata(providerId, name);
             
             // Import changes from DataMetadata into the DefaultMetadata
             final MetadataFeeder feeder = new MetadataFeeder(previous);
@@ -1430,7 +1433,7 @@ public class DataRest {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getIsoMetadata(final @PathParam("providerId") String providerId, final @PathParam("dataId") String dataId) {
-        final DefaultMetadata metadata = ConfigurationEngine.loadIsoDataMetadata(providerId, Util.parseQName(dataId), CSWMarshallerPool.getInstance());
+        final DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(providerId, Util.parseQName(dataId));
         if (metadata != null) {
             metadata.prune(); 
         }
