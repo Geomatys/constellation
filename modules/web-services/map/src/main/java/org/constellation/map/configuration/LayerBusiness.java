@@ -20,12 +20,14 @@
 package org.constellation.map.configuration;
 
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import javax.imageio.spi.ServiceRegistry;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import org.apache.sis.metadata.iso.DefaultMetadata;
@@ -85,11 +87,11 @@ public class LayerBusiness {
         final String alias       = addLayerData.getLayerAlias();
         final String serviceId   = addLayerData.getServiceId();
         final String serviceType = addLayerData.getServiceType();
-        add(name, namespace, providerId, alias, serviceId, serviceType);
+        add(name, namespace, providerId, alias, serviceId, serviceType, null);
     }
     
     public void add(final String name, String namespace, final String providerId, final String alias,
-            final String serviceId, final String serviceType) throws ConfigurationException {
+            final String serviceId, final String serviceType, final org.constellation.configuration.Layer config) throws ConfigurationException {
         
         final Service service = serviceRepository.findByIdentifierAndType(serviceId, serviceType);
         
@@ -102,7 +104,8 @@ public class LayerBusiness {
             }
 
             final Data data = dataRepository.findDataFromProvider(namespace, name, providerId);
-            Layer layer = new Layer(name, namespace, alias, service.getId(), data.getId(), System.currentTimeMillis(), -1, -1, null, securityManager.getCurrentUserLogin());
+            final String configXml = getStringFromLayerConfig(config);
+            Layer layer = new Layer(name, namespace, alias, service.getId(), data.getId(), System.currentTimeMillis(), -1, -1, configXml, securityManager.getCurrentUserLogin());
             layer = layerRepository.save(layer);
             
             //style
@@ -222,5 +225,21 @@ public class LayerBusiness {
             }
         }
         throw new FactoryNotFoundException("No Map factory has been found for type:" + type);
+    }
+    
+    private String getStringFromLayerConfig(final org.constellation.configuration.Layer obj) {
+        String config = null;
+        if (obj != null) {
+            try {
+                final StringWriter sw = new StringWriter();
+                final Marshaller m = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
+                m.marshal(obj, sw);
+                GenericDatabaseMarshallerPool.getInstance().recycle(m);
+                config = sw.toString();
+            } catch (JAXBException e) {
+                throw new ConstellationPersistenceException(e);
+            }
+        }
+        return config;
     }
 }

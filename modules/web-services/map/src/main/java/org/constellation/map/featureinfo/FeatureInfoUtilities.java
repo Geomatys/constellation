@@ -68,7 +68,7 @@ public final class FeatureInfoUtilities extends Static {
      */
     public static FeatureInfoFormat[] getAllFeatureInfoFormat() {
 
-        final Set<FeatureInfoFormat> infoFormats = new HashSet<FeatureInfoFormat>();
+        final Set<FeatureInfoFormat> infoFormats = new HashSet<>();
         final Iterator<FeatureInfoFormat> ite = ServiceRegistry.lookupProviders(FeatureInfoFormat.class);
         while (ite.hasNext()) {
             infoFormats.add(ite.next());
@@ -203,7 +203,7 @@ public final class FeatureInfoUtilities extends Static {
                 }
             }
 
-            for (Source source : config.getLayers()) {
+            /*for (Source source : config.getLayers()) {
                 if (source != null) {
                     for (Layer layer : source.getInclude()) {
                         if (layer != null && layer.getGetFeatureInfoCfgs() != null) {
@@ -217,7 +217,7 @@ public final class FeatureInfoUtilities extends Static {
                         }
                     }
                 }
-            }
+            }*/
         }
     }
 
@@ -238,7 +238,7 @@ public final class FeatureInfoUtilities extends Static {
                 }
             }
 
-            for (Source source : config.getLayers()) {
+            /*for (Source source : config.getLayers()) {
                 if (source != null) {
                     for (Layer layer : source.getInclude()) {
                         if (layer != null && layer.getGetFeatureInfoCfgs() != null) {
@@ -257,7 +257,7 @@ public final class FeatureInfoUtilities extends Static {
                         }
                     }
                 }
-            }
+            }*/
         }
         return mimes;
     }

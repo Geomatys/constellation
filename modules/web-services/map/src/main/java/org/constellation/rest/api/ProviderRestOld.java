@@ -152,7 +152,7 @@ public class ProviderRestOld {
                 final org.geotoolkit.process.Process process = procDesc.createProcess(inputs);
                 process.call();
 
-                //update the layer context using this provider
+                /*update the layer context using this provider
                 for (String specification : CommonConstants.WXS) {
                     final Map<String, Worker> instances = WSEngine.getWorkersMap(specification);
                     if (instances != null) {
@@ -172,7 +172,7 @@ public class ProviderRestOld {
                             }
                         }
                     }
-                }
+                }*/
                 providerListener.fireProvidedDeleted(providerId);
             } catch (ProcessException ex) {
                 return ok(new AcknowlegementType("Failure", ex.getLocalizedMessage()));

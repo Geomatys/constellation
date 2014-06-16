@@ -90,10 +90,10 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
             config.getCustomParameters().put("shiroAccessible", "false");
             
             serviceBusiness.create("WCS", "default", config, null);
-            layerBusiness.add("SST_tests", null, "coverageTestSrc", null, "default", "WCS");
+            layerBusiness.add("SST_tests", null, "coverageTestSrc", null, "default", "WCS", null);
             
             serviceBusiness.create("WCS", "test", config, null);
-            layerBusiness.add("SST_tests", null, "coverageTestSrc", null, "test",    "WCS");
+            layerBusiness.add("SST_tests", null, "coverageTestSrc", null, "test",    "WCS", null);
             
             final Configurator configurator = new AbstractConfigurator() {
                 

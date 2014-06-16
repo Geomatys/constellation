@@ -20,7 +20,7 @@ package org.constellation.process.service;
 
 import org.apache.sis.util.iso.ResourceInternationalString;
 import org.constellation.configuration.GetFeatureInfoCfg;
-import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.Layer;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.process.AbstractCstlProcessDescriptor;
 import org.constellation.process.ConstellationProcessFactory;
@@ -31,7 +31,6 @@ import org.constellation.util.DataReference;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.parameter.ExtendedParameterDescriptor;
-
 import org.opengis.filter.Filter;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
@@ -70,7 +69,7 @@ public class AddLayerToMapServiceDescriptor extends AbstractCstlProcessDescripto
     private static final String LAYER_CUSTOM_GFI_PARAM_REMARKS_KEY  = "service.add_layer.featureInfos";
     private static final String SERVICE_TYPE_PARAM_REMARKS_KEY      = "service.add_layer.serviceType";
     private static final String SERVICE_INSTANCE_PARAM_REMARKS_KEY  = "service.add_layer.serviceInstance";
-    private static final String OUT_LAYER_CTX_PARAM_REMARKS_KEY     = "service.add_layer.outLayerContext";
+    private static final String OUT_LAYER_PARAM_REMARKS_KEY     = "service.add_layer.outLayerContext";
 
     /*
      * Name and description
@@ -148,14 +147,14 @@ public class AddLayerToMapServiceDescriptor extends AbstractCstlProcessDescripto
     /*
      * Output Layer context
      */
-    public static final String OUT_LAYER_CTX_PARAM_NAME = "layer_context";
-    public static final InternationalString OUT_LAYER_CTX_PARAM_REMARKS = new ResourceInternationalString(BUNDLE, OUT_LAYER_CTX_PARAM_REMARKS_KEY);
-    public static final ParameterDescriptor<LayerContext> OUT_LAYER_CTX =
-            new DefaultParameterDescriptor(OUT_LAYER_CTX_PARAM_NAME, OUT_LAYER_CTX_PARAM_REMARKS, LayerContext.class, null, true);
+    public static final String OUT_LAYER_PARAM_NAME = "layer";
+    public static final InternationalString OUT_LAYER_PARAM_REMARKS = new ResourceInternationalString(BUNDLE, OUT_LAYER_PARAM_REMARKS_KEY);
+    public static final ParameterDescriptor<Layer> OUT_LAYER =
+            new DefaultParameterDescriptor(OUT_LAYER_PARAM_NAME, OUT_LAYER_PARAM_REMARKS, Layer.class, null, true);
 
     /**Output parameters */
     public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters",
-            new GeneralParameterDescriptor[]{OUT_LAYER_CTX});
+            new GeneralParameterDescriptor[]{OUT_LAYER});
 
 
     public AddLayerToMapServiceDescriptor() {

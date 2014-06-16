@@ -19,8 +19,10 @@
 package org.constellation.process.service;
 
 import java.util.logging.Level;
+import javax.inject.Inject;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
+import org.constellation.map.configuration.LayerBusiness;
 
 /**
  *
@@ -28,6 +30,8 @@ import org.constellation.configuration.LayerContext;
  */
 public abstract class AbstractMapServiceTest extends ServiceProcessTest {
 
+    @Inject
+    protected LayerBusiness layerBusiness;
 
     public AbstractMapServiceTest (final String str, final String serviceName, final Class workerClass) {
         super(str, serviceName, workerClass);

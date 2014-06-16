@@ -476,7 +476,7 @@ public class ConfigurationXmlBindingTest {
 
         LayerContext result = (LayerContext) unmarshaller.unmarshal(new StringReader(xml));
 
-        assertEquals(expresult.getLayers(), result.getLayers());
+        
         assertEquals(expresult, result);
 
         /////////////////////////////////////////
@@ -567,7 +567,7 @@ public class ConfigurationXmlBindingTest {
         assertEquals(expresult.getLayers().get(0).getInclude(), result.getLayers().get(0).getInclude());
         assertEquals(expresult.getLayers().get(0), result.getLayers().get(0));
         assertEquals(expresult.getLayers().get(1), result.getLayers().get(1));
-        assertEquals(expresult.getLayers(), result.getLayers());
+        
         assertEquals(expresult.getMainLayer(), result.getMainLayer());
         assertEquals(expresult, result);*/
 
@@ -590,7 +590,7 @@ public class ConfigurationXmlBindingTest {
 
         expresult = new LayerContext();
         expresult.getCustomParameters().put("transactionSecurized", "false");
-        assertEquals(expresult.getLayers(), result.getLayers());
+        
         assertEquals(expresult, result);
 
         /////////////////////////////////////////
@@ -624,7 +624,7 @@ public class ConfigurationXmlBindingTest {
         expresult = new LayerContext();
         expresult.setGetFeatureInfoCfgs(gfiList);
 
-        assertEquals(expresult.getLayers(), result.getLayers());
+        
         assertEquals(expresult.getGetFeatureInfoCfgs(), result.getGetFeatureInfoCfgs());
         assertEquals(expresult.getGetFeatureInfoCfgs().get(0).getMimeType(), result.getGetFeatureInfoCfgs().get(0).getMimeType());
         assertEquals(expresult.getGetFeatureInfoCfgs().get(0).getBinding(), result.getGetFeatureInfoCfgs().get(0).getBinding());
@@ -720,7 +720,7 @@ public class ConfigurationXmlBindingTest {
         assertEquals(expresult.getLayers().get(0).getInclude().get(0).getFilter().getSpatialOps().getName(), result.getLayers().get(0).getInclude().get(0).getFilter().getSpatialOps().getName());
         assertEquals(expresult.getLayers().get(0).getInclude().get(0).getFilter().getSpatialOps().getValue(), result.getLayers().get(0).getInclude().get(0).getFilter().getSpatialOps().getValue());
         assertEquals(expresult.getLayers().get(0).getInclude(), result.getLayers().get(0).getInclude());
-        assertEquals(expresult.getLayers(), result.getLayers());
+        
         assertEquals(expresult, result);
 
         /////////////////////////////////////////
@@ -783,7 +783,7 @@ public class ConfigurationXmlBindingTest {
         assertEquals(expLayer.getGetFeatureInfoCfgs().get(0).getGfiParameter().get(0).getKey(), resultLayer.getGetFeatureInfoCfgs().get(0).getGfiParameter().get(0).getKey());
         assertEquals(expLayer.getGetFeatureInfoCfgs().get(0).getGfiParameter().get(0).getValue(), resultLayer.getGetFeatureInfoCfgs().get(0).getGfiParameter().get(0).getValue());
 
-        assertEquals(expresult.getLayers(), result.getLayers());
+        
         assertEquals(expresult, result);*/
     }
 
