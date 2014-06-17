@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -35,9 +36,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.constellation.ServiceDef;
-import org.constellation.admin.ConfigurationEngine;
-import org.constellation.admin.dao.DataRecord;
-import org.constellation.admin.dao.SensorRecord;
+import org.constellation.admin.ProviderBusiness;
+import org.constellation.admin.SensorBusiness;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.NotRunningServiceException;
@@ -45,6 +45,8 @@ import org.constellation.configuration.StringList;
 import org.constellation.dto.ObservationFilter;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
+import org.constellation.engine.register.Data;
+import org.constellation.engine.register.Sensor;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.Provider;
 import org.constellation.provider.coveragestore.CoverageStoreProvider;
@@ -68,6 +70,11 @@ import org.geotoolkit.sos.netcdf.ExtractionResult.ProcedureTree;
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public class SOSRest {
     
+    @Inject
+    private SensorBusiness sensorBusiness;
+    
+    @Inject
+    private ProviderBusiness providerBusiness;
     
     @PUT
     @Path("{id}/sensors")
@@ -254,8 +261,8 @@ public class SOSRest {
     @Path("{id}/sensor/import")
     public Response importSensor(final @PathParam("id") String id, final ParameterValues params) throws Exception {
         final String sensorID          = params.get("sensorId");
-        final SensorRecord sensor      = ConfigurationEngine.getSensor(sensorID);
-        final List<DataRecord> datas   = ConfigurationEngine.getDataLinkedSensor(sensorID);
+        final Sensor sensor            = sensorBusiness.getSensor(sensorID);
+        final List<Data> datas         = sensorBusiness.getLinkedData(sensor);
         final SOSConfigurer configurer = getConfigurer();
         final List<String> sensorIds   = new ArrayList<>();
         
@@ -265,18 +272,19 @@ public class SOSRest {
         sensorIds.add(sensorID);
         
         //import sensor children
-        final List<SensorRecord> sensors = ConfigurationEngine.getSensorChildren(sensorID);
-        for (SensorRecord child : sensors) {
+        final List<Sensor> sensors = sensorBusiness.getChildren(sensor);
+        for (Sensor child : sensors) {
             final AbstractSensorML smlChild = SOSUtils.unmarshallSensor(child.getMetadata());
             configurer.importSensor(id, smlChild, child.getIdentifier());
-            datas.addAll(ConfigurationEngine.getDataLinkedSensor(child.getIdentifier()));
+            datas.addAll(sensorBusiness.getLinkedData(child));
             sensorIds.add(child.getIdentifier());
         }
         
         // look for provider ids
         final Set<String> providerIDs = new HashSet<>();
-        for (DataRecord data : datas) {
-            providerIDs.add(data.getProvider().getIdentifier());
+        for (Data data : datas) {
+            final org.constellation.engine.register.Provider provider = providerBusiness.getProvider(data.getId());
+            providerIDs.add(provider.getIdentifier());
         }
         
         // import observations

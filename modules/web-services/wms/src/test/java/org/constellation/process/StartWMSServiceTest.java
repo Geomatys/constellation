@@ -18,10 +18,7 @@
  */
 package org.constellation.process;
 
-import java.io.IOException;
 import java.util.logging.Level;
-import javax.xml.bind.JAXBException;
-import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
 import org.constellation.map.ws.DefaultWMSWorker;

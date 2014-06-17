@@ -21,6 +21,10 @@ public class ProviderBusiness {
         return providerRepository.findByIdentifier(identifier);
     }
     
+    public Provider getProvider(final int id) {
+        return providerRepository.findOne(id);
+    }
+    
     public List<String> getProviderIds() {
         final List<String> ids = new ArrayList<>();
         final List<Provider> providers =  providerRepository.findAll();
@@ -32,6 +36,10 @@ public class ProviderBusiness {
     
     public void removeProvider(final String identifier) {
         providerRepository.deleteByIdentifier(identifier);
+    }
+    
+    public List<Provider> getProviderChildren(final String identifier) {
+        return providerRepository.findChildren(identifier);
     }
 
 }

@@ -20,7 +20,6 @@ package org.constellation.sos.ws;
 
 // JDK dependencies
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.*;
@@ -35,7 +34,6 @@ import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.MonolineFormatter;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef;
-import org.constellation.admin.ConfigurationEngine;
 
 import static org.constellation.api.QueryConstants.*;
 import org.constellation.configuration.ConfigDirectory;

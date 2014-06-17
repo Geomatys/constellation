@@ -48,6 +48,6 @@ import org.constellation.engine.register.Provider;
 
     int deleteByIdentifier(String providerID);
 
+    List<Provider> findChildren(String id);
 
-    
 }

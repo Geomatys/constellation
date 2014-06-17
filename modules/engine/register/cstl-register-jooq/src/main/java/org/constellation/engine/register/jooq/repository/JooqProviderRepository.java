@@ -116,4 +116,9 @@ public class JooqProviderRepository extends AbstractJooqRespository<ProviderReco
     public Provider findByMetadataId(String metadataId) {
         return dsl.select().from(PROVIDER).where(PROVIDER.METADATA_ID.eq(metadataId)).fetchOneInto(Provider.class);
     }
+
+    @Override
+    public List<Provider> findChildren(String id) {
+        return dsl.select().from(PROVIDER).where(PROVIDER.PARENT.eq(id)).fetchInto(Provider.class);
+    }
 }

@@ -48,6 +48,8 @@ import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.engine.register.Provider;
+import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
@@ -98,6 +100,9 @@ public final class ProviderRest {
     
     @Inject
     private DomainRepository domainRepository;
+    
+    @Inject
+    private ProviderBusiness providerBusiness;
     
     /**
      * Create a new provider from the given configuration.
@@ -415,10 +420,9 @@ public final class ProviderRest {
         
         final ProviderPyramidChoiceList choices = new ProviderPyramidChoiceList();
         
-        final ProviderRecord providerRec = ConfigurationEngine.getProvider(id);
-        final List<ProviderRecord> childrenRecs = providerRec.getChildrenProviders();
+        final List<Provider> childrenRecs = providerBusiness.getProviderChildren(id);
         
-        for(ProviderRecord childRec : childrenRecs){
+        for(Provider childRec : childrenRecs){
             final DataProvider provider = DataProviders.getInstance().getProvider(childRec.getIdentifier());
             final CoverageData cacheData = (CoverageData) provider.get(layerName);
             if(cacheData!=null){
@@ -436,7 +440,7 @@ public final class ProviderRest {
                     cache.setScales(pyramid.getScales());
                     cache.setProviderId(provider.getId());
                     cache.setDataId(layerName);
-                    cache.setConform(childRec.isPyramidConformProvider());
+                    cache.setConform(childRec.getIdentifier().startsWith("conform_"));
                     
                     choices.getPyramids().add(cache);
                     
