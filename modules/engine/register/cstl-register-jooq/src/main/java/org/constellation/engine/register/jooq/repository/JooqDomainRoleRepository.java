@@ -155,7 +155,7 @@ public class JooqDomainroleRepository extends AbstractJooqRespository<Domainrole
             List<Pair<User, List<Domain>>> userList = new ArrayList<Pair<User, List<Domain>>>();
             for (Entry<Record, Result<Record>> userRecord : users.entrySet()) {
                 User user = userRecord.getKey().into(User.class);
-                if (user.getId() == 0)
+                if (user.getId() == null)
                     continue;
                 List<Domain> domains = filter(userRecord.getValue().into(Domain.class), nullDomain);
                 userList.add(Pair.of(user, domains));
