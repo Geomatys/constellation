@@ -9,13 +9,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.constellation.engine.register.Permission;
-import org.constellation.engine.register.repository.DomainroleRepository;
+import org.constellation.engine.register.repository.DomainRoleRepository;
 
 @Path("1/permission")
 public class PermissionRest {
     
     @Inject
-    private DomainroleRepository domainRoleRepository;
+    private DomainRoleRepository domainRoleRepository;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)

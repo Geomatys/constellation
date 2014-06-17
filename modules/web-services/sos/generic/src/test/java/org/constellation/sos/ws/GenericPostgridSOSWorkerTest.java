@@ -22,7 +22,11 @@ package org.constellation.sos.ws;
 // JUnit dependencies
 import java.io.File;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
@@ -35,6 +39,8 @@ import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.ServiceBusiness;
+import org.constellation.test.utils.SpringTestRunner;
 
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -43,56 +49,63 @@ import org.junit.runner.RunWith;
  *
  * @author Guilhem Legal (Geomatys)
  */
-@RunWith(TestRunner.class)
+@RunWith(SpringTestRunner.class)
 public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
 
     private static DefaultDataSource ds = null;
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
+    @Inject
+    private ServiceBusiness serviceBusiness;
+    
+    @PostConstruct
+    public void setUpClass() {
 
-        final String url = "jdbc:derby:memory:GPGTest1;create=true";
-        ds = new DefaultDataSource(url);
-
-        Connection con = ds.getConnection();
-
-        DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
-        sr.run(Util.getResourceAsStream("org/constellation/observation/structure_observations.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
-
-        ConfigurationEngine.setupTestEnvironement("GPGSOSWorkerTest");
-
-        MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
-        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-
-        //we write the configuration file
-        Automatic SMLConfiguration = new Automatic();
-        SMLConfiguration.setFormat("nosml");
-
-        Automatic OMConfiguration = (Automatic) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/generic-config.xml"));
-        pool.recycle(unmarshaller);
-
-        OMConfiguration.getBdd().setConnectURL(url);
-
-
-        SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
-        configuration.setObservationReaderType(DataSourceType.GENERIC);
-        configuration.setObservationWriterType(DataSourceType.NONE);
-        configuration.setSMLType(DataSourceType.NONE);
-        configuration.setObservationFilterType(DataSourceType.GENERIC);
-        configuration.setPhenomenonIdBase("urn:ogc:def:phenomenon:GEOM:");
-        configuration.setProfile("discovery");
-        configuration.setObservationTemplateIdBase("urn:ogc:object:observation:template:GEOM:");
-        configuration.setObservationIdBase("urn:ogc:object:observation:GEOM:");
-        configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
-        configuration.getParameters().put("transactionSecurized", "false");
-
-        ConfigurationEngine.storeConfiguration("SOS", "default", configuration);
-
-        init();
-        worker = new SOSworker("default");
-        worker.setServiceUrl(URL);
-        worker.setLogLevel(Level.FINER);
+        try {
+            final String url = "jdbc:derby:memory:GPGTest1;create=true";
+            ds = new DefaultDataSource(url);
+            
+            Connection con = ds.getConnection();
+            
+            DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
+            sr.run(Util.getResourceAsStream("org/constellation/observation/structure_observations.sql"));
+            sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
+            
+            ConfigurationEngine.setupTestEnvironement("GPGSOSWorkerTest");
+            
+            MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
+            Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+            
+            //we write the configuration file
+            Automatic SMLConfiguration = new Automatic();
+            SMLConfiguration.setFormat("nosml");
+            
+            Automatic OMConfiguration = (Automatic) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/generic-config.xml"));
+            pool.recycle(unmarshaller);
+            
+            OMConfiguration.getBdd().setConnectURL(url);
+            
+            
+            SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
+            configuration.setObservationReaderType(DataSourceType.GENERIC);
+            configuration.setObservationWriterType(DataSourceType.NONE);
+            configuration.setSMLType(DataSourceType.NONE);
+            configuration.setObservationFilterType(DataSourceType.GENERIC);
+            configuration.setPhenomenonIdBase("urn:ogc:def:phenomenon:GEOM:");
+            configuration.setProfile("discovery");
+            configuration.setObservationTemplateIdBase("urn:ogc:object:observation:template:GEOM:");
+            configuration.setObservationIdBase("urn:ogc:object:observation:GEOM:");
+            configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
+            configuration.getParameters().put("transactionSecurized", "false");
+            
+            serviceBusiness.create("SOS", "default", configuration, null);
+            
+            init();
+            worker = new SOSworker("default");
+            worker.setServiceUrl(URL);
+            worker.setLogLevel(Level.FINER);
+        } catch (Exception ex) {
+            Logger.getLogger(GenericPostgridSOSWorkerTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     @Override

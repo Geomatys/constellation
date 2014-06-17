@@ -142,6 +142,19 @@ public final class IOUtilities extends Static {
             }
         }
     }
+    
+    public static GeneralParameterValue readParameter(final String xml,
+            final GeneralParameterDescriptor descriptor) throws IOException {
+        ensureNonNull("xml", xml);
+        ensureNonNull("descriptor", descriptor);
+        try {
+            final ParameterValueReader reader = new ParameterValueReader(descriptor);
+            reader.setInput(xml);
+            return reader.read();
+        } catch (XMLStreamException ex) {
+            throw new IOException("An error occurred while parsing ParameterDescriptorGroup XML.", ex);
+        } 
+    }
 
     /**
      * Reads a {@link String} instance from the specified {@link InputStream}.

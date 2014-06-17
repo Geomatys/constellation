@@ -23,10 +23,14 @@ package org.constellation.metadata;
 import java.io.File;
 import java.util.TimeZone;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import javax.xml.bind.Unmarshaller;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.xml.XML;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.generic.database.Automatic;
 import org.constellation.provider.DataProviderFactory;
@@ -34,7 +38,7 @@ import org.constellation.provider.DataProviders;
 import static org.constellation.provider.configuration.ProviderParameters.*;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
 import org.constellation.test.utils.Order;
-import org.constellation.test.utils.TestRunner;
+import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.util.Util;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
@@ -47,45 +51,52 @@ import org.opengis.parameter.ParameterValueGroup;
  *
  * @author Guilhem Legal (Geomatys)
  */
-@RunWith(TestRunner.class)
+@RunWith(SpringTestRunner.class)
 public class InternalCSWworkerTest extends CSWworkerTest {
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-        deleteTemporaryFile();
-
-        pool = EBRIMMarshallerPool.getInstance();
-        fillPoolAnchor((AnchoredMarshallerPool) pool);
-
-        final File configDir = ConfigurationEngine.setupTestEnvironement("InternalCSWWorkerTest");
-
-        File CSWDirectory  = new File(configDir, "CSW");
-        CSWDirectory.mkdir();
-        final File instDirectory = new File(CSWDirectory, "default");
-        instDirectory.mkdir();
-
-        //we write the data files
-        writeProvider("meta1.xml",         "42292_5p_19900609195600");
-        writeProvider("meta2.xml",         "42292_9s_19900610041000");
-        writeProvider("meta3.xml",         "39727_22_19750113062500");
-        writeProvider("meta4.xml",         "11325_158_19640418141800");
-        writeProvider("meta5.xml",         "40510_145_19930221211500");
-        writeProvider("meta-19119.xml",    "mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4");
-        writeProvider("imageMetadata.xml", "gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
-        writeProvider("ebrim1.xml",        "000068C3-3B49-C671-89CF-10A39BB1B652");
-        writeProvider("ebrim2.xml",        "urn:uuid:3e195454-42e8-11dd-8329-00e08157d076");
-        writeProvider("ebrim3.xml",        "urn:motiive:csw-ebrim");
-        writeProvider("meta13.xml",        "urn:uuid:1ef30a8b-876d-4828-9246-dcbbyyiioo");
-
-        //we write the configuration file
-        final String nulll = null;
-        Automatic configuration = new Automatic("internal", nulll);
-        configuration.putParameter("shiroAccessible", "false");
-
-        ConfigurationEngine.storeConfiguration("CSW", "default", configuration);
-
-        worker = new CSWworker("default");
-        worker.setLogLevel(Level.FINER);
+    @Inject
+    private ServiceBusiness serviceBusiness;
+    
+    @PostConstruct
+    public void setUpClass() {
+        try {
+            deleteTemporaryFile();
+            
+            pool = EBRIMMarshallerPool.getInstance();
+            fillPoolAnchor((AnchoredMarshallerPool) pool);
+            
+            final File configDir = ConfigurationEngine.setupTestEnvironement("InternalCSWWorkerTest");
+            
+            File CSWDirectory  = new File(configDir, "CSW");
+            CSWDirectory.mkdir();
+            final File instDirectory = new File(CSWDirectory, "default");
+            instDirectory.mkdir();
+            
+            //we write the data files
+            writeProvider("meta1.xml",         "42292_5p_19900609195600");
+            writeProvider("meta2.xml",         "42292_9s_19900610041000");
+            writeProvider("meta3.xml",         "39727_22_19750113062500");
+            writeProvider("meta4.xml",         "11325_158_19640418141800");
+            writeProvider("meta5.xml",         "40510_145_19930221211500");
+            writeProvider("meta-19119.xml",    "mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4");
+            writeProvider("imageMetadata.xml", "gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
+            writeProvider("ebrim1.xml",        "000068C3-3B49-C671-89CF-10A39BB1B652");
+            writeProvider("ebrim2.xml",        "urn:uuid:3e195454-42e8-11dd-8329-00e08157d076");
+            writeProvider("ebrim3.xml",        "urn:motiive:csw-ebrim");
+            writeProvider("meta13.xml",        "urn:uuid:1ef30a8b-876d-4828-9246-dcbbyyiioo");
+            
+            //we write the configuration file
+            final String nulll = null;
+            Automatic configuration = new Automatic("internal", nulll);
+            configuration.putParameter("shiroAccessible", "false");
+            
+            serviceBusiness.create("CSW", "default", configuration, null);
+            
+            worker = new CSWworker("default");
+            worker.setLogLevel(Level.FINER);
+        } catch (Exception ex) {
+            Logger.getLogger(InternalCSWworkerTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
     }
 

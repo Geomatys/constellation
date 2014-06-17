@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
@@ -38,9 +39,13 @@ import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.DataBusiness;
+import org.constellation.admin.ProviderBusiness;
+import org.constellation.admin.SpringHelper;
 import org.constellation.admin.dao.DataRecord;
 import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.admin.dao.StyleRecord;
+import org.constellation.admin.util.IOUtilities;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
@@ -52,13 +57,13 @@ import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.feature.type.DefaultName;
+import org.geotoolkit.feature.type.FeatureType;
+import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
 import org.geotoolkit.image.io.metadata.SpatialMetadataFormat;
 import org.geotoolkit.style.MutableFeatureTypeStyle;
 import org.geotoolkit.style.MutableRule;
 import org.geotoolkit.style.MutableStyle;
-import org.geotoolkit.feature.type.FeatureType;
-import org.geotoolkit.feature.type.Name;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.style.RasterSymbolizer;
 import org.opengis.style.Symbolizer;
@@ -66,17 +71,24 @@ import org.w3c.dom.Node;
 
 /**
  *
- * @author Ghuillem Legal (Geomatys)
+ * @author Guilhem Legal (Geomatys)
  * @author Johann Sorel (Geomatys)
  */
 public final class DefaultConfigurator implements Configurator {
 
+    @Inject
+    private ProviderBusiness providerBusiness;
+    
+    @Inject
+    private DataBusiness dataBusiness;
+    
     public DefaultConfigurator() {
+        SpringHelper.injectDependencies(this);
     }
 
     @Override
     public List<Map.Entry<String, ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException {
-        final List<String> ids = ConfigurationEngine.getProviderIds();
+        final List<String> ids = providerBusiness.getProviderIds();
         final List<Map.Entry<String,ParameterValueGroup>> entries = new ArrayList<>();
         for(String id : ids){
             ParameterValueGroup param = getProviderConfiguration(id);
@@ -89,9 +101,9 @@ public final class DefaultConfigurator implements Configurator {
     
     @Override
     public List<ProviderInformation> getProviderInformations() throws ConfigurationException {
-        final List<ProviderRecord> records = ConfigurationEngine.getProviders();
+        final List<org.constellation.engine.register.Provider> records = providerBusiness.getProviders();
         final List<ProviderInformation> entries = new ArrayList<>();
-        for(ProviderRecord record : records){
+        for(org.constellation.engine.register.Provider record : records){
             ParameterValueGroup param = getProviderConfiguration(record.getIdentifier());
             if(param!=null){
                 entries.add(new ProviderInformation(record.getIdentifier(), record.getImpl(), param));
@@ -102,15 +114,15 @@ public final class DefaultConfigurator implements Configurator {
     
     @Override
     public ParameterValueGroup getProviderConfiguration(String providerId) throws ConfigurationException {
-        final ProviderRecord record = ConfigurationEngine.getProvider(providerId);
+        final org.constellation.engine.register.Provider record = providerBusiness.getProvider(providerId);
         final String impl = record.getImpl();
         ProviderFactory factory = DataProviders.getInstance().getFactory(impl);
         if(factory==null) factory = StyleProviders.getInstance().getFactory(impl);
         if(factory==null) return null;
         try {
-            ParameterValueGroup params = (ParameterValueGroup)record.getConfig(factory.getProviderDescriptor());
+            ParameterValueGroup params = (ParameterValueGroup)IOUtilities.readParameter(record.getConfig(), factory.getProviderDescriptor());
             return params;
-        } catch (SQLException | IOException ex) {
+        } catch (IOException ex) {
             throw new ConfigurationException(ex);
         }
     }
@@ -153,7 +165,7 @@ public final class DefaultConfigurator implements Configurator {
                     }
                 }
                 if (!found) {
-                    ConfigurationEngine.deleteData(data.getCompleteName(), provider.getId());
+                    dataBusiness.deleteData(data.getCompleteName(), provider.getId());
                 }
             }
             // Add new layer.
@@ -168,9 +180,10 @@ public final class DefaultConfigurator implements Configurator {
                     }
                 }
                 if (!found) {
-                    DataRecord record = ConfigurationEngine.writeData(name, pr, provider.getDataType(), provider.isSensorAffectable());
 
-                    // Subtype
+                    // Subtype and visibility
+                    String subType  = null;
+                    boolean visible = true;
                     final DataProvider dp = DataProviders.getInstance().getProvider(provider.getId());
                     final DataStore store = dp.getMainStore();
                     if (store instanceof FeatureStore) {
@@ -182,23 +195,22 @@ public final class DefaultConfigurator implements Configurator {
                             LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
                         }
                         if (fType != null && fType.getGeometryDescriptor() != null && fType.getGeometryDescriptor().getType() != null &&
-                                fType.getGeometryDescriptor().getType().getBinding() != null)
-                        {
-                            final String subtype = fType.getGeometryDescriptor().getType().getBinding().getSimpleName();
-                            ConfigurationEngine.updateDataSubtype(name, provider.getId(), subtype);
+                                fType.getGeometryDescriptor().getType().getBinding() != null) {
+                            
+                            subType = fType.getGeometryDescriptor().getType().getBinding().getSimpleName();
                         } else {
                             // A feature that does not contain geometry, we hide it
-                            ConfigurationEngine.updateDataVisibility(name, provider.getId(), false);
+                            visible = false;
                         }
                     }
-
+                    
                     // Metadata
-                    final InputStream currentMetadata = metadata.get(record.getName());
+                    String metadataXml = null;
+                    final InputStream currentMetadata = metadata.get(name.getLocalPart());
                     if (currentMetadata != null) {
                         StringWriter writer = new StringWriter();
                         IOUtils.copy(currentMetadata, writer);
-                        StringReader reader = new StringReader(writer.toString());
-                        record.setMetadata(reader);
+                        metadataXml = writer.toString();
                     } else {
                         final Data layer = (Data) provider.get(new DefaultName(name));
                         final Object origin = layer.getOrigin();
@@ -218,14 +230,14 @@ public final class DefaultConfigurator implements Configurator {
                                     final StringWriter sw = new StringWriter();
                                     marshaller.marshal(coverageMetadataBean, sw);
                                     mp.recycle(marshaller);
-                                    final StringReader sr = new StringReader(sw.toString());
-                                    record.setMetadata(sr);
+                                    metadataXml = sw.toString();
                                 }
                             } catch (CoverageStoreException | JAXBException e) {
                                 LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
                             }
                         }
                     }
+                    dataBusiness.write(name, pr.getIdentifier(), provider.getDataType().name(), provider.isSensorAffectable(), visible, subType, metadataXml);
                 }
             }
         } else {
@@ -280,7 +292,7 @@ public final class DefaultConfigurator implements Configurator {
 
     @Override
     public void removeProviderConfiguration(String providerId) throws ConfigurationException {
-        ConfigurationEngine.deleteProvider(providerId);
+        providerBusiness.removeProvider(providerId);
     }
         
 }

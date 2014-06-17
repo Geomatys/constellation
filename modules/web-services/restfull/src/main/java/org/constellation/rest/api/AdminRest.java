@@ -21,8 +21,6 @@ package org.constellation.rest.api;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -36,14 +34,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.ConfigurationBusiness;
 import org.constellation.api.CommonConstants;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
-import org.constellation.configuration.NotRunningServiceException;
-import org.constellation.ws.ServiceConfigurer;
 import org.constellation.configuration.ServiceReport;
 import org.constellation.configuration.ServiceStatus;
 import org.constellation.dto.Configuration;
@@ -51,7 +46,6 @@ import org.constellation.dto.SimpleValue;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.repository.LayerRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
-import org.constellation.ogc.configuration.OGCConfigurer;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.WSEngine;
 

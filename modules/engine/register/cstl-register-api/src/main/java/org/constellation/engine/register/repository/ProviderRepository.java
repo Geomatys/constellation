@@ -35,6 +35,8 @@ import org.constellation.engine.register.Provider;
     List<String> getProviderIds();
 
     Provider findByIdentifier(String providerIdentifier);
+    
+    Provider findByIdentifierAndType(String providerIdentifier, String type);
 
     List<String> getProviderIdsForDomain(int activeDomainId);
 

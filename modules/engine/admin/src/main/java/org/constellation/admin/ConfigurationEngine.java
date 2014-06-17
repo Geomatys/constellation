@@ -42,7 +42,6 @@ import javax.xml.namespace.QName;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.ServiceDef;
 import org.constellation.admin.dao.DataRecord;
 import org.constellation.admin.dao.LayerRecord;
 import org.constellation.admin.dao.ProviderRecord;
@@ -101,44 +100,6 @@ public class ConfigurationEngine {
     // End of spring managed component.
 
    
-    public static void storeConfiguration(final String serviceType, final String serviceID, final Object obj,
-            final Service metadata) throws JAXBException, IOException {
-        storeConfiguration(serviceType, serviceID, null, obj, GenericDatabaseMarshallerPool.getInstance());
-        if (metadata != null) {
-            writeServiceMetadata(serviceID, serviceType, metadata, null);
-        }
-    }
-
-    public static void storeConfiguration(final String serviceType, final String serviceID, final Object obj)
-            throws JAXBException {
-        storeConfiguration(serviceType, serviceID, null, obj, GenericDatabaseMarshallerPool.getInstance());
-    }
-
-    public static void storeConfiguration(final String serviceType, final String serviceID, final String fileName,
-            final Object obj, final MarshallerPool pool) throws JAXBException {
-            configurationService.storeConfiguration(serviceType, serviceID, fileName, obj, pool, securityManager.getCurrentUserLogin());
-    }
-
-    public static List<String> getServiceConfigurationIds(final String serviceType) {
-
-        final List<String> results = new ArrayList<>();
-        final ServiceDef.Specification spec = ServiceDef.Specification.fromShortName(serviceType);
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            final List<ServiceRecord> records = session.readServices(spec);
-            for (ServiceRecord record : records) {
-                results.add(record.getIdentifier());
-            }
-
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred while get services in database", ex);
-        } finally {
-            if (session != null)
-                session.close();
-        }
-        return results;
-    }
 
     public static void writeServiceMetadata(final String identifier, final String serviceType, final Service metadata,
             String language) throws IOException, JAXBException {
@@ -533,34 +494,6 @@ public class ConfigurationEngine {
                 session.close();
         }
         return results;
-    }
-
-    public static List<ProviderRecord> getProviders() {
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            return session.readProviders();
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred while reading provider records in database", ex);
-        } finally {
-            if (session != null)
-                session.close();
-        }
-        return new ArrayList<>();
-    }
-
-    public static List<ProviderRecord> getProviders(final String serviceName) {
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            return session.readProviders(serviceName);
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
-        } finally {
-            if (session != null)
-                session.close();
-        }
-        return new ArrayList<>();
     }
 
     public static List<ProviderRecord> getProvidersFromParent(final String parentIdentifier) {

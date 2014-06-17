@@ -26,15 +26,27 @@ import org.constellation.engine.register.Style;
 
 public interface StyleRepository {
 
+    int create(Style style);
+    
     List<Style> findAll();
     
+    List<Style> findByType(final String type);
+    
+    List<Style> findByTypeAndProvider(final int providerId, final String type);
+    
+    List<Style> findByProvider(final int providerId);
+    
     Style findByName(String name);
+    
+    Style findByNameAndProvider(final int providerId, String name);
     
     Style findById(int id);
 
     List<Style> findByData(Data data);
     
     List<Style> findByLayer(Layer layer);
+    
+    List<Data> getLinkedData(int styleId);
     
     void linkStyleToData(int styleId, int dataid);
 
@@ -45,5 +57,9 @@ public interface StyleRepository {
     void unlinkStyleToLayer(int styleId, int layerId);
 
     List<Integer> getStyleIdsForData(int id);
+    
+    void deleteStyle(int providerId, String name);
+
+    Style save(Style s);
     
 }

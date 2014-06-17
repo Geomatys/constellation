@@ -23,6 +23,7 @@ package org.constellation.metadata;
 import java.io.StringWriter;
 import java.sql.Statement;
 import java.util.logging.Level;
+import javax.inject.Inject;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -39,22 +40,28 @@ import org.geotoolkit.csw.xml.v202.GetCapabilitiesType;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.EmbeddedDatabase;
+import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.util.SQLExecuter;
+import org.constellation.test.utils.SpringTestRunner;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // JUnit dependencies
 import org.junit.*;
 import static org.junit.Assert.*;
+import org.junit.runner.RunWith;
 
 /**
  * Test some erroned initialisation of CSW Worker
  *
  * @author Guilhem Legal (Geomatys)
  */
+@RunWith(SpringTestRunner.class)
 public class CSWorkerInitialisationTest {
 
     private static MarshallerPool pool;
 
+    @Inject
+    private ServiceBusiness serviceBusiness;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -79,7 +86,7 @@ public class CSWorkerInitialisationTest {
         /**
          * Test 1: No configuration file.
          */
-        ConfigurationEngine.storeConfiguration("CSW", "default", null);
+        serviceBusiness.create("CSW", "default", null, null);
         CSWworker worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
 

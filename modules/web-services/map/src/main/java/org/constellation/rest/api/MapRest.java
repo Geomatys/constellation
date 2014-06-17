@@ -34,7 +34,7 @@ import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
 import org.constellation.map.configuration.LayerBusiness;
 import static org.constellation.utils.RESTfulUtilities.ok;
-import org.constellation.webservice.map.component.StyleBusiness;
+import org.constellation.admin.StyleBusiness;
 import org.constellation.security.SecurityManager;
 import org.springframework.stereotype.Component;
 

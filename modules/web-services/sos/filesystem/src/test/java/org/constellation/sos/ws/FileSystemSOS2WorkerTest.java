@@ -25,16 +25,20 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import javax.xml.bind.Marshaller;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.test.utils.Order;
-import org.constellation.test.utils.TestRunner;
 import org.constellation.util.Util;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.ServiceBusiness;
+import org.constellation.test.utils.SpringTestRunner;
 
 
 import org.junit.*;
@@ -44,55 +48,61 @@ import org.junit.runner.RunWith;
  *
  * @author Guilhem Legal (Geomatys)
  */
-@RunWith(TestRunner.class)
+@RunWith(SpringTestRunner.class)
 public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
 
+    @Inject
+    private ServiceBusiness serviceBusiness;
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-        MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
-        Marshaller marshaller =  pool.acquireMarshaller();
-
-        final File configDir = ConfigurationEngine.setupTestEnvironement("FSSOSWorkerTest");
-
-        File SOSDirectory  = new File(configDir, "SOS");
-        SOSDirectory.mkdir();
-        final File instDirectory = new File(SOSDirectory, "default");
-        instDirectory.mkdir();
-
-
-        File sensorDirectory = new File(instDirectory, "sensors");
-        sensorDirectory.mkdir();
-        writeCommonDataFile(sensorDirectory, "system.xml",     "urn:ogc:object:sensor:GEOM:1");
-        writeCommonDataFile(sensorDirectory, "component.xml",  "urn:ogc:object:sensor:GEOM:2");
-        writeCommonDataFile(sensorDirectory, "component2.xml", "urn:ogc:object:sensor:GEOM:3");
-
-        //we write the configuration file
-        Automatic SMLConfiguration = new Automatic();
-        SMLConfiguration.setDataDirectory(instDirectory.getPath() + "/sensors");
-
-        Automatic OMConfiguration  = new Automatic();
-        SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
-        configuration.setObservationReaderType(DataSourceType.NONE);
-        configuration.setObservationWriterType(DataSourceType.NONE);
-        configuration.setObservationFilterType(DataSourceType.NONE);
-
-        configuration.setSMLType(DataSourceType.FILESYSTEM);
-
-        configuration.setPhenomenonIdBase("urn:ogc:def:phenomenon:GEOM:");
-        configuration.setProfile("transactional");
-        configuration.setObservationIdBase("urn:ogc:object:observation:GEOM:");
-        configuration.setObservationTemplateIdBase("urn:ogc:object:observation:template:GEOM:");
-        configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
-        configuration.getParameters().put("transactionSecurized", "false");
-
-        ConfigurationEngine.storeConfiguration("SOS", "default", configuration);
-
-        pool.recycle(marshaller);
-        init();
-        worker = new SOSworker("default");
-        worker.setServiceUrl(URL);
-        worker.setLogLevel(Level.FINER);
+    @PostConstruct
+    public void setUpClass() {
+        try {
+            MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
+            Marshaller marshaller =  pool.acquireMarshaller();
+            
+            final File configDir = ConfigurationEngine.setupTestEnvironement("FSSOSWorkerTest");
+            
+            File SOSDirectory  = new File(configDir, "SOS");
+            SOSDirectory.mkdir();
+            final File instDirectory = new File(SOSDirectory, "default");
+            instDirectory.mkdir();
+            
+            
+            File sensorDirectory = new File(instDirectory, "sensors");
+            sensorDirectory.mkdir();
+            writeCommonDataFile(sensorDirectory, "system.xml",     "urn:ogc:object:sensor:GEOM:1");
+            writeCommonDataFile(sensorDirectory, "component.xml",  "urn:ogc:object:sensor:GEOM:2");
+            writeCommonDataFile(sensorDirectory, "component2.xml", "urn:ogc:object:sensor:GEOM:3");
+            
+            //we write the configuration file
+            Automatic SMLConfiguration = new Automatic();
+            SMLConfiguration.setDataDirectory(instDirectory.getPath() + "/sensors");
+            
+            Automatic OMConfiguration  = new Automatic();
+            SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
+            configuration.setObservationReaderType(DataSourceType.NONE);
+            configuration.setObservationWriterType(DataSourceType.NONE);
+            configuration.setObservationFilterType(DataSourceType.NONE);
+            
+            configuration.setSMLType(DataSourceType.FILESYSTEM);
+            
+            configuration.setPhenomenonIdBase("urn:ogc:def:phenomenon:GEOM:");
+            configuration.setProfile("transactional");
+            configuration.setObservationIdBase("urn:ogc:object:observation:GEOM:");
+            configuration.setObservationTemplateIdBase("urn:ogc:object:observation:template:GEOM:");
+            configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
+            configuration.getParameters().put("transactionSecurized", "false");
+            
+            serviceBusiness.create("SOS", "default", configuration, null);
+            
+            pool.recycle(marshaller);
+            init();
+            worker = new SOSworker("default");
+            worker.setServiceUrl(URL);
+            worker.setLogLevel(Level.FINER);
+        } catch (Exception ex) {
+            Logger.getLogger(FileSystemSOS2WorkerTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override

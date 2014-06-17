@@ -29,6 +29,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -63,7 +64,8 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 // Geotoolkit dependencies
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
 import org.opengis.util.CodeList;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -113,16 +115,17 @@ public abstract class OGCWebService<W extends Worker> implements Provider<SOAPMe
     @Resource
     private volatile WebServiceContext context;
 
+    @Inject
+    private ServiceBusiness serviceBusiness;
+    
     /**
      * Initialize the basic attributes of a web serviceType.
      *
-     * @param supportedVersions A list of the supported version of this serviceType.
-     *                          The first version specified <strong>MUST</strong> be the highest
-     *                          one, the best one.
      */
     public OGCWebService(final Specification spec) {
         LOGGER.log(Level.INFO, "Starting the SOAP {0} service facade.\n", spec.name());
         this.specification = spec;
+        SpringHelper.injectDependencies(this);
         WSEngine.registerService(specification.name(), "SOAP", getWorkerClass(), getConfigurerClass());
 
         /*
@@ -153,7 +156,7 @@ public abstract class OGCWebService<W extends Worker> implements Provider<SOAPMe
      */
     private void buildWorkerMap() {
         final Map<String, Worker> workersMap = new HashMap<>();
-        for (String serviceID : ConfigurationEngine.getServiceConfigurationIds(specification.name())) {
+        for (String serviceID : serviceBusiness.getServiceIdentifiers(specification.name())) {
             final W newWorker = createWorker(serviceID);
             workersMap.put(serviceID, newWorker);
         }

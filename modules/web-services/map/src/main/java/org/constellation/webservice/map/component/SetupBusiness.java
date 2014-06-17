@@ -18,27 +18,18 @@
  */
 package org.constellation.webservice.map.component;
 
-import static org.geotoolkit.parameter.ParametersExt.createGroup;
-import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
-import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
-import static org.geotoolkit.style.StyleConstants.DEFAULT_LINE_SYMBOLIZER;
-import static org.geotoolkit.style.StyleConstants.DEFAULT_POINT_SYMBOLIZER;
-import static org.geotoolkit.style.StyleConstants.DEFAULT_POLYGON_SYMBOLIZER;
-import static org.geotoolkit.style.StyleConstants.DEFAULT_RASTER_SYMBOLIZER;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import org.apache.sis.util.logging.Logging;
+import org.constellation.admin.StyleBusiness;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.process.ConstellationProcessFactory;
@@ -48,6 +39,9 @@ import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviders;
+import static org.geotoolkit.parameter.ParametersExt.createGroup;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
@@ -57,6 +51,10 @@ import org.geotoolkit.style.DefaultOnlineResource;
 import org.geotoolkit.style.DefaultPointSymbolizer;
 import org.geotoolkit.style.DefaultStyleFactory;
 import org.geotoolkit.style.MutableStyle;
+import static org.geotoolkit.style.StyleConstants.DEFAULT_LINE_SYMBOLIZER;
+import static org.geotoolkit.style.StyleConstants.DEFAULT_POINT_SYMBOLIZER;
+import static org.geotoolkit.style.StyleConstants.DEFAULT_POLYGON_SYMBOLIZER;
+import static org.geotoolkit.style.StyleConstants.DEFAULT_RASTER_SYMBOLIZER;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;

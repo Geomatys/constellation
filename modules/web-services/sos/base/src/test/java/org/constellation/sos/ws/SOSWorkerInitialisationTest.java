@@ -21,15 +21,18 @@ package org.constellation.sos.ws;
 
 import java.io.StringWriter;
 import java.sql.Statement;
+import javax.inject.Inject;
 import javax.xml.bind.Marshaller;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.EmbeddedDatabase;
+import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.util.SQLExecuter;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
+import org.constellation.test.utils.SpringTestRunner;
 import org.geotoolkit.sos.xml.v100.GetCapabilities;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -38,14 +41,19 @@ import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
+import org.junit.runner.RunWith;
 
 /**
  * Test some erroned initialisation of SOS Worker
  *
  * @author Guilhem Legal (Geomatys)
  */
+@RunWith(SpringTestRunner.class)
 public class SOSWorkerInitialisationTest {
 
+    @Inject
+    private ServiceBusiness serviceBusiness;
+    
     private static MarshallerPool pool;
 
     @BeforeClass
@@ -75,7 +83,7 @@ public class SOSWorkerInitialisationTest {
         /**
          * Test 1: No configuration file.
          */
-        ConfigurationEngine.storeConfiguration("SOS", "default", null);
+        serviceBusiness.create("SOS", "default", null, null);
         SOSworker worker = new SOSworker("default");
 
         boolean exceptionLaunched = false;

@@ -66,6 +66,11 @@ public class JooqProviderRepository extends AbstractJooqRespository<ProviderReco
     public Provider findByIdentifier(String identifier) {
         return dsl.select().from(PROVIDER).where(PROVIDER.IDENTIFIER.eq(identifier)).fetchOne().into(Provider.class);
     }
+    
+    @Override
+    public Provider findByIdentifierAndType(String providerIdentifier, String type) {
+        return dsl.select().from(PROVIDER).where(PROVIDER.IDENTIFIER.eq(providerIdentifier)).and(PROVIDER.TYPE.eq(type)).fetchOne().into(Provider.class);
+    }
 
     @Override
     public List<String> getProviderIdsForDomain(int domainId) {

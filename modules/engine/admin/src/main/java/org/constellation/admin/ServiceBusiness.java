@@ -101,6 +101,9 @@ public class ServiceBusiness {
         service.setOwner(securityManager.getCurrentUserLogin());
         service.setIdentifier(identifier);
         service.setStatus(ServiceStatus.STOPPED.toString());
+        if (metadata != null) {
+            service.setMetadata(getStringFromObject(metadata, GenericDatabaseMarshallerPool.getInstance()));
+        }
         // @TODO
         service.setVersions("1.3.0");
         serviceRepository.create(service);
@@ -303,13 +306,17 @@ public class ServiceBusiness {
             configuration = DefaultServiceConfiguration.getDefaultConfiguration(serviceType);
         }
 
+        
         //write configuration file.
-        try {
-            ConfigurationEngine.storeConfiguration(serviceType, identifier, configuration, metadata);
-        } catch (JAXBException ex) {
-            throw new ConfigurationException(ex.getMessage(), ex);
-        } catch (IOException ex) {
-            throw new ConfigurationException("An error occurred while trying to write serviceMetadata.xml file.");
+        final Service service = serviceRepository.findByIdentifierAndType(identifier, serviceType);
+        if (service == null) {
+            create(serviceType, identifier, configuration, metadata);
+        } else {
+            service.setConfig(getStringFromObject(configuration, GenericDatabaseMarshallerPool.getInstance()));
+            if (metadata != null) {
+                service.setMetadata(getStringFromObject(metadata, GenericDatabaseMarshallerPool.getInstance()));
+            }
+            serviceRepository.save(service);
         }
      }
      

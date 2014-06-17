@@ -24,7 +24,7 @@ import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.Domainrole;
 import org.constellation.engine.register.Permission;
 import org.constellation.engine.register.User;
-import org.constellation.engine.register.repository.DomainroleRepository;
+import org.constellation.engine.register.repository.DomainRoleRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -67,7 +67,7 @@ public class DomainRoleRest {
             }
 
     @Inject
-    private DomainroleRepository domainRoleRepository;
+    private DomainRoleRepository domainRoleRepository;
 
     @Path("/")
     @GET

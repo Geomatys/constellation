@@ -41,7 +41,7 @@ import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviders;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.util.DataReference;
-import org.constellation.webservice.map.component.StyleBusiness;
+import org.constellation.admin.StyleBusiness;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.LayerProviders;
 import org.geotoolkit.factory.FactoryFinder;

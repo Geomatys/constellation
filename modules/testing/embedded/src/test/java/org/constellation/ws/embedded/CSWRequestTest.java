@@ -36,12 +36,17 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import javax.xml.namespace.QName;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.ServiceBusiness;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.ws.soap.SOService;
 import org.constellation.test.utils.Order;
-import org.constellation.test.utils.TestRunner;
+import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.util.Util;
 import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.v202.*;
@@ -57,59 +62,66 @@ import org.junit.runner.RunWith;
  *
  * @author Guilhem Legal (Geomatys)
  */
-@RunWith(TestRunner.class)
+@RunWith(SpringTestRunner.class)
 public class CSWRequestTest extends AbstractGrizzlyServer {
 
+    @Inject
+    private ServiceBusiness serviceBusiness;
+    
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
-    @BeforeClass
-    public static void initPool() throws Exception {
-        final File configDirectory = ConfigurationEngine.setupTestEnvironement("CSWRequestTest");
-        
-        final File dataDirectory2 = new File(configDirectory, "dataCsw2");
-        dataDirectory2.mkdir();
-
-        writeDataFile(dataDirectory2, "urn-uuid-e8df05c2-d923-4a05-acce-2b20a27c0e58");
-        
-        final Automatic config2 = new Automatic("filesystem", dataDirectory2.getPath());
-        config2.putParameter("shiroAccessible", "false");
-        config2.putParameter("CSWCascading", "http://localhost:9090/csw/default");
-        ConfigurationEngine.storeConfiguration("CSW", "csw2", config2);
-
-
-        final File dataDirectory = new File(configDirectory, "dataCsw");
-        dataDirectory.mkdir();
-
-        writeDataFile(dataDirectory, "urn-uuid-19887a8a-f6b0-4a63-ae56-7fba0e17801f");
-        writeDataFile(dataDirectory, "urn-uuid-1ef30a8b-876d-4828-9246-c37ab4510bbd");
-        writeDataFile(dataDirectory, "urn-uuid-66ae76b7-54ba-489b-a582-0f0633d96493");
-        writeDataFile(dataDirectory, "urn-uuid-6a3de50b-fa66-4b58-a0e6-ca146fdd18d4");
-        writeDataFile(dataDirectory, "urn-uuid-784e2afd-a9fd-44a6-9a92-a3848371c8ec");
-        writeDataFile(dataDirectory, "urn-uuid-829babb0-b2f1-49e1-8cd5-7b489fe71a1e");
-        writeDataFile(dataDirectory, "urn-uuid-88247b56-4cbc-4df9-9860-db3f8042e357");
-        writeDataFile(dataDirectory, "urn-uuid-94bc9c83-97f6-4b40-9eb8-a8e8787a5c63");
-        writeDataFile(dataDirectory, "urn-uuid-9a669547-b69b-469f-a11f-2d875366bbdc");
-        writeDataFile(dataDirectory, "urn-uuid-e9330592-0932-474b-be34-c3a3bb67c7db");
-
-        final File subDataDirectory = new File(dataDirectory, "sub1");
-        subDataDirectory.mkdir();
-        writeDataFile(subDataDirectory, "urn-uuid-ab42a8c4-95e8-4630-bf79-33e59241605a");
-        
-        final File subDataDirectory2 = new File(dataDirectory, "sub2");
-        subDataDirectory2.mkdir();
-        writeDataFile(subDataDirectory2, "urn-uuid-a06af396-3105-442d-8b40-22b57a90d2f2");
-
-        final Automatic config = new Automatic("filesystem", dataDirectory.getPath());
-        config.putParameter("shiroAccessible", "false");
-        ConfigurationEngine.storeConfiguration("CSW", "default", config);
-
-
-        final Map<String, Object> map = new HashMap<>();
-        map.put("sos", new SOService());
-        initServer(null, map);
-        // Get the list of layers
-        pool = EBRIMMarshallerPool.getInstance();
+    @PostConstruct
+    public void initPool() {
+        try {
+            final File configDirectory = ConfigurationEngine.setupTestEnvironement("CSWRequestTest");
+            
+            final File dataDirectory2 = new File(configDirectory, "dataCsw2");
+            dataDirectory2.mkdir();
+            
+            writeDataFile(dataDirectory2, "urn-uuid-e8df05c2-d923-4a05-acce-2b20a27c0e58");
+            
+            final Automatic config2 = new Automatic("filesystem", dataDirectory2.getPath());
+            config2.putParameter("shiroAccessible", "false");
+            config2.putParameter("CSWCascading", "http://localhost:9090/csw/default");
+            serviceBusiness.create("CSW", "csw2", config2, null);
+            
+            
+            final File dataDirectory = new File(configDirectory, "dataCsw");
+            dataDirectory.mkdir();
+            
+            writeDataFile(dataDirectory, "urn-uuid-19887a8a-f6b0-4a63-ae56-7fba0e17801f");
+            writeDataFile(dataDirectory, "urn-uuid-1ef30a8b-876d-4828-9246-c37ab4510bbd");
+            writeDataFile(dataDirectory, "urn-uuid-66ae76b7-54ba-489b-a582-0f0633d96493");
+            writeDataFile(dataDirectory, "urn-uuid-6a3de50b-fa66-4b58-a0e6-ca146fdd18d4");
+            writeDataFile(dataDirectory, "urn-uuid-784e2afd-a9fd-44a6-9a92-a3848371c8ec");
+            writeDataFile(dataDirectory, "urn-uuid-829babb0-b2f1-49e1-8cd5-7b489fe71a1e");
+            writeDataFile(dataDirectory, "urn-uuid-88247b56-4cbc-4df9-9860-db3f8042e357");
+            writeDataFile(dataDirectory, "urn-uuid-94bc9c83-97f6-4b40-9eb8-a8e8787a5c63");
+            writeDataFile(dataDirectory, "urn-uuid-9a669547-b69b-469f-a11f-2d875366bbdc");
+            writeDataFile(dataDirectory, "urn-uuid-e9330592-0932-474b-be34-c3a3bb67c7db");
+            
+            final File subDataDirectory = new File(dataDirectory, "sub1");
+            subDataDirectory.mkdir();
+            writeDataFile(subDataDirectory, "urn-uuid-ab42a8c4-95e8-4630-bf79-33e59241605a");
+            
+            final File subDataDirectory2 = new File(dataDirectory, "sub2");
+            subDataDirectory2.mkdir();
+            writeDataFile(subDataDirectory2, "urn-uuid-a06af396-3105-442d-8b40-22b57a90d2f2");
+            
+            final Automatic config = new Automatic("filesystem", dataDirectory.getPath());
+            config.putParameter("shiroAccessible", "false");
+            serviceBusiness.create("CSW", "default", config, null);
+            
+            
+            final Map<String, Object> map = new HashMap<>();
+            map.put("sos", new SOService());
+            initServer(null, map);
+            // Get the list of layers
+            pool = EBRIMMarshallerPool.getInstance();
+        } catch (Exception ex) {
+            Logger.getLogger(CSWRequestTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @AfterClass

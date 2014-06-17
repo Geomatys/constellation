@@ -42,7 +42,7 @@ import org.constellation.configuration.AcknowlegementType;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.StyleListBrief;
 import org.constellation.json.binding.Style;
-import org.constellation.webservice.map.component.StyleBusiness;
+import org.constellation.admin.StyleBusiness;
 import org.geotoolkit.style.DefaultMutableStyle;
 import org.geotoolkit.style.MutableStyle;
 
