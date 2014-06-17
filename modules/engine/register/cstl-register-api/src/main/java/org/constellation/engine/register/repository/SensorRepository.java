@@ -13,4 +13,8 @@ public interface SensorRepository {
     List<Data> getLinkedDatas(Sensor sensor);
     
     List<Sensor> getChildren(Sensor sensor);
+
+    List<Sensor> findAll();
+
+    void delete(String identifier);
 }

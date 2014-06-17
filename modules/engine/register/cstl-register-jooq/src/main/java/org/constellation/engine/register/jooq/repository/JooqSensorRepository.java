@@ -41,4 +41,13 @@ public class JooqSensorRepository extends AbstractJooqRespository<SensorRecord, 
         return dsl.select().from(SENSOR).where(SENSOR.PARENT.eq(sensor.getIdentifier())).fetch().into(Sensor.class);
     }
 
+    @Override
+    public List<Sensor> findAll() {
+        return dsl.select().from(SENSOR).fetch().into(Sensor.class);
+    }
+
+    @Override
+    public void delete(String identifier) {
+        dsl.delete(SENSOR).where(SENSOR.IDENTIFIER.eq(identifier)).execute();
+    }
 }

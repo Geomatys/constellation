@@ -17,11 +17,19 @@ public class SensorBusiness {
         return sensorRepository.findByIdentifier(id);
     }
     
+    public List<Sensor> getAll() {
+        return sensorRepository.findAll();
+    }
+    
     public List<Data> getLinkedData(final Sensor sensor){
         return sensorRepository.getLinkedDatas(sensor);
     }
     
     public List<Sensor> getChildren(final Sensor sensor) {
         return sensorRepository.getChildren(sensor);
+    }
+    
+    public void delete(final String identifier) {
+        sensorRepository.delete(identifier);
     }
 }
