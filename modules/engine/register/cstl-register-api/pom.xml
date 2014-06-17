@@ -44,7 +44,7 @@
     <plugins>
       <plugin>
         <groupId>com.geomatys.maven</groupId>
-        <artifactId>geomaty-sqlpojo-plugin</artifactId>
+        <artifactId>geomatys-sqlpojo-plugin</artifactId>
         <version>0.0.1-SNAPSHOT</version>
         <dependencies>
           <dependency>
@@ -57,11 +57,12 @@
         
           <execution>
           <id>sql-pojos</id>
-<!--             <phase>generate-sources</phase> -->
+            <phase>generate-resources</phase>
             <goals>
               <goal>generate</goal>
             </goals>
             <configuration>
+             <targetSchema>admin</targetSchema>
               <classpathSQL>/org/constellation/sql/v1/create-admin-db.sql</classpathSQL>
               <targetPackage>org.constellation.engine.register</targetPackage>
             </configuration>

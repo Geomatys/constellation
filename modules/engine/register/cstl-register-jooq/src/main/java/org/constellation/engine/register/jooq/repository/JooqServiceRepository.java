@@ -85,7 +85,7 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
                 .set(SERVICE.CONFIG, service.getConfig())
                 .set(SERVICE.IDENTIFIER, service.getIdentifier())
                 .set(SERVICE.METADATA, service.getMetadata())
-                .set(SERVICE.METADATA_ID, service.getMetadata_id())
+                .set(SERVICE.METADATA_ID, service.getMetadataId())
                 .set(SERVICE.OWNER, service.getOwner())
                 .set(SERVICE.STATUS, service.getStatus())
                 .set(SERVICE.TYPE, service.getType())
@@ -186,7 +186,7 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
 		serviceRecord.setDate(service.getDate());
 		serviceRecord.setIdentifier(service.getIdentifier());
 		serviceRecord.setMetadata(service.getMetadata());
-		serviceRecord.setMetadataId(service.getMetadata_id());
+		serviceRecord.setMetadataId(service.getMetadataId());
 		serviceRecord.setType(service.getType());
 		serviceRecord.setOwner(service.getOwner());
 		serviceRecord.setStatus(service.getStatus());

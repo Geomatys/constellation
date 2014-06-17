@@ -89,7 +89,7 @@ public class JooqProviderRepository extends AbstractJooqRespository<ProviderReco
         newRecord.setIdentifier(provider.getIdentifier());
         newRecord.setImpl(provider.getImpl());
         newRecord.setMetadata(provider.getMetadata());
-        newRecord.setMetadataId(provider.getMetadata_id());
+        newRecord.setMetadataId(provider.getMetadataId());
         newRecord.setOwner(provider.getOwner());
         newRecord.setType(provider.getType());
         newRecord.setParent(provider.getParent());

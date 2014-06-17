@@ -55,7 +55,7 @@ public class DataBusiness {
 		MarshallerPool pool = ISOMarshallerPool.getInstance();
 		InputStream sr;
         try {
-	        sr = new ByteArrayInputStream(data.getIso_metadata().getBytes("UTF-8"));
+	        sr = new ByteArrayInputStream(data.getIsoMetadata().getBytes("UTF-8"));
 	        final Unmarshaller m = pool.acquireUnmarshaller();
 			if (sr != null) {
 				metadata = (DefaultMetadata) m.unmarshal(sr);
