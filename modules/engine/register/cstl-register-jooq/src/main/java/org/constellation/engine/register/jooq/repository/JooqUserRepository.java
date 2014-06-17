@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.DomainRole;
+import org.constellation.engine.register.Domainrole;
 import org.constellation.engine.register.DomainUser;
 import org.constellation.engine.register.User;
 import org.constellation.engine.register.jooq.Tables;
@@ -124,7 +124,7 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
         for (Entry<Record, Result<Record>> domainEntry : domains.entrySet()) {
 
             Domain domain = domainEntry.getKey().into(Domain.class);
-            if (domain.getId() != null) {
+            if (domain.getId() == 0) {
                 userDTO.addDomain(domain);
             }
         }
@@ -254,8 +254,8 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
     }
 
     @Override
-    public Map<User, List<DomainRole>> findUsersWithDomainRoles(int domainId) {
-        Map<User, List<DomainRole>> result = new LinkedHashMap<>();
+    public Map<User, List<Domainrole>> findUsersWithDomainRoles(int domainId) {
+        Map<User, List<Domainrole>> result = new LinkedHashMap<>();
         SelectConditionStep<Record> groupBy = dsl.select().from(USER).join(USER_X_DOMAIN_X_DOMAINROLE).onKey().join(Tables.DOMAINROLE).onKey()
                 .where(USER_X_DOMAIN_X_DOMAINROLE.DOMAIN_ID.eq(domainId));
         groupBy.execute();
@@ -263,7 +263,7 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
         for (Entry<Record, Result<Record>> userRecord : intoGroups.entrySet()) {
             User user = userRecord.getKey().into(User.class);
 
-            result.put(user, userRecord.getValue().into(DomainRole.class));
+            result.put(user, userRecord.getValue().into(Domainrole.class));
         }
         return result;
     }

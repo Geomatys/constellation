@@ -15,13 +15,13 @@ import java.util.Map.Entry;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.DomainRole;
+import org.constellation.engine.register.Domainrole;
 import org.constellation.engine.register.Permission;
 import org.constellation.engine.register.User;
 import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.tables.records.DomainroleRecord;
 import org.constellation.engine.register.jooq.tables.records.DomainroleXPermissionRecord;
-import org.constellation.engine.register.repository.DomainRoleRepository;
+import org.constellation.engine.register.repository.DomainroleRepository;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.UpdatableRecord;
@@ -29,11 +29,12 @@ import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.base.Optional;
 import com.google.common.primitives.Ints;
 
 @Component
-public class JooqDomainRoleRepository extends AbstractJooqRespository<DomainroleRecord, DomainRole> implements
-        DomainRoleRepository {
+public class JooqDomainroleRepository extends AbstractJooqRespository<DomainroleRecord, Domainrole> implements
+        DomainroleRepository {
 
     Predicate<Permission> nullPermission = new Predicate<Permission>() {
         @Override
@@ -49,31 +50,30 @@ public class JooqDomainRoleRepository extends AbstractJooqRespository<Domainrole
         }
     };
 
-    public JooqDomainRoleRepository() {
-        super(DomainRole.class, DOMAINROLE);
+    public JooqDomainroleRepository() {
+        super(Domainrole.class, DOMAINROLE);
     }
 
     @Override
-    public List<DomainRole> findAll() {
-        List<DomainRole> domainRoles = new ArrayList<DomainRole>();
+    public Map<Domainrole, List<Permission>> findAllWithPermission() {
+        Map<Domainrole, List<Permission>> result = new HashMap<>();
         Map<Record, Result<Record>> domains = dsl.select().from(DOMAINROLE).leftOuterJoin(DOMAINROLE_X_PERMISSION)
                 .onKey().leftOuterJoin(Tables.PERMISSION).onKey().fetch().intoGroups(DOMAINROLE.fields());
         for (Map.Entry<Record, Result<Record>> entry : domains.entrySet()) {
-            DomainRole domainRole = entry.getKey().into(DomainRole.class);
+            Domainrole domainRole = entry.getKey().into(Domainrole.class);
             List<Permission> permissions = filter(entry.getValue().into(Permission.class), nullPermission);
 
-            domainRole.setPermissions(permissions);
-            domainRoles.add(domainRole);
+            result.put(domainRole, permissions);
         }
 
-        return domainRoles;
+        return result;
     }
 
     @Override
     @Transactional
-    public DomainRole save(DomainRole group) {
+    public Domainrole createWithPermissions(Domainrole group, List<Permission> permissions) {
 
-        DomainRole saved = new DomainRole();
+        Domainrole saved = new Domainrole();
         DomainroleRecord newRecord = dsl.newRecord(DOMAINROLE);
         newRecord.setName(group.getName());
         newRecord.setDescription(group.getDescription());
@@ -84,16 +84,14 @@ public class JooqDomainRoleRepository extends AbstractJooqRespository<Domainrole
         saved.setName(group.getName());
         saved.setDescription(group.getDescription());
 
-        insertPermissions(saved);
-
-        saved.setPermissions(group.getPermissions());
+        insertPermissions(saved, permissions);
 
         return saved;
     }
 
     @Override
     @Transactional
-    public DomainRole update(DomainRole domainRole) {
+    public Domainrole updateWithPermissions(Domainrole domainRole, List<Permission> permissions) {
 
         dsl.update(DOMAINROLE).set(DOMAINROLE.NAME, domainRole.getName())
                 .set(DOMAINROLE.DESCRIPTION, domainRole.getDescription()).where(DOMAINROLE.ID.eq(domainRole.getId()))
@@ -102,14 +100,14 @@ public class JooqDomainRoleRepository extends AbstractJooqRespository<Domainrole
         dsl.delete(DOMAINROLE_X_PERMISSION).where(DOMAINROLE_X_PERMISSION.DOMAINROLE_ID.eq(domainRole.getId()))
                 .execute();
 
-        insertPermissions(domainRole);
+        insertPermissions(domainRole, permissions);
         return domainRole;
     }
 
-    private void insertPermissions(DomainRole domainRole) {
+    private void insertPermissions(Domainrole domainRole, List<Permission> permissions) {
 
         List<UpdatableRecord<DomainroleXPermissionRecord>> records = new ArrayList<UpdatableRecord<DomainroleXPermissionRecord>>();
-        for (Permission permission : domainRole.getPermissions()) {
+        for (Permission permission : permissions) {
             DomainroleXPermissionRecord permissionRecord = dsl.newRecord(DOMAINROLE_X_PERMISSION);
             permissionRecord.setDomainroleId(domainRole.getId());
             permissionRecord.setPermissionId(permission.getId());
@@ -128,17 +126,16 @@ public class JooqDomainRoleRepository extends AbstractJooqRespository<Domainrole
     }
 
     @Override
-    public DomainRole findOneWithPermission(int id) {
+    public Optional<Pair<Domainrole, List<Permission>>> findOneWithPermission(int id) {
         Result<Record> fetch = dsl.select().from(DOMAINROLE).leftOuterJoin(Tables.DOMAINROLE_X_PERMISSION).onKey()
                 .leftOuterJoin(Tables.PERMISSION).onKey().where(DOMAINROLE.ID.eq(id)).fetch();
         Map<Record, Result<Record>> domainRoleEntry = fetch.intoGroups(DOMAINROLE.fields());
         for (Entry<Record, Result<Record>> rec : domainRoleEntry.entrySet()) {
-            DomainRole domainRole = rec.getKey().into(DomainRole.class);
+            Domainrole domainRole = rec.getKey().into(Domainrole.class);
             List<Permission> permissions = filter(rec.getValue().into(Permission.class), nullPermission);
-            domainRole.setPermissions(permissions);
-            return domainRole;
+            return Optional.of(Pair.of(domainRole, permissions));
         }
-        return null;
+        return Optional.absent();
     }
 
     @Override
@@ -147,18 +144,18 @@ public class JooqDomainRoleRepository extends AbstractJooqRespository<Domainrole
     }
 
     @Override
-    public Map<DomainRole, List<Pair<User, List<Domain>>>> findAllWithMembers() {
-        Map<DomainRole, List<Pair<User, List<Domain>>>> result = new LinkedHashMap<>();
+    public Map<Domainrole, List<Pair<User, List<Domain>>>> findAllWithMembers() {
+        Map<Domainrole, List<Pair<User, List<Domain>>>> result = new LinkedHashMap<>();
         Map<Record, Result<Record>> domainRoles = dsl.select().from(DOMAINROLE)
                 .leftOuterJoin(Tables.USER_X_DOMAIN_X_DOMAINROLE).onKey().leftOuterJoin(DOMAIN).onKey()
                 .leftOuterJoin(USER).onKey().orderBy(DSL.lower(DOMAINROLE.NAME).asc()).fetchGroups(DOMAINROLE.fields());
         for (Entry<Record, Result<Record>> domainRoleEntry : domainRoles.entrySet()) {
-            DomainRole domainRole = domainRoleEntry.getKey().into(DomainRole.class);
+            Domainrole domainRole = domainRoleEntry.getKey().into(Domainrole.class);
             Map<Record, Result<Record>> users = domainRoleEntry.getValue().intoGroups(USER.fields());
             List<Pair<User, List<Domain>>> userList = new ArrayList<Pair<User, List<Domain>>>();
             for (Entry<Record, Result<Record>> userRecord : users.entrySet()) {
                 User user = userRecord.getKey().into(User.class);
-                if (user.getId() == null)
+                if (user.getId() == 0)
                     continue;
                 List<Domain> domains = filter(userRecord.getValue().into(Domain.class), nullDomain);
                 userList.add(Pair.of(user, domains));
@@ -169,12 +166,12 @@ public class JooqDomainRoleRepository extends AbstractJooqRespository<Domainrole
     }
 
     @Override
-    public Map<DomainRole, List<Integer>> findAllWithPermissions(int... serviceWriteAccessPermissionId) {
-        Map<DomainRole, List<Integer>> result = new HashMap<DomainRole, List<Integer>>();
+    public Map<Domainrole, List<Integer>> findAllWithPermissions(int... serviceWriteAccessPermissionId) {
+        Map<Domainrole, List<Integer>> result = new HashMap<Domainrole, List<Integer>>();
         Result<Record> fetch = dsl.select().from(DOMAINROLE).join(DOMAINROLE_X_PERMISSION).onKey()
                 .where(DOMAINROLE_X_PERMISSION.PERMISSION_ID.in(Ints.asList(serviceWriteAccessPermissionId))).fetch();
         for (Entry<Record, Result<Record>> e : fetch.intoGroups(DOMAINROLE.fields()).entrySet()) {
-            DomainRole domainRole = e.getKey().into(DomainRole.class);
+            Domainrole domainRole = e.getKey().into(Domainrole.class);
             List<Integer> values = e.getValue().getValues(DOMAINROLE_X_PERMISSION.PERMISSION_ID);
             result.put(domainRole, values);
         }
@@ -182,7 +179,7 @@ public class JooqDomainRoleRepository extends AbstractJooqRespository<Domainrole
     }
 
     @Override
-    public List<DomainRole> findUserDomainRoles(int id, int domainId) {
+    public List<Domainrole> findUserDomainroles(int id, int domainId) {
         return findBy(DOMAINROLE.ID.in(dsl
                 .select(USER_X_DOMAIN_X_DOMAINROLE.DOMAINROLE_ID)
                 .from(USER_X_DOMAIN_X_DOMAINROLE)

@@ -39,7 +39,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.DomainRole;
+import org.constellation.engine.register.Domainrole;
 import org.constellation.engine.register.User;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.UserRepository;
@@ -80,18 +80,18 @@ public class DomainRest {
     
     public static class UserWithDomainRoles  {
         private User user;
-        private List<DomainRole> domainRoles;
+        private List<Domainrole> domainRoles;
 
-        public UserWithDomainRoles(User user, List<DomainRole> domainRoles) {
+        public UserWithDomainRoles(User user, List<Domainrole> domainRoles) {
             this.user = user;
             this.domainRoles = domainRoles; 
         }
 
-        public List<DomainRole> getDomainRoles() {
+        public List<Domainrole> getDomainRoles() {
             return domainRoles;
         }
 
-        public void setDomainRoles(List<DomainRole> domainRoles) {
+        public void setDomainRoles(List<Domainrole> domainRoles) {
             this.domainRoles = domainRoles;
         }
 
@@ -235,11 +235,11 @@ public class DomainRest {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/members/{id}")
     public Response members(@PathParam("id") int domainId) {
-        Map<User, List<DomainRole>> findUsersWithDomainRoles = userRepository.findUsersWithDomainRoles(domainId);
+        Map<User, List<Domainrole>> findUsersWithDomainRoles = userRepository.findUsersWithDomainRoles(domainId);
         
         List<UserWithDomainRoles> result = new ArrayList<DomainRest.UserWithDomainRoles>();
         
-        for (Map.Entry<User, List<DomainRole>> e : findUsersWithDomainRoles.entrySet()) {
+        for (Map.Entry<User, List<Domainrole>> e : findUsersWithDomainRoles.entrySet()) {
             result.add(new UserWithDomainRoles(e.getKey(), e.getValue()));
         }
         

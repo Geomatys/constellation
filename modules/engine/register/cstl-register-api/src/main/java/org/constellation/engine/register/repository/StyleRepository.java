@@ -43,5 +43,7 @@ public interface StyleRepository {
     void linkStyleToLayer(int styleId, int layerid);
 
     void unlinkStyleToLayer(int styleId, int layerId);
+
+    List<Integer> getStyleIdsForData(int id);
     
 }

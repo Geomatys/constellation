@@ -17,16 +17,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.DomainRole;
-import org.constellation.engine.register.DomainUser;
+import org.constellation.engine.register.Domainrole;
 import org.constellation.engine.register.Permission;
+import org.constellation.engine.register.PermissionConstants;
 import org.constellation.engine.register.repository.DomainRepository;
-import org.constellation.engine.register.repository.DomainRoleRepository;
+import org.constellation.engine.register.repository.DomainroleRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
-import org.constellation.engine.register.repository.UserRepository;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Maps.EntryTransformer;
 
@@ -35,13 +32,13 @@ import com.google.common.collect.Maps.EntryTransformer;
 @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 public class ServicePermissionRest {
 
-    static class DomainRoleWithServiceAcccess {
+    static class DomainroleWithServiceAcccess {
 
         private String domainRole;
 
         private List<String> access;
 
-        public DomainRoleWithServiceAcccess() {
+        public DomainroleWithServiceAcccess() {
         }
 
         public String getDomainRole() {
@@ -52,7 +49,7 @@ public class ServicePermissionRest {
             this.domainRole = domainRole;
         }
 
-        public DomainRoleWithServiceAcccess(String domainRole, List<String> access) {
+        public DomainroleWithServiceAcccess(String domainRole, List<String> access) {
             super();
             this.domainRole = domainRole;
             this.access = access;
@@ -96,7 +93,7 @@ public class ServicePermissionRest {
     }
 
     @Inject
-    private DomainRoleRepository domainRoleRepository;
+    private DomainroleRepository domainRoleRepository;
 
     @Inject
     private ServiceRepository serviceRepository;
@@ -106,24 +103,24 @@ public class ServicePermissionRest {
 
     @GET
     @Path("/access")
-    public Collection<DomainRoleWithServiceAcccess> domainsrolesWithServiceAccess() {
+    public Collection<DomainroleWithServiceAcccess> domainsrolesWithServiceAccess() {
 
-        Map<DomainRole, List<Integer>> domainRolesWithPermissions = domainRoleRepository.findAllWithPermissions(
-                Permission.SERVICE_READ_ACCESS_PERMISSION_ID, Permission.SERVICE_WRITE_ACCESS_PERMISSION_ID);
+        Map<Domainrole, List<Integer>> domainRolesWithPermissions = domainRoleRepository.findAllWithPermissions(
+                PermissionConstants.SERVICE_READ_ACCESS_PERMISSION_ID, PermissionConstants.SERVICE_WRITE_ACCESS_PERMISSION_ID);
 
         return Maps.transformEntries(domainRolesWithPermissions,
-                new EntryTransformer<DomainRole, List<Integer>, DomainRoleWithServiceAcccess>() {
+                new EntryTransformer<Domainrole, List<Integer>, DomainroleWithServiceAcccess>() {
 
-                    public DomainRoleWithServiceAcccess transformEntry(DomainRole domainRole,
+                    public DomainroleWithServiceAcccess transformEntry(Domainrole domainRole,
                             List<Integer> permissionIds) {
                         List<String> access = new ArrayList<>();
-                        if (permissionIds.contains(Permission.SERVICE_READ_ACCESS_PERMISSION_ID)) {
+                        if (permissionIds.contains(PermissionConstants.SERVICE_READ_ACCESS_PERMISSION_ID)) {
                             access.add("READ");
                         }
-                        if (permissionIds.contains(Permission.SERVICE_WRITE_ACCESS_PERMISSION_ID)) {
+                        if (permissionIds.contains(PermissionConstants.SERVICE_WRITE_ACCESS_PERMISSION_ID)) {
                             access.add("WRITE");
                         }
-                        return new DomainRoleWithServiceAcccess(domainRole.getName(), access);
+                        return new DomainroleWithServiceAcccess(domainRole.getName(), access);
                     }
 
                 }).values();
@@ -135,7 +132,7 @@ public class ServicePermissionRest {
     public Response linkedDomains(@PathParam("userId") int userId, @PathParam("serviceId") int serviceId) {
 
         Set<Integer> domainsById = domainRepository
-                .findUserDomainIdsWithPermission(userId, Permission.SERVICE_CREATION);
+                .findUserDomainIdsWithPermission(userId, PermissionConstants.SERVICE_CREATION);
         List<LinkedDomain> result = new ArrayList<>();
         for (Entry<Domain, Boolean> e : serviceRepository.getLinkedDomains(serviceId).entrySet()) {
             Domain domain = e.getKey();

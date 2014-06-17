@@ -34,7 +34,7 @@ import java.util.Set;
 import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.ServiceExtraConfig;
-import org.constellation.engine.register.ServiceMetaData;
+import org.constellation.engine.register.ServiceMetadata;
 import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.tables.records.ServiceExtraConfigRecord;
 import org.constellation.engine.register.jooq.tables.records.ServiceRecord;
@@ -85,7 +85,7 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
                 .set(SERVICE.CONFIG, service.getConfig())
                 .set(SERVICE.IDENTIFIER, service.getIdentifier())
                 .set(SERVICE.METADATA, service.getMetadata())
-                .set(SERVICE.METADATA_ID, service.getMetadataId())
+                .set(SERVICE.METADATA_ID, service.getMetadata_id())
                 .set(SERVICE.OWNER, service.getOwner())
                 .set(SERVICE.STATUS, service.getStatus())
                 .set(SERVICE.TYPE, service.getType())
@@ -106,7 +106,7 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
     }
 
     @Override
-    public ServiceMetaData findMetaDataForLangByIdentifierAndType(String identifier, String serviceType, String language) {
+    public ServiceMetadata findMetaDataForLangByIdentifierAndType(String identifier, String serviceType, String language) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -186,7 +186,7 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
 		serviceRecord.setDate(service.getDate());
 		serviceRecord.setIdentifier(service.getIdentifier());
 		serviceRecord.setMetadata(service.getMetadata());
-		serviceRecord.setMetadataId(service.getMetadataId());
+		serviceRecord.setMetadataId(service.getMetadata_id());
 		serviceRecord.setType(service.getType());
 		serviceRecord.setOwner(service.getOwner());
 		serviceRecord.setStatus(service.getStatus());

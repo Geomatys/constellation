@@ -21,7 +21,6 @@ package org.constellation.engine.register.repository;
 import java.util.List;
 
 import org.constellation.engine.register.Property;
-import org.constellation.engine.register.Provider;
 
 public interface PropertyRepository {
 

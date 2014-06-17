@@ -104,19 +104,26 @@ public class LayerBusiness {
             }
 
             final Data data = dataRepository.findDataFromProvider(namespace, name, providerId);
+
+            Layer layer = new Layer();
+            layer.setName(name);
+            layer.setNamespace(namespace);
+            layer.setAlias(alias);
+            layer.setService(service.getId());
+            layer.setData(data.getId());
+            layer.setDate(System.currentTimeMillis());
+            layer.setOwner(securityManager.getCurrentUserLogin());
             final String configXml = getStringFromLayerConfig(config);
-            Layer layer = new Layer(name, namespace, alias, service.getId(), data.getId(), System.currentTimeMillis(), -1, -1, configXml, securityManager.getCurrentUserLogin());
+            layer.setConfig(configXml);
             layer = layerRepository.save(layer);
             
-            //style
-            if (data.getStyles() != null) {
-                for (int styleID : data.getStyles()) {
-                    styleRepository.linkStyleToLayer(styleID, layer.getId());
-                }
+            for (int styleID : styleRepository.getStyleIdsForData(data.getId())) {
+                styleRepository.linkStyleToLayer(styleID, layer.getId());
             }
+            //style
             
             //update service ISO metadata
-            if (service.hasIsoMetadata()) {
+            if (service.getMetadata() != null) {
                 try {
                     final DefaultMetadata servMeta = MetadataIOUtils.unmarshallMetadata(service.getMetadata());
                     CstlMetadatas.addServiceMetadataLayer(servMeta, name);

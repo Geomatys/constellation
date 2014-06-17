@@ -21,7 +21,7 @@ package org.constellation.engine.register.repository;
 import java.util.List;
 import java.util.Map;
 
-import org.constellation.engine.register.DomainRole;
+import org.constellation.engine.register.Domainrole;
 import org.constellation.engine.register.DomainUser;
 import org.constellation.engine.register.User;
 
@@ -64,7 +64,7 @@ public interface UserRepository {
     
     boolean loginAvailable(String login);
 
-    Map<User, List<DomainRole>> findUsersWithDomainRoles(int domainId);
+    Map<User, List<Domainrole>> findUsersWithDomainRoles(int domainId);
 
     List<User> findUsersNotInDomain(int domainId);
     

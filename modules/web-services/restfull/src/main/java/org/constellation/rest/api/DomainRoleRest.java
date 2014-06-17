@@ -21,17 +21,36 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.DomainRole;
+import org.constellation.engine.register.Domainrole;
+import org.constellation.engine.register.Permission;
 import org.constellation.engine.register.User;
-import org.constellation.engine.register.repository.DomainRoleRepository;
+import org.constellation.engine.register.repository.DomainroleRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 
+import com.google.common.base.Optional;
+
 @Path("/1/domainrole")
 public class DomainRoleRest {
 
-    public static class DomainRoleWithMembers extends DomainRole {
+    
+    public static class DomainroleWithPermissions extends Domainrole {
+        
+        private List<Permission> permissions;
+        
+        public void setPermissions(List<Permission> permissions) {
+            this.permissions = permissions;
+        }
+        
+        public List<Permission> getPermissions() {
+            return permissions;
+        }
+        
+        
+    }
+    
+    public static class DomainroleWithMembers extends Domainrole {
         
         
         
@@ -48,19 +67,19 @@ public class DomainRoleRest {
             }
 
     @Inject
-    private DomainRoleRepository domainRoleRepository;
+    private DomainroleRepository domainRoleRepository;
 
     @Path("/")
     @GET
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public Response all(@QueryParam("withMembers") boolean withMembers) {
         if (withMembers) {
-            List<DomainRoleWithMembers> result = new ArrayList<DomainRoleRest.DomainRoleWithMembers>();
-            Map<DomainRole, List<Pair<User, List<Domain>>>> findAllWithMembers = domainRoleRepository
+            List<DomainroleWithMembers> result = new ArrayList<DomainroleWithMembers>();
+            Map<Domainrole, List<Pair<User, List<Domain>>>> findAllWithMembers = domainRoleRepository
                     .findAllWithMembers();
 
-            for (Entry<DomainRole, List<Pair<User, List<Domain>>>> domainEntry : findAllWithMembers.entrySet()) {
-                DomainRoleWithMembers domainRoleWithMember = new DomainRoleWithMembers();
+            for (Entry<Domainrole, List<Pair<User, List<Domain>>>> domainEntry : findAllWithMembers.entrySet()) {
+                DomainroleWithMembers domainRoleWithMember = new DomainroleWithMembers();
                 domainRoleWithMember.setSystem(domainEntry.getKey().isSystem());
                 domainRoleWithMember.setId(domainEntry.getKey().getId());
                 domainRoleWithMember.setName(domainEntry.getKey().getName());
@@ -100,18 +119,23 @@ public class DomainRoleRest {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response get(@PathParam("id") int id) {
-        DomainRole domainRole = domainRoleRepository.findOneWithPermission(id);
-        if (domainRole == null)
-            return Response.status(404).build();
-        return Response.ok(domainRole).build();
+        Optional<Pair<Domainrole, List<Permission>>> opt = domainRoleRepository.findOneWithPermission(id);
+        if(opt.isPresent()) {
+            DomainroleWithPermissions domainroleWithPermissions = new DomainroleWithPermissions();          
+            
+            domainroleWithPermissions.setPermissions(opt.get().getValue());
+            return Response.ok(domainroleWithPermissions).build();
+        }
+        return Response.status(404).build();
+        
     }
 
     @Path("/")
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public Response insert(DomainRole domainRole) {
-        DomainRole saved = domainRoleRepository.save(domainRole);
+    public Response insert(DomainroleWithPermissions domainRole) {
+        Domainrole saved = domainRoleRepository.createWithPermissions(domainRole, domainRole.getPermissions());
         return Response.ok(saved).build();
     }
 
@@ -119,8 +143,8 @@ public class DomainRoleRest {
     @PUT
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public Response update(@PathParam("id") int id, DomainRole domainRole) {
-        DomainRole saved = domainRoleRepository.update(domainRole);
+    public Response update(@PathParam("id") int id, DomainroleWithPermissions domainRole) {
+        Domainrole saved = domainRoleRepository.updateWithPermissions(domainRole, domainRole.getPermissions());
         return Response.ok(saved).build();
     }
 

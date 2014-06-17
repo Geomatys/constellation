@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -173,15 +174,15 @@ public class JooqConfigurationService implements ConfigurationService {
                         layerRepository.save(storeLayer);
                     }
 
-                    if (data.hasIsoMetadata()) {
-                        layerIds.add(data.getMetadataId());
+                    if (data.getIso_metadata() != null) {
+                        layerIds.add(data.getIso_metadata());
                     }
                 }
             }
             for (Entry<String, org.constellation.engine.register.Layer> entry : layersByKey.entrySet()) {
                 layerRepository.delete(entry.getValue().getId());
             }
-            if (service.hasIsoMetadata()) {
+            if (service.getMetadata() != null ) {
                 try {
                     final DefaultMetadata servMeta = MetadataIOUtils.unmarshallMetadata(service.getMetadata());
                     CstlMetadatas.updateServiceMetadataLayer(servMeta, layerIds);

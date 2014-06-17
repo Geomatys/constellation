@@ -1,7 +1,7 @@
 package org.constellation.engine.register.jooq.repository;
 
 import org.constellation.engine.register.jooq.AbstractJooqTestTestCase;
-import org.constellation.engine.register.repository.DomainRoleRepository;
+import org.constellation.engine.register.repository.DomainroleRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -9,7 +9,7 @@ public class JooqDomainRoleRepositoryTestCase extends AbstractJooqTestTestCase {
     
     
     @Autowired
-    private DomainRoleRepository domainRoleRepository;
+    private DomainroleRepository domainRoleRepository;
 
     @Test
     public void all() {

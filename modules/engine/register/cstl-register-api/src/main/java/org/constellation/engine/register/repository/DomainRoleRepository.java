@@ -5,17 +5,21 @@ import java.util.Map;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.DomainRole;
+import org.constellation.engine.register.Domainrole;
 import org.constellation.engine.register.Permission;
 import org.constellation.engine.register.User;
 
-public interface DomainRoleRepository {
+import com.google.common.base.Optional;
 
-    List<DomainRole> findAll();
+public interface DomainroleRepository {
 
-    DomainRole save(DomainRole group);
+    List<Domainrole> findAll();
 
-    DomainRole update(DomainRole group);
+    Map<Domainrole, List<Permission>> findAllWithPermission();
+    
+    Domainrole createWithPermissions(Domainrole group,List<Permission> permissions);
+
+    Domainrole updateWithPermissions(Domainrole group, List<Permission> permissions);
 
     /**
      * Does not delete system entries.
@@ -25,14 +29,16 @@ public interface DomainRoleRepository {
      */
     int delete(int id);
 
-    DomainRole findOneWithPermission(int id);
+    Optional<Pair<Domainrole, List<Permission>>> findOneWithPermission(int id);
 
     List<Permission> allPermission();
 
-    Map<DomainRole, List<Pair<User, List<Domain>>>> findAllWithMembers();
+    Map<Domainrole, List<Pair<User, List<Domain>>>> findAllWithMembers();
 
-    Map<DomainRole, List<Integer>> findAllWithPermissions(int ... serviceWriteAccessPermissionId);
+    Map<Domainrole, List<Integer>> findAllWithPermissions(int ... serviceWriteAccessPermissionId);
 
-    List<DomainRole> findUserDomainRoles(int id, int domainId);
+    List<Domainrole> findUserDomainroles(int id, int domainId);
+
+
 
 }

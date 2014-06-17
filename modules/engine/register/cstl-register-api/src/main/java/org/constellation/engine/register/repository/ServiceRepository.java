@@ -25,7 +25,7 @@ import java.util.Set;
 import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.ServiceExtraConfig;
-import org.constellation.engine.register.ServiceMetaData;
+import org.constellation.engine.register.ServiceMetadata;
 
 public interface ServiceRepository {
 	
@@ -47,7 +47,7 @@ public interface ServiceRepository {
 
     List<String> findIdentifiersByType(String type);
 
-    ServiceMetaData findMetaDataForLangByIdentifierAndType(String identifier, String serviceType, String language);
+    ServiceMetadata findMetaDataForLangByIdentifierAndType(String identifier, String serviceType, String language);
 
     List<ServiceExtraConfig> getExtraConfig(int id);
     

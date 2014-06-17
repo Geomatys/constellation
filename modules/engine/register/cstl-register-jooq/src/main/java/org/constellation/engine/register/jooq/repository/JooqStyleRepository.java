@@ -1,12 +1,16 @@
 package org.constellation.engine.register.jooq.repository;
 
 import java.util.List;
+
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Layer;
 import org.constellation.engine.register.Style;
+
 import static org.constellation.engine.register.jooq.Tables.STYLE;
 import static org.constellation.engine.register.jooq.Tables.STYLED_DATA;
 import static org.constellation.engine.register.jooq.Tables.STYLED_LAYER;
+
+import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.tables.records.StyleRecord;
 import org.constellation.engine.register.jooq.tables.records.StyledDataRecord;
 import org.constellation.engine.register.jooq.tables.records.StyledLayerRecord;
@@ -26,7 +30,7 @@ public class JooqStyleRepository extends AbstractJooqRespository<StyleRecord, St
         return dsl.select(STYLE.fields()).from(STYLE).join(STYLED_DATA).onKey()
                 .where(STYLED_DATA.DATA.eq(data.getId())).fetchInto(Style.class);
     }
-    
+
     @Override
     public List<Style> findByLayer(Layer layer) {
         return dsl.select(STYLE.fields()).from(STYLE).join(STYLED_LAYER).onKey()
@@ -45,40 +49,50 @@ public class JooqStyleRepository extends AbstractJooqRespository<StyleRecord, St
 
     @Override
     public void linkStyleToData(int styleId, int dataid) {
-        InsertSetMoreStep<StyledDataRecord> insert = dsl.insertInto(STYLED_DATA).set(STYLED_DATA.DATA, dataid).set(STYLED_DATA.STYLE, styleId);
+        InsertSetMoreStep<StyledDataRecord> insert = dsl.insertInto(STYLED_DATA).set(STYLED_DATA.DATA, dataid)
+                .set(STYLED_DATA.STYLE, styleId);
         insert.execute();
-        
+
     }
 
     @Override
     public void unlinkStyleToData(int styleId, int dataid) {
-    	dsl.delete(STYLED_DATA).where(STYLED_DATA.DATA.eq(dataid).and(STYLED_DATA.STYLE.eq(styleId))).execute();
+        dsl.delete(STYLED_DATA).where(STYLED_DATA.DATA.eq(dataid).and(STYLED_DATA.STYLE.eq(styleId))).execute();
     }
 
-	@Override
-	public void linkStyleToLayer(int styleId, int layerId) {
-		StyledLayerRecord styledLayerRecord = dsl.select().from(STYLED_LAYER).where(STYLED_LAYER.LAYER.eq(layerId)).and(STYLED_LAYER.STYLE.eq(styleId))
-		        .fetchOneInto(StyledLayerRecord.class);
-		if (styledLayerRecord == null) {
-			
-			InsertSetMoreStep<StyledLayerRecord> insert = dsl.insertInto(STYLED_LAYER).set(STYLED_LAYER.LAYER, layerId).set(STYLED_LAYER.STYLE, styleId);
-			insert.execute();
-			setDefaultStyleToLayer(styleId, layerId);
-		}
-	}
-	
-	public void setDefaultStyleToLayer(int styleId, int layerId) {
-		StyledLayerRecord styledLayerRecord = dsl.select().from(STYLED_LAYER).where(STYLED_LAYER.LAYER.eq(layerId)).and(STYLED_LAYER.DEFAULT.eq(true)).fetchOneInto(StyledLayerRecord.class);
-		if (styledLayerRecord!=null) {
-			dsl.update(STYLED_LAYER).set(STYLED_LAYER.DEFAULT, false).where(STYLED_LAYER.LAYER.eq(layerId)).execute();
-		}
-		dsl.update(STYLED_LAYER).set(STYLED_LAYER.DEFAULT, true).where(STYLED_LAYER.LAYER.eq(layerId)).and(STYLED_LAYER.STYLE.eq(styleId)).execute();
-	}
+    @Override
+    public void linkStyleToLayer(int styleId, int layerId) {
+        StyledLayerRecord styledLayerRecord = dsl.select().from(STYLED_LAYER).where(STYLED_LAYER.LAYER.eq(layerId))
+                .and(STYLED_LAYER.STYLE.eq(styleId)).fetchOneInto(StyledLayerRecord.class);
+        if (styledLayerRecord == null) {
 
-	@Override
-	public void unlinkStyleToLayer(int styleId, int layerid) {
-		dsl.delete(STYLED_LAYER).where(STYLED_LAYER.LAYER.eq(layerid).and(STYLED_LAYER.STYLE.eq(styleId))).execute();
-		
-	}
+            InsertSetMoreStep<StyledLayerRecord> insert = dsl.insertInto(STYLED_LAYER).set(STYLED_LAYER.LAYER, layerId)
+                    .set(STYLED_LAYER.STYLE, styleId);
+            insert.execute();
+            setDefaultStyleToLayer(styleId, layerId);
+        }
+    }
+
+    public void setDefaultStyleToLayer(int styleId, int layerId) {
+        StyledLayerRecord styledLayerRecord = dsl.select().from(STYLED_LAYER).where(STYLED_LAYER.LAYER.eq(layerId))
+                .and(STYLED_LAYER.DEFAULT.eq(true)).fetchOneInto(StyledLayerRecord.class);
+        if (styledLayerRecord != null) {
+            dsl.update(STYLED_LAYER).set(STYLED_LAYER.DEFAULT, false).where(STYLED_LAYER.LAYER.eq(layerId)).execute();
+        }
+        dsl.update(STYLED_LAYER).set(STYLED_LAYER.DEFAULT, true).where(STYLED_LAYER.LAYER.eq(layerId))
+                .and(STYLED_LAYER.STYLE.eq(styleId)).execute();
+    }
+
+    @Override
+    public void unlinkStyleToLayer(int styleId, int layerid) {
+        dsl.delete(STYLED_LAYER).where(STYLED_LAYER.LAYER.eq(layerid).and(STYLED_LAYER.STYLE.eq(styleId))).execute();
+
+    }
+
+    @Override
+    public List<Integer> getStyleIdsForData(int dataId) {
+        return dsl.select(STYLED_DATA.STYLE).from(STYLED_DATA).where(STYLED_DATA.DATA.eq(dataId))
+                .fetch(STYLED_DATA.STYLE);
+    }
 
 }

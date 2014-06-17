@@ -19,13 +19,9 @@
 package org.constellation.engine.register.repository;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.DomainRole;
-import org.constellation.engine.register.Permission;
-import org.constellation.engine.register.User;
 
 public interface DomainRepository {
   

@@ -216,9 +216,10 @@ ALTER TABLE "admin"."data_x_domain" ADD CONSTRAINT data_x_domain_domain_id_fk FO
 
 CREATE TABLE "admin"."crs"(
   "dataid"  INTEGER NOT NULL,
-  "crscode" VARCHAR(64)
+  "crscode" VARCHAR(64) NOT NULL
 );
 
+ALTER TABLE "admin"."crs" ADD CONSTRAINT crs_pk      PRIMARY KEY ("dataid", "crscode");
 ALTER TABLE "admin"."crs" ADD CONSTRAINT crs_data_fk FOREIGN KEY ("dataid") REFERENCES "admin"."data"("id") ON DELETE CASCADE;
 
 
@@ -348,11 +349,11 @@ ALTER TABLE "admin"."task_i18n" ADD CONSTRAINT task_i18n_task_id_fk    FOREIGN K
 
 
 
-CREATE TABLE "admin"."properties"(
+CREATE TABLE "admin"."property"(
   "key"    VARCHAR(32) NOT NULL,
   "value"  VARCHAR(64) NOT NULL
 );
-ALTER TABLE "admin"."properties" ADD CONSTRAINT properties_pk PRIMARY KEY ("key");
+ALTER TABLE "admin"."property" ADD CONSTRAINT property_pk PRIMARY KEY ("key");
 
 insert into "admin"."role" ("name") values('cstl-admin');
 

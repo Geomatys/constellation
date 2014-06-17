@@ -67,7 +67,7 @@ public class JooqDomainRespositoryTestCase extends AbstractJooqTestTestCase {
 
     @Test
     public void crude() {
-        Domain domainDTO = new Domain("cadastre", "Domaine du cadastre", false);
+        Domain domainDTO = new Domain(0, "cadastre", "Domaine du cadastre", false);
         Domain saved = domainRepository.save(domainDTO);
         Assert.assertNotNull("Should return saved object", saved);
         String description = "New description";
