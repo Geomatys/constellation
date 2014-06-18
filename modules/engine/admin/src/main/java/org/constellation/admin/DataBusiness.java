@@ -16,10 +16,6 @@ import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef;
-import org.constellation.admin.dao.DataRecord;
-import org.constellation.admin.dao.LayerRecord;
-import org.constellation.admin.dao.ProviderRecord;
-import org.constellation.admin.dao.ServiceRecord;
 import org.constellation.admin.dto.LayerDTO;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.configuration.DataBrief;
@@ -39,18 +35,8 @@ import org.constellation.utils.ISOMarshallerPool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -100,7 +86,7 @@ public class DataBusiness {
 	public DefaultMetadata loadIsoDataMetadata(String providerId, QName name) {
 
 		DefaultMetadata metadata = null;
-		Data data = dataRepository.findByNameAndNamespaceAndProviderId(name.getLocalPart(), name.getNamespaceURI(), providerId);
+		Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(), name.getNamespaceURI(), providerId);
 		MarshallerPool pool = ISOMarshallerPool.getInstance();
 		InputStream sr;
 
@@ -126,7 +112,7 @@ public class DataBusiness {
         } catch (JAXBException ex){
             throw new ConstellationException(ex);
         }
-        Data data = dataRepository.findByNameAndNamespaceAndProviderId(name.getLocalPart(), name.getNamespaceURI(), providerId);
+        Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(), name.getNamespaceURI(), providerId);
         data.setIsoMetadata(sw.toString());
         dataRepository.save(data);
     }
@@ -145,7 +131,7 @@ public class DataBusiness {
                                                         final MarshallerPool pool) {
         CoverageMetadataBean metadata = null;
         try {
-            Data data = dataRepository.findByNameAndNamespaceAndProviderId(name.getLocalPart(), name.getNamespaceURI(), providerIdentifier);
+            Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(), name.getNamespaceURI(), providerIdentifier);
             if (data != null) {
                 final InputStream sr = new ByteArrayInputStream(data.getMetadata().getBytes());
                 final Unmarshaller m = pool.acquireUnmarshaller();
@@ -161,9 +147,19 @@ public class DataBusiness {
         }
         return null;
     }
+    public DataBrief getDataBrief(QName fullName,Integer providerId){
+        Data data = dataRepository.findByNameAndNamespaceAndProviderId(fullName.getLocalPart(),fullName.getNamespaceURI(), providerId);
+        List<Data> datas = new ArrayList<Data>();
+        datas.add(data);
+        List<DataBrief> dataBriefs = getDataBriefFrom(datas);
+        if (dataBriefs !=null && dataBriefs.size()==0){
+            return dataBriefs.get(0);
+        }
+        throw new ConstellationException(new Exception("Problem : DataBrief Construction is null or multiple"));
+    }
 
     public DataBrief getDataBrief(QName fullName, String providerIdentifier) {
-        Data data = dataRepository.findByNameAndNamespaceAndProviderId(fullName.getLocalPart(), fullName.getNamespaceURI(), providerIdentifier);
+        Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(fullName.getLocalPart(), fullName.getNamespaceURI(), providerIdentifier);
         List<Data> datas = new ArrayList<Data>();
         datas.add(data);
         List<DataBrief> dataBriefs = getDataBriefFrom(datas);

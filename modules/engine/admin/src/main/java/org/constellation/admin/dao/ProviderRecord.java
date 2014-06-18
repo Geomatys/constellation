@@ -104,12 +104,12 @@ public final class ProviderRecord extends Record {
         this.parent = parent;
     }
 
-    public ProviderRecord getParentProvider(){
-        if(parent==null || parent.isEmpty()){
-            return null;
-        }
-        return ConfigurationEngine.getProvider(parent);
-    }
+//    public ProviderRecord getParentProvider(){
+//        if(parent==null || parent.isEmpty()){
+//            return null;
+//        }
+//        return ConfigurationEngine.getProvider(parent);
+//    }
     
     public List<ProviderRecord> getChildrenProviders(){
         return ConfigurationEngine.getProvidersFromParent(identifier);

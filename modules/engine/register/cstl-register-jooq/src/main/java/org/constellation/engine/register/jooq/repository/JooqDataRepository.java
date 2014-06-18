@@ -41,7 +41,7 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
     }
 
     @Override
-    public Data findByNameAndNamespaceAndProviderId(String name, String namespace, String providerIdentifier) {
+    public Data findByNameAndNamespaceAndProviderIdentifier(String name, String namespace, String providerIdentifier) {
         return dsl.select().from(DATA).where(DATA.VISIBLE.eq(true))
                 .and(DATA.NAMESPACE.eq(namespace)).and(DATA.NAME.eq(name))
                 .and(DATA.PROVIDER.eq(dsl.select(PROVIDER.ID).from(PROVIDER).where(PROVIDER.IDENTIFIER.eq(providerIdentifier))))
@@ -107,6 +107,13 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
     @Override
     public List<Data> findByProviderId(Integer id) {
         return dsl.select().from(DATA).where(DATA.PROVIDER.eq(id)).fetchInto(Data.class);
+    }
+
+    @Override
+    public Data findByNameAndNamespaceAndProviderId(String localPart, String namespaceURI, Integer providerId) {
+        return dsl.select().from(DATA).where(DATA.PROVIDER.eq(providerId))
+                .and(DATA.NAME.eq(localPart)).and(DATA.NAMESPACE.eq(namespaceURI))
+                .fetchOneInto(Data.class);
     }
 
 }

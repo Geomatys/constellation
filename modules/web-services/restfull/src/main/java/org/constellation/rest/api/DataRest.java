@@ -69,8 +69,10 @@ import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.iso.Types;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.admin.ConfigurationBusiness;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.DataBusiness;
+import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.dao.DataRecord;
 import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.configuration.ConfigDirectory;
@@ -79,6 +81,7 @@ import org.constellation.configuration.StringList;
 import org.constellation.coverage.PyramidCoverageHelper;
 import org.constellation.coverage.PyramidCoverageProcessListener;
 import org.constellation.dto.*;
+import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.model.SelectedExtension;
@@ -159,9 +162,10 @@ public class DataRest {
 
     @Inject
     private DataBusiness dataBusiness;
-    
+
     @Inject
-    private ProviderRepository providerRepository;
+    private ProviderBusiness providerBusiness;
+
 
     /**
      * Give metadata CodeList (example {@link org.opengis.metadata.citation.Role} codes
@@ -606,7 +610,7 @@ public class DataRest {
                     extractedMetadata = new DefaultMetadata();
             }
             //Update metadata
-            final Properties prop = ConfigurationEngine.getMetadataTemplateProperties();
+            final Properties prop = ConfigurationBusiness.getMetadataTemplateProperties();
             final String metadataID = CstlMetadatas.getMetadataIdForData(providerId, dataName);
             prop.put("fileId", metadataID);
             prop.put("dataTitle", dataName);
@@ -780,9 +784,11 @@ public class DataRest {
         }
 
         // Update the parent attribute of the created provider
-        final ProviderRecord updatedProvider = ConfigurationEngine.getProvider(outProvider.getId());
-        updatedProvider.setParentIdentifier(providerId);
-        ConfigurationEngine.updateProvider(updatedProvider);
+//        final ProviderRecord updatedProvider = ConfigurationEngine.getProvider(outProvider.getId());
+//        updatedProvider.setParentIdentifier(providerId);
+//        ConfigurationEngine.updateProvider(updatedProvider);
+
+        providerBusiness.updateParent(outProvider.getId(),providerId);
 
         //create the output pyramid coverage reference
         CoverageStore outStore = (CoverageStore) outProvider.getMainStore();
@@ -797,13 +803,13 @@ public class DataRest {
         //update the DataRecord objects
         //this produces an update event which will create the DataRecord
         outProvider.reload();
-        final DataRecord outData;
-        try {
-            outData = ConfigurationEngine.getProvider(pyramidProviderId).getData().get(0);
-        } catch (SQLException ex) {
-            Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            return Response.ok("Failed to get ouput data record "+ex.getMessage()).status(500).build();
-        }
+        final org.constellation.engine.register.Data outData;
+
+        final Provider provider = providerBusiness.getProvider(pyramidProviderId);
+        final List<org.constellation.engine.register.Data> datas = providerBusiness.getDatasFromProviderId(provider.getId());
+        outData = datas.get(0);
+            //outData = ConfigurationEngine.getProvider(pyramidProviderId).getData().get(0);
+
         
         //get the coverage reference after reload, otherwise this won't be the same reference
         outStore = (CoverageStore) outProvider.getMainStore();
@@ -1011,10 +1017,10 @@ public class DataRest {
         }
 
         // Update the parent attribute of the created provider
-        final ProviderRecord updatedProvider = ConfigurationEngine.getProvider(outProvider.getId());
-        updatedProvider.setParentIdentifier(providerId);
-        ConfigurationEngine.updateProvider(updatedProvider);
-
+//        final ProviderRecord updatedProvider = ConfigurationEngine.getProvider(outProvider.getId());
+//        updatedProvider.setParentIdentifier(providerId);
+//        ConfigurationEngine.updateProvider(updatedProvider);
+          providerBusiness.updateParent(outProvider.getId(),providerId);
         //create the output pyramid coverage reference
         CoverageStore pyramidStore = (CoverageStore) outProvider.getMainStore();
         XMLCoverageReference outputRef;
@@ -1042,13 +1048,10 @@ public class DataRest {
         //update the DataRecord objects
         //this produces an update event which will create the DataRecord
         outProvider.reload();
-        final DataRecord outData;
-        try {
-            outData = ConfigurationEngine.getProvider(pyramidProviderId).getData().get(0);
-        } catch (SQLException ex) {
-            Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            return Response.ok("Failed to get ouput data record "+ex.getMessage()).status(500).build();
-        }
+        final org.constellation.engine.register.Data outData;
+        final Provider provider = providerBusiness.getProvider(pyramidProviderId);
+        final List<org.constellation.engine.register.Data> datas = providerBusiness.getDatasFromProviderId(provider.getId());
+        outData = datas.get(0);
         
         //get the coverage reference after reload, otherwise this won't be the same reference
         pyramidStore = (CoverageStore) outProvider.getMainStore();
@@ -1243,7 +1246,6 @@ public class DataRest {
         final String name = pv.get("name");
         final String providerId = pv.get("providerId");
         final QName fullName = new QName(namespace, name);
-//        final DataBrief db = ConfigurationEngine.getData(fullName, providerId);
         final DataBrief db = dataBusiness.getDataBrief(fullName, providerId);
         return Response.ok(db).build();
     }
@@ -1262,20 +1264,12 @@ public class DataRest {
     @Consumes({MediaType.APPLICATION_JSON})
     public Response getDataList(@PathParam("type") String type) {
         final List<DataBrief> briefs = new ArrayList<>();
-        final List<String> providerIds = ConfigurationEngine.getProviderIds();
+        final List<String> providerIds = providerBusiness.getProviderIds();
         for (final String providerId : providerIds) {
-            final ProviderRecord provider = ConfigurationEngine.getProvider(providerId);
-
-            final List<DataRecord> datas;
-            try {
-                datas = provider.getData();
-            } catch (SQLException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-                return Response.status(500).entity("failed").build();
-            }
-
-            for (final DataRecord data : datas) {
-                if (type != null && !data.getType().equals(DataRecord.DataType.valueOf(type))) {
+            final Provider provider = providerBusiness.getProvider(providerId);
+            final List<org.constellation.engine.register.Data> datas = providerBusiness.getDatasFromProviderId(provider.getId());
+            for (final org.constellation.engine.register.Data data : datas) {
+                if (type != null && !data.getType().equals(type)) {
                     continue;
                 }
 
@@ -1296,19 +1290,12 @@ public class DataRest {
     @Consumes({MediaType.APPLICATION_JSON})
     public Response getDataListsForProviders() {
         final Map<String, List<DataBrief>> all = new HashMap<>();
-        final List<String> providerIds = ConfigurationEngine.getProviderIds();
+        final List<String> providerIds = providerBusiness.getProviderIds();
         for (final String providerId : providerIds) {
-            final ProviderRecord provider = ConfigurationEngine.getProvider(providerId);
-
             final List<DataBrief> briefs = new ArrayList<>();
-            final List<DataRecord> datas;
-            try {
-                datas = provider.getData();
-            } catch (SQLException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-                return Response.status(500).entity("failed").build();
-            }
-            for (final DataRecord data : datas) {
+            final Provider provider = providerBusiness.getProvider(providerId);
+            final List<org.constellation.engine.register.Data> datas = providerBusiness.getDatasFromProviderId(provider.getId());
+            for (final org.constellation.engine.register.Data data : datas) {
                 if (data.isVisible()) {
                     final QName name = new QName(data.getNamespace(), data.getName());
                     final DataBrief db = dataBusiness.getDataBrief(name, providerId);
@@ -1326,16 +1313,11 @@ public class DataRest {
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
     public Response getDataListsForProviders(@PathParam("providerId") final String providerId) {
-        final ProviderRecord prov = ConfigurationEngine.getProvider(providerId);
+        final Provider prov = providerBusiness.getProvider(providerId);
         final List<DataBrief> briefs = new ArrayList<>();
-        final List<DataRecord> datas;
-        try {
-            datas = prov.getData();
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            return Response.status(500).entity("failed").build();
-        }
-        for (final DataRecord data : datas) {
+        final List<org.constellation.engine.register.Data> datas;
+        datas = providerBusiness.getDatasFromProviderId(prov.getId());
+        for (final org.constellation.engine.register.Data data : datas) {
             if (data.isVisible()) {
                 final QName name = new QName(data.getNamespace(), data.getName());
                 final DataBrief db = dataBusiness.getDataBrief(name, providerId);
@@ -1360,23 +1342,18 @@ public class DataRest {
     public Response getTopDataList(@PathParam("domainId") int domainId, @PathParam("type") String type) {
         final List<DataBrief> briefs = new ArrayList<>();
 
-        final List<String> providerIds = providerRepository.getProviderIdsForDomain(domainId);
-        for (final String providerId : providerIds) {
-            final ProviderRecord provider = ConfigurationEngine.getProvider(providerId);
-            final String parent = provider.getParentIdentifier();
+        final List<Integer> providerIds = providerBusiness.getProviderIdsForDomain(domainId);
+        for (final Integer providerId : providerIds) {
+            final Provider provider = providerBusiness.getProvider(providerId);
+            final String parent = provider.getParent();
             if (parent != null && !parent.isEmpty()) {
                 // Remove all providers that have a parent
                 continue;
             }
-            final List<DataRecord> datas;
-            try {
-                datas = provider.getData();
-            } catch (SQLException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-                return Response.status(500).entity("failed").build();
-            }
-            for (final DataRecord data : datas) {
-                if (type != null && !data.getType().equals(DataRecord.DataType.valueOf(type))) {
+            final List<org.constellation.engine.register.Data> datas;
+            datas = providerBusiness.getDatasFromProviderId(provider.getId());
+            for (final org.constellation.engine.register.Data data : datas) {
+                if (type != null && !data.getType().equals(type)) {
                     continue;
                 }
 

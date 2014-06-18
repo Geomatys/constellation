@@ -18,6 +18,7 @@
  */
 package org.constellation.admin;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
@@ -39,6 +40,7 @@ import org.constellation.admin.dao.DataRecord;
 import org.constellation.admin.dao.StyleRecord;
 import org.constellation.admin.dto.StyleDTO;
 import org.constellation.admin.exception.ConstellationException;
+import org.constellation.admin.util.IOUtilities;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.StyleBrief;
@@ -101,7 +103,7 @@ public final class StyleBusiness {
     @Inject
     ProviderRepository providerRepository;
     
-    @Autowired
+    @Inject
     private org.constellation.security.SecurityManager securityManager;
     
     private final StyleXmlIO sldParser = new StyleXmlIO();
@@ -249,7 +251,7 @@ public final class StyleBusiness {
     public List<StyleDTO> findStyleByDataId(final QName dataname, final String providerId) {
 
         List<StyleDTO> returnlist = new ArrayList<>();
-        Data data = dataRepository.findByNameAndNamespaceAndProviderId(dataname.getLocalPart(), dataname.getNamespaceURI(), providerId);
+        Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(dataname.getLocalPart(), dataname.getNamespaceURI(), providerId);
         List<Style> styleList = styleRepository.findByData(data);
         for (Style style : styleList) {
             StyleDTO styleDTO = new StyleDTO();
@@ -629,4 +631,19 @@ public final class StyleBusiness {
         }
         return "VECTOR";
     }
+
+
+    public void writeStyle(final String name, final Integer providerId, final StyleRecord.StyleType type, final MutableStyle body) throws IOException {
+        final String login = securityManager.getCurrentUserLogin();
+        Style style = new Style();
+        style.setBody(IOUtilities.writeStyle(body));
+        style.setDate(System.currentTimeMillis());
+        style.setName(name);
+        style.setOwner(login);
+        style.setProvider(providerId);
+        style.setType(type.name());
+        styleRepository.create(style);
+    }
+
+
 }

@@ -20,9 +20,11 @@ package org.constellation.engine.register.repository;
 
 import java.util.List;
 
+import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Provider;
+import org.constellation.engine.register.Style;
 
- public interface ProviderRepository {
+public interface ProviderRepository {
 
     List<Provider> findAll();
 
@@ -38,7 +40,7 @@ import org.constellation.engine.register.Provider;
     
     Provider findByIdentifierAndType(String providerIdentifier, String type);
 
-    List<String> getProviderIdsForDomain(int activeDomainId);
+    List<Integer> getProviderIdsForDomain(int activeDomainId);
 
     Provider getProviderParentIdOfLayer(String serviceType, String serviceId, String layerid);
 
@@ -50,4 +52,9 @@ import org.constellation.engine.register.Provider;
 
     List<Provider> findChildren(String id);
 
-}
+     List<Data> findDatasByProviderId(Integer id);
+
+     int update(Provider provider);
+
+     List<Style> findStylesByProviderId(Integer providerId);
+ }

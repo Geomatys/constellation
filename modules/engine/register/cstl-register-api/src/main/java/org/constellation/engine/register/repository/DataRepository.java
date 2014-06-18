@@ -26,7 +26,7 @@ public interface DataRepository {
 
     List<Data> findAll();
     
-    Data findByNameAndNamespaceAndProviderId(String name, String namespace, String providerIdentifier);
+    Data findByNameAndNamespaceAndProviderIdentifier(String name, String namespace, String providerIdentifier);
 
     Data fromLayer(String layerAlias, String providerId);
     
@@ -43,4 +43,6 @@ public interface DataRepository {
     Data findByMetadataId(String metadataId);
 
     List<Data> findByProviderId(Integer id);
+
+    Data findByNameAndNamespaceAndProviderId(String localPart, String namespaceURI, Integer providerId);
 }

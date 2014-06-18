@@ -38,18 +38,18 @@ import org.apache.commons.io.IOUtils;
 import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.admin.ConfigurationEngine;
-import org.constellation.admin.DataBusiness;
-import org.constellation.admin.ProviderBusiness;
-import org.constellation.admin.SpringHelper;
+import org.constellation.admin.*;
 import org.constellation.admin.dao.DataRecord;
 import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.admin.dao.StyleRecord;
 import org.constellation.admin.util.IOUtilities;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.CoverageMetadataBean;
+import org.constellation.engine.register.*;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.provider.*;
+import org.constellation.provider.Data;
+import org.constellation.provider.Provider;
 import org.constellation.util.MetadataMapBuilder;
 import org.constellation.util.SimplyMetadataTreeNode;
 import org.geotoolkit.coverage.CoverageReference;
@@ -81,6 +81,9 @@ public final class DefaultConfigurator implements Configurator {
     
     @Inject
     private DataBusiness dataBusiness;
+
+    @Inject
+    private StyleBusiness styleBusiness;
     
     public DefaultConfigurator() {
         SpringHelper.injectDependencies(this);
@@ -135,37 +138,39 @@ public final class DefaultConfigurator implements Configurator {
         final ProviderRecord.ProviderType type = provider.getProviderType();
         final String factoryName = provider.getFactory().getName();
         
-        final ProviderRecord pr = ConfigurationEngine.writeProvider(providerId, null, type, factoryName, config);
+//        final ProviderRecord pr = ConfigurationEngine.writeProvider(providerId, null, type, factoryName, config)
         try {
+            final org.constellation.engine.register.Provider pr = providerBusiness.createProvider(providerId, null, type, factoryName, config);
             checkDataUpdate(pr);
-        } catch (SQLException | IOException ex) {
+        } catch ( IOException ex) {
             throw new ConfigurationException(ex);
         }
     }
 
-    private void checkDataUpdate(final ProviderRecord pr) throws SQLException, IOException{
+    private void checkDataUpdate(final org.constellation.engine.register.Provider pr) throws IOException{
         
-        final List<DataRecord> list = pr.getData();
-        final ProviderRecord.ProviderType type = pr.getType();
-        if (type == ProviderRecord.ProviderType.LAYER) {
+//        final List<DataRecord> list = pr.getData();
+        final List<org.constellation.engine.register.Data> list = providerBusiness.getDatasFromProviderId(pr.getId());
+        final String type = pr.getType();
+        if (type == ProviderRecord.ProviderType.LAYER.name()) {
             final Provider provider = DataProviders.getInstance().getProvider(pr.getIdentifier());
             
             // Remove no longer existing layer.
-            final Map<String, InputStream> metadata = new HashMap<>(0);
-            for (final DataRecord data : list) {
+            final Map<String, String> metadata = new HashMap<>(0);
+            for (final org.constellation.engine.register.Data data : list) {
                 boolean found = false;
                 for (final Object keyObj : provider.getKeys()) {
                     final Name key = (Name) keyObj;
                     if (data.getName().equals(key.getLocalPart())) {
                         found = true;
                         break;
-                    } else if (key.getLocalPart().contains(data.getName()) && data.getProvider().getIdentifier().equalsIgnoreCase(provider.getId())) {
+                    } else if (key.getLocalPart().contains(data.getName()) &&  providerBusiness.getProvider(data.getProvider()).getIdentifier().equalsIgnoreCase(provider.getId())) {
                         //save metadata
                         metadata.put(key.getLocalPart(), data.getMetadata());
                     }
                 }
                 if (!found) {
-                    dataBusiness.deleteData(data.getCompleteName(), provider.getId());
+                    dataBusiness.deleteData(new QName(data.getNamespace(),data.getName()), provider.getId());
                 }
             }
             // Add new layer.
@@ -173,8 +178,8 @@ public final class DefaultConfigurator implements Configurator {
                 final Name key = (Name) keyObj;
                 final QName name = new QName(key.getNamespaceURI(), key.getLocalPart());
                 boolean found = false;
-                for (final DataRecord data : list) {
-                    if (name.equals(data.getCompleteName())) {
+                for (final org.constellation.engine.register.Data data : list) {
+                    if (name.equals(new QName(data.getNamespace(),data.getName()))) {
                         found = true;
                         break;
                     }
@@ -206,11 +211,9 @@ public final class DefaultConfigurator implements Configurator {
                     
                     // Metadata
                     String metadataXml = null;
-                    final InputStream currentMetadata = metadata.get(name.getLocalPart());
+                    final String currentMetadata = metadata.get(name.getLocalPart());
                     if (currentMetadata != null) {
-                        StringWriter writer = new StringWriter();
-                        IOUtils.copy(currentMetadata, writer);
-                        metadataXml = writer.toString();
+                        metadataXml = currentMetadata;
                     } else {
                         final Data layer = (Data) provider.get(new DefaultName(name));
                         final Object origin = layer.getOrigin();
@@ -242,10 +245,9 @@ public final class DefaultConfigurator implements Configurator {
             }
         } else {
             final Provider provider = StyleProviders.getInstance().getProvider(pr.getIdentifier());
-            
-            final List<StyleRecord> styles = pr.getStyles();
+            final List<Style> styles = providerBusiness.getStylesFromProviderId(pr.getId());
             // Remove no longer existing style.
-            for (final StyleRecord style : styles) {
+            for (final Style style : styles) {
                 if (provider.get(style.getName()) == null) {
                     ConfigurationEngine.deleteStyle(style.getName(), provider.getId());
                 }
@@ -253,7 +255,7 @@ public final class DefaultConfigurator implements Configurator {
             // Add not registered new data.
             for (final Object key : provider.getKeys()) {
                 boolean found = false;
-                for (final StyleRecord style : styles) {
+                for (final Style style : styles) {
                     if (key.equals(style.getName())) {
                         found = true;
                         break;
@@ -272,8 +274,10 @@ public final class DefaultConfigurator implements Configurator {
                                 }
                             }
                         }
+
                     }
-                    ConfigurationEngine.writeStyle((String) key, pr, styleType, style);
+
+                    styleBusiness.writeStyle((String) key, pr.getId(), styleType, style);
                 }
             }
         }
@@ -281,13 +285,16 @@ public final class DefaultConfigurator implements Configurator {
     
     @Override
     public void updateProviderConfiguration(String providerId, ParameterValueGroup config) throws ConfigurationException {
-        final ProviderRecord pr = ConfigurationEngine.getProvider(providerId);
+        final org.constellation.engine.register.Provider pr = providerBusiness.getProvider(providerId);
         try {
-            pr.setConfig(config);
+            final String configString = IOUtilities.writeParameter(config);
+            pr.setConfig(configString);
             checkDataUpdate(pr);
-        } catch (SQLException | IOException ex) {
-            throw new ConfigurationException(ex);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
+
     }
 
     @Override

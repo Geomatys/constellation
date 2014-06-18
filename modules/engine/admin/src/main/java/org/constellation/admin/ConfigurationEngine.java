@@ -230,19 +230,7 @@ public class ConfigurationEngine {
         }
     }
 
-    public static Properties getMetadataTemplateProperties() {
-        final File cstlDir = ConfigDirectory.getConfigDirectory();
-        final File propFile = new File(cstlDir, "metadataTemplate.properties");
-        final Properties prop = new Properties();
-        if (propFile.exists()) {
-            try {
-                prop.load(new FileReader(propFile));
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, "IOException while loading metadata template properties file", ex);
-            }
-        }
-        return prop;
-    }
+
 
     private static void updateServiceUrlForMetadata(final String url) {
         Session session = null;
@@ -373,33 +361,7 @@ public class ConfigurationEngine {
         return false;
     }
 
-    public static List<String> getProviderIds() {
-        return getProviderIds(false);
-    }
 
-    public static List<String> getProviderIds(final boolean hasMetadata) {
-        final List<String> results = new ArrayList<>();
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            final List<ProviderRecord> providers = session.readProviders();
-            for (ProviderRecord record : providers) {
-                if (hasMetadata) {
-                    if (record.hasMetadata()) {
-                        results.add(record.getIdentifier());
-                    }
-                } else {
-                    results.add(record.getIdentifier());
-                }
-            }
-        } catch (SQLException | IOException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
-        } finally {
-            if (session != null)
-                session.close();
-        }
-        return results;
-    }
 
     public static List<String> getInternalMetadataIds(final boolean includeService) {
         final List<String> results = new ArrayList<>();
@@ -449,26 +411,12 @@ public class ConfigurationEngine {
         return new ArrayList<>();
     }
 
-    public static ProviderRecord getProvider(final String providerID) {
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            return session.readProvider(providerID);
 
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
-        } finally {
-            if (session != null)
-                session.close();
-        }
-        return null;
-    }
-
-    public static void deleteProvider(final String providerID) {
-
-        configurationService.deleteProvider(providerID);
-
-    }
+//    public static void deleteProvider(final String providerID) {
+//
+//        configurationService.deleteProvider(providerID);
+//
+//    }
 
     public static ProviderRecord writeProvider(final String identifier, final String parent,
             final ProviderRecord.ProviderType type, final String serviceName, final GeneralParameterValue config) {
@@ -498,19 +446,19 @@ public class ConfigurationEngine {
         return null;
     }
 
-    public static void updateProvider(final ProviderRecord updatedProvider) {
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            session.updateProvider(updatedProvider);
-
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
-        } finally {
-            if (session != null)
-                session.close();
-        }
-    }
+//    public static void updateProvider(final ProviderRecord updatedProvider) {
+//        Session session = null;
+//        try {
+//            session = EmbeddedDatabase.createSession();
+//            session.updateProvider(updatedProvider);
+//
+//        } catch (SQLException ex) {
+//            LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
+//        } finally {
+//            if (session != null)
+//                session.close();
+//        }
+//    }
 
     public static List<SensorRecord> getSensors() {
         Session session = null;
@@ -526,19 +474,19 @@ public class ConfigurationEngine {
         return new ArrayList<>();
     }
 
-    public static List<SensorRecord> getSensorChildren(final String parentIdentififer) {
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            return session.readSensorsFromParent(parentIdentififer);
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred while reading sensor database", ex);
-        } finally {
-            if (session != null)
-                session.close();
-        }
-        return new ArrayList<>();
-    }
+//    public static List<SensorRecord> getSensorChildren(final String parentIdentififer) {
+//        Session session = null;
+//        try {
+//            session = EmbeddedDatabase.createSession();
+//            return session.readSensorsFromParent(parentIdentififer);
+//        } catch (SQLException ex) {
+//            LOGGER.log(Level.WARNING, "An error occurred while reading sensor database", ex);
+//        } finally {
+//            if (session != null)
+//                session.close();
+//        }
+//        return new ArrayList<>();
+//    }
 
     public static SensorRecord getSensor(final String sensorID) {
         Session session = null;
@@ -614,30 +562,30 @@ public class ConfigurationEngine {
 
     }
 
-    public static DataRecord writeData(final QName name, final ProviderRecord provider, final DataRecord.DataType type,
-            final boolean sensorable) {
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            String login = null;
-            try {
-                login = securityManager.getCurrentUserLogin();
-            } catch (NoSecurityManagerException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-
-            if (login == null) {
-                login = "admin";
-            }
-            return session.writeData(name, provider, type, login, sensorable);
-        } catch (SQLException e) {
-            LOGGER.log(Level.WARNING, "error when try to delete data", e);
-        } finally {
-            if (session != null)
-                session.close();
-        }
-        return null;
-    }
+//    public static DataRecord writeData(final QName name, final ProviderRecord provider, final DataRecord.DataType type,
+//            final boolean sensorable) {
+//        Session session = null;
+//        try {
+//            session = EmbeddedDatabase.createSession();
+//            String login = null;
+//            try {
+//                login = securityManager.getCurrentUserLogin();
+//            } catch (NoSecurityManagerException ex) {
+//                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+//            }
+//
+//            if (login == null) {
+//                login = "admin";
+//            }
+//            return session.writeData(name, provider, type, login, sensorable);
+//        } catch (SQLException e) {
+//            LOGGER.log(Level.WARNING, "error when try to delete data", e);
+//        } finally {
+//            if (session != null)
+//                session.close();
+//        }
+//        return null;
+//    }
 
     public static void updateDataVisibility(final QName name, final String providerId, final boolean visible) {
         Session session = null;
@@ -662,47 +610,47 @@ public class ConfigurationEngine {
         }
     }
 
-    public static void updateDataSensorable(final QName name, final String providerId, final boolean sensorable) {
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            String login = null;
-            try {
-                login = securityManager.getCurrentUserLogin();
-            } catch (NoSecurityManagerException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-
-            final DataRecord dr = session.readData(name, providerId);
-            dr.setSensorable(sensorable);
-        } catch (SQLException e) {
-            LOGGER.log(Level.WARNING, "error when try to delete data", e);
-        } finally {
-            if (session != null)
-                session.close();
-        }
-    }
-
-    public static void updateDataSubtype(final QName name, final String providerId, final String subtype) {
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            String login = null;
-            try {
-                login = securityManager.getCurrentUserLogin();
-            } catch (NoSecurityManagerException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-
-            final DataRecord dr = session.readData(name, providerId);
-            dr.setSubtype(subtype);
-        } catch (SQLException e) {
-            LOGGER.log(Level.WARNING, "error when try to delete data", e);
-        } finally {
-            if (session != null)
-                session.close();
-        }
-    }
+//    public static void updateDataSensorable(final QName name, final String providerId, final boolean sensorable) {
+//        Session session = null;
+//        try {
+//            session = EmbeddedDatabase.createSession();
+//            String login = null;
+//            try {
+//                login = securityManager.getCurrentUserLogin();
+//            } catch (NoSecurityManagerException ex) {
+//                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+//            }
+//
+//            final DataRecord dr = session.readData(name, providerId);
+//            dr.setSensorable(sensorable);
+//        } catch (SQLException e) {
+//            LOGGER.log(Level.WARNING, "error when try to delete data", e);
+//        } finally {
+//            if (session != null)
+//                session.close();
+//        }
+//    }
+//
+//    public static void updateDataSubtype(final QName name, final String providerId, final String subtype) {
+//        Session session = null;
+//        try {
+//            session = EmbeddedDatabase.createSession();
+//            String login = null;
+//            try {
+//                login = securityManager.getCurrentUserLogin();
+//            } catch (NoSecurityManagerException ex) {
+//                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+//            }
+//
+//            final DataRecord dr = session.readData(name, providerId);
+//            dr.setSubtype(subtype);
+//        } catch (SQLException e) {
+//            LOGGER.log(Level.WARNING, "error when try to delete data", e);
+//        } finally {
+//            if (session != null)
+//                session.close();
+//        }
+//    }
 
     public static void linkDataToSensor(final QName name, final String providerId, final String sensorId) {
         Session session = null;
@@ -748,37 +696,37 @@ public class ConfigurationEngine {
         }
     }
 
-    public static List<DataRecord> getDataLinkedSensor(final String sensorId) {
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            final SensorRecord sensor = session.readSensor(sensorId);
-            if (sensor != null) {
-                return session.readSensoredDataFromSensor(sensor);
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.WARNING, "error when try to read data linked to sensor", e);
-        } finally {
-            if (session != null)
-                session.close();
-        }
-        return new ArrayList<>();
-    }
-
-
-    public static DataRecord getDataRecord(QName name, String providerId) {
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            return session.readData(name, providerId);
-        } catch (SQLException e) {
-            LOGGER.log(Level.WARNING, "error when try to read data", e);
-        } finally {
-            if (session != null)
-                session.close();
-        }
-        return null;
-    }
+//    public static List<DataRecord> getDataLinkedSensor(final String sensorId) {
+//        Session session = null;
+//        try {
+//            session = EmbeddedDatabase.createSession();
+//            final SensorRecord sensor = session.readSensor(sensorId);
+//            if (sensor != null) {
+//                return session.readSensoredDataFromSensor(sensor);
+//            }
+//        } catch (SQLException e) {
+//            LOGGER.log(Level.WARNING, "error when try to read data linked to sensor", e);
+//        } finally {
+//            if (session != null)
+//                session.close();
+//        }
+//        return new ArrayList<>();
+//    }
+//
+//
+//    public static DataRecord getDataRecord(QName name, String providerId) {
+//        Session session = null;
+//        try {
+//            session = EmbeddedDatabase.createSession();
+//            return session.readData(name, providerId);
+//        } catch (SQLException e) {
+//            LOGGER.log(Level.WARNING, "error when try to read data", e);
+//        } finally {
+//            if (session != null)
+//                session.close();
+//        }
+//        return null;
+//    }
 
 
 
@@ -854,29 +802,29 @@ public class ConfigurationEngine {
         return null;
     }
 
-    public static StyleRecord writeStyle(final String name, final ProviderRecord provider,
-            final StyleRecord.StyleType type, final MutableStyle body) {
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            String login = null;
-            try {
-                login = securityManager.getCurrentUserLogin();
-            } catch (NoSecurityManagerException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            if (login == null) {
-                login = "admin";
-            }
-            return session.writeStyle(name, provider, type, body, login);
-        } catch (SQLException | IOException e) {
-            LOGGER.log(Level.WARNING, "error when try to delete data", e);
-        } finally {
-            if (session != null)
-                session.close();
-        }
-        return null;
-    }
+//    public static StyleRecord writeStyle(final String name, final ProviderRecord provider,
+//            final StyleRecord.StyleType type, final MutableStyle body) {
+//        Session session = null;
+//        try {
+//            session = EmbeddedDatabase.createSession();
+//            String login = null;
+//            try {
+//                login = securityManager.getCurrentUserLogin();
+//            } catch (NoSecurityManagerException ex) {
+//                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+//            }
+//            if (login == null) {
+//                login = "admin";
+//            }
+//            return session.writeStyle(name, provider, type, body, login);
+//        } catch (SQLException | IOException e) {
+//            LOGGER.log(Level.WARNING, "error when try to delete data", e);
+//        } finally {
+//            if (session != null)
+//                session.close();
+//        }
+//        return null;
+//    }
 
     public static void writeStyleForData(final StyleRecord style, final DataRecord record) {
         Session session = null;
