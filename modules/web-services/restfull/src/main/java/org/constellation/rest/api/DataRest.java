@@ -19,10 +19,7 @@
 package org.constellation.rest.api;
 
 import java.awt.Dimension;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -531,7 +528,8 @@ public class DataRest {
         for (Name dataName : dataProvider.getKeys()) {
             //Save metadata
             final QName name = Utils.getQnameFromName(dataName);
-            ConfigurationEngine.saveDataMetadata(metadata, name, providerId);
+            dataBusiness.saveMetadata(providerId, name, metadata);
+
         }
 
         return Response.status(200).build();
@@ -630,7 +628,7 @@ public class DataRest {
             
             //Save metadata
             final QName name = Utils.getQnameFromName(dataName);
-            ConfigurationEngine.saveDataMetadata(mergedMetadata, name, providerId);
+            dataBusiness.saveMetadata(providerId,name,mergedMetadata);
         }
         return Response.status(200).build();
     }
@@ -660,7 +658,7 @@ public class DataRest {
             feeder.feed(overridenValue);
             
             //Save metadata
-            ConfigurationEngine.saveDataMetadata(previous, name, providerId);
+            dataBusiness.saveMetadata(providerId,name,previous);
         }
         return Response.status(200).build();
     }
@@ -1245,7 +1243,8 @@ public class DataRest {
         final String name = pv.get("name");
         final String providerId = pv.get("providerId");
         final QName fullName = new QName(namespace, name);
-        final DataBrief db = ConfigurationEngine.getData(fullName, providerId);
+//        final DataBrief db = ConfigurationEngine.getData(fullName, providerId);
+        final DataBrief db = dataBusiness.getDataBrief(fullName, providerId);
         return Response.ok(db).build();
     }
 
@@ -1282,7 +1281,7 @@ public class DataRest {
 
                 if (data.isVisible()) {
                     final QName name = new QName(data.getNamespace(), data.getName());
-                    final DataBrief db = ConfigurationEngine.getData(name, providerId);
+                    final DataBrief db = dataBusiness.getDataBrief(name, providerId);
                     briefs.add(db);
                 }
             }
@@ -1312,7 +1311,7 @@ public class DataRest {
             for (final DataRecord data : datas) {
                 if (data.isVisible()) {
                     final QName name = new QName(data.getNamespace(), data.getName());
-                    final DataBrief db = ConfigurationEngine.getData(name, providerId);
+                    final DataBrief db = dataBusiness.getDataBrief(name, providerId);
                     briefs.add(db);
                 }
             }
@@ -1339,7 +1338,7 @@ public class DataRest {
         for (final DataRecord data : datas) {
             if (data.isVisible()) {
                 final QName name = new QName(data.getNamespace(), data.getName());
-                final DataBrief db = ConfigurationEngine.getData(name, providerId);
+                final DataBrief db = dataBusiness.getDataBrief(name, providerId);
                 briefs.add(db);
             }
         }
@@ -1383,7 +1382,7 @@ public class DataRest {
 
                 if (data.isVisible()) {
                     final QName name = new QName(data.getNamespace(), data.getName());
-                    final DataBrief db = ConfigurationEngine.getData(name, providerId);
+                    final DataBrief db = dataBusiness.getDataBrief(name, providerId);
                     briefs.add(db);
                 }
             }
@@ -1424,7 +1423,7 @@ public class DataRest {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getLayerSummary(@PathParam("providerid") String providerid, @PathParam("layerAlias") String layerAlias) {
-        final DataBrief db = ConfigurationEngine.getDataLayer(layerAlias, providerid);
+        final DataBrief db = dataBusiness.getDataLayer(layerAlias, providerid);
         return Response.ok(db).build();
     }
 
@@ -1464,7 +1463,7 @@ public class DataRest {
                 final GridCoverageReader reader = fcr.acquireReader();
                 information = MetadataUtilities.getRasterDataInformation(reader, metadata, "COVERAGE");
                 final QName name = new QName(layer.getName().getNamespaceURI(), layer.getName().getLocalPart());
-                final CoverageMetadataBean cmb = ConfigurationEngine.loadDataMetadata(providerId, name, GenericDatabaseMarshallerPool.getInstance());
+                final CoverageMetadataBean cmb = dataBusiness.loadDataMetadata(providerId, name, GenericDatabaseMarshallerPool.getInstance());
                 nameSpatialMetadataMap.put(dataId, cmb);
                 information.setCoveragesMetadata(nameSpatialMetadataMap);
                 fcr.recycle(reader);
@@ -1488,8 +1487,8 @@ public class DataRest {
     public Response getAssociatedData(final String[] params) {
         final Map<String, List<DataBrief>> mapping = new HashMap<>();
         for (final String id : params) {
-            final List<DataBrief> dataRecords = ConfigurationEngine.getDataRecordsForMetadata(id);
-            mapping.put(id, dataRecords);
+            final List<DataBrief> dataBriefs = dataBusiness.getDataBriefsFromMetadataId(id);
+            mapping.put(id, dataBriefs);
         }
         return Response.ok(mapping).build();
     }

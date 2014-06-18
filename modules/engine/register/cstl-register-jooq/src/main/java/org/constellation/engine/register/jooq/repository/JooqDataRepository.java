@@ -18,14 +18,20 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
-import java.util.List;
+
+import static org.constellation.engine.register.jooq.Tables.DATA;
+import static org.constellation.engine.register.jooq.Tables.PROVIDER;
+
+
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.jooq.Tables;
-import static org.constellation.engine.register.jooq.Tables.DATA;
+
 import org.constellation.engine.register.jooq.tables.records.DataRecord;
 import org.constellation.engine.register.repository.DataRepository;
 import org.jooq.Condition;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data> implements DataRepository {
@@ -36,8 +42,10 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
 
     @Override
     public Data findByNameAndNamespaceAndProviderId(String name, String namespace, String providerIdentifier) {
-        dsl.insertInto(DATA).select(dsl.select().from(DATA).where(DATA.VISIBLE.eq(true))).execute();
-        return null;
+        return dsl.select().from(DATA).where(DATA.VISIBLE.eq(true))
+                .and(DATA.NAMESPACE.eq(namespace)).and(DATA.NAME.eq(name))
+                .and(DATA.PROVIDER.eq(dsl.select(PROVIDER.ID).from(PROVIDER).where(PROVIDER.IDENTIFIER.eq(providerIdentifier))))
+                .fetchOneInto(Data.class);
     }
     
     @Override
@@ -89,6 +97,16 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
     public Data findDataFromProvider(String namespaceURI, String localPart, String providerId) {
         return dsl.select().from(DATA).join(Tables.PROVIDER).onKey().where(Tables.PROVIDER.IDENTIFIER.eq(providerId))
                 .fetchOneInto(Data.class);
+    }
+
+    @Override
+    public Data findByMetadataId(String metadataId) {
+        return dsl.select().from(DATA).where(DATA.METADATA_ID.eq(metadataId)).fetchOneInto(Data.class);
+    }
+
+    @Override
+    public List<Data> findByProviderId(Integer id) {
+        return dsl.select().from(DATA).where(DATA.PROVIDER.eq(id)).fetchInto(Data.class);
     }
 
 }

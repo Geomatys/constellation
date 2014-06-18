@@ -28,6 +28,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.DataBusiness;
 import org.constellation.configuration.*;
 import org.constellation.dto.AddLayer;
 import org.constellation.dto.ParameterValues;
@@ -61,11 +62,15 @@ public final class MapRest {
     
     @Inject
     private SecurityManager securityManager;
-    
+
+    @Inject
+    private DataBusiness dataBusiness;
+
     /**
      * Extracts and returns the list of {@link Layer}s available on a "map" service.
      *
-     * @param identifier the service identifier
+     * @param spec the service type
+     * @param id the service identifier
      * @return the {@link Layer} list
      * @throws TargetNotFoundException if the service with specified identifier does not exist
      * @throws ConfigurationException if the operation has failed for any reason
@@ -83,7 +88,7 @@ public final class MapRest {
         
         final List<LayerSummary> sumLayers = new ArrayList<>();
         for (final Layer lay : layers) {
-            final DataBrief db = ConfigurationEngine.getData(lay.getName(), lay.getProviderID());
+            final DataBrief db = dataBusiness.getDataBrief(lay.getName(), lay.getProviderID());
             sumLayers.add(new LayerSummary(lay,db));
         }
         return ok(sumLayers);

@@ -294,33 +294,6 @@ public class ConfigurationEngine {
         }
     }
 
-    /**
-     * Save metadata on specific folder
-     * 
-     * @param metadata
-     * @param dataName
-     * @param providerId
-     */
-    public static void saveDataMetadata(final DefaultMetadata metadata, final QName dataName, final String providerId) {
-        ensureNonNull("metadata", metadata);
-
-        // save in database
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            final StringReader sr = MetadataIOUtils.marshallMetadata(metadata);
-            final DataRecord data = session.readData(dataName, providerId);
-            if (data != null) {
-                data.setIsoMetadata(metadata.getFileIdentifier(), sr);
-            }
-
-        } catch (SQLException | IOException | JAXBException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
-        } finally {
-            if (session != null)
-                session.close();
-        }
-    }
 
     /**
      * Load a metadata for a provider.
@@ -382,40 +355,6 @@ public class ConfigurationEngine {
         return null;
     }
 
-    public static List<DataBrief> getDataRecordsForMetadata(final String metadataId) {
-        final List<DataRecord> records = new ArrayList<>();
-        final List<DataBrief> recordsBrief = new ArrayList<>();
-
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-
-            final Record record = session.searchMetadata(metadataId, true);
-            if (record instanceof DataRecord) {
-                records.add((DataRecord) record);
-            } else if (record instanceof ProviderRecord) {
-                final ProviderRecord provider = (ProviderRecord) record;
-                records.addAll(provider.getData());
-            } else if (record instanceof ServiceRecord) {
-                final ServiceRecord serv = (ServiceRecord) record;
-                final List<LayerRecord> layers = session.readLayers(serv);
-                for (final LayerRecord layer : layers) {
-                    records.add(layer.getData());
-                }
-            }
-
-            for (final DataRecord rec : records) {
-                recordsBrief.add(_getDataBrief(session, rec));
-            }
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred while reading provider metadata", ex);
-        } finally {
-            if (session != null)
-                session.close();
-        }
-
-        return recordsBrief;
-    }
 
     public static boolean existInternalMetadata(final String metadataID, final boolean includeService) {
         Session session = null;
@@ -657,39 +596,7 @@ public class ConfigurationEngine {
         return null;
     }
 
-    /**
-     * Load a metadata for a provider.
-     * 
-     * 
-     * @param providerId
-     * @param pool
-     * @param name
-     * @return
-     */
-    public static CoverageMetadataBean loadDataMetadata(final String providerId, final QName name,
-            final MarshallerPool pool) {
-        Session session = null;
-        CoverageMetadataBean metadata = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            final DataRecord data = session.readData(name, providerId);
-            if (data != null) {
-                final InputStream sr = data.getMetadata();
-                final Unmarshaller m = pool.acquireUnmarshaller();
-                if (sr != null) {
-                    metadata = (CoverageMetadataBean) m.unmarshal(sr);
-                }
-                pool.recycle(m);
-                return metadata;
-            }
-        } catch (SQLException | IOException | JAXBException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
-        } finally {
-            if (session != null)
-                session.close();
-        }
-        return null;
-    }
+
 
     /**
      * @param name
@@ -697,9 +604,9 @@ public class ConfigurationEngine {
      * @return
      */
 
-    public static DataBrief getData(QName name, String providerId) {
-        return _getData(name, providerId);
-    }
+//    public static DataBrief getData(QName name, String providerId) {
+//        return _getData(name, providerId);
+//    }
 
     public static void deleteData(final QName name, final String providerId) {
 
@@ -858,22 +765,6 @@ public class ConfigurationEngine {
         return new ArrayList<>();
     }
 
-    private static DataBrief _getData(QName name, String providerId) {
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            final DataRecord record = session.readData(name, providerId);
-            if (record != null) {
-                return _getDataBrief(session, record);
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.WARNING, "error when try to read data", e);
-        } finally {
-            if (session != null)
-                session.close();
-        }
-        return null;
-    }
 
     public static DataRecord getDataRecord(QName name, String providerId) {
         Session session = null;
@@ -889,81 +780,9 @@ public class ConfigurationEngine {
         return null;
     }
 
-    /**
-     * @param layerAlias
-     * @param providerId
-     * @return
-     */
-    public static DataBrief getDataLayer(final String layerAlias, final String providerId) {
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            DataRecord record = session.readDatafromLayer(layerAlias, providerId);
-            if (record != null) {
-                return _getDataBrief(session, record);
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.WARNING, "Error on sql execution when search data layer", e);
-        } finally {
-            if (session != null)
-                session.close();
-        }
-        return null;
-    }
 
-    /**
-     * create a {@link org.constellation.configuration.DataBrief} with style
-     * link and service link.
-     * 
-     * @param session
-     *            current {@link org.constellation.admin.dao.Session} used
-     * @param record
-     *            data found
-     * @return a {@link org.constellation.configuration.DataBrief} with all
-     *         informations linked.
-     * @throws SQLException
-     *             if they have an error when search style, service or provider.
-     */
 
-    private static DataBrief _getDataBrief(final Session session, final DataRecord record) throws SQLException {
-        final List<StyleRecord> styleRecords = session.readStyles(record);
-        final List<ServiceRecord> serviceRecords = session.readDataServices(record);
 
-        final DataBrief db = new DataBrief();
-        db.setOwner(record.getOwnerLogin());
-        db.setName(record.getName());
-        db.setNamespace(record.getNamespace());
-        db.setDate(record.getDate());
-        db.setProvider(record.getProvider().getIdentifier());
-        db.setType(record.getType().toString());
-        db.setSubtype(record.getSubtype());
-        db.setSensorable(record.isSensorable());
-        db.setTargetSensor(record.getLinkedSensors());
-
-        final List<StyleBrief> styleBriefs = new ArrayList<>(0);
-        for (StyleRecord styleRecord : styleRecords) {
-            final StyleBrief sb = new StyleBrief();
-            sb.setType(styleRecord.getType().toString());
-            sb.setProvider(styleRecord.getProvider().getIdentifier());
-            sb.setDate(styleRecord.getDate());
-            sb.setName(styleRecord.getName());
-            sb.setOwner(styleRecord.getOwnerLogin());
-            styleBriefs.add(sb);
-        }
-        db.setTargetStyle(styleBriefs);
-
-        final List<ServiceProtocol> serviceProtocols = new ArrayList<>(0);
-        for (ServiceRecord serviceRecord : serviceRecords) {
-            final List<String> protocol = new ArrayList<>(0);
-            protocol.add(serviceRecord.getType().name());
-            protocol.add(serviceRecord.getType().fullName);
-            final ServiceProtocol sp = new ServiceProtocol(serviceRecord.getIdentifier(), protocol);
-            serviceProtocols.add(sp);
-        }
-        db.setTargetService(serviceProtocols);
-
-        return db;
-    }
 
     // FIXME LayerRecord should not be exposed!
     public static LayerRecord getLayer(final String identifier, final String specification,

@@ -18,11 +18,6 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
-import static org.constellation.engine.register.jooq.Tables.SERVICE;
-import static org.constellation.engine.register.jooq.Tables.SERVICE_EXTRA_CONFIG;
-import static org.constellation.engine.register.jooq.Tables.SERVICE_X_DOMAIN;
-import static org.constellation.engine.register.jooq.Tables.USER_X_DOMAIN_X_DOMAINROLE;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -31,10 +26,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.Service;
-import org.constellation.engine.register.ServiceExtraConfig;
-import org.constellation.engine.register.ServiceMetadata;
+import org.constellation.engine.register.*;
 import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.tables.records.ServiceExtraConfigRecord;
 import org.constellation.engine.register.jooq.tables.records.ServiceRecord;
@@ -46,6 +38,8 @@ import org.jooq.Result;
 import org.jooq.SelectConditionStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import static org.constellation.engine.register.jooq.Tables.*;
 
 @Component
 public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord, Service> implements ServiceRepository {
@@ -59,7 +53,7 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
 
     @Override
     public List<Service> findByDataId(int dataId) {
-        SelectConditionStep<Record> from = dsl.select().from(SERVICE).join(Tables.LAYER).onKey()
+            SelectConditionStep<Record> from = dsl.select().from(SERVICE).join(Tables.LAYER).onKey()
                 .where(Tables.LAYER.DATA.eq(dataId));
         return from.fetchInto(Service.class);
     }
@@ -208,6 +202,17 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
             result.put(domain, false);
         }
         return result;
+    }
+
+    @Override
+    public Service findByMetadataId(String metadataId) {
+        return dsl.select().from(SERVICE).where(SERVICE.METADATA_ID.eq(metadataId)).fetchOneInto(Service.class);
+    }
+
+    @Override
+    public List<Data> findDataByServiceId(Integer id) {
+        return dsl.select().from(DATA).join(LAYER).on(LAYER.DATA.eq(DATA.ID)).join(SERVICE).on(LAYER.SERVICE.eq(SERVICE.ID)).where(SERVICE.ID.eq(id))
+        .fetchInto(Data.class);
     }
 
     @Override

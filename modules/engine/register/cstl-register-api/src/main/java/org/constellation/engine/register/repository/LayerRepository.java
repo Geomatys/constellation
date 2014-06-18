@@ -20,6 +20,7 @@ package org.constellation.engine.register.repository;
 
 import java.util.List;
 
+import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Layer;
 import org.constellation.engine.register.Service;
 
@@ -40,5 +41,6 @@ public interface LayerRepository {
     Layer findByServiceIdAndLayerName(int serviceId, String layerName);
     
     Layer findByServiceIdAndLayerName(int serviceId, String layerName, String namespace);
-    
+
+    Data findDatasFromLayerAlias(String layerAlias, String dataProviderIdentifier);
 }

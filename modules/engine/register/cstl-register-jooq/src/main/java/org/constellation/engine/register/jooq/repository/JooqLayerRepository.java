@@ -18,10 +18,13 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
+import static org.constellation.engine.register.jooq.Tables.DATA;
 import static org.constellation.engine.register.jooq.Tables.LAYER;
+import static org.constellation.engine.register.jooq.Tables.PROVIDER;
 
 import java.util.List;
 
+import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Layer;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.jooq.tables.records.LayerRecord;
@@ -92,6 +95,12 @@ public class JooqLayerRepository extends AbstractJooqRespository<LayerRecord, La
     @Override
     public Layer findByServiceIdAndLayerName(int serviceId, String layerName, String namespace) {
         return dsl.select().from(LAYER).where(LAYER.SERVICE.eq(serviceId)).and(LAYER.NAME.eq(layerName)).and(LAYER.NAMESPACE.eq(namespace)).fetchOneInto(Layer.class);
+    }
+
+    @Override
+    public Data findDatasFromLayerAlias(String layerAlias, String dataProviderIdentifier) {
+        return dsl.select().from(DATA).join(PROVIDER).on(DATA.PROVIDER.eq(PROVIDER.ID))
+                .join(LAYER).on(LAYER.DATA.eq(DATA.ID)).where(PROVIDER.IDENTIFIER.eq(dataProviderIdentifier)).and(LAYER.ALIAS.eq(layerAlias)).fetchOneInto(Data.class);
     }
 
 }

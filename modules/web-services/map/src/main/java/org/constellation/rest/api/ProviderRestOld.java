@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -43,6 +44,7 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.DataBusiness;
 import org.constellation.api.CommonConstants;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
@@ -86,6 +88,9 @@ import org.opengis.util.NoSuchIdentifierException;
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public class ProviderRestOld {
+
+    @Inject
+    private DataBusiness dataBusiness;
     
     private static final Logger LOGGER = Logging.getLogger(ProviderRestOld.class);
     
@@ -302,7 +307,7 @@ public class ProviderRestOld {
                     final List<DataBrief> keys = new ArrayList<>();
                     for(Name n : p.getKeys()){
                         final QName name = new QName(n.getNamespaceURI(), n.getLocalPart());
-                        final DataBrief db = ConfigurationEngine.getData(name, p.getId());
+                        final DataBrief db = dataBusiness.getDataBrief(name,p.getId());
                         keys.add(db);
                     }
                     final Date date = (Date) p.getSource().parameter("date").getValue();

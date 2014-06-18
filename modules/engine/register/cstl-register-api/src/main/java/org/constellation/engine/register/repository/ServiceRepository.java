@@ -22,10 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.Service;
-import org.constellation.engine.register.ServiceExtraConfig;
-import org.constellation.engine.register.ServiceMetadata;
+import org.constellation.engine.register.*;
 
 public interface ServiceRepository {
 	
@@ -65,4 +62,7 @@ public interface ServiceRepository {
 
     Map<Domain, Boolean> getLinkedDomains(int serviceId);
 
+    Service findByMetadataId(String metadataId);
+
+    List<Data> findDataByServiceId(Integer id);
 }
