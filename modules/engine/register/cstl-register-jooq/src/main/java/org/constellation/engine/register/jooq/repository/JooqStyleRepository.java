@@ -1,18 +1,30 @@
 package org.constellation.engine.register.jooq.repository;
 
 import java.util.List;
+
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Layer;
 import org.constellation.engine.register.Style;
+import org.constellation.engine.register.StyleI18n;
+
 import static org.constellation.engine.register.jooq.Tables.STYLE;
 import static org.constellation.engine.register.jooq.Tables.STYLED_DATA;
 import static org.constellation.engine.register.jooq.Tables.STYLED_LAYER;
+
+import org.constellation.engine.register.i18n.StyleWithI18N;
+import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.tables.records.StyleRecord;
 import org.constellation.engine.register.jooq.tables.records.StyledDataRecord;
 import org.constellation.engine.register.jooq.tables.records.StyledLayerRecord;
 import org.constellation.engine.register.repository.StyleRepository;
 import org.jooq.InsertSetMoreStep;
+import org.jooq.Record;
+import org.jooq.Result;
 import org.springframework.stereotype.Component;
+
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 
 @Component
 public class JooqStyleRepository extends AbstractJooqRespository<StyleRecord, Style> implements StyleRepository {
@@ -141,5 +153,17 @@ public class JooqStyleRepository extends AbstractJooqRespository<StyleRecord, St
                 .set(STYLE.TYPE, s.getType())
                 .where(STYLE.ID.eq(s.getId())).execute();
         return s;
+    }
+
+    @Override
+    public StyleWithI18N getStyleWithI18Ns(Style style) {
+        Result<Record> fetch = dsl.select().from(Tables.STYLE_I18N).where(Tables.STYLE_I18N.STYLE_ID.eq(style.getId())).fetch();
+        ImmutableMap<String, StyleI18n> styleI18ns = Maps.uniqueIndex(fetch.into(StyleI18n.class), new Function<StyleI18n, String>() {
+            @Override
+            public String apply(StyleI18n input) {
+                return input.getLang();
+            }
+        });
+        return new StyleWithI18N(style, styleI18ns);
     }
 }

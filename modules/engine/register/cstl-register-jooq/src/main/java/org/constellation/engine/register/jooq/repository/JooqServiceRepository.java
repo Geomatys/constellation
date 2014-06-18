@@ -27,6 +27,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.constellation.engine.register.*;
+import org.constellation.engine.register.i18n.ServiceWithI18N;
 import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.tables.records.ServiceExtraConfigRecord;
 import org.constellation.engine.register.jooq.tables.records.ServiceRecord;
@@ -219,6 +220,12 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
     public List<Service> findByDomain(int domainId) {
         return findBy(SERVICE.ID.in(dsl.select(Tables.SERVICE_X_DOMAIN.SERVICE_ID).from(SERVICE_X_DOMAIN)
                 .where(SERVICE_X_DOMAIN.DOMAIN_ID.eq(domainId))));
+    }
+
+    @Override
+    public ServiceWithI18N i18n(Service service) {
+        
+        return null;
     }
 
 }

@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.constellation.engine.register.*;
+import org.constellation.engine.register.i18n.ServiceWithI18N;
 
 public interface ServiceRepository {
 	
@@ -65,4 +66,6 @@ public interface ServiceRepository {
     Service findByMetadataId(String metadataId);
 
     List<Data> findDataByServiceId(Integer id);
+    
+    ServiceWithI18N i18n(Service service);
 }
