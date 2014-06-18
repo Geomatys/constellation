@@ -20,7 +20,6 @@
     <dependency>
       <groupId>org.apache.sis.core</groupId>
       <artifactId>sis-utility</artifactId>
-      <version>${sis.version}</version>
     </dependency>
     <dependency>
       <groupId>org.constellation.xml-bindings</groupId>
@@ -54,15 +53,15 @@
           </dependency>
         </dependencies>
         <executions>
-        
+
           <execution>
-          <id>sql-pojos</id>
+            <id>sql-pojos</id>
             <phase>generate-resources</phase>
             <goals>
               <goal>generate</goal>
             </goals>
             <configuration>
-             <targetSchema>admin</targetSchema>
+              <targetSchema>admin</targetSchema>
               <classpathSQL>/org/constellation/sql/v1/create-admin-db.sql</classpathSQL>
               <targetPackage>org.constellation.engine.register</targetPackage>
             </configuration>
