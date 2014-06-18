@@ -33,6 +33,7 @@ import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.Domainrole;
 import org.constellation.engine.register.DomainUser;
 import org.constellation.engine.register.User;
+import org.constellation.engine.register.helper.UserHelper;
 import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.tables.UserXDomainXDomainrole;
 import org.constellation.engine.register.jooq.tables.UserXRole;
@@ -155,15 +156,11 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
     @Transactional
     public User insert(User user, List<String> roles) {
 
+        user.setActive(true);
         UserRecord newRecord = dsl.newRecord(USER);
 
-        newRecord.setActive(true);
-        newRecord.setEmail(user.getEmail());
-        newRecord.setLastname(user.getLastname());
-        newRecord.setFirstname(user.getFirstname());
-        newRecord.setLogin(user.getLogin());
-        newRecord.setPassword(user.getPassword());
-
+        UserHelper.copy(user, newRecord);
+        
         if (newRecord.store() > 0) {
             user.setId(newRecord.getId());
         }
