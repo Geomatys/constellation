@@ -502,38 +502,7 @@ public final class Session implements Closeable {
         return new Query(LIST_PROVIDERS_FROM_PARENT).with(parentIdentifier).select().getAll(ProviderRecord.class);
     }
 
-    /**
-     * Inserts a new provider.
-     *
-     * @param identifier the provider identifier
-     * @param parent the provider parent identifier, can be null
-     * @param type       the provider type
-     * @param impl       the provider implementation (coverage-file, feature-store...)
-     * @param config     the provider configuration
-     * @param owner      the provider owner
-     * @return the inserted {@link ProviderRecord} instance
-     * @throws SQLException if a database access error occurs
-     * @throws IOException if the configuration cannot be written
-     */
-    public ProviderRecord writeProvider(final String identifier, String parent, 
-            final ProviderType type, final String impl, final GeneralParameterValue config, 
-            final String owner) throws SQLException, IOException {
-        ensureNonNull("identifier", identifier);
-        ensureNonNull("type",       type);
-        ensureNonNull("impl",       impl);
-        ensureNonNull("config",     config);
-        if(parent==null) parent="";
 
-        // Prepare insertion.
-        final StringReader reader = new StringReader(IOUtilities.writeParameter(config));
-        final String login        = owner;
-
-        // Proceed to insertion.
-        final int id = new Query(WRITE_PROVIDER).with(identifier, parent, type.name(), impl, reader, login).insert();
-
-        // Return inserted line.
-        return new ProviderRecord(this, id, identifier, parent, type, impl, login, null);
-    }
 
     /**
      * Updates the provider with the specified {@code generatedId}.

@@ -42,6 +42,7 @@ import org.constellation.admin.*;
 import org.constellation.admin.dao.DataRecord;
 import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.admin.dao.StyleRecord;
+import org.constellation.admin.exception.ConstellationException;
 import org.constellation.admin.util.IOUtilities;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.CoverageMetadataBean;
@@ -249,7 +250,11 @@ public final class DefaultConfigurator implements Configurator {
             // Remove no longer existing style.
             for (final Style style : styles) {
                 if (provider.get(style.getName()) == null) {
-                    ConfigurationEngine.deleteStyle(style.getName(), provider.getId());
+                    try {
+                        styleBusiness.deleteStyle(provider.getId(),style.getName());
+                    } catch (ConfigurationException e) {
+                        throw new ConstellationException(e);
+                    }
                 }
             }
             // Add not registered new data.

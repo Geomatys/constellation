@@ -19,6 +19,43 @@
 
 package org.constellation.rest.api;
 
+import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.storage.DataStoreException;
+import org.apache.sis.util.logging.Logging;
+import org.constellation.admin.ProviderBusiness;
+import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.NotRunningServiceException;
+import org.constellation.configuration.ProviderConfiguration;
+import org.constellation.dto.ProviderPyramidChoiceList;
+import org.constellation.dto.SimpleValue;
+import org.constellation.engine.register.Provider;
+import org.constellation.engine.register.repository.DomainRepository;
+import org.constellation.provider.*;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.rs.LayerProviders;
+import org.geotoolkit.coverage.CoverageReference;
+import org.geotoolkit.coverage.GridSampleDimension;
+import org.geotoolkit.coverage.Pyramid;
+import org.geotoolkit.coverage.PyramidalCoverageReference;
+import org.geotoolkit.coverage.io.CoverageStoreException;
+import org.geotoolkit.coverage.io.GridCoverageReader;
+import org.geotoolkit.data.FeatureStoreFactory;
+import org.geotoolkit.data.FeatureStoreFinder;
+import org.geotoolkit.data.FileFeatureStoreFactory;
+import org.geotoolkit.parameter.ParametersExt;
+import org.geotoolkit.process.ProcessException;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.ReferenceIdentifier;
+import org.opengis.util.NoSuchIdentifierException;
+
+import javax.inject.Inject;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -30,58 +67,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBException;
-
-import org.apache.sis.metadata.iso.DefaultMetadata;
-import org.apache.sis.storage.DataStoreException;
-import org.apache.sis.util.logging.Logging;
-import org.constellation.admin.ConfigurationEngine;
-import org.constellation.engine.register.Provider;
-import org.constellation.admin.ProviderBusiness;
-import org.constellation.admin.dao.ProviderRecord;
-import org.constellation.configuration.AcknowlegementType;
-import org.constellation.configuration.ConfigurationException;
-import org.constellation.configuration.NotRunningServiceException;
-import org.constellation.configuration.ProviderConfiguration;
-import org.constellation.dto.ProviderPyramidChoiceList;
-import org.constellation.dto.SimpleValue;
-import org.constellation.engine.register.repository.DomainRepository;
-import org.constellation.provider.CoverageData;
-import org.constellation.provider.Data;
-import org.constellation.provider.DataProvider;
-import org.constellation.provider.DataProviderFactory;
-import org.constellation.provider.DataProviders;
-import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.rs.LayerProviders;
-import org.geotoolkit.coverage.CoverageReference;
-import org.geotoolkit.coverage.GridSampleDimension;
-import org.geotoolkit.coverage.Pyramid;
-import org.geotoolkit.coverage.PyramidalCoverageReference;
-import org.geotoolkit.coverage.io.CoverageStoreException;
-import org.geotoolkit.coverage.io.GridCoverageReader;
-import org.geotoolkit.csw.xml.CSWMarshallerPool;
-import org.geotoolkit.data.FeatureStoreFactory;
-import org.geotoolkit.data.FeatureStoreFinder;
-import org.geotoolkit.data.FileFeatureStoreFactory;
-import org.geotoolkit.parameter.ParametersExt;
-import org.geotoolkit.process.ProcessException;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterValue;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.ReferenceIdentifier;
-import org.opengis.util.NoSuchIdentifierException;
 
 /**
  * RestFull API for provider management/operations.
@@ -473,8 +458,7 @@ public final class ProviderRest {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getMetadata(final @PathParam("domainId") int domainId, final @PathParam("providerId") String providerId) throws SQLException, NotRunningServiceException, CoverageStoreException, NoSuchIdentifierException, ProcessException, JAXBException {
-        final DefaultMetadata metadata = ConfigurationEngine.loadProviderMetadata(providerId, CSWMarshallerPool.getInstance());
-        metadata.prune();
+        DefaultMetadata metadata = providerBusiness.getMetadata(providerId,domainId);
         return Response.ok(metadata).build();
     }
 
@@ -483,7 +467,7 @@ public final class ProviderRest {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response setMetadata(final @PathParam("domainId") int domainId, final @PathParam("providerId") String providerId, final DefaultMetadata metadata) throws SQLException, NotRunningServiceException, CoverageStoreException, NoSuchIdentifierException, ProcessException, JAXBException {
-        ConfigurationEngine.saveProviderMetadata(metadata, providerId);
+        providerBusiness.updateMetadata(providerId, domainId, metadata);
         return Response.status(200).build();
     }
 }

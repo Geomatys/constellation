@@ -18,50 +18,6 @@
  */
 package org.constellation.rest.api;
 
-import java.awt.Dimension;
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.nio.file.*;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.zip.CRC32;
-
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
 import org.apache.sis.geometry.GeneralDirectPosition;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.storage.DataStore;
@@ -70,11 +26,10 @@ import org.apache.sis.util.iso.Types;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationBusiness;
-import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.DataBusiness;
 import org.constellation.admin.ProviderBusiness;
-import org.constellation.admin.dao.DataRecord;
-import org.constellation.admin.dao.ProviderRecord;
+import org.constellation.admin.SensorBusiness;
+import org.constellation.admin.exception.ConstellationException;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.StringList;
@@ -82,16 +37,9 @@ import org.constellation.coverage.PyramidCoverageHelper;
 import org.constellation.coverage.PyramidCoverageProcessListener;
 import org.constellation.dto.*;
 import org.constellation.engine.register.Provider;
-import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.model.SelectedExtension;
-import org.constellation.provider.CoverageData;
-import org.constellation.provider.Data;
-import org.constellation.provider.DataProvider;
-import org.constellation.provider.DataProviderFactory;
-import org.constellation.provider.DataProviders;
-import org.constellation.provider.FeatureData;
-import org.constellation.provider.Providers;
+import org.constellation.provider.*;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.scheduler.CstlScheduler;
 import org.constellation.security.SecurityManagerHolder;
@@ -113,6 +61,7 @@ import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.data.memory.ExtendedFeatureStore;
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.feature.type.DefaultName;
+import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.feature.xml.Utils;
 import org.geotoolkit.image.interpolation.InterpolationCase;
 import org.geotoolkit.map.MapBuilder;
@@ -131,7 +80,6 @@ import org.geotoolkit.util.StringUtilities;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.glassfish.jersey.media.multipart.MultiPart;
-import org.geotoolkit.feature.type.Name;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.Role;
@@ -144,6 +92,33 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
 import org.opengis.util.InternationalString;
 import org.opengis.util.NoSuchIdentifierException;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.awt.*;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.nio.file.FileSystem;
+import java.nio.file.*;
+import java.util.*;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.zip.CRC32;
 
 /**
  * Manage data sending
@@ -165,6 +140,9 @@ public class DataRest {
 
     @Inject
     private ProviderBusiness providerBusiness;
+
+    @Inject
+    private SensorBusiness sensorBusiness;
 
 
     /**
@@ -784,9 +762,7 @@ public class DataRest {
         }
 
         // Update the parent attribute of the created provider
-//        final ProviderRecord updatedProvider = ConfigurationEngine.getProvider(outProvider.getId());
-//        updatedProvider.setParentIdentifier(providerId);
-//        ConfigurationEngine.updateProvider(updatedProvider);
+
 
         providerBusiness.updateParent(outProvider.getId(),providerId);
 
@@ -808,7 +784,7 @@ public class DataRest {
         final Provider provider = providerBusiness.getProvider(pyramidProviderId);
         final List<org.constellation.engine.register.Data> datas = providerBusiness.getDatasFromProviderId(provider.getId());
         outData = datas.get(0);
-            //outData = ConfigurationEngine.getProvider(pyramidProviderId).getData().get(0);
+
 
         
         //get the coverage reference after reload, otherwise this won't be the same reference
@@ -983,7 +959,7 @@ public class DataRest {
         
         //get pyramid scale levels
         if(scales==null || scales.length==0){
-            //TODO a way to work on all cases, a defualt values ?
+            //TODO a way to work on all cases, a default values ?
             return Response.ok("Scale values missing").status(400).build();
         }
         
@@ -1017,9 +993,7 @@ public class DataRest {
         }
 
         // Update the parent attribute of the created provider
-//        final ProviderRecord updatedProvider = ConfigurationEngine.getProvider(outProvider.getId());
-//        updatedProvider.setParentIdentifier(providerId);
-//        ConfigurationEngine.updateProvider(updatedProvider);
+
           providerBusiness.updateParent(outProvider.getId(),providerId);
         //create the output pyramid coverage reference
         CoverageStore pyramidStore = (CoverageStore) outProvider.getMainStore();
@@ -1371,14 +1345,15 @@ public class DataRest {
     @DELETE
     @Path("{providerid}/{dataid}")
     public Response deleteData(@PathParam("providerid") String providerid, @PathParam("dataid") String dataid) {
-        ConfigurationEngine.deleteData(new QName("", dataid), providerid);
+        dataBusiness.deleteData(new QName("", dataid), providerid);
         return Response.status(200).build();
     }
 
     @POST
     @Path("{providerid}/{dataid}/visible")
     public Response visibleData(@PathParam("providerid") String providerid, @PathParam("dataid") String dataid) {
-        ConfigurationEngine.updateDataVisibility(new QName("", dataid), providerid, true);
+
+        dataBusiness.updateDataVisibility(new QName("", dataid), providerid, true);
         return Response.status(200).build();
     }
 
@@ -1391,7 +1366,7 @@ public class DataRest {
         } else {
             dataName = new QName(dataid);
         }
-        ConfigurationEngine.updateDataVisibility(dataName, providerid, false);
+        dataBusiness.updateDataVisibility(dataName, providerid, false);
         return Response.status(200).build();
     }
 
@@ -1428,7 +1403,21 @@ public class DataRest {
         final Object origin = layer.getOrigin();
         //generate DataInformation
 
-        final DefaultMetadata metadata = ConfigurationEngine.loadProviderMetadata(providerId, CSWMarshallerPool.getInstance());
+
+        DefaultMetadata metadata = null;
+        final Provider providerFromDB = providerBusiness.getProvider(providerId);
+        final String metadataFromDB = providerFromDB.getMetadata();
+        final InputStream is = new ByteArrayInputStream(metadataFromDB.getBytes());
+        final MarshallerPool pool = CSWMarshallerPool.getInstance();
+        try {
+            final Unmarshaller m = pool.acquireUnmarshaller();
+            if (metadataFromDB != null) {
+                metadata = (DefaultMetadata) m.unmarshal(is);
+            }
+            pool.recycle(m);
+        } catch (JAXBException ex) {
+            throw new ConstellationException(ex);
+        }
         DataInformation information = new DataInformation();
         if (layer instanceof FeatureData) {
             final ArrayList<SimplyMetadataTreeNode> meta = MetadataUtilities.getVectorDataInformation(metadata);
@@ -1594,7 +1583,7 @@ public class DataRest {
     public Response linkDataToSensor(final @PathParam("providerId") String providerId, final @PathParam("dataId") String dataId, final @PathParam("sensorId") String sensorId, final SimpleValue value) {
         final String namespace = value.getValue();
         final QName name = new QName(namespace, dataId);
-        ConfigurationEngine.linkDataToSensor(name, providerId, sensorId);
+        sensorBusiness.linkDataToSensor(name, providerId, sensorId);
         return Response.status(200).build();
     }
 
@@ -1603,7 +1592,7 @@ public class DataRest {
     public Response unlinkDataToSensor(final @PathParam("providerId") String providerId, final @PathParam("dataId") String dataId, final @PathParam("sensorId") String sensorId, final SimpleValue value) {
         final String namespace = value.getValue();
         final QName name = new QName(namespace, dataId);
-        ConfigurationEngine.unlinkDataToSensor(name, providerId, sensorId);
+        sensorBusiness.unlinkDataToSensor(name, providerId, sensorId);
         return Response.status(200).build();
     }
 }

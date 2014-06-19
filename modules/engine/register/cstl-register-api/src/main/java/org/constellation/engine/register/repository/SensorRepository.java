@@ -6,15 +6,23 @@ import org.constellation.engine.register.Sensor;
 
 public interface SensorRepository {
 
-    Sensor findByIdentifier(String identifier);
+    public Sensor findByIdentifier(String identifier);
     
-    List<String> getLinkedSensors(Data data);
+    public List<String> getLinkedSensors(Data data);
 
-    List<Data> getLinkedDatas(Sensor sensor);
+    public List<Data> getLinkedDatas(Sensor sensor);
     
-    List<Sensor> getChildren(Sensor sensor);
+    public List<Sensor> getChildren(Sensor sensor);
 
-    List<Sensor> findAll();
+    public List<Sensor> findAll();
 
-    void delete(String identifier);
+    public void delete(String identifier);
+
+    public void linkDataToSensor(Integer dataId, Integer sensorId);
+
+    public void unlinkDataToSensor(Integer dataId, Integer sensorId);
+
+    public Sensor create(Sensor sensor);
+
+    public void update(Sensor sensor);
 }

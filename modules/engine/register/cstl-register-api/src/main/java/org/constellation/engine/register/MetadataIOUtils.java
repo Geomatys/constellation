@@ -38,7 +38,8 @@ public class MetadataIOUtils {
     public static String marshallMetadataToString(final DefaultMetadata meta) throws JAXBException {
         final StringWriter swIso = new StringWriter();
         final Marshaller mi = ISOMarshallerPool.getInstance().acquireMarshaller();
-        mi.setProperty(XML.TIMEZONE, TimeZone.getTimeZone("GMT+2:00"));
+        //FIXME which timezone if is not set ?? UTC ??
+        //mi.setProperty(XML.TIMEZONE, TimeZone.getTimeZone("GMT+2:00"));
         mi.marshal(meta, swIso);
         ISOMarshallerPool.getInstance().recycle(mi);
         return swIso.toString();

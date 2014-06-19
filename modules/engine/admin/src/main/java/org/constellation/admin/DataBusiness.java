@@ -279,4 +279,9 @@ public class DataBusiness {
         }
     }
 
+    public void updateDataVisibility(QName name, String providerIdentifier, boolean visibility) {
+        final Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(), name.getNamespaceURI(), providerIdentifier);
+        data.setVisible(visibility);
+        dataRepository.save(data);
+    }
 }

@@ -30,6 +30,7 @@ import javax.xml.bind.Unmarshaller;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.xml.XML;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.generic.database.Automatic;
@@ -56,6 +57,9 @@ public class InternalCSWworkerTest extends CSWworkerTest {
 
     @Inject
     private ServiceBusiness serviceBusiness;
+
+    @Inject
+    private ProviderBusiness providerBusiness;
     
     @PostConstruct
     public void setUpClass() {
@@ -219,7 +223,7 @@ public class InternalCSWworkerTest extends CSWworkerTest {
         super.DescribeRecordTest();
     }
 
-    public static void writeProvider(String resourceName, String identifier) throws Exception {
+    public void writeProvider(String resourceName, String identifier) throws Exception {
 
         final DataProviderFactory service = DataProviders.getInstance().getFactory("coverage-sql");
         final ParameterValueGroup source = service.getProviderDescriptor().createValue();
@@ -239,8 +243,8 @@ public class InternalCSWworkerTest extends CSWworkerTest {
         DefaultMetadata meta = (DefaultMetadata) u.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/" + resourceName));
         pool.recycle(u);
 
-        ConfigurationEngine.writeProvider(identifier, null, ProviderRecord.ProviderType.LAYER, service.getName(), source);
-        ConfigurationEngine.saveProviderMetadata(meta, identifier);
+        providerBusiness.createProvider(identifier, null, ProviderRecord.ProviderType.LAYER, service.getName(), source);
+        providerBusiness.updateMetadata(identifier, null, meta);
 
     }
 }

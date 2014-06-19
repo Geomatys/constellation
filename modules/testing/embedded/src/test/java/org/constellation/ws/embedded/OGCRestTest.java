@@ -36,6 +36,7 @@ import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.xml.XML;
 import org.constellation.ServiceDef;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.admin.service.ConstellationClient;
@@ -68,6 +69,9 @@ public class OGCRestTest extends AbstractGrizzlyServer {
 
     @Inject
     private ServiceBusiness serviceBusiness;
+
+    @Inject
+    private ProviderBusiness providerBusiness;
     
     private static ConstellationClient client;
     /**
@@ -150,7 +154,7 @@ public class OGCRestTest extends AbstractGrizzlyServer {
         assertEquals("MD_Metadata", node.getLocalName());
     }
 
-    public static void writeProvider(String resourceName, String identifier) throws Exception {
+    public void writeProvider(String resourceName, String identifier) throws Exception {
 
         final DataProviderFactory service = DataProviders.getInstance().getFactory("coverage-sql");
         final ParameterValueGroup source = service.getProviderDescriptor().createValue();
@@ -170,8 +174,8 @@ public class OGCRestTest extends AbstractGrizzlyServer {
         DefaultMetadata meta = (DefaultMetadata) u.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/" + resourceName));
         CSWMarshallerPool.getInstance().recycle(u);
 
-        ConfigurationEngine.writeProvider(identifier, null, ProviderRecord.ProviderType.LAYER, service.getName(), source);
-        ConfigurationEngine.saveProviderMetadata(meta, identifier);
+        providerBusiness.createProvider(identifier, null, ProviderRecord.ProviderType.LAYER, service.getName(), source);
+        providerBusiness.updateMetadata(identifier,null,meta);
     }
 
     /**

@@ -221,7 +221,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
             final Contact ct = new Contact();
             serviceEng.setServiceContact(ct);
             serviceEng.setVersions(Arrays.asList("1.1.1", "1.3.0"));
-            
+
             ConfigurationEngine.writeServiceMetadata("wms1", "WMS", serviceEng, "eng");
             
             final Service serviceFre = new Service();

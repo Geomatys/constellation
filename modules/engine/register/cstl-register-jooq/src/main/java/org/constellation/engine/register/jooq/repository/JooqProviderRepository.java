@@ -150,4 +150,11 @@ public class JooqProviderRepository extends AbstractJooqRespository<ProviderReco
         return dsl.select().from(STYLE).join(PROVIDER).on(STYLE.PROVIDER.eq(PROVIDER.ID))
                 .where(PROVIDER.ID.eq(providerId)).fetchInto(Style.class);
     }
+
+    @Override
+    public Provider findByIdentifierAndDomainId(String providerIdentifier, Integer domainId) {
+        // @FIXME binding domainId
+        return dsl.select().from(PROVIDER).where(PROVIDER.IDENTIFIER.eq(providerIdentifier)).fetchOneInto(Provider.class);
+
+    }
 }

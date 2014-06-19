@@ -111,9 +111,9 @@ public final class ProviderRecord extends Record {
 //        return ConfigurationEngine.getProvider(parent);
 //    }
     
-    public List<ProviderRecord> getChildrenProviders(){
-        return ConfigurationEngine.getProvidersFromParent(identifier);
-    }
+//    public List<ProviderRecord> getChildrenProviders(){
+//        return ConfigurationEngine.getProvidersFromParent(identifier);
+//    }
     
     public ProviderType getType() {
         return type;

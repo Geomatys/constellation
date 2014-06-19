@@ -23,41 +23,10 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.io.WKTWriter;
-import java.io.File;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
-import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.SensorBusiness;
-import org.constellation.admin.dao.SensorRecord;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.StringList;
@@ -73,15 +42,32 @@ import org.constellation.provider.observationstore.ObservationStoreProvider;
 import org.constellation.sos.configuration.SensorMLGenerator;
 import org.constellation.sos.ws.SOSUtils;
 import org.constellation.util.Util;
-import static org.constellation.utils.RESTfulUtilities.ok;
 import org.geotoolkit.observation.ObservationReader;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
-
-import static org.geotoolkit.sml.xml.SensorMLUtilities.*;
 import org.geotoolkit.sos.netcdf.ExtractionResult.ProcedureTree;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
+
+import javax.inject.Inject;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
+import java.io.File;
+import java.io.StringWriter;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.constellation.utils.RESTfulUtilities.ok;
+import static org.geotoolkit.sml.xml.SensorMLUtilities.*;
 
 /**
  *
@@ -213,12 +199,12 @@ public class SensorRest {
         prop.put("component", component);
         final String sml = SensorMLGenerator.getTemplateSensorMLString(prop, process.type);
         
-        SensorRecord record = ConfigurationEngine.getSensor(process.id);
-        if (record == null) {
-            record = ConfigurationEngine.writeSensor(process.id, process.type, parentID);
-            record.setMetadata(new StringReader(sml));
+        Sensor sensor = sensorBusiness.getSensor(process.id);
+        if (sensor == null) {
+            sensor = sensorBusiness.create(process.id, process.type, parentID, sml);
+
         }
-        ConfigurationEngine.linkDataToSensor(dataID, providerID, record.getIdentifier());
+        sensorBusiness.linkDataToSensor(dataID, providerID, sensor.getIdentifier());
     }
     
     @PUT
@@ -226,7 +212,7 @@ public class SensorRest {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response importSensor(final ParameterValues pv) {
-        final List<SensorRecord> sensorsImported = new ArrayList<>();
+        final List<Sensor> sensorsImported = new ArrayList<>();
         final String path = pv.get("path");
         final File imported = new File(path);
         try {
@@ -238,32 +224,29 @@ public class SensorRest {
                     final String type           = getSensorMLType(sml);
                     final String sensorID       = getSmlID(sml);
                     final List<String> children = getChildrenIdentifiers(sml);
-                    final SensorRecord sensor = ConfigurationEngine.writeSensor(sensorID, type, null);
-                    sensor.setMetadata(new StringReader(marshallSensor(sml)));
+
+                    final Sensor sensor = sensorBusiness.create(sensorID, type, null, marshallSensor(sml));
                     sensorsImported.add(sensor);
                     parents.put(sensorID, children);
                 }
                 // update dependencies
                 for (Entry<String, List<String>> entry : parents.entrySet()) {
                     for (String child : entry.getValue()) {
-                        final SensorRecord childRecord = ConfigurationEngine.getSensor(child);
-                        childRecord.setParentIdentifier(entry.getKey());
+                        final Sensor childRecord = sensorBusiness.getSensor(child);//ConfigurationEngine.getSensor(child);
+                        childRecord.setParent(entry.getKey());
+                        sensorBusiness.update(childRecord);
                     }
                 }
             } else {
                 final AbstractSensorML sml = unmarshallSensor(imported);
                 final String type          = getSensorMLType(sml);
                 final String sensorID      = getSmlID(sml);
-                final SensorRecord sensor = ConfigurationEngine.writeSensor(sensorID, type, null);
-                sensor.setMetadata(new StringReader(marshallSensor(sml)));
+                final Sensor sensor = sensorBusiness.create(sensorID, type, null, marshallSensor(sml));
                 sensorsImported.add(sensor);
             }
         } catch (JAXBException ex) {
             LOGGER.log(Level.WARNING, "Error while reading sensorML file", ex);
             return Response.status(500).entity("fail to read sensorML file").build();
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, "Error while storing sensor record", ex);
-            return Response.status(500).entity("Error while storing sensor record").build();
         }
         return Response.ok(sensorsImported).build();
     }
