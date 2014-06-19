@@ -69,7 +69,7 @@
                                 <div class="item" ng-class="{'sensor-sos':sosdata.type!=='System','sensor-system':sosdata.type==='System','selected':sosdata==selected}" ng-click="select(sosdata);selectSensorsChild(null);">
                                     <div class="top">
                                         <span class="item-title" ng-class="{'title-sensorSystem':sosdata.type==='System'}" title="{{sosdata.id}}">{{sosdata.id}}</span>
-                                        <span ng-if="sosdata.type==='System'" class="pull-right text-right item-list-style" translate="label.sensor.system">sensor system</span>
+                                        <span ng-if="sosdata.type==='System'" class="pull-right text-right item-list-style" style="width:172px;" translate="label.sensor.system">sensor system</span>
                                         <span ng-if="sosdata.type!=='System'" class="pull-right text-right item-list-style"  translate="label.sensor">sensor</span>
                                     </div>
                                     <div class="bottom">
