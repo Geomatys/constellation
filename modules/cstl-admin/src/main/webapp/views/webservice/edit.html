@@ -120,7 +120,7 @@
                                                              src="images/vector-multipoint.svg"
                                                              class="pull-right"
                                                              style="margin-top:6px; margin-right:10px;" />
-                                                        <img ng-if="(layer.Type=='vector' || layer.Type=='feature-store') && layer.Subtype=='Geometry' && layer!=selected"
+                                                        <img ng-if="layer.Subtype=='Geometry' && layer!=selected"
                                                              src="images/vector-multigeometry.svg"
                                                              class="pull-right"
                                                              style="margin-top:6px; margin-right:10px; width:22px" />
@@ -140,7 +140,7 @@
                                                              src="images/vector-poly-selected.svg"
                                                              class="pull-right"
                                                              style="margin-top:6px; margin-right:10px;" />
-                                                        <img ng-if="(layer.Type=='vector' || layer.Type=='feature-store') && layer.Subtype=='Geometry' && layer==selected"
+                                                        <img ng-if="layer.Subtype=='Geometry' && layer==selected"
                                                              src="images/vector-multigeometry-selected.svg"
                                                              class="pull-right"
                                                              style="margin-top:6px; margin-right:10px; width:22px" />
