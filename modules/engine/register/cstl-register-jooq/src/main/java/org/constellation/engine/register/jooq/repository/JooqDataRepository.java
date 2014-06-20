@@ -25,6 +25,7 @@ import static org.constellation.engine.register.jooq.Tables.PROVIDER;
 
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.DataI18n;
+import org.constellation.engine.register.helper.DataHelper;
 import org.constellation.engine.register.i18n.DataWithI18N;
 import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.tables.records.DataRecord;
@@ -67,7 +68,7 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
     }
 
     @Override
-    public Data save(Data data) {
+    public Data create(Data data) {
         DataRecord newRecord = dsl.newRecord(DATA);
         newRecord.setDate(data.getDate());
         newRecord.setIsoMetadata(data.getIsoMetadata());
@@ -135,6 +136,25 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
         return dsl.select().from(DATA).where(DATA.PROVIDER.eq(providerId))
                 .and(DATA.NAME.eq(localPart)).and(DATA.NAMESPACE.eq(namespaceURI))
                 .fetchOneInto(Data.class);
+    }
+
+	@Override
+    public void update(Data data) {
+		
+		dsl.update(DATA).set(DATA.DATE,data.getDate())
+		.set(DATA.ISO_METADATA,data.getIsoMetadata())
+		.set(DATA.METADATA, data.getMetadata())
+		.set(DATA.METADATA_ID, data.getMetadataId())
+		.set(DATA.NAME, data.getName())
+		.set(DATA.NAMESPACE, data.getNamespace())
+		.set(DATA.OWNER, data.getOwner())
+		.set(DATA.PROVIDER, data.getProvider())
+		.set(DATA.SENSORABLE, data.isSensorable())
+		.set(DATA.SUBTYPE, data.getSubtype())
+		.set(DATA.TYPE, data.getType())
+		.set(DATA.VISIBLE, data.isVisible())
+		.execute();
+	    
     }
 
 

@@ -20,10 +20,7 @@
 package org.constellation.provider.configuration;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
 import java.io.StringWriter;
-import java.sql.SQLException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,12 +31,11 @@ import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
-import org.apache.commons.io.IOUtils;
+
 import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.*;
-import org.constellation.admin.dao.DataRecord;
 import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.admin.dao.StyleRecord;
 import org.constellation.admin.exception.ConstellationException;
@@ -241,7 +237,7 @@ public final class DefaultConfigurator implements Configurator {
                             }
                         }
                     }
-                    dataBusiness.write(name, pr.getIdentifier(), provider.getDataType().name(), provider.isSensorAffectable(), visible, subType, metadataXml);
+                    dataBusiness.create(name, pr.getIdentifier(), provider.getDataType().name(), provider.isSensorAffectable(), visible, subType, metadataXml);
                 }
             }
         } else {

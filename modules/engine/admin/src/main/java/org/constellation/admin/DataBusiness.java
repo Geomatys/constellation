@@ -114,7 +114,7 @@ public class DataBusiness {
         }
         Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(), name.getNamespaceURI(), providerId);
         data.setIsoMetadata(sw.toString());
-        dataRepository.save(data);
+        dataRepository.update(data);
     }
 
 
@@ -260,8 +260,8 @@ public class DataBusiness {
         }
     }
     
-    public void write(final QName name, final String providerIdentifier, final String type, final boolean sensorable, final boolean visible,
-            final String subType, final String metadata) {
+    public void create(final QName name, final String providerIdentifier, final String type, final boolean sensorable, final boolean visible,
+                       final String subType, final String metadata) {
         final Provider provider = providerRepository.findByIdentifier(providerIdentifier);
         if (provider != null) {
             final Data data = new Data();
@@ -275,13 +275,13 @@ public class DataBusiness {
             data.setSubtype(subType);
             data.setVisible(visible);
             data.setMetadata(metadata);
-            dataRepository.save(data);
+            dataRepository.create(data);
         }
     }
 
     public void updateDataVisibility(QName name, String providerIdentifier, boolean visibility) {
         final Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(), name.getNamespaceURI(), providerIdentifier);
         data.setVisible(visibility);
-        dataRepository.save(data);
+        dataRepository.update(data);
     }
 }

@@ -98,7 +98,7 @@ public class JooqDomainRespositoryTestCase extends AbstractJooqTestTestCase {
         Domain domain = domainRepository.save(TestSamples.newDomain());
         User user = userRepository.insert(TestSamples.newAdminUser(), TestSamples.adminRoles());
         Provider provider = providerRepository.insert(TestSamples.newProvider(user));
-        Data data = dataRepository.save(TestSamples.newData(user, provider));
+        Data data = dataRepository.create(TestSamples.newData(user, provider));
 
         int i = domainRepository.addDataToDomain(data.getId(), domain.getId());
         Assert.assertEquals("Should have inserted 1 record", 1, i);

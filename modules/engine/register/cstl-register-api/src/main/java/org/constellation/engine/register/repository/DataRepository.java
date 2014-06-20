@@ -33,7 +33,7 @@ public interface DataRepository {
     
     Data findById(int dataId);
     
-    Data save(Data data);
+    Data create(Data data);
 
     int delete(int id);
 
@@ -50,5 +50,8 @@ public interface DataRepository {
 
 
     Data findByNameAndNamespaceAndProviderId(String localPart, String namespaceURI, Integer providerId);
+
+	void update(Data data);
+
 
 }
