@@ -307,7 +307,7 @@ public class SOSworker extends AbstractWorker {
             if (object instanceof SOSConfiguration) {
                 configuration = (SOSConfiguration) object;
             } else {
-                startError("The generic configuration file is malformed.", null);
+                startError("The configuration object is malformed or null.", null);
                 return;
             }
 

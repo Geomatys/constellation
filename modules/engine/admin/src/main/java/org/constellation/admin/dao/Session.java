@@ -66,6 +66,7 @@ import org.opengis.parameter.GeneralParameterDescriptor;
  * @version 0.9
  * @since 0.9
  */
+@Deprecated
 public final class Session implements Closeable {
 
     /**

@@ -19,9 +19,9 @@
     into the JARs list that Maven will put into the directory "target/binaries". -->
     <dependencies>
         <dependency>
-          <groupId>javax.inject</groupId>
-          <artifactId>javax.inject</artifactId>
-          <version>1</version>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <version>1</version>
         </dependency>
         <dependency>
             <groupId>org.mdweb.metamodel</groupId>
@@ -77,6 +77,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.constellation.library</groupId>
+            <artifactId>cstl-lib-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.constellation.engine.register</groupId>
             <artifactId>cstl-register-api</artifactId>
             <version>${project.version}</version>
@@ -88,10 +93,17 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.constellation.library</groupId>
-            <artifactId>cstl-lib-api</artifactId>
+            <groupId>org.constellation.engine</groupId>
+            <artifactId>cstl-engine-spring-security</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <version>1.2-b03</version>
+            <scope>test</scope>
+        </dependency>
+        
     </dependencies>
 </project>

@@ -22,6 +22,7 @@ package org.constellation.metadata;
 
 import java.io.File;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,6 +30,7 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.test.utils.Order;
@@ -59,89 +61,101 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
     
     private static final File dbDirectory = new File("MDCSWWorkerTestDatabase");
     private static final File dbTHDirectory = new File("MDCSWWorkerTestThesaurusDatabase");
+    
+    private static  String url;
+    
+    private static String thUrl;
 
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+        url = "jdbc:derby:" + dbDirectory.getPath().replace('\\','/');
+        DefaultDataSource ds = new DefaultDataSource(url + ";create=true");
+
+        Connection con = ds.getConnection();
+
+        DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
+        LOGGER.info("Inserting ISO schemas...");
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/model/mdw_schema_2.4_derby.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19115.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19119.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19108.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19115-2.sql"));
+        LOGGER.info("Inserting Ebrim schemas...");
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/data/defaultRecordSets.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/users/creation_user.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/profiles/inputLevels.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/catalog_web_service.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ebrimv2.5.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ebrimv3.0.sql"));
+        LOGGER.info("Inserting datas...");
+        sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-3.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-4.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-6.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-7.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-9.sql"));
+
+        LOGGER.info("Writing thesauri...");
+        thUrl = "jdbc:derby:" + dbTHDirectory.getPath().replace('\\','/');
+        ThesaurusDatabaseCreator thCreator = new ThesaurusDatabaseCreator(dbTHDirectory);
+        thCreator.createBaseStructureThesaurus();
+
+        DefaultDataSource thds = new DefaultDataSource(thUrl + ";create=true");
+
+        final ThesaurusDatabaseWriter writer = new ThesaurusDatabaseWriter(thds, "default", true, "th:test", "Test thesaurus",
+                "various word used for Anchor", Arrays.asList(ISOLanguageCode.ENG), ISOLanguageCode.ENG);
+        writer.store();
+        writer.writeConcept(new Concept("SDN:L231:3:CDI", new Value("Common Data Index record", "en")));
+        writer.writeConcept(new Concept("SDN:C320:2:FR", new Value("France", "en")));
+        writer.writeConcept(new Concept("SDN:L101:2:4326", new Value("EPSG:4326", "en")));
+        writer.writeConcept(new Concept("SDN:C371:1:2", new Value("2", "en")));
+        writer.writeConcept(new Concept("SDN:C371:1:35", new Value("35", "en")));
+        writer.writeConcept(new Concept("SDN:P021:35:ATTN", new Value("Transmittance and attenuance of the water column", "en")));
+        writer.writeConcept(new Concept("SDN:P021:35:CNDC", new Value("Electrical conductivity of the water column", "en")));
+        writer.writeConcept(new Concept("SDN:P021:35:DOXY", new Value("Dissolved oxygen parameters in the water column", "en")));
+        writer.writeConcept(new Concept("SDN:P021:35:EXCO", new Value("Light extinction and diffusion coefficients", "en")));
+        writer.writeConcept(new Concept("SDN:P021:35:HEXC", new Value("Dissolved noble gas concentration parameters in the water column", "en")));
+        writer.writeConcept(new Concept("SDN:P021:35:OPBS", new Value("Optical backscatter", "en")));
+        writer.writeConcept(new Concept("SDN:P021:35:PSAL", new Value("Salinity of the water column", "en")));
+        writer.writeConcept(new Concept("SDN:P021:35:SCOX", new Value("Dissolved concentration parameters for 'other' gases in the water column", "en")));
+        writer.writeConcept(new Concept("SDN:P021:35:TEMP", new Value("Temperature of the water column", "en")));
+        writer.writeConcept(new Concept("SDN:P021:35:VSRA", new Value("Visible waveband radiance and irradiance measurements in the atmosphere", "en")));
+        writer.writeConcept(new Concept("SDN:P021:35:VSRW", new Value("Visible waveband radiance and irradiance measurements in the water column", "en")));
+        writer.writeConcept(new Concept("SDN:L241:1:MEDATLAS", new Value("MEDATLAS ASCII", "en")));
+        writer.writeConcept(new Concept("SDN:L231:3:EDMED", new Value("EDMED record", "en")));
+        writer.writeConcept(new Concept("SDN:EDMERP::9585", new Value("OCEANOGRAPHIC DATA CENTER", "en")));
+    }
+    
     @PostConstruct
-    public void setUpClass() {
+    public void setUp() {
+        SpringHelper.setApplicationContext(applicationContext);
         try {
-            final File configDir = ConfigurationEngine.setupTestEnvironement("MDCSWWorkerTest");
-            
-            File CSWDirectory  = new File(configDir, "CSW");
-            CSWDirectory.mkdir();
-            final File instDirectory = new File(CSWDirectory, "default");
-            instDirectory.mkdir();
-            
-            final String url = "jdbc:derby:" + dbDirectory.getPath().replace('\\','/');
-            DefaultDataSource ds = new DefaultDataSource(url + ";create=true");
-            
-            Connection con = ds.getConnection();
-            
-            DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
-            LOGGER.info("Inserting ISO schemas...");
-            sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/model/mdw_schema_2.4_derby.sql"));
-            sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19115.sql"));
-            sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19119.sql"));
-            sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19108.sql"));
-            sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19115-2.sql"));
-            LOGGER.info("Inserting Ebrim schemas...");
-            sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/data/defaultRecordSets.sql"));
-            sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/users/creation_user.sql"));
-            sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/profiles/inputLevels.sql"));
-            sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/catalog_web_service.sql"));
-            sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ebrimv2.5.sql"));
-            sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ebrimv3.0.sql"));
-            LOGGER.info("Inserting datas...");
-            sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data.sql"));
-            sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-3.sql"));
-            sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-4.sql"));
-            sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-6.sql"));
-            sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-7.sql"));
-            sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-9.sql"));
-            
-            LOGGER.info("Writing thesauri...");
-            final String thUrl = "jdbc:derby:" + dbTHDirectory.getPath().replace('\\','/');
-            ThesaurusDatabaseCreator thCreator = new ThesaurusDatabaseCreator(dbTHDirectory);
-            thCreator.createBaseStructureThesaurus();
-            
-            DefaultDataSource thds = new DefaultDataSource(thUrl + ";create=true");
-            
-            final ThesaurusDatabaseWriter writer = new ThesaurusDatabaseWriter(thds, "default", true, "th:test", "Test thesaurus",
-                    "various word used for Anchor", Arrays.asList(ISOLanguageCode.ENG), ISOLanguageCode.ENG);
-            writer.store();
-            writer.writeConcept(new Concept("SDN:L231:3:CDI", new Value("Common Data Index record", "en")));
-            writer.writeConcept(new Concept("SDN:C320:2:FR", new Value("France", "en")));
-            writer.writeConcept(new Concept("SDN:L101:2:4326", new Value("EPSG:4326", "en")));
-            writer.writeConcept(new Concept("SDN:C371:1:2", new Value("2", "en")));
-            writer.writeConcept(new Concept("SDN:C371:1:35", new Value("35", "en")));
-            writer.writeConcept(new Concept("SDN:P021:35:ATTN", new Value("Transmittance and attenuance of the water column", "en")));
-            writer.writeConcept(new Concept("SDN:P021:35:CNDC", new Value("Electrical conductivity of the water column", "en")));
-            writer.writeConcept(new Concept("SDN:P021:35:DOXY", new Value("Dissolved oxygen parameters in the water column", "en")));
-            writer.writeConcept(new Concept("SDN:P021:35:EXCO", new Value("Light extinction and diffusion coefficients", "en")));
-            writer.writeConcept(new Concept("SDN:P021:35:HEXC", new Value("Dissolved noble gas concentration parameters in the water column", "en")));
-            writer.writeConcept(new Concept("SDN:P021:35:OPBS", new Value("Optical backscatter", "en")));
-            writer.writeConcept(new Concept("SDN:P021:35:PSAL", new Value("Salinity of the water column", "en")));
-            writer.writeConcept(new Concept("SDN:P021:35:SCOX", new Value("Dissolved concentration parameters for 'other' gases in the water column", "en")));
-            writer.writeConcept(new Concept("SDN:P021:35:TEMP", new Value("Temperature of the water column", "en")));
-            writer.writeConcept(new Concept("SDN:P021:35:VSRA", new Value("Visible waveband radiance and irradiance measurements in the atmosphere", "en")));
-            writer.writeConcept(new Concept("SDN:P021:35:VSRW", new Value("Visible waveband radiance and irradiance measurements in the water column", "en")));
-            writer.writeConcept(new Concept("SDN:L241:1:MEDATLAS", new Value("MEDATLAS ASCII", "en")));
-            writer.writeConcept(new Concept("SDN:L231:3:EDMED", new Value("EDMED record", "en")));
-            writer.writeConcept(new Concept("SDN:EDMERP::9585", new Value("OCEANOGRAPHIC DATA CENTER", "en")));
-            
-            //we write the configuration file
-            final BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
-            Automatic configuration = new Automatic("mdweb", bdd);
-            configuration.putParameter("transactionSecurized", "false");
-            configuration.putParameter("shiroAccessible", "false");
-            final BDD thBdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", thUrl, "", "");
-            thBdd.setSchema("default");
-            configuration.setThesaurus(Arrays.asList(thBdd));
-            
-            serviceBusiness.create("CSW", "default", configuration, null);
-            
-            pool = EBRIMMarshallerPool.getInstance();
-            //fillPoolAnchor((AnchoredMarshallerPool) pool);
+            if (!serviceBusiness.getServiceIdentifiers("CSW").contains("default")) {
+                final File configDir = ConfigurationEngine.setupTestEnvironement("MDCSWWorkerTest");
 
-            worker = new CSWworker("default");
+                File CSWDirectory  = new File(configDir, "CSW");
+                CSWDirectory.mkdir();
+                final File instDirectory = new File(CSWDirectory, "default");
+                instDirectory.mkdir();
+
+
+
+                //we write the configuration file
+                final BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
+                Automatic configuration = new Automatic("mdweb", bdd);
+                configuration.putParameter("transactionSecurized", "false");
+                configuration.putParameter("shiroAccessible", "false");
+                final BDD thBdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", thUrl, "", "");
+                thBdd.setSchema("default");
+                configuration.setThesaurus(Arrays.asList(thBdd));
+
+                serviceBusiness.create("CSW", "default", configuration, null);
+
+                pool = EBRIMMarshallerPool.getInstance();
+                //fillPoolAnchor((AnchoredMarshallerPool) pool);
+
+                worker = new CSWworker("default");
+            }
         } catch (Exception ex) {
             Logger.getLogger(MDwebCSWworkerTest.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -159,14 +173,6 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
             derbyLog.delete();
         }
         ConfigurationEngine.shutdownTestEnvironement("MDCSWWorkerTest");
-    }
-
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
     }
 
     /**

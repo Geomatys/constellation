@@ -20,28 +20,31 @@
 package org.constellation.sos.ws;
 
 import java.io.StringWriter;
-import java.sql.Statement;
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.xml.bind.Marshaller;
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.admin.ConfigurationEngine;
-import org.constellation.admin.EmbeddedDatabase;
-import org.constellation.admin.ServiceBusiness;
-import org.constellation.admin.util.SQLExecuter;
+import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.SOSConfiguration;
+import org.constellation.engine.register.Service;
+import org.constellation.engine.register.repository.ServiceRepository;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.test.utils.SpringTestRunner;
-import org.geotoolkit.sos.xml.v100.GetCapabilities;
+import org.constellation.ws.CstlServiceException;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // JUnit dependencies
-import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
+import org.geotoolkit.sos.xml.v100.GetCapabilities;
 import org.junit.*;
 import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.context.ContextConfiguration;
 
 /**
  * Test some erroned initialisation of SOS Worker
@@ -49,22 +52,35 @@ import org.junit.runner.RunWith;
  * @author Guilhem Legal (Geomatys)
  */
 @RunWith(SpringTestRunner.class)
-public class SOSWorkerInitialisationTest {
+@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+public class SOSWorkerInitialisationTest implements ApplicationContextAware {
 
+    private ApplicationContext applicationContext;
+    
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+    
     @Inject
-    private ServiceBusiness serviceBusiness;
+    private ServiceRepository serviceRepository;
     
     private static MarshallerPool pool;
+    
+    @PostConstruct
+    public void setUp() {
+        SpringHelper.setApplicationContext(applicationContext);
+    }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        ConfigurationEngine.setupTestEnvironement("SOSWorkerInitialisationTest");
+        //ConfigurationEngine.setupTestEnvironement("SOSWorkerInitialisationTest");
         pool = SOSMarshallerPool.getInstance();
     }
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        ConfigurationEngine.shutdownTestEnvironement("SOSWorkerInitialisationTest");
+        //ConfigurationEngine.shutdownTestEnvironement("SOSWorkerInitialisationTest");
     }
 
     @After
@@ -83,7 +99,10 @@ public class SOSWorkerInitialisationTest {
         /**
          * Test 1: No configuration file.
          */
-        serviceBusiness.create("SOS", "default", null, null);
+        Service service = new Service("default", "sos", System.currentTimeMillis(), null, null, null, null, "NOT_STARTED", "1.0.0");
+        int id =  serviceRepository.create(service);
+        assertTrue(id > 0);
+        
         SOSworker worker = new SOSworker("default");
 
         boolean exceptionLaunched = false;
@@ -94,7 +113,7 @@ public class SOSWorkerInitialisationTest {
 
         } catch(CstlServiceException ex) {
             assertEquals(ex.getExceptionCode(), NO_APPLICABLE_CODE);
-            assertEquals(ex.getMessage(), "The service is not running!\nCause:The configuration file can't be found.");
+            assertEquals(ex.getMessage(), "The service is not running!\nCause:The configuration object is malformed or null.");
             exceptionLaunched = true;
         }
 
@@ -103,9 +122,9 @@ public class SOSWorkerInitialisationTest {
         /**
          * Test 2: An empty configuration file.
          */
-        final SQLExecuter executer = EmbeddedDatabase.createSQLExecuter();
-        final Statement stmt = executer.createStatement();
-        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"=''");
+        service = serviceRepository.findByIdentifierAndType("default", "SOS");
+        service.setConfig("");
+        serviceRepository.save(service);
         
         worker = new SOSworker("default");
 
@@ -116,7 +135,7 @@ public class SOSWorkerInitialisationTest {
 
         } catch(CstlServiceException ex) {
             assertEquals(ex.getExceptionCode(), NO_APPLICABLE_CODE);
-            assertTrue(ex.getMessage().equals("The service is not running!\nCause:JAXBException:Premature end of file.") || ex.getMessage().equals("The service is not running!\nCause:JAXBException:Fin prématurée du fichier.") );
+            assertTrue(ex.getMessage().equals("The service is not running!\nCause:The configuration file can't be found."));
 
             exceptionLaunched = true;
         }
@@ -130,7 +149,10 @@ public class SOSWorkerInitialisationTest {
         final Marshaller m = pool.acquireMarshaller();
         m.marshal(request, sw);
         pool.recycle(m);
-        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"='" + sw.toString() + "'");
+        
+        service = serviceRepository.findByIdentifierAndType("default", "SOS");
+        service.setConfig(sw.toString());
+        serviceRepository.save(service);
 
         worker = new SOSworker("default");
 
@@ -152,7 +174,9 @@ public class SOSWorkerInitialisationTest {
          */
         sw = new StringWriter();
         marshaller.marshal(new BDD(), sw);
-        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"='" + sw.toString() + "'");
+        service = serviceRepository.findByIdentifierAndType("default", "SOS");
+        service.setConfig(sw.toString());
+        serviceRepository.save(service);
 
         worker = new SOSworker("default");
 
@@ -175,7 +199,9 @@ public class SOSWorkerInitialisationTest {
         SOSConfiguration configuration = new SOSConfiguration();
         sw = new StringWriter();
         marshaller.marshal(configuration, sw);
-        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"='" + sw.toString() + "'");
+        service = serviceRepository.findByIdentifierAndType("default", "SOS");
+        service.setConfig(sw.toString());
+        serviceRepository.save(service);
         
         worker = new SOSworker("default");
 
@@ -198,7 +224,9 @@ public class SOSWorkerInitialisationTest {
         configuration = new SOSConfiguration(new Automatic(), null);
         sw = new StringWriter();
         marshaller.marshal(configuration, sw);
-        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"='" + sw.toString() + "'");
+        service = serviceRepository.findByIdentifierAndType("default", "SOS");
+        service.setConfig(sw.toString());
+        serviceRepository.save(service);
 
         worker = new SOSworker("default");
 
@@ -221,7 +249,9 @@ public class SOSWorkerInitialisationTest {
         configuration = new SOSConfiguration(new Automatic(), new Automatic());
         sw = new StringWriter();
         marshaller.marshal(configuration, sw);
-        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"='" + sw.toString() + "'");
+        service = serviceRepository.findByIdentifierAndType("default", "SOS");
+        service.setConfig(sw.toString());
+        serviceRepository.save(service);
 
         worker = new SOSworker("default");
 
@@ -247,7 +277,9 @@ public class SOSWorkerInitialisationTest {
 
         sw = new StringWriter();
         marshaller.marshal(configuration, sw);
-        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"='" + sw.toString() + "'");
+        service = serviceRepository.findByIdentifierAndType("default", "SOS");
+        service.setConfig(sw.toString());
+        serviceRepository.save(service);
 
         worker = new SOSworker("default");
 

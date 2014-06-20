@@ -19,24 +19,46 @@
 package org.constellation.process;
 
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import org.apache.sis.util.logging.Logging;
+import org.constellation.admin.SpringHelper;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
 import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.opengis.util.NoSuchIdentifierException;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 /**
  * Abstract test base for all engine process tests. 
  * 
  * @author Quentin Boileau (Geomatys)
  */
-public abstract class AbstractProcessTest {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+public abstract class AbstractProcessTest implements ApplicationContextAware {
 
     protected static final Logger LOGGER = Logging.getLogger(AbstractProcessTest.class);
     private static final String factory = ConstellationProcessFactory.NAME;
     private final String process;
+    
+    private ApplicationContext applicationContext;
+    
+    @PostConstruct
+    public void setUpClass() {
+        SpringHelper.setApplicationContext(applicationContext);
+    }
 
-
+    
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+    
     protected AbstractProcessTest(final String process){
         this.process = process;
     }

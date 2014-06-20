@@ -22,6 +22,7 @@ import org.constellation.engine.register.Style;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.utils.ISOMarshallerPool;
 import org.opengis.parameter.GeneralParameterValue;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -30,7 +31,7 @@ public class ProviderBusiness {
     @Inject
     ProviderRepository providerRepository;
 
-    @Inject
+    @Autowired
     private org.constellation.security.SecurityManager securityManager;
     
     public List<Provider> getProviders() {

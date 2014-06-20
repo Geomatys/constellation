@@ -149,7 +149,7 @@ public final class DefaultConfigurator implements Configurator {
 //        final List<DataRecord> list = pr.getData();
         final List<org.constellation.engine.register.Data> list = providerBusiness.getDatasFromProviderId(pr.getId());
         final String type = pr.getType();
-        if (type == ProviderRecord.ProviderType.LAYER.name()) {
+        if (type.equals(ProviderRecord.ProviderType.LAYER.name())) {
             final Provider provider = DataProviders.getInstance().getProvider(pr.getIdentifier());
             
             // Remove no longer existing layer.

@@ -123,8 +123,8 @@ public class ConfigurationXmlBindingTest {
         String expresult =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
                 + "<ns2:InstanceReport xmlns:ns2=\"http://www.constellation.org/config\">" + '\n'
-                + "    <ns2:instance name=\"default\" type=\"WMS\" status=\"WORKING\"/>" + '\n'
-                + "    <ns2:instance name=\"test1\" type=\"WMS\" status=\"NOT_STARTED\"/>" + '\n'
+                + "    <ns2:instance identifier=\"default\" type=\"WMS\" status=\"STARTED\"/>" + '\n'
+                + "    <ns2:instance identifier=\"test1\" type=\"WMS\" status=\"STOPPED\"/>" + '\n'
                 + "</ns2:InstanceReport>\n";
 
         final String result = sw.toString();
@@ -144,8 +144,8 @@ public class ConfigurationXmlBindingTest {
         String xml =
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
                 + "<ns2:InstanceReport xmlns:ns2=\"http://www.constellation.org/config\">" + '\n'
-                + "    <ns2:instance status=\"WORKING\" type=\"WMS\" name=\"default\"/>" + '\n'
-                + "    <ns2:instance status=\"NOT_STARTED\" type=\"WMS\" name=\"test1\"/>" + '\n'
+                + "    <ns2:instance status=\"STARTED\" type=\"WMS\" identifier=\"default\"/>" + '\n'
+                + "    <ns2:instance status=\"STOPPED\" type=\"WMS\" identifier=\"test1\"/>" + '\n'
                 + "</ns2:InstanceReport>\n";
 
         Object result =  unmarshaller.unmarshal(new StringReader(xml));
@@ -238,13 +238,11 @@ public class ConfigurationXmlBindingTest {
 
         expresult = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" + '\n'
                 + "<ns2:LayerContext xmlns:ns2=\"http://www.constellation.org/config\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">" + '\n'
-                + "    <ns2:layers>" + '\n'
-                + "        <ns2:MainLayer>" + '\n'
-                + "            <ns2:Title>mainTitle</ns2:Title>" + '\n'
-                + "            <ns2:CRS>CRS-custo1</ns2:CRS>" + '\n'
-                + "            <ns2:CRS>CRS-custo2</ns2:CRS>" + '\n'
-                + "        </ns2:MainLayer>" + '\n'
-                + "    </ns2:layers>" + '\n'
+                + "    <ns2:mainLayer>" + '\n'
+                + "        <ns2:Title>mainTitle</ns2:Title>" + '\n'
+                + "        <ns2:CRS>CRS-custo1</ns2:CRS>" + '\n'
+                + "        <ns2:CRS>CRS-custo2</ns2:CRS>" + '\n'
+                + "    </ns2:mainLayer>" + '\n'
                 + "    <ns2:customParameters/>" + '\n'
                 + "</ns2:LayerContext>\n";
 

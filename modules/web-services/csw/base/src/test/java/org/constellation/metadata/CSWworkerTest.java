@@ -123,6 +123,10 @@ import org.opengis.metadata.citation.Role;
 // JUnit dependencies
 import org.junit.Ignore;
 import static org.junit.Assert.*;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.context.ContextConfiguration;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -132,7 +136,15 @@ import org.w3c.dom.Node;
  * @author Guilhem Legal (geomatys)
  */
 @Ignore
-public class CSWworkerTest {
+@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+public class CSWworkerTest implements ApplicationContextAware {
+
+    protected ApplicationContext applicationContext;
+    
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
 
     protected static CSWworker worker;
 

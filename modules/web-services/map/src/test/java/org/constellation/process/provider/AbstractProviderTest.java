@@ -23,6 +23,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
+import javax.annotation.PostConstruct;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.process.AbstractProcessTest;
@@ -44,17 +45,19 @@ public abstract class AbstractProviderTest extends AbstractProcessTest {
     protected static URL EMPTY_CSV;
     // dataStore service
     protected static ProviderFactory DATASTORE_SERVICE;
-    static {
+
+    protected AbstractProviderTest(final String processName) {
+        super(processName);
+    }
+    
+    @PostConstruct
+    public void fillDatastoreService() {
         final Collection<DataProviderFactory> availableLayerServices = DataProviders.getInstance().getFactories();
         for (DataProviderFactory tmpService: availableLayerServices) {
             if ("feature-store".equals(tmpService.getName())) {
                 DATASTORE_SERVICE = tmpService;
             }
         }
-    }
-
-    protected AbstractProviderTest(final String processName) {
-        super(processName);
     }
 
     @BeforeClass

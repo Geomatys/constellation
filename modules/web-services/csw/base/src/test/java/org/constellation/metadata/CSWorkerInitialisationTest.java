@@ -21,8 +21,8 @@ package org.constellation.metadata;
 
 // JAXB dependencies
 import java.io.StringWriter;
-import java.sql.Statement;
 import java.util.logging.Level;
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import javax.xml.bind.JAXBContext;
@@ -39,9 +39,9 @@ import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.csw.xml.v202.GetCapabilitiesType;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
-import org.constellation.admin.EmbeddedDatabase;
-import org.constellation.admin.ServiceBusiness;
-import org.constellation.admin.util.SQLExecuter;
+import org.constellation.admin.SpringHelper;
+import org.constellation.engine.register.Service;
+import org.constellation.engine.register.repository.ServiceRepository;
 import org.constellation.test.utils.SpringTestRunner;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -49,6 +49,10 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.junit.*;
 import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.context.ContextConfiguration;
 
 /**
  * Test some erroned initialisation of CSW Worker
@@ -56,13 +60,27 @@ import org.junit.runner.RunWith;
  * @author Guilhem Legal (Geomatys)
  */
 @RunWith(SpringTestRunner.class)
-public class CSWorkerInitialisationTest {
+@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+public class CSWorkerInitialisationTest implements ApplicationContextAware {
+
+    private ApplicationContext applicationContext;
+    
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
 
     private static MarshallerPool pool;
 
     @Inject
-    private ServiceBusiness serviceBusiness;
+    private ServiceRepository serviceRepository;
 
+    @PostConstruct
+    public void setUp() {
+        SpringHelper.setApplicationContext(applicationContext);
+    }
+
+    
     @BeforeClass
     public static void setUpClass() throws Exception {
         ConfigurationEngine.setupTestEnvironement("CSWorkerInitialisationTest");
@@ -86,12 +104,38 @@ public class CSWorkerInitialisationTest {
         /**
          * Test 1: No configuration file.
          */
-        serviceBusiness.create("CSW", "default", null, null);
+        Service service = new Service("default", "csw", System.currentTimeMillis(), null, null, null, null, "NOT_STARTED", "1.0.0");
+        int id =  serviceRepository.create(service);
+        assertTrue(id > 0);
+        
         CSWworker worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
 
         boolean exceptionLaunched = false;
         GetCapabilitiesType request = new GetCapabilitiesType("CSW");
+        try {
+
+            worker.getCapabilities(request);
+
+        } catch(CstlServiceException ex) {
+            assertEquals(ex.getExceptionCode(), NO_APPLICABLE_CODE);
+            assertEquals(ex.getMessage(), "The service is not running!\nCause: Configuration Object is not an Automatic Object");
+            exceptionLaunched = true;
+        }
+
+        assertTrue(exceptionLaunched);
+
+        /**
+         * Test 2: An empty configuration file.
+         */
+        service = serviceRepository.findByIdentifierAndType("default", "CSW");
+        service.setConfig("");
+        serviceRepository.save(service);
+        
+        worker = new CSWworker("default");
+        worker.setLogLevel(Level.FINER);
+
+        exceptionLaunched = false;
         try {
 
             worker.getCapabilities(request);
@@ -105,36 +149,17 @@ public class CSWorkerInitialisationTest {
         assertTrue(exceptionLaunched);
 
         /**
-         * Test 2: An empty configuration file.
-         */
-        final SQLExecuter executer = EmbeddedDatabase.createSQLExecuter();
-        final Statement stmt = executer.createStatement();
-        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"=''");
-        
-        worker = new CSWworker("default");
-        worker.setLogLevel(Level.FINER);
-
-        exceptionLaunched = false;
-        try {
-
-            worker.getCapabilities(request);
-
-        } catch(CstlServiceException ex) {
-            assertEquals(ex.getExceptionCode(), NO_APPLICABLE_CODE);
-            assertEquals(ex.getMessage(), "The service is not running!\nCause:JAXBException:null");
-            exceptionLaunched = true;
-        }
-
-        assertTrue(exceptionLaunched);
-
-        /**
          * Test 3: A malformed configuration file (bad recognized type).
          */
         StringWriter sw = new StringWriter();
         final Marshaller m = pool.acquireMarshaller();
         m.marshal(request, sw);
         pool.recycle(m);
-        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"='" + sw.toString() + "'");
+        
+        service = serviceRepository.findByIdentifierAndType("default", "CSW");
+        service.setConfig(sw.toString());
+        serviceRepository.save(service);
+        
 
         worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
@@ -159,7 +184,10 @@ public class CSWorkerInitialisationTest {
         sw = new StringWriter();
         Marshaller tempMarshaller = JAXBContext.newInstance(UnknowObject.class, Automatic.class).createMarshaller();
         tempMarshaller.marshal(new UnknowObject(), sw);
-        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"='" + sw.toString() + "'");
+        
+        service = serviceRepository.findByIdentifierAndType("default", "CSW");
+        service.setConfig(sw.toString());
+        serviceRepository.save(service);
 
         worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
@@ -184,7 +212,10 @@ public class CSWorkerInitialisationTest {
         String s = null;
         Automatic configuration = new Automatic(null, s);
         tempMarshaller.marshal(configuration, sw);
-        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"='" + sw.toString() + "'");
+        
+        service = serviceRepository.findByIdentifierAndType("default", "CSW");
+        service.setConfig(sw.toString());
+        serviceRepository.save(service);
 
         worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
@@ -209,7 +240,10 @@ public class CSWorkerInitialisationTest {
         s = null;
         configuration = new Automatic("whatever", s);
         tempMarshaller.marshal(configuration, sw);
-        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"='" + sw.toString() + "'");
+        
+        service = serviceRepository.findByIdentifierAndType("default", "CSW");
+        service.setConfig(sw.toString());
+        serviceRepository.save(service);
         
         worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
@@ -234,7 +268,10 @@ public class CSWorkerInitialisationTest {
         s = null;
         configuration = new Automatic("mdweb", s);
         tempMarshaller.marshal(configuration, sw);
-        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"='" + sw.toString() + "'");
+        
+        service = serviceRepository.findByIdentifierAndType("default", "CSW");
+        service.setConfig(sw.toString());
+        serviceRepository.save(service);
 
         worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
@@ -258,7 +295,10 @@ public class CSWorkerInitialisationTest {
         sw = new StringWriter();
         configuration = new Automatic("mdweb", new BDD());
         tempMarshaller.marshal(configuration, sw);
-        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"='" + sw.toString() + "'");
+        
+        service = serviceRepository.findByIdentifierAndType("default", "CSW");
+        service.setConfig(sw.toString());
+        serviceRepository.save(service);
         
         worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
@@ -282,7 +322,10 @@ public class CSWorkerInitialisationTest {
         sw = new StringWriter();
         configuration = new Automatic("mdweb", new BDD(null, null, null, null));
         tempMarshaller.marshal(configuration, sw);
-        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"='" + sw.toString() + "'");
+        
+        service = serviceRepository.findByIdentifierAndType("default", "CSW");
+        service.setConfig(sw.toString());
+        serviceRepository.save(service);
 
         worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
@@ -306,7 +349,10 @@ public class CSWorkerInitialisationTest {
         sw = new StringWriter();
         configuration = new Automatic("mdweb", new BDD(null, "whatever", null, null));
         tempMarshaller.marshal(configuration, sw);
-        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"='" + sw.toString() + "'");
+        
+        service = serviceRepository.findByIdentifierAndType("default", "CSW");
+        service.setConfig(sw.toString());
+        serviceRepository.save(service);
 
         worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
@@ -330,7 +376,10 @@ public class CSWorkerInitialisationTest {
         sw = new StringWriter();
         configuration = new Automatic("mdweb", new BDD("org.postgresql.Driver", "whatever", null, null));
         tempMarshaller.marshal(configuration, sw);
-        stmt.executeUpdate("UPDATE \"admin\".\"service\" SET \"config\"='" + sw.toString() + "'");
+        
+        service = serviceRepository.findByIdentifierAndType("default", "CSW");
+        service.setConfig(sw.toString());
+        serviceRepository.save(service);
 
         worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
