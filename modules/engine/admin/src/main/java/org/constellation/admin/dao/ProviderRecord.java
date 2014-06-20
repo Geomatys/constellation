@@ -29,7 +29,6 @@ import java.io.StringReader;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import org.constellation.admin.ConfigurationEngine;
 import org.opengis.parameter.GeneralParameterDescriptor;
 
 /**

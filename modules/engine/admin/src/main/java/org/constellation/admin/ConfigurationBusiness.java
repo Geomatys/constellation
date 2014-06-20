@@ -3,18 +3,35 @@ package org.constellation.admin;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import javax.xml.bind.JAXBException;
+import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.ConfigDirectory;
+import org.constellation.engine.register.MetadataIOUtils;
+import org.constellation.engine.register.Property;
+import org.constellation.engine.register.Service;
+import org.constellation.engine.register.repository.PropertyRepository;
+import org.constellation.engine.register.repository.ServiceRepository;
+import org.constellation.utils.CstlMetadatas;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ConfigurationBusiness {
+
     private static final Logger LOGGER = Logging.getLogger(ConfigurationBusiness.class);
 
+    public static final String SERVICES_URL_KEY = "services.url";
+     
+    @Autowired
+    private PropertyRepository propertyRepository;
+    
+    @Autowired
+    private ServiceRepository serviceRepository;
 
     public File getConfigurationDirectory() {
         return ConfigDirectory.getConfigDirectory();
@@ -24,12 +41,34 @@ public class ConfigurationBusiness {
         return ConfigDirectory.getDataDirectory();
     }
 
-    public static String getProperty(final String key) {
-        return ConfigurationEngine.getConstellationProperty(key, null);
+    public String getProperty(final String key) {
+        return propertyRepository.getValue(key, null);
     }
     
-    public static void setProperty(final String key, final String value) {
-        ConfigurationEngine.setConstellationProperty(key, value);
+    public void setProperty(final String key, final String value) {
+        propertyRepository.save(new Property(key, value));
+        // update metadata when service URL key is updated
+            if (SERVICES_URL_KEY.equals(key)) {
+                updateServiceUrlForMetadata(value);
+            }
+    }
+    
+    private void updateServiceUrlForMetadata(final String url) {
+        try {
+            final List<Service> records = serviceRepository.findAll();
+            for (Service record : records) {
+                if (record.getMetadata() != null) {
+                    final DefaultMetadata servMeta = MetadataIOUtils.unmarshallMetadata(record.getMetadata());
+                    CstlMetadatas.updateServiceMetadataURL(record.getIdentifier(), record.getType(), url, servMeta);
+                    final String xml = MetadataIOUtils.marshallMetadataToString(servMeta);
+                    record.setMetadataId(servMeta.getFileIdentifier());
+                    record.setMetadata(xml);
+                    serviceRepository.save(record);
+                }
+            }
+        } catch (JAXBException ex) {
+            LOGGER.log(Level.WARNING, "An error occurred updating service URL", ex);
+        } 
     }
     
     public static boolean setConfigPath(final String path) {

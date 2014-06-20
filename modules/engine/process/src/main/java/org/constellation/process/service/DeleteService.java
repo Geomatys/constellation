@@ -18,12 +18,8 @@
  */
 package org.constellation.process.service;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.process.AbstractCstlProcess;
-import org.constellation.ws.WSEngine;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;

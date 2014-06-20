@@ -65,6 +65,9 @@ public class AdminRest {
     private ServiceRepository serviceRepository;
     @Inject
     private LayerRepository layerRepository;
+    
+    @Inject
+    private ConfigurationBusiness configurationBusiness;
 
     /**
      * service to return available service list
@@ -115,7 +118,7 @@ public class AdminRest {
     @GET
     @Path("/property/{key}")
     public Response getKey(@PathParam("key") String key) throws CstlServiceException {
-        return Response.ok(new SimpleValue(ConfigurationBusiness.getProperty(key))).build();
+        return Response.ok(new SimpleValue(configurationBusiness.getProperty(key))).build();
     }
 
     /**
@@ -128,7 +131,7 @@ public class AdminRest {
     @POST
     @Path("/property/{key}")
     public Response setKey(@PathParam("key") String key, final SimpleValue value) throws CstlServiceException {
-        ConfigurationBusiness.setProperty(key, value.getValue());
+        configurationBusiness.setProperty(key, value.getValue());
         return Response.ok(new AcknowlegementType(CommonConstants.SUCCESS, "the key have been set")).build();
     }
 

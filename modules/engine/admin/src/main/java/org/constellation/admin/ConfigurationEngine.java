@@ -22,7 +22,6 @@ package org.constellation.admin;
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -30,7 +29,6 @@ import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -41,32 +39,21 @@ import javax.xml.namespace.QName;
 
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.logging.Logging;
-import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.dao.DataRecord;
-import org.constellation.admin.dao.LayerRecord;
 import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.admin.dao.Record;
-import org.constellation.admin.dao.SensorRecord;
 import org.constellation.admin.dao.ServiceRecord;
 import org.constellation.admin.dao.Session;
-import org.constellation.admin.dao.StyleRecord;
 import org.constellation.admin.dao.TaskRecord;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.configuration.DataBrief;
-import org.constellation.configuration.ServiceProtocol;
-import org.constellation.configuration.StyleBrief;
-import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.dto.Service;
 import org.constellation.engine.register.ConfigurationService;
 import org.constellation.engine.register.MetadataIOUtils;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.security.NoSecurityManagerException;
 import org.constellation.security.SecurityManager;
 import org.constellation.util.Util;
 import org.constellation.utils.CstlMetadatas;
-import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.FileUtilities;
-import org.opengis.parameter.GeneralParameterValue;
 
 /**
  * @author Guilhem Legal (Geomatys)

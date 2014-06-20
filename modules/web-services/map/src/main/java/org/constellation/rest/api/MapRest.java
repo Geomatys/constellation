@@ -27,7 +27,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.sis.util.logging.Logging;
-import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.DataBusiness;
 import org.constellation.configuration.*;
 import org.constellation.dto.AddLayer;

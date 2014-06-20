@@ -19,7 +19,7 @@
 package org.constellation.metadata.io.internal;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,41 +27,33 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-
-// XML dependencies
+import javax.inject.Inject;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
-
-// constellation dependencies
+import org.apache.sis.xml.Namespaces;
+import org.constellation.admin.MetadataBusiness;
 import org.constellation.generic.database.Automatic;
-import org.constellation.metadata.io.CSWMetadataReader;
-import org.constellation.metadata.io.MetadataIoException;
-import org.constellation.metadata.io.MetadataType;
-import org.constellation.util.NodeUtilities;
-import org.constellation.metadata.io.DomMetadataReader;
 
 import static org.constellation.metadata.CSWQueryable.*;
 
 // Geotoolkit dependencies
+import org.constellation.metadata.io.CSWMetadataReader;
+import org.constellation.metadata.io.DomMetadataReader;
+import org.constellation.metadata.io.ElementSetType;
+import org.constellation.metadata.io.MetadataIoException;
+import org.constellation.metadata.io.MetadataType;
+import org.constellation.util.NodeUtilities;
 import org.geotoolkit.csw.xml.DomainValues;
+import static org.geotoolkit.csw.xml.TypeNames.*;
 import org.geotoolkit.csw.xml.v202.DomainValuesType;
 import org.geotoolkit.csw.xml.v202.ListOfValuesType;
-
-import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory.*;
 import static org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory.*;
-import static org.geotoolkit.csw.xml.TypeNames.*;
-
-// Apache SIS dependencies
-import org.apache.sis.xml.Namespaces;
-import org.constellation.admin.ConfigurationEngine;
-import org.constellation.metadata.io.ElementSetType;
-
-
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -77,6 +69,9 @@ import org.w3c.dom.Node;
 public class InternalMetadataReader extends DomMetadataReader implements CSWMetadataReader {
 
     private final boolean displayServiceMetadata = false;
+    
+    @Inject
+    private MetadataBusiness metadataBusiness;
     
     /**
      * Build a new CSW File Reader.
@@ -119,15 +114,15 @@ public class InternalMetadataReader extends DomMetadataReader implements CSWMeta
      */
     @Override
     public Node getMetadata(final String identifier, final MetadataType mode, final ElementSetType type, final List<QName> elementName) throws MetadataIoException {
-        final InputStream metadataStream = ConfigurationEngine.loadIsoMetadata(identifier);
-        if (metadataStream != null) {
+        final String metadataString = metadataBusiness.searchMetadata(identifier, displayServiceMetadata);
+        if (metadataString != null) {
             final MetadataType metadataMode;
             try {
-                metadataMode = getMetadataType(metadataStream, true);
+                metadataMode = getMetadataType(new StringReader(metadataString), true);
             } catch (IOException | XMLStreamException ex) {
                 throw new MetadataIoException(ex);
             }
-            final Node metadataNode = getNodeFromStream(metadataStream);
+            final Node metadataNode = getNodeFromReader(new StringReader(metadataString));
 
             if (metadataMode ==  MetadataType.ISO_19115 && mode == MetadataType.DUBLINCORE) {
                 return translateISOtoDCNode(metadataNode, type, elementName);
@@ -142,7 +137,7 @@ public class InternalMetadataReader extends DomMetadataReader implements CSWMeta
 
     @Override
     public boolean existMetadata(final String identifier) throws MetadataIoException {
-        return ConfigurationEngine.existInternalMetadata(identifier, displayServiceMetadata);
+        return metadataBusiness.existInternalMetadata(identifier, displayServiceMetadata);
     }
     
     private Node translateISOtoDCNode(final Node metadata, final ElementSetType type, final List<QName> elementName) throws MetadataIoException  {
@@ -401,17 +396,17 @@ public class InternalMetadataReader extends DomMetadataReader implements CSWMeta
     @Override
     public List<Node> getAllEntries() throws MetadataIoException {
         final List<Node> result = new ArrayList<>();
-        final List<String> metadataIds = ConfigurationEngine.getInternalMetadataIds(displayServiceMetadata);
+        final List<String> metadataIds = metadataBusiness.getInternalMetadataIds(displayServiceMetadata);
         for (String metadataID : metadataIds) {
-            final InputStream stream = ConfigurationEngine.loadIsoMetadata(metadataID);
-            result.add(getNodeFromStream(stream));
+            final String meta = metadataBusiness.searchMetadata(metadataID, displayServiceMetadata);
+            result.add(getNodeFromReader(new StringReader(meta)));
         }
         return result;
     }
     
    @Override
     public int getEntryCount() throws MetadataIoException {
-        return ConfigurationEngine.getInternalMetadataIds(displayServiceMetadata).size();
+        return metadataBusiness.getInternalMetadataIds(displayServiceMetadata).size();
     }
 
     /**
@@ -419,12 +414,12 @@ public class InternalMetadataReader extends DomMetadataReader implements CSWMeta
      */
     @Override
     public List<String> getAllIdentifiers() throws MetadataIoException {
-        return ConfigurationEngine.getInternalMetadataIds(displayServiceMetadata);
+        return metadataBusiness.getInternalMetadataIds(displayServiceMetadata);
     }
 
     @Override
     public Iterator<String> getIdentifierIterator() throws MetadataIoException {
-        return ConfigurationEngine.getInternalMetadataIds(displayServiceMetadata).iterator();
+        return metadataBusiness.getInternalMetadataIds(displayServiceMetadata).iterator();
     }
 
     /**

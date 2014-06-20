@@ -23,31 +23,21 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
-import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef;
 //import org.constellation.admin.util.IOUtilities;
 import org.constellation.configuration.DataBrief;
-import org.constellation.configuration.Layer;
-import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.ServiceStatus;
-import org.constellation.configuration.Source;
 import org.constellation.engine.register.ConfigurationService;
 import org.constellation.engine.register.ConstellationPersistenceException;
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.MetadataIOUtils;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.ServiceExtraConfig;
@@ -56,15 +46,12 @@ import org.constellation.engine.register.repository.LayerRepository;
 import org.constellation.engine.register.repository.PropertyRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
-import org.constellation.utils.CstlMetadatas;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Maps;
 
 @Component
 public class JooqConfigurationService implements ConfigurationService {
