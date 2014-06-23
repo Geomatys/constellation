@@ -122,7 +122,7 @@ public class SOSWorkerInitialisationTest implements ApplicationContextAware {
         /**
          * Test 2: An empty configuration file.
          */
-        service = serviceRepository.findByIdentifierAndType("default", "SOS");
+        service = serviceRepository.findByIdentifierAndType("default", "sos");
         service.setConfig("");
         serviceRepository.save(service);
         
@@ -150,7 +150,7 @@ public class SOSWorkerInitialisationTest implements ApplicationContextAware {
         m.marshal(request, sw);
         pool.recycle(m);
         
-        service = serviceRepository.findByIdentifierAndType("default", "SOS");
+        service = serviceRepository.findByIdentifierAndType("default", "sos");
         service.setConfig(sw.toString());
         serviceRepository.save(service);
 
@@ -174,7 +174,7 @@ public class SOSWorkerInitialisationTest implements ApplicationContextAware {
          */
         sw = new StringWriter();
         marshaller.marshal(new BDD(), sw);
-        service = serviceRepository.findByIdentifierAndType("default", "SOS");
+        service = serviceRepository.findByIdentifierAndType("default", "sos");
         service.setConfig(sw.toString());
         serviceRepository.save(service);
 
@@ -199,7 +199,7 @@ public class SOSWorkerInitialisationTest implements ApplicationContextAware {
         SOSConfiguration configuration = new SOSConfiguration();
         sw = new StringWriter();
         marshaller.marshal(configuration, sw);
-        service = serviceRepository.findByIdentifierAndType("default", "SOS");
+        service = serviceRepository.findByIdentifierAndType("default", "sos");
         service.setConfig(sw.toString());
         serviceRepository.save(service);
         
@@ -224,7 +224,7 @@ public class SOSWorkerInitialisationTest implements ApplicationContextAware {
         configuration = new SOSConfiguration(new Automatic(), null);
         sw = new StringWriter();
         marshaller.marshal(configuration, sw);
-        service = serviceRepository.findByIdentifierAndType("default", "SOS");
+        service = serviceRepository.findByIdentifierAndType("default", "sos");
         service.setConfig(sw.toString());
         serviceRepository.save(service);
 
@@ -249,7 +249,7 @@ public class SOSWorkerInitialisationTest implements ApplicationContextAware {
         configuration = new SOSConfiguration(new Automatic(), new Automatic());
         sw = new StringWriter();
         marshaller.marshal(configuration, sw);
-        service = serviceRepository.findByIdentifierAndType("default", "SOS");
+        service = serviceRepository.findByIdentifierAndType("default", "sos");
         service.setConfig(sw.toString());
         serviceRepository.save(service);
 
@@ -277,7 +277,7 @@ public class SOSWorkerInitialisationTest implements ApplicationContextAware {
 
         sw = new StringWriter();
         marshaller.marshal(configuration, sw);
-        service = serviceRepository.findByIdentifierAndType("default", "SOS");
+        service = serviceRepository.findByIdentifierAndType("default", "sos");
         service.setConfig(sw.toString());
         serviceRepository.save(service);
 

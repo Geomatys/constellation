@@ -65,7 +65,7 @@ public abstract class LayerWorker extends AbstractWorker {
         String defaultLanguageCandidate = null;
         
         try {
-            final Object obj = serviceBusiness.getConfiguration(specification.name(), id);
+            final Object obj = serviceBusiness.getConfiguration(specification.name().toLowerCase(), id);
             if (obj instanceof LayerContext) {
                 layerContext = (LayerContext) obj;
                 final String sec = layerContext.getSecurity();

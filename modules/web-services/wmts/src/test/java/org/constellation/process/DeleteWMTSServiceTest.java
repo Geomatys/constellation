@@ -39,7 +39,7 @@ public class DeleteWMTSServiceTest extends DeleteServiceTest {
     protected void createInstance(final String identifier) {
         try {
             final LayerContext configuration = new LayerContext();
-            serviceBusiness.create(serviceName, identifier, configuration, null);
+            serviceBusiness.create(serviceName.toLowerCase(), identifier, configuration, null);
         } catch (ConfigurationException ex) {
             LOGGER.log(Level.SEVERE, "Error while creating instance", ex);
         }
@@ -49,7 +49,7 @@ public class DeleteWMTSServiceTest extends DeleteServiceTest {
     @Override
     protected boolean checkInstanceExist(final String identifier) {
         try {
-            return serviceBusiness.getConfiguration(serviceName, identifier) != null;
+            return serviceBusiness.getConfiguration(serviceName.toLowerCase(), identifier) != null;
         } catch (ConfigurationException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
         }

@@ -153,6 +153,8 @@ public class CSWworkerTest implements ApplicationContextAware {
     protected static final Logger LOGGER = Logging.getLogger("org.constellation.metadata");
 
     protected boolean typeCheckUpdate = true;
+    
+    protected static boolean onlyIso = false;
 
     public static void fillPoolAnchor(AnchoredMarshallerPool pool) {
         try {
@@ -526,108 +528,110 @@ public class CSWworkerTest implements ApplicationContextAware {
         /*
          *  TEST 9 : getRecordById with ebrim 2.5 etadata.
          */
-        request = new GetRecordByIdType("CSW", "2.0.2", null,
-                MimeType.APPLICATION_XML, "urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", Arrays.asList("000068C3-3B49-C671-89CF-10A39BB1B652"));
-        result = (GetRecordByIdResponseType) worker.getRecordById(request);
+        if (!onlyIso) {
+            request = new GetRecordByIdType("CSW", "2.0.2", null,
+                    MimeType.APPLICATION_XML, "urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", Arrays.asList("000068C3-3B49-C671-89CF-10A39BB1B652"));
+            result = (GetRecordByIdResponseType) worker.getRecordById(request);
 
-        assertTrue(result != null);
-        assertTrue(result.getAny().size() == 1);
+            assertTrue(result != null);
+            assertTrue(result.getAny().size() == 1);
 
-        obj = result.getAny().get(0);
+            obj = result.getAny().get(0);
 
-        if (obj instanceof ExtrinsicObjectType) {
-            ExtrinsicObjectType eoResult =  (ExtrinsicObjectType) obj;
-            ExtrinsicObjectType expEoResult =  ((JAXBElement<ExtrinsicObjectType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/ebrim1.xml"))).getValue();
+            if (obj instanceof ExtrinsicObjectType) {
+                ExtrinsicObjectType eoResult =  (ExtrinsicObjectType) obj;
+                ExtrinsicObjectType expEoResult =  ((JAXBElement<ExtrinsicObjectType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/ebrim1.xml"))).getValue();
 
-            assertEquals(expEoResult, eoResult);
-        } else {
-            Node resultNode = (Node) obj;
-            Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/ebrim1.xml");
-            XMLComparator comparator = new XMLComparator(expResultNode, resultNode);
-            comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
-            comparator.compare();
-        }
+                assertEquals(expEoResult, eoResult);
+            } else {
+                Node resultNode = (Node) obj;
+                Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/ebrim1.xml");
+                XMLComparator comparator = new XMLComparator(expResultNode, resultNode);
+                comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
+                comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
+                comparator.compare();
+            }
 
-        /*
-         *  TEST 10 : getRecordById with ebrim 3.0 metadata.
-         */
-        request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
-                MimeType.APPLICATION_XML, "urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", Arrays.asList("urn:motiive:csw-ebrim"));
-        result = (GetRecordByIdResponseType) worker.getRecordById(request);
+            /*
+             *  TEST 10 : getRecordById with ebrim 3.0 metadata.
+             */
+            request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
+                    MimeType.APPLICATION_XML, "urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", Arrays.asList("urn:motiive:csw-ebrim"));
+            result = (GetRecordByIdResponseType) worker.getRecordById(request);
 
-        assertTrue(result != null);
-        assertTrue(result.getAny().size() == 1);
+            assertTrue(result != null);
+            assertTrue(result.getAny().size() == 1);
 
-        obj = result.getAny().get(0);
+            obj = result.getAny().get(0);
 
-        if (obj instanceof RegistryPackageType) {
-            RegistryPackageType rpResult =  (RegistryPackageType) obj;
+            if (obj instanceof RegistryPackageType) {
+                RegistryPackageType rpResult =  (RegistryPackageType) obj;
 
-            RegistryPackageType expRpResult =  ((JAXBElement<RegistryPackageType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/ebrim3.xml"))).getValue();
+                RegistryPackageType expRpResult =  ((JAXBElement<RegistryPackageType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/ebrim3.xml"))).getValue();
 
-            ebrimEquals(expRpResult, rpResult);
-        } else {
-            Node resultNode = (Node) obj;
-            Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/ebrim3.xml");
-            XMLComparator comparator = new XMLComparator(expResultNode, resultNode);
-            comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
-            comparator.compare();
-        }
+                ebrimEquals(expRpResult, rpResult);
+            } else {
+                Node resultNode = (Node) obj;
+                Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/ebrim3.xml");
+                XMLComparator comparator = new XMLComparator(expResultNode, resultNode);
+                comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
+                comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
+                comparator.compare();
+            }
 
-        /*
-         *  TEST 11 : getRecordById with native DC metadata.
-         */
-        request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
-                MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", Arrays.asList("urn:uuid:1ef30a8b-876d-4828-9246-dcbbyyiioo"));
-        result = (GetRecordByIdResponseType) worker.getRecordById(request);
+            /*
+             *  TEST 11 : getRecordById with native DC metadata.
+             */
+            request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
+                    MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", Arrays.asList("urn:uuid:1ef30a8b-876d-4828-9246-dcbbyyiioo"));
+            result = (GetRecordByIdResponseType) worker.getRecordById(request);
 
-        assertTrue(result != null);
-        assertTrue(result.getAny().size() == 1);
+            assertTrue(result != null);
+            assertTrue(result.getAny().size() == 1);
 
-        obj = result.getAny().get(0);
+            obj = result.getAny().get(0);
 
-        if (obj instanceof RecordType) {
-            RecordType dcResult =  (RecordType) obj;
-            RecordType dcexpResult =  (RecordType) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta13.xml"));
-            assertEquals(dcexpResult, dcResult);
-        } else if (obj instanceof Node) {
-            Node resultNode = (Node) obj;
-            Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta13.xml");
-            XMLComparator comparator = new XMLComparator(expResultNode, resultNode);
-            comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
-            comparator.compare();
-        } else {
-            fail("unexpected record type:" + obj);
-        }
+            if (obj instanceof RecordType) {
+                RecordType dcResult =  (RecordType) obj;
+                RecordType dcexpResult =  (RecordType) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta13.xml"));
+                assertEquals(dcexpResult, dcResult);
+            } else if (obj instanceof Node) {
+                Node resultNode = (Node) obj;
+                Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta13.xml");
+                XMLComparator comparator = new XMLComparator(expResultNode, resultNode);
+                comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
+                comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
+                comparator.compare();
+            } else {
+                fail("unexpected record type:" + obj);
+            }
 
-        /*
-         *  TEST 12 : getRecordById with native DC metadata applying a ElementSet Summary.
-         */
-        request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.SUMMARY),
-                MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", Arrays.asList("urn:uuid:1ef30a8b-876d-4828-9246-dcbbyyiioo"));
-        result = (GetRecordByIdResponseType) worker.getRecordById(request);
+            /*
+             *  TEST 12 : getRecordById with native DC metadata applying a ElementSet Summary.
+             */
+            request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.SUMMARY),
+                    MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", Arrays.asList("urn:uuid:1ef30a8b-876d-4828-9246-dcbbyyiioo"));
+            result = (GetRecordByIdResponseType) worker.getRecordById(request);
 
-        assertTrue(result != null);
-        assertTrue(result.getAny().size() == 1);
+            assertTrue(result != null);
+            assertTrue(result.getAny().size() == 1);
 
-        obj = result.getAny().get(0);
+            obj = result.getAny().get(0);
 
-        if (obj instanceof SummaryRecordType) {
-            SummaryRecordType dcResult =  (SummaryRecordType) obj;
-            SummaryRecordType dcexpResult =  (SummaryRecordType) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta13SDC.xml"));
-            assertEquals(dcexpResult, dcResult);
-        } else if (obj instanceof Node) {
-            Node resultNode = (Node) obj;
-            Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta13SDC.xml");
-            XMLComparator comparator = new XMLComparator(expResultNode, resultNode);
-            comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
-            comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
-            comparator.compare();
-        } else {
-            fail("unexpected record type:" + obj);
+            if (obj instanceof SummaryRecordType) {
+                SummaryRecordType dcResult =  (SummaryRecordType) obj;
+                SummaryRecordType dcexpResult =  (SummaryRecordType) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta13SDC.xml"));
+                assertEquals(dcexpResult, dcResult);
+            } else if (obj instanceof Node) {
+                Node resultNode = (Node) obj;
+                Node expResultNode = getOriginalMetadata("org/constellation/xml/metadata/meta13SDC.xml");
+                XMLComparator comparator = new XMLComparator(expResultNode, resultNode);
+                comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
+                comparator.ignoredAttributes.add("http://www.w3.org/2001/XMLSchema-instance:schemaLocation");
+                comparator.compare();
+            } else {
+                fail("unexpected record type:" + obj);
+            }
         }
 
         pool.recycle(unmarshaller);
@@ -1253,28 +1257,29 @@ public class CSWworkerTest implements ApplicationContextAware {
         query = new QueryType(typeNames, elementSetName, sortBy, constraint);
         request = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
 
-        result = (GetRecordsResponseType) worker.getRecords(request);
+        if (!onlyIso) {
+            result = (GetRecordsResponseType) worker.getRecords(request);
 
-        assertTrue(result.getSearchResults() != null);
-        assertTrue(result.getSearchResults().getElementSet().equals(ElementSetType.FULL));
-        assertEquals(1, result.getSearchResults().getAny().size());
-        assertEquals(1, result.getSearchResults().getNumberOfRecordsMatched());
-        assertEquals(1, result.getSearchResults().getNumberOfRecordsReturned());
-        assertEquals(0, result.getSearchResults().getNextRecord());
+            assertTrue(result.getSearchResults() != null);
+            assertTrue(result.getSearchResults().getElementSet().equals(ElementSetType.FULL));
+            assertEquals(1, result.getSearchResults().getAny().size());
+            assertEquals(1, result.getSearchResults().getNumberOfRecordsMatched());
+            assertEquals(1, result.getSearchResults().getNumberOfRecordsReturned());
+            assertEquals(0, result.getSearchResults().getNextRecord());
 
-        obj = result.getSearchResults().getAny().get(0);
-        if (obj instanceof JAXBElement) {
-            obj = ((JAXBElement) obj).getValue();
+            obj = result.getSearchResults().getAny().get(0);
+            if (obj instanceof JAXBElement) {
+                obj = ((JAXBElement) obj).getValue();
+            }
+
+            if (obj instanceof RecordType) {
+                RecordType recordResult = (RecordType) obj;
+                assertEquals(recordResult.getIdentifier().getContent().get(0), "urn:uuid:1ef30a8b-876d-4828-9246-dcbbyyiioo");
+            } else {
+                Node recordResult = (Node) obj;
+                assertEquals(NodeUtilities.getValuesFromPath(recordResult, "/csw:Record/dc:identifier").get(0), "urn:uuid:1ef30a8b-876d-4828-9246-dcbbyyiioo");
+            }
         }
-
-        if (obj instanceof RecordType) {
-            RecordType recordResult = (RecordType) obj;
-            assertEquals(recordResult.getIdentifier().getContent().get(0), "urn:uuid:1ef30a8b-876d-4828-9246-dcbbyyiioo");
-        } else {
-            Node recordResult = (Node) obj;
-            assertEquals(NodeUtilities.getValuesFromPath(recordResult, "/csw:Record/dc:identifier").get(0), "urn:uuid:1ef30a8b-876d-4828-9246-dcbbyyiioo");
-        }
-
         pool.recycle(unmarshaller);
     }
 
@@ -1631,7 +1636,9 @@ public class CSWworkerTest implements ApplicationContextAware {
 
         domainValues = new ArrayList<>();
         list = new ArrayList<>();
-        list.add("000068C3-3B49-C671-89CF-10A39BB1B652");
+        if (!onlyIso) {
+            list.add("000068C3-3B49-C671-89CF-10A39BB1B652");
+        }
         list.add("11325_158_19640418141800");
         list.add("39727_22_19750113062500");
         list.add("40510_145_19930221211500");
@@ -1639,9 +1646,11 @@ public class CSWworkerTest implements ApplicationContextAware {
         list.add("42292_9s_19900610041000");
         list.add("gov.noaa.nodc.ncddc. MODXXYYYYJJJ.L3_Mosaic_NOAA_GMX or MODXXYYYYJJJHHMMSS.L3_NOAA_GMX");
         list.add("mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4");
-        list.add("urn:motiive:csw-ebrim");
-        list.add("urn:uuid:1ef30a8b-876d-4828-9246-dcbbyyiioo");
-        list.add("urn:uuid:3e195454-42e8-11dd-8329-00e08157d076");
+        if (!onlyIso) {
+            list.add("urn:motiive:csw-ebrim");
+            list.add("urn:uuid:1ef30a8b-876d-4828-9246-dcbbyyiioo");
+            list.add("urn:uuid:3e195454-42e8-11dd-8329-00e08157d076");
+        }
         values = new ListOfValuesType(list);
         value  = new DomainValuesType(null, "identifier", values, METADATA_QNAME);
         domainValues.add(value);
@@ -1692,12 +1701,16 @@ public class CSWworkerTest implements ApplicationContextAware {
         list.add("90008411-2.ctd");
         list.add("90008411.ctd");
         list.add("92005711.ctd");
-        list.add("Feature Type Catalogue Extension Package");
+        if (!onlyIso) {
+            list.add("Feature Type Catalogue Extension Package");
+        }
         list.add("Sea surface temperature and history derived from an analysis of MODIS Level 3 data for the Gulf of Mexico");
         list.add("WMS Server for CORINE Land Cover France");
-        list.add("dcbbyyiioo");
-        list.add("ebrim1Title");
-        list.add("ebrim2Title");
+        if (!onlyIso) {
+            list.add("dcbbyyiioo");
+            list.add("ebrim1Title");
+            list.add("ebrim2Title");
+        }
         values = new ListOfValuesType(list);
         value  = new DomainValuesType(null, "title", values, METADATA_QNAME);
         domainValues.add(value);

@@ -91,7 +91,7 @@ public class SOSFactoryTest {
 
         final BDD bdd            = new BDD("org.postgresql.driver", "SomeUrl", "boby", "gary");
         final Automatic config   = new Automatic("postgrid", bdd);
-        final Map<String, Object> parameters = new HashMap<String, Object>();
+        final Map<String, Object> parameters = new HashMap<>();
         parameters.put(OMFactory.OBSERVATION_ID_BASE, "idbase");
         parameters.put(OMFactory.OBSERVATION_TEMPLATE_ID_BASE, "templateIdBase");
         parameters.put(OMFactory.SENSOR_ID_BASE, "sensorBase");

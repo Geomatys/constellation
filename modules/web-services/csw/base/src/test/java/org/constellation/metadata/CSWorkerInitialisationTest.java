@@ -128,7 +128,7 @@ public class CSWorkerInitialisationTest implements ApplicationContextAware {
         /**
          * Test 2: An empty configuration file.
          */
-        service = serviceRepository.findByIdentifierAndType("default", "CSW");
+        service = serviceRepository.findByIdentifierAndType("default", "csw");
         service.setConfig("");
         serviceRepository.save(service);
         
@@ -156,7 +156,7 @@ public class CSWorkerInitialisationTest implements ApplicationContextAware {
         m.marshal(request, sw);
         pool.recycle(m);
         
-        service = serviceRepository.findByIdentifierAndType("default", "CSW");
+        service = serviceRepository.findByIdentifierAndType("default", "csw");
         service.setConfig(sw.toString());
         serviceRepository.save(service);
         
@@ -185,7 +185,7 @@ public class CSWorkerInitialisationTest implements ApplicationContextAware {
         Marshaller tempMarshaller = JAXBContext.newInstance(UnknowObject.class, Automatic.class).createMarshaller();
         tempMarshaller.marshal(new UnknowObject(), sw);
         
-        service = serviceRepository.findByIdentifierAndType("default", "CSW");
+        service = serviceRepository.findByIdentifierAndType("default", "csw");
         service.setConfig(sw.toString());
         serviceRepository.save(service);
 
@@ -213,7 +213,7 @@ public class CSWorkerInitialisationTest implements ApplicationContextAware {
         Automatic configuration = new Automatic(null, s);
         tempMarshaller.marshal(configuration, sw);
         
-        service = serviceRepository.findByIdentifierAndType("default", "CSW");
+        service = serviceRepository.findByIdentifierAndType("default", "csw");
         service.setConfig(sw.toString());
         serviceRepository.save(service);
 
@@ -241,7 +241,7 @@ public class CSWorkerInitialisationTest implements ApplicationContextAware {
         configuration = new Automatic("whatever", s);
         tempMarshaller.marshal(configuration, sw);
         
-        service = serviceRepository.findByIdentifierAndType("default", "CSW");
+        service = serviceRepository.findByIdentifierAndType("default", "csw");
         service.setConfig(sw.toString());
         serviceRepository.save(service);
         
@@ -269,7 +269,7 @@ public class CSWorkerInitialisationTest implements ApplicationContextAware {
         configuration = new Automatic("mdweb", s);
         tempMarshaller.marshal(configuration, sw);
         
-        service = serviceRepository.findByIdentifierAndType("default", "CSW");
+        service = serviceRepository.findByIdentifierAndType("default", "csw");
         service.setConfig(sw.toString());
         serviceRepository.save(service);
 
@@ -296,7 +296,7 @@ public class CSWorkerInitialisationTest implements ApplicationContextAware {
         configuration = new Automatic("mdweb", new BDD());
         tempMarshaller.marshal(configuration, sw);
         
-        service = serviceRepository.findByIdentifierAndType("default", "CSW");
+        service = serviceRepository.findByIdentifierAndType("default", "csw");
         service.setConfig(sw.toString());
         serviceRepository.save(service);
         
@@ -323,7 +323,7 @@ public class CSWorkerInitialisationTest implements ApplicationContextAware {
         configuration = new Automatic("mdweb", new BDD(null, null, null, null));
         tempMarshaller.marshal(configuration, sw);
         
-        service = serviceRepository.findByIdentifierAndType("default", "CSW");
+        service = serviceRepository.findByIdentifierAndType("default", "csw");
         service.setConfig(sw.toString());
         serviceRepository.save(service);
 
@@ -350,7 +350,7 @@ public class CSWorkerInitialisationTest implements ApplicationContextAware {
         configuration = new Automatic("mdweb", new BDD(null, "whatever", null, null));
         tempMarshaller.marshal(configuration, sw);
         
-        service = serviceRepository.findByIdentifierAndType("default", "CSW");
+        service = serviceRepository.findByIdentifierAndType("default", "csw");
         service.setConfig(sw.toString());
         serviceRepository.save(service);
 
@@ -377,7 +377,7 @@ public class CSWorkerInitialisationTest implements ApplicationContextAware {
         configuration = new Automatic("mdweb", new BDD("org.postgresql.Driver", "whatever", null, null));
         tempMarshaller.marshal(configuration, sw);
         
-        service = serviceRepository.findByIdentifierAndType("default", "CSW");
+        service = serviceRepository.findByIdentifierAndType("default", "csw");
         service.setConfig(sw.toString());
         serviceRepository.save(service);
 

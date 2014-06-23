@@ -78,7 +78,7 @@ public abstract class ServiceProcessTest extends AbstractProcessTest {
 
     protected static void deleteInstance(final ServiceBusiness serviceBusiness, String identifier) {
         try {
-            serviceBusiness.delete(serviceName, identifier);
+            serviceBusiness.delete(serviceName.toLowerCase(), identifier);
             if (WSEngine.getWorkersMap(serviceName) != null) {
                 WSEngine.getWorkersMap(serviceName).remove(identifier);
             }

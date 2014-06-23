@@ -93,6 +93,7 @@ public abstract class CreateMapServiceTest extends AbstractMapServiceTest {
             final LayerContext conf = new LayerContext();
             conf.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
             createCustomInstance("createInstance15", conf);
+            
             //create
             ParameterValueGroup in = desc.getInputDescriptor().createValue();
             in.parameter(CreateServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);

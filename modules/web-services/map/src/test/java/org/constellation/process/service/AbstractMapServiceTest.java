@@ -46,7 +46,7 @@ public abstract class AbstractMapServiceTest extends ServiceProcessTest {
     protected void createInstance(final String identifier, LayerContext context) {
         final LayerContext configuration = context != null ? context : new LayerContext();
         try {
-            serviceBusiness.create(serviceName, identifier, configuration, null);
+            serviceBusiness.create(serviceName.toLowerCase(), identifier, configuration, null);
         } catch (ConfigurationException ex) {
             LOGGER.log(Level.SEVERE, "Error while creating instance", ex);
         }
@@ -56,7 +56,7 @@ public abstract class AbstractMapServiceTest extends ServiceProcessTest {
     @Override
     protected boolean checkInstanceExist(final String identifier) {
         try {
-            return serviceBusiness.getConfiguration(serviceName, identifier) != null;
+            return serviceBusiness.getConfiguration(serviceName.toLowerCase(), identifier) != null;
         } catch (ConfigurationException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
         }
@@ -71,7 +71,7 @@ public abstract class AbstractMapServiceTest extends ServiceProcessTest {
      */
     protected void createCustomInstance(final String identifier, LayerContext context) {
         try {
-            serviceBusiness.create(serviceName, identifier, context, null);
+            serviceBusiness.create(serviceName.toLowerCase(), identifier, context, null);
         }  catch (ConfigurationException ex) {
             LOGGER.log(Level.SEVERE, "Error while creating custom instance", ex);
         }
@@ -85,7 +85,7 @@ public abstract class AbstractMapServiceTest extends ServiceProcessTest {
     protected  LayerContext getConfig(final String identifier) {
         LayerContext context = null;
         try {
-            context = (LayerContext) serviceBusiness.getConfiguration(serviceName, identifier);
+            context = (LayerContext) serviceBusiness.getConfiguration(serviceName.toLowerCase(), identifier);
         } catch (ConfigurationException ex) {
             LOGGER.log(Level.SEVERE, "Error while getting configuration", ex);
         }

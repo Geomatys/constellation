@@ -214,7 +214,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
                           COUNTRIES_DATA_REF.getProviderOrServiceId(),
                           null, 
                           "addLayer3", 
-                          serviceName, 
+                          serviceName.toLowerCase(), 
                           layer);
         
 
@@ -235,7 +235,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
 
         assertNotNull(outputLayer);
         
-        final List<Layer> layers = layerBusiness.getLayers(serviceName, "addLayer3", null);
+        final List<Layer> layers = layerBusiness.getLayers(serviceName.toLowerCase(), "addLayer3", null);
         assertFalse(layers.isEmpty());
         assertTrue(layers.size() == 1);
         assertTrue(outputLayer.getGetFeatureInfoCfgs().size() > 0); //default generic GetFeatureInfo
@@ -271,7 +271,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
                           COUNTRIES_DATA_REF.getProviderOrServiceId(),
                           null, 
                           "addLayer5", 
-                          serviceName, 
+                          serviceName.toLowerCase(), 
                           layer1);
         
         Layer layer2 = new Layer(new QName(COUNTRIES_DATA_REF.getLayerId().getNamespaceURI(), "city"));
@@ -280,7 +280,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
                           COUNTRIES_DATA_REF.getProviderOrServiceId(),
                           null, 
                           "addLayer5", 
-                          serviceName, 
+                          serviceName.toLowerCase(), 
                           layer2);
         
         

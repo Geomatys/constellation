@@ -123,7 +123,7 @@ public class ConfigurationEngine {
         Session session = null;
         try {
             session = EmbeddedDatabase.createSession();
-            final ServiceRecord rec = session.readService(identifier,serviceType);
+            final ServiceRecord rec = session.readService(identifier,serviceType.toLowerCase());
             if (rec != null) {
                 final InputStream is = rec.getMetadata(language);
                 if (is != null) {

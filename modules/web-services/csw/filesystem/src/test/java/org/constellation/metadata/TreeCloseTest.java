@@ -30,6 +30,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
 import org.constellation.generic.database.Automatic;
 import static org.constellation.metadata.FileSystemCSWworkerTest.writeDataFile;
 import org.constellation.test.utils.SpringTestRunner;
@@ -48,8 +49,13 @@ import org.geotoolkit.ogc.xml.v110.SortByType;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.context.ContextConfiguration;
 import org.w3c.dom.Node;
 
 /**
@@ -58,44 +64,60 @@ import org.w3c.dom.Node;
  * @author Guilhem Legal (Geomatys)
  */
 @RunWith(SpringTestRunner.class)
-public class TreeCloseTest {
+@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+public class TreeCloseTest implements ApplicationContextAware {
+
+    protected ApplicationContext applicationContext;
+    
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
 
     @Inject
     private ServiceBusiness serviceBusiness;
     
     private static CSWworker worker;
 
+    private static File dataDirectory;
+    
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+        deleteTemporaryFile();
+            
+        final File configDir = ConfigurationEngine.setupTestEnvironement("TreeCloseTest");
+
+        File CSWDirectory  = new File(configDir, "CSW");
+        CSWDirectory.mkdir();
+        final File instDirectory = new File(CSWDirectory, "default");
+        instDirectory.mkdir();
+
+        //we write the data files
+        dataDirectory = new File(instDirectory, "data");
+        dataDirectory.mkdir();
+        writeDataFile(dataDirectory, "meta1.xml", "42292_5p_19900609195600");
+        writeDataFile(dataDirectory, "meta2.xml", "42292_9s_19900610041000");
+        writeDataFile(dataDirectory, "meta3.xml", "39727_22_19750113062500");
+        writeDataFile(dataDirectory, "meta4.xml", "11325_158_19640418141800");
+        writeDataFile(dataDirectory, "meta5.xml", "40510_145_19930221211500");
+    }
+    
     @PostConstruct
-    public void setUpClass() {
+    public void setUp() {
+        SpringHelper.setApplicationContext(applicationContext);
         try {
-            deleteTemporaryFile();
-            
-            final File configDir = ConfigurationEngine.setupTestEnvironement("TreeCloseTest");
-            
-            File CSWDirectory  = new File(configDir, "CSW");
-            CSWDirectory.mkdir();
-            final File instDirectory = new File(CSWDirectory, "default");
-            instDirectory.mkdir();
-            
-            //we write the data files
-            File dataDirectory = new File(instDirectory, "data");
-            dataDirectory.mkdir();
-            writeDataFile(dataDirectory, "meta1.xml", "42292_5p_19900609195600");
-            writeDataFile(dataDirectory, "meta2.xml", "42292_9s_19900610041000");
-            writeDataFile(dataDirectory, "meta3.xml", "39727_22_19750113062500");
-            writeDataFile(dataDirectory, "meta4.xml", "11325_158_19640418141800");
-            writeDataFile(dataDirectory, "meta5.xml", "40510_145_19930221211500");
-            
-            //we write the configuration file
-            Automatic configuration = new Automatic("filesystem", dataDirectory.getPath());
-            configuration.setProfile("discovery");
-            configuration.putParameter("transactionSecurized", "false");
-            configuration.putParameter("shiroAccessible", "false");
-            
-            serviceBusiness.create("CSW", "default", configuration, null);
-            
-            worker = new CSWworker("default");
-            worker.setLogLevel(Level.FINER);
+            if (!serviceBusiness.getServiceIdentifiers("csw").contains("default")) {
+                //we write the configuration file
+                Automatic configuration = new Automatic("filesystem", dataDirectory.getPath());
+                configuration.setProfile("discovery");
+                configuration.putParameter("transactionSecurized", "false");
+                configuration.putParameter("shiroAccessible", "false");
+
+                serviceBusiness.create("csw", "default", configuration, null);
+
+                worker = new CSWworker("default");
+                worker.setLogLevel(Level.FINER);
+            }
         } catch (Exception ex) {
             Logger.getLogger(TreeCloseTest.class.getName()).log(Level.SEVERE, null, ex);
         }

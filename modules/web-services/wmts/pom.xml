@@ -116,6 +116,18 @@
        <version>${project.version}</version>
        <scope>test</scope>
     </dependency>
+    <dependency>
+        <groupId>org.constellation.engine.register</groupId>
+        <artifactId>cstl-register-jooq</artifactId>
+        <version>${project.version}</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.constellation.engine</groupId>
+        <artifactId>cstl-engine-spring-security</artifactId>
+        <version>${project.version}</version>
+        <scope>test</scope>
+    </dependency>
     <!-- for debugging, netcdf ifremer readers -->
     <!--<dependency>
       <groupId>fr.ifremer.seagrid</groupId>

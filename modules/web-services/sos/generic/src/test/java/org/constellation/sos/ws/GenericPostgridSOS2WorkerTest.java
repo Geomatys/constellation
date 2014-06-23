@@ -38,6 +38,8 @@ import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
+import static org.constellation.sos.ws.SOSWorkerTest.worker;
 import org.constellation.test.utils.SpringTestRunner;
 
 import org.junit.*;
@@ -55,23 +57,30 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
     @Inject
     private ServiceBusiness serviceBusiness;
     
-    @PostConstruct
-    public void setUpClass() {
+    private static String url;
+    
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+        url = "jdbc:derby:memory:GPGTest2;create=true";
+        ds = new DefaultDataSource(url);
 
+        Connection con = ds.getConnection();
+        DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
+        sr.run(Util.getResourceAsStream("org/constellation/data/om2/structure_observations.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data-om2.sql"));
+
+        ConfigurationEngine.setupTestEnvironement("GPGSOSWorkerTest");
+
+    }
+    
+    @PostConstruct
+    public void setUp() {
+        SpringHelper.setApplicationContext(applicationContext);
         try {
-            final String url = "jdbc:derby:memory:GPGTest2;create=true";
-            ds = new DefaultDataSource(url);
-            
-            Connection con = ds.getConnection();
-            DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
-            sr.run(Util.getResourceAsStream("org/constellation/observation/structure_observations.sql"));
-            sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
-            
-            ConfigurationEngine.setupTestEnvironement("GPGSOSWorkerTest");
             
             MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
             Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-            
+        
             //we write the configuration file
             Automatic SMLConfiguration = new Automatic();
             SMLConfiguration.setFormat("nosml");
@@ -93,12 +102,22 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
             configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
             configuration.getParameters().put("transactionSecurized", "false");
             
-            serviceBusiness.create("SOS", "default", configuration, null);
-            
-            init();
-            worker = new SOSworker("default");
-            worker.setServiceUrl(URL);
-            worker.setLogLevel(Level.FINER);
+            if (!serviceBusiness.getServiceIdentifiers("sos").contains("default")) {
+                serviceBusiness.create("sos", "default", configuration, null);
+                init();
+                worker = new SOSworker("default");
+                worker.setServiceUrl(URL);
+                worker.setLogLevel(Level.FINER);
+            }  else if (worker == null) {
+                serviceBusiness.delete("sos", "default");
+                
+                serviceBusiness.create("sos", "default", configuration, null);
+
+                init();
+                worker = new SOSworker("default");
+                worker.setServiceUrl(URL);
+                worker.setLogLevel(Level.FINER);
+            }
         } catch (Exception ex) {
             Logger.getLogger(GenericPostgridSOS2WorkerTest.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -129,17 +148,6 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
         }
         ConfigurationEngine.shutdownTestEnvironement("GPGSOSWorkerTest");
     }
-
-
-
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
-    }
-
 
     /**
      * Tests the getcapabilities method

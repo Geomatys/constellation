@@ -59,7 +59,7 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
         final Instance instance = new Instance(service.getId(), identifier, serviceType, ServiceStatus.valueOf(service.getStatus()));
         Service metadata = null;
         try {
-            metadata = serviceBusiness.getInstanceMetadata(serviceType, identifier);
+            metadata = serviceBusiness.getInstanceMetadata(serviceType, identifier, null);
         } catch (ConfigurationException ignore) {
             // Do nothing.
         }

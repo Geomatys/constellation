@@ -50,7 +50,8 @@ public class GetConfigService extends AbstractCstlProcess {
         final String serviceType       = value(SERVICE_TYPE, inputParameters);
         final String identifier        = value(IDENTIFIER, inputParameters);
         try {
-            final Object obj = serviceBusiness.getConfiguration(serviceType, identifier);
+            serviceBusiness.ensureExistingInstance(serviceType.toLowerCase(), identifier);
+            final Object obj = serviceBusiness.getConfiguration(serviceType.toLowerCase(), identifier);
             getOrCreate(CONFIGURATION, outputParameters).setValue(obj);
         } catch (ConfigurationException ex) {
             throw new ProcessException(ex.getMessage(), this, ex);

@@ -39,6 +39,8 @@ import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
+import static org.constellation.sos.ws.SOS2WorkerTest.worker;
 import org.constellation.test.utils.SpringTestRunner;
 
 import org.junit.*;
@@ -56,29 +58,38 @@ public class OM2SOSWorkerTest extends SOSWorkerTest {
     @Inject
     private ServiceBusiness serviceBusiness;
     
+    private static String url;
+    
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+        url = "jdbc:derby:memory:OM2Test1;create=true";
+        ds = new DefaultDataSource(url);
+            
+        Connection con = ds.getConnection();
+
+        DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
+        sr.setEncoding("UTF-8");
+        sr.run(Util.getResourceAsStream("org/constellation/om2/structure_observations.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data-om2.sql"));
+
+
+        MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
+        Marshaller marshaller =  pool.acquireMarshaller();
+
+        final File workingDirectory = ConfigurationEngine.setupTestEnvironement("OM2SOSWorkerTest");
+
+        File CSWDirectory  = new File(workingDirectory, "SOS");
+        CSWDirectory.mkdir();
+        final File instDirectory = new File(CSWDirectory, "default");
+        instDirectory.mkdir();
+        
+        pool.recycle(marshaller);
+    }
+    
     @PostConstruct
-    public void setUpClass() {
+    public void setUp() {
+        SpringHelper.setApplicationContext(applicationContext);
         try {
-            final String url = "jdbc:derby:memory:OM2Test1;create=true";
-            ds = new DefaultDataSource(url);
-            
-            Connection con = ds.getConnection();
-            
-            DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
-            sr.setEncoding("UTF-8");
-            sr.run(Util.getResourceAsStream("org/constellation/om2/structure_observations.sql"));
-            sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data-om2.sql"));
-            
-            
-            MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
-            Marshaller marshaller =  pool.acquireMarshaller();
-            
-            final File workingDirectory = ConfigurationEngine.setupTestEnvironement("OM2SOSWorkerTest");
-            
-            File CSWDirectory  = new File(workingDirectory, "SOS");
-            CSWDirectory.mkdir();
-            final File instDirectory = new File(CSWDirectory, "default");
-            instDirectory.mkdir();
             
             //we write the configuration file
             Automatic SMLConfiguration = new Automatic();
@@ -98,13 +109,20 @@ public class OM2SOSWorkerTest extends SOSWorkerTest {
             configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
             configuration.getParameters().put("transactionSecurized", "false");
             
-            serviceBusiness.create("SOS", "default", configuration, null);
-            
-            pool.recycle(marshaller);
-            init();
-            worker = new SOSworker("default");
-            worker.setServiceUrl(URL);
-            worker.setLogLevel(Level.FINER);
+            if (!serviceBusiness.getServiceIdentifiers("sos").contains("default")) {
+                serviceBusiness.create("sos", "default", configuration, null);
+                init();
+                worker = new SOSworker("default");
+                worker.setServiceUrl(URL);
+                worker.setLogLevel(Level.FINER);
+            } else if (worker == null) {
+                serviceBusiness.delete("sos", "default");
+                serviceBusiness.create("sos", "default", configuration, null);
+                init();
+                worker = new SOSworker("default");
+                worker.setServiceUrl(URL);
+                worker.setLogLevel(Level.FINER);
+            }
         } catch (Exception ex) {
             Logger.getLogger(OM2SOSWorkerTest.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -134,16 +152,6 @@ public class OM2SOSWorkerTest extends SOSWorkerTest {
             ds.shutdown();
         }
         ConfigurationEngine.shutdownTestEnvironement("OM2SOSWorkerTest");
-    }
-
-
-
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
     }
 
 

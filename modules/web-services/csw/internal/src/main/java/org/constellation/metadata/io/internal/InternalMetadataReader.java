@@ -35,6 +35,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import org.apache.sis.xml.Namespaces;
 import org.constellation.admin.MetadataBusiness;
+import org.constellation.admin.SpringHelper;
 import org.constellation.generic.database.Automatic;
 
 import static org.constellation.metadata.CSWQueryable.*;
@@ -85,6 +86,7 @@ public class InternalMetadataReader extends DomMetadataReader implements CSWMeta
      */
     public InternalMetadataReader(final Automatic configuration) throws MetadataIoException {
         super(true, false);
+        SpringHelper.injectDependencies(this);
         if (configuration.getEnableThread() != null && !configuration.getEnableThread().isEmpty()) {
             final boolean t = Boolean.parseBoolean(configuration.getEnableThread());
             if (t) {
@@ -118,7 +120,7 @@ public class InternalMetadataReader extends DomMetadataReader implements CSWMeta
         if (metadataString != null) {
             final MetadataType metadataMode;
             try {
-                metadataMode = getMetadataType(new StringReader(metadataString), true);
+                metadataMode = getMetadataType(new StringReader(metadataString), false);
             } catch (IOException | XMLStreamException ex) {
                 throw new MetadataIoException(ex);
             }

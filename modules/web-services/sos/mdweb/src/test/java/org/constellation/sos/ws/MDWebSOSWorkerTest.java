@@ -39,6 +39,8 @@ import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
+import static org.constellation.sos.ws.SOS2WorkerTest.worker;
 import org.constellation.test.utils.SpringTestRunner;
 
 import org.junit.*;
@@ -56,34 +58,43 @@ public class MDWebSOSWorkerTest extends SOSWorkerTest {
     
     private static DefaultDataSource ds2 = null;
 
+    private static String url2;
+    
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+        url2 = "jdbc:derby:memory:MDTest2;create=true";
+        ds2 = new DefaultDataSource(url2);
+
+        Connection con2 = ds2.getConnection();
+
+        DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con2);
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/model/mdw_schema_2.4_derby.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19115.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19119.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19108.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/data/defaultRecordSets.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/users/creation_user.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/SensorML_v2.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/profiles/inputLevels.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/sml-data_v2.sql"));
+
+        MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
+        Marshaller marshaller =  pool.acquireMarshaller();
+
+        final File configDir = ConfigurationEngine.setupTestEnvironement("MDSOSWorkerTest");
+
+        File CSWDirectory  = new File(configDir, "SOS");
+        CSWDirectory.mkdir();
+        final File instDirectory = new File(CSWDirectory, "default");
+        instDirectory.mkdir();
+        
+        pool.recycle(marshaller);
+    }
+    
     @PostConstruct
-    public void setUpClass() {
+    public void setUp() {
+        SpringHelper.setApplicationContext(applicationContext);
         try {
-            final String url2 = "jdbc:derby:memory:MDTest2;create=true";
-            ds2 = new DefaultDataSource(url2);
-            
-            Connection con2 = ds2.getConnection();
-            
-            DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con2);
-            sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/model/mdw_schema_2.4_derby.sql"));
-            sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19115.sql"));
-            sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19119.sql"));
-            sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19108.sql"));
-            sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/data/defaultRecordSets.sql"));
-            sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/users/creation_user.sql"));
-            sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/SensorML_v2.sql"));
-            sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/profiles/inputLevels.sql"));
-            sr.run(Util.getResourceAsStream("org/constellation/sql/sml-data_v2.sql"));
-            
-            MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
-            Marshaller marshaller =  pool.acquireMarshaller();
-            
-            final File configDir = ConfigurationEngine.setupTestEnvironement("MDSOSWorkerTest");
-            
-            File CSWDirectory  = new File(configDir, "SOS");
-            CSWDirectory.mkdir();
-            final File instDirectory = new File(CSWDirectory, "default");
-            instDirectory.mkdir();
             
             //we write the configuration file
             Automatic SMLConfiguration = new Automatic();
@@ -106,13 +117,25 @@ public class MDWebSOSWorkerTest extends SOSWorkerTest {
             configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
             configuration.getParameters().put("transactionSecurized", "false");
             
-            serviceBusiness.create("SOS", "default", configuration, null);
+            if (!serviceBusiness.getServiceIdentifiers("sos").contains("default")) {
+                serviceBusiness.create("sos", "default", configuration, null);
+                init();
+                worker = new SOSworker("default");
+                worker.setServiceUrl(URL);
+                worker.setLogLevel(Level.FINER);
             
-            pool.recycle(marshaller);
-            init();
-            worker = new SOSworker("default");
-            worker.setServiceUrl(URL);
-            worker.setLogLevel(Level.FINER);
+            } else if (worker == null) {
+                serviceBusiness.delete("sos", "default");
+                
+                serviceBusiness.create("sos", "default", configuration, null);
+
+                init();
+                worker = new SOSworker("default");
+                worker.setServiceUrl(URL);
+                worker.setLogLevel(Level.FINER);
+            }
+            
+            
         } catch (Exception ex) {
             Logger.getLogger(MDWebSOSWorkerTest.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -144,15 +167,6 @@ public class MDWebSOSWorkerTest extends SOSWorkerTest {
         ConfigurationEngine.shutdownTestEnvironement("MDSOSWorkerTest");
     }
 
-
-
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
-    }
 
     /**
      * Tests the DescribeSensor method

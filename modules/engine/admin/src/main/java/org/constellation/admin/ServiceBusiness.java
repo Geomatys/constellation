@@ -2,6 +2,7 @@ package org.constellation.admin;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
@@ -29,10 +30,12 @@ import org.constellation.engine.register.ConstellationRegistryRuntimeException;
 import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.ServiceExtraConfig;
+import org.constellation.engine.register.ServiceMetadata;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.security.SecurityManager;
+import org.constellation.util.Util;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
 import org.geotoolkit.process.ProcessException;
@@ -214,7 +217,7 @@ public class ServiceBusiness {
             if (WSEngine.serviceInstanceExist(serviceType, identifier)) {
                 buildWorkers(serviceType, identifier, closeFirst);
             } else {
-                start(identifier, serviceType);
+                start(serviceType, identifier);
             }
         }
      }
@@ -284,6 +287,8 @@ public class ServiceBusiness {
             if (instanceDir.isDirectory()) {
                 FileUtilities.deleteDirectory(instanceDir);
             }
+         } else {
+             throw new ConfigurationException("There is no instance:" + identifier + " to delete");
          }
      }
      
@@ -464,11 +469,26 @@ public class ServiceBusiness {
      * @throws TargetNotFoundException if the service with specified identifier does not exist
      * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
-    public org.constellation.dto.Service getInstanceMetadata(final String serviceType, final String identifier) throws ConfigurationException {
+    public org.constellation.dto.Service getInstanceMetadata(final String serviceType, final String identifier, final String language) throws ConfigurationException {
         this.ensureExistingInstance(serviceType, identifier);
         try {
-            // todo add language parameter
-            return ConfigurationEngine.readServiceMetadata(identifier, serviceType, null);
+            ServiceMetadata metadata = serviceRepository.findMetaDataForLangByIdentifierAndType(identifier, serviceType, language);
+            if (metadata == null) {
+                final InputStream in = Util.getResourceAsStream("org/constellation/xml/" + serviceType.toUpperCase()
+                        + "Capabilities.xml");
+                if (in != null) {
+                    final Unmarshaller u = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+                    org.constellation.dto.Service servMetadata = (org.constellation.dto.Service) u.unmarshal(in);
+                    GenericDatabaseMarshallerPool.getInstance().recycle(u);
+                    in.close();
+                    servMetadata.setIdentifier(identifier);
+                    return servMetadata;
+                } else {
+                    throw new IOException("Unable to find the capabilities skeleton from resource.");
+                }
+            } else {
+                return (org.constellation.dto.Service) getObjectFromString(metadata.getContent(), GenericDatabaseMarshallerPool.getInstance());
+            }
         } catch (JAXBException | IOException ex) {
             throw new ConfigurationException("The serviceMetadata.xml file can't be read.", ex);
         }

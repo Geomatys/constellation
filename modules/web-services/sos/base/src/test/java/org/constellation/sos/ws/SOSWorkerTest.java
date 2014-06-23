@@ -82,12 +82,24 @@ import org.geotoolkit.swes.xml.InsertSensorResponse;
 // JUnit dependencies
 import static org.junit.Assert.*;
 import org.opengis.observation.sampling.SamplingPoint;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.context.ContextConfiguration;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-public abstract class SOSWorkerTest {
+@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+public abstract class SOSWorkerTest implements ApplicationContextAware {
+
+    protected ApplicationContext applicationContext;
+    
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
 
     protected static SOSworker worker;
 

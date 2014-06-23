@@ -210,7 +210,7 @@ public class CSWworker extends AbstractWorker {
         isStarted = true;
         try {
             //we look if the configuration have been specified
-            final Object obj = serviceBusiness.getConfiguration(CSW, getId());
+            final Object obj = serviceBusiness.getConfiguration("csw", getId());
             if (obj instanceof Automatic) {
                 configuration = (Automatic) obj;
             } else {
@@ -521,7 +521,7 @@ public class CSWworker extends AbstractWorker {
         */
 
         // we load the skeleton capabilities
-        final Service skeleton = getStaticCapabilitiesObject("CSW", null);
+        final Service skeleton = getStaticCapabilitiesObject("csw", null);
         final AbstractCapabilities skeletonCapabilities = CSWConstants.createCapabilities("2.0.2", skeleton);
 
         //we prepare the response document

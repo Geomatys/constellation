@@ -130,7 +130,7 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
     public void setUp() {
         SpringHelper.setApplicationContext(applicationContext);
         try {
-            if (!serviceBusiness.getServiceIdentifiers("CSW").contains("default")) {
+            if (!serviceBusiness.getServiceIdentifiers("csw").contains("default")) {
                 final File configDir = ConfigurationEngine.setupTestEnvironement("MDCSWWorkerTest");
 
                 File CSWDirectory  = new File(configDir, "CSW");
@@ -149,7 +149,7 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
                 thBdd.setSchema("default");
                 configuration.setThesaurus(Arrays.asList(thBdd));
 
-                serviceBusiness.create("CSW", "default", configuration, null);
+                serviceBusiness.create("csw", "default", configuration, null);
 
                 pool = EBRIMMarshallerPool.getInstance();
                 //fillPoolAnchor((AnchoredMarshallerPool) pool);

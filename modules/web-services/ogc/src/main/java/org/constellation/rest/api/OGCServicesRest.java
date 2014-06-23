@@ -270,7 +270,7 @@ public final class OGCServicesRest {
             final Object config = um.unmarshal(configuration);
             GenericDatabaseMarshallerPool.getInstance().recycle(um);
             
-            final Service metadata = serviceBusiness.getInstanceMetadata(serviceType, id);
+            final Service metadata = serviceBusiness.getInstanceMetadata(serviceType, id, null);
             serviceBusiness.configure(serviceType, id, metadata, config);
         } catch (JAXBException ex) {
             throw new ConfigurationException("Error while unmarshalling configuration object.", ex);
@@ -319,7 +319,7 @@ public final class OGCServicesRest {
                 return ok(AcknowlegementType.failure("Unknown configuration object given, unable to update service configuration"));
             }
             final Object configObj = jsonUnmarshaller.unmarshalFromJSON(new StringReader(json), c);
-            final Service metadata = serviceBusiness.getInstanceMetadata(serviceType, id);
+            final Service metadata = serviceBusiness.getInstanceMetadata(serviceType, id, null);
             serviceBusiness.configure(serviceType, id, metadata, configObj);
         } catch (JAXBException | IOException e) {
             throw new ConfigurationException(e);
@@ -341,7 +341,7 @@ public final class OGCServicesRest {
     public Response getMetadata(final @PathParam("spec") String serviceType, final @PathParam("id") String id) throws ConfigurationException {
         serviceBusiness.ensureExistingInstance(serviceType, id);
         // todo add language parameter
-        return ok(serviceBusiness.getInstanceMetadata(serviceType, id));
+        return ok(serviceBusiness.getInstanceMetadata(serviceType, id, null));
     }
 
     /**

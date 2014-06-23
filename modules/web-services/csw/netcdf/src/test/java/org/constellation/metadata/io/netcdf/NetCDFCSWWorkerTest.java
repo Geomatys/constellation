@@ -33,6 +33,7 @@ import org.apache.sis.test.XMLComparator;
 import org.apache.sis.util.ComparisonMode;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.CSWworker;
 import org.constellation.metadata.CSWworkerTest;
@@ -66,38 +67,47 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
     @Inject
     private ServiceBusiness serviceBusiness;
     
+    private static File dataDirectory;
+    
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+        deleteTemporaryFile();
+        
+        final File configDir = ConfigurationEngine.setupTestEnvironement("NCCSWWorkerTest");
+            
+        File CSWDirectory  = new File(configDir, "CSW");
+        CSWDirectory.mkdir();
+        final File instDirectory = new File(CSWDirectory, "default");
+        instDirectory.mkdir();
+
+        //we write the data files
+        dataDirectory = new File(instDirectory, "data");
+        dataDirectory.mkdir();
+        writeDataFile(dataDirectory, "2005092200_sst_21-24.en.nc", "2005092200_sst_21-24.en");
+            
+    }
+    
     @PostConstruct
-    public void setUpClass() {
+    public void setUp() {
+        SpringHelper.setApplicationContext(applicationContext);
         try {
-            deleteTemporaryFile();
-            
-            final File configDir = ConfigurationEngine.setupTestEnvironement("NCCSWWorkerTest");
-            
-            File CSWDirectory  = new File(configDir, "CSW");
-            CSWDirectory.mkdir();
-            final File instDirectory = new File(CSWDirectory, "default");
-            instDirectory.mkdir();
-            
-            //we write the data files
-            File dataDirectory = new File(instDirectory, "data");
-            dataDirectory.mkdir();
-            writeDataFile(dataDirectory, "2005092200_sst_21-24.en.nc", "2005092200_sst_21-24.en");
-            
-            //we write the configuration file
-            Automatic configuration = new Automatic("netcdf", dataDirectory.getPath());
-            configuration.putParameter("transactionSecurized", "false");
-            configuration.putParameter("shiroAccessible", "false");
-            
-            serviceBusiness.create("CSW", "default", configuration, null);
-            
-            pool = EBRIMMarshallerPool.getInstance();
-            fillPoolAnchor((AnchoredMarshallerPool) pool);
-            
-            Unmarshaller u = pool.acquireUnmarshaller();
-            pool.recycle(u);
-            
-            worker = new CSWworker("default");
-            worker.setLogLevel(Level.FINER);
+            if (!serviceBusiness.getServiceIdentifiers("csw").contains("default")) {
+                //we write the configuration file
+                Automatic configuration = new Automatic("netcdf", dataDirectory.getPath());
+                configuration.putParameter("transactionSecurized", "false");
+                configuration.putParameter("shiroAccessible", "false");
+
+                serviceBusiness.create("csw", "default", configuration, null);
+
+                pool = EBRIMMarshallerPool.getInstance();
+                fillPoolAnchor((AnchoredMarshallerPool) pool);
+
+                Unmarshaller u = pool.acquireUnmarshaller();
+                pool.recycle(u);
+
+                worker = new CSWworker("default");
+                worker.setLogLevel(Level.FINER);
+            }
         } catch (Exception ex) {
             Logger.getLogger(NetCDFCSWWorkerTest.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -115,15 +125,6 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
         }
         ConfigurationEngine.shutdownTestEnvironement("NCCSWWorkerTest");
     }
-
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
-    }
-
 
     /**
      * Tests the getcapabilities method

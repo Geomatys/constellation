@@ -303,7 +303,7 @@ public class SOSworker extends AbstractWorker {
         // Database configuration
         try {
                 
-            final Object object = serviceBusiness.getConfiguration("SOS", id);
+            final Object object = serviceBusiness.getConfiguration("sos", id);
             if (object instanceof SOSConfiguration) {
                 configuration = (SOSConfiguration) object;
             } else {
@@ -623,7 +623,7 @@ public class SOSworker extends AbstractWorker {
         }
 
         // we load the skeleton capabilities
-        final Service skeleton = getStaticCapabilitiesObject("SOS", null);
+        final Service skeleton = getStaticCapabilitiesObject("sos", null);
         final Capabilities skeletonCapabilities = SOSConstants.createCapabilities(currentVersion, skeleton);
         
 

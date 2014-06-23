@@ -170,7 +170,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         }
         
         // we load the skeleton capabilities 
-        final Service skeleton = getStaticCapabilitiesObject("WMTS", null);
+        final Service skeleton = getStaticCapabilitiesObject("wmts", null);
         final Capabilities skeletonCapabilities = (Capabilities) WMTSConstant.createCapabilities("1.0.0", skeleton);
         
          //we prepare the response document

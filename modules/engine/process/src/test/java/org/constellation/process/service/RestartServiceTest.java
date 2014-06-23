@@ -49,7 +49,7 @@ public abstract class RestartServiceTest extends ServiceProcessTest {
      * Start all the existing  instance.
      */
     private void startAllInstance() {
-        final List<String> serviceIDs = serviceBusiness.getServiceIdentifiers(serviceName);
+        final List<String> serviceIDs = serviceBusiness.getServiceIdentifiers(serviceName.toLowerCase());
         for (String serviceID : serviceIDs) {
             startInstance(serviceID);
         }

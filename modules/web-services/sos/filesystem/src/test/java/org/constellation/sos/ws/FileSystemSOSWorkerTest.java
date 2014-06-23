@@ -38,6 +38,7 @@ import org.constellation.util.Util;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
 import org.constellation.test.utils.SpringTestRunner;
 
 
@@ -54,36 +55,43 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
     @Inject
     private ServiceBusiness serviceBusiness;
 
+    private static File instDirectory; 
+    
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+        MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
+        Marshaller marshaller =  pool.acquireMarshaller();
+
+        final File configDir = ConfigurationEngine.setupTestEnvironement("FSSOSWorkerTest");
+
+        File CSWDirectory  = new File(configDir, "SOS");
+        CSWDirectory.mkdir();
+        instDirectory = new File(CSWDirectory, "default");
+        instDirectory.mkdir();
+
+        File sensorDirectory = new File(instDirectory, "sensors");
+        sensorDirectory.mkdir();
+        writeCommonDataFile(sensorDirectory, "system.xml",    "urn:ogc:object:sensor:GEOM:1");
+        writeCommonDataFile(sensorDirectory, "component.xml", "urn:ogc:object:sensor:GEOM:2");
+        pool.recycle(marshaller);
+    }
+    
     @PostConstruct
-    public void setUpClass() {
+    public void setUp() {
+        SpringHelper.setApplicationContext(applicationContext);
         try {
-            MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
-            Marshaller marshaller =  pool.acquireMarshaller();
             
-            final File configDir = ConfigurationEngine.setupTestEnvironement("FSSOSWorkerTest");
-            
-            File CSWDirectory  = new File(configDir, "SOS");
-            CSWDirectory.mkdir();
-            final File instDirectory = new File(CSWDirectory, "default");
-            instDirectory.mkdir();
-            
-            File sensorDirectory = new File(instDirectory, "sensors");
-            sensorDirectory.mkdir();
-            writeCommonDataFile(sensorDirectory, "system.xml",    "urn:ogc:object:sensor:GEOM:1");
-            writeCommonDataFile(sensorDirectory, "component.xml", "urn:ogc:object:sensor:GEOM:2");
-            
-            //we write the configuration file
             Automatic SMLConfiguration = new Automatic();
             SMLConfiguration.setDataDirectory(instDirectory.getPath() + "/sensors");
-            
+
             Automatic OMConfiguration  = new Automatic();
             SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
             configuration.setObservationReaderType(DataSourceType.NONE);
             configuration.setObservationWriterType(DataSourceType.NONE);
             configuration.setObservationFilterType(DataSourceType.NONE);
-            
+
             configuration.setSMLType(DataSourceType.FILESYSTEM);
-            
+
             configuration.setPhenomenonIdBase("urn:ogc:def:phenomenon:GEOM:");
             configuration.setProfile("transactional");
             configuration.setObservationIdBase("urn:ogc:object:observation:GEOM:");
@@ -91,13 +99,27 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
             configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
             configuration.getParameters().put("transactionSecurized", "false");
             
-            serviceBusiness.create("SOS", "default", configuration, null);
-            
-            pool.recycle(marshaller);
-            init();
-            worker = new SOSworker("default");
-            worker.setServiceUrl(URL);
-            worker.setLogLevel(Level.FINER);
+            if (!serviceBusiness.getServiceIdentifiers("sos").contains("default")) {
+                //we write the configuration file
+                
+                serviceBusiness.create("sos", "default", configuration, null);
+
+                init();
+                worker = new SOSworker("default");
+                worker.setServiceUrl(URL);
+                worker.setLogLevel(Level.FINER);
+                
+            } else if (worker == null) {
+                serviceBusiness.delete("sos", "default");
+                
+                serviceBusiness.create("sos", "default", configuration, null);
+
+                init();
+                worker = new SOSworker("default");
+                worker.setServiceUrl(URL);
+                worker.setLogLevel(Level.FINER);
+                 
+            }
         } catch (Exception ex) {
             Logger.getLogger(FileSystemSOSWorkerTest.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -116,15 +138,6 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
             worker.destroy();
         }
         ConfigurationEngine.shutdownTestEnvironement("FSSOSWorkerTest");
-    }
-
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
-
     }
 
     public static void writeCommonDataFile(File dataDirectory, String resourceName, String identifier) throws IOException {

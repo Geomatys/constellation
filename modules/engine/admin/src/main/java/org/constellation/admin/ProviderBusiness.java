@@ -119,6 +119,14 @@ public class ProviderBusiness {
         final String metadataString = outputStream.toString();
         final Provider provider = providerRepository.findByIdentifierAndDomainId(providerIdentifier, domainId);
         provider.setMetadata(metadataString);
+        provider.setMetadataId(metadata.getFileIdentifier());
+        providerRepository.update(provider);
+    }
+    
+    public void updateMetadata(String providerIdentifier, Integer domainId, String metaId, String metadataXml) throws JAXBException {
+        final Provider provider = providerRepository.findByIdentifierAndDomainId(providerIdentifier, domainId);
+        provider.setMetadata(metadataXml);
+        provider.setMetadataId(metaId);
         providerRepository.update(provider);
     }
 }

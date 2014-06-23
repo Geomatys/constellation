@@ -32,6 +32,7 @@ import javax.xml.bind.Marshaller;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
@@ -53,117 +54,156 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
     @Inject
     private ServiceBusiness serviceBusiness;
 
+    private static File instDirectory; 
+    
+    
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+        MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
+        Marshaller marshaller =  pool.acquireMarshaller();
+
+        final File configDir = ConfigurationEngine.setupTestEnvironement("LUCSOSWorkerTest");
+
+        File SOSDirectory  = new File(configDir, "SOS");
+        SOSDirectory.mkdir();
+        instDirectory = new File(SOSDirectory, "default");
+        instDirectory.mkdir();
+
+        //we write the data files
+        File offeringDirectory = new File(instDirectory, "offerings");
+        offeringDirectory.mkdir();
+
+        File offeringV100Directory = new File(offeringDirectory, "1.0.0");
+        offeringV100Directory.mkdir();
+        writeDataFile(offeringV100Directory, "v100/offering-1.xml", "offering-allSensor");
+
+        File offeringV200Directory = new File(offeringDirectory, "2.0.0");
+        offeringV200Directory.mkdir();
+        writeDataFile(offeringV200Directory, "v200/offering-1.xml", "offering-1");
+        writeDataFile(offeringV200Directory, "v200/offering-2.xml", "offering-4");
+        writeDataFile(offeringV200Directory, "v200/offering-3.xml", "offering-3");
+        writeDataFile(offeringV200Directory, "v200/offering-4.xml", "offering-5");
+        writeDataFile(offeringV200Directory, "v200/offering-5.xml", "offering-2");
+        writeDataFile(offeringV200Directory, "v200/offering-6.xml", "offering-6");
+        writeDataFile(offeringV200Directory, "v200/offering-7.xml", "offering-7");
+        writeDataFile(offeringV200Directory, "v200/offering-8.xml", "offering-8");
+        writeDataFile(offeringV200Directory, "v200/offering-9.xml", "offering-9");
+        writeDataFile(offeringV200Directory, "v200/offering-10.xml", "offering-10");
+
+
+        File phenomenonDirectory = new File(instDirectory, "phenomenons");
+        phenomenonDirectory.mkdir();
+        writeDataFile(phenomenonDirectory, "phenomenon-depth.xml", "depth");
+        writeDataFile(phenomenonDirectory, "phenomenon-temp.xml",  "temperature");
+        writeDataFile(phenomenonDirectory, "phenomenon-depth-temp.xml",  "aggregatePhenomenon");
+
+        File featureDirectory = new File(instDirectory, "features");
+        featureDirectory.mkdir();
+        writeDataFile(featureDirectory, "v200/feature1.xml", "station-001");
+        writeDataFile(featureDirectory, "v200/feature2.xml", "station-002");
+        writeDataFile(featureDirectory, "v200/feature3.xml", "station-006");
+
+        File observationsDirectory = new File(instDirectory, "observations");
+        observationsDirectory.mkdir();
+        writeDataFile(observationsDirectory, "v200/observation1.xml", "urn:ogc:object:observation:GEOM:304");
+        writeDataFile(observationsDirectory, "v200/observation2.xml", "urn:ogc:object:observation:GEOM:305");
+        writeDataFile(observationsDirectory, "v200/observation3.xml", "urn:ogc:object:observation:GEOM:406");
+        writeDataFile(observationsDirectory, "v200/observation4.xml", "urn:ogc:object:observation:GEOM:307");
+        writeDataFile(observationsDirectory, "v200/observation5.xml", "urn:ogc:object:observation:GEOM:507");
+        writeDataFile(observationsDirectory, "v200/observation6.xml", "urn:ogc:object:observation:GEOM:801");
+
+        File observationTemplatesDirectory = new File(instDirectory, "observationTemplates");
+        observationTemplatesDirectory.mkdir();
+        writeDataFile(observationTemplatesDirectory, "v200/observationTemplate-3.xml", "urn:ogc:object:observation:template:GEOM:3");
+        writeDataFile(observationTemplatesDirectory, "v200/observationTemplate-4.xml", "urn:ogc:object:observation:template:GEOM:4");
+        writeDataFile(observationTemplatesDirectory, "observationTemplate-5.xml", "urn:ogc:object:observation:template:GEOM:5");
+        writeDataFile(observationTemplatesDirectory, "observationTemplate-7.xml", "urn:ogc:object:observation:template:GEOM:7");
+        writeDataFile(observationTemplatesDirectory, "observationTemplate-8.xml", "urn:ogc:object:observation:template:GEOM:8");
+
+        File sensorDirectory = new File(instDirectory, "sensors");
+        sensorDirectory.mkdir();
+        File sensor1         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:1.xml");
+        sensor1.createNewFile();
+        File sensor2         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:2.xml");
+        sensor2.createNewFile();
+        File sensor3         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:3.xml");
+        sensor3.createNewFile();
+        File sensor4         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:4.xml");
+        sensor4.createNewFile();
+        File sensor5         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:5.xml");
+        sensor5.createNewFile();
+        File sensor6         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:6.xml");
+        sensor6.createNewFile();
+        File sensor7         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:7.xml");
+        sensor7.createNewFile();
+        File sensor8         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:8.xml");
+        sensor8.createNewFile();
+        File sensor9         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:9.xml");
+        sensor9.createNewFile();
+        File sensor10        = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:10.xml");
+        sensor10.createNewFile();
+        pool.recycle(marshaller);
+    }
+    
     @PostConstruct
-    public void setUpClass() {
+    public void setUp() {
+        SpringHelper.setApplicationContext(applicationContext);
         try {
-            MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
-            Marshaller marshaller =  pool.acquireMarshaller();
             
-            final File configDir = ConfigurationEngine.setupTestEnvironement("LUCSOSWorkerTest");
-            
-            File SOSDirectory  = new File(configDir, "SOS");
-            SOSDirectory.mkdir();
-            final File instDirectory = new File(SOSDirectory, "default");
-            instDirectory.mkdir();
-            
-            //we write the data files
-            File offeringDirectory = new File(instDirectory, "offerings");
-            offeringDirectory.mkdir();
-            
-            File offeringV100Directory = new File(offeringDirectory, "1.0.0");
-            offeringV100Directory.mkdir();
-            writeDataFile(offeringV100Directory, "v100/offering-1.xml", "offering-allSensor");
-            
-            File offeringV200Directory = new File(offeringDirectory, "2.0.0");
-            offeringV200Directory.mkdir();
-            writeDataFile(offeringV200Directory, "v200/offering-1.xml", "offering-1");
-            writeDataFile(offeringV200Directory, "v200/offering-2.xml", "offering-4");
-            writeDataFile(offeringV200Directory, "v200/offering-3.xml", "offering-3");
-            writeDataFile(offeringV200Directory, "v200/offering-4.xml", "offering-5");
-            writeDataFile(offeringV200Directory, "v200/offering-5.xml", "offering-2");
-            writeDataFile(offeringV200Directory, "v200/offering-6.xml", "offering-6");
-            writeDataFile(offeringV200Directory, "v200/offering-7.xml", "offering-7");
-            writeDataFile(offeringV200Directory, "v200/offering-8.xml", "offering-8");
-            writeDataFile(offeringV200Directory, "v200/offering-9.xml", "offering-9");
-            writeDataFile(offeringV200Directory, "v200/offering-10.xml", "offering-10");
-            
-            
-            File phenomenonDirectory = new File(instDirectory, "phenomenons");
-            phenomenonDirectory.mkdir();
-            writeDataFile(phenomenonDirectory, "phenomenon-depth.xml", "depth");
-            writeDataFile(phenomenonDirectory, "phenomenon-temp.xml",  "temperature");
-            writeDataFile(phenomenonDirectory, "phenomenon-depth-temp.xml",  "aggregatePhenomenon");
-            
-            File featureDirectory = new File(instDirectory, "features");
-            featureDirectory.mkdir();
-            writeDataFile(featureDirectory, "v200/feature1.xml", "station-001");
-            writeDataFile(featureDirectory, "v200/feature2.xml", "station-002");
-            writeDataFile(featureDirectory, "v200/feature3.xml", "station-006");
-            
-            File observationsDirectory = new File(instDirectory, "observations");
-            observationsDirectory.mkdir();
-            writeDataFile(observationsDirectory, "v200/observation1.xml", "urn:ogc:object:observation:GEOM:304");
-            writeDataFile(observationsDirectory, "v200/observation2.xml", "urn:ogc:object:observation:GEOM:305");
-            writeDataFile(observationsDirectory, "v200/observation3.xml", "urn:ogc:object:observation:GEOM:406");
-            writeDataFile(observationsDirectory, "v200/observation4.xml", "urn:ogc:object:observation:GEOM:307");
-            writeDataFile(observationsDirectory, "v200/observation5.xml", "urn:ogc:object:observation:GEOM:507");
-            writeDataFile(observationsDirectory, "v200/observation6.xml", "urn:ogc:object:observation:GEOM:801");
-            
-            File observationTemplatesDirectory = new File(instDirectory, "observationTemplates");
-            observationTemplatesDirectory.mkdir();
-            writeDataFile(observationTemplatesDirectory, "v200/observationTemplate-3.xml", "urn:ogc:object:observation:template:GEOM:3");
-            writeDataFile(observationTemplatesDirectory, "v200/observationTemplate-4.xml", "urn:ogc:object:observation:template:GEOM:4");
-            writeDataFile(observationTemplatesDirectory, "observationTemplate-5.xml", "urn:ogc:object:observation:template:GEOM:5");
-            writeDataFile(observationTemplatesDirectory, "observationTemplate-7.xml", "urn:ogc:object:observation:template:GEOM:7");
-            writeDataFile(observationTemplatesDirectory, "observationTemplate-8.xml", "urn:ogc:object:observation:template:GEOM:8");
-            
-            File sensorDirectory = new File(instDirectory, "sensors");
-            sensorDirectory.mkdir();
-            File sensor1         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:1.xml");
-            sensor1.createNewFile();
-            File sensor2         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:2.xml");
-            sensor2.createNewFile();
-            File sensor3         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:3.xml");
-            sensor3.createNewFile();
-            File sensor4         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:4.xml");
-            sensor4.createNewFile();
-            File sensor5         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:5.xml");
-            sensor5.createNewFile();
-            File sensor6         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:6.xml");
-            sensor6.createNewFile();
-            File sensor7         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:7.xml");
-            sensor7.createNewFile();
-            File sensor8         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:8.xml");
-            sensor8.createNewFile();
-            File sensor9         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:9.xml");
-            sensor9.createNewFile();
-            File sensor10        = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:10.xml");
-            sensor10.createNewFile();
-            
-            //we write the configuration file
-            Automatic SMLConfiguration = new Automatic();
-            
-            Automatic OMConfiguration  = new Automatic();
-            OMConfiguration.setDataDirectory(instDirectory.getPath());
-            SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
-            configuration.setObservationReaderType(DataSourceType.FILESYSTEM);
-            configuration.setObservationWriterType(DataSourceType.FILESYSTEM);
-            configuration.setSMLType(DataSourceType.NONE);
-            configuration.setObservationFilterType(DataSourceType.LUCENE);
-            configuration.setPhenomenonIdBase("urn:ogc:def:phenomenon:GEOM:");
-            configuration.setProfile("transactional");
-            configuration.setObservationIdBase("urn:ogc:object:observation:GEOM:");
-            configuration.setObservationTemplateIdBase("urn:ogc:object:observation:template:GEOM:");
-            configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
-            configuration.getParameters().put("transactionSecurized", "false");
-            
-            serviceBusiness.create("SOS", "default", configuration, null);
-            
-            pool.recycle(marshaller);
-            init();
-            worker = new SOSworker("default");
-            worker.setServiceUrl(URL);
-            worker.setLogLevel(Level.FINER);
+            if (!serviceBusiness.getServiceIdentifiers("sos").contains("default")) {
+                //we write the configuration file
+                Automatic SMLConfiguration = new Automatic();
+
+                Automatic OMConfiguration  = new Automatic();
+                OMConfiguration.setDataDirectory(instDirectory.getPath());
+                SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
+                configuration.setObservationReaderType(DataSourceType.FILESYSTEM);
+                configuration.setObservationWriterType(DataSourceType.FILESYSTEM);
+                configuration.setSMLType(DataSourceType.NONE);
+                configuration.setObservationFilterType(DataSourceType.LUCENE);
+                configuration.setPhenomenonIdBase("urn:ogc:def:phenomenon:GEOM:");
+                configuration.setProfile("transactional");
+                configuration.setObservationIdBase("urn:ogc:object:observation:GEOM:");
+                configuration.setObservationTemplateIdBase("urn:ogc:object:observation:template:GEOM:");
+                configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
+                configuration.getParameters().put("transactionSecurized", "false");
+
+                serviceBusiness.create("sos", "default", configuration, null);
+
+
+                init();
+                worker = new SOSworker("default");
+                worker.setServiceUrl(URL);
+                worker.setLogLevel(Level.FINER);
+            } else if (worker == null) {
+                
+                serviceBusiness.delete("sos", "default");
+                
+                //we write the configuration file
+                Automatic SMLConfiguration = new Automatic();
+
+                Automatic OMConfiguration  = new Automatic();
+                OMConfiguration.setDataDirectory(instDirectory.getPath());
+                SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
+                configuration.setObservationReaderType(DataSourceType.FILESYSTEM);
+                configuration.setObservationWriterType(DataSourceType.FILESYSTEM);
+                configuration.setSMLType(DataSourceType.NONE);
+                configuration.setObservationFilterType(DataSourceType.LUCENE);
+                configuration.setPhenomenonIdBase("urn:ogc:def:phenomenon:GEOM:");
+                configuration.setProfile("transactional");
+                configuration.setObservationIdBase("urn:ogc:object:observation:GEOM:");
+                configuration.setObservationTemplateIdBase("urn:ogc:object:observation:template:GEOM:");
+                configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
+                configuration.getParameters().put("transactionSecurized", "false");
+
+                serviceBusiness.create("sos", "default", configuration, null);
+
+
+                init();
+                worker = new SOSworker("default");
+                worker.setServiceUrl(URL);
+                worker.setLogLevel(Level.FINER);
+            }
         } catch (Exception ex) {
             Logger.getLogger(FileSystemSOS2WorkerTest.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -182,15 +222,6 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
             worker.destroy();
         }
         ConfigurationEngine.shutdownTestEnvironement("LUCSOSWorkerTest");
-    }
-
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
-
     }
 
     public static void writeCommonDataFile(File dataDirectory, String resourceName, String identifier) throws IOException {

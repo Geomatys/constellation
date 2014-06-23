@@ -93,7 +93,7 @@ public class LayerBusiness {
     public void add(final String name, String namespace, final String providerId, final String alias,
             final String serviceId, final String serviceType, final org.constellation.configuration.Layer config) throws ConfigurationException {
         
-        final Service service = serviceRepository.findByIdentifierAndType(serviceId, serviceType);
+        final Service service = serviceRepository.findByIdentifierAndType(serviceId, serviceType.toLowerCase());
         
         if (service !=null) {
             
@@ -140,7 +140,7 @@ public class LayerBusiness {
     }
     
     public void remove(final String spec, final String serviceId, final String name, final String namespace) throws ConfigurationException {
-        final Service service = serviceRepository.findByIdentifierAndType(serviceId, spec);
+        final Service service = serviceRepository.findByIdentifierAndType(serviceId, spec.toLowerCase());
         if (service != null) {
             final Layer layer = layerRepository.findByServiceIdAndLayerName(service.getId(), name, namespace);
             if (layer != null) {
@@ -155,7 +155,7 @@ public class LayerBusiness {
     
     public List<org.constellation.configuration.Layer> getLayers(final String spec, final String identifier, final String login) throws ConfigurationException {
         final List<org.constellation.configuration.Layer> response = new ArrayList<>();
-        final Service service = serviceRepository.findByIdentifierAndType(identifier, spec);
+        final Service service = serviceRepository.findByIdentifierAndType(identifier, spec.toLowerCase());
         
         if (service != null) {
             final LayerContext context = readMapConfiguration(service.getConfig());

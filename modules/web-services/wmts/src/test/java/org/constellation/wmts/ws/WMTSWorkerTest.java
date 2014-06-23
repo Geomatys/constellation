@@ -28,6 +28,7 @@ import org.apache.sis.test.XMLComparator;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
 import org.constellation.test.utils.SpringTestRunner;
@@ -44,6 +45,10 @@ import org.geotoolkit.wmts.xml.v100.GetCapabilities;
 import org.junit.*;
 import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.context.ContextConfiguration;
 
 
 /**
@@ -51,7 +56,15 @@ import org.junit.runner.RunWith;
  * @author Guilhem Legal (Geomatys)
  */
 @RunWith(SpringTestRunner.class)
-public class WMTSWorkerTest {
+@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+public class WMTSWorkerTest implements ApplicationContextAware {
+
+    protected ApplicationContext applicationContext;
+    
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
 
     @Inject
     private ServiceBusiness serviceBusiness;
@@ -61,11 +74,12 @@ public class WMTSWorkerTest {
 
     @PostConstruct
     public void setUpClass(){
+        SpringHelper.setApplicationContext(applicationContext);
         try {
             ConfigurationEngine.setupTestEnvironement("WMTSWorkerTest");
             pool = WMTSMarshallerPool.getInstance();
             
-            serviceBusiness.create("WMTS", "default", new LayerContext(), null);
+            serviceBusiness.create("wmts", "default", new LayerContext(), null);
             
             worker = new DefaultWMTSWorker("default");
             worker.setLogLevel(Level.FINER);

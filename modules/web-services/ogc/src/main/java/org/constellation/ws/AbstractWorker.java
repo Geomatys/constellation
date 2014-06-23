@@ -49,6 +49,7 @@ import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.Service;
 
 import org.constellation.security.SecurityManagerHolder;
@@ -350,9 +351,9 @@ public abstract class AbstractWorker implements Worker {
         Service metadata = capabilities.get(key);
         if (metadata == null) {
             try {
-                metadata = ConfigurationEngine.readServiceMetadata(getId(), service, language);
+                metadata = serviceBusiness.getInstanceMetadata(service, getId(), language);
                 capabilities.put(key, metadata);
-            } catch (JAXBException | IOException ex) {
+            } catch (ConfigurationException ex) {
                 LOGGER.log(Level.WARNING, "An error occurred when trying to read the service metadata. Returning default capabilities.", ex);
             }
         }

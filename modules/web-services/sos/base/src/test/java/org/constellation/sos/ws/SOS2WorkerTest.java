@@ -93,12 +93,25 @@ import org.geotoolkit.swes.xml.v200.DeleteSensorType;
 // JUnit dependencies
 import org.junit.Ignore;
 import static org.junit.Assert.*;
+import org.junit.runner.RunWith;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.context.ContextConfiguration;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-public abstract class SOS2WorkerTest {
+@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+public abstract class SOS2WorkerTest implements ApplicationContextAware {
+
+    protected ApplicationContext applicationContext;
+    
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
 
     protected static SOSworker worker;
 
