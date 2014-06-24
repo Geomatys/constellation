@@ -144,11 +144,11 @@ public final class OGCServicesRest {
             return Response.serverError().entity("admin.error.service.exist").build();
         }
         
-        serviceBusiness.create(spec, metadata.getIdentifier(), null, metadata);
-        
-        service = serviceRepository.findByIdentifierAndType(metadata.getIdentifier(), spec);
-        
-        domainRepository.addServiceToDomain(service.getId(), domainId);
+        serviceBusiness.create(spec, metadata.getIdentifier(), null, metadata, domainId);
+//        
+//        service = serviceRepository.findByIdentifierAndType(metadata.getIdentifier(), spec);
+//        
+//        domainRepository.addServiceToDomain(service.getId(), domainId);
         
         return created(AcknowlegementType.success(spec.toUpperCase() + " service \"" + metadata.getIdentifier() + "\" successfully created."));
     }

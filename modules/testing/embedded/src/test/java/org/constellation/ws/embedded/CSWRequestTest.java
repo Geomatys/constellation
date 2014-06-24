@@ -84,7 +84,7 @@ public class CSWRequestTest extends AbstractGrizzlyServer {
             final Automatic config2 = new Automatic("filesystem", dataDirectory2.getPath());
             config2.putParameter("shiroAccessible", "false");
             config2.putParameter("CSWCascading", "http://localhost:9090/csw/default");
-            serviceBusiness.create("CSW", "csw2", config2, null);
+            serviceBusiness.create("CSW", "csw2", config2, null, null);
             
             
             final File dataDirectory = new File(configDirectory, "dataCsw");
@@ -111,7 +111,7 @@ public class CSWRequestTest extends AbstractGrizzlyServer {
             
             final Automatic config = new Automatic("filesystem", dataDirectory.getPath());
             config.putParameter("shiroAccessible", "false");
-            serviceBusiness.create("CSW", "default", config, null);
+            serviceBusiness.create("CSW", "default", config, null, null);
             
             
             final Map<String, Object> map = new HashMap<>();

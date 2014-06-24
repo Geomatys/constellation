@@ -61,11 +61,9 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
 
     @Override
     public Service findByIdentifierAndType(String identifier, String type) {
-        Record one = dsl.select().from(SERVICE)
-                .where(SERVICE.IDENTIFIER.eq(identifier).and(SERVICE.TYPE.eq(type))).fetchOne();
-        if (one == null)
-            return null;
-        return one.into(Service.class);
+        return  dsl.select().from(SERVICE)
+                .where(SERVICE.IDENTIFIER.eq(identifier).and(SERVICE.TYPE.equalIgnoreCase(type))).fetchOneInto(Service.class);
+       
     }
 
     @Override
@@ -96,7 +94,7 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
     
     @Override
     public List<Service> findByType(String type) {
-        SelectConditionStep<Record> from = dsl.select().from(SERVICE).where(SERVICE.TYPE.eq(type));
+        SelectConditionStep<Record> from = dsl.select().from(SERVICE).where(SERVICE.TYPE.eq(type.toLowerCase()));
         return from.fetchInto(Service.class);
     }
 

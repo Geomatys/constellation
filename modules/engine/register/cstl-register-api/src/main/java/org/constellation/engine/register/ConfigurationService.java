@@ -30,7 +30,7 @@ import org.constellation.configuration.DataBrief;
 
 public interface ConfigurationService {
 
-    void storeConfiguration(String serviceType, String serviceID, String fileName, Object obj, MarshallerPool pool, String login);
+//    void storeConfiguration(String serviceType, String serviceID, String fileName, Object obj, MarshallerPool pool, String login);
 
     Object getConfiguration(String serviceType, String serviceID, String fileName, MarshallerPool pool) throws JAXBException, FileNotFoundException ;
 

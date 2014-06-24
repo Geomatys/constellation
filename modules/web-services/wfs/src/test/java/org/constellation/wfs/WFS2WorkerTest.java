@@ -179,7 +179,7 @@ public class WFS2WorkerTest {
             config.getCustomParameters().put("transactionSecurized", "false");
             config.getCustomParameters().put("transactionnal", "true");
 
-            serviceBusiness.create("WFS", "default", config, null);
+            serviceBusiness.create("WFS", "default", config, null, null);
             layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "WFS", null);
             layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "WFS", null);
             layerBusiness.add("EntitéGénérique",     "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "WFS", null);
@@ -197,7 +197,7 @@ public class WFS2WorkerTest {
             layerBusiness.add("MapNeatline",         "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS", null);
             layerBusiness.add("Ponds",               "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS", null);
 
-            serviceBusiness.create("WFS", "test", config, null);
+            serviceBusiness.create("WFS", "test", config, null, null);
             layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "test", "WFS", null);
             layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "test", "WFS", null);
             layerBusiness.add("EntitéGénérique",     "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "test", "WFS", null);
@@ -221,7 +221,7 @@ public class WFS2WorkerTest {
             config2.getCustomParameters().put("transactionSecurized", "false");
             config2.getCustomParameters().put("transactionnal", "true");
 
-            serviceBusiness.create("WFS", "test1", config, null);
+            serviceBusiness.create("WFS", "test1", config, null, null);
             layerBusiness.add("SamplingPoint",       "http://www.opengis.net/sampling/1.0",  "omSrc",      null, "test1", "WFS", null);
             layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test1", "WFS", null);
             layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test1", "WFS", null);

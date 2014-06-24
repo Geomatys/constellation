@@ -79,8 +79,11 @@ public class WMTSWorkerTest implements ApplicationContextAware {
             ConfigurationEngine.setupTestEnvironement("WMTSWorkerTest");
             pool = WMTSMarshallerPool.getInstance();
             
-            serviceBusiness.create("wmts", "default", new LayerContext(), null);
-            
+
+
+            serviceBusiness.create("wmts", "default", new LayerContext(), null, null);
+
+
             worker = new DefaultWMTSWorker("default");
             worker.setLogLevel(Level.FINER);
             worker.setServiceUrl("http://geomatys.com/constellation/WS/");

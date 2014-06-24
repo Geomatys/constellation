@@ -39,7 +39,7 @@ public class DeleteWMTSServiceTest extends DeleteServiceTest {
     protected void createInstance(final String identifier) {
         try {
             final LayerContext configuration = new LayerContext();
-            serviceBusiness.create(serviceName.toLowerCase(), identifier, configuration, null);
+            serviceBusiness.create(serviceName.toLowerCase(), identifier, configuration, null, null);
         } catch (ConfigurationException ex) {
             LOGGER.log(Level.SEVERE, "Error while creating instance", ex);
         }

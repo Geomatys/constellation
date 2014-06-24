@@ -105,7 +105,7 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
             configuration.getParameters().put("transactionSecurized", "false");
             
             if (!serviceBusiness.getServiceIdentifiers("sos").contains("default")) {
-                serviceBusiness.create("sos", "default", configuration, null);
+                serviceBusiness.create("sos", "default", configuration, null, null);
                 init();
                 worker = new SOSworker("default");
                 worker.setServiceUrl(URL);
@@ -113,7 +113,7 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
             }  else if (worker == null) {
                 serviceBusiness.delete("sos", "default");
                 
-                serviceBusiness.create("sos", "default", configuration, null);
+                serviceBusiness.create("sos", "default", configuration, null, null);
 
                 init();
                 worker = new SOSworker("default");

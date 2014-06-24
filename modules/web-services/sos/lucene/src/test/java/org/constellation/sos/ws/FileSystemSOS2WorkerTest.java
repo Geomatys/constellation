@@ -168,7 +168,7 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
                 configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
                 configuration.getParameters().put("transactionSecurized", "false");
 
-                serviceBusiness.create("sos", "default", configuration, null);
+                serviceBusiness.create("sos", "default", configuration, null, null);
 
 
                 init();
@@ -196,7 +196,7 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
                 configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
                 configuration.getParameters().put("transactionSecurized", "false");
 
-                serviceBusiness.create("sos", "default", configuration, null);
+                serviceBusiness.create("sos", "default", configuration, null, null);
 
 
                 init();

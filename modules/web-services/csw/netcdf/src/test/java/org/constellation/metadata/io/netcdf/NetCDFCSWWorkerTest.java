@@ -97,7 +97,7 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
                 configuration.putParameter("transactionSecurized", "false");
                 configuration.putParameter("shiroAccessible", "false");
 
-                serviceBusiness.create("csw", "default", configuration, null);
+                serviceBusiness.create("csw", "default", configuration, null, null);
 
                 pool = EBRIMMarshallerPool.getInstance();
                 fillPoolAnchor((AnchoredMarshallerPool) pool);

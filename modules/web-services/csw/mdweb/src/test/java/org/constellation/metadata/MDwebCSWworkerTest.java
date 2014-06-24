@@ -149,7 +149,7 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
                 thBdd.setSchema("default");
                 configuration.setThesaurus(Arrays.asList(thBdd));
 
-                serviceBusiness.create("csw", "default", configuration, null);
+                serviceBusiness.create("csw", "default", configuration, null, null);
 
                 pool = EBRIMMarshallerPool.getInstance();
                 //fillPoolAnchor((AnchoredMarshallerPool) pool);

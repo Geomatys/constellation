@@ -1,36 +1,15 @@
 package org.constellation.admin;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import javax.inject.Inject;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.admin.dto.ServiceDTO;
+import org.constellation.ServiceDef;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.admin.util.DefaultServiceConfiguration;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.ServiceStatus;
 import org.constellation.configuration.TargetNotFoundException;
-import org.constellation.engine.register.ConstellationPersistenceException;
-import org.constellation.engine.register.ConstellationRegistryRuntimeException;
-import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.Service;
-import org.constellation.engine.register.ServiceExtraConfig;
-import org.constellation.engine.register.ServiceMetadata;
+import org.constellation.engine.register.*;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
@@ -40,40 +19,44 @@ import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.util.FileUtilities;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Inject;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import java.io.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class ServiceBusiness {
 
-    @Autowired
+    @Inject
     private SecurityManager securityManager;
             
     @Inject
     private DomainRepository domainRepository;
 
-    @Autowired
+    @Inject
     private ServiceRepository serviceRepository;
 
-    ServiceDTO getService(int id) throws IllegalAccessException, InvocationTargetException {
-        final ServiceDTO returnService = new ServiceDTO();
-        org.constellation.engine.register.Service service = serviceRepository.findById(id);
-        BeanUtils.copyProperties(returnService, service);
-        return returnService;
-    }
 
-    ServiceDTO create(ServiceDTO serviceDTO) {
-        Service service = new Service();
-        try {
-            BeanUtils.copyProperties(service, serviceDTO);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new ConstellationException(e);
-        }
-        int serviceId = serviceRepository.create(service);
-        serviceDTO.setId(serviceId);
-        return serviceDTO;
-    }
+
+//    ServiceDTO create(ServiceDTO serviceDTO) {
+//        Service service = new Service();
+//        try {
+//            BeanUtils.copyProperties(service, serviceDTO);
+//        } catch (IllegalAccessException | InvocationTargetException e) {
+//            throw new ConstellationException(e);
+//        }
+//        int serviceId = serviceRepository.create(service);
+//        serviceDTO.setId(serviceId);
+//        return serviceDTO;
+//    }
 
     /**
      * Creates a new service instance.
@@ -86,7 +69,7 @@ public class ServiceBusiness {
      * @return the configuration object just setted.
      * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
-    public Object create(final String serviceType, final String identifier, Object configuration, final org.constellation.dto.Service metadata) throws ConfigurationException {
+    public Object create(final String serviceType, final String identifier, Object configuration, final org.constellation.dto.Service metadata ,final Integer domainId) throws ConfigurationException {
 
         if (identifier == null || identifier.isEmpty()) {
             throw new ConfigurationException("Service instance identifier can't be null or empty.");
@@ -100,7 +83,7 @@ public class ServiceBusiness {
         final Service service = new Service();
         service.setConfig(config);
         service.setDate(new Date().getTime());
-        service.setType(serviceType);
+        service.setType( ServiceDef.Specification.valueOf(serviceType.toUpperCase()).name());
         service.setOwner(securityManager.getCurrentUserLogin());
         service.setIdentifier(identifier);
         service.setStatus(ServiceStatus.STOPPED.toString());
@@ -109,7 +92,11 @@ public class ServiceBusiness {
         }
         // @TODO
         service.setVersions("1.3.0");
-        serviceRepository.create(service);
+        int serviceId = serviceRepository.create(service);
+
+        if (domainId != null){
+            domainRepository.addServiceToDomain(serviceId,domainId);
+        }
         
         return configuration;
     }
@@ -315,7 +302,8 @@ public class ServiceBusiness {
         //write configuration file.
         final Service service = serviceRepository.findByIdentifierAndType(identifier, serviceType);
         if (service == null) {
-            create(serviceType, identifier, configuration, metadata);
+            //create(serviceType, identifier, configuration, metadata);
+            throw new ConstellationException(new Exception("Service not found."));
         } else {
             service.setConfig(getStringFromObject(configuration, GenericDatabaseMarshallerPool.getInstance()));
             if (metadata != null) {
@@ -403,8 +391,9 @@ public class ServiceBusiness {
      /**
      * Create new worker instance in service directory.
      *
-     * @param serviceDir
+     * @param serviceType
      * @param identifier
+      * @param closeInstance
      * @throws ProcessException
      */
     private void buildWorkers(final String serviceType, final String identifier, final boolean closeInstance) throws ConfigurationException {
@@ -494,20 +483,20 @@ public class ServiceBusiness {
         }
     }
     
-    /**
-     * Updates a service instance metadata.
-     *
-     * @param serviceType The type of the service.
-     * @param identifier the service identifier
-     * @param metadata   the service metadata
-     * @throws TargetNotFoundException if the service with specified identifier does not exist
-     * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
-     */
-    public void setInstanceMetadata(final String serviceType, final String identifier, final org.constellation.dto.Service metadata) throws ConfigurationException {
-        this.ensureExistingInstance(serviceType, identifier);
-        final Object config = getConfiguration(serviceType, identifier);
-        this.configure(serviceType, identifier, metadata, config);
-    }
+//    /**
+//     * Updates a service instance metadata.
+//     *
+//     * @param serviceType The type of the service.
+//     * @param identifier the service identifier
+//     * @param metadata   the service metadata
+//     * @throws TargetNotFoundException if the service with specified identifier does not exist
+//     * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
+//     */
+//    public void setInstanceMetadata(final String serviceType, final String identifier, final org.constellation.dto.Service metadata) throws ConfigurationException {
+//        this.ensureExistingInstance(serviceType, identifier);
+//        final Object config = getConfiguration(serviceType, identifier);
+//        this.configure(serviceType, identifier, metadata, config);
+//    }
     
     /**
      * Ensure that a service instance really exists.

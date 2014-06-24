@@ -40,7 +40,7 @@ public class StartWMTSServiceTest extends StartServiceTest {
     protected void createInstance(final String identifier) {
         try {
             final LayerContext configuration = new LayerContext();
-            serviceBusiness.create(serviceName, identifier, configuration, null);
+            serviceBusiness.create(serviceName, identifier, configuration, null, null);
         } catch (ConfigurationException ex) {
             LOGGER.log(Level.SEVERE, "Error while creating instance", ex);
         }

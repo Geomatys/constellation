@@ -432,7 +432,7 @@ public class WPSWorker extends AbstractWorker {
             webdavCtx.setId(webdavName);
             try {
                 if (SecurityManagerHolder.getInstance().isAuthenticated()) {
-                    serviceBusiness.create("webdav", webdavName, webdavCtx, null);
+                    serviceBusiness.create("webdav", webdavName, webdavCtx, null, null);
                 } else {
                     try {
                         ConfigurationEngine.setSecurityManager(new SecurityManagerAdapter() {
@@ -442,7 +442,7 @@ public class WPSWorker extends AbstractWorker {
                             }
                         });
                         
-                        serviceBusiness.create("webdav", webdavName, webdavCtx, null);
+                        serviceBusiness.create("webdav", webdavName, webdavCtx, null, null);
                     } finally {
                         ConfigurationEngine.setSecurityManager(SecurityManagerHolder.getInstance());
                     }

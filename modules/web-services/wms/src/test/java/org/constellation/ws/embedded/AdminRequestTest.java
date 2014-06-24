@@ -85,7 +85,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
             final LayerContext config = new LayerContext();
             config.getCustomParameters().put("shiroAccessible", "false");
             
-            serviceBusiness.create("WMS", "default", config, null);
+            serviceBusiness.create("WMS", "default", config, null, null);
             layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
             layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
             layerBusiness.add("Bridges",             "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
@@ -103,7 +103,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
             config2.setSupportedLanguages(new Languages(Arrays.asList(new Language("fre"), new Language("eng", true))));
             config2.getCustomParameters().put("shiroAccessible", "false");
             
-            serviceBusiness.create("WMS", "wms1", config2, null);
+            serviceBusiness.create("WMS", "wms1", config2, null, null);
             layerBusiness.add("Lakes", "http://www.opengis.net/gml/3.2", "shapeSrc", null, "default", "WMS", null);
             
             

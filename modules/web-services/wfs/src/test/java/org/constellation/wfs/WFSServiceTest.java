@@ -99,7 +99,7 @@ public class WFSServiceTest {
             config.getCustomParameters().put("transactionSecurized", "false");
             config.getCustomParameters().put("transactionnal", "true");
             
-            serviceBusiness.create("WFS", "default", config, null);
+            serviceBusiness.create("WFS", "default", config, null, null);
             layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "WFS", null);
             layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "WFS", null);
             layerBusiness.add("EntitéGénérique",     "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "WFS", null);

@@ -1,42 +1,34 @@
 package org.constellation.admin;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
-
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef;
-import org.constellation.admin.dto.LayerDTO;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.ServiceProtocol;
 import org.constellation.configuration.StyleBrief;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Layer;
-
+import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.Style;
-
-import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.repository.*;
-
 import org.constellation.utils.ISOMarshallerPool;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,42 +38,28 @@ public class DataBusiness {
 
     private static final Logger LOGGER = Logging.getLogger(DataBusiness.class);
 
-    @Autowired
+    @Inject
     private DataRepository dataRepository;
 
-    @Autowired
+    @Inject
     private LayerRepository layerRepository;
 
-    @Autowired
+    @Inject
     private org.constellation.security.SecurityManager securityManager;
 
-    @Autowired
+    @Inject
     private StyleRepository styleRepository;
 
-    @Autowired
+    @Inject
     private ServiceRepository serviceRepository;
 
-    @Autowired
+    @Inject
     private ProviderRepository providerRepository;
 
-    @Autowired
+    @Inject
     private SensorRepository sensorRepository;
 
 
-	public List<LayerDTO> getLayers(int serviceId) {
-		List<LayerDTO> returnlist = new ArrayList<LayerDTO>();
-		List<Layer> layerList = layerRepository.findByServiceId(serviceId);
-		for (Layer layer : layerList) {
-			LayerDTO layerDTO = new LayerDTO();
-			try {
-				BeanUtils.copyProperties(layerDTO, layer);
-			} catch (IllegalAccessException | InvocationTargetException e) {
-				throw new ConstellationException(e);
-			}
-			returnlist.add(layerDTO);
-		}
-		return returnlist;
-	}
 
 	public DefaultMetadata loadIsoDataMetadata(String providerId, QName name) {
 
@@ -152,7 +130,7 @@ public class DataBusiness {
         List<Data> datas = new ArrayList<Data>();
         datas.add(data);
         List<DataBrief> dataBriefs = getDataBriefFrom(datas);
-        if (dataBriefs !=null && dataBriefs.size()==0){
+        if (dataBriefs !=null && dataBriefs.size()==1){
             return dataBriefs.get(0);
         }
         throw new ConstellationException(new Exception("Problem : DataBrief Construction is null or multiple"));

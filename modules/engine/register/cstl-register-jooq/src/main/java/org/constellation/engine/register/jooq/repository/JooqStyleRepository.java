@@ -125,8 +125,8 @@ public class JooqStyleRepository extends AbstractJooqRespository<StyleRecord, St
     }
 
     @Override
-    public List<Integer> getStyleIdsForData(int id) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public List<Integer> getStyleIdsForData(int dataId) {
+    	return dsl.select(STYLED_DATA.STYLE).from(STYLED_DATA).where(STYLED_DATA.DATA.eq(dataId)).fetchInto(Integer.class);
     }
 
     @Override

@@ -74,122 +74,122 @@ public class JooqConfigurationService implements ConfigurationService {
     private LayerRepository layerRepository;
     
     
-    /**
-     * Store configuration, this method is too "generic" and should be refactored/splited.
-     * <br />
-     * When obj id a LayerContext 
-     */
-    @Override
-    @Transactional
-    public void storeConfiguration(String serviceType, String serviceID, String fileName, Object obj,
-            MarshallerPool pool, String login) {
-
-        String config = null;
-        if (obj != null) {
-            try {
-                final StringWriter sw = new StringWriter();
-                final Marshaller m = pool.acquireMarshaller();
-                m.marshal(obj, sw);
-                pool.recycle(m);
-                config = sw.toString();
-            } catch (JAXBException e) {
-                throw new ConstellationPersistenceException(e);
-            }
-
-        }
-
-       
-        Service service = serviceRepository.findByIdentifierAndType(serviceID, serviceType);
-        if (service == null) {
-            service = new Service();
-            service.setConfig(config);
-            service.setDate(new Date().getTime());
-            service.setType(serviceType);
-            service.setOwner(login);
-            service.setIdentifier(serviceID);
-            service.setStatus(ServiceStatus.STOPPED.toString());
-            // @TODO
-            service.setVersions("1.3.0");
-            serviceRepository.create(service);
-        }
-         
-
-        /*if (obj instanceof LayerContext) {
-
-            Map<String, org.constellation.engine.register.Layer> layersByKey = new HashMap<String, org.constellation.engine.register.Layer>();
-            layersByKey.putAll(Maps.uniqueIndex(layerRepository.findByServiceId(service.getId()),
-                    new Function<org.constellation.engine.register.Layer, String>() {
-
-                        @Override
-                        public String apply(org.constellation.engine.register.Layer layer) {
-                            return generateLayerByServiceKey(layer.getService(), layer.getName());
-                        }
-
-                    }));
-
-            // layerRepository.deleteServiceLayer(service);
-            // save Layers
-            LayerContext context = (LayerContext) obj;
-            final List<String> layerIds = new ArrayList<>();
-            for (Source source : context.getLayers()) {
-                for (Layer layer : source.getInclude()) {
-
-                    final Data data = dataRepository.findDataFromProvider(layer.getName().getNamespaceURI(), layer
-                            .getName().getLocalPart(), source.getId());
-
-                    String layerKey = generateLayerByServiceKey(service.getId(), layer.getName().getLocalPart());
-
-                    org.constellation.engine.register.Layer storeLayer = layersByKey.get(layerKey);
-
-                    if (storeLayer == null) {
-                        storeLayer = new org.constellation.engine.register.Layer();
-                        storeLayer.setDate(new Date().getTime());
-                        storeLayer.setService(service.getId());
-                    }
-
-                    storeLayer.setOwner(login);
-                    storeLayer.setAlias(layer.getAlias());
-                    storeLayer.setNamespace(layer.getName().getNamespaceURI());
-                    storeLayer.setName(layer.getName().getLocalPart());
-                    storeLayer.setData(data.getId());
-                    storeLayer.setService(service.getId());
-
-                    if (layersByKey.containsKey(layerKey)) {
-                        layerRepository.update(storeLayer);
-                        layersByKey.remove(layerKey);
-                    } else {
-                        layerRepository.save(storeLayer);
-                    }
-
-                    if (data.getIso_metadata() != null) {
-                        layerIds.add(data.getIso_metadata());
-                    }
-                }
-            }
-            for (Entry<String, org.constellation.engine.register.Layer> entry : layersByKey.entrySet()) {
-                layerRepository.delete(entry.getValue().getId());
-            }
-            if (service.getMetadata() != null ) {
-                try {
-                    final DefaultMetadata servMeta = MetadataIOUtils.unmarshallMetadata(service.getMetadata());
-                    CstlMetadatas.updateServiceMetadataLayer(servMeta, layerIds);
-                    final String srm = MetadataIOUtils.marshallMetadataToString(servMeta);
-                    serviceRepository.updateIsoMetadata(service, servMeta.getFileIdentifier(), srm.toString());
-                } catch (JAXBException e) {
-                    throw new ConstellationPersistenceException(e);
-                }
-            }
-        }*/
-
-        if (fileName == null) {
-            service.setConfig(config);
-            serviceRepository.updateConfig(service);
-        } else {
-            serviceRepository.updateExtraFile(service, fileName, config);
-        }
-
-    }
-
+//    /**
+//     * Store configuration, this method is too "generic" and should be refactored/splited.
+//     * <br />
+//     * When obj id a LayerContext
+//     */
+//    @Override
+//    @Transactional
+//    public void storeConfiguration(String serviceType, String serviceID, String fileName, Object obj,
+//            MarshallerPool pool, String login) {
+//
+//        String config = null;
+//        if (obj != null) {
+//            try {
+//                final StringWriter sw = new StringWriter();
+//                final Marshaller m = pool.acquireMarshaller();
+//                m.marshal(obj, sw);
+//                pool.recycle(m);
+//                config = sw.toString();
+//            } catch (JAXBException e) {
+//                throw new ConstellationPersistenceException(e);
+//            }
+//
+//        }
+//
+//
+//        Service service = serviceRepository.findByIdentifierAndType(serviceID, serviceType);
+//        if (service == null) {
+//            service = new Service();
+//            service.setConfig(config);
+//            service.setDate(new Date().getTime());
+//            service.setType(serviceType);
+//            service.setOwner(login);
+//            service.setIdentifier(serviceID);
+//            service.setStatus(ServiceStatus.STOPPED.toString());
+//            // @TODO
+//            service.setVersions("1.3.0");
+//            serviceRepository.create(service);
+//        }
+//
+//
+//        /*if (obj instanceof LayerContext) {
+//
+//            Map<String, org.constellation.engine.register.Layer> layersByKey = new HashMap<String, org.constellation.engine.register.Layer>();
+//            layersByKey.putAll(Maps.uniqueIndex(layerRepository.findByServiceId(service.getId()),
+//                    new Function<org.constellation.engine.register.Layer, String>() {
+//
+//                        @Override
+//                        public String apply(org.constellation.engine.register.Layer layer) {
+//                            return generateLayerByServiceKey(layer.getService(), layer.getName());
+//                        }
+//
+//                    }));
+//
+//            // layerRepository.deleteServiceLayer(service);
+//            // save Layers
+//            LayerContext context = (LayerContext) obj;
+//            final List<String> layerIds = new ArrayList<>();
+//            for (Source source : context.getLayers()) {
+//                for (Layer layer : source.getInclude()) {
+//
+//                    final Data data = dataRepository.findDataFromProvider(layer.getName().getNamespaceURI(), layer
+//                            .getName().getLocalPart(), source.getId());
+//
+//                    String layerKey = generateLayerByServiceKey(service.getId(), layer.getName().getLocalPart());
+//
+//                    org.constellation.engine.register.Layer storeLayer = layersByKey.get(layerKey);
+//
+//                    if (storeLayer == null) {
+//                        storeLayer = new org.constellation.engine.register.Layer();
+//                        storeLayer.setDate(new Date().getTime());
+//                        storeLayer.setService(service.getId());
+//                    }
+//
+//                    storeLayer.setOwner(login);
+//                    storeLayer.setAlias(layer.getAlias());
+//                    storeLayer.setNamespace(layer.getName().getNamespaceURI());
+//                    storeLayer.setName(layer.getName().getLocalPart());
+//                    storeLayer.setData(data.getId());
+//                    storeLayer.setService(service.getId());
+//
+//                    if (layersByKey.containsKey(layerKey)) {
+//                        layerRepository.update(storeLayer);
+//                        layersByKey.remove(layerKey);
+//                    } else {
+//                        layerRepository.save(storeLayer);
+//                    }
+//
+//                    if (data.getIso_metadata() != null) {
+//                        layerIds.add(data.getIso_metadata());
+//                    }
+//                }
+//            }
+//            for (Entry<String, org.constellation.engine.register.Layer> entry : layersByKey.entrySet()) {
+//                layerRepository.delete(entry.getValue().getId());
+//            }
+//            if (service.getMetadata() != null ) {
+//                try {
+//                    final DefaultMetadata servMeta = MetadataIOUtils.unmarshallMetadata(service.getMetadata());
+//                    CstlMetadatas.updateServiceMetadataLayer(servMeta, layerIds);
+//                    final String srm = MetadataIOUtils.marshallMetadataToString(servMeta);
+//                    serviceRepository.updateIsoMetadata(service, servMeta.getFileIdentifier(), srm.toString());
+//                } catch (JAXBException e) {
+//                    throw new ConstellationPersistenceException(e);
+//                }
+//            }
+//        }*/
+//
+//        if (fileName == null) {
+//            service.setConfig(config);
+//            serviceRepository.updateConfig(service);
+//        } else {
+//            serviceRepository.updateExtraFile(service, fileName, config);
+//        }
+//
+//    }
+//
     @Transactional
     public Object getConfiguration(String serviceType, String serviceID, String fileName, MarshallerPool pool)
             throws JAXBException, FileNotFoundException {

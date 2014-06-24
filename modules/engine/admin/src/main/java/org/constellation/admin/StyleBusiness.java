@@ -18,10 +18,35 @@
  */
 package org.constellation.admin;
 
+import org.apache.sis.util.logging.Logging;
+import org.constellation.admin.dao.DataRecord;
+import org.constellation.admin.dao.StyleRecord;
+import org.constellation.admin.util.IOUtilities;
+import org.constellation.configuration.*;
+import org.constellation.dto.StyleBean;
+import org.constellation.engine.register.*;
+import org.constellation.engine.register.Layer;
+import org.constellation.engine.register.Style;
+import org.constellation.engine.register.repository.*;
+import org.geotoolkit.factory.FactoryFinder;
+import org.geotoolkit.factory.Hints;
+import org.geotoolkit.sld.*;
+import org.geotoolkit.sld.xml.Specification;
+import org.geotoolkit.sld.xml.StyleXmlIO;
+import org.geotoolkit.style.MutableFeatureTypeStyle;
+import org.geotoolkit.style.MutableRule;
+import org.geotoolkit.style.MutableStyle;
+import org.geotoolkit.style.MutableStyleFactory;
+import org.opengis.style.*;
+import org.opengis.util.FactoryException;
+import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,56 +54,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.inject.Inject;
-import javax.xml.bind.JAXBException;
-import javax.xml.namespace.QName;
-import org.apache.commons.beanutils.BeanUtils;
+
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
-import org.apache.sis.util.logging.Logging;
-import org.constellation.admin.dao.DataRecord;
-import org.constellation.admin.dao.StyleRecord;
-import org.constellation.admin.dto.StyleDTO;
-import org.constellation.admin.exception.ConstellationException;
-import org.constellation.admin.util.IOUtilities;
-import org.constellation.configuration.ConfigurationException;
-import org.constellation.configuration.DataBrief;
-import org.constellation.configuration.StyleBrief;
-import org.constellation.configuration.StyleReport;
-import org.constellation.configuration.TargetNotFoundException;
-import org.constellation.dto.StyleBean;
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Layer;
-import org.constellation.engine.register.Provider;
-import org.constellation.engine.register.Service;
-import org.constellation.engine.register.Style;
-import org.constellation.engine.register.repository.DataRepository;
-import org.constellation.engine.register.repository.LayerRepository;
-import org.constellation.engine.register.repository.ProviderRepository;
-import org.constellation.engine.register.repository.ServiceRepository;
-import org.constellation.engine.register.repository.StyleRepository;
-import org.geotoolkit.factory.FactoryFinder;
-import org.geotoolkit.factory.Hints;
-import org.geotoolkit.sld.MutableLayer;
-import org.geotoolkit.sld.MutableLayerStyle;
-import org.geotoolkit.sld.MutableNamedLayer;
-import org.geotoolkit.sld.MutableStyledLayerDescriptor;
-import org.geotoolkit.sld.MutableUserLayer;
-import org.geotoolkit.sld.xml.Specification;
-import org.geotoolkit.sld.xml.StyleXmlIO;
-import org.geotoolkit.style.MutableFeatureTypeStyle;
-import org.geotoolkit.style.MutableRule;
-import org.geotoolkit.style.MutableStyle;
-import org.geotoolkit.style.MutableStyleFactory;
-import org.opengis.style.LineSymbolizer;
-import org.opengis.style.PointSymbolizer;
-import org.opengis.style.PolygonSymbolizer;
-import org.opengis.style.RasterSymbolizer;
-import org.opengis.style.Symbolizer;
-import org.opengis.style.TextSymbolizer;
-import org.opengis.util.FactoryException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Bernard Fabien (Geomatys)
@@ -243,28 +221,28 @@ public final class StyleBusiness {
         return beans;
     }
 
-    /**
-     * Returns the list of available styles for dataId.
-     *
-     * @return a {@link List} of {@link StyleDTO} instances
-     */
-    public List<StyleDTO> findStyleByDataId(final QName dataname, final String providerId) {
-
-        List<StyleDTO> returnlist = new ArrayList<>();
-        Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(dataname.getLocalPart(), dataname.getNamespaceURI(), providerId);
-        List<Style> styleList = styleRepository.findByData(data);
-        for (Style style : styleList) {
-            StyleDTO styleDTO = new StyleDTO();
-            try {
-                BeanUtils.copyProperties(styleDTO, style);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                throw new ConstellationException(e);
-            }
-            returnlist.add(styleDTO);
-        }
-        return returnlist;
-
-    }
+//    /**
+//     * Returns the list of available styles for dataId.
+//     *
+//     * @return a {@link List} of {@link StyleDTO} instances
+//     */
+//    public List<StyleDTO> findStyleByDataId(final QName dataname, final String providerId) {
+//
+//        List<StyleDTO> returnlist = new ArrayList<>();
+//        Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(dataname.getLocalPart(), dataname.getNamespaceURI(), providerId);
+//        List<Style> styleList = styleRepository.findByData(data);
+//        for (Style style : styleList) {
+//            StyleDTO styleDTO = new StyleDTO();
+//            try {
+//                BeanUtils.copyProperties(styleDTO, style);
+//            } catch (IllegalAccessException | InvocationTargetException e) {
+//                throw new ConstellationException(e);
+//            }
+//            returnlist.add(styleDTO);
+//        }
+//        return returnlist;
+//
+//    }
 
     /**
      * Gets and returns the {@link MutableStyle} that matches with the specified

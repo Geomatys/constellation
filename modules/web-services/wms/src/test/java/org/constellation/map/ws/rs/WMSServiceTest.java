@@ -91,7 +91,7 @@ public class WMSServiceTest {
             final LayerContext config = new LayerContext();
             config.getCustomParameters().put("shiroAccessible", "false");
             
-            serviceBusiness.create("WMS", "default", config, null);
+            serviceBusiness.create("WMS", "default", config, null, null);
             layerBusiness.add("SST_tests",            null,                                  "coverageTestSrc", null, "default", "WMS", null);
             layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
             layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);

@@ -87,13 +87,13 @@ public class OGCRestTest extends AbstractGrizzlyServer {
             
             final Automatic config2 = new Automatic("filesystem", dataDirectory2.getPath());
             config2.putParameter("shiroAccessible", "false");
-            serviceBusiness.create("CSW", "default", config2, null);
+            serviceBusiness.create("CSW", "default", config2, null, null);
             
             writeProvider("meta1.xml",  "42292_5p_19900609195600");
             
             Automatic configuration = new Automatic("internal", (String)null);
             configuration.putParameter("shiroAccessible", "false");
-            serviceBusiness.create("CSW", "intern", configuration, null);
+            serviceBusiness.create("CSW", "intern", configuration, null, null);
             
             initServer(null, null, "api");
             pool = GenericDatabaseMarshallerPool.getInstance();

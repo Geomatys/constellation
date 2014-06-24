@@ -48,7 +48,7 @@ public class ServiceReloadAction extends Action {
         if (target instanceof Map.Entry) {
             final Instance inst = (Instance) ((Map.Entry)target).getKey();
             final String type = (String) ((Map.Entry)target).getValue();
-            final String lowerType = type.toLowerCase();
+            final String lowerType = type.toUpperCase();
             return true;
         }
         return false;

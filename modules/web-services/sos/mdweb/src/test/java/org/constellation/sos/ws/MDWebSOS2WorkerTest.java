@@ -116,7 +116,7 @@ public class MDWebSOS2WorkerTest extends SOS2WorkerTest {
             configuration.getParameters().put("transactionSecurized", "false");
             
             if (!serviceBusiness.getServiceIdentifiers("sos").contains("default")) {
-                serviceBusiness.create("sos", "default", configuration, null);
+                serviceBusiness.create("sos", "default", configuration, null, null);
 
                 init();
                 worker = new SOSworker("default");
@@ -125,7 +125,7 @@ public class MDWebSOS2WorkerTest extends SOS2WorkerTest {
             } else if (worker == null) {
                 serviceBusiness.delete("sos", "default");
                 
-                serviceBusiness.create("sos", "default", configuration, null);
+                serviceBusiness.create("sos", "default", configuration, null, null);
 
                 init();
                 worker = new SOSworker("default");

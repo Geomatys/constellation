@@ -47,7 +47,7 @@ public class ServiceBusinessTest {
         serviceDTO.setStatus("STARTED");
         serviceDTO.setTitle("title test");
         serviceDTO.setType();*/
-        Object conf = serviceBusiness.create("WMS", "test", new LayerContext(), new Service());
+        Object conf = serviceBusiness.create("WMS", "test", new LayerContext(), new Service(),null);
         Assert.assertTrue(serviceBusiness.getServiceIdentifiers("WMS").contains("test"));
         
     }
