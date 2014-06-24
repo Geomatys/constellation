@@ -92,12 +92,12 @@ public abstract class CreateMapServiceTest extends AbstractMapServiceTest {
 
             final LayerContext conf = new LayerContext();
             conf.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
-            createCustomInstance("createInstance15", conf);
             
             //create
             ParameterValueGroup in = desc.getInputDescriptor().createValue();
             in.parameter(CreateServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
             in.parameter(CreateServiceDescriptor.IDENTIFIER_NAME).setValue("createInstance15");
+            in.parameter(CreateServiceDescriptor.CONFIG_NAME).setValue(conf);
 
 
             org.geotoolkit.process.Process proc = desc.createProcess(in);

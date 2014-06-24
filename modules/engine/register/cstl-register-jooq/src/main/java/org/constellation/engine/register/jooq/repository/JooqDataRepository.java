@@ -25,7 +25,6 @@ import static org.constellation.engine.register.jooq.Tables.PROVIDER;
 
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.DataI18n;
-import org.constellation.engine.register.helper.DataHelper;
 import org.constellation.engine.register.i18n.DataWithI18N;
 import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.tables.records.DataRecord;
@@ -89,21 +88,31 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
 
     @Override
     public int delete(String namespaceURI, String localPart, int providerId) {
-        Condition whereClause = buildDeleteWhereClause(namespaceURI, localPart, providerId);
+        Condition whereClause = buildWhereClause(namespaceURI, localPart, providerId);
         return dsl.delete(DATA).where(whereClause).execute();
 
     }
 
-    private Condition buildDeleteWhereClause(String namespaceURI, String localPart, int providerId) {
+    private Condition buildWhereClause(String namespaceURI, String localPart, int providerId) {
         Condition whereClause = DATA.NAME.eq(localPart).and(DATA.PROVIDER.eq(providerId));
-        if (namespaceURI != null)
+        if (namespaceURI != null) {
             return whereClause.and(DATA.NAMESPACE.eq(namespaceURI));
+        }
+        return whereClause;
+    }
+    
+    private Condition buildWhereClause(String namespaceURI, String localPart, String providerId) {
+        Condition whereClause = Tables.PROVIDER.IDENTIFIER.eq(providerId).and(DATA.NAME.eq(localPart));
+        if (namespaceURI != null) {
+            return whereClause.and(DATA.NAMESPACE.eq(namespaceURI));
+        }
         return whereClause;
     }
 
     @Override
     public Data findDataFromProvider(String namespaceURI, String localPart, String providerId) {
-        return dsl.select().from(DATA).join(Tables.PROVIDER).onKey().where(Tables.PROVIDER.IDENTIFIER.eq(providerId))
+        final Condition whereClause = buildWhereClause(namespaceURI, localPart, providerId);
+        return dsl.select().from(DATA).join(Tables.PROVIDER).onKey().where(whereClause)
                 .fetchOneInto(Data.class);
     }
 

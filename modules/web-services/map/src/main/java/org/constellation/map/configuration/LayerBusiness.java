@@ -105,7 +105,12 @@ public class LayerBusiness {
 
             final Data data = dataRepository.findDataFromProvider(namespace, name, providerId);
 
-            Layer layer = new Layer();
+            boolean update = true;
+            Layer layer = layerRepository.findByServiceIdAndLayerName(service.getId(), name, namespace);
+            if (layer == null) {
+                update = false;
+                layer = new Layer();
+            }
             layer.setName(name);
             layer.setNamespace(namespace);
             layer.setAlias(alias);
@@ -115,10 +120,16 @@ public class LayerBusiness {
             layer.setOwner(securityManager.getCurrentUserLogin());
             final String configXml = getStringFromLayerConfig(config);
             layer.setConfig(configXml);
-            layer = layerRepository.save(layer);
+            
+            int layerID;
+            if (!update) {
+                layerID = layerRepository.save(layer).getId();
+            } else {
+                layerID = layerRepository.update(layer);
+            }
             
             for (int styleID : styleRepository.getStyleIdsForData(data.getId())) {
-                styleRepository.linkStyleToLayer(styleID, layer.getId());
+                styleRepository.linkStyleToLayer(styleID, layerID);
             }
             //style
             
@@ -167,34 +178,41 @@ public class LayerBusiness {
                 final Provider provider  = providerRepository.findOne(data.getProvider());
                 final QName name         = new QName(layer.getNamespace(), layer.getName());
                 final List<Style> styles = styleRepository.findByLayer(layer);
+                org.constellation.configuration.Layer layerConfig = readLayerConfiguration(layer.getConfig());
                 if (securityFilter.allowed(login, name)) {
-                    final org.constellation.configuration.Layer layerDto = new org.constellation.configuration.Layer(name);
-                    layerDto.setAlias(layer.getAlias());
+                    if (layerConfig == null) {
+                        layerConfig = new org.constellation.configuration.Layer(name);
+                    }
+                    
+                    // override with table values (TODO remove)
+                    layerConfig.setAlias(layer.getAlias());
+                    layerConfig.setDate(new Date(layer.getDate()));
+                    layerConfig.setOwner(layer.getOwner());
+                    layerConfig.setProviderID(provider.getIdentifier());
+                    layerConfig.setProviderType(provider.getType());
+                    
                     // TODO layerDto.setAbstrac();
                     // TODO layerDto.setAttribution(null);
                     // TODO layerDto.setAuthorityURL(null);
                     // TODO layerDto.setCrs(null);
                     // TODO layerDto.setDataURL(null);
-                    layerDto.setDate(new Date(layer.getDate()));
                     // TODO layerDto.setDimensions(null);
                     // TODO layerDto.setFilter(null);
                     // TODO layerDto.setGetFeatureInfoCfgs(null);
                     // TODO layerDto.setKeywords();
                     // TODO layerDto.setMetadataURL(null);
                     // TODO layerDto.setOpaque(Boolean.TRUE);
-                    layerDto.setOwner(layer.getOwner());
-                    layerDto.setProviderID(provider.getIdentifier());
-                    layerDto.setProviderType(provider.getType());
+                    
 
                     for (Style style : styles) {
                         final Provider styleProvider = providerRepository.findOne(style.getProvider());
                         DataReference styleProviderReference = DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, styleProvider.getIdentifier(), style.getName());
-                        layerDto.getStyles().add(styleProviderReference);
+                        layerConfig.getStyles().add(styleProviderReference);
                     }
 
                      // TODO layerDto.setTitle(null);
                      // TODO layerDto.setVersion();
-                    response.add(layerDto);
+                    response.add(layerConfig);
                 }
             }
         } else {
@@ -210,6 +228,20 @@ public class LayerBusiness {
                 final Object config = u.unmarshal(new StringReader(xml));
                 GenericDatabaseMarshallerPool.getInstance().recycle(u);
                 return (LayerContext) config;
+            }
+            return null;
+        } catch (JAXBException ex) {
+            throw new ConfigurationException(ex);
+        }
+    }
+    
+    private org.constellation.configuration.Layer readLayerConfiguration(final String xml) throws ConfigurationException {
+        try {
+            if (xml != null) {
+                final Unmarshaller u = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+                final Object config = u.unmarshal(new StringReader(xml));
+                GenericDatabaseMarshallerPool.getInstance().recycle(u);
+                return (org.constellation.configuration.Layer) config;
             }
             return null;
         } catch (JAXBException ex) {

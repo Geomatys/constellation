@@ -34,6 +34,7 @@ import org.constellation.util.DataReference;
  * @author Quentin Boileau (Geomatys)
  * @since 0.6
  */
+@XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Layer {
 
@@ -368,6 +369,9 @@ public class Layer {
      * @return a list with GetFeatureInfoCfg, can be null.
      */
     public List<GetFeatureInfoCfg> getGetFeatureInfoCfgs() {
+        if (getFeatureInfoCfgs == null) {
+            getFeatureInfoCfgs = new ArrayList<>();
+        }
         return getFeatureInfoCfgs;
     }
 

@@ -38,8 +38,10 @@ import org.constellation.ServiceDef;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
 import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.admin.service.ConstellationClient;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Instance;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
@@ -58,6 +60,10 @@ import org.junit.*;
 import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
 import org.opengis.parameter.ParameterValueGroup;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.context.ContextConfiguration;
 import org.w3c.dom.Node;
 
 /**
@@ -65,7 +71,15 @@ import org.w3c.dom.Node;
  * @author Guilhem Legal (Geomatys)
  */
 @RunWith(SpringTestRunner.class)
-public class OGCRestTest extends AbstractGrizzlyServer {
+@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+public class OGCRestTest extends AbstractGrizzlyServer implements ApplicationContextAware {
+
+    protected ApplicationContext applicationContext;
+    
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
 
     @Inject
     private ServiceBusiness serviceBusiness;
@@ -74,33 +88,42 @@ public class OGCRestTest extends AbstractGrizzlyServer {
     private ProviderBusiness providerBusiness;
     
     private static ConstellationClient client;
+    
+    private static boolean initialized = false;
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
     @PostConstruct
     public void initPool() {
-        try {
-            final File configDirectory = ConfigurationEngine.setupTestEnvironement("OGCRestTest");
-            final File dataDirectory2 = new File(configDirectory, "dataCsw2");
-            dataDirectory2.mkdir();
-            
-            
-            final Automatic config2 = new Automatic("filesystem", dataDirectory2.getPath());
-            config2.putParameter("shiroAccessible", "false");
-            serviceBusiness.create("CSW", "default", config2, null, null);
-            
-            writeProvider("meta1.xml",  "42292_5p_19900609195600");
-            
-            Automatic configuration = new Automatic("internal", (String)null);
-            configuration.putParameter("shiroAccessible", "false");
-            serviceBusiness.create("CSW", "intern", configuration, null, null);
-            
-            initServer(null, null, "api");
-            pool = GenericDatabaseMarshallerPool.getInstance();
-        } catch (Exception ex) {
-            Logger.getLogger(OGCRestTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        SpringHelper.setApplicationContext(applicationContext);
+        if (!initialized) {
+            try {
+                final File configDirectory = ConfigurationEngine.setupTestEnvironement("OGCRestTest");
+                final File dataDirectory2 = new File(configDirectory, "dataCsw2");
+                dataDirectory2.mkdir();
 
+                try {
+                    serviceBusiness.delete("csw", "default");
+                    serviceBusiness.delete("csw", "intern");
+                } catch (ConfigurationException ex) {}
+
+                final Automatic config2 = new Automatic("filesystem", dataDirectory2.getPath());
+                config2.putParameter("shiroAccessible", "false");
+                serviceBusiness.create("csw", "default", config2, null, null);
+
+                writeProvider("meta1.xml",  "42292_5p_19900609195600");
+
+                Automatic configuration = new Automatic("internal", (String)null);
+                configuration.putParameter("shiroAccessible", "false");
+                serviceBusiness.create("csw", "intern", configuration, null, null);
+
+                initServer(null, null, "api");
+                pool = GenericDatabaseMarshallerPool.getInstance();
+                initialized = true;
+            } catch (Exception ex) {
+                Logger.getLogger(OGCRestTest.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     @AfterClass

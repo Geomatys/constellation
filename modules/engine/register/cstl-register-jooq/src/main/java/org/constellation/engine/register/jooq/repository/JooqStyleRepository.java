@@ -125,8 +125,8 @@ public class JooqStyleRepository extends AbstractJooqRespository<StyleRecord, St
     }
 
     @Override
-    public List<Integer> getStyleIdsForData(int dataId) {
-    	return dsl.select(STYLED_DATA.STYLE).from(STYLED_DATA).where(STYLED_DATA.DATA.eq(dataId)).fetchInto(Integer.class);
+    public List<Integer> getStyleIdsForData(int id) {
+        return dsl.select(STYLE.ID).from(STYLE).join(STYLED_DATA).on(STYLED_DATA.STYLE.eq(STYLE.ID)).where(STYLED_DATA.DATA.eq(id)).fetch(STYLE.ID);
     }
 
     @Override

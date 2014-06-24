@@ -108,7 +108,7 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
          */
         if (!WSEngine.isSetService(serviceName)) {
             try {
-                serviceBusiness.start(serviceName);
+                serviceBusiness.start(serviceName.toLowerCase());
             } catch (ConfigurationException ex) {
                 LOGGER.log(Level.WARNING, "Error while starting services for :" + serviceName, ex);
             }

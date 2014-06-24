@@ -118,9 +118,9 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
                 suffix = "";
             }
             if (grizzly != null && grizzly.getCurrentPort() != null) {
-                u = new URL("http://localhost:" + grizzly.getCurrentPort() + suffix + "/configuration?request=access");
+                u = new URL("http://localhost:" + grizzly.getCurrentPort() + suffix + "/1/user/access");
             } else {
-                u = new URL("http://localhost:9090"+ suffix +"/configuration?request=access");
+                u = new URL("http://localhost:9090/1/user/access");
             }
             ex = false;
             URLConnection conec = u.openConnection();

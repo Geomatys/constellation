@@ -120,6 +120,13 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
     @Test
     public void testAddSFLayerToConfiguration() throws NoSuchIdentifierException, ProcessException, MalformedURLException, ConfigurationException {
         final ProcessDescriptor descriptor = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, PROCESS_NAME);
+        
+        //init
+        final LayerContext inputContext = new LayerContext();
+        inputContext.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
+        
+        createCustomInstance("addLayer1", inputContext);
+        startInstance("addLayer1");
 
         final Filter bbox = FF.bbox("geom", 10, 0, 30, 50, null);
 
@@ -209,6 +216,8 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         startInstance("addLayer3");
         
         Layer layer = new Layer(new QName(COUNTRIES_DATA_REF.getLayerId().getNamespaceURI(), COUNTRIES_DATA_REF.getLayerId().getLocalPart()));
+        layer.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
+        
         layerBusiness.add(COUNTRIES_DATA_REF.getLayerId().getLocalPart(), 
                           COUNTRIES_DATA_REF.getLayerId().getNamespaceURI(), 
                           COUNTRIES_DATA_REF.getProviderOrServiceId(),
@@ -220,6 +229,9 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
 
         final Filter bbox = FF.bbox("geom", 10, 0, 30, 50, null);
         
+        final List<GetFeatureInfoCfg> gfi = FeatureInfoUtilities.createGenericConfiguration();
+        final GetFeatureInfoCfg[] customGFI = gfi.toArray(new GetFeatureInfoCfg[gfi.size()]);
+        
         //exec process
         final ParameterValueGroup inputs = descriptor.getInputDescriptor().createValue();
         inputs.parameter(AddLayerToMapServiceDescriptor.LAYER_REF_PARAM_NAME).setValue(COUNTRIES_DATA_REF);
@@ -228,6 +240,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         inputs.parameter(AddLayerToMapServiceDescriptor.LAYER_FILTER_PARAM_NAME).setValue(bbox);
         inputs.parameter(AddLayerToMapServiceDescriptor.SERVICE_TYPE_PARAM_NAME).setValue(serviceName);
         inputs.parameter(AddLayerToMapServiceDescriptor.SERVICE_INSTANCE_PARAM_NAME).setValue("addLayer3");
+        inputs.parameter(AddLayerToMapServiceDescriptor.LAYER_CUSTOM_GFI_PARAM_NAME).setValue(customGFI);
 
         final org.geotoolkit.process.Process process = descriptor.createProcess(inputs);
         final ParameterValueGroup outputs = process.call();
@@ -260,12 +273,15 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
 
         //init
         final LayerContext inputContext = new LayerContext();
-        inputContext.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
+        final List<GetFeatureInfoCfg> gfi = FeatureInfoUtilities.createGenericConfiguration();
+        final GetFeatureInfoCfg[] gfiArray = gfi.toArray(new GetFeatureInfoCfg[gfi.size()]);
+        inputContext.setGetFeatureInfoCfgs(gfi);
         
         createCustomInstance("addLayer5", inputContext);
         startInstance("addLayer5");
         
         Layer layer1 = new Layer(new QName(COUNTRIES_DATA_REF.getLayerId().getNamespaceURI(), COUNTRIES_DATA_REF.getLayerId().getLocalPart()));
+        layer1.setGetFeatureInfoCfgs(gfi);
         layerBusiness.add(COUNTRIES_DATA_REF.getLayerId().getLocalPart(), 
                           COUNTRIES_DATA_REF.getLayerId().getNamespaceURI(), 
                           COUNTRIES_DATA_REF.getProviderOrServiceId(),
@@ -275,6 +291,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
                           layer1);
         
         Layer layer2 = new Layer(new QName(COUNTRIES_DATA_REF.getLayerId().getNamespaceURI(), "city"));
+        layer2.setGetFeatureInfoCfgs(gfi);
         layerBusiness.add("city", 
                           COUNTRIES_DATA_REF.getLayerId().getNamespaceURI(), 
                           COUNTRIES_DATA_REF.getProviderOrServiceId(),
@@ -294,6 +311,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         inputs.parameter(AddLayerToMapServiceDescriptor.LAYER_FILTER_PARAM_NAME).setValue(bbox);
         inputs.parameter(AddLayerToMapServiceDescriptor.SERVICE_TYPE_PARAM_NAME).setValue(serviceName);
         inputs.parameter(AddLayerToMapServiceDescriptor.SERVICE_INSTANCE_PARAM_NAME).setValue("addLayer5");
+        inputs.parameter(AddLayerToMapServiceDescriptor.LAYER_CUSTOM_GFI_PARAM_NAME).setValue(gfiArray);
 
 
         final org.geotoolkit.process.Process process = descriptor.createProcess(inputs);
@@ -304,7 +322,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         
         final List<Layer> layers = layerBusiness.getLayers(serviceName, "addLayer5", null);
         assertFalse(layers.isEmpty());
-        assertTrue(layers.size() == 1);
+        assertTrue(layers.size() == 2);
         assertTrue(outputLayer.getGetFeatureInfoCfgs().size() > 0); //default generic GetFeatureInfo
 
 
@@ -328,6 +346,13 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
      */
      @Test
     public void testAddSFLayerToConfiguration6() throws NoSuchIdentifierException, ProcessException, MalformedURLException, ConfigurationException {
+        //init
+        final LayerContext inputContext = new LayerContext();
+        inputContext.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
+        
+        createCustomInstance("addLayer6", inputContext);
+        startInstance("addLayer6");
+        
         final ProcessDescriptor descriptor = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, PROCESS_NAME);
 
         final ParameterValueGroup inputs = descriptor.getInputDescriptor().createValue();
@@ -365,6 +390,13 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
     public void testAddSFLayerToConfiguration7() throws NoSuchIdentifierException, ProcessException, MalformedURLException, ConfigurationException {
         final ProcessDescriptor descriptor = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, PROCESS_NAME);
 
+        //init
+        final LayerContext inputContext = new LayerContext();
+        inputContext.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
+        
+        createCustomInstance("addLayer7", inputContext);
+        startInstance("addLayer7");
+        
         final Filter bbox = FF.bbox("geom", 10, 0, 30, 50, null);
         final GetFeatureInfoCfg[] customGFI = new GetFeatureInfoCfg[1];
         customGFI[0] = new GetFeatureInfoCfg("text/plain", CSVFeatureInfoFormat.class.getCanonicalName());
@@ -387,7 +419,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         final List<Layer> layers = layerBusiness.getLayers(serviceName, "addLayer7", null);
         assertFalse(layers.isEmpty());
         assertTrue(layers.size() == 1);
-        assertTrue(output.getGetFeatureInfoCfgs().isEmpty()); //default generic GetFeatureInfo
+        assertTrue(output.getGetFeatureInfoCfgs().size() == 1); //default generic GetFeatureInfo
 
 
         final Layer outLayer = layers.get(0);
