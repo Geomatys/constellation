@@ -141,7 +141,7 @@ public class DataBusiness {
         List<Data> datas = new ArrayList<Data>();
         datas.add(data);
         List<DataBrief> dataBriefs = getDataBriefFrom(datas);
-        if (dataBriefs !=null && dataBriefs.size()==0){
+        if (dataBriefs !=null && dataBriefs.size()==1){
             return dataBriefs.get(0);
         }
         throw new ConstellationException(new Exception("Problem : DataBrief Construction is null or multiple"));

@@ -68,15 +68,9 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
 
     @Override
     public Data create(Data data) {
-        DataRecord newRecord = dsl.newRecord(DATA);
-        newRecord.setDate(data.getDate());
-        newRecord.setIsoMetadata(data.getIsoMetadata());
-        newRecord.setMetadata(data.getMetadata());
-        newRecord.setName(data.getName());
-        newRecord.setNamespace(data.getNamespace());
-        newRecord.setOwner(data.getOwner());
-        newRecord.setProvider(data.getProvider());
-        newRecord.setType(data.getType());
+
+        DataRecord newRecord = DataHelper.copy(data, dsl.newRecord(DATA));
+
         newRecord.store();
         return newRecord.into(Data.class);
     }
