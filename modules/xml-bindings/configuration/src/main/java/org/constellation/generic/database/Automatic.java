@@ -633,6 +633,18 @@ public class Automatic extends AbstractConfigurationObject {
         }
         return result;
     }
+    
+    public void setParameterList(final String key, List<String> list) {
+        if (customparameters == null) {
+            customparameters = new HashMap<>();
+        }
+        String s = ",";
+        for (String l : list) {
+            s = s + ',' + l;
+        }
+        s = s.substring(1);
+        customparameters.put(key, s);
+    }
 
     public void removeParameter(final String key) {
         if (customparameters == null) {

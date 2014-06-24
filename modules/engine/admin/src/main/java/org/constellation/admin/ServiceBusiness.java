@@ -83,7 +83,7 @@ public class ServiceBusiness {
         final Service service = new Service();
         service.setConfig(config);
         service.setDate(new Date().getTime());
-        service.setType( ServiceDef.Specification.valueOf(serviceType.toUpperCase()).name());
+        service.setType( ServiceDef.Specification.valueOf(serviceType.toUpperCase()).name().toLowerCase());
         service.setOwner(securityManager.getCurrentUserLogin());
         service.setIdentifier(identifier);
         service.setStatus(ServiceStatus.STOPPED.toString());

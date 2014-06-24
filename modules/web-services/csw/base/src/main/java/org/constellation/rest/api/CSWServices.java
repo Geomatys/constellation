@@ -37,8 +37,11 @@ import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.BriefNode;
 import org.constellation.configuration.BriefNodeList;
 import org.constellation.configuration.NotRunningServiceException;
+import org.constellation.configuration.StringList;
 import org.constellation.dto.ParameterValues;
+import org.constellation.dto.Service;
 import org.constellation.dto.SimpleValue;
+import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.configuration.CSWConfigurer;
 import static org.constellation.utils.RESTfulUtilities.ok;
 import org.constellation.ws.ServiceConfigurer;
@@ -145,6 +148,18 @@ public class CSWServices {
     @Path("types")
     public Response getCSWDatasourceType() throws Exception {
         return ok(getConfigurer().getAvailableCSWDataSourceType());
+    }
+    
+    @POST
+    @Path("{id}/federatedCatalog")
+    public Response setFederatedCatalog(final @PathParam("id") String id, StringList url) throws Exception {
+        final Service metadata = serviceBusiness.getInstanceMetadata("csw", id, null);
+        final Automatic conf = (Automatic) serviceBusiness.getConfiguration("csw", id);
+        final List<String> urls = conf.getParameterList("CSWCascading");
+        urls.addAll(url.getList());
+        conf.setParameterList("CSWCascading", urls);
+        serviceBusiness.configure("csw", id, metadata, conf);
+        return ok(new AcknowlegementType("Success", "federated catalog added"));
     }
 
     private static CSWConfigurer getConfigurer() throws NotRunningServiceException {

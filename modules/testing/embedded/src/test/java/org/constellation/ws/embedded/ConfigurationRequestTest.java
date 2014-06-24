@@ -32,6 +32,7 @@ import org.geotoolkit.util.StringUtilities;
 import org.apache.sis.xml.MarshallerPool;
 import java.net.URLConnection;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -44,7 +45,11 @@ import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.ServiceReport;
+import org.constellation.configuration.StringList;
+import org.constellation.dto.ParameterValues;
+import org.constellation.dto.SimpleValue;
 import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.metadata.io.filesystem.sql.MetadataDatasource;
 import org.constellation.metadata.io.filesystem.sql.Session;
 import org.constellation.sos.ws.soap.SOService;
@@ -52,6 +57,7 @@ import org.constellation.test.utils.Order;
 import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.util.Util;
 import org.constellation.ws.ExceptionCode;
+import static org.constellation.ws.embedded.AbstractGrizzlyServer.postRequestObject;
 import org.geotoolkit.csw.xml.v202.GetRecordsResponseType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
 import org.junit.*;
@@ -174,19 +180,21 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer implements A
 
         waitForStart();
         //update the federated catalog in case of busy port
-        URL fedCatURL = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/csw/admin?request=setFederatedCatalog&id=csw2&servers=" + getCswURL());
+        URL fedCatURL = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/1/CSW/csw2/federatedCatalog");
         URLConnection conec = fedCatURL.openConnection();
 
+        postRequestObject(conec, new StringList(Arrays.asList(getCswURL())),  GenericDatabaseMarshallerPool.getInstance());
         Object obj = unmarshallResponse(conec);
 
         assertTrue(obj instanceof AcknowlegementType);
 
 
-        URL niUrl = new URL(getConfigurationURL() + "request=restart");
+        URL niUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/1/OGC/csw/csw2/restart");
 
         // for a POST request
         conec = niUrl.openConnection();
 
+        postRequestObject(conec, new SimpleValue(false), GenericDatabaseMarshallerPool.getInstance());
         obj = unmarshallResponse(conec);
 
         assertTrue(obj instanceof AcknowlegementType);
@@ -195,48 +203,16 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer implements A
     }
 
     @Test
-    @Order(order=2)
-    public void testDownloadFile() throws Exception {
-
-        URL niUrl = new URL(getConfigurationURL() + "request=download");
-
-
-        // for a POST request
-        URLConnection conec = niUrl.openConnection();
-
-        Object obj = unmarshallResponse(conec);
-
-        assertTrue(obj instanceof ExceptionReport);
-        ExceptionReport expResult = new ExceptionReport("Download operation not implemented",
-                                                         StringUtilities.transformCodeName(ExceptionCode.OPERATION_NOT_SUPPORTED.name()));
-        assertEquals(expResult, obj);
-    }
-
-    @Test
     @Order(order=3)
     public void testCSWRefreshIndex() throws Exception {
 
-        /*
-         * try to get a missing parameter error
-         */
-        URL niUrl = new URL(getConfigurationURL() + "request=refreshIndex");
+
+        // first we make a getRecords request to count the number of record
+        URL niUrl = new URL(getCswURL() + "request=getRecords&version=2.0.2&service=CSW&typenames=csw:Record");
 
         URLConnection conec = niUrl.openConnection();
 
         Object obj = unmarshallResponse(conec);
-
-        assertTrue(obj instanceof ExceptionReport);
-        ExceptionReport exception = new ExceptionReport("The parameter ID must be specified",
-                                                         StringUtilities.transformCodeName(ExceptionCode.MISSING_PARAMETER_VALUE.name()));
-        assertEquals(exception, obj);
-
-
-        // first we make a getRecords request to count the number of record
-        niUrl = new URL(getCswURL() + "request=getRecords&version=2.0.2&service=CSW&typenames=csw:Record");
-
-        conec = niUrl.openConnection();
-
-        obj = unmarshallResponse(conec);
 
         assertTrue(obj instanceof GetRecordsResponseType);
         GetRecordsResponseType response = (GetRecordsResponseType) obj;
@@ -258,11 +234,16 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer implements A
         pool.recycle(m);
 
 
-        niUrl = new URL(getConfigurationURL() + "request=refreshIndex&id=default");
+        niUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/1/CSW/default/index/refresh");
 
         // for a POST request
         conec = niUrl.openConnection();
 
+        Map<String, String> params = new HashMap<>();
+        params.put("ASYNCHRONE", "false");
+        params.put("FORCED", "false");
+        
+        postRequestObject(conec, new ParameterValues(params), GenericDatabaseMarshallerPool.getInstance());
         obj = unmarshallResponse(conec);
 
         assertTrue(obj instanceof AcknowlegementType);
@@ -284,7 +265,7 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer implements A
         f.delete();
         f2.delete();
         
-        niUrl = new URL(getConfigurationURL() + "request=refreshIndex&id=default");
+        niUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/1/CSW/default/index/refresh");
 
         // for a POST request
         conec = niUrl.openConnection();
@@ -375,7 +356,7 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer implements A
         
         // restore previous context
         f.delete();
-        niUrl = new URL(getConfigurationURL() + "request=refreshIndex&id=default");
+        niUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/1/CSW/default/index/refresh");
 
         // for a POST request
         conec = niUrl.openConnection();
@@ -446,7 +427,7 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer implements A
         assertEquals(11, response.getSearchResults().getNumberOfRecordsMatched());
         
         // restore previous context
-        niUrl = new URL(getConfigurationURL() + "request=refreshIndex&id=default");
+        niUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/1/CSW/default/index/refresh");
 
         // for a POST request
         conec = niUrl.openConnection();

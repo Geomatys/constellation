@@ -45,7 +45,9 @@ import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.StringList;
 import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.sos.ws.soap.SOService;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.SpringTestRunner;
@@ -137,7 +139,6 @@ public class CSWRequestTest extends AbstractGrizzlyServer implements Application
                 config.putParameter("shiroAccessible", "false");
                 serviceBusiness.create("csw", "default", config, null, null);
 
-
                 final Map<String, Object> map = new HashMap<>();
                 map.put("sos", new SOService());
                 initServer(null, map);
@@ -175,10 +176,10 @@ public class CSWRequestTest extends AbstractGrizzlyServer implements Application
         waitForStart();
 
         //update the federated catalog in case of busy port
-        URL fedCatURL = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/csw/admin?request=setFederatedCatalog&id=csw2&servers=" + getDefaultURL());
+        URL fedCatURL = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/1/CSW/csw2/federatedCatalog");
         URLConnection conec = fedCatURL.openConnection();
 
-        getStringResponse(conec);
+        postRequestObject(conec, new StringList(Arrays.asList(getDefaultURL())),  GenericDatabaseMarshallerPool.getInstance());
 
         // Creates a valid GetCapabilities url.
         URL getCapsUrl = new URL(getDefaultURL());

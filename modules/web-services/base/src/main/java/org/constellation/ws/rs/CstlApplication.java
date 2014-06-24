@@ -35,7 +35,7 @@ import javax.ws.rs.core.Application;
 public class CstlApplication extends Application {
 
     private final Set<Object> singletons = new HashSet<>();
-
+    
     public CstlApplication() {
         final Iterator<WebService> ite = ServiceRegistry.lookupProviders(WebService.class);
         while (ite.hasNext()) {

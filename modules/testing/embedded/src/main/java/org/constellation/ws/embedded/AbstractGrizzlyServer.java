@@ -346,6 +346,10 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
     }
 
     protected static void postRequestObject(URLConnection conec, Object request) throws IOException, JAXBException {
+        postRequestObject(conec, request, pool);
+    }
+    
+    protected static void postRequestObject(URLConnection conec, Object request, MarshallerPool pool) throws IOException, JAXBException {
         conec.setDoOutput(true);
         conec.setRequestProperty("Content-Type", "application/xml");
         final OutputStreamWriter wr = new OutputStreamWriter(conec.getOutputStream());

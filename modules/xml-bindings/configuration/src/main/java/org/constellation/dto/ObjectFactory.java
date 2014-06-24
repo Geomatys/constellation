@@ -75,4 +75,8 @@ public class ObjectFactory {
     public ObservationFilter createObservationFilter(){
         return new ObservationFilter();
     }
+    
+    public SimpleValue createSimpleValue() {
+        return new SimpleValue();
+    }
 }

@@ -22,27 +22,28 @@ import java.io.IOException;
 import java.net.URI;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
+import java.util.Map.Entry;
 import java.util.logging.Level;
-
+import java.util.logging.Logger;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.UriBuilder;
 import javax.xml.ws.Endpoint;
-import java.util.*;
-import java.util.Map.Entry;
-import javax.ws.rs.ProcessingException;
-import org.glassfish.grizzly.http.server.HttpServer;
-
-import org.geotoolkit.console.CommandLine;
-import org.geotoolkit.console.Option;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.ws.rs.CstlApplication;
+import org.constellation.ws.rs.jackson.JacksonFeature;
+import org.geotoolkit.console.CommandLine;
+import org.geotoolkit.console.Option;
+import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ApplicationHandler;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
+import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 
 /**
  * An Abstract class to run the web service in an embedded container.
@@ -242,6 +243,9 @@ public class CstlEmbeddedService extends CommandLine {
             try {
                 final ResourceConfig config = ResourceConfig.forApplication(new CstlApplication());
                 config.addProperties(grizzlyWebContainerProperties);
+                config.register(JacksonFeature.class);
+                config.register(MultiPartFeature.class);
+                config.register(RolesAllowedDynamicFeature.class);
                 ApplicationHandler handler = new ApplicationHandler(config);
 
                 threadSelector = GrizzlyHttpServerFactory.createHttpServer(currentUri, handler, true);
