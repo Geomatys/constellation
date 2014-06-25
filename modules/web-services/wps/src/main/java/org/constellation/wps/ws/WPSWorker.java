@@ -51,6 +51,7 @@ import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.process.*;
 import org.geotoolkit.referencing.CRS;
 import org.apache.sis.util.ArgumentChecks;
+import org.geotoolkit.util.Exceptions;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.converter.NonconvertibleObjectException;
 import org.geotoolkit.wps.converters.WPSConvertersUtils;
@@ -890,7 +891,11 @@ public class WPSWorker extends AbstractWorker {
      * @return execute response (Raw data or Document response) depends of the ResponseFormType in execute request
      * @throws CstlServiceException
      */
-    private Object execute100(Execute request) throws CstlServiceException {
+    private Object execute100(final Execute request) throws CstlServiceException {
+
+        //////////////////////////////
+        //    REQUEST VALIDATION
+        //////////////////////////////
 
         //check mandatory IDENTIFIER is not missing.
         if (request.getIdentifier() == null || request.getIdentifier().getValue() == null || request.getIdentifier().getValue().isEmpty()) {
@@ -954,66 +959,36 @@ public class WPSWorker extends AbstractWorker {
              throw new CstlServiceException("Set the storeExecuteResponse to true if you want to see status in response documents.", INVALID_PARAMETER_VALUE, "storeExecuteResponse");
         }
 
+        //////////////////////////////
+        // END OF REQUEST VALIDATION
+        //////////////////////////////
         LOGGER.log(Level.INFO, "Process Execute : {0}", request.getIdentifier().getValue());
 
         /*
          * ResponseDocument attributes
          */
         boolean useLineage = isOutputRespDoc && respDoc.isLineage();
-        boolean useStatus = isOutputRespDoc && respDoc.isStatus();
         boolean useStorage = isOutputRespDoc && respDoc.isStoreExecuteResponse();
         final List<DocumentOutputDefinitionType> wantedOutputs = isOutputRespDoc ? respDoc.getOutput() : null;
 
-        //LOGGER.log(Level.INFO, "Request : [Lineage=" + isLineage + ", Storage=" + useStatus + ", Status=" + useStorage + "]");
-
-
         //Input temporary files used by the process. In order to delete them at the end of the process.
-        List<File> files = null;
-
-        //Create Process and Inputs
-        final ParameterValueGroup in = processDesc.getInputDescriptor().createValue();
-
-        ///////////////////////
-        //   Process INPUT
-        //////////////////////
-        List<InputType> requestInputData = new ArrayList<>();
-        if (request.getDataInputs() != null && request.getDataInputs().getInput() != null) {
-            requestInputData = request.getDataInputs().getInput();
-        }
-        final List<GeneralParameterDescriptor> processInputDesc = processDesc.getInputDescriptor().descriptors();
-        //Fill input process with there default values
-        for (final GeneralParameterDescriptor inputGeneDesc : processInputDesc) {
-
-            if (inputGeneDesc instanceof ParameterDescriptor) {
-                final ParameterDescriptor inputDesc = (ParameterDescriptor) inputGeneDesc;
-
-                if (inputDesc.getDefaultValue() != null) {
-                    in.parameter(inputDesc.getName().getCode()).setValue(inputDesc.getDefaultValue());
-                }
-            } 
-        }
-
-        //Fill process input with data from execute request.
-        fillProcessInputFromRequest(in, requestInputData, processInputDesc, files);
-
-
-        ///////////////////////
-        //   RUN Process
-        //////////////////////
-
-
-        //Give input parameter to the process
-        final org.geotoolkit.process.Process process = processDesc.createProcess(in);
+        final ArrayList<File> tempFiles = new ArrayList<>();
 
         //Submit the process execution to the ExecutorService
         final List<GeneralParameterDescriptor> processOutputDesc = processDesc.getOutputDescriptor().descriptors();
         ParameterValueGroup result = null;
+
+        ///////////////////////
+        //   RUN Process
+        //////////////////////
 
         if (isOutputRaw) {
 
             ////////
             // RAW Sync no timeout
             ////////
+            final org.geotoolkit.process.Process process = createProcess(
+                    processDesc, request.getDataInputs() ==  null? null : request.getDataInputs().getInput(),tempFiles);
             final Future<ParameterValueGroup> future = WPSService.getExecutor().submit(process);
             try {
                 result = future.get();
@@ -1061,38 +1036,60 @@ public class WPSWorker extends AbstractWorker {
             // DOC Async
             ////////
             if (useStorage) {
+
+        /*
+         * If we are in asynchronous execution, we create the status document and return, to specify user we accepted its
+         * request. We create the process in a thread, so if an input is a reference and we've got a timeout, client has
+         * already got the status location, and he will receive a proper exception report instead of a timeout error due
+         * to the input.
+         */
                 if (!supportStorage) {
                     throw new CstlServiceException("Storage not supported.", STORAGE_NOT_SUPPORTED, "storeExecuteResponse");
                 }
 
                 final String respDocFileName = UUID.randomUUID().toString();
 
-                //copy of the current response for async purpose.
-                final ExecuteResponse responseAsync = new ExecuteResponse(response);
-
-                process.addListener(new WPSProcessListener(request, responseAsync, respDocFileName, ServiceDef.WPS_1_0_0, parameters));
-
                 status.setCreationTime(WPSUtils.getCurrentXMLGregorianCalendar());
-                status.setProcessAccepted("Process "+request.getIdentifier().getValue()+" accepted.");
+                status.setProcessAccepted("Process " + request.getIdentifier().getValue() + " accepted.");
                 response.setStatus(status);
-
-                //run process in asynchronous
-                WPSService.getExecutor().submit(process);
-
+                response.setStatusLocation(webdavURL + "/" + respDocFileName); //Output data URL
                 //store response document
                 WPSUtils.storeResponse(response, webdavFolderPath, respDocFileName);
-                response.setStatusLocation(webdavURL + "/" + respDocFileName); //Output data URL
+
+                //run process in asynchronous
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            // Prepare and launch process in a separate thread.
+                            final org.geotoolkit.process.Process process = createProcess(
+                                    processDesc, request.getDataInputs() == null ? null : request.getDataInputs().getInput(), tempFiles);
+                            process.addListener(new WPSProcessListener(request, response, respDocFileName, ServiceDef.WPS_1_0_0, parameters));
+                            WPSService.getExecutor().submit(process);
+                        } catch (Exception e) {
+                            // If we've got an exception, input parsing must have failed.
+                            final StatusType status = new StatusType();
+                            status.setCreationTime(WPSUtils.getCurrentXMLGregorianCalendar());
+                            final ProcessFailedType processFT = new ProcessFailedType();
+                            processFT.setExceptionReport(new ExceptionReport(Exceptions.formatStackTrace(e), null, null, ServiceDef.WPS_1_0_0.exceptionVersion.toString()));
+                            status.setProcessFailed(processFT);
+                            response.setStatus(status);
+                            WPSUtils.storeResponse(response, webdavFolderPath, respDocFileName);
+                        }
+                    }
+                }).start();
 
             } else {
 
                 ////////
                 // DOC Sync
                 ////////
+                final org.geotoolkit.process.Process process = createProcess(
+                        processDesc, request.getDataInputs() ==  null? null : request.getDataInputs().getInput(),tempFiles);
                 final Future<ParameterValueGroup> future = WPSService.getExecutor().submit(process);
 
                 final ProcessFailedType processFT = new ProcessFailedType();
                 ExceptionReport report = null;
-
 
                 // timeout
                 try {
@@ -1137,6 +1134,43 @@ public class WPSWorker extends AbstractWorker {
             //WPSUtils.cleanTempFiles(files);
             return response;
         }
+    }
+
+    /**
+     * Create a Process object from the given descriptor, and set its input using the {@link org.geotoolkit.wps.xml.v100.Execute}
+     * request input in parameter.
+     * @param processDesc A descriptor for Process creation.
+     * @param requestInputData The list of inputs to set to the process.
+     * @param tempFiles A list to store references of possible temporary files created with the process.
+     * @return An ready-to-use process.
+     */
+    private org.geotoolkit.process.Process createProcess(
+            final ProcessDescriptor processDesc, List<InputType> requestInputData, List<File> tempFiles)
+            throws CstlServiceException {
+        //Create Process and Inputs
+        final ParameterValueGroup in = processDesc.getInputDescriptor().createValue();
+
+        if (requestInputData == null) {
+            requestInputData = new ArrayList<>();
+        }
+        final List<GeneralParameterDescriptor> processInputDesc = processDesc.getInputDescriptor().descriptors();
+        //Fill input process with there default values
+        for (final GeneralParameterDescriptor inputGeneDesc : processInputDesc) {
+
+            if (inputGeneDesc instanceof ParameterDescriptor) {
+                final ParameterDescriptor inputDesc = (ParameterDescriptor) inputGeneDesc;
+
+                if (inputDesc.getDefaultValue() != null) {
+                    in.parameter(inputDesc.getName().getCode()).setValue(inputDesc.getDefaultValue());
+                }
+            }
+        }
+
+        //Fill process input with data from execute request.
+        fillProcessInputFromRequest(in, requestInputData, processInputDesc, tempFiles);
+
+        //Give input parameter to the process
+        return processDesc.createProcess(in);
     }
 
     /**
@@ -1234,10 +1268,7 @@ public class WPSWorker extends AbstractWorker {
                     throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
                 }
 
-                if (dataValue instanceof File) {
-                    if (files == null) {
-                        files = new ArrayList<>();
-                    }
+                if (dataValue instanceof File && files != null) {
                     files.add((File) dataValue);
                 }
             }
