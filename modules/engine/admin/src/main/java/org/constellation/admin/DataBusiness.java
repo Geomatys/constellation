@@ -214,8 +214,8 @@ public class DataBusiness {
             final List<ServiceProtocol> serviceProtocols = new ArrayList<>(0);
             for (Service service : services) {
                 final List<String> protocol = new ArrayList<>(0);
-                protocol.add(ServiceDef.Specification.valueOf(service.getType()).name());
-                protocol.add(ServiceDef.Specification.valueOf(service.getType()).fullName);
+                protocol.add(ServiceDef.Specification.valueOf(service.getType().toUpperCase()).name());
+                protocol.add(ServiceDef.Specification.valueOf(service.getType().toUpperCase()).fullName);
                 final ServiceProtocol sp = new ServiceProtocol(service.getIdentifier(), protocol);
                 serviceProtocols.add(sp);
             }

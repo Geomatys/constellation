@@ -134,16 +134,16 @@ public class LayerBusiness {
             //style
             
             //update service ISO metadata
-            if (service.getMetadata() != null) {
-                try {
-                    final DefaultMetadata servMeta = MetadataIOUtils.unmarshallMetadata(service.getMetadata());
-                    CstlMetadatas.addServiceMetadataLayer(servMeta, name);
-                    final String srm = MetadataIOUtils.marshallMetadataToString(servMeta);
-                    serviceRepository.updateIsoMetadata(service, servMeta.getFileIdentifier(), srm);
-                } catch (JAXBException e) {
-                    throw new ConstellationPersistenceException(e);
-                }
-            }
+//            if (service.getMetadata() != null) {
+//                try {
+//                    final DefaultMetadata servMeta = MetadataIOUtils.unmarshallMetadata(service.getMetadata());
+//                    CstlMetadatas.addServiceMetadataLayer(servMeta, name);
+//                    final String srm = MetadataIOUtils.marshallMetadataToString(servMeta);
+//                    serviceRepository.updateIsoMetadata(service, servMeta.getFileIdentifier(), srm);
+//                } catch (JAXBException e) {
+//                    throw new ConstellationPersistenceException(e);
+//                }
+//            }
             
         } else {
             throw new TargetNotFoundException("Unable to find a service:" + serviceId);

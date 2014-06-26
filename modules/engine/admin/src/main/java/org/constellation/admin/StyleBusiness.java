@@ -448,8 +448,8 @@ public final class StyleBusiness {
             throws ConfigurationException {
         ensureNonNull("dataProvider", dataProvider);
         ensureNonNull("dataId", dataId);
-        ensureExistingStyle(styleProvider, styleId);
-        final Style style = styleRepository.findByName(styleId);
+        final Style style = ensureExistingStyle(styleProvider, styleId);
+
         if (style == null) {
             throw new ConfigurationException("Style named \"" + styleId + "\" can't be found from database.");
         }
@@ -477,8 +477,8 @@ public final class StyleBusiness {
             final QName dataId) throws ConfigurationException {
         ensureNonNull("dataProvider", dataProvider);
         ensureNonNull("dataId", dataId);
-        ensureExistingStyle(styleProvider, styleId);
-        final Style style = styleRepository.findByName(styleId);
+        final Style style = ensureExistingStyle(styleProvider, styleId);
+
         if (style == null) {
             throw new ConfigurationException("Style named \"" + styleId + "\" can't be found from database.");
         }
@@ -490,24 +490,25 @@ public final class StyleBusiness {
         styleRepository.unlinkStyleToData(style.getId(), data.getId());
     }
 
-    public void removeStyleFromLayer(String serviceIdentifier, String serviceType, String layerName, String styleProviderId, String styleName) {
-        Service service = serviceRepository.findByIdentifierAndType(serviceIdentifier, serviceType);
-        Layer layer = layerRepository.findByServiceIdAndLayerName(service.getId(), layerName);
-        Style style = styleRepository.findByName(styleName);
+    public void removeStyleFromLayer(String serviceIdentifier, String serviceType, String layerName, String styleProviderId, String styleName) throws TargetNotFoundException {
+        final Service service = serviceRepository.findByIdentifierAndType(serviceIdentifier, serviceType);
+        final Layer layer = layerRepository.findByServiceIdAndLayerName(service.getId(), layerName);
+        final Style style = ensureExistingStyle(styleProviderId, styleName);
         styleRepository.unlinkStyleToLayer(style.getId(), layer.getId());
 
     }
 
-    public void createOrUpdateStyleFromLayer(String serviceType, String serviceIdentifier, String layerName, String styleProviderId, String styleName) {
-        Service service = serviceRepository.findByIdentifierAndType(serviceIdentifier, serviceType);
-        Layer layer = layerRepository.findByServiceIdAndLayerName(service.getId(), layerName);
-        Style style = styleRepository.findByName(styleName);
+    public void createOrUpdateStyleFromLayer(String serviceType, String serviceIdentifier, String layerName, String styleProviderId, String styleName) throws TargetNotFoundException {
+        final Service service = serviceRepository.findByIdentifierAndType(serviceIdentifier, serviceType);
+        final Layer layer = layerRepository.findByServiceIdAndLayerName(service.getId(), layerName);
+        final Style style = ensureExistingStyle(styleProviderId, styleName);
+
         styleRepository.linkStyleToLayer(style.getId(), layer.getId());
     }
 
     private MutableStyle parseStyle(final String name, final String xml) {
         MutableStyle value = null;
-        final StringReader sr = new StringReader(xml);
+        StringReader sr = new StringReader(xml);
         final String baseErrorMsg = "SLD Style ";
         
         //try SLD 1.1
@@ -520,6 +521,9 @@ public final class StyleBusiness {
                 return value;
             }
         } catch (JAXBException | FactoryException ex) { /* dont log*/ }
+        finally {
+            sr = new StringReader(xml);
+        }
 
         //try SLD 1.0
         try {
@@ -531,6 +535,9 @@ public final class StyleBusiness {
                 return value;
             }
         } catch (JAXBException | FactoryException ex) { /* dont log*/ }
+        finally {
+            sr = new StringReader(xml);
+        }
 
         //try UserStyle SLD 1.1
         try {
@@ -541,6 +548,9 @@ public final class StyleBusiness {
                 return value;
             }
         } catch (JAXBException | FactoryException ex) { /* dont log*/ }
+        finally {
+            sr = new StringReader(xml);
+        }
 
         //try UserStyle SLD 1.0
         try {
@@ -551,6 +561,9 @@ public final class StyleBusiness {
                 return value;
             }
         } catch (JAXBException | FactoryException ex) { /* dont log*/ }
+        finally {
+            sr = new StringReader(xml);
+        }
 
         //try FeatureTypeStyle SE 1.1
         try {
@@ -562,6 +575,9 @@ public final class StyleBusiness {
             return value;
             
         } catch (JAXBException |FactoryException ex) { /* dont log*/ }
+        finally {
+            sr = new StringReader(xml);
+        }
 
         //try FeatureTypeStyle SLD 1.0
         try {
@@ -573,6 +589,9 @@ public final class StyleBusiness {
             return value;
             
         } catch (JAXBException  | FactoryException ex) { /* dont log*/ }
+        finally {
+            sr = new StringReader(xml);
+        }
         
         return value;
     }

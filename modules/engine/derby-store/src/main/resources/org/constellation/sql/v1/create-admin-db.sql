@@ -396,7 +396,7 @@ ALTER TABLE "admin"."styled_data" ADD CONSTRAINT styled_data_data_fk       FOREI
 CREATE TABLE "admin"."styled_layer"(
   "style"       INTEGER     NOT NULL,
   "layer"       INTEGER     NOT NULL,
-  "default"     BOOLEAN     NOT NULL
+  "default"     BOOLEAN
 );
 
 ALTER TABLE "admin"."styled_layer" ADD CONSTRAINT styled_layer_pk PRIMARY KEY ("style","layer");

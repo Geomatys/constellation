@@ -301,6 +301,9 @@ public final class LayerProviders {
             return portray(providerId, layerName, crsCode, bbox, width, height, null, sldVersion, filter);
         }
     	MutableStyle style = styleBusiness.getStyle(sldProvider, styleId);
+        if (style == null){
+            throw new CstlServiceException("styleid : "+styleId+" on provider : "+sldProvider+" not found");
+        }
     	StyleXmlIO styleXmlIO = new StyleXmlIO();
     	final StringWriter sw = new StringWriter();
     	styleXmlIO.writeStyle(sw, style, Specification.StyledLayerDescriptor.V_1_1_0);

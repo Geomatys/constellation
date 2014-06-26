@@ -36,9 +36,7 @@ public interface StyleRepository {
     List<Style> findByTypeAndProvider(final int providerId, final String type);
     
     List<Style> findByProvider(final int providerId);
-    
-    Style findByName(String name);
-    
+
     Style findByNameAndProvider(final int providerId, String name);
     
     Style findById(int id);

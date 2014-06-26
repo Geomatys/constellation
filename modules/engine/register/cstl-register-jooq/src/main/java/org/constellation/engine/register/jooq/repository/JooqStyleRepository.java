@@ -65,10 +65,7 @@ public class JooqStyleRepository extends AbstractJooqRespository<StyleRecord, St
         return dsl.select().from(STYLE).where(STYLE.ID.eq(id)).fetchOneInto(Style.class);
     }
 
-    @Override
-    public Style findByName(String name) {
-        return dsl.select().from(STYLE).where(STYLE.NAME.eq(name)).fetchOneInto(Style.class);
-    }
+
 
     @Override
     public Style findByNameAndProvider(int providerId, String name) {

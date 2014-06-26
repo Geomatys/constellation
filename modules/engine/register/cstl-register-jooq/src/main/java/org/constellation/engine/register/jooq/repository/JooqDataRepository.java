@@ -25,6 +25,7 @@ import static org.constellation.engine.register.jooq.Tables.PROVIDER;
 
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.DataI18n;
+import org.constellation.engine.register.helper.DataHelper;
 import org.constellation.engine.register.i18n.DataWithI18N;
 import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.tables.records.DataRecord;

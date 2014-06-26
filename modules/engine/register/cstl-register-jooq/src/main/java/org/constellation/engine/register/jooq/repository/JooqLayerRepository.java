@@ -29,6 +29,7 @@ import org.constellation.engine.register.Layer;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.jooq.tables.records.LayerRecord;
 import org.constellation.engine.register.repository.LayerRepository;
+import org.jooq.DeleteConditionStep;
 import org.jooq.UpdateConditionStep;
 import org.springframework.stereotype.Component;
 
@@ -79,7 +80,9 @@ public class JooqLayerRepository extends AbstractJooqRespository<LayerRecord, La
 
     @Override
     public void delete(int layerId) {
-        dsl.delete(LAYER).where(LAYER.ID.eq(layerId));
+
+        final DeleteConditionStep<LayerRecord> delete = dsl.delete(LAYER).where(LAYER.ID.eq(layerId));
+        delete.execute();
     }
 
     @Override
