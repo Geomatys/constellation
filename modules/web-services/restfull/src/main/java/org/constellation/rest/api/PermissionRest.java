@@ -11,7 +11,7 @@ import javax.ws.rs.core.MediaType;
 import org.constellation.engine.register.Permission;
 import org.constellation.engine.register.repository.DomainRoleRepository;
 
-@Path("1/permission")
+@Path("/1/permission")
 public class PermissionRest {
     
     @Inject

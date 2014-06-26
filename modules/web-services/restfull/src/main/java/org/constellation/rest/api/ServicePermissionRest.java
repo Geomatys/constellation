@@ -27,7 +27,7 @@ import org.constellation.engine.register.repository.ServiceRepository;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Maps.EntryTransformer;
 
-@Path("1/servicepermission")
+@Path("/1/servicepermission")
 @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 public class ServicePermissionRest {
