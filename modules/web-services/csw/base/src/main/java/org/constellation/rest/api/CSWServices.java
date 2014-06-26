@@ -42,9 +42,11 @@ import org.constellation.dto.ParameterValues;
 import org.constellation.dto.Service;
 import org.constellation.dto.SimpleValue;
 import org.constellation.generic.database.Automatic;
+import org.constellation.metadata.CSWworker;
 import org.constellation.metadata.configuration.CSWConfigurer;
 import static org.constellation.utils.RESTfulUtilities.ok;
 import org.constellation.ws.ServiceConfigurer;
+import org.constellation.ws.WSEngine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Node;
 
@@ -68,8 +70,8 @@ public class CSWServices {
         final boolean forced     = values.getAsBoolean("FORCED");
         final CSWConfigurer conf = getConfigurer();
         final AcknowlegementType ack = conf.refreshIndex(id, asynchrone, forced);
-        if (asynchrone && ack.getStatus().equals("Sucess")) {
-            serviceBusiness.restart("CSW", id, false);
+        if (!asynchrone && ack.getStatus().equals("Success")) {
+            serviceBusiness.restart("CSW", id, true);
         }
         return ok(ack);
    }
@@ -122,6 +124,17 @@ public class CSWServices {
     @Path("{id}/record/{metaID}")
     public Response getMetadata(final @PathParam("id") String id, final @PathParam("metaID") String metaID) throws Exception {
         return ok(getConfigurer().getMetadata(id, metaID));
+    }
+    
+    @GET
+    @Path("{id}/clearCache")
+    public Response clearCache(final @PathParam("id") String id) throws Exception {
+        final CSWworker worker = (CSWworker) WSEngine.getInstance("CSW", id);
+        if (worker != null) {
+            worker.clearCache();
+            return ok(AcknowlegementType.success("The CSW cache has been cleared"));
+        }
+        return ok(AcknowlegementType.failure("Unable to find a csw service " + id));
     }
     
     @GET

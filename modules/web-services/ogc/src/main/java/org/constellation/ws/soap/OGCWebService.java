@@ -156,7 +156,7 @@ public abstract class OGCWebService<W extends Worker> implements Provider<SOAPMe
      */
     private void buildWorkerMap() {
         final Map<String, Worker> workersMap = new HashMap<>();
-        for (String serviceID : serviceBusiness.getServiceIdentifiers(specification.name())) {
+        for (String serviceID : serviceBusiness.getServiceIdentifiers(specification.name().toLowerCase())) {
             final W newWorker = createWorker(serviceID);
             workersMap.put(serviceID, newWorker);
         }

@@ -36,11 +36,13 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 import javax.imageio.ImageReader;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import org.apache.sis.util.logging.Logging;
 
 import org.constellation.data.CoverageSQLTestCase;
 import org.constellation.util.Util;
@@ -59,6 +61,8 @@ import org.apache.sis.xml.MarshallerPool;
  * @since 0.3
  */
 public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
+    
+    private static final Logger LOGGER = Logging.getLogger(AbstractGrizzlyServer.class);
     /**
      * The grizzly server that will received some HTTP requests.
      */
@@ -77,6 +81,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
         // Protective test in order not to launch a new instance of the grizzly server for
         // each sub classes.
         if (grizzly != null) {
+            LOGGER.info("GRIZZLY is not shutDown");
             return;
         }
 
@@ -96,6 +101,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
      */
     public static void finish() {
         if (grizzly.isAlive()) {
+            grizzly.cstlServer.shutdown();
             grizzly.interrupt();
         }
         File f = new File("derby.log");
@@ -129,7 +135,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
             } catch (IOException e) {
                 ex = true;
             }
-            if (cpt == 80) {
+            if (cpt == 100) {
                 throw new Exception("The grizzly server never start");
             }
             cpt++;
@@ -361,6 +367,34 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
         wr.flush();
     }
 
+    protected static Object unmarshallResponsePut(final URLConnection conec) throws JAXBException, IOException {
+        HttpURLConnection httpCon = (HttpURLConnection) conec;
+        httpCon.setRequestMethod("PUT");
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        Object obj = unmarshaller.unmarshal(conec.getInputStream());
+
+        pool.recycle(unmarshaller);
+
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement) obj).getValue();
+        }
+        return obj;
+    }
+    
+    protected static Object unmarshallResponseDelete(final URLConnection conec) throws JAXBException, IOException {
+        HttpURLConnection httpCon = (HttpURLConnection) conec;
+        httpCon.setRequestMethod("DELETE");
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        Object obj = unmarshaller.unmarshal(conec.getInputStream());
+
+        pool.recycle(unmarshaller);
+
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement) obj).getValue();
+        }
+        return obj;
+    }
+    
     protected static Object unmarshallResponse(final URLConnection conec) throws JAXBException, IOException {
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         Object obj = unmarshaller.unmarshal(conec.getInputStream());

@@ -18,6 +18,7 @@
  */
 package org.constellation.process.service;
 
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
 import org.constellation.process.ConstellationProcessFactory;
 import org.geotoolkit.process.ProcessDescriptor;
@@ -80,8 +81,9 @@ public abstract class SetConfigMapServiceTest  extends AbstractMapServiceTest {
 
             org.geotoolkit.process.Process proc = desc.createProcess(in);
             proc.call();
-
-            assertEquals(conf, getConfig("instance10"));
+            fail();
+        } catch (ProcessException ex) {
+            assertEquals("Service " + serviceName.toLowerCase() + ":instance10 not found.", ex.getCause().getMessage());
         } finally {
             deleteInstance(serviceBusiness, "instance10");
         }

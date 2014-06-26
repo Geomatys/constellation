@@ -37,8 +37,13 @@ import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.spi.ImageWriterSpi;
 import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.DataBusiness;
+import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
+import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Language;
 import org.constellation.configuration.Languages;
@@ -86,6 +91,10 @@ import static org.junit.Assert.*;
 import static org.junit.Assume.*;
 import org.junit.runner.RunWith;
 import org.opengis.parameter.ParameterValueGroup;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.context.ContextConfiguration;
 
 
 /**
@@ -97,13 +106,27 @@ import org.opengis.parameter.ParameterValueGroup;
  * @since 0.3
  */
 @RunWith(SpringTestRunner.class)
-public class WMSRequestsTest extends AbstractGrizzlyServer {
+@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+public class WMSRequestsTest extends AbstractGrizzlyServer  implements ApplicationContextAware {
 
+    protected ApplicationContext applicationContext;
+    
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+    
     @Inject
     private ServiceBusiness serviceBusiness;
     
     @Inject
     protected LayerBusiness layerBusiness;
+    
+    @Inject
+    protected ProviderBusiness providerBusiness;
+    
+    @Inject
+    protected DataBusiness dataBusiness;
     
     /**
      * The layer to test.
@@ -168,172 +191,184 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
     "TrAnSpArEnT=TRUE&CrS=CRS:84&FoRmAt=image%2Fgif&VeRsIoN=1.3.0&HeIgHt=100&WiDtH=200&StYlEs=&LaYeRs=cite%3ALakes&ReQuEsT=GetMap&BbOx=0,-0.0020,0.0040,0";
 
     public static boolean hasLocalDatabase() {
-        return false; // TODO
+        return true; // TODO
     }
 
+    private static boolean initialized = false;
+    
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
     @PostConstruct
     public void initLayerList() {
+        SpringHelper.setApplicationContext(applicationContext);
+        if (!initialized) {
+            try {
+                ConfigurationEngine.setupTestEnvironement("WMSRequestTest");
+                try {
+                    layerBusiness.removeForService("wms", "default");
+                    serviceBusiness.delete("wms", "default");
+                } catch (ConfigurationException ex) {}
 
-        try {
-            ConfigurationEngine.setupTestEnvironement("WMSRequestTest");
-            
-            final LayerContext config = new LayerContext();
-            config.getCustomParameters().put("shiroAccessible", "false");
-            config.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
-            
-            serviceBusiness.create("WMS", "default", config, null, null);
-            layerBusiness.add("SST_tests",            null,                                  "coverageTestSrc", null, "default", "WMS", null);
-            layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("Bridges",             "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("Streams",             "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("Lakes",               "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("NamedPlaces",         "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("Buildings",           "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("RoadSegments",        "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("DividedRoutes",       "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("Forests",             "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("MapNeatline",         "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("Ponds",               "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            
-            
-            final LayerContext config2 = new LayerContext();
-            config2.setSupportedLanguages(new Languages(Arrays.asList(new Language("fre"), new Language("eng", true))));
-            config2.getCustomParameters().put("shiroAccessible", "false");
-            config2.getCustomParameters().put("supported_versions", "1.1.1,1.3.0");
-            config2.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
-            
-            serviceBusiness.create("WMS", "wms1", config2, null, null);
-            layerBusiness.add("SST_tests", null,                        "coverageTestSrc", null, "wms1", "WMS", null);
-            layerBusiness.add("Lakes",    "http://www.opengis.net/gml", "shapeSrc",        null, "wms1", "WMS", null);
-            
-            
-            final Service serviceEng = new Service();
-            serviceEng.setDescription("Serveur Cartographique.  Contact: someone@geomatys.fr.  Carte haute qualité.");
-            serviceEng.setIdentifier("wms1");
-            serviceEng.setKeywords(Arrays.asList("WMS"));
-            serviceEng.setName("this is the default english capabilities");
-            final AccessConstraint cstr = new AccessConstraint("NONE", "NONE", 20, 1024, 1024);
-            serviceEng.setServiceConstraints(cstr);
-            final Contact ct = new Contact();
-            serviceEng.setServiceContact(ct);
-            serviceEng.setVersions(Arrays.asList("1.1.1", "1.3.0"));
+                try {
+                    layerBusiness.removeForService("wms", "wms1");
+                    serviceBusiness.delete("wms", "wms1");
+                } catch (ConfigurationException ex) {}
 
-            ConfigurationEngine.writeServiceMetadata("wms1", "WMS", serviceEng, "eng");
-            
-            final Service serviceFre = new Service();
-            serviceFre.setDescription("Serveur Cartographique.  Contact: someone@geomatys.fr.  Carte haute qualité.");
-            serviceFre.setIdentifier("wms1");
-            serviceFre.setKeywords(Arrays.asList("WMS"));
-            serviceFre.setName("Ceci est le document capabilities français");
-            serviceFre.setServiceConstraints(cstr);
-            serviceFre.setServiceContact(ct);
-            serviceFre.setVersions(Arrays.asList("1.1.1", "1.3.0"));
-            ConfigurationEngine.writeServiceMetadata("wms1", "WMS", serviceFre, "fre");
-            
-            
-            final LayerContext config3 = new LayerContext();
-            config3.getCustomParameters().put("shiroAccessible", "false");
-            config3.getCustomParameters().put("supported_versions", "1.3.0");
-            config3.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
-            
-            serviceBusiness.create("WMS", "wms2", config3, null, null);
-            layerBusiness.add("SST_tests",            null,                                  "coverageTestSrc", null, "wms2", "WMS", null);
-            layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "wms2", "WMS", null);
-            layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "wms2", "WMS", null);
-            layerBusiness.add("Bridges",             "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "wms2", "WMS", null);
-            layerBusiness.add("Streams",             "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "wms2", "WMS", null);
-            layerBusiness.add("Lakes",               "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "wms2", "WMS", null);
-            layerBusiness.add("NamedPlaces",         "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "wms2", "WMS", null);
-            layerBusiness.add("Buildings",           "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "wms2", "WMS", null);
-            layerBusiness.add("RoadSegments",        "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "wms2", "WMS", null);
-            layerBusiness.add("DividedRoutes",       "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "wms2", "WMS", null);
-            layerBusiness.add("Forests",             "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "wms2", "WMS", null);
-            layerBusiness.add("MapNeatline",         "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "wms2", "WMS", null);
-            layerBusiness.add("Ponds",               "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "wms2", "WMS", null);
-            
-            initServer(new String[] {
-                "org.constellation.map.ws.rs",
-                "org.constellation.configuration.ws.rs",
-                "org.constellation.ws.rs.provider"
-            }, null);
-            
-            pool = WMSMarshallerPool.getInstance();
-            
-            final Configurator configurator = new AbstractConfigurator() {
-                @Override
-                public List<Map.Entry<String, ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException {
-                    
-                    final ArrayList<Map.Entry<String, ParameterValueGroup>> lst = new ArrayList<>();
-                    
-                    final ProviderFactory factorycsql = DataProviders.getInstance().getFactory("coverage-sql");
-                    if (hasLocalDatabase()) {
-                        // Defines a PostGrid data provider
-                        final ParameterValueGroup source = factorycsql.getProviderDescriptor().createValue();
-                        final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
-                        srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://flupke.geomatys.com/coverages-test");
-                        srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
-                        final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
-                        srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
-                        srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
-                        srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
-                        srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
-                        source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
-                        
-                        lst.add(new AbstractMap.SimpleImmutableEntry<>("coverageTestSrc",source));
-                    }
-                    
-                    try{
-                        final ProviderFactory factory = DataProviders.getInstance().getFactory("feature-store");
-                        final File outputDir = initDataDirectory();
-                        final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
-                        getOrCreateValue(source, "id").setValue("shapeSrc");
-                        getOrCreateValue(source, "load_all").setValue(true);
-                        
-                        final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
-                        final ParameterValueGroup shpconfig = createGroup(choice, "ShapefileParametersFolder");
-                        getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
-                        getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");
-                        
-                        final ParameterValueGroup layer = getOrCreateGroup(source, "Layer");
-                        getOrCreateValue(layer, "name").setValue("NamedPlaces");
-                        getOrCreateValue(layer, "style").setValue("cite_style_NamedPlaces");
-                        
-                        lst.add(new AbstractMap.SimpleImmutableEntry<>("shapeSrc",source));
-                    }catch(Exception ex){
-                        throw new RuntimeException(ex.getLocalizedMessage(),ex);
-                    }
-                    
-                    return lst;
+                try {
+                    layerBusiness.removeForService("wms", "wms2");
+                    serviceBusiness.delete("wms", "wms2");
+                } catch (ConfigurationException ex) {}
+
+                final ProviderFactory factory = DataProviders.getInstance().getFactory("coverage-sql");
+                final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
+                srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://localhost:5432/coverages");
+                srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
+                final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
+                srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
+                srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
+                srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
+                srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
+                source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
+                providerBusiness.createProvider("coverageTestSrc", null, ProviderRecord.ProviderType.LAYER, "coverage-sql", source);
+
+                dataBusiness.create(new QName("SST_tests"), "coverageTestSrc", rootDir, false, true, null, null);
+
+
+                final ProviderFactory ffactory = DataProviders.getInstance().getFactory("feature-store");
+                final File outputDir = initDataDirectory();
+                final ParameterValueGroup sourcef = ffactory.getProviderDescriptor().createValue();
+                getOrCreateValue(sourcef, "id").setValue("shapeSrc");
+                getOrCreateValue(sourcef, "load_all").setValue(true);
+
+                final ParameterValueGroup choice = getOrCreateGroup(sourcef, "choice");
+                final ParameterValueGroup shpconfig = createGroup(choice, "ShapefileParametersFolder");
+                getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
+                getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");
+
+                final ParameterValueGroup layer = getOrCreateGroup(sourcef, "Layer");
+                getOrCreateValue(layer, "name").setValue("NamedPlaces");
+                getOrCreateValue(layer, "style").setValue("cite_style_NamedPlaces");
+
+                providerBusiness.createProvider("shapeSrc", null, ProviderRecord.ProviderType.LAYER, "feature-store", sourcef);
+
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "BuildingCenters"), "shapeSrc", rootDir, false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "BasicPolygons"),   "shapeSrc", rootDir, false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Bridges"),         "shapeSrc", rootDir, false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Streams"),         "shapeSrc", rootDir, false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Lakes"),           "shapeSrc", rootDir, false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "NamedPlaces"),     "shapeSrc", rootDir, false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Buildings"),       "shapeSrc", rootDir, false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "RoadSegments"),    "shapeSrc", rootDir, false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "DividedRoutes"),   "shapeSrc", rootDir, false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Forests"),         "shapeSrc", rootDir, false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "MapNeatline"),     "shapeSrc", rootDir, false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Ponds"),           "shapeSrc", rootDir, false, true, null, null);
+
+
+
+
+                final LayerContext config = new LayerContext();
+                config.getCustomParameters().put("shiroAccessible", "false");
+                config.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
+
+                serviceBusiness.create("wms", "default", config, null, null);
+                layerBusiness.add("SST_tests",            null,                                  "coverageTestSrc", null, "default", "WMS", null);
+                layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
+                layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
+                layerBusiness.add("Bridges",             "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
+                layerBusiness.add("Streams",             "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
+                layerBusiness.add("Lakes",               "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
+                layerBusiness.add("NamedPlaces",         "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
+                layerBusiness.add("Buildings",           "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
+                layerBusiness.add("RoadSegments",        "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
+                layerBusiness.add("DividedRoutes",       "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
+                layerBusiness.add("Forests",             "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
+                layerBusiness.add("MapNeatline",         "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
+                layerBusiness.add("Ponds",               "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
+
+
+                final LayerContext config2 = new LayerContext();
+                config2.setSupportedLanguages(new Languages(Arrays.asList(new Language("fre"), new Language("eng", true))));
+                config2.getCustomParameters().put("shiroAccessible", "false");
+                config2.getCustomParameters().put("supported_versions", "1.1.1,1.3.0");
+                config2.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
+
+                serviceBusiness.create("wms", "wms1", config2, null, null);
+                layerBusiness.add("SST_tests", null,                        "coverageTestSrc", null, "wms1", "WMS", null);
+                layerBusiness.add("Lakes",    "http://www.opengis.net/gml", "shapeSrc",        null, "wms1", "WMS", null);
+
+
+                final Service serviceEng = new Service();
+                serviceEng.setDescription("Serveur Cartographique.  Contact: someone@geomatys.fr.  Carte haute qualité.");
+                serviceEng.setIdentifier("wms1");
+                serviceEng.setKeywords(Arrays.asList("WMS"));
+                serviceEng.setName("this is the default english capabilities");
+                final AccessConstraint cstr = new AccessConstraint("NONE", "NONE", 20, 1024, 1024);
+                serviceEng.setServiceConstraints(cstr);
+                final Contact ct = new Contact();
+                serviceEng.setServiceContact(ct);
+                serviceEng.setVersions(Arrays.asList("1.1.1", "1.3.0"));
+
+                ConfigurationEngine.writeServiceMetadata("wms1", "WMS", serviceEng, "eng");
+
+                final Service serviceFre = new Service();
+                serviceFre.setDescription("Serveur Cartographique.  Contact: someone@geomatys.fr.  Carte haute qualité.");
+                serviceFre.setIdentifier("wms1");
+                serviceFre.setKeywords(Arrays.asList("WMS"));
+                serviceFre.setName("Ceci est le document capabilities français");
+                serviceFre.setServiceConstraints(cstr);
+                serviceFre.setServiceContact(ct);
+                serviceFre.setVersions(Arrays.asList("1.1.1", "1.3.0"));
+                ConfigurationEngine.writeServiceMetadata("wms1", "WMS", serviceFre, "fre");
+
+
+                final LayerContext config3 = new LayerContext();
+                config3.getCustomParameters().put("shiroAccessible", "false");
+                config3.getCustomParameters().put("supported_versions", "1.3.0");
+                config3.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
+
+                serviceBusiness.create("wms", "wms2", config3, null, null);
+                layerBusiness.add("SST_tests",            null,                                  "coverageTestSrc", null, "wms2", "WMS", null);
+                layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "wms2", "WMS", null);
+                layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "wms2", "WMS", null);
+                layerBusiness.add("Bridges",             "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "wms2", "WMS", null);
+                layerBusiness.add("Streams",             "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "wms2", "WMS", null);
+                layerBusiness.add("Lakes",               "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "wms2", "WMS", null);
+                layerBusiness.add("NamedPlaces",         "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "wms2", "WMS", null);
+                layerBusiness.add("Buildings",           "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "wms2", "WMS", null);
+                layerBusiness.add("RoadSegments",        "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "wms2", "WMS", null);
+                layerBusiness.add("DividedRoutes",       "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "wms2", "WMS", null);
+                layerBusiness.add("Forests",             "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "wms2", "WMS", null);
+                layerBusiness.add("MapNeatline",         "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "wms2", "WMS", null);
+                layerBusiness.add("Ponds",               "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "wms2", "WMS", null);
+
+                initServer(new String[] {
+                    "org.constellation.map.ws.rs",
+                    "org.constellation.configuration.ws.rs",
+                    "org.constellation.ws.rs.provider"
+                }, null);
+
+                pool = WMSMarshallerPool.getInstance();
+
+                WorldFileImageReader.Spi.registerDefaults(null);
+                WMSPortrayal.setEmptyExtension(true);
+
+                //reset values, only allow pure java readers
+                for(String jn : ImageIO.getReaderFormatNames()){
+                    Registry.setNativeCodecAllowed(jn, ImageReaderSpi.class, false);
                 }
-                
-                @Override
-                public List<Configurator.ProviderInformation> getProviderInformations() throws ConfigurationException {
-                    throw new UnsupportedOperationException("Not supported yet.");
+
+                //reset values, only allow pure java writers
+                for(String jn : ImageIO.getWriterFormatNames()){
+                    Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, false);
                 }
-                
-            };
-            
-            DataProviders.getInstance().setConfigurator(configurator);
-            
-            WorldFileImageReader.Spi.registerDefaults(null);
-            WMSPortrayal.setEmptyExtension(true);
-            
-            //reset values, only allow pure java readers
-            for(String jn : ImageIO.getReaderFormatNames()){
-                Registry.setNativeCodecAllowed(jn, ImageReaderSpi.class, false);
+                initialized = true;
+            } catch (Exception ex) {
+                Logger.getLogger(WMSRequestsTest.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
-            //reset values, only allow pure java writers
-            for(String jn : ImageIO.getWriterFormatNames()){
-                Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, false);
-            }
-        } catch (Exception ex) {
-            Logger.getLogger(WMSRequestsTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

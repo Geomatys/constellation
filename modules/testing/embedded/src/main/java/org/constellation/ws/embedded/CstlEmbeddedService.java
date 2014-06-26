@@ -141,6 +141,11 @@ public class CstlEmbeddedService extends CommandLine {
     //FOR SOAP, DEFINE THIS REFERENCE:
     public final Map<String, Object> serviceInstanceSOAP = new HashMap<>();
 
+    
+    private HttpServer threadSelector;
+    
+    final List<Endpoint> eps = new ArrayList<>();
+    
     //INCLUDE THIS MAIN.
 //	public static void main(String[] args) {
 //
@@ -247,8 +252,10 @@ public class CstlEmbeddedService extends CommandLine {
                 config.register(MultiPartFeature.class);
                 config.register(RolesAllowedDynamicFeature.class);
                 ApplicationHandler handler = new ApplicationHandler(config);
-
+                
                 threadSelector = GrizzlyHttpServerFactory.createHttpServer(currentUri, handler, true);
+                
+                
                 
             } catch (ProcessingException e) {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
@@ -274,16 +281,14 @@ public class CstlEmbeddedService extends CommandLine {
 
         LOGGER.log(Level.INFO, "Starting grizzly server at: {0}", f.format(new Date()));
 
-        final HttpServer threadSelector = buildThreadSelector();
+        threadSelector = buildThreadSelector();
 
         ready = true;
         LOGGER.log(Level.INFO, "Started Grizzly application server for: {0}", uri);
         LOGGER.log(Level.INFO, "The service definition file can be found at: {0}application.wadl", uri);
 
         stayAlive();
-        if (threadSelector != null) {
-            threadSelector.stop();
-        }
+        shutdown();
         LOGGER.log(Level.INFO, "*Stopped grizzly server at: {0}.", f.format(new Date()));
     }
 
@@ -300,7 +305,7 @@ public class CstlEmbeddedService extends CommandLine {
 
         LOGGER.log(Level.INFO, "Starting jax-ws server at: {0}", f.format(new Date()));
 
-        final List<Endpoint> eps = new ArrayList<>();
+        eps.clear();
         for (Entry<String, Object> instance : serviceInstanceSOAP.entrySet()) {
             final String service = uriSoap.toString() + instance.getKey();
             Endpoint ep =  Endpoint.create(instance.getValue());
@@ -312,9 +317,7 @@ public class CstlEmbeddedService extends CommandLine {
         ready = true;
 
         stayAlive();
-        for (Endpoint ep : eps) {
-            ep.stop();
-        }
+        shutdown();
         LOGGER.log(Level.INFO, "*Stopped jax-ws server at: {0}.", f.format(new Date()));
     }
 
@@ -329,12 +332,12 @@ public class CstlEmbeddedService extends CommandLine {
 
         LOGGER.log(Level.INFO, "Starting grizzly server at: {0}", f.format(new Date()));
 
-        final HttpServer threadSelector = buildThreadSelector();
+        threadSelector = buildThreadSelector();
 
         LOGGER.log(Level.INFO, "Started Grizzly application server for: {0}", uri);
         LOGGER.log(Level.INFO, "The service definition file can be found at: {0}application.wadl", uri);
 
-        final List<Endpoint> eps = new ArrayList<>();
+        eps.clear();
         for (Entry<String, Object> instance : serviceInstanceSOAP.entrySet()) {
             final String service = uriSoap.toString() + instance.getKey();
             final Endpoint ep =  Endpoint.create(instance.getValue());
@@ -347,12 +350,8 @@ public class CstlEmbeddedService extends CommandLine {
         ready = true;
 
         stayAlive();
-        if (threadSelector != null) {
-            threadSelector.stop();
-        }
-        for (Endpoint ep : eps) {
-            ep.stop();
-        }
+        LOGGER.log(Level.INFO, "*grizzly shutdown in progress");
+        shutdown();
         LOGGER.log(Level.INFO, "*Stopped grizzly server at: {0}.", f.format(new Date()));
     }
 
@@ -373,7 +372,7 @@ public class CstlEmbeddedService extends CommandLine {
                 Thread.sleep(duration);
             } catch (InterruptedException iex) {
                 LOGGER.fine("The grizzly thread has received an interrupted request.");
-                LOGGER.log(Level.INFO, "*Stopped grizzly server at: {0}.", f.format(new Date()));
+                LOGGER.log(Level.INFO, "*Interrupted grizzly server at: {0}.", f.format(new Date()));
             }
         } else {
             //Listen and wait for <ENTER>
@@ -388,5 +387,15 @@ public class CstlEmbeddedService extends CommandLine {
 
     public static void main(String[] args) {
         new CstlEmbeddedService(args).runSOAP();
+    }
+    
+    public void shutdown() {
+        LOGGER.log(Level.INFO, "*grizzly shutdown in progress");
+        if (threadSelector != null) {
+            threadSelector.shutdownNow();
+        }
+        for (Endpoint ep : eps) {
+            ep.stop();
+        }
     }
 }

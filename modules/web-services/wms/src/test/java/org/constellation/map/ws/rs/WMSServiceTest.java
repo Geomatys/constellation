@@ -19,9 +19,8 @@
 
 package org.constellation.map.ws.rs;
 
-import java.lang.reflect.InvocationTargetException;
-import javax.ws.rs.core.MultivaluedMap;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Calendar;
 import java.util.Date;
@@ -32,44 +31,55 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.ws.rs.core.MultivaluedMap;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
 import org.constellation.map.configuration.LayerBusiness;
-
 import org.constellation.map.ws.QueryContext;
-import org.constellation.ws.rs.WebService;
 import org.constellation.test.utils.BasicMultiValueMap;
 import org.constellation.test.utils.BasicUriInfo;
+import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.test.utils.TestRunner;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
-
-import org.geotoolkit.referencing.CRS;
+import org.constellation.ws.rs.WebService;
 import org.geotoolkit.internal.referencing.CRSUtilities;
+import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.ReferencingUtilities;
-import org.geotoolkit.wms.xml.GetMap;
 import org.geotoolkit.wms.xml.GetFeatureInfo;
+import org.geotoolkit.wms.xml.GetMap;
 import org.junit.AfterClass;
-
+import static org.junit.Assert.*;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
-
-import org.junit.Test;
-import static org.junit.Assert.*;
-import org.junit.runner.RunWith;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.context.ContextConfiguration;
 
 /**
  * Testing wms service value parsing.
  * 
  * @author Johann Sorel (Geomatys)
  */
-@RunWith(TestRunner.class)
-public class WMSServiceTest {
+@RunWith(SpringTestRunner.class)
+@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+public class WMSServiceTest  implements ApplicationContextAware {
+
+    protected ApplicationContext applicationContext;
+    
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
 
     @Inject
     private ServiceBusiness serviceBusiness;
@@ -85,6 +95,7 @@ public class WMSServiceTest {
 
     @PostConstruct
     public void init() {
+        SpringHelper.setApplicationContext(applicationContext);
         try {
             ConfigurationEngine.setupTestEnvironement("WMSServiceTest");
             

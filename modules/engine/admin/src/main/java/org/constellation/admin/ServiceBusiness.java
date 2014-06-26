@@ -3,7 +3,6 @@ package org.constellation.admin;
 
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef;
-import org.constellation.admin.exception.ConstellationException;
 import org.constellation.admin.util.DefaultServiceConfiguration;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
@@ -302,8 +301,7 @@ public class ServiceBusiness {
         //write configuration file.
         final Service service = serviceRepository.findByIdentifierAndType(identifier, serviceType);
         if (service == null) {
-            //create(serviceType, identifier, configuration, metadata);
-            throw new ConstellationException(new Exception("Service not found."));
+            throw new ConfigurationException("Service " + serviceType + ':' + identifier + " not found.");
         } else {
             service.setConfig(getStringFromObject(configuration, GenericDatabaseMarshallerPool.getInstance()));
             if (metadata != null) {

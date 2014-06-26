@@ -19,27 +19,24 @@
 package org.constellation.engine.register.jooq.repository;
 
 
-import static org.constellation.engine.register.jooq.Tables.DATA;
-import static org.constellation.engine.register.jooq.Tables.DATA_I18N;
-import static org.constellation.engine.register.jooq.Tables.PROVIDER;
-
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
+import java.util.List;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.DataI18n;
 import org.constellation.engine.register.helper.DataHelper;
 import org.constellation.engine.register.i18n.DataWithI18N;
 import org.constellation.engine.register.jooq.Tables;
+import static org.constellation.engine.register.jooq.Tables.DATA;
+import static org.constellation.engine.register.jooq.Tables.DATA_I18N;
+import static org.constellation.engine.register.jooq.Tables.PROVIDER;
 import org.constellation.engine.register.jooq.tables.records.DataRecord;
 import org.constellation.engine.register.repository.DataRepository;
 import org.jooq.Condition;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.springframework.stereotype.Component;
-
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
-
-import java.util.List;
 
 @Component
 public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data> implements DataRepository {

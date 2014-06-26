@@ -210,7 +210,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
         mapPortrayal = new WMSPortrayal();
         try {
-            mapPortrayal = (WMSPortrayal) serviceBusiness.getExtraConfiguration("WMS", id, "WMSPortrayal.xml");
+            WMSPortrayal candidate = (WMSPortrayal) serviceBusiness.getExtraConfiguration("WMS", id, "WMSPortrayal.xml");
+            if (candidate != null) {
+                mapPortrayal = candidate;
+            }
         } catch (ConfigurationException ex) {
             LOGGER.log(Level.WARNING, null, ex);
         } 

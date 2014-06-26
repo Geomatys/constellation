@@ -100,7 +100,9 @@ public class LayerBusiness {
             // look for layer namespace
             if (namespace == null) {
                 final DataProvider provider = DataProviders.getInstance().getProvider(providerId);
-                namespace = ProviderParameters.getNamespace(provider);
+                if (provider != null) {
+                    namespace = ProviderParameters.getNamespace(provider);
+                }
             }
 
             final Data data = dataRepository.findDataFromProvider(namespace, name, providerId);
@@ -158,6 +160,18 @@ public class LayerBusiness {
                 layerRepository.delete(layer.getId());
             } else {
                 throw new TargetNotFoundException("Unable to find a layer: {" + namespace + "}" + name);
+            }
+        } else {
+            throw new TargetNotFoundException("Unable to find a service:" + serviceId);
+        }
+    }
+    
+    public void removeForService(final String spec, final String serviceId) throws ConfigurationException {
+        final Service service = serviceRepository.findByIdentifierAndType(serviceId, spec.toLowerCase());
+        if (service != null) {
+            final List<Layer> layers = layerRepository.findByServiceId(service.getId());
+            for (Layer layer : layers) {
+                layerRepository.delete(layer.getId());
             }
         } else {
             throw new TargetNotFoundException("Unable to find a service:" + serviceId);

@@ -32,7 +32,9 @@ import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Instance;
@@ -60,27 +62,91 @@ import org.junit.*;
 import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
 import org.opengis.parameter.ParameterValueGroup;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.context.ContextConfiguration;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
 @RunWith(TestRunner.class)
-public class AdminRequestTest extends AbstractGrizzlyServer {
+@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+public class AdminRequestTest extends AbstractGrizzlyServer  implements ApplicationContextAware {
 
+    protected ApplicationContext applicationContext;
+    
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+    
     @Inject
     private ServiceBusiness serviceBusiness;
     
     @Inject
     protected LayerBusiness layerBusiness;
     
+    @Inject
+    protected ProviderBusiness providerBusiness;
+    
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
     @PostConstruct
     public void start() {
+        SpringHelper.setApplicationContext(applicationContext);
         try {
             ConfigurationEngine.setupTestEnvironement("AdminRequestTest");
+            
+            final Configurator configurator = new AbstractConfigurator() {
+                @Override
+                public List<Map.Entry<String, ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException {
+                    
+                    final ArrayList<Map.Entry<String, ParameterValueGroup>> lst = new ArrayList<>();
+                    final ProviderFactory factory = DataProviders.getInstance().getFactory("feature-store");
+                    
+                    try{
+                        {//SHAPEFILE
+                            final File outputDir = initDataDirectory();
+                            final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                            getOrCreateValue(source, "id").setValue("shapeSrc");
+                            getOrCreateValue(source, "load_all").setValue(true);
+                            
+                            final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
+                            final ParameterValueGroup shpconfig = createGroup(choice, "ShapefileParametersFolder");
+                            getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
+                            getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");
+                            
+                            final ParameterValueGroup layer = getOrCreateGroup(source, "Layer");
+                            getOrCreateValue(layer, "name").setValue("NamedPlaces");
+                            getOrCreateValue(layer, "style").setValue("cite_style_NamedPlaces");
+                            lst.add(new AbstractMap.SimpleImmutableEntry<>("shapeSrc",source));
+                        }
+                        
+                    }catch(Exception ex){
+                        throw new RuntimeException(ex.getLocalizedMessage(),ex);
+                    }
+                    
+                    return lst;
+                }
+                
+                @Override
+                public List<Configurator.ProviderInformation> getProviderInformations() throws ConfigurationException {
+                    final List<org.constellation.engine.register.Provider> records = providerBusiness.getProviders();
+                    final List<Configurator.ProviderInformation> entries = new ArrayList<>();
+                    for(org.constellation.engine.register.Provider record : records){
+                        ParameterValueGroup param = getProviderConfiguration(record.getIdentifier());
+                        if(param!=null){
+                            entries.add(new Configurator.ProviderInformation(record.getIdentifier(), record.getImpl(), param));
+                        }
+                    }
+                    return entries;
+                }
+            };
+            
+            DataProviders.getInstance().setConfigurator(configurator);
             
             final LayerContext config = new LayerContext();
             config.getCustomParameters().put("shiroAccessible", "false");
@@ -117,45 +183,6 @@ public class AdminRequestTest extends AbstractGrizzlyServer {
             // Get the list of layers
             pool = GenericDatabaseMarshallerPool.getInstance();
             
-            final Configurator configurator = new AbstractConfigurator() {
-                @Override
-                public List<Map.Entry<String, ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException {
-                    
-                    final ArrayList<Map.Entry<String, ParameterValueGroup>> lst = new ArrayList<>();
-                    final ProviderFactory factory = DataProviders.getInstance().getFactory("feature-store");
-                    
-                    try{
-                        {//SHAPEFILE
-                            final File outputDir = initDataDirectory();
-                            final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
-                            getOrCreateValue(source, "id").setValue("shapeSrc");
-                            getOrCreateValue(source, "load_all").setValue(true);
-                            
-                            final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
-                            final ParameterValueGroup shpconfig = createGroup(choice, "ShapefileParametersFolder");
-                            getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
-                            getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");
-                            
-                            final ParameterValueGroup layer = getOrCreateGroup(source, "Layer");
-                            getOrCreateValue(layer, "name").setValue("NamedPlaces");
-                            getOrCreateValue(layer, "style").setValue("cite_style_NamedPlaces");
-                            lst.add(new AbstractMap.SimpleImmutableEntry<>("shapeSrc",source));
-                        }
-                        
-                    }catch(Exception ex){
-                        throw new RuntimeException(ex.getLocalizedMessage(),ex);
-                    }
-                    
-                    return lst;
-                }
-                
-                @Override
-                public List<Configurator.ProviderInformation> getProviderInformations() throws ConfigurationException {
-                    throw new UnsupportedOperationException("Not supported yet.");
-                }
-            };
-            
-            DataProviders.getInstance().setConfigurator(configurator);
         } catch (Exception ex) {
             Logger.getLogger(AdminRequestTest.class.getName()).log(Level.SEVERE, null, ex);
         }

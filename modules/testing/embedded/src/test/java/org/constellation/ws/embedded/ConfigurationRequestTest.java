@@ -19,7 +19,6 @@
 package org.constellation.ws.embedded;
 
 // JUnit dependencies
-import org.constellation.configuration.ExceptionReport;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -28,7 +27,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import org.geotoolkit.csw.xml.v202.RecordType;
-import org.geotoolkit.util.StringUtilities;
 import org.apache.sis.xml.MarshallerPool;
 import java.net.URLConnection;
 import java.net.URL;
@@ -56,7 +54,6 @@ import org.constellation.sos.ws.soap.SOService;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.util.Util;
-import org.constellation.ws.ExceptionCode;
 import static org.constellation.ws.embedded.AbstractGrizzlyServer.postRequestObject;
 import org.geotoolkit.csw.xml.v202.GetRecordsResponseType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
@@ -166,10 +163,6 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer implements A
         finish();
     }
 
-    private static String getConfigurationURL() {
-        return "http://localhost:" +  grizzly.getCurrentPort() + "/configuration?";
-    }
-
     private static String getCswURL() {
         return "http://localhost:" +  grizzly.getCurrentPort() + "/csw/default?";
     }
@@ -198,14 +191,14 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer implements A
         obj = unmarshallResponse(conec);
 
         assertTrue(obj instanceof AcknowlegementType);
-        AcknowlegementType expResult = new AcknowlegementType("Success",  "services successfully restarted");
+        AcknowlegementType expResult = new AcknowlegementType("Success",  "CSW service \"csw2\" successfully restarted.");
         assertEquals(expResult, obj);
     }
 
     @Test
     @Order(order=3)
     public void testCSWRefreshIndex() throws Exception {
-
+        waitForStart();
 
         // first we make a getRecords request to count the number of record
         URL niUrl = new URL(getCswURL() + "request=getRecords&version=2.0.2&service=CSW&typenames=csw:Record");
@@ -267,8 +260,8 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer implements A
         
         niUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/1/CSW/default/index/refresh");
 
-        // for a POST request
         conec = niUrl.openConnection();
+        postRequestObject(conec, new ParameterValues(params), GenericDatabaseMarshallerPool.getInstance());
 
         obj = unmarshallResponse(conec);
 
@@ -291,7 +284,8 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer implements A
     @Test
     @Order(order=4)
     public void testCSWAddToIndex() throws Exception {
-
+        waitForStart();
+        
         // first we make a getRecords request to count the number of record
         URL niUrl = new URL(getCswURL() + "request=getRecords&version=2.0.2&service=CSW&typenames=csw:Record");
 
@@ -324,12 +318,12 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer implements A
         pool.recycle(m);
 
         // add a metadata to the index
-        niUrl = new URL(getConfigurationURL() + "request=addToIndex&id=default&identifiers=urn_test");
+        niUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/1/CSW/default/index/urn_test");
 
         // for a POST request
         conec = niUrl.openConnection();
 
-        obj = unmarshallResponse(conec);
+        obj = unmarshallResponsePut(conec);
 
         assertTrue(obj instanceof AcknowlegementType);
         AcknowlegementType expResult = new AcknowlegementType("Success",  "The specified record have been added to the CSW index");
@@ -337,7 +331,7 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer implements A
 
 
         //clear the csw cache
-        niUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/csw/admin?request=clearCache&id=default");
+        niUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/1/CSW/default/clearCache");
         conec = niUrl.openConnection();
         obj = unmarshallResponse(conec);
 
@@ -358,9 +352,13 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer implements A
         f.delete();
         niUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/1/CSW/default/index/refresh");
 
-        // for a POST request
         conec = niUrl.openConnection();
-
+        
+        // for a PUT request
+        Map<String, String> params = new HashMap<>();
+        params.put("ASYNCHRONE", "false");
+        params.put("FORCED", "false");
+        postRequestObject(conec, new ParameterValues(params), GenericDatabaseMarshallerPool.getInstance());
         obj = unmarshallResponse(conec);
 
         assertTrue(obj instanceof AcknowlegementType);
@@ -382,7 +380,8 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer implements A
     @Test
     @Order(order=5)
     public void testCSWRemoveFromIndex() throws Exception {
-
+        waitForStart();
+        
         // first we make a getRecords request to count the number of record
         URL niUrl = new URL(getCswURL() + "request=getRecords&version=2.0.2&service=CSW&typenames=csw:Record");
 
@@ -396,12 +395,12 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer implements A
         assertEquals(12, response.getSearchResults().getNumberOfRecordsMatched());
 
         // remove metadata from the index
-        niUrl = new URL(getConfigurationURL() + "request=removeFromIndex&id=default&identifiers=urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
+        niUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/1/CSW/default/index/urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f");
 
         // for a POST request
         conec = niUrl.openConnection();
 
-        obj = unmarshallResponse(conec);
+        obj = unmarshallResponseDelete(conec);
 
         assertTrue(obj instanceof AcknowlegementType);
         AcknowlegementType expResult = new AcknowlegementType("Success",  "The specified record have been remove from the CSW index");
@@ -409,7 +408,7 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer implements A
 
 
         //clear the csw cache
-        niUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/csw/admin?request=clearCache&id=default");
+        niUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/1/CSW/default/clearCache");
         conec = niUrl.openConnection();
         obj = unmarshallResponse(conec);
 
@@ -429,9 +428,12 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer implements A
         // restore previous context
         niUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/1/CSW/default/index/refresh");
 
-        // for a POST request
+        // for a PUT request
         conec = niUrl.openConnection();
-
+        Map<String, String> params = new HashMap<>();
+        params.put("ASYNCHRONE", "false");
+        params.put("FORCED", "false");
+        postRequestObject(conec, new ParameterValues(params), GenericDatabaseMarshallerPool.getInstance());
         obj = unmarshallResponse(conec);
 
         assertTrue(obj instanceof AcknowlegementType);
@@ -453,7 +455,8 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer implements A
     @Test
     @Order(order=6)
     public void testCSWRemoveAll() throws Exception {
-
+        waitForStart();
+        
         // first we make a getRecords request to count the number of record
         URL niUrl = new URL(getCswURL() + "request=getRecords&version=2.0.2&service=CSW&typenames=csw:Record");
 
@@ -467,12 +470,12 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer implements A
         assertEquals(12, response.getSearchResults().getNumberOfRecordsMatched());
 
          // remove  all metadata from the index
-        niUrl = new URL(getConfigurationURL() + "request=deleteAllRecords&id=default");
+        niUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/1/CSW/default/records");
 
         // for a POST request
         conec = niUrl.openConnection();
 
-        obj = unmarshallResponse(conec);
+        obj = unmarshallResponseDelete(conec);
 
         assertTrue(obj instanceof AcknowlegementType);
         AcknowlegementType expResult = new AcknowlegementType("Success",  "All records have been deleted from the CSW");
@@ -480,7 +483,7 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer implements A
 
 
         //clear the csw cache
-        niUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/csw/admin?request=clearCache&id=default");
+        niUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/1/CSW/default/clearCache");
         conec = niUrl.openConnection();
         obj = unmarshallResponse(conec);
 
@@ -501,7 +504,9 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer implements A
     @Test
     @Order(order=7)
     public void testListAvailableService() throws Exception {
-        URL niUrl = new URL(getConfigurationURL() + "request=ListAvailableService");
+        waitForStart();
+
+        URL niUrl = new URL("http://localhost:" + grizzly.getCurrentPort() +  "/1/OGC/CSW/list");
 
 
         // for a POST request
@@ -511,8 +516,8 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer implements A
 
         assertTrue(obj instanceof ServiceReport);
         final ServiceReport result = (ServiceReport) obj;
-        assertTrue(result.getAvailableServices().containsKey("SOS"));
-        assertTrue(result.getAvailableServices().containsKey("CSW"));
+        assertTrue(result.getAvailableServices().containsKey("sos"));
+        assertTrue(result.getAvailableServices().containsKey("csw"));
 
         assertEquals(result.getAvailableServices().toString(), 3, result.getAvailableServices().size());
 
