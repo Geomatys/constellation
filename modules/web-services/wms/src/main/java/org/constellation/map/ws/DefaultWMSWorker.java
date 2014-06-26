@@ -19,38 +19,7 @@
 package org.constellation.map.ws;
 
 //J2SE dependencies
-import static org.constellation.api.CommonConstants.DEFAULT_CRS;
-import static org.constellation.map.ws.WMSConstant.*;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import static org.geotoolkit.wms.xml.WmsXmlFactory.createBoundingBox;
-import static org.geotoolkit.wms.xml.WmsXmlFactory.createDimension;
-import static org.geotoolkit.wms.xml.WmsXmlFactory.createGeographicBoundingBox;
-import static org.geotoolkit.wms.xml.WmsXmlFactory.createLayer;
-import static org.geotoolkit.wms.xml.WmsXmlFactory.createLegendURL;
-import static org.geotoolkit.wms.xml.WmsXmlFactory.createLogoURL;
-import static org.geotoolkit.wms.xml.WmsXmlFactory.createOnlineResource;
-import static org.geotoolkit.wms.xml.WmsXmlFactory.createStyle;
-
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
-import java.io.FileNotFoundException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.inject.Named;
-import javax.measure.unit.SI;
-import javax.measure.unit.Unit;
-import javax.measure.unit.UnitFormat;
-import javax.xml.bind.JAXBException;
-
+import com.codahale.metrics.annotation.Timed;
 import org.apache.sis.internal.util.UnmodifiableArrayList;
 import org.apache.sis.measure.MeasurementRange;
 import org.apache.sis.measure.Range;
@@ -59,11 +28,10 @@ import org.apache.sis.referencing.cs.AbstractCS;
 import org.apache.sis.referencing.datum.DefaultEngineeringDatum;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.xml.MarshallerPool;
-//Constellation dependencies
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
+import org.constellation.admin.exception.ConstellationException;
 import org.constellation.configuration.*;
-import org.constellation.converter.DataReferenceConverter;
 import org.constellation.dto.Service;
 import org.constellation.map.featureinfo.FeatureInfoFormat;
 import org.constellation.map.featureinfo.FeatureInfoUtilities;
@@ -75,7 +43,6 @@ import org.constellation.util.DataReference;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.LayerWorker;
 import org.constellation.ws.MimeType;
-//Geotoolkit dependencies
 import org.geotoolkit.cql.CQL;
 import org.geotoolkit.cql.CQLException;
 import org.geotoolkit.data.query.QueryBuilder;
@@ -87,6 +54,7 @@ import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.feature.type.DefaultName;
+import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.inspire.xml.vs.ExtendedCapabilitiesType;
 import org.geotoolkit.inspire.xml.vs.LanguageType;
 import org.geotoolkit.inspire.xml.vs.LanguagesType;
@@ -101,39 +69,18 @@ import org.geotoolkit.referencing.crs.DefaultVerticalCRS;
 import org.geotoolkit.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotoolkit.referencing.cs.DiscreteCoordinateSystemAxis;
 import org.geotoolkit.se.xml.v110.OnlineResourceType;
-import org.geotoolkit.sld.MutableLayer;
-import org.geotoolkit.sld.MutableLayerStyle;
-import org.geotoolkit.sld.MutableNamedLayer;
-import org.geotoolkit.sld.MutableNamedStyle;
-import org.geotoolkit.sld.MutableStyledLayerDescriptor;
+import org.geotoolkit.sld.*;
 import org.geotoolkit.sld.xml.GetLegendGraphic;
 import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
 import org.geotoolkit.sld.xml.v110.LayerDescriptionType;
 import org.geotoolkit.sld.xml.v110.TypeNameType;
 import org.geotoolkit.style.MutableStyle;
-import org.geotoolkit.style.StyleUtilities;
 import org.geotoolkit.util.PeriodUtilities;
 import org.geotoolkit.util.StringUtilities;
-import org.geotoolkit.util.converter.NonconvertibleObjectException;
-import org.geotoolkit.wms.xml.AbstractBoundingBox;
-import org.geotoolkit.wms.xml.AbstractDimension;
-import org.geotoolkit.wms.xml.AbstractGeographicBoundingBox;
-import org.geotoolkit.wms.xml.AbstractLayer;
-import org.geotoolkit.wms.xml.AbstractLegendURL;
-import org.geotoolkit.wms.xml.AbstractLogoURL;
-import org.geotoolkit.wms.xml.AbstractOnlineResource;
-import org.geotoolkit.wms.xml.AbstractRequest;
-import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
-import org.geotoolkit.wms.xml.DescribeLayer;
-import org.geotoolkit.wms.xml.GetCapabilities;
-import org.geotoolkit.wms.xml.GetFeatureInfo;
-import org.geotoolkit.wms.xml.GetMap;
-import org.geotoolkit.wms.xml.WMSMarshallerPool;
+import org.geotoolkit.wms.xml.*;
 import org.geotoolkit.wms.xml.v111.LatLonBoundingBox;
 import org.geotoolkit.wms.xml.v130.Capability;
-//Geoapi dependencies
-import org.geotoolkit.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.filter.expression.Expression;
 import org.opengis.geometry.Envelope;
@@ -145,12 +92,34 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.datum.EngineeringDatum;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.sld.StyledLayerDescriptor;
-import org.opengis.style.Style;
 import org.opengis.util.FactoryException;
 import org.springframework.context.annotation.Scope;
 
-import com.codahale.metrics.annotation.Timed;
-import org.constellation.admin.ServiceBusiness;
+import javax.inject.Named;
+import javax.measure.unit.SI;
+import javax.measure.unit.Unit;
+import javax.measure.unit.UnitFormat;
+import javax.xml.bind.JAXBException;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.FileNotFoundException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.constellation.api.CommonConstants.DEFAULT_CRS;
+import static org.constellation.map.ws.WMSConstant.*;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import static org.geotoolkit.wms.xml.WmsXmlFactory.*;
+
+//Constellation dependencies
+//Geotoolkit dependencies
+//Geoapi dependencies
 
 /**
  * A WMS worker for a local WMS service which handles requests from either REST
@@ -172,6 +141,7 @@ import org.constellation.admin.ServiceBusiness;
 @Named
 @Scope("prototype")
 public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
+
 
 
     /**
@@ -812,16 +782,28 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             // @TODO: convert the data reference string to a mutable style
             // ${providerStyleType|providerStyleId|styleName}
             final List<org.geotoolkit.wms.xml.Style> styles = new ArrayList<>();
-            for (DataReference styl : configLayer.getStyles()) {
-                final MutableStyle ms;
-                Style style = null;
+            for (DataReference styleRef : configLayer.getStyles()) {
+                MutableStyle ms = null;
                 try {
-                    style = DataReferenceConverter.convertDataReferenceToStyle(styl);
-                } catch (NonconvertibleObjectException e) {
+                    final MutableStyle style = styleBusiness.getStyle(styleRef.getProviderId(), styleRef.getLayerId().getLocalPart());
+                    if (style != null) {
+                        ms = style;
+                    } else {
+                        throw new ConstellationException(new IllegalArgumentException("The given style reference was invalid"));
+                    }
+                } catch (ConstellationException | TargetNotFoundException e) {
                     // The given style reference was invalid, we can't get a style from that
                     LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
                 }
-                ms = StyleUtilities.copy(style);
+
+//                Style style = null;
+//                try {
+//                    style = DataReferenceConverter.convertDataReferenceToStyle(styleRef);
+//                } catch (NonconvertibleObjectException e) {
+//                    // The given style reference was invalid, we can't get a style from that
+//                    LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+//                }
+//                ms = StyleUtilities.copy(style);
                 if (ms != null) {
                     styles.add(convertMutableStyleToWmsStyle(version, ms, layerDetails, legendUrlPng, legendUrlGif));
                 }
@@ -1322,7 +1304,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         }
     }
 
-    private static MutableStyle extractStyle(final Name layerName, final Layer configLayer, final StyledLayerDescriptor sld) throws CstlServiceException{
+    private MutableStyle extractStyle(final Name layerName, final Layer configLayer, final StyledLayerDescriptor sld) throws CstlServiceException{
         if(sld == null){
             throw new IllegalArgumentException("SLD should not be null");
         }

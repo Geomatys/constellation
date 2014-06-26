@@ -28,6 +28,7 @@ import javax.inject.Inject;
 import javax.xml.namespace.QName;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.StyleBusiness;
 import org.constellation.configuration.*;
 import org.constellation.map.configuration.LayerBusiness;
 import org.constellation.map.featureinfo.FeatureInfoUtilities;
@@ -51,7 +52,10 @@ public abstract class LayerWorker extends AbstractWorker {
 
     @Inject
     private LayerBusiness layerBusiness;
-    
+
+    @Inject
+    protected StyleBusiness styleBusiness;
+
     private LayerContext layerContext;
 
     protected final List<String> supportedLanguages = new ArrayList<>();
@@ -291,19 +295,30 @@ public abstract class LayerWorker extends AbstractWorker {
         return new NameInProvider(directLayer.getName(), directLayer.getProviderID(), version);
     }
     
-    protected static MutableStyle getStyle(final DataReference styleName) throws CstlServiceException {
-        final MutableStyle style;
-        if (styleName != null) {
-            //try to grab the style if provided
-            //a style has been given for this layer, try to use it
-            style = StyleProviders.getInstance().get(styleName.getLayerId().getLocalPart(), styleName.getProviderId());
-            if (style == null) {
-                throw new CstlServiceException("Style provided: " + styleName.getReference() + " not found.", STYLE_NOT_DEFINED);
+    protected MutableStyle getStyle(final DataReference styleReference) throws CstlServiceException {
+        MutableStyle style;
+        if (styleReference != null) {
+            try {
+                style = styleBusiness.getStyle(styleReference.getProviderId(), styleReference.getLayerId().getLocalPart());
+            } catch (TargetNotFoundException e) {
+                throw new CstlServiceException("Style provided: " + styleReference.getReference() + " not found.", STYLE_NOT_DEFINED);
             }
         } else {
             //no defined styles, use the favorite one, let the layer get it himself.
             style = null;
         }
+//        final MutableStyle style;
+//        if (styleName != null) {
+//            //try to grab the style if provided
+//            //a style has been given for this layer, try to use it
+//            style = StyleProviders.getInstance().get(styleName.getLayerId().getLocalPart(), styleName.getProviderId());
+//            if (style == null) {
+//                throw new CstlServiceException("Style provided: " + styleName.getReference() + " not found.", STYLE_NOT_DEFINED);
+//            }
+//        } else {
+//            //no defined styles, use the favorite one, let the layer get it himself.
+//            style = null;
+//        }
         return style;
     }
 
