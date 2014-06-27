@@ -305,6 +305,7 @@
     "label.return": "Return",
     "label.save": "Save",
     "label.search": "Search",
+    "label.select.all": "Select all",
     "label.sensor": "Sensor",
     "label.sensor.system": "Sensors system",
     "label.success": "Success",
@@ -322,6 +323,7 @@
     "label.reduced.display":"Reduced display",
     "label.yes":"Yes",
     "label.no":"No",
+
     "layer.listing.data.add.button.label": "Add data",
     "layer.listing.data.create.button.label": "Create data",
     "layer.listing.data.upload.button": "Upload file",

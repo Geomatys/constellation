@@ -346,6 +346,7 @@
     "label.return": "Retour",
     "label.save": "Sauvegarder",
     "label.search": "Rechercher",
+    "label.select.all": "Sélectionner tout",
     "label.sensor": "Sensor",
     "label.sensor.system": "Système de capteurs",
     "label.success": "Succès",
@@ -363,6 +364,7 @@
     "label.reduced.display":"Affichage réduit",
     "label.yes":"Oui",
     "label.no":"Non",
+
     "layer.listing.data.add.button.label": "Ajouter une donnée",
     "layer.listing.data.create.button.label": "Créer une donnée",
     "layer.listing.data.upload.button": "Envoyer le fichier",

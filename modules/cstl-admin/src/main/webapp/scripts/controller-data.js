@@ -44,7 +44,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
             } else {
                 layerName = $scope.selected.Name;
             }
-                
+
             var providerId = $scope.selected.Provider;
             var layerData;
             var modalLoader = $modal.open({
@@ -436,99 +436,154 @@ cstlAdminApp.controller('DataModalController', ['$scope', 'dataListing', 'webSer
             }
         };
 
+        $scope.dataSelect={all:false};
+        $scope.listSelect=[];
+
+        $scope.selectAllData = function() {
+            if ($scope.dataSelect.all) {
+                $scope.listSelect = $scope.dataList.slice();
+            }else{
+                $scope.listSelect=[];
+            }
+        }
+        $scope.dataInArray = function(item){
+            if($scope.listSelect.length>0) {
+                for (var i = 0; i < $scope.listSelect.length; i++) {
+                    if ($scope.listSelect[i].Name == item.Name && $scope.listSelect[i].Provider == item.Provider) {
+                        $scope.listSelect.splice(i, 1);
+                        break;
+                    }
+                    if(i==$scope.listSelect.length-1){
+                        if ($scope.listSelect[i].Name != item.Name || $scope.listSelect[i].Provider != item.Provider){
+                            $scope.listSelect.push(item);
+                            break;
+                        }
+                    }
+                }
+            } else $scope.listSelect.push(item);
+
+            if($scope.listSelect.length < $scope.dataList.length){
+                $scope.dataSelect.all=false;
+            } else $scope.dataSelect.all=true;
+        }
+        $scope.isInSelected = function(item){
+            for(var i=0; i < $scope.listSelect.length; i++){
+                if($scope.listSelect[i].Name == item.Name && $scope.listSelect[i].Provider == item.Provider){
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
         $scope.close = function() {
             $modalInstance.dismiss('close');
         };
 
         $scope.choose = function() {
+            if ($scope.listSelect.length != 0) {
+                $scope.selected = $scope.listSelect;
+            }
             if ($scope.selected == null) {
-                $growl('warning','Warning','No data selected');
+                $growl('warning', 'Warning', 'No data selected');
                 $modalInstance.dismiss('close');
                 return;
             }
-
-            if ($scope.service.type.toLowerCase() === 'sos') {
-                var sensorId = ($scope.selectedSensorsChild !== null) ? $scope.selectedSensorsChild.id : $scope.selected.id;
-                sos.importSensor({id: service.identifier}, {values: {"sensorId" : sensorId}}, function() {
-                    $growl('success', 'Success', 'Sensor '+ sensorId +' imported in service '+ service.name);
-                    $modalInstance.close();
-                }, function() {
-                    $growl('error', 'Error', 'Unable to import sensor '+ sensorId +' in service '+ service.name);
-                    $modalInstance.dismiss('close');
-                });
-                return;
-            }
-
-            if ($scope.wmtsParams === false) {
-                // just add the data if we are not in the case of the wmts service
-                if (service.type.toLowerCase() !== 'wmts') {
-                    if (service.type.toLowerCase() === 'wms' && $scope.conformPyramid) {
-                        // In the case of a wms service and user asked to pyramid the data
-                        dataListing.pyramidConform({providerId: $scope.selected.Provider, dataId: $scope.selected.Name}, {}, function(tiledProvider) {
-                            webService.addLayer({type: service.type, id: service.identifier},
-                                {layerAlias: tiledProvider.dataId, layerId: tiledProvider.dataId, serviceType: service.type, serviceId: service.identifier, providerId: tiledProvider.providerId},
-                                function () {
-                                    $growl('success', 'Success', 'Layer ' + tiledProvider.dataId + ' successfully added to service ' + service.name);
-                                    $modalInstance.close();
-                                },
-                                function () {
-                                    $growl('error', 'Error', 'Layer ' + tiledProvider.dataId + ' failed to be added to service ' + service.name);
-                                    $modalInstance.dismiss('close');
-                                }
-                            );
-                        } , function() {
-                            $growl('error', 'Error', 'Failed to generate conform pyramid for ' + $scope.selected.Name);
-                            $modalInstance.dismiss('close');
-                        });
-                    } else {
-                        // Not in WMTS and no pyramid requested
-                        var modalLoader = $modal.open({
-                          templateUrl: 'views/modalLoader.html',
-                          controller: 'ModalInstanceCtrl'
-                        });
-                        webService.addLayer({type: service.type, id: service.identifier},
-                            {layerAlias: $scope.selected.Name, layerId: $scope.selected.Name, serviceType: service.type, serviceId: service.identifier, providerId: $scope.selected.Provider, layerNamespace: $scope.selected.Namespace},
-                            function () {
-                                $growl('success', 'Success', 'Layer ' + $scope.selected.Name + ' successfully added to service ' + service.name);
-                                modalLoader.close();
-                                $modalInstance.close();
-                            },
-                            function () {
-                                $growl('error', 'Error', 'Layer ' + $scope.selected.Name + ' failed to be added to service ' + service.name);
-                                $modalInstance.dismiss('close');
-                            }
-                        );
-                    }
+            else{
+                if ($scope.service.type.toLowerCase() === 'sos') {
+                    var sensorId = ($scope.selectedSensorsChild !== null) ? $scope.selectedSensorsChild.id : $scope.selected.id;
+                    sos.importSensor({id: service.identifier}, {values: {"sensorId": sensorId}}, function () {
+                        $growl('success', 'Success', 'Sensor ' + sensorId + ' imported in service ' + service.name);
+                        $modalInstance.close();
+                    }, function () {
+                        $growl('error', 'Error', 'Unable to import sensor ' + sensorId + ' in service ' + service.name);
+                        $modalInstance.dismiss('close');
+                    });
                     return;
                 }
 
-                // WMTS here, prepare form
-                dataListing.pyramidScales({providerId: $scope.selected.Provider, dataId: $scope.selected.Name}, function(response) {
-                    $scope.scales = response.Entry[0].split(',');
-                }, function () {
-                    $growl('error', 'Error', 'Unable to pyramid data ' + $scope.selected.Name);
-                });
+                if ($scope.wmtsParams === false) {
+                    // just add the data if we are not in the case of the wmts service
 
-                $scope.wmtsParams = true;
-            } else {
-                // Finish the WMTS publish process
-                // Pyramid the data to get the new provider to add
-                dataListing.pyramidData({providerId: $scope.selected.Provider, dataId: $scope.selected.Name},
-                    {tileFormat: $scope.tileFormat, crs: $scope.crs, scales: $scope.scales, upperCornerX: $scope.upperCornerX, upperCornerY: $scope.upperCornerY},
-                    function(respProvider) {
-                        // Add the tiled provider to the service
-                        webService.addLayer({type: service.type, id: service.identifier},
-                            {layerAlias: respProvider.dataId, layerId: respProvider.dataId, serviceType: service.type, serviceId: service.identifier, providerId: respProvider.providerId},
-                            function () {
-                                $growl('success', 'Success', 'Layer ' + respProvider.dataId + ' successfully added to service ' + service.name);
-                                $modalInstance.close();
-                            },
-                            function () {
-                                $growl('error', 'Error', 'Layer ' + respProvider.dataId + ' failed to be added to service ' + service.name);
-                                $modalInstance.dismiss('close');
+
+                    if (service.type.toLowerCase() !== 'wmts') {
+                        for(var i=0; i<$scope.selected.length; i++) {
+                            if (service.type.toLowerCase() === 'wms' && $scope.conformPyramid) {
+                                // In the case of a wms service and user asked to pyramid the data
+                                dataListing.pyramidConform({providerId: $scope.selected[i].Provider, dataId: $scope.selected[i].Name}, {}, function (tiledProvider) {
+                                    webService.addLayer({type: service.type, id: service.identifier},
+                                        {layerAlias: tiledProvider.dataId, layerId: tiledProvider.dataId, serviceType: service.type, serviceId: service.identifier, providerId: tiledProvider.providerId},
+                                        function () {
+                                            $growl('success', 'Success', 'Layer ' + tiledProvider.dataId + ' successfully added to service ' + service.name);
+                                            $modalInstance.close();
+                                        },
+                                        function () {
+                                            $growl('error', 'Error', 'Layer ' + tiledProvider.dataId + ' failed to be added to service ' + service.name);
+                                            $modalInstance.dismiss('close');
+                                        }
+                                    );
+                                }, function () {
+                                    $growl('error', 'Error', 'Failed to generate conform pyramid for ' + $scope.selected[i].Name);
+                                    $modalInstance.dismiss('close');
+                                });
+                            } else {
+
+                                webService.addLayer({type: service.type, id: service.identifier},
+                                    {layerAlias: $scope.selected[i].Name, layerId: $scope.selected[i].Name, serviceType: service.type, serviceId: service.identifier, providerId: $scope.selected[i].Provider, layerNamespace: $scope.selected[i].Namespace},
+                                    function (response) {
+                                        $growl('success', 'Success', response.message);
+                                        modalLoader.close();
+                                        $modalInstance.close();
+                                    },
+                                    function (response) {
+                                        $growl('error', 'Error', response.message);
+                                        $modalInstance.dismiss('close');
+                                    }
+                                );
                             }
-                        );
-                    }, function() { $growl('error', 'Error', 'Pyramid process failed for ' + $scope.selected.Name); });
+                        }
+                        // Not in WMTS and no pyramid requested
+                        var modalLoader = $modal.open({
+                            templateUrl: 'views/modalLoader.html',
+                            controller: 'ModalInstanceCtrl'
+                        });
+                        return;
+                    }
+                    for(var i=0; i<$scope.selected.length; i++) {
+                        // WMTS here, prepare form
+                        dataListing.pyramidScales({providerId: $scope.selected[i].Provider, dataId: $scope.selected[i].Name}, function (response) {
+                            $scope.scales = response.Entry[0].split(',');
+                        }, function () {
+                            $growl('error', 'Error', 'Unable to pyramid data ' + $scope.selected[i].Name);
+                        });
+
+                        $scope.wmtsParams = true;
+                    }
+                } else {
+                    // Finish the WMTS publish process
+                    // Pyramid the data to get the new provider to add
+
+                    for(var i=0; i<$scope.selected.length; i++) {
+                        dataListing.pyramidData({providerId: $scope.selected[i].Provider, dataId: $scope.selected[i].Name},
+                            {tileFormat: $scope.tileFormat, crs: $scope.crs, scales: $scope.scales, upperCornerX: $scope.upperCornerX, upperCornerY: $scope.upperCornerY},
+                            function (respProvider) {
+                                // Add the tiled provider to the service
+                                webService.addLayer({type: service.type, id: service.identifier},
+                                    {layerAlias: respProvider.dataId, layerId: respProvider.dataId, serviceType: service.type, serviceId: service.identifier, providerId: respProvider.providerId},
+                                    function () {
+                                        $growl('success', 'Success', 'Layer ' + respProvider.dataId + ' successfully added to service ' + service.name);
+                                        $modalInstance.close();
+                                    },
+                                    function () {
+                                        $growl('error', 'Error', 'Layer ' + respProvider.dataId + ' failed to be added to service ' + service.name);
+                                        $modalInstance.dismiss('close');
+                                    }
+                                );
+                            }, function () {
+                                $growl('error', 'Error', 'Pyramid process failed for ' + $scope.selected[i].Name);
+                            });
+                    }
+                }
             }
         };
     }]);
