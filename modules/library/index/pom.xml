@@ -51,7 +51,7 @@
   <!-- =========================================================== -->
   <modules>
     <module>base</module>
-    <module>mdweb</module>
+    <!--<module>mdweb</module>-->
     <module>generic</module>
   </modules>
 

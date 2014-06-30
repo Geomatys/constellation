@@ -81,11 +81,11 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-       <groupId>org.mdweb.metamodel</groupId>
-       <artifactId>mdweb-metamodel-lib-sql-data</artifactId>
-      <scope>test</scope>
-    </dependency>
+    <!--<dependency>-->
+       <!--<groupId>org.mdweb.metamodel</groupId>-->
+       <!--<artifactId>mdweb-metamodel-lib-sql-data</artifactId>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
     <dependency>
       <groupId>org.constellation.web-services</groupId>
       <artifactId>cstl-web-sos-base</artifactId>

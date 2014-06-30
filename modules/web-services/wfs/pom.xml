@@ -101,12 +101,12 @@
     </dependency>
 
     <!-- Test dependencies -->
-    <dependency>
-       <groupId>org.constellation.engine</groupId>
-       <artifactId>cstl-engine-shiro</artifactId>
-       <version>${project.version}</version>
-       <scope>test</scope>
-    </dependency>
+    <!--<dependency>-->
+       <!--<groupId>org.constellation.engine</groupId>-->
+       <!--<artifactId>cstl-engine-shiro</artifactId>-->
+       <!--<version>${project.version}</version>-->
+       <!--<scope>test</scope>-->
+    <!--</dependency>-->
     <dependency>
       <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-jaxp-core</artifactId>
@@ -157,11 +157,11 @@
       <artifactId>derby</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-       <groupId>org.mdweb.metamodel</groupId>
-       <artifactId>mdweb-metamodel-lib-sql-data</artifactId>
-      <scope>test</scope>
-    </dependency>
+    <!--<dependency>-->
+       <!--<groupId>org.mdweb.metamodel</groupId>-->
+       <!--<artifactId>mdweb-metamodel-lib-sql-data</artifactId>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
     <dependency>
         <groupId>org.constellation.engine</groupId>
         <artifactId>cstl-engine-process-core</artifactId>

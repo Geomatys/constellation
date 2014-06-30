@@ -160,7 +160,7 @@
         <shiro.version>1.2.1</shiro.version>
         <sis.version>0.5-jdk7-SNAPSHOT</sis.version>
         <geotoolkit.version>4.x-SNAPSHOT</geotoolkit.version>
-        <mdweb-meta.version>2.4-SNAPSHOT</mdweb-meta.version>
+        <!--<mdweb-meta.version>2.4-SNAPSHOT</mdweb-meta.version>-->
         <juzu.version>0.7.0-beta22</juzu.version>
         <slf4j.version>1.7.5</slf4j.version>
         <jersey.version>2.5</jersey.version>
@@ -477,31 +477,31 @@
                </exclusions>
             </dependency>
             <!-- mdweb-metamodel -->
-            <dependency>
-                <groupId>org.mdweb.metamodel</groupId>
-                <artifactId>mdweb-metamodel-lib-model</artifactId>
-                <version>${mdweb-meta.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mdweb.metamodel</groupId>
-                <artifactId>mdweb-metamodel-lib-thesaurus</artifactId>
-                <version>${mdweb-meta.version}</version>
-            </dependency>
-	    <dependency>
-                <groupId>org.mdweb.metamodel</groupId>
-                <artifactId>mdweb-metamodel-lib-sql-data</artifactId>
-                <version>${mdweb-meta.version}</version>
-            </dependency>
-	    <dependency>
-                <groupId>org.mdweb.metamodel</groupId>
-                <artifactId>mdweb-metamodel-lib-thesaurus-sql-data</artifactId>
-                <version>${mdweb-meta.version}</version>
-            </dependency>
-	    <dependency>
-               <groupId>org.mdweb.metamodel</groupId>
-               <artifactId>mdweb-metamodel-lib-auth</artifactId>
-               <version>${mdweb-meta.version}</version>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>org.mdweb.metamodel</groupId>-->
+                <!--<artifactId>mdweb-metamodel-lib-model</artifactId>-->
+                <!--<version>${mdweb-meta.version}</version>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+                <!--<groupId>org.mdweb.metamodel</groupId>-->
+                <!--<artifactId>mdweb-metamodel-lib-thesaurus</artifactId>-->
+                <!--<version>${mdweb-meta.version}</version>-->
+            <!--</dependency>-->
+	    <!--<dependency>-->
+                <!--<groupId>org.mdweb.metamodel</groupId>-->
+                <!--<artifactId>mdweb-metamodel-lib-sql-data</artifactId>-->
+                <!--<version>${mdweb-meta.version}</version>-->
+            <!--</dependency>-->
+	    <!--<dependency>-->
+                <!--<groupId>org.mdweb.metamodel</groupId>-->
+                <!--<artifactId>mdweb-metamodel-lib-thesaurus-sql-data</artifactId>-->
+                <!--<version>${mdweb-meta.version}</version>-->
+            <!--</dependency>-->
+	    <!--<dependency>-->
+               <!--<groupId>org.mdweb.metamodel</groupId>-->
+               <!--<artifactId>mdweb-metamodel-lib-auth</artifactId>-->
+               <!--<version>${mdweb-meta.version}</version>-->
+            <!--</dependency>-->
 
             <!-- SIS version -->
             <dependency>

@@ -110,10 +110,10 @@
         </dependency>
         
         <!-- Geomatys external project -->
-        <dependency>
-            <groupId>org.mdweb.metamodel</groupId>
-            <artifactId>mdweb-metamodel-lib-auth</artifactId>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.mdweb.metamodel</groupId>-->
+            <!--<artifactId>mdweb-metamodel-lib-auth</artifactId>-->
+        <!--</dependency>-->
 
         <!-- External dependencies -->
         <dependency>

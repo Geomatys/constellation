@@ -158,11 +158,11 @@
       <artifactId>cstl-test-embedded</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-       <groupId>org.constellation.engine</groupId>
-       <artifactId>cstl-engine-shiro</artifactId>
-       <version>${project.version}</version>
-    </dependency>
+    <!--<dependency>-->
+       <!--<groupId>org.constellation.engine</groupId>-->
+       <!--<artifactId>cstl-engine-shiro</artifactId>-->
+       <!--<version>${project.version}</version>-->
+    <!--</dependency>-->
     <!--  For the embedded service. -->
     <dependency>
       <groupId>org.glassfish.jersey.containers</groupId>

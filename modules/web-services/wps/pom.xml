@@ -90,23 +90,23 @@
         </dependency>
 
         <!-- test dependencies -->
-        <dependency>
-            <groupId>org.constellation.engine</groupId>
-            <artifactId>cstl-engine-shiro</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.constellation.engine</groupId>-->
+            <!--<artifactId>cstl-engine-shiro</artifactId>-->
+            <!--<version>${project.version}</version>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
         <dependency>
            <groupId>org.constellation.testing</groupId>
            <artifactId>cstl-test-embedded</artifactId>
            <version>${project.version}</version>
            <scope>test</scope>
         </dependency>
-        <dependency>
-           <groupId>org.apache.shiro</groupId>
-           <artifactId>shiro-spring</artifactId>
-           <scope>test</scope>
-        </dependency>
+        <!--<dependency>-->
+           <!--<groupId>org.apache.shiro</groupId>-->
+           <!--<artifactId>shiro-spring</artifactId>-->
+           <!--<scope>test</scope>-->
+        <!--</dependency>-->
    	<dependency>
            <groupId>javax.servlet</groupId>
            <artifactId>javax.servlet-api</artifactId>

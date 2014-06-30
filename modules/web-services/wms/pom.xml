@@ -93,12 +93,12 @@
 
     <!-- test dependencies -->
 
-     <dependency>
-       <groupId>org.constellation.engine</groupId>
-       <artifactId>cstl-engine-shiro</artifactId>
-       <version>${project.version}</version>
-       <scope>test</scope>
-    </dependency>
+     <!--<dependency>-->
+       <!--<groupId>org.constellation.engine</groupId>-->
+       <!--<artifactId>cstl-engine-shiro</artifactId>-->
+       <!--<version>${project.version}</version>-->
+       <!--<scope>test</scope>-->
+    <!--</dependency>-->
     <dependency>
       <groupId>org.constellation.engine</groupId>
       <artifactId>cstl-engine-testing</artifactId>
@@ -157,11 +157,11 @@
        <version>${project.version}</version>
        <scope>test</scope>
     </dependency>
-    <dependency>
-       <groupId>org.apache.shiro</groupId>
-       <artifactId>shiro-spring</artifactId>
-       <scope>test</scope>
-    </dependency>
+    <!--<dependency>-->
+       <!--<groupId>org.apache.shiro</groupId>-->
+       <!--<artifactId>shiro-spring</artifactId>-->
+       <!--<scope>test</scope>-->
+    <!--</dependency>-->
     <dependency>
         <groupId>org.constellation.engine.register</groupId>
         <artifactId>cstl-register-jooq</artifactId>
