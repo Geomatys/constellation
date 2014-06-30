@@ -1,0 +1,8 @@
+target/
+*.log
+//Intellij
+*.iml
+//eclipse
+.classpath
+.project
+.settings/
