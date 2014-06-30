@@ -21,7 +21,7 @@ import org.constellation.engine.register.User;
 import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.tables.records.DomainroleRecord;
 import org.constellation.engine.register.jooq.tables.records.DomainroleXPermissionRecord;
-import org.constellation.engine.register.repository.DomainRoleRepository;
+import org.constellation.engine.register.repository.DomainroleRepository;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.UpdatableRecord;
@@ -34,7 +34,7 @@ import com.google.common.primitives.Ints;
 
 @Component
 public class JooqDomainroleRepository extends AbstractJooqRespository<DomainroleRecord, Domainrole> implements
-        DomainRoleRepository {
+        DomainroleRepository {
 
     Predicate<Permission> nullPermission = new Predicate<Permission>() {
         @Override

@@ -18,10 +18,9 @@ import javax.ws.rs.core.Response;
 
 import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.Domainrole;
-import org.constellation.engine.register.Permission;
 import org.constellation.engine.register.PermissionConstants;
 import org.constellation.engine.register.repository.DomainRepository;
-import org.constellation.engine.register.repository.DomainRoleRepository;
+import org.constellation.engine.register.repository.DomainroleRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
 
 import com.google.common.collect.Maps;
@@ -93,7 +92,7 @@ public class ServicePermissionRest {
     }
 
     @Inject
-    private DomainRoleRepository domainRoleRepository;
+    private DomainroleRepository domainRoleRepository;
 
     @Inject
     private ServiceRepository serviceRepository;

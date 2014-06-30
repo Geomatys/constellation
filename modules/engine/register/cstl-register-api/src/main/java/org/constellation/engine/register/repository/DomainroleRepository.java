@@ -11,7 +11,7 @@ import org.constellation.engine.register.User;
 
 import com.google.common.base.Optional;
 
-public interface DomainRoleRepository {
+public interface DomainroleRepository {
 
     List<Domainrole> findAll();
 

@@ -34,8 +34,7 @@ import javax.ws.rs.core.Response;
 
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.engine.register.DomainUser;
-import org.constellation.engine.register.User;
-import org.constellation.engine.register.repository.DomainRoleRepository;
+import org.constellation.engine.register.repository.DomainroleRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.geotoolkit.util.StringUtilities;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,7 +58,7 @@ public class UserRest  {
     private UserRepository userRepository;
     
     @Inject
-    private DomainRoleRepository domainroleRepository;
+    private DomainroleRepository domainroleRepository;
     
     @GET
     @Path("/")
