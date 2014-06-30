@@ -22,7 +22,6 @@
   },
   "resolutions": {
     "angular": "~1.2.3",
-    "angular-cookies": "~1.2.3",
     "angular-translate": "2.1.0"
   }
 }
