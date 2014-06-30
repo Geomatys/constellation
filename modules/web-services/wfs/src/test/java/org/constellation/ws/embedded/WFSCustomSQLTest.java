@@ -24,10 +24,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Connection;
-import java.util.AbstractMap;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -42,14 +39,11 @@ import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.admin.dao.ProviderRecord;
-import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
 import org.constellation.map.configuration.LayerBusiness;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
 import org.constellation.provider.Providers;
-import org.constellation.provider.configuration.AbstractConfigurator;
-import org.constellation.provider.configuration.Configurator;
 import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
 import static org.constellation.provider.configuration.ProviderParameters.SOURCE_LOADALL_DESCRIPTOR;
 import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
@@ -64,7 +58,6 @@ import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.HOST;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.PASSWORD;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.SCHEMA;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.USER;
-import org.geotoolkit.db.postgres.PostgresFeatureStoreFactory;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import static org.geotoolkit.parameter.ParametersExt.createGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
@@ -155,6 +148,13 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer implements Applicati
                 pgconfig.parameter(USER.getName().getCode()).setValue("test");
                 pgconfig.parameter(PASSWORD.getName().getCode()).setValue("test");
                 pgconfig.parameter(NAMESPACE.getName().getCode()).setValue("http://cite.opengeospatial.org/gmlsf");
+                
+                //add a custom sql query layer
+                final ParameterValueGroup layer = getOrCreateGroup(source, "Layer");
+                getOrCreateValue(layer, "name").setValue("CustomSQLQuery");
+                getOrCreateValue(layer, "language").setValue("CUSTOM-SQL");
+                getOrCreateValue(layer, "statement").setValue("SELECT name as nom, \"pointProperty\" as geom FROM \"PrimitiveGeoFeature\" ");
+                         
                 choice.values().add(pgconfig);
 
                 providerBusiness.createProvider("postgisSrc", null, ProviderRecord.ProviderType.LAYER, "feature-store", source);
@@ -162,6 +162,7 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer implements Applicati
                 dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "AggregateGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);
                 dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "PrimitiveGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);
                 dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "EntitéGénérique"),     "postgisSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "CustomSQLQuery"),      "postgisSrc", "VECTOR", false, true, null, null);
                 
                 final File outputDir = initDataDirectory();
                 final ParameterValueGroup sourcef = featfactory.getProviderDescriptor().createValue();
@@ -173,9 +174,9 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer implements Applicati
                 getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
                 getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");
 
-                final ParameterValueGroup layer = getOrCreateGroup(sourcef, "Layer");
-                getOrCreateValue(layer, "name").setValue("NamedPlaces");
-                getOrCreateValue(layer, "style").setValue("cite_style_NamedPlaces");
+                final ParameterValueGroup layer2 = getOrCreateGroup(sourcef, "Layer");
+                getOrCreateValue(layer2, "name").setValue("NamedPlaces");
+                getOrCreateValue(layer2, "style").setValue("cite_style_NamedPlaces");
                 
                 providerBusiness.createProvider("shapeSrc", null, ProviderRecord.ProviderType.LAYER, "feature-store", sourcef);
 
@@ -213,6 +214,8 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer implements Applicati
                 providerBusiness.createProvider("omSrc", null, ProviderRecord.ProviderType.LAYER, "feature-store", sourceOM);
                 dataBusiness.create(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"), "omSrc", "VECTOR", false, true, null, null);
                 
+                DataProviders.getInstance().reload();
+                
                 final LayerContext config = new LayerContext();
                 config.getCustomParameters().put("shiroAccessible", "false");
                 config.getCustomParameters().put("transactionSecurized", "false");
@@ -222,6 +225,7 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer implements Applicati
                layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "WFS", null);
                layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "WFS", null);
                layerBusiness.add("EntitéGénérique",     "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "WFS", null);
+               layerBusiness.add("CustomSQLQuery",      "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "WFS", null);
                layerBusiness.add("SamplingPoint",       "http://www.opengis.net/sampling/1.0",  "omSrc",      null, "default", "WFS", null);
                layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml",       "shapeSrc",   null, "default", "WFS", null);
                layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml",       "shapeSrc",   null, "default", "WFS", null);
@@ -282,6 +286,7 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer implements Applicati
         assertEquals(1, elements.size());
 
         final XMLComparator comparator = new XMLComparator(WFSCustomSQLTest.class.getResource("/expected/customsqlquery.xsd"), getfeatsUrl);
+        comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
         comparator.compare();
 
     }

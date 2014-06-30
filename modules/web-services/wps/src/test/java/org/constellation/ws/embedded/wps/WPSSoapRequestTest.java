@@ -33,9 +33,11 @@ import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.ProcessContext;
 import org.constellation.configuration.ProcessFactory;
 import org.constellation.configuration.Processes;
+import org.constellation.test.utils.Order;
 import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.wps.ws.soap.WPSService;
 import org.constellation.ws.embedded.AbstractGrizzlyServer;
@@ -45,38 +47,55 @@ import org.junit.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
 import org.junit.runner.RunWith;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.context.ContextConfiguration;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
 @RunWith(SpringTestRunner.class)
-public class WPSSoapRequestTest extends AbstractGrizzlyServer {
+@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+public class WPSSoapRequestTest extends AbstractGrizzlyServer implements ApplicationContextAware {
+
+    protected ApplicationContext applicationContext;
+    
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
 
     @Inject
     private ServiceBusiness serviceBusiness;
     
+    private static boolean initialized = false;
+    
     @PostConstruct
     public void initLayerList() {
-        try {
-            ConfigurationEngine.setupTestEnvironement("WPSSoapRequestTest");
-            
-            final List<ProcessFactory> process = Arrays.asList(new ProcessFactory("jts", true));
-            final Processes processes = new Processes(process);
-            final ProcessContext config = new ProcessContext(processes);
-            config.getCustomParameters().put("shiroAccessible", "false");
-            
-            serviceBusiness.create("WPS", "default", config, null, null);
-            serviceBusiness.create("WPS", "test",    config, null, null);
-            
-            final Map<String, Object> map = new HashMap<>();
-            map.put("wps", new WPSService());
-            initServer(new String[] {
-                "org.constellation.wps.ws.rs",
-                "org.constellation.configuration.ws.rs",
-                "org.constellation.ws.rs.provider"}, map);
-        } catch (Exception ex) {
-            Logger.getLogger(WPSSoapRequestTest.class.getName()).log(Level.SEVERE, null, ex);
+        SpringHelper.setApplicationContext(applicationContext);
+        if (!initialized) {
+            try {
+                ConfigurationEngine.setupTestEnvironement("WPSSoapRequestTest");
+                serviceBusiness.deleteAll();
+                
+                final List<ProcessFactory> process = Arrays.asList(new ProcessFactory("jts", true));
+                final Processes processes = new Processes(process);
+                final ProcessContext config = new ProcessContext(processes);
+                config.getCustomParameters().put("shiroAccessible", "false");
+
+                serviceBusiness.create("wps", "default", config, null, null);
+                serviceBusiness.create("wps", "test",    config, null, null);
+
+                final Map<String, Object> map = new HashMap<>();
+                map.put("wps", new WPSService());
+                initServer(null, map);
+                
+                initialized = true;
+            } catch (Exception ex) {
+                Logger.getLogger(WPSSoapRequestTest.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
@@ -89,13 +108,14 @@ public class WPSSoapRequestTest extends AbstractGrizzlyServer {
     /**
      */
     @Test
+    @Order(order = 1)
     public void testWPSGetCapabilities() throws Exception {
 
-        waitForStart();
+        waitForSoapStart("wps");
         // Creates a valid GetCapabilities url.
         URL getCapsUrl;
         try {
-            getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wps/default?");
+            getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPortSoap() +"/wps/default?");
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -113,12 +133,13 @@ public class WPSSoapRequestTest extends AbstractGrizzlyServer {
     /**
      */
     @Test
+    @Order(order = 2)
     public void testWPSDescribeProcess() throws JAXBException, IOException {
 
         // Creates a valid GetCapabilities url.
         URL getCapsUrl;
         try {
-            getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wps/default?");
+            getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPortSoap() +"/wps/default?");
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -137,12 +158,13 @@ public class WPSSoapRequestTest extends AbstractGrizzlyServer {
     /**
      */
     @Test
+    @Order(order = 3)
     public void testWPSExecute() throws JAXBException, IOException {
 
         // Creates a valid GetCapabilities url.
         URL getCapsUrl;
         try {
-            getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPort() +"/wps/default?");
+            getCapsUrl = new URL("http://localhost:"+ grizzly.getCurrentPortSoap() +"/wps/default?");
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;

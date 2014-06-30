@@ -141,6 +141,37 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
             cpt++;
         }
     }
+    
+    public void waitForSoapStart(String instance) throws Exception {
+        boolean ex = true;
+        int cpt = 0;
+        while (ex) {
+            Thread.sleep(1 * 2000);
+            final URL u;
+            final String suffix;
+            if (grizzly.getUriSuffix() != null) {
+                suffix = "/" + grizzly.getUriSuffix();
+            } else {
+                suffix = "";
+            }
+            if (grizzly != null && grizzly.getCurrentPortSoap()!= null) {
+                u = new URL("http://localhost:" + grizzly.getCurrentPortSoap() + suffix + "/" + instance + "?wsdl");
+            } else {
+                u = new URL("http://localhost:9090/1/user/access");
+            }
+            ex = false;
+            URLConnection conec = u.openConnection();
+            try {
+                conec.getInputStream();
+            } catch (IOException e) {
+                ex = true;
+            }
+            if (cpt == 100) {
+                throw new Exception("The grizzly server never start");
+            }
+            cpt++;
+        }
+    }
 
     /**
      * Thread that launches a Grizzly server in a separate thread.
@@ -164,6 +195,10 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
 
         public Integer getCurrentPort() {
             return cstlServer.currentPort;
+        }
+        
+        public Integer getCurrentPortSoap() {
+            return cstlServer.portsoap;
         }
 
         public String getUriSuffix() {

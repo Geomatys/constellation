@@ -3,7 +3,7 @@
     <wfs:boundedBy>
         <gml:Envelope srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:4326">
             <gml:lowerCorner>42.387988622819975 -4.244083878356522</gml:lowerCorner>
-            <gml:upperCorner>43.46788242438395 -4.14498462789604</gml:upperCorner>
+            <gml:upperCorner>43.467882424383944 -4.14498462789604</gml:upperCorner>
         </gml:Envelope>
     </wfs:boundedBy>
     <wfs:member>
@@ -38,7 +38,7 @@
             </sml:keywords>
             <sml:location>
                 <ns3:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:4326" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:ns3="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink">
-                    <ns3:pos srsDimension="2" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:4326">43.46788242438395 -4.244083878356522</ns3:pos>
+                    <ns3:pos srsDimension="2" srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:4326">43.467882424383944 -4.244083878356522</ns3:pos>
                 </ns3:Point>
             </sml:location>
             <sml:phenomenons>time</sml:phenomenons>

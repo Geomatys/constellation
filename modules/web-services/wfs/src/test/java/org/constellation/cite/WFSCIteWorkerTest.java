@@ -146,6 +146,7 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
                 dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "EntitéGénérique"),     "postgisSrc", "VECTOR", false, true, null, null);
 
 
+                DataProviders.getInstance().reload();
                 final LayerContext config = new LayerContext();
                 config.getCustomParameters().put("shiroAccessible", "false");
                 config.getCustomParameters().put("transactionSecurized", "false");
@@ -167,7 +168,6 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        DataProviders.getInstance().setConfigurator(Providers.DEFAULT_CONFIGURATOR);
         ConfigurationEngine.shutdownTestEnvironement("WFSCIteWorkerTest");
     }
 

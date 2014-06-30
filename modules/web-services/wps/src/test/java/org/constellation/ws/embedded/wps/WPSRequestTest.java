@@ -33,6 +33,7 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.ProcessContext;
 import org.constellation.configuration.ProcessFactory;
 import org.constellation.configuration.Processes;
@@ -44,6 +45,10 @@ import org.junit.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
 import org.junit.runner.RunWith;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.context.ContextConfiguration;
 
 /**
  *
@@ -51,7 +56,15 @@ import org.junit.runner.RunWith;
  * @since 0.9
  */
 @RunWith(SpringTestRunner.class)
-public class WPSRequestTest  extends AbstractGrizzlyServer {
+@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+public class WPSRequestTest  extends AbstractGrizzlyServer implements ApplicationContextAware {
+
+    protected ApplicationContext applicationContext;
+    
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
 
     private static final String WPS_GETCAPABILITIES ="request=GetCapabilities&service=WPS&version=1.0.0";
 
@@ -60,28 +73,33 @@ public class WPSRequestTest  extends AbstractGrizzlyServer {
     @Inject
     private ServiceBusiness serviceBusiness;
     
+    private static boolean initialized = false;
+    
     @PostConstruct
     public void initLayerList() {
-        try {
-            ConfigurationEngine.setupTestEnvironement("WPSRequestTest");
-            
-            final List<ProcessFactory> process = Arrays.asList(new ProcessFactory("jts", true));
-            final Processes processes = new Processes(process);
-            final ProcessContext config = new ProcessContext(processes);
-            config.getCustomParameters().put("shiroAccessible", "false");
-            
-            serviceBusiness.create("WPS", "default", config, null, null);
-            serviceBusiness.create("WPS", "test",    config, null, null);
-            
-            final Map<String, Object> map = new HashMap<>();
-            map.put("wps", new WPSService());
-            initServer(new String[] {
-                "org.constellation.wps.ws.rs",
-                "org.constellation.configuration.ws.rs",
-                "org.constellation.ws.rs.provider"}, map);
-            pool = WPSMarshallerPool.getInstance();
-        } catch (Exception ex) {
-            Logger.getLogger(WPSRequestTest.class.getName()).log(Level.SEVERE, null, ex);
+        SpringHelper.setApplicationContext(applicationContext);
+        if (!initialized) {
+            try {
+                ConfigurationEngine.setupTestEnvironement("WPSRequestTest");
+                serviceBusiness.deleteAll();
+                
+                final List<ProcessFactory> process = Arrays.asList(new ProcessFactory("jts", true));
+                final Processes processes = new Processes(process);
+                final ProcessContext config = new ProcessContext(processes);
+                config.getCustomParameters().put("shiroAccessible", "false");
+
+                serviceBusiness.create("wps", "default", config, null, null);
+                serviceBusiness.create("wps", "test",    config, null, null);
+
+                final Map<String, Object> map = new HashMap<>();
+                map.put("wps", new WPSService());
+                initServer(null, map);
+                pool = WPSMarshallerPool.getInstance();
+                
+                initialized = true;
+            } catch (Exception ex) {
+                Logger.getLogger(WPSRequestTest.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 

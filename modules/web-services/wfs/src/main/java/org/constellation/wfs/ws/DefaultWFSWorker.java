@@ -1445,7 +1445,11 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 }
                 
                 // look to remove featureType prefix
-                final String ftName = ft.getName().toString();
+                String ftName = "";
+                if (ft.getName().getNamespaceURI() != null) {
+                    ftName = "{" + ft.getName().getNamespaceURI() + "}";
+                }
+                ftName = ftName + ft.getName().getLocalPart();
                 if (filterProperty.startsWith(ftName)) {
                     filterProperty = filterProperty.substring(ftName.length());
                 }
@@ -1458,7 +1462,12 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 }
                 final Binding pa = Bindings.getBinding(FeatureType.class, filterProperty);
                 if (pa == null || pa.get(ft, filterProperty, null) == null) {
-                    throw new CstlServiceException("The feature Type " + ft.getName() + " does not has such a property: " + filterProperty, INVALID_PARAMETER_VALUE, "filter");
+                    String s = "";
+                    if (ft.getName().getNamespaceURI() != null) {
+                        s = "{" + ft.getName().getNamespaceURI() + "}";
+                    }
+                    s = s + ft.getName().getLocalPart();
+                    throw new CstlServiceException("The feature Type " + s + " does not has such a property: " + filterProperty, INVALID_PARAMETER_VALUE, "filter");
                 }
             }
         }
