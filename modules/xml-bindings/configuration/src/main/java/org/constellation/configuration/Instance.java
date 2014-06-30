@@ -71,8 +71,8 @@ public class Instance {
 
     public Instance(final int id, final String identifier, final String name, final String _abstract, final String type,
             final List<String> versions, final Integer layerNumber, final ServiceStatus status) {
-        this(id, name, type, status);
-        this.identifier   = identifier;
+        this(id, identifier, type, status);
+        this.name         = name;
         this._abstract    = _abstract;
         this.versions     = versions;
         this.layersNumber = layerNumber;

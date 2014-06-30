@@ -63,6 +63,13 @@ public class ProviderBusiness {
         providerRepository.deleteByIdentifier(identifier);
     }
     
+    public void removeAll() {
+        final List<Provider> providers = providerRepository.findAll();
+        for (Provider p : providers) {
+            providerRepository.delete(p.getId());
+        }
+    }
+    
     public List<Provider> getProviderChildren(final String identifier) {
         return providerRepository.findChildren(identifier);
     }

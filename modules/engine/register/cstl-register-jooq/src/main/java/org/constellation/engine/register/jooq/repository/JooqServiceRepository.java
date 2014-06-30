@@ -41,6 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static org.constellation.engine.register.jooq.Tables.*;
+import org.constellation.engine.register.jooq.tables.records.ServiceMetadataRecord;
 
 @Component
 public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord, Service> implements ServiceRepository {
@@ -68,6 +69,8 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
 
     @Override
     public void delete(Integer id) {
+        dsl.delete(SERVICE_METADATA).where(SERVICE_METADATA.ID.eq(id)).execute();
+        dsl.delete(SERVICE_EXTRA_CONFIG).where(SERVICE_EXTRA_CONFIG.ID.eq(id)).execute();
         dsl.delete(SERVICE).where(SERVICE.ID.eq(id)).execute();
     }
 
@@ -99,9 +102,17 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
     }
 
     @Override
-    public ServiceMetadata findMetaDataForLangByIdentifierAndType(String identifier, String serviceType, String language) {
-        // TODO Auto-generated method stub
-        return null;
+    public ServiceMetadata findMetaDataForLang(int serviceId, String language) {
+        return dsl.select().from(SERVICE_METADATA).where(SERVICE_METADATA.ID.eq(serviceId)).and(SERVICE_METADATA.LANG.eq(language)).fetchOneInto(ServiceMetadata.class);
+    }
+    
+    @Override
+    public void writeMetadataForLang(ServiceMetadata metadata) {
+        ServiceMetadataRecord newRecord = dsl.newRecord(SERVICE_METADATA);
+        newRecord.setContent(metadata.getContent());
+        newRecord.setLang(metadata.getLang());
+        newRecord.setId(metadata.getId());
+        newRecord.store();
     }
 
     @Override

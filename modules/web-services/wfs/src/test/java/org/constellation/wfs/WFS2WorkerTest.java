@@ -41,7 +41,11 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.DataBusiness;
+import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
+import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
 import org.constellation.map.configuration.LayerBusiness;
@@ -50,6 +54,10 @@ import org.constellation.provider.FeatureData;
 import org.constellation.provider.ProviderFactory;
 import org.constellation.provider.configuration.AbstractConfigurator;
 import org.constellation.provider.configuration.Configurator;
+import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.SOURCE_LOADALL_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
+import static org.constellation.provider.featurestore.FeatureStoreProviderService.SOURCE_CONFIG_DESCRIPTOR;
 import org.constellation.test.CstlDOMComparator;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.SpringTestRunner;
@@ -60,7 +68,15 @@ import org.constellation.wfs.ws.WFSWorker;
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
 import org.constellation.wfs.ws.rs.ValueCollectionWrapper;
 import org.constellation.ws.CstlServiceException;
+import static org.constellation.ws.embedded.AbstractGrizzlyServer.initDataDirectory;
+import static org.geotoolkit.data.AbstractFeatureStoreFactory.NAMESPACE;
 import org.geotoolkit.data.FeatureCollection;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.DATABASE;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.HOST;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.PASSWORD;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.SCHEMA;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.USER;
+import org.geotoolkit.db.postgres.PostgresFeatureStoreFactory;
 import org.geotoolkit.feature.Feature;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.FeatureType;
@@ -114,6 +130,9 @@ import static org.junit.Assert.*;
 
 import org.junit.runner.RunWith;
 import org.opengis.parameter.ParameterValueGroup;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
 
 
@@ -122,8 +141,16 @@ import org.springframework.test.context.ContextConfiguration;
  * @author Guilhem Legal (Geomatys)
  */
 @RunWith(SpringTestRunner.class)
-@ContextConfiguration("classpath:/test/wfs-context.xml")
-public class WFS2WorkerTest {
+@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+public class WFS2WorkerTest implements ApplicationContextAware {
+
+    protected ApplicationContext applicationContext;
+    
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+    
     private static MarshallerPool pool;
     private static WFSWorker worker ;
     
@@ -132,6 +159,12 @@ public class WFS2WorkerTest {
     
     @Inject
     protected LayerBusiness layerBusiness;
+    
+    @Inject
+    protected ProviderBusiness providerBusiness;
+    
+    @Inject
+    protected DataBusiness dataBusiness;
 
     private static final DefaultDataSource ds = null;
 
@@ -169,102 +202,216 @@ public class WFS2WorkerTest {
         Collections.sort(alltypes, new QNameComparator());
     }
 
+    private static boolean initialized = false;
+    
     @PostConstruct
     public void setUpClass() {
-        try {
-            ConfigurationEngine.setupTestEnvironement("WFS2WorkerTest");
+        SpringHelper.setApplicationContext(applicationContext);
+        if (!initialized) {
+            try {
+                ConfigurationEngine.setupTestEnvironement("WFS2WorkerTest");
 
-            final LayerContext config = new LayerContext();
-            config.getCustomParameters().put("shiroAccessible", "false");
-            config.getCustomParameters().put("transactionSecurized", "false");
-            config.getCustomParameters().put("transactionnal", "true");
+                layerBusiness.removeAll();
+                serviceBusiness.deleteAll();
+                dataBusiness.deleteAll();
+                providerBusiness.removeAll();
+                
+                 final ProviderFactory featfactory = DataProviders.getInstance().getFactory("feature-store");
 
-            serviceBusiness.create("WFS", "default", config, null, null);
-            layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "WFS", null);
-            layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "WFS", null);
-            layerBusiness.add("EntitéGénérique",     "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "WFS", null);
-            layerBusiness.add("SamplingPoint",       "http://www.opengis.net/sampling/1.0",  "omSrc",      null, "default", "WFS", null);
-            layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS", null);
-            layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS", null);
-            layerBusiness.add("Bridges",             "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS", null);
-            layerBusiness.add("Streams",             "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS", null);
-            layerBusiness.add("Lakes",               "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS", null);
-            layerBusiness.add("NamedPlaces",         "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS", null);
-            layerBusiness.add("Buildings",           "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS", null);
-            layerBusiness.add("RoadSegments",        "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS", null);
-            layerBusiness.add("DividedRoutes",       "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS", null);
-            layerBusiness.add("Forests",             "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS", null);
-            layerBusiness.add("MapNeatline",         "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS", null);
-            layerBusiness.add("Ponds",               "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "default", "WFS", null);
+                // Defines a PostGis data provider
+                final ParameterValueGroup source = featfactory.getProviderDescriptor().createValue();;
+                source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgisSrc");
 
-            serviceBusiness.create("WFS", "test", config, null, null);
-            layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "test", "WFS", null);
-            layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "test", "WFS", null);
-            layerBusiness.add("EntitéGénérique",     "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "test", "WFS", null);
-            layerBusiness.add("SamplingPoint",       "http://www.opengis.net/sampling/1.0",  "omSrc",      null, "test", "WFS", null);
-            layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test", "WFS", null);
-            layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test", "WFS", null);
-            layerBusiness.add("Bridges",             "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test", "WFS", null);
-            layerBusiness.add("Streams",             "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test", "WFS", null);
-            layerBusiness.add("Lakes",               "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test", "WFS", null);
-            layerBusiness.add("NamedPlaces",         "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test", "WFS", null);
-            layerBusiness.add("Buildings",           "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test", "WFS", null);
-            layerBusiness.add("RoadSegments",        "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test", "WFS", null);
-            layerBusiness.add("DividedRoutes",       "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test", "WFS", null);
-            layerBusiness.add("Forests",             "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test", "WFS", null);
-            layerBusiness.add("MapNeatline",         "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test", "WFS", null);
-            layerBusiness.add("Ponds",               "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test", "WFS", null);
-            
+                final ParameterValueGroup choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
+                final ParameterValueGroup pgconfig = createGroup(choice, "PostgresParameters");
+                pgconfig.parameter(DATABASE.getName().getCode()).setValue("cite-wfs");
+                pgconfig.parameter(HOST.getName().getCode()).setValue("localhost");
+                pgconfig.parameter(SCHEMA.getName().getCode()).setValue("public");
+                pgconfig.parameter(USER.getName().getCode()).setValue("test");
+                pgconfig.parameter(PASSWORD.getName().getCode()).setValue("test");
+                pgconfig.parameter(NAMESPACE.getName().getCode()).setValue("http://cite.opengeospatial.org/gmlsf");
+                choice.values().add(pgconfig);
 
-            final LayerContext config2 = new LayerContext();
-            config2.getCustomParameters().put("shiroAccessible", "false");
-            config2.getCustomParameters().put("transactionSecurized", "false");
-            config2.getCustomParameters().put("transactionnal", "true");
+                providerBusiness.createProvider("postgisSrc", null, ProviderRecord.ProviderType.LAYER, "feature-store", source);
 
-            serviceBusiness.create("WFS", "test1", config, null, null);
-            layerBusiness.add("SamplingPoint",       "http://www.opengis.net/sampling/1.0",  "omSrc",      null, "test1", "WFS", null);
-            layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test1", "WFS", null);
-            layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test1", "WFS", null);
-            layerBusiness.add("Bridges",             "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test1", "WFS", null);
-            layerBusiness.add("Streams",             "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test1", "WFS", null);
-            layerBusiness.add("Lakes",               "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test1", "WFS", null);
-            layerBusiness.add("NamedPlaces",         "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test1", "WFS", null);
-            layerBusiness.add("Buildings",           "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test1", "WFS", null);
-            layerBusiness.add("RoadSegments",        "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test1", "WFS", null);
-            layerBusiness.add("DividedRoutes",       "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test1", "WFS", null);
-            layerBusiness.add("Forests",             "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test1", "WFS", null);
-            layerBusiness.add("MapNeatline",         "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test1", "WFS", null);
-            layerBusiness.add("Ponds",               "http://www.opengis.net/gml/3.2",       "shapeSrc",   null, "test1", "WFS", null);
-            layerBusiness.add("System",              "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "WFS", null);
-            layerBusiness.add("Component",           "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "WFS", null);
-            layerBusiness.add("DataSourceType",      "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "WFS", null);
-            layerBusiness.add("ProcessModel",        "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "WFS", null);
-            layerBusiness.add("ProcessChain",        "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "WFS", null);
-            
+                dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "AggregateGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "PrimitiveGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "EntitéGénérique"),     "postgisSrc", "VECTOR", false, true, null, null);
+                
+                final File outputDir = initDataDirectory();
+                final ParameterValueGroup sourcef = featfactory.getProviderDescriptor().createValue();
+                getOrCreateValue(sourcef, "id").setValue("shapeSrc");
+                getOrCreateValue(sourcef, "load_all").setValue(true);
 
-            pool = WFSMarshallerPool.getInstance();
+                final ParameterValueGroup choice2 = getOrCreateGroup(sourcef, "choice");
+                final ParameterValueGroup shpconfig = createGroup(choice2, "ShapefileParametersFolder");
+                getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
+                getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");
 
-            final List<StoredQueryDescription> descriptions = new ArrayList<>();
-            final ParameterExpressionType param = new ParameterExpressionType("name", "name Parameter", "A parameter on the name of the feature", new QName("http://www.w3.org/2001/XMLSchema", "string", "xs"));
-            final List<QName> types = Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"));
-            final PropertyIsEqualToType pis = new PropertyIsEqualToType(new LiteralType("$name"), "name", true);
-            final FilterType filter = new FilterType(pis);
-            final QueryType query = new QueryType(filter, types, "2.0.0");
-            final QueryExpressionTextType queryEx = new QueryExpressionTextType("urn:ogc:def:queryLanguage:OGC-WFS::WFS_QueryExpression", null, types);
-            final ObjectFactory factory = new ObjectFactory();
-            queryEx.getContent().add(factory.createQuery(query));
-            final StoredQueryDescriptionType des1 = new StoredQueryDescriptionType("nameQuery", "Name query" , "filter on name for samplingPoint", param, queryEx);
-            descriptions.add(des1);
-            final StoredQueries queries = new StoredQueries(descriptions);
-            serviceBusiness.setExtraConfiguration("WFS", "test1", "StoredQueries.xml", queries, pool);
+                final ParameterValueGroup layer = getOrCreateGroup(sourcef, "Layer");
+                getOrCreateValue(layer, "name").setValue("NamedPlaces");
+                getOrCreateValue(layer, "style").setValue("cite_style_NamedPlaces");
 
-            
-            worker = new DefaultWFSWorker("test1");
-            worker.setLogLevel(Level.FINER);
-            worker.setServiceUrl("http://geomatys.com/constellation/WS/");
-            worker.setShiroAccessible(false);
-        } catch (Exception ex) {
-            Logger.getAnonymousLogger().log(Level.SEVERE, "error while initializing test", ex);
+                providerBusiness.createProvider("shapeSrc", null, ProviderRecord.ProviderType.LAYER, "feature-store", sourcef);
+
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "BuildingCenters"), "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "BasicPolygons"),   "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Bridges"),         "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Streams"),         "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Lakes"),           "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "NamedPlaces"),     "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Buildings"),       "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "RoadSegments"),    "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "DividedRoutes"),   "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Forests"),         "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "MapNeatline"),     "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Ponds"),           "shapeSrc", "VECTOR", false, true, null, null);
+                
+                final String url = "jdbc:derby:memory:TestWFS2WorkerOM";
+                final DefaultDataSource ds = new DefaultDataSource(url + ";create=true");
+                Connection con = ds.getConnection();
+                DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
+                sr.run(Util.getResourceAsStream("org/constellation/om2/structure_observations.sql"));
+                sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data-om2.sql"));
+                con.close();
+                ds.shutdown();
+
+                final ParameterValueGroup sourceOM = featfactory.getProviderDescriptor().createValue();
+                getOrCreateValue(sourceOM, "id").setValue("omSrc");
+                getOrCreateValue(sourceOM, "load_all").setValue(true);    
+
+                final ParameterValueGroup choiceOM = getOrCreateGroup(sourceOM, "choice");
+                final ParameterValueGroup omconfig = createGroup(choiceOM, " SOSDBParameters");
+                getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
+                getOrCreateValue(omconfig, "derbyurl").setValue(url);
+                
+                providerBusiness.createProvider("omSrc", null, ProviderRecord.ProviderType.LAYER, "feature-store", sourceOM);
+                dataBusiness.create(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"), "omSrc", "VECTOR", false, true, null, null);
+                
+                final String url2 = "jdbc:derby:memory:TestWFS2WorkerSMl";
+                ds2 = new DefaultDataSource(url2 + ";create=true");
+                Connection con2 = ds2.getConnection();
+                DerbySqlScriptRunner sr2 = new DerbySqlScriptRunner(con2);
+                sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/model/mdw_schema_2.4_derby.sql"));
+                sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19115.sql"));
+                sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19119.sql"));
+                sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19108.sql"));
+                sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/data/defaultRecordSets.sql"));
+                sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/users/creation_user.sql"));
+                sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/SensorML.sql"));
+                sr2.run(Util.getResourceAsStream("org/constellation/sql/sml-data.sql"));
+                con.close();
+
+                final ParameterValueGroup sourceSML = featfactory.getProviderDescriptor().createValue();
+                getOrCreateValue(sourceSML, "id").setValue("smlSrc");
+                getOrCreateValue(sourceSML, "load_all").setValue(true);             
+
+                final ParameterValueGroup choiceSML = getOrCreateGroup(sourceSML, "choice");
+                final ParameterValueGroup smlconfig = createGroup(choiceSML, "SMLParameters");
+                getOrCreateValue(smlconfig, "sgbdtype").setValue("derby");
+                getOrCreateValue(smlconfig, "derbyurl").setValue(url2);
+                
+                providerBusiness.createProvider("smlSrc", null, ProviderRecord.ProviderType.LAYER, "feature-store", sourceSML);
+                dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "System"),         "smlSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "Component"),      "smlSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "DataSourceType"), "smlSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "ProcessModel"),   "smlSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "ProcessChain"),   "smlSrc", "VECTOR", false, true, null, null);
+                
+                final LayerContext config = new LayerContext();
+                config.getCustomParameters().put("shiroAccessible", "false");
+                config.getCustomParameters().put("transactionSecurized", "false");
+                config.getCustomParameters().put("transactionnal", "true");
+
+                serviceBusiness.create("wfs", "default", config, null, null);
+                layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "wfs", null);
+                layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "wfs", null);
+                layerBusiness.add("EntitéGénérique",     "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "wfs", null);
+                layerBusiness.add("SamplingPoint",       "http://www.opengis.net/sampling/1.0",  "omSrc",      null, "default", "wfs", null);
+                layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml",       "shapeSrc",   null, "default", "wfs", null);
+                layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml",       "shapeSrc",   null, "default", "wfs", null);
+                layerBusiness.add("Bridges",             "http://www.opengis.net/gml",       "shapeSrc",   null, "default", "wfs", null);
+                layerBusiness.add("Streams",             "http://www.opengis.net/gml",       "shapeSrc",   null, "default", "wfs", null);
+                layerBusiness.add("Lakes",               "http://www.opengis.net/gml",       "shapeSrc",   null, "default", "wfs", null);
+                layerBusiness.add("NamedPlaces",         "http://www.opengis.net/gml",       "shapeSrc",   null, "default", "wfs", null);
+                layerBusiness.add("Buildings",           "http://www.opengis.net/gml",       "shapeSrc",   null, "default", "wfs", null);
+                layerBusiness.add("RoadSegments",        "http://www.opengis.net/gml",       "shapeSrc",   null, "default", "wfs", null);
+                layerBusiness.add("DividedRoutes",       "http://www.opengis.net/gml",       "shapeSrc",   null, "default", "wfs", null);
+                layerBusiness.add("Forests",             "http://www.opengis.net/gml",       "shapeSrc",   null, "default", "wfs", null);
+                layerBusiness.add("MapNeatline",         "http://www.opengis.net/gml",       "shapeSrc",   null, "default", "wfs", null);
+                layerBusiness.add("Ponds",               "http://www.opengis.net/gml",       "shapeSrc",   null, "default", "wfs", null);
+
+                serviceBusiness.create("wfs", "test", config, null, null);
+                layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "test", "wfs", null);
+                layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "test", "wfs", null);
+                layerBusiness.add("EntitéGénérique",     "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "test", "wfs", null);
+                layerBusiness.add("SamplingPoint",       "http://www.opengis.net/sampling/1.0",  "omSrc",      null, "test", "wfs", null);
+                layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml",       "shapeSrc",   null, "test", "wfs", null);
+                layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml",       "shapeSrc",   null, "test", "wfs", null);
+                layerBusiness.add("Bridges",             "http://www.opengis.net/gml",       "shapeSrc",   null, "test", "wfs", null);
+                layerBusiness.add("Streams",             "http://www.opengis.net/gml",       "shapeSrc",   null, "test", "wfs", null);
+                layerBusiness.add("Lakes",               "http://www.opengis.net/gml",       "shapeSrc",   null, "test", "wfs", null);
+                layerBusiness.add("NamedPlaces",         "http://www.opengis.net/gml",       "shapeSrc",   null, "test", "wfs", null);
+                layerBusiness.add("Buildings",           "http://www.opengis.net/gml",       "shapeSrc",   null, "test", "wfs", null);
+                layerBusiness.add("RoadSegments",        "http://www.opengis.net/gml",       "shapeSrc",   null, "test", "wfs", null);
+                layerBusiness.add("DividedRoutes",       "http://www.opengis.net/gml",       "shapeSrc",   null, "test", "wfs", null);
+                layerBusiness.add("Forests",             "http://www.opengis.net/gml",       "shapeSrc",   null, "test", "wfs", null);
+                layerBusiness.add("MapNeatline",         "http://www.opengis.net/gml",       "shapeSrc",   null, "test", "wfs", null);
+                layerBusiness.add("Ponds",               "http://www.opengis.net/gml",       "shapeSrc",   null, "test", "wfs", null);
+
+
+                final LayerContext config2 = new LayerContext();
+                config2.getCustomParameters().put("shiroAccessible", "false");
+                config2.getCustomParameters().put("transactionSecurized", "false");
+                config2.getCustomParameters().put("transactionnal", "true");
+
+                serviceBusiness.create("wfs", "test1", config, null, null);
+                layerBusiness.add("SamplingPoint",       "http://www.opengis.net/sampling/1.0",  "omSrc",      null, "test1", "wfs", null);
+                layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml",       "shapeSrc",   null, "test1", "wfs", null);
+                layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml",       "shapeSrc",   null, "test1", "wfs", null);
+                layerBusiness.add("Bridges",             "http://www.opengis.net/gml",       "shapeSrc",   null, "test1", "wfs", null);
+                layerBusiness.add("Streams",             "http://www.opengis.net/gml",       "shapeSrc",   null, "test1", "wfs", null);
+                layerBusiness.add("Lakes",               "http://www.opengis.net/gml",       "shapeSrc",   null, "test1", "wfs", null);
+                layerBusiness.add("NamedPlaces",         "http://www.opengis.net/gml",       "shapeSrc",   null, "test1", "wfs", null);
+                layerBusiness.add("Buildings",           "http://www.opengis.net/gml",       "shapeSrc",   null, "test1", "wfs", null);
+                layerBusiness.add("RoadSegments",        "http://www.opengis.net/gml",       "shapeSrc",   null, "test1", "wfs", null);
+                layerBusiness.add("DividedRoutes",       "http://www.opengis.net/gml",       "shapeSrc",   null, "test1", "wfs", null);
+                layerBusiness.add("Forests",             "http://www.opengis.net/gml",       "shapeSrc",   null, "test1", "wfs", null);
+                layerBusiness.add("MapNeatline",         "http://www.opengis.net/gml",       "shapeSrc",   null, "test1", "wfs", null);
+                layerBusiness.add("Ponds",               "http://www.opengis.net/gml",       "shapeSrc",   null, "test1", "wfs", null);
+                layerBusiness.add("System",              "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "wfs", null);
+                layerBusiness.add("Component",           "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "wfs", null);
+                layerBusiness.add("DataSourceType",      "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "wfs", null);
+                layerBusiness.add("ProcessModel",        "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "wfs", null);
+                layerBusiness.add("ProcessChain",        "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "wfs", null);
+
+
+                pool = WFSMarshallerPool.getInstance();
+
+                final List<StoredQueryDescription> descriptions = new ArrayList<>();
+                final ParameterExpressionType param = new ParameterExpressionType("name", "name Parameter", "A parameter on the name of the feature", new QName("http://www.w3.org/2001/XMLSchema", "string", "xs"));
+                final List<QName> types = Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"));
+                final PropertyIsEqualToType pis = new PropertyIsEqualToType(new LiteralType("$name"), "name", true);
+                final FilterType filter = new FilterType(pis);
+                final QueryType query = new QueryType(filter, types, "2.0.0");
+                final QueryExpressionTextType queryEx = new QueryExpressionTextType("urn:ogc:def:queryLanguage:OGC-WFS::WFS_QueryExpression", null, types);
+                final ObjectFactory factory = new ObjectFactory();
+                queryEx.getContent().add(factory.createQuery(query));
+                final StoredQueryDescriptionType des1 = new StoredQueryDescriptionType("nameQuery", "Name query" , "filter on name for samplingPoint", param, queryEx);
+                descriptions.add(des1);
+                final StoredQueries queries = new StoredQueries(descriptions);
+                serviceBusiness.setExtraConfiguration("wfs", "test1", "StoredQueries.xml", queries, pool);
+
+
+                worker = new DefaultWFSWorker("test1");
+                worker.setLogLevel(Level.FINER);
+                worker.setServiceUrl("http://geomatys.com/constellation/WS/");
+                worker.setShiroAccessible(false);
+                initialized = true;
+            } catch (Exception ex) {
+                Logger.getAnonymousLogger().log(Level.SEVERE, "error while initializing test", ex);
+            }
         }
     }
 
@@ -2166,133 +2313,6 @@ public class WFS2WorkerTest {
         
     }
 
-    private static void initFeatureSource() throws IOException  {
-         final File outputDir = initDataDirectory();
-
-         final Configurator config = new AbstractConfigurator() {
-
-            @Override
-            public List<Map.Entry<String, ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException {
-                final ArrayList<Map.Entry<String, ParameterValueGroup>> lst = new ArrayList<>();
-                
-                final ProviderFactory factory = DataProviders.getInstance().getFactory("feature-store");
-                
-                try{ 
-                    
-                    {//OBSERVATION
-                        final String url = "jdbc:derby:memory:TestWFS2WorkerOM";
-                        final DefaultDataSource ds = new DefaultDataSource(url + ";create=true");
-                        Connection con = ds.getConnection();
-                        DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
-                        sr.run(Util.getResourceAsStream("org/constellation/om2/structure_observations.sql"));
-                        sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data-om2.sql"));
-                        con.close();
-                        ds.shutdown();
-
-                        final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
-                        getOrCreateValue(source, "id").setValue("omSrc");
-                        getOrCreateValue(source, "load_all").setValue(true);    
-
-                        final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
-                        final ParameterValueGroup omconfig = createGroup(choice, "OMParameters");
-                        getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
-                        getOrCreateValue(omconfig, "derbyurl").setValue(url);
-                        lst.add(new AbstractMap.SimpleImmutableEntry<>("omSrc",source));
-                    }
-
-                    {//SHAPEFILE
-                        final File outputDir = initDataDirectory();
-                        final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
-                        getOrCreateValue(source, "id").setValue("shapeSrc");
-                        getOrCreateValue(source, "load_all").setValue(true);    
-
-                        final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
-                        final ParameterValueGroup shpconfig = createGroup(choice, "ShapefileParametersFolder");
-                        getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
-                        getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml/3.2");        
-
-                        ParameterValueGroup layer = createGroup(source, "Layer");
-                        getOrCreateValue(layer, "name").setValue("BasicPolygons");
-                        getOrCreateValue(layer, "style").setValue("cite_style_BasicPolygons");     
-                        layer = createGroup(source, "Layer");
-                        getOrCreateValue(layer, "name").setValue("Bridges");
-                        getOrCreateValue(layer, "style").setValue("cite_style_Bridges");
-                        layer = createGroup(source, "Layer");
-                        getOrCreateValue(layer, "name").setValue("BuildingCenters");
-                        getOrCreateValue(layer, "style").setValue("cite_style_BuildingCenters");
-                        layer = createGroup(source, "Layer");
-                        getOrCreateValue(layer, "name").setValue("Buildings");
-                        getOrCreateValue(layer, "style").setValue("cite_style_Buildings");
-                        layer = createGroup(source, "Layer");
-                        getOrCreateValue(layer, "name").setValue("DividedRoutes");
-                        getOrCreateValue(layer, "style").setValue("cite_style_DividedRoutes");
-                        layer = createGroup(source, "Layer");
-                        getOrCreateValue(layer, "name").setValue("Forests");
-                        getOrCreateValue(layer, "style").setValue("cite_style_Forests");
-                        layer = createGroup(source, "Layer");
-                        getOrCreateValue(layer, "name").setValue("Lakes");
-                        getOrCreateValue(layer, "style").setValue("cite_style_Lakes");
-                        layer = createGroup(source, "Layer");
-                        getOrCreateValue(layer, "name").setValue("MapNeatline");
-                        getOrCreateValue(layer, "style").setValue("cite_style_MapNeatLine");
-                        layer = createGroup(source, "Layer");
-                        getOrCreateValue(layer, "name").setValue("NamedPlaces");
-                        getOrCreateValue(layer, "style").setValue("cite_style_NamedPlaces");
-                        layer = createGroup(source, "Layer");
-                        getOrCreateValue(layer, "name").setValue("Ponds");
-                        getOrCreateValue(layer, "style").setValue("cite_style_Ponds");
-                        layer = createGroup(source, "Layer");
-                        getOrCreateValue(layer, "name").setValue("RoadSegments");
-                        getOrCreateValue(layer, "style").setValue("cite_style_RoadSegments");
-                        layer = createGroup(source, "Layer");
-                        getOrCreateValue(layer, "name").setValue("Streams");
-                        getOrCreateValue(layer, "style").setValue("cite_style_Streams");  
-                        
-                        lst.add(new AbstractMap.SimpleImmutableEntry<>("shapeSrc",source));
-                    }
-
-                    {//SENSORML
-                        final String url2 = "jdbc:derby:memory:TestWFSWorker2SMl";
-                        ds2 = new DefaultDataSource(url2 + ";create=true");
-                        Connection con = ds2.getConnection();
-                        DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
-                        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/model/mdw_schema_2.4_derby.sql"));
-                        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19115.sql"));
-                        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19119.sql"));
-                        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19108.sql"));
-                        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/data/defaultRecordSets.sql"));
-                        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/users/creation_user.sql"));
-                        sr.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/SensorML.sql"));
-                        sr.run(Util.getResourceAsStream("org/constellation/sql/sml-data.sql"));
-                        con.close();
-
-                        final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
-                        getOrCreateValue(source, "id").setValue("smlSrc");
-                        getOrCreateValue(source, "load_all").setValue(true);             
-
-                        final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
-                        final ParameterValueGroup omconfig = createGroup(choice, "SMLParameters");
-                        getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
-                        getOrCreateValue(omconfig, "derbyurl").setValue(url2);   
-                        
-                        lst.add(new AbstractMap.SimpleImmutableEntry<>("smlSrc",source));                   
-                    }
-
-                }catch(Exception ex){
-                    throw new RuntimeException(ex.getLocalizedMessage(),ex);
-                }
-                
-                return lst;
-            }
-
-            @Override
-            public List<Configurator.ProviderInformation> getProviderInformations() throws ConfigurationException {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
-        };
-
-        DataProviders.getInstance().setConfigurator(config);
-    }
     /**
      * Initialises the data directory in unzipping the jar containing the resources
      * into a temporary directory.

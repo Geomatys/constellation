@@ -104,7 +104,7 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
     @Override
     public Data findDataFromProvider(String namespaceURI, String localPart, String providerId) {
         final Condition whereClause = buildWhereClause(namespaceURI, localPart, providerId);
-        return dsl.select().from(DATA).join(Tables.PROVIDER).onKey().where(whereClause)
+        return dsl.select(DATA.fields()).from(DATA).join(Tables.PROVIDER).onKey().where(whereClause)
                 .fetchOneInto(Data.class);
     }
 

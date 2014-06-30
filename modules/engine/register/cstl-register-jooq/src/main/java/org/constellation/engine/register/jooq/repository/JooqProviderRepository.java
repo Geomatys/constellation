@@ -48,7 +48,7 @@ public class JooqProviderRepository extends AbstractJooqRespository<ProviderReco
 
     @Override
     public Provider findOne(Integer id) {
-        return dsl.select().from(PROVIDER).where(PROVIDER.ID.eq(id)).fetchOne().into(Provider.class);
+        return dsl.select().from(PROVIDER).where(PROVIDER.ID.eq(id)).fetchOneInto(Provider.class);
     }
 
     @Override
@@ -63,12 +63,12 @@ public class JooqProviderRepository extends AbstractJooqRespository<ProviderReco
 
     @Override
     public Provider findByIdentifier(String identifier) {
-        return dsl.select().from(PROVIDER).where(PROVIDER.IDENTIFIER.eq(identifier)).fetchOne().into(Provider.class);
+        return dsl.select().from(PROVIDER).where(PROVIDER.IDENTIFIER.eq(identifier)).fetchOneInto(Provider.class);
     }
     
     @Override
     public Provider findByIdentifierAndType(String providerIdentifier, String type) {
-        return dsl.select().from(PROVIDER).where(PROVIDER.IDENTIFIER.eq(providerIdentifier)).and(PROVIDER.TYPE.eq(type)).fetchOne().into(Provider.class);
+        return dsl.select().from(PROVIDER).where(PROVIDER.IDENTIFIER.eq(providerIdentifier)).and(PROVIDER.TYPE.eq(type)).fetchOneInto(Provider.class);
     }
 
     @Override

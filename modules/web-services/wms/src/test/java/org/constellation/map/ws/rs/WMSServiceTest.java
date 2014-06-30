@@ -19,9 +19,11 @@
 
 package org.constellation.map.ws.rs;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -32,21 +34,41 @@ import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.xml.namespace.QName;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.DataBusiness;
+import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
+import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
 import org.constellation.map.configuration.LayerBusiness;
 import org.constellation.map.ws.QueryContext;
+import org.constellation.provider.DataProviders;
+import org.constellation.provider.ProviderFactory;
+import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.SOURCE_LOADALL_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.COVERAGESQL_DESCRIPTOR;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.NAMESPACE_DESCRIPTOR;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.PASSWORD_DESCRIPTOR;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.ROOT_DIRECTORY_DESCRIPTOR;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.SCHEMA_DESCRIPTOR;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.URL_DESCRIPTOR;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.USER_DESCRIPTOR;
 import org.constellation.test.utils.BasicMultiValueMap;
 import org.constellation.test.utils.BasicUriInfo;
 import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.test.utils.TestRunner;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
+import org.constellation.ws.embedded.AbstractGrizzlyServer;
 import org.constellation.ws.rs.WebService;
 import org.geotoolkit.internal.referencing.CRSUtilities;
+import static org.geotoolkit.parameter.ParametersExt.createGroup;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.ReferencingUtilities;
 import org.geotoolkit.wms.xml.GetFeatureInfo;
@@ -56,6 +78,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opengis.geometry.Envelope;
+import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
@@ -87,39 +110,103 @@ public class WMSServiceTest  implements ApplicationContextAware {
     @Inject
     protected LayerBusiness layerBusiness;
     
+    @Inject
+    protected ProviderBusiness providerBusiness;
+    
+    @Inject
+    protected DataBusiness dataBusiness;
+    
     private static final double DELTA = 0.00000001;
     private static WMSService service;
     private final BasicUriInfo info = new BasicUriInfo(null, null);
     private final MultivaluedMap<String,String> queryParameters = new BasicMultiValueMap<>();
     private final MultivaluedMap<String,String> pathParameters = new BasicMultiValueMap<>();
 
+    private static boolean initialized = false;
+    
     @PostConstruct
     public void init() {
         SpringHelper.setApplicationContext(applicationContext);
-        try {
-            ConfigurationEngine.setupTestEnvironement("WMSServiceTest");
-            
-            final LayerContext config = new LayerContext();
-            config.getCustomParameters().put("shiroAccessible", "false");
-            
-            serviceBusiness.create("WMS", "default", config, null, null);
-            layerBusiness.add("SST_tests",            null,                                  "coverageTestSrc", null, "default", "WMS", null);
-            layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("Bridges",             "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("Streams",             "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("Lakes",               "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("NamedPlaces",         "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("Buildings",           "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("RoadSegments",        "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("DividedRoutes",       "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("Forests",             "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("MapNeatline",         "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("Ponds",               "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            
-            service = new WMSService();
-        } catch (ConfigurationException ex) {
-            Logger.getLogger(WMSServiceTest.class.getName()).log(Level.SEVERE, null, ex);
+        if (!initialized) {
+            try {
+                ConfigurationEngine.setupTestEnvironement("WMSServiceTest");
+
+
+                layerBusiness.removeAll();
+                serviceBusiness.deleteAll();
+                dataBusiness.deleteAll();
+                providerBusiness.removeAll();
+
+                final ProviderFactory factory = DataProviders.getInstance().getFactory("coverage-sql");
+                final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
+                srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://localhost:5432/coverages");
+                srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
+                final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
+                srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
+                srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
+                srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
+                srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
+                source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
+                providerBusiness.createProvider("coverageTestSrc", null, ProviderRecord.ProviderType.LAYER, "coverage-sql", source);
+
+                dataBusiness.create(new QName("SST_tests"), "coverageTestSrc", rootDir, false, true, null, null);
+
+
+                final ProviderFactory ffactory = DataProviders.getInstance().getFactory("feature-store");
+                final File outputDir = AbstractGrizzlyServer.initDataDirectory();
+                final ParameterValueGroup sourcef = ffactory.getProviderDescriptor().createValue();
+                getOrCreateValue(sourcef, "id").setValue("shapeSrc");
+                getOrCreateValue(sourcef, "load_all").setValue(true);
+
+                final ParameterValueGroup choice = getOrCreateGroup(sourcef, "choice");
+                final ParameterValueGroup shpconfig = createGroup(choice, "ShapefileParametersFolder");
+                getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
+                getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");
+
+                final ParameterValueGroup layer = getOrCreateGroup(sourcef, "Layer");
+                getOrCreateValue(layer, "name").setValue("NamedPlaces");
+                getOrCreateValue(layer, "style").setValue("cite_style_NamedPlaces");
+
+                providerBusiness.createProvider("shapeSrc", null, ProviderRecord.ProviderType.LAYER, "feature-store", sourcef);
+
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "BuildingCenters"), "shapeSrc", rootDir, false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "BasicPolygons"),   "shapeSrc", rootDir, false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Bridges"),         "shapeSrc", rootDir, false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Streams"),         "shapeSrc", rootDir, false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Lakes"),           "shapeSrc", rootDir, false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "NamedPlaces"),     "shapeSrc", rootDir, false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Buildings"),       "shapeSrc", rootDir, false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "RoadSegments"),    "shapeSrc", rootDir, false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "DividedRoutes"),   "shapeSrc", rootDir, false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Forests"),         "shapeSrc", rootDir, false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "MapNeatline"),     "shapeSrc", rootDir, false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Ponds"),           "shapeSrc", rootDir, false, true, null, null);
+
+                final LayerContext config = new LayerContext();
+                config.getCustomParameters().put("shiroAccessible", "false");
+
+                serviceBusiness.create("wms", "default", config, null, null);
+                layerBusiness.add("SST_tests",            null,                              "coverageTestSrc", null, "default", "wms", null);
+                layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
+                layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
+                layerBusiness.add("Bridges",             "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
+                layerBusiness.add("Streams",             "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
+                layerBusiness.add("Lakes",               "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
+                layerBusiness.add("NamedPlaces",         "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
+                layerBusiness.add("Buildings",           "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
+                layerBusiness.add("RoadSegments",        "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
+                layerBusiness.add("DividedRoutes",       "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
+                layerBusiness.add("Forests",             "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
+                layerBusiness.add("MapNeatline",         "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
+                layerBusiness.add("Ponds",               "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
+
+                service = new WMSService();
+                initialized = true;
+            } catch (Exception ex) {
+                Logger.getLogger(WMSServiceTest.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
     
@@ -129,7 +216,7 @@ public class WMSServiceTest  implements ApplicationContextAware {
         ConfigurationEngine.shutdownTestEnvironement("WMSServiceTest");
     }
     
-    public WMSServiceTest() throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException {
+    public void setFields() throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException {
         //do not use this in real code, just for testing
         Field privateStringField = WebService.class.getDeclaredField("uriContext");
         privateStringField.setAccessible(true);
@@ -184,6 +271,7 @@ public class WMSServiceTest  implements ApplicationContextAware {
         queryParameters.putSingle("TIME", "2007-06-23T14:31:56");
         queryParameters.putSingle("WIDTH", "800");
         queryParameters.putSingle("VERSION", "1.3.0");
+        setFields();
 
         final GetMap parsedQuery = callGetMap();
 
@@ -203,7 +291,7 @@ public class WMSServiceTest  implements ApplicationContextAware {
         cal.set(Calendar.SECOND, 56);
         cal.set(Calendar.MILLISECOND, 0);
         Date time = cal.getTime();
-        assertEquals(time, parsedQuery.getTime());
+        assertEquals(time, parsedQuery.getTime().get(0));
 
         //envelope 2D
         Envelope env2D = parsedQuery.getEnvelope2D();
@@ -252,8 +340,7 @@ public class WMSServiceTest  implements ApplicationContextAware {
     }
 
     @Test
-    public void testAdaptGetFeatureInfo() throws NoSuchMethodException, IllegalAccessException, IllegalArgumentException,
-                   InvocationTargetException, NoSuchAuthorityCodeException, FactoryException, TransformException{
+    public void testAdaptGetFeatureInfo() throws Exception{
         queryParameters.clear();
         pathParameters.clear();
         queryParameters.putSingle("AZIMUTH", "49");
@@ -270,7 +357,8 @@ public class WMSServiceTest  implements ApplicationContextAware {
         queryParameters.putSingle("TIME", "2007-06-23T14:31:56");
         queryParameters.putSingle("WIDTH", "800");
         queryParameters.putSingle("VERSION", "1.3.0");
-
+        setFields();
+        
         final GetFeatureInfo parsedQuery = callGetFeatureInfo();
 
         //azimuth
@@ -289,7 +377,7 @@ public class WMSServiceTest  implements ApplicationContextAware {
         cal.set(Calendar.SECOND, 56);
         cal.set(Calendar.MILLISECOND, 0);
         Date time = cal.getTime();
-        assertEquals(time, parsedQuery.getTime());
+        assertEquals(time, parsedQuery.getTime().get(0));
 
         //envelope 2D
         Envelope env2D = parsedQuery.getEnvelope2D();

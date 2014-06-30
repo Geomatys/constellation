@@ -278,6 +278,13 @@ public class ServiceBusiness {
          }
      }
      
+     public void deleteAll() throws ConfigurationException {
+         final List<Service> services = serviceRepository.findAll();
+         for (Service service : services) {
+             delete(service.getType(), service.getIdentifier());
+         }
+     }
+     
      /**
      * Configures a service instance.
      *
@@ -457,9 +464,9 @@ public class ServiceBusiness {
      * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
     public org.constellation.dto.Service getInstanceMetadata(final String serviceType, final String identifier, final String language) throws ConfigurationException {
-        this.ensureExistingInstance(serviceType, identifier);
+        final Service service = this.ensureExistingInstance(serviceType, identifier);
         try {
-            ServiceMetadata metadata = serviceRepository.findMetaDataForLangByIdentifierAndType(identifier, serviceType, language);
+            ServiceMetadata metadata = serviceRepository.findMetaDataForLang(service.getId(), language);
             if (metadata == null) {
                 final InputStream in = Util.getResourceAsStream("org/constellation/xml/" + serviceType.toUpperCase()
                         + "Capabilities.xml");
@@ -481,20 +488,23 @@ public class ServiceBusiness {
         }
     }
     
-//    /**
-//     * Updates a service instance metadata.
-//     *
-//     * @param serviceType The type of the service.
-//     * @param identifier the service identifier
-//     * @param metadata   the service metadata
-//     * @throws TargetNotFoundException if the service with specified identifier does not exist
-//     * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
-//     */
-//    public void setInstanceMetadata(final String serviceType, final String identifier, final org.constellation.dto.Service metadata) throws ConfigurationException {
-//        this.ensureExistingInstance(serviceType, identifier);
-//        final Object config = getConfiguration(serviceType, identifier);
-//        this.configure(serviceType, identifier, metadata, config);
-//    }
+    /**
+     * Updates a service instance metadata.
+     *
+     * @param serviceType The type of the service.
+     * @param identifier the service identifier
+     * @param metadata   the service metadata
+     * @throws TargetNotFoundException if the service with specified identifier does not exist
+     * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
+     */
+    public void setInstanceMetadata(final String serviceType, final String identifier, final org.constellation.dto.Service metadata, final String language) throws ConfigurationException {
+        final Service service = this.ensureExistingInstance(serviceType, identifier);
+        if (service != null) {
+            final String xml = getStringFromObject(metadata, GenericDatabaseMarshallerPool.getInstance());
+            final ServiceMetadata meta = new ServiceMetadata(service.getId(), language, xml);
+            serviceRepository.writeMetadataForLang(meta);
+        }
+    }
     
     /**
      * Ensure that a service instance really exists.
@@ -503,14 +513,15 @@ public class ServiceBusiness {
      * @param identifier the service identifier
      * @throws TargetNotFoundException if the service with specified identifier does not exist
      */
-    public void ensureExistingInstance(final String spec, final String identifier) throws TargetNotFoundException {
-        if (!WSEngine.serviceInstanceExist(spec, identifier)) {
-            final Service service = serviceRepository.findByIdentifierAndType(identifier, spec);
+    public Service ensureExistingInstance(final String spec, final String identifier) throws TargetNotFoundException {
+        Service service = serviceRepository.findByIdentifierAndType(identifier, spec);
+        if (!WSEngine.serviceInstanceExist(spec.toUpperCase(), identifier)) {
             if (service == null) {
                 throw new TargetNotFoundException(spec + " service instance with identifier \"" + identifier +
                         "\" not found. There is not configuration in the database.");
             }
         }
+        return service;
     }
     
     private String getStringFromObject(final Object obj, final MarshallerPool pool) {
@@ -543,7 +554,7 @@ public class ServiceBusiness {
 
     public void addServiceToDomain(int serviceId, int domainId) {
         domainRepository.addServiceToDomain(serviceId, domainId);
-}
+    }
 
     @Transactional
     public synchronized void removeServiceFromDomain(int serviceId, int domainId) {

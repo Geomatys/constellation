@@ -22,19 +22,20 @@ package org.constellation.ws.embedded;
 import java.io.File;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.xml.namespace.QName;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.DataBusiness;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
+import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Instance;
@@ -43,14 +44,15 @@ import org.constellation.configuration.Language;
 import org.constellation.configuration.Languages;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.ServiceStatus;
+import org.constellation.dto.Service;
+import org.constellation.dto.SimpleValue;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.map.configuration.LayerBusiness;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
 import org.constellation.provider.Providers;
-import org.constellation.provider.configuration.AbstractConfigurator;
-import org.constellation.provider.configuration.Configurator;
 import org.constellation.test.utils.Order;
+import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.test.utils.TestRunner;
 import static org.constellation.ws.embedded.AbstractGrizzlyServer.initDataDirectory;
 import static org.geotoolkit.parameter.ParametersExt.createGroup;
@@ -71,7 +73,7 @@ import org.springframework.test.context.ContextConfiguration;
  *
  * @author Guilhem Legal (Geomatys)
  */
-@RunWith(TestRunner.class)
+@RunWith(SpringTestRunner.class)
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
 public class AdminRequestTest extends AbstractGrizzlyServer  implements ApplicationContextAware {
 
@@ -91,106 +93,94 @@ public class AdminRequestTest extends AbstractGrizzlyServer  implements Applicat
     @Inject
     protected ProviderBusiness providerBusiness;
     
+    @Inject
+    protected DataBusiness dataBusiness;
+    
+    private static boolean initialized = false;
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
     @PostConstruct
     public void start() {
         SpringHelper.setApplicationContext(applicationContext);
-        try {
-            ConfigurationEngine.setupTestEnvironement("AdminRequestTest");
-            
-            final Configurator configurator = new AbstractConfigurator() {
-                @Override
-                public List<Map.Entry<String, ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException {
-                    
-                    final ArrayList<Map.Entry<String, ParameterValueGroup>> lst = new ArrayList<>();
-                    final ProviderFactory factory = DataProviders.getInstance().getFactory("feature-store");
-                    
-                    try{
-                        {//SHAPEFILE
-                            final File outputDir = initDataDirectory();
-                            final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
-                            getOrCreateValue(source, "id").setValue("shapeSrc");
-                            getOrCreateValue(source, "load_all").setValue(true);
-                            
-                            final ParameterValueGroup choice = getOrCreateGroup(source, "choice");
-                            final ParameterValueGroup shpconfig = createGroup(choice, "ShapefileParametersFolder");
-                            getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
-                            getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");
-                            
-                            final ParameterValueGroup layer = getOrCreateGroup(source, "Layer");
-                            getOrCreateValue(layer, "name").setValue("NamedPlaces");
-                            getOrCreateValue(layer, "style").setValue("cite_style_NamedPlaces");
-                            lst.add(new AbstractMap.SimpleImmutableEntry<>("shapeSrc",source));
-                        }
-                        
-                    }catch(Exception ex){
-                        throw new RuntimeException(ex.getLocalizedMessage(),ex);
-                    }
-                    
-                    return lst;
-                }
+        if (!initialized) {
+            try {
+                ConfigurationEngine.setupTestEnvironement("AdminRequestTest");
+
+                layerBusiness.removeAll();
+                serviceBusiness.deleteAll();
+                dataBusiness.deleteAll();
+                providerBusiness.removeAll();
                 
-                @Override
-                public List<Configurator.ProviderInformation> getProviderInformations() throws ConfigurationException {
-                    final List<org.constellation.engine.register.Provider> records = providerBusiness.getProviders();
-                    final List<Configurator.ProviderInformation> entries = new ArrayList<>();
-                    for(org.constellation.engine.register.Provider record : records){
-                        ParameterValueGroup param = getProviderConfiguration(record.getIdentifier());
-                        if(param!=null){
-                            entries.add(new Configurator.ProviderInformation(record.getIdentifier(), record.getImpl(), param));
-                        }
-                    }
-                    return entries;
-                }
-            };
-            
-            DataProviders.getInstance().setConfigurator(configurator);
-            
-            final LayerContext config = new LayerContext();
-            config.getCustomParameters().put("shiroAccessible", "false");
-            
-            serviceBusiness.create("WMS", "default", config, null, null);
-            layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("Bridges",             "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("Streams",             "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("Lakes",               "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("NamedPlaces",         "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("Buildings",           "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("RoadSegments",        "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("DividedRoutes",       "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("Forests",             "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("MapNeatline",         "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            layerBusiness.add("Ponds",               "http://www.opengis.net/gml/3.2",       "shapeSrc",        null, "default", "WMS", null);
-            
-            final LayerContext config2 = new LayerContext();
-            config2.setSupportedLanguages(new Languages(Arrays.asList(new Language("fre"), new Language("eng", true))));
-            config2.getCustomParameters().put("shiroAccessible", "false");
-            
-            serviceBusiness.create("WMS", "wms1", config2, null, null);
-            layerBusiness.add("Lakes", "http://www.opengis.net/gml/3.2", "shapeSrc", null, "default", "WMS", null);
-            
-            
-            
-            initServer(new String[] {
-                "org.constellation.map.ws.rs",
-                "org.constellation.configuration.ws.rs",
-                "org.constellation.ws.rs.provider"
-            }, null);
-            
-            // Get the list of layers
-            pool = GenericDatabaseMarshallerPool.getInstance();
-            
-        } catch (Exception ex) {
-            Logger.getLogger(AdminRequestTest.class.getName()).log(Level.SEVERE, null, ex);
+                final ProviderFactory ffactory = DataProviders.getInstance().getFactory("feature-store");
+                final File outputDir = initDataDirectory();
+                final ParameterValueGroup sourcef = ffactory.getProviderDescriptor().createValue();
+                getOrCreateValue(sourcef, "id").setValue("shapeSrc");
+                getOrCreateValue(sourcef, "load_all").setValue(true);
+
+                final ParameterValueGroup choice = getOrCreateGroup(sourcef, "choice");
+                final ParameterValueGroup shpconfig = createGroup(choice, "ShapefileParametersFolder");
+                getOrCreateValue(shpconfig, "url").setValue(new URL("file:"+outputDir.getAbsolutePath() + "/org/constellation/ws/embedded/wms111/shapefiles"));
+                getOrCreateValue(shpconfig, "namespace").setValue("http://www.opengis.net/gml");
+
+                final ParameterValueGroup layer = getOrCreateGroup(sourcef, "Layer");
+                getOrCreateValue(layer, "name").setValue("NamedPlaces");
+                getOrCreateValue(layer, "style").setValue("cite_style_NamedPlaces");
+
+                providerBusiness.createProvider("shapeSrc", null, ProviderRecord.ProviderType.LAYER, "feature-store", sourcef);
+
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "BuildingCenters"), "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "BasicPolygons"),   "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Bridges"),         "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Streams"),         "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Lakes"),           "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "NamedPlaces"),     "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Buildings"),       "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "RoadSegments"),    "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "DividedRoutes"),   "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Forests"),         "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "MapNeatline"),     "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Ponds"),           "shapeSrc", "VECTOR", false, true, null, null);
+
+                final LayerContext config = new LayerContext();
+                config.getCustomParameters().put("shiroAccessible", "false");
+
+                serviceBusiness.create("wms", "default", config, null, null);
+                layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
+                layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
+                layerBusiness.add("Bridges",             "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
+                layerBusiness.add("Streams",             "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
+                layerBusiness.add("Lakes",               "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
+                layerBusiness.add("NamedPlaces",         "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
+                layerBusiness.add("Buildings",           "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
+                layerBusiness.add("RoadSegments",        "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
+                layerBusiness.add("DividedRoutes",       "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
+                layerBusiness.add("Forests",             "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
+                layerBusiness.add("MapNeatline",         "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
+                layerBusiness.add("Ponds",               "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
+
+                final LayerContext config2 = new LayerContext();
+                config2.setSupportedLanguages(new Languages(Arrays.asList(new Language("fre"), new Language("eng", true))));
+                config2.getCustomParameters().put("shiroAccessible", "false");
+
+                serviceBusiness.create("wms", "wms1", config2, null, null);
+                layerBusiness.add("Lakes", "http://www.opengis.net/gml", "shapeSrc", null, "wms1", "wms", null);
+
+
+
+                initServer(null, null);
+
+                // Get the list of layers
+                pool = GenericDatabaseMarshallerPool.getInstance();
+                initialized = true;
+            } catch (Exception ex) {
+                Logger.getLogger(AdminRequestTest.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
     @AfterClass
     public static void shutDown() {
-        DataProviders.getInstance().setConfigurator(Providers.DEFAULT_CONFIGURATOR);
         File f = new File("derby.log");
         if (f.exists()) {
             f.delete();
@@ -208,23 +198,26 @@ public class AdminRequestTest extends AbstractGrizzlyServer  implements Applicat
         /*
          * we build a new instance
          */
-        URL niUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/wms/admin?request=newInstance&id=wms2");
+        URL niUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/1/OGC/wms/domain/1");
 
 
         // for a POST request
         URLConnection conec = niUrl.openConnection();
 
+        final Service meta = new Service();
+        meta.setIdentifier("wms2");
+        putRequestObject(conec, meta, GenericDatabaseMarshallerPool.getInstance());
         Object obj = unmarshallResponse(conec);
 
         assertTrue(obj instanceof AcknowlegementType);
 
-        AcknowlegementType expResult = new AcknowlegementType("Success", "Service instance successfully created.");
+        AcknowlegementType expResult = new AcknowlegementType("Success", "WMS service \"wms2\" successfully created.");
         assertEquals(expResult, obj);
 
         /*
          * we see the instance with a status NOT_STARTED
          */
-        URL liUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/wms/admin?request=listInstance");
+        URL liUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/1/OGC/wms/all");
 
 
         // for a POST request
@@ -236,9 +229,9 @@ public class AdminRequestTest extends AbstractGrizzlyServer  implements Applicat
 
         final List<Instance> instances = new ArrayList<>();
         final List<String> versions = Arrays.asList("1.1.1", "1.3.0");
-        instances.add(new Instance(1, "default", "OGC:WMS", "Constellation Map Server", "WMS", versions, 12, ServiceStatus.STARTED));
-        instances.add(new Instance(2, "wms1",    "OGC:WMS", "Constellation Map Server", "WMS", versions, 1,  ServiceStatus.STARTED));
-        instances.add(new Instance(3, "wms2",    "OGC:WMS", "Constellation Map Server", "WMS", versions, 0,  ServiceStatus.STOPPED));
+        instances.add(new Instance(1, "default", "OGC:WMS", "Constellation Map Server", "wms", versions, 12, ServiceStatus.STARTED));
+        instances.add(new Instance(2, "wms1",    "OGC:WMS", "Constellation Map Server", "wms", versions, 1,  ServiceStatus.STARTED));
+        instances.add(new Instance(3, "wms2",    "OGC:WMS", "Constellation Map Server", "wms", versions, 0,  ServiceStatus.STOPPED));
         InstanceReport expResult2 = new InstanceReport(instances);
         assertEquals(expResult2, obj);
 
@@ -248,12 +241,12 @@ public class AdminRequestTest extends AbstractGrizzlyServer  implements Applicat
 
         // for a POST request
         conec = niUrl.openConnection();
-
+        putRequestObject(conec, meta, GenericDatabaseMarshallerPool.getInstance());
         obj = unmarshallResponse(conec);
 
         assertTrue(obj instanceof AcknowlegementType);
 
-        expResult = new AcknowlegementType("Error", "Unable to create an instance.");
+        expResult = new AcknowlegementType("Failure", "Instance already created");
         assertEquals(expResult, obj);
     }
 
@@ -264,23 +257,23 @@ public class AdminRequestTest extends AbstractGrizzlyServer  implements Applicat
         /*
          * we start the instance created at the previous test
          */
-        URL niUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/wms/admin?request=start&id=wms2");
+        URL niUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/1/OGC/wms/wms2/start");
 
 
         // for a POST request
         URLConnection conec = niUrl.openConnection();
 
-        Object obj = unmarshallResponse(conec);
+        Object obj = unmarshallResponsePost(conec);
 
         assertTrue(obj instanceof AcknowlegementType);
 
-        AcknowlegementType expResult = new AcknowlegementType("Success", "Service instance successfully started.");
+        AcknowlegementType expResult = new AcknowlegementType("Success", "WMS service \"wms2\" successfully started.");
         assertEquals(expResult, obj);
 
          /*
          * we verify tat the instance has now a status WORKING
          */
-        URL liUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/wms/admin?request=listInstance");
+        URL liUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/1/OGC/wms/all");
 
 
         // for a POST request
@@ -292,9 +285,9 @@ public class AdminRequestTest extends AbstractGrizzlyServer  implements Applicat
 
         List<Instance> instances = new ArrayList<>();
         final List<String> versions = Arrays.asList("1.1.1", "1.3.0");
-        instances.add(new Instance(1, "default", "OGC:WMS", "Constellation Map Server", "WMS", versions, 12, ServiceStatus.STARTED));
-        instances.add(new Instance(2, "wms1",    "OGC:WMS", "Constellation Map Server", "WMS", versions, 1,  ServiceStatus.STARTED));
-        instances.add(new Instance(3, "wms2",    "OGC:WMS", "Constellation Map Server", "WMS", versions, 0,  ServiceStatus.STARTED));
+        instances.add(new Instance(1, "default", "OGC:WMS", "Constellation Map Server", "wms", versions, 12, ServiceStatus.STARTED));
+        instances.add(new Instance(2, "wms1",    "OGC:WMS", "Constellation Map Server", "wms", versions, 1,  ServiceStatus.STARTED));
+        instances.add(new Instance(3, "wms2",    "OGC:WMS", "Constellation Map Server", "wms", versions, 0,  ServiceStatus.STARTED));
         InstanceReport expResult2 = new InstanceReport(instances);
         assertEquals(expResult2, obj);
 
@@ -307,15 +300,11 @@ public class AdminRequestTest extends AbstractGrizzlyServer  implements Applicat
         /*
          * we configure the instance created at the previous test
          */
-        URL niUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/wms/admin?request=configure&id=wms2");
+        URL niUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/1/OGC/wms/wms2/config");
 
 
         // for a POST request
         URLConnection conec = niUrl.openConnection();
-        /*List<Source> sources = new ArrayList<>();
-        sources.add(new Source("coverageTestSrc", true, null, null));
-        sources.add(new Source("shapeSrc", true, null, null));
-        Layers layerObj = new Layers(sources);*/
         LayerContext layerContext = new LayerContext();
         layerContext.getCustomParameters().put("shiroAccessible", "false");
 
@@ -330,12 +319,12 @@ public class AdminRequestTest extends AbstractGrizzlyServer  implements Applicat
         /*
          * we restart the instance to take change in count
          */
-        niUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/wms/admin?request=restart&id=wms2");
+        niUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/1/OGC/wms/wms2/restart");
 
 
         // for a POST request
         conec = niUrl.openConnection();
-
+        postRequestObject(conec, new SimpleValue(false), GenericDatabaseMarshallerPool.getInstance());
         obj = unmarshallResponse(conec);
 
         assertTrue(obj instanceof AcknowlegementType);
@@ -360,23 +349,23 @@ public class AdminRequestTest extends AbstractGrizzlyServer  implements Applicat
         /*
          * we stop the instance created at the previous test
          */
-        URL niUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/wms/admin?request=stop&id=wms2");
+        URL niUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/1/OGC/wms/wms2/stop");
 
 
         // for a POST request
         URLConnection conec = niUrl.openConnection();
 
-        Object obj = unmarshallResponse(conec);
+        Object obj = unmarshallResponsePost(conec);
 
         assertTrue(obj instanceof AcknowlegementType);
 
-        AcknowlegementType expResult = new AcknowlegementType("Success", "Service instance successfully stopped.");
+        AcknowlegementType expResult = new AcknowlegementType("Success", "WMS service \"wms2\" successfully stopped.");
         assertEquals(expResult, obj);
 
          /*
          * we see the instance has now a status NOT_STARTED
          */
-        URL liUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/wms/admin?request=listInstance");
+        URL liUrl = new URL("http://localhost:" +  grizzly.getCurrentPort() + "/1/OGC/wms/all");
 
 
         // for a POST request
@@ -388,9 +377,9 @@ public class AdminRequestTest extends AbstractGrizzlyServer  implements Applicat
 
         final List<Instance> instances = new ArrayList<>();
         final List<String> versions = Arrays.asList("1.1.1", "1.3.0");
-        instances.add(new Instance(1, "default", "OGC:WMS", "Constellation Map Server", "WMS", versions, 12, ServiceStatus.STARTED));
-        instances.add(new Instance(2, "wms1",    "OGC:WMS", "Constellation Map Server", "WMS", versions, 1,  ServiceStatus.STARTED));
-        instances.add(new Instance(3, "wms2",    "OGC:WMS", "Constellation Map Server", "WMS", versions, 12, ServiceStatus.STOPPED));
+        instances.add(new Instance(1, "default", "OGC:WMS", "Constellation Map Server", "wms", versions, 12, ServiceStatus.STARTED));
+        instances.add(new Instance(2, "wms1",    "OGC:WMS", "Constellation Map Server", "wms", versions, 1,  ServiceStatus.STARTED));
+        instances.add(new Instance(3, "wms2",    "OGC:WMS", "Constellation Map Server", "wms", versions, 0, ServiceStatus.STOPPED));
         InstanceReport expResult2 = new InstanceReport(instances);
         assertEquals(expResult2, obj);
     }
@@ -401,23 +390,23 @@ public class AdminRequestTest extends AbstractGrizzlyServer  implements Applicat
         /*
          * we stop the instance created at the previous test
          */
-        URL niUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/admin?request=delete&id=wms2");
+        URL niUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/1/OGC/wms/wms2");
 
 
         // for a POST request
         URLConnection conec = niUrl.openConnection();
 
-        Object obj = unmarshallResponse(conec);
+        Object obj = unmarshallResponseDelete(conec);
 
         assertTrue(obj instanceof AcknowlegementType);
 
-        AcknowlegementType expResult = new AcknowlegementType("Success", "Service instance successfully deleted.");
+        AcknowlegementType expResult = new AcknowlegementType("Success", "WMS service \"wms2\" successfully deleted.");
         assertEquals(expResult, obj);
 
          /*
          * we see the instance has now a status NOT_STARTED
          */
-        URL liUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/wms/admin?request=listInstance");
+        URL liUrl = new URL("http://localhost:" + grizzly.getCurrentPort() + "/1/OGC/wms/all");
 
 
         // for a POST request
@@ -429,8 +418,8 @@ public class AdminRequestTest extends AbstractGrizzlyServer  implements Applicat
 
         final List<Instance> instances = new ArrayList<>();
         final List<String> versions = Arrays.asList("1.1.1", "1.3.0");
-        instances.add(new Instance(1, "default", "OGC:WMS", "Constellation Map Server", "WMS", versions, 12, ServiceStatus.STARTED));
-        instances.add(new Instance(2, "wms1",    "OGC:WMS", "Constellation Map Server", "WMS", versions, 1,  ServiceStatus.STARTED));
+        instances.add(new Instance(1, "default", "OGC:WMS", "Constellation Map Server", "wms", versions, 12, ServiceStatus.STARTED));
+        instances.add(new Instance(2, "wms1",    "OGC:WMS", "Constellation Map Server", "wms", versions, 1,  ServiceStatus.STARTED));
         InstanceReport expResult2 = new InstanceReport(instances);
         assertEquals(expResult2, obj);
     }

@@ -141,14 +141,10 @@ public final class OGCServicesRest {
         
         org.constellation.engine.register.Service service = serviceRepository.findByIdentifierAndType(metadata.getIdentifier(), spec);
         if(service != null) {
-            return Response.serverError().entity("admin.error.service.exist").build();
+            return ok(AcknowlegementType.failure("Instance already created"));
         }
         
         serviceBusiness.create(spec, metadata.getIdentifier(), null, metadata, domainId);
-//        
-//        service = serviceRepository.findByIdentifierAndType(metadata.getIdentifier(), spec);
-//        
-//        domainRepository.addServiceToDomain(service.getId(), domainId);
         
         return created(AcknowlegementType.success(spec.toUpperCase() + " service \"" + metadata.getIdentifier() + "\" successfully created."));
     }

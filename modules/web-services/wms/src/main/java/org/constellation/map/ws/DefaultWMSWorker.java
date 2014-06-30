@@ -240,8 +240,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         final String userLogin         = getUserLogin();
         // we get the request language, if its not set we get the default "eng"
         final String currentLanguage;
-        if (requestedLanguage != null && supportedLanguages.contains(requestedLanguage) && !requestedLanguage.equals(defaultLanguage)) {
+        if (requestedLanguage != null && supportedLanguages.contains(requestedLanguage)) {
             currentLanguage = requestedLanguage;
+        } else if (requestedLanguage == null && defaultLanguage != null) {
+            currentLanguage = defaultLanguage;
         } else {
             currentLanguage = null;
         }
@@ -251,7 +253,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             return (AbstractWMSCapabilities) cachedCapabilities;
         }
 
-        final Service skeleton = getStaticCapabilitiesObject("WMS", requestedLanguage);
+        final Service skeleton = getStaticCapabilitiesObject("wms", currentLanguage);
         final AbstractWMSCapabilities inCapabilities = WMSConstant.createCapabilities(queryVersion, skeleton);
 
         final AbstractRequest request;

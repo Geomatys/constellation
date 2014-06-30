@@ -324,7 +324,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
      * @return The root output directory where the data are unzipped.
      * @throws IOException
      */
-    protected static File initDataDirectory() throws IOException {
+    public static File initDataDirectory() throws IOException {
         final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
         String styleResource = classloader.getResource("org/constellation/ws/embedded/wms111/styles").getFile();
         if (styleResource.indexOf('!') != -1) {
@@ -366,10 +366,38 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
         wr.write(sw.toString());
         wr.flush();
     }
+    
+    protected static void putRequestObject(URLConnection conec, Object request, MarshallerPool pool) throws IOException, JAXBException {
+        HttpURLConnection httpCon = (HttpURLConnection) conec;
+        httpCon.setRequestMethod("PUT");
+        conec.setDoOutput(true);
+        conec.setRequestProperty("Content-Type", "application/xml");
+        final OutputStreamWriter wr = new OutputStreamWriter(conec.getOutputStream());
+        final StringWriter sw = new StringWriter();
+        Marshaller marshaller = pool.acquireMarshaller();
+        marshaller.marshal(request, sw);
+
+        wr.write(sw.toString());
+        wr.flush();
+    }
 
     protected static Object unmarshallResponsePut(final URLConnection conec) throws JAXBException, IOException {
         HttpURLConnection httpCon = (HttpURLConnection) conec;
         httpCon.setRequestMethod("PUT");
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        Object obj = unmarshaller.unmarshal(conec.getInputStream());
+
+        pool.recycle(unmarshaller);
+
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement) obj).getValue();
+        }
+        return obj;
+    }
+    
+    protected static Object unmarshallResponsePost(final URLConnection conec) throws JAXBException, IOException {
+        HttpURLConnection httpCon = (HttpURLConnection) conec;
+        httpCon.setRequestMethod("POST");
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         Object obj = unmarshaller.unmarshal(conec.getInputStream());
 

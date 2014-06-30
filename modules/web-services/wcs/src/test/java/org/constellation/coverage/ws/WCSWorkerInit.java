@@ -27,8 +27,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.xml.namespace.QName;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.DataBusiness;
+import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
+import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
 import org.constellation.data.CoverageSQLTestCase;
@@ -47,6 +52,10 @@ import static org.constellation.provider.coveragesql.CoverageSQLProviderService.
 import static org.constellation.provider.configuration.ProviderParameters.*;
 import org.constellation.test.utils.SpringTestRunner;
 import org.junit.runner.RunWith;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.context.ContextConfiguration;
 
 /**
  * Initializes a {@link WCSWorker} for testing GetCapabilities, DescribeCoverage and GetCoverage
@@ -57,8 +66,14 @@ import org.junit.runner.RunWith;
  *
  * @since 0.5
  */
-@RunWith(SpringTestRunner.class)
-public class WCSWorkerInit extends CoverageSQLTestCase {
+public class WCSWorkerInit extends CoverageSQLTestCase implements ApplicationContextAware {
+
+    protected ApplicationContext applicationContext;
+    
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
 
     /**
      * The layer to test.
@@ -73,68 +88,66 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
     @Inject
     protected LayerBusiness layerBusiness;
     
+    @Inject
+    protected ProviderBusiness providerBusiness;
+    
+    @Inject
+    protected DataBusiness dataBusiness;
+    
     public static boolean hasLocalDatabase() {
-        return false; // TODO
+        return true; // TODO
     }
 
+    private static boolean initialized = false;
+    
     /**
      * Initialisation of the worker and the PostGRID data provider before launching
      * the different tests.
      */
     @PostConstruct
     public void setUpClass() {
-        try {
-            ConfigurationEngine.setupTestEnvironement("WCSWorkerInit");
-            
-            final LayerContext config = new LayerContext();
-            config.getCustomParameters().put("shiroAccessible", "false");
-            
-            serviceBusiness.create("WCS", "default", config, null, null);
-            layerBusiness.add("SST_tests", null, "coverageTestSrc", null, "default", "WCS", null);
-            
-            serviceBusiness.create("WCS", "test", config, null, null);
-            layerBusiness.add("SST_tests", null, "coverageTestSrc", null, "test",    "WCS", null);
-            
-            final Configurator configurator = new AbstractConfigurator() {
+        SpringHelper.setApplicationContext(applicationContext);
+        if (!initialized) {
+            try {
+                ConfigurationEngine.setupTestEnvironement("WCSWorkerInit");
+                layerBusiness.removeAll();
+                serviceBusiness.deleteAll();
+                dataBusiness.deleteAll();
+                providerBusiness.removeAll();
+
+                final ProviderFactory factory = DataProviders.getInstance().getFactory("coverage-sql");
+                final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
+                srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://localhost:5432/coverages");
+                srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
+                final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
+                srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
+                srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
+                srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
+                srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
+                source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
+                providerBusiness.createProvider("coverageTestSrc", null, ProviderRecord.ProviderType.LAYER, "coverage-sql", source);
+
+                dataBusiness.create(new QName("SST_tests"), "coverageTestSrc", rootDir, false, true, null, null);
+
+                final LayerContext config = new LayerContext();
+                config.getCustomParameters().put("shiroAccessible", "false");
+
+                serviceBusiness.create("WCS", "default", config, null, null);
+                layerBusiness.add("SST_tests", null, "coverageTestSrc", null, "default", "WCS", null);
+
+                serviceBusiness.create("WCS", "test", config, null, null);
+                layerBusiness.add("SST_tests", null, "coverageTestSrc", null, "test",    "WCS", null);
+
+                DataProviders.getInstance().reload();
                 
-                @Override
-                public List<Map.Entry<String, ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException {
-                    final ArrayList<Map.Entry<String, ParameterValueGroup>> lst = new ArrayList<>();
-                    
-                    final ProviderFactory factory = DataProviders.getInstance().getFactory("coverage-sql");
-                    
-                    if (hasLocalDatabase()) {
-                        final ParameterValueGroup config = factory.getProviderDescriptor().createValue();
-                        // Defines a PostGrid data provider
-                        final ParameterValueGroup source = config.addGroup(SOURCE_DESCRIPTOR_NAME);
-                        final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
-                        srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://flupke.geomatys.com/coverages-test");
-                        srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
-                        final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
-                        srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
-                        srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
-                        srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
-                        srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
-                        source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                        source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
-                        lst.add(new AbstractMap.SimpleImmutableEntry<>("coverageTestSrc",config));
-                    }
-                    return lst;
-                }
-                
-                @Override
-                public List<Configurator.ProviderInformation> getProviderInformations() throws ConfigurationException {
-                    throw new UnsupportedOperationException("Not supported yet.");
-                }
-            };
-            DataProviders.getInstance().setConfigurator(configurator);
-            
-            
-            WORKER = new DefaultWCSWorker("default");
-            // Default instanciation of the worker' servlet context and uri context.
-            WORKER.setServiceUrl("http://localhost:9090");
-        } catch (ConfigurationException ex) {
-            Logger.getLogger(WCSWorkerInit.class.getName()).log(Level.SEVERE, null, ex);
+                WORKER = new DefaultWCSWorker("default");
+                // Default instanciation of the worker' servlet context and uri context.
+                WORKER.setServiceUrl("http://localhost:9090");
+            } catch (Exception ex) {
+                Logger.getLogger(WCSWorkerInit.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
 
     }

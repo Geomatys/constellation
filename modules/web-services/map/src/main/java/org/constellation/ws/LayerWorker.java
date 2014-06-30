@@ -189,7 +189,7 @@ public abstract class LayerWorker extends AbstractWorker {
      */
     public List<Layer> getConfigurationLayers(final String login) {
         try {
-            return layerBusiness.getLayers(this.specification.name(), getId(), login);
+            return layerBusiness.getLayers(this.specification.name().toLowerCase(), getId(), login);
         } catch (ConfigurationException ex) {
             LOGGER.log(Level.WARNING, "Erro while getting layers", ex);
         }

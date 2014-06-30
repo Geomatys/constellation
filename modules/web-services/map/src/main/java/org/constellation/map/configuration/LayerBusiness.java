@@ -19,6 +19,7 @@
 
 package org.constellation.map.configuration;
 
+import com.sun.istack.logging.Logger;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -106,7 +107,6 @@ public class LayerBusiness {
             }
 
             final Data data = dataRepository.findDataFromProvider(namespace, name, providerId);
-
             boolean update = true;
             Layer layer = layerRepository.findByServiceIdAndLayerName(service.getId(), name, namespace);
             if (layer == null) {
@@ -175,6 +175,13 @@ public class LayerBusiness {
             }
         } else {
             throw new TargetNotFoundException("Unable to find a service:" + serviceId);
+        }
+    }
+    
+    public void removeAll() {
+        final List<Layer> layers = layerRepository.findAll();
+        for (Layer layer : layers) {
+            layerRepository.delete(layer.getId());
         }
     }
     

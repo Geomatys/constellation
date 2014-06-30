@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
@@ -52,6 +53,8 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
 
 
 /**
@@ -62,6 +65,8 @@ import static org.junit.Assume.assumeTrue;
  *
  * @since 0.5
  */
+@RunWith(SpringTestRunner.class)
+@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
 public class WCSWorkerOutputTest extends WCSWorkerInit {
     /**
      * Ensures that a PostGRID layer preconfigured is found in the GetCapabilities document
@@ -150,7 +155,7 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
                     final TimeSequenceType temporalDomain = (TimeSequenceType) offering.getDomainSet()
                             .getContent().get(1).getValue();
                     // Builds expected spatial domain
-                    final List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
+                    final List<DirectPositionType> pos = new ArrayList<>();
                     pos.add(new DirectPositionType(-180.0, -90.0));
                     pos.add(new DirectPositionType(180.0, 90.0));
                     final EnvelopeType expectedEnvelope = new EnvelopeType(pos, "EPSG:4326");

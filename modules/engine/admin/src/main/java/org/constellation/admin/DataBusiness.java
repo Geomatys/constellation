@@ -238,6 +238,24 @@ public class DataBusiness {
         }
     }
     
+    public void deleteDataForProvider(final String providerIdentifier) {
+        final Provider provider = providerRepository.findByIdentifier(providerIdentifier);
+        if (provider != null) {
+            List<Data> datas = dataRepository.findByProviderId(provider.getId());
+            for (Data data : datas) {
+                dataRepository.delete(data.getId());
+            }
+            
+        }
+    }
+    
+    public void deleteAll() {
+        final List<Data> datas = dataRepository.findAll();
+        for (Data data : datas) {
+            dataRepository.delete(data.getId());
+        }
+    }
+    
     public void create(final QName name, final String providerIdentifier, final String type, final boolean sensorable, final boolean visible,
                        final String subType, final String metadata) {
         final Provider provider = providerRepository.findByIdentifier(providerIdentifier);

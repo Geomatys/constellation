@@ -77,41 +77,7 @@ public class ConfigurationEngine {
 
    
 
-    public static void writeServiceMetadata(final String identifier, final String serviceType, final Service metadata,
-            String language) throws IOException, JAXBException {
-        ensureNonNull("metadata", metadata);
-
-        if (language == null) {
-            language = "eng";
-        }
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            final ServiceRecord service = session.readService(identifier, serviceType);
-            if (service != null) {
-                final StringWriter sw = new StringWriter();
-                final Marshaller m = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
-                m.marshal(metadata, sw);
-                GenericDatabaseMarshallerPool.getInstance().recycle(m);
-                final StringReader sr = new StringReader(sw.toString());
-                service.setMetadata(language, sr);
-
-                // ISO metadata
-                String url = getConstellationProperty(SERVICES_URL_KEY, null);
-                final DefaultMetadata isoMetadata = CstlMetadatas.defaultServiceMetadata(identifier, serviceType, url,
-                        metadata);
-                final StringReader srIso = MetadataIOUtils.marshallMetadata(isoMetadata);
-
-                service.setIsoMetadata(isoMetadata.getFileIdentifier(), srIso);
-            }
-
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
-        } finally {
-            if (session != null)
-                session.close();
-        }
-    }
+   
 
     public static Service readServiceMetadata(final String identifier, final String serviceType, String language)
             throws IOException, JAXBException {
@@ -231,34 +197,6 @@ public class ConfigurationEngine {
         }
     }
 
-
-    public static InputStream loadIsoMetadata(final String metadataID) {
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-
-            final Record record = session.searchMetadata(metadataID, true);
-            if (record instanceof ProviderRecord) {
-                final ProviderRecord provider = (ProviderRecord) record;
-                return provider.getMetadata();
-
-            } else if (record instanceof ServiceRecord) {
-                final ServiceRecord serv = (ServiceRecord) record;
-                return serv.getIsoMetadata();
-
-            } else if (record instanceof DataRecord) {
-                final DataRecord data = (DataRecord) record;
-                return data.getIsoMetadata();
-            }
-
-        } catch (SQLException | IOException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred while reading provider metadata", ex);
-        } finally {
-            if (session != null)
-                session.close();
-        }
-        return null;
-    }
 
 
     public static boolean existInternalMetadata(final String metadataID, final boolean includeService) {

@@ -166,18 +166,12 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
-                ConfigurationEngine.setupTestEnvironement("WMSAxesOrderTest");
+                layerBusiness.removeAll();
+                dataBusiness.deleteAll();
+                serviceBusiness.deleteAll();
+                providerBusiness.removeAll();
                 
-                try {
-                   layerBusiness.removeForService("wms", "default");
-                   serviceBusiness.delete("wms", "default");
-                } catch (ConfigurationException ex) {}
                 
-                try {
-                   layerBusiness.removeForService("wms", "wms1");
-                   serviceBusiness.delete("wms", "wms1");
-                } catch (ConfigurationException ex) {}
-
                 final ProviderFactory factory = DataProviders.getInstance().getFactory("coverage-sql");
                 final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
                 final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
@@ -243,7 +237,6 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
         if (f.exists()) {
             f.delete();
         }
-        ConfigurationEngine.shutdownTestEnvironement("WMSAxesOrderTest");
         finish();
     }
     /**
