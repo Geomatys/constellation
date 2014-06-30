@@ -125,7 +125,7 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
         for (Entry<Record, Result<Record>> domainEntry : domains.entrySet()) {
 
             Domain domain = domainEntry.getKey().into(Domain.class);
-            if (domain.getId() == null) {
+            if (domain.getId() != null) {
                 userDTO.addDomain(domain);
             }
         }
