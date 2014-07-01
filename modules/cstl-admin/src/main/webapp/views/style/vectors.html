@@ -74,19 +74,19 @@
                     <span translate="sldeditor.breadcrumb.edition">Rule edition</span>
                 </li>
             </ol>
-            <ul class="nav nav-tabs" ng-init="chosenTab = 'description'">
-                <li ng-class="{active: chosenTab==='description'}">
-                    <a ng-click="chosenTab = 'description'" data-toggle="tab">
+            <ul class="nav nav-tabs">
+                <li ng-class="{active: $parent.chosenTab==='description'}">
+                    <a ng-click="$parent.chosenTab = 'description'" data-toggle="tab">
                         <span translate="edition.style.label.description" >Description</span>
                     </a>
                 </li>
-                <li ng-class="{active: chosenTab==='symbols'}">
-                    <a ng-click="chosenTab = 'symbols'" data-toggle="tab">
+                <li ng-class="{active: $parent.chosenTab==='symbols'}">
+                    <a ng-click="$parent.chosenTab = 'symbols'" data-toggle="tab">
                         <span translate="label.symbols" >Symbols</span>
                     </a>
                 </li>
-                <li ng-class="{active: chosenTab==='filters'}">
-                    <a ng-click="chosenTab = 'filters'" data-toggle="tab">
+                <li ng-class="{active: $parent.chosenTab==='filters'}">
+                    <a ng-click="$parent.chosenTab = 'filters'" data-toggle="tab">
                         <span translate="edition.style.label.filters" >Filters</span>
                     </a>
                 </li>
@@ -214,7 +214,7 @@
                                             <span class="pull-left"
                                                   style="position:absolute"
                                                   ng-if="optionsSLD.selectedRule.minScale != undefined && optionsSLD.selectedRule.minScale !== 0">1/</span>
-                                            <input type="number"
+                                            <input type="text"
                                                    class="form-control"
                                                    id="minScale"
                                                    ng-model="optionsSLD.selectedRule.minScale"
@@ -230,20 +230,12 @@
                                             <span class="pull-left"
                                                   style="position:absolute"
                                                   ng-if="optionsSLD.selectedRule.maxScale != undefined && optionsSLD.selectedRule.maxScale !== 0">1/</span>
-                                            <input type="number"
+                                            <input type="text"
                                                    class="form-control"
                                                    id="maxScale"
                                                    ng-model="optionsSLD.selectedRule.maxScale"
                                                    min="0"/>
                                         </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="col-sm-5 col-md-4"
-                                               style="font-size: 13px;font-weight:normal;margin-bottom:0;padding-left:15px;padding-right:15px;text-align:right;color:#808080;">
-                                            <em translate="sldeditor.edition.currentScale">Current scale of the map</em>
-                                        </label>
-                                        <em style="font-size: 13px;color:#808080;"
-                                              class="col-sm-7 col-md-8 currentScale"></em>
                                     </div>
                                     <hr style="margin-bottom:10px;"/>
                                     <!--div class="form-group">
@@ -345,6 +337,10 @@
                     <span translate="sldeditor.apercu.titre">Data preview</span>
                 </button>
             </div>
+        </div>
+        <div style="position: absolute; z-index: 800; padding-left: 5px; padding-top: 5px;" ng-show="chosenTab==='filters'">
+            <button type="button" class="btn btn-primary" ng-click="setMinScale()" title="min scale filter">min</button>
+            <button type="button" class="btn btn-primary" ng-click="setMaxScale()" title="max scale filter">max</button>
         </div>
         <div class="bloc_apercu" id="styledMapOL" style="height: 448px;"></div>
     </div>

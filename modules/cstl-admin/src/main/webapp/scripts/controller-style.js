@@ -126,6 +126,8 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             pageSld: 'views/style/chooseType.html'
         };
 
+        $scope.chosenTab = 'description';
+
         /**
          * SLD model object that store all needed variables to avoid angular bug behaviour in modal.
          */
@@ -1165,23 +1167,30 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                             var extent = new OpenLayers.Bounds($scope.dataBbox[0], $scope.dataBbox[1], $scope.dataBbox[2], $scope.dataBbox[3]);
                             DataViewer.map.zoomToExtent(extent, true);
                         }
-                        DataViewer.map.events.register("moveend", DataViewer.map, function(){
-                            setCurrentScale();
-                        });
-                        setCurrentScale();
                     }
                 );
             }
         };
 
-        /**
-         * Utility function to set the current scale of OL map into page element.
-         */
-        var setCurrentScale = function(){
+        $scope.setMinScale = function(){
             if(DataViewer.map) {
                 var currentScale=DataViewer.map.getScale();
-                //currentScale = Math.round(currentScale);
-                jQuery('.currentScale').html("1 / "+currentScale);
+                if(currentScale < $scope.optionsSLD.selectedRule.maxScale){
+                	$scope.optionsSLD.selectedRule.minScale = currentScale;
+                }else{
+                	console.log("currenscale > maxScale");
+                }
+            }
+        };
+
+        $scope.setMaxScale = function(){
+            if(DataViewer.map) {
+                var currentScale=DataViewer.map.getScale();
+                if(currentScale > $scope.optionsSLD.selectedRule.minScale){
+                	$scope.optionsSLD.selectedRule.maxScale = currentScale;                	
+                }else{
+                	console.log("currenscale < minScale");
+                }
             }
         };
 

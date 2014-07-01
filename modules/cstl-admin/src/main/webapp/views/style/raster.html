@@ -70,25 +70,25 @@
                     <span translate="sldeditor.breadcrumb.edition">Rule edition</span>
                 </li>
             </ol>
-            <ul class="nav nav-tabs" ng-init="chosenTab = 'description'">
-                <li ng-class="{active: chosenTab==='description'}">
-                    <a ng-click="chosenTab = 'description'" data-toggle="tab">
+            <ul class="nav nav-tabs">
+                <li ng-class="{active: $parent.chosenTab==='description'}">
+                    <a ng-click="$parent.chosenTab = 'description'" data-toggle="tab">
                         <span translate="edition.style.label.description" >Description</span>
                     </a>
                 </li>
-                <li ng-class="{active: chosenTab==='symbols'}">
-                    <a ng-click="chosenTab = 'symbols'" data-toggle="tab">
+                <li ng-class="{active: $parent.chosenTab==='symbols'}">
+                    <a ng-click="$parent.chosenTab = 'symbols'" data-toggle="tab">
                         <span translate="label.symbols" >Symbols</span>
                     </a>
                 </li>
-                <li ng-class="{active: chosenTab==='filters'}">
-                    <a ng-click="chosenTab = 'filters'" data-toggle="tab">
+                <li ng-class="{active: $parent.chosenTab==='filters'}">
+                    <a ng-click="$parent.chosenTab = 'filters'" data-toggle="tab">
                         <span translate="edition.style.label.filters" >Filters</span>
                     </a>
                 </li>
             </ul>
             <div class="tab-content">
-                <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='description'}">
+                <div class="tab-pane tab-style-edition" ng-class="{active:$parent.chosenTab==='description'}">
                     <form class="form-horizontal" role="form">
                         <div class="row">
                             <div class="col-xs-12 col-sm-11 col-md-11 col-lg-11" style="margin-top: 20pt;">
@@ -129,13 +129,13 @@
                         </div>
                     </form>
                 </div>
-                <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='symbols'}">
+                <div class="tab-pane tab-style-edition" ng-class="{active:$parent.chosenTab==='symbols'}">
                     <form class="form-horizontal" role="form">
                         @TODO voir la maquette
 
                     </form>
                 </div>
-                <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='filters'}">
+                <div class="tab-pane tab-style-edition" ng-class="{active:$parent.chosenTab==='filters'}">
                     <div style="padding: 10pt;">
                         <div class="row">
                             <div class="col-xs-10">
@@ -177,14 +177,6 @@
                                                    min="0"/>
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label class="col-sm-5 col-md-4"
-                                               style="font-size: 13px;font-weight:normal;margin-bottom:0;padding-left:15px;padding-right:15px;text-align:right;color:#808080;">
-                                            <em translate="sldeditor.edition.currentScale">Current scale of the map</em>
-                                        </label>
-                                        <em style="font-size: 13px;color:#808080;"
-                                            class="col-sm-7 col-md-8 currentScale"></em>
-                                    </div>
                                     <hr style="margin-bottom:10px;"/>
                                     <!--div class="form-group">
                                         <div class="col-sm-5 col-md-4">
@@ -224,6 +216,10 @@
                     <span translate="sldeditor.apercu.titre">Data preview</span>
                 </button>
             </div>
+        </div>
+        <div style="position: absolute; z-index: 800; padding-left: 5px; padding-top: 5px;" ng-show="chosenTab==='filters'">
+            <button type="button" class="btn btn-primary" ng-click="setMinScale()" title="min scale filter">min</button>
+            <button type="button" class="btn btn-primary" ng-click="setMaxScale()" title="max scale filter">max</button>
         </div>
         <div class="bloc_apercu" id="styledMapOL" style="height: 448px;"></div>
     </div>
