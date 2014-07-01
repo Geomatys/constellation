@@ -31,6 +31,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
+import org.apache.sis.referencing.IdentifiedObjects;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
@@ -93,7 +94,6 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ows.xml.Sections;
 import org.geotoolkit.referencing.CRS;
-import org.geotoolkit.referencing.IdentifiedObjects;
 import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.wfs.xml.*;
 import org.geotoolkit.wfs.xml.DeleteElement;
@@ -400,9 +400,9 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         if (type.getGeometryDescriptor() != null && type.getGeometryDescriptor().getCoordinateReferenceSystem() != null) {
             final CoordinateReferenceSystem crs = type.getGeometryDescriptor().getCoordinateReferenceSystem();
             //todo wait for martin fix
-            String id  = IdentifiedObjects.lookupIdentifier(crs, true);
+            String id  = org.geotoolkit.referencing.IdentifiedObjects.lookupIdentifier(crs, true);
             if (id == null) {
-                id = IdentifiedObjects.getIdentifier(crs);
+                id = IdentifiedObjects.getIdentifierOrName(crs);
             }
 
             if (id != null) {
