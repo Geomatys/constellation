@@ -22,15 +22,18 @@ package org.constellation.wfs.ws;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
+
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
+
 import javax.inject.Named;
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
+
 import org.apache.sis.referencing.IdentifiedObjects;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
@@ -46,7 +49,9 @@ import org.constellation.provider.FeatureData;
 import org.constellation.security.SecurityManagerHolder;
 import org.constellation.util.QNameComparator;
 import org.constellation.util.QnameLocalComparator;
+
 import static org.constellation.wfs.ws.WFSConstants.*;
+
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
 import org.constellation.wfs.ws.rs.ValueCollectionWrapper;
 import org.constellation.ws.CstlServiceException;
@@ -90,39 +95,17 @@ import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
 import org.geotoolkit.ows.xml.AbstractServiceIdentification;
 import org.geotoolkit.ows.xml.AbstractServiceProvider;
 import org.geotoolkit.ows.xml.AcceptVersions;
+
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
 import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ows.xml.Sections;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.wfs.xml.*;
-import org.geotoolkit.wfs.xml.DeleteElement;
-import org.geotoolkit.wfs.xml.DescribeFeatureType;
-import org.geotoolkit.wfs.xml.DescribeStoredQueries;
-import org.geotoolkit.wfs.xml.DescribeStoredQueriesResponse;
-import org.geotoolkit.wfs.xml.FeatureTypeList;
-import org.geotoolkit.wfs.xml.GetCapabilities;
-import org.geotoolkit.wfs.xml.GetFeature;
-import org.geotoolkit.wfs.xml.GetGmlObject;
-import org.geotoolkit.wfs.xml.GetPropertyValue;
-import org.geotoolkit.wfs.xml.IdentifierGenerationOptionType;
-import org.geotoolkit.wfs.xml.InsertElement;
-import org.geotoolkit.wfs.xml.ListStoredQueries;
-import org.geotoolkit.wfs.xml.ListStoredQueriesResponse;
-import org.geotoolkit.wfs.xml.LockFeature;
-import org.geotoolkit.wfs.xml.LockFeatureResponse;
-import org.geotoolkit.wfs.xml.Property;
-import org.geotoolkit.wfs.xml.Query;
-import org.geotoolkit.wfs.xml.ResultTypeType;
-import org.geotoolkit.wfs.xml.StoredQueries;
-import org.geotoolkit.wfs.xml.StoredQueryDescription;
-import org.geotoolkit.wfs.xml.Transaction;
-import org.geotoolkit.wfs.xml.TransactionResponse;
-import org.geotoolkit.wfs.xml.UpdateElement;
-import org.geotoolkit.wfs.xml.WFSCapabilities;
-import org.geotoolkit.wfs.xml.WFSMarshallerPool;
 
 import static org.geotoolkit.wfs.xml.WFSXmlFactory.*;
+
 import org.geotoolkit.wfs.xml.v110.FeatureCollectionType;
 import org.geotoolkit.wfs.xml.v200.ObjectFactory;
 import org.geotoolkit.wfs.xml.v200.PropertyName;
@@ -143,6 +126,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.CodeList;
 import org.opengis.util.FactoryException;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -155,7 +139,7 @@ import org.w3c.dom.NodeList;
  * @author Guilhem Legal (Geomatys)
  */
 @Named
-@Scope("prototype")
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
     /**

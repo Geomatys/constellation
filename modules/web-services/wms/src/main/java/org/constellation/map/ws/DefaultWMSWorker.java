@@ -20,6 +20,7 @@ package org.constellation.map.ws;
 
 //J2SE dependencies
 import com.codahale.metrics.annotation.Timed;
+
 import org.apache.sis.internal.util.UnmodifiableArrayList;
 import org.apache.sis.measure.MeasurementRange;
 import org.apache.sis.measure.Range;
@@ -93,6 +94,7 @@ import org.opengis.referencing.datum.EngineeringDatum;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.sld.StyledLayerDescriptor;
 import org.opengis.util.FactoryException;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 
 import javax.inject.Named;
@@ -100,6 +102,7 @@ import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 import javax.measure.unit.UnitFormat;
 import javax.xml.bind.JAXBException;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
@@ -139,7 +142,7 @@ import static org.geotoolkit.wms.xml.WmsXmlFactory.*;
  */
 
 @Named
-@Scope("prototype")
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
 
