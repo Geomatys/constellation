@@ -19,6 +19,9 @@
 
 package org.constellation.rest.api;
 
+import static org.constellation.utils.RESTfulUtilities.created;
+import static org.constellation.utils.RESTfulUtilities.ok;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -26,7 +29,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
+
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -40,19 +43,26 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import org.apache.sis.util.logging.Logging;
+
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.ServiceBusiness;
-import org.constellation.configuration.*;
+import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.Instance;
+import org.constellation.configuration.InstanceReport;
+import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.NotRunningServiceException;
+import org.constellation.configuration.ProcessContext;
+import org.constellation.configuration.SOSConfiguration;
+import org.constellation.configuration.ServiceReport;
+import org.constellation.configuration.ServiceStatus;
+import org.constellation.configuration.WebdavContext;
 import org.constellation.dto.Service;
 import org.constellation.dto.SimpleValue;
-import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.ogc.configuration.OGCConfigurer;
-import static org.constellation.utils.RESTfulUtilities.created;
-import static org.constellation.utils.RESTfulUtilities.ok;
 import org.constellation.ws.ServiceConfigurer;
 import org.constellation.ws.WSEngine;
 import org.geotoolkit.util.FileUtilities;
@@ -71,11 +81,6 @@ import org.glassfish.jersey.jettison.JettisonUnmarshaller;
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public final class OGCServicesRest {
-    private static final Logger LOGGER = Logging.getLogger(OGCServicesRest.class);
-
-    
-    @Inject
-    private DomainRepository domainRepository;
     
     @Inject
     private ServiceRepository serviceRepository;
