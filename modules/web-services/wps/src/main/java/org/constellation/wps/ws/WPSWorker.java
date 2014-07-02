@@ -19,53 +19,6 @@
 package org.constellation.wps.ws;
 
 import com.vividsolutions.jts.geom.Geometry;
-
-import org.constellation.ServiceDef;
-import org.constellation.configuration.*;
-import org.constellation.configuration.Process;
-import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.service.RestartServiceDescriptor;
-import org.constellation.provider.DataProvider;
-import org.constellation.provider.DataProviders;
-import org.constellation.wps.utils.WPSUtils;
-import org.constellation.wps.ws.rs.WPSService;
-import org.constellation.ws.AbstractWorker;
-import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.WSEngine;
-import org.constellation.dto.Service;
-import org.constellation.admin.ConfigurationEngine;
-import org.constellation.admin.SecurityManagerAdapter;
-import org.constellation.security.SecurityManagerHolder;
-import static org.constellation.wps.ws.WPSConstant.*;
-
-import static org.constellation.api.CommonConstants.DEFAULT_CRS;
-import static org.constellation.api.QueryConstants.*;
-
-import org.constellation.ws.Worker;
-import org.geotoolkit.geometry.isoonjts.GeometryUtils;
-import org.geotoolkit.gml.JTStoGeometry;
-import org.geotoolkit.ows.xml.v110.*;
-import org.geotoolkit.ows.xml.v110.ExceptionReport;
-import org.geotoolkit.parameter.ExtendedParameterDescriptor;
-import org.geotoolkit.parameter.Parameters;
-import org.geotoolkit.process.*;
-import org.geotoolkit.referencing.CRS;
-import org.apache.sis.util.ArgumentChecks;
-import org.geotoolkit.util.FileUtilities;
-import org.geotoolkit.util.converter.NonconvertibleObjectException;
-import org.geotoolkit.wps.converters.WPSConvertersUtils;
-import org.geotoolkit.wps.io.WPSIO;
-import org.geotoolkit.wps.io.WPSMimeType;
-import org.geotoolkit.wps.xml.WPSMarshallerPool;
-import org.geotoolkit.wps.xml.v100.*;
-import org.geotoolkit.wps.xml.v100.ExecuteResponse.ProcessOutputs;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-
-import org.apache.sis.xml.MarshallerPool;
-
-import javax.measure.converter.UnitConverter;
-import javax.measure.unit.Unit;
-import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.math.BigInteger;
 import java.net.URL;
@@ -83,17 +36,59 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import javax.inject.Inject;
+import javax.measure.converter.UnitConverter;
+import javax.measure.unit.Unit;
+import javax.xml.bind.JAXBException;
+import org.apache.sis.util.ArgumentChecks;
+import org.apache.sis.util.UnconvertibleObjectException;
+import org.apache.sis.xml.MarshallerPool;
+import org.constellation.ServiceDef;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.SecurityManagerAdapter;
 import org.constellation.admin.ServiceBusiness;
+import static org.constellation.api.CommonConstants.DEFAULT_CRS;
+import static org.constellation.api.QueryConstants.*;
+import org.constellation.configuration.*;
+import org.constellation.configuration.Process;
+import org.constellation.dto.Service;
+import org.constellation.process.ConstellationProcessFactory;
+import org.constellation.process.service.RestartServiceDescriptor;
+import org.constellation.provider.DataProvider;
+import org.constellation.provider.DataProviders;
+import org.constellation.security.SecurityManagerHolder;
+import org.constellation.wps.utils.WPSUtils;
+import static org.constellation.wps.ws.WPSConstant.*;
 
-import org.opengis.parameter.ParameterValue;
-import org.opengis.coverage.grid.GridCoverage;
+import org.constellation.wps.ws.rs.WPSService;
+import org.constellation.ws.AbstractWorker;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.WSEngine;
+import org.constellation.ws.Worker;
 import org.geotoolkit.feature.ComplexAttribute;
 import org.geotoolkit.feature.Feature;
 import org.geotoolkit.feature.type.FeatureType;
+import org.geotoolkit.geometry.isoonjts.GeometryUtils;
+import org.geotoolkit.gml.JTStoGeometry;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.ows.xml.v110.*;
+import org.geotoolkit.ows.xml.v110.ExceptionReport;
+import org.geotoolkit.parameter.ExtendedParameterDescriptor;
+import org.geotoolkit.parameter.Parameters;
+import org.geotoolkit.process.*;
+import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.util.FileUtilities;
+import org.geotoolkit.wps.converters.WPSConvertersUtils;
+import org.geotoolkit.wps.io.WPSIO;
+import org.geotoolkit.wps.io.WPSMimeType;
+import org.geotoolkit.wps.xml.WPSMarshallerPool;
+import org.geotoolkit.wps.xml.v100.*;
+import org.geotoolkit.wps.xml.v100.ExecuteResponse.ProcessOutputs;
+import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.geometry.Envelope;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.FactoryException;
@@ -1229,7 +1224,7 @@ public class WPSWorker extends AbstractWorker {
                 }
                 try {
                     dataValue = WPSConvertersUtils.convertFromReference(requestedRef, expectedClass);
-                } catch (NonconvertibleObjectException ex) {
+                } catch (UnconvertibleObjectException ex) {
                     LOGGER.log(Level.WARNING, "Error during conversion of reference input {0}.",inputIdentifier);
                     throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
                 }
@@ -1286,7 +1281,7 @@ public class WPSWorker extends AbstractWorker {
 
                     try {
                         dataValue = WPSConvertersUtils.convertFromComplex(complex, expectedClass);
-                    } catch (NonconvertibleObjectException ex) {
+                    } catch (UnconvertibleObjectException ex) {
                         LOGGER.log(Level.WARNING, "Error during conversion of complex input {0}.",inputIdentifier);
                         throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
                     }
@@ -1319,7 +1314,7 @@ public class WPSWorker extends AbstractWorker {
 
                     try {
                         dataValue = WPSConvertersUtils.convertFromString(data, expectedClass);
-                    } catch (NonconvertibleObjectException ex) {
+                    } catch (UnconvertibleObjectException ex) {
                         LOGGER.log(Level.WARNING, "Error during conversion of literal input {0}.",inputIdentifier);
                         throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
                     }
@@ -1471,7 +1466,7 @@ public class WPSWorker extends AbstractWorker {
 
                     data.setComplexData(complex);
 
-                } catch (NonconvertibleObjectException ex) {
+                } catch (UnconvertibleObjectException ex) {
                     LOGGER.log(Level.WARNING, "Error during conversion of complex output {0}.", outputIdentifier);
                     throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
                 }
@@ -1543,7 +1538,7 @@ public class WPSWorker extends AbstractWorker {
                     parameters,
                     WPSIO.IOType.OUTPUT);
 
-        } catch (NonconvertibleObjectException ex) {
+        } catch (UnconvertibleObjectException ex) {
             LOGGER.log(Level.WARNING, "Error during conversion of reference output {0}.", outputIdentifier);
             throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
         }

@@ -26,9 +26,7 @@ import java.awt.Color;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.SwingConstants;
-import org.constellation.configuration.PositionableDecoration;
-import org.geotoolkit.util.Converters;
+import org.apache.sis.util.ObjectConverters;
 import org.apache.sis.util.logging.Logging;
 
 /**
@@ -56,7 +54,7 @@ public final class WMSPortrayalUtils {
     public static Color parseColor(final String strColor, final Float strOpacity, final Color fallback){
         if(strColor == null) return fallback;
 
-        Color color = Converters.convert(strColor, Color.class);
+        Color color = ObjectConverters.convert(strColor, Color.class);
 
         if(color == null) return fallback;
 
