@@ -43,7 +43,7 @@ import org.constellation.ServiceDef.Version;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.FormatURL;
 import org.constellation.configuration.Layer;
-import org.constellation.dto.Details;
+import org.constellation.dto.Service;
 import org.constellation.provider.Data;
 import org.constellation.provider.FeatureData;
 import org.constellation.security.SecurityManagerHolder;
@@ -280,7 +280,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             return (WFSCapabilities) cachedCapabilities.applySections(sections);
         }
 
-        final Details skeleton = getStaticCapabilitiesObject("WFS", null);
+        final Service skeleton = getStaticCapabilitiesObject("WFS", null);
         final WFSCapabilities inCapabilities = WFSConstants.createCapabilities(currentVersion, skeleton);
         
         final FeatureTypeList ftl = buildFeatureTypeList(currentVersion);

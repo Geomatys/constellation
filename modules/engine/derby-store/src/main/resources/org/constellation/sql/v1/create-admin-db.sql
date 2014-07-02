@@ -280,7 +280,7 @@ CREATE TABLE "admin"."service_extra_config"(
 ALTER TABLE "admin"."service_extra_config" ADD CONSTRAINT service_extra_config_pk  PRIMARY KEY ("id", "filename");
 ALTER TABLE "admin"."service_extra_config" ADD CONSTRAINT service_extra_config_service_fk FOREIGN KEY ("id") REFERENCES "admin"."service"("id");
 
-CREATE TABLE "admin"."service_details"(
+CREATE TABLE "admin"."service_metadata"(
   "id"            INTEGER     NOT NULL,
   "lang"          VARCHAR(3) NOT NULL,
   "content"       CLOB,
@@ -288,8 +288,8 @@ CREATE TABLE "admin"."service_details"(
 
 );
 
-ALTER TABLE "admin"."service_details" ADD CONSTRAINT service_details_pk  PRIMARY KEY ("id", "lang");
-ALTER TABLE "admin"."service_details" ADD CONSTRAINT service_details_service_fk FOREIGN KEY ("id") REFERENCES "admin"."service"("id") ON DELETE CASCADE;
+ALTER TABLE "admin"."service_metadata" ADD CONSTRAINT service_metadata_pk  PRIMARY KEY ("id", "lang");
+ALTER TABLE "admin"."service_metadata" ADD CONSTRAINT service_metadata_service_fk FOREIGN KEY ("id") REFERENCES "admin"."service"("id") ON DELETE CASCADE;
 
 
 -- service items

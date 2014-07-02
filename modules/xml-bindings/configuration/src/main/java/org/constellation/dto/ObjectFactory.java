@@ -32,8 +32,8 @@ public class ObjectFactory {
     public ObjectFactory() {
     }
 
-    public Details createService(){
-        return new Details();
+    public Service createService(){
+        return new Service();
     }
 
     public MetadataLists createMetadataLists() {

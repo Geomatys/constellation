@@ -19,11 +19,13 @@
 
 package org.constellation.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 //import juzu.Mapped;
 
 /**
  * Access constraint part on getCapabilities service section.
- * It's a DTO used from Juzu to constellation server side. it's {@link Details} part.
+ * It's a DTO used from Juzu to constellation server side. it's {@link org.constellation.dto.Service} part.
  *
  * @author Benjamin Garcia (Geomatys)
  * @version 0.9

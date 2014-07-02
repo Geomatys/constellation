@@ -57,7 +57,7 @@ import org.constellation.configuration.SOSConfiguration;
 import org.constellation.configuration.ServiceReport;
 import org.constellation.configuration.ServiceStatus;
 import org.constellation.configuration.WebdavContext;
-import org.constellation.dto.Details;
+import org.constellation.dto.Service;
 import org.constellation.dto.SimpleValue;
 import org.constellation.engine.register.repository.ServiceRepository;
 import org.constellation.generic.database.Automatic;
@@ -159,7 +159,7 @@ public final class OGCServicesRest {
      */
     @PUT
     @Path("domain/{domainId}")
-    public Response addInstance(@PathParam("domainId") int domainId, final @PathParam("spec") String spec, final Details metadata) throws ConfigurationException {
+    public Response addInstance(@PathParam("domainId") int domainId, final @PathParam("spec") String spec, final Service metadata) throws ConfigurationException {
         
         org.constellation.engine.register.Service service = serviceRepository.findByIdentifierAndType(metadata.getIdentifier(), spec);
         if(service != null) {
@@ -288,7 +288,7 @@ public final class OGCServicesRest {
             final Object config = um.unmarshal(configuration);
             GenericDatabaseMarshallerPool.getInstance().recycle(um);
             
-            final Details metadata = serviceBusiness.getInstanceDetails(serviceType, id, null);
+            final Service metadata = serviceBusiness.getInstanceMetadata(serviceType, id, null);
             serviceBusiness.configure(serviceType, id, metadata, config);
         } catch (JAXBException ex) {
             throw new ConfigurationException("Error while unmarshalling configuration object.", ex);
@@ -337,7 +337,7 @@ public final class OGCServicesRest {
                 return ok(AcknowlegementType.failure("Unknown configuration object given, unable to update service configuration"));
             }
             final Object configObj = jsonUnmarshaller.unmarshalFromJSON(new StringReader(json), c);
-            final Details metadata = serviceBusiness.getInstanceDetails(serviceType, id, null);
+            final Service metadata = serviceBusiness.getInstanceMetadata(serviceType, id, null);
             serviceBusiness.configure(serviceType, id, metadata, configObj);
         } catch (JAXBException | IOException e) {
             throw new ConfigurationException(e);
@@ -359,7 +359,7 @@ public final class OGCServicesRest {
     public Response getMetadata(final @PathParam("spec") String serviceType, final @PathParam("id") String id, final @PathParam("lang") String lang) throws ConfigurationException {
         serviceBusiness.ensureExistingInstance(serviceType, id);
         // todo add language parameter
-        return ok(serviceBusiness.getInstanceDetails(serviceType, id, lang));
+        return ok(serviceBusiness.getInstanceMetadata(serviceType, id, lang));
     }
 
     /**
@@ -373,7 +373,7 @@ public final class OGCServicesRest {
      */
     @POST
     @Path("{id}/metadata")
-    public Response setMetadata(final @PathParam("spec") String serviceType, final @PathParam("id") String id, final Details metadata) throws ConfigurationException {
+    public Response setMetadata(final @PathParam("spec") String serviceType, final @PathParam("id") String id, final Service metadata) throws ConfigurationException {
         serviceBusiness.ensureExistingInstance(serviceType, id);
         final Object config = serviceBusiness.getConfiguration(serviceType, id);
         serviceBusiness.configure(serviceType, id, metadata, config);

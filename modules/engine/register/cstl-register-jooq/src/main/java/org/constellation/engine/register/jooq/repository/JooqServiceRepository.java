@@ -40,7 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static org.constellation.engine.register.jooq.Tables.*;
-import org.constellation.engine.register.jooq.tables.records.ServiceDetailsRecord;
+import org.constellation.engine.register.jooq.tables.records.ServiceMetadataRecord;
 
 @Component
 public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord, Service> implements ServiceRepository {
@@ -68,7 +68,7 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
 
     @Override
     public void delete(Integer id) {
-        dsl.delete(SERVICE_DETAILS).where(SERVICE_DETAILS.ID.eq(id)).execute();
+        dsl.delete(SERVICE_METADATA).where(SERVICE_METADATA.ID.eq(id)).execute();
         dsl.delete(SERVICE_EXTRA_CONFIG).where(SERVICE_EXTRA_CONFIG.ID.eq(id)).execute();
         dsl.delete(SERVICE).where(SERVICE.ID.eq(id)).execute();
     }
@@ -101,23 +101,23 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
     }
 
     @Override
-    public ServiceDetails getServiceDetails(int serviceId, String language) {
-        return dsl.select().from(SERVICE_DETAILS).where(SERVICE_DETAILS.ID.eq(serviceId)).and(SERVICE_DETAILS.LANG.eq(language)).fetchOneInto(ServiceDetails.class);
+    public ServiceMetadata getServiceDetails(int serviceId, String language) {
+        return dsl.select().from(SERVICE_METADATA).where(SERVICE_METADATA.ID.eq(serviceId)).and(SERVICE_METADATA.LANG.eq(language)).fetchOneInto(ServiceMetadata.class);
     }
     
     @Override
-    public void createOrUpdateServiceDetails(ServiceDetails details) {
-        final ServiceDetails serviceMetadata = getServiceDetails(details.getId(), details.getLang());
+    public void createOrUpdateServiceDetails(ServiceMetadata metadata) {
+        final ServiceMetadata serviceMetadata = getServiceDetails(metadata.getId(), metadata.getLang());
         if (serviceMetadata!=null){
-            dsl.update(SERVICE_DETAILS).set(SERVICE_DETAILS.CONTENT, details.getContent())
-                    .set(SERVICE_DETAILS.DEFAULT_LANG, details.isDefaultLang())
-                    .where(SERVICE_DETAILS.ID.eq(details.getId()))
-                    .and(SERVICE_DETAILS.LANG.eq(details.getLang())).execute();
+            dsl.update(SERVICE_METADATA).set(SERVICE_METADATA.CONTENT, metadata.getContent())
+                    .set(SERVICE_METADATA.DEFAULT_LANG, metadata.isDefaultLang())
+                    .where(SERVICE_METADATA.ID.eq(metadata.getId()))
+                    .and(SERVICE_METADATA.LANG.eq(metadata.getLang())).execute();
         } else {
-            ServiceDetailsRecord newRecord = dsl.newRecord(SERVICE_DETAILS);
-            newRecord.setContent(details.getContent());
-            newRecord.setLang(details.getLang());
-            newRecord.setId(details.getId());
+            ServiceMetadataRecord newRecord = dsl.newRecord(SERVICE_METADATA);
+            newRecord.setContent(metadata.getContent());
+            newRecord.setLang(metadata.getLang());
+            newRecord.setId(metadata.getId());
             newRecord.store();
         }
     }

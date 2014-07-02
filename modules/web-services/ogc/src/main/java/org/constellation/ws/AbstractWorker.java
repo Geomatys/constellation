@@ -19,6 +19,7 @@
 package org.constellation.ws;
 
 //J2SE dependencies
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -31,12 +32,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 
+import javax.xml.bind.JAXBException;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import org.constellation.ServiceDef;
 import org.constellation.ServiceDef.Specification;
-import org.constellation.dto.Details;
 import org.constellation.ws.security.SimplePDP;
 import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
@@ -45,9 +46,11 @@ import org.apache.sis.util.Version;
 import org.apache.sis.internal.util.UnmodifiableArrayList;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.ConfigurationException;
+import org.constellation.dto.Service;
 
 import org.constellation.security.SecurityManagerHolder;
 
@@ -96,7 +99,7 @@ public abstract class AbstractWorker implements Worker {
     /**
      * A map containing the Capabilities Object already loaded from file.
      */
-    private final Map<String, Details> capabilities = Collections.synchronizedMap(new HashMap<String,Details>());
+    private final Map<String, Service> capabilities = Collections.synchronizedMap(new HashMap<String,Service>());
 
     /**
      * Output responses of a GetCapabilities request.
@@ -338,17 +341,17 @@ public abstract class AbstractWorker implements Worker {
      *
      * @throws CstlServiceException if an error occurs during the unmarshall of the document.
      */
-    protected Details getStaticCapabilitiesObject(final String service, final String language) throws CstlServiceException {
+    protected Service getStaticCapabilitiesObject(final String service, final String language) throws CstlServiceException {
         final String key;
         if (language == null) {
             key = getId() + service;
         } else {
             key = getId() + service + "-" + language;
         }
-        Details metadata = capabilities.get(key);
+        Service metadata = capabilities.get(key);
         if (metadata == null) {
             try {
-                metadata = serviceBusiness.getInstanceDetails(service, getId(), language);
+                metadata = serviceBusiness.getInstanceMetadata(service, getId(), language);
                 capabilities.put(key, metadata);
             } catch (ConfigurationException ex) {
                 LOGGER.log(Level.WARNING, "An error occurred when trying to read the service metadata. Returning default capabilities.", ex);

@@ -23,7 +23,7 @@ package org.constellation.dto;
 
 /**
  * Contact part on getCapabilities service section.
- * It's a DTO used from Juzu to constellation server side. It's {@link Details} part.
+ * It's a DTO used from Juzu to constellation server side. It's {@link org.constellation.dto.Service} part.
  *
  * @author Benjamin Garcia (Geomatys)
  * @version 0.9

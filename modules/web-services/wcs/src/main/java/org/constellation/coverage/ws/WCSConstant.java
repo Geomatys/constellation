@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.constellation.dto.Details;
+import org.constellation.dto.Service;
 import org.constellation.ws.MimeType;
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
@@ -269,7 +269,7 @@ public final class WCSConstant {
      * @param metadata the service metadata
      * @return the service base capabilities
      */
-    public static GetCapabilitiesResponse createCapabilities(final String version, final Details metadata) {
+    public static GetCapabilitiesResponse createCapabilities(final String version, final Service metadata) {
         ensureNonNull("metadata", metadata);
         ensureNonNull("version",  version);
 

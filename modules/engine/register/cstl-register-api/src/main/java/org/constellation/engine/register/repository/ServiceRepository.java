@@ -45,9 +45,9 @@ public interface ServiceRepository {
 
     List<String> findIdentifiersByType(String type);
 
-    ServiceDetails getServiceDetails(int serviceId, String language);
+    ServiceMetadata getServiceDetails(int serviceId, String language);
     
-    void createOrUpdateServiceDetails(ServiceDetails details);
+    void createOrUpdateServiceDetails(ServiceMetadata metadata);
 
     List<ServiceExtraConfig> getExtraConfig(int id);
     

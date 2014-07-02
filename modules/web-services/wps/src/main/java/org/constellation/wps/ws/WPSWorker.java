@@ -66,7 +66,7 @@ import org.constellation.configuration.Process;
 import org.constellation.configuration.ProcessContext;
 import org.constellation.configuration.ProcessFactory;
 import org.constellation.configuration.WebdavContext;
-import org.constellation.dto.Details;
+import org.constellation.dto.Service;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.service.RestartServiceDescriptor;
 import org.constellation.provider.DataProvider;
@@ -559,7 +559,7 @@ public class WPSWorker extends AbstractWorker {
             }
 
             // We unmarshall the static capabilities document.
-            final Details skeleton = getStaticCapabilitiesObject("WPS", null);
+            final Service skeleton = getStaticCapabilitiesObject("WPS", null);
             final WPSCapabilitiesType staticCapabilities = (WPSCapabilitiesType) WPSConstant.createCapabilities("1.0.0", skeleton);
 
             final ServiceIdentification si = staticCapabilities.getServiceIdentification();

@@ -33,7 +33,7 @@ import org.constellation.Cstl;
 import org.constellation.ServiceDef;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.configuration.*;
-import org.constellation.dto.Details;
+import org.constellation.dto.Service;
 import org.constellation.map.featureinfo.FeatureInfoFormat;
 import org.constellation.map.featureinfo.FeatureInfoUtilities;
 import org.constellation.portrayal.PortrayalUtil;
@@ -256,7 +256,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             return (AbstractWMSCapabilities) cachedCapabilities;
         }
 
-        final Details skeleton = getStaticCapabilitiesObject("wms", currentLanguage);
+        final Service skeleton = getStaticCapabilitiesObject("wms", currentLanguage);
         final AbstractWMSCapabilities inCapabilities = WMSConstant.createCapabilities(queryVersion, skeleton);
 
         final AbstractRequest request;

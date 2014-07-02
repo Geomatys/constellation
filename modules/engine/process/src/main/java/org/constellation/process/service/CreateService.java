@@ -19,7 +19,7 @@
 package org.constellation.process.service;
 
 import org.constellation.configuration.ConfigurationException;
-import org.constellation.dto.Details;
+import org.constellation.dto.Service;
 import org.constellation.process.AbstractCstlProcess;
 import static org.constellation.process.service.CreateServiceDescriptor.*;
 
@@ -55,10 +55,10 @@ public class CreateService extends AbstractCstlProcess {
         final String serviceType       = value(SERVICE_TYPE, inputParameters);
         final String identifier        = value(IDENTIFIER, inputParameters);
         Object configuration           = value(CONFIGURATION, inputParameters);
-        final Details detailsMetadata = value(SERVICE_METADATA, inputParameters);
+        final Service serviceMetadata  = value(SERVICE_METADATA, inputParameters);
 
         try {
-            configuration = serviceBusiness.create(serviceType.toLowerCase(), identifier, configuration, detailsMetadata,null);
+            configuration = serviceBusiness.create(serviceType.toLowerCase(), identifier, configuration, serviceMetadata,null);
 
         } catch (ConfigurationException ex) {
             throw new ProcessException(ex.getMessage(), this, ex);

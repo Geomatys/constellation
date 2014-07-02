@@ -40,7 +40,7 @@ import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
-import org.constellation.dto.Details;
+import org.constellation.dto.Service;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.security.SecurityManagerHolder;
@@ -623,7 +623,7 @@ public class SOSworker extends AbstractWorker {
         }
 
         // we load the skeleton capabilities
-        final Details skeleton = getStaticCapabilitiesObject("sos", null);
+        final Service skeleton = getStaticCapabilitiesObject("sos", null);
         final Capabilities skeletonCapabilities = SOSConstants.createCapabilities(currentVersion, skeleton);
         
 

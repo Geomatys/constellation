@@ -49,7 +49,6 @@ import org.apache.lucene.search.SortField;
 import org.apache.sis.util.logging.MonolineFormatter;
 import org.constellation.ServiceDef;
 import org.constellation.configuration.DataSourceType;
-import org.constellation.dto.Details;
 import org.constellation.filter.FilterParser;
 import org.constellation.filter.FilterParserException;
 import org.constellation.filter.SQLQuery;
@@ -97,6 +96,7 @@ import org.geotoolkit.ows.xml.v100.SectionsType;
 import org.geotoolkit.util.StringUtilities;
 import org.apache.sis.xml.MarshallerPool;
 import org.apache.sis.xml.Namespaces;
+import org.constellation.dto.Service;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.metadata.io.MetadataType;
@@ -521,7 +521,7 @@ public class CSWworker extends AbstractWorker {
         */
 
         // we load the skeleton capabilities
-        final Details skeleton = getStaticCapabilitiesObject("csw", null);
+        final Service skeleton = getStaticCapabilitiesObject("csw", null);
         final AbstractCapabilities skeletonCapabilities = CSWConstants.createCapabilities("2.0.2", skeleton);
 
         //we prepare the response document
