@@ -77,7 +77,7 @@
                             <label class="control-label col-sm-2 new-service-form-label" translate="service.description.tab.description.tags">Tags</label>
                             <div class="col-sm-8 col-md-6">
                                 <div class="tag-input-ctn">
-                                    <div data-ng-repeat="(key, tag) in metadata.keywords" class="input-tag">
+                                    <div data-ng-repeat="(key, tag) in metadata.keywords track by $index" class="input-tag">
                                         {{ tag }}
                                         <div class="delete-tag" data-ng-click="deleteTag(key)">&times;</div>
                                     </div>

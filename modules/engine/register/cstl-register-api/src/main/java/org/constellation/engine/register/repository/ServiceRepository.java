@@ -45,9 +45,9 @@ public interface ServiceRepository {
 
     List<String> findIdentifiersByType(String type);
 
-    ServiceMetadata findMetaDataForLang(int serviceId, String language);
+    ServiceMetadata getServiceDetails(int serviceId, String language);
     
-    void writeMetadataForLang(ServiceMetadata metadata);
+    void createOrUpdateServiceDetails(ServiceMetadata metadata);
 
     List<ServiceExtraConfig> getExtraConfig(int id);
     
@@ -55,13 +55,13 @@ public interface ServiceRepository {
 
     java.util.Map<String, Set<String>> getAccessiblesServicesByType(int domainId, String name);
 
-    Service save(Service service);
+    Service update(Service service);
 
     Service updateConfig(Service service);
 
     void updateExtraFile(Service service, String fileName, String config);
 
-    int updateIsoMetadata(Service service, String fileIdentifier, String string);
+//    int updateIsoMetadata(Service service, String fileIdentifier, String string);
 
     Map<Domain, Boolean> getLinkedDomains(int serviceId);
 
@@ -69,5 +69,9 @@ public interface ServiceRepository {
 
     List<Data> findDataByServiceId(Integer id);
     
-    ServiceWithI18N i18n(Service service);
+    ServiceI18n getI18n(Integer id, String lang);
+
+    void create(ServiceI18n serviceI18n);
+
+    void update(ServiceI18n serviceI18n);
 }

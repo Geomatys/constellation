@@ -27,7 +27,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.constellation.engine.register.*;
-import org.constellation.engine.register.i18n.ServiceWithI18N;
 import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.tables.records.ServiceExtraConfigRecord;
 import org.constellation.engine.register.jooq.tables.records.ServiceRecord;
@@ -75,12 +74,12 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
     }
 
     @Override
-    public Service save(Service service) {
+    public Service update(Service service) {
         dsl.update(SERVICE)
                 .set(SERVICE.DATE, service.getDate())
                 .set(SERVICE.CONFIG, service.getConfig())
                 .set(SERVICE.IDENTIFIER, service.getIdentifier())
-                .set(SERVICE.METADATA, service.getMetadata())
+                .set(SERVICE.METADATA_ISO, service.getMetadataIso())
                 .set(SERVICE.METADATA_ID, service.getMetadataId())
                 .set(SERVICE.OWNER, service.getOwner())
                 .set(SERVICE.STATUS, service.getStatus())
@@ -102,17 +101,25 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
     }
 
     @Override
-    public ServiceMetadata findMetaDataForLang(int serviceId, String language) {
+    public ServiceMetadata getServiceDetails(int serviceId, String language) {
         return dsl.select().from(SERVICE_METADATA).where(SERVICE_METADATA.ID.eq(serviceId)).and(SERVICE_METADATA.LANG.eq(language)).fetchOneInto(ServiceMetadata.class);
     }
     
     @Override
-    public void writeMetadataForLang(ServiceMetadata metadata) {
-        ServiceMetadataRecord newRecord = dsl.newRecord(SERVICE_METADATA);
-        newRecord.setContent(metadata.getContent());
-        newRecord.setLang(metadata.getLang());
-        newRecord.setId(metadata.getId());
-        newRecord.store();
+    public void createOrUpdateServiceDetails(ServiceMetadata metadata) {
+        final ServiceMetadata serviceMetadata = getServiceDetails(metadata.getId(), metadata.getLang());
+        if (serviceMetadata!=null){
+            dsl.update(SERVICE_METADATA).set(SERVICE_METADATA.CONTENT, metadata.getContent())
+                    .set(SERVICE_METADATA.DEFAULT_LANG, metadata.isDefaultLang())
+                    .where(SERVICE_METADATA.ID.eq(metadata.getId()))
+                    .and(SERVICE_METADATA.LANG.eq(metadata.getLang())).execute();
+        } else {
+            ServiceMetadataRecord newRecord = dsl.newRecord(SERVICE_METADATA);
+            newRecord.setContent(metadata.getContent());
+            newRecord.setLang(metadata.getLang());
+            newRecord.setId(metadata.getId());
+            newRecord.store();
+        }
     }
 
     @Override
@@ -149,11 +156,11 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
 
     }
 
-    @Override
-    public int updateIsoMetadata(Service service, String metadataId, String metadata) {
-        return dsl.update(SERVICE).set(SERVICE.METADATA_ID, metadataId).set(SERVICE.METADATA, metadata)
-                .where(SERVICE.ID.eq(service.getId())).execute();
-    }
+//    @Override
+//    public int updateIsoMetadata(Service service, String metadataId, String metadata) {
+//        return dsl.update(SERVICE).set(SERVICE.METADATA_ID, metadataId).set(SERVICE.METADATA, metadata)
+//                .where(SERVICE.ID.eq(service.getId())).execute();
+//    }
 
     @Override
     public Map<String, Set<String>> getAccessiblesServicesByType(int domainId, String userName) {
@@ -189,7 +196,7 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
 		serviceRecord.setConfig(service.getConfig());
 		serviceRecord.setDate(service.getDate());
 		serviceRecord.setIdentifier(service.getIdentifier());
-		serviceRecord.setMetadata(service.getMetadata());
+		serviceRecord.setMetadataIso(service.getMetadataIso());
 		serviceRecord.setMetadataId(service.getMetadataId());
 		serviceRecord.setType(service.getType());
 		serviceRecord.setOwner(service.getOwner());
@@ -225,6 +232,8 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
         .fetchInto(Data.class);
     }
 
+
+
     @Override
     public List<Service> findByDomain(int domainId) {
         return findBy(SERVICE.ID.in(dsl.select(Tables.SERVICE_X_DOMAIN.SERVICE_ID).from(SERVICE_X_DOMAIN)
@@ -232,9 +241,51 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
     }
 
     @Override
-    public ServiceWithI18N i18n(Service service) {
-        
-        return null;
+    public ServiceI18n getI18n(Integer id, String lang) {
+        ServiceI18n serviceI18n;
+        if (lang != null){
+            serviceI18n = dsl.select().from(Tables.SERVICE_I18N).where(SERVICE_I18N.SERVICE_ID.eq(id))
+                    .and(SERVICE_I18N.LANG.eq(lang)).fetchOneInto(ServiceI18n.class);
+            if (serviceI18n==null){
+                final List<ServiceI18n> serviceI18ns = getAllI18n(id);
+                if (serviceI18ns == null){
+                    return null;
+                } else {
+                    serviceI18n = serviceI18ns.get(0);
+                }
+            }
+        } else {
+            final List<ServiceI18n> serviceI18ns = getAllI18n(id);
+            if (serviceI18ns == null || serviceI18ns.size()==0){
+                return null;
+            } else {
+                serviceI18n = serviceI18ns.get(0);
+            }
+        }
+        return serviceI18n;
+    }
+
+    private List<ServiceI18n> getAllI18n(Integer serviceId){
+        return dsl.select().from(Tables.SERVICE_I18N).where(SERVICE_I18N.SERVICE_ID.eq(serviceId)).fetchInto(ServiceI18n.class);
+    }
+
+    @Override
+    public void create(ServiceI18n serviceI18n) {
+        dsl.insertInto(Tables.SERVICE_I18N).set(SERVICE_I18N.DESCRIPTION, serviceI18n.getDescription())
+                .set(SERVICE_I18N.SERVICE_ID, serviceI18n.getServiceId())
+                .set(SERVICE_I18N.LANG, serviceI18n.getLang())
+                .set(SERVICE_I18N.TITLE, serviceI18n.getTitle()).execute();
+    }
+
+    @Override
+    public void update(ServiceI18n serviceI18n) {
+        dsl.update(SERVICE_I18N).set(SERVICE_I18N.LANG, serviceI18n.getLang())
+                .set(SERVICE_I18N.SERVICE_ID, serviceI18n.getServiceId())
+                .set(SERVICE_I18N.TITLE, serviceI18n.getTitle())
+                .set(SERVICE_I18N.DESCRIPTION, serviceI18n.getDescription())
+                .where(SERVICE_I18N.SERVICE_ID.eq(serviceI18n.getServiceId()))
+                .and(SERVICE_I18N.LANG.eq(serviceI18n.getLang()))
+                .execute();
     }
 
 }

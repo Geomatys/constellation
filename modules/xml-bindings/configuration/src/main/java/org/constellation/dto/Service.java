@@ -48,6 +48,8 @@ public class Service {
 
     private List<String> versions;
 
+    private String lang;
+
     private Contact serviceContact;
 
     private AccessConstraint serviceConstraints;
@@ -57,9 +59,11 @@ public class Service {
     public Service() {
     }
 
+
+
     public Service(final String name, final String identifier, final List<String> keywords,
                    final String description, final List<String> versions, final Contact serviceContact,
-                   final AccessConstraint serviceConstraints, final boolean transactionnal) {
+                   final AccessConstraint serviceConstraints, final boolean transactionnal, final String lang) {
         this.description = description;
         this.identifier  = identifier;
         this.keywords    = keywords;
@@ -68,6 +72,15 @@ public class Service {
         this.serviceContact = serviceContact;
         this.versions = versions;
         this.transactional = transactionnal;
+        this.lang = lang;
+    }
+
+    public String getLang() {
+        return lang;
+    }
+
+    public void setLang(String lang) {
+        this.lang = lang;
     }
 
     public String getName() {

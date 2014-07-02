@@ -16,8 +16,9 @@ public class ServiceDTO {
     private String config;
     private String owner;
     private String status;
-    private String metadata;
+    private String metadataIso;
     private String metadataId;
+    private String versions;
  
     
     
@@ -75,11 +76,11 @@ public class ServiceDTO {
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	public String getMetadata() {
-		return metadata;
+	public String getMetadataIso() {
+		return metadataIso;
 	}
-	public void setMetadata(String metadata) {
-		this.metadata = metadata;
+	public void setMetadataIso(String metadataIso) {
+		this.metadataIso = metadataIso;
 	}
 	public String getMetadataId() {
 		return metadataId;
@@ -87,6 +88,13 @@ public class ServiceDTO {
 	public void setMetadataId(String metadataId) {
 		this.metadataId = metadataId;
 	}
+    public String getVersions() {
+        return versions;
+    }
+
+    public void setVersions(String versions) {
+        this.versions = versions;
+    }
 	
 	@Override
 	public String toString() {
@@ -94,7 +102,7 @@ public class ServiceDTO {
 				+ ", type=" + type + ", date=" + date + ", title=" + title
 				+ ", description=" + description + ", config=" + config
 				+ ", owner=" + owner + ", status=" + status + ", metadata="
-				+ metadata + ", metadataId=" + metadataId + "]";
+				+ metadataIso + ", metadataId=" + metadataId + "]";
 	}
 
 }

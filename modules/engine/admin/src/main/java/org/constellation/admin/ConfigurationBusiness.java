@@ -57,13 +57,13 @@ public class ConfigurationBusiness {
         try {
             final List<Service> records = serviceRepository.findAll();
             for (Service record : records) {
-                if (record.getMetadata() != null) {
-                    final DefaultMetadata servMeta = MetadataIOUtils.unmarshallMetadata(record.getMetadata());
+                if (record.getMetadataIso() != null) {
+                    final DefaultMetadata servMeta = MetadataIOUtils.unmarshallMetadata(record.getMetadataIso());
                     CstlMetadatas.updateServiceMetadataURL(record.getIdentifier(), record.getType(), url, servMeta);
                     final String xml = MetadataIOUtils.marshallMetadataToString(servMeta);
                     record.setMetadataId(servMeta.getFileIdentifier());
-                    record.setMetadata(xml);
-                    serviceRepository.save(record);
+                    record.setMetadataIso(xml);
+                    serviceRepository.update(record);
                 }
             }
         } catch (JAXBException ex) {

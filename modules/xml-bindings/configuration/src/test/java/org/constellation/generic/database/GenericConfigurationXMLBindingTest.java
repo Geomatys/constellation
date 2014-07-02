@@ -553,7 +553,7 @@ public class GenericConfigurationXMLBindingTest {
 
         final Contact ctc = new Contact("firstname", "lastname", "org1", "pos1", "0600", "0800", "test@jj.com", "adr1", "city1", "state1", "34000", "france", "url1", null, null);
         final AccessConstraint cstr = new AccessConstraint("fees1", "constraint1", 5, 200, 300);
-        final Service service = new Service("name1", "id1", Arrays.asList("kw1", "kw2"), "desc1", Arrays.asList("1.0.0", "2.0.0"), ctc, cstr, false);
+        final Service service = new Service("name1", "id1", Arrays.asList("kw1", "kw2"), "desc1", Arrays.asList("1.0.0", "2.0.0"), ctc, cstr, false, "FR");
 
         StringWriter sw = new StringWriter();
         marshaller.marshal(service, sw);

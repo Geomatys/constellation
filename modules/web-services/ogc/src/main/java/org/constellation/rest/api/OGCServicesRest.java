@@ -89,11 +89,28 @@ public final class OGCServicesRest {
     private ServiceBusiness serviceBusiness;
     
     /**
+     * Find and returns a i18n service {@link Instance}.
+     *
+     * @param serviceType The type of the service.
+     * @param identifier the service identifier.
+     * @param lang the language of current user
+     *
+     * 
+     * @return an {@link Instance} instance
+     */
+    @GET
+    @Path("{id}/{lang}")
+    public Response getInstance(final @PathParam("spec") String serviceType, final @PathParam("id") String identifier, final @PathParam("lang") String lang) throws ConfigurationException {
+        Instance instance = serviceBusiness.getI18nInstance(serviceType, identifier, lang);
+        return ok(instance);
+    }
+
+    /**
      * Find and returns a service {@link Instance}.
      *
      * @param serviceType The type of the service.
      * @param id the service identifier
-     * 
+     *
      * @return an {@link Instance} instance
      */
     @GET
@@ -338,11 +355,11 @@ public final class OGCServicesRest {
      * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
     @GET
-    @Path("{id}/metadata")
-    public Response getMetadata(final @PathParam("spec") String serviceType, final @PathParam("id") String id) throws ConfigurationException {
+    @Path("{id}/metadata/{lang}")
+    public Response getMetadata(final @PathParam("spec") String serviceType, final @PathParam("id") String id, final @PathParam("lang") String lang) throws ConfigurationException {
         serviceBusiness.ensureExistingInstance(serviceType, id);
         // todo add language parameter
-        return ok(serviceBusiness.getInstanceMetadata(serviceType, id, null));
+        return ok(serviceBusiness.getInstanceMetadata(serviceType, id, lang));
     }
 
     /**

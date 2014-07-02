@@ -15,8 +15,8 @@
  */
 'use strict';
 
-cstlAdminApp.controller('WebServiceController', ['$scope', 'webService', 'provider', 'csw', 'sos', '$modal', 'textService', '$growl',
-    function ($scope, webService, provider, csw, sos, $modal, textService, $growl) {
+cstlAdminApp.controller('WebServiceController', ['$scope', 'webService', 'provider', 'csw', 'sos', '$modal', 'textService', '$growl','$translate',
+    function ($scope, webService, provider, csw, sos, $modal, textService, $growl, $translate) {
 
 
         $scope.typeFilter = {type: '!WEBDAV'};
@@ -26,7 +26,12 @@ cstlAdminApp.controller('WebServiceController', ['$scope', 'webService', 'provid
           templateUrl: 'views/modalLoader.html',
           controller: 'ModalInstanceCtrl'
         });
-        webService.listAll(function(response){
+
+        $scope.getCurrentLang = function() {
+            return $translate.use();
+        };
+
+        webService.listAll({lang: $scope.getCurrentLang()}, function(response){
             $scope.services = response;
             modalLoader.close();
         });
@@ -86,14 +91,14 @@ cstlAdminApp.controller('WebServiceController', ['$scope', 'webService', 'provid
             if(service.status==='STARTED'){
                 webService.stop({type: service.type, id: service.identifier}, {}, function(response) {
                     if (response.status==="Success") {
-                        $scope.services = webService.listAll();
+                        $scope.services = webService.listAll({lang: $scope.getCurrentLang()});
                         $growl('success','Success','Service '+ service.name +' successfully stopped');
                     }
                 }, function() { $growl('error','Error','Service '+ service.name +' stop failed'); });
             }else{
                 webService.start({type: service.type, id: service.identifier}, {}, function(response) {
                     if (response.status==="Success") {
-                        $scope.services = webService.listAll();
+                        $scope.services = webService.listAll({lang: $scope.getCurrentLang()});
                         $growl('success','Success','Service '+ service.name +' successfully started');
                     }
                 }, function() { $growl('error','Error','Service '+ service.name +' start failed'); });
@@ -108,7 +113,7 @@ cstlAdminApp.controller('WebServiceController', ['$scope', 'webService', 'provid
                 }
                 webService.delete({type: service.type, id: service.identifier}, {} ,
                     function() { $growl('success','Success','Service '+ service.name +' successfully deleted');
-                        $scope.services = webService.listAll(); },
+                        $scope.services = webService.listAll({lang: $scope.getCurrentLang()}); },
                     function() { $growl('error','Error','Service '+ service.name +' deletion failed'); }
                 );
             }
@@ -151,8 +156,8 @@ cstlAdminApp.controller('WebServiceVersionsController', ['$scope', 'webService',
         };
     }]);
 
-cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 'webService', '$filter', '$location', '$growl',
-    function ($scope, $routeParams, webService, $filter, $location, $growl) {
+cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 'webService', '$filter', '$location', '$growl', '$translate',
+    function ($scope, $routeParams, webService, $filter, $location, $growl, $translate) {
         $scope.type = $routeParams.type;
         $scope.tonext = true;
         $scope.serviceInfo = true;
@@ -160,6 +165,11 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
         $scope.serviceRights = false;
         $scope.metadata = {};
         $scope.metadata.keywords = [];
+
+        $scope.getCurrentLang = function() {
+            return $translate.use();
+        };
+
 
         $scope.getVersionsForType = function() {
             if ($scope.type === 'wms') {
@@ -256,6 +266,8 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
                 $scope.metadata.name = $scope.metadata.identifier;
             }
 
+            $scope.metadata.lang = $scope.getCurrentLang();
+
             webService.create({type: $scope.type}, $scope.metadata,
                 function() {
                     $growl('success', 'Success', 'Service ' + $scope.metadata.name + ' successfully created');
@@ -347,8 +359,8 @@ cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routePar
         }
     }]);
 
-cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$routeParams', 'webService', 'dataListing', 'provider', 'csw', 'sos', '$modal','textService', '$dashboard', '$growl', '$filter', 'DomainResource' ,'StyleSharedService','style','$cookies',
-    function ($rootScope, $scope, $routeParams , webService, dataListing, provider, csw, sos, $modal, textService, $dashboard, $growl, $filter, DomainResource,StyleSharedService, style, $cookies) {
+cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$routeParams', 'webService', 'dataListing', 'provider', 'csw', 'sos', '$modal','textService', '$dashboard', '$growl', '$filter', 'DomainResource' ,'StyleSharedService','style','$cookies','$translate',
+    function ($rootScope, $scope, $routeParams , webService, dataListing, provider, csw, sos, $modal, textService, $dashboard, $growl, $filter, DomainResource,StyleSharedService, style, $cookies, $translate) {
         $scope.tagText = '';
         $scope.type = $routeParams.type;
         $scope.url = $cookies.cstlUrl + "WS/" + $routeParams.type + "/" + $routeParams.id;
@@ -357,8 +369,12 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
         $scope.urlBoxSize = Math.min($scope.url.length,100);
         $scope.domainId = $cookies.cstlActiveDomainId;
         $scope.writeOperationAvailable = $scope.type == 'csw' || $scope.type == 'sos' || $scope.type == 'wfs';
+
+        $scope.getCurrentLang = function() {
+            return $translate.use();
+        };
         
-        webService.get({type: $scope.type, id:$routeParams.id}, function(service){
+        webService.get({type: $scope.type, id:$routeParams.id, lang:$scope.getCurrentLang()}, function(service){
            $scope.service = service  
            webService.permissionByDomainRole(function(domainroles){
              $scope.domainroles = domainroles;          
@@ -401,7 +417,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
             } );
         } );
 
-        $scope.metadata = webService.metadata({type: $scope.type, id:$routeParams.id});
+        $scope.metadata = webService.metadata({type: $scope.type, id:$routeParams.id, lang:$scope.getCurrentLang()});
 
         $scope.tabdata = true;
         $scope.tabdesc = false;

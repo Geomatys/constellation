@@ -219,19 +219,19 @@ cstlAdminApp.factory('PermissionService', ['$http',
 
 cstlAdminApp.factory('webService', ['$resource',
                                      function ($resource) {
-                                         return $resource('@cstl/api/1/admin/domain/$domainId/instances', {}, {
+                                         return $resource('@cstl/api/1/admin/domain/$domainId/instances/:lang', {}, {
                                              'permissionByDomainRole' : {method: 'GET', url: '@cstl/api/1/servicepermission/access', isArray: true},
                                              'domains':      {method: 'GET', url: '@cstl/api/1/servicepermission/user/$userId/service/:id', isArray: true},
                                              'linkToDomain':      {method: 'POST',   url: '@cstl/api/1/serviceXdomain/:domainId/service/:serviceId'},
                                              'unlinkFromDomain':  {method: 'DELETE', url: '@cstl/api/1/serviceXdomain/:domainId/service/:serviceId'},
                                              'listAll':      {method: 'GET', isArray: false},
-                                             'get':          {method: 'GET', url: '@cstl/api/1/OGC/:type/:id;jsessionid='},
+                                             'get':          {method: 'GET', url: '@cstl/api/1/OGC/:type/:id/:lang;jsessionid='},
                                              'create':       {method: 'PUT', url: '@cstl/api/1/OGC/:type/domain/$domainId'},
                                              'delete':       {method: 'DELETE', url: '@cstl/api/1/OGC/:type/:id;jsessionid='},
                                              'restart':      {method: 'POST', url: '@cstl/api/1/OGC/:type/:id/restart;jsessionid='},
                                              'start':        {method: 'POST', url: '@cstl/api/1/OGC/:type/:id/start;jsessionid='},
                                              'stop':         {method: 'POST', url: '@cstl/api/1/OGC/:type/:id/stop;jsessionid='},
-                                             'metadata':     {method: 'GET', url: '@cstl/api/1/OGC/:type/:id/metadata;jsessionid='},
+                                             'metadata':     {method: 'GET', url: '@cstl/api/1/OGC/:type/:id/metadata/:lang;jsessionid='},
                                              'updateMd':     {method: 'POST', url: '@cstl/api/1/OGC/:type/:id/metadata;jsessionid='},
                                              'config':       {method: 'GET', url: '@cstl/api/1/OGC/:type/:id/config;jsessionid='},
                                              'setConfig':    {method: 'POST', url: '@cstl/api/1/OGC/:type/:id/config;jsessionid='},

@@ -35,6 +35,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.constellation.admin.ConfigurationBusiness;
+import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.dto.ServiceDTO;
 import org.constellation.api.CommonConstants;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.Instance;
@@ -62,7 +64,7 @@ import org.constellation.ws.WSEngine;
 public class AdminRest {
 
     @Inject
-    private ServiceRepository serviceRepository;
+    private ServiceBusiness serviceBusiness;
     @Inject
     private LayerRepository layerRepository;
     
@@ -136,27 +138,35 @@ public class AdminRest {
     }
 
 
-    
-    /**
-  *
-  * @return
-  */
+
+    @GET
+    @Path("/domain/{domainId}/instances")
+    public Response listInstances(@PathParam("domainId") int domainId, @Context HttpServletRequest httpServletRequest) {
+        return listInstances(domainId,null, httpServletRequest);
+    }
+
+
+        /**
+      *
+      * @return
+      */
  @GET
- @Path("/domain/{domainId}/instances")
- public Response listInstances(@PathParam("domainId") int domainId, @Context HttpServletRequest httpServletRequest) {
+ @Path("/domain/{domainId}/instances/{lang}")
+ public Response listInstances(@PathParam("domainId") int domainId, @PathParam("lang") String lang, @Context HttpServletRequest httpServletRequest) {
      final List<Instance> instances = new ArrayList<>();
-     List<Service> services = serviceRepository.findByDomain(domainId);
-     for (Service service : services) {
+     final List<ServiceDTO> services = serviceBusiness.getAllServicesByDomainId(domainId, lang);
+
+     for (ServiceDTO service : services) {
 	    Instance instance = new Instance();
 	    instance.setId(service.getId());
-	    instance.set_abstract("TODO");
+	    instance.set_abstract(service.getDescription());
 	    instance.setIdentifier(service.getIdentifier());
 	    int layersNumber = layerRepository.findByServiceId(service.getId()).size();
 	    instance.setLayersNumber(layersNumber);
-	    instance.setName(service.getIdentifier());
+	    instance.setName(service.getTitle());
 	    instance.setType(service.getType());
 	    instance.setVersions(Arrays.asList(service.getVersions().split("|")));
-            instance.setStatus(ServiceStatus.valueOf(service.getStatus()));
+        instance.setStatus(ServiceStatus.valueOf(service.getStatus()));
 	    instances.add(instance);
     }
      return Response.ok(new InstanceReport(instances)).build();

@@ -236,7 +236,7 @@ CREATE TABLE "admin"."service"(
   "config"      CLOB,
   "owner"       VARCHAR(32),
   "metadata_id" VARCHAR(512),
-  "metadata"    CLOB,
+  "metadata_iso"    CLOB,
   "status"		VARCHAR(32)	NOT NULL,
   "versions"	VARCHAR(32) NOT NULL
 );
@@ -249,12 +249,13 @@ ALTER TABLE "admin"."service" ADD CONSTRAINT service_owner_fk FOREIGN KEY ("owne
 CREATE TABLE "admin"."service_i18n" (
   "service_id"    INTEGER  NOT NULL,
   "lang"        CHAR(2)  NOT NULL,
-  "title"       INTEGER  NOT NULL,
-  "description" INTEGER  NOT NULL
+  "title"       VARCHAR(512)  NOT NULL,
+  "keywords"    VARCHAR(512),
+  "description" VARCHAR(512)
 );
 
 ALTER TABLE "admin"."service_i18n" ADD CONSTRAINT service_i18n_pk          PRIMARY KEY ("service_id", "lang");
-ALTER TABLE "admin"."service_i18n" ADD CONSTRAINT service_i18n_service_id_fk    FOREIGN KEY ("service_id")  REFERENCES "admin"."data"("id") ON DELETE CASCADE;
+ALTER TABLE "admin"."service_i18n" ADD CONSTRAINT service_i18n_service_id_fk    FOREIGN KEY ("service_id")  REFERENCES "admin"."service"("id") ON DELETE CASCADE;
 
 
 -- Domain cross tables with for services
@@ -280,13 +281,15 @@ ALTER TABLE "admin"."service_extra_config" ADD CONSTRAINT service_extra_config_p
 ALTER TABLE "admin"."service_extra_config" ADD CONSTRAINT service_extra_config_service_fk FOREIGN KEY ("id") REFERENCES "admin"."service"("id");
 
 CREATE TABLE "admin"."service_metadata"(
-  "id"          INTEGER     NOT NULL,
-  "lang"        VARCHAR(3) NOT NULL,
-  "content"     CLOB
+  "id"            INTEGER     NOT NULL,
+  "lang"          VARCHAR(3) NOT NULL,
+  "content"       CLOB,
+  "default_lang"  BOOLEAN
+
 );
 
 ALTER TABLE "admin"."service_metadata" ADD CONSTRAINT service_metadata_pk  PRIMARY KEY ("id", "lang");
-ALTER TABLE "admin"."service_metadata" ADD CONSTRAINT service_metadata_service_fk FOREIGN KEY ("id") REFERENCES "admin"."service"("id");
+ALTER TABLE "admin"."service_metadata" ADD CONSTRAINT service_metadata_service_fk FOREIGN KEY ("id") REFERENCES "admin"."service"("id") ON DELETE CASCADE;
 
 
 -- service items

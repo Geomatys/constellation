@@ -54,13 +54,13 @@ public class MetadataBusiness {
         
         final Data data = dataRepository.findByMetadataId(metadataId);
         if (data != null) {
-            return data.getMetadata();
+            return data.getIsoMetadata();
         }
         
         if (includeService) {
             final Service service = serviceRepository.findByMetadataId(metadataId);
             if (service != null) {
-                return service.getMetadata();
+                return service.getMetadataIso();
             }
         }
         return null;
@@ -81,14 +81,14 @@ public class MetadataBusiness {
         if (includeService) {
             final List<Service> services = serviceRepository.findAll();
             for (Service record : services) {
-                if (record.getMetadata() != null) {
+                if (record.getMetadataIso() != null) {
                     results.add(record.getMetadataId());
                 }
             }
         }
         final List<Data> datas = dataRepository.findAll();
         for (Data record : datas) {
-            if (record.isVisible() && record.getMetadata() != null) {
+            if (record.isVisible() && record.getIsoMetadata() != null) {
                 results.add(record.getMetadataId());
             }
         }

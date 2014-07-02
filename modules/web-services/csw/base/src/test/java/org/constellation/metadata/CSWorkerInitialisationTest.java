@@ -130,7 +130,7 @@ public class CSWorkerInitialisationTest implements ApplicationContextAware {
          */
         service = serviceRepository.findByIdentifierAndType("default", "csw");
         service.setConfig("");
-        serviceRepository.save(service);
+        serviceRepository.update(service);
         
         worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
@@ -158,7 +158,7 @@ public class CSWorkerInitialisationTest implements ApplicationContextAware {
         
         service = serviceRepository.findByIdentifierAndType("default", "csw");
         service.setConfig(sw.toString());
-        serviceRepository.save(service);
+        serviceRepository.update(service);
         
 
         worker = new CSWworker("default");
@@ -187,7 +187,7 @@ public class CSWorkerInitialisationTest implements ApplicationContextAware {
         
         service = serviceRepository.findByIdentifierAndType("default", "csw");
         service.setConfig(sw.toString());
-        serviceRepository.save(service);
+        serviceRepository.update(service);
 
         worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
@@ -215,7 +215,7 @@ public class CSWorkerInitialisationTest implements ApplicationContextAware {
         
         service = serviceRepository.findByIdentifierAndType("default", "csw");
         service.setConfig(sw.toString());
-        serviceRepository.save(service);
+        serviceRepository.update(service);
 
         worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
@@ -243,7 +243,7 @@ public class CSWorkerInitialisationTest implements ApplicationContextAware {
         
         service = serviceRepository.findByIdentifierAndType("default", "csw");
         service.setConfig(sw.toString());
-        serviceRepository.save(service);
+        serviceRepository.update(service);
         
         worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
@@ -271,7 +271,7 @@ public class CSWorkerInitialisationTest implements ApplicationContextAware {
         
         service = serviceRepository.findByIdentifierAndType("default", "csw");
         service.setConfig(sw.toString());
-        serviceRepository.save(service);
+        serviceRepository.update(service);
 
         worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
@@ -298,7 +298,7 @@ public class CSWorkerInitialisationTest implements ApplicationContextAware {
         
         service = serviceRepository.findByIdentifierAndType("default", "csw");
         service.setConfig(sw.toString());
-        serviceRepository.save(service);
+        serviceRepository.update(service);
         
         worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
@@ -325,7 +325,7 @@ public class CSWorkerInitialisationTest implements ApplicationContextAware {
         
         service = serviceRepository.findByIdentifierAndType("default", "csw");
         service.setConfig(sw.toString());
-        serviceRepository.save(service);
+        serviceRepository.update(service);
 
         worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
@@ -352,7 +352,7 @@ public class CSWorkerInitialisationTest implements ApplicationContextAware {
         
         service = serviceRepository.findByIdentifierAndType("default", "csw");
         service.setConfig(sw.toString());
-        serviceRepository.save(service);
+        serviceRepository.update(service);
 
         worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
@@ -379,7 +379,7 @@ public class CSWorkerInitialisationTest implements ApplicationContextAware {
         
         service = serviceRepository.findByIdentifierAndType("default", "csw");
         service.setConfig(sw.toString());
-        serviceRepository.save(service);
+        serviceRepository.update(service);
 
         worker = new CSWworker("default");
         worker.setLogLevel(Level.FINER);
