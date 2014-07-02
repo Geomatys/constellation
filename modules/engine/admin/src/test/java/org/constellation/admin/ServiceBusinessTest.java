@@ -20,7 +20,7 @@ package org.constellation.admin;
 
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
-import org.constellation.dto.Service;
+import org.constellation.dto.Details;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,7 +47,7 @@ public class ServiceBusinessTest {
         serviceDTO.setStatus("STARTED");
         serviceDTO.setTitle("title test");
         serviceDTO.setType();*/
-        Object conf = serviceBusiness.create("wms", "test", new LayerContext(), new Service(),null);
+        Object conf = serviceBusiness.create("wms", "test", new LayerContext(), new Details(),null);
         Assert.assertTrue(serviceBusiness.getServiceIdentifiers("wms").contains("test"));
         
     }

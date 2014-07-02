@@ -48,7 +48,7 @@ import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.WMSPortrayal;
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
-import org.constellation.dto.Service;
+import org.constellation.dto.Details;
 import org.constellation.map.configuration.LayerBusiness;
 import org.constellation.map.featureinfo.FeatureInfoUtilities;
 import org.constellation.provider.DataProviders;
@@ -58,7 +58,6 @@ import static org.constellation.provider.coveragesql.CoverageSQLProviderService.
 import org.constellation.test.ImageTesting;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.SpringTestRunner;
-import static org.constellation.ws.embedded.AbstractGrizzlyServer.initDataDirectory;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.image.jai.Registry;
@@ -286,7 +285,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                 layerBusiness.add("Lakes",    "http://www.opengis.net/gml", "shapeSrc",        null, "wms1", "wms", null);
 
 
-                final Service serviceEng = new Service();
+                final Details serviceEng = new Details();
                 serviceEng.setDescription("Serveur Cartographique.  Contact: someone@geomatys.fr.  Carte haute qualité.");
                 serviceEng.setIdentifier("wms1");
                 serviceEng.setKeywords(Arrays.asList("WMS"));
@@ -297,10 +296,10 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                 serviceEng.setServiceContact(ct);
                 serviceEng.setVersions(Arrays.asList("1.1.1", "1.3.0"));
 
-                serviceBusiness.setInstanceMetadata("wms", "wms1", serviceEng, "eng");
+                serviceBusiness.setInstanceDetails("wms", "wms1", serviceEng, "eng");
                 //ConfigurationEngine.writeServiceMetadata("wms1", "wms", serviceEng, "eng");
 
-                final Service serviceFre = new Service();
+                final Details serviceFre = new Details();
                 serviceFre.setDescription("Serveur Cartographique.  Contact: someone@geomatys.fr.  Carte haute qualité.");
                 serviceFre.setIdentifier("wms1");
                 serviceFre.setKeywords(Arrays.asList("WMS"));
@@ -309,7 +308,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                 serviceFre.setServiceContact(ct);
                 serviceFre.setVersions(Arrays.asList("1.1.1", "1.3.0"));
                 
-                serviceBusiness.setInstanceMetadata("wms", "wms1", serviceFre, "fre");
+                serviceBusiness.setInstanceDetails("wms", "wms1", serviceFre, "fre");
 
                 final LayerContext config3 = new LayerContext();
                 config3.getCustomParameters().put("shiroAccessible", "false");

@@ -24,7 +24,7 @@ import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.dao.*;
 import org.constellation.configuration.ConfigDirectory;
-import org.constellation.dto.Service;
+import org.constellation.dto.Details;
 import org.constellation.engine.register.ConfigurationService;
 import org.constellation.engine.register.MetadataIOUtils;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
@@ -34,7 +34,6 @@ import org.constellation.utils.CstlMetadatas;
 import org.geotoolkit.util.FileUtilities;
 
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import java.io.*;
@@ -79,7 +78,7 @@ public class ConfigurationEngine {
 
    
 
-    public static Service readServiceMetadata(final String identifier, final String serviceType, String language)
+    public static Details readServiceMetadata(final String identifier, final String serviceType, String language)
             throws IOException, JAXBException {
         ensureNonNull("identifier", identifier);
         ensureNonNull("serviceType", serviceType);
@@ -94,7 +93,7 @@ public class ConfigurationEngine {
                 final InputStream is = rec.getMetadata(language);
                 if (is != null) {
                     final Unmarshaller u = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-                    final Service config = (Service) u.unmarshal(is);
+                    final Details config = (Details) u.unmarshal(is);
                     GenericDatabaseMarshallerPool.getInstance().recycle(u);
                     return config;
                 } else {
@@ -102,7 +101,7 @@ public class ConfigurationEngine {
                             + "Capabilities.xml");
                     if (in != null) {
                         final Unmarshaller u = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-                        final Service metadata = (Service) u.unmarshal(in);
+                        final Details metadata = (Details) u.unmarshal(in);
                         GenericDatabaseMarshallerPool.getInstance().recycle(u);
                         in.close();
                         metadata.setIdentifier(identifier);

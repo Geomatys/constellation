@@ -19,7 +19,7 @@
 package org.constellation.process.service;
 
 import org.constellation.configuration.ConfigurationException;
-import org.constellation.dto.Service;
+import org.constellation.dto.Details;
 import org.constellation.process.AbstractCstlProcess;
 import static org.constellation.process.service.SetConfigServiceDescriptor.*;
 import static org.geotoolkit.parameter.Parameters.*;
@@ -51,7 +51,7 @@ public class SetConfigService extends AbstractCstlProcess {
         final String serviceType       = value(SERVICE_TYPE, inputParameters);
         final String identifier        = value(IDENTIFIER, inputParameters);
         Object configuration           = value(CONFIGURATION, inputParameters);
-        final Service serviceMetadata  = value(SERVICE_METADATA, inputParameters);
+        final Details serviceMetadata  = value(SERVICE_METADATA, inputParameters);
 
         try {
             serviceBusiness.configure(serviceType.toLowerCase(), identifier, serviceMetadata, configuration);

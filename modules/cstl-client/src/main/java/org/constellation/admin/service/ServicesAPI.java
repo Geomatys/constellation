@@ -36,7 +36,7 @@ import org.constellation.configuration.ProcessContext;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.configuration.ServiceReport;
 import org.constellation.dto.AddLayer;
-import org.constellation.dto.Service;
+import org.constellation.dto.Details;
 import org.constellation.dto.SimpleValue;
 import org.constellation.generic.database.Automatic;
 
@@ -113,7 +113,7 @@ public final class ServicesAPI {
      * @throws HttpResponseException if the response does not have a {@code 2xx} status code
      * @throws IOException on HTTP communication error
      */
-    public void newInstance(final Specification serviceType, final Service metadata) throws HttpResponseException, IOException {
+    public void newInstance(final Specification serviceType, final Details metadata) throws HttpResponseException, IOException {
         ensureNonNull("serviceType", serviceType);
         ensureNonNull("metadata",    metadata);
 
@@ -176,16 +176,16 @@ public final class ServicesAPI {
      *
      * @param serviceType the service type
      * @param identifier  the service identifier
-     * @return a {@link Service} instance
+     * @return a {@link org.constellation.dto.Details} instance
      * @throws HttpResponseException if the response does not have a {@code 2xx} status code
      * @throws IOException on HTTP communication error or response entity parsing error
      */
-    public Service getMetadata(final Specification serviceType, final String identifier) throws HttpResponseException, IOException {
+    public Details getMetadata(final Specification serviceType, final String identifier) throws HttpResponseException, IOException {
         ensureNonNull("serviceType", serviceType);
         ensureNonNull("identifier",  identifier);
 
         final String path = "OGC/" + serviceType + "/" + identifier + "/metadata";
-        return client.get(path, MediaType.APPLICATION_XML_TYPE).getEntity(Service.class);
+        return client.get(path, MediaType.APPLICATION_XML_TYPE).getEntity(Details.class);
     }
 
     /**
@@ -197,7 +197,7 @@ public final class ServicesAPI {
      * @throws HttpResponseException if the response does not have a {@code 2xx} status code
      * @throws IOException on HTTP communication error
      */
-    public void setMetadata(final Specification serviceType, final String identifier, final Service metadata) throws HttpResponseException, IOException {
+    public void setMetadata(final Specification serviceType, final String identifier, final Details metadata) throws HttpResponseException, IOException {
         ensureNonNull("serviceType", serviceType);
         ensureNonNull("metadata",    metadata);
 

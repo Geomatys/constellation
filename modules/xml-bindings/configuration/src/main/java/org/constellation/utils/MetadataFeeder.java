@@ -52,7 +52,7 @@ import org.apache.sis.xml.IdentifierSpace;
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
 import org.constellation.dto.DataMetadata;
-import org.constellation.dto.Service;
+import org.constellation.dto.Details;
 import org.geotoolkit.service.OperationMetadataImpl;
 import org.geotoolkit.service.ServiceIdentificationImpl;
 import org.opengis.metadata.citation.Citation;
@@ -97,7 +97,7 @@ public class MetadataFeeder {
         this.eater = eater;
     }
 
-    public void feedService(Service serviceInfo) {
+    public void feedService(Details serviceInfo) {
         setAbstract(serviceInfo.getDescription());
         setTitle(serviceInfo.getName());
         setKeywordsNoType(serviceInfo.getKeywords());

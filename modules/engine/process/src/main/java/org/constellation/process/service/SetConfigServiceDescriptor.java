@@ -19,7 +19,7 @@
 package org.constellation.process.service;
 
 import org.apache.sis.util.iso.SimpleInternationalString;
-import org.constellation.dto.Service;
+import org.constellation.dto.Details;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.process.AbstractCstlProcessDescriptor;
 import org.constellation.process.ConstellationProcessFactory;
@@ -64,8 +64,8 @@ public class SetConfigServiceDescriptor extends AbstractCstlProcessDescriptor {
 
     public static final String SERVICE_METADATA_NAME = "serviceMetadata";
     private static final String SERVICE_METADATA_REMARKS = "The service metadata to apply.";
-    public static final ParameterDescriptor<Service> SERVICE_METADATA =
-            new DefaultParameterDescriptor(SERVICE_METADATA_NAME, SERVICE_METADATA_REMARKS, Service.class, null, false);
+    public static final ParameterDescriptor<Details> SERVICE_METADATA =
+            new DefaultParameterDescriptor(SERVICE_METADATA_NAME, SERVICE_METADATA_REMARKS, Details.class, null, false);
 
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC =

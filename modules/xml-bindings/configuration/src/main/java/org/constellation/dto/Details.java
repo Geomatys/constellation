@@ -36,7 +36,7 @@ import java.util.List;
  */
 //@Mapped
 @XmlRootElement
-public class Service {
+public class Details {
 
     private String name;
 
@@ -56,12 +56,12 @@ public class Service {
 
     private boolean transactional;
 
-    public Service() {
+    public Details() {
     }
 
 
 
-    public Service(final String name, final String identifier, final List<String> keywords,
+    public Details(final String name, final String identifier, final List<String> keywords,
                    final String description, final List<String> versions, final Contact serviceContact,
                    final AccessConstraint serviceConstraints, final boolean transactionnal, final String lang) {
         this.description = description;

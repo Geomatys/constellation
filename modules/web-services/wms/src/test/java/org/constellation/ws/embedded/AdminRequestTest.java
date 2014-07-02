@@ -37,24 +37,21 @@ import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.configuration.AcknowlegementType;
-import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.Language;
 import org.constellation.configuration.Languages;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.ServiceStatus;
-import org.constellation.dto.Service;
+import org.constellation.dto.Details;
 import org.constellation.dto.SimpleValue;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.map.configuration.LayerBusiness;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
-import org.constellation.provider.Providers;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.SpringTestRunner;
-import org.constellation.test.utils.TestRunner;
-import static org.constellation.ws.embedded.AbstractGrizzlyServer.initDataDirectory;
+
 import static org.geotoolkit.parameter.ParametersExt.createGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
 import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
@@ -204,7 +201,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer  implements Applicat
         // for a POST request
         URLConnection conec = niUrl.openConnection();
 
-        final Service meta = new Service();
+        final Details meta = new Details();
         meta.setIdentifier("wms2");
         putRequestObject(conec, meta, GenericDatabaseMarshallerPool.getInstance());
         Object obj = unmarshallResponse(conec);

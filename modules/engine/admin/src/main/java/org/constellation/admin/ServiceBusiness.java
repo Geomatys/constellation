@@ -11,6 +11,7 @@ import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.ServiceStatus;
 import org.constellation.configuration.TargetNotFoundException;
+import org.constellation.dto.Details;
 import org.constellation.engine.register.*;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.LayerRepository;
@@ -77,7 +78,7 @@ public class ServiceBusiness {
      * @return the configuration object just setted.
      * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
-    public Object create(final String serviceType, final String identifier, Object configuration, final org.constellation.dto.Service metadata ,final Integer domainId) throws ConfigurationException {
+    public Object create(final String serviceType, final String identifier, Object configuration, final Details metadata ,final Integer domainId) throws ConfigurationException {
 
         if (identifier == null || identifier.isEmpty()) {
             throw new ConfigurationException("Service instance identifier can't be null or empty.");
@@ -108,7 +109,7 @@ public class ServiceBusiness {
         if (domainId != null){
             domainRepository.addServiceToDomain(serviceId,domainId);
         }
-        setInstanceMetadata(serviceType,identifier,metadata,metadata.getLang());
+        setInstanceDetails(serviceType, identifier, metadata, metadata.getLang());
         return configuration;
     }
     
@@ -307,7 +308,7 @@ public class ServiceBusiness {
      * 
      * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
-     public void configure(final String serviceType, final String identifier, final org.constellation.dto.Service metadata, Object configuration) throws ConfigurationException {
+     public void configure(final String serviceType, final String identifier, final Details metadata, Object configuration) throws ConfigurationException {
          if (identifier == null || identifier.isEmpty()) {
             throw new ConfigurationException("Service instance identifier can't be null or empty.");
         }
@@ -343,7 +344,7 @@ public class ServiceBusiness {
                     serviceRepository.update(serviceI18n);
                 }
             }
-            setInstanceMetadata(serviceType,identifier,metadata,metadata.getLang());
+            setInstanceDetails(serviceType, identifier, metadata, metadata.getLang());
         }
      }
      
@@ -492,16 +493,16 @@ public class ServiceBusiness {
      * @throws TargetNotFoundException if the service with specified identifier does not exist
      * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
-    public org.constellation.dto.Service getInstanceMetadata(final String serviceType, final String identifier, final String language) throws ConfigurationException {
+    public Details getInstanceDetails(final String serviceType, final String identifier, final String language) throws ConfigurationException {
         final Service service = this.ensureExistingInstance(serviceType, identifier);
         try {
-            ServiceMetadata metadata = serviceRepository.getServiceDetails(service.getId(), language);
-            if (metadata == null) {
+            ServiceDetails details = serviceRepository.getServiceDetails(service.getId(), language);
+            if (details == null) {
                 final InputStream in = Util.getResourceAsStream("org/constellation/xml/" + serviceType.toUpperCase()
                         + "Capabilities.xml");
                 if (in != null) {
                     final Unmarshaller u = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-                    org.constellation.dto.Service servMetadata = (org.constellation.dto.Service) u.unmarshal(in);
+                    Details servMetadata = (Details) u.unmarshal(in);
                     GenericDatabaseMarshallerPool.getInstance().recycle(u);
                     in.close();
                     servMetadata.setIdentifier(identifier);
@@ -510,10 +511,10 @@ public class ServiceBusiness {
                     throw new IOException("Unable to find the capabilities skeleton from resource.");
                 }
             } else {
-                return (org.constellation.dto.Service) getObjectFromString(metadata.getContent(), GenericDatabaseMarshallerPool.getInstance());
+                return (Details) getObjectFromString(details.getContent(), GenericDatabaseMarshallerPool.getInstance());
             }
         } catch (JAXBException | IOException ex) {
-            throw new ConfigurationException("The serviceMetadata.xml file can't be read.", ex);
+            throw new ConfigurationException("The ServiceDetails.xml file can't be read.", ex);
         }
     }
     
@@ -522,15 +523,15 @@ public class ServiceBusiness {
      *
      * @param serviceType The type of the service.
      * @param identifier the service identifier
-     * @param metadata   the service metadata
+     * @param details   the service metadata
      * @throws TargetNotFoundException if the service with specified identifier does not exist
      * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
-    public void setInstanceMetadata(final String serviceType, final String identifier, final org.constellation.dto.Service metadata, final String language) throws ConfigurationException {
+    public void setInstanceDetails(final String serviceType, final String identifier, final Details details, final String language) throws ConfigurationException {
         final Service service = this.ensureExistingInstance(serviceType, identifier);
         if (service != null) {
-            final String xml = getStringFromObject(metadata, GenericDatabaseMarshallerPool.getInstance());
-            final ServiceMetadata meta = new ServiceMetadata(service.getId(), language, xml,true);
+            final String xml = getStringFromObject(details, GenericDatabaseMarshallerPool.getInstance());
+            final ServiceDetails meta = new ServiceDetails(service.getId(), language, xml,true);
             serviceRepository.createOrUpdateServiceDetails(meta);
         }
     }
