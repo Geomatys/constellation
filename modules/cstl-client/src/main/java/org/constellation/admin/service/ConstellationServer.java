@@ -22,6 +22,8 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
+
+import org.constellation.dto.Details;
 import org.glassfish.jersey.client.ClientResponse;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -38,7 +40,6 @@ import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.LayerList;
 import org.constellation.configuration.ObjectFactory;
 import org.constellation.dto.DataDescription;
-import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.dto.DataInformation;
 import org.geotoolkit.client.AbstractRequest;
@@ -576,12 +577,12 @@ public class ConstellationServer<S extends Services, P extends Providers> extend
          * @param identifier
          * @return
          */
-        public Service getMetadata(final String serviceType, final String identifier){
+        public Details getMetadata(final String serviceType, final String identifier){
             final String url = getURLWithEndSlash()+serviceType.toUpperCase()+"/"+identifier+"/metadata";
             try {
                 Object response = sendRequest(url, null);
-                if(response instanceof Service){
-                    return (Service)response;
+                if(response instanceof Details){
+                    return (Details)response;
                 }
             } catch (IOException e) {
                 LOGGER.log(Level.WARNING, "Error when send request to server", e);

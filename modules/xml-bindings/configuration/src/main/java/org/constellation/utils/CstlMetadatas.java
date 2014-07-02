@@ -23,7 +23,8 @@ import java.util.Date;
 import java.util.List;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.ArgumentChecks;
-import org.constellation.dto.Service;
+import org.constellation.dto.Details;
+
 import static org.constellation.utils.CstlMetadataTemplate.*;
 import org.geotoolkit.feature.type.Name;
 
@@ -39,18 +40,18 @@ public class CstlMetadatas {
      * @param serviceIdentifier the identifier of the service.
      * @param serviceType the OGC type of the service (WMS, SOS, WFS, ...)
      * @param cstlURL the current URL of the service.
-     * @param serviceInfo Information about the service.
+     * @param detailsInfo Information about the service.
      * 
      * @return DefaultMetadata a new metadata for the service with given identifier.
      */
-    public static DefaultMetadata defaultServiceMetadata(final String serviceIdentifier, final String serviceType, final String cstlURL, final Service serviceInfo) {
+    public static DefaultMetadata defaultServiceMetadata(final String serviceIdentifier, final String serviceType, final String cstlURL, final Details detailsInfo) {
         final String serviceID = getMetadataIdForService(serviceIdentifier, serviceType);
-        final DefaultMetadata metadata = defaultServiceMetadata(serviceID, serviceInfo);
+        final DefaultMetadata metadata = defaultServiceMetadata(serviceID, detailsInfo);
         
         // add specific service part
         final MetadataFeeder feeder = new MetadataFeeder(metadata);
         final String serviceURL = cstlURL + "/WS/" + serviceType.toLowerCase() + '/' + serviceIdentifier;
-        feeder.feedService(serviceInfo);
+        feeder.feedService(detailsInfo);
         feeder.addServiceInformation(serviceType, serviceURL);
         feeder.setServiceInstanceName(serviceIdentifier);
         return metadata;
@@ -98,13 +99,13 @@ public class CstlMetadatas {
      * Create a default metadata for the given data.
      *
      * @param metadataId the identifier of the metadata to create.
-     * @param serviceInfo
+     * @param detailsInfo
      * 
      * @return A new {@link DefaultMetadata}. ISO_19115 compliant.
      */
-    private static DefaultMetadata defaultServiceMetadata(final String metadataId, final Service serviceInfo) {
+    private static DefaultMetadata defaultServiceMetadata(final String metadataId, final Details detailsInfo) {
 
-        ArgumentChecks.ensureNonNull("serviceInfo", serviceInfo);
+        ArgumentChecks.ensureNonNull("serviceInfo", detailsInfo);
         ArgumentChecks.ensureNonNull("metadataId", metadataId);
         final DefaultMetadata metadata = new DefaultMetadata();
         final MetadataFeeder feeder    = new MetadataFeeder(metadata);
@@ -112,7 +113,7 @@ public class CstlMetadatas {
 
         // create the Service part
         feeder.getServiceIdentification();
-        feeder.setTitle(serviceInfo.getName());
+        feeder.setTitle(detailsInfo.getName());
         feeder.setCitationIdentifier(metadataId);
         feeder.setCreationDate(creationDate);
 

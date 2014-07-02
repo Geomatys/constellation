@@ -25,7 +25,7 @@ import java.util.List;
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
-import org.constellation.dto.Service;
+import org.constellation.dto.Details;
 import org.geotoolkit.ows.xml.AbstractContact;
 import org.geotoolkit.ows.xml.AbstractDCP;
 import org.geotoolkit.ows.xml.AbstractDomain;
@@ -93,7 +93,7 @@ public final class WMTSConstant {
      * @param metadata the service metadata
      * @return the service base capabilities
      */
-    public static WMTSResponse createCapabilities(final String version, final Service metadata) {
+    public static WMTSResponse createCapabilities(final String version, final Details metadata) {
         ensureNonNull("metadata", metadata);
         ensureNonNull("version",  version);
 

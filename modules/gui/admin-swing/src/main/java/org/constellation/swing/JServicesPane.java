@@ -57,7 +57,8 @@ import org.constellation.admin.service.ConstellationClient;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.ServiceStatus;
-import org.constellation.dto.Service;
+import org.constellation.dto.Details;
+
 import static org.constellation.security.ActionPermissions.*;
 import org.constellation.security.RoleController;
 import org.constellation.swing.action.Action;
@@ -319,7 +320,7 @@ public final class JServicesPane extends JPanel implements ActionListener, Prope
         final String[] params = JServiceCreationPane.showDialog(cstlV2);
         if(params != null){
             try {
-                final Service metadata = new Service();
+                final Details metadata = new Details();
                 metadata.setIdentifier(params[1]);
                 cstlV2.services.newInstance(ServiceDef.Specification.valueOf(params[0]), metadata);
                 updateInstanceList();

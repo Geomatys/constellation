@@ -27,7 +27,7 @@ import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.ServiceStatus;
 import org.constellation.configuration.TargetNotFoundException;
-import org.constellation.dto.Service;
+import org.constellation.dto.Details;
 import org.constellation.ws.ServiceConfigurer;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -57,9 +57,9 @@ public abstract class OGCConfigurer extends ServiceConfigurer {
     public Instance getInstance(final String serviceType, final String identifier) throws ConfigurationException {
         org.constellation.engine.register.Service service = serviceBusiness.getServiceByIdentifierAndType(serviceType, identifier);
         final Instance instance = new Instance(service.getId(), identifier, serviceType, ServiceStatus.valueOf(service.getStatus()));
-        Service metadata = null;
+        Details metadata = null;
         try {
-            metadata = serviceBusiness.getInstanceMetadata(serviceType, identifier, null);
+            metadata = serviceBusiness.getInstanceDetails(serviceType, identifier, null);
         } catch (ConfigurationException ignore) {
             // Do nothing.
         }

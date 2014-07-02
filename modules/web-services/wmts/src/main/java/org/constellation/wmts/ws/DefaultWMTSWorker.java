@@ -32,7 +32,7 @@ import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Layer;
-import org.constellation.dto.Service;
+import org.constellation.dto.Details;
 import org.constellation.map.featureinfo.FeatureInfoFormat;
 import org.constellation.map.featureinfo.FeatureInfoUtilities;
 import org.constellation.portrayal.PortrayalUtil;
@@ -168,7 +168,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         }
         
         // we load the skeleton capabilities 
-        final Service skeleton = getStaticCapabilitiesObject("wmts", null);
+        final Details skeleton = getStaticCapabilitiesObject("wmts", null);
         final Capabilities skeletonCapabilities = (Capabilities) WMTSConstant.createCapabilities("1.0.0", skeleton);
         
          //we prepare the response document

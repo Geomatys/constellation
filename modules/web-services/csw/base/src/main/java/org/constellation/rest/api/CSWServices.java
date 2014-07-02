@@ -38,8 +38,8 @@ import org.constellation.configuration.BriefNode;
 import org.constellation.configuration.BriefNodeList;
 import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.configuration.StringList;
+import org.constellation.dto.Details;
 import org.constellation.dto.ParameterValues;
-import org.constellation.dto.Service;
 import org.constellation.dto.SimpleValue;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.CSWworker;
@@ -166,7 +166,7 @@ public class CSWServices {
     @POST
     @Path("{id}/federatedCatalog")
     public Response setFederatedCatalog(final @PathParam("id") String id, StringList url) throws Exception {
-        final Service metadata = serviceBusiness.getInstanceMetadata("csw", id, null);
+        final Details metadata = serviceBusiness.getInstanceDetails("csw", id, null);
         final Automatic conf = (Automatic) serviceBusiness.getConfiguration("csw", id);
         final List<String> urls = conf.getParameterList("CSWCascading");
         urls.addAll(url.getList());

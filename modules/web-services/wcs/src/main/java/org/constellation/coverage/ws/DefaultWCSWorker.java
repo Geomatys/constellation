@@ -42,7 +42,8 @@ import org.constellation.ServiceDef;
 import org.constellation.api.QueryConstants;
 import org.constellation.configuration.Layer;
 import static org.constellation.coverage.ws.WCSConstant.*;
-import org.constellation.dto.Service;
+
+import org.constellation.dto.Details;
 import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.provider.CoverageData;
 import org.constellation.provider.Data;
@@ -435,7 +436,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
         }
         
         // We unmarshall the static capabilities document.
-        final Service skeleton = getStaticCapabilitiesObject("WCS", null);
+        final Details skeleton = getStaticCapabilitiesObject("WCS", null);
         final GetCapabilitiesResponse staticCapabilities = WCSConstant.createCapabilities(version, skeleton);
         final AbstractServiceIdentification si  = staticCapabilities.getServiceIdentification();
         final AbstractServiceProvider sp        = staticCapabilities.getServiceProvider();

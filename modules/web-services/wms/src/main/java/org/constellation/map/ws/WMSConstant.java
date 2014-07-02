@@ -28,7 +28,7 @@ import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import org.apache.sis.util.iso.DefaultNameFactory;
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
-import org.constellation.dto.Service;
+import org.constellation.dto.Details;
 import org.geotoolkit.inspire.xml.vs.ExtendedCapabilitiesType;
 import org.geotoolkit.service.ServiceTypeImpl;
 import org.geotoolkit.wms.xml.AbstractCapability;
@@ -234,7 +234,7 @@ public final class WMSConstant {
      * @param metadata the service metadata
      * @return the service base capabilities
      */
-    public static AbstractWMSCapabilities createCapabilities(final String version, final Service metadata) {
+    public static AbstractWMSCapabilities createCapabilities(final String version, final Details metadata) {
         ensureNonNull("metadata", metadata);
         ensureNonNull("version",  version);
 
