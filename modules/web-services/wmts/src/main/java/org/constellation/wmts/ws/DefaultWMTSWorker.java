@@ -50,8 +50,8 @@ import org.geotoolkit.map.MapContext;
 import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
 import org.geotoolkit.ows.xml.v110.*;
 import org.geotoolkit.referencing.CRS;
-import org.geotoolkit.referencing.IdentifiedObjects;
-import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
+import org.apache.sis.referencing.IdentifiedObjects;
+import org.apache.sis.referencing.CommonCRS;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.TimeParser;
 import org.geotoolkit.wmts.WMTSUtilities;
@@ -113,7 +113,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         LOGGER.log(logLevel, "getCapabilities request processing\n");
         final long start = System.currentTimeMillis();
         final String userLogin  = getUserLogin();
-        
+
         //we verify the base request attribute
         if (requestCapabilities.getService() != null) {
             if (!requestCapabilities.getService().equals("WMTS")) {
@@ -131,7 +131,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                                              VERSION_NEGOTIATION_FAILED, "acceptVersion");
             }
         }
-        
+
         final AcceptFormatsType formats = requestCapabilities.getAcceptFormats();
         if (formats != null && formats.getOutputFormat().size() > 0 ) {
             boolean found = false;
@@ -145,7 +145,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                                                  INVALID_PARAMETER_VALUE, "acceptFormats");
             }
         }
-        
+
         SectionsType sections = requestCapabilities.getSections();
         if (sections == null) {
             sections = new SectionsType(SectionsType.getExistingSections("1.1.1"));
@@ -162,18 +162,18 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         if (cachedCapabilities != null) {
             return (Capabilities) cachedCapabilities.applySections(sections);
         }
-        
-        // we load the skeleton capabilities 
+
+        // we load the skeleton capabilities
         final Service skeleton = getStaticCapabilitiesObject("WMTS", null);
         final Capabilities skeletonCapabilities = (Capabilities) WMTSConstant.createCapabilities("1.0.0", skeleton);
-        
+
          //we prepare the response document
         final ServiceIdentification si = skeletonCapabilities.getServiceIdentification();
         final ServiceProvider       sp = skeletonCapabilities.getServiceProvider();
         final OperationsMetadata    om = (OperationsMetadata) WMTSConstant.OPERATIONS_METADATA.clone();
         // TODO
         final List<Themes>      themes = new ArrayList<>();
-        
+
         //we update the URL
         om.updateURL(getServiceUrl());
 
@@ -211,7 +211,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
 
                 Envelope env = set.getEnvelope();
 
-                env = CRS.transform(env, DefaultGeographicCRS.WGS84);
+                env = CRS.transform(env, CommonCRS.WGS84.normalizedGeographic());
 
                 final BoundingBoxType bbox = new WGS84BoundingBoxType(
                         env.getMinimum(0),
@@ -239,11 +239,11 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
                     resources.add(tileURL);
                 }
                 outputLayer.setResourceURL(resources);
-                
+
                 for(Pyramid pr : set.getPyramids()){
                     final TileMatrixSet tms = new TileMatrixSet();
                     tms.setIdentifier(new CodeType(pr.getId()));
-                    tms.setSupportedCRS(IdentifiedObjects.getIdentifier(pr.getCoordinateReferenceSystem()));
+                    tms.setSupportedCRS(IdentifiedObjects.getIdentifierOrName(pr.getCoordinateReferenceSystem()));
 
                     final List<TileMatrix> tm = new ArrayList<>();
                     final double[] scales = pr.getScales();
@@ -274,7 +274,7 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
             }
         }
         final ContentsType cont = new ContentsType(outputLayers, tileSets);
-       
+
         // put full capabilities in cache
         final Capabilities c = new Capabilities(si, sp, om, "1.0.0", null, cont, themes);
         putCapabilitiesInCache("1.0.0", null, c);
@@ -294,13 +294,13 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         final Name layerName        = Util.parseLayerName(getTile.getLayer());
         final Data layerRef = getLayerReference(userLogin, layerName);
         final Layer configLayer     = getConfigurationLayer(layerName, userLogin);
-        
+
         // build an equivalent style List
         final String styleName       = getTile.getStyle();
         final DataReference styleRef = configLayer.getStyle(styleName);
         final MutableStyle style     = getStyle(styleRef);
 
-        
+
         Coverage c = null;
         //       -- create the rendering parameter Map
         Double elevation =  null;
@@ -399,8 +399,8 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         final Name layerName = Util.parseLayerName(request.getLayer());
         final String userLogin  = getUserLogin();
         final Layer configLayer = getConfigurationLayer(layerName, userLogin);
-        
-        
+
+
         // 2. PARAMETERS NOT USED FOR NOW
         Double elevation =  null;
         Date time        = null;

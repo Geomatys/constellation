@@ -61,8 +61,8 @@ import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapItem;
 import org.geotoolkit.style.DefaultStyleFactory;
 import org.geotoolkit.style.MutableStyle;
-import org.geotoolkit.util.ArgumentChecks;
-import org.geotoolkit.util.converter.NonconvertibleObjectException;
+import org.apache.sis.util.ArgumentChecks;
+import org.apache.sis.util.UnconvertibleObjectException;
 import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.version.VersionControl;
 import org.geotoolkit.version.VersioningException;
@@ -94,7 +94,7 @@ public final class ConvertersJaxbToGeotk {
         Object obj;
         try {
             obj = convertsDataReferenceToCoverageReference(ref, login, password);
-        } catch (NonconvertibleObjectException e) {
+        } catch (UnconvertibleObjectException e) {
             obj = null;
         }
 
@@ -102,7 +102,7 @@ public final class ConvertersJaxbToGeotk {
         if (obj == null) {
             try {
                 obj = convertsDataReferenceToFeatureCollection(ref);
-            } catch (NonconvertibleObjectException e) {
+            } catch (UnconvertibleObjectException e) {
                 obj = null;
                 LOGGER.log(Level.WARNING, "No data found for the given DataReference {0}.",ref.getReference());
             }
@@ -192,12 +192,12 @@ public final class ConvertersJaxbToGeotk {
         return style != null ? style : new DefaultStyleFactory().style();
     }
 
-    public static CoverageReference convertsDataReferenceToCoverageReference(final DataReference source, final String login, final String password) throws NonconvertibleObjectException {
+    public static CoverageReference convertsDataReferenceToCoverageReference(final DataReference source, final String login, final String password) throws UnconvertibleObjectException {
         final String dataType = source.getDataType();
         final Date dataVersion = source.getDataVersion();
 
         if (dataType.equals(DataReference.PROVIDER_STYLE_TYPE)) {
-            throw new NonconvertibleObjectException("Style provider not supported.");
+            throw new UnconvertibleObjectException("Style provider not supported.");
         }
 
         CoverageReference coverageReference = null;
@@ -241,9 +241,9 @@ public final class ConvertersJaxbToGeotk {
                         }
 
                     } catch (VersioningException e) {
-                        throw new NonconvertibleObjectException(e.getMessage(), e);
+                        throw new UnconvertibleObjectException(e.getMessage(), e);
                     } catch (DataStoreException e) {
-                        throw new NonconvertibleObjectException(e.getMessage(), e);
+                        throw new UnconvertibleObjectException(e.getMessage(), e);
                     }
 
                     if (coverageReference != null) {
@@ -254,10 +254,10 @@ public final class ConvertersJaxbToGeotk {
             }
 
             if (!providerFound) {
-                throw new NonconvertibleObjectException("Provider id "+providerID+" not found.");
+                throw new UnconvertibleObjectException("Provider id "+providerID+" not found.");
             }
             if (!providerLayerFound) {
-                throw new NonconvertibleObjectException("Layer name "+layerName+" not found.");
+                throw new UnconvertibleObjectException("Layer name "+layerName+" not found.");
             }
 
 
@@ -300,37 +300,37 @@ public final class ConvertersJaxbToGeotk {
                             }
 
                         } else {
-                            throw new NonconvertibleObjectException("Server is not a coverageStore.");
+                            throw new UnconvertibleObjectException("Server is not a coverageStore.");
                         }
 
                     } catch (VersioningException e) {
-                        throw new NonconvertibleObjectException(e.getMessage(), e);
+                        throw new UnconvertibleObjectException(e.getMessage(), e);
                     } catch (DataStoreException ex) {
-                        throw new NonconvertibleObjectException(ex);
+                        throw new UnconvertibleObjectException(ex);
                     } catch (MalformedURLException ex) {
-                        throw new NonconvertibleObjectException(ex);
+                        throw new UnconvertibleObjectException(ex);
                     }
                 } else {
-                    throw new NonconvertibleObjectException("Service URL unknow.");
+                    throw new UnconvertibleObjectException("Service URL unknow.");
                 }
             } else {
-                throw new NonconvertibleObjectException("Service specification should be a WMS or WMTS service.");
+                throw new UnconvertibleObjectException("Service specification should be a WMS or WMTS service.");
             }
         }
 
         if (coverageReference == null) {
-            throw new NonconvertibleObjectException("Data no found for : "+source.getReference());
+            throw new UnconvertibleObjectException("Data no found for : "+source.getReference());
         }
 
         return new CoverageReferenceWrapper(source.getReference(), coverageReference);
     }
 
-    public static FeatureCollection convertsDataReferenceToFeatureCollection(final DataReference source) throws NonconvertibleObjectException {
+    public static FeatureCollection convertsDataReferenceToFeatureCollection(final DataReference source) throws UnconvertibleObjectException {
         final String dataType = source.getDataType();
         final Date dataVersion = source.getDataVersion();
 
         if (dataType.equals(DataReference.PROVIDER_STYLE_TYPE)) {
-            throw new NonconvertibleObjectException("Style provider not supported.");
+            throw new UnconvertibleObjectException("Style provider not supported.");
         }
 
         FeatureCollection featureColl = null;
@@ -374,10 +374,10 @@ public final class ConvertersJaxbToGeotk {
             }
 
             if (!providerFound) {
-                throw new NonconvertibleObjectException("Provider id "+providerID+" not found.");
+                throw new UnconvertibleObjectException("Provider id "+providerID+" not found.");
             }
             if (!providerLayerFound) {
-                throw new NonconvertibleObjectException("Layer name "+layerName+" not found.");
+                throw new UnconvertibleObjectException("Layer name "+layerName+" not found.");
             }
 
 
@@ -399,21 +399,21 @@ public final class ConvertersJaxbToGeotk {
                             final Session session = datastore.createSession(true);
                             featureColl = session.getFeatureCollection(query);
                         } else {
-                            throw new NonconvertibleObjectException("Server is not a datastore.");
+                            throw new UnconvertibleObjectException("Server is not a datastore.");
                         }
                     } catch (MalformedURLException ex) {
-                        throw new NonconvertibleObjectException(ex);
+                        throw new UnconvertibleObjectException(ex);
                     }
                 } else {
-                    throw new NonconvertibleObjectException("Service URL unknow.");
+                    throw new UnconvertibleObjectException("Service URL unknow.");
                 }
             } else {
-                throw new NonconvertibleObjectException("Service specification should be a WFS service.");
+                throw new UnconvertibleObjectException("Service specification should be a WFS service.");
             }
         }
 
         if (featureColl == null) {
-            throw new NonconvertibleObjectException("Data no found for : "+source.getReference());
+            throw new UnconvertibleObjectException("Data no found for : "+source.getReference());
         }
 
         return new ReferenceCollectionWrapper(featureColl, source.getReference());

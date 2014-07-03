@@ -23,7 +23,7 @@ import java.util.List;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviders;
 import org.constellation.util.DataReference;
-import org.geotoolkit.util.converter.NonconvertibleObjectException;
+import org.apache.sis.util.UnconvertibleObjectException;
 import org.geotoolkit.feature.type.Name;
 import org.opengis.style.Description;
 import org.opengis.style.FeatureTypeStyle;
@@ -44,9 +44,9 @@ public final class DataReferenceConverter {
      */
     private DataReferenceConverter() {}
 
-    public static Style convertDataReferenceToStyle(final DataReference source) throws NonconvertibleObjectException {
+    public static Style convertDataReferenceToStyle(final DataReference source) throws UnconvertibleObjectException {
         if (source == null) {
-            throw new NonconvertibleObjectException("Null data reference given.");
+            throw new UnconvertibleObjectException("Null data reference given.");
         }
 
         final String dataType = source.getDataType();
@@ -74,13 +74,13 @@ public final class DataReferenceConverter {
             }
 
             if (!providerFound) {
-                throw new NonconvertibleObjectException("Provider id " + providerID + " not found.");
+                throw new UnconvertibleObjectException("Provider id " + providerID + " not found.");
             }
             if (style == null) {
-                throw new NonconvertibleObjectException("Layer name " + layerName + " not found.");
+                throw new UnconvertibleObjectException("Layer name " + layerName + " not found.");
             }
         } else {
-            throw new NonconvertibleObjectException("Layer provider and service are not supported.");
+            throw new UnconvertibleObjectException("Layer provider and service are not supported.");
         }
 
         return new ReferenceStyleWrapper(style, source.getReference());

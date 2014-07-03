@@ -26,9 +26,8 @@ import java.awt.Color;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.SwingConstants;
-import org.constellation.configuration.PositionableDecoration;
-import org.geotoolkit.util.Converters;
+import org.apache.sis.util.ObjectConverters;
+import org.apache.sis.util.UnconvertibleObjectException;
 import org.apache.sis.util.logging.Logging;
 
 /**
@@ -36,12 +35,12 @@ import org.apache.sis.util.logging.Logging;
  * @author Quentin Boileau (Geomatys)
  */
 public final class WMSPortrayalUtils {
-    
+
     private static final Logger LOGGER = Logging.getLogger(WMSPortrayalUtils.class);
-    
+
     private WMSPortrayalUtils() {
     }
-     
+
     public static float parseFloat(final String str, final int fallback){
         if(str == null) return fallback;
 
@@ -52,13 +51,16 @@ public final class WMSPortrayalUtils {
             return fallback;
         }
     }
-    
+
     public static Color parseColor(final String strColor, final Float strOpacity, final Color fallback){
         if(strColor == null) return fallback;
 
-        Color color = Converters.convert(strColor, Color.class);
-
-        if(color == null) return fallback;
+        Color color;
+        try {
+            color = ObjectConverters.convert(strColor, Color.class);
+        } catch (UnconvertibleObjectException e) {
+            return fallback;
+        }
 
         if(strOpacity != null){
             float opa = strOpacity != null ? strOpacity : 1.0f;
@@ -70,9 +72,9 @@ public final class WMSPortrayalUtils {
 
         return color;
     }
-    
+
     public static String colorToHex(final Color color) {
-        
+
         String colorCode = "";
         if (color != null ) {
             String redCode = Integer.toHexString(color.getRed());
@@ -89,12 +91,12 @@ public final class WMSPortrayalUtils {
                 colorCode = "#" + alphaCode + redCode + greenCode + blueCode;
             }else{
                 colorCode = "#" + redCode + greenCode + blueCode;
-            }        
+            }
         }
-        
+
         return colorCode.toUpperCase();
     }
-    
+
     public static Float getColorOpacity (final Color color) {
         Float opacity = 1.0f;
         if (color != null) {
@@ -103,7 +105,7 @@ public final class WMSPortrayalUtils {
         }
         return opacity;
     }
-    
+
     public static URL parseURL(final String url, final URL fallback){
         if(url == null) return fallback;
 

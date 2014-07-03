@@ -22,7 +22,6 @@ package org.constellation.metadata.io;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
 
@@ -131,7 +130,7 @@ public class StaticMetadata {
         "       </gmd:MD_DataIdentification>" + '\n' +
         "   </gmd:identificationInfo>" + '\n' +
         "</gmd:MD_Metadata>";
-      
+
       public static final String META_15 =
         "<gmd:MD_Metadata xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:gml=\"http://www.opengis.net/gml\" xmlns:gco=\"http://www.isotc211.org/2005/gco\">" + '\n' +
         "   <gmd:fileIdentifier>" + '\n' +
@@ -351,13 +350,13 @@ public class StaticMetadata {
         "               <gmd:MD_DataIdentification>" + '\n' +
         "                   <gmd:abstract>" + '\n' +
         "                       <gco:CharacterString>not empty</gco:CharacterString>" + '\n' +
-        "                   </gmd:abstract>" + '\n' +        
-        "               </gmd:MD_DataIdentification>" + '\n' +        
+        "                   </gmd:abstract>" + '\n' +
+        "               </gmd:MD_DataIdentification>" + '\n' +
         "           </srv:operatesOn>" + '\n' +
         "       </srv:SV_ServiceIdentification>" + '\n' +
         "    </gmd:identificationInfo>" + '\n' +
         "</gmd:MD_Metadata>";
-        
+
         public static final String META_21 =
         "<gmd:MD_Metadata xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:srv=\"http://www.isotc211.org/2005/srv\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:gco=\"http://www.isotc211.org/2005/gco\">" + '\n' +
         "   <gmd:fileIdentifier>" + '\n' +
@@ -395,7 +394,7 @@ public class StaticMetadata {
         "    </gmd:identificationInfo>" + '\n' +
         "</gmd:MD_Metadata>";
 
-        
+
         public static void fillPoolAnchor(AnchoredMarshallerPool pool) {
         try {
             pool.addAnchor("Common Data Index record", new URI("SDN:L231:3:CDI"));

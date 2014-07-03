@@ -25,11 +25,9 @@ import static org.constellation.map.ws.WMSConstant.EXCEPTION_111_INIMAGE;
 import static org.constellation.map.ws.WMSConstant.EXCEPTION_130_BLANK;
 import static org.constellation.map.ws.WMSConstant.EXCEPTION_130_INIMAGE;
 import static org.constellation.query.wms.WMSQuery.KEY_BBOX;
-import static org.constellation.query.wms.WMSQuery.KEY_INFO_FORMAT;
 import static org.constellation.query.wms.WMSQuery.KEY_LAYER;
 import static org.constellation.query.wms.WMSQuery.KEY_LAYERS;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.CURRENT_UPDATE_SEQUENCE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_FORMAT;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_POINT;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_UPDATE_SEQUENCE;
@@ -45,7 +43,6 @@ import static org.geotoolkit.wms.xml.WmsXmlFactory.createLegendURL;
 import static org.geotoolkit.wms.xml.WmsXmlFactory.createLogoURL;
 import static org.geotoolkit.wms.xml.WmsXmlFactory.createOnlineResource;
 import static org.geotoolkit.wms.xml.WmsXmlFactory.createStyle;
-import groovy.transform.TimedInterrupt;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -70,11 +67,12 @@ import javax.xml.bind.JAXBException;
 import org.apache.sis.internal.util.UnmodifiableArrayList;
 import org.apache.sis.measure.MeasurementRange;
 import org.apache.sis.measure.Range;
+import org.apache.sis.referencing.CommonCRS;
 import org.apache.sis.referencing.crs.DefaultEngineeringCRS;
 import org.apache.sis.referencing.cs.AbstractCS;
-import org.apache.sis.referencing.datum.AbstractDatum;
 import org.apache.sis.referencing.datum.DefaultEngineeringDatum;
 import org.apache.sis.storage.DataStoreException;
+import org.apache.sis.util.UnconvertibleObjectException;
 import org.apache.sis.xml.MarshallerPool;
 //Constellation dependencies
 import org.constellation.Cstl;
@@ -115,8 +113,6 @@ import org.geotoolkit.map.MapItem;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.referencing.ReferencingUtilities;
-import org.geotoolkit.referencing.crs.DefaultTemporalCRS;
-import org.geotoolkit.referencing.crs.DefaultVerticalCRS;
 import org.geotoolkit.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotoolkit.referencing.cs.DiscreteCoordinateSystemAxis;
 import org.geotoolkit.se.xml.v110.OnlineResourceType;
@@ -134,7 +130,6 @@ import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.StyleUtilities;
 import org.geotoolkit.util.PeriodUtilities;
 import org.geotoolkit.util.StringUtilities;
-import org.geotoolkit.util.converter.NonconvertibleObjectException;
 import org.geotoolkit.wms.xml.AbstractBoundingBox;
 import org.geotoolkit.wms.xml.AbstractDimension;
 import org.geotoolkit.wms.xml.AbstractGeographicBoundingBox;
@@ -151,8 +146,8 @@ import org.geotoolkit.wms.xml.GetMap;
 import org.geotoolkit.wms.xml.WMSMarshallerPool;
 import org.geotoolkit.wms.xml.v111.LatLonBoundingBox;
 import org.geotoolkit.wms.xml.v130.Capability;
-//Geoapi dependencies
 import org.geotoolkit.feature.type.Name;
+//Geoapi dependencies
 import org.opengis.filter.Filter;
 import org.opengis.filter.expression.Expression;
 import org.opengis.geometry.Envelope;
@@ -211,7 +206,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     private final List<String> GFI_MIME_TYPES = new ArrayList<String>();
 
     private WMSPortrayal mapPortrayal;
-    
+
     public static class Factory {
         public static DefaultWMSWorker create(String id) {
             return new DefaultWMSWorker(id);
@@ -840,7 +835,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                 Style style = null;
                 try {
                     style = DataReferenceConverter.convertDataReferenceToStyle(styl);
-                } catch (NonconvertibleObjectException e) {
+                } catch (UnconvertibleObjectException e) {
                     // The given style reference was invalid, we can't get a style from that
                     LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
                 }
@@ -1349,7 +1344,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         if(sld == null){
             throw new IllegalArgumentException("SLD should not be null");
         }
-        
+
         final List<MutableNamedLayer> emptyNameSLDLayers = new ArrayList<>();
         for(final org.opengis.sld.Layer sldLayer : sld.layers()){
             // We can't do anything if it is not a MutableNamedLayer.
@@ -1451,9 +1446,9 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     final CoordinateReferenceSystem crs;
 
                     if("elevation".equalsIgnoreCase(crsname)){
-                        crs = DefaultVerticalCRS.ELLIPSOIDAL_HEIGHT;
+                        crs = CommonCRS.Vertical.ELLIPSOIDAL.crs();
                     }else if("temporal".equalsIgnoreCase(crsname)){
-                        crs = DefaultTemporalCRS.JAVA;
+                        crs = CommonCRS.Temporal.JAVA.crs();
                     }else{
                         final EngineeringDatum customDatum = new DefaultEngineeringDatum(Collections.singletonMap("name", crsname));
                         final CoordinateSystemAxis csAxis = new DefaultCoordinateSystemAxis(crsname, "u", AxisDirection.valueOf(crsname), Unit.ONE);

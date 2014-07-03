@@ -38,8 +38,8 @@ import org.geotoolkit.display2d.primitive.ProjectedCoverage;
 import org.geotoolkit.display2d.primitive.SearchAreaJ2D;
 import org.geotoolkit.lang.Static;
 import org.geotoolkit.map.CoverageMapLayer;
-import org.geotoolkit.referencing.CRS;
-import org.geotoolkit.referencing.crs.DefaultCompoundCRS;
+import org.apache.sis.referencing.CRS;
+import org.apache.sis.referencing.crs.DefaultCompoundCRS;
 
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.geometry.Envelope;
@@ -332,7 +332,7 @@ public final class FeatureInfoUtilities extends Static {
         final CoverageMapLayer layer = gra.getLayer();
         Envelope objBounds = context.getCanvasObjectiveBounds();
         CoordinateReferenceSystem objCRS = objBounds.getCoordinateReferenceSystem();
-        TemporalCRS temporalCRS = CRS.getTemporalCRS(objCRS);
+        TemporalCRS temporalCRS = CRS.getTemporalComponent(objCRS);
         if (temporalCRS == null) {
             /*
              * If there is no temporal range, arbitrarily select the latest date.
@@ -341,10 +341,10 @@ public final class FeatureInfoUtilities extends Static {
              */
             Envelope timeRange = layer.getBounds();
             if (timeRange != null) {
-                temporalCRS = CRS.getTemporalCRS(timeRange.getCoordinateReferenceSystem());
+                temporalCRS = CRS.getTemporalComponent(timeRange.getCoordinateReferenceSystem());
                 if (temporalCRS != null) {
                     try {
-                        timeRange = CRS.transform(timeRange, temporalCRS);
+                        timeRange = org.geotoolkit.referencing.CRS.transform(timeRange, temporalCRS);
                     } catch (TransformException e) {
                         // Should never happen since temporalCRS is a component of layer CRS.
                         Logging.unexpectedException(AbstractGraphicVisitor.class, "getCoverageValues", e);
@@ -361,7 +361,8 @@ public final class FeatureInfoUtilities extends Static {
                         Logging.unexpectedException(AbstractGraphicVisitor.class, "getCoverageValues", e);
                         day = 1;
                     }
-                    objCRS = new DefaultCompoundCRS(objCRS.getName().getCode() + " + time", objCRS, temporalCRS);
+                    objCRS = new DefaultCompoundCRS(Collections.singletonMap(DefaultCompoundCRS.NAME_KEY,
+                            objCRS.getName().getCode() + " + time"), objCRS, temporalCRS);
                     final GeneralEnvelope merged = new GeneralEnvelope(objCRS);
                     GeneralEnvelope subEnv = merged.subEnvelope(0, objBounds.getDimension());
                     subEnv.setEnvelope(objBounds);

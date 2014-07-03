@@ -53,7 +53,7 @@ import org.geotoolkit.referencing.CRS;
 import org.apache.sis.util.ArgumentChecks;
 import org.geotoolkit.util.Exceptions;
 import org.geotoolkit.util.FileUtilities;
-import org.geotoolkit.util.converter.NonconvertibleObjectException;
+import org.apache.sis.util.UnconvertibleObjectException;
 import org.geotoolkit.wps.converters.WPSConvertersUtils;
 import org.geotoolkit.wps.io.WPSIO;
 import org.geotoolkit.wps.io.WPSMimeType;
@@ -225,19 +225,19 @@ public class WPSWorker extends AbstractWorker {
             }
             webdavFolderPath = tmpFolder.getAbsolutePath();
         }
-        
+
         //Configure the directory to store parameters schema into.
         File schemaLoc = new File(webdavFolderPath + SCHEMA_FOLDER_NAME);
         schemaLoc.mkdir();
-        
+
         if(schemaLoc.exists()) {
             schemaFolder = schemaLoc.getAbsolutePath();
         } else {
             schemaFolder = webdavFolderPath;
         }
-        
+
         this.webdavURL = null; //initialize on WPS execute request.
-        
+
         //create new WebDav instance
         final boolean webdav = createWebDav();
         if (!webdav) {
@@ -347,7 +347,7 @@ public class WPSWorker extends AbstractWorker {
                         LOGGER.log(Level.WARNING, "No process factory found for authorityCode:{0}", processFactory.getAutorityCode());
                     }
                 }
-            }        
+            }
         for(ProcessDescriptor desc : processDescriptorList) {
             try {
                 checkForSchemasToStore(desc);
@@ -392,7 +392,7 @@ public class WPSWorker extends AbstractWorker {
     }
 
     /**
-     * Update the current WebDav URL based on the current service URL. 
+     * Update the current WebDav URL based on the current service URL.
      * TODO find a better way to build webdavURL
      */
     private void updateWebDavURL() {
@@ -458,7 +458,7 @@ public class WPSWorker extends AbstractWorker {
         }
         return true;
     }
-    
+
     //////////////////////////////////////////////////////////////////////
     //                      GetCapabilities
     //////////////////////////////////////////////////////////////////////
@@ -505,7 +505,7 @@ public class WPSWorker extends AbstractWorker {
             if (returnUS) {
                 return new WPSCapabilitiesType("1.0.0", getCurrentUpdateSequence());
             }
-            
+
             final Object cachedCapabilities = getCapabilitiesFromCache("1.0.0", null);
             if (cachedCapabilities != null) {
                 return (WPSCapabilitiesType) cachedCapabilities;
@@ -526,7 +526,7 @@ public class WPSWorker extends AbstractWorker {
                 offering.getProcess().add(WPSUtils.generateProcessBrief(procDesc));
             }
             final org.geotoolkit.wps.xml.v100.Languages languages = new org.geotoolkit.wps.xml.v100.Languages("en-EN", Arrays.asList("en-EN"));
-           
+
             final WPSCapabilitiesType response = new WPSCapabilitiesType(si, sp, om, "1.0.0", getCurrentUpdateSequence(), offering, languages, null);
             putCapabilitiesInCache("1.0.0", null, response);
             return response;
@@ -719,7 +719,7 @@ public class WPSWorker extends AbstractWorker {
 
                 } else if (param instanceof ParameterDescriptorGroup) {
                     /*
-                     * If we get a parameterDescriptorGroup, we must expose the 
+                     * If we get a parameterDescriptorGroup, we must expose the
                      * parameters contained in it as one single input. To do so,
                      * we'll expose a feature type input.
                      */
@@ -809,7 +809,7 @@ public class WPSWorker extends AbstractWorker {
 
                 } else if (param instanceof ParameterDescriptorGroup) {
                     /*
-                     * If we get a parameterDescriptorGroup, we must expose the 
+                     * If we get a parameterDescriptorGroup, we must expose the
                      * parameters contained in it as one single input. To do so,
                      * we'll expose a feature type input.
                      */
@@ -1244,7 +1244,7 @@ public class WPSWorker extends AbstractWorker {
             } else {
                 expectedClass = Feature.class;
             }
-            
+
             Object dataValue = null;
             //LOGGER.log(Level.INFO, "Input : " + inputIdentifier + " : expected Class " + expectedClass.getCanonicalName());
 
@@ -1263,7 +1263,7 @@ public class WPSWorker extends AbstractWorker {
                 }
                 try {
                     dataValue = WPSConvertersUtils.convertFromReference(requestedRef, expectedClass);
-                } catch (NonconvertibleObjectException ex) {
+                } catch (UnconvertibleObjectException ex) {
                     LOGGER.log(Level.WARNING, "Error during conversion of reference input {0}.",inputIdentifier);
                     throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
                 }
@@ -1317,7 +1317,7 @@ public class WPSWorker extends AbstractWorker {
 
                     try {
                         dataValue = WPSConvertersUtils.convertFromComplex(complex, expectedClass);
-                    } catch (NonconvertibleObjectException ex) {
+                    } catch (UnconvertibleObjectException ex) {
                         LOGGER.log(Level.WARNING, "Error during conversion of complex input {0}.",inputIdentifier);
                         throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
                     }
@@ -1336,7 +1336,7 @@ public class WPSWorker extends AbstractWorker {
                 if(!(inputDescriptor instanceof ParameterDescriptor)) {
                     throw new CstlServiceException("Invalid parameter type.", INVALID_PARAMETER_VALUE, inputIdentifier);
                 }
-                
+
                 final LiteralDataType literal = inputRequest.getData().getLiteralData();
                 final String data = literal.getValue();
 
@@ -1350,7 +1350,7 @@ public class WPSWorker extends AbstractWorker {
 
                     try {
                         dataValue = WPSConvertersUtils.convertFromString(data, expectedClass);
-                    } catch (NonconvertibleObjectException ex) {
+                    } catch (UnconvertibleObjectException ex) {
                         LOGGER.log(Level.WARNING, "Error during conversion of literal input {0}.",inputIdentifier);
                         throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
                     }
@@ -1362,7 +1362,7 @@ public class WPSWorker extends AbstractWorker {
                     in.parameter(inputIdentifierCode).setValue(dataValue);
                 } else if(inputDescriptor instanceof ParameterDescriptorGroup && dataValue instanceof ComplexAttribute) {
                     WPSConvertersUtils.featureToParameterGroup(
-                            (ComplexAttribute)dataValue, 
+                            (ComplexAttribute)dataValue,
                             in.addGroup(inputIdentifierCode));
                 } else {
                     throw new Exception();
@@ -1420,14 +1420,14 @@ public class WPSWorker extends AbstractWorker {
                 /**
                  * TODO: Treat ParameterValueGroup for outputs.
                  */
-                throw new CstlServiceException("Invalid or unknown output identifier " + outputIdentifier + ".", INVALID_PARAMETER_VALUE, outputIdentifier); 
+                throw new CstlServiceException("Invalid or unknown output identifier " + outputIdentifier + ".", INVALID_PARAMETER_VALUE, outputIdentifier);
             } else {
-                throw new CstlServiceException("Invalid or unknown output identifier " + outputIdentifier + ".", INVALID_PARAMETER_VALUE, outputIdentifier);                
+                throw new CstlServiceException("Invalid or unknown output identifier " + outputIdentifier + ".", INVALID_PARAMETER_VALUE, outputIdentifier);
             }
 
         }//end foreach wanted outputs
     }
-    
+
 
     /**
      * Create {@link OutputDataType output} object for one requested output.
@@ -1502,7 +1502,7 @@ public class WPSWorker extends AbstractWorker {
 
                     data.setComplexData(complex);
 
-                } catch (NonconvertibleObjectException ex) {
+                } catch (UnconvertibleObjectException ex) {
                     LOGGER.log(Level.WARNING, "Error during conversion of complex output {0}.", outputIdentifier);
                     throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
                 }
@@ -1574,7 +1574,7 @@ public class WPSWorker extends AbstractWorker {
                     parameters,
                     WPSIO.IOType.OUTPUT);
 
-        } catch (NonconvertibleObjectException ex) {
+        } catch (UnconvertibleObjectException ex) {
             LOGGER.log(Level.WARNING, "Error during conversion of reference output {0}.", outputIdentifier);
             throw new CstlServiceException(ex.getMessage(), ex, NO_APPLICABLE_CODE);
         }
@@ -1627,8 +1627,8 @@ public class WPSWorker extends AbstractWorker {
         }
         return outputValue;
     }
-    
-    
+
+
     private void checkForSchemasToStore(ProcessDescriptor source) throws JAXBException {
         /*
          * Check each input and output. If we get a parameterDescriptorGroup,
@@ -1651,7 +1651,7 @@ public class WPSWorker extends AbstractWorker {
             }
         }
     }
-    
+
     @Override
     protected String getProperty(final String key) {
         if (context != null && context.getCustomParameters() != null) {

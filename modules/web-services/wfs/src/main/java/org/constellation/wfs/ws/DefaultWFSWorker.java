@@ -70,7 +70,7 @@ import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureReader;
 import org.geotoolkit.filter.binding.Binding;
 import org.geotoolkit.filter.binding.Bindings;
 import org.geotoolkit.referencing.CRS;
-import org.geotoolkit.referencing.IdentifiedObjects;
+import org.apache.sis.referencing.IdentifiedObjects;
 import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
@@ -177,7 +177,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     private List<StoredQueryDescription> storedQueries = new ArrayList<>();
 
     private final boolean isTransactionnal;
-    
+
     public DefaultWFSWorker(final String id) {
         super(id, ServiceDef.Specification.WFS);
         if (isStarted) {
@@ -209,7 +209,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         } catch (FileNotFoundException e) {
             // there is no file continue
         }
-            
+
         // we verify if the identifier query is loaded (if not we load it)
        boolean foundID = false;
        for (StoredQueryDescription squery : storedQueries) {
@@ -228,7 +228,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
            final StoredQueryDescriptionType idQ = new StoredQueryDescriptionType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureById", "Identifier query" , "filter on feature identifier", IDENTIFIER_PARAM, queryEx);
            storedQueries.add(idQ);
        }
-       
+
         // we verify if the type query is loaded (if not we load it)
        boolean foundT = false;
        for (StoredQueryDescription squery : storedQueries) {
@@ -247,7 +247,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
            final StoredQueryDescriptionType idQ = new StoredQueryDescriptionType("urn:ogc:def:storedQuery:OGC-WFS::GetFeatureByType", "By type query" , "filter on feature type", TYPE_PARAM, queryEx);
            storedQueries.add(idQ);
        }
-       
+
     }
 
     private void storedQueries() {
@@ -255,7 +255,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             ConfigurationEngine.storeConfiguration("WFS", getId(), "StoredQueries.xml", new StoredQueries(storedQueries), getMarshallerPool());
         } catch (JAXBException ex) {
            LOGGER.log(Level.WARNING, "JAXBExeception while marshalling the stored queries File", ex);
-        } 
+        }
     }
 
     @Override
@@ -270,7 +270,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
     public WFSCapabilities getCapabilities(final GetCapabilities request) throws CstlServiceException {
         LOGGER.log(logLevel, "GetCapabilities request proccesing");
         final long start = System.currentTimeMillis();
-        
+
         final String userLogin  = getUserLogin();
         //choose the best version from acceptVersion
         final AcceptVersions versions = request.getAcceptVersions();
@@ -288,7 +288,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 request.setVersion(max.toString());
             }
         }
-        
+
         // we verify the base attribute
         verifyBaseRequest(request, false, true);
         final String currentVersion = request.getVersion().toString();
@@ -298,12 +298,12 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         if (returnUS) {
             return buildWFSCapabilities(currentVersion, getCurrentUpdateSequence());
         }
-        
+
         Sections sections = request.getSections();
         if (sections == null) {
             sections = buildSections(currentVersion, Arrays.asList("All"));
         }
-        
+
         final AbstractCapabilitiesBase cachedCapabilities = (WFSCapabilities) getCapabilitiesFromCache(currentVersion, null);
         if (cachedCapabilities != null) {
             return (WFSCapabilities) cachedCapabilities.applySections(sections);
@@ -311,7 +311,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
         final Service skeleton = getStaticCapabilitiesObject("WFS", null);
         final WFSCapabilities inCapabilities = WFSConstants.createCapabilities(currentVersion, skeleton);
-        
+
         final FeatureTypeList ftl = buildFeatureTypeList(currentVersion);
         /*
          *  layer providers
@@ -376,7 +376,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 LOGGER.log(Level.WARNING, "The layer:{0} is not a feature layer", layerName);
             }
         }
-        
+
         final AbstractOperationsMetadata om;
         if (currentVersion.equals("2.0.0")) {
             om = OPERATIONS_METADATA_V200.clone();
@@ -392,7 +392,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 cst.setDefaultValue("FALSE");
             }
         }
-            
+
         final AbstractServiceProvider sp       = inCapabilities.getServiceProvider();
         final AbstractServiceIdentification si = inCapabilities.getServiceIdentification();
         final FilterCapabilities fc;
@@ -413,9 +413,9 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         if (type.getGeometryDescriptor() != null && type.getGeometryDescriptor().getCoordinateReferenceSystem() != null) {
             final CoordinateReferenceSystem crs = type.getGeometryDescriptor().getCoordinateReferenceSystem();
             //todo wait for martin fix
-            String id  = IdentifiedObjects.lookupIdentifier(crs, true);
+            String id  = org.geotoolkit.referencing.IdentifiedObjects.lookupIdentifier(crs, true);
             if (id == null) {
-                id = IdentifiedObjects.getIdentifier(crs);
+                id = IdentifiedObjects.getIdentifierOrName(crs);
             }
 
             if (id != null) {
@@ -444,7 +444,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         verifyBaseRequest(request, false, false);
         final String currentVersion = request.getVersion().toString();
         final String userLogin      = getUserLogin();
-        
+
         final String gmlVersion;
         if ("2.0.0".equals(currentVersion)) {
             gmlVersion = "3.2.1";
@@ -702,10 +702,10 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 } catch (DataStoreException ex) {
                     throw new CstlServiceException(ex);
                 }
-                
+
                 // suplied typeName can be imcomplete (no namespace)
                 final QName realName = Utils.getQnameFromName(ft.getName());
-                        
+
                 // we ensure that the property names are contained in the feature type and add the mandatory attribute to the list
                 queryBuilder.setProperties(verifyPropertyNames(realName, ft, requestPropNames));
                 queryBuilder.setTypeName(ft.getName());
@@ -727,7 +727,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 } catch (DataStoreException ex) {
                     throw new CstlServiceException(ex);
                 }
-                 
+
                 if (!collection.isEmpty()) {
                     if(queryCRS == null){
                         try {
@@ -973,7 +973,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         final Map<String, String> namespaceMapping  = request.getPrefixMapping();
         final JAXPStreamFeatureReader featureReader = new JAXPStreamFeatureReader(getFeatureTypes(userLogin));
         featureReader.getProperties().put(JAXPStreamFeatureReader.BINDING_PACKAGE, "GML");
-        
+
         for (Object transaction: transactions) {
 
             /**
@@ -1214,10 +1214,10 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
 
             } else if (transaction instanceof ReplaceElement) {
-                
+
                 final ReplaceElement replaceRequest = (ReplaceElement) transaction;
                 final String handle = replaceRequest.getHandle();
-                
+
                 // we verify the input format
                 if (replaceRequest.getInputFormat() != null && !(replaceRequest.getInputFormat().equals("text/xml; subtype=gml/3.1.1")
                                                             ||   replaceRequest.getInputFormat().equals("application/gml+xml; version=3.2"))) {
@@ -1230,8 +1230,8 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
 
                 //decode crs--------------------------------------------------------
                 final CoordinateReferenceSystem crs = extractCRS(replaceRequest.getSrsName());
-                
-                // extract replacement feature 
+
+                // extract replacement feature
                 Object featureObject = replaceRequest.getFeature();
                 if (featureObject instanceof JAXBElement) {
                     featureObject = ((JAXBElement) featureObject).getValue();
@@ -1283,11 +1283,11 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     }
                     throw new CstlServiceException("Unexpected replacement object:" + featureType);
                 }
-                        
+
                 if (layersContainsKey(userLogin, typeName) == null) {
                     throw new CstlServiceException(UNKNOW_TYPENAME + typeName);
                 }
-                
+
                 try {
                     final FeatureData layer = (FeatureData) getLayerReference(userLogin, typeName);
                     final FeatureType ft = getFeatureTypeFromLayer(layer);
@@ -1316,7 +1316,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                 } catch (DataStoreException ex) {
                     throw new CstlServiceException(ex);
                 }
-                
+
             } else {
                 String className = " null object";
                 if (transaction != null) {
@@ -1456,7 +1456,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
                     //but it always exist on the features
                     continue;
                 }
-                
+
                 // look to remove featureType prefix
                 final String ftName = ft.getName().toString();
                 if (filterProperty.startsWith(ftName)) {
@@ -1497,7 +1497,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
             filter = (Filter) filter.accept(new DefaultGeomPropertyVisitor(ft), null);
             filter = (Filter) filter.accept(new GMLNamespaceVisitor(), null);
             filter = (Filter) filter.accept(new BooleanVisitor(ft), null);
-            
+
             if (!CRS.equalsIgnoreMetadata(trueCrs, exposedCrs)) {
                 filter = (Filter) filter.accept(FillCrsVisitor.VISITOR, exposedCrs);
                 filter = (Filter) filter.accept(new CrsAdjustFilterVisitor(exposedCrs, trueCrs), null);
@@ -1563,7 +1563,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         query.getTypeNames().removeAll(toRemove);
         query.getTypeNames().addAll(toAdd);
     }
-    
+
     private static void applyParameterOnFilter(final Filter filter, final List<? extends Parameter> parameters) throws CstlServiceException {
         if (filter instanceof XMLFilter) {
             final Object filterObject = ((XMLFilter)filter).getFilterObject();
@@ -1708,7 +1708,7 @@ public class DefaultWFSWorker extends LayerWorker implements WFSWorker {
         final long startTime = System.currentTimeMillis();
         verifyBaseRequest(request, true, false);
         final String currentVersion = request.getVersion().toString();
-        
+
         final List<StoredQueryDescription> storedQueryList;
         if (request.getStoredQueryId() != null && !request.getStoredQueryId().isEmpty()) {
             storedQueryList = new ArrayList<>();

@@ -70,7 +70,7 @@ import org.mdweb.io.Reader;
 
 // Geotoolkit dependencies
 import org.apache.sis.util.iso.Types;
-import org.geotoolkit.io.wkt.UnformattableObjectException;
+import org.apache.sis.io.wkt.UnformattableObjectException;
 import org.geotoolkit.temporal.object.TemporalUtilities;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.UnlimitedInteger;
@@ -178,9 +178,9 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     private boolean storeMapping = false;
 
     private static final TimeZone tz = TimeZone.getTimeZone("GMT+2:00");
-    
+
     private final boolean indexOnlyPublished;
-    
+
     /**
      * Build a new metadata Reader.
      *
@@ -249,7 +249,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             }
             storeMapping = m;
         }
-        
+
         this.indexOnlyPublished = configuration.getIndexOnlyPublishedMetadata();
 
         initPackage();
@@ -1268,13 +1268,13 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         }
         return results;
     }
-    
+
     /**
      * TODO add a proper count methode in mdreader.
-     * 
+     *
      * @return the number of record in the database.
-     * 
-     * @throws MetadataIoException 
+     *
+     * @throws MetadataIoException
      */
     @Override
     public int getEntryCount() throws MetadataIoException {
