@@ -74,13 +74,13 @@ public class ServiceBusiness {
      *
      * @param serviceType
      * @param identifier    The identifier of the service.
-     * @param metadata      the service metadata (can be null).
+     * @param details      the service metadata (can be null).
      * @param configuration the service configuration (can be null).
      * 
      * @return the configuration object just setted.
      * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
-    public Object create(final String serviceType, final String identifier, Object configuration, final Details metadata ,final Integer domainId) throws ConfigurationException {
+    public Object create(final String serviceType, final String identifier, Object configuration, final Details details ,final Integer domainId) throws ConfigurationException {
 
         if (identifier == null || identifier.isEmpty()) {
             throw new ConfigurationException("Service instance identifier can't be null or empty.");
@@ -99,19 +99,19 @@ public class ServiceBusiness {
         service.setIdentifier(identifier);
         service.setStatus(ServiceStatus.STOPPED.toString());
         //TODO metadata-Iso
-        service.setVersions(StringUtils.join(metadata.getVersions(),"|"));
+        service.setVersions(StringUtils.join(details.getVersions(), "|"));
         int serviceId = serviceRepository.create(service);
         ServiceI18n serviceI18n = new ServiceI18n();
-        serviceI18n.setDescription(metadata.getDescription());
+        serviceI18n.setDescription(details.getDescription());
         serviceI18n.setServiceId(serviceId);
-        serviceI18n.setTitle(metadata.getName());
-        serviceI18n.setLang(metadata.getLang());
-        serviceI18n.setKeywords(StringUtils.join(metadata.getKeywords(), "|"));
+        serviceI18n.setTitle(details.getName());
+        serviceI18n.setLang(details.getLang());
+        serviceI18n.setKeywords(StringUtils.join(details.getKeywords(), "|"));
         serviceRepository.create(serviceI18n);
         if (domainId != null){
             domainRepository.addServiceToDomain(serviceId,domainId);
         }
-        setInstanceDetails(serviceType, identifier, metadata, metadata.getLang());
+        setInstanceDetails(serviceType, identifier, details, details.getLang());
         return configuration;
     }
     
@@ -306,11 +306,11 @@ public class ServiceBusiness {
      * @param serviceType The service type (WMS, WFS, ...)
      * @param identifier    the service identifier.
      * @param configuration the service configuration (depending on implementation).
-     * @param metadata      the service metadata.
+     * @param details      the service metadata.
      * 
      * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
-     public void configure(final String serviceType, final String identifier, final Details metadata, Object configuration) throws ConfigurationException {
+     public void configure(final String serviceType, final String identifier, final Details details, Object configuration) throws ConfigurationException {
          if (identifier == null || identifier.isEmpty()) {
             throw new ConfigurationException("Service instance identifier can't be null or empty.");
         }
@@ -327,26 +327,26 @@ public class ServiceBusiness {
         } else {
             service.setConfig(getStringFromObject(configuration, GenericDatabaseMarshallerPool.getInstance()));
             serviceRepository.update(service);
-            if (metadata != null) {
-                final ServiceI18n serviceI18n = serviceRepository.getI18n(service.getId(), metadata.getLang());
+            if (details != null) {
+                final ServiceI18n serviceI18n = serviceRepository.getI18n(service.getId(), details.getLang());
                 if (serviceI18n == null){
                     final ServiceI18n newServiceI18n = new ServiceI18n();
-                    newServiceI18n.setLang(metadata.getLang());
+                    newServiceI18n.setLang(details.getLang());
                     newServiceI18n.setServiceId(service.getId());
-                    newServiceI18n.setDescription(metadata.getDescription());
-                    newServiceI18n.setTitle(metadata.getName());
-                    newServiceI18n.setKeywords(StringUtils.join(metadata.getKeywords(), "|"));
+                    newServiceI18n.setDescription(details.getDescription());
+                    newServiceI18n.setTitle(details.getName());
+                    newServiceI18n.setKeywords(StringUtils.join(details.getKeywords(), "|"));
                     serviceRepository.create(newServiceI18n);
                 } else {
-                    serviceI18n.setLang(metadata.getLang());
+                    serviceI18n.setLang(details.getLang());
                     serviceI18n.setServiceId(service.getId());
-                    serviceI18n.setDescription(metadata.getDescription());
-                    serviceI18n.setTitle(metadata.getName());
-                    serviceI18n.setKeywords(StringUtils.join(metadata.getKeywords(),"|"));
+                    serviceI18n.setDescription(details.getDescription());
+                    serviceI18n.setTitle(details.getName());
+                    serviceI18n.setKeywords(StringUtils.join(details.getKeywords(),"|"));
                     serviceRepository.update(serviceI18n);
                 }
             }
-            setInstanceDetails(serviceType, identifier, metadata, metadata.getLang());
+            setInstanceDetails(serviceType, identifier, details, details.getLang());
         }
      }
      
@@ -533,8 +533,8 @@ public class ServiceBusiness {
         final Service service = this.ensureExistingInstance(serviceType, identifier);
         if (service != null) {
             final String xml = getStringFromObject(details, GenericDatabaseMarshallerPool.getInstance());
-            final ServiceDetails meta = new ServiceDetails(service.getId(), language, xml,true);
-            serviceRepository.createOrUpdateServiceDetails(meta);
+            final ServiceDetails serviceDetails = new ServiceDetails(service.getId(), language, xml,true);
+            serviceRepository.createOrUpdateServiceDetails(serviceDetails);
         }
     }
     

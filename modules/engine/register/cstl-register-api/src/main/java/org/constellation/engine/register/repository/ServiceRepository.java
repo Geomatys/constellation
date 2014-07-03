@@ -61,8 +61,6 @@ public interface ServiceRepository {
 
     void updateExtraFile(Service service, String fileName, String config);
 
-//    int updateIsoMetadata(Service service, String fileIdentifier, String string);
-
     Map<Domain, Boolean> getLinkedDomains(int serviceId);
 
     Service findByMetadataId(String metadataId);

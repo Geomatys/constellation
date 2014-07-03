@@ -106,18 +106,18 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
     }
     
     @Override
-    public void createOrUpdateServiceDetails(ServiceDetails metadata) {
-        final ServiceDetails ServiceDetails = getServiceDetails(metadata.getId(), metadata.getLang());
+    public void createOrUpdateServiceDetails(ServiceDetails serviceDetails) {
+        final ServiceDetails ServiceDetails = getServiceDetails(serviceDetails.getId(), serviceDetails.getLang());
         if (ServiceDetails!=null){
-            dsl.update(SERVICE_DETAILS).set(SERVICE_DETAILS.CONTENT, metadata.getContent())
-                    .set(SERVICE_DETAILS.DEFAULT_LANG, metadata.isDefaultLang())
-                    .where(SERVICE_DETAILS.ID.eq(metadata.getId()))
-                    .and(SERVICE_DETAILS.LANG.eq(metadata.getLang())).execute();
+            dsl.update(SERVICE_DETAILS).set(SERVICE_DETAILS.CONTENT, serviceDetails.getContent())
+                    .set(SERVICE_DETAILS.DEFAULT_LANG, serviceDetails.isDefaultLang())
+                    .where(SERVICE_DETAILS.ID.eq(serviceDetails.getId()))
+                    .and(SERVICE_DETAILS.LANG.eq(serviceDetails.getLang())).execute();
         } else {
             ServiceDetailsRecord newRecord = dsl.newRecord(SERVICE_DETAILS);
-            newRecord.setContent(metadata.getContent());
-            newRecord.setLang(metadata.getLang());
-            newRecord.setId(metadata.getId());
+            newRecord.setContent(serviceDetails.getContent());
+            newRecord.setLang(serviceDetails.getLang());
+            newRecord.setId(serviceDetails.getId());
             newRecord.store();
         }
     }
@@ -155,12 +155,6 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
         }
 
     }
-
-//    @Override
-//    public int updateIsoMetadata(Service service, String metadataId, String metadata) {
-//        return dsl.update(SERVICE).set(SERVICE.METADATA_ID, metadataId).set(SERVICE.METADATA, metadata)
-//                .where(SERVICE.ID.eq(service.getId())).execute();
-//    }
 
     @Override
     public Map<String, Set<String>> getAccessiblesServicesByType(int domainId, String userName) {
