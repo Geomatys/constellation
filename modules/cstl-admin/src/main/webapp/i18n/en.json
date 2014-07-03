@@ -327,6 +327,9 @@
     "label.reduced.display":"Reduced display",
     "label.yes":"Yes",
     "label.no":"No",
+    "label.color":"Color",
+    "label.outline":"Outline",
+    "label.contrast":"Contrast and relief",
 
     "layer.listing.data.add.button.label": "Add data",
     "layer.listing.data.create.button.label": "Create data",

@@ -1222,3 +1222,15 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         };
 
     }]);
+
+cstlAdminApp.controller('SldRasterController', ['$scope', function($scope){
+
+    $scope.colorModels = [
+        {name:'palette', value:'Palette'},
+        {name:'grayscale', value:'Grascale /RGB'}];
+
+    $scope.colorModel= $scope.colorModels[0];
+
+    $scope.symbolPills = 'color';
+
+}]);

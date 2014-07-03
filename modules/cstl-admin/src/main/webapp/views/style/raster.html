@@ -129,10 +129,9 @@
                         </div>
                     </form>
                 </div>
-                <div class="tab-pane tab-style-edition" ng-class="{active:$parent.chosenTab==='symbols'}">
-                    <form class="form-horizontal" role="form">
-                        @TODO voir la maquette
+                <div class="tab-pane tab-style-edition" ng-class="{active:$parent.chosenTab==='symbols'}" ng-controller="SldRasterController">
 
+						<div ng-include="'views/style/raster_sld.html'"></div>
                     </form>
                 </div>
                 <div class="tab-pane tab-style-edition" ng-class="{active:$parent.chosenTab==='filters'}">

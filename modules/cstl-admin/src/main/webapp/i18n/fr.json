@@ -367,6 +367,9 @@
     "label.reduced.display":"Affichage réduit",
     "label.yes":"Oui",
     "label.no":"Non",
+    "label.color":"Couleur",
+    "label.outline":"Contour",
+    "label.contrast":"Contraste et relief",
 
     "layer.listing.data.add.button.label": "Ajouter une donnée",
     "layer.listing.data.create.button.label": "Créer une donnée",

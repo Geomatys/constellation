@@ -1,0 +1,52 @@
+<form class="form-horizontal" role="form">
+    <ul class="nav nav-pills" role="tablist">
+        <li ng-class="{active:symbolPills==='color'}">
+            <a ng-click="symbolPills='color'" role="tab">
+                <span translate="label.color">Color</span>
+            </a>
+        </li>
+        <li ng-class="{active:symbolPills==='outline'}">
+            <a ng-click="symbolPills='outline'" role="tab">
+                <span translate="label.outline">Outline</span>
+            </a>
+        </li>
+        <li ng-class="{active:symbolPills==='contrast'}">
+            <a ng-click="symbolPills='contrast'" role="tab">
+                <span translate="label.contrast">Contrast and relief</span>
+            </a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane" ng-class="{active:symbolPills==='color'}">
+            <div class="form-group">
+                <div class="row">
+                    <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label"
+                           for="colormodel" translate="label.color.model">Color model</label>
+                    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+                        <select class="form-control" id="colormodel" data-ng-model="colorModel" ng-options="colorModel.value for colorModel in colorModels">
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div id="palette" class="row" ng-show="colorModel.name === 'palette'">
+                <div class="form-group">
+                    <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label"
+                           for="bands" translate="label.color.band">Band : </label>
+                    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+                        <select class="form-control" id="bands">
+                            <option value="red">Red</option>
+                            <option value="Green">Green</option>
+                            <option value="Blue">Blue</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div id="grayscale" ng-show="colorModel.name === 'grayscale'">
+                grayscale
+            </div>
+        </div>
+        <div class="tab-pane" ng-class="{active:symbolPills==='outline'}">outline</div>
+        <div class="tab-pane" ng-class="{active:symbolPills==='contrast'}">contrast</div>
+    </div>
+</form>
