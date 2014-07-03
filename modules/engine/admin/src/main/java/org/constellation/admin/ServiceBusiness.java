@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef;
 import org.constellation.admin.dto.ServiceDTO;
+import org.constellation.admin.exception.ConstellationException;
 import org.constellation.admin.util.DefaultServiceConfiguration;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
@@ -100,16 +101,8 @@ public class ServiceBusiness {
         service.setStatus(ServiceStatus.STOPPED.toString());
         //TODO metadata-Iso
         service.setVersions(StringUtils.join(details.getVersions(), "|"));
-        int serviceId = serviceRepository.create(service);
-        ServiceI18n serviceI18n = new ServiceI18n();
-        serviceI18n.setDescription(details.getDescription());
-        serviceI18n.setServiceId(serviceId);
-        serviceI18n.setTitle(details.getName());
-        serviceI18n.setLang(details.getLang());
-        serviceI18n.setKeywords(StringUtils.join(details.getKeywords(), "|"));
-        serviceRepository.create(serviceI18n);
         if (domainId != null){
-            domainRepository.addServiceToDomain(serviceId,domainId);
+            domainRepository.addServiceToDomain(service.getId(),domainId);
         }
         setInstanceDetails(serviceType, identifier, details, details.getLang());
         return configuration;
@@ -328,25 +321,8 @@ public class ServiceBusiness {
             service.setConfig(getStringFromObject(configuration, GenericDatabaseMarshallerPool.getInstance()));
             serviceRepository.update(service);
             if (details != null) {
-                final ServiceI18n serviceI18n = serviceRepository.getI18n(service.getId(), details.getLang());
-                if (serviceI18n == null){
-                    final ServiceI18n newServiceI18n = new ServiceI18n();
-                    newServiceI18n.setLang(details.getLang());
-                    newServiceI18n.setServiceId(service.getId());
-                    newServiceI18n.setDescription(details.getDescription());
-                    newServiceI18n.setTitle(details.getName());
-                    newServiceI18n.setKeywords(StringUtils.join(details.getKeywords(), "|"));
-                    serviceRepository.create(newServiceI18n);
-                } else {
-                    serviceI18n.setLang(details.getLang());
-                    serviceI18n.setServiceId(service.getId());
-                    serviceI18n.setDescription(details.getDescription());
-                    serviceI18n.setTitle(details.getName());
-                    serviceI18n.setKeywords(StringUtils.join(details.getKeywords(),"|"));
-                    serviceRepository.update(serviceI18n);
-                }
+                setInstanceDetails(serviceType, identifier, details, details.getLang());
             }
-            setInstanceDetails(serviceType, identifier, details, details.getLang());
         }
      }
      
@@ -497,17 +473,23 @@ public class ServiceBusiness {
      */
     public Details getInstanceDetails(final String serviceType, final String identifier, final String language) throws ConfigurationException {
         final Service service = this.ensureExistingInstance(serviceType, identifier);
+        return getInstanceDetails(service.getId(),language);
+    }
+
+
+    public Details getInstanceDetails(final int serviceId, final String language) {
+        final Service service = serviceRepository.findById(serviceId);
         try {
-            ServiceDetails details = serviceRepository.getServiceDetails(service.getId(), language);
+            ServiceDetails details = serviceRepository.getServiceDetails(serviceId, language);
             if (details == null) {
-                final InputStream in = Util.getResourceAsStream("org/constellation/xml/" + serviceType.toUpperCase()
+                final InputStream in = Util.getResourceAsStream("org/constellation/xml/" + service.getType().toUpperCase()
                         + "Capabilities.xml");
                 if (in != null) {
                     final Unmarshaller u = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
                     Details servMetadata = (Details) u.unmarshal(in);
                     GenericDatabaseMarshallerPool.getInstance().recycle(u);
                     in.close();
-                    servMetadata.setIdentifier(identifier);
+                    servMetadata.setIdentifier(service.getIdentifier());
                     return servMetadata;
                 } else {
                     throw new IOException("Unable to find the capabilities skeleton from resource.");
@@ -516,10 +498,10 @@ public class ServiceBusiness {
                 return (Details) getObjectFromString(details.getContent(), GenericDatabaseMarshallerPool.getInstance());
             }
         } catch (JAXBException | IOException ex) {
-            throw new ConfigurationException("The ServiceDetails.xml file can't be read.", ex);
+            throw new ConstellationException(ex);
         }
     }
-    
+
     /**
      * Updates a service instance metadata.
      *
@@ -602,18 +584,18 @@ public class ServiceBusiness {
         List<ServiceDTO> serviceDTOs = new ArrayList<>();
         List<Service> services = serviceRepository.findByDomain(domainId);
         for (Service service : services){
-            final ServiceI18n serviceI18n = serviceRepository.getI18n(domainId, lang);
+            final Details details = getInstanceDetails(service.getId(), lang);
             ServiceDTO serviceDTO = new ServiceDTO();
             serviceDTO.setMetadataIso(service.getMetadataIso());
             serviceDTO.setOwner(service.getOwner());
             serviceDTO.setConfig(service.getConfig());
             serviceDTO.setDate(new Date(service.getDate()));
-            serviceDTO.setDescription(serviceI18n!=null ? serviceI18n.getDescription() : "");
+            serviceDTO.setDescription(details!=null ? details.getDescription() : "");
             serviceDTO.setId(service.getId());
             serviceDTO.setIdentifier(service.getIdentifier());
             serviceDTO.setMetadataId(service.getMetadataId());
             serviceDTO.setStatus(service.getStatus());
-            serviceDTO.setTitle(serviceI18n!=null ? serviceI18n.getTitle() : "");
+            serviceDTO.setTitle(details!=null ? details.getName() : "");
             serviceDTO.setType(service.getType());
             serviceDTO.setVersions(service.getVersions());
             serviceDTOs.add(serviceDTO);
@@ -625,18 +607,24 @@ public class ServiceBusiness {
     public Instance getI18nInstance(String serviceType, String identifier, String lang) {
         Instance instance = new Instance();
         final Service service = serviceRepository.findByIdentifierAndType(identifier,serviceType);
-        final ServiceI18n serviceI18n = serviceRepository.getI18n(service.getId(), lang);
+        try {
+            final Details details = getInstanceDetails(serviceType, identifier, lang);
+            instance.setId(service.getId());
+            instance.set_abstract(details.getDescription());
+            instance.setIdentifier(service.getIdentifier());
+            int layersNumber = layerRepository.findByServiceId(service.getId()).size();
+            instance.setLayersNumber(layersNumber);
+            instance.setName(details.getName());
+            instance.setType(service.getType());
+            instance.setVersions(Arrays.asList(service.getVersions().split("|")));
+            instance.setStatus(ServiceStatus.valueOf(service.getStatus()));
+            return instance;
+        } catch (ConfigurationException e) {
+            throw new ConstellationException(e);
+        }
 
-        instance.setId(service.getId());
-        instance.set_abstract(serviceI18n.getDescription());
-        instance.setIdentifier(service.getIdentifier());
-        int layersNumber = layerRepository.findByServiceId(service.getId()).size();
-        instance.setLayersNumber(layersNumber);
-        instance.setName(serviceI18n.getTitle());
-        instance.setType(service.getType());
-        instance.setVersions(Arrays.asList(service.getVersions().split("|")));
-        instance.setStatus(ServiceStatus.valueOf(service.getStatus()));
-        return instance;
+
+
 
     }
 }

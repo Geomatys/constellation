@@ -66,10 +66,4 @@ public interface ServiceRepository {
     Service findByMetadataId(String metadataId);
 
     List<Data> findDataByServiceId(Integer id);
-    
-    ServiceI18n getI18n(Integer id, String lang);
-
-    void create(ServiceI18n serviceI18n);
-
-    void update(ServiceI18n serviceI18n);
 }

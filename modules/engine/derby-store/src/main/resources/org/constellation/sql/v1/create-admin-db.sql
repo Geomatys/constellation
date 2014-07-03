@@ -245,19 +245,6 @@ ALTER TABLE "admin"."service" ADD CONSTRAINT service_pk       PRIMARY KEY ("id")
 ALTER TABLE "admin"."service" ADD CONSTRAINT service_uq       UNIQUE ("identifier","type");
 ALTER TABLE "admin"."service" ADD CONSTRAINT service_owner_fk FOREIGN KEY ("owner") REFERENCES "admin"."user"("login");
 
-
-CREATE TABLE "admin"."service_i18n" (
-  "service_id"    INTEGER  NOT NULL,
-  "lang"        CHAR(2)  NOT NULL,
-  "title"       VARCHAR(512)  NOT NULL,
-  "keywords"    VARCHAR(512),
-  "description" VARCHAR(512)
-);
-
-ALTER TABLE "admin"."service_i18n" ADD CONSTRAINT service_i18n_pk          PRIMARY KEY ("service_id", "lang");
-ALTER TABLE "admin"."service_i18n" ADD CONSTRAINT service_i18n_service_id_fk    FOREIGN KEY ("service_id")  REFERENCES "admin"."service"("id") ON DELETE CASCADE;
-
-
 -- Domain cross tables with for services
 
 CREATE TABLE "admin"."service_x_domain"(

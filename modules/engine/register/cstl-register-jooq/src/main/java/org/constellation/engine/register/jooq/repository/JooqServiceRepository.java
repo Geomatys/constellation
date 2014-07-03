@@ -234,52 +234,6 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
                 .where(SERVICE_X_DOMAIN.DOMAIN_ID.eq(domainId))));
     }
 
-    @Override
-    public ServiceI18n getI18n(Integer id, String lang) {
-        ServiceI18n serviceI18n;
-        if (lang != null){
-            serviceI18n = dsl.select().from(Tables.SERVICE_I18N).where(SERVICE_I18N.SERVICE_ID.eq(id))
-                    .and(SERVICE_I18N.LANG.eq(lang)).fetchOneInto(ServiceI18n.class);
-            if (serviceI18n==null){
-                final List<ServiceI18n> serviceI18ns = getAllI18n(id);
-                if (serviceI18ns == null){
-                    return null;
-                } else {
-                    serviceI18n = serviceI18ns.get(0);
-                }
-            }
-        } else {
-            final List<ServiceI18n> serviceI18ns = getAllI18n(id);
-            if (serviceI18ns == null || serviceI18ns.size()==0){
-                return null;
-            } else {
-                serviceI18n = serviceI18ns.get(0);
-            }
-        }
-        return serviceI18n;
-    }
 
-    private List<ServiceI18n> getAllI18n(Integer serviceId){
-        return dsl.select().from(Tables.SERVICE_I18N).where(SERVICE_I18N.SERVICE_ID.eq(serviceId)).fetchInto(ServiceI18n.class);
-    }
-
-    @Override
-    public void create(ServiceI18n serviceI18n) {
-        dsl.insertInto(Tables.SERVICE_I18N).set(SERVICE_I18N.DESCRIPTION, serviceI18n.getDescription())
-                .set(SERVICE_I18N.SERVICE_ID, serviceI18n.getServiceId())
-                .set(SERVICE_I18N.LANG, serviceI18n.getLang())
-                .set(SERVICE_I18N.TITLE, serviceI18n.getTitle()).execute();
-    }
-
-    @Override
-    public void update(ServiceI18n serviceI18n) {
-        dsl.update(SERVICE_I18N).set(SERVICE_I18N.LANG, serviceI18n.getLang())
-                .set(SERVICE_I18N.SERVICE_ID, serviceI18n.getServiceId())
-                .set(SERVICE_I18N.TITLE, serviceI18n.getTitle())
-                .set(SERVICE_I18N.DESCRIPTION, serviceI18n.getDescription())
-                .where(SERVICE_I18N.SERVICE_ID.eq(serviceI18n.getServiceId()))
-                .and(SERVICE_I18N.LANG.eq(serviceI18n.getLang()))
-                .execute();
-    }
 
 }

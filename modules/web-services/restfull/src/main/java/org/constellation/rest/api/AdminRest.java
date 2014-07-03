@@ -155,7 +155,6 @@ public class AdminRest {
  public Response listInstances(@PathParam("domainId") int domainId, @PathParam("lang") String lang, @Context HttpServletRequest httpServletRequest) {
      final List<Instance> instances = new ArrayList<>();
      final List<ServiceDTO> services = serviceBusiness.getAllServicesByDomainId(domainId, lang);
-
      for (ServiceDTO service : services) {
 	    Instance instance = new Instance();
 	    instance.setId(service.getId());
