@@ -19,6 +19,10 @@
 
 package org.constellation.rest.api;
 
+import static org.constellation.utils.RESTfulUtilities.badRequest;
+import static org.constellation.utils.RESTfulUtilities.internalError;
+import static org.constellation.utils.RESTfulUtilities.notFound;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,12 +35,8 @@ import org.apache.sis.util.NullArgumentException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigProcessException;
+import org.constellation.configuration.CstlConfigurationRuntimeException;
 import org.constellation.configuration.TargetNotFoundException;
-import org.constellation.engine.register.ConstellationRegistryRuntimeException;
-
-import static org.constellation.utils.RESTfulUtilities.badRequest;
-import static org.constellation.utils.RESTfulUtilities.internalError;
-import static org.constellation.utils.RESTfulUtilities.notFound;
 
 /**
  * Custom {@link ExceptionMapper} to transform an {@link Exception} into an
@@ -57,12 +57,13 @@ public class GenericExceptionMapper implements ExceptionMapper<Exception> {
     @Override
     public Response toResponse(final Exception exception) {
     
-        
-        if(exception instanceof ConstellationRegistryRuntimeException) {
-            LOGGER.log(Level.WARNING, exception.getMessage());
-            ConstellationRegistryRuntimeException registryRuntimeException = (ConstellationRegistryRuntimeException) exception;
+        if(exception instanceof CstlConfigurationRuntimeException) {
+            //This exception hold an error code, will be handled by client.
+            CstlConfigurationRuntimeException registryRuntimeException = (CstlConfigurationRuntimeException) exception;
+            LOGGER.log(Level.WARNING, exception.getMessage() + '(' + registryRuntimeException.getErrorCode() + ')');
             return internalError(AcknowlegementType.failure(exception.getLocalizedMessage(), registryRuntimeException.getErrorCode()));
         }
+        
         LOGGER.log(Level.WARNING, exception.getMessage(), exception);
         /*
          * Runtime exception that defines the response to be returned.

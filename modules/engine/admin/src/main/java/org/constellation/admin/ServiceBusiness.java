@@ -8,6 +8,7 @@ import org.constellation.admin.dto.ServiceDTO;
 import org.constellation.admin.util.DefaultServiceConfiguration;
 import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.CstlConfigurationRuntimeException;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.ServiceStatus;
 import org.constellation.configuration.TargetNotFoundException;
@@ -30,6 +31,7 @@ import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -590,7 +592,7 @@ public class ServiceBusiness {
     public synchronized void removeServiceFromDomain(int serviceId, int domainId) {
         List<Domain> findByLinkedService = domainRepository.findByLinkedService(serviceId);
         if (findByLinkedService.size() == 1) {
-            throw new ConstellationRegistryRuntimeException("Could not unlink last domain from a service")
+            throw new CstlConfigurationRuntimeException("Could not unlink last domain from a service")
                     .withErrorCode("error.service.lastdomain");
         }
         domainRepository.removeServiceFromDomain(serviceId, domainId);
