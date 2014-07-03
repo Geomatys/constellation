@@ -129,6 +129,9 @@
     "data.modal.validate":"Validate",
     "data.modal.view.metadata.title":"View metadata",
 
+    "domain.list": "Domains",
+    "domain.linked": "Linked Domains",
+
     "edition.style.label.attribute":"Attribute",
     "edition.style.label.auto.intervals":"By intervals",
     "edition.style.label.auto.unique":"By unique values",
@@ -395,7 +398,6 @@
     "server.choose.file": "Choose a file on the server",
     "server.create.button": "Create",
     "server.next.button": "Next",
-
     "service.abstract.label": "Service description",
     "service.config.source": "Source",
     "service.config.source.sos":"Metadata source",
