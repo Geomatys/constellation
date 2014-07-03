@@ -257,7 +257,7 @@ cstlAdminApp.factory('dataListing', ['$resource',
             'pyramidScales':  {method: 'GET', url: '@cstl/api/1/domain/$domainId/data/pyramid/bestscales/:providerId/:dataId;jsessionid='},
             'deletePyramidFolder': {method: 'DELETE', url: '@cstl/api/1/domain/$domainId/data/pyramid/folder/:providerId;jsessionid='},
             'dataFolder':   {method: 'POST', url: '@cstl/api/1/domain/$domainId/data/datapath/true;jsessionid=', isArray: true},
-    		    'importData':     {method: 'POST', url: '@cstl/api/1/domain/$domainId/data/import;jsessionid='},
+    		'importData':     {method: 'POST', url: '@cstl/api/1/domain/$domainId/data/import;jsessionid='},
             'loadData':     {method: 'POST', url: '@cstl/api/1/domain/$domainId/data/load;jsessionid='},
             'extension':    {method: 'POST', url: '@cstl/api/1/domain/$domainId/data/testextension;jsessionid='},
             'hideData':   {method: 'POST', url: '@cstl/api/1/domain/$domainId/data/:providerid/:dataid/hidden;jsessionid='},
@@ -271,7 +271,12 @@ cstlAdminApp.factory('dataListing', ['$resource',
             'findDataType':    {method: 'POST', url: '@cstl/api/1/domain/$domainId/data/findDataType;jsessionid='},
             'linkToSensor': {method: 'POST', url: '@cstl/api/1/domain/$domainId/data/link/sensor/:providerId/:dataId/:sensorId;jsessionid='},
             'unlinkSensor': {method: 'POST', url: '@cstl/api/1/domain/$domainId/data/unlink/sensor/:providerId/:dataId/:sensorId;jsessionid='},
-            'generateSML': {method: 'PUT', url: '@cstl/api/1/sensor/generate;jsessionid='}
+            'generateSML': {method: 'PUT', url: '@cstl/api/1/sensor/generate;jsessionid='},
+            'linkToDomain':      {method: 'POST',   url: '@cstl/api/1/dataXdomain/:dataId/domain/:domainId'},
+            'unlinkFromDomain':  {method: 'DELETE', url: '@cstl/api/1/dataXdomain/:dataId/domain/:domainId'},
+            'domains':  {method: 'GET', url: '@cstl/api/1/dataXdomain/:dataId/user/$userId/domain', isArray: true},
+            
+          
         });
     }]);
 

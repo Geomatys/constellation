@@ -27,6 +27,7 @@ import static org.constellation.engine.register.jooq.Tables.USER_X_DOMAIN_X_DOMA
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -63,6 +64,8 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
 
     @Override
     public List<Domain> findByIds(List<Integer> fetch) {
+        if(fetch.isEmpty())
+            return Collections.emptyList();
         return findBy(DOMAIN.ID.in(fetch));
     }
 
@@ -232,6 +235,12 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
                 
         return findBy(DOMAIN.ID.in(dsl.select(SERVICE_X_DOMAIN.DOMAIN_ID).from(SERVICE_X_DOMAIN)
                 .where(SERVICE_X_DOMAIN.SERVICE_ID.eq(serviceId))));
+    }
+
+    @Override
+    public List<Domain> findByLinkedData(int dataId) {
+        return findBy(DOMAIN.ID.in(dsl.select(DATA_X_DOMAIN.DOMAIN_ID).from(DATA_X_DOMAIN)
+                .where(DATA_X_DOMAIN.DATA_ID.eq(dataId))));
     }
 
 }

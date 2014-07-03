@@ -57,8 +57,13 @@ public class GenericExceptionMapper implements ExceptionMapper<Exception> {
     @Override
     public Response toResponse(final Exception exception) {
     
-        LOGGER.log(Level.WARNING, exception.getMessage(), exception);
         
+        if(exception instanceof ConstellationRegistryRuntimeException) {
+            LOGGER.log(Level.WARNING, exception.getMessage());
+            ConstellationRegistryRuntimeException registryRuntimeException = (ConstellationRegistryRuntimeException) exception;
+            return internalError(AcknowlegementType.failure(exception.getLocalizedMessage(), registryRuntimeException.getErrorCode()));
+        }
+        LOGGER.log(Level.WARNING, exception.getMessage(), exception);
         /*
          * Runtime exception that defines the response to be returned.
          */
@@ -66,10 +71,6 @@ public class GenericExceptionMapper implements ExceptionMapper<Exception> {
             return ((WebApplicationException) exception).getResponse();
         }
         
-        if(exception instanceof ConstellationRegistryRuntimeException) {
-            ConstellationRegistryRuntimeException registryRuntimeException = (ConstellationRegistryRuntimeException) exception;
-            return internalError(AcknowlegementType.failure(exception.getLocalizedMessage(), registryRuntimeException.getErrorCode()));
-        }
         /*
          * Others. Simply return the response message with an appropriate HTTP status code.
          */

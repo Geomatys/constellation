@@ -19,8 +19,10 @@
 package org.constellation.engine.register.repository;
 
 import java.util.List;
+import java.util.Map;
 
 import org.constellation.engine.register.Data;
+import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.i18n.DataWithI18N;
 
 public interface DataRepository {
@@ -52,6 +54,8 @@ public interface DataRepository {
     Data findByNameAndNamespaceAndProviderId(String localPart, String namespaceURI, Integer providerId);
 
 	void update(Data data);
+
+    Map<Domain, Boolean> getLinkedDomains(int dataId);
 
 
 }

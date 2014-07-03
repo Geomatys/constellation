@@ -9,19 +9,23 @@ import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.ServiceProtocol;
 import org.constellation.configuration.StyleBrief;
 import org.constellation.dto.CoverageMetadataBean;
+import org.constellation.engine.register.ConstellationRegistryRuntimeException;
 import org.constellation.engine.register.Data;
+import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.Style;
 import org.constellation.engine.register.repository.*;
 import org.constellation.utils.ISOMarshallerPool;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -38,6 +42,9 @@ public class DataBusiness {
 
     private static final Logger LOGGER = Logging.getLogger(DataBusiness.class);
 
+    @Inject
+    private DomainRepository domainRepository;
+    
     @Inject
     private DataRepository dataRepository;
 
@@ -189,6 +196,7 @@ public class DataBusiness {
 
 
             final DataBrief db = new DataBrief();
+            db.setId(data.getId());
             db.setOwner(data.getOwner());
             db.setName(data.getName());
             db.setNamespace(data.getNamespace());
@@ -279,5 +287,21 @@ public class DataBusiness {
         final Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(), name.getNamespaceURI(), providerIdentifier);
         data.setVisible(visibility);
         dataRepository.update(data);
+    }
+    
+    
+    
+    public void addDataToDomain(int dataId, int domainId) {
+        domainRepository.addDataToDomain(dataId, domainId);
+    }
+
+    @Transactional
+    public synchronized void removeDataFromDomain(int dataId, int domainId) {
+        List<Domain> findByLinkedService = domainRepository.findByLinkedData(dataId);
+        if (findByLinkedService.size() == 1) {
+            throw new ConstellationRegistryRuntimeException("Could not unlink last domain from a data")
+                    .withErrorCode("error.data.lastdomain");
+        }
+        domainRepository.removeDataFromDomain(dataId, domainId);
     }
 }

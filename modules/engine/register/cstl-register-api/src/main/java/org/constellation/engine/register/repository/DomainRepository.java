@@ -69,4 +69,6 @@ public interface DomainRepository {
 
     List<Domain> findByLinkedService(int serviceId);
 
+    List<Domain> findByLinkedData(int dataId);
+
 }

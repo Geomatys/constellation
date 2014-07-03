@@ -10,6 +10,9 @@ public interface PermissionConstants  {
     
     public static final int SERVICE_CREATION = 3;
     
+    public static final int DATA_CREATION = 4;
+    
+    
     
 
 }
