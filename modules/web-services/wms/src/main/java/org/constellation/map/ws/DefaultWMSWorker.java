@@ -65,8 +65,7 @@ import org.geotoolkit.map.MapItem;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.referencing.ReferencingUtilities;
-import org.geotoolkit.referencing.crs.DefaultTemporalCRS;
-import org.geotoolkit.referencing.crs.DefaultVerticalCRS;
+import org.apache.sis.referencing.CommonCRS;
 import org.geotoolkit.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotoolkit.referencing.cs.DiscreteCoordinateSystemAxis;
 import org.geotoolkit.se.xml.v110.OnlineResourceType;
@@ -1415,9 +1414,9 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     final CoordinateReferenceSystem crs;
 
                     if("elevation".equalsIgnoreCase(crsname)){
-                        crs = DefaultVerticalCRS.ELLIPSOIDAL_HEIGHT;
+                        crs = CommonCRS.Vertical.ELLIPSOIDAL.crs();
                     }else if("temporal".equalsIgnoreCase(crsname)){
-                        crs = DefaultTemporalCRS.JAVA;
+                        crs = CommonCRS.Temporal.JAVA.crs();
                     }else{
                         final EngineeringDatum customDatum = new DefaultEngineeringDatum(Collections.singletonMap("name", crsname));
                         final CoordinateSystemAxis csAxis = new DefaultCoordinateSystemAxis(crsname, "u", AxisDirection.valueOf(crsname), Unit.ONE);
