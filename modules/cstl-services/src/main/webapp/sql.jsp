@@ -43,6 +43,7 @@ query : <textarea rows="5" cols="80" name="query" id="query"><%= request.getPara
             <button class="btn btn-primary" id="layer">layer</button>
             <button class="btn btn-primary" id="task">task</button>
             <button class="btn btn-primary" id="user">user</button>
+            <button class="btn btn-primary" id="mapcontext">mapcontext</button>
         </div>
     </div>
     <div class="row">
@@ -151,6 +152,10 @@ result :
         });
         $("#sensored_data").on("click", function(){
             $("#query").val('select * from "admin"."sensored_data"');
+            $("#sqlForm").submit();
+        });
+        $("#mapcontext").on("click", function(){
+            $("#query").val('select * from "admin"."mapcontext"');
             $("#sqlForm").submit();
         });
     })

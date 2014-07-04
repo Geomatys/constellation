@@ -347,6 +347,13 @@ cstlAdminApp.factory('sensor', ['$resource',
         });
     }]);
 
+cstlAdminApp.factory('mapcontext', ['$resource',
+    function ($resource) {
+        return $resource('@cstl/api/1/context', {}, {
+            'list': {method: 'GET', url: '@cstl/api/1/context/list;jsessionid=', isArray: true}
+        });
+    }]);
+
 cstlAdminApp.factory('ProcessService', ['$resource', '$cookies',
     function($resource, $cookies) {
         return $resource('@cstl/spring/admin/process;jsessionid=', {}, {

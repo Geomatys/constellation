@@ -4,20 +4,15 @@
     </div>
     <!-- Menu to create services -->
     <div class="col-sm-3">
-        <div class="dropdown pull-right">
-            <a data-toggle="dropdown" class="btn btn-info btn-lg dropdown-toggle" style="margin-top:8px;padding:15px 19px;">
+        <div class="pull-right">
+            <a class="btn btn-info btn-lg" ng-click="addMapContext()"  style="margin-top:8px;padding:15px 19px;">
                 <span class="icon-plus icon-white" style="margin-right:5px;"></span>
                 <span translate="label.add.mapcontext">Add map context</span>
-                <span class="caret"></span>
             </a>
-            <ul class="dropdown-menu">
-                <li><a id="uploadchoice" ng-click="showLocalFilePopup()" translate="label.file.local">Local file</a></li>
-                <li><a id="filesystemchoice" ng-click="showServerFilePopup()" translate="label.file.server">Server file</a></li>
-            </ul>
         </div>
     </div>
 </div>
-<div id="dataDashboard" class="row" ng-init="init()">
+<div id="MapcontextDashboard" class="row" ng-init="init()">
     <div class="col-sm-12">
         <div class="frame dashboard">
             <div class="navbar navbar-default" style="margin-bottom: 0px;">
@@ -30,12 +25,8 @@
             <div class="navbar sort-navbar">
                 <div class="navbar-inner">
                     <ul class="nav nav-style">
-                        <li ng-click="ordertype='Name';orderreverse=false"><a translate="label.title">
+                        <li ng-click="ordertype='name';orderreverse=false"><a translate="label.title">
                             Title<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
-                        </a></li>
-                        <li class="divider-vertical"></li>
-                        <li ng-click="ordertype='Date';orderreverse=true"><a translate="label.date">
-                            Date<i class="icon-caret-up"></i><i class="icon-caret-down"></i>
                         </a></li>
                         <li class="divider-vertical"></li>
                         <li ng-click="ordertype='Owner';orderreverse=false"><a translate="label.owner">
@@ -43,7 +34,7 @@
                         </a></li>
                         <li class="divider-vertical"></li>
                     </ul>
-                    <button type="button" ng-click="ordertype='Name';orderreverse=false" class="btn btn-xs btn-info btn-mapcontext"><i class="icon-remove icon-white"></i></button>
+                    <button type="button" ng-click="ordertype='name';orderreverse=false" class="btn btn-xs btn-info btn-mapcontext"><i class="icon-remove icon-white"></i></button>
                     <div class="pull-right">
                         <div style="position:relative;">
                             <div class="ajax-loader" style="right:0;position:absolute;"></div>
@@ -74,15 +65,12 @@
                             <div ng-repeat="context in dataList" ng-class="{'col-xs-6':small==true}" style="padding-left:0;">
                                 <div class="item mapcontext" ng-class="{'selected':context==selected}" ng-click="select(context);selectContextChild(null);">
                                     <div class="top">
-                                        <span class="item-title" title="{{context.id}}">{{context.id}}</span>
+                                        <span class="item-title" title="{{context.name}}">{{context.name}}</span>
                                         <span class="pull-right text-right item-list-style" translate="label.mapcontext.system">mapcontext dashboard</span>
                                     </div>
                                     <div class="bottom">
                                         <div class="block">
-                                            <i class="icon-calendar"></i>{{context.createDate | date:'yyyy-MM-dd'}}
-                                        </div>
-                                        <div class="block">
-                                            <i class="icon-user"></i>{{context.creator}}
+                                            <i class="icon-user"></i>{{context.owner}}
                                         </div>
                                         <div class="block pull-right">
                                             <i class="icon-paper-clip"></i>
@@ -120,19 +108,11 @@
                         </div>
                         <div class="selected-item" id="selected-item" ng-class="{hide: selected == null}">
                             <div class="block-header" ng-click="toggleUpDownSelected()">
-                                <strong class="item-title title-bloc" title="{{selected.Name}}">{{selected.Name}}</strong><i class="icon-chevron-up pull-right"></i>
+                                <strong class="item-title title-bloc" title="{{selected.name}}">{{selected.name}}</strong><i class="icon-chevron-up pull-right"></i>
                             </div>
                             <div class="block-content">
                                 <h6 translate="label.owner">Owner</h6>
-                                <span>{{selected.Owner}}</span>
-
-                                <div class="separator"></div>
-                                <h6 translate="label.date">Date</h6>
-                                <span>{{selected.Date | date:'yyyy-MM-dd'}}</span>
-
-                                <div class="separator"></div>
-                                <h6 translate="label.type">Type</h6>
-                                <span>{{selected.Type}}</span>
+                                <span>{{selected.owner}}</span>
 
                                 <div class="separator"></div>
                                 <h6>
@@ -156,22 +136,6 @@
                                     <span ng-show="selected.TargetService.length == 0" translate="label.no.association">No association</span>
                                     <div ng-show="selected.TargetService.length > 0" class="style" ng-repeat="service in selected.TargetService">
                                         {{service.name}}
-                                    </div>
-                                </div>
-
-                                <div class="separator"></div>
-                                <h6>
-                                    <span translate="label.related.sensors">Related sensor(s)</span>
-                                    <button type="button" ng-show="selected.TargetSensor.length === 0" ng-click="showSensorsList();"
-                                            class="btn btn-sm pull-right">
-                                        <i class="icon-plus"></i></button>
-                                </h6>
-                                <div id="linkedSensorList">
-                                    <span ng-show="selected.TargetSensor.length === 0" translate="label.no.association">No association</span>
-                                    <div ng-show="selected.TargetSensor.length > 0" class="style" ng-repeat="sensorId in selected.TargetSensor">
-                                        <button type="button" ng-click="unlinkSensor(sensorId)"
-                                                class="btn btn-small"><i class="icon-minus"></i></button>
-                                        {{sensorId}}
                                     </div>
                                 </div>
                             </div>
@@ -198,23 +162,6 @@
                                         <button type="button" id="deleteLayer" class="btn btn-danger" ng-click="deleteData();">
                                             <i class="icon-trash"></i> <span translate="layer.listing.selected.delete.button">Delete</span>
                                         </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Modal -->
-                            <div id="viewerData" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                                            <h4 class="modal-title" translate="layer.listing.modal.dataviewer">Data Viewer</h4>
-                                        </div>
-                                        <div class="modal-body">
-                                            <div id="dataMap" style="height: 400px; width:740px"></div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>
-                                        </div>
                                     </div>
                                 </div>
                             </div>

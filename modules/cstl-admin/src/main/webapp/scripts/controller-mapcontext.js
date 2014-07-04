@@ -15,22 +15,30 @@
  */
 'use strict';
 
-cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', 'ProcessService', '$growl', '$modal', '$cookies',
-    function ($scope, $dashboard, process, $growl, $modal, $cookies){
-        var lastOpened = null;
+cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', '$growl', '$modal', '$cookies', 'mapcontext',
+    function ($scope, $dashboard, $growl, $modal, $cookies, mapcontext){
         $scope.domainId = $cookies.cstlActiveDomainId;
 
         $scope.init = function() {
-
+            var modalLoader = $modal.open({
+                templateUrl: 'views/modalLoader.html',
+                controller: 'ModalInstanceCtrl'
+            });
+            mapcontext.list({}, function(response) {
+                $dashboard($scope, response, false);
+                modalLoader.close();
+            }, function() {
+                modalLoader.close();
+            });
         };
 
-        $scope.selectMapcontextChild = null;
+        $scope.selectedMapcontextChild = null;
 
-        $scope.selectMapcontextChild = function(item) {
-            if ($scope.selectMapcontextChild === item) {
-                $scope.selectMapcontextChild = null;
+        $scope.selectContextChild = function(item) {
+            if ($scope.selectedMapcontextChild === item) {
+                $scope.selectedMapcontextChild = null;
             } else {
-                $scope.selectMapcontextChild = item;
+                $scope.selectedMapcontextChild = item;
             }
         };
 
@@ -41,6 +49,9 @@ cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', 'Proces
             $header.find('i').toggleClass('icon-chevron-down icon-chevron-up');
         };
 
+        $scope.addMapContext = function() {
+
+        }
     }]);
 
 
