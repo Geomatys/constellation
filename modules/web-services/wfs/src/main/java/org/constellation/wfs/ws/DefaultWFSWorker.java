@@ -19,12 +19,41 @@
 
 package org.constellation.wfs.ws;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
+import static org.constellation.wfs.ws.WFSConstants.IDENTIFIER_FILTER;
+import static org.constellation.wfs.ws.WFSConstants.IDENTIFIER_PARAM;
+import static org.constellation.wfs.ws.WFSConstants.OPERATIONS_METADATA_V110;
+import static org.constellation.wfs.ws.WFSConstants.OPERATIONS_METADATA_V200;
+import static org.constellation.wfs.ws.WFSConstants.TYPE_PARAM;
+import static org.constellation.wfs.ws.WFSConstants.UNKNOW_TYPENAME;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.OPERATION_NOT_SUPPORTED;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildBBOX;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildCreateStoredQueryResponse;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildDescribeStoredQueriesResponse;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildDropStoredQueryResponse;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildFeatureCollection;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildFeatureType;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildFeatureTypeList;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildListStoredQueriesResponse;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildSections;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildTransactionResponse;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildValueCollection;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildWFSCapabilities;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 import javax.inject.Named;
@@ -49,9 +78,6 @@ import org.constellation.provider.FeatureData;
 import org.constellation.security.SecurityManagerHolder;
 import org.constellation.util.QNameComparator;
 import org.constellation.util.QnameLocalComparator;
-
-import static org.constellation.wfs.ws.WFSConstants.*;
-
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
 import org.constellation.wfs.ws.rs.ValueCollectionWrapper;
 import org.constellation.ws.CstlServiceException;
@@ -77,13 +103,6 @@ import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureReader;
 import org.geotoolkit.filter.binding.Binding;
 import org.geotoolkit.filter.binding.Bindings;
-import org.geotoolkit.referencing.CRS;
-import org.apache.sis.referencing.IdentifiedObjects;
-import org.geotoolkit.sld.xml.StyleXmlIO;
-import org.apache.sis.xml.MarshallerPool;
-import org.constellation.admin.ConfigurationEngine;
-import org.constellation.dto.Service;
-import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.filter.visitor.FillCrsVisitor;
 import org.geotoolkit.filter.visitor.IsValidSpatialFilterVisitor;
 import org.geotoolkit.filter.visitor.ListingPropertyVisitor;
@@ -102,17 +121,46 @@ import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
 import org.geotoolkit.ows.xml.AbstractServiceIdentification;
 import org.geotoolkit.ows.xml.AbstractServiceProvider;
 import org.geotoolkit.ows.xml.AcceptVersions;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-
 import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ows.xml.Sections;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.sld.xml.StyleXmlIO;
-import org.geotoolkit.wfs.xml.*;
-
-import static org.geotoolkit.wfs.xml.WFSXmlFactory.*;
-
+import org.geotoolkit.wfs.xml.CreateStoredQuery;
+import org.geotoolkit.wfs.xml.CreateStoredQueryResponse;
+import org.geotoolkit.wfs.xml.DeleteElement;
+import org.geotoolkit.wfs.xml.DescribeFeatureType;
+import org.geotoolkit.wfs.xml.DescribeStoredQueries;
+import org.geotoolkit.wfs.xml.DescribeStoredQueriesResponse;
+import org.geotoolkit.wfs.xml.DropStoredQuery;
+import org.geotoolkit.wfs.xml.DropStoredQueryResponse;
+import org.geotoolkit.wfs.xml.FeatureRequest;
+import org.geotoolkit.wfs.xml.FeatureTypeList;
+import org.geotoolkit.wfs.xml.GetCapabilities;
+import org.geotoolkit.wfs.xml.GetFeature;
+import org.geotoolkit.wfs.xml.GetGmlObject;
+import org.geotoolkit.wfs.xml.GetPropertyValue;
+import org.geotoolkit.wfs.xml.IdentifierGenerationOptionType;
+import org.geotoolkit.wfs.xml.InsertElement;
+import org.geotoolkit.wfs.xml.ListStoredQueries;
+import org.geotoolkit.wfs.xml.ListStoredQueriesResponse;
+import org.geotoolkit.wfs.xml.LockFeature;
+import org.geotoolkit.wfs.xml.LockFeatureResponse;
+import org.geotoolkit.wfs.xml.Parameter;
+import org.geotoolkit.wfs.xml.ParameterExpression;
+import org.geotoolkit.wfs.xml.Property;
+import org.geotoolkit.wfs.xml.Query;
+import org.geotoolkit.wfs.xml.QueryExpressionText;
+import org.geotoolkit.wfs.xml.ReplaceElement;
+import org.geotoolkit.wfs.xml.ResultTypeType;
+import org.geotoolkit.wfs.xml.StoredQueries;
+import org.geotoolkit.wfs.xml.StoredQuery;
+import org.geotoolkit.wfs.xml.StoredQueryDescription;
+import org.geotoolkit.wfs.xml.Transaction;
+import org.geotoolkit.wfs.xml.TransactionResponse;
+import org.geotoolkit.wfs.xml.UpdateElement;
+import org.geotoolkit.wfs.xml.WFSCapabilities;
+import org.geotoolkit.wfs.xml.WFSMarshallerPool;
+import org.geotoolkit.wfs.xml.WFSXmlFactory;
 import org.geotoolkit.wfs.xml.v110.FeatureCollectionType;
 import org.geotoolkit.wfs.xml.v200.ObjectFactory;
 import org.geotoolkit.wfs.xml.v200.PropertyName;
@@ -139,6 +187,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 
 /**

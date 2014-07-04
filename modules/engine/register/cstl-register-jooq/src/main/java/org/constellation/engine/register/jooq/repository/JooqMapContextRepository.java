@@ -24,12 +24,14 @@ import org.constellation.engine.register.MapcontextStyledLayer;
 import org.constellation.engine.register.helper.MapcontextHelper;
 import org.constellation.engine.register.jooq.tables.records.MapcontextRecord;
 import org.constellation.engine.register.repository.MapContextRepository;
+import org.springframework.stereotype.Component;
 
 import static org.constellation.engine.register.jooq.Tables.MAPCONTEXT;
 import static org.constellation.engine.register.jooq.Tables.MAPCONTEXT_STYLED_LAYER;
 
 import java.util.List;
 
+@Component
 public class JooqMapContextRepository extends AbstractJooqRespository<MapcontextRecord, Mapcontext> implements MapContextRepository {
     public JooqMapContextRepository() {
         super(Mapcontext.class, MAPCONTEXT);

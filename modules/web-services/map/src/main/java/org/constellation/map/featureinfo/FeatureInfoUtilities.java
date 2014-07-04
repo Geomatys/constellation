@@ -341,11 +341,7 @@ public final class FeatureInfoUtilities extends Static {
                 temporalCRS = CRS.getTemporalComponent(timeRange.getCoordinateReferenceSystem());
                 if (temporalCRS != null) {
                     try {
-<<<<<<< HEAD
                         timeRange = org.geotoolkit.referencing.CRS.transform(timeRange, temporalCRS);
-=======
-                        timeRange =  org.geotoolkit.referencing.CRS.transform(timeRange, temporalCRS);
->>>>>>> engine-refactor
                     } catch (TransformException e) {
                         // Should never happen since temporalCRS is a component of layer CRS.
                         Logging.unexpectedException(AbstractGraphicVisitor.class, "getCoverageValues", e);
