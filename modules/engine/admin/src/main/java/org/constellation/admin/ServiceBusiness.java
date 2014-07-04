@@ -481,7 +481,12 @@ public class ServiceBusiness {
     public Details getInstanceDetails(final int serviceId, final String language) {
         final Service service = serviceRepository.findById(serviceId);
         try {
-            ServiceDetails details = serviceRepository.getServiceDetails(serviceId, language);
+            ServiceDetails details;
+            if (language==null){
+                details = serviceRepository.getServiceDetailsForDefaultLang(serviceId);
+            } else {
+                details = serviceRepository.getServiceDetails(serviceId, language);
+            }
             if (details == null) {
                 final InputStream in = Util.getResourceAsStream("org/constellation/xml/" + service.getType().toUpperCase()
                         + "Capabilities.xml");

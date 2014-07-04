@@ -101,6 +101,11 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
     }
 
     @Override
+    public ServiceDetails getServiceDetailsForDefaultLang(int serviceId) {
+        return dsl.select().from(SERVICE_DETAILS).where(SERVICE_DETAILS.ID.eq(serviceId)).and(SERVICE_DETAILS.DEFAULT_LANG.eq(true)).fetchOneInto(ServiceDetails.class);
+    }
+
+    @Override
     public ServiceDetails getServiceDetails(int serviceId, String language) {
         return dsl.select().from(SERVICE_DETAILS).where(SERVICE_DETAILS.ID.eq(serviceId)).and(SERVICE_DETAILS.LANG.eq(language)).fetchOneInto(ServiceDetails.class);
     }
@@ -112,12 +117,15 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
             dsl.update(SERVICE_DETAILS).set(SERVICE_DETAILS.CONTENT, serviceDetails.getContent())
                     .set(SERVICE_DETAILS.DEFAULT_LANG, serviceDetails.isDefaultLang())
                     .where(SERVICE_DETAILS.ID.eq(serviceDetails.getId()))
-                    .and(SERVICE_DETAILS.LANG.eq(serviceDetails.getLang())).execute();
+                    .and(SERVICE_DETAILS.LANG.eq(serviceDetails.getLang()))
+
+                    .execute();
         } else {
             ServiceDetailsRecord newRecord = dsl.newRecord(SERVICE_DETAILS);
             newRecord.setContent(serviceDetails.getContent());
             newRecord.setLang(serviceDetails.getLang());
             newRecord.setId(serviceDetails.getId());
+            newRecord.setDefaultLang(true);
             newRecord.store();
         }
     }
