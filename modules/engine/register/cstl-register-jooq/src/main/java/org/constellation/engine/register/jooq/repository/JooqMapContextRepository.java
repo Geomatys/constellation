@@ -21,6 +21,7 @@ package org.constellation.engine.register.jooq.repository;
 
 import org.constellation.engine.register.Mapcontext;
 import org.constellation.engine.register.MapcontextStyledLayer;
+import org.constellation.engine.register.helper.MapcontextHelper;
 import org.constellation.engine.register.jooq.tables.records.MapcontextRecord;
 import org.constellation.engine.register.repository.MapContextRepository;
 
@@ -44,6 +45,14 @@ public class JooqMapContextRepository extends AbstractJooqRespository<Mapcontext
         return dsl.select().from(MAPCONTEXT_STYLED_LAYER)
                 .where(MAPCONTEXT_STYLED_LAYER.MAPCONTEXT_ID.eq(mapContextId))
                 .fetchInto(MapcontextStyledLayer.class);
+    }
+
+    @Override
+    public Mapcontext create(Mapcontext mapContext) {
+        MapcontextRecord newRecord = MapcontextHelper.copy(mapContext, dsl.newRecord(MAPCONTEXT));
+
+        newRecord.store();
+        return newRecord.into(Mapcontext.class);
     }
 
     @Override

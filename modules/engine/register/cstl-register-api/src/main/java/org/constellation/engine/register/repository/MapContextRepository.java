@@ -18,7 +18,6 @@
  */
 package org.constellation.engine.register.repository;
 
-
 import org.constellation.engine.register.Mapcontext;
 import org.constellation.engine.register.MapcontextStyledLayer;
 
@@ -30,6 +29,8 @@ public interface MapContextRepository {
     List<Mapcontext> findAll();
 
     List<MapcontextStyledLayer> getLinkedLayers(int mapContextId);
+
+    Mapcontext create(Mapcontext mapContext);
 
     int delete(int id);
 }
