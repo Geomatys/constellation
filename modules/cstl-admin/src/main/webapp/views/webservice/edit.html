@@ -19,11 +19,11 @@
                 <form class="navbar-form">
                     <div class="btn-group service-item pull-right">
                         <button type="button" class="btn btn-default btn-sm" ng-click="showCapa(service)"
-                                ng-disabled="service.status!=='WORKING'">GetCapabilities</button>
+                                ng-disabled="service.status!=='STARTED'">GetCapabilities</button>
                         <button type="button" class="btn btn-default btn-sm"  ng-click="showLogs(service)">Logs</button>
                         <button type="button" class="btn btn-default btn-sm btn-info" ng-click="reload(service)" translate="service.description.reload.button">Reload</button>
-                        <button type="button" class="btn btn-default btn-sm"  ng-class="{'started':service.status=='WORKING','stopped':service.status!='WORKING'}" ng-click="startOrStop(service)">
-                            <i ng-class="{'icon-play':service.status!='WORKING','icon-stop':service.status=='WORKING'}"></i>
+                        <button type="button" class="btn btn-default btn-sm"  ng-class="{'started':service.status=='STARTED','stopped':service.status!='STARTED'}" ng-click="startOrStop(service)">
+                            <i ng-class="{'icon-play':service.status!='STARTED','icon-stop':service.status=='STARTED'}"></i>
                         </button>
                     </div>
                 </form>
@@ -112,7 +112,7 @@
                                         </div>
                                         <div class="item-list">
                                             <div ng-if="type !== 'csw' && type!== 'sos'">
-                                                <div class="item" ng-repeat="layer in dataList" ng-class="{selected:layer==selected,coverage:layer.Type==='coverage-store'||layer.Type==='raster',vector:layer.Type==='feature-store'||layer.Type==='observation-store'||layer.Type==='vector', 'col-xs-6':small==true}" ng-click="select(layer)">
+                                                <div class="item" ng-repeat="layer in dataList" ng-class="{selected:layer==selected,coverage:layer.Type.toUpperCase()==='coverage-store'.toUpperCase()||layer.Type.toUpperCase()==='raster'.toUpperCase(),vector:layer.Type.toUpperCase()==='feature-store'.toUpperCase()||layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layer.Type.toUpperCase()==='vector'.toUpperCase(), 'col-xs-6':small==true}" ng-click="select(layer)">
                                                     <div class="top">
                                                         <span class="item-title" title="{{layer.Name}}">{{layer.Name}}</span>
                                                         <span class="pull-right text-right item-list-style">{{layer.Type==='coverage-store'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector':layer.Type}}</span>
@@ -693,49 +693,46 @@
                                         <tr title="click to order">
                                             <td ng-click="predicate = 'roles'; reverse=!reverse"
                                                 translate="service.rights.group.list">Liste des groupes</td>
-
-                                        </tr>
-                                    </thead>
-                                    <tr ng-click="details($index)" style='cursor:pointer'
-                                        ng-repeat="user in list | filter:filter | orderBy:predicate:reverse">
-                                        <td>{{group.name}}</td>
-                                        <td class="user-delete" style="width:20px;" ng-click="details($index)"><span class="glyphicon glyphicon-plus"></span></td>
-                                    </tr>
-                                </table>
-                            </div>
-
-                            <div class="col-sm-6 col-sm-offset-1">
-                                <span>
-                                    
-                                </span>
-                                <table class="table table-condensed table-striped table-bordered table-responsive user-table" style="margin-top: 34px;">
-                                    <thead>
-                                        <tr title="click to order">
-                                            <td ng-click="predicate = 'roles'; reverse=!reverse"
-                                                translate="service.rights.group.group">Groupes</td>
                                             <td translate="service.rights.group.read">Lecture</td>
                                             <td translate="service.rights.group.write">Ecriture</td>
                                         </tr>
                                     </thead>
-                                    <tr >
-                                        <td>Anonymous</td>
-                                        <td><input type="checkbox"></td>
-                                        <td><input type="checkbox"></td>
-                                        <td class="user-delete" style="width:20px;" ng-click="details($index)"><span class="glyphicon glyphicon-remove"></span></td>
-
-                                    </tr>
                                     <tr ng-click="details($index)" style='cursor:pointer'
-                                        ng-repeat="user in list | filter:filter | orderBy:predicate:reverse">
-                                        <td>{{group.name}}</td>
-                                        <td><input type="checkbox"></td>
-                                        <td><input type="checkbox"></td>
-                                        <td class="user-delete" style="width:20px;" ng-click="details($index)"><span class="glyphicon glyphicon-remove"></span></td>
-
+                                        ng-repeat="entry in domainroles | filter:filter | orderBy:predicate:reverse">
+                                        <td>{{entry.domainRole}}</td>
+                                        <td><input type="checkbox" disabled="true" ng-checked="domain.access.indexOf('READ') != -1"></td>
+                                        <td><input type="checkbox" disabled="true"></td>
+                                        <td class="user-delete" style="width:20px;" ng-click="details($index)"><span class="glyphicon glyphicon-plus"></span></td>
                                     </tr>
                                 </table>
                             </div>
+                             <div class="col-sm-5">
+                                <span class="searchicon glyphicon glyphicon-search" style="float:right; width:200px; right: 35px;">
+                                    <input type="text" ng-model="domainFilter" class="form-control " maxlength="10">
+                                </span>
+                                <table class="table table-condensed table-striped table-bordered table-responsive user-table">
+                                    <thead>
+                                        <tr title="click to order">
+                                            <td ng-click="predicate = 'roles'; reverse=!reverse"
+                                                translate="domain.list">Liste des domaines</td>
+                                            <td ng-click="predicate = 'roles'; reverse=!reverse"
+                                                translate="domain.linked">Linked</td>
+                                        </tr>
+                                    </thead>
+                                    <tr ng-click="details($index)" style='cursor:pointer'
+                                        ng-repeat="domain in domains | filter:domainFilter | orderBy:predicate:reverse">
+                                        <td>{{domain.name}}</td>
+                                        <td><input type="checkbox" ng-click="toggleDomain($index)" ng-checked="domain.linked" ng-disabled="!domain.canPublish"></td>
+                                        <td class="user-delete" style="width:20px;" ng-click="details($index)"><span class="glyphicon glyphicon-plus"></span></td>
+                                    </tr>
+                                </table>
+                            </div>
+                          
                         </div>
                     </div>
+                    
+                    
+                    
                     <div class="row" style="margin-top: 20px;">
                         <div class="pull-right">
                             <button class="btn btn-info" style="margin-right:30px;" type="button" ng-click="" translate="label.save">Save</button>

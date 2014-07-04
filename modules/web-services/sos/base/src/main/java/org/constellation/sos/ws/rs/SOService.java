@@ -35,7 +35,7 @@ import javax.xml.namespace.QName;
 // Constellation dependencies
 import org.constellation.ServiceDef;
 import org.constellation.ServiceDef.Specification;
-import org.constellation.configuration.ServiceConfigurer;
+import org.constellation.ws.ServiceConfigurer;
 import org.constellation.sos.configuration.SOSConfigurer;
 import org.constellation.sos.ws.SOSworker;
 import org.constellation.ws.CstlServiceException;

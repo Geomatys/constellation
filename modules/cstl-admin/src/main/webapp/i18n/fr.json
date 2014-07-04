@@ -127,6 +127,9 @@
     "data.modal.server.title": "Fichier serveur",
     "data.modal.validate": "Valider",
     "data.modal.view.metadata.title": "Voir la métadonnée",
+    
+    "domain.list": "Domaines",
+    "domain.linked": "Domaines liés",
 
     "edition.style.label.attribute": "Attribut",
     "edition.style.label.auto.intervals": "Par intervalles",

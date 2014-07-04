@@ -21,27 +21,27 @@ package org.constellation.swing;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.Icon;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.xml.namespace.QName;
-import org.constellation.admin.service.ConstellationServer;
-import org.constellation.configuration.DataBrief;
+import org.constellation.ServiceDef;
+import org.constellation.admin.service.ConstellationClient;
+import org.constellation.configuration.AbstractConfigurationObject;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
-import org.constellation.configuration.ProviderReport;
-import org.constellation.configuration.ProviderServiceReport;
-import org.constellation.configuration.ProvidersReport;
-import org.constellation.configuration.Source;
-import org.geotoolkit.gui.swing.util.ActionCell;
+import org.constellation.configuration.LayerList;
+import org.constellation.dto.AddLayer;
 import org.geotoolkit.gui.swing.resource.IconBundle;
+import org.geotoolkit.gui.swing.util.ActionCell;
 import org.netbeans.swing.outline.DefaultOutlineModel;
 import org.netbeans.swing.outline.RenderDataProvider;
 import org.netbeans.swing.outline.RowModel;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -49,21 +49,25 @@ import org.netbeans.swing.outline.RowModel;
  */
 public class JServiceMapEditPane extends JServiceEditionPane {
 
-    private final ConstellationServer server;
+    private final ConstellationClient serverV2;
     private final String serviceType;
     private final LayerContext configuration;
     private List<LayerModel> layerModelList;
     private List<SourceModel> sourceModelList;
+    private final String identifier;
     
     /**
      * Creates new form JServiceMapEditPane
-     * @param server
+     *
+     * @param serverV2
      * @param serviceType
      * @param configuration
+     * @param identifier
      */
-    public JServiceMapEditPane(final ConstellationServer server, final String serviceType, final Object configuration) {
-        this.server = server;
-        this.serviceType = serviceType;
+    public JServiceMapEditPane(final ConstellationClient serverV2, final String serviceType, final Object configuration, final String identifier) {
+        this.serverV2      = serverV2;
+        this.serviceType   = serviceType;
+        this.identifier    = identifier;
         this.configuration = (configuration instanceof LayerContext) ? (LayerContext) configuration : null;
         initComponents();
 
@@ -78,7 +82,7 @@ public class JServiceMapEditPane extends JServiceEditionPane {
                 
                 if (value instanceof LayerModel) {
                     final LayerModel oldLayerModel = (LayerModel) value;
-                    final  LayerModel updateLayerModel = JEditLayerPane.showDialog(server, serviceType, oldLayerModel);
+                    final  LayerModel updateLayerModel = JEditLayerPane.showDialog(serverV2, serviceType, oldLayerModel);
                     if (updateLayerModel != null) {
                         final int pos = layerModelList.indexOf(oldLayerModel);
                         layerModelList.remove(pos);
@@ -118,7 +122,7 @@ public class JServiceMapEditPane extends JServiceEditionPane {
 
                 if (value instanceof SourceModel) {
                     final SourceModel oldSourceModel = (SourceModel) value;
-                    final SourceModel updateSourceModel = JEditSourcePane.showDialog(server, serviceType, oldSourceModel);
+                    final SourceModel updateSourceModel = JEditSourcePane.showDialog(serverV2, serviceType, oldSourceModel);
                     if (updateSourceModel != null) {
                         final int pos = sourceModelList.indexOf(oldSourceModel);
                         sourceModelList.remove(pos);
@@ -148,7 +152,11 @@ public class JServiceMapEditPane extends JServiceEditionPane {
         guiSourceTable.setShowVerticalLines(false);
         guiSourceTable.setFillsViewportHeight(true);
         
-        initLayerSourceList();
+        try {
+            initLayerSourceList();
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
         
         updateLayerTableModel();
         updateSourceTableModel();
@@ -157,46 +165,17 @@ public class JServiceMapEditPane extends JServiceEditionPane {
     /**
      * Create a list of layer model based on service configuration.
      */
-    private void initLayerSourceList() {
+    private void initLayerSourceList() throws IOException {
         layerModelList  = new ArrayList<>();
         sourceModelList = new ArrayList<>();
-        final List<Source> sources = configuration.getLayers();
+        LayerList layers = serverV2.services.getLayers(ServiceDef.Specification.valueOf(serviceType), identifier);
+        
 
-        for (final Source source : sources) {
-            final String providerId = source.getId();
+        for (final Layer layer : layers.getLayer()) {
+            final String providerId = layer.getProviderID();
 
-            sourceModelList.add(new SourceModel(providerId, source.getLoadAll()));
-
-            if (!source.getLoadAll()) {
-                final List<Layer> layers = source.getInclude();
-                for (final Layer layer : layers) {
-                    layerModelList.add(new LayerModel(layer, providerId));
-                }
-
-            } else {
-                //get all layer from provider except exclude
-
-                //Map providers and there layers
-                ProviderReport provider = null;
-                final ProvidersReport providersReport = server.providers.listProviders();
-                final List<ProviderServiceReport> servicesReport = providersReport.getProviderServices();
-                for (final ProviderServiceReport serviceReport : servicesReport) {
-                    if (serviceReport.getProvider(providerId) != null) {
-                        provider = serviceReport.getProvider(providerId);
-                    }
-                }
-
-                if (provider != null) {
-                    final List<DataBrief> layers = provider.getItems();
-                    for (final DataBrief layerName : layers) {
-                        final QName layerQname = new QName(layerName.getName());
-                        if (!source.isExcludedLayer(layerQname)) {
-                            final Layer layer = new Layer(layerQname);
-                            layerModelList.add(new LayerModel(layer, providerId));
-                        }
-                    }
-                }
-            }
+            sourceModelList.add(new SourceModel(providerId, false));
+            layerModelList.add(new LayerModel(layer, providerId));
         }
     }
     
@@ -282,36 +261,19 @@ public class JServiceMapEditPane extends JServiceEditionPane {
     /**
      * Update layer defined in configuration using layerModelList.
      */
-    private void updateConfiguration() {
-        final List<Source> sources = new ArrayList<>();
+    private void updateConfiguration() throws IOException {
 
-        for (final SourceModel sourceModel : sourceModelList) {
-            sources.add(new Source(sourceModel.getProviderId(), sourceModel.isLoadAll(), new ArrayList<Layer>(), null));
-        }
+        /*for (final SourceModel sourceModel : sourceModelList) {
+            layers.add(new Source(sourceModel.getProviderId(), sourceModel.isLoadAll(), new ArrayList<Layer>(), null));
+        }*/
         
         for (final LayerModel layerModel : layerModelList) {
-            final String providerId = layerModel.getProviderId();
-            
-            Source src = getSourceFromId(sources, providerId);
-            
-            //create new source if not exist.
-            if (src == null) {
-                src = new Source(providerId, Boolean.FALSE, new ArrayList<Layer>(), null);
-                sources.add(src);
-            }
-            
-            // init include list if null
-            if (src.getInclude() == null) {
-                src.setInclude(new ArrayList<Layer>());
-            }
-            
-            //add layer to source.
-            src.getInclude().add(layerModel.getLayer());
+            final Layer layer = layerModel.getLayer();
+            final AddLayer addLayer = new AddLayer(layer.getAlias(), serviceType, identifier, layer.getProviderID(), layer.getName().getLocalPart(), layer.getName().getNamespaceURI());
+            serverV2.services.addLayer(ServiceDef.Specification.valueOf(serviceType), identifier, addLayer);
         }
         
         //update configuration layers
-        configuration.setLayers(sources);
-
         if (serviceType.equals("WFS")) {
             configuration.getCustomParameters().put("transactionnal", Boolean.toString(transactionnalBox.isSelected()));
         }
@@ -322,7 +284,7 @@ public class JServiceMapEditPane extends JServiceEditionPane {
      * @param sources
      * @param providerId
      * @return source if found, null either.
-     */
+     
     private Source getSourceFromId(final List<Source> sources, final String providerId) {
         for (final Source source : sources) {
             if (source.getId().equals(providerId)) {
@@ -330,14 +292,18 @@ public class JServiceMapEditPane extends JServiceEditionPane {
             }
         }
         return null;
-    }
+    }*/
     
     /**
      * {@inheritDoc }
      */
     @Override
-    public Object getConfiguration() {
-        updateConfiguration();
+    public AbstractConfigurationObject getConfiguration() {
+        try {
+            updateConfiguration();
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
         return configuration;
     }
     
@@ -422,7 +388,7 @@ public class JServiceMapEditPane extends JServiceEditionPane {
     }// </editor-fold>//GEN-END:initComponents
 
     private void guiAddLayerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiAddLayerActionPerformed
-        final  LayerModel layerModel = JEditLayerPane.showDialog(server, serviceType, null);
+        final  LayerModel layerModel = JEditLayerPane.showDialog(serverV2, serviceType, null);
         if (layerModel != null) {
             layerModelList.add(layerModel);
             updateLayerTableModel();
@@ -430,7 +396,7 @@ public class JServiceMapEditPane extends JServiceEditionPane {
     }//GEN-LAST:event_guiAddLayerActionPerformed
 
     private void guiAddSourceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiAddSourceActionPerformed
-        final  SourceModel sourceModel = JEditSourcePane.showDialog(server, serviceType, null);
+        final  SourceModel sourceModel = JEditSourcePane.showDialog(serverV2, serviceType, null);
         if (sourceModel != null) {
             sourceModelList.add(sourceModel);
             updateSourceTableModel();

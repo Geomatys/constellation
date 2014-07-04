@@ -19,46 +19,40 @@
 package org.constellation.metadata.ws.rs;
 
 // java se dependencies
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.Duration;
-import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
-
-// jersey dependencies
+import javax.inject.Singleton;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.inject.Singleton;
-
-// Constellation dependencies
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.Duration;
+import javax.xml.namespace.QName;
+import org.apache.sis.xml.Namespaces;
 import org.constellation.ServiceDef;
 import org.constellation.ServiceDef.Specification;
-import org.constellation.configuration.AcknowlegementType;
-import org.constellation.configuration.ServiceConfigurer;
-import org.constellation.jaxb.CstlXMLSerializer;
-import org.constellation.metadata.CSWworker;
-import org.constellation.metadata.configuration.CSWConfigurer;
-import org.constellation.metadata.utils.SerializerResponse;
-import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.MimeType;
-import org.constellation.ws.UnauthorizedException;
-import org.constellation.ws.WSEngine;
-import org.constellation.ws.WebServiceUtilities;
-import org.constellation.ws.Worker;
-import org.constellation.ws.rs.OGCWebService;
-import org.constellation.configuration.ConfigurationException;
-import org.constellation.generic.database.Automatic;
 
 import static org.constellation.api.QueryConstants.*;
+import org.constellation.jaxb.CstlXMLSerializer;
 import static org.constellation.metadata.CSWConstants.*;
 
 // Geotoolkit dependencies
+import org.constellation.metadata.CSWworker;
+import org.constellation.metadata.configuration.CSWConfigurer;
+import org.constellation.metadata.utils.CSWUtils;
+import org.constellation.metadata.utils.SerializerResponse;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.MimeType;
+import org.constellation.ws.ServiceConfigurer;
+import org.constellation.ws.UnauthorizedException;
+import org.constellation.ws.WebServiceUtilities;
+import org.constellation.ws.Worker;
+import org.constellation.ws.rs.OGCWebService;
 import org.geotoolkit.csw.xml.CSWResponse;
 import org.geotoolkit.csw.xml.CswXmlFactory;
 import org.geotoolkit.csw.xml.DescribeRecord;
@@ -81,15 +75,12 @@ import org.geotoolkit.ogc.xml.v110.SortOrderType;
 import org.geotoolkit.ogc.xml.v110.SortPropertyType;
 import org.geotoolkit.ows.xml.AcceptFormats;
 import org.geotoolkit.ows.xml.AcceptVersions;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ows.xml.Sections;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
 import org.geotoolkit.ows.xml.v100.SectionsType;
-import org.geotoolkit.util.StringUtilities;
-import org.apache.sis.xml.Namespaces;
-import org.constellation.metadata.utils.CSWUtils;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
  * RestFul CSW service.
@@ -214,48 +205,6 @@ public class CSWService extends OGCWebService<CSWworker> {
         } catch (CstlServiceException ex) {
             return processExceptionResponse(ex, serviceDef, worker);
 
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Response treatSpecificAdminRequest(final String request) throws CstlServiceException {
-        switch (request) {
-            case "setFederatedCatalog": {
-                    final String identifier = getParameter("id", true);
-                    final List<String> servers = StringUtilities.toStringList(getParameter("servers", true));
-                    final CSWworker worker = (CSWworker) WSEngine.getInstance("CSW", identifier);
-                    if (worker != null) {
-                        try {
-                            worker.setCascadedService(servers);
-                            final Automatic config = (Automatic) configurer.getInstanceConfiguration(identifier);
-                            config.getCustomparameters().put("CSWCascading", StringUtilities.toCommaSeparatedValues(servers));
-                            configurer.setInstanceConfiguration(identifier, config);
-                            return Response.ok(new AcknowlegementType("Success", "Federated catalogs updated"), "text/xml").build();
-                        } catch (ConfigurationException ex)  {
-                            throw new CstlServiceException(ex);
-                        }
-                    } else {
-                        throw new CstlServiceException("There is no CSW  instance " + identifier + ".",
-                                INVALID_PARAMETER_VALUE, "id");
-                    }
-                }
-            case "clearCache": {
-                    final String identifier = getParameter("id", true);
-                    final CSWworker worker = (CSWworker) WSEngine.getInstance("CSW", identifier);
-                    if (worker != null) {
-                        worker.clearCache();
-                        return Response.ok(new AcknowlegementType("Success", "CSW cache cleared"), "text/xml").build();
-                    } else {
-                        throw new CstlServiceException("There is no CSW  instance " + identifier + ".",
-                                INVALID_PARAMETER_VALUE, "id");
-                    }
-                }
-            default:
-                throw new CstlServiceException("The operation " + request + " is not supported by the CSW administration service",
-                            INVALID_PARAMETER_VALUE, "request");
         }
     }
 

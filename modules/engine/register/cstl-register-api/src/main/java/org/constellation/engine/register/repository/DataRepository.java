@@ -19,21 +19,43 @@
 package org.constellation.engine.register.repository;
 
 import java.util.List;
+import java.util.Map;
 
 import org.constellation.engine.register.Data;
+import org.constellation.engine.register.Domain;
+import org.constellation.engine.register.i18n.DataWithI18N;
 
 public interface DataRepository {
 
     List<Data> findAll();
     
-    Data findByNameAndNamespaceAndProviderId(String name, String namespace, String providerIdentifier);
+    Data findByNameAndNamespaceAndProviderIdentifier(String name, String namespace, String providerIdentifier);
 
     Data fromLayer(String layerAlias, String providerId);
-
-    Data save(Data data);
+    
+    Data findById(int dataId);
+    
+    Data create(Data data);
 
     int delete(int id);
 
     int delete(String namespaceURI, String localPart, int providerId);
+
+    Data findDataFromProvider(String namespaceURI, String localPart, String providerId);
+
+    Data findByMetadataId(String metadataId);
+
+    List<Data> findByProviderId(Integer id);
+
     
+    DataWithI18N getDescription(Data data);
+
+
+    Data findByNameAndNamespaceAndProviderId(String localPart, String namespaceURI, Integer providerId);
+
+	void update(Data data);
+
+    Map<Domain, Boolean> getLinkedDomains(int dataId);
+
+
 }

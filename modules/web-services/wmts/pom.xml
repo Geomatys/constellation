@@ -84,21 +84,21 @@
         <type>test-jar</type>
         <scope>test</scope>
     </dependency>
-     <dependency>
-        <groupId>org.constellation.engine</groupId>
-        <artifactId>cstl-engine-shiro</artifactId>
-        <version>${project.version}</version>
-        <scope>test</scope>
-    </dependency>
+     <!--<dependency>-->
+        <!--<groupId>org.constellation.engine</groupId>-->
+        <!--<artifactId>cstl-engine-shiro</artifactId>-->
+        <!--<version>${project.version}</version>-->
+        <!--<scope>test</scope>-->
+    <!--</dependency>-->
     <dependency>
         <groupId>org.constellation.storage</groupId>
         <artifactId>cstl-store-data-featurestore</artifactId>
         <version>${project.version}</version>
         <scope>test</scope>
     </dependency>
-    <dependency>
-        <groupId>org.constellation.web-services</groupId>
-        <artifactId>cstl-web-ogc</artifactId>
+     <dependency>
+        <groupId>org.constellation.engine</groupId>
+        <artifactId>cstl-engine-process</artifactId>
         <version>${project.version}</version>
         <type>test-jar</type>
         <scope>test</scope>
@@ -115,6 +115,18 @@
        <artifactId>cstl-test-data</artifactId>
        <version>${project.version}</version>
        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.constellation.engine.register</groupId>
+        <artifactId>cstl-register-jooq</artifactId>
+        <version>${project.version}</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.constellation.engine</groupId>
+        <artifactId>cstl-engine-spring-security</artifactId>
+        <version>${project.version}</version>
+        <scope>test</scope>
     </dependency>
     <!-- for debugging, netcdf ifremer readers -->
     <!--<dependency>

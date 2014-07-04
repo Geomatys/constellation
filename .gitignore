@@ -1,6 +1,9 @@
 target/
-*.iml
 *.log
+//Intellij
+*.iml
+//eclipse
+>>>>>>> engine-refactor
 .classpath
 .project
 .settings/

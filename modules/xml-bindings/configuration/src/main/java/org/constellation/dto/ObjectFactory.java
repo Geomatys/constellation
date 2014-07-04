@@ -32,8 +32,8 @@ public class ObjectFactory {
     public ObjectFactory() {
     }
 
-    public Service createService(){
-        return new Service();
+    public Details createService(){
+        return new Details();
     }
 
     public MetadataLists createMetadataLists() {
@@ -74,5 +74,9 @@ public class ObjectFactory {
     
     public ObservationFilter createObservationFilter(){
         return new ObservationFilter();
+    }
+    
+    public SimpleValue createSimpleValue() {
+        return new SimpleValue();
     }
 }

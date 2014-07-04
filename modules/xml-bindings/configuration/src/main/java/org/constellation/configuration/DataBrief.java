@@ -39,6 +39,9 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.FIELD)
 public final class DataBrief implements Serializable {
 
+    @XmlElement(name="Id")
+    private Integer id;
+    
     @XmlElement(name="Name")
     private String name;
 
@@ -78,6 +81,15 @@ public final class DataBrief implements Serializable {
     @XmlElement(name="TargetSensor")
     private List<String> targetSensor = new ArrayList<>(0);
 
+    
+    public Integer getId() {
+        return id;
+    }
+    
+    public void setId(Integer id) {
+        this.id = id;
+    }
+    
     public String getName() {
         return name;
     }

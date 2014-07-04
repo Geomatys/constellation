@@ -91,7 +91,7 @@
     </dependency>
     <dependency>
         <groupId>org.constellation.engine</groupId>
-        <artifactId>cstl-engine-process-core</artifactId>
+        <artifactId>cstl-engine-process</artifactId>
         <version>${project.version}</version>
     </dependency>
     <dependency>

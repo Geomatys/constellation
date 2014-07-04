@@ -23,6 +23,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -598,6 +599,18 @@ public final class SOSUtils {
     public static AbstractSensorML unmarshallSensor(final InputStream is) throws JAXBException, DataStoreException {
         final Unmarshaller um = SensorMLMarshallerPool.getInstance().acquireUnmarshaller();
         Object obj = um.unmarshal(is);
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement)obj).getValue();
+        }
+        if (obj instanceof AbstractSensorML) {
+            return (AbstractSensorML)obj;
+        }
+        throw new DataStoreException("the sensorML file does not contain a valid sensorML object");
+    }
+    
+    public static AbstractSensorML unmarshallSensor(final String xml) throws JAXBException, DataStoreException {
+        final Unmarshaller um = SensorMLMarshallerPool.getInstance().acquireUnmarshaller();
+        Object obj = um.unmarshal(new StringReader(xml));
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement)obj).getValue();
         }

@@ -80,20 +80,15 @@
           <scope>runtime</scope>
         </dependency>
         <dependency>
-          <groupId>org.hibernate</groupId>
-          <artifactId>hibernate-validator</artifactId>
-          <version>5.0.2.Final</version>
-        </dependency>
-        <dependency>
           <groupId>org.glassfish.jersey.containers</groupId>
           <artifactId>jersey-container-servlet</artifactId>
           <scope>runtime</scope>
         </dependency>
-        <dependency>
-          <groupId>org.constellation.web-services</groupId>
-          <artifactId>cstl-web-sos-mdw</artifactId>
-          <version>${project.version}</version>
-        </dependency>
+        <!--<dependency>-->
+          <!--<groupId>org.constellation.web-services</groupId>-->
+          <!--<artifactId>cstl-web-sos-mdw</artifactId>-->
+          <!--<version>${project.version}</version>-->
+        <!--</dependency>-->
         <dependency>
           <groupId>org.constellation.web-services</groupId>
           <artifactId>cstl-web-sos-filesystem</artifactId>
@@ -646,11 +641,6 @@
     </dependency>
     <dependency>
       <groupId>org.constellation.web-services</groupId>
-      <artifactId>cstl-web-configuration</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.web-services</groupId>
       <artifactId>cstl-web-webdav</artifactId>
       <version>${project.version}</version>
       <exclusions>
@@ -706,11 +696,6 @@
       <groupId>commons-fileupload</groupId>
       <artifactId>commons-fileupload</artifactId>
       <version>1.2.1</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.datatype</groupId>
-      <artifactId>jackson-datatype-hibernate4</artifactId>
-      <version>2.2.3</version>
     </dependency>
     <dependency>
       <groupId>com.thoughtworks.xstream</groupId>

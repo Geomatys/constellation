@@ -25,6 +25,7 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.util.*;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -35,8 +36,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
+import javax.xml.stream.XMLStreamException;
 import org.constellation.admin.service.ConstellationClient;
-import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.ProviderReport;
 import org.geotoolkit.gui.swing.style.JColorMapPane;
@@ -60,6 +61,7 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
+import org.openide.util.Exceptions;
 
 /**
  * Edit a provider.
@@ -74,7 +76,6 @@ public class JProviderEditPane extends javax.swing.JPanel {
 
     private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("org/constellation/swing/Bundle");
 
-    private final ConstellationServer server;
     private final ConstellationClient serverV2;
     private final String providerType;
     private ProviderReport providerReport;
@@ -87,13 +88,12 @@ public class JProviderEditPane extends javax.swing.JPanel {
     private ParameterValueGroup subdataParam;
     private final JFeatureOutLine guiParameterEditor = new JFeatureOutLine();
 
-    public JProviderEditPane(final ConstellationServer server, final ConstellationClient serverV2, final String serviceType, final ProviderReport providerReport) {
-        this.server         = server;
+    public JProviderEditPane(final ConstellationClient serverV2, final String serviceType, final ProviderReport providerReport) throws IOException, XMLStreamException, ClassNotFoundException {
         this.serverV2       = serverV2;
         this.providerType   = serviceType;
         this.providerReport = providerReport;
 
-        configDesc = (ParameterDescriptorGroup) server.providers.getServiceDescriptor(providerType);
+        configDesc = (ParameterDescriptorGroup) serverV2.providers.getServiceDescriptor(providerType);
         ParameterDescriptorGroup sourceCandidate = null; 
         try {
             sourceCandidate = (ParameterDescriptorGroup) configDesc.descriptor("source");
@@ -101,8 +101,14 @@ public class JProviderEditPane extends javax.swing.JPanel {
             sourceCandidate = configDesc;
         }
         sourceDesc = sourceCandidate;
-        sourceParam = (ParameterValueGroup) server.providers.getProviderConfiguration(providerReport.getId(), sourceDesc);
-        dataDesc = (ParameterDescriptorGroup) server.providers.getSourceDescriptor(providerType);
+        ParameterValueGroup source = null;
+        try {
+            source = (ParameterValueGroup) serverV2.providers.getProviderConfiguration(providerReport.getId(), sourceDesc);
+        } catch (IOException | XMLStreamException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        sourceParam = source;
+        dataDesc = (ParameterDescriptorGroup) serverV2.providers.getSourceDescriptor(providerType);
         final List<ParameterValueGroup> dataGroups = sourceParam.groups(dataDesc.getName().getCode());
         dataParam = (dataGroups.isEmpty()) ? null : dataGroups.get(0);
 
@@ -133,100 +139,116 @@ public class JProviderEditPane extends javax.swing.JPanel {
     }
 
     private void updateDataModel(){
-        providerReport = server.providers.listProviders().getProviderService(providerType).getProvider(providerReport.getId());
-        final boolean styleType = "sld".equals(providerType);
+        try {
+            providerReport = serverV2.providers.listProviders().getProviderService(providerType).getProvider(providerReport.getId());
+            final boolean styleType = "sld".equals(providerType);
 
-        final Font fontBig = new Font("Monospaced", Font.BOLD, 16);
-        final Font fontNormal = new Font("Monospaced", Font.PLAIN, 12);
-        final ImageIcon editIcon = new ImageIcon(JServicesPane.createImage("",
-                ICON_EDIT, Color.BLACK, fontNormal, Color.DARK_GRAY));
-        final ImageIcon copyIcon = new ImageIcon(JServicesPane.createImage("",
-                ICON_COPY, Color.BLACK, fontNormal, Color.DARK_GRAY));
-        final ImageIcon deleteIcon = new ImageIcon(JServicesPane.createImage("",
-                ICON_DELETE, Color.WHITE, fontNormal, Color.DARK_GRAY));
+            final Font fontBig = new Font("Monospaced", Font.BOLD, 16);
+            final Font fontNormal = new Font("Monospaced", Font.PLAIN, 12);
+            final ImageIcon editIcon = new ImageIcon(JServicesPane.createImage("",
+                    ICON_EDIT, Color.BLACK, fontNormal, Color.DARK_GRAY));
+            final ImageIcon copyIcon = new ImageIcon(JServicesPane.createImage("",
+                    ICON_COPY, Color.BLACK, fontNormal, Color.DARK_GRAY));
+            final ImageIcon deleteIcon = new ImageIcon(JServicesPane.createImage("",
+                    ICON_DELETE, Color.WHITE, fontNormal, Color.DARK_GRAY));
 
-        final List<DataBrief> layers = providerReport.getItems();
+            final List<DataBrief> layers = providerReport.getItems();
 
-        Collections.sort(layers, new Comparator<DataBrief>() {
-            @Override
-            public int compare(DataBrief o1, DataBrief o2) {
-                String l1 = o1.getName();
-                String l2 = o2.getName();
-                return l1.toLowerCase().compareTo(l2.toLowerCase());
+            Collections.sort(layers, new Comparator<DataBrief>() {
+                @Override
+                public int compare(DataBrief o1, DataBrief o2) {
+                    String l1 = o1.getName();
+                    String l2 = o2.getName();
+                    return l1.toLowerCase().compareTo(l2.toLowerCase());
+                }
+            });
+
+            final List<String> itemNames = new ArrayList<>(0);
+            for (DataBrief dataBrief : layers) {
+                itemNames.add(dataBrief.getName());
             }
-        });
 
-        final List<String> itemNames = new ArrayList<>(0);
-        for (DataBrief dataBrief : layers) {
-            itemNames.add(dataBrief.getName());
-        }
+            guiData.setModel(new DataModel(itemNames,styleType));
 
-        guiData.setModel(new DataModel(itemNames,styleType));
-
-        if(styleType){
-            guiData.getColumn(1).setCellRenderer(new ActionCell.Renderer(editIcon));
-            guiData.getColumn(1).setCellEditor(new ActionCell.Editor(editIcon) {
-                @Override
-                public void actionPerformed(final ActionEvent e, Object value) {
-                    final String styleName = (String) value;
-                    MutableStyle style = server.providers.downloadStyle(providerReport.getId(), styleName);
-                    editStyle(style, styleName,false);
-
-                }
-            });
-            guiData.getColumn(1).setMaxWidth(40);
-            guiData.getColumn(1).setWidth(40);
-            guiData.getColumn(1).setPreferredWidth(40);
-            
-            guiData.getColumn(2).setCellRenderer(new ActionCell.Renderer(copyIcon));
-            guiData.getColumn(2).setCellEditor(new ActionCell.Editor(copyIcon) {
-                @Override
-                public void actionPerformed(final ActionEvent e, Object value) {
-                    final String styleName = (String) value;
-                    final MutableStyle style = server.providers.downloadStyle(providerReport.getId(), styleName);
-                    final String newName = styleName+"(copy)";
-                    style.setName(newName);
-                    server.providers.createStyle(providerReport.getId(), newName, style);
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateDataModel();
+            if(styleType){
+                guiData.getColumn(1).setCellRenderer(new ActionCell.Renderer(editIcon));
+                guiData.getColumn(1).setCellEditor(new ActionCell.Editor(editIcon) {
+                    @Override
+                    public void actionPerformed(final ActionEvent e, Object value) {
+                        try {
+                            final String styleName = (String) value;
+                            MutableStyle style = serverV2.providers.getStyle(providerReport.getId(), styleName);
+                            editStyle(style, styleName,false);
+                        } catch (IOException ex) {
+                            Exceptions.printStackTrace(ex);
                         }
-                    });
-                }
-            });
-            guiData.getColumn(2).setMaxWidth(40);
-            guiData.getColumn(2).setWidth(40);
-            guiData.getColumn(2).setPreferredWidth(40);
 
-            guiData.getColumn(3).setCellRenderer(new ActionCell.Renderer(deleteIcon));
-            guiData.getColumn(3).setCellEditor(new ActionCell.Editor(deleteIcon) {
-                @Override
-                public void actionPerformed(final ActionEvent e, Object value) {
-                    final String styleName = (String) value;
-                    server.providers.deleteStyle(providerReport.getId(), styleName);
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateDataModel();
+                    }
+                });
+                guiData.getColumn(1).setMaxWidth(40);
+                guiData.getColumn(1).setWidth(40);
+                guiData.getColumn(1).setPreferredWidth(40);
+
+                guiData.getColumn(2).setCellRenderer(new ActionCell.Renderer(copyIcon));
+                guiData.getColumn(2).setCellEditor(new ActionCell.Editor(copyIcon) {
+                    @Override
+                    public void actionPerformed(final ActionEvent e, Object value) {
+                        try {
+                            final String styleName = (String) value;
+                            final MutableStyle style = serverV2.providers.getStyle(providerReport.getId(), styleName);
+                            final String newName = styleName+"(copy)";
+                            style.setName(newName);
+                            serverV2.providers.createStyle(providerReport.getId(), style);
+                            SwingUtilities.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    updateDataModel();
+                                }
+                            });
+                        } catch (IOException ex) {
+                            Exceptions.printStackTrace(ex);
                         }
-                    });
-                }
-            });
-            guiData.getColumn(3).setMaxWidth(40);
-            guiData.getColumn(3).setWidth(40);
-            guiData.getColumn(3).setPreferredWidth(40);
-        }
+                    }
+                });
+                guiData.getColumn(2).setMaxWidth(40);
+                guiData.getColumn(2).setWidth(40);
+                guiData.getColumn(2).setPreferredWidth(40);
 
-        guiData.setTableHeader(null);
-        guiData.setRowHeight(37);
-        guiData.setFillsViewportHeight(true);
-        guiData.setBackground(Color.WHITE);
-        guiData.setShowGrid(true);
-        guiData.setShowHorizontalLines(true);
-        guiData.setShowVerticalLines(false);
-        guiData.revalidate();
-        guiData.repaint();
+                guiData.getColumn(3).setCellRenderer(new ActionCell.Renderer(deleteIcon));
+                guiData.getColumn(3).setCellEditor(new ActionCell.Editor(deleteIcon) {
+                    @Override
+                    public void actionPerformed(final ActionEvent e, Object value) {
+                        try {
+                            final String styleName = (String) value;
+                            serverV2.providers.deleteStyle(providerReport.getId(), styleName);
+                            SwingUtilities.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    updateDataModel();
+                                }
+                            });
+                        } catch (IOException ex) {
+                            Exceptions.printStackTrace(ex);
+                        }
+                    }
+                });
+                guiData.getColumn(3).setMaxWidth(40);
+                guiData.getColumn(3).setWidth(40);
+                guiData.getColumn(3).setPreferredWidth(40);
+            }
+
+            guiData.setTableHeader(null);
+            guiData.setRowHeight(37);
+            guiData.setFillsViewportHeight(true);
+            guiData.setBackground(Color.WHITE);
+            guiData.setShowGrid(true);
+            guiData.setShowHorizontalLines(true);
+            guiData.setShowVerticalLines(false);
+            guiData.revalidate();
+            guiData.repaint();
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
     }
 
     public String getProviderType() {
@@ -291,12 +313,20 @@ public class JProviderEditPane extends javax.swing.JPanel {
             }
         } else {
             if (providerReport.getItems().contains(oldName)) {
-                //delete previous if it existed
-                server.providers.deleteStyle(providerReport.getId(), oldName);
+                try {
+                    //delete previous if it existed
+                    serverV2.providers.deleteStyle(providerReport.getId(), oldName);
+                } catch (IOException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
             }
         }
 
-        server.providers.createStyle(providerReport.getId(), styleName, style);
+        try {
+            serverV2.providers.createStyle(providerReport.getId(), style);
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
         updateDataModel();
 
     }
@@ -489,13 +519,21 @@ public class JProviderEditPane extends javax.swing.JPanel {
             Parameters.copy(config, subdataParam);
         }
 
-        server.providers.updateProvider(providerType, id, sourceParam);
+        try {
+            serverV2.providers.updateProvider(providerType, id, sourceParam);
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
 
         firePropertyChange("update", 0, 1);
     }//GEN-LAST:event_guiSaveActionPerformed
 
     private void guiDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiDeleteActionPerformed
-        server.providers.deleteProvider(providerReport.getId());
+        try {
+            serverV2.providers.deleteProvider(providerReport.getId(), false);
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
         firePropertyChange("update", 0, 1);
     }//GEN-LAST:event_guiDeleteActionPerformed
 

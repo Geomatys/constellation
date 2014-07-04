@@ -36,7 +36,14 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
@@ -44,7 +51,7 @@ import org.constellation.generic.database.BDD;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.constellation.sos.ws.soap.SOService;
 import org.constellation.test.utils.Order;
-import org.constellation.test.utils.TestRunner;
+import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.util.Util;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.internal.sql.ScriptRunner;
@@ -58,14 +65,31 @@ import org.geotoolkit.sos.xml.v200.GetCapabilitiesType;
 import org.junit.*;
 import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.context.ContextConfiguration;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-@RunWith(TestRunner.class)
-public class SOSRequestTest extends AbstractGrizzlyServer {
+@RunWith(SpringTestRunner.class)
+@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+public class SOSRequestTest extends AbstractGrizzlyServer implements ApplicationContextAware {
 
+    protected ApplicationContext applicationContext;
+    
+    private static boolean initialized = false;
+    
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+
+    @Inject
+    private ServiceBusiness serviceBusiness;
+    
     private static String getDefaultURL() {
         return "http://localhost:" +  grizzly.getCurrentPort() + "/sos/default?";
     }
@@ -78,49 +102,62 @@ public class SOSRequestTest extends AbstractGrizzlyServer {
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
-    @BeforeClass
-    public static void initPool() throws Exception {
-        final File configDirectory = ConfigurationEngine.setupTestEnvironement("SOSRequestTest");
+    @PostConstruct
+    public void initPool() {
+        SpringHelper.setApplicationContext(applicationContext);
+        if (!initialized) {
+            try {
+                final File configDirectory = ConfigurationEngine.setupTestEnvironement("SOSRequestTest");
 
-        final String url = "jdbc:derby:memory:TestOM2;create=true";
-        final DefaultDataSource ds = new DefaultDataSource(url);
-        Connection con = ds.getConnection();
+                final String url = "jdbc:derby:memory:TestOM2;create=true";
+                final DefaultDataSource ds = new DefaultDataSource(url);
+                Connection con = ds.getConnection();
 
-        final ScriptRunner exec = new ScriptRunner(con);
-        exec.run(Util.getResourceAsStream("org/constellation/data/om2/structure_observations.sql"));
-        exec.run(Util.getResourceAsStream("org/constellation/sql/sos-data-om2.sql"));
-        con.close();
+                final ScriptRunner exec = new ScriptRunner(con);
+                exec.run(Util.getResourceAsStream("org/constellation/data/om2/structure_observations.sql"));
+                exec.run(Util.getResourceAsStream("org/constellation/sql/sos-data-om2.sql"));
+                con.close();
 
-        
-        final File dataDirectory = new File(configDirectory, "dataSos");
-        dataDirectory.mkdir();
 
-        writeDataFile(dataDirectory, "urn-ogc-object-sensor-SunSpot-0014.4F01.0000.261A");
-        writeDataFile(dataDirectory, "urn-ogc-object-sensor-SunSpot-0014.4F01.0000.2626");
-        writeDataFile(dataDirectory, "urn-ogc-object-sensor-SunSpot-2");
+                final File dataDirectory = new File(configDirectory, "dataSos");
+                dataDirectory.mkdir();
 
-        final Automatic smlConfig = new Automatic(null, dataDirectory.getPath());
-        final Automatic omCOnfig = new Automatic(null, new BDD("derby", url, null, null));
-        final SOSConfiguration sosconf = new SOSConfiguration(smlConfig, omCOnfig);
-        sosconf.setObservationFilterType(DataSourceType.OM2);
-        sosconf.setObservationReaderType(DataSourceType.OM2);
-        sosconf.setObservationWriterType(DataSourceType.OM2);
-        sosconf.setSMLType(DataSourceType.FILESYSTEM);
-        sosconf.setProfile("transactional");
-        sosconf.setObservationIdBase("urn:ogc:object:observation:SunSpot:");
-        sosconf.setSensorIdBase("urn:ogc:object:sensor:SunSpot:");
-        sosconf.setPhenomenonIdBase("urn:phenomenon:");
-        sosconf.setObservationTemplateIdBase("urn:ogc:object:observationTemplate:SunSpot:");
-        sosconf.setVerifySynchronization(false);
-        
-        ConfigurationEngine.storeConfiguration("SOS", "default", sosconf);
-        ConfigurationEngine.storeConfiguration("SOS", "test", sosconf);
+                writeDataFile(dataDirectory, "urn-ogc-object-sensor-SunSpot-0014.4F01.0000.261A");
+                writeDataFile(dataDirectory, "urn-ogc-object-sensor-SunSpot-0014.4F01.0000.2626");
+                writeDataFile(dataDirectory, "urn-ogc-object-sensor-SunSpot-2");
 
-        final Map<String, Object> map = new HashMap<>();
-        map.put("sos", new SOService());
-        initServer(null, map);
-        // Get the list of layers
-        pool = SOSMarshallerPool.getInstance();
+                final Automatic smlConfig = new Automatic(null, dataDirectory.getPath());
+                final Automatic omCOnfig = new Automatic(null, new BDD("derby", url, null, null));
+                final SOSConfiguration sosconf = new SOSConfiguration(smlConfig, omCOnfig);
+                sosconf.setObservationFilterType(DataSourceType.OM2);
+                sosconf.setObservationReaderType(DataSourceType.OM2);
+                sosconf.setObservationWriterType(DataSourceType.OM2);
+                sosconf.setSMLType(DataSourceType.FILESYSTEM);
+                sosconf.setProfile("transactional");
+                sosconf.setObservationIdBase("urn:ogc:object:observation:SunSpot:");
+                sosconf.setSensorIdBase("urn:ogc:object:sensor:SunSpot:");
+                sosconf.setPhenomenonIdBase("urn:phenomenon:");
+                sosconf.setObservationTemplateIdBase("urn:ogc:object:observationTemplate:SunSpot:");
+                sosconf.setVerifySynchronization(false);
+                
+                try {
+                    serviceBusiness.delete("sos", "default");
+                    serviceBusiness.delete("sos", "test");
+                } catch (ConfigurationException ex) {}
+                
+                serviceBusiness.create("sos", "default", sosconf, null, null);
+                serviceBusiness.create("sos", "test", sosconf, null, null);
+
+                final Map<String, Object> map = new HashMap<>();
+                map.put("sos", new SOService());
+                initServer(null, map);
+                // Get the list of layers
+                pool = SOSMarshallerPool.getInstance();
+                initialized = true;
+            } catch (Exception ex) {
+                Logger.getLogger(SOSRequestTest.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     @AfterClass

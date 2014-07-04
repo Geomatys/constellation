@@ -18,12 +18,11 @@
  */
 package org.constellation.process.service;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.logging.Level;
-import javax.xml.bind.JAXBException;
-import org.constellation.admin.ConfigurationEngine;
+import javax.inject.Inject;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
+import org.constellation.map.configuration.LayerBusiness;
 
 /**
  *
@@ -31,6 +30,8 @@ import org.constellation.configuration.LayerContext;
  */
 public abstract class AbstractMapServiceTest extends ServiceProcessTest {
 
+    @Inject
+    protected LayerBusiness layerBusiness;
 
     public AbstractMapServiceTest (final String str, final String serviceName, final Class workerClass) {
         super(str, serviceName, workerClass);
@@ -45,8 +46,8 @@ public abstract class AbstractMapServiceTest extends ServiceProcessTest {
     protected void createInstance(final String identifier, LayerContext context) {
         final LayerContext configuration = context != null ? context : new LayerContext();
         try {
-            ConfigurationEngine.storeConfiguration(serviceName, identifier, configuration, null);
-        } catch (JAXBException | IOException ex) {
+            serviceBusiness.create(serviceName.toLowerCase(), identifier, configuration, null, null);
+        } catch (ConfigurationException ex) {
             LOGGER.log(Level.SEVERE, "Error while creating instance", ex);
         }
     }
@@ -54,7 +55,12 @@ public abstract class AbstractMapServiceTest extends ServiceProcessTest {
     /** {@inheritDoc} */
     @Override
     protected boolean checkInstanceExist(final String identifier) {
-        return ConfigurationEngine.getServiceConfigurationIds(serviceName).contains(identifier);
+        try {
+            return serviceBusiness.getConfiguration(serviceName.toLowerCase(), identifier) != null;
+        } catch (ConfigurationException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+        }
+        return false;
     }
 
     /**
@@ -65,8 +71,8 @@ public abstract class AbstractMapServiceTest extends ServiceProcessTest {
      */
     protected void createCustomInstance(final String identifier, LayerContext context) {
         try {
-            ConfigurationEngine.storeConfiguration(serviceName, identifier, context, null);
-        }  catch (JAXBException | IOException ex) {
+            serviceBusiness.create(serviceName.toLowerCase(), identifier, context, null, null);
+        }  catch (ConfigurationException ex) {
             LOGGER.log(Level.SEVERE, "Error while creating custom instance", ex);
         }
     }
@@ -79,8 +85,8 @@ public abstract class AbstractMapServiceTest extends ServiceProcessTest {
     protected  LayerContext getConfig(final String identifier) {
         LayerContext context = null;
         try {
-            context = (LayerContext) ConfigurationEngine.getConfiguration(serviceName, identifier);
-        } catch (JAXBException | FileNotFoundException ex) {
+            context = (LayerContext) serviceBusiness.getConfiguration(serviceName.toLowerCase(), identifier);
+        } catch (ConfigurationException ex) {
             LOGGER.log(Level.SEVERE, "Error while getting configuration", ex);
         }
         return context;

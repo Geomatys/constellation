@@ -20,6 +20,7 @@
 package org.constellation.swing;
 
 import java.awt.Component;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.GroupLayout;
@@ -29,14 +30,12 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.LayoutStyle;
 import javax.swing.SwingConstants;
-import javax.xml.namespace.QName;
-import org.constellation.admin.service.ConstellationServer;
-import org.constellation.configuration.Layer;
+import org.constellation.admin.service.ConstellationClient;
 import org.constellation.configuration.ProviderReport;
 import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.ProvidersReport;
-import org.constellation.util.DataReference;
 import org.jdesktop.swingx.combobox.ListComboBoxModel;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
@@ -53,51 +52,54 @@ public class JEditSourcePane extends javax.swing.JPanel {
      * @param serviceType
      * @param sourceModel
      */
-    public JEditSourcePane(final ConstellationServer server, final String serviceType, final SourceModel sourceModel) {
+    public JEditSourcePane(final ConstellationClient serverV2, final String serviceType, final SourceModel sourceModel) {
         this.sourceModel = sourceModel;
         initComponents();
 
         //create combobox items (dataReference string)
         final List<String> providerList = new ArrayList<>();
 
-        final ProvidersReport providersReport = server.providers.listProviders();
-        final List<ProviderServiceReport> servicesReport = providersReport.getProviderServices();
-        for(final ProviderServiceReport serviceReport : servicesReport) {
-            final String serviceProviderType = serviceReport.getType();
+        try {
+            final ProvidersReport providersReport = serverV2.providers.listProviders();
+            final List<ProviderServiceReport> servicesReport = providersReport.getProviderServices();
+            for(final ProviderServiceReport serviceReport : servicesReport) {
+                final String serviceProviderType = serviceReport.getType();
 
-            final List<ProviderReport> providers = serviceReport.getProviders();
-            for (final ProviderReport providerReport : providers) {
+                final List<ProviderReport> providers = serviceReport.getProviders();
+                for (final ProviderReport providerReport : providers) {
 
-                boolean addProviderToList = false;
-                //WFS -> data-store
-                if ( ("WFS".equals(serviceType) && "feature-store".equals(serviceProviderType)) ) {
-                    addProviderToList = true;
-                }
+                    boolean addProviderToList = false;
+                    //WFS -> data-store
+                    if ( ("WFS".equals(serviceType) && "feature-store".equals(serviceProviderType)) ) {
+                        addProviderToList = true;
+                    }
 
-                //WMTS or WCS -> coverage-store
-                if ( ("WMTS".equals(serviceType) || "WCS".equals(serviceType) ) && "coverage-store".equals(serviceProviderType)) {
-                    addProviderToList = true;
-                }
+                    //WMTS or WCS -> coverage-store
+                    if ( ("WMTS".equals(serviceType) || "WCS".equals(serviceType) ) && "coverage-store".equals(serviceProviderType)) {
+                        addProviderToList = true;
+                    }
 
-                //WMS -> all layer provider
-                if ("WMS".equals(serviceType)) {
-                    addProviderToList = true;
-                }
+                    //WMS -> all layer provider
+                    if ("WMS".equals(serviceType)) {
+                        addProviderToList = true;
+                    }
 
-                if (addProviderToList) {
-                    providerList.add(providerReport.getId());
+                    if (addProviderToList) {
+                        providerList.add(providerReport.getId());
+                    }
                 }
             }
+
+            guiSourceList.setModel(new ListComboBoxModel(providerList));
+
+
+            if (sourceModel != null) {
+                guiSourceList.setSelectedItem(sourceModel.getProviderId());
+                guiLoadAllBox.setSelected(sourceModel.isLoadAll());
+            }
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
         }
-
-        guiSourceList.setModel(new ListComboBoxModel(providerList));
-        
-
-        if (sourceModel != null) {
-            guiSourceList.setSelectedItem(sourceModel.getProviderId());
-            guiLoadAllBox.setSelected(sourceModel.isLoadAll());
-        }
-
     }
 
     /**
@@ -176,9 +178,9 @@ public class JEditSourcePane extends javax.swing.JPanel {
     }
 
 
-    public static SourceModel showDialog(final ConstellationServer server, final String serviceType, final SourceModel source) {
+    public static SourceModel showDialog(final ConstellationClient serverV2, final String serviceType, final SourceModel source) {
 
-        final JEditSourcePane pane = new JEditSourcePane(server, serviceType, source);
+        final JEditSourcePane pane = new JEditSourcePane(serverV2, serviceType, source);
 
         int res = JOptionPane.showOptionDialog(null, new Object[]{pane},
                 LayerRowModel.BUNDLE.getString("createSourceMsg"),

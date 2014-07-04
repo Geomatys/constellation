@@ -74,10 +74,7 @@ public class SensorRecord extends Record {
         ensureConnectionNotClosed();
         session.updateSensor(id, identifier, type, parent, owner);
     }
-    
-    public String getType() {
-        return type;
-    }
+
 
     public void setType(String type) throws SQLException {
         this.type = type;
@@ -93,6 +90,11 @@ public class SensorRecord extends Record {
         this.parent = parent;
         ensureConnectionNotClosed();
         session.updateSensor(id, identifier, type, parent, owner);
+    }
+
+
+    public String getType() {
+        return type;
     }
 
     public String getOwnerLogin() {

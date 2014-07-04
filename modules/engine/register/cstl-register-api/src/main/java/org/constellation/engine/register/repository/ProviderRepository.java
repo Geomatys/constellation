@@ -20,30 +20,43 @@ package org.constellation.engine.register.repository;
 
 import java.util.List;
 
+import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Provider;
+import org.constellation.engine.register.Style;
 
- public interface ProviderRepository {
+public interface ProviderRepository {
 
-    List<Provider> findAll();
+    public List<Provider> findAll();
 
-    Provider findOne(Integer id);
+    public Provider findOne(Integer id);
 
-    List<Provider> findByImpl(String serviceName);
+    public Provider findByMetadataId(String metadataId);
 
-    List<String> getProviderIds();
+    public List<Provider> findByImpl(String serviceName);
 
-    Provider findByIdentifie(String providerIdentifier);
+    public List<String> getProviderIds();
 
-    List<String> getProviderIdsForDomain(int activeDomainId);
+    public Provider findByIdentifier(String providerIdentifier);
 
-    Provider getProviderParentIdOfLayer(String serviceType, String serviceId, String layerid);
+    public Provider findByIdentifierAndType(String providerIdentifier, String type);
 
-    Provider insert(Provider newProvider);
+    public List<Integer> getProviderIdsForDomain(int activeDomainId);
 
-    int delete(int id);
+    public Provider getProviderParentIdOfLayer(String serviceType, String serviceId, String layerid);
 
-    int deleteByIdentifier(String providerID);
+    public Provider insert(Provider newProvider);
 
+    public int delete(int id);
 
-    
+    public int deleteByIdentifier(String providerID);
+
+    public List<Provider> findChildren(String id);
+
+    public List<Data> findDatasByProviderId(Integer id);
+
+    public int update(Provider provider);
+
+    public List<Style> findStylesByProviderId(Integer providerId);
+
+    public Provider findByIdentifierAndDomainId(String providerIdentifier, Integer domainId);
 }

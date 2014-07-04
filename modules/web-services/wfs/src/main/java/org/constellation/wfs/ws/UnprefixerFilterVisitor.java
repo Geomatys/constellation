@@ -37,7 +37,11 @@ public class UnprefixerFilterVisitor extends DuplicatingFilterVisitor{
 
     @Override
     public Object visit(final PropertyName expression, final Object extraData) {
-        final String prefix = ft.getName().toString();
+        String prefix = "";
+        if (ft.getName().getNamespaceURI() != null) {
+            prefix = "{" + ft.getName().getNamespaceURI() + "}";
+        }
+        prefix = prefix + ft.getName().getLocalPart();
         if (expression.getPropertyName().startsWith(prefix)) {
             final String newPropertyName = expression.getPropertyName().substring(prefix.length());
             return getFactory(extraData).property(newPropertyName);

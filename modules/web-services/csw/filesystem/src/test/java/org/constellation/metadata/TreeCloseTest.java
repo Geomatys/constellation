@@ -23,14 +23,17 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
 import org.constellation.generic.database.Automatic;
-import static org.constellation.metadata.CSWworkerTest.pool;
 import static org.constellation.metadata.FileSystemCSWworkerTest.writeDataFile;
-import org.constellation.test.utils.Order;
+import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.util.NodeUtilities;
 import org.constellation.ws.MimeType;
 import org.geotoolkit.csw.xml.ElementSetType;
@@ -43,13 +46,16 @@ import org.geotoolkit.csw.xml.v202.QueryConstraintType;
 import org.geotoolkit.csw.xml.v202.QueryType;
 import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.ogc.xml.v110.SortByType;
-import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.context.ContextConfiguration;
 import org.w3c.dom.Node;
 
 /**
@@ -57,14 +63,28 @@ import org.w3c.dom.Node;
  * Cause a crash with no closing management of the R-Tree
  * @author Guilhem Legal (Geomatys)
  */
-public class TreeCloseTest {
+@RunWith(SpringTestRunner.class)
+@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+public class TreeCloseTest implements ApplicationContextAware {
 
+    protected ApplicationContext applicationContext;
+    
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+
+    @Inject
+    private ServiceBusiness serviceBusiness;
+    
     private static CSWworker worker;
 
+    private static File dataDirectory;
+    
     @BeforeClass
     public static void setUpClass() throws Exception {
         deleteTemporaryFile();
-
+            
         final File configDir = ConfigurationEngine.setupTestEnvironement("TreeCloseTest");
 
         File CSWDirectory  = new File(configDir, "CSW");
@@ -73,24 +93,34 @@ public class TreeCloseTest {
         instDirectory.mkdir();
 
         //we write the data files
-        File dataDirectory = new File(instDirectory, "data");
+        dataDirectory = new File(instDirectory, "data");
         dataDirectory.mkdir();
         writeDataFile(dataDirectory, "meta1.xml", "42292_5p_19900609195600");
         writeDataFile(dataDirectory, "meta2.xml", "42292_9s_19900610041000");
         writeDataFile(dataDirectory, "meta3.xml", "39727_22_19750113062500");
         writeDataFile(dataDirectory, "meta4.xml", "11325_158_19640418141800");
         writeDataFile(dataDirectory, "meta5.xml", "40510_145_19930221211500");
-        
-        //we write the configuration file
-        Automatic configuration = new Automatic("filesystem", dataDirectory.getPath());
-        configuration.setProfile("discovery");
-        configuration.putParameter("transactionSecurized", "false");
-        configuration.putParameter("shiroAccessible", "false");
+    }
+    
+    @PostConstruct
+    public void setUp() {
+        SpringHelper.setApplicationContext(applicationContext);
+        try {
+            if (!serviceBusiness.getServiceIdentifiers("csw").contains("default")) {
+                //we write the configuration file
+                Automatic configuration = new Automatic("filesystem", dataDirectory.getPath());
+                configuration.setProfile("discovery");
+                configuration.putParameter("transactionSecurized", "false");
+                configuration.putParameter("shiroAccessible", "false");
 
-        ConfigurationEngine.storeConfiguration("CSW", "default", configuration);
+                serviceBusiness.create("csw", "default", configuration, null, null);
 
-        worker = new CSWworker("default");
-        worker.setLogLevel(Level.FINER);
+                worker = new CSWworker("default");
+                worker.setLogLevel(Level.FINER);
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(TreeCloseTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @AfterClass

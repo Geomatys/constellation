@@ -21,26 +21,22 @@ package org.constellation.ws;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import org.constellation.configuration.*;
-import org.constellation.map.featureinfo.FeatureInfoUtilities;
-import org.constellation.ws.security.SimplePDP;
-import org.constellation.ServiceDef.Specification;
-
 import java.util.*;
-import java.io.FileNotFoundException;
 import java.util.logging.Level;
-import javax.imageio.spi.ServiceRegistry;
-import javax.xml.bind.JAXBException;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import javax.xml.namespace.QName;
-
-import org.constellation.admin.ConfigurationEngine;
-import org.constellation.map.factory.MapFactory;
-import org.constellation.map.security.LayerSecurityFilter;
+import org.constellation.ServiceDef.Specification;
+import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.StyleBusiness;
+import org.constellation.configuration.*;
+import org.constellation.map.configuration.LayerBusiness;
+import org.constellation.map.featureinfo.FeatureInfoUtilities;
 import org.constellation.provider.Data;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.StyleProviders;
 import org.constellation.util.DataReference;
-import org.constellation.ws.rs.MapUtilities;
+import org.constellation.ws.security.SimplePDP;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.Name;
@@ -54,13 +50,17 @@ import org.geotoolkit.style.MutableStyle;
  */
 public abstract class LayerWorker extends AbstractWorker {
 
+    @Inject
+    private LayerBusiness layerBusiness;
+
+    @Inject
+    protected StyleBusiness styleBusiness;
+
     private LayerContext layerContext;
 
     protected final List<String> supportedLanguages = new ArrayList<>();
 
     protected final String defaultLanguage;
-
-    private LayerSecurityFilter securityFilter;
 
     public LayerWorker(final String id, final Specification specification) {
         super(id, specification);
@@ -69,7 +69,7 @@ public abstract class LayerWorker extends AbstractWorker {
         String defaultLanguageCandidate = null;
         
         try {
-            final Object obj = ConfigurationEngine.getConfiguration(specification.name(), id);
+            final Object obj = serviceBusiness.getConfiguration(specification.name().toLowerCase(), id);
             if (obj instanceof LayerContext) {
                 layerContext = (LayerContext) obj;
                 final String sec = layerContext.getSecurity();
@@ -96,8 +96,6 @@ public abstract class LayerWorker extends AbstractWorker {
                 if (cc != null && !cc.isEmpty()) {
                     cacheCapabilities = Boolean.parseBoolean(cc);
                 }
-                final MapFactory mapfactory = getMapFactory(layerContext.getImplementation());
-                securityFilter = mapfactory.getSecurityFilter();
 
                 //Check  FeatureInfo configuration (if exist)
                 FeatureInfoUtilities.checkConfiguration(layerContext);
@@ -108,18 +106,10 @@ public abstract class LayerWorker extends AbstractWorker {
                 isStarted  = false;
                 LOGGER.log(Level.WARNING, startError);
             }
-        } catch (JAXBException ex) {
-            startError = "JAXBException while unmarshalling the layer context File";
-            isStarted  = false;
-            LOGGER.log(Level.WARNING, startError, ex);
         } catch (FactoryNotFoundException ex) {
             startError = ex.getMessage();
             isStarted  = false;
             LOGGER.log(Level.WARNING, startError, ex);
-        } catch (FileNotFoundException ex) {
-            startError = "The configuration file layerContext.xml has not been found";
-            isStarted = false;
-            LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, id);
         } catch (ClassNotFoundException | ConfigurationException ex) {
             startError = "Custom FeatureInfo configuration error : " + ex.getMessage();
             isStarted  = false;
@@ -141,22 +131,10 @@ public abstract class LayerWorker extends AbstractWorker {
             }
         });
     }
-
-    /**
-     * Select the good CSW factory in the available ones in function of the dataSource type.
-     *
-     * @param type
-     * @return
-     */
-    private MapFactory getMapFactory(final DataSourceType type) {
-        final Iterator<MapFactory> ite = ServiceRegistry.lookupProviders(MapFactory.class);
-        while (ite.hasNext()) {
-            MapFactory currentFactory = ite.next();
-            if (currentFactory.factoryMatchType(type)) {
-                return currentFactory;
-            }
-        }
-        throw new FactoryNotFoundException("No Map factory has been found for type:" + type);
+    
+    @PostConstruct
+    public void init(){
+        
     }
 
     protected List<Layer> getConfigurationLayers(final String login, final List<Name> layerNames) {
@@ -210,7 +188,12 @@ public abstract class LayerWorker extends AbstractWorker {
      * layer context.
      */
     public List<Layer> getConfigurationLayers(final String login) {
-        return MapUtilities.getConfigurationLayers(layerContext, securityFilter, login);
+        try {
+            return layerBusiness.getLayers(this.specification.name().toLowerCase(), getId(), login);
+        } catch (ConfigurationException ex) {
+            LOGGER.log(Level.WARNING, "Erro while getting layers", ex);
+        }
+        return new ArrayList<>();
     }
 
     
@@ -312,19 +295,30 @@ public abstract class LayerWorker extends AbstractWorker {
         return new NameInProvider(directLayer.getName(), directLayer.getProviderID(), version);
     }
     
-    protected static MutableStyle getStyle(final DataReference styleName) throws CstlServiceException {
-        final MutableStyle style;
-        if (styleName != null) {
-            //try to grab the style if provided
-            //a style has been given for this layer, try to use it
-            style = StyleProviders.getInstance().get(styleName.getLayerId().getLocalPart(), styleName.getProviderId());
-            if (style == null) {
-                throw new CstlServiceException("Style provided: " + styleName.getReference() + " not found.", STYLE_NOT_DEFINED);
+    protected MutableStyle getStyle(final DataReference styleReference) throws CstlServiceException {
+        MutableStyle style;
+        if (styleReference != null) {
+            try {
+                style = styleBusiness.getStyle(styleReference.getProviderId(), styleReference.getLayerId().getLocalPart());
+            } catch (TargetNotFoundException e) {
+                throw new CstlServiceException("Style provided: " + styleReference.getReference() + " not found.", STYLE_NOT_DEFINED);
             }
         } else {
             //no defined styles, use the favorite one, let the layer get it himself.
             style = null;
         }
+//        final MutableStyle style;
+//        if (styleName != null) {
+//            //try to grab the style if provided
+//            //a style has been given for this layer, try to use it
+//            style = StyleProviders.getInstance().get(styleName.getLayerId().getLocalPart(), styleName.getProviderId());
+//            if (style == null) {
+//                throw new CstlServiceException("Style provided: " + styleName.getReference() + " not found.", STYLE_NOT_DEFINED);
+//            }
+//        } else {
+//            //no defined styles, use the favorite one, let the layer get it himself.
+//            style = null;
+//        }
         return style;
     }
 

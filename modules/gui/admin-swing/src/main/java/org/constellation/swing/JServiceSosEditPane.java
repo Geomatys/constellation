@@ -21,7 +21,8 @@ package org.constellation.swing;
 
 import java.awt.BorderLayout;
 import java.util.logging.Level;
-import org.constellation.admin.service.ConstellationServer;
+import org.constellation.admin.service.ConstellationClient;
+import org.constellation.configuration.AbstractConfigurationObject;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.SOSConfiguration;
@@ -33,16 +34,15 @@ import org.constellation.generic.database.Automatic;
  */
 public class JServiceSosEditPane extends JServiceEditionPane {
 
-     private ConstellationServer server;
+    private ConstellationClient serverV2;
     private Instance serviceInstance;
     private SOSConfiguration configuration;
     private JServiceEditionPane OMspecificPane;
     private JServiceEditionPane SMLspecificPane;
-    /**
-     * Creates new form JServiceSosEditPane
-     */
-    public JServiceSosEditPane(final ConstellationServer server, final Instance serviceInstance, final Object configuration) {
-        this.server = server;
+    
+    
+    public JServiceSosEditPane(final ConstellationClient server, final Instance serviceInstance, final Object configuration) {
+        this.serverV2 = serverV2;
         this.serviceInstance = serviceInstance;
         this.configuration = (configuration instanceof SOSConfiguration) ? (SOSConfiguration) configuration : null;
         initComponents();
@@ -258,7 +258,7 @@ public class JServiceSosEditPane extends JServiceEditionPane {
     }
     
     @Override
-    public Object getConfiguration() {
+    public AbstractConfigurationObject getConfiguration() {
         updateConfiguration();
         return configuration;
     }

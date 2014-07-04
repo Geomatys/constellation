@@ -52,7 +52,7 @@ import org.apache.sis.xml.IdentifierSpace;
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
 import org.constellation.dto.DataMetadata;
-import org.constellation.dto.Service;
+import org.constellation.dto.Details;
 import org.geotoolkit.service.OperationMetadataImpl;
 import org.geotoolkit.service.ServiceIdentificationImpl;
 import org.opengis.metadata.citation.Citation;
@@ -97,7 +97,7 @@ public class MetadataFeeder {
         this.eater = eater;
     }
 
-    public void feedService(Service serviceInfo) {
+    public void feedService(Details serviceInfo) {
         setAbstract(serviceInfo.getDescription());
         setTitle(serviceInfo.getName());
         setKeywordsNoType(serviceInfo.getKeywords());
@@ -814,6 +814,32 @@ public class MetadataFeeder {
             resources.add(dataIdent);
         }
         servIdent.setOperatesOn(resources);
+    }
+    
+    public void addServiceMetadataIdForData(final String layerId) {
+        final Collection<Identification> idents = eater.getIdentificationInfo();
+        ServiceIdentificationImpl servIdent = null;
+        for (Identification ident : idents) {
+            if (ident instanceof ServiceIdentificationImpl) {
+                servIdent = (ServiceIdentificationImpl) ident;
+            }
+        }
+        if (servIdent == null) {
+            servIdent = new ServiceIdentificationImpl();
+            eater.getIdentificationInfo().add(servIdent);
+        }
+
+        final Collection<DataIdentification> resources = servIdent.getOperatesOn();
+        for (DataIdentification did : resources) {
+            final DefaultDataIdentification dataIdent = (DefaultDataIdentification) did;
+            if (dataIdent.getIdentifierMap().getSpecialized(IdentifierSpace.HREF).equals(layerId)) {
+                return;
+            }
+        }
+        // add new resouce
+        final DefaultDataIdentification dataIdent = new DefaultDataIdentification();
+        dataIdent.getIdentifierMap().put(IdentifierSpace.HREF, layerId);
+        servIdent.getOperatesOn().add(dataIdent);
     }
     
     /**

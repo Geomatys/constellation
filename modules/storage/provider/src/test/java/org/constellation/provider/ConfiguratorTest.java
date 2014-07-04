@@ -25,30 +25,46 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.PostConstruct;
+import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.ConfigurationException;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import org.constellation.provider.configuration.Configurator;
-import org.opengis.parameter.ParameterValueGroup;
-
-import static org.junit.Assert.*;
 import static org.constellation.provider.MockLayerProviderFactory.*;
 import org.constellation.provider.configuration.AbstractConfigurator;
+import org.constellation.provider.configuration.Configurator;
 import static org.constellation.provider.configuration.ProviderParameters.*;
+import org.junit.AfterClass;
+import static org.junit.Assert.*;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.opengis.parameter.ParameterValueGroup;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
  * @author Johann Sorel (Geomatys)
  */
-public class ConfiguratorTest {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+public class ConfiguratorTest implements ApplicationContextAware {
 
+    private ApplicationContext applicationContext;
+    
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+    
     public ConfiguratorTest() {
     }
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
+    @PostConstruct
+    public void setUpClass() {
+        SpringHelper.setApplicationContext(applicationContext);
     }
 
     @AfterClass

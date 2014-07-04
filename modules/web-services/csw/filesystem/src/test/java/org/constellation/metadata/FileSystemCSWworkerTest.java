@@ -25,11 +25,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
 import org.constellation.generic.database.Automatic;
 import org.constellation.test.utils.Order;
-import org.constellation.test.utils.TestRunner;
+import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.util.Util;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
@@ -40,22 +45,26 @@ import org.junit.runner.RunWith;
  *
  * @author Guilhem Legal (Geomatys)
  */
-@RunWith(TestRunner.class)
+@RunWith(SpringTestRunner.class)
 public class FileSystemCSWworkerTest extends CSWworkerTest {
 
+    @Inject
+    private ServiceBusiness serviceBusiness;
+    
+    private static File dataDirectory;
+    
     @BeforeClass
     public static void setUpClass() throws Exception {
         deleteTemporaryFile();
-
         final File configDir = ConfigurationEngine.setupTestEnvironement("FSCSWWorkerTest");
-
+            
         File CSWDirectory  = new File(configDir, "CSW");
         CSWDirectory.mkdir();
         final File instDirectory = new File(CSWDirectory, "default");
         instDirectory.mkdir();
 
         //we write the data files
-        File dataDirectory = new File(instDirectory, "data");
+        dataDirectory = new File(instDirectory, "data");
         dataDirectory.mkdir();
         writeDataFile(dataDirectory, "meta1.xml", "42292_5p_19900609195600");
         writeDataFile(dataDirectory, "meta2.xml", "42292_9s_19900610041000");
@@ -69,22 +78,46 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
         writeDataFile(dataDirectory, "ebrim3.xml", "urn:motiive:csw-ebrim");
         //writeDataFile(dataDirectory, "error-meta.xml", "urn:error:file");
         writeDataFile(dataDirectory, "meta13.xml", "urn:uuid:1ef30a8b-876d-4828-9246-dcbbyyiioo");
-
-        //we write the configuration file
-        Automatic configuration = new Automatic("filesystem", dataDirectory.getPath());
-        configuration.putParameter("transactionSecurized", "false");
-        configuration.putParameter("shiroAccessible", "false");
-
-        ConfigurationEngine.storeConfiguration("CSW", "default", configuration);
-
+        
         pool = EBRIMMarshallerPool.getInstance();
-        fillPoolAnchor((AnchoredMarshallerPool) pool);
+    }
+    
+    @PostConstruct
+    public void setUp() {
+        SpringHelper.setApplicationContext(applicationContext);
+        try {
+            if (!serviceBusiness.getServiceIdentifiers("csw").contains("default")) {
+                //we write the configuration file
+                Automatic configuration = new Automatic("filesystem", dataDirectory.getPath());
+                configuration.putParameter("transactionSecurized", "false");
+                configuration.putParameter("shiroAccessible", "false");
 
-        Unmarshaller u = pool.acquireUnmarshaller();
-        pool.recycle(u);
+                serviceBusiness.create("csw", "default", configuration, null, null);
 
-        worker = new CSWworker("default");
-        worker.setLogLevel(Level.FINER);
+                fillPoolAnchor((AnchoredMarshallerPool) pool);
+                Unmarshaller u = pool.acquireUnmarshaller();
+                pool.recycle(u);
+
+                worker = new CSWworker("default");
+                worker.setLogLevel(Level.FINER);
+                
+            } else if (worker == null) {
+                
+                serviceBusiness.delete("csw", "default");
+                
+                //we write the configuration file
+                Automatic configuration = new Automatic("filesystem", dataDirectory.getPath());
+                configuration.putParameter("transactionSecurized", "false");
+                configuration.putParameter("shiroAccessible", "false");
+
+                serviceBusiness.create("csw", "default", configuration, null, null);
+                
+                worker = new CSWworker("default");
+                worker.setLogLevel(Level.FINER);
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(FileSystemCSWworkerTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
     }
 
@@ -98,14 +131,6 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
             worker.destroy();
         }
         ConfigurationEngine.shutdownTestEnvironement("FSCSWWorkerTest");
-    }
-
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
     }
 
     /**

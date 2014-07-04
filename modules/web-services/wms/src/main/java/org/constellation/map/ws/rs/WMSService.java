@@ -18,59 +18,6 @@
  */
 package org.constellation.map.ws.rs;
 
-import static org.constellation.api.QueryConstants.REQUEST_PARAMETER;
-import static org.constellation.api.QueryConstants.SERVICE_PARAMETER;
-import static org.constellation.api.QueryConstants.UPDATESEQUENCE_PARAMETER;
-import static org.constellation.api.QueryConstants.VERSION_PARAMETER;
-import static org.constellation.query.Query.*;
-import static org.constellation.query.wms.WMSQuery.CAPABILITIES;
-import static org.constellation.query.wms.WMSQuery.DESCRIBELAYER;
-import static org.constellation.query.wms.WMSQuery.GETCAPABILITIES;
-import static org.constellation.query.wms.WMSQuery.GETFEATUREINFO;
-import static org.constellation.query.wms.WMSQuery.GETLEGENDGRAPHIC;
-import static org.constellation.query.wms.WMSQuery.GETMAP;
-import static org.constellation.query.wms.WMSQuery.KEY_AZIMUTH;
-import static org.constellation.query.wms.WMSQuery.KEY_BBOX;
-import static org.constellation.query.wms.WMSQuery.KEY_BGCOLOR;
-import static org.constellation.query.wms.WMSQuery.KEY_CRS_V111;
-import static org.constellation.query.wms.WMSQuery.KEY_CRS_V130;
-import static org.constellation.query.wms.WMSQuery.KEY_ELEVATION;
-import static org.constellation.query.wms.WMSQuery.KEY_FEATURE_COUNT;
-import static org.constellation.query.wms.WMSQuery.KEY_FORMAT;
-import static org.constellation.query.wms.WMSQuery.KEY_HEIGHT;
-import static org.constellation.query.wms.WMSQuery.KEY_INFO_FORMAT;
-import static org.constellation.query.wms.WMSQuery.KEY_I_V111;
-import static org.constellation.query.wms.WMSQuery.KEY_I_V130;
-import static org.constellation.query.wms.WMSQuery.KEY_J_V111;
-import static org.constellation.query.wms.WMSQuery.KEY_J_V130;
-import static org.constellation.query.wms.WMSQuery.KEY_LANGUAGE;
-import static org.constellation.query.wms.WMSQuery.KEY_LAYER;
-import static org.constellation.query.wms.WMSQuery.KEY_LAYERS;
-import static org.constellation.query.wms.WMSQuery.KEY_QUERY_LAYERS;
-import static org.constellation.query.wms.WMSQuery.KEY_REMOTE_OWS_URL;
-import static org.constellation.query.wms.WMSQuery.KEY_RULE;
-import static org.constellation.query.wms.WMSQuery.KEY_SCALE;
-import static org.constellation.query.wms.WMSQuery.KEY_SLD;
-import static org.constellation.query.wms.WMSQuery.KEY_SLD_BODY;
-import static org.constellation.query.wms.WMSQuery.KEY_SLD_VERSION;
-import static org.constellation.query.wms.WMSQuery.KEY_STYLE;
-import static org.constellation.query.wms.WMSQuery.KEY_STYLES;
-import static org.constellation.query.wms.WMSQuery.KEY_TIME;
-import static org.constellation.query.wms.WMSQuery.KEY_TRANSPARENT;
-import static org.constellation.query.wms.WMSQuery.KEY_WIDTH;
-import static org.constellation.query.wms.WMSQuery.KEY_WMTVER;
-import static org.constellation.query.wms.WMSQuery.MAP;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_CRS;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_DIMENSION_VALUE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_FORMAT;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_POINT;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.OPERATION_NOT_SUPPORTED;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.STYLE_NOT_DEFINED;
-
-
-//J2SE dependencies
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
@@ -85,36 +32,40 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-
-import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
-
 import org.apache.sis.util.Version;
-//Constellation dependencies
 import org.constellation.ServiceDef;
 import org.constellation.ServiceDef.Specification;
-import org.constellation.map.configuration.MapConfigurer;
+import org.constellation.api.QueryConstants;
+import static org.constellation.api.QueryConstants.REQUEST_PARAMETER;
+import static org.constellation.api.QueryConstants.SERVICE_PARAMETER;
+import static org.constellation.api.QueryConstants.UPDATESEQUENCE_PARAMETER;
+import static org.constellation.api.QueryConstants.VERSION_PARAMETER;
 import org.constellation.map.ws.DefaultWMSWorker;
 import org.constellation.map.ws.QueryContext;
 import org.constellation.map.ws.WMSConstant;
+import static org.constellation.map.ws.WMSConstant.*;
 import org.constellation.map.ws.WMSWorker;
 import org.constellation.portrayal.internal.PortrayalResponse;
-import org.constellation.query.QueryAdapter;
 import org.constellation.util.Util;
-import org.constellation.wms.configuration.WMSConfigurer;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.Worker;
 import org.constellation.ws.rs.GridWebService;
+import org.constellation.ws.rs.MapUtilities;
 import org.constellation.ws.rs.provider.SchemaLocatedExceptionResponse;
-//GeotoolKit dependencies
 import org.geotoolkit.client.RequestsUtilities;
 import org.geotoolkit.display2d.service.DefaultPortrayalService;
+import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
 import org.geotoolkit.ogc.xml.exception.ServiceExceptionType;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
+
+//J2SE dependencies
 import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.sld.MutableStyledLayerDescriptor;
@@ -130,8 +81,6 @@ import org.geotoolkit.wms.xml.GetCapabilities;
 import org.geotoolkit.wms.xml.GetFeatureInfo;
 import org.geotoolkit.wms.xml.GetMap;
 import org.geotoolkit.wms.xml.WMSMarshallerPool;
-//Geoapi dependencies
-import org.geotoolkit.feature.type.Name;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.FactoryException;
@@ -171,15 +120,6 @@ public class WMSService extends GridWebService<WMSWorker> {
     protected Class getWorkerClass() {
         return DefaultWMSWorker.class;
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Class<? extends MapConfigurer> getConfigurerClass() {
-        return WMSConfigurer.class;
-    }
-
 
     /**
      * {@inheritDoc}
@@ -239,7 +179,7 @@ public class WMSService extends GridWebService<WMSWorker> {
                 return Response.ok(response, MimeType.TEXT_XML).build();
             }
             throw new CstlServiceException("The operation " + request + " is not supported by the service",
-                                           OPERATION_NOT_SUPPORTED, KEY_REQUEST.toLowerCase());
+                                           OPERATION_NOT_SUPPORTED, QueryConstants.REQUEST_PARAMETER.toLowerCase());
         } catch (CstlServiceException ex) {
             return processExceptionResponse(queryContext, ex, version, worker);
         }
@@ -421,7 +361,7 @@ public class WMSService extends GridWebService<WMSWorker> {
               String infoFormat  = getParameter(KEY_INFO_FORMAT, false);
         final String strFeatureCount = getParameter(KEY_FEATURE_COUNT, false);
         final List<String> queryLayers = StringUtilities.toStringList(strQueryLayers);
-        final List<String> queryableLayers = QueryAdapter.areQueryableLayers(queryLayers, null);
+        final List<String> queryableLayers = MapUtilities.areQueryableLayers(queryLayers, null);
         final List<Name> namedQueryableLayers = parseNamespaceLayerList(queryableLayers);
         if (infoFormat == null) {
             infoFormat = MimeType.TEXT_XML;
@@ -455,7 +395,7 @@ public class WMSService extends GridWebService<WMSWorker> {
      * @return
      */
     private List<Name> parseNamespaceLayerList(List<String> layerNames) {
-        final List<Name> result = new ArrayList<Name>();
+        final List<Name> result = new ArrayList<>();
         for (String layerName : layerNames) {
             result.add(Util.parseLayerName(layerName));
         }
@@ -546,7 +486,7 @@ public class WMSService extends GridWebService<WMSWorker> {
         }
         w.checkVersionSupported(version, false);
 
-        final String strExceptions   = getParameter(KEY_EXCEPTIONS,     false);
+        final String strExceptions   = getParameter(WMSConstant.KEY_EXCEPTIONS,     false);
         /*
          * we verify that the exception format is an allowed value
          */
@@ -696,7 +636,7 @@ public class WMSService extends GridWebService<WMSWorker> {
                     throw new CstlServiceException("The given sld version "+ strSldVersion +" is not known.",
                             INVALID_PARAMETER_VALUE, KEY_SLD_VERSION.toLowerCase());
                 }
-                sld = QueryAdapter.toSLD(bodySLD, urlSLD, sldVersion);
+                sld = MapUtilities.toSLD(bodySLD, urlSLD, sldVersion);
             } catch (MalformedURLException ex) {
                 throw new CstlServiceException(ex, STYLE_NOT_DEFINED);
             }

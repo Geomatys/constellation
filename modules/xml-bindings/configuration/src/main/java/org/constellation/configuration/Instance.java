@@ -35,6 +35,9 @@ import java.util.Objects;
 public class Instance {
 
     @XmlAttribute
+    private int id;
+    
+    @XmlAttribute
     private String name;
 
     @XmlAttribute
@@ -59,21 +62,36 @@ public class Instance {
 
     }
 
-    public Instance(final String name, final String type, final ServiceStatus status) {
-        this.name   = name;
-        this.type   = type;
-        this.status = status;
+    public Instance(final int id, final String identifier, final String type, final ServiceStatus status) {
+        this.id         = id;
+        this.identifier = identifier;
+        this.type       = type;
+        this.status     = status;
     }
 
-    public Instance(final String identifier, final String name, final String _abstract, final String type,
+    public Instance(final int id, final String identifier, final String name, final String _abstract, final String type,
             final List<String> versions, final Integer layerNumber, final ServiceStatus status) {
-        this.identifier   = identifier;
+        this(id, identifier, type, status);
         this.name         = name;
         this._abstract    = _abstract;
-        this.type         = type;
         this.versions     = versions;
         this.layersNumber = layerNumber;
-        this.status       = status;
+    }
+    
+    /**
+     * Set id;
+     * @param id
+     */
+    public void setId(int id) {
+        this.id = id;
+    }
+    
+    /**
+     * Return the id;
+     * @return
+     */
+    public int getId() {
+        return id;
     }
 
     /**
@@ -92,6 +110,10 @@ public class Instance {
      */
     public ServiceStatus getStatus() {
         return status;
+    }
+    
+    public void setStatus(ServiceStatus status) {
+        this.status = status;
     }
 
     /**
@@ -122,6 +144,22 @@ public class Instance {
 
     public void setLayersNumber(Integer layersNumber) {
         this.layersNumber = layersNumber;
+    }
+    
+    public void setVersions(final List<String> versions) {
+        this.versions = versions;
+    }
+
+    public List<String> getVersions() {
+        return versions;
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(final String identifier) {
+        this.identifier = identifier;
     }
 
     @Override
@@ -185,21 +223,5 @@ public class Instance {
             sb.append("status:").append(status).append('\n');
         }
         return sb.toString();
-    }
-
-    public void setVersions(final List<String> versions) {
-        this.versions = versions;
-    }
-
-    public List<String> getVersions() {
-        return versions;
-    }
-
-    public String getIdentifier() {
-        return identifier;
-    }
-
-    public void setIdentifier(final String identifier) {
-        this.identifier = identifier;
     }
 }

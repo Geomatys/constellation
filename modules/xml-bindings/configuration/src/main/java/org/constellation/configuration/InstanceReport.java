@@ -52,7 +52,7 @@ public class InstanceReport {
      */
     public List<Instance> getInstances() {
         if (instances == null) {
-            instances = new ArrayList<Instance>();
+            instances = new ArrayList<>();
         }
         return instances;
     }
@@ -69,7 +69,7 @@ public class InstanceReport {
     }
 
     public List<Instance> getInstances(final String type) {
-        final List<Instance> results = new ArrayList<Instance>();
+        final List<Instance> results = new ArrayList<>();
         if (instances != null) {
             for (Instance instance : instances) {
                 if (instance.getType().equals(type)) {

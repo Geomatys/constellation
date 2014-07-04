@@ -20,10 +20,27 @@ package org.constellation.engine.register.repository;
 
 import java.util.List;
 
+import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Layer;
+import org.constellation.engine.register.Service;
 
 public interface LayerRepository {
 
-    List<? extends Layer> findAll();
+    List<Layer> findAll();
     
+    List<Layer> findByServiceId(int serviceId);
+
+    int deleteServiceLayer(Service service);
+
+    Layer save(Layer storeLayer);
+
+    int update(Layer storeLayer);
+
+    void delete(int layerId);
+    
+    Layer findByServiceIdAndLayerName(int serviceId, String layerName);
+    
+    Layer findByServiceIdAndLayerName(int serviceId, String layerName, String namespace);
+
+    Data findDatasFromLayerAlias(String layerAlias, String dataProviderIdentifier);
 }

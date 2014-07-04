@@ -63,6 +63,7 @@ import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 import javax.measure.unit.UnitFormat;
 import javax.xml.bind.JAXBException;
+import com.codahale.metrics.annotation.Timed;
 
 import org.apache.sis.internal.util.UnmodifiableArrayList;
 import org.apache.sis.measure.MeasurementRange;
@@ -74,25 +75,21 @@ import org.apache.sis.referencing.datum.DefaultEngineeringDatum;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.UnconvertibleObjectException;
 import org.apache.sis.xml.MarshallerPool;
-//Constellation dependencies
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.exception.ConstellationException;
 import org.constellation.configuration.*;
-import org.constellation.converter.DataReferenceConverter;
-import org.constellation.dto.Service;
+import org.constellation.dto.Details;
 import org.constellation.map.featureinfo.FeatureInfoFormat;
 import org.constellation.map.featureinfo.FeatureInfoUtilities;
 import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.portrayal.internal.PortrayalResponse;
 import org.constellation.provider.CoverageData;
 import org.constellation.provider.Data;
-import org.constellation.query.wms.WMSQuery;
 import org.constellation.util.DataReference;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.LayerWorker;
 import org.constellation.ws.MimeType;
-//Geotoolkit dependencies
 import org.geotoolkit.cql.CQL;
 import org.geotoolkit.cql.CQLException;
 import org.geotoolkit.data.query.QueryBuilder;
@@ -104,6 +101,7 @@ import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.feature.type.DefaultName;
+import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.inspire.xml.vs.ExtendedCapabilitiesType;
 import org.geotoolkit.inspire.xml.vs.LanguageType;
 import org.geotoolkit.inspire.xml.vs.LanguagesType;
@@ -113,21 +111,17 @@ import org.geotoolkit.map.MapItem;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.referencing.ReferencingUtilities;
+import org.apache.sis.referencing.CommonCRS;
 import org.geotoolkit.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotoolkit.referencing.cs.DiscreteCoordinateSystemAxis;
 import org.geotoolkit.se.xml.v110.OnlineResourceType;
-import org.geotoolkit.sld.MutableLayer;
-import org.geotoolkit.sld.MutableLayerStyle;
-import org.geotoolkit.sld.MutableNamedLayer;
-import org.geotoolkit.sld.MutableNamedStyle;
-import org.geotoolkit.sld.MutableStyledLayerDescriptor;
+import org.geotoolkit.sld.*;
 import org.geotoolkit.sld.xml.GetLegendGraphic;
 import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
 import org.geotoolkit.sld.xml.v110.LayerDescriptionType;
 import org.geotoolkit.sld.xml.v110.TypeNameType;
 import org.geotoolkit.style.MutableStyle;
-import org.geotoolkit.style.StyleUtilities;
 import org.geotoolkit.util.PeriodUtilities;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.wms.xml.AbstractBoundingBox;
@@ -148,6 +142,9 @@ import org.geotoolkit.wms.xml.v111.LatLonBoundingBox;
 import org.geotoolkit.wms.xml.v130.Capability;
 import org.geotoolkit.feature.type.Name;
 //Geoapi dependencies
+import org.geotoolkit.wms.xml.*;
+import org.geotoolkit.wms.xml.v111.LatLonBoundingBox;
+import org.geotoolkit.wms.xml.v130.Capability;
 import org.opengis.filter.Filter;
 import org.opengis.filter.expression.Expression;
 import org.opengis.geometry.Envelope;
@@ -159,11 +156,36 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.datum.EngineeringDatum;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.sld.StyledLayerDescriptor;
-import org.opengis.style.Style;
 import org.opengis.util.FactoryException;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 
-import com.codahale.metrics.annotation.Timed;
+import javax.inject.Named;
+import javax.measure.unit.SI;
+import javax.measure.unit.Unit;
+import javax.measure.unit.UnitFormat;
+import javax.xml.bind.JAXBException;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.FileNotFoundException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.constellation.api.CommonConstants.DEFAULT_CRS;
+import static org.constellation.map.ws.WMSConstant.*;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import static org.geotoolkit.wms.xml.WmsXmlFactory.*;
+
+//Constellation dependencies
+//Geotoolkit dependencies
+//Geoapi dependencies
 
 /**
  * A WMS worker for a local WMS service which handles requests from either REST
@@ -183,8 +205,9 @@ import com.codahale.metrics.annotation.Timed;
  */
 
 @Named
-@Scope("prototype")
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
+
 
 
     /**
@@ -203,16 +226,9 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
     /**
      * List of FeatureInfo mimeTypes
      */
-    private final List<String> GFI_MIME_TYPES = new ArrayList<String>();
+    private final List<String> GFI_MIME_TYPES = new ArrayList<>();
 
     private WMSPortrayal mapPortrayal;
-
-    public static class Factory {
-        public static DefaultWMSWorker create(String id) {
-            return new DefaultWMSWorker(id);
-        }
-    }
-
     public DefaultWMSWorker(final String id) {
         super(id, ServiceDef.Specification.WMS);
 
@@ -229,12 +245,13 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
 
         mapPortrayal = new WMSPortrayal();
         try {
-            mapPortrayal = (WMSPortrayal) ConfigurationEngine.getConfiguration("WMS", id, "WMSPortrayal.xml");
-        } catch (JAXBException ex) {
+            WMSPortrayal candidate = (WMSPortrayal) serviceBusiness.getExtraConfiguration("WMS", id, "WMSPortrayal.xml");
+            if (candidate != null) {
+                mapPortrayal = candidate;
+            }
+        } catch (ConfigurationException ex) {
             LOGGER.log(Level.WARNING, null, ex);
-        } catch (FileNotFoundException ex) {
-            // the file can be absent
-        }
+        } 
 
         if (isStarted) {
             LOGGER.log(Level.INFO, "WMS worker {0} running", id);
@@ -288,8 +305,10 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         final String userLogin         = getUserLogin();
         // we get the request language, if its not set we get the default "eng"
         final String currentLanguage;
-        if (requestedLanguage != null && supportedLanguages.contains(requestedLanguage) && !requestedLanguage.equals(defaultLanguage)) {
+        if (requestedLanguage != null && supportedLanguages.contains(requestedLanguage)) {
             currentLanguage = requestedLanguage;
+        } else if (requestedLanguage == null && defaultLanguage != null) {
+            currentLanguage = defaultLanguage;
         } else {
             currentLanguage = null;
         }
@@ -299,7 +318,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             return (AbstractWMSCapabilities) cachedCapabilities;
         }
 
-        final Service skeleton = getStaticCapabilitiesObject("WMS", requestedLanguage);
+        final Details skeleton = getStaticCapabilitiesObject("wms", currentLanguage);
         final AbstractWMSCapabilities inCapabilities = WMSConstant.createCapabilities(queryVersion, skeleton);
 
         final AbstractRequest request;
@@ -830,16 +849,28 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
             // @TODO: convert the data reference string to a mutable style
             // ${providerStyleType|providerStyleId|styleName}
             final List<org.geotoolkit.wms.xml.Style> styles = new ArrayList<>();
-            for (DataReference styl : configLayer.getStyles()) {
-                final MutableStyle ms;
-                Style style = null;
+            for (DataReference styleRef : configLayer.getStyles()) {
+                MutableStyle ms = null;
                 try {
-                    style = DataReferenceConverter.convertDataReferenceToStyle(styl);
-                } catch (UnconvertibleObjectException e) {
+                    final MutableStyle style = styleBusiness.getStyle(styleRef.getProviderId(), styleRef.getLayerId().getLocalPart());
+                    if (style != null) {
+                        ms = style;
+                    } else {
+                        throw new ConstellationException(new IllegalArgumentException("The given style reference was invalid"));
+                    }
+                } catch (ConstellationException | TargetNotFoundException e) {
                     // The given style reference was invalid, we can't get a style from that
                     LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
                 }
-                ms = StyleUtilities.copy(style);
+
+//                Style style = null;
+//                try {
+//                    style = DataReferenceConverter.convertDataReferenceToStyle(styleRef);
+//                } catch (NonconvertibleObjectException e) {
+//                    // The given style reference was invalid, we can't get a style from that
+//                    LOGGER.log(Level.INFO, e.getLocalizedMessage(), e);
+//                }
+//                ms = StyleUtilities.copy(style);
                 if (ms != null) {
                     styles.add(convertMutableStyleToWmsStyle(version, ms, layerDetails, legendUrlPng, legendUrlGif));
                 }
@@ -985,9 +1016,9 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         final Double elevation                 = getFI.getElevation();
         final List<Date> time                  = getFI.getTime();
         final Map<String, Object> params       = new HashMap<>();
-        params.put(WMSQuery.KEY_ELEVATION, elevation);
-        params.put(WMSQuery.KEY_TIME, time);
-        params.put(WMSQuery.KEY_EXTRA_PARAMETERS, getFI.getParameters());
+        params.put(KEY_ELEVATION, elevation);
+        params.put(KEY_TIME, time);
+        params.put(KEY_EXTRA_PARAMETERS, getFI.getParameters());
         final SceneDef sdef = new SceneDef();
 
         try {
@@ -1237,7 +1268,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         }
         //       -- create the rendering parameter Map
         final Map<String, Object> params = new HashMap<>();
-        params.put(WMSQuery.KEY_EXTRA_PARAMETERS, getMap.getParameters());
+        params.put(KEY_EXTRA_PARAMETERS, getMap.getParameters());
         final SceneDef sdef = new SceneDef();
         sdef.extensions().add(mapPortrayal.getExtension());
         final Hints hints = mapPortrayal.getHints();
@@ -1340,7 +1371,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
         }
     }
 
-    private static MutableStyle extractStyle(final Name layerName, final Layer configLayer, final StyledLayerDescriptor sld) throws CstlServiceException{
+    private MutableStyle extractStyle(final Name layerName, final Layer configLayer, final StyledLayerDescriptor sld) throws CstlServiceException{
         if(sld == null){
             throw new IllegalArgumentException("SLD should not be null");
         }

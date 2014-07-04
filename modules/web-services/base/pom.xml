@@ -112,11 +112,6 @@
             <version>2.3.0</version>
         </dependency>
        <dependency>
-         <groupId>com.fasterxml.jackson.datatype</groupId>
-         <artifactId>jackson-datatype-hibernate4</artifactId>
-         <version>2.2.3</version>
-       </dependency>
-       <dependency>
           <groupId>org.constellation.library</groupId>
           <artifactId>cstl-lib-base</artifactId>
           <version>${project.version}</version>

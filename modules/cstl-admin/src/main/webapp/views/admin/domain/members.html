@@ -53,6 +53,7 @@
                         <td ng-click="predicate = 'firstname'; reverse=!reverse" translate="settings.form.firstname">First name</td>
                         <td ng-click="predicate = 'lastname'; reverse=!reverse" translate="settings.form.lastname">Last name</td>
                         <td ng-click="predicate = 'email'; reverse=!reverse" translate="settings.form.email">E-mail</td>
+                        <td ng-click="predicate = 'email'; reverse=!reverse" translate="settings.form.domainroles">DomainRoles</td>
                     </tr>
                     </thead>
 
@@ -61,6 +62,7 @@
                         <td>{{user.firstname}}</td>
                         <td>{{user.lastname}}</td>
                         <td>{{user.email}}</td>
+                        <td><span ng-repeat="role in user.domainRoles" ng-click="changeDomainRoles(user)"><span ng-if="$index>0">, </span>{{role.name}}</span></span><td>
                         <td class="user-delete" ng-click="removeMemberFromDomain($index)"><span class="glyphicon glyphicon-trash"></span></td>
                     </tr>
                 </table>

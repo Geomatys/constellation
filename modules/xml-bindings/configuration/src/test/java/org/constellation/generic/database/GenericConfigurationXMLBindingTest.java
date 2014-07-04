@@ -34,9 +34,9 @@ import org.apache.sis.xml.MarshallerPool;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
+import org.constellation.dto.Details;
 import org.constellation.dto.ObservationFilter;
 import org.constellation.dto.ParameterValues;
-import org.constellation.dto.Service;
 import org.junit.*;
 import static org.junit.Assert.*;
 import org.w3c.dom.Node;
@@ -553,7 +553,7 @@ public class GenericConfigurationXMLBindingTest {
 
         final Contact ctc = new Contact("firstname", "lastname", "org1", "pos1", "0600", "0800", "test@jj.com", "adr1", "city1", "state1", "34000", "france", "url1", null, null);
         final AccessConstraint cstr = new AccessConstraint("fees1", "constraint1", 5, 200, 300);
-        final Service service = new Service("name1", "id1", Arrays.asList("kw1", "kw2"), "desc1", Arrays.asList("1.0.0", "2.0.0"), ctc, cstr, false);
+        final Details service = new Details("name1", "id1", Arrays.asList("kw1", "kw2"), "desc1", Arrays.asList("1.0.0", "2.0.0"), ctc, cstr, false, "FR");
 
         StringWriter sw = new StringWriter();
         marshaller.marshal(service, sw);
@@ -561,11 +561,12 @@ public class GenericConfigurationXMLBindingTest {
         String result =  sw.toString();
         String expResult =
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-        "<ns2:service xmlns:ns2=\"http://www.constellation.org/config\">\n" +
+        "<ns2:details xmlns:ns2=\"http://www.constellation.org/config\">\n" +
         "  <ns2:description>desc1</ns2:description>\n" +
         "  <ns2:identifier>id1</ns2:identifier>\n" +
         "  <ns2:keywords>kw1</ns2:keywords>\n" +
         "  <ns2:keywords>kw2</ns2:keywords>\n" +
+        "  <ns2:lang>FR</ns2:lang>\n" +
         "  <ns2:name>name1</ns2:name>\n" +
         "  <ns2:serviceConstraints>\n" +
         "    <ns2:accessConstraint>constraint1</ns2:accessConstraint>\n" +
@@ -593,7 +594,7 @@ public class GenericConfigurationXMLBindingTest {
         "  <ns2:transactional>false</ns2:transactional>\n" +
         "  <ns2:versions>1.0.0</ns2:versions>\n" +
         "  <ns2:versions>2.0.0</ns2:versions>\n" +
-        "</ns2:service>" + '\n';
+        "</ns2:details>" + '\n';
 
         final XMLComparator comparator = new XMLComparator(expResult, result);
         comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");

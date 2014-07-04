@@ -27,6 +27,7 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,7 +45,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.constellation.admin.service.ConstellationClient;
-import org.constellation.admin.service.ConstellationServer;
 import org.constellation.configuration.ProviderReport;
 import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.ProvidersReport;
@@ -54,6 +54,7 @@ import org.constellation.swing.action.Action;
 import org.constellation.swing.action.ActionEditor;
 import org.constellation.swing.action.ActionRenderer;
 import org.jdesktop.swingx.JXTable;
+import org.openide.util.Exceptions;
 
 /**
  * Top component to manage constellation providers.
@@ -73,18 +74,18 @@ public final class JProvidersPane extends JPanel implements ActionListener, Prop
 
     private final List<Action> actions = new ArrayList<>();
     private final JXTable guiTable = new JXTable();
-    private final ConstellationServer cstl;
+    private final ConstellationClient serverV2;
     private final FrameDisplayer displayer;
 
-    public JProvidersPane(final ConstellationServer cstl, final ConstellationClient cstlV2, final FrameDisplayer displayer) {
-        this(cstl, cstlV2, displayer, null);
+    public JProvidersPane(final ConstellationClient cstlV2, final FrameDisplayer displayer) {
+        this(cstlV2, displayer, null);
     }
 
-    public JProvidersPane(final ConstellationServer cstl, final ConstellationClient cstlV2, final FrameDisplayer displayer,
+    public JProvidersPane(final ConstellationClient cstlV2, final FrameDisplayer displayer,
             RoleController roleController, final Action ... actions) {
         initComponents();
 
-        this.cstl = cstl;
+        this.serverV2 = cstlV2;
         if(displayer == null){
             this.displayer = new DefaultFrameDisplayer();
         } else {
@@ -100,26 +101,30 @@ public final class JProvidersPane extends JPanel implements ActionListener, Prop
 
         //list all providers
         guiAll.addActionListener(this);
-        final ProvidersReport providersReport = cstl.providers.listProviders();
-        if (providersReport != null) {
-            final List<ProviderServiceReport> servicesReport = providersReport.getProviderServices();
-            Collections.sort(servicesReport,SERVICE_COMPARATOR);
-            for (final ProviderServiceReport serviceReport : servicesReport) {
-                //add a button for each type
-                final JToggleButton btn = new JToggleButton(serviceReport.getType());
-                btn.setActionCommand(serviceReport.getType());
-                btn.addActionListener(this);
-                guiTypeGroup.add(btn);
-                guiToolBar.add(btn);
+        try {
+            final ProvidersReport providersReport = cstlV2.providers.listProviders();
+            if (providersReport != null) {
+                final List<ProviderServiceReport> servicesReport = providersReport.getProviderServices();
+                Collections.sort(servicesReport,SERVICE_COMPARATOR);
+                for (final ProviderServiceReport serviceReport : servicesReport) {
+                    //add a button for each type
+                    final JToggleButton btn = new JToggleButton(serviceReport.getType());
+                    btn.setActionCommand(serviceReport.getType());
+                    btn.addActionListener(this);
+                    guiTypeGroup.add(btn);
+                    guiToolBar.add(btn);
+                }
             }
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
         }
         guiNew.setVisible(roleController == null || roleController.hasPermission(NEW_PROVIDER));
 
 
 
         final Font fontBig = new Font("Monospaced", Font.BOLD, 16);
-        guiTable.setDefaultRenderer(Action.class, new ActionRenderer(cstl, cstlV2));
-        guiTable.setDefaultEditor(Action.class, new ActionEditor(cstl, cstlV2));
+        guiTable.setDefaultRenderer(Action.class, new ActionRenderer(cstlV2));
+        guiTable.setDefaultEditor(Action.class, new ActionEditor(cstlV2));
         guiTable.setDefaultRenderer(Entry.class, new DefaultTableCellRenderer(){
 
             @Override
@@ -165,39 +170,43 @@ public final class JProvidersPane extends JPanel implements ActionListener, Prop
         }
 
         //list all providers
-        final ProvidersReport providersReport = cstl.providers.listProviders();
-        if (providersReport != null) {
-            final List<ProviderServiceReport> servicesReport = providersReport.getProviderServices();
-            final List<Entry<String,ProviderReport>> instances = new ArrayList<> ();
+        try {
+            final ProvidersReport providersReport = serverV2.providers.listProviders();
+            if (providersReport != null) {
+                final List<ProviderServiceReport> servicesReport = providersReport.getProviderServices();
+                final List<Entry<String,ProviderReport>> instances = new ArrayList<> ();
 
-            for (final ProviderServiceReport serviceReport : servicesReport) {
-                final String type = serviceReport.getType();
-                if("all".equals(action) || action.equalsIgnoreCase(type)){
-                    final List<ProviderReport> providers = serviceReport.getProviders();
+                for (final ProviderServiceReport serviceReport : servicesReport) {
+                    final String type = serviceReport.getType();
+                    if("all".equals(action) || action.equalsIgnoreCase(type)){
+                        final List<ProviderReport> providers = serviceReport.getProviders();
 
-                    for(ProviderReport report : providers){
-                        instances.add(new AbstractMap.SimpleEntry<>(type,report));
+                        for(ProviderReport report : providers){
+                            instances.add(new AbstractMap.SimpleEntry<>(type,report));
+                        }
                     }
                 }
+
+                Collections.sort(instances,new Comparator<Entry<String,ProviderReport>>(){
+                    @Override
+                    public int compare(Entry<String,ProviderReport> o1, Entry<String,ProviderReport> o2) {
+                        if(o1.getKey().equals(o2.getKey())){
+                            //compare instance names
+                            return o1.getValue().getId().compareTo(o2.getValue().getId());
+                        }else{
+                            //compare types
+                            return o1.getKey().compareTo(o2.getKey());
+                        }
+                    }
+                });
+
+                final TableModel model = new InstanceModel(instances);
+                guiTable.setModel(model);
             }
 
-            Collections.sort(instances,new Comparator<Entry<String,ProviderReport>>(){
-                @Override
-                public int compare(Entry<String,ProviderReport> o1, Entry<String,ProviderReport> o2) {
-                    if(o1.getKey().equals(o2.getKey())){
-                        //compare instance names
-                        return o1.getValue().getId().compareTo(o2.getValue().getId());
-                    }else{
-                        //compare types
-                        return o1.getKey().compareTo(o2.getKey());
-                    }
-                }
-            });
-
-            final TableModel model = new InstanceModel(instances);
-            guiTable.setModel(model);
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
         }
-
 
         final int width = 140;
         for (int i = 1; i < guiTable.getColumnCount(); i++) {
@@ -296,7 +305,7 @@ public final class JProvidersPane extends JPanel implements ActionListener, Prop
 
     private void guiNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiNewActionPerformed
 
-        JProviderCreationPane.showDialog(cstl);
+        JProviderCreationPane.showDialog(serverV2);
         updateInstanceList();
 
     }//GEN-LAST:event_guiNewActionPerformed

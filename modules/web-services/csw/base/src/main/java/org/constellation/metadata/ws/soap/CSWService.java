@@ -20,26 +20,20 @@ package org.constellation.metadata.ws.soap;
 
 // J2SE dependencies
 import java.util.logging.Level;
-
-// JAX-WS dependencies
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.ParameterStyle;
-
-// constellation dependencies
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.ws.BindingType;
 import org.constellation.ServiceDef.Specification;
-import org.constellation.configuration.ServiceConfigurer;
+import org.constellation.metadata.CSWworker;
 import org.constellation.metadata.configuration.CSWConfigurer;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.metadata.CSWworker;
-
-//geotoolkit dependencies
+import org.constellation.ws.ServiceConfigurer;
 import org.constellation.ws.soap.OGCWebService;
 import org.geotoolkit.csw.xml.v202.Capabilities;
 import org.geotoolkit.csw.xml.v202.DescribeRecordResponseType;

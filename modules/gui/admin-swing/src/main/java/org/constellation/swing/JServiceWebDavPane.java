@@ -24,6 +24,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle;
+import org.constellation.configuration.AbstractConfigurationObject;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.WebdavContext;
 import org.openide.util.NbBundle;
@@ -145,7 +146,7 @@ public class JServiceWebDavPane extends JServiceEditionPane {
     // End of variables declaration//GEN-END:variables
 
     @Override
-    public Object getConfiguration() {
+    public AbstractConfigurationObject getConfiguration() {
         final String contextPath = guiTextContextPath.getText();
         if (contextPath != null && !contextPath.isEmpty()) {
             this.configuration.setContextPath(contextPath);

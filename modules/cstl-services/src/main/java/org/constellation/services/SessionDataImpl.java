@@ -18,7 +18,7 @@
  */
 package org.constellation.services;
 
-import org.constellation.ws.rest.SessionData;
+import org.constellation.rest.api.SessionData;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;

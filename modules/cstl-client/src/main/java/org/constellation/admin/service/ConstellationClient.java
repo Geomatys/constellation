@@ -25,7 +25,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -89,6 +88,11 @@ public final class ConstellationClient {
      * API methods related to providers administration.
      */
     public final ProvidersAPI providers;
+    
+    /**
+     * API methods related to tasks administration.
+     */
+    public final TasksAPI tasks;
 
     /**
      * API methods related to csw administration.
@@ -122,7 +126,7 @@ public final class ConstellationClient {
         ensureNonNull("version", version);
 
         // Initialize Jersey client.
-        final Configuration config = new ClientConfig(NodeReader.class);
+        final Configuration config = new ClientConfig(NodeReader.class, ParameterValueGroupWriter.class);
         this.client = ClientBuilder.newClient(config);
         connectTimeout(5000);
         readTimeout(20000);
@@ -133,6 +137,7 @@ public final class ConstellationClient {
         this.providers  = new ProvidersAPI(this);
         this.csw        = new CswAPI(this);
         this.admin      = new AdminAPI(this);
+        this.tasks      = new TasksAPI(this);
     }
 
     public String getUrl() {

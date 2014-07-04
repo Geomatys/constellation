@@ -27,19 +27,18 @@ public class TestSamples {
     }
 
     public static Domain newDomain() {
-        return new Domain("Domain1", "Test domain");
+        return new Domain(1, "Domain1", "Test domain", false);
     }
     
     
     public static Data newData(User owner, Provider provider) {
         Data data = new Data();
         data.setDate(new Date().getTime());
-        data.setDescription(1);
         data.setName("testdata");
         data.setNamespace("");
         data.setOwner(owner.getLogin());
         data.setType("type");
-        data.setProviderId(provider.getId());
+        data.setProvider(provider.getId());
         return data;
     }
 

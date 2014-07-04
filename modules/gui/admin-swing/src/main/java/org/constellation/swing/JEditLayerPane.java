@@ -20,6 +20,7 @@ package org.constellation.swing;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -31,7 +32,8 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.ListCellRenderer;
 import javax.xml.namespace.QName;
-import org.constellation.admin.service.ConstellationServer;
+import org.apache.sis.util.logging.Logging;
+import org.constellation.admin.service.ConstellationClient;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.ProviderReport;
@@ -42,10 +44,10 @@ import org.geotoolkit.cql.CQL;
 import org.geotoolkit.cql.CQLException;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.sld.xml.StyleXmlIO;
-import org.apache.sis.util.logging.Logging;
 import org.jdesktop.swingx.combobox.ListComboBoxModel;
 import org.opengis.filter.Filter;
 import org.opengis.util.FactoryException;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -65,7 +67,7 @@ public class JEditLayerPane extends javax.swing.JPanel {
      * @param serviceType
      * @param layerModel
      */
-    public JEditLayerPane(final ConstellationServer server, final String serviceType, final LayerModel layerModel) {
+    public JEditLayerPane(final ConstellationClient serverV2, final String serviceType, final LayerModel layerModel) {
         this.layerModel = layerModel;
         initComponents();
         
@@ -76,48 +78,52 @@ public class JEditLayerPane extends javax.swing.JPanel {
         final List<DataReference> styleList = new ArrayList<>();
         styleList.add(null);
         
-        final ProvidersReport providersReport = server.providers.listProviders();
-        final List<ProviderServiceReport> servicesReport = providersReport.getProviderServices();
-        for(final ProviderServiceReport serviceReport : servicesReport) {
-            final String serviceProviderType = serviceReport.getType();
-            
-            final List<ProviderReport> providers = serviceReport.getProviders();
-            for (final ProviderReport providerReport : providers) {
-                
-                final String providerID = providerReport.getId();
-                final List<DataBrief> layers = providerReport.getItems();
-                for (final DataBrief item : layers) {
-                    final String fullName;
-                    if (item.getNamespace() != null) {
-                        fullName = '{' + item.getNamespace() + '}' + item.getName();
-                    } else {
-                        fullName = item.getName();
-                    }
-                    if ("sld".equals(serviceProviderType)) {
-                        styleList.add(DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, providerID, fullName));
-                    } else {
-                        boolean addProviderToList = false;
-                        //WFS -> data-store
-                        if ( ("WFS".equals(serviceType) && "feature-store".equals(serviceProviderType)) ) {
-                            addProviderToList = true;
+        try {
+            final ProvidersReport providersReport = serverV2.providers.listProviders();
+            final List<ProviderServiceReport> servicesReport = providersReport.getProviderServices();
+            for(final ProviderServiceReport serviceReport : servicesReport) {
+                final String serviceProviderType = serviceReport.getType();
+
+                final List<ProviderReport> providers = serviceReport.getProviders();
+                for (final ProviderReport providerReport : providers) {
+
+                    final String providerID = providerReport.getId();
+                    final List<DataBrief> layers = providerReport.getItems();
+                    for (final DataBrief item : layers) {
+                        final String fullName;
+                        if (item.getNamespace() != null) {
+                            fullName = '{' + item.getNamespace() + '}' + item.getName();
+                        } else {
+                            fullName = item.getName();
                         }
-                        
-                        //WMTS or WCS -> coverage-store
-                        if ( ("WMTS".equals(serviceType) || "WCS".equals(serviceType) ) && "coverage-store".equals(serviceProviderType)) {
-                            addProviderToList = true;
-                        }
-                        
-                        //WMS -> all layer provider
-                        if ("WMS".equals(serviceType)) {
-                            addProviderToList = true;
-                        }
-                        
-                        if (addProviderToList) {
-                            providerList.add(DataReference.createProviderDataReference(DataReference.PROVIDER_LAYER_TYPE, providerID, fullName).getReference());
+                        if ("sld".equals(serviceProviderType)) {
+                            styleList.add(DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, providerID, fullName));
+                        } else {
+                            boolean addProviderToList = false;
+                            //WFS -> data-store
+                            if ( ("WFS".equals(serviceType) && "feature-store".equals(serviceProviderType)) ) {
+                                addProviderToList = true;
+                            }
+
+                            //WMTS or WCS -> coverage-store
+                            if ( ("WMTS".equals(serviceType) || "WCS".equals(serviceType) ) && "coverage-store".equals(serviceProviderType)) {
+                                addProviderToList = true;
+                            }
+
+                            //WMS -> all layer provider
+                            if ("WMS".equals(serviceType)) {
+                                addProviderToList = true;
+                            }
+
+                            if (addProviderToList) {
+                                providerList.add(DataReference.createProviderDataReference(DataReference.PROVIDER_LAYER_TYPE, providerID, fullName).getReference());
+                            }
                         }
                     }
                 }
             }
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
         }
         
         guiLayerDataCBox.setModel(new ListComboBoxModel(providerList));
@@ -336,9 +342,9 @@ public class JEditLayerPane extends javax.swing.JPanel {
      * @param layer
      * @return 
      */
-    public static LayerModel showDialog(final ConstellationServer server, final String serviceType, final LayerModel layer){
+    public static LayerModel showDialog(final ConstellationClient serverV2, final String serviceType, final LayerModel layer){
         
-        final JEditLayerPane pane = new JEditLayerPane(server, serviceType, layer);
+        final JEditLayerPane pane = new JEditLayerPane(serverV2, serviceType, layer);
                 
         int res = JOptionPane.showOptionDialog(null, new Object[]{pane}, 
                 LayerRowModel.BUNDLE.getString("createLayerMsg"), 

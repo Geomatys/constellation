@@ -25,7 +25,6 @@ import java.awt.image.BufferedImage;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import org.constellation.admin.service.ConstellationClient;
-import org.constellation.admin.service.ConstellationServer;
 import org.constellation.swing.JServicesPane;
 import org.geotoolkit.gui.swing.util.ActionCell;
 
@@ -37,12 +36,10 @@ public class ActionEditor extends ActionCell.Editor{
 
     private static final Font FONT = new Font("Monospaced", Font.PLAIN, 12);
         
-    private final ConstellationServer server;
     private final ConstellationClient serverV2;
     
-    public ActionEditor(final ConstellationServer server, final ConstellationClient serverV2) {
+    public ActionEditor(final ConstellationClient serverV2) {
         super(null);
-        this.server   = server;
         this.serverV2 = serverV2;
     }
 
@@ -51,7 +48,6 @@ public class ActionEditor extends ActionCell.Editor{
         
         final Action action = (Action) value;
         
-        action.setServer(server);
         action.setServerV2(serverV2);
         
         if(!action.isEnable()) return null;
@@ -68,7 +64,6 @@ public class ActionEditor extends ActionCell.Editor{
     @Override
     public void actionPerformed(ActionEvent e, Object value) {        
         final Action action = (Action) value;        
-        action.setServer(server);
         action.setServerV2(serverV2);
         
         if(!action.isEnable()) return;

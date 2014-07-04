@@ -18,17 +18,11 @@
  */
 package org.constellation.process;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.logging.Level;
-import javax.xml.bind.JAXBException;
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
 import org.constellation.process.service.DeleteServiceTest;
 import org.constellation.wmts.ws.DefaultWMTSWorker;
-import org.geotoolkit.util.FileUtilities;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 
 /**
  *
@@ -45,8 +39,8 @@ public class DeleteWMTSServiceTest extends DeleteServiceTest {
     protected void createInstance(final String identifier) {
         try {
             final LayerContext configuration = new LayerContext();
-            ConfigurationEngine.storeConfiguration(serviceName, identifier, configuration, null);
-        } catch (JAXBException | IOException ex) {
+            serviceBusiness.create(serviceName.toLowerCase(), identifier, configuration, null, null);
+        } catch (ConfigurationException ex) {
             LOGGER.log(Level.SEVERE, "Error while creating instance", ex);
         }
     }
@@ -54,6 +48,11 @@ public class DeleteWMTSServiceTest extends DeleteServiceTest {
     /** {@inheritDoc} */
     @Override
     protected boolean checkInstanceExist(final String identifier) {
-        return ConfigurationEngine.getServiceConfigurationIds(serviceName).contains(identifier);
+        try {
+            return serviceBusiness.getConfiguration(serviceName.toLowerCase(), identifier) != null;
+        } catch (ConfigurationException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+        }
+        return false;
     }
 }

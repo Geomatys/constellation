@@ -50,7 +50,7 @@ public class LayerSummary {
     @XmlElement(name = "Provider")
     private String provider;
     @XmlElement(name = "TargetStyle")
-	private List<StyleBrief> targetStyle;
+    private List<StyleBrief> targetStyle;
 
     public LayerSummary() {}
 
@@ -58,7 +58,7 @@ public class LayerSummary {
         this.name = layer.getName().getLocalPart();
         this.namespace = layer.getName().getNamespaceURI();
         this.alias = layer.getAlias();
-        this.type = layer.getProviderType();
+        this.type = db.getType();
         this.subtype = db.getSubtype();
         this.date = layer.getDate();
         this.owner = layer.getOwner();

@@ -10,6 +10,8 @@
 
 
 
+  
+
   <context:component-scan base-package="org.constellation.engine.register.jooq" />
 
   <tx:annotation-driven transaction-manager="transactionManager" />

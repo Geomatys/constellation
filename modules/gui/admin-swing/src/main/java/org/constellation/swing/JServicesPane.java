@@ -31,6 +31,7 @@ import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,18 +52,20 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.apache.sis.util.logging.Logging;
+import org.constellation.ServiceDef;
 import org.constellation.admin.service.ConstellationClient;
-import org.constellation.admin.service.ConstellationServer;
-import org.constellation.admin.service.ConstellationServer.Services;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.ServiceStatus;
-import org.constellation.security.RoleController;
+import org.constellation.dto.Details;
+
 import static org.constellation.security.ActionPermissions.*;
+import org.constellation.security.RoleController;
 import org.constellation.swing.action.Action;
 import org.constellation.swing.action.ActionEditor;
 import org.constellation.swing.action.ActionRenderer;
 import org.jdesktop.swingx.JXTable;
+import org.openide.util.Exceptions;
 
 /**
  * Top component to manage constellation services.
@@ -75,15 +78,14 @@ public final class JServicesPane extends JPanel implements ActionListener, Prope
     
     private final List<Action> actions = new ArrayList<>();
     private final JXTable guiTable = new JXTable();
-    private final ConstellationServer cstl;
     private final ConstellationClient cstlV2;
     private final FrameDisplayer displayer;
 
-    public JServicesPane(final ConstellationServer cstl, final ConstellationClient cstlV2, final FrameDisplayer displayer) {
-        this(cstl, cstlV2, displayer, null);
+    public JServicesPane(final ConstellationClient cstlV2, final FrameDisplayer displayer) {
+        this(cstlV2, displayer, null);
     }
 
-    public JServicesPane(final ConstellationServer cstl, final ConstellationClient cstlV2, final FrameDisplayer displayer,
+    public JServicesPane(final ConstellationClient cstlV2, final FrameDisplayer displayer,
             RoleController roleController, Action ... actions) {
         initComponents();
 
@@ -94,31 +96,33 @@ public final class JServicesPane extends JPanel implements ActionListener, Prope
             }
         }
 
-        this.cstl   = cstl;
         this.cstlV2 = cstlV2;
         if (displayer == null) {
             this.displayer = new DefaultFrameDisplayer();
         } else {
             this.displayer = displayer;
         }
-        final Services services = cstl.services;
-        final Map<String,List<String>> listServices = services.getAvailableService();
-        final List<String> types = new ArrayList<>(listServices.keySet());
-        Collections.sort(types);
+        try {
+            final Map<String,List<String>> listServices = cstlV2.services.getAvailableService();
+            final List<String> types = new ArrayList<>(listServices.keySet());
+            Collections.sort(types);
 
-        guiAll.addActionListener(this);
-        for(String type : types) {
-            final JToggleButton btn = new JToggleButton(type);
-            btn.setActionCommand(type);
-            btn.addActionListener(this);
-            guiTypeGroup.add(btn);
-            guiToolBar.add(btn);
+            guiAll.addActionListener(this);
+            for(String type : types) {
+                final JToggleButton btn = new JToggleButton(type);
+                btn.setActionCommand(type);
+                btn.addActionListener(this);
+                guiTypeGroup.add(btn);
+                guiToolBar.add(btn);
+            }
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
         }
 
         guiNew.setVisible(roleController == null || roleController.hasPermission(NEW_SERVICE));
 
-        guiTable.setDefaultRenderer(Action.class, new ActionRenderer(cstl, cstlV2));
-        guiTable.setDefaultEditor(Action.class, new ActionEditor(cstl, cstlV2));
+        guiTable.setDefaultRenderer(Action.class, new ActionRenderer(cstlV2));
+        guiTable.setDefaultEditor(Action.class, new ActionEditor(cstlV2));
 
         guiTable.setDefaultRenderer(Entry.class, new DefaultTableCellRenderer(){
 
@@ -139,12 +143,14 @@ public final class JServicesPane extends JPanel implements ActionListener, Prope
                     final String type = (String) entry.getValue();
 
                     final Color bgColor;
-                    if(ServiceStatus.WORKING.equals(inst.getStatus())){
+                    if (ServiceStatus.STARTED.equals(inst.getStatus())) {
                         bgColor = new Color(130, 160, 50);
-                    }else if(ServiceStatus.NOT_STARTED.equals(inst.getStatus())){
+                    } else if (ServiceStatus.STOPPED.equals(inst.getStatus()) || ServiceStatus.ERROR.equals(inst.getStatus())) {
                         bgColor = Color.GRAY;
-                    }else{
-                        bgColor = new Color(180,60,60);
+                    } else if (ServiceStatus.STARTING.equals(inst.getStatus()) || ServiceStatus.STOPPING.equals(inst.getStatus())) {
+                        bgColor = Color.ORANGE;
+                    } else {
+                        bgColor = new Color(180, 60, 60);
                     }
 
                     final Font fontBig = new Font("Monospaced", Font.BOLD, 16);
@@ -178,21 +184,25 @@ public final class JServicesPane extends JPanel implements ActionListener, Prope
         final List<Entry<Instance,String>> instances = new ArrayList<> ();
 
 
-        final Map<String,List<String>> services = cstl.services.getAvailableService();
-        for(Map.Entry<String,List<String>> service : services.entrySet()){
+        try {
+            final Map<String,List<String>> services = cstlV2.services.getAvailableService();
+            for(Map.Entry<String,List<String>> service : services.entrySet()){
 
-            if("all".equals(action) || action.equalsIgnoreCase(service.getKey())){
-                final InstanceReport report = cstl.services.listInstance(service.getKey());
-                if (report != null) {
-                    if (report.getInstances() == null) continue;
-                    for(Instance instance : report.getInstances()){
-                        instances.add(new AbstractMap.SimpleImmutableEntry<>(instance, service.getKey()));
+                if("all".equals(action) || action.equalsIgnoreCase(service.getKey())){
+                    final InstanceReport report = cstlV2.services.getInstances(ServiceDef.Specification.valueOf(service.getKey()));
+                    if (report != null) {
+                        if (report.getInstances() == null) continue;
+                        for(Instance instance : report.getInstances()){
+                            instances.add(new AbstractMap.SimpleImmutableEntry<>(instance, service.getKey()));
+                        }
+                    } else {
+                        LOGGER.log(Level.WARNING, "Unable to get the report for service: {0}", service.getKey());
                     }
-                } else {
-                    LOGGER.log(Level.WARNING, "Unable to get the report for service: {0}", service.getKey());
                 }
             }
-        }
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        } 
 
         Collections.sort(instances,new Comparator<Entry<Instance,String>>(){
             @Override
@@ -307,10 +317,16 @@ public final class JServicesPane extends JPanel implements ActionListener, Prope
 
     private void guiNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiNewActionPerformed
 
-        final String[] params = JServiceCreationPane.showDialog(cstl);
+        final String[] params = JServiceCreationPane.showDialog(cstlV2);
         if(params != null){
-            cstl.services.newInstance(params[0], params[1]);
-            updateInstanceList();
+            try {
+                final Details metadata = new Details();
+                metadata.setIdentifier(params[1]);
+                cstlV2.services.newInstance(ServiceDef.Specification.valueOf(params[0]), metadata);
+                updateInstanceList();
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            }
         }
 
     }//GEN-LAST:event_guiNewActionPerformed

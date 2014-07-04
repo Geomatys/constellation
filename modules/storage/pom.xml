@@ -96,7 +96,7 @@
             </activation>
             <modules>
                 <module>metadata</module>
-                <module>metadata-mdw</module>
+                <!--<module>metadata-mdw</module>-->
                 <module>metadata-dom</module>
                 <module>generic</module>
                 <module>om2</module>
@@ -148,7 +148,7 @@
             <id>csw</id>
             <modules>
                 <module>metadata</module>
-                <module>metadata-mdw</module>
+                <!--<module>metadata-mdw</module>-->
                 <module>metadata-dom</module>
                 <module>generic</module>
             </modules>
@@ -157,7 +157,7 @@
             <id>sos</id>
             <modules>
                 <module>metadata</module>
-                <module>metadata-mdw</module>
+                <!--<module>metadata-mdw</module>-->
                 <module>metadata-dom</module>
                 <module>generic</module>
                 <module>om2</module>

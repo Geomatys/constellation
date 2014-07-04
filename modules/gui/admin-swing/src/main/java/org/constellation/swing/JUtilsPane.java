@@ -21,7 +21,6 @@ package org.constellation.swing;
 
 import java.io.IOException;
 import org.constellation.admin.service.ConstellationClient;
-import org.constellation.admin.service.ConstellationServer;
 import org.openide.util.Exceptions;
 
 /**
@@ -31,7 +30,6 @@ import org.openide.util.Exceptions;
 public class JUtilsPane extends javax.swing.JPanel {
 
     private final FrameDisplayer displayer;
-    private final ConstellationServer cstl;
     private final ConstellationClient cstlv2;
     
     /**
@@ -39,14 +37,13 @@ public class JUtilsPane extends javax.swing.JPanel {
      * @param cstl
      * @param displayer
      */
-    public JUtilsPane(final ConstellationServer cstl, final ConstellationClient cstlv2, final FrameDisplayer displayer) {
+    public JUtilsPane(final ConstellationClient cstlv2, final FrameDisplayer displayer) {
         initComponents();
         if (displayer == null) {
             this.displayer = new DefaultFrameDisplayer();
         } else {
             this.displayer = displayer;
         }
-        this.cstl = cstl;
         this.cstlv2 = cstlv2;
 
         try {

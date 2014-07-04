@@ -21,9 +21,11 @@ package org.constellation.ws.embedded;
 
 import java.io.File;
 import java.io.StringWriter;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.TimeZone;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -34,8 +36,12 @@ import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.xml.XML;
 import org.constellation.ServiceDef;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.ProviderBusiness;
+import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
 import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.admin.service.ConstellationClient;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Instance;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
@@ -44,6 +50,7 @@ import org.constellation.provider.DataProviders;
 import static org.constellation.provider.configuration.ProviderParameters.*;
 import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
+import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.util.Util;
 import static org.constellation.ws.embedded.AbstractGrizzlyServer.grizzly;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
@@ -51,39 +58,72 @@ import org.geotoolkit.csw.xml.CSWMarshallerPool;
 // JUnit dependencies
 import org.junit.*;
 import static org.junit.Assert.*;
+import org.junit.runner.RunWith;
 import org.opengis.parameter.ParameterValueGroup;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.context.ContextConfiguration;
 import org.w3c.dom.Node;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class OGCRestTest extends AbstractGrizzlyServer {
+@RunWith(SpringTestRunner.class)
+@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+public class OGCRestTest extends AbstractGrizzlyServer implements ApplicationContextAware {
 
+    protected ApplicationContext applicationContext;
+    
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+
+    @Inject
+    private ServiceBusiness serviceBusiness;
+
+    @Inject
+    private ProviderBusiness providerBusiness;
+    
     private static ConstellationClient client;
+    
+    private static boolean initialized = false;
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
-    @BeforeClass
-    public static void initPool() throws Exception {
-        final File configDirectory = ConfigurationEngine.setupTestEnvironement("OGCRestTest");
-        final File dataDirectory2 = new File(configDirectory, "dataCsw2");
-        dataDirectory2.mkdir();
+    @PostConstruct
+    public void initPool() {
+        SpringHelper.setApplicationContext(applicationContext);
+        if (!initialized) {
+            try {
+                final File configDirectory = ConfigurationEngine.setupTestEnvironement("OGCRestTest");
+                final File dataDirectory2 = new File(configDirectory, "dataCsw2");
+                dataDirectory2.mkdir();
 
+                try {
+                    serviceBusiness.delete("csw", "default");
+                    serviceBusiness.delete("csw", "intern");
+                } catch (ConfigurationException ex) {}
 
-        final Automatic config2 = new Automatic("filesystem", dataDirectory2.getPath());
-        config2.putParameter("shiroAccessible", "false");
-        ConfigurationEngine.storeConfiguration("CSW", "default", config2);
+                final Automatic config2 = new Automatic("filesystem", dataDirectory2.getPath());
+                config2.putParameter("shiroAccessible", "false");
+                serviceBusiness.create("csw", "default", config2, null, null);
 
-        writeProvider("meta1.xml",  "42292_5p_19900609195600");
-        
-        Automatic configuration = new Automatic("internal", (String)null);
-        configuration.putParameter("shiroAccessible", "false");
-        ConfigurationEngine.storeConfiguration("CSW", "intern", configuration);
+                writeProvider("meta1.xml",  "42292_5p_19900609195600");
 
-        initServer(null, null, "api");
-        pool = GenericDatabaseMarshallerPool.getInstance();
+                Automatic configuration = new Automatic("internal", (String)null);
+                configuration.putParameter("shiroAccessible", "false");
+                serviceBusiness.create("csw", "intern", configuration, null, null);
 
+                initServer(null, null, "api");
+                pool = GenericDatabaseMarshallerPool.getInstance();
+                initialized = true;
+            } catch (Exception ex) {
+                Logger.getLogger(OGCRestTest.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     @AfterClass
@@ -137,7 +177,7 @@ public class OGCRestTest extends AbstractGrizzlyServer {
         assertEquals("MD_Metadata", node.getLocalName());
     }
 
-    public static void writeProvider(String resourceName, String identifier) throws Exception {
+    public void writeProvider(String resourceName, String identifier) throws Exception {
 
         final DataProviderFactory service = DataProviders.getInstance().getFactory("coverage-sql");
         final ParameterValueGroup source = service.getProviderDescriptor().createValue();
@@ -157,8 +197,8 @@ public class OGCRestTest extends AbstractGrizzlyServer {
         DefaultMetadata meta = (DefaultMetadata) u.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/" + resourceName));
         CSWMarshallerPool.getInstance().recycle(u);
 
-        ConfigurationEngine.writeProvider(identifier, null, ProviderRecord.ProviderType.LAYER, service.getName(), source);
-        ConfigurationEngine.saveProviderMetadata(meta, identifier);
+        providerBusiness.createProvider(identifier, null, ProviderRecord.ProviderType.LAYER, service.getName(), source);
+        providerBusiness.updateMetadata(identifier,null,meta);
     }
 
     /**

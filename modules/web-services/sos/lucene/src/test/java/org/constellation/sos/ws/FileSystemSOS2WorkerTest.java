@@ -25,16 +25,21 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import javax.xml.bind.Marshaller;
+import org.apache.sis.xml.MarshallerPool;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.test.utils.Order;
-import org.constellation.test.utils.TestRunner;
+import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.util.Util;
-import org.apache.sis.xml.MarshallerPool;
-import org.constellation.admin.ConfigurationEngine;
 
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -43,10 +48,15 @@ import org.junit.runner.RunWith;
  *
  * @author Guilhem Legal (Geomatys)
  */
-@RunWith(TestRunner.class)
+@RunWith(SpringTestRunner.class)
 public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
 
+    @Inject
+    private ServiceBusiness serviceBusiness;
 
+    private static File instDirectory; 
+    
+    
     @BeforeClass
     public static void setUpClass() throws Exception {
         MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
@@ -56,7 +66,7 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
 
         File SOSDirectory  = new File(configDir, "SOS");
         SOSDirectory.mkdir();
-        final File instDirectory = new File(SOSDirectory, "default");
+        instDirectory = new File(SOSDirectory, "default");
         instDirectory.mkdir();
 
         //we write the data files
@@ -110,7 +120,7 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
         writeDataFile(observationTemplatesDirectory, "observationTemplate-7.xml", "urn:ogc:object:observation:template:GEOM:7");
         writeDataFile(observationTemplatesDirectory, "observationTemplate-8.xml", "urn:ogc:object:observation:template:GEOM:8");
 
-         File sensorDirectory = new File(instDirectory, "sensors");
+        File sensorDirectory = new File(instDirectory, "sensors");
         sensorDirectory.mkdir();
         File sensor1         = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:1.xml");
         sensor1.createNewFile();
@@ -132,31 +142,71 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
         sensor9.createNewFile();
         File sensor10        = new File(sensorDirectory, "urn:ogc:object:sensor:GEOM:10.xml");
         sensor10.createNewFile();
-
-        //we write the configuration file
-        Automatic SMLConfiguration = new Automatic();
-
-        Automatic OMConfiguration  = new Automatic();
-        OMConfiguration.setDataDirectory(instDirectory.getPath());
-        SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
-        configuration.setObservationReaderType(DataSourceType.FILESYSTEM);
-        configuration.setObservationWriterType(DataSourceType.FILESYSTEM);
-        configuration.setSMLType(DataSourceType.NONE);
-        configuration.setObservationFilterType(DataSourceType.LUCENE);
-        configuration.setPhenomenonIdBase("urn:ogc:def:phenomenon:GEOM:");
-        configuration.setProfile("transactional");
-        configuration.setObservationIdBase("urn:ogc:object:observation:GEOM:");
-        configuration.setObservationTemplateIdBase("urn:ogc:object:observation:template:GEOM:");
-        configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
-        configuration.getParameters().put("transactionSecurized", "false");
-
-        ConfigurationEngine.storeConfiguration("SOS", "default", configuration);
-
         pool.recycle(marshaller);
-        init();
-        worker = new SOSworker("default");
-        worker.setServiceUrl(URL);
-        worker.setLogLevel(Level.FINER);
+    }
+    
+    @PostConstruct
+    public void setUp() {
+        SpringHelper.setApplicationContext(applicationContext);
+        try {
+            
+            if (!serviceBusiness.getServiceIdentifiers("sos").contains("default")) {
+                //we write the configuration file
+                Automatic SMLConfiguration = new Automatic();
+
+                Automatic OMConfiguration  = new Automatic();
+                OMConfiguration.setDataDirectory(instDirectory.getPath());
+                SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
+                configuration.setObservationReaderType(DataSourceType.FILESYSTEM);
+                configuration.setObservationWriterType(DataSourceType.FILESYSTEM);
+                configuration.setSMLType(DataSourceType.NONE);
+                configuration.setObservationFilterType(DataSourceType.LUCENE);
+                configuration.setPhenomenonIdBase("urn:ogc:def:phenomenon:GEOM:");
+                configuration.setProfile("transactional");
+                configuration.setObservationIdBase("urn:ogc:object:observation:GEOM:");
+                configuration.setObservationTemplateIdBase("urn:ogc:object:observation:template:GEOM:");
+                configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
+                configuration.getParameters().put("transactionSecurized", "false");
+
+                serviceBusiness.create("sos", "default", configuration, null, null);
+
+
+                init();
+                worker = new SOSworker("default");
+                worker.setServiceUrl(URL);
+                worker.setLogLevel(Level.FINER);
+            } else if (worker == null) {
+                
+                serviceBusiness.delete("sos", "default");
+                
+                //we write the configuration file
+                Automatic SMLConfiguration = new Automatic();
+
+                Automatic OMConfiguration  = new Automatic();
+                OMConfiguration.setDataDirectory(instDirectory.getPath());
+                SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
+                configuration.setObservationReaderType(DataSourceType.FILESYSTEM);
+                configuration.setObservationWriterType(DataSourceType.FILESYSTEM);
+                configuration.setSMLType(DataSourceType.NONE);
+                configuration.setObservationFilterType(DataSourceType.LUCENE);
+                configuration.setPhenomenonIdBase("urn:ogc:def:phenomenon:GEOM:");
+                configuration.setProfile("transactional");
+                configuration.setObservationIdBase("urn:ogc:object:observation:GEOM:");
+                configuration.setObservationTemplateIdBase("urn:ogc:object:observation:template:GEOM:");
+                configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
+                configuration.getParameters().put("transactionSecurized", "false");
+
+                serviceBusiness.create("sos", "default", configuration, null, null);
+
+
+                init();
+                worker = new SOSworker("default");
+                worker.setServiceUrl(URL);
+                worker.setLogLevel(Level.FINER);
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(FileSystemSOS2WorkerTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override
@@ -172,15 +222,6 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
             worker.destroy();
         }
         ConfigurationEngine.shutdownTestEnvironement("LUCSOSWorkerTest");
-    }
-
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
-
     }
 
     public static void writeCommonDataFile(File dataDirectory, String resourceName, String identifier) throws IOException {

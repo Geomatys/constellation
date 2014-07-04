@@ -55,13 +55,11 @@ public final class DataRecord extends Record {
     private boolean visible;
     private boolean sensorable;
     private final Date date;
-    private final int title;
-    private final int description;
     private String owner;
     private String metadataId;
 
     DataRecord(final Session session, final int id, final String name, final String namespace, final int provider, final DataType type, final String subtype,
-               final boolean visible, final boolean sensorable, final Date date, final int title, final int description, final String owner, final String metadataId) {
+               final boolean visible, final boolean sensorable, final Date date, final String owner, final String metadataId) {
         this.session     = session;
         this.id          = id;
         this.name        = name;
@@ -72,8 +70,6 @@ public final class DataRecord extends Record {
         this.visible     = visible;
         this.sensorable  = sensorable;
         this.date        = date;
-        this.title       = title;
-        this.description = description;
         this.owner       = owner;
         this.metadataId  = metadataId;
     }
@@ -88,10 +84,8 @@ public final class DataRecord extends Record {
                 rs.getBoolean(7),
                 rs.getBoolean(8),
                 new Date(rs.getLong(9)),
-                rs.getInt(10),
-                rs.getInt(11),
-                rs.getString(12),
-                rs.getString(13));
+                rs.getString(10),
+                rs.getString(11));
     }
 
     /**
@@ -192,37 +186,7 @@ public final class DataRecord extends Record {
         return date;
     }
 
-    public String getTitle(final Locale locale) throws SQLException {
-        ensureConnectionNotClosed();
-        return session.readI18n(title, locale);
-    }
 
-    public void setTitle(final Locale locale, final String value) throws SQLException {
-        ensureConnectionNotClosed();
-        final String title = session.readI18n(this.title, locale);
-        if(title !=null){
-            session.updateI18n(this.title, locale, value);
-        }
-        else{
-            session.writeI18n(this.title, locale, value);
-        }
-    }
-
-    public String getDescription(final Locale locale) throws SQLException {
-        ensureConnectionNotClosed();
-        return session.readI18n(description, locale);
-    }
-
-    public void setDescription(final Locale locale, final String value) throws SQLException {
-        ensureConnectionNotClosed();
-        final String title = session.readI18n(this.description, locale);
-        if(title !=null){
-            session.updateI18n(this.description, locale, value);
-        }
-        else{
-            session.writeI18n(this.description, locale, value);
-        }
-    }
 
     public String getOwnerLogin() {
         return owner;
@@ -230,15 +194,15 @@ public final class DataRecord extends Record {
 
   
 
-    public List<StyleRecord> getLinkedStyles() throws SQLException {
-        ensureConnectionNotClosed();
-        return session.readStyles(this);
-    }
+//    public List<StyleRecord> getLinkedStyles() throws SQLException {
+//        ensureConnectionNotClosed();
+//        return session.readStyles(this);
+//    }
 
-    public void linkToStyle(final StyleRecord style) throws SQLException {
-        ensureConnectionNotClosed();
-        session.writeStyledData(style, this);
-    }
+//    public void linkToStyle(final StyleRecord style) throws SQLException {
+//        ensureConnectionNotClosed();
+//        session.writeStyledData(style, this);
+//    }
 
     public InputStream getMetadata() throws IOException, SQLException {
         ensureConnectionNotClosed();

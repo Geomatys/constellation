@@ -18,25 +18,57 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
-import static org.constellation.engine.register.jooq.Tables.DATA;
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.constellation.engine.register.Data;
+import org.constellation.engine.register.DataI18n;
+import org.constellation.engine.register.Domain;
+import org.constellation.engine.register.helper.DataHelper;
+import org.constellation.engine.register.i18n.DataWithI18N;
+import org.constellation.engine.register.jooq.Tables;
+
+import static org.constellation.engine.register.jooq.Tables.DATA;
+import static org.constellation.engine.register.jooq.Tables.DATA_I18N;
+import static org.constellation.engine.register.jooq.Tables.DATA_X_DOMAIN;
+import static org.constellation.engine.register.jooq.Tables.PROVIDER;
+import static org.constellation.engine.register.jooq.Tables.SERVICE_X_DOMAIN;
+
 import org.constellation.engine.register.jooq.tables.records.DataRecord;
 import org.constellation.engine.register.repository.DataRepository;
+import org.constellation.engine.register.repository.DomainRepository;
 import org.jooq.Condition;
+import org.jooq.Record;
+import org.jooq.Result;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data> implements DataRepository {
+
+    @Autowired
+    private DomainRepository domainRepository;
 
     public JooqDataRepository() {
         super(Data.class, DATA);
     }
 
     @Override
-    public Data findByNameAndNamespaceAndProviderId(String name, String namespace, String providerIdentifier) {
-        dsl.insertInto(DATA).select(dsl.select().from(DATA).where(DATA.VISIBLE.eq(true))).execute();
-        return null;
+    public Data findByNameAndNamespaceAndProviderIdentifier(String name, String namespace, String providerIdentifier) {
+        return dsl.select().from(DATA).where(DATA.VISIBLE.eq(true)).and(DATA.NAMESPACE.eq(namespace)).and(DATA.NAME.eq(name))
+                .and(DATA.PROVIDER.eq(dsl.select(PROVIDER.ID).from(PROVIDER).where(PROVIDER.IDENTIFIER.eq(providerIdentifier))))
+                .fetchOneInto(Data.class);
+    }
+
+    @Override
+    public Data findById(int id) {
+        return dsl.select().from(DATA).where(DATA.ID.eq(id)).fetchOneInto(Data.class);
     }
 
     @Override
@@ -46,18 +78,10 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
     }
 
     @Override
-    public Data save(Data data) {
-        DataRecord newRecord = dsl.newRecord(DATA);
-        newRecord.setDate(data.getDate());
-        newRecord.setDescription(data.getDescription());
-        newRecord.setIsoMetadata(data.getIsoMetadata());
-        newRecord.setMetadata(data.getMetadata());
-        newRecord.setName(data.getName());
-        newRecord.setNamespace(data.getNamespace());
-        newRecord.setOwner(data.getOwner());
-        newRecord.setProvider(data.getProviderId());
-        newRecord.setType(data.getType());
-        newRecord.setTitle(data.getTitle());
+    public Data create(Data data) {
+
+        DataRecord newRecord = DataHelper.copy(data, dsl.newRecord(DATA));
+
         newRecord.store();
         return newRecord.into(Data.class);
     }
@@ -69,16 +93,86 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
 
     @Override
     public int delete(String namespaceURI, String localPart, int providerId) {
-        Condition whereClause = buildDeleteWhereClause(namespaceURI, localPart, providerId);
+        Condition whereClause = buildWhereClause(namespaceURI, localPart, providerId);
         return dsl.delete(DATA).where(whereClause).execute();
-        
+
     }
 
-    private Condition buildDeleteWhereClause(String namespaceURI, String localPart, int providerId) {
+    private Condition buildWhereClause(String namespaceURI, String localPart, int providerId) {
         Condition whereClause = DATA.NAME.eq(localPart).and(DATA.PROVIDER.eq(providerId));
-        if(namespaceURI!=null)
+        if (namespaceURI != null) {
             return whereClause.and(DATA.NAMESPACE.eq(namespaceURI));
+        }
         return whereClause;
+    }
+
+    private Condition buildWhereClause(String namespaceURI, String localPart, String providerId) {
+        Condition whereClause = Tables.PROVIDER.IDENTIFIER.eq(providerId).and(DATA.NAME.eq(localPart));
+        if (namespaceURI != null) {
+            return whereClause.and(DATA.NAMESPACE.eq(namespaceURI));
+        }
+        return whereClause;
+    }
+
+    @Override
+    public Data findDataFromProvider(String namespaceURI, String localPart, String providerId) {
+        final Condition whereClause = buildWhereClause(namespaceURI, localPart, providerId);
+        return dsl.select(DATA.fields()).from(DATA).join(Tables.PROVIDER).onKey().where(whereClause).fetchOneInto(Data.class);
+    }
+
+    @Override
+    public Data findByMetadataId(String metadataId) {
+        return dsl.select().from(DATA).where(DATA.METADATA_ID.eq(metadataId)).fetchOneInto(Data.class);
+    }
+
+    @Override
+    public List<Data> findByProviderId(Integer id) {
+        return dsl.select().from(DATA).where(DATA.PROVIDER.eq(id)).fetchInto(Data.class);
+    }
+
+    @Override
+    public DataWithI18N getDescription(Data data) {
+        Result<Record> fetch = dsl.select().from(DATA_I18N).where(DATA_I18N.DATA_ID.eq(data.getId())).fetch();
+        ImmutableMap<String, DataI18n> dataI18ns = Maps.uniqueIndex(fetch.into(DataI18n.class), new Function<DataI18n, String>() {
+            @Override
+            public String apply(DataI18n input) {
+                return input.getLang();
+            }
+        });
+        return new DataWithI18N(data, dataI18ns);
+    }
+
+    @Override
+    public Data findByNameAndNamespaceAndProviderId(String localPart, String namespaceURI, Integer providerId) {
+        return dsl.select().from(DATA).where(DATA.PROVIDER.eq(providerId)).and(DATA.NAME.eq(localPart))
+                .and(DATA.NAMESPACE.eq(namespaceURI)).fetchOneInto(Data.class);
+    }
+
+    @Override
+    public void update(Data data) {
+
+        dsl.update(DATA).set(DATA.DATE, data.getDate()).set(DATA.ISO_METADATA, data.getIsoMetadata())
+                .set(DATA.METADATA, data.getMetadata()).set(DATA.METADATA_ID, data.getMetadataId()).set(DATA.NAME, data.getName())
+                .set(DATA.NAMESPACE, data.getNamespace()).set(DATA.OWNER, data.getOwner()).set(DATA.PROVIDER, data.getProvider())
+                .set(DATA.SENSORABLE, data.isSensorable()).set(DATA.SUBTYPE, data.getSubtype()).set(DATA.TYPE, data.getType())
+                .set(DATA.VISIBLE, data.isVisible()).where(DATA.ID.eq(data.getId())).execute();
+
+    }
+
+    @Override
+    public Map<Domain, Boolean> getLinkedDomains(int dataId) {
+
+        List<Integer> domainIds = dsl.select(DATA_X_DOMAIN.DOMAIN_ID).from(DATA_X_DOMAIN).where(DATA_X_DOMAIN.DATA_ID.eq(dataId))
+                .fetch(DATA_X_DOMAIN.DOMAIN_ID);
+        Map<Domain, Boolean> result = new LinkedHashMap<>();
+        for (Domain domain : domainRepository.findByIds(domainIds)) {
+            result.put(domain, true);
+        }
+
+        for (Domain domain : domainRepository.findByIdsNotIn(domainIds)) {
+            result.put(domain, false);
+        }
+        return result;
     }
 
 }

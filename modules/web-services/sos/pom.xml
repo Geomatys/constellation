@@ -64,7 +64,7 @@
     <module>base</module>
     <module>lucene</module>
     <module>filesystem</module>
-    <module>mdweb</module>
+    <!--<module>mdweb</module>-->
     <module>generic</module>
     <module>om2</module>
   </modules>

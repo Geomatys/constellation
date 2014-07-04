@@ -484,8 +484,8 @@
             <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
             <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:3395</ns8:OtherCRS>
             <ns9:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
-                <ns9:LowerCorner>-6.005569537102806 27.13885310447501</ns9:LowerCorner>
-                <ns9:UpperCorner>-2.7284896314336695 49.881987092759665</ns9:UpperCorner>
+                <ns9:LowerCorner>-6.005569537102806 27.138853104475007</ns9:LowerCorner>
+                <ns9:UpperCorner>-2.7284896314336695 49.88198709275965</ns9:UpperCorner>
             </ns9:WGS84BoundingBox>
         </ns8:FeatureType>
         <ns8:FeatureType>
@@ -506,8 +506,8 @@
             <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
             <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:3395</ns8:OtherCRS>
             <ns9:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
-                <ns9:LowerCorner>-4.267780806810321 42.384796180904864</ns9:LowerCorner>
-                <ns9:UpperCorner>-4.121179134071048 43.46478200379224</ns9:UpperCorner>
+                <ns9:LowerCorner>-4.267780806810321 42.38479618090486</ns9:LowerCorner>
+                <ns9:UpperCorner>-4.121179134071048 43.46478200379223</ns9:UpperCorner>
             </ns9:WGS84BoundingBox>
         </ns8:FeatureType>
     </ns8:FeatureTypeList>

@@ -20,31 +20,33 @@
 package org.constellation.provider.configuration;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
 import java.io.StringWriter;
-import java.sql.SQLException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
-import org.apache.commons.io.IOUtils;
+
 import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.admin.ConfigurationEngine;
-import org.constellation.admin.dao.DataRecord;
+import org.constellation.admin.*;
 import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.admin.dao.StyleRecord;
+import org.constellation.admin.exception.ConstellationException;
+import org.constellation.admin.util.IOUtilities;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.CoverageMetadataBean;
+import org.constellation.engine.register.*;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.provider.*;
+import org.constellation.provider.Data;
+import org.constellation.provider.Provider;
 import org.constellation.util.MetadataMapBuilder;
 import org.constellation.util.SimplyMetadataTreeNode;
 import org.geotoolkit.coverage.CoverageReference;
@@ -52,13 +54,13 @@ import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.feature.type.DefaultName;
+import org.geotoolkit.feature.type.FeatureType;
+import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
 import org.geotoolkit.image.io.metadata.SpatialMetadataFormat;
 import org.geotoolkit.style.MutableFeatureTypeStyle;
 import org.geotoolkit.style.MutableRule;
 import org.geotoolkit.style.MutableStyle;
-import org.geotoolkit.feature.type.FeatureType;
-import org.geotoolkit.feature.type.Name;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.style.RasterSymbolizer;
 import org.opengis.style.Symbolizer;
@@ -66,17 +68,27 @@ import org.w3c.dom.Node;
 
 /**
  *
- * @author Ghuillem Legal (Geomatys)
+ * @author Guilhem Legal (Geomatys)
  * @author Johann Sorel (Geomatys)
  */
 public final class DefaultConfigurator implements Configurator {
 
+    @Inject
+    private ProviderBusiness providerBusiness;
+    
+    @Inject
+    private DataBusiness dataBusiness;
+
+    @Inject
+    private StyleBusiness styleBusiness;
+    
     public DefaultConfigurator() {
+        SpringHelper.injectDependencies(this);
     }
 
     @Override
     public List<Map.Entry<String, ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException {
-        final List<String> ids = ConfigurationEngine.getProviderIds();
+        final List<String> ids = providerBusiness.getProviderIds();
         final List<Map.Entry<String,ParameterValueGroup>> entries = new ArrayList<>();
         for(String id : ids){
             ParameterValueGroup param = getProviderConfiguration(id);
@@ -89,9 +101,9 @@ public final class DefaultConfigurator implements Configurator {
     
     @Override
     public List<ProviderInformation> getProviderInformations() throws ConfigurationException {
-        final List<ProviderRecord> records = ConfigurationEngine.getProviders();
+        final List<org.constellation.engine.register.Provider> records = providerBusiness.getProviders();
         final List<ProviderInformation> entries = new ArrayList<>();
-        for(ProviderRecord record : records){
+        for(org.constellation.engine.register.Provider record : records){
             ParameterValueGroup param = getProviderConfiguration(record.getIdentifier());
             if(param!=null){
                 entries.add(new ProviderInformation(record.getIdentifier(), record.getImpl(), param));
@@ -102,15 +114,15 @@ public final class DefaultConfigurator implements Configurator {
     
     @Override
     public ParameterValueGroup getProviderConfiguration(String providerId) throws ConfigurationException {
-        final ProviderRecord record = ConfigurationEngine.getProvider(providerId);
+        final org.constellation.engine.register.Provider record = providerBusiness.getProvider(providerId);
         final String impl = record.getImpl();
         ProviderFactory factory = DataProviders.getInstance().getFactory(impl);
         if(factory==null) factory = StyleProviders.getInstance().getFactory(impl);
         if(factory==null) return null;
         try {
-            ParameterValueGroup params = (ParameterValueGroup)record.getConfig(factory.getProviderDescriptor());
+            ParameterValueGroup params = (ParameterValueGroup)IOUtilities.readParameter(record.getConfig(), factory.getProviderDescriptor());
             return params;
-        } catch (SQLException | IOException ex) {
+        } catch (IOException ex) {
             throw new ConfigurationException(ex);
         }
     }
@@ -123,37 +135,39 @@ public final class DefaultConfigurator implements Configurator {
         final ProviderRecord.ProviderType type = provider.getProviderType();
         final String factoryName = provider.getFactory().getName();
         
-        final ProviderRecord pr = ConfigurationEngine.writeProvider(providerId, null, type, factoryName, config);
+//        final ProviderRecord pr = ConfigurationEngine.writeProvider(providerId, null, type, factoryName, config)
         try {
+            final org.constellation.engine.register.Provider pr = providerBusiness.createProvider(providerId, null, type, factoryName, config);
             checkDataUpdate(pr);
-        } catch (SQLException | IOException ex) {
+        } catch ( IOException ex) {
             throw new ConfigurationException(ex);
         }
     }
 
-    private void checkDataUpdate(final ProviderRecord pr) throws SQLException, IOException{
+    private void checkDataUpdate(final org.constellation.engine.register.Provider pr) throws IOException{
         
-        final List<DataRecord> list = pr.getData();
-        final ProviderRecord.ProviderType type = pr.getType();
-        if (type == ProviderRecord.ProviderType.LAYER) {
+//        final List<DataRecord> list = pr.getData();
+        final List<org.constellation.engine.register.Data> list = providerBusiness.getDatasFromProviderId(pr.getId());
+        final String type = pr.getType();
+        if (type.equals(ProviderRecord.ProviderType.LAYER.name())) {
             final Provider provider = DataProviders.getInstance().getProvider(pr.getIdentifier());
             
             // Remove no longer existing layer.
-            final Map<String, InputStream> metadata = new HashMap<>(0);
-            for (final DataRecord data : list) {
+            final Map<String, String> metadata = new HashMap<>(0);
+            for (final org.constellation.engine.register.Data data : list) {
                 boolean found = false;
                 for (final Object keyObj : provider.getKeys()) {
                     final Name key = (Name) keyObj;
                     if (data.getName().equals(key.getLocalPart())) {
                         found = true;
                         break;
-                    } else if (key.getLocalPart().contains(data.getName()) && data.getProvider().getIdentifier().equalsIgnoreCase(provider.getId())) {
+                    } else if (key.getLocalPart().contains(data.getName()) &&  providerBusiness.getProvider(data.getProvider()).getIdentifier().equalsIgnoreCase(provider.getId())) {
                         //save metadata
                         metadata.put(key.getLocalPart(), data.getMetadata());
                     }
                 }
                 if (!found) {
-                    ConfigurationEngine.deleteData(data.getCompleteName(), provider.getId());
+                    dataBusiness.deleteData(new QName(data.getNamespace(),data.getName()), provider.getId());
                 }
             }
             // Add new layer.
@@ -161,16 +175,17 @@ public final class DefaultConfigurator implements Configurator {
                 final Name key = (Name) keyObj;
                 final QName name = new QName(key.getNamespaceURI(), key.getLocalPart());
                 boolean found = false;
-                for (final DataRecord data : list) {
-                    if (name.equals(data.getCompleteName())) {
+                for (final org.constellation.engine.register.Data data : list) {
+                    if (name.equals(new QName(data.getNamespace(),data.getName()))) {
                         found = true;
                         break;
                     }
                 }
                 if (!found) {
-                    DataRecord record = ConfigurationEngine.writeData(name, pr, provider.getDataType(), provider.isSensorAffectable());
 
-                    // Subtype
+                    // Subtype and visibility
+                    String subType  = null;
+                    boolean visible = true;
                     final DataProvider dp = DataProviders.getInstance().getProvider(provider.getId());
                     final DataStore store = dp.getMainStore();
                     if (store instanceof FeatureStore) {
@@ -182,23 +197,20 @@ public final class DefaultConfigurator implements Configurator {
                             LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
                         }
                         if (fType != null && fType.getGeometryDescriptor() != null && fType.getGeometryDescriptor().getType() != null &&
-                                fType.getGeometryDescriptor().getType().getBinding() != null)
-                        {
-                            final String subtype = fType.getGeometryDescriptor().getType().getBinding().getSimpleName();
-                            ConfigurationEngine.updateDataSubtype(name, provider.getId(), subtype);
+                                fType.getGeometryDescriptor().getType().getBinding() != null) {
+                            
+                            subType = fType.getGeometryDescriptor().getType().getBinding().getSimpleName();
                         } else {
                             // A feature that does not contain geometry, we hide it
-                            ConfigurationEngine.updateDataVisibility(name, provider.getId(), false);
+                            visible = false;
                         }
                     }
-
+                    
                     // Metadata
-                    final InputStream currentMetadata = metadata.get(record.getName());
+                    String metadataXml = null;
+                    final String currentMetadata = metadata.get(name.getLocalPart());
                     if (currentMetadata != null) {
-                        StringWriter writer = new StringWriter();
-                        IOUtils.copy(currentMetadata, writer);
-                        StringReader reader = new StringReader(writer.toString());
-                        record.setMetadata(reader);
+                        metadataXml = currentMetadata;
                     } else {
                         final Data layer = (Data) provider.get(new DefaultName(name));
                         final Object origin = layer.getOrigin();
@@ -218,30 +230,33 @@ public final class DefaultConfigurator implements Configurator {
                                     final StringWriter sw = new StringWriter();
                                     marshaller.marshal(coverageMetadataBean, sw);
                                     mp.recycle(marshaller);
-                                    final StringReader sr = new StringReader(sw.toString());
-                                    record.setMetadata(sr);
+                                    metadataXml = sw.toString();
                                 }
                             } catch (CoverageStoreException | JAXBException e) {
                                 LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
                             }
                         }
                     }
+                    dataBusiness.create(name, pr.getIdentifier(), provider.getDataType().name(), provider.isSensorAffectable(), visible, subType, metadataXml);
                 }
             }
         } else {
             final Provider provider = StyleProviders.getInstance().getProvider(pr.getIdentifier());
-            
-            final List<StyleRecord> styles = pr.getStyles();
+            final List<Style> styles = providerBusiness.getStylesFromProviderId(pr.getId());
             // Remove no longer existing style.
-            for (final StyleRecord style : styles) {
+            for (final Style style : styles) {
                 if (provider.get(style.getName()) == null) {
-                    ConfigurationEngine.deleteStyle(style.getName(), provider.getId());
+                    try {
+                        styleBusiness.deleteStyle(provider.getId(),style.getName());
+                    } catch (ConfigurationException e) {
+                        throw new ConstellationException(e);
+                    }
                 }
             }
             // Add not registered new data.
             for (final Object key : provider.getKeys()) {
                 boolean found = false;
-                for (final StyleRecord style : styles) {
+                for (final Style style : styles) {
                     if (key.equals(style.getName())) {
                         found = true;
                         break;
@@ -260,8 +275,10 @@ public final class DefaultConfigurator implements Configurator {
                                 }
                             }
                         }
+
                     }
-                    ConfigurationEngine.writeStyle((String) key, pr, styleType, style);
+
+                    styleBusiness.writeStyle((String) key, pr.getId(), styleType, style);
                 }
             }
         }
@@ -269,18 +286,21 @@ public final class DefaultConfigurator implements Configurator {
     
     @Override
     public void updateProviderConfiguration(String providerId, ParameterValueGroup config) throws ConfigurationException {
-        final ProviderRecord pr = ConfigurationEngine.getProvider(providerId);
+        final org.constellation.engine.register.Provider pr = providerBusiness.getProvider(providerId);
         try {
-            pr.setConfig(config);
+            final String configString = IOUtilities.writeParameter(config);
+            pr.setConfig(configString);
             checkDataUpdate(pr);
-        } catch (SQLException | IOException ex) {
-            throw new ConfigurationException(ex);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
+
     }
 
     @Override
     public void removeProviderConfiguration(String providerId) throws ConfigurationException {
-        ConfigurationEngine.deleteProvider(providerId);
+        providerBusiness.removeProvider(providerId);
     }
         
 }

@@ -23,9 +23,8 @@ import java.util.Date;
 import java.util.List;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.ArgumentChecks;
-import org.constellation.ServiceDef;
-import org.constellation.dto.DataMetadata;
-import org.constellation.dto.Service;
+import org.constellation.dto.Details;
+
 import static org.constellation.utils.CstlMetadataTemplate.*;
 import org.geotoolkit.feature.type.Name;
 
@@ -45,7 +44,7 @@ public class CstlMetadatas {
      * 
      * @return DefaultMetadata a new metadata for the service with given identifier.
      */
-    public static DefaultMetadata defaultServiceMetadata(final String serviceIdentifier, final String serviceType, final String cstlURL, final Service serviceInfo) {
+    public static DefaultMetadata defaultServiceMetadata(final String serviceIdentifier, final String serviceType, final String cstlURL, final Details serviceInfo) {
         final String serviceID = getMetadataIdForService(serviceIdentifier, serviceType);
         final DefaultMetadata metadata = defaultServiceMetadata(serviceID, serviceInfo);
         
@@ -67,6 +66,11 @@ public class CstlMetadatas {
     public static void updateServiceMetadataLayer(final DefaultMetadata metadata, final List<String> layerIds) {
         final MetadataFeeder feeder = new MetadataFeeder(metadata);
         feeder.setServiceMetadataIdForData(layerIds);
+    }
+    
+    public static void addServiceMetadataLayer(final DefaultMetadata metadata, final String layerId) {
+        final MetadataFeeder feeder = new MetadataFeeder(metadata);
+        feeder.addServiceMetadataIdForData(layerId);
     }
     
     public static String getMetadataIdForService(final String serviceName, final String serviceType){
@@ -99,7 +103,7 @@ public class CstlMetadatas {
      * 
      * @return A new {@link DefaultMetadata}. ISO_19115 compliant.
      */
-    private static DefaultMetadata defaultServiceMetadata(final String metadataId, final Service serviceInfo) {
+    private static DefaultMetadata defaultServiceMetadata(final String metadataId, final Details serviceInfo) {
 
         ArgumentChecks.ensureNonNull("serviceInfo", serviceInfo);
         ArgumentChecks.ensureNonNull("metadataId", metadataId);
@@ -118,14 +122,5 @@ public class CstlMetadatas {
         metadata.setDateStamp(creationDate);
 
         return metadata;
-    }
-    
-    public static ServiceDef.Specification getSpecification(final String metadataID) {
-        // remove prefix
-        String tmp = metadataID.substring(SERVICE.getPrefix().length() + 1);
-        // remove specification
-        final int index = tmp.indexOf('_');
-        tmp = tmp.substring(0, index);
-        return ServiceDef.Specification.valueOf(tmp);
     }
 }

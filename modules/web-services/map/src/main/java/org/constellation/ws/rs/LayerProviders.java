@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.inject.Inject;
 import javax.measure.unit.NonSI;
 import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBException;
@@ -36,7 +37,9 @@ import org.apache.sis.geometry.GeneralEnvelope;
 import org.apache.sis.storage.DataStoreException;
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.apache.sis.util.ArgumentChecks.ensurePositive;
+
 import org.apache.sis.util.Static;
+import org.constellation.admin.StyleBusiness;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.BandDescription;
 import org.constellation.dto.CoverageDataDescription;
@@ -44,7 +47,6 @@ import org.constellation.dto.DataDescription;
 import org.constellation.dto.FeatureDataDescription;
 import org.constellation.dto.PortrayalContext;
 import org.constellation.dto.PropertyDescription;
-import org.constellation.map.configuration.StyleProviderConfig;
 import org.constellation.portrayal.internal.PortrayalResponse;
 import org.constellation.provider.Data;
 import org.constellation.provider.DataProvider;
@@ -68,7 +70,11 @@ import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
+import org.geotoolkit.feature.Feature;
 import org.geotoolkit.feature.type.DefaultName;
+import org.geotoolkit.feature.type.FeatureType;
+import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.feature.type.PropertyDescriptor;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapItem;
@@ -87,10 +93,6 @@ import static org.geotoolkit.style.StyleConstants.LITERAL_ONE_FLOAT;
 import org.geotoolkit.style.function.InterpolationPoint;
 import org.geotoolkit.style.function.Method;
 import org.geotoolkit.style.function.Mode;
-import org.geotoolkit.feature.Feature;
-import org.geotoolkit.feature.type.FeatureType;
-import org.geotoolkit.feature.type.Name;
-import org.geotoolkit.feature.type.PropertyDescriptor;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Function;
 import org.opengis.geometry.Envelope;
@@ -105,6 +107,7 @@ import org.opengis.style.RasterSymbolizer;
 import org.opengis.style.ShadedRelief;
 import org.opengis.style.Symbolizer;
 import org.opengis.util.FactoryException;
+import org.springframework.stereotype.Component;
 
 /**
  * Utility class for layer provider management/configuration.
@@ -113,7 +116,11 @@ import org.opengis.util.FactoryException;
  * @version 0.9
  * @since 0.9
  */
-public final class LayerProviders extends Static {
+@Component
+public final class LayerProviders {
+    
+    @Inject
+    StyleBusiness styleBusiness;
 
     /**
      * Default rendering options.
@@ -286,14 +293,17 @@ public final class LayerProviders extends Static {
      * @throws TargetNotFoundException CstlServiceException
      * @throws JAXBException
      */
-    public static PortrayalResponse portray(final String providerId, final String layerName, final String crsCode,
+    public PortrayalResponse portray(final String providerId, final String layerName, final String crsCode,
                                             final String bbox, final int width, final int height, final String sldVersion,
                                             final String sldProvider, final String styleId, final String filter)
                                             throws CstlServiceException, TargetNotFoundException, JAXBException {
         if (sldProvider == null || styleId == null) {
             return portray(providerId, layerName, crsCode, bbox, width, height, null, sldVersion, filter);
         }
-    	MutableStyle style = StyleProviderConfig.getStyle(sldProvider, styleId);
+    	MutableStyle style = styleBusiness.getStyle(sldProvider, styleId);
+        if (style == null){
+            throw new CstlServiceException("styleid : "+styleId+" on provider : "+sldProvider+" not found");
+        }
     	StyleXmlIO styleXmlIO = new StyleXmlIO();
     	final StringWriter sw = new StringWriter();
     	styleXmlIO.writeStyle(sw, style, Specification.StyledLayerDescriptor.V_1_1_0);

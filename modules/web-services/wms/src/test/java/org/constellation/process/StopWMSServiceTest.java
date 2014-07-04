@@ -18,12 +18,11 @@
  */
 package org.constellation.process;
 
-import java.io.IOException;
 import java.util.logging.Level;
-import javax.xml.bind.JAXBException;
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
 import org.constellation.map.ws.DefaultWMSWorker;
+import static org.constellation.process.AbstractProcessTest.LOGGER;
 import org.constellation.process.service.StopServiceTest;
 
 /**
@@ -41,8 +40,8 @@ public class StopWMSServiceTest extends StopServiceTest {
     protected void createInstance(final String identifier) {
         try {
             final LayerContext configuration = new LayerContext();
-            ConfigurationEngine.storeConfiguration(serviceName, identifier, configuration, null);
-        } catch (JAXBException | IOException ex) {
+            serviceBusiness.create(serviceName, identifier, configuration, null, null);
+        } catch (ConfigurationException ex) {
             LOGGER.log(Level.SEVERE, "Error while creating instance", ex);
         }
     }
@@ -50,6 +49,11 @@ public class StopWMSServiceTest extends StopServiceTest {
     /** {@inheritDoc} */
     @Override
     protected boolean checkInstanceExist(final String identifier) {
-        return ConfigurationEngine.getServiceConfigurationIds(serviceName).contains(identifier);
+        try {
+            return serviceBusiness.getConfiguration(serviceName, identifier) != null;
+        } catch (ConfigurationException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+        }
+        return false;
     }
 }

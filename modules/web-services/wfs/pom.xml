@@ -101,12 +101,12 @@
     </dependency>
 
     <!-- Test dependencies -->
-    <dependency>
-       <groupId>org.constellation.engine</groupId>
-       <artifactId>cstl-engine-shiro</artifactId>
-       <version>${project.version}</version>
-       <scope>test</scope>
-    </dependency>
+    <!--<dependency>-->
+       <!--<groupId>org.constellation.engine</groupId>-->
+       <!--<artifactId>cstl-engine-shiro</artifactId>-->
+       <!--<version>${project.version}</version>-->
+       <!--<scope>test</scope>-->
+    <!--</dependency>-->
     <dependency>
       <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-jaxp-core</artifactId>
@@ -135,6 +135,12 @@
       <artifactId>cstl-test-embedded</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>slf4j-jdk14</artifactId>
+          <groupId>org.slf4j</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.geotoolkit</groupId>
@@ -151,11 +157,11 @@
       <artifactId>derby</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-       <groupId>org.mdweb.metamodel</groupId>
-       <artifactId>mdweb-metamodel-lib-sql-data</artifactId>
-      <scope>test</scope>
-    </dependency>
+    <!--<dependency>-->
+       <!--<groupId>org.mdweb.metamodel</groupId>-->
+       <!--<artifactId>mdweb-metamodel-lib-sql-data</artifactId>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
     <dependency>
         <groupId>org.constellation.engine</groupId>
         <artifactId>cstl-engine-process-core</artifactId>
@@ -164,8 +170,8 @@
         <scope>test</scope>
     </dependency>
     <dependency>
-        <groupId>org.constellation.web-services</groupId>
-        <artifactId>cstl-web-ogc</artifactId>
+        <groupId>org.constellation.engine</groupId>
+        <artifactId>cstl-engine-process</artifactId>
         <version>${project.version}</version>
         <type>test-jar</type>
         <scope>test</scope>
@@ -180,6 +186,24 @@
     <dependency>
        <groupId>org.constellation.testing</groupId>
        <artifactId>cstl-test-data</artifactId>
+       <version>${project.version}</version>
+       <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.constellation.engine.register</groupId>
+        <artifactId>cstl-register-jooq</artifactId>
+        <version>${project.version}</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.constellation.engine</groupId>
+        <artifactId>cstl-engine-spring-security</artifactId>
+        <version>${project.version}</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+       <groupId>org.constellation.web-services-rest</groupId>
+       <artifactId>cstl-web-restfull</artifactId>
        <version>${project.version}</version>
        <scope>test</scope>
     </dependency>

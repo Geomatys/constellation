@@ -21,14 +21,28 @@ package org.constellation.metadata.io.netcdf;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import javax.xml.bind.Unmarshaller;
+import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.test.XMLComparator;
+import org.apache.sis.util.ComparisonMode;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.CSWworker;
 import org.constellation.metadata.CSWworkerTest;
+
+import static org.constellation.test.utils.MetadataUtilities.*;
+
+// JUnit dependencies
+import org.constellation.test.utils.Order;
+import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.util.Util;
 import org.constellation.ws.MimeType;
 import org.geotoolkit.csw.xml.ElementSetType;
@@ -36,19 +50,9 @@ import org.geotoolkit.csw.xml.v202.ElementSetNameType;
 import org.geotoolkit.csw.xml.v202.GetRecordByIdResponseType;
 import org.geotoolkit.csw.xml.v202.GetRecordByIdType;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
-import org.apache.sis.metadata.iso.DefaultMetadata;
-import org.apache.sis.test.XMLComparator;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
-
-import static org.constellation.test.utils.MetadataUtilities.*;
-
-// JUnit dependencies
-import org.apache.sis.util.ComparisonMode;
-import org.constellation.admin.ConfigurationEngine;
-import org.constellation.test.utils.Order;
-import org.constellation.test.utils.TestRunner;
-import static org.junit.Assert.*;
 import org.junit.*;
+import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
 import org.w3c.dom.Node;
 
@@ -57,13 +61,18 @@ import org.w3c.dom.Node;
  *
  *  @author Guilhem Legal (Geomatys)
  */
-@RunWith(TestRunner.class)
+@RunWith(SpringTestRunner.class)
 public class NetCDFCSWWorkerTest extends CSWworkerTest {
 
+    @Inject
+    private ServiceBusiness serviceBusiness;
+    
+    private static File dataDirectory;
+    
     @BeforeClass
     public static void setUpClass() throws Exception {
         deleteTemporaryFile();
-
+        
         final File configDir = ConfigurationEngine.setupTestEnvironement("NCCSWWorkerTest");
             
         File CSWDirectory  = new File(configDir, "CSW");
@@ -72,26 +81,36 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
         instDirectory.mkdir();
 
         //we write the data files
-        File dataDirectory = new File(instDirectory, "data");
+        dataDirectory = new File(instDirectory, "data");
         dataDirectory.mkdir();
         writeDataFile(dataDirectory, "2005092200_sst_21-24.en.nc", "2005092200_sst_21-24.en");
+            
+    }
+    
+    @PostConstruct
+    public void setUp() {
+        SpringHelper.setApplicationContext(applicationContext);
+        try {
+            if (!serviceBusiness.getServiceIdentifiers("csw").contains("default")) {
+                //we write the configuration file
+                Automatic configuration = new Automatic("netcdf", dataDirectory.getPath());
+                configuration.putParameter("transactionSecurized", "false");
+                configuration.putParameter("shiroAccessible", "false");
 
-        //we write the configuration file
-        File configFile = new File(instDirectory, "config.xml");
-        Automatic configuration = new Automatic("netcdf", dataDirectory.getPath());
-        configuration.putParameter("transactionSecurized", "false");
-        configuration.putParameter("shiroAccessible", "false");
+                serviceBusiness.create("csw", "default", configuration, null, null);
 
-        ConfigurationEngine.storeConfiguration("CSW", "default", configuration);
+                pool = EBRIMMarshallerPool.getInstance();
+                fillPoolAnchor((AnchoredMarshallerPool) pool);
 
-        pool = EBRIMMarshallerPool.getInstance();
-        fillPoolAnchor((AnchoredMarshallerPool) pool);
+                Unmarshaller u = pool.acquireUnmarshaller();
+                pool.recycle(u);
 
-        Unmarshaller u = pool.acquireUnmarshaller();
-        pool.recycle(u);
-
-        worker = new CSWworker("default");
-        worker.setLogLevel(Level.FINER);
+                worker = new CSWworker("default");
+                worker.setLogLevel(Level.FINER);
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(NetCDFCSWWorkerTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
     }
 
@@ -106,15 +125,6 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
         }
         ConfigurationEngine.shutdownTestEnvironement("NCCSWWorkerTest");
     }
-
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
-    }
-
 
     /**
      * Tests the getcapabilities method

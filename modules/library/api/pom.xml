@@ -42,6 +42,11 @@
     </developer>
   </developers>
 
-  <dependencies/>
+  <dependencies>
+      <dependency>
+          <groupId>org.apache.sis.core</groupId>
+          <artifactId>sis-utility</artifactId>
+      </dependency>
+  </dependencies>
 
 </project>

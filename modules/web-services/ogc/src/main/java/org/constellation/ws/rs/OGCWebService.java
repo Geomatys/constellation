@@ -19,66 +19,37 @@
 package org.constellation.ws.rs;
 
 // J2SE dependencies
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 import java.util.logging.Level;
-
-import net.iharder.Base64;
-
-// Jersey dependencies
 import javax.annotation.PreDestroy;
-import javax.ws.rs.PUT;
+import javax.inject.Inject;
 import javax.ws.rs.core.Response;
-
-// JAXB dependencies
 import javax.xml.bind.JAXBElement;
 import javax.xml.validation.Schema;
-
-// Shiro dependencies
-//import org.apache.shiro.authc.IncorrectCredentialsException;
-//import org.apache.shiro.authc.UnknownAccountException;
-
-// Constellation dependencies
+import net.iharder.Base64;
+import org.apache.sis.util.iso.Types;
+import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef;
-import org.constellation.configuration.AcknowlegementType;
-import org.constellation.configuration.ExceptionReport;
-import org.constellation.configuration.InstanceReport;
-import org.constellation.configuration.ServiceConfigurer;
+import org.constellation.ServiceDef.Specification;
+import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.ogc.configuration.OGCConfigurer;
-import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.service.StartServiceDescriptor;
 import org.constellation.security.IncorrectCredentialsException;
 import org.constellation.security.SecurityManagerHolder;
 import org.constellation.security.UnknownAccountException;
-import org.constellation.util.ReflectionUtilities;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.ServiceConfigurer;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
-import org.constellation.ServiceDef.Specification;
-import org.constellation.admin.ConfigurationEngine;
-import static org.constellation.api.QueryConstants.*;
-
-// Geotoolkit dependencies
 import org.geotoolkit.ows.xml.OWSExceptionCode;
-import org.geotoolkit.util.FileUtilities;
-import org.geotoolkit.util.StringUtilities;
-import org.geotoolkit.process.ProcessDescriptor;
-import org.geotoolkit.process.ProcessException;
-import org.geotoolkit.process.ProcessFinder;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // Apache SIS dependencies
-import org.apache.sis.xml.MarshallerPool;
-import org.apache.sis.util.iso.Types;
-
-// GeoAPI dependencies
-import org.opengis.parameter.ParameterValueGroup;
+import org.geotoolkit.util.StringUtilities;
 import org.opengis.util.CodeList;
-import org.opengis.util.NoSuchIdentifierException;
 
 
 /**
@@ -111,8 +82,9 @@ import org.opengis.util.NoSuchIdentifierException;
 public abstract class OGCWebService<W extends Worker> extends WebService {
 
     private final String serviceName;
-    protected final OGCConfigurer configurer;
-
+    
+    @Inject
+    private ServiceBusiness serviceBusiness;
     
     /**
      * Initialize the basic attributes of a web serviceType.
@@ -124,9 +96,8 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
         if (specification == null){
             throw new IllegalArgumentException("It is compulsory for a web service to have a specification.");
         }
-
+        SpringHelper.injectDependencies(this);
         this.serviceName = specification.name();
-        this.configurer  = (OGCConfigurer) ReflectionUtilities.newInstance(getConfigurerClass());
 
         LOGGER.log(Level.INFO, "Starting the REST {0} service facade.\n", serviceName);
         WSEngine.registerService(serviceName, "REST", getWorkerClass(), getConfigurerClass());
@@ -136,28 +107,13 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
          * service directory.
          */
         if (!WSEngine.isSetService(serviceName)) {
-            startAllInstance();
+            try {
+                serviceBusiness.start(serviceName.toLowerCase());
+            } catch (ConfigurationException ex) {
+                LOGGER.log(Level.WARNING, "Error while starting services for :" + serviceName, ex);
+            }
         } else {
             LOGGER.log(Level.INFO, "Workers already set for {0}", serviceName);
-        }
-    }
-
-    private void startAllInstance() {
-        final List<String> serviceIDs = ConfigurationEngine.getServiceConfigurationIds(serviceName);
-        for (String serviceID : serviceIDs) {
-            try {
-                ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, StartServiceDescriptor.NAME);
-                ParameterValueGroup inputs = desc.getInputDescriptor().createValue();
-                inputs.parameter(StartServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
-                inputs.parameter(StartServiceDescriptor.IDENTIFIER_NAME).setValue(serviceID);
-
-                org.geotoolkit.process.Process proc = desc.createProcess(inputs);
-                proc.call();
-            } catch (NoSuchIdentifierException ex) {
-                LOGGER.log(Level.WARNING, "StartService process is unreachable.");
-            } catch (ProcessException ex) {
-                LOGGER.log(Level.WARNING, "Error while starting all instances", ex);
-            }
         }
     }
 
@@ -245,10 +201,6 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
 
             return treatIncomingRequest(objectRequest, worker);
 
-        // administration a the instance
-        } else if ("admin".equals(serviceID)){
-            return treatAdminRequest(objectRequest);
-
         // unbounded URL
         } else {
             LOGGER.log(Level.WARNING, "Received request on undefined instance identifier:{0}", serviceID);
@@ -279,152 +231,6 @@ public abstract class OGCWebService<W extends Worker> extends WebService {
                     LOGGER.info("only basic authorization are handled for now");
                 }
             }
-        }
-    }
-
-    /**
-     * treat the request sent to the admin instance.
-     */
-    private Response treatAdminRequest(final Object objectRequest) {
-        try {
-            final String request = getParameter("request", true);
-
-            /*
-             * Restart service instance (kill all the workers and rebuild each one).
-             */
-            if ("restart".equalsIgnoreCase(request)) {
-                LOGGER.info("refreshing the workers");
-                final String identifier = getParameter("id", false);
-                final String closeFirst = getParameter("closeFirst", false);
-                configurer.restartInstance(identifier, closeFirst == null || Boolean.parseBoolean(closeFirst));
-                return Response.ok(new AcknowlegementType("Success", "Service instance successfully restarted.")).build();
-
-            /*
-             * Start service instance.
-             */
-            } else if ("start".equalsIgnoreCase(request)) {
-                LOGGER.info("starting an instance");
-                final String identifier = getParameter("id", true);
-                configurer.startInstance(identifier);
-                return Response.ok(new AcknowlegementType("Success", "Service instance successfully started.")).build();
-
-            /*
-             * Stop service instance.
-             */
-            } else if ("stop".equalsIgnoreCase(request)) {
-                final String identifier = getParameter("id", true);
-                configurer.stopInstance(identifier);
-                return Response.ok(new AcknowlegementType("Success", "Service instance successfully stopped.")).build();
-
-            /*
-             * Delete service instance.
-             */
-            } else if ("delete".equalsIgnoreCase(request)) {
-                LOGGER.info("deleting an instance");
-                final String identifier = getParameter("id", true);
-                configurer.deleteInstance(identifier);
-                return Response.ok(new AcknowlegementType("Success", "Service instance successfully deleted.")).build();
-
-            /*
-             * Create service instance.
-             */
-            } else if ("newInstance".equalsIgnoreCase(request)) {
-                LOGGER.info("creating an instance");
-                final String identifier = getParameter("id", true);
-                if (!ConfigurationEngine.serviceConfigurationExist(serviceName, identifier)) {
-                    configurer.createInstance(identifier, null, objectRequest);
-                    return Response.ok(new AcknowlegementType("Success", "Service instance successfully created.")).build();
-                } else {
-                    return Response.ok(new AcknowlegementType("Error", "Unable to create an instance.")).build();
-                }
-
-            /*
-             * Rename service instance.
-             */
-            } else if ("renameInstance".equalsIgnoreCase(request)) {
-                LOGGER.info("renaming an instance");
-                final String identifier = getParameter("id", true);
-                final String newName    = getParameter("newName", true);
-                configurer.renameInstance(identifier, newName);
-                return Response.ok(new AcknowlegementType("Success", "Service instance successfully renamed.")).build();
-
-            /*
-             * Set service instance configuration.
-             */
-            } else if ("configure".equalsIgnoreCase(request)) {
-                LOGGER.info("configure an instance");
-                final String identifier = getParameter("id", true);
-                configurer.setInstanceConfiguration(identifier, objectRequest);
-                return Response.ok(new AcknowlegementType("Success", "Service instance configuration successfully updated.")).build();
-
-            /*
-             * Get service instance configuration.
-             */
-            } else if ("getConfiguration".equalsIgnoreCase(request)) {
-                LOGGER.info("sending instance configuration");
-                final String identifier = getParameter("id", true);
-                final Object response = configurer.getInstanceConfiguration(identifier);
-                return Response.ok(response).build();
-
-            /*
-             * Get list of current service instances.
-             */
-            } else if (REQUEST_LIST_INSTANCE.equalsIgnoreCase(request)) {
-                final InstanceReport report = new InstanceReport(configurer.getInstances());
-                return Response.ok(report).build();
-
-            /*
-             * Treat other specific administration operations.
-             */
-            } else {
-                return treatSpecificAdminRequest(request);
-            }
-        } catch (Exception ex) {
-            LOGGER.log(Level.WARNING, "Sending admin exception: {0}", ex.getMessage());
-            final ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getMessage());
-            return Response.ok(report).build();
-        }
-    }
-
-    /**
-     * need to be overriden by subClasses to add specific admin operation
-     * @param request the request name of the specific admin operation
-     * @throws CstlServiceException
-     */
-    protected Response treatSpecificAdminRequest(final String request) throws CstlServiceException {
-        throw new CstlServiceException("The operation " + request + " is not supported by the administration service",
-                        INVALID_PARAMETER_VALUE, "request");
-    }
-
-    /**
-     * Receive a file and write it into the static file path.
-     *
-     * @param in The input stream.
-     * @return an Acknowledgment indicating if the operation succeed or not.
-     *
-     * @todo Not implemented. This is just a placeholder where we can customize the
-     *       download action for some users. Will probably be removed in a future version.
-     */
-    @PUT
-    public Response uploadFile(final InputStream in) {
-        final String serviceID = getSafeParameter("serviceId");
-        try {
-            // allow this method only for admin
-            if ("admin".equals(serviceID)) {
-                final File tmp          = File.createTempFile("cstl-", null);
-                final File uploadedFile = FileUtilities.buildFileFromStream(in, tmp);
-                in.close();
-                return treatAdminRequest(uploadedFile);
-            } else {
-                LOGGER.log(Level.WARNING, "Received a PUT request on a not admin instance identifier:{0}", serviceID);
-                return Response.status(Response.Status.NOT_FOUND).build();
-            }
-
-        } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, "IO exception while uploading file", ex);
-            launchException("error while uploading the file", NO_APPLICABLE_CODE.name(), null);
-            // should never happen
-            return null;
         }
     }
 

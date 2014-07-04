@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+
 import java.util.Objects;
 
 /**
@@ -38,7 +39,13 @@ public class AcknowlegementType {
     public static AcknowlegementType success(final String message) {
         return new AcknowlegementType("Success", message);
     }
+    
 
+
+    public static AcknowlegementType failure(final String message, String errorCode) {
+        return new AcknowlegementType("Failure", message, errorCode);
+    }
+    
     public static AcknowlegementType failure(final String message) {
         return new AcknowlegementType("Failure", message);
     }
@@ -53,11 +60,13 @@ public class AcknowlegementType {
      */
     private String status;
 
+    private String errorCode;
+
     /**
      * Empty constructor, by default status is set to "success".
      */
     public AcknowlegementType() {
-        status  = "succeed";
+        status  = "Success";
         message = null;
     }
 
@@ -66,8 +75,23 @@ public class AcknowlegementType {
      * @param status
      * @param message
      */
-    public AcknowlegementType(String status, String message) {
+    public AcknowlegementType(final String status, final String message) {
         this.status  = status;
+        this.message = message;
+    }
+
+    public AcknowlegementType(final String status, final String message, String errorCode) {
+        this(status, message);
+        this.errorCode = errorCode;
+    }
+
+    
+    public AcknowlegementType(final boolean status, final String message) {
+        if (status) {
+            this.status  = "Success";
+        } else {
+            this.status  = "Failure";
+        }
         this.message = message;
     }
 
@@ -90,6 +114,10 @@ public class AcknowlegementType {
      */
     public String getStatus() {
         return status;
+    }
+    
+    public String getErrorCode() {
+        return errorCode;
     }
 
     /**

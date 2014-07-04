@@ -24,82 +24,150 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import javax.xml.namespace.QName;
-
-import org.constellation.provider.DataProviders;
-import org.constellation.provider.configuration.Configurator;
-import org.constellation.wfs.ws.WFSWorker;
-import org.constellation.wfs.ws.DefaultWFSWorker;
-
-import org.geotoolkit.data.FeatureCollection;
-import org.geotoolkit.feature.xml.XmlFeatureWriter;
-import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.apache.sis.geometry.GeneralDirectPosition;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.DataBusiness;
+import org.constellation.admin.ProviderBusiness;
+import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
+import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
-import org.constellation.configuration.Layers;
-import org.constellation.configuration.Source;
-import org.constellation.provider.Provider;
+import org.constellation.map.configuration.LayerBusiness;
+import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
 import org.constellation.provider.Providers;
 import org.constellation.provider.configuration.AbstractConfigurator;
+import org.constellation.provider.configuration.Configurator;
+import static org.constellation.provider.configuration.ProviderParameters.*;
+import static org.constellation.provider.featurestore.FeatureStoreProviderService.*;
+import org.constellation.test.utils.SpringTestRunner;
+import org.constellation.wfs.ws.DefaultWFSWorker;
+import org.constellation.wfs.ws.WFSWorker;
+import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
+import org.geotoolkit.data.FeatureCollection;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.*;
+import org.geotoolkit.db.postgres.PostgresFeatureStoreFactory;
+import org.geotoolkit.feature.xml.XmlFeatureWriter;
+import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.geotoolkit.gml.xml.v311.MultiPointType;
 import org.geotoolkit.gml.xml.v311.PointPropertyType;
 import org.geotoolkit.gml.xml.v311.PointType;
 import org.geotoolkit.ogc.xml.v110.EqualsType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
+import static org.geotoolkit.parameter.ParametersExt.createGroup;
+import org.geotoolkit.wfs.xml.ResultTypeType;
 import org.geotoolkit.wfs.xml.v110.GetFeatureType;
 import org.geotoolkit.wfs.xml.v110.QueryType;
-import org.geotoolkit.wfs.xml.ResultTypeType;
-
 import org.junit.*;
-import org.opengis.parameter.ParameterValueGroup;
-
 import static org.junit.Assert.*;
-import static org.constellation.provider.featurestore.FeatureStoreProviderService.*;
-import static org.constellation.provider.configuration.ProviderParameters.*;
-import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.*;
-import org.geotoolkit.db.postgres.PostgresFeatureStoreFactory;
 import static org.junit.Assume.assumeTrue;
+import org.junit.runner.RunWith;
+import org.opengis.parameter.ParameterValueGroup;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.context.ContextConfiguration;
 
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class WFSCIteWorkerTest {
+@RunWith(SpringTestRunner.class)
+@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+public class WFSCIteWorkerTest implements ApplicationContextAware {
+
+    protected ApplicationContext applicationContext;
+    
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
 
     private static WFSWorker worker;
 
     private XmlFeatureWriter featureWriter;
+    
+    @Inject
+    protected ServiceBusiness serviceBusiness;
+    
+    @Inject
+    protected LayerBusiness layerBusiness;
+    
+    @Inject
+    protected ProviderBusiness providerBusiness;
+    
+    @Inject
+    protected DataBusiness dataBusiness;
 
     public static boolean hasLocalDatabase() {
-        return false; // TODO
+        return true; // TODO
     }
+    private static boolean initialized = false;
     
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-        ConfigurationEngine.setupTestEnvironement("WFSCIteWorkerTest");
+    @PostConstruct
+    public void setUpClass() {
+        SpringHelper.setApplicationContext(applicationContext);
+        if (!initialized) {
+            try {
+                ConfigurationEngine.setupTestEnvironement("WFSCiteWorkerTest");
 
-        final List<Source> sources = Arrays.asList(new Source("postgisSrc", true, null, null));
-        final Layers layers = new Layers(sources);
-        final LayerContext config = new LayerContext(layers);
-        config.getCustomParameters().put("shiroAccessible", "false");
-        config.getCustomParameters().put("transactionSecurized", "false");
-        config.getCustomParameters().put("transactionnal", "true");
+                layerBusiness.removeAll();
+                serviceBusiness.deleteAll();
+                dataBusiness.deleteAll();
+                providerBusiness.removeAll();
 
-        ConfigurationEngine.storeConfiguration("WFS", "default", config);
+                final ProviderFactory factory = DataProviders.getInstance().getFactory("feature-store");
 
-        initFeatureSource();
-        worker = new DefaultWFSWorker("default");
-        worker.setLogLevel(Level.FINER);
+                // Defines a PostGis data provider
+                final ParameterValueGroup source = factory.getProviderDescriptor().createValue();;
+                source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgisSrc");
+
+                final ParameterValueGroup choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
+                final ParameterValueGroup pgconfig = createGroup(choice, "PostgresParameters");
+                pgconfig.parameter(DATABASE.getName().getCode()).setValue("cite-wfs");
+                pgconfig.parameter(HOST.getName().getCode()).setValue("localhost");
+                pgconfig.parameter(SCHEMA.getName().getCode()).setValue("public");
+                pgconfig.parameter(USER.getName().getCode()).setValue("test");
+                pgconfig.parameter(PASSWORD.getName().getCode()).setValue("test");
+                pgconfig.parameter(NAMESPACE.getName().getCode()).setValue("http://cite.opengeospatial.org/gmlsf");
+                choice.values().add(pgconfig);
+
+                providerBusiness.createProvider("postgisSrc", null, ProviderRecord.ProviderType.LAYER, "feature-store", source);
+
+                dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "AggregateGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "PrimitiveGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "EntitéGénérique"),     "postgisSrc", "VECTOR", false, true, null, null);
+
+
+                DataProviders.getInstance().reload();
+                final LayerContext config = new LayerContext();
+                config.getCustomParameters().put("shiroAccessible", "false");
+                config.getCustomParameters().put("transactionSecurized", "false");
+                config.getCustomParameters().put("transactionnal", "true");
+
+                serviceBusiness.create("wfs", "default", config, null, null);
+                layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "wfs", null);
+                layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "wfs", null);
+                layerBusiness.add("EntitéGénérique",     "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "wfs", null);
+
+                worker = new DefaultWFSWorker("default");
+                worker.setLogLevel(Level.FINER);
+                initialized = true;
+            } catch (Exception ex) {
+                Logger.getLogger(WFSCIteWorkerTest.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        DataProviders.getInstance().setConfigurator(Providers.DEFAULT_CONFIGURATOR);
         ConfigurationEngine.shutdownTestEnvironement("WFSCIteWorkerTest");
     }
 
@@ -177,51 +245,5 @@ public class WFSCIteWorkerTest {
 
 
     }
-
-
-
-    private static void initFeatureSource() throws Exception {
-
-
-        /****************************************
-         *                                      *
-         *    Defines a postgis provider       *
-         *                                      *
-         ****************************************/
-
-        final Configurator config = new AbstractConfigurator() {
-
-            @Override
-            public List<Map.Entry<String, ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException {
-                final ArrayList<Map.Entry<String, ParameterValueGroup>> lst = new ArrayList<>();
-                
-                final ProviderFactory factory = DataProviders.getInstance().getFactory("feature-store");
-                
-                if (hasLocalDatabase()) {
-                    // Defines a PostGis data provider
-                    final ParameterValueGroup source = factory.getProviderDescriptor().createValue();;
-                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgisSrc");
-
-                    final ParameterValueGroup choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
-                    final ParameterValueGroup pgconfig = getOrCreate(PostgresFeatureStoreFactory.PARAMETERS_DESCRIPTOR,source);
-                    pgconfig.parameter(DATABASE.getName().getCode()).setValue("cite-wfs");
-                    pgconfig.parameter(HOST.getName().getCode()).setValue("flupke.geomatys.com");
-                    pgconfig.parameter(SCHEMA.getName().getCode()).setValue("public");
-                    pgconfig.parameter(USER.getName().getCode()).setValue("test");
-                    pgconfig.parameter(PASSWORD.getName().getCode()).setValue("test");
-                    pgconfig.parameter(NAMESPACE.getName().getCode()).setValue("http://cite.opengeospatial.org/gmlsf");
-                    choice.values().add(pgconfig);
-                }
-                return lst;
-            }
-            
-            @Override
-            public List<Configurator.ProviderInformation> getProviderInformations() throws ConfigurationException {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
-        };
-        DataProviders.getInstance().setConfigurator(config);
-
-    }
+    
 }

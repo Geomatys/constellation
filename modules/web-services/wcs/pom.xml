@@ -73,17 +73,17 @@
     </dependency>
 
     <!-- Test dependencies -->
-     <dependency>
-        <groupId>org.constellation.engine</groupId>
-        <artifactId>cstl-engine-shiro</artifactId>
-        <version>${project.version}</version>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-       <groupId>org.apache.shiro</groupId>
-       <artifactId>shiro-spring</artifactId>
-       <scope>test</scope>
-    </dependency>
+     <!--<dependency>-->
+        <!--<groupId>org.constellation.engine</groupId>-->
+        <!--<artifactId>cstl-engine-shiro</artifactId>-->
+        <!--<version>${project.version}</version>-->
+        <!--<scope>test</scope>-->
+    <!--</dependency>-->
+    <!--<dependency>-->
+       <!--<groupId>org.apache.shiro</groupId>-->
+       <!--<artifactId>shiro-spring</artifactId>-->
+       <!--<scope>test</scope>-->
+    <!--</dependency>-->
     <dependency>
       <groupId>org.constellation.storage</groupId>
       <artifactId>cstl-store-data-coveragesql</artifactId>
@@ -123,8 +123,8 @@
         <scope>test</scope>
     </dependency>
     <dependency>
-        <groupId>org.constellation.web-services</groupId>
-        <artifactId>cstl-web-ogc</artifactId>
+        <groupId>org.constellation.engine</groupId>
+        <artifactId>cstl-engine-process</artifactId>
         <version>${project.version}</version>
         <type>test-jar</type>
         <scope>test</scope>
@@ -135,6 +135,24 @@
         <version>${project.version}</version>
         <type>test-jar</type>
         <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.constellation.engine.register</groupId>
+        <artifactId>cstl-register-jooq</artifactId>
+        <version>${project.version}</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.constellation.engine</groupId>
+        <artifactId>cstl-engine-spring-security</artifactId>
+        <version>${project.version}</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+       <groupId>org.constellation.web-services-rest</groupId>
+       <artifactId>cstl-web-restfull</artifactId>
+       <version>${project.version}</version>
+       <scope>test</scope>
     </dependency>
     <dependency>
         <groupId>javax.servlet</groupId>

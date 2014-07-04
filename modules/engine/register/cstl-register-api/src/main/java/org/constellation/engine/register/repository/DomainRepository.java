@@ -22,12 +22,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.Permission;
-import org.constellation.engine.register.User;
 
 public interface DomainRepository {
   
     List<Domain> findAll();
+    
+    List<Domain> findAllByUserId(int userId);
 
     Domain findOne(Integer id);
     
@@ -54,13 +54,21 @@ public interface DomainRepository {
     int removeAllDataFromDomain(int i);
 
     int addProviderDataToDomain(String id, int activeDomainId);
-
-    List<User> findUsers(int id);
-
+    
+ 
     Domain findDefaultByUserId(Integer id);
 
-    List<User> findUsersNotInDomain(int domainId);
-
+ 
     Set<Integer> updateUserInDomain(int userId, int domainId, Set<Integer> roles);
+
+    List<Domain> findByIdsNotIn(List<Integer> fetch);
+
+    List<Domain> findByIds(List<Integer> fetch);
+
+    Set<Integer> findUserDomainIdsWithPermission(int userId, int permissionId);
+
+    List<Domain> findByLinkedService(int serviceId);
+
+    List<Domain> findByLinkedData(int dataId);
 
 }

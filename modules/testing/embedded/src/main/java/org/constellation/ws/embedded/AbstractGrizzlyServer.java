@@ -36,11 +36,13 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 import javax.imageio.ImageReader;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import org.apache.sis.util.logging.Logging;
 
 import org.constellation.data.CoverageSQLTestCase;
 import org.constellation.util.Util;
@@ -59,6 +61,8 @@ import org.apache.sis.xml.MarshallerPool;
  * @since 0.3
  */
 public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
+    
+    private static final Logger LOGGER = Logging.getLogger(AbstractGrizzlyServer.class);
     /**
      * The grizzly server that will received some HTTP requests.
      */
@@ -77,6 +81,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
         // Protective test in order not to launch a new instance of the grizzly server for
         // each sub classes.
         if (grizzly != null) {
+            LOGGER.info("GRIZZLY is not shutDown");
             return;
         }
 
@@ -96,6 +101,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
      */
     public static void finish() {
         if (grizzly.isAlive()) {
+            grizzly.cstlServer.shutdown();
             grizzly.interrupt();
         }
         File f = new File("derby.log");
@@ -118,9 +124,9 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
                 suffix = "";
             }
             if (grizzly != null && grizzly.getCurrentPort() != null) {
-                u = new URL("http://localhost:" + grizzly.getCurrentPort() + suffix + "/configuration?request=access");
+                u = new URL("http://localhost:" + grizzly.getCurrentPort() + suffix + "/1/user/access");
             } else {
-                u = new URL("http://localhost:9090"+ suffix +"/configuration?request=access");
+                u = new URL("http://localhost:9090/1/user/access");
             }
             ex = false;
             URLConnection conec = u.openConnection();
@@ -129,7 +135,38 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
             } catch (IOException e) {
                 ex = true;
             }
-            if (cpt == 80) {
+            if (cpt == 100) {
+                throw new Exception("The grizzly server never start");
+            }
+            cpt++;
+        }
+    }
+    
+    public void waitForSoapStart(String instance) throws Exception {
+        boolean ex = true;
+        int cpt = 0;
+        while (ex) {
+            Thread.sleep(1 * 2000);
+            final URL u;
+            final String suffix;
+            if (grizzly.getUriSuffix() != null) {
+                suffix = "/" + grizzly.getUriSuffix();
+            } else {
+                suffix = "";
+            }
+            if (grizzly != null && grizzly.getCurrentPortSoap()!= null) {
+                u = new URL("http://localhost:" + grizzly.getCurrentPortSoap() + suffix + "/" + instance + "?wsdl");
+            } else {
+                u = new URL("http://localhost:9090/1/user/access");
+            }
+            ex = false;
+            URLConnection conec = u.openConnection();
+            try {
+                conec.getInputStream();
+            } catch (IOException e) {
+                ex = true;
+            }
+            if (cpt == 100) {
                 throw new Exception("The grizzly server never start");
             }
             cpt++;
@@ -158,6 +195,10 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
 
         public Integer getCurrentPort() {
             return cstlServer.currentPort;
+        }
+        
+        public Integer getCurrentPortSoap() {
+            return cstlServer.portsoap;
         }
 
         public String getUriSuffix() {
@@ -318,7 +359,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
      * @return The root output directory where the data are unzipped.
      * @throws IOException
      */
-    protected static File initDataDirectory() throws IOException {
+    public static File initDataDirectory() throws IOException {
         final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
         String styleResource = classloader.getResource("org/constellation/ws/embedded/wms111/styles").getFile();
         if (styleResource.indexOf('!') != -1) {
@@ -346,6 +387,24 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
     }
 
     protected static void postRequestObject(URLConnection conec, Object request) throws IOException, JAXBException {
+        postRequestObject(conec, request, pool);
+    }
+    
+    protected static void postRequestObject(URLConnection conec, Object request, MarshallerPool pool) throws IOException, JAXBException {
+        conec.setDoOutput(true);
+        conec.setRequestProperty("Content-Type", "application/xml");
+        final OutputStreamWriter wr = new OutputStreamWriter(conec.getOutputStream());
+        final StringWriter sw = new StringWriter();
+        Marshaller marshaller = pool.acquireMarshaller();
+        marshaller.marshal(request, sw);
+
+        wr.write(sw.toString());
+        wr.flush();
+    }
+    
+    protected static void putRequestObject(URLConnection conec, Object request, MarshallerPool pool) throws IOException, JAXBException {
+        HttpURLConnection httpCon = (HttpURLConnection) conec;
+        httpCon.setRequestMethod("PUT");
         conec.setDoOutput(true);
         conec.setRequestProperty("Content-Type", "application/xml");
         final OutputStreamWriter wr = new OutputStreamWriter(conec.getOutputStream());
@@ -357,6 +416,48 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
         wr.flush();
     }
 
+    protected static Object unmarshallResponsePut(final URLConnection conec) throws JAXBException, IOException {
+        HttpURLConnection httpCon = (HttpURLConnection) conec;
+        httpCon.setRequestMethod("PUT");
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        Object obj = unmarshaller.unmarshal(conec.getInputStream());
+
+        pool.recycle(unmarshaller);
+
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement) obj).getValue();
+        }
+        return obj;
+    }
+    
+    protected static Object unmarshallResponsePost(final URLConnection conec) throws JAXBException, IOException {
+        HttpURLConnection httpCon = (HttpURLConnection) conec;
+        httpCon.setRequestMethod("POST");
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        Object obj = unmarshaller.unmarshal(conec.getInputStream());
+
+        pool.recycle(unmarshaller);
+
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement) obj).getValue();
+        }
+        return obj;
+    }
+    
+    protected static Object unmarshallResponseDelete(final URLConnection conec) throws JAXBException, IOException {
+        HttpURLConnection httpCon = (HttpURLConnection) conec;
+        httpCon.setRequestMethod("DELETE");
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        Object obj = unmarshaller.unmarshal(conec.getInputStream());
+
+        pool.recycle(unmarshaller);
+
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement) obj).getValue();
+        }
+        return obj;
+    }
+    
     protected static Object unmarshallResponse(final URLConnection conec) throws JAXBException, IOException {
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         Object obj = unmarshaller.unmarshal(conec.getInputStream());

@@ -64,7 +64,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
-        <module>cstl-engine-shiro</module>
+        <!--<module>cstl-engine-shiro</module>-->
         <module>cstl-engine-spring-security</module>
         <module>server</module>
         <module>xacml</module>
@@ -132,6 +132,7 @@
     <module>admin</module>
     <module>register</module>
     <module>template</module>
+    <module>derby-store</module>
   </modules>
 
 </project>

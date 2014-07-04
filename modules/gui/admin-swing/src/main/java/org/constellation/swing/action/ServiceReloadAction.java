@@ -19,12 +19,15 @@
 package org.constellation.swing.action;
 
 import java.awt.Color;
+import java.io.IOException;
 import java.util.Map;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
+import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.Instance;
 import org.constellation.security.ActionPermissions;
 import org.constellation.swing.LayerRowModel;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -45,7 +48,7 @@ public class ServiceReloadAction extends Action {
         if (target instanceof Map.Entry) {
             final Instance inst = (Instance) ((Map.Entry)target).getKey();
             final String type = (String) ((Map.Entry)target).getValue();
-            final String lowerType = type.toLowerCase();
+            final String lowerType = type.toUpperCase();
             return true;
         }
         return false;
@@ -74,15 +77,19 @@ public class ServiceReloadAction extends Action {
     @Override
     public void actionPerformed() {
         if(target instanceof Map.Entry){
-            final Instance inst = (Instance) ((Map.Entry)target).getKey();
-            final String type = (String) ((Map.Entry)target).getValue();
-             server.services.restartInstance(type, inst.getIdentifier());
-             SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    fireUpdate();
-                }
-            });
+            try {
+                final Instance inst = (Instance) ((Map.Entry)target).getKey();
+                final String type = (String) ((Map.Entry)target).getValue();
+                serverV2.services.restart(Specification.valueOf(type), inst.getIdentifier(), false);
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        fireUpdate();
+                    }
+                });
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            }
         }
     }
 

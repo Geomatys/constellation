@@ -28,7 +28,6 @@ var cstlUrlPrefix = "@cstl/";
  * Injection of jessionid for csltSessionId cookie.
  */
 
-
 cstlAdminApp.factory('AuthInterceptor', function($rootScope, $cookies, CookiesStorageService) {
     return {
 	    'request': function(config) {
@@ -40,7 +39,10 @@ cstlAdminApp.factory('AuthInterceptor', function($rootScope, $cookies, CookiesSt
 	    	  }
 	    	  url = $cookies.cstlUrl + url.substring(cstlUrlPrefix.length);
 	    	  if($cookies.cstlActiveDomainId)
-	    	    url = url.replace('$domainId', $cookies.cstlActiveDomainId);
+            url = url.replace('$domainId', $cookies.cstlActiveDomainId);
+	    	  if($cookies.cstlUserId)
+            url = url.replace('$userId', $cookies.cstlUserId);
+	    	  
 	    	  var jsessionIdIndex = url.indexOf(";jsessionid=");
 	    	  if(jsessionIdIndex == -1){
 	    	    var cstlSessionId=$cookies.cstlSessionId;
@@ -180,7 +182,8 @@ cstlAdminApp.factory('UserResource', ['$resource', '$cookies',
    function ($resource, $cookies) {
         return $resource('@cstl/api/1/user/:id', null,
             {
-          'update': { method:'PUT' }
+          'update': { method:'PUT' },
+          'domainRoles': {url: '@cstl/api/1/user/$userId/domainroles/:domainId', isArray:true}
       });
 }]);
 
@@ -190,9 +193,9 @@ cstlAdminApp.factory('DomainResource', ['$resource',
      'update': { method:'PUT' },
      'members' : {url: '@cstl/api/1/domain/members/:id', isArray:true},
      'nonmembers' : {url: '@cstl/api/1/domain/nonmembers/:id', isArray:true},
-     'addMemberToDomain' : {method: 'POST', url: '@cstl/api/1/userXdomain/:domainId/:userId'},
-     'updateMemberInDomain' : {method: 'PUT', url: '@cstl/api/1/userXdomain/:domainId/:userId'},
-     'removeMemberFromDomain' : {method: 'DELETE', url: '@cstl/api/1/userXdomain/:domainId/:userId'}
+     'addMemberToDomain' : {method: 'POST', url: '@cstl/api/1/userXdomain/:domainId/user/:userId'},
+     'updateMemberInDomain' : {method: 'PUT', url: '@cstl/api/1/userXdomain/:domainId/user/:userId'},
+     'removeMemberFromDomain' : {method: 'DELETE', url: '@cstl/api/1/userXdomain/:domainId/user/:userId'}
     });
 }]);
 
@@ -216,15 +219,19 @@ cstlAdminApp.factory('PermissionService', ['$http',
 
 cstlAdminApp.factory('webService', ['$resource',
                                      function ($resource) {
-                                         return $resource('@cstl/api/1/admin/domain/$domainId/instances;jsessionid=', {}, {
+                                         return $resource('@cstl/api/1/admin/domain/$domainId/instances/:lang', {}, {
+                                             'permissionByDomainRole' : {method: 'GET', url: '@cstl/api/1/servicepermission/access', isArray: true},
+                                             'domains':      {method: 'GET', url: '@cstl/api/1/servicepermission/user/$userId/service/:id', isArray: true},
+                                             'linkToDomain':      {method: 'POST',   url: '@cstl/api/1/serviceXdomain/:domainId/service/:serviceId'},
+                                             'unlinkFromDomain':  {method: 'DELETE', url: '@cstl/api/1/serviceXdomain/:domainId/service/:serviceId'},
                                              'listAll':      {method: 'GET', isArray: false},
-                                             'get':          {method: 'GET', url: '@cstl/api/1/OGC/:type/:id;jsessionid='},
+                                             'get':          {method: 'GET', url: '@cstl/api/1/OGC/:type/:id/:lang;jsessionid='},
                                              'create':       {method: 'PUT', url: '@cstl/api/1/OGC/:type/domain/$domainId'},
                                              'delete':       {method: 'DELETE', url: '@cstl/api/1/OGC/:type/:id;jsessionid='},
                                              'restart':      {method: 'POST', url: '@cstl/api/1/OGC/:type/:id/restart;jsessionid='},
                                              'start':        {method: 'POST', url: '@cstl/api/1/OGC/:type/:id/start;jsessionid='},
                                              'stop':         {method: 'POST', url: '@cstl/api/1/OGC/:type/:id/stop;jsessionid='},
-                                             'metadata':     {method: 'GET', url: '@cstl/api/1/OGC/:type/:id/metadata;jsessionid='},
+                                             'metadata':     {method: 'GET', url: '@cstl/api/1/OGC/:type/:id/metadata/:lang;jsessionid='},
                                              'updateMd':     {method: 'POST', url: '@cstl/api/1/OGC/:type/:id/metadata;jsessionid='},
                                              'config':       {method: 'GET', url: '@cstl/api/1/OGC/:type/:id/config;jsessionid='},
                                              'setConfig':    {method: 'POST', url: '@cstl/api/1/OGC/:type/:id/config;jsessionid='},
@@ -250,7 +257,7 @@ cstlAdminApp.factory('dataListing', ['$resource',
             'pyramidScales':  {method: 'GET', url: '@cstl/api/1/domain/$domainId/data/pyramid/bestscales/:providerId/:dataId;jsessionid='},
             'deletePyramidFolder': {method: 'DELETE', url: '@cstl/api/1/domain/$domainId/data/pyramid/folder/:providerId;jsessionid='},
             'dataFolder':   {method: 'POST', url: '@cstl/api/1/domain/$domainId/data/datapath/true;jsessionid=', isArray: true},
-    		    'importData':     {method: 'POST', url: '@cstl/api/1/domain/$domainId/data/import;jsessionid='},
+    		'importData':     {method: 'POST', url: '@cstl/api/1/domain/$domainId/data/import;jsessionid='},
             'loadData':     {method: 'POST', url: '@cstl/api/1/domain/$domainId/data/load;jsessionid='},
             'extension':    {method: 'POST', url: '@cstl/api/1/domain/$domainId/data/testextension;jsessionid='},
             'hideData':   {method: 'POST', url: '@cstl/api/1/domain/$domainId/data/:providerid/:dataid/hidden;jsessionid='},
@@ -264,7 +271,12 @@ cstlAdminApp.factory('dataListing', ['$resource',
             'findDataType':    {method: 'POST', url: '@cstl/api/1/domain/$domainId/data/findDataType;jsessionid='},
             'linkToSensor': {method: 'POST', url: '@cstl/api/1/domain/$domainId/data/link/sensor/:providerId/:dataId/:sensorId;jsessionid='},
             'unlinkSensor': {method: 'POST', url: '@cstl/api/1/domain/$domainId/data/unlink/sensor/:providerId/:dataId/:sensorId;jsessionid='},
-            'generateSML': {method: 'PUT', url: '@cstl/api/1/sensor/generate;jsessionid='}
+            'generateSML': {method: 'PUT', url: '@cstl/api/1/sensor/generate;jsessionid='},
+            'linkToDomain':      {method: 'POST',   url: '@cstl/api/1/dataXdomain/:dataId/domain/:domainId'},
+            'unlinkFromDomain':  {method: 'DELETE', url: '@cstl/api/1/dataXdomain/:dataId/domain/:domainId'},
+            'domains':  {method: 'GET', url: '@cstl/api/1/dataXdomain/:dataId/user/$userId/domain', isArray: true},
+            
+          
         });
     }]);
 
@@ -349,14 +361,20 @@ cstlAdminApp.factory('TaskService', ['$resource',
         });
     }]);
 
-cstlAdminApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'authService', '$base64','$cookieStore',
-    function ($rootScope, $http, authService, $base64, $cookieStore) {
+cstlAdminApp.factory('AuthenticationSharedService', ['$rootScope', '$http', 'Account' ,'authService', '$base64','$cookieStore',
+    function ($rootScope, $http, Account, authService, $base64, $cookieStore) {
         return {
             authenticate: function() {
-                $http.get('@cstl/spring/session/status;jsessionid=')
-                    .success(function (data, status, headers, config) {
-                        $rootScope.$broadcast('event:auth-authConfirmed');
-                    })
+                Account.get(function(account){
+                    $rootScope.account=account
+                    $rootScope.hasRole = function(role){
+                        return account.roles.indexOf(role) != -1
+                    }
+                    $rootScope.hasMultipleDomains = function(){
+                        return account.domains.length > 1
+                    }
+                    $rootScope.$broadcast('event:auth-authConfirmed');
+                });
             },
             logout: function () {
                 $rootScope.authenticationError = false;

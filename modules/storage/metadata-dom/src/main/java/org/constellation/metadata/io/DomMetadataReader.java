@@ -21,6 +21,7 @@ package org.constellation.metadata.io;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -46,6 +47,7 @@ import org.geotoolkit.temporal.object.TemporalUtilities;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
@@ -107,6 +109,41 @@ public abstract class DomMetadataReader extends AbstractMetadataReader {
         }
         // TODO complete other metadata type
     }
+    
+    protected MetadataType getMetadataType(final Reader metadataReader, final boolean reset) throws IOException, XMLStreamException {
+        final String rootName;
+        if (reset){
+            metadataReader.mark(0);
+        }
+        final XMLStreamReader xsr = xif.createXMLStreamReader(metadataReader);
+        xsr.nextTag();
+        rootName = xsr.getLocalName();
+        xsr.close();
+        if (reset) {
+            metadataReader.reset();
+        }
+
+        switch (rootName) {
+            case "MD_Metadata":
+            case "MI_Metadata":
+                return MetadataType.ISO_19115;
+            case "Record":
+                return MetadataType.DUBLINCORE;
+            case "SensorML":
+                return MetadataType.SENSORML;
+            case "RegistryObject":
+            case "AdhocQuery":
+            case "Association":
+            case "RegistryPackage":
+            case "Registry":
+            case "ExtrinsicObject":
+            case "RegistryEntry":
+                return MetadataType.EBRIM;
+            default:
+                return MetadataType.NATIVE;
+        }
+        // TODO complete other metadata type
+    }
 
     protected Node getNodeFromFile(final File metadataFile) throws MetadataIoException {
         try {
@@ -122,6 +159,17 @@ public abstract class DomMetadataReader extends AbstractMetadataReader {
         try {
             final DocumentBuilder docBuilder = dbf.newDocumentBuilder();
             final Document document = docBuilder.parse(stream);
+            return document.getDocumentElement();
+        } catch (ParserConfigurationException | SAXException | IOException ex) {
+            throw new MetadataIoException("unable to parse the metadata", ex, NO_APPLICABLE_CODE);
+        }
+    }
+    
+    protected Node getNodeFromReader(final Reader reader) throws MetadataIoException {
+        try {
+            final InputSource source = new InputSource(reader);
+            final DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+            final Document document = docBuilder.parse(source);
             return document.getDocumentElement();
         } catch (ParserConfigurationException | SAXException | IOException ex) {
             throw new MetadataIoException("unable to parse the metadata", ex, NO_APPLICABLE_CODE);

@@ -38,9 +38,9 @@ import javax.swing.LayoutStyle;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.mdweb.sql.DatabaseCreator;
-import org.mdweb.sql.DatabaseUpdater;
-import org.mdweb.sql.DefaultDatabaseUpdater;
+//import org.mdweb.sql.DatabaseCreator;
+//import org.mdweb.sql.DatabaseUpdater;
+//import org.mdweb.sql.DefaultDatabaseUpdater;
 import org.openide.util.NbBundle;
 
 /**
@@ -243,26 +243,26 @@ public class JCswMdwEditPane extends JServiceEditionPane {
         }
         
         // look for existing database
-        boolean exist = true;
-        try {
-            final DatabaseUpdater updater = new DefaultDatabaseUpdater(bdd.getDataSource(), true);
-            updater.isToUpgradeDatabase();
-        } catch (SQLException ex) {
-            exist = false;
-        }
-        
-        // build the database if not exist
-        if (!exist) {
-            try {            
-                DatabaseCreator creator = new DatabaseCreator(bdd.getDataSource(), true);
-                creator.createMetadataDatabase(true);
-            } catch (SQLException ex) {
-                LOGGER.log(Level.WARNING, "Unable to create the mdweb database", ex);
-            }
-        } else {
-            JOptionPane.showMessageDialog(null, LayerRowModel.BUNDLE.getString("alreadyExistingDatabase"), 
-                        LayerRowModel.BUNDLE.getString("alreadyExistingDatabaseTitle"), JOptionPane.ERROR_MESSAGE);
-        }
+//        boolean exist = true;
+//        try {
+//            final DatabaseUpdater updater = new DefaultDatabaseUpdater(bdd.getDataSource(), true);
+//            updater.isToUpgradeDatabase();
+//        } catch (SQLException ex) {
+//            exist = false;
+//        }
+//
+//        // build the database if not exist
+//        if (!exist) {
+//            try {
+//                DatabaseCreator creator = new DatabaseCreator(bdd.getDataSource(), true);
+//                creator.createMetadataDatabase(true);
+//            } catch (SQLException ex) {
+//                LOGGER.log(Level.WARNING, "Unable to create the mdweb database", ex);
+//            }
+//        } else {
+//            JOptionPane.showMessageDialog(null, LayerRowModel.BUNDLE.getString("alreadyExistingDatabase"),
+//                        LayerRowModel.BUNDLE.getString("alreadyExistingDatabaseTitle"), JOptionPane.ERROR_MESSAGE);
+//        }
     }//GEN-LAST:event_dbCreateButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

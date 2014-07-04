@@ -19,8 +19,6 @@
 
 package org.constellation.webdav;
 
-import org.constellation.ServiceDef.Specification;
-import org.constellation.configuration.WebdavContext;
 import org.constellation.ogc.configuration.OGCConfigurer;
 
 /**
@@ -29,11 +27,5 @@ import org.constellation.ogc.configuration.OGCConfigurer;
  */
 public class WebDavConfigurer extends OGCConfigurer {
 
-    /**
-     * Create a new {@link CSWConfigurer} instance.
-     */
-    public WebDavConfigurer() {
-        super(Specification.WEBDAV, WebdavContext.class, "webDav.xml");
-    }
 
 }

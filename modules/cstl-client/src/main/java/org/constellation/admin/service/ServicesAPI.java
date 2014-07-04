@@ -19,6 +19,13 @@
 
 package org.constellation.admin.service;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXBElement;
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.AbstractConfigurationObject;
 import org.constellation.configuration.Instance;
@@ -27,18 +34,11 @@ import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.LayerList;
 import org.constellation.configuration.ProcessContext;
 import org.constellation.configuration.SOSConfiguration;
+import org.constellation.configuration.ServiceReport;
 import org.constellation.dto.AddLayer;
-import org.constellation.dto.Service;
+import org.constellation.dto.Details;
 import org.constellation.dto.SimpleValue;
 import org.constellation.generic.database.Automatic;
-
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBElement;
-
-import java.io.IOException;
-
-import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
 /**
  * Constellation RESTful API for services management/configuration.
@@ -100,6 +100,11 @@ public final class ServicesAPI {
         return client.get(path, MediaType.APPLICATION_XML_TYPE).getEntity(InstanceReport.class);
     }
 
+    public Map<String, List<String>> getAvailableService() throws IOException {
+        final String path = "OGC/whatever/list";
+        return client.get(path, MediaType.APPLICATION_XML_TYPE).getEntity(ServiceReport.class).getAvailableServices();
+    }
+    
     /**
      * Create a new service instance.
      *
@@ -108,11 +113,12 @@ public final class ServicesAPI {
      * @throws HttpResponseException if the response does not have a {@code 2xx} status code
      * @throws IOException on HTTP communication error
      */
-    public void newInstance(final Specification serviceType, final Service metadata) throws HttpResponseException, IOException {
+    public void newInstance(final Specification serviceType, final Details metadata) throws HttpResponseException, IOException {
         ensureNonNull("serviceType", serviceType);
         ensureNonNull("metadata",    metadata);
 
-        final String path = "OGC/" + serviceType;
+        final String domain = "0";// TODO
+        final String path = "OGC/" + serviceType + "/domain/" + domain;
         client.put(path, MediaType.APPLICATION_XML_TYPE, metadata).ensure2xxStatus();
     }
 
@@ -170,16 +176,16 @@ public final class ServicesAPI {
      *
      * @param serviceType the service type
      * @param identifier  the service identifier
-     * @return a {@link Service} instance
+     * @return a {@link org.constellation.dto.Details} instance
      * @throws HttpResponseException if the response does not have a {@code 2xx} status code
      * @throws IOException on HTTP communication error or response entity parsing error
      */
-    public Service getMetadata(final Specification serviceType, final String identifier) throws HttpResponseException, IOException {
+    public Details getMetadata(final Specification serviceType, final String identifier) throws HttpResponseException, IOException {
         ensureNonNull("serviceType", serviceType);
         ensureNonNull("identifier",  identifier);
 
         final String path = "OGC/" + serviceType + "/" + identifier + "/metadata";
-        return client.get(path, MediaType.APPLICATION_XML_TYPE).getEntity(Service.class);
+        return client.get(path, MediaType.APPLICATION_XML_TYPE).getEntity(Details.class);
     }
 
     /**
@@ -191,7 +197,7 @@ public final class ServicesAPI {
      * @throws HttpResponseException if the response does not have a {@code 2xx} status code
      * @throws IOException on HTTP communication error
      */
-    public void setMetadata(final Specification serviceType, final String identifier, final Service metadata) throws HttpResponseException, IOException {
+    public void setMetadata(final Specification serviceType, final String identifier, final Details metadata) throws HttpResponseException, IOException {
         ensureNonNull("serviceType", serviceType);
         ensureNonNull("metadata",    metadata);
 
@@ -273,7 +279,7 @@ public final class ServicesAPI {
      * @throws HttpResponseException if the response does not have a {@code 2xx} status code
      * @throws IOException on HTTP communication error
      */
-    public void delete(final Specification serviceType, final String identifier) throws HttpResponseException, IOException {
+    public void delete(final Specification serviceType, final String identifier) throws IOException {
         ensureNonNull("serviceType", serviceType);
         ensureNonNull("identifier",  identifier);
 
@@ -330,4 +336,17 @@ public final class ServicesAPI {
     public void deleteLayer(final String serviceId, final String layerId, final String layerNamespace, final String spec) throws IOException {
         client.delete("MAP/" + spec + "/" + serviceId+"/"+layerId, MediaType.APPLICATION_XML_TYPE, "layernamespace", layerNamespace).ensure2xxStatus();
     }
+    
+    /**
+     * Return a complete URL for the specified service (wms, wfs, csw,...) and
+     * instance identifier.
+     *
+     * @param service The service name (wms, wfs, csw,...).
+     * @param instanceId The instance identifier.
+     * @return A complete URL for the specified service.
+     */
+    public String getInstanceURL(final String service, final String instanceId) {
+        return client.getUrl() + service.toLowerCase() + '/' + instanceId;
+    }
+
 }

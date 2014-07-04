@@ -18,19 +18,30 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
+import static org.constellation.engine.register.jooq.Tables.SERVICE;
+import static org.constellation.engine.register.jooq.Tables.SERVICE_X_DOMAIN;
+
+import java.util.Date;
 import java.util.List;
 
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.jooq.AbstractJooqTestTestCase;
+import org.constellation.engine.register.jooq.Tables;
+import org.constellation.engine.register.jooq.tables.Data;
+import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 public class JooqServicesRepositoryTestCase extends AbstractJooqTestTestCase {
 
     
     @Autowired
     private ServiceRepository serviceRepository;
+    
+    @Autowired
+    private DomainRepository domainRepository;
     
     @Test
     public void all() {
@@ -59,7 +70,10 @@ public class JooqServicesRepositoryTestCase extends AbstractJooqTestTestCase {
         dump(serviceRepository.getAccessiblesServicesByType(1, "looo"));
     }
     
-    
+    @Test
+    public void findByDomain() {
+        dump(serviceRepository.findByDomain(1));
+    }
     
     @Test
     public void save() {

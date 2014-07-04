@@ -6,169 +6,188 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.constellation</groupId>
-    <artifactId>web-services</artifactId>
-    <version>0.9-SNAPSHOT</version>
-  </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.constellation</groupId>
+        <artifactId>web-services</artifactId>
+        <version>0.9-SNAPSHOT</version>
+    </parent>
 
 
 
-  <!--
-    Module description.
-  -->
-  <groupId>org.constellation.web-services</groupId>
-  <artifactId>cstl-web-map</artifactId>
-  <packaging>jar</packaging>
-  <name>Web service base for Map web services</name>
-  <description>
-    The geospatial web services standardized by the Open Geospatial Consortium
-    (OGC), including WMS, WFS, WMTS and WCS.
-  </description>
+    <!--
+      Module description.
+    -->
+    <groupId>org.constellation.web-services</groupId>
+    <artifactId>cstl-web-map</artifactId>
+    <packaging>jar</packaging>
+    <name>Web service base for Map web services</name>
+    <description>
+        The geospatial web services standardized by the Open Geospatial Consortium
+        (OGC), including WMS, WFS, WMTS and WCS.
+    </description>
 
 
 
-  <!--
-    Developers and contributors.
-  -->
-  <developers>
-    <developer>
-      <id>glegal</id>
-      <name>Guilhem Legal</name>
-      <email>guilhem.legal@geomatys.fr</email>
-      <organization>Geomatys</organization>
-      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-    <developer>
-      <id>qboileau</id>
-      <name>Quentin Boileau</name>
-      <email>quentin.boileau@geomatys.com</email>
-      <organization>Geomatys</organization>
-      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-    <developer>
-      <id>cedricbr</id>
-      <name>Cédric Briançon</name>
-      <email>cedric.briancon@geomatys.com</email>
-      <organization>Geomatys</organization>
-      <organizationUrl>http://www.geomatys.com/</organizationUrl>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-  </developers>
+    <!--
+      Developers and contributors.
+    -->
+    <developers>
+        <developer>
+            <id>glegal</id>
+            <name>Guilhem Legal</name>
+            <email>guilhem.legal@geomatys.fr</email>
+            <organization>Geomatys</organization>
+            <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+        <developer>
+            <id>qboileau</id>
+            <name>Quentin Boileau</name>
+            <email>quentin.boileau@geomatys.com</email>
+            <organization>Geomatys</organization>
+            <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+        <developer>
+            <id>cedricbr</id>
+            <name>Cédric Briançon</name>
+            <email>cedric.briancon@geomatys.com</email>
+            <organization>Geomatys</organization>
+            <organizationUrl>http://www.geomatys.com/</organizationUrl>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
 
 
-  <!--
-    Required dependencies for building. These dependencies wil be included into
-    the JARs list that Maven will put into the directory "target/binaries".
-  -->
-  <dependencies>
-    <!-- Constellation modules -->
-    <dependency>
-      <groupId>org.constellation.web-services</groupId>
-      <artifactId>cstl-web-ogc</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.library</groupId>
-      <artifactId>cstl-lib-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.engine</groupId>
-      <artifactId>cstl-engine-server</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.engine</groupId>
-      <artifactId>cstl-engine-scheduler</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.engine</groupId>
-      <artifactId>cstl-engine-process-core</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.storage</groupId>
-      <artifactId>cstl-store-data-coveragesgroup</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.json-bindings</groupId>
-      <artifactId>cstl-json-style</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <!-- Geotoolkit pending -->
-    <dependency>
-      <groupId>org.geotoolkit</groupId>
-      <artifactId>geotk-xml-sld</artifactId>
-    </dependency>
+    <!--
+      Required dependencies for building. These dependencies wil be included into
+      the JARs list that Maven will put into the directory "target/binaries".
+    -->
+    <dependencies>
+        <!-- Constellation modules -->
+        <dependency>
+            <groupId>org.constellation.web-services</groupId>
+            <artifactId>cstl-web-ogc</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.library</groupId>
+            <artifactId>cstl-lib-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.engine</groupId>
+            <artifactId>cstl-engine-server</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.engine</groupId>
+            <artifactId>cstl-engine-scheduler</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.engine</groupId>
+            <artifactId>cstl-engine-process-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.storage</groupId>
+            <artifactId>cstl-store-data-coveragesgroup</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.json-bindings</groupId>
+            <artifactId>cstl-json-style</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- Geotoolkit pending -->
+        <dependency>
+            <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-xml-sld</artifactId>
+        </dependency>
 
-      <!-- WMTS JAXB binding used for GetFeatureInfo -->
-    <dependency>
-      <groupId>org.geotoolkit</groupId>
-      <artifactId>geotk-xml-wmts</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.geotoolkit</groupId>
-      <artifactId>geotk-svg</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.geotoolkit</groupId>
-      <artifactId>geotk-client-store</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-    </dependency>
+        <!-- WMTS JAXB binding used for GetFeatureInfo -->
+        <dependency>
+            <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-xml-wmts</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-svg</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-client-store</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+        </dependency>
 
-    <!-- Tests dependencies -->
-    <dependency>
-       <groupId>org.constellation.engine</groupId>
-       <artifactId>cstl-engine-process-core</artifactId>
-       <version>${project.version}</version>
-       <type>test-jar</type>
-       <scope>test</scope>
-    </dependency>
-     <dependency>
-        <groupId>org.constellation.engine</groupId>
-        <artifactId>cstl-engine-shiro</artifactId>
-        <version>${project.version}</version>
-        <scope>test</scope>
-    </dependency>
-     <dependency>
-      <groupId>org.constellation.storage</groupId>
-      <artifactId>cstl-store-data-featurestore</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-     <dependency>
-      <groupId>org.constellation.storage</groupId>
-      <artifactId>cstl-store-style-sld</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-       <groupId>org.constellation.web-services</groupId>
-       <artifactId>cstl-web-ogc</artifactId>
-       <version>${project.version}</version>
-       <type>test-jar</type>
-       <scope>test</scope>
-    </dependency>
+        <!-- Tests dependencies -->
 
-  </dependencies>
+        <!--<dependency>-->
+            <!--<groupId>org.constellation.engine</groupId>-->
+            <!--<artifactId>cstl-engine-shiro</artifactId>-->
+            <!--<version>${project.version}</version>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
+        <dependency>
+            <groupId>org.constellation.storage</groupId>
+            <artifactId>cstl-store-data-featurestore</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.storage</groupId>
+            <artifactId>cstl-store-style-sld</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.engine</groupId>
+            <artifactId>cstl-engine-process-core</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.engine</groupId>
+            <artifactId>cstl-engine-process</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.engine</groupId>
+            <artifactId>cstl-engine-spring-security</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.engine.register</groupId>
+            <artifactId>cstl-register-jooq</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
 
     <build>
         <plugins>

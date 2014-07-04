@@ -20,47 +20,77 @@ package org.constellation.wmts.ws;
 
 import java.io.StringWriter;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import javax.xml.bind.Marshaller;
-
 import org.apache.sis.test.XMLComparator;
+import org.apache.sis.xml.MarshallerPool;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
+import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.LayerContext;
+import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.ws.CstlServiceException;
 
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
+import org.geotoolkit.ows.xml.v110.SectionsType;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.wmts.xml.WMTSMarshallerPool;
 import org.geotoolkit.wmts.xml.v100.Capabilities;
 import org.geotoolkit.wmts.xml.v100.GetCapabilities;
-import org.apache.sis.xml.MarshallerPool;
-import org.constellation.admin.ConfigurationEngine;
-import org.constellation.configuration.LayerContext;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import org.geotoolkit.ows.xml.v110.SectionsType;
 
 import org.junit.*;
 import static org.junit.Assert.*;
+import org.junit.runner.RunWith;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.context.ContextConfiguration;
 
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class WMTSWorkerTest {
+@RunWith(SpringTestRunner.class)
+@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+public class WMTSWorkerTest implements ApplicationContextAware {
 
+    protected ApplicationContext applicationContext;
+    
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+
+    @Inject
+    private ServiceBusiness serviceBusiness;
+    
     private static MarshallerPool pool;
     private static WMTSWorker worker ;
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-        ConfigurationEngine.setupTestEnvironement("WMTSWorkerTest");
-        pool = WMTSMarshallerPool.getInstance();
-        
-        ConfigurationEngine.storeConfiguration("WMTS", "default", new LayerContext());
+    @PostConstruct
+    public void setUpClass(){
+        SpringHelper.setApplicationContext(applicationContext);
+        try {
+            ConfigurationEngine.setupTestEnvironement("WMTSWorkerTest");
+            pool = WMTSMarshallerPool.getInstance();
+            
 
-        worker = new DefaultWMTSWorker("default");
-        worker.setLogLevel(Level.FINER);
-        worker.setServiceUrl("http://geomatys.com/constellation/WS/");
-        worker.setShiroAccessible(false);
+
+            serviceBusiness.create("wmts", "default", new LayerContext(), null, null);
+
+
+            worker = new DefaultWMTSWorker("default");
+            worker.setLogLevel(Level.FINER);
+            worker.setServiceUrl("http://geomatys.com/constellation/WS/");
+            worker.setShiroAccessible(false);
+        } catch (ConfigurationException ex) {
+            Logger.getLogger(WMTSWorkerTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @AfterClass

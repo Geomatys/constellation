@@ -19,17 +19,21 @@
 package org.constellation.engine.register.jooq.repository;
 
 import static org.constellation.engine.register.jooq.Tables.USER;
+import static org.constellation.engine.register.jooq.Tables.USER_X_DOMAIN_X_DOMAINROLE;
 import static org.constellation.engine.register.jooq.Tables.USER_X_ROLE;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.constellation.engine.register.Domain;
+import org.constellation.engine.register.Domainrole;
 import org.constellation.engine.register.DomainUser;
 import org.constellation.engine.register.User;
+import org.constellation.engine.register.helper.UserHelper;
 import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.tables.UserXDomainXDomainrole;
 import org.constellation.engine.register.jooq.tables.UserXRole;
@@ -37,6 +41,7 @@ import org.constellation.engine.register.jooq.tables.records.UserRecord;
 import org.constellation.engine.register.jooq.tables.records.UserXRoleRecord;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.UserRepository;
+import org.jooq.Condition;
 import org.jooq.DeleteConditionStep;
 import org.jooq.InsertSetMoreStep;
 import org.jooq.Record;
@@ -50,6 +55,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.google.common.base.Optional;
 
 @Component
 public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User> implements UserRepository {
@@ -69,10 +76,9 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
         super(User.class, USER);
     }
 
-    
     @Override
     public List<DomainUser> findAllWithDomainAndRole() {
-     
+
         SelectJoinStep<Record> records = getSelectWithRolesAndDomains();
 
         records.execute();
@@ -119,7 +125,7 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
         for (Entry<Record, Result<Record>> domainEntry : domains.entrySet()) {
 
             Domain domain = domainEntry.getKey().into(Domain.class);
-            if (domain.getId()!= null) {
+            if (domain.getId() != null) {
                 userDTO.addDomain(domain);
             }
         }
@@ -150,19 +156,15 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
     @Transactional
     public User insert(User user, List<String> roles) {
 
+        user.setActive(true);
         UserRecord newRecord = dsl.newRecord(USER);
+
+        UserHelper.copy(user, newRecord);
         
-        newRecord.setActive(true);
-        newRecord.setEmail(user.getEmail());
-        newRecord.setLastname(user.getLastname());
-        newRecord.setFirstname(user.getFirstname());
-        newRecord.setLogin(user.getLogin());
-        newRecord.setPassword(user.getPassword());
-        
-        if(newRecord.store() > 0) {
+        if (newRecord.store() > 0) {
             user.setId(newRecord.getId());
         }
-        
+
         insertRoles(user, roles);
 
         return user;
@@ -195,16 +197,24 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
     }
 
     @Override
-    public DomainUser findOneWithRolesAndDomains(String login) {
-        SelectConditionStep<Record> records = getSelectWithRolesAndDomains().where(userTable.LOGIN.eq(login));
-        records.execute();
-        List<DomainUser> result = mapUsers(records.getResult());
-        
-        if (result.size() == 0)
-            return null;
-        DomainUser domainUser = result.get(0);
-        domainUser.setPassword(null);
-        return domainUser;
+    public Optional<DomainUser> findOneWithRolesAndDomains(String login) {
+        return fetchUserWithRolesAndDomains(userTable.LOGIN.eq(login));
+    }
+
+    private Optional<DomainUser> fetchUserWithRolesAndDomains(Condition condition) {
+        SelectConditionStep<Record> records = getSelectWithRolesAndDomains().where(condition);
+        if (records.execute() > 0) {
+            List<DomainUser> result = mapUsers(records.getResult());
+            DomainUser domainUser = result.get(0);
+            domainUser.setPassword(null);
+            return Optional.of(domainUser);
+        }
+        return Optional.absent();
+    }
+
+    @Override
+    public Optional<DomainUser> findOneWithRolesAndDomains(int id) {
+        return fetchUserWithRolesAndDomains(userTable.ID.eq(id));
     }
 
     @Override
@@ -224,16 +234,45 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
         return dsl.select().from(USER).where(USER_X_ROLE.USER_ID.eq(userId)).fetch(USER_X_ROLE.ROLE);
     }
 
-
     @Override
     public int countUser() {
         return dsl.selectCount().from(USER).fetchOne(0, int.class);
     }
-
 
     @Override
     public boolean loginAvailable(String login) {
         return dsl.selectCount().from(USER).where(USER.LOGIN.eq(login)).fetchOne().value1() == 0;
     }
 
+    @Override
+    public List<User> findUsersByDomainId(int domainId) {
+        return findBy(USER.ID.in(dsl.selectDistinct(USER_X_DOMAIN_X_DOMAINROLE.USER_ID)
+                .from(USER_X_DOMAIN_X_DOMAINROLE).where(USER_X_DOMAIN_X_DOMAINROLE.DOMAIN_ID.eq(domainId))));
+    }
+
+    @Override
+    public Map<User, List<Domainrole>> findUsersWithDomainRoles(int domainId) {
+        Map<User, List<Domainrole>> result = new LinkedHashMap<>();
+        SelectConditionStep<Record> groupBy = dsl.select().from(USER).join(USER_X_DOMAIN_X_DOMAINROLE).onKey().join(Tables.DOMAINROLE).onKey()
+                .where(USER_X_DOMAIN_X_DOMAINROLE.DOMAIN_ID.eq(domainId));
+        groupBy.execute();
+        Map<Record, Result<Record>> intoGroups = groupBy.getResult().intoGroups(Tables.USER.fields());
+        for (Entry<Record, Result<Record>> userRecord : intoGroups.entrySet()) {
+            User user = userRecord.getKey().into(User.class);
+
+            result.put(user, userRecord.getValue().into(Domainrole.class));
+        }
+        return result;
+    }
+    
+    @Override
+    public List<User> findUsersNotInDomain(int domainId) {
+        return dsl
+                .select()
+                .from(USER)
+                .where(USER.ID.notIn(dsl.selectDistinct(USER_X_DOMAIN_X_DOMAINROLE.USER_ID)
+                        .from(USER_X_DOMAIN_X_DOMAINROLE).where(USER_X_DOMAIN_X_DOMAINROLE.DOMAIN_ID.eq(domainId))))
+                .fetchInto(User.class);
+    }
+    
 }

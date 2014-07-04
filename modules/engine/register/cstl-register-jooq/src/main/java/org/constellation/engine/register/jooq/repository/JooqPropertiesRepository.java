@@ -18,13 +18,13 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
-import static org.constellation.engine.register.jooq.Tables.PROPERTIES;
+import static org.constellation.engine.register.jooq.Tables.PROPERTY;
 
 import java.util.List;
 
 import org.constellation.engine.register.Property;
 import org.constellation.engine.register.jooq.Tables;
-import org.constellation.engine.register.jooq.tables.records.PropertiesRecord;
+import org.constellation.engine.register.jooq.tables.records.PropertyRecord;
 import org.constellation.engine.register.repository.PropertyRepository;
 import org.jooq.DeleteConditionStep;
 import org.jooq.Record1;
@@ -32,52 +32,52 @@ import org.jooq.SelectQuery;
 import org.springframework.stereotype.Component;
 
 @Component
-public class JooqPropertiesRepository extends AbstractJooqRespository<PropertiesRecord, Property> implements
+public class JooqPropertiesRepository extends AbstractJooqRespository<PropertyRecord, Property> implements
         PropertyRepository {
 
     
     public JooqPropertiesRepository() {
-        super(Property.class, PROPERTIES);
+        super(Property.class, PROPERTY);
     }
     
 
     @Override
     public Property findOne(String key) {
-        SelectQuery<PropertiesRecord> selectQuery = dsl.selectQuery(PROPERTIES);
-        selectQuery.addConditions(PROPERTIES.KEY.equal(key));
-        PropertiesRecord fetchOne = dsl.fetchOne(selectQuery);
+        SelectQuery<PropertyRecord> selectQuery = dsl.selectQuery(PROPERTY);
+        selectQuery.addConditions(PROPERTY.KEY.equal(key));
+        PropertyRecord fetchOne = dsl.fetchOne(selectQuery);
         return maptoDTO(fetchOne);
     }
 
     @Override
     public List<? extends Property> findIn(List<String> keys) {
-        SelectQuery<PropertiesRecord> selectQuery = dsl.selectQuery(PROPERTIES);
-        selectQuery.addConditions(PROPERTIES.KEY.in(keys));
+        SelectQuery<PropertyRecord> selectQuery = dsl.selectQuery(PROPERTY);
+        selectQuery.addConditions(PROPERTY.KEY.in(keys));
         return mapResult(selectQuery);
     }
 
     @Override
     public void save(Property prop) {
-        PropertiesRecord newRecord = dsl.newRecord(PROPERTIES, prop);
+        PropertyRecord newRecord = dsl.newRecord(PROPERTY, prop);
         newRecord.store();
     }
 
     @Override
     public List<? extends Property> startWith(String string) {
-        SelectQuery<PropertiesRecord> selectQuery = dsl.selectQuery(Tables.PROPERTIES);
-        selectQuery.addConditions(Tables.PROPERTIES.KEY.like((string)));
+        SelectQuery<PropertyRecord> selectQuery = dsl.selectQuery(Tables.PROPERTY);
+        selectQuery.addConditions(Tables.PROPERTY.KEY.like((string)));
         return selectQuery.fetch().into(Property.class);
     }
 
     @Override
     public void delete(Property property) {
-        DeleteConditionStep<PropertiesRecord> deleteConditionStep = dsl.delete(PROPERTIES).where(
-                PROPERTIES.KEY.eq(property.getKey()));
+        DeleteConditionStep<PropertyRecord> deleteConditionStep = dsl.delete(PROPERTY).where(
+                PROPERTY.KEY.eq(property.getKey()));
         deleteConditionStep.execute();
 
     }
 
-    private Property maptoDTO(PropertiesRecord propertiesRecord) {
+    private Property maptoDTO(PropertyRecord propertiesRecord) {
         if (propertiesRecord == null)
             return null;
         Property Property = new Property();
@@ -88,10 +88,16 @@ public class JooqPropertiesRepository extends AbstractJooqRespository<Properties
 
     @Override
     public String getValue(String key, String defaultValue) {
-        Record1<String> fetchOne = dsl.select(PROPERTIES.VALUE).from(PROPERTIES).where(PROPERTIES.KEY.eq(key)).fetchOne();
+        Record1<String> fetchOne = dsl.select(PROPERTY.VALUE).from(PROPERTY).where(PROPERTY.KEY.eq(key)).fetchOne();
         if (fetchOne == null)
             return defaultValue;
         return fetchOne.value1();
     }
+
+
+   
+
+
+   
 
 }

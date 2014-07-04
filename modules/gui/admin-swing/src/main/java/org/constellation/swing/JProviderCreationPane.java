@@ -19,23 +19,26 @@
 package org.constellation.swing;
 
 import java.awt.Component;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
-import org.constellation.admin.service.ConstellationServer;
+import javax.xml.stream.XMLStreamException;
+import org.constellation.admin.service.ConstellationClient;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ProviderServiceReport;
 import org.constellation.configuration.ProvidersReport;
+import org.geotoolkit.feature.Property;
 import org.geotoolkit.gui.swing.propertyedit.JFeatureOutLine;
 import org.geotoolkit.parameter.Parameters;
 import org.jdesktop.swingx.combobox.ListComboBoxModel;
-import org.geotoolkit.feature.Property;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -43,27 +46,31 @@ import org.opengis.parameter.ParameterValueGroup;
  */
 public class JProviderCreationPane extends javax.swing.JPanel {
 
-    private final ConstellationServer cstl;
+    private final ConstellationClient serverV2;
     private final JFeatureOutLine guiParameterEditor = new JFeatureOutLine();
 
     /**
      * Creates new form JProviderCreationPane
      */
-    public JProviderCreationPane(final ConstellationServer cstl) {
-        this.cstl = cstl;
+    public JProviderCreationPane(final ConstellationClient serverV2) {
+        this.serverV2 = serverV2;
         initComponents();
 
         guiType.setRenderer(new DataRenderer());
         guiSubType.setRenderer(new DataRenderer());
         guiParameters.setViewportView(guiParameterEditor);
 
-        final List<Object> services = new ArrayList<Object>();
+        final List<Object> services = new ArrayList<>();
         services.add("-");
-        final ProvidersReport report = cstl.providers.listProviders();
-        for(ProviderServiceReport service : report.getProviderServices()){
-            services.add(service);
+        try {
+            final ProvidersReport report = serverV2.providers.listProviders();
+            for(ProviderServiceReport service : report.getProviderServices()){
+                services.add(service);
+            }
+            guiType.setModel(new ListComboBoxModel(services));
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
         }
-        guiType.setModel(new ListComboBoxModel(services));
     }
 
     public String getType(){
@@ -75,30 +82,35 @@ public class JProviderCreationPane extends javax.swing.JPanel {
 
     public ParameterValueGroup getParameters(){
 
-        final String type = getType();
-        final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup) cstl.providers.getServiceDescriptor(type);
-        ParameterValueGroup sources = sourceDesc.createValue();
-        sources.parameter("id").setValue(guiId.getText().trim());
-        sources.parameter("providerType").setValue(guiCategory.getSelectedItem());
-
-        final ParameterValueGroup params;
-        if(guiSubType.isEnabled()){
-            //we have a subtype
-            final ParameterDescriptorGroup desc = (ParameterDescriptorGroup) guiSubType.getSelectedItem();
-            params = guiParameterEditor.getEditedAsParameter(desc);
-            sources.groups("choice").get(0).values().add(params);
-
-        }else if(guiType.getSelectedItem() instanceof ProviderServiceReport){
-            final ProviderServiceReport rep = (ProviderServiceReport) guiType.getSelectedItem();
-            final ParameterDescriptorGroup desc = (ParameterDescriptorGroup) cstl.providers.getSourceDescriptor(rep.getType());
-            params = guiParameterEditor.getEditedAsParameter(desc);
-            Parameters.copy(params, sources.groups(params.getDescriptor().getName().getCode()).get(0));
-        }else{
-            //no type selected
-            return null;
+        try {
+            final String type = getType();
+            final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup) serverV2.providers.getServiceDescriptor(type);
+            ParameterValueGroup sources = sourceDesc.createValue();
+            sources.parameter("id").setValue(guiId.getText().trim());
+            sources.parameter("providerType").setValue(guiCategory.getSelectedItem());
+            
+            final ParameterValueGroup params;
+            if(guiSubType.isEnabled()){
+                //we have a subtype
+                final ParameterDescriptorGroup desc = (ParameterDescriptorGroup) guiSubType.getSelectedItem();
+                params = guiParameterEditor.getEditedAsParameter(desc);
+                sources.groups("choice").get(0).values().add(params);
+                
+            }else if(guiType.getSelectedItem() instanceof ProviderServiceReport){
+                final ProviderServiceReport rep = (ProviderServiceReport) guiType.getSelectedItem();
+                final ParameterDescriptorGroup desc = (ParameterDescriptorGroup) serverV2.providers.getSourceDescriptor(rep.getType());
+                params = guiParameterEditor.getEditedAsParameter(desc);
+                Parameters.copy(params, sources.groups(params.getDescriptor().getName().getCode()).get(0));
+            }else{
+                //no type selected
+                return null;
+            }
+            
+            return sources;
+        } catch (IOException |XMLStreamException | ClassNotFoundException ex ) {
+            Exceptions.printStackTrace(ex);
         }
-
-        return sources;
+        return null;
     }
 
     /**
@@ -200,24 +212,27 @@ public class JProviderCreationPane extends javax.swing.JPanel {
         guiSubType.setModel(new ListComboBoxModel(new ArrayList()));
 
         if (candidate instanceof ProviderServiceReport) {
-            final ProviderServiceReport report = (ProviderServiceReport) candidate;
-            final ParameterDescriptorGroup desc = (ParameterDescriptorGroup) cstl.providers.getSourceDescriptor(report.getType());
-
-            guiParameterEditor.setEdited((Property)null);
-
-            if("choice".equalsIgnoreCase(desc.getName().getCode())){
-                guiSubType.setModel(new ListComboBoxModel(desc.descriptors()));
-                guiLblSubType.setEnabled(true);
-                guiSubType.setEnabled(true);
-            }else{
-                guiLblSubType.setEnabled(false);
-                guiSubType.setEnabled(false);
-                guiParameterEditor.setEdited(desc.createValue());
+            try {
+                final ProviderServiceReport report = (ProviderServiceReport) candidate;
+                final ParameterDescriptorGroup desc = (ParameterDescriptorGroup) serverV2.providers.getSourceDescriptor(report.getType());
+                
+                guiParameterEditor.setEdited((Property)null);
+                
+                if("choice".equalsIgnoreCase(desc.getName().getCode())){
+                    guiSubType.setModel(new ListComboBoxModel(desc.descriptors()));
+                    guiLblSubType.setEnabled(true);
+                    guiSubType.setEnabled(true);
+                }else{
+                    guiLblSubType.setEnabled(false);
+                    guiSubType.setEnabled(false);
+                    guiParameterEditor.setEdited(desc.createValue());
+                }
+                
+                guiSubType.setSelectedIndex(-1);
+            } catch (IOException | XMLStreamException | ClassNotFoundException ex) {
+                Exceptions.printStackTrace(ex);
             }
-
-            guiSubType.setSelectedIndex(-1);
         }
-
     }//GEN-LAST:event_guiTypeItemStateChanged
 
     private void guiSubTypeItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_guiSubTypeItemStateChanged
@@ -271,9 +286,9 @@ public class JProviderCreationPane extends javax.swing.JPanel {
      * @param server
      * @return
      */
-    public static void showDialog(final ConstellationServer server){
+    public static void showDialog(final ConstellationClient serverV2){
 
-        final JProviderCreationPane pane = new JProviderCreationPane(server);
+        final JProviderCreationPane pane = new JProviderCreationPane(serverV2);
 
         final int res = JOptionPane.showOptionDialog(null, new Object[]{pane},
                 LayerRowModel.BUNDLE.getString("createProviderMsg"),
@@ -290,10 +305,14 @@ public class JProviderCreationPane extends javax.swing.JPanel {
                         LayerRowModel.BUNDLE.getString("invalidProviderNameFrameTitle"), JOptionPane.WARNING_MESSAGE);
             } else {
                 if(type != null && parameters != null) {
-                    //request server for creation. If it worked, a null value is returned.
-                    final AcknowlegementType response = server.providers.createProvider(type, parameters);
-                    if (response != null) {
-                        JOptionPane.showMessageDialog(null, response.getMessage(), response.getStatus(), JOptionPane.WARNING_MESSAGE);
+                    try {
+                        //request server for creation. If it worked, a null value is returned.
+                        final AcknowlegementType response = serverV2.providers.createProvider(type, parameters);
+                        if (response != null) {
+                            JOptionPane.showMessageDialog(null, response.getMessage(), response.getStatus(), JOptionPane.WARNING_MESSAGE);
+                        }
+                    } catch (IOException ex) {
+                        Exceptions.printStackTrace(ex);
                     }
                 }
             }

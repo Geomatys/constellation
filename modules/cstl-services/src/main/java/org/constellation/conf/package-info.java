@@ -21,6 +21,7 @@
  */
 /**
  * @author Olivier NOUGUIER
+ * Spring configuration.
  *
  */
 package org.constellation.conf;

@@ -28,7 +28,7 @@ import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import org.apache.sis.util.iso.DefaultNameFactory;
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
-import org.constellation.dto.Service;
+import org.constellation.dto.Details;
 import org.geotoolkit.inspire.xml.vs.ExtendedCapabilitiesType;
 import org.geotoolkit.service.ServiceTypeImpl;
 import org.geotoolkit.wms.xml.AbstractCapability;
@@ -65,6 +65,103 @@ import org.opengis.util.NameFactory;
 @Immutable
 public final class WMSConstant {
 
+    /**
+     * Request parameters.
+     */
+    public static final String GETMAP           = "GetMap";
+    public static final String MAP              = "Map";
+    public static final String GETFEATUREINFO   = "GetFeatureInfo";
+    public static final String GETCAPABILITIES  = "GetCapabilities";
+    public static final String DESCRIBELAYER    = "DescribeLayer";
+    public static final String GETLEGENDGRAPHIC = "GetLegendGraphic";
+    public static final String GETORIGFILE      = "GetOrigFile";
+    
+    /**
+     * WMS Query service
+     */
+    public static final String WMS_SERVICE = "WMS";
+
+    /**
+     * For backward compatibility with WMS 1.0.0, the request can be done with
+     * a value {@code capabilities}.
+     */
+    public static final String CAPABILITIES     = "Capabilities";
+
+    /** Parameter used in getMap, getLegendGraphic, getCapabilities */
+    public static final String KEY_FORMAT = "FORMAT";
+    /** Parameter used in getMap, describeLayer */
+    public static final String KEY_LAYERS = "LAYERS";
+    /** Parameter used in getOrigFile, getLegendGraphic */
+    public static final String KEY_LAYER = "LAYER";
+    /** Parameter used in getFeatureInfo */
+    public static final String KEY_QUERY_LAYERS = "QUERY_LAYERS";
+    /** Parameter used in getMap, getFeatureInfo */
+    public static final String KEY_CRS_V111 = "SRS";
+    /** Parameter used in getMap, getFeatureInfo */
+    public static final String KEY_CRS_V130 = "CRS";
+    /** Parameter used in getMap, getFeatureInfo */
+    public static final String KEY_BBOX = "BBOX";
+    /** Parameter used in getMap, getFeatureInfo */
+    public static final String KEY_ELEVATION = "ELEVATION";
+    /** Parameter used in getMap, getOrigFile, getFeatureInfo */
+    public static final String KEY_TIME = "TIME";
+    /** Parameter used in getMap, getFeatureInfo, getLegendGraphic */
+    public static final String KEY_WIDTH = "WIDTH";
+    /** Parameter used in getMap, getFeatureInfo, getLegendGraphic */
+    public static final String KEY_HEIGHT = "HEIGHT";
+    /** Parameter used in getMap */
+    public static final String KEY_BGCOLOR = "BGCOLOR";
+    /** Parameter used in getMap */
+    public static final String KEY_TRANSPARENT = "TRANSPARENT";
+    /** Parameter used in getMap */
+    public static final String KEY_STYLES = "STYLES";
+    /** Parameter used in getLegendGraphic */
+    public static final String KEY_STYLE = "STYLE";
+    /** Parameter used in getMap,getLegendGraphic */
+    public static final String KEY_SLD = "SLD";
+    /** Parameter used in getMap, getLegendGraphic */
+    public static final String KEY_SLD_VERSION = "SLD_VERSION";
+    /** Parameter used in getLegendGraphic */
+    public static final String KEY_FEATURETYPE = "FEATURETYPE";
+    /** Parameter used in getLegendGraphic */
+    public static final String KEY_COVERAGE = "COVERAGE";
+    /** Parameter used in getLegendGraphic */
+    public static final String KEY_RULE = "RULE";
+    /** Parameter used in getLegendGraphic */
+    public static final String KEY_SCALE = "SCALE";
+    /** Parameter used in getLegendGraphic */
+    public static final String KEY_SLD_BODY = "SLD_BODY";
+    /** Parameter used in getMap,getLegendGraphic */
+    public static final String KEY_REMOTE_OWS_TYPE = "REMOTE_OWS_TYPE";
+    /** Parameter used in getMap,getLegendGraphic */
+    public static final String KEY_REMOTE_OWS_URL = "REMOTE_OWS_URL";
+    /** Parameter used in getFeatureInfo */
+    public static final String KEY_I_V130 = "I";
+    /** Parameter used in getFeatureInfo */
+    public static final String KEY_J_V130 = "J";
+    /** Parameter used in getFeatureInfo */
+    public static final String KEY_I_V111 = "X";
+    /** Parameter used in getFeatureInfo */
+    public static final String KEY_J_V111 = "Y";
+    /** Parameter used in getFeatureInfo */
+    public static final String KEY_INFO_FORMAT= "INFO_FORMAT";
+    /** Parameter used in getFeatureInfo */
+    public static final String KEY_FEATURE_COUNT = "FEATURE_COUNT";
+    /** Parameter used in getFeatureInfo */
+    public static final String KEY_GETMETADATA = "GetMetadata";
+    /** Parameter used in getMap */
+    public static final String KEY_AZIMUTH = "AZIMUTH";
+    /** Parameter used in GetCapabilities, for backward compatibility with WMS 1.0.0 */
+    public static final String KEY_WMTVER = "WMTVER";
+    /** Parameter used to store additional parameters from the query, the value object is a MultiValueMap */
+    public static final String KEY_EXTRA_PARAMETERS = "EXTRA";
+    /** Parameter INSPIRE used to choose the language of the capabilities document */
+    public static final String KEY_LANGUAGE = "LANGUAGE";
+    
+    public static final String KEY_EXCEPTIONS = "EXCEPTIONS";
+    
+    public static final String EXCEPTIONS_INIMAGE = "INIMAGE";
+    
     private WMSConstant() {}
 
     public static Request createRequest130(final List<String> gfi_mimetypes){
@@ -137,7 +234,7 @@ public final class WMSConstant {
      * @param metadata the service metadata
      * @return the service base capabilities
      */
-    public static AbstractWMSCapabilities createCapabilities(final String version, final Service metadata) {
+    public static AbstractWMSCapabilities createCapabilities(final String version, final Details metadata) {
         ensureNonNull("metadata", metadata);
         ensureNonNull("version",  version);
 

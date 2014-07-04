@@ -3,7 +3,7 @@
     <gml:boundedBy>
         <gml:Envelope srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:4326">
             <gml:lowerCorner>42.387988622819975 -4.244083878356522</gml:lowerCorner>
-            <gml:upperCorner>43.46788242438395 -4.14498462789604</gml:upperCorner>
+            <gml:upperCorner>43.467882424383944 -4.14498462789604</gml:upperCorner>
         </gml:Envelope>
     </gml:boundedBy>
     <gml:featureMember>
@@ -38,7 +38,7 @@
             </sml:keywords>
             <sml:location>
                 <gml:Point srsName="urn:ogc:def:crs:epsg:EPSG_VERSION:4326">
-                    <gml:pos>43.46788242438395 -4.244083878356522</gml:pos>
+                    <gml:pos>43.467882424383944 -4.244083878356522</gml:pos>
                 </gml:Point>
             </sml:location>
             <sml:phenomenons>time</sml:phenomenons>

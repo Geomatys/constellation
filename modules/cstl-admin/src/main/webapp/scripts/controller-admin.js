@@ -212,6 +212,9 @@ cstlAdminApp.controller('UserDetailsController', ['$scope', '$modalInstance', 'G
             }, 400)
         };
 
+        
+        
+        
         $scope.save = function(){
             var userResource = new UserResource($scope.user);
             if(isUpdate)
@@ -276,7 +279,7 @@ cstlAdminApp.controller('DomainController', ['$scope', '$modal', 'DomainResource
         $scope.members = dataNotReady;
         $scope.deleteDomain = dataNotReady;
 
-        DomainResource.query({withMembers:true}, function(domains){
+        DomainResource.query(function(domains){
 
             $scope.domains = domains;
 
@@ -376,6 +379,22 @@ cstlAdminApp.controller('DomainMembersController', ['$scope', '$routeParams', 'D
         DomainResource.members({id: $routeParams.domainId}, function(members){
             $scope.members = members
         })
+        
+        $scope.changeDomainRoles = function(user) {
+            $modal.open({
+                templateUrl: 'views/admin/domain/changeUserRoles.html',
+                controller: 'DomainChangeUserRolesController',
+                resolve: {
+                    'domain': function(){ return $scope.domain},
+                    'user': function(){ return angular.copy(user)},
+                    'allDomainRoles': function(){return DomainRoleResource.query().$promise}
+                }
+            }).result.then(function(domain){
+                    DomainResource.members({id: $routeParams.domainId}, function(members){
+                        $scope.members = members
+                    })
+                });
+        }
 
         $scope.addMembers = function(i) {
             $modal.open({
@@ -423,6 +442,31 @@ cstlAdminApp.controller('DomainAddMembersController', ['$scope', '$modalInstance
 
     }
 ]);
+
+//
+// User domainrole in a given domain management.
+//
+cstlAdminApp.controller('DomainChangeUserRolesController', ['$scope', '$modalInstance', 'domain', 'user', 'allDomainRoles', 'DomainRoleResource', 'DomainResource',
+  function ($scope, $modalInstance, domain, user, allDomainRoles, DomainRoleResource, DomainResource) {
+    $scope.domain = domain;
+    $scope.user = user;
+    $scope.allDomainRoles = allDomainRoles;
+    
+    $scope.close = function() {
+      $modalInstance.dismiss('close');
+    }
+
+    $scope.save = function(){
+      var roleIds = [];
+      for(var i in $scope.user.domainRoles){
+        roleIds[roleIds.length] = $scope.user.domainRoles[i].id;
+      }
+      DomainResource.updateMemberInDomain({userId: user.id, domainId: $scope.domain.id}, roleIds, function(){
+         $modalInstance.close(user);
+
+      });
+    };
+}]);
 
 cstlAdminApp.controller('DomainRoleController', ['$scope', '$modal', '$growl', '$translate', 'DomainRoleResource', 'PermissionService',
     function ($scope, $modal, $growl, $translate, DomainRoleResource, PermissionService) {

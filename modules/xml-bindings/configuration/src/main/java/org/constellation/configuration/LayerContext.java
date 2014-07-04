@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import javax.xml.bind.annotation.*;
 
-import org.geotoolkit.gui.swing.tree.Trees;
 import java.util.Objects;
 
 /**
@@ -41,13 +40,13 @@ public class LayerContext extends AbstractConfigurationObject {
     @XmlAttribute
     private DataSourceType implementation;
 
-    private Layers layers;
+    private Layer mainLayer;
 
     private String security;
 
     private Languages supportedLanguages;
 
-    private final Map<String, String> customParameters = new HashMap<String, String>();
+    private final Map<String, String> customParameters = new HashMap<>();
 
     @XmlElementWrapper(name="featureInfos")
     @XmlElement(name="FeatureInfo")
@@ -57,74 +56,15 @@ public class LayerContext extends AbstractConfigurationObject {
 
     }
 
-    public LayerContext(final Layers layers) {
-        this.layers = layers;
-    }
-
-    public LayerContext(final Layers layers, final String security) {
-        this.layers = layers;
-        this.security = security;
-    }
-
-    /**
-     * @return the layers
-     */
-    public List<Source> getLayers() {
-        if (layers == null) {
-            layers = new Layers();
-            return layers.getSource();
-        } else {
-            return layers.getSource();
-        }
-    }
-
-
-    /**
-     * @param layers the layers to set
-     */
-    public void setLayers(final List<Source> layers) {
-        this.layers = new Layers(layers);
-    }
-
-    public boolean hasSource(final String sourceID) {
-        for (Source src : getLayers()) {
-            if (Objects.equals(src.getId(), sourceID)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public void removeSource(final String sourceID) {
-        for (Source src : getLayers()) {
-            if (Objects.equals(src.getId(), sourceID)) {
-                layers.getSource().remove(src);
-                return;
-            }
-        }
-    }
-
-    public List<String> getSourceIDs() {
-        final List<String> providerIds = new ArrayList<String>();
-        for (Source s : getLayers()) {
-            final String providerId = s.getId();
-            if (providerId != null && !providerIds.contains(providerId)) {
-                providerIds.add(providerId);
-            }
-        }
-        return providerIds;
-    }
-
     /**
      * @return the layers
      */
     public Layer getMainLayer() {
-        if (layers == null) {
-            layers = new Layers();
-            return layers.getMainLayer();
-        } else {
-            return layers.getMainLayer();
-        }
+        return mainLayer;
+    }
+    
+    public void setMainLayer(final Layer mainlayer) {
+        this.mainLayer = mainlayer;
     }
 
     /**
@@ -196,7 +136,6 @@ public class LayerContext extends AbstractConfigurationObject {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-        sb.append(Trees.toString("LayerContext", getLayers()));
         if (security != null && !security.isEmpty()) {
             sb.append("Security=").append(security);
         }
@@ -225,7 +164,7 @@ public class LayerContext extends AbstractConfigurationObject {
     public boolean equals(final Object obj) {
         if (obj instanceof LayerContext) {
             final LayerContext that = (LayerContext) obj;
-            return Objects.equals(this.layers, that.layers) &&
+            return Objects.equals(this.mainLayer, that.mainLayer) &&
                    Objects.equals(this.security, that.security) &&
                    Objects.equals(this.customParameters, that.customParameters) &&
                    Objects.equals(this.supportedLanguages, that.supportedLanguages)&&
@@ -237,7 +176,7 @@ public class LayerContext extends AbstractConfigurationObject {
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 97 * hash + (this.layers != null ? this.layers.hashCode() : 0);
+        hash = 97 * hash + (this.mainLayer != null ? this.mainLayer.hashCode() : 0);
         hash = 97 * hash + (this.security != null ? this.security.hashCode() : 0);
         hash = 97 * hash + (this.customParameters != null ? this.customParameters.hashCode() : 0);
         hash = 97 * hash + (this.supportedLanguages != null ? this.supportedLanguages.hashCode() : 0);

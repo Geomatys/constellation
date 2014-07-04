@@ -28,18 +28,11 @@ import com.vividsolutions.jts.geom.Polygon;
 import java.awt.*;
 
 import org.apache.sis.storage.DataStoreException;
-import org.constellation.ServiceDef.Specification;
-import org.constellation.admin.ConfigurationEngine;
-import org.constellation.admin.dao.LayerRecord;
 import org.constellation.configuration.ConfigProcessException;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Instance;
-import org.constellation.configuration.Layer;
-import org.constellation.configuration.LayerContext;
-import org.constellation.configuration.Source;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.*;
-import org.constellation.map.featureinfo.FeatureInfoUtilities;
 import org.constellation.ogc.configuration.OGCConfigurer;
 import org.constellation.process.service.AddLayerToMapServiceDescriptor;
 import org.constellation.provider.DataProvider;
@@ -48,9 +41,9 @@ import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviders;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.util.DataReference;
+import org.constellation.admin.StyleBusiness;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.LayerProviders;
-import org.constellation.ws.rs.MapUtilities;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.process.ProcessDescriptor;
@@ -74,20 +67,24 @@ import org.opengis.style.RasterSymbolizer;
 import org.opengis.style.ShadedRelief;
 import org.opengis.style.Symbolizer;
 
+import javax.inject.Inject;
 import javax.measure.unit.NonSI;
 import javax.measure.unit.Unit;
+
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
-import javax.xml.namespace.QName;
+
+import org.constellation.process.ConstellationProcessFactory;
+import org.geotoolkit.process.ProcessFinder;
 
 import static org.geotoolkit.style.StyleConstants.DEFAULT_CATEGORIZE_LOOKUP;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_DESCRIPTION;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_FALLBACK;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_GEOM;
 import static org.geotoolkit.style.StyleConstants.LITERAL_ONE_FLOAT;
+import org.opengis.util.NoSuchIdentifierException;
 
 /**
  * {@link org.constellation.configuration.ServiceConfigurer} base for "map" services.
@@ -99,16 +96,27 @@ import static org.geotoolkit.style.StyleConstants.LITERAL_ONE_FLOAT;
  * @since 0.9
  */
 public class MapConfigurer extends OGCConfigurer {
+    
+    @Inject
+    StyleBusiness styleBusiness;
+    
+    @Inject
+    LayerBusiness layerBusiness;
 
     /**
-     * Create a new {@link MapConfigurer} instance.
+     * Returns a Constellation {@link ProcessDescriptor} from its name.
      *
-     * @param specification  the target service specification
+     * @param name the process descriptor name
+     * @return a {@link ProcessDescriptor} instance
      */
-    public MapConfigurer(final Specification specification) {
-        super(specification, LayerContext.class, "layerContext.xml");
+    protected ProcessDescriptor getProcessDescriptor(final String name) {
+        try {
+            return ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, name);
+        } catch (NoSuchIdentifierException ex) { // unexpected
+            throw new IllegalStateException("Unexpected error has occurred", ex);
+        }
     }
-
+    
     /**
      * Adds a new layer to a "map" service instance.
      *
@@ -116,8 +124,9 @@ public class MapConfigurer extends OGCConfigurer {
      * @throws TargetNotFoundException if the service with specified identifier does not exist
      * @throws ConfigurationException if the operation has failed for any reason
      */
+    @Deprecated
     public void addLayer(final AddLayer addLayerData) throws ConfigurationException {
-        this.ensureExistingInstance(addLayerData.getServiceId());
+        serviceBusiness.ensureExistingInstance(addLayerData.getServiceType(), addLayerData.getServiceId());
 
         final DataProvider provider = DataProviders.getInstance().getProvider(addLayerData.getProviderId());
         final String namespace;
@@ -131,6 +140,7 @@ public class MapConfigurer extends OGCConfigurer {
         // Set layer provider reference.
         final DataReference layerProviderReference = DataReference.createProviderDataReference(DataReference.PROVIDER_LAYER_TYPE, addLayerData.getProviderId(), layerId);
 
+        
         // Set style provider reference.
         DataReference styleProviderReference;
         try {
@@ -153,16 +163,16 @@ public class MapConfigurer extends OGCConfigurer {
         }
 
         // Declare the style as "applicable" for the layer data.
-        try {
-            final QName layerID = new QName(layerProviderReference.getLayerId().getNamespaceURI(), layerProviderReference.getLayerId().getLocalPart());
-            StyleProviderConfig.linkToData(
-                    styleProviderReference.getProviderId(),
-                    styleProviderReference.getLayerId().getLocalPart(),
-                    layerProviderReference.getProviderId(),
-                    layerID);
-        } catch (ConfigurationException ex) {
-            LOGGER.log(Level.WARNING, "Error when associating layer default style to the layer source data.", ex);
-        }
+//        try {
+//            final QName layerID = new QName(layerProviderReference.getLayerId().getNamespaceURI(), layerProviderReference.getLayerId().getLocalPart());
+//            styleBusiness.linkToData(
+//                    styleProviderReference.getProviderId(),
+//                    styleProviderReference.getLayerId().getLocalPart(),
+//                    layerProviderReference.getProviderId(),
+//                    layerID);
+//        } catch (ConfigurationException ex) {
+//            LOGGER.log(Level.WARNING, "Error when associating layer default style to the layer source data.", ex);
+//        }
 
         // Build descriptor.
         final ProcessDescriptor desc = getProcessDescriptor("service.add_layer");
@@ -240,168 +250,12 @@ public class MapConfigurer extends OGCConfigurer {
     }
 
     /**
-     * Extracts and returns the list of {@link Layer}s available on a "map" service.
-     *
-     * @param identifier the service identifier
-     * @return the {@link Layer} list
-     * @throws TargetNotFoundException if the service with specified identifier does not exist
-     * @throws ConfigurationException if the operation has failed for any reason
-     */
-    public List<Layer> getLayers(final String identifier) throws ConfigurationException {
-        this.ensureExistingInstance(identifier);
-
-        // Extracts the layer list from service configuration.
-        final LayerContext layerContext = (LayerContext) this.getInstanceConfiguration(identifier);
-        List<Layer> layers = MapUtilities.getConfigurationLayers(layerContext, null, null);
-
-        for (Layer layer : layers) {
-            final LayerRecord record = ConfigurationEngine.getLayer(identifier, this.specification, layer.getName());
-            if (record != null) {
-                layer.setDate(record.getDate());
-                layer.setOwner(record.getOwnerLogin());
-            }
-         }
-
-        return layers;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
-    public Instance getInstance(String identifier) throws ConfigurationException {
-        final Instance instance = super.getInstance(identifier);
-        instance.setLayersNumber(getLayers(identifier).size());
+    public Instance getInstance(String spec, String identifier) throws ConfigurationException {
+        final Instance instance = super.getInstance(spec, identifier);
+        instance.setLayersNumber(layerBusiness.getLayers(spec, identifier, null).size());
         return instance;
-    }
-    /**
-     * {@inheritDoc}
-     * Add default FeatureInfoFormat for LayerContext configuration.
-     */
-    @Override
-    public void createInstance(String identifier, Service metadata, Object configuration) throws ConfigurationException {
-
-        if (configuration == null) {
-            configuration = new LayerContext();
-            ((LayerContext)configuration).setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
-        }
-
-        super.createInstance(identifier, metadata, configuration);
-    }
-
-    /**
-     * Remove a layer from a service.
-     *
-     * @param serviceId the service identifier
-     * @param layerId the layer to remove
-     * @throws ConfigurationException
-     */
-    public void removeLayer(final String serviceId, final QName layerId) throws ConfigurationException {
-        try {
-            final LayerContext layerContext = (LayerContext) ConfigurationEngine.getConfiguration(specification.name(), serviceId);
-            final List<Source> sources = layerContext.getLayers();
-            QName name = null;
-            boolean found = false;
-
-            for (Source source : sources) {
-                List<Layer> layers = source.getInclude();
-                for (Layer layer : layers) {
-                    if(layer.getName().equals(layerId)){
-                        name = layer.getName();
-                        layers.remove(layer);
-                        found = true;
-                        break;
-                    }
-                }
-                if(found){
-                    break;
-                }
-            }
-
-            if(found){
-                ConfigurationEngine.storeConfiguration(specification.name(), serviceId, layerContext);
-                ConfigurationEngine.deleteLayer(serviceId, specification, name);
-                restartInstance(serviceId, true);
-            }
-
-        } catch (Exception e) {
-            throw new ConfigurationException("Error when trying to remove a layer from the service "+ serviceId, e);
-        }
-    }
-
-    /**
-     * Update layer style for the given service.
-     * @param serviceId
-     * @param layerId
-     * @param spId
-     * @param styleName
-     * @throws ConfigurationException
-     */
-    public void updateLayerStyle(final String serviceId, final String layerId, final String spId, final String styleName) throws ConfigurationException {
-        try {
-            final LayerContext layerContext = (LayerContext) ConfigurationEngine.getConfiguration(specification.name(), serviceId);
-            final List<Source> sources = layerContext.getLayers();
-            boolean found = false;
-
-            for (Source source : sources) {
-                List<Layer> layers = source.getInclude();
-                for (Layer layer : layers) {
-                    if (layer.getName().getLocalPart().equals(layerId)) {
-                        layer.setStyles(Collections.singletonList(DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, spId, styleName)));
-                        found = true;
-                        break;
-                    }
-                }
-                if(found){
-                    break;
-                }
-            }
-
-            if(found){
-                ConfigurationEngine.storeConfiguration(specification.name(), serviceId, layerContext);
-                restartInstance(serviceId, true);
-            }
-
-        } catch (Exception e) {
-            throw new ConfigurationException("Error when trying to remove a layer from the service "+ serviceId, e);
-        }
-    }
-
-    /**
-     * Remove layer style for the given service.
-     * @param serviceId
-     * @param layerId
-     * @param spId
-     * @param styleName
-     * @throws ConfigurationException
-     */
-    public void removeLayerStyle(final String serviceId, final String layerId, final String spId, final String styleName) throws ConfigurationException {
-        try {
-            final LayerContext layerContext = (LayerContext) ConfigurationEngine.getConfiguration(specification.name(), serviceId);
-            final List<Source> sources = layerContext.getLayers();
-            boolean found = false;
-
-            for (Source source : sources) {
-                List<Layer> layers = source.getInclude();
-                for (Layer layer : layers) {
-                    if (layer.getName().getLocalPart().equals(layerId)) {
-                        layer.setStyles(new ArrayList<DataReference>());
-                        found = true;
-                        break;
-                    }
-                }
-                if(found){
-                    break;
-                }
-            }
-
-            if(found){
-                ConfigurationEngine.storeConfiguration(specification.name(), serviceId, layerContext);
-                restartInstance(serviceId, true);
-            }
-
-        } catch (Exception e) {
-            throw new ConfigurationException("Error when trying to remove a layer from the service "+ serviceId, e);
-        }
     }
 }

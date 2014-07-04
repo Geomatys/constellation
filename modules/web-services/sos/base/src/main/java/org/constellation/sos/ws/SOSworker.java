@@ -20,7 +20,6 @@ package org.constellation.sos.ws;
 
 // JDK dependencies
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.*;
@@ -35,13 +34,13 @@ import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.MonolineFormatter;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef;
-import org.constellation.admin.ConfigurationEngine;
 
 import static org.constellation.api.QueryConstants.*;
 import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
-import org.constellation.dto.Service;
+import org.constellation.dto.Details;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.security.SecurityManagerHolder;
@@ -304,11 +303,11 @@ public class SOSworker extends AbstractWorker {
         // Database configuration
         try {
                 
-            final Object object = ConfigurationEngine.getConfiguration("SOS", id);
+            final Object object = serviceBusiness.getConfiguration("sos", id);
             if (object instanceof SOSConfiguration) {
                 configuration = (SOSConfiguration) object;
             } else {
-                startError("The generic configuration file is malformed.", null);
+                startError("The configuration object is malformed or null.", null);
                 return;
             }
 
@@ -456,8 +455,8 @@ public class SOSworker extends AbstractWorker {
             startError("MetadataIOException while initializing the sensor reader/writer:\n" + ex.getMessage(), ex);
         } catch (CstlServiceException | DataStoreException ex) {
             startError(ex.getMessage(), ex);
-        } catch (FileNotFoundException ex) {
-            startError("The configuration file can't be found.", null);
+        } catch (ConfigurationException ex) {
+            startError("The configuration file can't be found.", ex);
         }
     }
     
@@ -559,7 +558,7 @@ public class SOSworker extends AbstractWorker {
         //we fill the cachedCapabilities if we have to
         LOGGER.info("adding capabilities document in cache");
         try {
-            Object object = ConfigurationEngine.getConfiguration("SOS", getId(), "cached-offerings.xml", SOSMarshallerPool.getInstance());
+            Object object = serviceBusiness.getExtraConfiguration("SOS", getId(), "cached-offerings.xml", SOSMarshallerPool.getInstance());
             
             if (object instanceof JAXBElement) {
                 object = ((JAXBElement)object).getValue();
@@ -569,7 +568,7 @@ public class SOSworker extends AbstractWorker {
             } else {
                 LOGGER.severe("cached capabilities file does not contains Capablities object.");
             }
-        } catch (FileNotFoundException ex) {
+        } catch (ConfigurationException ex) {
             // file can be missing
         }
     }
@@ -624,7 +623,7 @@ public class SOSworker extends AbstractWorker {
         }
 
         // we load the skeleton capabilities
-        final Service skeleton = getStaticCapabilitiesObject("SOS", null);
+        final Details skeleton = getStaticCapabilitiesObject("sos", null);
         final Capabilities skeletonCapabilities = SOSConstants.createCapabilities(currentVersion, skeleton);
         
 

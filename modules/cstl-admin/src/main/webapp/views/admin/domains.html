@@ -39,7 +39,7 @@
                         <td class="user-delete" style="width: 20px;"><a href="#/admin/domainmembers/{{domain.id}}"><span class="glyphicon glyphicon-user"></span></a></td>
                         <td ng-click="details($index)">{{domain.name}}</td>
                         <td ng-click="details($index)"><span>{{domain.description}}</span></td>
-                        <td class="user-delete" ng-click="deleteDomain($index)"><span class="glyphicon glyphicon-trash"></span></td>
+                        <td ng-hide="domain.system" class="user-delete" ng-click="deleteDomain($index)"><span  class="glyphicon glyphicon-trash"></span></td>
                     </tr>
                 </table>
             </div>

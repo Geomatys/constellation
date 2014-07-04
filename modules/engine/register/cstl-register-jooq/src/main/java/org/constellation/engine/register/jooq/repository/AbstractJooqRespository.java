@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
@@ -79,5 +80,8 @@ public abstract class AbstractJooqRespository<T extends Record, U> {
         return selectQuery.getResult().map(getDTOMapper());
     }
 
+    protected List<U> findBy(Condition condition) {
+        return dsl.select().from(table).where(condition).fetchInto(dtoClass);
+    }
    
 }

@@ -19,13 +19,16 @@
 package org.constellation.swing.action;
 
 import java.awt.Color;
+import java.io.IOException;
 import java.util.Map;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import org.constellation.ServiceDef;
 import org.constellation.configuration.Instance;
 import org.constellation.security.ActionPermissions;
 import org.constellation.swing.LayerRowModel;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -81,7 +84,11 @@ public class ServiceDeleteAction extends Action {
                     ,getDisplayName(),JOptionPane.YES_NO_OPTION);
             
             if(res == JOptionPane.YES_OPTION){
-                server.services.deleteInstance(type, inst.getIdentifier());
+                try {
+                    serverV2.services.delete(ServiceDef.Specification.valueOf(type), inst.getIdentifier());
+                } catch (IOException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
                 SwingUtilities.invokeLater(new Runnable() {
                    @Override
                    public void run() {

@@ -22,22 +22,26 @@ package org.constellation.metadata;
 
 import java.io.File;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Arrays;
-
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.test.utils.Order;
-import org.constellation.test.utils.TestRunner;
+import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.util.Util;
-
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.skos.xml.Concept;
 import org.geotoolkit.skos.xml.Value;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
-import org.geotoolkit.xml.AnchoredMarshallerPool;
 
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -49,23 +53,22 @@ import org.mdweb.sql.ThesaurusDatabaseCreator;
  *
  * @author Guilhem Legal (Geomatys)
  */
-@RunWith(TestRunner.class)
+@RunWith(SpringTestRunner.class)
 public class MDwebCSWworkerTest extends CSWworkerTest {
 
+    @Inject
+    private ServiceBusiness serviceBusiness;
+    
     private static final File dbDirectory = new File("MDCSWWorkerTestDatabase");
     private static final File dbTHDirectory = new File("MDCSWWorkerTestThesaurusDatabase");
+    
+    private static  String url;
+    
+    private static String thUrl;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-
-        final File configDir = ConfigurationEngine.setupTestEnvironement("MDCSWWorkerTest");
-
-        File CSWDirectory  = new File(configDir, "CSW");
-        CSWDirectory.mkdir();
-        final File instDirectory = new File(CSWDirectory, "default");
-        instDirectory.mkdir();
-
-        final String url = "jdbc:derby:" + dbDirectory.getPath().replace('\\','/');
+        url = "jdbc:derby:" + dbDirectory.getPath().replace('\\','/');
         DefaultDataSource ds = new DefaultDataSource(url + ";create=true");
 
         Connection con = ds.getConnection();
@@ -93,11 +96,11 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
         sr.run(Util.getResourceAsStream("org/constellation/sql/csw-data-9.sql"));
 
         LOGGER.info("Writing thesauri...");
-        final String thUrl = "jdbc:derby:" + dbTHDirectory.getPath().replace('\\','/');
+        thUrl = "jdbc:derby:" + dbTHDirectory.getPath().replace('\\','/');
         ThesaurusDatabaseCreator thCreator = new ThesaurusDatabaseCreator(dbTHDirectory);
         thCreator.createBaseStructureThesaurus();
-        
-         DefaultDataSource thds = new DefaultDataSource(thUrl + ";create=true");
+
+        DefaultDataSource thds = new DefaultDataSource(thUrl + ";create=true");
 
         final ThesaurusDatabaseWriter writer = new ThesaurusDatabaseWriter(thds, "default", true, "th:test", "Test thesaurus",
                 "various word used for Anchor", Arrays.asList(ISOLanguageCode.ENG), ISOLanguageCode.ENG);
@@ -121,22 +124,41 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
         writer.writeConcept(new Concept("SDN:L241:1:MEDATLAS", new Value("MEDATLAS ASCII", "en")));
         writer.writeConcept(new Concept("SDN:L231:3:EDMED", new Value("EDMED record", "en")));
         writer.writeConcept(new Concept("SDN:EDMERP::9585", new Value("OCEANOGRAPHIC DATA CENTER", "en")));
+    }
+    
+    @PostConstruct
+    public void setUp() {
+        SpringHelper.setApplicationContext(applicationContext);
+        try {
+            if (!serviceBusiness.getServiceIdentifiers("csw").contains("default")) {
+                final File configDir = ConfigurationEngine.setupTestEnvironement("MDCSWWorkerTest");
 
-        //we write the configuration file
-        final BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
-        Automatic configuration = new Automatic("mdweb", bdd);
-        configuration.putParameter("transactionSecurized", "false");
-        configuration.putParameter("shiroAccessible", "false");
-        final BDD thBdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", thUrl, "", "");
-        thBdd.setSchema("default");
-        configuration.setThesaurus(Arrays.asList(thBdd));
+                File CSWDirectory  = new File(configDir, "CSW");
+                CSWDirectory.mkdir();
+                final File instDirectory = new File(CSWDirectory, "default");
+                instDirectory.mkdir();
 
-        ConfigurationEngine.storeConfiguration("CSW", "default", configuration);
 
-        pool = EBRIMMarshallerPool.getInstance();
-        //fillPoolAnchor((AnchoredMarshallerPool) pool);
 
-        worker = new CSWworker("default");
+                //we write the configuration file
+                final BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
+                Automatic configuration = new Automatic("mdweb", bdd);
+                configuration.putParameter("transactionSecurized", "false");
+                configuration.putParameter("shiroAccessible", "false");
+                final BDD thBdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", thUrl, "", "");
+                thBdd.setSchema("default");
+                configuration.setThesaurus(Arrays.asList(thBdd));
+
+                serviceBusiness.create("csw", "default", configuration, null, null);
+
+                pool = EBRIMMarshallerPool.getInstance();
+                //fillPoolAnchor((AnchoredMarshallerPool) pool);
+
+                worker = new CSWworker("default");
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(MDwebCSWworkerTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @AfterClass
@@ -151,14 +173,6 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
             derbyLog.delete();
         }
         ConfigurationEngine.shutdownTestEnvironement("MDCSWWorkerTest");
-    }
-
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
     }
 
     /**

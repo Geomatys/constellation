@@ -25,7 +25,6 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.io.WKTWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -39,13 +38,8 @@ import java.util.logging.Level;
 import javax.imageio.spi.ServiceRegistry;
 import javax.xml.bind.JAXBException;
 import org.apache.sis.storage.DataStoreException;
-import org.constellation.ServiceDef.Specification;
-import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.*;
 import org.constellation.dto.SensorMLTree;
-import org.constellation.dto.Service;
-import org.constellation.generic.database.Automatic;
-import org.constellation.generic.database.BDD;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.ogc.configuration.OGCConfigurer;
 import org.constellation.sos.factory.OMFactory;
@@ -86,32 +80,10 @@ import static org.geotoolkit.sml.xml.SensorMLUtilities.*;
  */
 public class SOSConfigurer extends OGCConfigurer {
 
-    /**
-     * Create a new {@link SOSConfigurer} instance.
-     */
-    public SOSConfigurer() {
-        super(Specification.SOS, SOSConfiguration.class, "config.xml");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void createInstance(final String identifier, final Service metadata, Object configuration) throws ConfigurationException {
-        if (configuration == null) {
-            final SOSConfiguration baseConfig = new SOSConfiguration(new Automatic(null, new BDD()), new Automatic(null, new BDD()));
-            baseConfig.setObservationReaderType(DataSourceType.FILESYSTEM);
-            baseConfig.setObservationFilterType(DataSourceType.LUCENE);
-            baseConfig.setObservationWriterType(DataSourceType.FILESYSTEM);
-            baseConfig.setSMLType(DataSourceType.FILESYSTEM);
-            configuration = baseConfig;
-        }
-        super.createInstance(identifier, metadata, configuration);
-    }
 
     @Override
-    public Instance getInstance(String identifier) throws ConfigurationException {
-        final Instance instance = super.getInstance(identifier);
+    public Instance getInstance(final String spec, final String identifier) throws ConfigurationException {
+        final Instance instance = super.getInstance(spec, identifier);
         try {
             instance.setLayersNumber(getSensorIds(identifier).size());
         } catch (ConfigurationException ex) {
@@ -521,15 +493,13 @@ public class SOSConfigurer extends OGCConfigurer {
     protected SOSConfiguration getServiceConfiguration(final String id) throws ConfigurationException {
         try {
             // we get the SOS configuration file
-            final SOSConfiguration config = (SOSConfiguration) ConfigurationEngine.getConfiguration("SOS", id);
+            final SOSConfiguration config = (SOSConfiguration) serviceBusiness.getConfiguration("SOS", id);
             return config;
 
-        } catch (JAXBException ex) {
-            throw new ConfigurationException("JAXBexception while getting the SOS configuration for:" + id, ex.getMessage());
+        } catch (ConfigurationException ex) {
+            throw new ConfigurationException("ConfigurationException while getting the SOS configuration for:" + id, ex.getMessage());
         } catch (IllegalArgumentException ex) {
             throw new ConfigurationException("IllegalArgumentException: " + ex.getMessage());
-        } catch (FileNotFoundException ex) {
-            throw new ConfigurationException("Unable to find the configuration file");
         }
     }
 

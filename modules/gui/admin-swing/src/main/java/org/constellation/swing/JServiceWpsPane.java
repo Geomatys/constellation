@@ -41,13 +41,14 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import org.constellation.admin.service.ConstellationServer;
+import org.constellation.admin.service.ConstellationClient;
+import org.constellation.configuration.AbstractConfigurationObject;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.ProcessContext;
 import org.constellation.configuration.ProcessFactory;
 import static org.constellation.swing.JServiceEditionPane.ICON_EDIT;
-import org.geotoolkit.gui.swing.util.ActionCell;
 import org.geotoolkit.gui.swing.resource.IconBundle;
+import org.geotoolkit.gui.swing.util.ActionCell;
 import org.netbeans.swing.outline.DefaultOutlineModel;
 import org.netbeans.swing.outline.Outline;
 import org.netbeans.swing.outline.RenderDataProvider;
@@ -64,16 +65,16 @@ public class JServiceWpsPane extends JServiceEditionPane {
 
     private List<ProcessFactoryModel> fatoryModelModelList;
 
-    private final ConstellationServer server;
+    private final ConstellationClient serverV2;
     
     /**
      * Creates new form JServiceWpsPane
-     * @param server
+     * @param serverV2
      * @param configuration
      */
-    public JServiceWpsPane(final ConstellationServer server, final Object configuration) {
+    public JServiceWpsPane(final ConstellationClient serverV2, final Object configuration) {
         this.configuration = (configuration instanceof ProcessContext) ? (ProcessContext) configuration : null;
-        this.server = server;
+        this.serverV2 = serverV2;
         initComponents();
 
         guiProcessFactoryTable.setDefaultRenderer(ProcessFactoryRowModel.EditProcessFactory.class, new ActionCell.Renderer(ICON_EDIT));
@@ -86,7 +87,7 @@ public class JServiceWpsPane extends JServiceEditionPane {
 
                 if (value instanceof ProcessFactoryModel) {
                     final ProcessFactoryModel oldProcessFactoryModel = (ProcessFactoryModel) value;
-                    final  ProcessFactoryModel updateProcessFactoryModel = JEditProcessFactoryPane.showDialog(server, oldProcessFactoryModel);
+                    final  ProcessFactoryModel updateProcessFactoryModel = JEditProcessFactoryPane.showDialog(serverV2, oldProcessFactoryModel);
                     if (updateProcessFactoryModel != null) {
                         final int pos = fatoryModelModelList.indexOf(oldProcessFactoryModel);
                         fatoryModelModelList.remove(pos);
@@ -298,7 +299,7 @@ public class JServiceWpsPane extends JServiceEditionPane {
 
     private void guiAddProcessFactoryActionPerformed(ActionEvent evt) {//GEN-FIRST:event_guiAddProcessFactoryActionPerformed
 
-        final ProcessFactoryModel processFactoryModel = JEditProcessFactoryPane.showDialog(server, null);
+        final ProcessFactoryModel processFactoryModel = JEditProcessFactoryPane.showDialog(serverV2, null);
         if (processFactoryModel != null) {
             guiProcessFactoryTable.setEnabled(true);
             fatoryModelModelList.add(processFactoryModel);
@@ -331,7 +332,7 @@ public class JServiceWpsPane extends JServiceEditionPane {
     // End of variables declaration//GEN-END:variables
 
     @Override
-    public Object getConfiguration() {
+    public AbstractConfigurationObject getConfiguration() {
         updateConfiguration();
         return configuration;
     }

@@ -18,58 +18,23 @@
  */
 package org.constellation.wps.ws;
 
-import com.vividsolutions.jts.geom.Geometry;
-
-import org.constellation.ServiceDef;
-import org.constellation.configuration.*;
-import org.constellation.configuration.Process;
-import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.process.service.RestartServiceDescriptor;
-import org.constellation.provider.DataProvider;
-import org.constellation.provider.DataProviders;
-import org.constellation.wps.utils.WPSUtils;
-import org.constellation.wps.ws.rs.WPSService;
-import org.constellation.ws.AbstractWorker;
-import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.WSEngine;
-import org.constellation.dto.Service;
-import org.constellation.admin.ConfigurationEngine;
-import org.constellation.admin.SecurityManagerAdapter;
-import org.constellation.security.SecurityManagerHolder;
-import static org.constellation.wps.ws.WPSConstant.*;
-
 import static org.constellation.api.CommonConstants.DEFAULT_CRS;
-import static org.constellation.api.QueryConstants.*;
+import static org.constellation.api.QueryConstants.ACCEPT_VERSIONS_PARAMETER;
+import static org.constellation.api.QueryConstants.SERVICE_PARAMETER;
+import static org.constellation.api.QueryConstants.VERSION_PARAMETER;
+import static org.constellation.wps.ws.WPSConstant.IDENTIFER_PARAMETER;
+import static org.constellation.wps.ws.WPSConstant.LANGUAGE_PARAMETER;
+import static org.constellation.wps.ws.WPSConstant.WPS_1_0_0;
+import static org.constellation.wps.ws.WPSConstant.WPS_LANG;
+import static org.constellation.wps.ws.WPSConstant.WPS_SERVICE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.OPERATION_NOT_SUPPORTED;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.STORAGE_NOT_SUPPORTED;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
 
-import org.constellation.ws.Worker;
-import org.geotoolkit.geometry.isoonjts.GeometryUtils;
-import org.geotoolkit.gml.JTStoGeometry;
-import org.geotoolkit.ows.xml.v110.*;
-import org.geotoolkit.ows.xml.v110.ExceptionReport;
-import org.geotoolkit.parameter.ExtendedParameterDescriptor;
-import org.geotoolkit.parameter.Parameters;
-import org.geotoolkit.process.*;
-import org.geotoolkit.referencing.CRS;
-import org.apache.sis.util.ArgumentChecks;
-import org.geotoolkit.util.Exceptions;
-import org.geotoolkit.util.FileUtilities;
-import org.apache.sis.util.UnconvertibleObjectException;
-import org.geotoolkit.wps.converters.WPSConvertersUtils;
-import org.geotoolkit.wps.io.WPSIO;
-import org.geotoolkit.wps.io.WPSMimeType;
-import org.geotoolkit.wps.xml.WPSMarshallerPool;
-import org.geotoolkit.wps.xml.v100.*;
-import org.geotoolkit.wps.xml.v100.ExecuteResponse.ProcessOutputs;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-
-import org.apache.sis.xml.MarshallerPool;
-
-import javax.measure.converter.UnitConverter;
-import javax.measure.unit.Unit;
-import javax.xml.bind.JAXBException;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URL;
 import java.util.ArrayList;
@@ -86,19 +51,104 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 
-import org.opengis.parameter.ParameterValue;
-import org.opengis.coverage.grid.GridCoverage;
+import javax.measure.converter.UnitConverter;
+import javax.measure.unit.Unit;
+import javax.xml.bind.JAXBException;
+
+import org.apache.sis.util.ArgumentChecks;
+import org.apache.sis.util.UnconvertibleObjectException;
+import org.apache.sis.xml.MarshallerPool;
+import org.constellation.ServiceDef;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.SecurityManagerAdapter;
+import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.Process;
+import org.constellation.configuration.ProcessContext;
+import org.constellation.configuration.ProcessFactory;
+import org.constellation.configuration.WebdavContext;
+import org.constellation.dto.Details;
+import org.constellation.process.ConstellationProcessFactory;
+import org.constellation.process.service.RestartServiceDescriptor;
+import org.constellation.provider.DataProvider;
+import org.constellation.provider.DataProviders;
+import org.constellation.security.SecurityManagerHolder;
+import org.constellation.wps.utils.WPSUtils;
+import org.constellation.wps.ws.rs.WPSService;
+import org.constellation.ws.AbstractWorker;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.WSEngine;
+import org.constellation.ws.Worker;
 import org.geotoolkit.feature.ComplexAttribute;
 import org.geotoolkit.feature.Feature;
 import org.geotoolkit.feature.type.FeatureType;
+import org.geotoolkit.geometry.isoonjts.GeometryUtils;
+import org.geotoolkit.gml.JTStoGeometry;
+import org.geotoolkit.ows.xml.v110.AllowedValues;
+import org.geotoolkit.ows.xml.v110.AnyValue;
+import org.geotoolkit.ows.xml.v110.BoundingBoxType;
+import org.geotoolkit.ows.xml.v110.CodeType;
+import org.geotoolkit.ows.xml.v110.ExceptionReport;
+import org.geotoolkit.ows.xml.v110.LanguageStringType;
+import org.geotoolkit.ows.xml.v110.OperationsMetadata;
+import org.geotoolkit.ows.xml.v110.ServiceIdentification;
+import org.geotoolkit.ows.xml.v110.ServiceProvider;
+import org.geotoolkit.parameter.ExtendedParameterDescriptor;
+import org.geotoolkit.parameter.Parameters;
+import org.geotoolkit.process.AbstractProcess;
+import org.geotoolkit.process.ProcessDescriptor;
+import org.geotoolkit.process.ProcessException;
+import org.geotoolkit.process.ProcessFinder;
+import org.geotoolkit.process.ProcessingRegistry;
+import org.geotoolkit.referencing.CRS;
+import org.apache.sis.util.ArgumentChecks;
+import org.geotoolkit.util.Exceptions;
+import org.geotoolkit.util.FileUtilities;
+import org.apache.sis.util.UnconvertibleObjectException;
+import org.geotoolkit.wps.converters.WPSConvertersUtils;
+import org.geotoolkit.wps.io.WPSIO;
+import org.geotoolkit.wps.io.WPSMimeType;
+import org.geotoolkit.wps.xml.WPSMarshallerPool;
+import org.geotoolkit.wps.xml.v100.CRSsType;
+import org.geotoolkit.wps.xml.v100.ComplexDataType;
+import org.geotoolkit.wps.xml.v100.DataType;
+import org.geotoolkit.wps.xml.v100.DescribeProcess;
+import org.geotoolkit.wps.xml.v100.DocumentOutputDefinitionType;
+import org.geotoolkit.wps.xml.v100.Execute;
+import org.geotoolkit.wps.xml.v100.ExecuteResponse;
+import org.geotoolkit.wps.xml.v100.ExecuteResponse.ProcessOutputs;
+import org.geotoolkit.wps.xml.v100.GetCapabilities;
+import org.geotoolkit.wps.xml.v100.InputDescriptionType;
+import org.geotoolkit.wps.xml.v100.InputReferenceType;
+import org.geotoolkit.wps.xml.v100.InputType;
+import org.geotoolkit.wps.xml.v100.LiteralDataType;
+import org.geotoolkit.wps.xml.v100.LiteralInputType;
+import org.geotoolkit.wps.xml.v100.LiteralOutputType;
+import org.geotoolkit.wps.xml.v100.OutputDataType;
+import org.geotoolkit.wps.xml.v100.OutputDefinitionType;
+import org.geotoolkit.wps.xml.v100.OutputDefinitionsType;
+import org.geotoolkit.wps.xml.v100.OutputDescriptionType;
+import org.geotoolkit.wps.xml.v100.OutputReferenceType;
+import org.geotoolkit.wps.xml.v100.ProcessDescriptionType;
+import org.geotoolkit.wps.xml.v100.ProcessDescriptions;
+import org.geotoolkit.wps.xml.v100.ProcessFailedType;
+import org.geotoolkit.wps.xml.v100.ProcessOfferings;
+import org.geotoolkit.wps.xml.v100.ResponseDocumentType;
+import org.geotoolkit.wps.xml.v100.ResponseFormType;
+import org.geotoolkit.wps.xml.v100.StatusType;
+import org.geotoolkit.wps.xml.v100.SupportedCRSsType;
+import org.geotoolkit.wps.xml.v100.WPSCapabilitiesType;
+import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.geometry.Envelope;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.FactoryException;
 import org.opengis.util.NoSuchIdentifierException;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * WPS worker.Compute response of getCapabilities, DescribeProcess and Execute requests.
@@ -182,7 +232,7 @@ public class WPSWorker extends AbstractWorker {
     public WPSWorker(final String id) {
         super(id, ServiceDef.Specification.WPS);
         try {
-            final Object obj = ConfigurationEngine.getConfiguration("WPS", id);
+            final Object obj = serviceBusiness.getConfiguration("WPS", id);
             if (obj instanceof ProcessContext) {
                 context = (ProcessContext) obj;
                 applySupportedVersion();
@@ -192,12 +242,8 @@ public class WPSWorker extends AbstractWorker {
                 isStarted = false;
                 LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, id);
             }
-        } catch (JAXBException ex) {
-            startError = "JAXBExeception while unmarshalling the process context File";
-            isStarted = false;
-            LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, ex);
-        }  catch (FileNotFoundException ex) {
-            startError = "The configuration file processContext.xml has not been found";
+        } catch (ConfigurationException ex) {
+            startError = ex.getMessage();
             isStarted = false;
             LOGGER.log(Level.WARNING, "\nThe worker ({0}) is not working!\nCause: " + startError, id);
         } catch (CstlServiceException ex) {
@@ -370,8 +416,12 @@ public class WPSWorker extends AbstractWorker {
         super.destroy();
         //Delete recursively temporary directory.
         if (isTmpWebDav) {
-            FileUtilities.deleteDirectory(new File(webdavFolderPath));
-            ConfigurationEngine.deleteConfiguration("webdav", webdavName);
+            try {
+                FileUtilities.deleteDirectory(new File(webdavFolderPath));
+                serviceBusiness.delete("webdav", webdavName);
+            } catch (ConfigurationException ex) {
+                LOGGER.log(Level.WARNING, "Erro while deleting temporary webdav service", ex);
+            }
         }
     }
 
@@ -427,13 +477,13 @@ public class WPSWorker extends AbstractWorker {
 
         //configure webdav if not exist
         try {
-            ConfigurationEngine.getConfiguration("webdav", webdavName);
-        } catch (FileNotFoundException | JAXBException e) {
+            serviceBusiness.getConfiguration("webdav", webdavName);
+        } catch (ConfigurationException e) {
             final WebdavContext webdavCtx = new WebdavContext(webdavFolderPath);
             webdavCtx.setId(webdavName);
             try {
                 if (SecurityManagerHolder.getInstance().isAuthenticated()) {
-                    ConfigurationEngine.storeConfiguration("webdav", webdavName, webdavCtx, null);
+                    serviceBusiness.create("webdav", webdavName, webdavCtx, null, null);
                 } else {
                     try {
                         ConfigurationEngine.setSecurityManager(new SecurityManagerAdapter() {
@@ -442,8 +492,8 @@ public class WPSWorker extends AbstractWorker {
                                 return "admin";
                             }
                         });
-
-                        ConfigurationEngine.storeConfiguration("webdav", webdavName, webdavCtx, null);
+                        
+                        serviceBusiness.create("webdav", webdavName, webdavCtx, null, null);
                     } finally {
                         ConfigurationEngine.setSecurityManager(SecurityManagerHolder.getInstance());
                     }
@@ -451,7 +501,7 @@ public class WPSWorker extends AbstractWorker {
                 // /!\ CASE SENSITIVE /!\
                 final Worker worker = WSEngine.buildWorker("WEBDAV", webdavName);
                 WSEngine.addServiceInstance("WEBDAV", webdavName, worker);
-            } catch (JAXBException | IOException ex) {
+            } catch (ConfigurationException ex) {
                 LOGGER.log(Level.WARNING, "Error during WebDav configuration", ex);
                 return false;
             }
@@ -512,7 +562,7 @@ public class WPSWorker extends AbstractWorker {
             }
 
             // We unmarshall the static capabilities document.
-            final Service skeleton = getStaticCapabilitiesObject("WPS", null);
+            final Details skeleton = getStaticCapabilitiesObject("WPS", null);
             final WPSCapabilitiesType staticCapabilities = (WPSCapabilitiesType) WPSConstant.createCapabilities("1.0.0", skeleton);
 
             final ServiceIdentification si = staticCapabilities.getServiceIdentification();

@@ -31,19 +31,24 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
 import org.constellation.ServiceDef.Specification;
+import org.constellation.admin.ServiceBusiness;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.BriefNode;
 import org.constellation.configuration.BriefNodeList;
 import org.constellation.configuration.NotRunningServiceException;
-import org.constellation.configuration.ServiceConfigurer;
+import org.constellation.configuration.StringList;
+import org.constellation.dto.Details;
 import org.constellation.dto.ParameterValues;
-import org.constellation.metadata.configuration.CSWConfigurer;
 import org.constellation.dto.SimpleValue;
-import org.w3c.dom.Node;
-
+import org.constellation.generic.database.Automatic;
+import org.constellation.metadata.CSWworker;
+import org.constellation.metadata.configuration.CSWConfigurer;
 import static org.constellation.utils.RESTfulUtilities.ok;
+import org.constellation.ws.ServiceConfigurer;
+import org.constellation.ws.WSEngine;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.w3c.dom.Node;
 
 /**
  *
@@ -55,6 +60,9 @@ import static org.constellation.utils.RESTfulUtilities.ok;
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public class CSWServices {
 
+    @Autowired
+    protected ServiceBusiness serviceBusiness;
+    
     @POST
     @Path("{id}/index/refresh")
     public Response refreshIndex(final @PathParam("id") String id, final ParameterValues values) throws Exception {
@@ -62,8 +70,8 @@ public class CSWServices {
         final boolean forced     = values.getAsBoolean("FORCED");
         final CSWConfigurer conf = getConfigurer();
         final AcknowlegementType ack = conf.refreshIndex(id, asynchrone, forced);
-        if (asynchrone && ack.getStatus().equals("Sucess")) {
-            conf.restartInstance(id, false);
+        if (!asynchrone && ack.getStatus().equals("Success")) {
+            serviceBusiness.restart("CSW", id, true);
         }
         return ok(ack);
    }
@@ -86,9 +94,7 @@ public class CSWServices {
         return ok(getConfigurer().stopIndexation(id));
     }
 
-    /**
-     * TODO change fileName into dataType parameter
-     */
+    // TODO change fileName into dataType parameter
     @PUT
     @Path("{id}/records/{fileName}")
     public Response importRecord(final @PathParam("id") String id, final @PathParam("fileName") String fileName, final File record) throws Exception {
@@ -107,11 +113,34 @@ public class CSWServices {
     public Response removeMetadata(final @PathParam("id") String id, final @PathParam("metaID") String metaID) throws Exception {
         return ok(getConfigurer().removeRecords(id, metaID));
     }
+    
+    @DELETE
+    @Path("{id}/records")
+    public Response removeAllMetadata(final @PathParam("id") String id) throws Exception {
+        return ok(getConfigurer().removeAllRecords(id));
+    }
 
     @GET
     @Path("{id}/record/{metaID}")
     public Response getMetadata(final @PathParam("id") String id, final @PathParam("metaID") String metaID) throws Exception {
         return ok(getConfigurer().getMetadata(id, metaID));
+    }
+    
+    @GET
+    @Path("{id}/clearCache")
+    public Response clearCache(final @PathParam("id") String id) throws Exception {
+        final CSWworker worker = (CSWworker) WSEngine.getInstance("CSW", id);
+        if (worker != null) {
+            worker.clearCache();
+            return ok(AcknowlegementType.success("The CSW cache has been cleared"));
+        }
+        return ok(AcknowlegementType.failure("Unable to find a csw service " + id));
+    }
+    
+    @GET
+    @Path("{id}/record/exist/{metaID}")
+    public Response metadataExist(final @PathParam("id") String id, final @PathParam("metaID") String metaID) throws Exception {
+        return ok(getConfigurer().metadataExist(id, metaID));
     }
 
     @GET
@@ -132,6 +161,18 @@ public class CSWServices {
     @Path("types")
     public Response getCSWDatasourceType() throws Exception {
         return ok(getConfigurer().getAvailableCSWDataSourceType());
+    }
+    
+    @POST
+    @Path("{id}/federatedCatalog")
+    public Response setFederatedCatalog(final @PathParam("id") String id, StringList url) throws Exception {
+        final Details details = serviceBusiness.getInstanceDetails("csw", id, null);
+        final Automatic conf = (Automatic) serviceBusiness.getConfiguration("csw", id);
+        final List<String> urls = conf.getParameterList("CSWCascading");
+        urls.addAll(url.getList());
+        conf.setParameterList("CSWCascading", urls);
+        serviceBusiness.configure("csw", id, details, conf);
+        return ok(new AcknowlegementType("Success", "federated catalog added"));
     }
 
     private static CSWConfigurer getConfigurer() throws NotRunningServiceException {

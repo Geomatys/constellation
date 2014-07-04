@@ -27,47 +27,80 @@ import org.geotoolkit.wps.xml.v100.WPSCapabilitiesType;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.ProcessContext;
 import org.constellation.configuration.ProcessFactory;
 import org.constellation.configuration.Processes;
+import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.wps.ws.soap.WPSService;
 import org.constellation.ws.embedded.AbstractGrizzlyServer;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
+import org.junit.runner.RunWith;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.context.ContextConfiguration;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  * @since 0.9
  */
-public class WPSRequestTest  extends AbstractGrizzlyServer {
+@RunWith(SpringTestRunner.class)
+@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+public class WPSRequestTest  extends AbstractGrizzlyServer implements ApplicationContextAware {
+
+    protected ApplicationContext applicationContext;
+    
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
 
     private static final String WPS_GETCAPABILITIES ="request=GetCapabilities&service=WPS&version=1.0.0";
 
     private static final String WPS_GETCAPABILITIES2 ="request=GetCapabilities&service=WpS&version=1.0.0";
 
-    @BeforeClass
-    public static void initLayerList() throws Exception {
-        ConfigurationEngine.setupTestEnvironement("WPSRequestTest");
+    @Inject
+    private ServiceBusiness serviceBusiness;
+    
+    private static boolean initialized = false;
+    
+    @PostConstruct
+    public void initLayerList() {
+        SpringHelper.setApplicationContext(applicationContext);
+        if (!initialized) {
+            try {
+                ConfigurationEngine.setupTestEnvironement("WPSRequestTest");
+                serviceBusiness.deleteAll();
+                
+                final List<ProcessFactory> process = Arrays.asList(new ProcessFactory("jts", true));
+                final Processes processes = new Processes(process);
+                final ProcessContext config = new ProcessContext(processes);
+                config.getCustomParameters().put("shiroAccessible", "false");
 
-        final List<ProcessFactory> process = Arrays.asList(new ProcessFactory("jts", true));
-        final Processes processes = new Processes(process);
-        final ProcessContext config = new ProcessContext(processes);
-        config.getCustomParameters().put("shiroAccessible", "false");
+                serviceBusiness.create("wps", "default", config, null, null);
+                serviceBusiness.create("wps", "test",    config, null, null);
 
-        ConfigurationEngine.storeConfiguration("WPS", "default", config);
-        ConfigurationEngine.storeConfiguration("WPS", "test", config);
-
-        final Map<String, Object> map = new HashMap<>();
-        map.put("wps", new WPSService());
-        initServer(new String[] {
-            "org.constellation.wps.ws.rs",
-            "org.constellation.configuration.ws.rs",
-            "org.constellation.ws.rs.provider"}, map);
-        pool = WPSMarshallerPool.getInstance();
+                final Map<String, Object> map = new HashMap<>();
+                map.put("wps", new WPSService());
+                initServer(null, map);
+                pool = WPSMarshallerPool.getInstance();
+                
+                initialized = true;
+            } catch (Exception ex) {
+                Logger.getLogger(WPSRequestTest.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     @AfterClass

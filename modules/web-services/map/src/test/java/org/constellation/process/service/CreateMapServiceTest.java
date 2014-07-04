@@ -18,11 +18,7 @@
  */
 package org.constellation.process.service;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.constellation.configuration.LayerContext;
-import org.constellation.configuration.Layers;
-import org.constellation.configuration.Source;
 import org.constellation.map.featureinfo.FeatureInfoUtilities;
 import org.constellation.process.ConstellationProcessFactory;
 import org.geotoolkit.process.ProcessDescriptor;
@@ -53,14 +49,13 @@ public abstract class CreateMapServiceTest extends AbstractMapServiceTest {
             ParameterValueGroup in = desc.getInputDescriptor().createValue();
             in.parameter(CreateServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
             in.parameter(CreateServiceDescriptor.IDENTIFIER_NAME).setValue("createInstance1");
-            in.parameter(CreateServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(LayerContext.class);
 
             org.geotoolkit.process.Process proc = desc.createProcess(in);
             proc.call();
 
             assertTrue(checkInstanceExist("createInstance1"));
         } finally {
-            deleteInstance("createInstance1");
+            deleteInstance(serviceBusiness, "createInstance1");
         }
     }
 
@@ -70,17 +65,13 @@ public abstract class CreateMapServiceTest extends AbstractMapServiceTest {
         try {
             final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateServiceDescriptor.NAME);
 
-            final List<Source> sources = new ArrayList<>();
-            sources.add(new Source("source1", Boolean.TRUE, null, null));
-            final Layers layers = new Layers(sources);
-            final LayerContext conf = new LayerContext(layers);
+            final LayerContext conf = new LayerContext();
 
             //WMS
             ParameterValueGroup in = desc.getInputDescriptor().createValue();
             in.parameter(CreateServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
             in.parameter(CreateServiceDescriptor.IDENTIFIER_NAME).setValue("createInstance11");
             in.parameter(CreateServiceDescriptor.CONFIG_NAME).setValue(conf);
-            in.parameter(CreateServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(LayerContext.class);
 
 
             org.geotoolkit.process.Process proc = desc.createProcess(in);
@@ -89,7 +80,7 @@ public abstract class CreateMapServiceTest extends AbstractMapServiceTest {
             assertTrue(checkInstanceExist("createInstance11"));
             assertEquals(conf, getConfig("createInstance11"));
         } finally {
-            deleteInstance("createInstance11");
+            deleteInstance(serviceBusiness, "createInstance11");
         }
     }
     
@@ -99,17 +90,14 @@ public abstract class CreateMapServiceTest extends AbstractMapServiceTest {
         try {
             final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor(ConstellationProcessFactory.NAME, CreateServiceDescriptor.NAME);
 
-            final List<Source> sources = new ArrayList<>();
-            sources.add(new Source("source1", Boolean.TRUE, null, null));
-            final Layers layers = new Layers(sources);
-            final LayerContext conf = new LayerContext(layers);
+            final LayerContext conf = new LayerContext();
             conf.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
-            createCustomInstance("createInstance15", conf);
+            
             //create
             ParameterValueGroup in = desc.getInputDescriptor().createValue();
             in.parameter(CreateServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
             in.parameter(CreateServiceDescriptor.IDENTIFIER_NAME).setValue("createInstance15");
-            in.parameter(CreateServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(LayerContext.class);
+            in.parameter(CreateServiceDescriptor.CONFIG_NAME).setValue(conf);
 
 
             org.geotoolkit.process.Process proc = desc.createProcess(in);
@@ -120,7 +108,7 @@ public abstract class CreateMapServiceTest extends AbstractMapServiceTest {
             assertTrue(checkInstanceExist("createInstance15"));
             assertEquals(conf, outContext);
         } finally {
-            deleteInstance("createInstance15");
+            deleteInstance(serviceBusiness, "createInstance15");
         }
     }
 
@@ -132,7 +120,6 @@ public abstract class CreateMapServiceTest extends AbstractMapServiceTest {
         final ParameterValueGroup in = desc.getInputDescriptor().createValue();
         in.parameter(CreateServiceDescriptor.SERVICE_TYPE_NAME).setValue(serviceName);
         in.parameter(CreateServiceDescriptor.IDENTIFIER_NAME).setValue("");
-        in.parameter(CreateServiceDescriptor.CONFIGURATION_CLASS_NAME).setValue(LayerContext.class);
 
         try {
             final org.geotoolkit.process.Process proc = desc.createProcess(in);

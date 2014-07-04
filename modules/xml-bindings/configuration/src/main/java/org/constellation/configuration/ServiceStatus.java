@@ -25,9 +25,13 @@ package org.constellation.configuration;
  */
 public enum ServiceStatus {
 
-    WORKING,
+    STARTING,
+    
+    STARTED,
+    
+    STOPPING,
+    
+    STOPPED,
 
-    ERROR,
-
-    NOT_STARTED
+    ERROR
 }

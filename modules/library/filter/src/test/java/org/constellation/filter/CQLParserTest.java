@@ -1254,7 +1254,7 @@ public class CQLParserTest {
         /**
          * Test 7:  propertyIsEquals OR (propertyIsLike AND BBOX)
          */
-        cql = "Title = 'VMAI' OR (Title LIKE 'LO?Li' AND DWITHIN(BoundingBox, POINT(12.1 28.9), 10, meters))";
+        cql = "Title = 'VMAI' OR (Title LIKE 'LO?Li' AND DWITHIN(BoundingBox, POINT(12.1 28.9), 10, \"meters\"))";
         filter = FilterParser.cqlToFilter(cql);
 
         assertTrue(filter.getComparisonOps() == null);

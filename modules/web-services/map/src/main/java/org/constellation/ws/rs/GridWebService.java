@@ -52,6 +52,11 @@ public abstract class GridWebService<W extends Worker> extends OGCWebService<W> 
         DataProviders.getInstance().dispose();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected abstract Class<? extends MapConfigurer> getConfigurerClass();
+    protected Class<? extends MapConfigurer> getConfigurerClass() {
+        return MapConfigurer.class;
+    }
 }

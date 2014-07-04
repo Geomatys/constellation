@@ -19,7 +19,20 @@
 
 package org.constellation.admin.service;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXBElement;
+import javax.xml.stream.XMLStreamException;
+import org.apache.sis.metadata.iso.DefaultMetadata;
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.DataBrief;
+import org.constellation.configuration.ProvidersReport;
 import org.constellation.configuration.StyleReport;
 import org.constellation.dto.DataInformation;
 import org.constellation.dto.DataMetadata;
@@ -29,19 +42,14 @@ import org.constellation.dto.MetadataLists;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
 import org.constellation.dto.StyleListBrief;
-
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBElement;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import org.apache.sis.metadata.iso.DefaultMetadata;
-
-import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import org.geotoolkit.style.DefaultMutableStyle;
+import org.geotoolkit.style.MutableStyle;
+import org.geotoolkit.xml.parameter.ParameterDescriptorReader;
+import org.geotoolkit.xml.parameter.ParameterValueReader;
+import org.opengis.parameter.GeneralParameterDescriptor;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
  * Constellation RESTful API for providers management/configuration.
@@ -130,7 +138,20 @@ public final class ProvidersAPI {
         final String path = "SP/" + providerId + "/style/" + styleName + "/report";
         return client.get(path, MediaType.APPLICATION_XML_TYPE).getEntity(StyleReport.class);
     }
+    
+    public MutableStyle getStyle(final String providerId, final String styleName) throws HttpResponseException, IOException {
+        ensureNonNull("providerId", providerId);
+        ensureNonNull("styleName", styleName);
 
+        final String path = "SP/" + providerId + "/style/" + styleName;
+        return client.get(path, MediaType.APPLICATION_XML_TYPE).getEntity(MutableStyle.class);
+    }
+
+    public void createStyle(final String providerId, final MutableStyle style) throws IOException {
+        final String path = "SP/" + providerId + "/style";
+        client.put(path, MediaType.APPLICATION_XML_TYPE, style);
+    }
+    
     /**
      * Links a style resource to an existing data resource.
      *
@@ -287,5 +308,72 @@ public final class ProvidersAPI {
 
     public void saveMetadata(final String providerId, final DefaultMetadata metadata) throws IOException {
         client.post("provider/metadata/"+providerId, MediaType.APPLICATION_XML_TYPE, metadata);
+    }
+    
+    public void reloadProvider(final String providerId) throws IOException {
+        client.get("DP/" + providerId + "/restart", MediaType.APPLICATION_XML_TYPE);
+    }
+    
+    public void restartAllLayerProviders() throws IOException {
+        client.get("DP/restart", MediaType.APPLICATION_XML_TYPE);
+    }
+    
+    public void restartAllStyleProviders() throws IOException {
+        client.get("SP/restart", MediaType.APPLICATION_XML_TYPE);
+    }
+    
+    public void deleteProvider(final String providerId, final boolean deleteData) throws IOException {
+        client.delete("DP/" + providerId + "/" + Boolean.toString(deleteData), MediaType.APPLICATION_XML_TYPE);
+    }
+    
+   
+    public AcknowlegementType createProvider(final String serviceName, final ParameterValueGroup config) throws IOException {
+        return client.post("DP/" + serviceName, MediaType.APPLICATION_XML_TYPE, config).getEntity(AcknowlegementType.class);
+    }
+    
+    public AcknowlegementType updateProvider(final String serviceName, final String id, final ParameterValueGroup config) throws IOException {
+        return client.put("DP/" + serviceName + "/" + id, MediaType.APPLICATION_XML_TYPE, config).getEntity(AcknowlegementType.class);
+    }
+    
+    public GeneralParameterValue getProviderConfiguration(final String id, final ParameterDescriptorGroup descriptor) throws IOException, XMLStreamException {
+        final Object object = client.get("DP/" + id + "/configuration", MediaType.APPLICATION_XML_TYPE).getEntity(Object.class);
+        final ParameterValueReader reader = new ParameterValueReader(descriptor);
+        reader.setInput(object);
+        return reader.read();    
+    }
+
+    public ProvidersReport listProviders() throws IOException {
+        return client.get("DP/providers", MediaType.APPLICATION_XML_TYPE).getEntity(ProvidersReport.class);  
+    }
+    
+    public GeneralParameterDescriptor getServiceDescriptor(final String serviceName) throws IOException, XMLStreamException, ClassNotFoundException {
+        
+        final Object object = client.get("DP/service/descriptor/" + serviceName, MediaType.APPLICATION_XML_TYPE).getEntity(Object.class);
+        final ParameterDescriptorReader reader = new ParameterDescriptorReader();
+        reader.setInput(object);
+        reader.read();
+        Object response = reader.getDescriptorsRoot();
+        if (response instanceof GeneralParameterDescriptor) {
+            return (GeneralParameterDescriptor) response;
+        }
+        return null;
+    }
+ 
+    /**
+     * Get the provider service source configuration description.
+     *
+     * @param serviceName name of the provider service.
+     * @return
+     */
+    public GeneralParameterDescriptor getSourceDescriptor(final String serviceName) throws IOException, XMLStreamException, ClassNotFoundException {
+        final Object object = client.get("DP/source/descriptor/" + serviceName, MediaType.APPLICATION_XML_TYPE).getEntity(Object.class);
+        final ParameterDescriptorReader reader = new ParameterDescriptorReader();
+        reader.setInput(object);
+        reader.read();
+        Object response = reader.getDescriptorsRoot();
+        if (response instanceof GeneralParameterDescriptor) {
+            return (GeneralParameterDescriptor) response;
+        }
+        return null;
     }
 }

@@ -15,9 +15,9 @@
  */
 'use strict';
 
-cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 'webService', 'dataListing', 'provider',
-    'style', 'textService', '$modal', '$growl', 'StyleSharedService', '$cookies',
-    function ($scope, $location, $dashboard, webService, dataListing, provider, style, textService, $modal, $growl,
+cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 'webService', 'dataListing', 'DomainResource', 'provider',
+    'style', 'textService', '$modal', '$growl', 'StyleSharedService', '$cookies', 
+    function ($scope, $location, $dashboard, webService, dataListing, DomainResource,  provider, style, textService, $modal, $growl,
               StyleSharedService, $cookies) {
         $scope.cstlUrl = $cookies.cstlUrl;
         $scope.cstlSessionId = $cookies.cstlSessionId;
@@ -223,7 +223,49 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
                 }
             });
         };
+        
+        $scope.showDomains = function(){
+        	var modal = $modal.open({
+                templateUrl: 'views/data/linkedDomains.html',
+                controller: 'ModalDataLinkedDomainsController',
+                resolve: {
+                    'domains': function() {return dataListing.domains({dataId: $scope.selected.Id}).$promise},
+                    'dataId': function(){return $scope.selected.Id}
+                }
+            });
+        };
     }]);
+
+
+cstlAdminApp.controller('ModalDataLinkedDomainsController', ['$scope', '$modalInstance', '$growl', 'dataListing', 'domains', 'dataId',
+  function($scope, $modalInstance, $growl, dataListing, domains, dataId){
+	$scope.domains = domains;
+    $scope.close = function() {
+      $modalInstance.dismiss('close');
+    };
+    
+    $scope.toggleDomain = function(i){
+        var pathParams = {domainId: $scope.domains[i].id, dataId:dataId};
+        if($scope.domains[i].linked){
+        	dataListing.unlinkFromDomain(pathParams, function(){
+            $scope.domains[i].linked = !$scope.domains[i].linked;
+            $scope.domains[i].linked = false;
+          }, function(response){
+            $growl('error','error', response.data.message );
+            dataListing.domains({dataId:dataId}, function(domains){
+               $scope.domains = domains;          
+             })
+          }); 
+        }else{
+        	dataListing.linkToDomain(pathParams, {}, function(){
+            $scope.domains[i].linked = true;
+          }, function(){
+            
+          }); 
+        }
+      }
+	
+}]);
 
 cstlAdminApp.controller('DescriptionController', ['$scope', '$routeParams','dataListing','$location', '$translate', '$uploadFiles', '$modal',
     function ($scope, $routeParams, dataListing, $location, $translate, $uploadFiles, $modal) {

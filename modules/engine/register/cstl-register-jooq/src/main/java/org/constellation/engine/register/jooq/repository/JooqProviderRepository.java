@@ -18,20 +18,19 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
-import static org.constellation.engine.register.jooq.Tables.DATA;
-import static org.constellation.engine.register.jooq.Tables.DATA_X_DOMAIN;
-import static org.constellation.engine.register.jooq.Tables.LAYER;
-import static org.constellation.engine.register.jooq.Tables.PROVIDER;
-import static org.constellation.engine.register.jooq.Tables.SERVICE;
-
 import java.util.List;
 
 import org.constellation.engine.register.Provider;
+import org.constellation.engine.register.Style;
 import org.constellation.engine.register.jooq.tables.Data;
 import org.constellation.engine.register.jooq.tables.DataXDomain;
+import org.constellation.engine.register.jooq.tables.records.LayerRecord;
 import org.constellation.engine.register.jooq.tables.records.ProviderRecord;
 import org.constellation.engine.register.repository.ProviderRepository;
+import org.jooq.UpdateConditionStep;
 import org.springframework.stereotype.Component;
+
+import static org.constellation.engine.register.jooq.Tables.*;
 
 @Component
 public class JooqProviderRepository extends AbstractJooqRespository<ProviderRecord, Provider> implements
@@ -49,7 +48,7 @@ public class JooqProviderRepository extends AbstractJooqRespository<ProviderReco
 
     @Override
     public Provider findOne(Integer id) {
-        return dsl.select().from(PROVIDER).where(PROVIDER.ID.eq(id)).fetchOne().into(Provider.class);
+        return dsl.select().from(PROVIDER).where(PROVIDER.ID.eq(id)).fetchOneInto(Provider.class);
     }
 
     @Override
@@ -63,15 +62,19 @@ public class JooqProviderRepository extends AbstractJooqRespository<ProviderReco
     }
 
     @Override
-    public Provider findByIdentifie(String identifier) {
-        return dsl.select().from(PROVIDER).where(PROVIDER.IDENTIFIER.eq(identifier)).fetchOne().into(Provider.class);
+    public Provider findByIdentifier(String identifier) {
+        return dsl.select().from(PROVIDER).where(PROVIDER.IDENTIFIER.eq(identifier)).fetchOneInto(Provider.class);
+    }
+    
+    @Override
+    public Provider findByIdentifierAndType(String providerIdentifier, String type) {
+        return dsl.select().from(PROVIDER).where(PROVIDER.IDENTIFIER.eq(providerIdentifier)).and(PROVIDER.TYPE.eq(type)).fetchOneInto(Provider.class);
     }
 
     @Override
-    public List<String> getProviderIdsForDomain(int domainId) {
-
-        return dsl.selectDistinct(provider.IDENTIFIER).from(provider).join(data).on(provider.ID.eq(data.PROVIDER))
-                .join(dXd).on(data.ID.eq(dXd.DATA_ID)).where(dXd.DOMAIN_ID.eq(domainId)).fetch(provider.IDENTIFIER);
+    public List<Integer> getProviderIdsForDomain(int domainId) {
+        return dsl.selectDistinct(provider.ID).from(provider).join(data).on(provider.ID.eq(data.PROVIDER))
+                .join(dXd).on(data.ID.eq(dXd.DATA_ID)).where(dXd.DOMAIN_ID.eq(domainId)).fetch(provider.ID);
     }
 
     @Override
@@ -105,5 +108,53 @@ public class JooqProviderRepository extends AbstractJooqRespository<ProviderReco
     @Override
     public int deleteByIdentifier(String providerID) {
         return dsl.delete(PROVIDER).where(PROVIDER.IDENTIFIER.eq(providerID)).execute();
+    }
+
+    @Override
+    public Provider findByMetadataId(String metadataId) {
+        return dsl.select().from(PROVIDER).where(PROVIDER.METADATA_ID.eq(metadataId)).fetchOneInto(Provider.class);
+    }
+
+    @Override
+    public List<Provider> findChildren(String id) {
+        return dsl.select().from(PROVIDER).where(PROVIDER.PARENT.eq(id)).fetchInto(Provider.class);
+    }
+
+    @Override
+    public List<org.constellation.engine.register.Data> findDatasByProviderId(Integer id) {
+        return dsl.select().from(DATA).join(PROVIDER).on(DATA.PROVIDER.eq(PROVIDER.ID))
+                .where(PROVIDER.ID.eq(id)).fetchInto(org.constellation.engine.register.Data.class);
+    }
+
+    @Override
+    public int update(Provider provider) {
+        ProviderRecord providerRecord = new ProviderRecord();
+        providerRecord.from(provider);
+        UpdateConditionStep<ProviderRecord> set = dsl.update(PROVIDER)
+                .set(PROVIDER.CONFIG, provider.getConfig())
+                .set(PROVIDER.IDENTIFIER, provider.getIdentifier())
+                .set(PROVIDER.METADATA, provider.getMetadata())
+                .set(PROVIDER.METADATA_ID, provider.getMetadataId())
+                .set(PROVIDER.IMPL, provider.getImpl())
+                .set(PROVIDER.OWNER, provider.getOwner())
+                .set(PROVIDER.PARENT, provider.getParent())
+                .set(PROVIDER.TYPE, provider.getType())
+                .where(PROVIDER.ID.eq(provider.getId()));
+
+        return set.execute();
+
+    }
+
+    @Override
+    public List<Style> findStylesByProviderId(Integer providerId) {
+        return dsl.select().from(STYLE).join(PROVIDER).on(STYLE.PROVIDER.eq(PROVIDER.ID))
+                .where(PROVIDER.ID.eq(providerId)).fetchInto(Style.class);
+    }
+
+    @Override
+    public Provider findByIdentifierAndDomainId(String providerIdentifier, Integer domainId) {
+        // @FIXME binding domainId
+        return dsl.select().from(PROVIDER).where(PROVIDER.IDENTIFIER.eq(providerIdentifier)).fetchOneInto(Provider.class);
+
     }
 }

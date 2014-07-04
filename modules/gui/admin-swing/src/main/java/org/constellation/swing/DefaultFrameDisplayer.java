@@ -20,6 +20,7 @@ package org.constellation.swing;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
@@ -27,8 +28,11 @@ import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.xml.stream.XMLStreamException;
 import org.apache.sis.storage.DataStoreException;
-import org.constellation.admin.service.ConstellationServer;
+import org.apache.sis.util.iso.SimpleInternationalString;
+import org.apache.sis.util.logging.Logging;
+import org.constellation.admin.service.ConstellationClient;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.ObjectFactory;
 import org.constellation.configuration.ProviderReport;
@@ -38,12 +42,13 @@ import org.geotoolkit.client.ClientFinder;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.coverage.CoverageStoreFinder;
+import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.FeatureStoreFinder;
-import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.data.session.Session;
 import org.geotoolkit.display2d.GO2Utilities;
+import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.gui.swing.render2d.JMap2DFrame;
 import org.geotoolkit.map.CoverageMapLayer;
 import org.geotoolkit.map.FeatureMapLayer;
@@ -55,13 +60,11 @@ import org.geotoolkit.style.DefaultStyleFactory;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.RandomStyleBuilder;
 import org.geotoolkit.style.StyleConstants;
-import org.apache.sis.util.iso.SimpleInternationalString;
-import org.apache.sis.util.logging.Logging;
-import org.geotoolkit.feature.type.Name;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -94,14 +97,14 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
     }
 
     @Override
-    public void display(final ConstellationServer cstl, final String serviceType, final Instance service) {
+    public void display(final ConstellationClient serverV2, final String serviceType, final Instance service) {
         try {
-            final String url = cstl.services.getInstanceURL(serviceType, service.getIdentifier());
+            final String url = serverV2.services.getInstanceURL(serviceType, service.getIdentifier());
             final ClientFactory factory = ClientFinder.getFactoryById(serviceType);
             if (factory != null) {
                 final ParameterValueGroup params = factory.getParametersDescriptor().createValue();
                 params.parameter("url").setValue(new URL(url));
-                params.parameter("security").setValue(cstl.getClientSecurity());
+                // TODO params.parameter("security").setValue(cstl.getClientSecurity());
                 try {
                     params.parameter("post").setValue(true);
                 } catch(ParameterNotFoundException ex) {
@@ -121,23 +124,28 @@ public class DefaultFrameDisplayer implements FrameDisplayer {
     }
 
     @Override
-    public void display(final ConstellationServer server, final String providerType, final ProviderReport pr) {
-        final GeneralParameterDescriptor desc = server.providers.getServiceDescriptor(providerType);
-        if(!(desc instanceof ParameterDescriptorGroup)) {
-            return;
-        }
-
-        // parameters needed to build the store.
-        final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup) ((ParameterDescriptorGroup) desc).descriptor(ObjectFactory.SOURCE_QNAME.getLocalPart());
-        final ParameterValueGroup gpv = (ParameterValueGroup) server.providers.getProviderConfiguration(pr.getId(), sourceDesc);
-
+    public void display(final ConstellationClient serverV2, final String providerType, final ProviderReport pr) {
         try {
-            MapContext context = getProviderLayers(gpv);
-            display(context);
-        } catch (DataStoreException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(),ex);
+            final GeneralParameterDescriptor desc = serverV2.providers.getServiceDescriptor(providerType);
+            if(!(desc instanceof ParameterDescriptorGroup)) {
+                return;
+            }
+            
+            // parameters needed to build the store.
+            final ParameterDescriptorGroup sourceDesc = (ParameterDescriptorGroup) ((ParameterDescriptorGroup) desc).descriptor(ObjectFactory.SOURCE_QNAME.getLocalPart());
+            final ParameterValueGroup gpv;
+            try {
+                gpv = (ParameterValueGroup) serverV2.providers.getProviderConfiguration(pr.getId(), sourceDesc);
+                
+                MapContext context = getProviderLayers(gpv);
+                display(context);
+            } catch (IOException | XMLStreamException | DataStoreException ex) {
+                LOGGER.log(Level.WARNING, ex.getMessage(),ex);
+            }
+            
+        } catch (IOException | XMLStreamException | ClassNotFoundException ex) {
+            Exceptions.printStackTrace(ex);
         }
-
     }
 
     protected MapContext getProviderLayers(final ParameterValueGroup providerParameters) throws DataStoreException {

@@ -20,10 +20,46 @@ package org.constellation.engine.register.repository;
 
 import java.util.List;
 
+import org.constellation.engine.register.Data;
+import org.constellation.engine.register.Layer;
 import org.constellation.engine.register.Style;
+import org.constellation.engine.register.i18n.StyleWithI18N;
 
 public interface StyleRepository {
 
-    List<? extends Style> findAll();
+    int create(Style style);
     
+    List<Style> findAll();
+    
+    List<Style> findByType(final String type);
+    
+    List<Style> findByTypeAndProvider(final int providerId, final String type);
+    
+    List<Style> findByProvider(final int providerId);
+
+    Style findByNameAndProvider(final int providerId, String name);
+    
+    Style findById(int id);
+
+    List<Style> findByData(Data data);
+    
+    List<Style> findByLayer(Layer layer);
+    
+    List<Data> getLinkedData(int styleId);
+    
+    void linkStyleToData(int styleId, int dataid);
+
+    void unlinkStyleToData(int styleId, int dataid);
+    
+    void linkStyleToLayer(int styleId, int layerid);
+
+    void unlinkStyleToLayer(int styleId, int layerId);
+
+    List<Integer> getStyleIdsForData(int id);
+    
+    void deleteStyle(int providerId, String name);
+
+    Style save(Style s);
+    
+    StyleWithI18N getStyleWithI18Ns(Style style);
 }

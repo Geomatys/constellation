@@ -19,19 +19,42 @@
 
 package org.constellation.provider.coveragesgroup.util;
 
+import javax.annotation.PostConstruct;
+import org.constellation.admin.SpringHelper;
 import org.constellation.provider.coveragesgroup.xml.DataReference;
 import org.constellation.provider.coveragesgroup.xml.MapLayer;
 import org.constellation.provider.coveragesgroup.xml.StyleReference;
 import org.geotoolkit.map.MapItem;
 import static org.junit.Assert.*;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 
 /**
  *
  * @author Cédric Briançon (Geomatys)
  */
-public class ConvertersJaxbToGeotkTest {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+public class ConvertersJaxbToGeotkTest implements ApplicationContextAware {
+
+    private ApplicationContext applicationContext;
+    
+    @PostConstruct
+    public void setUpClass() {
+        SpringHelper.setApplicationContext(applicationContext);
+    }
+
+    
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
 
     @Test
     public void testConvertsMapLayer() {

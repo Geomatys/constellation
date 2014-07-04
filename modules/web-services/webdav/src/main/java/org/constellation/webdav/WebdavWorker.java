@@ -21,13 +21,11 @@ package org.constellation.webdav;
 import com.bradmcevoy.common.Path;
 import com.bradmcevoy.http.Resource;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.logging.Level;
-import javax.xml.bind.JAXBException;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef;
 import org.constellation.configuration.WebdavContext;
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.ws.AbstractWorker;
 
 /**
@@ -42,7 +40,7 @@ public class WebdavWorker extends AbstractWorker {
         super(id, ServiceDef.Specification.WEBDAV);
         WebdavContext candidate = null;
         try {
-            Object obj = ConfigurationEngine.getConfiguration("webdav", id);
+            Object obj = serviceBusiness.getConfiguration("webdav", id);
             if (obj instanceof WebdavContext) {
                 candidate = (WebdavContext) obj;
                 isStarted = true;
@@ -51,8 +49,8 @@ public class WebdavWorker extends AbstractWorker {
                 isStarted = false;
                 LOGGER.log(Level.WARNING, startError);
             }
-        } catch (FileNotFoundException | JAXBException ex) {
-            startError = "JAXBExeception while unmarshalling the webdav context File";
+        } catch (ConfigurationException ex) {
+            startError = "ConfigurationException while unmarshalling the webdav context File";
             isStarted = false;
             LOGGER.log(Level.WARNING, startError, ex);
         }

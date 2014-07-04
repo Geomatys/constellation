@@ -22,6 +22,8 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
+
+import org.constellation.dto.Details;
 import org.glassfish.jersey.client.ClientResponse;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -30,22 +32,14 @@ import org.glassfish.jersey.media.multipart.MultiPart;
 import org.apache.sis.util.ArgumentChecks;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.admin.service.ConstellationServer.Csws;
 import org.constellation.admin.service.ConstellationServer.Providers;
 import org.constellation.admin.service.ConstellationServer.Services;
-import org.constellation.admin.service.ConstellationServer.Tasks;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ExceptionReport;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.LayerList;
 import org.constellation.configuration.ObjectFactory;
-import org.constellation.configuration.ProvidersReport;
-import org.constellation.configuration.ServiceReport;
-import org.constellation.configuration.StringList;
-import org.constellation.configuration.StringTreeNode;
 import org.constellation.dto.DataDescription;
-import org.constellation.dto.DataMetadata;
-import org.constellation.dto.Service;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.dto.DataInformation;
 import org.geotoolkit.client.AbstractRequest;
@@ -55,19 +49,14 @@ import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.security.BasicAuthenticationSecurity;
 import org.geotoolkit.security.FormSecurity;
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
-import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
 import org.geotoolkit.sld.xml.StyleXmlIO;
-import org.geotoolkit.style.MutableStyle;
-import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.xml.parameter.ParameterDescriptorReader;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.geotoolkit.xml.parameter.ParameterValueWriter;
-import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.style.Style;
-import org.opengis.util.FactoryException;
 
 import javax.swing.event.EventListenerList;
 import javax.ws.rs.core.MediaType;
@@ -88,18 +77,10 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static org.constellation.api.QueryConstants.*;
-
 
 
 /**
@@ -110,7 +91,8 @@ import static org.constellation.api.QueryConstants.*;
  * @author Benjamin Garcia (Geomatys)
  * @version 0.9
  */
-public class ConstellationServer<S extends Services, P extends Providers, C extends Csws, T extends Tasks> extends AbstractClient {
+@Deprecated
+public class ConstellationServer<S extends Services, P extends Providers> extends AbstractClient {
 
     protected static final Logger LOGGER = Logging.getLogger("org.constellation.admin.service");
     private static final MarshallerPool POOL = GenericDatabaseMarshallerPool.getInstance();
@@ -119,8 +101,6 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
     public final S services;
     public final P providers;
-    public final C csws;
-    public final T tasks;
 
     public final String currentUser;
 
@@ -130,8 +110,6 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         super(create(ConstellationServerFactory.PARAMETERS, server, null));
         this.services = createServiceManager();
         this.providers = createProviderManager();
-        this.csws = createCswManager();
-        this.tasks = createTaskManager();
         this.securityType = "Basic";
         Parameters.getOrCreate(ConstellationServerFactory.USER, parameters).setValue(user);
         Parameters.getOrCreate(ConstellationServerFactory.PASSWORD, parameters).setValue(password);
@@ -143,8 +121,6 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         super(params);
         this.services = createServiceManager();
         this.providers = createProviderManager();
-        this.csws = createCswManager();
-        this.tasks = createTaskManager();
         this.currentUser = Parameters.value(ConstellationServerFactory.USER, parameters);
         this.securityType = Parameters.value(ConstellationServerFactory.SECURITY_TYPE, params);
         if ("Basic".equals(securityType)) {
@@ -166,14 +142,6 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
 
     protected S createServiceManager() {
         return (S) new Services();
-    }
-
-    protected T createTaskManager() {
-        return (T) new Tasks();
-    }
-
-    protected C createCswManager() {
-        return (C) new Csws();
     }
 
     protected P createProviderManager() {
@@ -222,30 +190,8 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
      */
     protected boolean authenticate() {
         if ("Basic".equals(securityType)) {
-            final String str = this.getURLWithEndSlash() + "configuration?request=" + REQUEST_ACCESS;
-            InputStream stream = null;
-            HttpURLConnection cnx = null;
-            try {
-                final URL url = new URL(str);
-                cnx = (HttpURLConnection) url.openConnection();
-                getClientSecurity().secure(cnx);
-                stream = AbstractRequest.openRichException(cnx, getClientSecurity());
-            } catch (Exception ex) {
-                LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
-                return false;
-            } finally {
-                if (stream != null) {
-                    try {
-                        stream.close();
-                    } catch (IOException ex) {
-                        LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-                    }
-                }
-                if (cnx != null) {
-                    cnx.disconnect();
-                }
-            }
-            return true;
+            throw new UnsupportedOperationException("Basic auth is no longer implemented");
+            
         } else if ("Form".equals(securityType)) {
             final int index = getURLWithEndSlash().lastIndexOf("WS");
             String str = getURLWithEndSlash().substring(0, index) + "j_spring_security_check?";
@@ -294,56 +240,6 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
         }
     }
 
-    /**
-     * @return configuration path used by constellation, null if failed to get path.
-     */
-    public String getConfigurationPath() {
-        try {
-            final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_GET_CONFIG_PATH;
-            final Object response = sendRequest(url, null);
-            if (response instanceof AcknowlegementType) {
-                final AcknowlegementType ak = (AcknowlegementType) response;
-                if ("Success".equalsIgnoreCase(ak.getStatus())) {
-                    return ak.getMessage();
-                } else {
-                    return null;
-                }
-            } else if (response instanceof ExceptionReport) {
-                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                return null;
-            } else {
-                LOGGER.warning("The service respond uncorrectly");
-                return null;
-            }
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-        }
-        return null;
-    }
-
-    /**
-     * @param path
-     * @return true if succeed
-     */
-    public boolean setConfigurationPath(final String path) {
-        try {
-
-            final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_SET_CONFIG_PATH + "&path=" + URLEncoder.encode(path);
-            final Object response = sendRequest(url, null);
-            if (response instanceof AcknowlegementType) {
-                return "Success".equals(((AcknowlegementType) response).getStatus());
-            } else if (response instanceof ExceptionReport) {
-                LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                return false;
-            } else {
-                LOGGER.warning("The service respond uncorrectly");
-                return false;
-            }
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-        }
-        return false;
-    }
 
     public boolean deleteUser(final String userName) {
         try {
@@ -449,40 +345,6 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
      * Configuration methods for services
      */
     public final class Services {
-
-        public Map<String, List<String>> getAvailableService() {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_LIST_SERVICE;
-                final Object response = sendRequest(url, null);
-                if (response instanceof ServiceReport) {
-                    return ((ServiceReport) response).getAvailableServices();
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                    return new HashMap<>();
-                } else {
-                    LOGGER.warning("The service respond uncorrectly");
-                    return new HashMap<>();
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return new HashMap<>();
-        }
-
-        /**
-         * Restart all the web-service (wms, wfs, csw,...)
-         *
-         * @return true if the operation succeed
-         */
-        public boolean restartAll() {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_FULL_RESTART;
-                return sendRequestAck(url, null);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
 
         /**
          * Restart all the instance of a specific web-service (wms, wfs, csw,...)
@@ -698,27 +560,6 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             return false;
         }
 
-        public boolean updateCapabilities(final String service, final String instanceId, final File importFile, final String fileName) {
-            try {
-                final String url = getURLWithEndSlash() + service.toLowerCase() + "/admin?request=" + REQUEST_UPDATE_CAPABILITIES + "&id=" + instanceId + "&filename=" + fileName;
-                Object response = sendRequest(url, importFile, null, null, true);
-                if (response instanceof AcknowlegementType) {
-                    final AcknowlegementType ack = (AcknowlegementType) response;
-                    if ("Success".equals(ack.getStatus())) {
-                        return true;
-                    } else {
-                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
-                    }
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-
         /**
          * Return a complete URL for the specified service  (wms, wfs, csw,...) and instance identifier.
          *
@@ -736,12 +577,12 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
          * @param identifier
          * @return
          */
-        public Service getMetadata(final String serviceType, final String identifier){
+        public Details getMetadata(final String serviceType, final String identifier){
             final String url = getURLWithEndSlash()+serviceType.toUpperCase()+"/"+identifier+"/metadata";
             try {
                 Object response = sendRequest(url, null);
-                if(response instanceof Service){
-                    return (Service)response;
+                if(response instanceof Details){
+                    return (Details)response;
                 }
             } catch (IOException e) {
                 LOGGER.log(Level.WARNING, "Error when send request to server", e);
@@ -775,380 +616,7 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
      */
     public final class Providers {
 
-        /**
-         * Restart all layer providers.
-         *
-         * @return True if the operation succeed.
-         */
-        public boolean restartAllLayerProviders() {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_RESTART_ALL_LAYER_PROVIDERS;
-                return sendRequestAck(url, null);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-        /**
-         * Restart all layer providers.
-         *
-         * @return True if the operation succeed.
-         */
-        public boolean restartAllStyleProviders() {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_RESTART_ALL_STYLE_PROVIDERS;
-                return sendRequestAck(url, null);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-        /**
-         * Add a new source provider to the service.
-         *
-         * @param serviceName The provider service name (shapefile, coverage-sql, ...)
-         * @param config      The configuration Object to add to the specific provider file.
-         * @return
-         */
-        public AcknowlegementType createProvider(final String serviceName, final ParameterValueGroup config) {
-            ArgumentChecks.ensureNonNull("service name", serviceName);
-            ArgumentChecks.ensureNonNull("config", config);
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_CREATE_PROVIDER + "&serviceName=" + serviceName;
-                Object response = sendRequest(url, config);
-                if (response instanceof AcknowlegementType) {
-                    final AcknowlegementType ack = (AcknowlegementType) response;
-                    if ("Success".equals(ack.getStatus())) {
-                        fireProviderCreated(serviceName, config);
-                        return null;
-                    } else {
-                        return ack;
-                    }
-                } else if (response instanceof ExceptionReport) {
-                    return new AcknowlegementType("Failure", ((ExceptionReport) response).getMessage());
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-                return new AcknowlegementType("Failure", ex.getMessage());
-            }
-            return null;
-        }
-
-        /**
-         * Get the source provider configuration.
-         *
-         * @param id The identifier of the source
-         * @param descriptor The descriptor allowing to read the configuration Object.
-         * @return
-         */
-        public GeneralParameterValue getProviderConfiguration(final String id, final ParameterDescriptorGroup descriptor) {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_GET_PROVIDER_CONFIG + "&id=" + id;
-                Object response = sendRequest(url, null, descriptor, null, false);
-                if (response instanceof GeneralParameterValue) {
-                    return (GeneralParameterValue) response;
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return null;
-        }
-
-        /**
-         * Remove a source provider in the service.
-         *
-         * @param id The identifier of the source
-         * @return
-         */
-        public boolean deleteProvider(final String id) {
-            return deleteProvider(id, false);
-        }
-
-        /**
-         * Remove a source provider in the service and eventually delete data.
-         *
-         * @param id The identifier of the source
-         * @param deleteData {@code True} to delete the data.
-         * @return
-         */
-        public boolean deleteProvider(final String id, final boolean deleteData) {
-            try {
-                final StringBuilder url = new StringBuilder();
-                url.append(getURLWithEndSlash()).append("configuration?request=").append(REQUEST_DELETE_PROVIDER)
-                        .append("&id=").append(id);
-                if (deleteData) {
-                    url.append("&deleteData=").append(deleteData);
-                }
-                Object response = sendRequest(url.toString(), null);
-                if (response instanceof AcknowlegementType) {
-                    final AcknowlegementType ack = (AcknowlegementType) response;
-                    if ("Success".equals(ack.getStatus())) {
-                        fireProviderDeleted(id);
-                        return true;
-                    } else {
-                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
-                    }
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-        /**
-         * Modify a source provider in the service.
-         *
-         * @param serviceName The provider type (shapefile, coverage-sql, ...)
-         * @param id          The identifier of the source to update.
-         * @param config      The configuration Object to modify on the specific provider file.
-         * @return
-         */
-        public boolean updateProvider(final String serviceName, final String id, final ParameterValueGroup config) {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_UPDATE_PROVIDER + "&serviceName=" + serviceName + "&id=" + id;
-                final Object response = sendRequest(url, config);
-                if (response instanceof AcknowlegementType) {
-                    final AcknowlegementType ack = (AcknowlegementType) response;
-                    if ("Success".equals(ack.getStatus())) {
-                        fireProviderUpdated(serviceName, id, config);
-                        return true;
-                    } else {
-                        LOGGER.log(Level.INFO, "Failure:{0}", ack.getMessage());
-                    }
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-        /**
-         * Reload a source provider in the service.
-         *
-         * @param id The identifier of the source
-         * @return
-         */
-        public boolean restartProvider(final String id) {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_RESTART_PROVIDER + "&id=" + id;
-                return sendRequestAck(url, null);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-
         // LAYER PROVIDERS ACTIONS /////////////////////////////////////////////
-
-        /**
-         * Add a new layer to a source provider in the service.
-         *
-         * @param id The identifier of the provider
-         * @param config the configuration object of the layer.
-         * @return
-         */
-        public boolean createLayer(final String id, final ParameterValueGroup config) {
-            ArgumentChecks.ensureNonNull("id", id);
-            ArgumentChecks.ensureNonNull("config", config);
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_CREATE_LAYER + "&id=" + id;
-                return sendRequestAck(url, config);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-        /**
-         * Remove a source provider in the service.
-         *
-         * @param id The identifier of the provider
-         * @param layerName The name of the layer to delete.
-         * @return
-         */
-        public boolean deleteLayer(final String id, final String layerName) {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_DELETE_LAYER + "&id=" + id + "&layerName=" + layerName;
-                return sendRequestAck(url, null);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-        /**
-         * Add a new layer to a source provider in the service.
-         *
-         * @param id The identifier of the provider
-         * @param layerName The name of the layer to update.
-         * @param layer the new configuration object of the layer.
-         * @return
-         */
-        public boolean updateLayer(final String id, final String layerName, final ParameterValueGroup layer) {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_UPDATE_LAYER + "&id=" + id + "&layerName=" + layerName;
-                return sendRequestAck(url, layer);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-        // STYLE PROVIDERS ACTIONS /////////////////////////////////////////////
-
-        public MutableStyle downloadStyle(final String id, final String styleName) {
-            ArgumentChecks.ensureNonNull("id", id);
-            ArgumentChecks.ensureNonNull("styleName", styleName);
-
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_DOWNLOAD_STYLE + "&id=" + id + "&styleName=" + styleName;
-                Object response = sendRequest(url, null, null, StyleXmlIO.getJaxbContext110(), false);
-
-                if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                } else {
-                    final StyleXmlIO utils = new StyleXmlIO();
-                    return utils.readStyle(response, SymbologyEncoding.V_1_1_0);
-                }
-            } catch (IOException | JAXBException | FactoryException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return null;
-        }
-
-        /**
-         * @param id name of the SLD provider
-         * @param styleName name of the new style.
-         * @param style : SLD or other
-         * @return null if successful, AcknowlegementType if failed
-         */
-        public boolean createStyle(final String id, final String styleName, final Object style) {
-            ArgumentChecks.ensureNonNull("id", id);
-            ArgumentChecks.ensureNonNull("styleName", styleName);
-            ArgumentChecks.ensureNonNull("style", style);
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_CREATE_STYLE + "&id=" + id + "&styleName=" + styleName;
-                return sendRequestAck(url, style);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-        /**
-         * Remove a style in the specified provider.
-         *
-         * @param id provider id.
-         * @param styleName style id.
-         * @return true if successful.
-         */
-        public boolean deleteStyle(final String id, final String styleName) {
-            ArgumentChecks.ensureNonNull("id", id);
-            ArgumentChecks.ensureNonNull("styleName", styleName);
-
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_DELETE_STYLE + "&id=" + id + "&styleName=" + styleName;
-                return sendRequestAck(url, null);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-        /**
-         * Update a style
-         *
-         * @param id        The identifier of the provider
-         * @param styleName The identifier of the style
-         * @param style     The new style definition
-         * @return
-         */
-        public boolean updateStyle(final String id, final String styleName, final Object style) {
-            ArgumentChecks.ensureNonNull("id", id);
-            ArgumentChecks.ensureNonNull("styleName", styleName);
-            ArgumentChecks.ensureNonNull("style", style);
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_UPDATE_STYLE + "&id=" + id + "&styleName=" + styleName;
-                return sendRequestAck(url, style);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-        /**
-         * Get the provider service configuration description.
-         *
-         * @param serviceName name of the provider service.
-         * @return
-         */
-        public GeneralParameterDescriptor getServiceDescriptor(final String serviceName) {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_GET_SERVICE_DESCRIPTOR + "&serviceName=" + serviceName;
-                Object response = sendDescriptorRequest(url, null);
-                if (response instanceof GeneralParameterDescriptor) {
-                    return (GeneralParameterDescriptor) response;
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                } else {
-                    LOGGER.log(Level.WARNING, "Unexpected response type :{0}", response);
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return null;
-        }
-
-        /**
-         * Get the provider service source configuration description.
-         *
-         * @param serviceName name of the provider service.
-         * @return
-         */
-        public GeneralParameterDescriptor getSourceDescriptor(final String serviceName) {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_GET_SOURCE_DESCRIPTOR + "&serviceName=" + serviceName;
-                Object response = sendDescriptorRequest(url, null);
-                if (response instanceof GeneralParameterDescriptor) {
-                    return (GeneralParameterDescriptor) response;
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                } else {
-                    LOGGER.log(Level.WARNING, "Unexpected response type :{0}", response);
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return null;
-        }
-
-        public ProvidersReport listProviders() {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_LIST_SERVICES;
-                final Object response = sendRequest(url, null);
-                if (response instanceof ProvidersReport) {
-                    return (ProvidersReport) response;
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                    return null;
-                } else {
-                    LOGGER.warning("The service respond uncorrectly");
-                    return null;
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return null;
-        }
 
         /**
          * Send file on constellation server
@@ -1210,354 +678,6 @@ public class ConstellationServer<S extends Services, P extends Providers, C exte
             return null;
         }
     }
-
-    /**
-     * Configuration methods for task scheduler.
-     */
-    public final class Tasks {
-
-        /**
-         * Ask for a list of all available process.
-         * @return A list of process identifier.
-         */
-        public StringList listProcess() {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_LIST_PROCESS;
-                final Object response = sendRequest(url, null);
-                if (response instanceof StringList) {
-                    return (StringList) response;
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                    return null;
-                } else {
-                    LOGGER.warning("The service respond uncorrectly");
-                    return null;
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return null;
-        }
-
-        /**
-         * Ask for a list of all available process in the specified factory.
-         *
-         * @param authorityCode
-         * @return A list of process identifier.
-         */
-        public StringList listProcessForFactory(final String authorityCode) {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_LIST_PROCESS_FOR_FACTO + "&authorityCode=" + authorityCode;
-                final Object response = sendRequest(url, null);
-                if (response instanceof StringList) {
-                    return (StringList) response;
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                    return null;
-                } else {
-                    LOGGER.warning("The service respond uncorrectly");
-                    return null;
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return null;
-        }
-
-        /**
-         * Ask for a list of all available process factories.
-         * @return A list of process factories authority code.
-         */
-        public StringList listProcessFactories() {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_LIST_PROCESS_FACTORIES;
-                final Object response = sendRequest(url, null);
-                if (response instanceof StringList) {
-                    return (StringList) response;
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                    return null;
-                } else {
-                    LOGGER.warning("The service respond uncorrectly");
-                    return null;
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return null;
-        }
-
-        /**
-         * Ask for a list of all tasks.
-         * @return A tree representing the registered tasks.
-         */
-        public StringTreeNode listTasks() {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_LIST_TASKS;
-                final Object response = sendRequest(url, null);
-                if (response instanceof StringTreeNode) {
-                    return (StringTreeNode) response;
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                    return null;
-                } else {
-                    LOGGER.warning("The service respond uncorrectly");
-                    return null;
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return null;
-        }
-
-        /**
-         * Get the parameters description for the given process.
-         * @param authority
-         * @param code
-         * @return
-         */
-        public GeneralParameterDescriptor getProcessDescriptor(final String authority, final String code) {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_GET_PROCESS_DESC + "&authority=" + authority + "&code=" + code;
-                Object response = sendDescriptorRequest(url, null);
-                if (response instanceof GeneralParameterDescriptor) {
-                    return (GeneralParameterDescriptor) response;
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                } else {
-                    LOGGER.log(Level.WARNING, "Unexpected response type :{0}", response);
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return null;
-        }
-
-        /**
-         * Get the parameters for the given task
-         *
-         * @param id
-         * @param desc
-         * @return
-         */
-        public GeneralParameterValue getTaskParameters(final String id, ParameterDescriptorGroup desc) {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_GET_TASK_PARAMS + "&id=" + id;
-                Object response = sendRequest(url, null, desc, null, false);
-                if (response instanceof GeneralParameterValue) {
-                    return (GeneralParameterValue) response;
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                } else {
-                    LOGGER.log(Level.WARNING, "Unexpected response type :{0}", response);
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return null;
-        }
-
-        /**
-         * Create a new task.
-         *
-         * @param authority
-         * @param code
-         * @param id
-         * @param title
-         * @param step
-         * @param parameters
-         * @return
-         */
-        public boolean createTask(final String authority, final String code, final String id,
-                                  final String title, final int step, final GeneralParameterValue parameters) {
-            ArgumentChecks.ensureNonNull("authority", authority);
-            ArgumentChecks.ensureNonNull("code", code);
-            ArgumentChecks.ensureNonNull("id", id);
-            ArgumentChecks.ensureNonNull("title", title);
-            ArgumentChecks.ensureNonNull("step", step);
-            ArgumentChecks.ensureNonNull("parameters", parameters);
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_CREATE_TASK
-                        + "&authority=" + authority
-                        + "&code=" + code
-                        + "&id=" + id
-                        + "&title=" + URLEncoder.encode(title, "UTF-8")
-                        + "&step=" + step;
-                return sendRequestAck(url, parameters);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-
-        /**
-         * Update a task.
-         *
-         * @param authority
-         * @param code
-         * @param id
-         * @param title
-         * @param step
-         * @param parameters
-         * @return
-         */
-        public boolean updateTask(final String authority, final String code, final String id,
-                                  final String title, final int step, final GeneralParameterValue parameters) {
-            ArgumentChecks.ensureNonNull("authority", authority);
-            ArgumentChecks.ensureNonNull("code", code);
-            ArgumentChecks.ensureNonNull("id", id);
-            ArgumentChecks.ensureNonNull("title", title);
-            ArgumentChecks.ensureNonNull("step", step);
-            ArgumentChecks.ensureNonNull("parameters", parameters);
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_UPDATE_TASK
-                        + "&authority=" + authority
-                        + "&code=" + code
-                        + "&id=" + id
-                        + "&title=" + title
-                        + "&step=" + step;
-                return sendRequestAck(url, parameters);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-
-        /**
-         * Delete an existing task.
-         * @param id
-         */
-        public boolean deleteTask(final String id) {
-            ArgumentChecks.ensureNonNull("id", id);
-            try {
-                final String url = getURLWithEndSlash().toString() + "configuration?request=" + REQUEST_DELETE_TASK + "&id=" + id;
-                return sendRequestAck(url, null);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-    }
-
-    /**
-     * Configuration methods for csw
-     */
-    public class Csws {
-
-        public boolean refreshIndex(final String id, final boolean asynchrone) {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_REFRESH_INDEX + "&id=" + id + "&asynchrone=" + asynchrone;
-                return sendRequestAck(url, null);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-        public boolean addToIndex(final String id, final List<String> identifiers) {
-            try {
-                final String idList = StringUtilities.toCommaSeparatedValues(identifiers);
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_ADD_TO_INDEX + "&id=" + id + "&identifiers=" + idList;
-                return sendRequestAck(url, null);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-        public boolean removeFromIndex(final String id, final List<String> identifiers) {
-            try {
-                final String idList = StringUtilities.toCommaSeparatedValues(identifiers);
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_REMOVE_FROM_INDEX + "&id=" + id + "&identifiers=" + idList;
-                return sendRequestAck(url, null);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-        public boolean clearCache(final String id) {
-            try {
-                final String url = getURLWithEndSlash() + "csw/admin?request=" + REQUEST_CLEAR_CACHE + "&id=" + id;
-                return sendRequestAck(url, null);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-        public boolean importFile(final String id, final File importFile, final String fileName) {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_IMPORT_RECORDS + "&id=" + id + "&filename=" + fileName;
-                return sendRequestAck(url, importFile, null, null, true);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-        public boolean metadataExist(final String id, final String metadataName) {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_METADATA_EXIST + "&id=" + id + "&metadata=" + metadataName;
-                Object response = sendRequest(url, null);
-                if (response instanceof AcknowlegementType) {
-                    final AcknowlegementType ack = (AcknowlegementType) response;
-                    if ("Exist".equals(ack.getStatus())) {
-                        return true;
-                    } else if ("Not Exist".equals(ack.getStatus())) {
-                        return false;
-                    } else {
-                        LOGGER.log(Level.WARNING, "Failure:{0}", ack.getMessage());
-                    }
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-        public boolean deleteMetadata(final String id, final String metadataName) {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_DELETE_RECORDS + "&id=" + id + "&metadata=" + metadataName;
-                return sendRequestAck(url, null);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-         public boolean deleteAllMetadata(final String id) {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_DELETE_ALL_RECORDS + "&id=" + id;
-                return sendRequestAck(url, null);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return false;
-        }
-
-        public Collection<String> getAvailableDataSourceType() {
-            try {
-                final String url = getURLWithEndSlash() + "configuration?request=" + REQUEST_AVAILABLE_SOURCE_TYPE;
-                Object response = sendRequest(url, null);
-                if (response instanceof StringList) {
-                    final StringList sl = (StringList) response;
-                    return sl.getList();
-                } else if (response instanceof ExceptionReport) {
-                    LOGGER.log(Level.WARNING, "The service return an exception:{0}", ((ExceptionReport) response).getMessage());
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
-            return new ArrayList<>();
-        }
-    }
-
 
     // convinient methods //////////////////////////////////////////////////////
 

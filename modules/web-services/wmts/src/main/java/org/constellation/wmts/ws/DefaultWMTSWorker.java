@@ -23,12 +23,16 @@ import java.awt.Rectangle;
 import java.text.ParseException;
 import java.util.*;
 import java.util.logging.Level;
-import org.apache.sis.storage.DataStoreException;
 
-// Constellation dependencies
+import javax.inject.Named;
+
+import org.apache.sis.referencing.IdentifiedObjects;
+import org.apache.sis.storage.DataStoreException;
+import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Layer;
+import org.constellation.dto.Details;
 import org.constellation.map.featureinfo.FeatureInfoFormat;
 import org.constellation.map.featureinfo.FeatureInfoUtilities;
 import org.constellation.portrayal.PortrayalUtil;
@@ -45,9 +49,13 @@ import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
+import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
 import org.geotoolkit.ows.xml.v110.*;
 import org.geotoolkit.referencing.CRS;
 import org.apache.sis.referencing.IdentifiedObjects;
@@ -57,16 +65,11 @@ import org.geotoolkit.util.TimeParser;
 import org.geotoolkit.wmts.WMTSUtilities;
 import org.geotoolkit.wmts.xml.WMTSMarshallerPool;
 import org.geotoolkit.wmts.xml.v100.*;
-import org.apache.sis.xml.MarshallerPool;
-import org.constellation.dto.Service;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-
-// GeoAPI dependencies
 import org.opengis.coverage.Coverage;
-import org.geotoolkit.feature.type.Name;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.operation.TransformException;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 
 /**
  * Working part of the WMTS service.
@@ -79,6 +82,8 @@ import org.opengis.referencing.operation.TransformException;
  * @author Guilhem Legal (Geomatys)
  * @since 0.3
  */
+@Named("WTMSWorker")
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
 
     /**
@@ -162,9 +167,8 @@ public class DefaultWMTSWorker extends LayerWorker implements WMTSWorker {
         if (cachedCapabilities != null) {
             return (Capabilities) cachedCapabilities.applySections(sections);
         }
-
         // we load the skeleton capabilities
-        final Service skeleton = getStaticCapabilitiesObject("WMTS", null);
+        final Details skeleton = getStaticCapabilitiesObject("wmts", null);
         final Capabilities skeletonCapabilities = (Capabilities) WMTSConstant.createCapabilities("1.0.0", skeleton);
 
          //we prepare the response document

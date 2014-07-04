@@ -31,6 +31,14 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class Configuration {
 
+    public Configuration() {
+
+    }
+
+    public Configuration(final String path) {
+        this.path = path;
+    }
+
     /**
      * Constellation configuration path
      */

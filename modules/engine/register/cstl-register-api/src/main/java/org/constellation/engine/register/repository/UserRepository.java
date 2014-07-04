@@ -19,9 +19,13 @@
 package org.constellation.engine.register.repository;
 
 import java.util.List;
+import java.util.Map;
 
+import org.constellation.engine.register.Domainrole;
 import org.constellation.engine.register.DomainUser;
 import org.constellation.engine.register.User;
+
+import com.google.common.base.Optional;
 
 
 public interface UserRepository {
@@ -29,6 +33,8 @@ public interface UserRepository {
     List<User> findAll();
     
     List<DomainUser> findAllWithDomainAndRole();
+    
+    List<User> findUsersByDomainId(int domainId);
     
     User insert(User user, List<String> roles);
 
@@ -42,16 +48,24 @@ public interface UserRepository {
     
     int delete(int userId);
     
-    DomainUser findOneWithRolesAndDomains(String login);
+    Optional<DomainUser> findOneWithRolesAndDomains(String login);
+    
+    Optional<DomainUser> findOneWithRolesAndDomains(int id);
 
     boolean isLastAdmin(int userId);
 
     User findOne(String username);
 
     List<String> getRoles(int userId);
+    
+    
 
     int countUser();
     
     boolean loginAvailable(String login);
+
+    Map<User, List<Domainrole>> findUsersWithDomainRoles(int domainId);
+
+    List<User> findUsersNotInDomain(int domainId);
     
 }

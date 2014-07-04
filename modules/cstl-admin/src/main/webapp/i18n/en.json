@@ -20,6 +20,7 @@
     "admin.domain.memberscount": "Members count",
     "admin.domain.title": "Domains",
     "admin.domain.add": "Add a domain",
+    "admin.domain.linked": "Linked domains",
     "admin.domain.count": "{{ NUM }} domain(s)",
     "admin.domain.new": "New domain",
     "admin.domain.tab.name": "Name",
@@ -127,6 +128,9 @@
     "data.modal.server.title":"Server file",
     "data.modal.validate":"Validate",
     "data.modal.view.metadata.title":"View metadata",
+
+    "domain.list": "Domains",
+    "domain.linked": "Linked Domains",
 
     "edition.style.label.attribute":"Attribute",
     "edition.style.label.auto.intervals":"By intervals",
@@ -348,6 +352,7 @@
     "layer.listing.reduce.button.label": "Reduce or expand",
     "layer.listing.selectall.button": "select all layers",
     "layer.listing.selected.data.button": "View",
+    "layer.listing.selected.domain.button": "Domains",
     "layer.listing.selected.delete.button": "Delete",
     "layer.listing.selected.export.button": "Export",
     "layer.listing.selected.metadata.button": "Metadata",
@@ -405,7 +410,6 @@
     "server.choose.file": "Choose a file on the server",
     "server.create.button": "Create",
     "server.next.button": "Next",
-
     "service.abstract.label": "Service description",
     "service.config.source": "Source",
     "service.config.source.sos":"Metadata source",
@@ -601,7 +605,7 @@
     "settings.form.button": "Save",
     "settings.form.login.placeholder": "Your login",
     "settings.form.password.placeholder": "Your password",
-    "settings.form.button.close":"Cancel",
+    "settings.form.button.close":"Close",
     "settings.form.modal.title": "New User",
     "settings.messages.error": "<strong>An error has occured!</strong> Settings could not be saved.",
     "settings.messages.success": "<strong>Settings saved!</strong>",

@@ -29,7 +29,6 @@ import java.io.StringReader;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import org.constellation.admin.ConfigurationEngine;
 import org.opengis.parameter.GeneralParameterDescriptor;
 
 /**
@@ -104,16 +103,16 @@ public final class ProviderRecord extends Record {
         this.parent = parent;
     }
 
-    public ProviderRecord getParentProvider(){
-        if(parent==null || parent.isEmpty()){
-            return null;
-        }
-        return ConfigurationEngine.getProvider(parent);
-    }
+//    public ProviderRecord getParentProvider(){
+//        if(parent==null || parent.isEmpty()){
+//            return null;
+//        }
+//        return ConfigurationEngine.getProvider(parent);
+//    }
     
-    public List<ProviderRecord> getChildrenProviders(){
-        return ConfigurationEngine.getProvidersFromParent(identifier);
-    }
+//    public List<ProviderRecord> getChildrenProviders(){
+//        return ConfigurationEngine.getProvidersFromParent(identifier);
+//    }
     
     public ProviderType getType() {
         return type;
@@ -165,10 +164,10 @@ public final class ProviderRecord extends Record {
         session.updateProviderMetadata(id, metadataId, metadata);
     }
 
-    public List<StyleRecord> getStyles() throws SQLException {
-        ensureConnectionNotClosed();
-        return session.readStyles(this);
-    }
+//    public List<StyleRecord> getStyles() throws SQLException {
+//        ensureConnectionNotClosed();
+//        return session.readStyles(this);
+//    }
 
     public List<DataRecord> getData() throws SQLException {
         ensureConnectionNotClosed();
