@@ -39,6 +39,7 @@ import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.dto.ServiceDTO;
 import org.constellation.api.CommonConstants;
 import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.ServiceReport;
@@ -141,7 +142,7 @@ public class AdminRest {
 
     @GET
     @Path("/domain/{domainId}/instances")
-    public Response listInstances(@PathParam("domainId") int domainId, @Context HttpServletRequest httpServletRequest) {
+    public Response listInstances(@PathParam("domainId") int domainId, @Context HttpServletRequest httpServletRequest) throws ConfigurationException {
         return listInstances(domainId,null, httpServletRequest);
     }
 
@@ -152,7 +153,7 @@ public class AdminRest {
       */
  @GET
  @Path("/domain/{domainId}/instances/{lang}")
- public Response listInstances(@PathParam("domainId") int domainId, @PathParam("lang") String lang, @Context HttpServletRequest httpServletRequest) {
+ public Response listInstances(@PathParam("domainId") int domainId, @PathParam("lang") String lang, @Context HttpServletRequest httpServletRequest) throws ConfigurationException {
      final List<Instance> instances = new ArrayList<>();
      final List<ServiceDTO> services = serviceBusiness.getAllServicesByDomainId(domainId, lang);
      for (ServiceDTO service : services) {

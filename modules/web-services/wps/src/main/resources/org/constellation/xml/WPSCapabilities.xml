@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<service xmlns="http://www.constellation.org/config">
+<details xmlns="http://www.constellation.org/config">
     <description>WPS server developed by Geomatys for Constellation SDI.</description>
     <identifier>default</identifier>
     <keywords>WPS</keywords>
@@ -25,4 +25,4 @@
         <zipCode>13200</zipCode>
     </serviceContact>
     <versions>1.0.0</versions>
-</service>
+</details>

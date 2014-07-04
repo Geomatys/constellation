@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<service xmlns="http://www.constellation.org/config">
+<details xmlns="http://www.constellation.org/config">
     <description>Service that contrains the map access interface to some TileMatrixSets</description>
     <identifier>default</identifier>
     <keywords>WMTS</keywords>
@@ -26,4 +26,4 @@
         <url>http://www.geomatys.fr/</url>
     </serviceContact>
     <versions>1.0.0</versions>
-</service>
+</details>

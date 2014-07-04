@@ -58,18 +58,6 @@ public class ServiceBusiness {
 
 
 
-//    ServiceDTO create(ServiceDTO serviceDTO) {
-//        Service service = new Service();
-//        try {
-//            BeanUtils.copyProperties(service, serviceDTO);
-//        } catch (IllegalAccessException | InvocationTargetException e) {
-//            throw new ConstellationException(e);
-//        }
-//        int serviceId = serviceRepository.create(service);
-//        serviceDTO.setId(serviceId);
-//        return serviceDTO;
-//    }
-
     /**
      * Creates a new service instance.
      *
@@ -81,7 +69,7 @@ public class ServiceBusiness {
      * @return the configuration object just setted.
      * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
-    public Object create(final String serviceType, final String identifier, Object configuration, final Details details ,final Integer domainId) throws ConfigurationException {
+    public Object create(final String serviceType, final String identifier, Object configuration, Details details ,final Integer domainId) throws ConfigurationException {
 
         if (identifier == null || identifier.isEmpty()) {
             throw new ConfigurationException("Service instance identifier can't be null or empty.");
@@ -100,12 +88,40 @@ public class ServiceBusiness {
         service.setIdentifier(identifier);
         service.setStatus(ServiceStatus.STOPPED.toString());
         //TODO metadata-Iso
-        service.setVersions(StringUtils.join(details.getVersions(), "|"));
+        
+        if (details == null) {
+            final InputStream in = Util.getResourceAsStream("org/constellation/xml/" + service.getType().toUpperCase() + "Capabilities.xml");
+            if (in != null) {
+                try {
+                    final Unmarshaller u = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+                    details = (Details) u.unmarshal(in);
+                    details.setIdentifier(service.getIdentifier());
+                    details.setLang("eng"); // default value
+                    GenericDatabaseMarshallerPool.getInstance().recycle(u);
+                    in.close();
+                } catch (JAXBException | IOException ex) {
+                    throw new ConfigurationException(ex);
+                }
+            } else {
+                throw new ConfigurationException("Unable to find the capabilities skeleton from resource.");
+            }
+        } else if (details.getLang() == null) {
+            details.setLang("eng");// default value
+        }
+        
+        final String versions;
+        if (details.getVersions() != null) {
+            versions = StringUtils.join(details.getVersions(), "|");
+        } else {
+            versions = "";
+        }
+        service.setVersions(versions);
+        
         int serviceId = serviceRepository.create(service);
         if (domainId != null){
             domainRepository.addServiceToDomain(serviceId,domainId);
         }
-        setInstanceDetails(serviceType, identifier, details, details.getLang());
+        setInstanceDetails(serviceType, identifier, details, details.getLang(), true);
         return configuration;
     }
     
@@ -322,7 +338,7 @@ public class ServiceBusiness {
             service.setConfig(getStringFromObject(configuration, GenericDatabaseMarshallerPool.getInstance()));
             serviceRepository.update(service);
             if (details != null) {
-                setInstanceDetails(serviceType, identifier, details, details.getLang());
+                setInstanceDetails(serviceType, identifier, details, details.getLang(), true);
             }
         }
      }
@@ -478,8 +494,7 @@ public class ServiceBusiness {
     }
 
 
-    public Details getInstanceDetails(final int serviceId, final String language) {
-        final Service service = serviceRepository.findById(serviceId);
+    public Details getInstanceDetails(final int serviceId, String language) throws ConfigurationException {
         try {
             ServiceDetails details;
             if (language==null){
@@ -488,22 +503,11 @@ public class ServiceBusiness {
                 details = serviceRepository.getServiceDetails(serviceId, language);
             }
             if (details == null) {
-                final InputStream in = Util.getResourceAsStream("org/constellation/xml/" + service.getType().toUpperCase()
-                        + "Capabilities.xml");
-                if (in != null) {
-                    final Unmarshaller u = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-                    Details servMetadata = (Details) u.unmarshal(in);
-                    GenericDatabaseMarshallerPool.getInstance().recycle(u);
-                    in.close();
-                    servMetadata.setIdentifier(service.getIdentifier());
-                    return servMetadata;
-                } else {
-                    throw new IOException("Unable to find the capabilities skeleton from resource.");
-                }
+                throw new ConfigurationException("service " + serviceId + " does not have a details object for language:" + language);
             } else {
                 return (Details) getObjectFromString(details.getContent(), GenericDatabaseMarshallerPool.getInstance());
             }
-        } catch (JAXBException | IOException ex) {
+        } catch (JAXBException ex) {
             throw new ConstellationException(ex);
         }
     }
@@ -517,11 +521,11 @@ public class ServiceBusiness {
      * @throws TargetNotFoundException if the service with specified identifier does not exist
      * @throws org.constellation.configuration.ConfigurationException if the operation has failed for any reason
      */
-    public void setInstanceDetails(final String serviceType, final String identifier, final Details details, final String language) throws ConfigurationException {
+    public void setInstanceDetails(final String serviceType, final String identifier, final Details details, final String language, final boolean default_) throws ConfigurationException {
         final Service service = this.ensureExistingInstance(serviceType, identifier);
         if (service != null) {
             final String xml = getStringFromObject(details, GenericDatabaseMarshallerPool.getInstance());
-            final ServiceDetails serviceDetails = new ServiceDetails(service.getId(), language, xml,true);
+            final ServiceDetails serviceDetails = new ServiceDetails(service.getId(), language, xml, default_);
             serviceRepository.createOrUpdateServiceDetails(serviceDetails);
         }
     }
@@ -586,7 +590,7 @@ public class ServiceBusiness {
         domainRepository.removeServiceFromDomain(serviceId, domainId);
     }
 
-    public List<ServiceDTO> getAllServicesByDomainId(int domainId, String lang) {
+    public List<ServiceDTO> getAllServicesByDomainId(int domainId, String lang) throws ConfigurationException {
         List<ServiceDTO> serviceDTOs = new ArrayList<>();
         List<Service> services = serviceRepository.findByDomain(domainId);
         for (Service service : services){

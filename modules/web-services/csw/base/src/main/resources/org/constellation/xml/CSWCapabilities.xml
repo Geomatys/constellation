@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<service xmlns="http://www.constellation.org/config">
+<details xmlns="http://www.constellation.org/config">
     <description>CS-W 2.0.2/AP ISO19115/19139 for service, datasets and applications</description>
     <identifier>default</identifier>
     <keywords>CS-W</keywords>
@@ -28,4 +28,4 @@
         <zipCode>13200</zipCode>
     </serviceContact>
     <versions>2.0.2</versions>
-</service>
+</details>

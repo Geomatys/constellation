@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<service xmlns="http://www.constellation.org/config">
+<details xmlns="http://www.constellation.org/config">
     <description>Constellation Map Server</description>
     <identifier>default</identifier>
     <keywords>WMS</keywords>
@@ -27,4 +27,4 @@
     </serviceContact>
     <versions>1.1.1</versions>
     <versions>1.3.0</versions>
-</service>
+</details>

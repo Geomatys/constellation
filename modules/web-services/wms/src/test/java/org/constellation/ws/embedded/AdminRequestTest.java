@@ -203,6 +203,9 @@ public class AdminRequestTest extends AbstractGrizzlyServer  implements Applicat
 
         final Details meta = new Details();
         meta.setIdentifier("wms2");
+        meta.setName("OGC:WMS");
+        meta.setDescription("Constellation Map Server");
+        meta.setVersions(Arrays.asList("1.1.1", "1.3.0"));
         putRequestObject(conec, meta, GenericDatabaseMarshallerPool.getInstance());
         Object obj = unmarshallResponse(conec);
 

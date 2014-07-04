@@ -296,7 +296,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                 serviceEng.setServiceContact(ct);
                 serviceEng.setVersions(Arrays.asList("1.1.1", "1.3.0"));
 
-                serviceBusiness.setInstanceDetails("wms", "wms1", serviceEng, "eng");
+                serviceBusiness.setInstanceDetails("wms", "wms1", serviceEng, "eng", true);
                 //ConfigurationEngine.writeServiceMetadata("wms1", "wms", serviceEng, "eng");
 
                 final Details serviceFre = new Details();
@@ -308,7 +308,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                 serviceFre.setServiceContact(ct);
                 serviceFre.setVersions(Arrays.asList("1.1.1", "1.3.0"));
                 
-                serviceBusiness.setInstanceDetails("wms", "wms1", serviceFre, "fre");
+                serviceBusiness.setInstanceDetails("wms", "wms1", serviceFre, "fre", false);
 
                 final LayerContext config3 = new LayerContext();
                 config3.getCustomParameters().put("shiroAccessible", "false");

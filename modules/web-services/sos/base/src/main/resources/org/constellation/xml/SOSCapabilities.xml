@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<service xmlns="http://www.constellation.org/config">
+<details xmlns="http://www.constellation.org/config">
     <description>Constellation SOS Server</description>
     <identifier>default</identifier>
     <keywords>SOS</keywords>
@@ -25,4 +25,4 @@
     </serviceContact>
     <versions>1.0.0</versions>
     <versions>2.0.0</versions>
-</service>
+</details>
