@@ -19,24 +19,38 @@
 
 package org.constellation.rest.api;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
-import javax.inject.Inject;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.DataBusiness;
-import org.constellation.configuration.*;
+import org.constellation.admin.StyleBusiness;
+import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.DataBrief;
+import org.constellation.configuration.Layer;
+import org.constellation.configuration.LayerList;
+import org.constellation.configuration.LayerSummary;
+import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.AddLayer;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
 import org.constellation.map.configuration.LayerBusiness;
-import static org.constellation.utils.RESTfulUtilities.ok;
-import org.constellation.admin.StyleBusiness;
 import org.constellation.security.SecurityManager;
 import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
+
+import static org.constellation.utils.RESTfulUtilities.ok;
 
 /**
  * RESTful API for map services configuration.

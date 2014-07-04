@@ -19,29 +19,39 @@
 
 package org.constellation.provider;
 
+import org.apache.sis.storage.DataStoreException;
+import org.constellation.admin.dao.DataRecord.DataType;
+import org.geotoolkit.data.AbstractFeatureStoreFactory;
+import org.geotoolkit.data.FeatureStore;
+import org.geotoolkit.data.memory.ExtendedFeatureStore;
+import org.geotoolkit.data.memory.MemoryFeatureStore;
+import org.geotoolkit.data.query.Query;
+import org.geotoolkit.data.query.QueryBuilder;
+import org.geotoolkit.feature.type.DefaultName;
+import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.parameter.Parameters;
+import org.opengis.parameter.ParameterNotFoundException;
+import org.opengis.parameter.ParameterValueGroup;
+
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.logging.Level;
-import org.apache.sis.storage.DataStoreException;
-import org.constellation.admin.dao.DataRecord.DataType;
 
-import org.geotoolkit.data.query.Query;
-import org.geotoolkit.data.query.QueryBuilder;
-import org.geotoolkit.feature.type.DefaultName;
-
-import org.geotoolkit.parameter.Parameters;
-import org.geotoolkit.feature.type.Name;
-import org.opengis.parameter.ParameterValueGroup;
-
-import static org.constellation.provider.configuration.ProviderParameters.*;
-import org.geotoolkit.data.AbstractFeatureStoreFactory;
-import org.geotoolkit.data.FeatureStore;
-import org.geotoolkit.data.memory.ExtendedFeatureStore;
-import org.geotoolkit.data.memory.MemoryFeatureStore;
-import static org.geotoolkit.parameter.Parameters.*;
-import org.opengis.parameter.ParameterNotFoundException;
+import static org.constellation.provider.configuration.ProviderParameters.LAYER_DATE_END_FIELD_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.LAYER_DATE_START_FIELD_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.LAYER_ELEVATION_END_FIELD_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.LAYER_ELEVATION_START_FIELD_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.LAYER_NAME_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.LAYER_QUERY_LANGUAGE;
+import static org.constellation.provider.configuration.ProviderParameters.LAYER_QUERY_STATEMENT;
+import static org.constellation.provider.configuration.ProviderParameters.containLayer;
+import static org.constellation.provider.configuration.ProviderParameters.getLayer;
+import static org.constellation.provider.configuration.ProviderParameters.getLayers;
+import static org.constellation.provider.configuration.ProviderParameters.getQueryLayers;
+import static org.constellation.provider.configuration.ProviderParameters.isLoadAll;
+import static org.geotoolkit.parameter.Parameters.value;
 
 /**
  * Abstract provider which handle a Datastore.

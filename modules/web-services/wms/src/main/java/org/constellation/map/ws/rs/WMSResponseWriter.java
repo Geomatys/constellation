@@ -19,27 +19,28 @@
 
 package org.constellation.map.ws.rs;
 
+import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
+import org.constellation.writer.CapabilitiesFilterWriter;
+import org.geotoolkit.wms.xml.WMSMarshallerPool;
+import org.geotoolkit.wms.xml.WMSResponse;
+import org.geotoolkit.wms.xml.v111.WMT_MS_Capabilities;
+import org.geotoolkit.wms.xml.v130.WMSCapabilities;
+
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.Provider;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.Provider;
-import javax.ws.rs.ext.MessageBodyWriter;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import org.constellation.writer.CapabilitiesFilterWriter;
-import org.apache.sis.util.logging.Logging;
-import org.geotoolkit.wms.xml.WMSResponse;
-import org.geotoolkit.wms.xml.WMSMarshallerPool;
-import org.geotoolkit.wms.xml.v111.WMT_MS_Capabilities;
-import org.geotoolkit.wms.xml.v130.WMSCapabilities;
-import org.apache.sis.xml.MarshallerPool;
 
 /**
  *

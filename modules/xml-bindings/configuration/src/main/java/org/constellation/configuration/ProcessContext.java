@@ -19,13 +19,14 @@
 
 package org.constellation.configuration;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.geotoolkit.gui.swing.tree.Trees;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.geotoolkit.gui.swing.tree.Trees;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Configuration for a WPS service.

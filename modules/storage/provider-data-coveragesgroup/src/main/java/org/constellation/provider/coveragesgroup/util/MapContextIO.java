@@ -18,25 +18,23 @@
  */
 package org.constellation.provider.coveragesgroup.util;
 
+import org.apache.sis.internal.jaxb.geometry.ObjectFactory;
+import org.apache.sis.xml.MarshallerPool;
+import org.constellation.provider.coveragesgroup.xml.DataReference;
+import org.constellation.provider.coveragesgroup.xml.MapLayer;
+import org.constellation.provider.coveragesgroup.xml.StyleReference;
+import org.geotoolkit.map.CoverageMapLayer;
+import org.geotoolkit.map.FeatureMapLayer;
+import org.geotoolkit.map.MapContext;
+import org.geotoolkit.map.MapItem;
+import org.geotoolkit.style.MutableStyle;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.IOException;
-
-import org.apache.sis.internal.jaxb.geometry.ObjectFactory;
-import org.apache.sis.xml.MarshallerPool;
-
-import org.constellation.provider.coveragesgroup.xml.DataReference;
-import org.constellation.provider.coveragesgroup.xml.MapLayer;
-import org.constellation.provider.coveragesgroup.xml.StyleReference;
-
-import org.geotoolkit.map.CoverageMapLayer;
-import org.geotoolkit.map.FeatureMapLayer;
-import org.geotoolkit.map.MapContext;
-import org.geotoolkit.map.MapItem;
-import org.geotoolkit.style.MutableStyle;
 
 /**
  * Utility class to read/write geotk MapContext into/from file.

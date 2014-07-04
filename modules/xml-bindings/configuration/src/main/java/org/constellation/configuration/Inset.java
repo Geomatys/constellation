@@ -18,9 +18,11 @@
  */
 package org.constellation.configuration;
 
-import java.awt.Insets;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import java.awt.*;
 import java.io.Serializable;
-import javax.xml.bind.annotation.*;
 /**
  *
  * @author Quentin Boileau (Geomatys).

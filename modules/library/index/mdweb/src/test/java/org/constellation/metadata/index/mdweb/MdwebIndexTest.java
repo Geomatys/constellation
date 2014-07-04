@@ -19,55 +19,55 @@
 package org.constellation.metadata.index.mdweb;
 
 // J2SE dependencies
-import javax.imageio.spi.ServiceRegistry;
-import java.util.Iterator;
-import java.io.File;
-import java.sql.Connection;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-// MDWeb dependencies
-import org.apache.sis.geometry.GeneralEnvelope;
-import org.mdweb.model.storage.Value;
-import org.mdweb.io.Reader;
-import org.mdweb.model.storage.FullRecord;
-import org.mdweb.io.MD_IOFactory;
-import org.mdweb.model.storage.TextValue;
-
-// Constellation dependencies
-import org.constellation.util.Util;
-import org.constellation.generic.database.Automatic;
-import org.constellation.generic.database.BDD;
-
-// lucene dependencies
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
+import org.apache.sis.geometry.GeneralEnvelope;
+import org.apache.sis.util.logging.Logging;
+import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.TestRunner;
-
-// geotoolkit dependencies
+import org.constellation.util.Util;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
-import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.lucene.index.LuceneIndexSearcher;
+import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.util.FileUtilities;
-import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
-
-// GeoAPI dependencies
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.filter.FilterFactory2;
-
-//Junit dependencies
-import org.junit.*;
-import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
+import org.mdweb.io.MD_IOFactory;
+import org.mdweb.io.Reader;
+import org.mdweb.model.storage.FullRecord;
+import org.mdweb.model.storage.TextValue;
+import org.mdweb.model.storage.Value;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import javax.imageio.spi.ServiceRegistry;
+import java.io.File;
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.junit.Assert.*;
+
+// MDWeb dependencies
+// Constellation dependencies
+// lucene dependencies
+// geotoolkit dependencies
+// GeoAPI dependencies
+//Junit dependencies
 
 /**
  * Test class for constellation lucene index

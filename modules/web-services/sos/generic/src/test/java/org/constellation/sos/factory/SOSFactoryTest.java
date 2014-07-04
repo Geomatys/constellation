@@ -19,19 +19,25 @@
 
 package org.constellation.sos.factory;
 
-import javax.imageio.spi.ServiceRegistry;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.HashMap;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.geotoolkit.observation.ObservationFilter;
 import org.geotoolkit.observation.ObservationReader;
-import org.constellation.ws.CstlServiceException;
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import javax.imageio.spi.ServiceRegistry;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  *

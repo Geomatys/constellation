@@ -1,11 +1,10 @@
 package org.constellation.engine.register.i18n;
 
-import java.util.Map;
-
+import com.google.common.collect.ImmutableMap;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.DataI18n;
 
-import com.google.common.collect.ImmutableMap;
+import java.util.Map;
 
 /**
  * Wrap {@link Data} and {@link DataI18n}.

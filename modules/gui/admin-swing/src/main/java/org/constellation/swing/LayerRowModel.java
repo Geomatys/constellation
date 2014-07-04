@@ -19,8 +19,9 @@
 
 package org.constellation.swing;
 
-import java.util.ResourceBundle;
 import org.netbeans.swing.outline.RowModel;
+
+import java.util.ResourceBundle;
 
 /**
  *

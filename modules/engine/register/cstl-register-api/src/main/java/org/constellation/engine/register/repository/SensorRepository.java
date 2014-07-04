@@ -1,8 +1,9 @@
 package org.constellation.engine.register.repository;
 
-import java.util.List;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Sensor;
+
+import java.util.List;
 
 public interface SensorRepository {
 

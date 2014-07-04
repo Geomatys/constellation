@@ -19,15 +19,15 @@
 package org.constellation.numeric.table;
 
 // J2SE dependencies
-import java.util.Arrays;
-import java.util.Random;
-import java.io.IOException;
-import java.nio.DoubleBuffer;
 
-// JUnit dependencies
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+import java.io.IOException;
+import java.util.Random;
+
+// JUnit dependencies
 
 
 /**

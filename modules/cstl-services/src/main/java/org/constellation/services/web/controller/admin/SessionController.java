@@ -18,13 +18,13 @@
  */
 package org.constellation.services.web.controller.admin;
 
-import javax.inject.Inject;
-
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.inject.Inject;
 
 @Controller("adminSessionController")
 @RequestMapping("/admin/session")

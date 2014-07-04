@@ -18,16 +18,14 @@
  */
 package org.constellation.plugin;
 
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-
-import org.constellation.ws.embedded.LaunchTests;
 import org.apache.sis.util.logging.Logging;
+import org.constellation.ws.embedded.LaunchTests;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**

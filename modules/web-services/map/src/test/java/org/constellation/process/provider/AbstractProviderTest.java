@@ -19,22 +19,23 @@
 package org.constellation.process.provider;
 
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import javax.annotation.PostConstruct;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.process.AbstractProcessTest;
 import org.constellation.provider.DataProvider;
-import org.constellation.provider.DataProviders;
 import org.constellation.provider.DataProviderFactory;
+import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
+
+import javax.annotation.PostConstruct;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Collection;
 
 /**
  *

@@ -18,12 +18,6 @@
  */
 package org.constellation.wmts.ws;
 
-import java.io.StringWriter;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.xml.bind.Marshaller;
 import org.apache.sis.test.XMLComparator;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
@@ -33,22 +27,34 @@ import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
 import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.ws.CstlServiceException;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.SectionsType;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.wmts.xml.WMTSMarshallerPool;
 import org.geotoolkit.wmts.xml.v100.Capabilities;
 import org.geotoolkit.wmts.xml.v100.GetCapabilities;
-
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.xml.bind.Marshaller;
+import java.io.StringWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 
 /**

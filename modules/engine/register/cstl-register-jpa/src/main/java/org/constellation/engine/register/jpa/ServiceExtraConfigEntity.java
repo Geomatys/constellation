@@ -18,6 +18,9 @@
  */
 package org.constellation.engine.register.jpa;
 
+import org.constellation.engine.register.Service;
+import org.constellation.engine.register.ServiceExtraConfig;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -25,9 +28,6 @@ import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import org.constellation.engine.register.Service;
-import org.constellation.engine.register.ServiceExtraConfig;
 
 @Entity
 @IdClass(ServiceExtraConfigEntityPk.class)

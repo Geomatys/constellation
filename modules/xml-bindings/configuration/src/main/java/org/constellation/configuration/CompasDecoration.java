@@ -18,14 +18,15 @@
  */
 package org.constellation.configuration;
 
-import java.awt.Dimension;
+import org.constellation.configuration.utils.WMSPortrayalUtils;
+import org.geotoolkit.display2d.ext.northarrow.DefaultNorthArrowTemplate;
+import org.geotoolkit.display2d.ext.northarrow.NorthArrowTemplate;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import org.constellation.configuration.utils.WMSPortrayalUtils;
-import org.geotoolkit.display2d.ext.northarrow.DefaultNorthArrowTemplate;
-import org.geotoolkit.display2d.ext.northarrow.NorthArrowTemplate;
+import java.awt.*;
 
 /**
  *

@@ -19,6 +19,8 @@
 package org.constellation.test;
 
 // J2SE dependencies
+
+import javax.media.jai.operator.AffineDescriptor;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
@@ -26,7 +28,6 @@ import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.util.HashSet;
 import java.util.Set;
-import javax.media.jai.operator.AffineDescriptor;
 
 
 /**

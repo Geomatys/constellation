@@ -19,68 +19,113 @@
 package org.constellation.coverage.ws.rs;
 
 // Jersey dependencies
-import javax.inject.Singleton;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Response;
 
-// J2SE dependencies
-import java.util.logging.Level;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.StringTokenizer;
-
-// Constellation dependencies
 import org.constellation.ServiceDef;
 import org.constellation.ServiceDef.Specification;
+import org.constellation.api.QueryConstants;
+import org.constellation.coverage.ws.DefaultWCSWorker;
 import org.constellation.coverage.ws.WCSWorker;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.MimeType;
+import org.constellation.ws.Worker;
 import org.constellation.ws.rs.GridWebService;
 import org.constellation.ws.rs.provider.SchemaLocatedExceptionResponse;
-import org.constellation.coverage.ws.DefaultWCSWorker;
-import org.constellation.ws.ExceptionCode;
-import org.constellation.ws.Worker;
-
-import static org.constellation.coverage.ws.WCSConstant.*;
-import static org.constellation.api.QueryConstants.*;
-
-// Geotoolkit dependencies
+import org.geotoolkit.client.RequestsUtilities;
 import org.geotoolkit.gml.xml.v311.CodeType;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.gml.xml.v311.EnvelopeType;
 import org.geotoolkit.gml.xml.v311.GridLimitsType;
 import org.geotoolkit.gml.xml.v311.GridType;
-import org.geotoolkit.ows.xml.v110.ExceptionReport;
-import org.geotoolkit.ows.xml.v110.BoundingBoxType;
-import org.geotoolkit.ows.xml.v110.SectionsType;
-import org.geotoolkit.client.RequestsUtilities;
-import org.geotoolkit.resources.Errors;
-import org.geotoolkit.util.StringUtilities;
-import java.util.Objects;
-import org.constellation.api.QueryConstants;
-import org.geotoolkit.wcs.xml.DescribeCoverage;
-import org.geotoolkit.wcs.xml.DescribeCoverageResponse;
-import org.geotoolkit.wcs.xml.GetCapabilities;
-import org.geotoolkit.wcs.xml.GetCapabilitiesResponse;
-import org.geotoolkit.wcs.xml.GetCoverage;
-import org.geotoolkit.wcs.xml.v111.GridCrsType;
-import org.geotoolkit.wcs.xml.v111.RangeSubsetType.FieldSubset;
 import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
 import org.geotoolkit.ogc.xml.exception.ServiceExceptionType;
 import org.geotoolkit.ows.xml.AcceptFormats;
 import org.geotoolkit.ows.xml.AcceptVersions;
-import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ows.xml.ExceptionResponse;
-import org.geotoolkit.wcs.xml.WCSMarshallerPool;
 import org.geotoolkit.ows.xml.OWSXmlFactory;
+import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ows.xml.Sections;
-import org.geotoolkit.wcs.xml.WCSXmlFactory;
+import org.geotoolkit.ows.xml.v110.BoundingBoxType;
+import org.geotoolkit.ows.xml.v110.ExceptionReport;
+import org.geotoolkit.ows.xml.v110.SectionsType;
+import org.geotoolkit.resources.Errors;
+import org.geotoolkit.util.StringUtilities;
+import org.geotoolkit.wcs.xml.DescribeCoverage;
+import org.geotoolkit.wcs.xml.DescribeCoverageResponse;
 import org.geotoolkit.wcs.xml.DomainSubset;
+import org.geotoolkit.wcs.xml.GetCapabilities;
+import org.geotoolkit.wcs.xml.GetCapabilitiesResponse;
+import org.geotoolkit.wcs.xml.GetCoverage;
 import org.geotoolkit.wcs.xml.TimeSequence;
+import org.geotoolkit.wcs.xml.WCSMarshallerPool;
+import org.geotoolkit.wcs.xml.WCSXmlFactory;
+import org.geotoolkit.wcs.xml.v111.GridCrsType;
+import org.geotoolkit.wcs.xml.v111.RangeSubsetType.FieldSubset;
 
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import javax.inject.Singleton;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
+
+import static org.constellation.api.QueryConstants.ACCEPT_FORMATS_PARAMETER;
+import static org.constellation.api.QueryConstants.REQUEST_PARAMETER;
+import static org.constellation.api.QueryConstants.SECTIONS_PARAMETER;
+import static org.constellation.api.QueryConstants.UPDATESEQUENCE_PARAMETER;
+import static org.constellation.api.QueryConstants.VERSION_PARAMETER;
+import static org.constellation.coverage.ws.WCSConstant.ASCII_GRID;
+import static org.constellation.coverage.ws.WCSConstant.BMP;
+import static org.constellation.coverage.ws.WCSConstant.DESCRIBECOVERAGE;
+import static org.constellation.coverage.ws.WCSConstant.GEOTIFF;
+import static org.constellation.coverage.ws.WCSConstant.GETCAPABILITIES;
+import static org.constellation.coverage.ws.WCSConstant.GETCOVERAGE;
+import static org.constellation.coverage.ws.WCSConstant.GIF;
+import static org.constellation.coverage.ws.WCSConstant.JPEG;
+import static org.constellation.coverage.ws.WCSConstant.JPG;
+import static org.constellation.coverage.ws.WCSConstant.KEY_BBOX;
+import static org.constellation.coverage.ws.WCSConstant.KEY_BOUNDINGBOX;
+import static org.constellation.coverage.ws.WCSConstant.KEY_CATEGORIES;
+import static org.constellation.coverage.ws.WCSConstant.KEY_COVERAGE;
+import static org.constellation.coverage.ws.WCSConstant.KEY_CRS;
+import static org.constellation.coverage.ws.WCSConstant.KEY_DEPTH;
+import static org.constellation.coverage.ws.WCSConstant.KEY_FORMAT;
+import static org.constellation.coverage.ws.WCSConstant.KEY_GRIDBASECRS;
+import static org.constellation.coverage.ws.WCSConstant.KEY_GRIDCS;
+import static org.constellation.coverage.ws.WCSConstant.KEY_GRIDOFFSETS;
+import static org.constellation.coverage.ws.WCSConstant.KEY_GRIDORIGIN;
+import static org.constellation.coverage.ws.WCSConstant.KEY_GRIDTYPE;
+import static org.constellation.coverage.ws.WCSConstant.KEY_HEIGHT;
+import static org.constellation.coverage.ws.WCSConstant.KEY_IDENTIFIER;
+import static org.constellation.coverage.ws.WCSConstant.KEY_INTERPOLATION;
+import static org.constellation.coverage.ws.WCSConstant.KEY_RANGESUBSET;
+import static org.constellation.coverage.ws.WCSConstant.KEY_RESPONSE_CRS;
+import static org.constellation.coverage.ws.WCSConstant.KEY_RESX;
+import static org.constellation.coverage.ws.WCSConstant.KEY_RESY;
+import static org.constellation.coverage.ws.WCSConstant.KEY_RESZ;
+import static org.constellation.coverage.ws.WCSConstant.KEY_SECTION;
+import static org.constellation.coverage.ws.WCSConstant.KEY_TIME;
+import static org.constellation.coverage.ws.WCSConstant.KEY_TIMESEQUENCE;
+import static org.constellation.coverage.ws.WCSConstant.KEY_WIDTH;
+import static org.constellation.coverage.ws.WCSConstant.MATRIX;
+import static org.constellation.coverage.ws.WCSConstant.NETCDF;
+import static org.constellation.coverage.ws.WCSConstant.PNG;
+import static org.constellation.coverage.ws.WCSConstant.TIF;
+import static org.constellation.coverage.ws.WCSConstant.TIFF;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_DIMENSION_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_FORMAT;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.OPERATION_NOT_SUPPORTED;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
+
+// J2SE dependencies
+// Constellation dependencies
+// Geotoolkit dependencies
 
 
 

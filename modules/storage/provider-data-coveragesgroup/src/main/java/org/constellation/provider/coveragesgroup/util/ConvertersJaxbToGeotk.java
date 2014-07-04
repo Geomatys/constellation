@@ -18,19 +18,17 @@
  */
 package org.constellation.provider.coveragesgroup.util;
 
-import java.awt.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.ArgumentChecks;
 import org.apache.sis.util.UnconvertibleObjectException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.ServiceDef;
-import org.constellation.provider.*;
+import org.constellation.provider.Data;
+import org.constellation.provider.DataProvider;
+import org.constellation.provider.DataProviders;
+import org.constellation.provider.FeatureData;
+import org.constellation.provider.StyleProvider;
+import org.constellation.provider.StyleProviders;
 import org.constellation.util.DataReference;
 import org.geotoolkit.client.Client;
 import org.geotoolkit.coverage.AbstractCoverageReference;
@@ -61,9 +59,6 @@ import org.geotoolkit.security.BasicAuthenticationSecurity;
 import org.geotoolkit.security.ClientSecurity;
 import org.geotoolkit.style.DefaultStyleFactory;
 import org.geotoolkit.style.MutableStyle;
-import org.apache.sis.util.ArgumentChecks;
-import org.apache.sis.util.UnconvertibleObjectException;
-import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.version.VersionControl;
 import org.geotoolkit.version.VersioningException;
 import org.geotoolkit.wms.WebMapClient;
@@ -72,6 +67,14 @@ import org.geotoolkit.wmts.WebMapTileClient;
 import org.geotoolkit.wmts.xml.WMTSVersion;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
+
+import java.awt.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Collection;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**

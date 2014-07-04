@@ -18,33 +18,15 @@
  */
 package org.constellation.wmts.ws.rs;
 
-import javax.inject.Singleton;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.logging.Level;
-import javax.imageio.IIOException;
-
-// Jersey dependencies
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Response;
-
 import org.constellation.ServiceDef;
 import org.constellation.ServiceDef.Specification;
+import org.constellation.wmts.ws.DefaultWMTSWorker;
+import org.constellation.wmts.ws.WMTSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
-import org.constellation.ws.rs.GridWebService;
-import org.constellation.wmts.ws.WMTSWorker;
-import org.constellation.wmts.ws.DefaultWMTSWorker;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
-
-import static org.constellation.ws.ExceptionCode.*;
-import static org.constellation.api.QueryConstants.*;
-
+import org.constellation.ws.rs.GridWebService;
 import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
@@ -55,6 +37,32 @@ import org.geotoolkit.wmts.xml.WMTSMarshallerPool;
 import org.geotoolkit.wmts.xml.v100.GetCapabilities;
 import org.geotoolkit.wmts.xml.v100.GetFeatureInfo;
 import org.geotoolkit.wmts.xml.v100.GetTile;
+
+import javax.imageio.IIOException;
+import javax.inject.Singleton;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
+
+import static org.constellation.api.QueryConstants.ACCEPT_FORMATS_PARAMETER;
+import static org.constellation.api.QueryConstants.ACCEPT_VERSIONS_PARAMETER;
+import static org.constellation.api.QueryConstants.REQUEST_PARAMETER;
+import static org.constellation.api.QueryConstants.SECTIONS_PARAMETER;
+import static org.constellation.api.QueryConstants.SERVICE_PARAMETER;
+import static org.constellation.api.QueryConstants.UPDATESEQUENCE_PARAMETER;
+import static org.constellation.api.QueryConstants.VERSION_PARAMETER;
+import static org.constellation.ws.ExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.constellation.ws.ExceptionCode.MISSING_PARAMETER_VALUE;
+import static org.constellation.ws.ExceptionCode.NO_APPLICABLE_CODE;
+import static org.constellation.ws.ExceptionCode.OPERATION_NOT_SUPPORTED;
+
+// Jersey dependencies
 
 /**
  * The REST facade to an OGC Web Map Tile Service, implementing the 1.0.0 version.

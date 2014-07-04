@@ -20,6 +20,20 @@
 package org.constellation.sos.io.filesystem;
 
 // J2SE dependencies
+
+import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
+import org.constellation.generic.database.Automatic;
+import org.constellation.metadata.io.MetadataIoException;
+import org.constellation.sos.io.SensorReader;
+import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
+import org.geotoolkit.util.StringUtilities;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,26 +42,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+
+import static org.constellation.sos.ws.SOSConstants.SENSORML_100_FORMAT_V100;
+import static org.constellation.sos.ws.SOSConstants.SENSORML_100_FORMAT_V200;
+import static org.constellation.sos.ws.SOSConstants.SENSORML_101_FORMAT_V100;
+import static org.constellation.sos.ws.SOSConstants.SENSORML_101_FORMAT_V200;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
 
 // Constellation dependencies
-import org.constellation.generic.database.Automatic;
-import org.constellation.metadata.io.MetadataIoException;
-import org.constellation.sos.io.SensorReader;
-import org.constellation.ws.CstlServiceException;
-
-import static org.constellation.sos.ws.SOSConstants.*;
-
 // Geotoolkit dependendies
-import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
-import org.geotoolkit.sml.xml.AbstractSensorML;
-import org.apache.sis.xml.MarshallerPool;
-import org.apache.sis.util.logging.Logging;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import org.geotoolkit.util.StringUtilities;
 
 /**
  *

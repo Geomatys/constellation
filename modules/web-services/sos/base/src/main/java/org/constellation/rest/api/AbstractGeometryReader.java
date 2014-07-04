@@ -18,12 +18,9 @@
  */
 package org.constellation.rest.api;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.geotoolkit.gml.xml.AbstractGeometry;
+import org.geotoolkit.gml.xml.GMLMarshallerPool;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -33,8 +30,12 @@ import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import org.geotoolkit.gml.xml.AbstractGeometry;
-import org.geotoolkit.gml.xml.GMLMarshallerPool;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**

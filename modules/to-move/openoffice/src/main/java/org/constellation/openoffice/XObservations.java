@@ -19,8 +19,9 @@
 package org.constellation.openoffice;
 
 // OpenOffice dependencies
-import com.sun.star.uno.XInterface;
+
 import com.sun.star.beans.XPropertySet;
+import com.sun.star.uno.XInterface;
 
 
 /**

@@ -18,12 +18,11 @@
  */
 package org.constellation.coverage;
 
-import java.net.MalformedURLException;
-
 import junit.framework.Assert;
-
 import org.apache.sis.storage.DataStoreException;
 import org.junit.Test;
+
+import java.net.MalformedURLException;
 
 public class PyramidCoverageHelperTestCase {
 

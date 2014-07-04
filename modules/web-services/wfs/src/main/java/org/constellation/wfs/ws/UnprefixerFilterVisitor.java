@@ -19,8 +19,8 @@
 
 package org.constellation.wfs.ws;
 
-import org.geotoolkit.filter.visitor.DuplicatingFilterVisitor;
 import org.geotoolkit.feature.type.FeatureType;
+import org.geotoolkit.filter.visitor.DuplicatingFilterVisitor;
 import org.opengis.filter.expression.PropertyName;
 
 /**

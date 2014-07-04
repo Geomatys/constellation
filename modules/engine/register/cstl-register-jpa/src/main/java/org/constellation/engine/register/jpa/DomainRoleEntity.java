@@ -18,14 +18,14 @@
  */
 package org.constellation.engine.register.jpa;
 
+import org.constellation.engine.register.DomainRole;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.constellation.engine.register.DomainRole;
 
 @Entity
 @Table(schema="`admin`", name="`domainrole`")

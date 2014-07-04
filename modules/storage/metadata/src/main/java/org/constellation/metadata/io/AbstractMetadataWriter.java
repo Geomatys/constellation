@@ -19,12 +19,13 @@
 package org.constellation.metadata.io;
 
 // J2SE dependencies
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.sis.util.logging.Logging;
 import org.w3c.dom.Node;
+
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *

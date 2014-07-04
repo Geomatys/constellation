@@ -19,14 +19,17 @@
 
 package org.constellation.utils;
 
-import java.util.Date;
-import java.util.List;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.ArgumentChecks;
 import org.constellation.dto.Details;
-
-import static org.constellation.utils.CstlMetadataTemplate.*;
 import org.geotoolkit.feature.type.Name;
+
+import java.util.Date;
+import java.util.List;
+
+import static org.constellation.utils.CstlMetadataTemplate.DATA;
+import static org.constellation.utils.CstlMetadataTemplate.PROVIDER;
+import static org.constellation.utils.CstlMetadataTemplate.SERVICE;
 
 /**
  *

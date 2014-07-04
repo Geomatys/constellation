@@ -19,7 +19,9 @@
 package org.constellation.engine.register.jpa;
 
 
-import java.util.List;
+import org.constellation.engine.register.Data;
+import org.constellation.engine.register.Provider;
+import org.constellation.engine.register.User;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -30,10 +32,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Provider;
-import org.constellation.engine.register.User;
+import java.util.List;
 
 
 

@@ -19,8 +19,6 @@
 
 package org.constellation.admin.util;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.GetFeatureInfoCfg;
 import org.constellation.configuration.LayerContext;
@@ -31,6 +29,9 @@ import org.constellation.configuration.WebdavContext;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.ws.MimeType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *

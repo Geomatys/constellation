@@ -18,6 +18,13 @@
  */
 package org.constellation.metadata.io.filesystem.sql;
 
+import org.apache.sis.util.logging.Logging;
+import org.constellation.configuration.ConfigDirectory;
+import org.constellation.util.Util;
+import org.geotoolkit.internal.sql.DefaultDataSource;
+import org.geotoolkit.util.sql.DerbySqlScriptRunner;
+
+import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,13 +35,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.sql.DataSource;
+
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
-import org.apache.sis.util.logging.Logging;
-import org.constellation.configuration.ConfigDirectory;
-import org.constellation.util.Util;
-import org.geotoolkit.internal.sql.DefaultDataSource;
-import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 
 /**
  *

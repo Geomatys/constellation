@@ -20,6 +20,31 @@
 package org.constellation.metadata.index.mdweb;
 
 // J2SE dependencies
+
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
+import org.constellation.metadata.index.AbstractCSWIndexer;
+import org.constellation.util.Util;
+import org.constellation.util.XpathUtils;
+import org.geotoolkit.lucene.IndexingException;
+import org.geotoolkit.temporal.object.TemporalUtilities;
+import org.mdweb.io.MD_IOException;
+import org.mdweb.io.MD_IOFactory;
+import org.mdweb.io.Reader;
+import org.mdweb.model.schemas.Classe;
+import org.mdweb.model.schemas.CodeList;
+import org.mdweb.model.schemas.CodeListElement;
+import org.mdweb.model.schemas.Standard;
+import org.mdweb.model.storage.FullRecord;
+import org.mdweb.model.storage.RecordSet;
+import org.mdweb.model.storage.RecordSet.EXPOSURE;
+import org.mdweb.model.storage.TextValue;
+import org.mdweb.model.storage.Value;
+
+import javax.imageio.spi.ServiceRegistry;
+import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,40 +55,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
-import javax.imageio.spi.ServiceRegistry;
-import javax.sql.DataSource;
-
-// Apache Lucene dependencies
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-
-// constellation dependencies
-import org.constellation.generic.database.Automatic;
-import org.constellation.generic.database.BDD;
-import org.constellation.metadata.index.AbstractCSWIndexer;
 
 import static org.constellation.metadata.CSWQueryable.*;
-import org.constellation.metadata.io.MetadataIoException;
-import org.constellation.util.Util;
-import org.constellation.util.XpathUtils;
 
+// Apache Lucene dependencies
+// constellation dependencies
 // geotoolkit dependencies
-import org.geotoolkit.lucene.IndexingException;
-import org.geotoolkit.temporal.object.TemporalUtilities;
-
 // MDweb dependencies
-import org.mdweb.model.schemas.Classe;
-import org.mdweb.model.schemas.CodeList;
-import org.mdweb.model.schemas.CodeListElement;
-import org.mdweb.model.schemas.Standard;
-import org.mdweb.model.storage.RecordSet;
-import org.mdweb.model.storage.FullRecord;
-import org.mdweb.model.storage.TextValue;
-import org.mdweb.model.storage.Value;
-import org.mdweb.io.Reader;
-import org.mdweb.io.MD_IOException;
-import org.mdweb.io.MD_IOFactory;
-import org.mdweb.model.storage.RecordSet.EXPOSURE;
 
 /**
  * A Lucene index handler for an MDWeb Database.

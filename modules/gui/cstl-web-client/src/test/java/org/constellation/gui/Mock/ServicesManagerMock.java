@@ -18,16 +18,13 @@
  */
 package org.constellation.gui.Mock;
 
+import org.constellation.ServiceDef.Specification;
 import org.constellation.dto.Service;
 import org.constellation.gui.service.ServicesManager;
 
 import javax.enterprise.inject.Specializes;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotSame;
-import org.constellation.ServiceDef.Specification;
 
 /**
  * ServiceManager mock

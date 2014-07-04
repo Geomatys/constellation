@@ -50,7 +50,13 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
 
 import javax.inject.Inject;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
@@ -61,13 +67,21 @@ import javax.xml.namespace.QName;
 import java.io.File;
 import java.io.StringWriter;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.constellation.utils.RESTfulUtilities.ok;
-import static org.geotoolkit.sml.xml.SensorMLUtilities.*;
+import static org.geotoolkit.sml.xml.SensorMLUtilities.getChildrenIdentifiers;
+import static org.geotoolkit.sml.xml.SensorMLUtilities.getSensorMLType;
+import static org.geotoolkit.sml.xml.SensorMLUtilities.getSmlID;
 
 /**
  *

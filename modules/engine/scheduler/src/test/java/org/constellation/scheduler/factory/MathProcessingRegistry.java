@@ -18,14 +18,14 @@
  */
 package org.constellation.scheduler.factory;
 
-import java.util.Collections;
-
 import org.apache.sis.metadata.iso.DefaultIdentifier;
 import org.apache.sis.metadata.iso.citation.DefaultCitation;
 import org.apache.sis.metadata.iso.identification.DefaultServiceIdentification;
 import org.geotoolkit.process.AbstractProcessingRegistry;
 import org.opengis.metadata.Identifier;
 import org.opengis.metadata.identification.Identification;
+
+import java.util.Collections;
 
 /**
  * The factory is registered in META-INF/

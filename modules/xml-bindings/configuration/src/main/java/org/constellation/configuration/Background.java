@@ -18,13 +18,15 @@
  */
 package org.constellation.configuration;
 
-import java.awt.Color;
-import java.awt.Insets;
-import java.io.Serializable;
-import javax.xml.bind.annotation.*;
 import org.constellation.configuration.utils.WMSPortrayalUtils;
 import org.geotoolkit.display2d.ext.BackgroundTemplate;
 import org.geotoolkit.display2d.ext.DefaultBackgroundTemplate;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import java.awt.*;
+import java.io.Serializable;
 
 /**
  * Background used by decorations and legend template.

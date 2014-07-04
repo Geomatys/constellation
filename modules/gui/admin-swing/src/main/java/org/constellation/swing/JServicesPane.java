@@ -18,13 +18,26 @@
  */
 package org.constellation.swing;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import org.apache.sis.util.logging.Logging;
+import org.constellation.ServiceDef;
+import org.constellation.admin.service.ConstellationClient;
+import org.constellation.configuration.Instance;
+import org.constellation.configuration.InstanceReport;
+import org.constellation.configuration.ServiceStatus;
+import org.constellation.dto.Details;
+import org.constellation.security.RoleController;
+import org.constellation.swing.action.Action;
+import org.constellation.swing.action.ActionEditor;
+import org.constellation.swing.action.ActionRenderer;
+import org.jdesktop.swingx.JXTable;
+import org.openide.util.Exceptions;
+
+import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableModel;
+import javax.swing.tree.DefaultMutableTreeNode;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.RoundRectangle2D;
@@ -41,31 +54,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JToggleButton;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableModel;
-import javax.swing.tree.DefaultMutableTreeNode;
-import org.apache.sis.util.logging.Logging;
-import org.constellation.ServiceDef;
-import org.constellation.admin.service.ConstellationClient;
-import org.constellation.configuration.Instance;
-import org.constellation.configuration.InstanceReport;
-import org.constellation.configuration.ServiceStatus;
-import org.constellation.dto.Details;
 
-import static org.constellation.security.ActionPermissions.*;
-import org.constellation.security.RoleController;
-import org.constellation.swing.action.Action;
-import org.constellation.swing.action.ActionEditor;
-import org.constellation.swing.action.ActionRenderer;
-import org.jdesktop.swingx.JXTable;
-import org.openide.util.Exceptions;
+import static org.constellation.security.ActionPermissions.NEW_SERVICE;
 
 /**
  * Top component to manage constellation services.

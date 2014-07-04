@@ -18,15 +18,16 @@
  */
 package org.constellation.webdav;
 
-import javax.inject.Singleton;
-import java.util.logging.Level;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Response;
 import org.constellation.ServiceDef;
-import org.constellation.ws.ServiceConfigurer;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.ServiceConfigurer;
 import org.constellation.ws.Worker;
 import org.constellation.ws.rs.OGCWebService;
+
+import javax.inject.Singleton;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Response;
+import java.util.logging.Level;
 
 /**
  *

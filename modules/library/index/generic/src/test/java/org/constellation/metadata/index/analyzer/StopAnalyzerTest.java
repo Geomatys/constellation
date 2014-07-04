@@ -36,7 +36,26 @@
 
 package org.constellation.metadata.index.analyzer;
 
+import org.apache.lucene.analysis.core.StopAnalyzer;
+import org.apache.lucene.search.Filter;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
+import org.apache.lucene.util.Version;
+import org.apache.sis.geometry.GeneralEnvelope;
 import org.constellation.metadata.index.generic.GenericIndexer;
+import org.geotoolkit.lucene.filter.LuceneOGCFilter;
+import org.geotoolkit.lucene.filter.SerialChainFilter;
+import org.geotoolkit.lucene.filter.SpatialQuery;
+import org.geotoolkit.lucene.index.LuceneIndexSearcher;
+import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.util.FileUtilities;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -44,25 +63,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
-import org.apache.lucene.analysis.core.StopAnalyzer;
-import org.apache.lucene.search.Filter;
-import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.SortField;
-import org.apache.lucene.util.Version;
-
-import org.apache.sis.geometry.GeneralEnvelope;
-import org.geotoolkit.lucene.filter.LuceneOGCFilter;
-import org.geotoolkit.lucene.filter.SerialChainFilter;
-import org.geotoolkit.lucene.filter.SpatialQuery;
-import org.geotoolkit.referencing.CRS;
-import org.geotoolkit.lucene.index.LuceneIndexSearcher;
-import org.geotoolkit.util.FileUtilities;
-
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import static org.junit.Assert.assertEquals;
 
 //Junit dependencies
-import org.junit.*;
-import static org.junit.Assert.*;
 
 /**
  *

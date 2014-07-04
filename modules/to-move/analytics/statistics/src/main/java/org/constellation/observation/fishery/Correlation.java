@@ -19,11 +19,12 @@
 package org.constellation.observation.fishery;
 
 // Constellation dependencies
+
 import org.constellation.catalog.Element;
 import org.constellation.coverage.model.Descriptor;
+import org.opengis.metadata.citation.Citation;
 
 // OpenGIS dependencies
-import org.opengis.metadata.citation.Citation;
 
 
 /**

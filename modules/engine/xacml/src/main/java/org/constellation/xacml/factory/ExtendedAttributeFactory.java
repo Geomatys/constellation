@@ -55,12 +55,11 @@ import com.sun.xacml.attr.proxy.StringAttributeProxy;
 import com.sun.xacml.attr.proxy.TimeAttributeProxy;
 import com.sun.xacml.attr.proxy.X500NameAttributeProxy;
 import com.sun.xacml.attr.proxy.YearMonthDurationAttributeProxy;
+import org.w3c.dom.Node;
 
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.w3c.dom.Node;
 
 
 /**

@@ -19,15 +19,15 @@
 package org.constellation.scheduler;
 
 import org.constellation.scheduler.configuration.XMLTasksReader;
-import java.util.List;
-import java.io.IOException;
-import javax.xml.stream.XMLStreamException;
-
 import org.junit.Test;
-
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 
-import static org.junit.Assert.*;
+import javax.xml.stream.XMLStreamException;
+import java.io.IOException;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  *

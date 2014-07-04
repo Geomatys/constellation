@@ -19,50 +19,55 @@
 
 package org.constellation.metadata.io.mdweb;
 
-import javax.sql.DataSource;
-import java.lang.reflect.Method;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.*;
-import java.util.logging.Level;
-import javax.xml.namespace.QName;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.metadata.io.CSWMetadataReader;
+import org.constellation.metadata.io.ElementSetType;
 import org.constellation.metadata.io.MDWebMetadataReader;
 import org.constellation.metadata.io.MetadataIoException;
-import org.constellation.util.ReflectionUtilities;
-
-import static org.constellation.metadata.CSWQueryable.*;
-import org.constellation.metadata.io.ElementSetType;
 import org.constellation.metadata.io.MetadataType;
+import org.constellation.util.ReflectionUtilities;
 import org.constellation.util.XpathUtils;
-
 import org.geotoolkit.csw.xml.DomainValues;
 import org.geotoolkit.csw.xml.Settable;
-import org.geotoolkit.csw.xml.v202.DomainValuesType;
-import org.geotoolkit.csw.xml.v202.ListOfValuesType;
 import org.geotoolkit.csw.xml.v202.AbstractRecordType;
 import org.geotoolkit.csw.xml.v202.BriefRecordType;
-import org.geotoolkit.csw.xml.v202.SummaryRecordType;
+import org.geotoolkit.csw.xml.v202.DomainValuesType;
+import org.geotoolkit.csw.xml.v202.ListOfValuesType;
 import org.geotoolkit.csw.xml.v202.RecordType;
+import org.geotoolkit.csw.xml.v202.SummaryRecordType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
 import org.geotoolkit.ows.xml.v100.BoundingBoxType;
 import org.geotoolkit.util.StringUtilities;
-
-import org.mdweb.model.schemas.Standard;
-import org.mdweb.model.storage.FullRecord;
-import org.mdweb.model.storage.Value;
-import org.mdweb.model.schemas.CodeListElement;
-import org.mdweb.model.storage.TextValue;
-import org.mdweb.model.thesaurus.Word;
-import org.mdweb.model.thesaurus.Thesaurus;
 import org.mdweb.io.MD_IOException;
 import org.mdweb.io.sql.LocalThesaurusHandler;
 import org.mdweb.io.sql.ThesaurusDatabase;
+import org.mdweb.model.schemas.CodeListElement;
+import org.mdweb.model.schemas.Standard;
+import org.mdweb.model.storage.FullRecord;
+import org.mdweb.model.storage.TextValue;
+import org.mdweb.model.storage.Value;
+import org.mdweb.model.thesaurus.Thesaurus;
+import org.mdweb.model.thesaurus.Word;
+import org.w3c.dom.Node;
+
+import javax.sql.DataSource;
+import javax.xml.namespace.QName;
+import java.lang.reflect.Method;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
+
+import static org.constellation.metadata.CSWQueryable.*;
 import static org.geotoolkit.csw.xml.TypeNames.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import org.w3c.dom.Node;
 
 /**
  * A CSW Metadata reader specific for MDweb data source.

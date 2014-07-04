@@ -19,13 +19,11 @@
 
 package org.constellation.provider.coveragesgroup.util;
 
-import javax.annotation.PostConstruct;
 import org.constellation.admin.SpringHelper;
 import org.constellation.provider.coveragesgroup.xml.DataReference;
 import org.constellation.provider.coveragesgroup.xml.MapLayer;
 import org.constellation.provider.coveragesgroup.xml.StyleReference;
 import org.geotoolkit.map.MapItem;
-import static org.junit.Assert.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.BeansException;
@@ -33,6 +31,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import javax.annotation.PostConstruct;
+
+import static org.junit.Assert.assertNotNull;
 
 
 /**

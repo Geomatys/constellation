@@ -19,48 +19,15 @@
 
 package org.constellation.metadata;
 
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.logging.Logger;
-import javax.measure.unit.Unit;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-
-// Junit dependencies
-import org.junit.*;
-import static org.junit.Assert.*;
-
-// Constellation dependencies
-import org.constellation.util.Util;
-
-// geotoolkit dependencies
-import org.geotoolkit.csw.xml.CSWMarshallerPool;
-import org.geotoolkit.gml.xml.v311.TimePeriodType;
-import org.apache.sis.internal.jaxb.metadata.ReferenceSystemMetadata;
 import org.apache.sis.internal.jaxb.gmx.Anchor;
+import org.apache.sis.internal.jaxb.metadata.ReferenceSystemMetadata;
 import org.apache.sis.metadata.iso.DefaultExtendedElementInformation;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.metadata.iso.DefaultMetadataExtensionInformation;
 import org.apache.sis.metadata.iso.ImmutableIdentifier;
 import org.apache.sis.metadata.iso.citation.DefaultAddress;
-import org.apache.sis.metadata.iso.citation.DefaultCitationDate;
 import org.apache.sis.metadata.iso.citation.DefaultCitation;
+import org.apache.sis.metadata.iso.citation.DefaultCitationDate;
 import org.apache.sis.metadata.iso.citation.DefaultContact;
 import org.apache.sis.metadata.iso.citation.DefaultOnlineResource;
 import org.apache.sis.metadata.iso.citation.DefaultResponsibleParty;
@@ -88,15 +55,19 @@ import org.apache.sis.referencing.cs.DefaultCoordinateSystemAxis;
 import org.apache.sis.referencing.cs.DefaultVerticalCS;
 import org.apache.sis.referencing.datum.DefaultVerticalDatum;
 import org.apache.sis.test.XMLComparator;
-import org.geotoolkit.temporal.object.TemporalUtilities;
 import org.apache.sis.util.iso.SimpleInternationalString;
-
-// GeoAPI dependencies
 import org.apache.sis.util.logging.Logging;
-import org.geotoolkit.xml.AnchoredMarshallerPool;
 import org.apache.sis.xml.MarshallerPool;
 import org.apache.sis.xml.XML;
 import org.constellation.test.utils.MetadataUtilities;
+import org.constellation.util.Util;
+import org.geotoolkit.csw.xml.CSWMarshallerPool;
+import org.geotoolkit.gml.xml.v311.TimePeriodType;
+import org.geotoolkit.temporal.object.TemporalUtilities;
+import org.geotoolkit.xml.AnchoredMarshallerPool;
+import org.junit.After;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.opengis.metadata.Datatype;
 import org.opengis.metadata.ExtendedElementInformation;
 import org.opengis.metadata.citation.CitationDate;
@@ -123,6 +94,37 @@ import org.opengis.referencing.datum.VerticalDatumType;
 import org.opengis.temporal.Period;
 import org.opengis.temporal.TemporalPrimitive;
 import org.opengis.util.InternationalString;
+
+import javax.measure.unit.Unit;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.logging.Logger;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+// Junit dependencies
+// Constellation dependencies
+// geotoolkit dependencies
+// GeoAPI dependencies
 
 /**
  *

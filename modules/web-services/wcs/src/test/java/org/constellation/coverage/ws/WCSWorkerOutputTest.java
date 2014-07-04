@@ -18,12 +18,6 @@
  */
 package org.constellation.coverage.ws;
 
-import java.awt.image.RenderedImage;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
 import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
@@ -50,11 +44,23 @@ import org.geotoolkit.wcs.xml.v100.SpatialSubsetType;
 import org.geotoolkit.wcs.xml.v100.TimeSequenceType;
 import org.geotoolkit.wcs.xml.v100.WCSCapabilitiesType;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
-import static org.junit.Assume.assumeTrue;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import java.awt.image.RenderedImage;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeTrue;
 
 
 /**

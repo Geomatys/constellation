@@ -19,15 +19,11 @@
 
 package org.constellation.wmts.ws.rs;
 
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import java.net.URI;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.commons.io.IOUtils;
+import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.coverage.TileReference;
+import org.geotoolkit.util.ImageIOUtilities;
+
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.ws.rs.Produces;
@@ -36,11 +32,21 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-
-import org.apache.commons.io.IOUtils;
-import org.geotoolkit.coverage.TileReference;
-import org.geotoolkit.util.ImageIOUtilities;
-import org.apache.sis.util.logging.Logging;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.net.URI;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *

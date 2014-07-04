@@ -18,10 +18,6 @@
  */
 package org.constellation.provider.observationstore;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.Set;
-import java.util.logging.Level;
 import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.admin.dao.DataRecord;
@@ -31,12 +27,17 @@ import org.constellation.provider.DefaultFeatureData;
 import org.constellation.provider.ProviderFactory;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.FeatureStoreFinder;
+import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.observation.ObservationStore;
 import org.geotoolkit.observation.ObservationStoreFinder;
 import org.geotoolkit.parameter.ParametersExt;
-import org.geotoolkit.feature.type.Name;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
+
+import java.util.Collections;
+import java.util.Date;
+import java.util.Set;
+import java.util.logging.Level;
 
 /**
  *

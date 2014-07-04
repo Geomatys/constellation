@@ -19,11 +19,8 @@
 
 package org.constellation.management;
 
-import java.lang.management.ManagementFactory;
-import java.util.Properties;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
+
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanRegistrationException;
@@ -33,9 +30,10 @@ import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-
-import org.geotoolkit.internal.SetupService;
-import org.apache.sis.util.logging.Logging;
+import java.lang.management.ManagementFactory;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Registers and unregister constellation managed beans.

@@ -18,9 +18,10 @@
  */
 package org.constellation.dto;
 
+import org.constellation.util.SimplyMetadataTreeNode;
+
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
-import org.constellation.util.SimplyMetadataTreeNode;
 
 /**
  * Container used to pass a list on JAXB

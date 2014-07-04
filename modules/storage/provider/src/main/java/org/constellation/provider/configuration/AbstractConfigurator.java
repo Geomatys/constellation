@@ -20,10 +20,11 @@
 
 package org.constellation.provider.configuration;
 
-import java.util.List;
-import java.util.Map;
 import org.constellation.configuration.ConfigurationException;
 import org.opengis.parameter.ParameterValueGroup;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Abstract configurator.

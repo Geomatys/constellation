@@ -19,17 +19,6 @@
 package org.constellation.ws.embedded;
 
 
-import java.io.File;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.xml.namespace.QName;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.DataBusiness;
 import org.constellation.admin.ProviderBusiness;
@@ -51,20 +40,35 @@ import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.SpringTestRunner;
-
-import static org.geotoolkit.parameter.ParametersExt.createGroup;
-import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
-import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
-
-// JUnit dependencies
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.AfterClass;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opengis.parameter.ParameterValueGroup;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.xml.namespace.QName;
+import java.io.File;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.geotoolkit.parameter.ParametersExt.createGroup;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+// JUnit dependencies
 
 /**
  *

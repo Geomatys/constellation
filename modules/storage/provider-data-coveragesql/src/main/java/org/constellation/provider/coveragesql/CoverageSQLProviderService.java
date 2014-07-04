@@ -18,27 +18,25 @@
  */
 package org.constellation.provider.coveragesql;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-
 import org.constellation.provider.AbstractProviderFactory;
 import org.constellation.provider.Data;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviderFactory;
 import org.constellation.provider.configuration.ProviderParameters;
-
-import org.geotoolkit.internal.sql.table.ConfigurationKey;
 import org.geotoolkit.coverage.sql.CoverageDatabase;
-import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
-import org.geotoolkit.parameter.DefaultParameterDescriptor;
-
 import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.internal.sql.table.ConfigurationKey;
+import org.geotoolkit.parameter.DefaultParameterDescriptor;
+import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
 
 
 /**

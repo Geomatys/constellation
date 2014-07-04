@@ -19,26 +19,7 @@
 package org.constellation.xacml;
 
 // J2SE dependencies
-import org.geotoolkit.xacml.xml.XACMLMarshallerPool;
-import java.io.InputStream;
-import java.net.URI;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.logging.Logger;
-import java.security.Principal;
-import java.security.acl.Group;
 
-// JAXB dependencies
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Vector;
-import javax.xml.bind.JAXBElement;
-
-// Constellation dependencies
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import org.constellation.xacml.api.PolicyLocator;
 import org.constellation.xacml.api.RequestContext;
 import org.constellation.xacml.api.XACMLPolicy;
@@ -46,6 +27,7 @@ import org.constellation.xacml.factory.FactoryException;
 import org.constellation.xacml.factory.PolicyAttributeFactory;
 import org.constellation.xacml.factory.PolicyFactory;
 import org.constellation.xacml.locators.JBossPolicyLocator;
+import org.geotoolkit.xacml.xml.XACMLMarshallerPool;
 import org.geotoolkit.xacml.xml.policy.ActionMatchType;
 import org.geotoolkit.xacml.xml.policy.ActionType;
 import org.geotoolkit.xacml.xml.policy.ActionsType;
@@ -64,11 +46,34 @@ import org.geotoolkit.xacml.xml.policy.ResourcesType;
 import org.geotoolkit.xacml.xml.policy.RuleType;
 import org.geotoolkit.xacml.xml.policy.SubjectAttributeDesignatorType;
 import org.geotoolkit.xacml.xml.policy.TargetType;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import java.io.InputStream;
+import java.net.URI;
+import java.security.Principal;
+import java.security.acl.Group;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.Vector;
+import java.util.logging.Logger;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+// JAXB dependencies
+// Constellation dependencies
 // Junit dependencies
-import org.apache.sis.xml.MarshallerPool;
-import org.junit.*;
-import static org.junit.Assert.*;
 
 /**
  *

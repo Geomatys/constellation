@@ -18,36 +18,42 @@
  */
 package org.constellation.scheduler.configuration;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.apache.sis.util.logging.Logging;
-import org.opengis.util.NoSuchIdentifierException;
-import org.quartz.SimpleTrigger;
-
-import java.util.List;
-import java.io.IOException;
-import java.util.ArrayList;
-import javax.xml.stream.XMLStreamException;
 import org.constellation.scheduler.Task;
-
 import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.process.quartz.ProcessJobDetail;
 import org.geotoolkit.xml.StaxStreamReader;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
-
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
-
+import org.opengis.util.NoSuchIdentifierException;
 import org.quartz.SimpleScheduleBuilder;
+import org.quartz.SimpleTrigger;
 import org.quartz.TriggerBuilder;
 
-import static javax.xml.stream.XMLStreamReader.*;
-import static org.constellation.scheduler.configuration.XMLTasksConstants.*;
+import javax.xml.stream.XMLStreamException;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.logging.Level;
+
+import static javax.xml.stream.XMLStreamReader.END_ELEMENT;
+import static javax.xml.stream.XMLStreamReader.START_ELEMENT;
+import static org.constellation.scheduler.configuration.XMLTasksConstants.ATT_AUTHORITY;
+import static org.constellation.scheduler.configuration.XMLTasksConstants.ATT_CODE;
+import static org.constellation.scheduler.configuration.XMLTasksConstants.ATT_ID;
+import static org.constellation.scheduler.configuration.XMLTasksConstants.ATT_START_DATE;
+import static org.constellation.scheduler.configuration.XMLTasksConstants.ATT_START_STEP;
+import static org.constellation.scheduler.configuration.XMLTasksConstants.ATT_STEP;
+import static org.constellation.scheduler.configuration.XMLTasksConstants.ATT_TITLE;
+import static org.constellation.scheduler.configuration.XMLTasksConstants.TAG_PARAMETERS;
+import static org.constellation.scheduler.configuration.XMLTasksConstants.TAG_TASK;
+import static org.constellation.scheduler.configuration.XMLTasksConstants.TAG_TASKS;
+import static org.constellation.scheduler.configuration.XMLTasksConstants.TAG_TRIGGER;
 
 /**
  * Reader tasks from an xml file. A task can get a repeat step (in seconds), a start date ( formatted as YYYY/MM/dd HH:mm:ss)

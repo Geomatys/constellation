@@ -19,11 +19,12 @@
 
 package org.constellation.metadata.io;
 
+import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.xml.AnchoredMarshallerPool;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
-import org.apache.sis.util.logging.Logging;
-import org.geotoolkit.xml.AnchoredMarshallerPool;
 
 /**
  *

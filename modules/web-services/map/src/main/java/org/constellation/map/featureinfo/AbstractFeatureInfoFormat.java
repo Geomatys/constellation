@@ -20,21 +20,25 @@ package org.constellation.map.featureinfo;
 
 import org.constellation.configuration.GetFeatureInfoCfg;
 import org.constellation.provider.Data;
+import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.display.SearchArea;
 import org.geotoolkit.display.canvas.RenderingContext;
-import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.display2d.GraphicVisitor;
 import org.geotoolkit.display2d.canvas.RenderingContext2D;
 import org.geotoolkit.display2d.primitive.ProjectedCoverage;
 import org.geotoolkit.display2d.primitive.ProjectedFeature;
 import org.geotoolkit.display2d.primitive.SearchAreaJ2D;
-import org.geotoolkit.display2d.service.*;
+import org.geotoolkit.display2d.service.CanvasDef;
+import org.geotoolkit.display2d.service.DefaultPortrayalService;
+import org.geotoolkit.display2d.service.SceneDef;
+import org.geotoolkit.display2d.service.ViewDef;
+import org.geotoolkit.display2d.service.VisitDef;
 import org.geotoolkit.map.CoverageMapLayer;
 import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.ows.xml.GetFeatureInfo;
 import org.opengis.display.primitive.Graphic;
 
-import java.awt.Rectangle;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

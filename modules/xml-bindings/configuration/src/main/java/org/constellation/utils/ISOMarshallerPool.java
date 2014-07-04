@@ -19,16 +19,18 @@
 
 package org.constellation.utils;
 
+import org.apache.sis.internal.jaxb.LegacyNamespaces;
+import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.xml.MarshallerPool;
+import org.geotoolkit.xml.AnchoredMarshallerPool;
+
+import javax.xml.bind.JAXBException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.xml.bind.JAXBException;
-import org.apache.sis.internal.jaxb.LegacyNamespaces;
-import org.apache.sis.metadata.iso.DefaultMetadata;
-import org.apache.sis.xml.MarshallerPool;
+
 import static org.geotoolkit.gml.xml.GMLMarshallerPool.createJAXBContext;
-import org.geotoolkit.xml.AnchoredMarshallerPool;
 
 /**
  *

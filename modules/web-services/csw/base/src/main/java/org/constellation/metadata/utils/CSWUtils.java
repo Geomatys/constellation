@@ -19,10 +19,11 @@
 
 package org.constellation.metadata.utils;
 
-import static org.constellation.metadata.CSWConstants.ACCEPTED_OUTPUT_FORMATS;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.geotoolkit.csw.xml.AbstractCswRequest;
+
+import static org.constellation.metadata.CSWConstants.ACCEPTED_OUTPUT_FORMATS;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 
 /**

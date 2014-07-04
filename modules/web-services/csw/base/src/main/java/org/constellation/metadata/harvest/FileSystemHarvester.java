@@ -18,28 +18,27 @@
  */
 package org.constellation.metadata.harvest;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import org.constellation.metadata.DistributedResults;
-import org.geotoolkit.csw.xml.v202.AbstractRecordType;
-import javax.xml.bind.JAXBElement;
-import java.util.logging.Level;
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.sql.SQLException;
-import java.util.List;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.csw.xml.GetRecordsRequest;
-import org.apache.sis.metadata.iso.DefaultMetadata;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.w3c.dom.Node;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.logging.Level;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.OPERATION_NOT_SUPPORTED;
 
 /**
  *

@@ -18,23 +18,25 @@
  */
 package org.constellation.provider.featurestore;
 
+import org.constellation.provider.AbstractProviderFactory;
+import org.constellation.provider.Data;
+import org.constellation.provider.DataProvider;
+import org.constellation.provider.DataProviderFactory;
+import org.geotoolkit.data.FeatureStoreFactory;
+import org.geotoolkit.data.FeatureStoreFinder;
+import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
+import org.opengis.parameter.GeneralParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.parameter.ParameterValueGroup;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
-import org.constellation.provider.AbstractProviderFactory;
-import org.constellation.provider.Data;
-import org.constellation.provider.DataProvider;
-import org.constellation.provider.DataProviderFactory;
+
 import static org.constellation.provider.configuration.ProviderParameters.createDescriptor;
-import org.geotoolkit.data.FeatureStoreFactory;
-import org.geotoolkit.data.FeatureStoreFinder;
-import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
-import org.geotoolkit.feature.type.Name;
-import org.opengis.parameter.GeneralParameterDescriptor;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.parameter.ParameterValueGroup;
 
 /**
  *

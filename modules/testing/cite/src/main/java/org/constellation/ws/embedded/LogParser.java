@@ -18,8 +18,9 @@
  */
 package org.constellation.ws.embedded;
 
-import java.util.Date;
 import org.constellation.sql.Result;
+
+import java.util.Date;
 
 
 /**

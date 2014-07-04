@@ -18,16 +18,17 @@
  */
 package org.constellation.process.service;
 
-import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
 import org.constellation.process.ConstellationProcessFactory;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
-import static org.junit.Assert.*;
 import org.junit.Test;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.NoSuchIdentifierException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 /**
  *
  * @author Quentin Boileau (Geomatys).

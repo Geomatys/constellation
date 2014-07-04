@@ -19,8 +19,8 @@
 
 package org.constellation.sos.io;
 
-import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.sml.xml.AbstractSensorML;
 
 /**
  * An interface used by the SOS worker to store sensorML document into various datasource.

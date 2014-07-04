@@ -19,20 +19,7 @@
 
 package org.constellation.sos.io.mdweb;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.TransformerException;
 import org.apache.sis.internal.jaxb.LegacyNamespaces;
-
-// constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.metadata.io.MDWebMetadataReader;
@@ -40,21 +27,31 @@ import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.metadata.io.MetadataType;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.ws.CstlServiceException;
-
-import static org.constellation.sos.ws.SOSConstants.*;
-
-// MDWeb dependencies
+import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.geotoolkit.sos.xml.SOSMarshallerPool;
+import org.geotoolkit.util.StringUtilities;
 import org.mdweb.io.MD_IOException;
 import org.mdweb.io.sql.AbstractReader;
 import org.mdweb.model.storage.RecordSet;
-
-// GEOTK dependencies
-import org.geotoolkit.sml.xml.AbstractSensorML;
-import org.geotoolkit.util.StringUtilities;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.w3c.dom.Node;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+
+import static org.constellation.sos.ws.SOSConstants.*;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
+// constellation dependencies
+// MDWeb dependencies
+// GEOTK dependencies
 
 /**
  *

@@ -19,12 +19,13 @@
 
 package org.constellation.generic;
 
+import org.geotoolkit.internal.sql.StatementEntry;
+
 import java.sql.Date;
 import java.sql.ParameterMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.geotoolkit.internal.sql.StatementEntry;
 
 /**
  * A object allowing to acces the sql String of a statement.

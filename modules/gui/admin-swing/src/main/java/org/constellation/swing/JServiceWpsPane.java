@@ -18,35 +18,11 @@
  */
 package org.constellation.swing;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
-import javax.swing.GroupLayout;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.JToolBar;
-import javax.swing.LayoutStyle;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 import org.constellation.admin.service.ConstellationClient;
 import org.constellation.configuration.AbstractConfigurationObject;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.ProcessContext;
 import org.constellation.configuration.ProcessFactory;
-import static org.constellation.swing.JServiceEditionPane.ICON_EDIT;
 import org.geotoolkit.gui.swing.resource.IconBundle;
 import org.geotoolkit.gui.swing.util.ActionCell;
 import org.netbeans.swing.outline.DefaultOutlineModel;
@@ -54,6 +30,18 @@ import org.netbeans.swing.outline.Outline;
 import org.netbeans.swing.outline.RenderDataProvider;
 import org.netbeans.swing.outline.RowModel;
 import org.openide.util.NbBundle;
+
+import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
 
 /**
  *

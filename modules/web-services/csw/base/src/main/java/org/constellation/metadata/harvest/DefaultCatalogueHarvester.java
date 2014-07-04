@@ -19,15 +19,53 @@
 package org.constellation.metadata.harvest;
 
 // J2SE dependencies
+
 import org.apache.sis.xml.Namespaces;
-import org.constellation.metadata.utils.Utils;
-import org.geotoolkit.csw.xml.SearchResults;
-import org.geotoolkit.csw.xml.GetRecordsResponse;
-import java.io.BufferedInputStream;
-import java.io.InputStreamReader;
 import org.constellation.metadata.DistributedResults;
+import org.constellation.metadata.io.MetadataIoException;
+import org.constellation.metadata.io.MetadataWriter;
+import org.constellation.metadata.utils.Utils;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.MimeType;
+import org.geotoolkit.csw.xml.ElementSetType;
+import org.geotoolkit.csw.xml.GetRecordsRequest;
+import org.geotoolkit.csw.xml.GetRecordsResponse;
+import org.geotoolkit.csw.xml.ResultType;
+import org.geotoolkit.csw.xml.SearchResults;
+import org.geotoolkit.csw.xml.v202.Capabilities;
+import org.geotoolkit.csw.xml.v202.ElementSetNameType;
+import org.geotoolkit.csw.xml.v202.GetCapabilitiesType;
+import org.geotoolkit.csw.xml.v202.GetRecordsResponseType;
+import org.geotoolkit.csw.xml.v202.GetRecordsType;
+import org.geotoolkit.csw.xml.v202.QueryConstraintType;
+import org.geotoolkit.csw.xml.v202.QueryType;
+import org.geotoolkit.csw.xml.v202.SearchResultsType;
+import org.geotoolkit.ogc.xml.v110.FilterType;
+import org.geotoolkit.ogc.xml.v110.NotType;
+import org.geotoolkit.ogc.xml.v110.PropertyIsLikeType;
+import org.geotoolkit.ogc.xml.v110.PropertyNameType;
+import org.geotoolkit.ows.xml.v100.AcceptFormatsType;
+import org.geotoolkit.ows.xml.v100.AcceptVersionsType;
+import org.geotoolkit.ows.xml.v100.CapabilitiesBaseType;
+import org.geotoolkit.ows.xml.v100.DCP;
+import org.geotoolkit.ows.xml.v100.DomainType;
+import org.geotoolkit.ows.xml.v100.ExceptionReport;
+import org.geotoolkit.ows.xml.v100.Operation;
+import org.geotoolkit.ows.xml.v100.OperationsMetadata;
+import org.geotoolkit.ows.xml.v100.RequestMethodType;
+import org.geotoolkit.ows.xml.v100.SectionsType;
+import org.geotoolkit.util.StringUtilities;
+import org.w3c.dom.Node;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -39,50 +77,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 
+import static org.constellation.metadata.CSWConstants.CSW;
+import static org.constellation.metadata.CSWConstants.CSW_202_VERSION;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.OPERATION_NOT_SUPPORTED;
+
 // JAXB dependencies
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
-
 // Constellation dependencies
-import org.constellation.metadata.io.MetadataIoException;
-import org.constellation.metadata.io.MetadataWriter;
-import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.MimeType;
-
 // Geotoolkit dependencies
-import org.geotoolkit.csw.xml.ResultType;
-import org.geotoolkit.csw.xml.ElementSetType;
-import org.geotoolkit.csw.xml.GetRecordsRequest;
-import org.geotoolkit.csw.xml.v202.Capabilities;
-import org.geotoolkit.csw.xml.v202.ElementSetNameType;
-import org.geotoolkit.csw.xml.v202.GetCapabilitiesType;
-import org.geotoolkit.csw.xml.v202.GetRecordsResponseType;
-import org.geotoolkit.csw.xml.v202.GetRecordsType;
-import org.geotoolkit.csw.xml.v202.QueryConstraintType;
-import org.geotoolkit.csw.xml.v202.QueryType;
-import org.geotoolkit.csw.xml.v202.SearchResultsType;
-import org.geotoolkit.ows.xml.v100.AcceptFormatsType;
-import org.geotoolkit.ows.xml.v100.AcceptVersionsType;
-import org.geotoolkit.ows.xml.v100.CapabilitiesBaseType;
-import org.geotoolkit.ows.xml.v100.DCP;
-import org.geotoolkit.ows.xml.v100.DomainType;
-import org.geotoolkit.ows.xml.v100.ExceptionReport;
-import org.geotoolkit.ows.xml.v100.Operation;
-import org.geotoolkit.ows.xml.v100.OperationsMetadata;
-import org.geotoolkit.ows.xml.v100.RequestMethodType;
-import org.geotoolkit.ows.xml.v100.SectionsType;
-import org.geotoolkit.ogc.xml.v110.FilterType;
-import org.geotoolkit.ogc.xml.v110.NotType;
-import org.geotoolkit.ogc.xml.v110.PropertyIsLikeType;
-import org.geotoolkit.ogc.xml.v110.PropertyNameType;
-import org.geotoolkit.util.StringUtilities;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import static org.constellation.metadata.CSWConstants.*;
-import org.w3c.dom.Node;
 
 /**
  *

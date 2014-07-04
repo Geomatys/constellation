@@ -18,12 +18,12 @@
  */
 package org.constellation.process;
 
-import java.util.logging.Level;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
 import org.constellation.map.ws.DefaultWMSWorker;
-import static org.constellation.process.AbstractProcessTest.LOGGER;
 import org.constellation.process.service.StopServiceTest;
+
+import java.util.logging.Level;
 
 /**
  *

@@ -18,7 +18,35 @@
  */
 package org.constellation.provider.coveragesgroup;
 
-import java.awt.Dimension;
+import org.apache.sis.measure.MeasurementRange;
+import org.apache.sis.storage.DataStoreException;
+import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
+import org.constellation.ServiceDef.Query;
+import org.constellation.provider.AbstractData;
+import org.constellation.provider.coveragesgroup.util.ConvertersJaxbToGeotk;
+import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.data.query.QueryBuilder;
+import org.geotoolkit.display.PortrayalException;
+import org.geotoolkit.display2d.GO2Utilities;
+import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.feature.type.PropertyDescriptor;
+import org.geotoolkit.filter.visitor.DefaultFilterVisitor;
+import org.geotoolkit.map.FeatureMapLayer;
+import org.geotoolkit.map.MapContext;
+import org.geotoolkit.map.MapItem;
+import org.geotoolkit.map.MapLayer;
+import org.geotoolkit.style.MutableStyle;
+import org.opengis.filter.And;
+import org.opengis.filter.Filter;
+import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.expression.PropertyName;
+import org.opengis.geometry.Envelope;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,37 +59,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-
-import org.constellation.ServiceDef.Query;
-import org.constellation.provider.AbstractData;
-import org.constellation.provider.coveragesgroup.util.ConvertersJaxbToGeotk;
-
-import org.geotoolkit.coverage.grid.GridCoverage2D;
-import org.geotoolkit.data.query.QueryBuilder;
-import org.geotoolkit.display.PortrayalException;
-import org.geotoolkit.display2d.GO2Utilities;
-import org.geotoolkit.filter.visitor.DefaultFilterVisitor;
-import org.geotoolkit.map.FeatureMapLayer;
-import org.geotoolkit.map.MapContext;
-import org.geotoolkit.map.MapItem;
-import org.apache.sis.storage.DataStoreException;
-import org.geotoolkit.map.MapLayer;
-import org.geotoolkit.style.MutableStyle;
-
-import org.apache.sis.measure.MeasurementRange;
-import org.apache.sis.util.logging.Logging;
-import org.apache.sis.xml.MarshallerPool;
-
-import org.geotoolkit.feature.type.Name;
-import org.geotoolkit.feature.type.PropertyDescriptor;
-import org.opengis.filter.And;
-import org.opengis.filter.Filter;
-import org.opengis.filter.PropertyIsEqualTo;
-import org.opengis.filter.expression.PropertyName;
-import org.opengis.geometry.Envelope;
 
 /**
  *

@@ -19,7 +19,6 @@
 
 package org.constellation.portrayal.internal;
 
-import java.awt.image.BufferedImage;
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.OutputDef;
@@ -27,6 +26,7 @@ import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.awt.image.BufferedImage;
 
 /**
  * Contain image informations for the response.

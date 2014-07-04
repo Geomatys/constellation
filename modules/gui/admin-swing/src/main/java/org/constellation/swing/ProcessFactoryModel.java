@@ -20,8 +20,9 @@
 package org.constellation.swing;
 
 import com.google.common.base.Objects;
-import java.io.Serializable;
 import org.constellation.configuration.ProcessFactory;
+
+import java.io.Serializable;
 
 /**
  *

@@ -19,11 +19,12 @@
 
 package org.constellation.sos.io;
 
+import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.sml.xml.AbstractSensorML;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import org.geotoolkit.sml.xml.AbstractSensorML;
-import org.constellation.ws.CstlServiceException;
 
 /**
  *

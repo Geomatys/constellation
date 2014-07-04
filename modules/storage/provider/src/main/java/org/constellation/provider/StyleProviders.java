@@ -18,6 +18,16 @@
  */
 package org.constellation.provider;
 
+import org.constellation.configuration.ConfigurationException;
+import org.geotoolkit.factory.FactoryFinder;
+import org.geotoolkit.factory.Hints;
+import org.geotoolkit.parameter.ParametersExt;
+import org.geotoolkit.style.MutableStyle;
+import org.geotoolkit.style.MutableStyleFactory;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -30,16 +40,8 @@ import java.util.Map.Entry;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.logging.Level;
-import org.constellation.configuration.ConfigurationException;
+
 import static org.constellation.provider.Provider.RELOAD_TIME_PROPERTY;
-import org.geotoolkit.factory.FactoryFinder;
-import org.geotoolkit.factory.Hints;
-import org.geotoolkit.parameter.ParametersExt;
-import org.geotoolkit.style.MutableStyle;
-import org.geotoolkit.style.MutableStyleFactory;
-import org.opengis.filter.FilterFactory2;
-import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.ParameterValueGroup;
 
 
 /**

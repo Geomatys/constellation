@@ -19,17 +19,6 @@
 
 package org.constellation.swing;
 
-import java.awt.Component;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import javax.swing.GroupLayout;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.LayoutStyle;
-import javax.swing.SwingConstants;
 import org.constellation.admin.service.ConstellationClient;
 import org.constellation.configuration.ProviderReport;
 import org.constellation.configuration.ProviderServiceReport;
@@ -37,6 +26,12 @@ import org.constellation.configuration.ProvidersReport;
 import org.jdesktop.swingx.combobox.ListComboBoxModel;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *

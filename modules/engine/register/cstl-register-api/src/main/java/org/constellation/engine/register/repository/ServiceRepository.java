@@ -18,12 +18,15 @@
  */
 package org.constellation.engine.register.repository;
 
+import org.constellation.engine.register.Data;
+import org.constellation.engine.register.Domain;
+import org.constellation.engine.register.Service;
+import org.constellation.engine.register.ServiceDetails;
+import org.constellation.engine.register.ServiceExtraConfig;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.constellation.engine.register.*;
-import org.constellation.engine.register.i18n.ServiceWithI18N;
 
 public interface ServiceRepository {
 	

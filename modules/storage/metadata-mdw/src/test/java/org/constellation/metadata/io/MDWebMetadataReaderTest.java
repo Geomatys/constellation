@@ -20,16 +20,24 @@
 
 package org.constellation.metadata.io;
 
-import java.io.File;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.sql.Connection;
-import java.util.TimeZone;
+import org.apache.sis.internal.jaxb.LegacyNamespaces;
+import org.apache.sis.test.XMLComparator;
+import org.apache.sis.xml.MarshallerPool;
+import org.apache.sis.xml.XML;
+import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
+import org.constellation.jaxb.MarshallWarnings;
+import org.constellation.util.Util;
+import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
+import org.geotoolkit.internal.sql.DefaultDataSource;
+import org.geotoolkit.util.sql.DerbySqlScriptRunner;
+import org.geotoolkit.xml.AnchoredMarshallerPool;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -38,29 +46,18 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import org.apache.sis.internal.jaxb.LegacyNamespaces;
+import java.io.File;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.sql.Connection;
+import java.util.TimeZone;
 
-import org.apache.sis.test.XMLComparator;
-import org.apache.sis.xml.MarshallerPool;
-import org.apache.sis.xml.XML;
+import static org.junit.Assert.*;
 
 // Constellation dependencies
-import org.constellation.generic.database.Automatic;
-import org.constellation.generic.database.BDD;
-import org.constellation.jaxb.MarshallWarnings;
-import org.constellation.util.Util;
-
 // Geotoolkit dependencies
-import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
-import org.geotoolkit.util.sql.DerbySqlScriptRunner;
-import org.geotoolkit.internal.sql.DefaultDataSource;
-import org.geotoolkit.xml.AnchoredMarshallerPool;
-
 // Junit dependencies
-import org.junit.*;
-import static org.junit.Assert.*;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
 /**
  *

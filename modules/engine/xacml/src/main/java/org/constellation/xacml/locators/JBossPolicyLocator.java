@@ -19,22 +19,22 @@
 package org.constellation.xacml.locators;
 
 import com.sun.xacml.AbstractPolicy;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import org.constellation.xacml.bridge.WrapperPolicyFinderModule;
-import org.constellation.xacml.XACMLConstants;
-import org.constellation.xacml.api.XACMLPolicy;
 import com.sun.xacml.Policy;
 import com.sun.xacml.PolicySet;
 import com.sun.xacml.finder.PolicyFinderModule;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Logger;
+import org.constellation.xacml.XACMLConstants;
 import org.constellation.xacml.api.ContextMapOp;
 import org.constellation.xacml.api.PolicyLocator;
+import org.constellation.xacml.api.XACMLPolicy;
 import org.constellation.xacml.bridge.PolicySetFinderModule;
+import org.constellation.xacml.bridge.WrapperPolicyFinderModule;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  *  Policy Locator for plain XACML Policy instances

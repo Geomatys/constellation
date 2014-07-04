@@ -18,15 +18,14 @@
  */
 package org.constellation.engine.register;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.List;
+import org.apache.sis.xml.MarshallerPool;
+import org.constellation.configuration.DataBrief;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
-
-import org.apache.sis.xml.MarshallerPool;
-import org.constellation.configuration.DataBrief;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.List;
 
 public interface ConfigurationService {
 

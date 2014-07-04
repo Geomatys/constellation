@@ -18,9 +18,6 @@
  */
 package org.constellation.engine.register.jooq;
 
-import java.lang.invoke.MethodHandles;
-import java.util.List;
-
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -30,6 +27,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.lang.invoke.MethodHandles;
+import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")

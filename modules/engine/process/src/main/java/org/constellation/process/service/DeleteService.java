@@ -23,8 +23,10 @@ import org.constellation.process.AbstractCstlProcess;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
-import static org.geotoolkit.parameter.Parameters.*;
-import static org.constellation.process.service.DeleteServiceDescriptor.*;
+
+import static org.constellation.process.service.DeleteServiceDescriptor.IDENTIFIER;
+import static org.constellation.process.service.DeleteServiceDescriptor.SERVICE_TYPE;
+import static org.geotoolkit.parameter.Parameters.value;
 
 /**
  *

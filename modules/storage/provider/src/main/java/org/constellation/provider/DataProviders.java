@@ -18,6 +18,13 @@
  */
 package org.constellation.provider;
 
+import org.constellation.configuration.ConfigurationException;
+import org.constellation.provider.configuration.Configurator.ProviderInformation;
+import org.geotoolkit.feature.type.DefaultName;
+import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.map.ElevationModel;
+import org.opengis.parameter.ParameterValueGroup;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -31,13 +38,8 @@ import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.logging.Level;
-import org.constellation.configuration.ConfigurationException;
+
 import static org.constellation.provider.Provider.RELOAD_TIME_PROPERTY;
-import org.constellation.provider.configuration.Configurator.ProviderInformation;
-import org.geotoolkit.feature.type.DefaultName;
-import org.geotoolkit.map.ElevationModel;
-import org.geotoolkit.feature.type.Name;
-import org.opengis.parameter.ParameterValueGroup;
 
 /**
  * Main data provider for MapLayer objects. This class act as a proxy for

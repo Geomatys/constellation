@@ -18,17 +18,6 @@
  */
 package org.constellation.admin.service;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-
-import org.constellation.dto.Details;
-import org.glassfish.jersey.client.ClientResponse;
-import org.glassfish.jersey.media.multipart.FormDataBodyPart;
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
-import org.glassfish.jersey.media.multipart.MultiPart;
-
 import org.apache.sis.util.ArgumentChecks;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
@@ -40,10 +29,11 @@ import org.constellation.configuration.InstanceReport;
 import org.constellation.configuration.LayerList;
 import org.constellation.configuration.ObjectFactory;
 import org.constellation.dto.DataDescription;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.dto.DataInformation;
-import org.geotoolkit.client.AbstractRequest;
+import org.constellation.dto.Details;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.geotoolkit.client.AbstractClient;
+import org.geotoolkit.client.AbstractRequest;
 import org.geotoolkit.client.ClientFactory;
 import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.security.BasicAuthenticationSecurity;
@@ -53,12 +43,20 @@ import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.xml.parameter.ParameterDescriptorReader;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.geotoolkit.xml.parameter.ParameterValueWriter;
+import org.glassfish.jersey.client.ClientResponse;
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.MultiPart;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.style.Style;
 
 import javax.swing.event.EventListenerList;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;

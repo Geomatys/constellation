@@ -18,20 +18,13 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
-import static org.constellation.engine.register.jooq.Tables.DATA;
-import static org.constellation.engine.register.jooq.Tables.DATA_X_DOMAIN;
-import static org.constellation.engine.register.jooq.Tables.PROVIDER;
-
-import java.util.HashSet;
-import java.util.Set;
-
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Domain;
+import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.User;
 import org.constellation.engine.register.jooq.AbstractJooqTestTestCase;
 import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.TestSamples;
-import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
@@ -41,6 +34,13 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.constellation.engine.register.jooq.Tables.DATA;
+import static org.constellation.engine.register.jooq.Tables.DATA_X_DOMAIN;
+import static org.constellation.engine.register.jooq.Tables.PROVIDER;
 
 @Transactional
 public class JooqDomainRespositoryTestCase extends AbstractJooqTestTestCase {

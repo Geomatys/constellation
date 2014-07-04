@@ -19,13 +19,14 @@
 
 package org.constellation.scheduler;
 
+import org.geotoolkit.feature.type.DefaultName;
+import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.process.ProcessFinder;
+import org.geotoolkit.process.ProcessingRegistry;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import org.geotoolkit.feature.type.DefaultName;
-import org.geotoolkit.process.ProcessFinder;
-import org.geotoolkit.process.ProcessingRegistry;
-import org.geotoolkit.feature.type.Name;
 
 /**
  *

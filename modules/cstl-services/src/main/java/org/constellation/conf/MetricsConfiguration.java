@@ -18,22 +18,6 @@
  */
 package org.constellation.conf;
 
-import static org.constellation.setup.CstlInstaller.HEALTH_CHECK_REGISTRY;
-import static org.constellation.setup.CstlInstaller.METRIC_REGISTRY;
-
-import java.lang.management.ManagementFactory;
-import java.net.InetSocketAddress;
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.sql.DataSource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
-
 import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.graphite.Graphite;
@@ -46,6 +30,20 @@ import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
 import com.codahale.metrics.jvm.ThreadStatesGaugeSet;
 import com.ryantenney.metrics.spring.config.annotation.EnableMetrics;
 import com.ryantenney.metrics.spring.config.annotation.MetricsConfigurerAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.sql.DataSource;
+import java.lang.management.ManagementFactory;
+import java.net.InetSocketAddress;
+import java.util.concurrent.TimeUnit;
+
+import static org.constellation.setup.CstlInstaller.HEALTH_CHECK_REGISTRY;
+import static org.constellation.setup.CstlInstaller.METRIC_REGISTRY;
 
 @Configuration
 @EnableMetrics(proxyTargetClass = true)

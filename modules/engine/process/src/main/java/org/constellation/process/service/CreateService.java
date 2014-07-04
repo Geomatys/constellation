@@ -21,13 +21,17 @@ package org.constellation.process.service;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.Details;
 import org.constellation.process.AbstractCstlProcess;
-import static org.constellation.process.service.CreateServiceDescriptor.*;
-
-import static org.geotoolkit.parameter.Parameters.*;
-
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
+
+import static org.constellation.process.service.CreateServiceDescriptor.CONFIGURATION;
+import static org.constellation.process.service.CreateServiceDescriptor.IDENTIFIER;
+import static org.constellation.process.service.CreateServiceDescriptor.OUT_CONFIGURATION;
+import static org.constellation.process.service.CreateServiceDescriptor.SERVICE_METADATA;
+import static org.constellation.process.service.CreateServiceDescriptor.SERVICE_TYPE;
+import static org.geotoolkit.parameter.Parameters.getOrCreate;
+import static org.geotoolkit.parameter.Parameters.value;
 
 /**
  * Process that create a new instance configuration from the service name (WMS, WMTS, WCS or WFS) for a specified instance name.

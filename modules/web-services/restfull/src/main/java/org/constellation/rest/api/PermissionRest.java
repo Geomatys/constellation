@@ -1,15 +1,14 @@
 package org.constellation.rest.api;
 
-import java.util.List;
+import org.constellation.engine.register.Permission;
+import org.constellation.engine.register.repository.DomainroleRepository;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-
-import org.constellation.engine.register.Permission;
-import org.constellation.engine.register.repository.DomainroleRepository;
+import java.util.List;
 
 @Path("/1/permission")
 public class PermissionRest {

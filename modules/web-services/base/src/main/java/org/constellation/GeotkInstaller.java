@@ -18,16 +18,16 @@
  */
 package org.constellation;
 
-import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.imageio.ImageIO;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.internal.io.Installation;
 import org.geotoolkit.lang.Setup;
-import org.apache.sis.util.logging.Logging;
+
+import javax.imageio.ImageIO;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class responsible for starting and stopping geotoolkit.

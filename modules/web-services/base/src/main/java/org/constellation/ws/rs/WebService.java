@@ -18,18 +18,19 @@
  */
 package org.constellation.ws.rs;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.lang.reflect.Proxy;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
+import org.constellation.configuration.ConfigDirectory;
+import org.constellation.engine.register.Property;
+import org.constellation.engine.register.repository.PropertyRepository;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.MimeType;
+import org.constellation.ws.WebServiceUtilities;
+import org.constellation.xml.PrefixMappingInvocationHandler;
+import org.geotoolkit.util.StringUtilities;
+import org.glassfish.jersey.internal.util.collection.StringKeyIgnoreCaseMultivaluedMap;
 
 import javax.inject.Inject;
-
-// Jersey dependencies
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -40,8 +41,6 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-
-// JAXB dependencies
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -50,26 +49,29 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.validation.Schema;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.lang.reflect.Proxy;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import static org.constellation.ws.ExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.constellation.ws.ExceptionCode.INVALID_REQUEST;
+import static org.constellation.ws.ExceptionCode.MISSING_PARAMETER_VALUE;
+import static org.constellation.ws.ExceptionCode.OPERATION_NOT_SUPPORTED;
+
+// Jersey dependencies
+// JAXB dependencies
 // Constellation dependencies
-import org.constellation.configuration.ConfigDirectory;
-import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.MimeType;
-import org.constellation.ws.WebServiceUtilities;
-import org.constellation.xml.PrefixMappingInvocationHandler;
-import org.constellation.engine.register.Property;
-import org.constellation.engine.register.repository.PropertyRepository;
-
-
-import static org.constellation.ws.ExceptionCode.*;
-
 // Geotoolkit dependencies
-import org.geotoolkit.util.StringUtilities;
-
 // Apache SIS dependencies
-import org.apache.sis.util.logging.Logging;
-import org.apache.sis.xml.MarshallerPool;
-import org.glassfish.jersey.internal.util.collection.StringKeyIgnoreCaseMultivaluedMap;
 
 /**
  * Abstract parent of all REST facade classes for Constellation web services.

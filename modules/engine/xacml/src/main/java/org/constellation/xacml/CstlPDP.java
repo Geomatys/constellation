@@ -27,22 +27,21 @@ import com.sun.xacml.finder.PolicyFinder;
 import com.sun.xacml.finder.PolicyFinderModule;
 import com.sun.xacml.finder.impl.CurrentEnvModule;
 import com.sun.xacml.finder.impl.SelectorModule;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.constellation.xacml.factory.FactoryException;
-import org.constellation.xacml.factory.PolicyFactory;
 import org.constellation.xacml.api.PolicyDecisionPoint;
 import org.constellation.xacml.api.PolicyLocator;
 import org.constellation.xacml.api.RequestContext;
 import org.constellation.xacml.api.ResponseContext;
 import org.constellation.xacml.api.XACMLPolicy;
+import org.constellation.xacml.factory.FactoryException;
+import org.constellation.xacml.factory.PolicyFactory;
 import org.constellation.xacml.locators.JBossPolicyLocator;
 import org.geotoolkit.xacml.xml.policy.PolicySetType;
 import org.geotoolkit.xacml.xml.policy.PolicyType;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 

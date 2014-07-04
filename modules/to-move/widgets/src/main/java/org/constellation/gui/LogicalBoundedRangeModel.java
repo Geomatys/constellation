@@ -18,7 +18,7 @@
  */
 package org.constellation.gui;
 
-import javax.swing.BoundedRangeModel;
+import javax.swing.*;
 
 
 /**

@@ -19,20 +19,12 @@
 
 package org.constellation.sos.io.generic;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import javax.xml.namespace.QName;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.generic.GenericReader;
 import org.constellation.generic.Values;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.sos.factory.OMFactory;
-import static org.constellation.sos.ws.SOSConstants.*;
 import org.constellation.ws.MimeType;
 import org.geotoolkit.gml.xml.AbstractGeometry;
 import org.geotoolkit.gml.xml.Envelope;
@@ -44,11 +36,9 @@ import org.geotoolkit.gml.xml.v311.UnitOfMeasureEntry;
 import org.geotoolkit.observation.ObservationReader;
 import org.geotoolkit.observation.xml.OMXmlFactory;
 import org.geotoolkit.observation.xml.v100.MeasureType;
-
 import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.sos.xml.ResponseModeType;
 import org.geotoolkit.sos.xml.SOSXmlFactory;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
 import org.geotoolkit.swe.xml.AbstractDataComponent;
 import org.geotoolkit.swe.xml.AbstractDataRecord;
 import org.geotoolkit.swe.xml.AnyScalar;
@@ -66,6 +56,27 @@ import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.temporal.Period;
 import org.opengis.temporal.TemporalGeometricPrimitive;
 import org.opengis.temporal.TemporalPrimitive;
+
+import javax.xml.namespace.QName;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+
+import static org.constellation.sos.ws.SOSConstants.MEASUREMENT_QNAME;
+import static org.constellation.sos.ws.SOSConstants.OBSERVATION_MODEL;
+import static org.constellation.sos.ws.SOSConstants.OBSERVATION_QNAME;
+import static org.constellation.sos.ws.SOSConstants.SENSORML_100_FORMAT_V200;
+import static org.constellation.sos.ws.SOSConstants.SENSORML_101_FORMAT_V200;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildDirectPosition;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildFeatureProperty;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildLineString;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildOffering;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildPoint;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildSamplingCurve;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildSamplingPoint;
 
 
 /**

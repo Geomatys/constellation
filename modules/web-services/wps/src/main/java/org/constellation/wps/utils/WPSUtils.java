@@ -18,11 +18,38 @@
  */
 package org.constellation.wps.utils;
 
-import java.io.File;
-import java.math.BigInteger;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.sis.util.ArgumentChecks;
+import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
+import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.feature.type.FeatureType;
+import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeWriter;
+import org.geotoolkit.ows.xml.v110.CodeType;
+import org.geotoolkit.ows.xml.v110.DomainMetadataType;
+import org.geotoolkit.ows.xml.v110.LanguageStringType;
+import org.geotoolkit.process.ProcessDescriptor;
+import org.geotoolkit.process.ProcessFinder;
+import org.geotoolkit.wps.io.WPSIO;
+import org.geotoolkit.wps.xml.WPSMarshallerPool;
+import org.geotoolkit.wps.xml.v100.ComplexDataCombinationType;
+import org.geotoolkit.wps.xml.v100.ComplexDataCombinationsType;
+import org.geotoolkit.wps.xml.v100.ComplexDataDescriptionType;
+import org.geotoolkit.wps.xml.v100.DataInputsType;
+import org.geotoolkit.wps.xml.v100.DocumentOutputDefinitionType;
+import org.geotoolkit.wps.xml.v100.Execute;
+import org.geotoolkit.wps.xml.v100.InputType;
+import org.geotoolkit.wps.xml.v100.ProcessBriefType;
+import org.geotoolkit.wps.xml.v100.ResponseFormType;
+import org.geotoolkit.wps.xml.v100.SupportedComplexDataInputType;
+import org.geotoolkit.wps.xml.v100.SupportedUOMsType;
+import org.geotoolkit.wps.xml.v100.UOMsType;
+import org.geotoolkit.xsd.xml.v2001.Schema;
+import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
+import org.opengis.parameter.GeneralParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptorGroup;
+import org.opengis.util.NoSuchIdentifierException;
+
 import javax.measure.unit.NonSI;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
@@ -31,32 +58,24 @@ import javax.xml.bind.Marshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.io.File;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import static org.constellation.wps.ws.WPSConstant.*;
-import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeWriter;
-
+import static org.constellation.wps.ws.WPSConstant.IDENTIFER_PARAMETER;
+import static org.constellation.wps.ws.WPSConstant.MAX_MB_INPUT_COMPLEX;
+import static org.constellation.wps.ws.WPSConstant.PROCESS_PREFIX;
+import static org.constellation.wps.ws.WPSConstant.WPS_1_0_0;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
-import org.geotoolkit.ows.xml.v110.CodeType;
-import org.geotoolkit.ows.xml.v110.DomainMetadataType;
-import org.geotoolkit.ows.xml.v110.LanguageStringType;
-import org.geotoolkit.process.ProcessDescriptor;
-import org.geotoolkit.process.ProcessFinder;
-import org.apache.sis.util.ArgumentChecks;
-import org.apache.sis.util.logging.Logging;
-import org.geotoolkit.wps.io.WPSIO;
-import org.geotoolkit.wps.xml.WPSMarshallerPool;
-import org.geotoolkit.wps.xml.v100.*;
-import org.apache.sis.xml.MarshallerPool;
-import org.geotoolkit.xsd.xml.v2001.Schema;
-import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
-import org.geotoolkit.feature.type.FeatureType;
-
-import org.opengis.parameter.GeneralParameterDescriptor;
-import org.opengis.parameter.ParameterDescriptor;
-import org.opengis.parameter.ParameterDescriptorGroup;
-import org.opengis.util.NoSuchIdentifierException;
 
 /**
  * Set of utilities method used by WPS worker.

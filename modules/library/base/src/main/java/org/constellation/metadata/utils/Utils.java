@@ -18,6 +18,15 @@
  */
 package org.constellation.metadata.utils;
 
+import org.apache.sis.util.Classes;
+import org.apache.sis.util.iso.SimpleInternationalString;
+import org.apache.sis.util.logging.Logging;
+import org.constellation.util.NodeUtilities;
+import org.constellation.util.ReflectionUtilities;
+import org.opengis.util.InternationalString;
+import org.w3c.dom.Node;
+
+import javax.xml.bind.JAXBElement;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,15 +35,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.bind.JAXBElement;
-
-import org.apache.sis.util.iso.SimpleInternationalString;
-import org.constellation.util.ReflectionUtilities;
-import org.apache.sis.util.Classes;
-import org.apache.sis.util.logging.Logging;
-import org.constellation.util.NodeUtilities;
-import org.opengis.util.InternationalString;
-import org.w3c.dom.Node;
 
 /**
  * Utility methods used in CSW object.

@@ -18,9 +18,11 @@
  */
 package org.constellation.configuration;
 
+import javax.swing.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import java.io.Serializable;
-import javax.swing.SwingConstants;
-import javax.xml.bind.annotation.*;
 
 /**
  * WMS Portrayal legend template configuration.

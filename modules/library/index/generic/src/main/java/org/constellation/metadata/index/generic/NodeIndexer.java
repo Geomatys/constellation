@@ -20,6 +20,19 @@
 package org.constellation.metadata.index.generic;
 
 // J2SE dependencies
+
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+import org.constellation.metadata.index.AbstractCSWIndexer;
+import org.constellation.metadata.io.MetadataIoException;
+import org.constellation.metadata.io.MetadataReader;
+import org.constellation.metadata.io.MetadataType;
+import org.constellation.metadata.utils.Utils;
+import org.constellation.util.NodeUtilities;
+import org.geotoolkit.lucene.IndexingException;
+import org.w3c.dom.Node;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -28,23 +41,9 @@ import java.util.Map;
 import java.util.logging.Level;
 
 // Apache Lucene dependencies
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-
 // constellation dependencies
-import org.constellation.metadata.index.AbstractCSWIndexer;
-import org.constellation.metadata.io.MetadataReader;
-import org.constellation.metadata.io.MetadataIoException;
-import org.constellation.metadata.io.MetadataType;
-import org.constellation.metadata.utils.Utils;
-import org.constellation.util.NodeUtilities;
-
 // geotoolkit dependencies
-import org.geotoolkit.lucene.IndexingException;
-
 // GeoAPI dependencies
-import org.w3c.dom.Node;
 
 
 /**

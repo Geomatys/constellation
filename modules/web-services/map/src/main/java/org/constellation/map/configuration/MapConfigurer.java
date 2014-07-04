@@ -24,16 +24,19 @@ import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
-
-import java.awt.*;
-
 import org.apache.sis.storage.DataStoreException;
+import org.constellation.admin.StyleBusiness;
 import org.constellation.configuration.ConfigProcessException;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.TargetNotFoundException;
-import org.constellation.dto.*;
+import org.constellation.dto.AddLayer;
+import org.constellation.dto.CoverageDataDescription;
+import org.constellation.dto.DataDescription;
+import org.constellation.dto.FeatureDataDescription;
+import org.constellation.dto.PropertyDescription;
 import org.constellation.ogc.configuration.OGCConfigurer;
+import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.process.service.AddLayerToMapServiceDescriptor;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
@@ -41,13 +44,13 @@ import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviders;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.util.DataReference;
-import org.constellation.admin.StyleBusiness;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.LayerProviders;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
+import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.MutableStyleFactory;
 import org.geotoolkit.style.function.InterpolationPoint;
@@ -66,25 +69,22 @@ import org.opengis.style.OverlapBehavior;
 import org.opengis.style.RasterSymbolizer;
 import org.opengis.style.ShadedRelief;
 import org.opengis.style.Symbolizer;
+import org.opengis.util.NoSuchIdentifierException;
 
 import javax.inject.Inject;
 import javax.measure.unit.NonSI;
 import javax.measure.unit.Unit;
-
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-
-import org.constellation.process.ConstellationProcessFactory;
-import org.geotoolkit.process.ProcessFinder;
 
 import static org.geotoolkit.style.StyleConstants.DEFAULT_CATEGORIZE_LOOKUP;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_DESCRIPTION;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_FALLBACK;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_GEOM;
 import static org.geotoolkit.style.StyleConstants.LITERAL_ONE_FLOAT;
-import org.opengis.util.NoSuchIdentifierException;
 
 /**
  * {@link org.constellation.configuration.ServiceConfigurer} base for "map" services.

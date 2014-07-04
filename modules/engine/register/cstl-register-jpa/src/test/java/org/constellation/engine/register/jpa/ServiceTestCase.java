@@ -18,9 +18,6 @@
  */
 package org.constellation.engine.register.jpa;
 
-import java.lang.invoke.MethodHandles;
-import java.util.List;
-
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.repository.ServiceRepository;
 import org.junit.Test;
@@ -31,6 +28,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.lang.invoke.MethodHandles;
+import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:/spring/test-derby.xml")

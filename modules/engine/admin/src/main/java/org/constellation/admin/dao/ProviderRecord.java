@@ -20,6 +20,7 @@
 package org.constellation.admin.dao;
 
 import org.constellation.admin.EmbeddedDatabase;
+import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -29,7 +30,6 @@ import java.io.StringReader;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import org.opengis.parameter.GeneralParameterDescriptor;
 
 /**
  * @author Fabien Bernard (Geomatys).

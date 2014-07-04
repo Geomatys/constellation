@@ -19,13 +19,14 @@
 
 package org.constellation.sos.factory;
 
-import java.util.Map;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.generic.database.Automatic;
 import org.geotoolkit.observation.ObservationFilter;
 import org.geotoolkit.observation.ObservationReader;
 import org.geotoolkit.observation.ObservationWriter;
+
+import java.util.Map;
 
 /**
  * Factory used to load various implementation of observation reader/writer/filter.

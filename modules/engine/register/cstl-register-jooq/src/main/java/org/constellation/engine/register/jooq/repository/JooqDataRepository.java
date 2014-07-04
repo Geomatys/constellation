@@ -21,25 +21,12 @@ package org.constellation.engine.register.jooq.repository;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.DataI18n;
 import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.helper.DataHelper;
 import org.constellation.engine.register.i18n.DataWithI18N;
 import org.constellation.engine.register.jooq.Tables;
-
-import static org.constellation.engine.register.jooq.Tables.DATA;
-import static org.constellation.engine.register.jooq.Tables.DATA_I18N;
-import static org.constellation.engine.register.jooq.Tables.DATA_X_DOMAIN;
-import static org.constellation.engine.register.jooq.Tables.PROVIDER;
-import static org.constellation.engine.register.jooq.Tables.SERVICE_X_DOMAIN;
-
 import org.constellation.engine.register.jooq.tables.records.DataRecord;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.DomainRepository;
@@ -48,6 +35,15 @@ import org.jooq.Record;
 import org.jooq.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.constellation.engine.register.jooq.Tables.DATA;
+import static org.constellation.engine.register.jooq.Tables.DATA_I18N;
+import static org.constellation.engine.register.jooq.Tables.DATA_X_DOMAIN;
+import static org.constellation.engine.register.jooq.Tables.PROVIDER;
 
 @Component
 public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data> implements DataRepository {

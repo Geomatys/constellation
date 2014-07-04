@@ -18,6 +18,12 @@
  */
 package org.constellation.om2;
 
+import org.apache.sis.util.logging.Logging;
+import org.constellation.util.Util;
+import org.geotoolkit.internal.sql.PostgisInstaller;
+import org.geotoolkit.internal.sql.ScriptRunner;
+
+import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
@@ -26,11 +32,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.sql.DataSource;
-import org.constellation.util.Util;
-import org.geotoolkit.internal.sql.PostgisInstaller;
-import org.geotoolkit.internal.sql.ScriptRunner;
-import org.apache.sis.util.logging.Logging;
 
 /**
  *

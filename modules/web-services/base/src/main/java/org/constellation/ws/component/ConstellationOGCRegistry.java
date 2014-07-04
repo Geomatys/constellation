@@ -1,17 +1,16 @@
 package org.constellation.ws.component;
 
-import java.lang.invoke.MethodHandles;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Named;
-
 import org.constellation.ws.ConstellationOGCModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Named;
+import java.lang.invoke.MethodHandles;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 @Named
 public class ConstellationOGCRegistry {

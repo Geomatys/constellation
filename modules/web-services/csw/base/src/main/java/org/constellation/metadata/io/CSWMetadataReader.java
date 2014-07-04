@@ -20,13 +20,14 @@
 
 package org.constellation.metadata.io;
 
-import java.util.List;
-import java.util.Map;
-import javax.xml.namespace.QName;
-
-// geotoolkit dependencies
 import org.geotoolkit.csw.xml.DomainValues;
 import org.w3c.dom.Node;
+
+import javax.xml.namespace.QName;
+import java.util.List;
+import java.util.Map;
+
+// geotoolkit dependencies
 
 /**
  *

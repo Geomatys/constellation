@@ -19,19 +19,20 @@
 
 package org.constellation.sos.factory;
 
-import java.util.Map;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.om2.OM2ObservationFilter;
+import org.constellation.sos.io.om2.OM2ObservationFilterReader;
 import org.constellation.sos.io.om2.OM2ObservationReader;
 import org.constellation.sos.io.om2.OM2ObservationWriter;
 import org.geotoolkit.observation.ObservationFilter;
 import org.geotoolkit.observation.ObservationReader;
 import org.geotoolkit.observation.ObservationWriter;
 
-import static org.constellation.configuration.DataSourceType.*;
-import org.constellation.sos.io.om2.OM2ObservationFilterReader;
+import java.util.Map;
+
+import static org.constellation.configuration.DataSourceType.OM2;
 
 /**
   * A postgrid implementation of the SOS factory.

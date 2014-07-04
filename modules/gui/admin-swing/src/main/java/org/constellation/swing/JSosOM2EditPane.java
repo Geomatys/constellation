@@ -18,17 +18,18 @@
  */
 package org.constellation.swing;
 
+import org.constellation.configuration.DataSourceType;
+import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
+import org.constellation.om2.OM2DatabaseCreator;
+
+import javax.sql.DataSource;
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.logging.Level;
-import javax.sql.DataSource;
-import javax.swing.JOptionPane;
-import org.constellation.configuration.DataSourceType;
-import org.constellation.generic.database.Automatic;
-import org.constellation.generic.database.BDD;
-import org.constellation.om2.OM2DatabaseCreator;
 
 /**
  *

@@ -19,24 +19,25 @@
 
 package org.constellation.coverage.ws.rs;
 
+import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.image.io.metadata.SpatialMetadata;
+
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriter;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriter;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.Provider;
-import org.geotoolkit.coverage.grid.GridCoverage2D;
-import org.geotoolkit.image.io.metadata.SpatialMetadata;
-import org.apache.sis.util.logging.Logging;
 
 /**
  *

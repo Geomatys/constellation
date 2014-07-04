@@ -18,18 +18,22 @@
  */
 package org.constellation.process.provider.style;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.process.AbstractProcessTest;
-import org.constellation.provider.*;
+import org.constellation.provider.ProviderFactory;
+import org.constellation.provider.StyleProvider;
+import org.constellation.provider.StyleProviderFactory;
+import org.constellation.provider.StyleProviders;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
+
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Collection;
 
 /**
  *

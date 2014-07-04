@@ -20,31 +20,33 @@
 package org.constellation.sos.ws;
 
 // JUnit dependencies
-import java.io.File;
-import java.sql.Connection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.xml.bind.Marshaller;
+
+import org.apache.sis.xml.MarshallerPool;
+import org.constellation.admin.ConfigurationEngine;
+import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.test.utils.Order;
+import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.util.Util;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
-import org.apache.sis.xml.MarshallerPool;
-import org.constellation.admin.ConfigurationEngine;
-import org.constellation.admin.ServiceBusiness;
-import org.constellation.admin.SpringHelper;
-import static org.constellation.sos.ws.SOS2WorkerTest.worker;
-import org.constellation.test.utils.SpringTestRunner;
-
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.xml.bind.Marshaller;
+import java.io.File;
+import java.sql.Connection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *

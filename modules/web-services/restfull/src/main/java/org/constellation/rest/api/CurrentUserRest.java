@@ -18,6 +18,12 @@
  */
 package org.constellation.rest.api;
 
+import com.google.common.base.Function;
+import org.constellation.configuration.AcknowlegementType;
+import org.constellation.engine.register.DomainUser;
+import org.constellation.engine.register.repository.UserRepository;
+import org.constellation.security.SecurityManagerHolder;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.Consumes;
@@ -26,15 +32,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import org.constellation.configuration.AcknowlegementType;
-import org.constellation.engine.register.DomainUser;
-import org.constellation.engine.register.User;
-import org.constellation.engine.register.repository.UserRepository;
-import org.constellation.security.SecurityManagerHolder;
-import org.springframework.util.StringUtils;
-
-import com.google.common.base.Function;
 
 /**
  * RestFull user configuration service

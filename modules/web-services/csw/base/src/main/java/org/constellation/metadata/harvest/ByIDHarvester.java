@@ -19,14 +19,26 @@
 package org.constellation.metadata.harvest;
 
 // J2SE dependencies
+
 import org.constellation.metadata.DistributedResults;
+import org.constellation.metadata.io.MetadataIoException;
+import org.constellation.metadata.io.MetadataWriter;
+import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.csw.xml.GetRecordsRequest;
+import org.geotoolkit.csw.xml.v202.GetRecordByIdResponseType;
+import org.geotoolkit.ows.xml.v100.ExceptionReport;
+import org.w3c.dom.Node;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.InputStreamReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -35,23 +47,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
+import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.OPERATION_NOT_SUPPORTED;
+
 // JAXB dependencies
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-
 // Constellation dependencies
-import org.constellation.metadata.io.MetadataIoException;
-import org.constellation.metadata.io.MetadataWriter;
-import org.constellation.ws.CstlServiceException;
-
 // Geotoolkit dependencies
-import org.geotoolkit.csw.xml.GetRecordsRequest;
-import org.geotoolkit.ows.xml.v100.ExceptionReport;
-import org.geotoolkit.csw.xml.v202.GetRecordByIdResponseType;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import org.w3c.dom.Node;
 
 /**
  * This catalogue harvester is a special tool used to harvest a CSW.

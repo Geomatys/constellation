@@ -18,17 +18,11 @@
  */
 package org.constellation.admin;
 
-import java.lang.invoke.MethodHandles;
-
-import javax.inject.Inject;
-
-import org.constellation.admin.ConfigurationEngine;
-import org.constellation.admin.SpringHelper;
-import org.constellation.ws.ServiceConfigurer;
 import org.constellation.engine.register.ConfigurationService;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.security.SecurityManagerHolder;
 import org.constellation.util.ReflectionUtilities;
+import org.constellation.ws.ServiceConfigurer;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
 import org.constellation.ws.WorkerFactory;
@@ -37,6 +31,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+
+import javax.inject.Inject;
+import java.lang.invoke.MethodHandles;
 
 /**
  * This class wires spring managed beans with legacy code.

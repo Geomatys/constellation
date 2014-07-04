@@ -36,10 +36,20 @@
 package org.constellation.data.om2;
 
 import com.vividsolutions.jts.geom.Geometry;
+import org.apache.sis.geometry.GeneralEnvelope;
+import org.geotoolkit.data.AbstractReadingTests;
+import org.geotoolkit.data.FeatureStore;
+import org.geotoolkit.data.FeatureStoreFinder;
+import org.geotoolkit.feature.FeatureTypeBuilder;
+import org.geotoolkit.feature.type.DefaultName;
+import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.internal.sql.DefaultDataSource;
+import org.geotoolkit.internal.sql.ScriptRunner;
+import org.geotoolkit.referencing.CRS;
+
 import java.io.InputStream;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,18 +57,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.geotoolkit.data.AbstractReadingTests;
-import org.geotoolkit.data.FeatureStore;
-import org.geotoolkit.data.FeatureStoreFinder;
-import org.geotoolkit.feature.type.DefaultName;
-import org.geotoolkit.feature.FeatureTypeBuilder;
-import org.apache.sis.geometry.GeneralEnvelope;
-import org.geotoolkit.internal.sql.DefaultDataSource;
-import org.geotoolkit.internal.sql.ScriptRunner;
-import org.geotoolkit.referencing.CRS;
-
-import org.geotoolkit.feature.type.Name;
 
 
 /**

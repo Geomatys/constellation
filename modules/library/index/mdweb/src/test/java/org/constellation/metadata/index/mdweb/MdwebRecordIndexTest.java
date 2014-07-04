@@ -19,29 +19,14 @@
 package org.constellation.metadata.index.mdweb;
 
 // J2SE dependencies
-import java.io.File;
-import java.sql.Connection;
-import java.sql.Date;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-//Junit dependencies
-import javax.imageio.spi.ServiceRegistry;
-import org.junit.*;
-import static org.junit.Assert.*;
-
-// Constellation dependencies
-import org.constellation.generic.database.Automatic;
-import org.constellation.generic.database.BDD;
-import org.constellation.util.Util;
-
-// lucene dependencies
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
-
-// geotoolkit dependencies
+import org.apache.sis.util.logging.Logging;
+import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
+import org.constellation.util.Util;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.internal.sql.DefaultDataSource;
@@ -50,10 +35,7 @@ import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.lucene.index.LuceneIndexSearcher;
 import org.geotoolkit.util.FileUtilities;
-import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
-
-// MDWeb dependencies
 import org.mdweb.io.MD_IOException;
 import org.mdweb.io.MD_IOFactory;
 import org.mdweb.io.Writer;
@@ -63,14 +45,33 @@ import org.mdweb.model.schemas.Path;
 import org.mdweb.model.schemas.PrimitiveType;
 import org.mdweb.model.schemas.Property;
 import org.mdweb.model.schemas.Standard;
-import org.mdweb.model.storage.RecordSet;
 import org.mdweb.model.storage.FullRecord;
+import org.mdweb.model.storage.RecordSet;
 import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
 import org.mdweb.model.users.User;
-
-// GeoAPI dependencies
 import org.opengis.filter.FilterFactory2;
+
+import javax.imageio.spi.ServiceRegistry;
+import java.io.File;
+import java.sql.Connection;
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.junit.Assert.*;
+
+//Junit dependencies
+// Constellation dependencies
+// lucene dependencies
+// geotoolkit dependencies
+// MDWeb dependencies
+// GeoAPI dependencies
 
 
 /**

@@ -34,31 +34,40 @@
  */
 package org.constellation.provider.coveragesgroup.util.xml;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-
-import org.apache.sis.test.XMLComparator;
 import org.apache.sis.internal.jaxb.geometry.ObjectFactory;
+import org.apache.sis.test.XMLComparator;
+import org.apache.sis.xml.MarshallerPool;
 import org.constellation.configuration.GFIParam;
 import org.constellation.configuration.GetFeatureInfoCfg;
-import org.constellation.provider.coveragesgroup.xml.*;
+import org.constellation.provider.coveragesgroup.xml.DataReference;
+import org.constellation.provider.coveragesgroup.xml.MapContext;
+import org.constellation.provider.coveragesgroup.xml.MapItem;
+import org.constellation.provider.coveragesgroup.xml.MapLayer;
+import org.constellation.provider.coveragesgroup.xml.StyleReference;
 import org.geotoolkit.se.xml.v110.DescriptionType;
 import org.geotoolkit.se.xml.v110.FeatureTypeStyleType;
 import org.geotoolkit.sld.xml.v110.StyledLayerDescriptor;
 import org.geotoolkit.sld.xml.v110.UserLayer;
 import org.geotoolkit.sld.xml.v110.UserStyle;
-import org.apache.sis.xml.MarshallerPool;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-import static org.junit.Assert.*;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests on the marshalling/unmarshalling process for a map context.

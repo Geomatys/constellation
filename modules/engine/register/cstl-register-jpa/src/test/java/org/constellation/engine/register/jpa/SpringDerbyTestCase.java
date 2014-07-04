@@ -18,16 +18,7 @@
  */
 package org.constellation.engine.register.jpa;
 
-import java.lang.invoke.MethodHandles;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.DomainAccess;
-import org.constellation.engine.register.DomainRole;
 import org.constellation.engine.register.Provider;
-import org.constellation.engine.register.User;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.LayerRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
@@ -35,7 +26,6 @@ import org.constellation.engine.register.repository.ServiceRepository;
 import org.constellation.engine.register.repository.StyleRepository;
 import org.constellation.engine.register.repository.TaskRepository;
 import org.constellation.engine.register.repository.UserRepository;
-import org.geotoolkit.gml.xml.v321.DomainSetType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -44,6 +34,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.lang.invoke.MethodHandles;
+import java.util.List;
 
 //@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)

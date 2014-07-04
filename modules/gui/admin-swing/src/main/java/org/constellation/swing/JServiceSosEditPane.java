@@ -19,14 +19,15 @@
 
 package org.constellation.swing;
 
-import java.awt.BorderLayout;
-import java.util.logging.Level;
 import org.constellation.admin.service.ConstellationClient;
 import org.constellation.configuration.AbstractConfigurationObject;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
+
+import java.awt.*;
+import java.util.logging.Level;
 
 /**
  *

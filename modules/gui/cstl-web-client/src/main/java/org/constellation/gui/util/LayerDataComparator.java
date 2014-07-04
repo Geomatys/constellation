@@ -19,9 +19,7 @@
 package org.constellation.gui.util;
 
 import org.apache.commons.lang3.ObjectUtils;
-import org.constellation.configuration.Layer;
 import org.constellation.gui.service.bean.LayerData;
-import org.geotoolkit.temporal.object.TemporalUtilities;
 
 import java.util.Comparator;
 import java.util.logging.Logger;

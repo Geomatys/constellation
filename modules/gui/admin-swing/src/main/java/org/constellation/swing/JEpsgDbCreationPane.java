@@ -20,15 +20,16 @@
 
 package org.constellation.swing;
 
+import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.referencing.factory.epsg.EpsgInstaller;
+import org.opengis.util.FactoryException;
+
+import javax.swing.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
-import org.apache.sis.util.logging.Logging;
-import org.geotoolkit.referencing.factory.epsg.EpsgInstaller;
-import org.opengis.util.FactoryException;
 
 /**
  *

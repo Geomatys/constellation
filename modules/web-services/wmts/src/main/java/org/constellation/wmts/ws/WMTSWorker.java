@@ -19,8 +19,6 @@
 package org.constellation.wmts.ws;
 
 //J2SE dependencies
-import java.awt.image.BufferedImage;
-import java.util.Map;
 
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.Worker;
@@ -29,6 +27,9 @@ import org.geotoolkit.wmts.xml.v100.Capabilities;
 import org.geotoolkit.wmts.xml.v100.GetCapabilities;
 import org.geotoolkit.wmts.xml.v100.GetFeatureInfo;
 import org.geotoolkit.wmts.xml.v100.GetTile;
+
+import java.awt.image.BufferedImage;
+import java.util.Map;
 
 
 /**

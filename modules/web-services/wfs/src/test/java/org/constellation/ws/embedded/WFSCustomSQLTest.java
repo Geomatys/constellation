@@ -20,17 +20,6 @@
 package org.constellation.ws.embedded;
 
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.sql.Connection;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.xml.bind.JAXBContext;
-import javax.xml.namespace.QName;
 import org.apache.sis.test.XMLComparator;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
@@ -44,37 +33,51 @@ import org.constellation.map.configuration.LayerBusiness;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
 import org.constellation.provider.Providers;
-import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
-import static org.constellation.provider.configuration.ProviderParameters.SOURCE_LOADALL_DESCRIPTOR;
-import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
-import static org.constellation.provider.featurestore.FeatureStoreProviderService.SOURCE_CONFIG_DESCRIPTOR;
-
 import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.util.Util;
-
-import static org.geotoolkit.data.AbstractFeatureStoreFactory.NAMESPACE;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.DATABASE;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.HOST;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.PASSWORD;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.SCHEMA;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.USER;
 import org.geotoolkit.internal.sql.DefaultDataSource;
-import static org.geotoolkit.parameter.ParametersExt.createGroup;
-import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
-import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.geotoolkit.xsd.xml.v2001.Schema;
-
-// JUnit dependencies
-import org.junit.*;
-import static org.junit.Assert.*;
-import static org.junit.Assume.*;
+import org.junit.AfterClass;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opengis.parameter.ParameterValueGroup;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.xml.bind.JAXBContext;
+import javax.xml.namespace.QName;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.sql.Connection;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.SOURCE_LOADALL_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
+import static org.constellation.provider.featurestore.FeatureStoreProviderService.SOURCE_CONFIG_DESCRIPTOR;
+import static org.geotoolkit.data.AbstractFeatureStoreFactory.NAMESPACE;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.DATABASE;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.HOST;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.PASSWORD;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.SCHEMA;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.USER;
+import static org.geotoolkit.parameter.ParametersExt.createGroup;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeNoException;
+import static org.junit.Assume.assumeTrue;
+
+// JUnit dependencies
 
 /**
  * Ensure extended datastores properly work.

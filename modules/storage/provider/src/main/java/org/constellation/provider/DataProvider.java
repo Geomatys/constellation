@@ -18,11 +18,11 @@
  */
 package org.constellation.provider;
 
-import org.geotoolkit.map.ElevationModel;
+import org.apache.sis.storage.DataStore;
 import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.map.ElevationModel;
 
 import java.util.Date;
-import org.apache.sis.storage.DataStore;
 
 /**
  *

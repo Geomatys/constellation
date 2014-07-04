@@ -34,7 +34,6 @@ import org.constellation.configuration.StyleReport;
 import org.constellation.dto.BandDescription;
 import org.constellation.dto.CoverageDataDescription;
 import org.constellation.dto.DataDescription;
-import org.constellation.dto.StyleBean;
 import org.constellation.dto.StyleListBrief;
 import org.constellation.gui.binding.ColorMap;
 import org.constellation.gui.binding.Interpolate;
@@ -48,7 +47,7 @@ import org.geotoolkit.style.interval.DefaultIntervalPalette;
 import org.geotoolkit.style.interval.IntervalPalette;
 
 import javax.inject.Inject;
-import java.awt.Color;
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;

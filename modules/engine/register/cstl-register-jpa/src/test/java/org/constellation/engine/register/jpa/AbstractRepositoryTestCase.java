@@ -18,14 +18,14 @@
  */
 package org.constellation.engine.register.jpa;
 
-import java.lang.invoke.MethodHandles;
-import java.util.List;
-
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.lang.invoke.MethodHandles;
+import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:/spring/test-derby.xml")

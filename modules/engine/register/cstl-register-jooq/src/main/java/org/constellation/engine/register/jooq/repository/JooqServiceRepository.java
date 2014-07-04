@@ -18,16 +18,13 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import org.constellation.engine.register.*;
+import org.constellation.engine.register.Data;
+import org.constellation.engine.register.Domain;
+import org.constellation.engine.register.Service;
+import org.constellation.engine.register.ServiceDetails;
+import org.constellation.engine.register.ServiceExtraConfig;
 import org.constellation.engine.register.jooq.Tables;
+import org.constellation.engine.register.jooq.tables.records.ServiceDetailsRecord;
 import org.constellation.engine.register.jooq.tables.records.ServiceExtraConfigRecord;
 import org.constellation.engine.register.jooq.tables.records.ServiceRecord;
 import org.constellation.engine.register.repository.DomainRepository;
@@ -39,8 +36,21 @@ import org.jooq.SelectConditionStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import static org.constellation.engine.register.jooq.Tables.*;
-import org.constellation.engine.register.jooq.tables.records.ServiceDetailsRecord;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import static org.constellation.engine.register.jooq.Tables.DATA;
+import static org.constellation.engine.register.jooq.Tables.LAYER;
+import static org.constellation.engine.register.jooq.Tables.SERVICE;
+import static org.constellation.engine.register.jooq.Tables.SERVICE_DETAILS;
+import static org.constellation.engine.register.jooq.Tables.SERVICE_EXTRA_CONFIG;
+import static org.constellation.engine.register.jooq.Tables.SERVICE_X_DOMAIN;
+import static org.constellation.engine.register.jooq.Tables.USER_X_DOMAIN_X_DOMAINROLE;
 
 @Component
 public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord, Service> implements ServiceRepository {

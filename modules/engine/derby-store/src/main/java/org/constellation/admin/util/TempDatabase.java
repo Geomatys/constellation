@@ -18,14 +18,14 @@
  */
 package org.constellation.admin.util;
 
+import org.apache.commons.io.FileUtils;
+import org.geotoolkit.internal.sql.DefaultDataSource;
+import org.geotoolkit.util.sql.DerbySqlScriptRunner;
+
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-
-import org.apache.commons.io.FileUtils;
-import org.geotoolkit.internal.sql.DefaultDataSource;
-import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 
 public class TempDatabase {
 

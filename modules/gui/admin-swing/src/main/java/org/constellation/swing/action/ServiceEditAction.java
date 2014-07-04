@@ -18,19 +18,19 @@
  */
 package org.constellation.swing.action;
 
-import java.awt.Color;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.IOException;
-import java.util.Map;
-import java.util.ResourceBundle;
-import javax.swing.ImageIcon;
-import javax.swing.SwingUtilities;
 import org.constellation.configuration.Instance;
 import org.constellation.security.ActionPermissions;
 import org.constellation.swing.JServiceEditPane;
 import org.constellation.swing.LayerRowModel;
 import org.openide.util.Exceptions;
+
+import javax.swing.*;
+import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 /**
  *

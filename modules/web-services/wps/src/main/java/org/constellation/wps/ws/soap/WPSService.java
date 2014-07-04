@@ -19,31 +19,36 @@
 package org.constellation.wps.ws.soap;
 
 // JDK dependencies
-import java.util.logging.Level;
-import javax.xml.bind.annotation.XmlSeeAlso;
 
-// JAX-WS dependencies
+import org.constellation.ServiceDef;
+import org.constellation.ServiceDef.Specification;
+import org.constellation.wps.configuration.WPSConfigurer;
+import org.constellation.wps.ws.WPSWorker;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.ServiceConfigurer;
+import org.constellation.ws.soap.OGCWebService;
+import org.geotoolkit.ows.xml.OWSExceptionCode;
+import org.geotoolkit.wps.xml.v100.DescribeProcess;
+import org.geotoolkit.wps.xml.v100.Execute;
+import org.geotoolkit.wps.xml.v100.ExecuteResponse;
+import org.geotoolkit.wps.xml.v100.GetCapabilities;
+import org.geotoolkit.wps.xml.v100.ProcessDescriptions;
+import org.geotoolkit.wps.xml.v100.WPSCapabilitiesType;
+
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.ParameterStyle;
+import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.ws.BindingType;
+import java.util.logging.Level;
 
+// JAX-WS dependencies
 // Constellation dependencies
-import org.constellation.ServiceDef;
-import org.constellation.ServiceDef.Specification;
-import org.constellation.ws.ServiceConfigurer;
-import org.constellation.wps.configuration.WPSConfigurer;
-import org.constellation.ws.CstlServiceException;
-import org.constellation.wps.ws.WPSWorker;
-
 // Geotoolkit dependencies
-import org.constellation.ws.soap.OGCWebService;
-import org.geotoolkit.ows.xml.OWSExceptionCode;
-import org.geotoolkit.wps.xml.v100.*;
 
 
 

@@ -19,10 +19,6 @@
 
 package org.constellation.wmts.ws;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
 import org.constellation.dto.Details;
@@ -42,6 +38,12 @@ import org.geotoolkit.ows.xml.v110.CodeType;
 import org.geotoolkit.wmts.xml.WMTSResponse;
 import org.geotoolkit.wmts.xml.WMTSXmlFactory;
 import org.geotoolkit.wmts.xml.v100.Style;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
 /**
  *  WMTS Constants

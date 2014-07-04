@@ -19,9 +19,10 @@
 
 package org.constellation.swing;
 
-import java.io.IOException;
 import org.constellation.admin.service.ConstellationClient;
 import org.openide.util.Exceptions;
+
+import java.io.IOException;
 
 /**
  *

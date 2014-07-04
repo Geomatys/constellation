@@ -18,9 +18,6 @@
  */
 package org.constellation.process.service;
 
-import java.util.UUID;
-import java.util.logging.Level;
-import javax.inject.Inject;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.configuration.ConfigurationException;
@@ -30,6 +27,10 @@ import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+
+import javax.inject.Inject;
+import java.util.UUID;
+import java.util.logging.Level;
 
 /**
  *

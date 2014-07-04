@@ -20,13 +20,14 @@
 
 package org.constellation.admin.util;
 
+import org.apache.sis.util.logging.Logging;
+
 import java.io.Closeable;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.sis.util.logging.Logging;
 
 /**
  *

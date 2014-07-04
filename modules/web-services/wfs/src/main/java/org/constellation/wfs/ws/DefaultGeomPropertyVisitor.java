@@ -20,11 +20,11 @@
 
 package org.constellation.wfs.ws;
 
+import org.geotoolkit.feature.type.FeatureType;
 import org.geotoolkit.filter.DefaultLiteral;
 import org.geotoolkit.filter.binaryspatial.LooseBBox;
 import org.geotoolkit.filter.binaryspatial.UnreprojectedLooseBBox;
 import org.geotoolkit.filter.visitor.DuplicatingFilterVisitor;
-import org.geotoolkit.feature.type.FeatureType;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;

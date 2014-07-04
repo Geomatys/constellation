@@ -20,7 +20,36 @@ package org.constellation.provider;
 
 
 import com.vividsolutions.jts.geom.GeometryFactory;
-import java.awt.Dimension;
+import org.apache.sis.measure.MeasurementRange;
+import org.apache.sis.metadata.iso.extent.DefaultGeographicBoundingBox;
+import org.apache.sis.storage.DataStoreException;
+import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.data.FeatureCollection;
+import org.geotoolkit.data.FeatureIterator;
+import org.geotoolkit.data.FeatureStore;
+import org.geotoolkit.data.query.Query;
+import org.geotoolkit.data.query.QueryBuilder;
+import org.geotoolkit.display.PortrayalException;
+import org.geotoolkit.factory.FactoryFinder;
+import org.geotoolkit.feature.simple.SimpleFeature;
+import org.geotoolkit.feature.simple.SimpleFeatureType;
+import org.geotoolkit.feature.type.AttributeDescriptor;
+import org.geotoolkit.feature.type.FeatureType;
+import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.feature.type.PropertyDescriptor;
+import org.geotoolkit.map.FeatureMapLayer;
+import org.geotoolkit.map.MapBuilder;
+import org.geotoolkit.map.MapLayer;
+import org.geotoolkit.style.MutableStyle;
+import org.geotoolkit.style.RandomStyleBuilder;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.expression.PropertyName;
+import org.opengis.geometry.Envelope;
+import org.opengis.metadata.extent.GeographicBoundingBox;
+
+import java.awt.*;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
@@ -28,38 +57,6 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
-import org.apache.sis.measure.MeasurementRange;
-import org.apache.sis.metadata.iso.extent.DefaultGeographicBoundingBox;
-import org.apache.sis.storage.DataStoreException;
-import static org.constellation.provider.AbstractData.LOGGER;
-import static org.constellation.provider.Data.KEY_EXTRA_PARAMETERS;
-import org.geotoolkit.coverage.grid.GridCoverage2D;
-
-import org.geotoolkit.data.FeatureStore;
-import org.geotoolkit.data.FeatureCollection;
-import org.geotoolkit.data.FeatureIterator;
-import org.geotoolkit.data.query.Query;
-import org.geotoolkit.data.query.QueryBuilder;
-import org.geotoolkit.display.PortrayalException;
-import org.geotoolkit.factory.FactoryFinder;
-import org.geotoolkit.map.FeatureMapLayer;
-import org.geotoolkit.map.MapBuilder;
-import org.geotoolkit.map.MapLayer;
-import org.geotoolkit.style.MutableStyle;
-import org.geotoolkit.style.RandomStyleBuilder;
-import org.geotoolkit.feature.simple.SimpleFeature;
-import org.geotoolkit.feature.simple.SimpleFeatureType;
-import org.geotoolkit.feature.type.AttributeDescriptor;
-
-import org.geotoolkit.feature.type.FeatureType;
-import org.geotoolkit.feature.type.Name;
-import org.geotoolkit.feature.type.PropertyDescriptor;
-import org.opengis.filter.Filter;
-import org.opengis.filter.FilterFactory;
-import org.opengis.filter.PropertyIsEqualTo;
-import org.opengis.filter.expression.PropertyName;
-import org.opengis.geometry.Envelope;
-import org.opengis.metadata.extent.GeographicBoundingBox;
 
 /**
  * Default layer details for a datastore type.

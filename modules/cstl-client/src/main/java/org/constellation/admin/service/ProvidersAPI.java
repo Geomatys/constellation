@@ -19,17 +19,7 @@
 
 package org.constellation.admin.service;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBElement;
-import javax.xml.stream.XMLStreamException;
 import org.apache.sis.metadata.iso.DefaultMetadata;
-import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.ProvidersReport;
@@ -42,7 +32,6 @@ import org.constellation.dto.MetadataLists;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.SimpleValue;
 import org.constellation.dto.StyleListBrief;
-import org.geotoolkit.style.DefaultMutableStyle;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.xml.parameter.ParameterDescriptorReader;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
@@ -50,6 +39,18 @@ import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
+
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXBElement;
+import javax.xml.stream.XMLStreamException;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
 /**
  * Constellation RESTful API for providers management/configuration.

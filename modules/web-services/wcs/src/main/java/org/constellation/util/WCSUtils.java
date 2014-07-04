@@ -19,18 +19,6 @@
 
 package org.constellation.util;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.SortedSet;
-import java.util.TimeZone;
 import org.geotoolkit.display2d.ext.pattern.PatternSymbolizer;
 import org.geotoolkit.filter.DefaultFilterFactory2;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
@@ -49,6 +37,19 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.style.FeatureTypeStyle;
 import org.opengis.style.Rule;
 import org.opengis.style.Symbolizer;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.SortedSet;
+import java.util.TimeZone;
 
 /**
  *

@@ -18,23 +18,25 @@
  */
 package org.constellation.provider.coveragesgroup;
 
-import java.net.URL;
-import java.util.logging.Level;
 import org.constellation.provider.AbstractProviderFactory;
 import org.constellation.provider.Data;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviderFactory;
+import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
-import org.geotoolkit.feature.type.Name;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
-import static org.geotoolkit.parameter.Parameters.*;
-import static org.constellation.provider.configuration.ProviderParameters.*;
-import static org.constellation.provider.coveragesgroup.CoveragesGroupProvider.*;
+import java.net.URL;
+import java.util.logging.Level;
+
+import static org.constellation.provider.configuration.ProviderParameters.createDescriptor;
+import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
+import static org.constellation.provider.coveragesgroup.CoveragesGroupProvider.KEY_PATH;
+import static org.geotoolkit.parameter.Parameters.value;
 
 
 /**

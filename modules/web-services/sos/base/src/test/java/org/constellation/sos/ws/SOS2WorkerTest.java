@@ -19,22 +19,11 @@
 
 package org.constellation.sos.ws;
 
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-
+import org.apache.sis.xml.MarshallerPool;
+import org.constellation.test.utils.MetadataUtilities;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
-import org.constellation.test.utils.MetadataUtilities;
-
-import static org.constellation.sos.ws.SOSConstants.*;
 import org.geotoolkit.gml.xml.AbstractFeature;
 import org.geotoolkit.gml.xml.v321.FeatureCollectionType;
 import org.geotoolkit.gml.xml.v321.TimeInstantType;
@@ -47,32 +36,22 @@ import org.geotoolkit.ogc.xml.v200.TimeAfterType;
 import org.geotoolkit.ogc.xml.v200.TimeBeforeType;
 import org.geotoolkit.ogc.xml.v200.TimeDuringType;
 import org.geotoolkit.ogc.xml.v200.TimeEqualsType;
-
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.SectionsType;
-import org.geotoolkit.sos.xml.Capabilities;
-import org.geotoolkit.sos.xml.v200.GetCapabilitiesType;
-import org.geotoolkit.sos.xml.v200.GetFeatureOfInterestType;
-import org.geotoolkit.sos.xml.v200.GetObservationResponseType;
-import org.geotoolkit.sos.xml.v200.GetObservationType;
-import org.geotoolkit.sos.xml.SOSMarshallerPool;
+import org.geotoolkit.samplingspatial.xml.v200.SFSpatialSamplingFeatureType;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
 import org.geotoolkit.sml.xml.v100.SensorML;
-import org.geotoolkit.swe.xml.v200.DataArrayPropertyType;
-import org.geotoolkit.swe.xml.v200.TimeType;
-import org.geotoolkit.swes.xml.InsertSensorResponse;
-import org.geotoolkit.swes.xml.v200.InsertSensorType;
-import org.geotoolkit.swes.xml.v200.DescribeSensorType;
-import org.geotoolkit.swes.xml.v200.InsertSensorResponseType;
-import org.apache.sis.xml.MarshallerPool;
-import org.geotoolkit.samplingspatial.xml.v200.SFSpatialSamplingFeatureType;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.sos.xml.Capabilities;
 import org.geotoolkit.sos.xml.InsertResultResponse;
+import org.geotoolkit.sos.xml.SOSMarshallerPool;
+import org.geotoolkit.sos.xml.v200.GetCapabilitiesType;
+import org.geotoolkit.sos.xml.v200.GetFeatureOfInterestType;
 import org.geotoolkit.sos.xml.v200.GetObservationByIdResponseType;
 import org.geotoolkit.sos.xml.v200.GetObservationByIdType;
+import org.geotoolkit.sos.xml.v200.GetObservationResponseType;
+import org.geotoolkit.sos.xml.v200.GetObservationType;
 import org.geotoolkit.sos.xml.v200.GetResultResponseType;
 import org.geotoolkit.sos.xml.v200.GetResultTemplateResponseType;
 import org.geotoolkit.sos.xml.v200.GetResultTemplateType;
@@ -83,21 +62,45 @@ import org.geotoolkit.sos.xml.v200.InsertResultTemplateType;
 import org.geotoolkit.sos.xml.v200.InsertResultType;
 import org.geotoolkit.swe.xml.v200.AbstractDataComponentType;
 import org.geotoolkit.swe.xml.v200.AbstractEncodingType;
+import org.geotoolkit.swe.xml.v200.DataArrayPropertyType;
 import org.geotoolkit.swe.xml.v200.DataArrayType;
 import org.geotoolkit.swe.xml.v200.DataRecordType;
 import org.geotoolkit.swe.xml.v200.Field;
+import org.geotoolkit.swe.xml.v200.TimeType;
+import org.geotoolkit.swes.xml.InsertSensorResponse;
 import org.geotoolkit.swes.xml.v200.DeleteSensorResponseType;
 import org.geotoolkit.swes.xml.v200.DeleteSensorType;
-
-
-// JUnit dependencies
-import org.junit.Ignore;
-import static org.junit.Assert.*;
-import org.junit.runner.RunWith;
+import org.geotoolkit.swes.xml.v200.DescribeSensorType;
+import org.geotoolkit.swes.xml.v200.InsertSensorResponseType;
+import org.geotoolkit.swes.xml.v200.InsertSensorType;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+
+import static org.constellation.sos.ws.SOSConstants.OFFERING;
+import static org.constellation.sos.ws.SOSConstants.PROCEDURE;
+import static org.constellation.sos.ws.SOSConstants.PROCEDURE_DESCRIPTION_FORMAT;
+import static org.constellation.sos.ws.SOSConstants.RESPONSE_FORMAT;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+// JUnit dependencies
 
 /**
  *

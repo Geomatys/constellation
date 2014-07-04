@@ -18,6 +18,10 @@
  */
 package org.constellation.rest.api;
 
+import com.google.common.base.Function;
+import org.constellation.engine.register.DomainUser;
+import org.constellation.engine.register.repository.UserRepository;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
@@ -30,11 +34,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import org.constellation.engine.register.DomainUser;
-import org.constellation.engine.register.repository.UserRepository;
-
-import com.google.common.base.Function;
 
 /**
  * RestFull user configuration service

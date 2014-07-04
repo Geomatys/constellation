@@ -18,21 +18,19 @@
  */
 package org.constellation.provider.sld;
 
-import org.opengis.parameter.GeneralParameterDescriptor;
-import java.util.logging.Level;
-
 import org.constellation.provider.AbstractProviderFactory;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviderFactory;
 import org.constellation.provider.configuration.ProviderParameters;
-
-import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
-
+import org.geotoolkit.style.MutableStyle;
+import org.opengis.parameter.GeneralParameterDescriptor;
+import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.parameter.ParameterDescriptor;
+
+import java.util.logging.Level;
 
 /**
  *

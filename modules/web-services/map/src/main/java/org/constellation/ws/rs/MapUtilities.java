@@ -18,20 +18,21 @@
  */
 package org.constellation.ws.rs;
 
-import java.io.StringReader;
-import java.net.MalformedURLException;
-import java.net.URL;
+import org.apache.sis.util.Version;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.Layer;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.xml.bind.JAXBException;
-import org.apache.sis.util.Version;
 import org.geotoolkit.sld.MutableStyledLayerDescriptor;
 import org.geotoolkit.sld.xml.Specification;
 import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.opengis.util.FactoryException;
+
+import javax.xml.bind.JAXBException;
+import java.io.StringReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Guilhem Legal (Geomatys).

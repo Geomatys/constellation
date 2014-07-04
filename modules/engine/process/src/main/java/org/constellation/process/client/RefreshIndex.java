@@ -19,20 +19,28 @@
 package org.constellation.process.client;
 
 
+import org.constellation.ServiceDef;
+import org.constellation.admin.service.ConstellationClient;
+import org.constellation.admin.service.ConstellationServerFactory;
+import org.constellation.process.AbstractCstlProcess;
+import org.geotoolkit.process.ProcessDescriptor;
+import org.opengis.parameter.ParameterValueGroup;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
-import org.constellation.ServiceDef;
-import org.constellation.admin.service.ConstellationClient;
-import org.constellation.admin.service.ConstellationServerFactory;
-import org.constellation.process.AbstractCstlProcess;
-import static org.constellation.process.client.RefreshIndexDescriptor.*;
-import static org.geotoolkit.io.X364.*;
-import org.geotoolkit.process.ProcessDescriptor;
-import org.opengis.parameter.ParameterValueGroup;
+
+import static org.constellation.process.client.RefreshIndexDescriptor.CSTL_ASYNCHRONOUS;
+import static org.constellation.process.client.RefreshIndexDescriptor.CSTL_CSW_INSTANCE;
+import static org.constellation.process.client.RefreshIndexDescriptor.CSTL_DESCRIPTOR_GROUP;
+import static org.geotoolkit.io.X364.BOLD;
+import static org.geotoolkit.io.X364.FOREGROUND_DEFAULT;
+import static org.geotoolkit.io.X364.FOREGROUND_GREEN;
+import static org.geotoolkit.io.X364.FOREGROUND_RED;
+import static org.geotoolkit.io.X364.RESET;
 
 /**
  * @author Guilhem Legal (Geomatys)

@@ -19,6 +19,8 @@
 
 package org.constellation.metadata.io.filesystem;
 
+import org.apache.sis.util.logging.Logging;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -27,7 +29,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.sis.util.logging.Logging;
+
 import static org.constellation.metadata.CSWConstants.XML_EXT;
 
 /**

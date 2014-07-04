@@ -20,26 +20,7 @@
 package org.constellation.ws.embedded;
 
 // JUnit dependencies
-import org.geotoolkit.ows.xml.v110.Operation;
-import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
-import org.geotoolkit.sos.xml.ResponseModeType;
-import java.util.Arrays;
-import org.geotoolkit.sos.xml.v100.GetObservation;
-import org.geotoolkit.sos.xml.v100.Capabilities;
-import org.geotoolkit.sos.xml.v100.GetCapabilities;
-import java.net.URLConnection;
-import java.net.URL;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Connection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
+
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
@@ -48,7 +29,6 @@ import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.constellation.sos.ws.soap.SOService;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.SpringTestRunner;
@@ -57,18 +37,43 @@ import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.internal.sql.ScriptRunner;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionType;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
+import org.geotoolkit.ows.xml.v110.Operation;
 import org.geotoolkit.sampling.xml.v100.SamplingPointType;
 import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.geotoolkit.sos.xml.ResponseModeType;
+import org.geotoolkit.sos.xml.SOSMarshallerPool;
+import org.geotoolkit.sos.xml.v100.Capabilities;
 import org.geotoolkit.sos.xml.v100.DescribeSensor;
+import org.geotoolkit.sos.xml.v100.GetCapabilities;
+import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
+import org.geotoolkit.sos.xml.v100.GetObservation;
 import org.geotoolkit.sos.xml.v200.CapabilitiesType;
 import org.geotoolkit.sos.xml.v200.GetCapabilitiesType;
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.AfterClass;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.sql.Connection;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  *

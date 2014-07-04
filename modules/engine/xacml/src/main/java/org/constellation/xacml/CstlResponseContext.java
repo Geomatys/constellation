@@ -24,16 +24,7 @@ import com.sun.xacml.ParsingException;
 import com.sun.xacml.ctx.ResponseCtx;
 import com.sun.xacml.ctx.Result;
 import com.sun.xacml.ctx.Status;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import javax.xml.parsers.ParserConfigurationException;
+import org.constellation.xacml.api.ResponseContext;
 import org.geotoolkit.xacml.xml.context.ObjectFactory;
 import org.geotoolkit.xacml.xml.context.ResultType;
 import org.geotoolkit.xacml.xml.context.StatusCodeType;
@@ -41,12 +32,19 @@ import org.geotoolkit.xacml.xml.context.StatusType;
 import org.geotoolkit.xacml.xml.policy.EffectType;
 import org.geotoolkit.xacml.xml.policy.ObligationType;
 import org.geotoolkit.xacml.xml.policy.ObligationsType;
-import org.constellation.xacml.api.ResponseContext;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 
 /**

@@ -20,6 +20,18 @@
 package org.constellation.metadata.io.generic;
 
 // J2SE dependencies
+
+import org.apache.sis.metadata.iso.citation.DefaultCitationDate;
+import org.apache.sis.metadata.iso.extent.DefaultGeographicBoundingBox;
+import org.apache.sis.util.iso.SimpleInternationalString;
+import org.apache.sis.util.logging.Logging;
+import org.constellation.generic.Values;
+import org.geotoolkit.ows.xml.v100.BoundingBoxType;
+import org.opengis.metadata.citation.CitationDate;
+import org.opengis.metadata.citation.DateType;
+import org.opengis.metadata.extent.GeographicExtent;
+import org.opengis.util.InternationalString;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -30,20 +42,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // Constellation dependencies
-import org.constellation.generic.Values;
-
 // Geotoolkit dependencies
-import org.apache.sis.metadata.iso.citation.DefaultCitationDate;
-import org.apache.sis.metadata.iso.extent.DefaultGeographicBoundingBox;
-import org.geotoolkit.ows.xml.v100.BoundingBoxType;
-import org.apache.sis.util.iso.SimpleInternationalString;
-
 // GeoAPI dependencies
-import org.apache.sis.util.logging.Logging;
-import org.opengis.metadata.citation.CitationDate;
-import org.opengis.metadata.citation.DateType;
-import org.opengis.metadata.extent.GeographicExtent;
-import org.opengis.util.InternationalString;
 
 /**
  * A set of static utility methods generally used in sub-implementations of the Generic reader.

@@ -19,17 +19,18 @@
 
 package org.constellation.configuration;
 
+import org.apache.sis.util.logging.Logging;
+import org.constellation.generic.database.Automatic;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import org.constellation.generic.database.Automatic;
-import org.apache.sis.util.logging.Logging;
 
 /**
  * A XML binding object for SOS configuration.

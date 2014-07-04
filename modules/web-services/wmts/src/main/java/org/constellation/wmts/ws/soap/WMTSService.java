@@ -18,19 +18,6 @@
  */
 package org.constellation.wmts.ws.soap;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.Map;
-import java.util.logging.Level;
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebResult;
-import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
-import javax.jws.soap.SOAPBinding.ParameterStyle;
-import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.xml.soap.SOAPMessage;
-import javax.xml.ws.BindingType;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.map.configuration.MapConfigurer;
 import org.constellation.wmts.ws.DefaultWMTSWorker;
@@ -44,6 +31,20 @@ import org.geotoolkit.wmts.xml.v100.Capabilities;
 import org.geotoolkit.wmts.xml.v100.GetCapabilities;
 import org.geotoolkit.wmts.xml.v100.GetFeatureInfo;
 import org.geotoolkit.wmts.xml.v100.GetTile;
+
+import javax.jws.WebMethod;
+import javax.jws.WebParam;
+import javax.jws.WebResult;
+import javax.jws.WebService;
+import javax.jws.soap.SOAPBinding;
+import javax.jws.soap.SOAPBinding.ParameterStyle;
+import javax.xml.bind.annotation.XmlSeeAlso;
+import javax.xml.soap.SOAPMessage;
+import javax.xml.ws.BindingType;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Map;
+import java.util.logging.Level;
 
 /**
  * The SOAP facade to an OGC Web Map Tile Service, implementing the 1.0.0 version.

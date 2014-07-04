@@ -19,13 +19,6 @@
 
 package org.constellation.configuration;
 
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.*;
-import java.util.Arrays;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import org.apache.sis.test.XMLComparator;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.dto.SimpleValue;
@@ -33,8 +26,24 @@ import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.glassfish.jersey.jettison.JettisonConfig;
 import org.glassfish.jersey.jettison.JettisonJaxbContext;
 import org.glassfish.jersey.jettison.JettisonMarshaller;
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  *

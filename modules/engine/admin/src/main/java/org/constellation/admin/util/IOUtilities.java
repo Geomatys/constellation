@@ -19,15 +19,6 @@
 
 package org.constellation.admin.util;
 
-import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-
-import javax.xml.bind.JAXBException;
-import javax.xml.stream.XMLStreamException;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.sis.util.Static;
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
@@ -39,6 +30,14 @@ import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.slf4j.Logger;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.stream.XMLStreamException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
 /**
  * @author Fabien Bernard (Geomatys).

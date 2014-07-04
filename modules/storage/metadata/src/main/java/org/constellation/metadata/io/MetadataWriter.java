@@ -18,9 +18,10 @@
  */
 package org.constellation.metadata.io;
 
+import org.w3c.dom.Node;
+
 import java.util.Map;
 import java.util.logging.Level;
-import org.w3c.dom.Node;
 
 /**
  *

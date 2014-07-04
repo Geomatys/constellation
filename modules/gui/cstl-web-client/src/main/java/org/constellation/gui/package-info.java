@@ -136,9 +136,3 @@
  */
 @WithAssets
 package org.constellation.gui;
-import juzu.Alias;
-import juzu.asset.AssetLocation;
-import juzu.plugin.asset.Asset;
-import juzu.plugin.asset.Assets;
-import juzu.plugin.asset.WithAssets;
-import juzu.plugin.less.Less;

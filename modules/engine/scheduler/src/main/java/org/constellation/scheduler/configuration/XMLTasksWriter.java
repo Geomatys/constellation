@@ -18,9 +18,6 @@
  */
 package org.constellation.scheduler.configuration;
 
-import java.io.IOException;
-import java.util.Collection;
-import javax.xml.stream.XMLStreamException;
 import org.constellation.scheduler.Task;
 import org.geotoolkit.process.quartz.ProcessJobDetail;
 import org.geotoolkit.xml.StaxStreamWriter;
@@ -28,7 +25,19 @@ import org.geotoolkit.xml.parameter.ParameterValueWriter;
 import org.opengis.parameter.ParameterValueGroup;
 import org.quartz.SimpleTrigger;
 
-import static org.constellation.scheduler.configuration.XMLTasksConstants.*;
+import javax.xml.stream.XMLStreamException;
+import java.io.IOException;
+import java.util.Collection;
+
+import static org.constellation.scheduler.configuration.XMLTasksConstants.ATT_AUTHORITY;
+import static org.constellation.scheduler.configuration.XMLTasksConstants.ATT_CODE;
+import static org.constellation.scheduler.configuration.XMLTasksConstants.ATT_ID;
+import static org.constellation.scheduler.configuration.XMLTasksConstants.ATT_STEP;
+import static org.constellation.scheduler.configuration.XMLTasksConstants.ATT_TITLE;
+import static org.constellation.scheduler.configuration.XMLTasksConstants.TAG_PARAMETERS;
+import static org.constellation.scheduler.configuration.XMLTasksConstants.TAG_TASK;
+import static org.constellation.scheduler.configuration.XMLTasksConstants.TAG_TASKS;
+import static org.constellation.scheduler.configuration.XMLTasksConstants.TAG_TRIGGER;
 
 /**
  * Write tasks in xml.

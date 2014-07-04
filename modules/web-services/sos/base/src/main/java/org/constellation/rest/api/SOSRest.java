@@ -18,23 +18,6 @@
  */
 package org.constellation.rest.api;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import org.constellation.ServiceDef;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.SensorBusiness;
@@ -54,12 +37,31 @@ import org.constellation.provider.observationstore.ObservationStoreProvider;
 import org.constellation.sos.configuration.SOSConfigurer;
 import org.constellation.sos.configuration.SensorMLGenerator;
 import org.constellation.sos.ws.SOSUtils;
-import static org.constellation.utils.RESTfulUtilities.ok;
 import org.constellation.ws.ServiceConfigurer;
 import org.geotoolkit.gml.xml.v321.AbstractGeometryType;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sos.netcdf.ExtractionResult;
 import org.geotoolkit.sos.netcdf.ExtractionResult.ProcedureTree;
+
+import javax.inject.Inject;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+
+import static org.constellation.utils.RESTfulUtilities.ok;
 
 /**
  *

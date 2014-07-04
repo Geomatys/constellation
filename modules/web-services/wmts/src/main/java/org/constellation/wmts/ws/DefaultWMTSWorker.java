@@ -18,14 +18,7 @@
  */
 package org.constellation.wmts.ws;
 
-import java.awt.Color;
-import java.awt.Rectangle;
-import java.text.ParseException;
-import java.util.*;
-import java.util.logging.Level;
-
-import javax.inject.Named;
-
+import org.apache.sis.referencing.CommonCRS;
 import org.apache.sis.referencing.IdentifiedObjects;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.xml.MarshallerPool;
@@ -42,9 +35,12 @@ import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.LayerWorker;
 import org.constellation.ws.MimeType;
-
-// Geotoolkit dependencies
-import org.geotoolkit.coverage.*;
+import org.geotoolkit.coverage.CoverageReference;
+import org.geotoolkit.coverage.GridMosaic;
+import org.geotoolkit.coverage.Pyramid;
+import org.geotoolkit.coverage.PyramidSet;
+import org.geotoolkit.coverage.PyramidalCoverageReference;
+import org.geotoolkit.coverage.TileReference;
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.SceneDef;
@@ -53,23 +49,58 @@ import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-
-import org.geotoolkit.ows.xml.v110.*;
+import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
+import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
+import org.geotoolkit.ows.xml.v110.BoundingBoxType;
+import org.geotoolkit.ows.xml.v110.CodeType;
+import org.geotoolkit.ows.xml.v110.OperationsMetadata;
+import org.geotoolkit.ows.xml.v110.SectionsType;
+import org.geotoolkit.ows.xml.v110.ServiceIdentification;
+import org.geotoolkit.ows.xml.v110.ServiceProvider;
+import org.geotoolkit.ows.xml.v110.WGS84BoundingBoxType;
 import org.geotoolkit.referencing.CRS;
-import org.apache.sis.referencing.IdentifiedObjects;
-import org.apache.sis.referencing.CommonCRS;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.TimeParser;
 import org.geotoolkit.wmts.WMTSUtilities;
 import org.geotoolkit.wmts.xml.WMTSMarshallerPool;
-import org.geotoolkit.wmts.xml.v100.*;
+import org.geotoolkit.wmts.xml.v100.Capabilities;
+import org.geotoolkit.wmts.xml.v100.ContentsType;
+import org.geotoolkit.wmts.xml.v100.Dimension;
+import org.geotoolkit.wmts.xml.v100.DimensionNameValue;
+import org.geotoolkit.wmts.xml.v100.GetCapabilities;
+import org.geotoolkit.wmts.xml.v100.GetFeatureInfo;
+import org.geotoolkit.wmts.xml.v100.GetTile;
+import org.geotoolkit.wmts.xml.v100.LayerType;
+import org.geotoolkit.wmts.xml.v100.Themes;
+import org.geotoolkit.wmts.xml.v100.TileMatrix;
+import org.geotoolkit.wmts.xml.v100.TileMatrixSet;
+import org.geotoolkit.wmts.xml.v100.TileMatrixSetLink;
+import org.geotoolkit.wmts.xml.v100.URLTemplateType;
 import org.opengis.coverage.Coverage;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.operation.TransformException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
+
+import javax.inject.Named;
+import java.awt.*;
+import java.text.ParseException;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_POINT;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
+
+// Geotoolkit dependencies
 
 /**
  * Working part of the WMTS service.

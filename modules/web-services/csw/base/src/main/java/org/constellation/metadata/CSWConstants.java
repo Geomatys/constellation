@@ -18,15 +18,11 @@
  */
 package org.constellation.metadata;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import net.jcip.annotations.Immutable;
-
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
 import org.constellation.dto.Details;
-
+import org.constellation.ws.MimeType;
 import org.geotoolkit.csw.xml.AbstractCapabilities;
 import org.geotoolkit.csw.xml.CswXmlFactory;
 import org.geotoolkit.ogc.xml.v110.ComparisonOperatorType;
@@ -40,22 +36,26 @@ import org.geotoolkit.ogc.xml.v110.SpatialOperatorType;
 import org.geotoolkit.ogc.xml.v110.SpatialOperatorsType;
 import org.geotoolkit.ows.xml.AbstractContact;
 import org.geotoolkit.ows.xml.AbstractDCP;
+import org.geotoolkit.ows.xml.AbstractDomain;
+import org.geotoolkit.ows.xml.AbstractOnlineResourceType;
+import org.geotoolkit.ows.xml.AbstractOperation;
+import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
 import org.geotoolkit.ows.xml.AbstractResponsiblePartySubset;
 import org.geotoolkit.ows.xml.AbstractServiceIdentification;
 import org.geotoolkit.ows.xml.AbstractServiceProvider;
 import org.geotoolkit.ows.xml.OWSXmlFactory;
-import org.geotoolkit.ows.xml.AbstractDomain;
-import org.geotoolkit.ows.xml.AbstractOperation;
-import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
-
-import static org.geotoolkit.gml.xml.v311.ObjectFactory.*;
-
 import org.opengis.filter.capability.Operator;
 import org.opengis.filter.capability.SpatialOperator;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
-import org.constellation.ws.MimeType;
-import org.geotoolkit.ows.xml.AbstractOnlineResourceType;
+import static org.geotoolkit.gml.xml.v311.ObjectFactory._Envelope_QNAME;
+import static org.geotoolkit.gml.xml.v311.ObjectFactory._LineString_QNAME;
+import static org.geotoolkit.gml.xml.v311.ObjectFactory._Point_QNAME;
+import static org.geotoolkit.gml.xml.v311.ObjectFactory._Polygon_QNAME;
 
 /**
  * CSW constants.

@@ -19,19 +19,20 @@
 package org.constellation.observation.fishery.sql;
 
 // Geotools dependencies
+
+import org.constellation.coverage.model.Distribution;
+import org.constellation.gml.v311.AbstractTimeGeometricPrimitiveType;
+import org.constellation.metadata.MetaDataEntry;
+import org.constellation.observation.ElementEntry;
+import org.constellation.observation.ObservationEntry;
+import org.constellation.observation.fishery.Category;
+import org.constellation.observation.fishery.FisheryType;
+import org.constellation.observation.fishery.Species;
+import org.constellation.observation.fishery.Stage;
+import org.constellation.sampling.SamplingFeatureEntry;
 import org.geotoolkit.util.Utilities;
 
 // Constellation dependencies
-import org.constellation.coverage.model.Distribution;
-import org.constellation.gml.v311.AbstractTimeGeometricPrimitiveType;
-import org.constellation.observation.ElementEntry;
-import org.constellation.metadata.MetaDataEntry;
-import org.constellation.observation.fishery.Stage;
-import org.constellation.observation.fishery.Species;
-import org.constellation.observation.fishery.Category;
-import org.constellation.observation.fishery.FisheryType;
-import org.constellation.observation.ObservationEntry;
-import org.constellation.sampling.SamplingFeatureEntry;
 
 /**
  * Implémentation d'une entrée représentant une {@linkplain Category catégorie}.

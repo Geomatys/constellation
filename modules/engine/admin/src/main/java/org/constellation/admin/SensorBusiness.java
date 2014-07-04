@@ -19,16 +19,15 @@
 
 package org.constellation.admin;
 
-import java.util.List;
-import javax.inject.Inject;
-import javax.xml.namespace.QName;
-
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Sensor;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.SensorRepository;
-import org.constellation.security.*;
 import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import javax.xml.namespace.QName;
+import java.util.List;
 
 @Component
 public class SensorBusiness {

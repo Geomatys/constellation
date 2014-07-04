@@ -18,36 +18,35 @@
  */
 package org.constellation.coverage.ws;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.constellation.dto.Details;
-import org.constellation.ws.MimeType;
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
-
+import org.constellation.dto.Details;
+import org.constellation.ws.MimeType;
 import org.geotoolkit.gml.xml.v311.CodeListType;
+import org.geotoolkit.ows.xml.AbstractContact;
+import org.geotoolkit.ows.xml.AbstractDCP;
+import org.geotoolkit.ows.xml.AbstractDomain;
+import org.geotoolkit.ows.xml.AbstractOnlineResourceType;
+import org.geotoolkit.ows.xml.AbstractOperation;
 import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
+import org.geotoolkit.ows.xml.AbstractResponsiblePartySubset;
+import org.geotoolkit.ows.xml.AbstractServiceIdentification;
+import org.geotoolkit.ows.xml.AbstractServiceProvider;
+import org.geotoolkit.ows.xml.OWSXmlFactory;
 import org.geotoolkit.wcs.xml.GetCapabilitiesResponse;
+import org.geotoolkit.wcs.xml.WCSXmlFactory;
 import org.geotoolkit.wcs.xml.v100.DCPTypeType;
 import org.geotoolkit.wcs.xml.v100.DCPTypeType.HTTP.Get;
 import org.geotoolkit.wcs.xml.v100.DCPTypeType.HTTP.Post;
 import org.geotoolkit.wcs.xml.v100.OnlineResourceType;
 import org.geotoolkit.wcs.xml.v100.Request;
 import org.geotoolkit.wcs.xml.v100.WCSCapabilityType;
-import org.geotoolkit.ows.xml.AbstractContact;
-import org.geotoolkit.ows.xml.AbstractDCP;
-import org.geotoolkit.ows.xml.AbstractDomain;
-import org.geotoolkit.ows.xml.AbstractOperation;
-import org.geotoolkit.ows.xml.AbstractResponsiblePartySubset;
-import org.geotoolkit.ows.xml.AbstractServiceIdentification;
-import org.geotoolkit.ows.xml.AbstractServiceProvider;
-import org.geotoolkit.ows.xml.OWSXmlFactory;
-import org.geotoolkit.wcs.xml.WCSXmlFactory;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
-import org.geotoolkit.ows.xml.AbstractOnlineResourceType;
 
 /**
  *  WCS Constants

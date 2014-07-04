@@ -19,17 +19,12 @@
 
 package org.constellation.wfs.ws;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import javax.ws.rs.core.MediaType;
-import javax.xml.namespace.QName;
 import net.jcip.annotations.Immutable;
-
-import org.constellation.dto.Details;
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
-
+import org.constellation.dto.Details;
+import org.geotoolkit.ogc.xml.Conformance;
+import org.geotoolkit.ogc.xml.FilterXmlFactory;
 import org.geotoolkit.ogc.xml.v110.ArithmeticOperatorsType;
 import org.geotoolkit.ogc.xml.v110.ComparisonOperatorType;
 import org.geotoolkit.ogc.xml.v110.IdCapabilitiesType;
@@ -38,36 +33,38 @@ import org.geotoolkit.ogc.xml.v200.FilterType;
 import org.geotoolkit.ogc.xml.v200.LiteralType;
 import org.geotoolkit.ogc.xml.v200.PropertyIsEqualToType;
 import org.geotoolkit.ogc.xml.v200.ResourceIdentifierType;
-import org.geotoolkit.ogc.xml.FilterXmlFactory;
-import org.geotoolkit.ogc.xml.Conformance;
+import org.geotoolkit.ows.xml.AbstractContact;
+import org.geotoolkit.ows.xml.AbstractDCP;
 import org.geotoolkit.ows.xml.AbstractDomain;
+import org.geotoolkit.ows.xml.AbstractOnlineResourceType;
 import org.geotoolkit.ows.xml.AbstractOperation;
 import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
-import org.geotoolkit.ows.xml.OWSXmlFactory;
-import org.geotoolkit.ows.xml.AbstractContact;
 import org.geotoolkit.ows.xml.AbstractResponsiblePartySubset;
 import org.geotoolkit.ows.xml.AbstractServiceIdentification;
 import org.geotoolkit.ows.xml.AbstractServiceProvider;
-import org.geotoolkit.ows.xml.AbstractDCP;
+import org.geotoolkit.ows.xml.OWSXmlFactory;
+import org.geotoolkit.wfs.xml.WFSCapabilities;
+import org.geotoolkit.wfs.xml.WFSXmlFactory;
 import org.geotoolkit.wfs.xml.v200.ObjectFactory;
 import org.geotoolkit.wfs.xml.v200.ParameterExpressionType;
 import org.geotoolkit.wfs.xml.v200.QueryExpressionTextType;
 import org.geotoolkit.wfs.xml.v200.QueryType;
 import org.geotoolkit.wfs.xml.v200.StoredQueryDescriptionType;
-import org.geotoolkit.wfs.xml.WFSCapabilities;
-import org.geotoolkit.wfs.xml.WFSXmlFactory;
-
-import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
-import org.geotoolkit.ows.xml.AbstractOnlineResourceType;
-
 import org.opengis.filter.capability.ComparisonOperators;
 import org.opengis.filter.capability.FilterCapabilities;
-
 import org.opengis.filter.capability.GeometryOperand;
 import org.opengis.filter.capability.Operator;
 import org.opengis.filter.capability.SpatialCapabilities;
 import org.opengis.filter.capability.SpatialOperator;
 import org.opengis.filter.capability.SpatialOperators;
+
+import javax.ws.rs.core.MediaType;
+import javax.xml.namespace.QName;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
 /**
  *  WFS Constants

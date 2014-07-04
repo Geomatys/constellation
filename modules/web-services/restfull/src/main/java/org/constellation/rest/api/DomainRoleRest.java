@@ -1,10 +1,15 @@
 package org.constellation.rest.api;
 
-import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import com.google.common.base.Optional;
+import org.apache.commons.lang3.tuple.Pair;
+import org.constellation.engine.register.Domain;
+import org.constellation.engine.register.Domainrole;
+import org.constellation.engine.register.Permission;
+import org.constellation.engine.register.User;
+import org.constellation.engine.register.repository.DomainroleRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -18,18 +23,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import org.apache.commons.lang3.tuple.Pair;
-import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.Domainrole;
-import org.constellation.engine.register.Permission;
-import org.constellation.engine.register.User;
-import org.constellation.engine.register.repository.DomainroleRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataIntegrityViolationException;
-
-import com.google.common.base.Optional;
+import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 @Path("/1/domainrole")
 public class DomainRoleRest {

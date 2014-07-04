@@ -19,22 +19,11 @@
 
 package org.constellation.provider;
 
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import javax.annotation.PostConstruct;
 import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.ConfigurationException;
-import static org.constellation.provider.MockLayerProviderFactory.*;
 import org.constellation.provider.configuration.AbstractConfigurator;
 import org.constellation.provider.configuration.Configurator;
-import static org.constellation.provider.configuration.ProviderParameters.*;
 import org.junit.AfterClass;
-import static org.junit.Assert.*;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opengis.parameter.ParameterValueGroup;
@@ -43,6 +32,23 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import javax.annotation.PostConstruct;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import static org.constellation.provider.MockLayerProviderFactory.CRASH_CREATE;
+import static org.constellation.provider.MockLayerProviderFactory.CRASH_DISPOSE;
+import static org.constellation.provider.MockLayerProviderFactory.LAYERS;
+import static org.constellation.provider.MockLayerProviderFactory.PARAMETERS_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  *

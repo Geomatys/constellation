@@ -19,12 +19,14 @@
 
 package org.constellation.provider;
 
+import org.apache.sis.storage.DataStore;
+import org.constellation.admin.dao.DataRecord.DataType;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.geotoolkit.feature.type.DefaultName;
+import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.parameter.Parameters;
-import org.geotoolkit.feature.type.Name;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
@@ -34,8 +36,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.apache.sis.storage.DataStore;
-import org.constellation.admin.dao.DataRecord.DataType;
 
 /**
  *

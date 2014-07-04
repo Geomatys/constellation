@@ -22,13 +22,14 @@
  */
 package org.constellation.configuration.utils;
 
-import java.awt.Color;
-import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.sis.util.ObjectConverters;
 import org.apache.sis.util.UnconvertibleObjectException;
 import org.apache.sis.util.logging.Logging;
+
+import java.awt.*;
+import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *

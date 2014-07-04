@@ -18,9 +18,10 @@
  */
 package org.constellation.swing;
 
+import org.constellation.configuration.Layer;
+
 import java.io.Serializable;
 import java.util.Objects;
-import org.constellation.configuration.Layer;
 
 /**
  * Class LayerModel extend Layer to add provider identifier from where layer is come from.

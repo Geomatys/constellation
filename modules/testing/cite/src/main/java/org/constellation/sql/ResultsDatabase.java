@@ -18,6 +18,11 @@
  */
 package org.constellation.sql;
 
+import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.internal.sql.DefaultDataSource;
+import org.geotoolkit.io.X364;
+import org.geotoolkit.util.FileUtilities;
+
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
@@ -36,10 +41,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // Geotoolkit dependencies
-import org.geotoolkit.internal.sql.DefaultDataSource;
-import org.geotoolkit.io.X364;
-import org.geotoolkit.util.FileUtilities;
-import org.apache.sis.util.logging.Logging;
 
 
 /**

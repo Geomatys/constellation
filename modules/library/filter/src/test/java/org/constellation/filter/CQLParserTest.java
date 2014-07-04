@@ -19,19 +19,19 @@
 package org.constellation.filter;
 
 // J2SE dependencies
-import java.util.Arrays;
-import java.util.logging.Logger;
-import org.geotoolkit.csw.xml.TypeNames;
 
-// Geotoolkit dependencies
+import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.csw.xml.TypeNames;
 import org.geotoolkit.csw.xml.v202.QueryConstraintType;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.ogc.xml.v110.FilterType;
-import org.apache.sis.util.logging.Logging;
-
-// GeoAPI dependencies
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.opengis.filter.Filter;
 import org.opengis.filter.spatial.BBOX;
 import org.opengis.filter.spatial.Beyond;
@@ -45,9 +45,17 @@ import org.opengis.filter.spatial.Overlaps;
 import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
 
+import java.util.Arrays;
+import java.util.logging.Logger;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+// Geotoolkit dependencies
+// GeoAPI dependencies
 // JUnit dependencies
-import org.junit.*;
-import static org.junit.Assert.*;
 
 /**
  * A suite of test verifying the transformation of an CQL request into a Lucene Query/filter

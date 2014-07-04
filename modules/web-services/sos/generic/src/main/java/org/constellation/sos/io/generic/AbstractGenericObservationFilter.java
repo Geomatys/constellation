@@ -20,29 +20,28 @@
 package org.constellation.sos.io.generic;
 
 
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.HashMap;
+import org.apache.sis.storage.DataStoreException;
+import org.apache.sis.util.logging.Logging;
+import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
+import org.constellation.generic.database.Query;
+import org.constellation.sos.factory.OMFactory;
+import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.observation.ObservationFilter;
+
+import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.sql.SQLException;
-import javax.sql.DataSource;
-import org.apache.sis.storage.DataStoreException;
 
-
-import org.constellation.generic.database.Automatic;
-import org.constellation.generic.database.BDD;
-import org.constellation.generic.database.Query;
-import org.geotoolkit.observation.ObservationFilter;
-import org.constellation.sos.factory.OMFactory;
-import org.constellation.ws.CstlServiceException;
-
-import org.apache.sis.util.logging.Logging;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
 
 /**
  *

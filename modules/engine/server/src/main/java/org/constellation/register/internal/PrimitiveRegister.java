@@ -18,10 +18,6 @@
  */
 package org.constellation.register.internal;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import org.constellation.ServiceDef;
 import org.constellation.provider.Data;
 import org.constellation.provider.DataProvider;
@@ -29,6 +25,10 @@ import org.constellation.provider.DataProviders;
 import org.constellation.register.PrimitiveRegisterIF;
 import org.constellation.register.RegisterException;
 import org.geotoolkit.feature.type.Name;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * First attempt at a Register, we merely want something functional for now.

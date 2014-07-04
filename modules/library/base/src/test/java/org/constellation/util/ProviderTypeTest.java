@@ -18,11 +18,11 @@
  */
 package org.constellation.util;
 
-import org.geotoolkit.feature.type.DefaultName;
-import static org.junit.Assert.*;
 import org.junit.Test;
 
 import java.util.Date;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  *

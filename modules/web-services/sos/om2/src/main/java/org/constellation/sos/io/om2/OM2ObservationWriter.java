@@ -20,20 +20,6 @@ package org.constellation.sos.io.om2;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKBWriter;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.sql.DataSource;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.generic.database.Automatic;
@@ -43,8 +29,6 @@ import org.geotoolkit.gml.GeometrytoJTS;
 import org.geotoolkit.gml.xml.AbstractGeometry;
 import org.geotoolkit.observation.ObservationWriter;
 import org.geotoolkit.observation.xml.AbstractObservation;
-import org.geotoolkit.observation.xml.v200.OMObservationType;
-
 import org.geotoolkit.observation.xml.v200.OMObservationType.InternalPhenomenon;
 import org.geotoolkit.sampling.xml.SamplingFeature;
 import org.geotoolkit.sos.xml.ObservationOffering;
@@ -71,6 +55,21 @@ import org.opengis.temporal.Instant;
 import org.opengis.temporal.Period;
 import org.opengis.temporal.TemporalObject;
 import org.opengis.util.FactoryException;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 

@@ -1,18 +1,7 @@
 package org.constellation.engine.register.jooq.repository;
 
-import static org.constellation.engine.register.jooq.Tables.DOMAIN;
-import static org.constellation.engine.register.jooq.Tables.DOMAINROLE;
-import static org.constellation.engine.register.jooq.Tables.DOMAINROLE_X_PERMISSION;
-import static org.constellation.engine.register.jooq.Tables.USER;
-import static org.constellation.engine.register.jooq.Tables.USER_X_DOMAIN_X_DOMAINROLE;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
+import com.google.common.base.Optional;
+import com.google.common.primitives.Ints;
 import org.apache.commons.lang3.tuple.Pair;
 import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.Domainrole;
@@ -29,8 +18,18 @@ import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Optional;
-import com.google.common.primitives.Ints;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import static org.constellation.engine.register.jooq.Tables.DOMAIN;
+import static org.constellation.engine.register.jooq.Tables.DOMAINROLE;
+import static org.constellation.engine.register.jooq.Tables.DOMAINROLE_X_PERMISSION;
+import static org.constellation.engine.register.jooq.Tables.USER;
+import static org.constellation.engine.register.jooq.Tables.USER_X_DOMAIN_X_DOMAINROLE;
 
 @Component
 public class JooqDomainroleRepository extends AbstractJooqRespository<DomainroleRecord, Domainrole> implements

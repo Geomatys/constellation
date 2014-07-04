@@ -19,13 +19,13 @@
 
 package org.constellation.ws.rs;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 import javax.annotation.PreDestroy;
 import javax.imageio.spi.ServiceRegistry;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * This class is here to initiate the webservice at startup instead of waiting for the first request to instanciate the service.

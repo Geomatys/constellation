@@ -19,63 +19,39 @@
 package org.constellation.gui;
 
 // Geometry
-import java.awt.Shape;
-import java.awt.Rectangle;
+
+import org.apache.sis.util.ArraysExt;
+import org.geotoolkit.gui.swing.ExceptionMonitor;
+import org.geotoolkit.math.XMath;
+import org.geotoolkit.referencing.operation.matrix.XAffineTransform;
+import org.geotoolkit.util.Utilities;
+
+import javax.swing.*;
+import javax.swing.event.MouseInputAdapter;
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.geom.PathIterator;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.RectangularShape;
-import java.awt.geom.NoninvertibleTransformException;
-import org.geotoolkit.referencing.operation.matrix.XAffineTransform;
-
-// Graphics
-import java.awt.Paint;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-
-// User interface
-import java.awt.Cursor;
-import java.awt.Insets;
-import java.awt.Component;
-import javax.swing.JFrame;
-import javax.swing.JSpinner;
-import javax.swing.KeyStroke;
-import javax.swing.JComponent;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-import javax.swing.SpinnerDateModel;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.text.JTextComponent;
-import javax.swing.JFormattedTextField;
-
-// Events
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import javax.swing.event.MouseInputAdapter;
-
-// Formats
-import java.util.Date;
-import java.text.Format;
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-
-// Miscellaneous
-import java.lang.Double;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
+// Graphics
+// User interface
+// Events
+// Formats
+// Miscellaneous
 // Resources
-import org.geotoolkit.math.XMath;
-import org.apache.sis.util.ArraysExt;
-import org.geotoolkit.util.Utilities;
-import org.geotoolkit.gui.swing.ExceptionMonitor;
 
 
 /**

@@ -19,18 +19,6 @@
 
 package org.constellation.rest.api;
 
-import java.io.File;
-import java.util.List;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.configuration.AcknowlegementType;
@@ -44,11 +32,25 @@ import org.constellation.dto.SimpleValue;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.CSWworker;
 import org.constellation.metadata.configuration.CSWConfigurer;
-import static org.constellation.utils.RESTfulUtilities.ok;
 import org.constellation.ws.ServiceConfigurer;
 import org.constellation.ws.WSEngine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Node;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.io.File;
+import java.util.List;
+
+import static org.constellation.utils.RESTfulUtilities.ok;
 
 /**
  *

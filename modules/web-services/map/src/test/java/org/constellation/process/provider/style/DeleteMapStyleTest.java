@@ -18,19 +18,29 @@
  */
 package org.constellation.process.provider.style;
 
-import java.io.File;
-import java.net.MalformedURLException;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.process.ConstellationProcessFactory;
-import org.constellation.provider.*;
+import org.constellation.provider.Provider;
+import org.constellation.provider.StyleProvider;
+import org.constellation.provider.StyleProviders;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
-import org.geotoolkit.style.*;
-import static org.junit.Assert.*;
+import org.geotoolkit.style.DefaultStyleFactory;
+import org.geotoolkit.style.MutableStyle;
+import org.geotoolkit.style.MutableStyleFactory;
+import org.geotoolkit.style.StyleConstants;
 import org.junit.Test;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.NoSuchIdentifierException;
+
+import java.io.File;
+import java.net.MalformedURLException;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  *

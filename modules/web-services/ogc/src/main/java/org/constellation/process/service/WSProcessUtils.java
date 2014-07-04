@@ -18,8 +18,9 @@
  */
 package org.constellation.process.service;
 
-import java.util.List;
 import org.apache.sis.internal.util.UnmodifiableArrayList;
+
+import java.util.List;
 
 /**
  *

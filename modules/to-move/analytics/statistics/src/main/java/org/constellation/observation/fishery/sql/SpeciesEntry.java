@@ -19,12 +19,16 @@
 package org.constellation.observation.fishery.sql;
 
 // J2SE dependencies
-import java.util.Locale;
-import static java.util.Locale.*;
 
-// Constellation dependencies
 import org.constellation.observation.fishery.Species;
 import org.constellation.swe.v101.PhenomenonEntry;
+
+import java.util.Locale;
+
+import static java.util.Locale.ENGLISH;
+import static java.util.Locale.FRENCH;
+
+// Constellation dependencies
 
 
 /**

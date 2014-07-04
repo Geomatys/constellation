@@ -19,12 +19,11 @@
 
 package org.constellation.ws.rs.provider;
 
+import org.constellation.configuration.LayerContext;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.glassfish.jersey.jettison.JettisonConfig;
 import org.glassfish.jersey.jettison.JettisonJaxbContext;
 import org.glassfish.jersey.jettison.JettisonUnmarshaller;
-
-import org.constellation.configuration.LayerContext;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;

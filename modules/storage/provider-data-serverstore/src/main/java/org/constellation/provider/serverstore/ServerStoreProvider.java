@@ -18,20 +18,22 @@
  */
 package org.constellation.provider.serverstore;
 
+import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
+import org.constellation.admin.dao.DataRecord.DataType;
 import org.constellation.provider.AbstractDataProvider;
+import org.constellation.provider.Data;
 import org.constellation.provider.DefaultCoverageData;
 import org.constellation.provider.DefaultFeatureData;
-import org.constellation.provider.Data;
 import org.constellation.provider.ProviderFactory;
 import org.geotoolkit.client.Client;
 import org.geotoolkit.client.ClientFinder;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.data.FeatureStore;
+import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.version.VersionControl;
 import org.geotoolkit.version.VersioningException;
-import org.geotoolkit.feature.type.Name;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 
@@ -39,8 +41,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 import java.util.logging.Level;
-import org.apache.sis.storage.DataStore;
-import org.constellation.admin.dao.DataRecord.DataType;
 
 /**
  *

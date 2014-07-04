@@ -19,16 +19,9 @@
 package org.constellation.filter;
 
 // J2SE dependencies
-import org.geotoolkit.ogc.xml.v110.UpperBoundaryType;
-import org.geotoolkit.ogc.xml.v110.PropertyIsBetweenType;
-import java.io.StringReader;
-import java.util.Arrays;
 
-// JAXB dependencies
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Unmarshaller;
+import org.apache.sis.xml.MarshallerPool;
 import org.geotoolkit.csw.xml.TypeNames;
-
 import org.geotoolkit.csw.xml.v202.QueryConstraintType;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
@@ -38,20 +31,31 @@ import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.LiteralType;
 import org.geotoolkit.ogc.xml.v110.LowerBoundaryType;
 import org.geotoolkit.ogc.xml.v110.ObjectFactory;
+import org.geotoolkit.ogc.xml.v110.PropertyIsBetweenType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsEqualToType;
 import org.geotoolkit.ogc.xml.v110.PropertyNameType;
-import org.apache.sis.xml.MarshallerPool;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-
+import org.geotoolkit.ogc.xml.v110.UpperBoundaryType;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.opengis.filter.spatial.BBOX;
 import org.opengis.filter.spatial.Contains;
 import org.opengis.filter.spatial.DWithin;
 import org.opengis.filter.spatial.Intersects;
 
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.Unmarshaller;
+import java.io.StringReader;
+import java.util.Arrays;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+// JAXB dependencies
 // JUnit dependencies
-import org.junit.*;
-import static org.junit.Assert.*;
 
 /**
  * A suite of test verifying the transformation of an XML filter into a Lucene Query/filter

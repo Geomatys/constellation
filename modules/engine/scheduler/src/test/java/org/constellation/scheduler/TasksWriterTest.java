@@ -18,26 +18,24 @@
  */
 package org.constellation.scheduler;
 
-import org.constellation.scheduler.configuration.XMLTasksWriter;
-import java.util.Collection;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLStreamException;
-
 import org.apache.sis.test.XMLComparator;
+import org.constellation.scheduler.configuration.XMLTasksWriter;
 import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.process.quartz.ProcessJobDetail;
-
 import org.junit.Test;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.NoSuchIdentifierException;
 import org.quartz.SimpleScheduleBuilder;
 import org.quartz.TriggerBuilder;
-
 import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLStreamException;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Test task writer.

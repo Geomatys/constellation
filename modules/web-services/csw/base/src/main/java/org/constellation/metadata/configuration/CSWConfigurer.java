@@ -19,19 +19,13 @@
 
 package org.constellation.metadata.configuration;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.logging.Level;
-import javax.imageio.spi.ServiceRegistry;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import org.constellation.configuration.*;
+import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.BriefNode;
+import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.DataSourceType;
+import org.constellation.configuration.Instance;
+import org.constellation.configuration.StringList;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.factory.AbstractCSWFactory;
 import org.constellation.metadata.io.CSWMetadataReader;
@@ -48,6 +42,19 @@ import org.geotoolkit.util.StringUtilities;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
+
+import javax.imageio.spi.ServiceRegistry;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.logging.Level;
 
 /**
  * {@link org.constellation.configuration.ServiceConfigurer} implementation for CSW service.

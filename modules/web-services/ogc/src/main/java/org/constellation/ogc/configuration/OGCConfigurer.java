@@ -19,9 +19,6 @@
 
 package org.constellation.ogc.configuration;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Instance;
@@ -30,6 +27,10 @@ import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.Details;
 import org.constellation.ws.ServiceConfigurer;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Describe methods which need to be specify by an implementation to manage

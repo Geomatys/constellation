@@ -18,10 +18,14 @@
  */
 package org.constellation.rest.api;
 
-import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import org.constellation.engine.register.Domain;
+import org.constellation.engine.register.Domainrole;
+import org.constellation.engine.register.User;
+import org.constellation.engine.register.repository.DomainRepository;
+import org.constellation.engine.register.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
@@ -37,15 +41,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.Domainrole;
-import org.constellation.engine.register.User;
-import org.constellation.engine.register.repository.DomainRepository;
-import org.constellation.engine.register.repository.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataIntegrityViolationException;
+import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Path("/1/domain")
 @RolesAllowed("cstl-admin")

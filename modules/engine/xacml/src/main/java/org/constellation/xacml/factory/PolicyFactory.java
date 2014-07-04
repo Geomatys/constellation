@@ -19,22 +19,21 @@
 package org.constellation.xacml.factory;
 
 import com.sun.xacml.finder.PolicyFinder;
+import org.constellation.xacml.CstlXACMLPolicy;
+import org.constellation.xacml.api.XACMLPolicy;
+import org.geotoolkit.xacml.xml.policy.ObjectFactory;
+import org.geotoolkit.xacml.xml.policy.PolicySetType;
+import org.geotoolkit.xacml.xml.policy.PolicyType;
+
+import javax.xml.bind.JAXB;
+import javax.xml.bind.JAXBElement;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.bind.JAXB;
-import javax.xml.bind.JAXBElement;
-
-import org.constellation.xacml.api.XACMLPolicy;
-import org.constellation.xacml.CstlXACMLPolicy;
-import org.geotoolkit.xacml.xml.policy.ObjectFactory;
-import org.geotoolkit.xacml.xml.policy.PolicySetType;
-import org.geotoolkit.xacml.xml.policy.PolicyType;
 
 
 /**

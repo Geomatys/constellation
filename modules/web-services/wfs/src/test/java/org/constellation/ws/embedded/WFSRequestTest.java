@@ -19,32 +19,6 @@
 
 package org.constellation.ws.embedded;
 
-import java.net.MalformedURLException;
-import java.io.File;
-import java.net.URL;
-import java.net.URLConnection;
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
-
-// Constellation dependencies
-import org.constellation.provider.DataProviders;
-import org.constellation.util.Util;
-
-import org.constellation.test.CstlDOMComparator;
-import org.constellation.test.utils.Order;
-
-// Geotoolkit dependencies
-import org.geotoolkit.xsd.xml.v2001.Schema;
-import org.geotoolkit.referencing.CRS;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.DataBusiness;
@@ -54,29 +28,30 @@ import org.constellation.admin.SpringHelper;
 import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.configuration.LayerContext;
 import org.constellation.map.configuration.LayerBusiness;
+import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
 import org.constellation.provider.Providers;
-import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
-import static org.constellation.provider.configuration.ProviderParameters.SOURCE_LOADALL_DESCRIPTOR;
-import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
-import static org.constellation.provider.featurestore.FeatureStoreProviderService.SOURCE_CONFIG_DESCRIPTOR;
+import org.constellation.test.CstlDOMComparator;
+import org.constellation.test.utils.Order;
 import org.constellation.test.utils.SpringTestRunner;
-import static org.constellation.ws.embedded.AbstractGrizzlyServer.initDataDirectory;
-import static org.geotoolkit.data.AbstractFeatureStoreFactory.NAMESPACE;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.DATABASE;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.HOST;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.PASSWORD;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.SCHEMA;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.USER;
+import org.constellation.util.Util;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.ogc.xml.v110.FeatureIdType;
-import org.geotoolkit.sampling.xml.v100.SamplingPointType;
-import org.geotoolkit.util.sql.DerbySqlScriptRunner;
-import org.geotoolkit.wfs.xml.v110.*;
-import org.geotoolkit.wfs.xml.*;
-
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
+import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.sampling.xml.v100.SamplingPointType;
 import org.geotoolkit.util.FileUtilities;
+import org.geotoolkit.util.sql.DerbySqlScriptRunner;
+import org.geotoolkit.wfs.xml.ResultTypeType;
+import org.geotoolkit.wfs.xml.ValueCollection;
+import org.geotoolkit.wfs.xml.v110.FeatureCollectionType;
+import org.geotoolkit.wfs.xml.v110.GetFeatureType;
+import org.geotoolkit.wfs.xml.v110.InsertResultsType;
+import org.geotoolkit.wfs.xml.v110.InsertedFeatureType;
+import org.geotoolkit.wfs.xml.v110.QueryType;
+import org.geotoolkit.wfs.xml.v110.TransactionResponseType;
+import org.geotoolkit.wfs.xml.v110.TransactionSummaryType;
+import org.geotoolkit.wfs.xml.v110.WFSCapabilitiesType;
 import org.geotoolkit.wfs.xml.v200.DescribeStoredQueriesResponseType;
 import org.geotoolkit.wfs.xml.v200.DescribeStoredQueriesType;
 import org.geotoolkit.wfs.xml.v200.GetPropertyValueType;
@@ -84,20 +59,53 @@ import org.geotoolkit.wfs.xml.v200.ListStoredQueriesResponseType;
 import org.geotoolkit.wfs.xml.v200.ListStoredQueriesType;
 import org.geotoolkit.wfs.xml.v200.MemberPropertyType;
 import org.geotoolkit.wfs.xml.v200.ValueCollectionType;
-
-// JUnit dependencies
-import org.junit.*;
-import static org.junit.Assume.*;
-import static org.junit.Assert.*;
+import org.geotoolkit.xsd.xml.v2001.Schema;
+import org.junit.AfterClass;
+import org.junit.Test;
 import org.junit.runner.RunWith;
-
-// GeoAPI dependencies
 import org.opengis.parameter.ParameterValueGroup;
-import static org.geotoolkit.parameter.ParametersExt.*;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.SOURCE_LOADALL_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
+import static org.constellation.provider.featurestore.FeatureStoreProviderService.SOURCE_CONFIG_DESCRIPTOR;
+import static org.geotoolkit.data.AbstractFeatureStoreFactory.NAMESPACE;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.DATABASE;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.HOST;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.PASSWORD;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.SCHEMA;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.USER;
+import static org.geotoolkit.parameter.ParametersExt.createGroup;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeNoException;
+
+// Constellation dependencies
+// Geotoolkit dependencies
+// JUnit dependencies
+// GeoAPI dependencies
 
 /**
  *

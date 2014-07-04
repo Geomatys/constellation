@@ -18,20 +18,6 @@
  */
 package org.constellation.swing;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.ListCellRenderer;
-import javax.xml.namespace.QName;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.service.ConstellationClient;
 import org.constellation.configuration.DataBrief;
@@ -48,6 +34,16 @@ import org.jdesktop.swingx.combobox.ListComboBoxModel;
 import org.opengis.filter.Filter;
 import org.opengis.util.FactoryException;
 import org.openide.util.Exceptions;
+
+import javax.swing.*;
+import javax.xml.namespace.QName;
+import java.awt.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *

@@ -18,14 +18,6 @@
  */
 package org.constellation.ws.embedded;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.xml.bind.JAXBContext;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.ServiceBusiness;
@@ -36,16 +28,30 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.sos.ws.soap.SOService;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.SpringTestRunner;
-import static org.constellation.ws.embedded.ConfigurationRequestTest.writeDataFile;
 import org.geotoolkit.util.FileUtilities;
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.AfterClass;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.xml.bind.JAXBContext;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.constellation.ws.embedded.ConfigurationRequestTest.writeDataFile;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  *

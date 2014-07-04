@@ -32,12 +32,18 @@ import com.bradmcevoy.http.exceptions.NotFoundException;
 import com.bradmcevoy.http.webdav.PropPatchHandler.Fields;
 import com.bradmcevoy.io.ReadingException;
 import com.bradmcevoy.io.WritingException;
-import java.io.*;
-import java.util.Map;
-import java.util.logging.Level;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.constellation.configuration.WebdavContext;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Map;
+import java.util.logging.Level;
 
 
 /**

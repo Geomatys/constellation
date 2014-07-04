@@ -18,19 +18,41 @@
  */
 package org.constellation.webdav;
 
-import com.bradmcevoy.http.*;
+import com.bradmcevoy.http.Auth;
+import com.bradmcevoy.http.CollectionResource;
+import com.bradmcevoy.http.CopyableResource;
+import com.bradmcevoy.http.DeletableResource;
+import com.bradmcevoy.http.GetableResource;
+import com.bradmcevoy.http.HttpManager;
+import com.bradmcevoy.http.LockInfo;
+import com.bradmcevoy.http.LockResult;
+import com.bradmcevoy.http.LockTimeout;
+import com.bradmcevoy.http.LockToken;
+import com.bradmcevoy.http.LockingCollectionResource;
+import com.bradmcevoy.http.MakeCollectionableResource;
+import com.bradmcevoy.http.MoveableResource;
+import com.bradmcevoy.http.PropFindableResource;
+import com.bradmcevoy.http.PutableResource;
+import com.bradmcevoy.http.Range;
+import com.bradmcevoy.http.Request;
+import com.bradmcevoy.http.Resource;
+import com.bradmcevoy.http.XmlWriter;
 import com.bradmcevoy.http.exceptions.NotAuthorizedException;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.constellation.configuration.WebdavContext;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.constellation.configuration.WebdavContext;
 
 /**
  * Represents a directory in a physical file system.

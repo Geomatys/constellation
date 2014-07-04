@@ -20,6 +20,25 @@
 package org.constellation.sos.io.filesystem;
 
 // J2SE dependencies
+
+import org.apache.sis.storage.DataStoreException;
+import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
+import org.constellation.generic.database.Automatic;
+import org.constellation.sos.factory.OMFactory;
+import org.constellation.sos.io.lucene.LuceneObservationIndexer;
+import org.geotoolkit.gml.xml.AbstractGeometry;
+import org.geotoolkit.lucene.IndexingException;
+import org.geotoolkit.observation.ObservationWriter;
+import org.geotoolkit.sampling.xml.SamplingFeature;
+import org.geotoolkit.sos.xml.ObservationOffering;
+import org.geotoolkit.sos.xml.SOSMarshallerPool;
+import org.geotoolkit.swe.xml.Phenomenon;
+import org.geotoolkit.swes.xml.ObservationTemplate;
+import org.opengis.observation.Observation;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,23 +46,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import org.apache.sis.storage.DataStoreException;
-import org.apache.sis.util.logging.Logging;
-import org.apache.sis.xml.MarshallerPool;
-import org.constellation.generic.database.Automatic;
-import org.constellation.sos.factory.OMFactory;
-import org.geotoolkit.observation.ObservationWriter;
-import org.constellation.sos.io.lucene.LuceneObservationIndexer;
-import org.geotoolkit.gml.xml.AbstractGeometry;
-import org.geotoolkit.lucene.IndexingException;
-import org.geotoolkit.sampling.xml.SamplingFeature;
-import org.geotoolkit.sos.xml.ObservationOffering;
-import org.geotoolkit.sos.xml.SOSMarshallerPool;
-import org.geotoolkit.swe.xml.Phenomenon;
-import org.geotoolkit.swes.xml.ObservationTemplate;
-import org.opengis.observation.Observation;
 
 
 /**

@@ -19,9 +19,10 @@
 
 package org.constellation.filter;
 
+import org.apache.lucene.search.Filter;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.lucene.search.Filter;
 
 /**
  *

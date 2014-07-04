@@ -1,14 +1,13 @@
 package org.constellation.engine.register.jooq;
 
-import java.util.Collection;
+import org.constellation.engine.register.Data;
+import org.constellation.engine.register.Domain;
+import org.constellation.engine.register.Provider;
+import org.constellation.engine.register.User;
+
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.User;
-import org.constellation.engine.register.Provider;
 
 public class TestSamples {
 

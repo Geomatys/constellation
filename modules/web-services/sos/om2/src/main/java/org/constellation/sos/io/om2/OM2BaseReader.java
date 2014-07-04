@@ -25,6 +25,18 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKBReader;
+import org.apache.sis.storage.DataStoreException;
+import org.apache.sis.util.logging.Logging;
+import org.constellation.sos.factory.OMFactory;
+import org.geotoolkit.gml.JTStoGeometry;
+import org.geotoolkit.gml.xml.Envelope;
+import org.geotoolkit.gml.xml.FeatureProperty;
+import org.geotoolkit.referencing.CRS;
+import org.opengis.observation.Phenomenon;
+import org.opengis.observation.sampling.SamplingFeature;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.util.FactoryException;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -35,20 +47,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.sis.storage.DataStoreException;
-import org.constellation.sos.factory.OMFactory;
-import org.geotoolkit.gml.JTStoGeometry;
-import org.geotoolkit.gml.xml.Envelope;
-import org.geotoolkit.gml.xml.FeatureProperty;
-import org.geotoolkit.referencing.CRS;
-import org.apache.sis.util.logging.Logging;
 
-import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
-
-import org.opengis.observation.Phenomenon;
-import org.opengis.observation.sampling.SamplingFeature;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.util.FactoryException;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildCompositePhenomenon;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildFeatureProperty;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildPhenomenon;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildSamplingCurve;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildSamplingFeature;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildSamplingPoint;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildSamplingPolygon;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.getGMLVersion;
 
 /**
  *

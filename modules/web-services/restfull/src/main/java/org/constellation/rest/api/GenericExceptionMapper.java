@@ -19,24 +19,23 @@
 
 package org.constellation.rest.api;
 
-import static org.constellation.utils.RESTfulUtilities.badRequest;
-import static org.constellation.utils.RESTfulUtilities.internalError;
-import static org.constellation.utils.RESTfulUtilities.notFound;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
-
 import org.apache.sis.util.NullArgumentException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigProcessException;
 import org.constellation.configuration.CstlConfigurationRuntimeException;
 import org.constellation.configuration.TargetNotFoundException;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.constellation.utils.RESTfulUtilities.badRequest;
+import static org.constellation.utils.RESTfulUtilities.internalError;
+import static org.constellation.utils.RESTfulUtilities.notFound;
 
 /**
  * Custom {@link ExceptionMapper} to transform an {@link Exception} into an

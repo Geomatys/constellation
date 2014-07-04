@@ -20,16 +20,34 @@
 package org.constellation.wfs.ws;
 
 
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.Worker;
+import org.geotoolkit.gml.xml.AbstractGML;
+import org.geotoolkit.wfs.xml.CreateStoredQuery;
+import org.geotoolkit.wfs.xml.CreateStoredQueryResponse;
+import org.geotoolkit.wfs.xml.DescribeFeatureType;
+import org.geotoolkit.wfs.xml.DescribeStoredQueries;
+import org.geotoolkit.wfs.xml.DescribeStoredQueriesResponse;
+import org.geotoolkit.wfs.xml.DropStoredQuery;
+import org.geotoolkit.wfs.xml.DropStoredQueryResponse;
+import org.geotoolkit.wfs.xml.GetCapabilities;
+import org.geotoolkit.wfs.xml.GetFeature;
+import org.geotoolkit.wfs.xml.GetGmlObject;
+import org.geotoolkit.wfs.xml.GetPropertyValue;
+import org.geotoolkit.wfs.xml.ListStoredQueries;
+import org.geotoolkit.wfs.xml.ListStoredQueriesResponse;
+import org.geotoolkit.wfs.xml.LockFeature;
+import org.geotoolkit.wfs.xml.LockFeatureResponse;
+import org.geotoolkit.wfs.xml.ParameterExpression;
+import org.geotoolkit.wfs.xml.Transaction;
+import org.geotoolkit.wfs.xml.TransactionResponse;
+import org.geotoolkit.wfs.xml.WFSCapabilities;
+import org.geotoolkit.xsd.xml.v2001.Schema;
+
 import java.util.List;
 
 // Constellation dependencies
-import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.Worker;
-
 // Geotoolkit dependencies
-import org.geotoolkit.gml.xml.AbstractGML;
-import org.geotoolkit.wfs.xml.*;
-import org.geotoolkit.xsd.xml.v2001.Schema;
 
 /**
  *

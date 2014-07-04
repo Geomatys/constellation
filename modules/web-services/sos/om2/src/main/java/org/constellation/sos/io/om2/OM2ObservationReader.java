@@ -20,31 +20,13 @@
 package org.constellation.sos.io.om2;
 
 // J2SE dependencies
+
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKBReader;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import javax.sql.DataSource;
-import javax.xml.namespace.QName;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import static org.constellation.sos.io.om2.OM2BaseReader.defaultCRS;
-import static org.constellation.sos.ws.SOSConstants.*;
-
 import org.geotoolkit.gml.JTStoGeometry;
 import org.geotoolkit.gml.xml.AbstractGeometry;
 import org.geotoolkit.gml.xml.FeatureProperty;
@@ -54,7 +36,6 @@ import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.sos.xml.ResponseModeType;
 import org.geotoolkit.sos.xml.SOSXmlFactory;
-import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
 import org.geotoolkit.swe.xml.AbstractDataComponent;
 import org.geotoolkit.swe.xml.AbstractDataRecord;
 import org.geotoolkit.swe.xml.AnyScalar;
@@ -71,6 +52,47 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.temporal.TemporalGeometricPrimitive;
 import org.opengis.temporal.TemporalPrimitive;
 import org.opengis.util.FactoryException;
+
+import javax.sql.DataSource;
+import javax.xml.namespace.QName;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.constellation.sos.ws.SOSConstants.MEASUREMENT_QNAME;
+import static org.constellation.sos.ws.SOSConstants.OBSERVATION_MODEL;
+import static org.constellation.sos.ws.SOSConstants.OBSERVATION_QNAME;
+import static org.constellation.sos.ws.SOSConstants.RESPONSE_FORMAT_V100;
+import static org.constellation.sos.ws.SOSConstants.RESPONSE_FORMAT_V200;
+import static org.constellation.sos.ws.SOSConstants.SENSORML_100_FORMAT_V100;
+import static org.constellation.sos.ws.SOSConstants.SENSORML_100_FORMAT_V200;
+import static org.constellation.sos.ws.SOSConstants.SENSORML_101_FORMAT_V100;
+import static org.constellation.sos.ws.SOSConstants.SENSORML_101_FORMAT_V200;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildAnyScalar;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildDataArrayProperty;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildFeatureProperty;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildMeasure;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildOffering;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildQuantity;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildSimpleDatarecord;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildText;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildTimeInstant;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildTimePeriod;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildUomProperty;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.getDefaultTextEncoding;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.getDefaultTimeField;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.getGMLVersion;
 
 
 /**

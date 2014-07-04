@@ -19,6 +19,14 @@
 
 package org.constellation.admin;
 
+import org.apache.sis.util.Static;
+import org.apache.sis.util.logging.Logging;
+import org.constellation.admin.dao.Session;
+import org.constellation.admin.util.SQLExecuter;
+import org.constellation.configuration.ConfigDirectory;
+import org.geotoolkit.internal.sql.DefaultDataSource;
+
+import javax.sql.DataSource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -27,21 +35,9 @@ import java.io.InputStream;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.sql.DataSource;
-
-import org.apache.sis.util.Static;
-import org.apache.sis.util.logging.Logging;
-import org.constellation.admin.dao.Session;
-import org.constellation.admin.util.SQLExecuter;
-import org.constellation.configuration.ConfigDirectory;
-import org.geotoolkit.internal.sql.DefaultDataSource;
 
 /**
  * Constellation embedded administration database class.

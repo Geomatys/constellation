@@ -19,24 +19,24 @@
 
 package org.constellation.generic.database;
 
+import org.apache.sis.util.logging.Logging;
+import org.constellation.configuration.AbstractConfigurationObject;
+import org.constellation.configuration.DataSourceType;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
-
-import org.constellation.configuration.AbstractConfigurationObject;
-import org.constellation.configuration.DataSourceType;
-import java.util.Objects;
-import org.apache.sis.util.logging.Logging;
 
 /**
  *

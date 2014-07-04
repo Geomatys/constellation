@@ -36,7 +36,6 @@ import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.xml.namespace.QName;
 
 /**
  * Main data controller. For common action without data type

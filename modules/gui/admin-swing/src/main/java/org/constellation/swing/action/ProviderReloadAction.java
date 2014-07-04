@@ -18,16 +18,16 @@
  */
 package org.constellation.swing.action;
 
-import java.awt.Color;
-import java.io.IOException;
-import java.util.Map;
-import javax.swing.ImageIcon;
-import javax.swing.SwingUtilities;
 import org.constellation.configuration.ProviderReport;
 import org.constellation.security.ActionPermissions;
 import org.constellation.swing.JServicesPane;
 import org.constellation.swing.LayerRowModel;
 import org.openide.util.Exceptions;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.IOException;
+import java.util.Map;
 
 /**
  *

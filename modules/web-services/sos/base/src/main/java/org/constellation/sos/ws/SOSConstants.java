@@ -19,12 +19,7 @@
 
 package org.constellation.sos.ws;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import javax.xml.namespace.QName;
 import net.jcip.annotations.Immutable;
-import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
 import org.constellation.dto.Details;
@@ -43,29 +38,35 @@ import org.geotoolkit.ogc.xml.v110.TemporalOperatorNameType;
 import org.geotoolkit.ogc.xml.v110.TemporalOperatorType;
 import org.geotoolkit.ogc.xml.v110.TemporalOperatorsType;
 import org.geotoolkit.ogc.xml.v200.ConformanceType;
-import org.geotoolkit.ows.xml.v110.NoValues;
-import org.geotoolkit.ows.xml.v110.ValueType;
+import org.geotoolkit.ows.xml.AbstractContact;
 import org.geotoolkit.ows.xml.AbstractDCP;
 import org.geotoolkit.ows.xml.AbstractDomain;
-import org.geotoolkit.ows.xml.AbstractOperation;
-import org.geotoolkit.ows.xml.OWSXmlFactory;
-import org.geotoolkit.sos.xml.v200.InsertionCapabilitiesPropertyType;
-import org.geotoolkit.sos.xml.v200.InsertionCapabilitiesType;
-import org.geotoolkit.sos.xml.v100.FilterCapabilities;
-
-import static org.geotoolkit.gml.xml.v311.ObjectFactory.*;
-import org.geotoolkit.ows.xml.AbstractContact;
 import org.geotoolkit.ows.xml.AbstractOnlineResourceType;
+import org.geotoolkit.ows.xml.AbstractOperation;
 import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
 import org.geotoolkit.ows.xml.AbstractResponsiblePartySubset;
 import org.geotoolkit.ows.xml.AbstractServiceIdentification;
 import org.geotoolkit.ows.xml.AbstractServiceProvider;
+import org.geotoolkit.ows.xml.OWSXmlFactory;
+import org.geotoolkit.ows.xml.v110.NoValues;
+import org.geotoolkit.ows.xml.v110.ValueType;
 import org.geotoolkit.sos.xml.Capabilities;
 import org.geotoolkit.sos.xml.SOSXmlFactory;
-
-
+import org.geotoolkit.sos.xml.v100.FilterCapabilities;
+import org.geotoolkit.sos.xml.v200.InsertionCapabilitiesPropertyType;
+import org.geotoolkit.sos.xml.v200.InsertionCapabilitiesType;
 import org.opengis.filter.capability.Operator;
 import org.opengis.filter.capability.SpatialOperator;
+
+import javax.xml.namespace.QName;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import static org.geotoolkit.gml.xml.v311.ObjectFactory._Envelope_QNAME;
+import static org.geotoolkit.gml.xml.v311.ObjectFactory._TimeInstant_QNAME;
+import static org.geotoolkit.gml.xml.v311.ObjectFactory._TimePeriod_QNAME;
 
 /**
  *

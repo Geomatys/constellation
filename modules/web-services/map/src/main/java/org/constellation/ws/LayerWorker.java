@@ -18,18 +18,14 @@
  */
 package org.constellation.ws;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import java.util.*;
-import java.util.logging.Level;
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.xml.namespace.QName;
 import org.constellation.ServiceDef.Specification;
-import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.StyleBusiness;
-import org.constellation.configuration.*;
+import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.Language;
+import org.constellation.configuration.Languages;
+import org.constellation.configuration.Layer;
+import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.map.configuration.LayerBusiness;
 import org.constellation.map.featureinfo.FeatureInfoUtilities;
 import org.constellation.provider.Data;
@@ -40,8 +36,22 @@ import org.constellation.ws.security.SimplePDP;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.Name;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.style.MutableStyle;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.xml.namespace.QName;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.logging.Level;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.LAYER_NOT_DEFINED;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.STYLE_NOT_DEFINED;
 
 /**
  * A super class for all the web service worker dealing with layers (WMS, WCS, WMTS, WFS, ...)

@@ -18,16 +18,15 @@
  */
 package org.constellation.process.service;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.process.AbstractCstlProcess;
-import org.constellation.ws.WSEngine;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
-import static org.geotoolkit.parameter.Parameters.*;
-import static org.constellation.process.service.StopServiceDescriptor.*;
+
+import static org.constellation.process.service.StopServiceDescriptor.IDENTIFIER;
+import static org.constellation.process.service.StopServiceDescriptor.SERVICE_TYPE;
+import static org.geotoolkit.parameter.Parameters.value;
 
 /**
  * Stop service specified instance. If instance already stopped or didn't exist, a ProcessException will be throws.

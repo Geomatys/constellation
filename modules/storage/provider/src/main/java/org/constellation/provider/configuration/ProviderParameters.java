@@ -19,16 +19,10 @@
 
 package org.constellation.provider.configuration;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.ArrayList;
-
-
 import org.apache.sis.parameter.DefaultParameterDescriptorGroup;
+import org.apache.sis.util.ArgumentChecks;
 import org.constellation.provider.DataProvider;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
-import org.apache.sis.util.ArgumentChecks;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptor;
@@ -36,7 +30,12 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 
-import static org.geotoolkit.parameter.Parameters.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
+import static org.geotoolkit.parameter.Parameters.value;
 
 /**
  * General parameters for provider configuration files.

@@ -18,11 +18,15 @@
  */
 package org.constellation.provider.coveragesgroup.xml;
 
-import javax.xml.bind.annotation.*;
-
 import org.constellation.configuration.GetFeatureInfoCfg;
 import org.geotoolkit.sld.xml.v110.StyledLayerDescriptor;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
 import java.util.List;
 

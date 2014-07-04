@@ -20,27 +20,28 @@
 package org.constellation.metadata.io.generic;
 
 // J2SE dependencies
+
+import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.constellation.generic.GenericReader;
+import org.constellation.generic.Values;
+import org.constellation.generic.database.Automatic;
+import org.constellation.metadata.io.CSWMetadataReader;
+import org.constellation.metadata.io.ElementSetType;
+import org.constellation.metadata.io.MetadataIoException;
+import org.constellation.metadata.io.MetadataType;
+import org.geotoolkit.csw.xml.DomainValues;
+import org.w3c.dom.Node;
+
+import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import javax.xml.namespace.QName;
 
 // constellation dependencies
-import org.constellation.generic.GenericReader;
-import org.constellation.generic.Values;
-import org.constellation.generic.database.Automatic;
-import org.constellation.metadata.io.CSWMetadataReader;
-import org.constellation.metadata.io.MetadataIoException;
-
 // Geotoolkit dependencies
-import org.apache.sis.metadata.iso.DefaultMetadata;
-import org.constellation.metadata.io.ElementSetType;
-import org.constellation.metadata.io.MetadataType;
-import org.geotoolkit.csw.xml.DomainValues;
-import org.w3c.dom.Node;
 
 /**
  * A database Reader using a generic configuration to request an unknown database.

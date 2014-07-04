@@ -19,6 +19,7 @@
 package org.constellation.metadata.utils;
 
 // J2SE dependencies
+
 import org.apache.sis.internal.jaxb.gmi.MI_Metadata;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.metadata.iso.citation.DefaultCitation;
@@ -26,29 +27,34 @@ import org.apache.sis.metadata.iso.citation.DefaultResponsibleParty;
 import org.apache.sis.metadata.iso.identification.DefaultDataIdentification;
 import org.apache.sis.util.iso.DefaultInternationalString;
 import org.apache.sis.util.iso.SimpleInternationalString;
-import org.geotoolkit.sml.xml.v100.ComponentType;
-import java.util.Arrays;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import org.constellation.util.Util;
-
-// geotoolkit dependencies
-import org.geotoolkit.ows.xml.v100.BoundingBoxType;
-import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
 import org.geotoolkit.csw.xml.v202.RecordType;
-import org.geotoolkit.ebrim.xml.v300.RegistryObjectType;
-import org.geotoolkit.ebrim.xml.v300.LocalizedStringType;
+import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
 import org.geotoolkit.ebrim.xml.v300.InternationalStringType;
+import org.geotoolkit.ebrim.xml.v300.LocalizedStringType;
+import org.geotoolkit.ebrim.xml.v300.RegistryObjectType;
+import org.geotoolkit.feature.catalog.FeatureCatalogueImpl;
+import org.geotoolkit.ows.xml.v100.BoundingBoxType;
+import org.geotoolkit.sml.xml.v100.ComponentType;
 import org.geotoolkit.sml.xml.v100.Member;
 import org.geotoolkit.sml.xml.v100.SensorML;
 import org.geotoolkit.sml.xml.v100.SystemType;
-import org.geotoolkit.feature.catalog.FeatureCatalogueImpl;
-
-// JUnit dependencies
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.util.Arrays;
+
+import static org.junit.Assert.assertEquals;
+
+// geotoolkit dependencies
+// JUnit dependencies
 
 /**
  * Test the utilities class org.constellation.metadata.utils.utils from the storage-metadata.

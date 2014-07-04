@@ -18,8 +18,6 @@
  */
 package org.constellation.process;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ServiceBusiness;
 import org.geotoolkit.io.X364;
@@ -27,6 +25,9 @@ import org.geotoolkit.process.AbstractProcess;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.opengis.parameter.ParameterValueGroup;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *

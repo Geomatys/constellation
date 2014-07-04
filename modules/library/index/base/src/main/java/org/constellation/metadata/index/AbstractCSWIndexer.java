@@ -20,17 +20,7 @@
 package org.constellation.metadata.index;
 
 // J2SE dependencies
-import java.util.Map.Entry;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.logging.Level;
 
-// Apache Lucene dependencies
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.DoubleField;
@@ -40,13 +30,26 @@ import org.apache.lucene.document.FloatField;
 import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.StringField;
-
-// geotoolkit dependencies
+import org.apache.sis.util.NullArgumentException;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
-import org.apache.sis.util.NullArgumentException;
 
-import static org.constellation.metadata.CSWQueryable.*;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
+
+import static org.constellation.metadata.CSWQueryable.DUBLIN_CORE_QUERYABLE;
+import static org.constellation.metadata.CSWQueryable.ISO_FC_QUERYABLE;
+import static org.constellation.metadata.CSWQueryable.ISO_QUERYABLE;
+
+// Apache Lucene dependencies
+// geotoolkit dependencies
 /**
  *
  * @author Guilhem Legal (Geomatys)

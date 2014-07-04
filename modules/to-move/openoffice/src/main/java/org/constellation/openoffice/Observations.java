@@ -19,32 +19,31 @@
 package org.constellation.openoffice;
 
 // J2SE dependencies
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Date;
-import java.util.logging.Logger;
+
+import com.sun.star.beans.XPropertySet;
+import com.sun.star.comp.loader.FactoryHelper;
+import com.sun.star.lang.XMultiServiceFactory;
+import com.sun.star.lang.XSingleServiceFactory;
+import com.sun.star.registry.XRegistryKey;
+import org.constellation.observation.CatalogException;
+import org.constellation.observation.coverage.DynamicCoverage;
+import org.geotoolkit.coverage.SpatioTemporalCoverage3D;
+import org.geotools.openoffice.Formulas;
+import org.geotools.openoffice.MethodInfo;
+import org.opengis.geometry.DirectPosition;
+
 import java.awt.geom.Point2D;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Logger;
 
 // OpenOffice dependencies
-import com.sun.star.beans.XPropertySet;
-import com.sun.star.lang.XSingleServiceFactory;
-import com.sun.star.lang.XMultiServiceFactory;
-import com.sun.star.comp.loader.FactoryHelper;
-import com.sun.star.registry.XRegistryKey;
-
 // OpenGIS dependencies
-import org.opengis.geometry.DirectPosition;
-
 // Geotools dependencies
-import org.geotools.openoffice.Formulas;
-import org.geotools.openoffice.MethodInfo;
-import org.geotoolkit.coverage.SpatioTemporalCoverage3D;
-
 // Constellation dependencies
-import org.constellation.observation.CatalogException;
-import org.constellation.observation.coverage.DynamicCoverage;
 
 
 /**

@@ -19,18 +19,19 @@
 
 package org.constellation.configuration;
 
+import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.display2d.ext.BackgroundTemplate;
+import org.geotoolkit.display2d.service.PortrayalExtension;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElements;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
-import org.geotoolkit.display2d.ext.BackgroundTemplate;
-import org.geotoolkit.display2d.service.PortrayalExtension;
-import org.apache.sis.util.logging.Logging;
 
 /**
  *

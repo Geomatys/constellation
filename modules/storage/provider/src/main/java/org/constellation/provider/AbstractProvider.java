@@ -19,14 +19,13 @@
 
 package org.constellation.provider;
 
+import org.opengis.parameter.ParameterValueGroup;
+
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Collections;
 import java.util.Set;
 import java.util.logging.Logger;
-import org.opengis.parameter.ParameterValueGroup;
-
-import static org.constellation.provider.configuration.ProviderParameters.*;
 
 /**
  *

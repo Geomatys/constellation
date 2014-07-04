@@ -1,8 +1,10 @@
 package org.constellation.map.ws;
 
+import org.constellation.ws.ConstellationOGCModule;
+
 import javax.inject.Named;
 
-import org.constellation.ws.ConstellationOGCModule;;
+;
 
 @Named
 public class WMSConstellationOGCModule implements ConstellationOGCModule {

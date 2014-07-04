@@ -19,39 +19,22 @@
 package org.constellation.map.featureinfo;
 
 import com.vividsolutions.jts.geom.Geometry;
-import org.apache.sis.geometry.GeneralDirectPosition;
-import org.apache.sis.util.ArraysExt;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.GridSampleDimension;
 import org.geotoolkit.display2d.canvas.RenderingContext2D;
 import org.geotoolkit.display2d.primitive.ProjectedCoverage;
 import org.geotoolkit.display2d.primitive.ProjectedFeature;
 import org.geotoolkit.display2d.primitive.SearchAreaJ2D;
-import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.feature.Feature;
 import org.geotoolkit.feature.Property;
 import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.map.FeatureMapLayer;
 
 import javax.measure.unit.Unit;
-import java.awt.geom.Rectangle2D;
-import java.util.*;
-import java.util.logging.Level;
-import javax.measure.converter.ConversionException;
-import javax.measure.unit.NonSI;
-import org.geotoolkit.coverage.grid.GridCoverage2D;
-import org.geotoolkit.coverage.io.CoverageStoreException;
-import org.geotoolkit.coverage.io.GridCoverageReadParam;
-import org.geotoolkit.coverage.io.GridCoverageReader;
-import org.geotoolkit.display2d.canvas.AbstractGraphicVisitor;
-import org.geotoolkit.map.CoverageMapLayer;
-import org.geotoolkit.referencing.CRS;
-import org.geotoolkit.referencing.crs.DefaultCompoundCRS;
-import  org.apache.sis.util.logging.Logging;
-import org.opengis.coverage.CannotEvaluateException;
-import org.opengis.geometry.Envelope;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.crs.TemporalCRS;
-import org.opengis.referencing.operation.TransformException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Quentin Boileau (Geomatys)

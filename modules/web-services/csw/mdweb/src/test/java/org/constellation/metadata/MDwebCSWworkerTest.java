@@ -20,14 +20,6 @@
 
 package org.constellation.metadata;
 
-import java.io.File;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
@@ -42,12 +34,18 @@ import org.geotoolkit.skos.xml.Concept;
 import org.geotoolkit.skos.xml.Value;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
-
-import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mdweb.io.sql.ThesaurusDatabaseWriter;
 import org.mdweb.model.thesaurus.ISOLanguageCode;
 import org.mdweb.sql.ThesaurusDatabaseCreator;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.io.File;
+import java.sql.Connection;
+import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *

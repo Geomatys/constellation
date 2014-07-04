@@ -19,48 +19,57 @@
 package org.constellation.metadata.index.generic;
 
 // J2SE dependencies
-import org.apache.sis.geometry.GeneralEnvelope;
-import org.constellation.test.utils.Order;
-import org.constellation.test.utils.TestRunner;
-import org.apache.sis.util.logging.Logging;
-import java.io.File;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-// Constellation dependencies
-import org.constellation.util.Util;
-
-// lucene dependencies
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
+import org.apache.sis.geometry.GeneralEnvelope;
+import org.apache.sis.util.logging.Logging;
 import org.constellation.metadata.CSWQueryable;
+import org.constellation.test.utils.Order;
+import org.constellation.test.utils.TestRunner;
 import org.constellation.util.NodeUtilities;
-
-// geotoolkit dependencies
+import org.constellation.util.Util;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
-import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.lucene.index.LuceneIndexSearcher;
+import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.util.FileUtilities;
-
-// GeoAPI dependencies
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-//Junit dependencies
-import org.junit.*;
 import org.opengis.filter.FilterFactory2;
-import static org.junit.Assert.*;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+// Constellation dependencies
+// lucene dependencies
+// geotoolkit dependencies
+// GeoAPI dependencies
+//Junit dependencies
 
 /**
  * Test class for constellation lucene index

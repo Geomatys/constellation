@@ -18,69 +18,99 @@
  */
 package org.constellation.sos.ws.rs;
 
+import org.constellation.ServiceDef;
+import org.constellation.ServiceDef.Specification;
+import org.constellation.sos.configuration.SOSConfigurer;
+import org.constellation.sos.ws.SOSworker;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.MimeType;
+import org.constellation.ws.ServiceConfigurer;
+import org.constellation.ws.UnauthorizedException;
+import org.constellation.ws.Worker;
+import org.constellation.ws.rs.OGCWebService;
+import org.geotoolkit.ows.xml.AcceptFormats;
+import org.geotoolkit.ows.xml.AcceptVersions;
+import org.geotoolkit.ows.xml.OWSXmlFactory;
+import org.geotoolkit.ows.xml.RequestBase;
+import org.geotoolkit.ows.xml.Sections;
+import org.geotoolkit.ows.xml.v110.ExceptionReport;
+import org.geotoolkit.ows.xml.v110.SectionsType;
+import org.geotoolkit.sos.xml.GetCapabilities;
+import org.geotoolkit.sos.xml.GetFeatureOfInterest;
+import org.geotoolkit.sos.xml.GetObservation;
+import org.geotoolkit.sos.xml.GetObservationById;
+import org.geotoolkit.sos.xml.GetResult;
+import org.geotoolkit.sos.xml.GetResultTemplate;
+import org.geotoolkit.sos.xml.InsertObservation;
+import org.geotoolkit.sos.xml.InsertResult;
+import org.geotoolkit.sos.xml.InsertResultTemplate;
+import org.geotoolkit.sos.xml.ResponseModeType;
+import org.geotoolkit.sos.xml.SOSMarshallerPool;
+import org.geotoolkit.sos.xml.SOSResponseWrapper;
+import org.geotoolkit.sos.xml.v100.GetFeatureOfInterestTime;
+import org.geotoolkit.swes.xml.DeleteSensor;
+import org.geotoolkit.swes.xml.DescribeSensor;
+import org.geotoolkit.swes.xml.InsertSensor;
+import org.geotoolkit.util.StringUtilities;
+import org.opengis.filter.Filter;
+import org.opengis.filter.spatial.BBOX;
+import org.opengis.observation.ObservationCollection;
+import org.opengis.temporal.Instant;
+import org.opengis.temporal.Period;
+
+import javax.inject.Singleton;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Response;
+import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 
+import static org.constellation.api.QueryConstants.ACCEPT_FORMATS_PARAMETER;
+import static org.constellation.api.QueryConstants.ACCEPT_VERSIONS_PARAMETER;
+import static org.constellation.api.QueryConstants.REQUEST_PARAMETER;
+import static org.constellation.api.QueryConstants.SECTIONS_PARAMETER;
+import static org.constellation.api.QueryConstants.SERVICE_PARAMETER;
+import static org.constellation.api.QueryConstants.UPDATESEQUENCE_PARAMETER;
+import static org.constellation.api.QueryConstants.VERSION_PARAMETER;
+import static org.constellation.sos.ws.SOSConstants.ACCEPTED_OUTPUT_FORMATS;
+import static org.constellation.sos.ws.SOSConstants.FEATURE_OF_INTEREST;
+import static org.constellation.sos.ws.SOSConstants.OBSERVATION;
+import static org.constellation.sos.ws.SOSConstants.OBSERVATION_ID;
+import static org.constellation.sos.ws.SOSConstants.OBSERVED_PROPERTY;
+import static org.constellation.sos.ws.SOSConstants.OFFERING;
+import static org.constellation.sos.ws.SOSConstants.OM_NAMESPACE;
+import static org.constellation.sos.ws.SOSConstants.OUTPUT_FORMAT;
+import static org.constellation.sos.ws.SOSConstants.PROCEDURE;
+import static org.constellation.sos.ws.SOSConstants.PROCEDURE_DESCRIPTION_FORMAT;
+import static org.constellation.sos.ws.SOSConstants.RESPONSE_FORMAT;
+import static org.constellation.sos.ws.SOSConstants.RESPONSE_MODE;
+import static org.constellation.sos.ws.SOSConstants.RESULT_MODEL;
+import static org.constellation.sos.ws.SOSConstants.SRS_NAME;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.OPERATION_NOT_SUPPORTED;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildAcceptVersion;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildBBOX;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildDeleteSensor;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildDescribeSensor;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildGetCapabilities;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildGetFeatureOfInterest;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildGetObservation;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildGetObservationById;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildGetResult;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildGetResultTemplate;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildTimeDuring;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildTimeEquals;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildTimeInstant;
+import static org.geotoolkit.sos.xml.SOSXmlFactory.buildTimePeriod;
+
 // Jersey dependencies
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Response;
-import javax.inject.Singleton;
-
 //JAXB dependencies
-import javax.xml.namespace.QName;
-
 // Constellation dependencies
-import org.constellation.ServiceDef;
-import org.constellation.ServiceDef.Specification;
-import org.constellation.ws.ServiceConfigurer;
-import org.constellation.sos.configuration.SOSConfigurer;
-import org.constellation.sos.ws.SOSworker;
-import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.rs.OGCWebService;
-import org.constellation.ws.MimeType;
-import org.constellation.ws.UnauthorizedException;
-import org.constellation.ws.Worker;
-
-import static org.constellation.api.QueryConstants.*;
-import static org.constellation.sos.ws.SOSConstants.*;
-
 // Geotoolkit dependencies
-import org.geotoolkit.util.StringUtilities;
-import org.geotoolkit.ows.xml.RequestBase;
-import org.geotoolkit.ows.xml.v110.ExceptionReport;
-import org.geotoolkit.ows.xml.v110.SectionsType;
-import org.geotoolkit.ows.xml.AcceptFormats;
-import org.geotoolkit.ows.xml.AcceptVersions;
-import org.geotoolkit.ows.xml.Sections;
-import org.geotoolkit.ows.xml.OWSXmlFactory;
-import org.geotoolkit.swes.xml.DescribeSensor;
-import org.geotoolkit.swes.xml.InsertSensor;
-import org.geotoolkit.sos.xml.GetCapabilities;
-import org.geotoolkit.sos.xml.GetObservation;
-import org.geotoolkit.sos.xml.GetResult;
-import org.geotoolkit.sos.xml.InsertObservation;
-import org.geotoolkit.sos.xml.SOSMarshallerPool;
-import org.geotoolkit.sos.xml.SOSResponseWrapper;
-import org.geotoolkit.sos.xml.GetFeatureOfInterest;
-import org.geotoolkit.sos.xml.v100.GetFeatureOfInterestTime;
-import org.geotoolkit.sos.xml.GetObservationById;
-import org.geotoolkit.sos.xml.GetResultTemplate;
-import org.geotoolkit.sos.xml.InsertResult;
-import org.geotoolkit.sos.xml.InsertResultTemplate;
-import org.geotoolkit.sos.xml.ResponseModeType;
-import org.geotoolkit.swes.xml.DeleteSensor;
-
-import static org.geotoolkit.sos.xml.SOSXmlFactory.*;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-
-import org.opengis.observation.ObservationCollection;
-import org.opengis.filter.Filter;
-import org.opengis.filter.spatial.BBOX;
-import org.opengis.temporal.Instant;
-import org.opengis.temporal.Period;
 
 /**
  *

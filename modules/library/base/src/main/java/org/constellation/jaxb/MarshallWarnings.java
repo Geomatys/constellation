@@ -19,14 +19,14 @@
 
 package org.constellation.jaxb;
 
+import org.apache.sis.internal.storage.IOUtilities;
+import org.apache.sis.xml.MarshalContext;
+import org.apache.sis.xml.ValueConverter;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.sis.xml.MarshalContext;
-import org.apache.sis.xml.ValueConverter;
-import org.apache.sis.internal.storage.IOUtilities;
 
 /**
  *

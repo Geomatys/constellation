@@ -18,20 +18,6 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
-import static org.constellation.engine.register.jooq.Tables.DATA;
-import static org.constellation.engine.register.jooq.Tables.DATA_X_DOMAIN;
-import static org.constellation.engine.register.jooq.Tables.DOMAIN;
-import static org.constellation.engine.register.jooq.Tables.PROVIDER;
-import static org.constellation.engine.register.jooq.Tables.SERVICE_X_DOMAIN;
-import static org.constellation.engine.register.jooq.Tables.USER_X_DOMAIN_X_DOMAINROLE;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.tables.records.DataXDomainRecord;
@@ -46,6 +32,20 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static org.constellation.engine.register.jooq.Tables.DATA;
+import static org.constellation.engine.register.jooq.Tables.DATA_X_DOMAIN;
+import static org.constellation.engine.register.jooq.Tables.DOMAIN;
+import static org.constellation.engine.register.jooq.Tables.PROVIDER;
+import static org.constellation.engine.register.jooq.Tables.SERVICE_X_DOMAIN;
+import static org.constellation.engine.register.jooq.Tables.USER_X_DOMAIN_X_DOMAINROLE;
 
 @Component
 public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, Domain> implements DomainRepository {

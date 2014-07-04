@@ -18,8 +18,6 @@
  */
 package org.constellation.process.service;
 
-import java.util.List;
-import java.util.Set;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.SpringTestRunner;
@@ -27,11 +25,16 @@ import org.constellation.ws.WSEngine;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
-import static org.junit.Assert.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.NoSuchIdentifierException;
+
+import java.util.List;
+import java.util.Set;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  *

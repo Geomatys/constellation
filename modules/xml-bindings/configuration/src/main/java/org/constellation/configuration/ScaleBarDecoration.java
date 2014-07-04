@@ -18,16 +18,15 @@
  */
 package org.constellation.configuration;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.text.NumberFormat;
+import org.geotoolkit.display2d.ext.scalebar.DefaultScaleBarTemplate;
+import org.geotoolkit.display2d.ext.scalebar.ScaleBarTemplate;
+
 import javax.measure.unit.Unit;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import org.geotoolkit.display2d.ext.scalebar.DefaultScaleBarTemplate;
-import org.geotoolkit.display2d.ext.scalebar.ScaleBarTemplate;
+import java.awt.*;
+import java.text.NumberFormat;
 
 /**
  *

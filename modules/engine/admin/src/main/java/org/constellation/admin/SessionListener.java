@@ -18,11 +18,11 @@
  */
 package org.constellation.admin;
 
+import org.constellation.configuration.ConfigDirectory;
+
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
-
-import org.constellation.configuration.ConfigDirectory;
 
 
 

@@ -18,16 +18,20 @@
  */
 package org.constellation.provider.coveragesql;
 
+import org.apache.sis.storage.DataStore;
+import org.constellation.admin.dao.DataRecord;
 import org.constellation.provider.AbstractDataProvider;
 import org.constellation.provider.Data;
 import org.constellation.provider.configuration.ProviderParameters;
+import org.geotoolkit.coverage.CoverageReference;
+import org.geotoolkit.coverage.DefaultCoverageReference;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.sql.CoverageDatabase;
 import org.geotoolkit.coverage.sql.LayerCoverageReader;
 import org.geotoolkit.feature.type.DefaultName;
+import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.map.MapBuilder;
-import org.geotoolkit.feature.type.Name;
 import org.opengis.parameter.ParameterValueGroup;
 
 import java.sql.SQLException;
@@ -37,9 +41,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.apache.sis.storage.DataStore;
-import org.constellation.admin.dao.DataRecord;
 
 import static org.constellation.provider.configuration.ProviderParameters.LAYER_ELEVATION_MODEL_DESCRIPTOR;
 import static org.constellation.provider.configuration.ProviderParameters.LAYER_IS_ELEVATION_MODEL_DESCRIPTOR;
@@ -48,8 +49,6 @@ import static org.constellation.provider.configuration.ProviderParameters.getLay
 import static org.constellation.provider.configuration.ProviderParameters.isLoadAll;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.COVERAGESQL_DESCRIPTOR;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.NAMESPACE_DESCRIPTOR;
-import org.geotoolkit.coverage.CoverageReference;
-import org.geotoolkit.coverage.DefaultCoverageReference;
 import static org.geotoolkit.parameter.Parameters.value;
 
 /**

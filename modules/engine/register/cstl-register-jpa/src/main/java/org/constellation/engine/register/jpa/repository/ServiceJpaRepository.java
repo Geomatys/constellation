@@ -18,8 +18,6 @@
  */
 package org.constellation.engine.register.jpa.repository;
 
-import java.util.List;
-
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.ServiceMetaData;
 import org.constellation.engine.register.jpa.ServiceEntity;
@@ -27,6 +25,8 @@ import org.constellation.engine.register.repository.ServiceRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 public interface ServiceJpaRepository extends JpaRepository<ServiceEntity, Integer>, ServiceRepository {
     @Query("select s from ServiceEntity s join s.layers l join fetch s.extraConfig ec join fetch s.metaDatas m where l.data.id = ?1")

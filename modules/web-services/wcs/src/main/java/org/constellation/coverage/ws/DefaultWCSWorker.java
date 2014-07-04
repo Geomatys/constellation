@@ -19,21 +19,7 @@
 package org.constellation.coverage.ws;
 
 // J2SE dependencies
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.logging.Level;
+
 import org.apache.sis.geometry.GeneralEnvelope;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.xml.MarshallerPool;
@@ -41,8 +27,6 @@ import org.constellation.Cstl;
 import org.constellation.ServiceDef;
 import org.constellation.api.QueryConstants;
 import org.constellation.configuration.Layer;
-import static org.constellation.coverage.ws.WCSConstant.*;
-
 import org.constellation.dto.Details;
 import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.provider.CoverageData;
@@ -70,9 +54,6 @@ import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
 import org.geotoolkit.ows.xml.AbstractServiceIdentification;
 import org.geotoolkit.ows.xml.AbstractServiceProvider;
 import org.geotoolkit.ows.xml.AcceptFormats;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-
-// GeoAPI dependencies
 import org.geotoolkit.ows.xml.Sections;
 import org.geotoolkit.ows.xml.v110.BoundingBoxType;
 import org.geotoolkit.ows.xml.v110.SectionsType;
@@ -113,6 +94,54 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.logging.Level;
+
+import static org.constellation.coverage.ws.WCSConstant.ASCII_GRID;
+import static org.constellation.coverage.ws.WCSConstant.GEOTIFF;
+import static org.constellation.coverage.ws.WCSConstant.INTERPOLATION_V100;
+import static org.constellation.coverage.ws.WCSConstant.INTERPOLATION_V111;
+import static org.constellation.coverage.ws.WCSConstant.KEY_BBOX;
+import static org.constellation.coverage.ws.WCSConstant.KEY_COVERAGE;
+import static org.constellation.coverage.ws.WCSConstant.KEY_CRS;
+import static org.constellation.coverage.ws.WCSConstant.KEY_FORMAT;
+import static org.constellation.coverage.ws.WCSConstant.KEY_IDENTIFIER;
+import static org.constellation.coverage.ws.WCSConstant.KEY_INTERPOLATION;
+import static org.constellation.coverage.ws.WCSConstant.KEY_RESPONSE_CRS;
+import static org.constellation.coverage.ws.WCSConstant.KEY_SECTION;
+import static org.constellation.coverage.ws.WCSConstant.KEY_TIME;
+import static org.constellation.coverage.ws.WCSConstant.MATRIX;
+import static org.constellation.coverage.ws.WCSConstant.NETCDF;
+import static org.constellation.coverage.ws.WCSConstant.SUPPORTED_FORMATS_100;
+import static org.constellation.coverage.ws.WCSConstant.SUPPORTED_FORMATS_111;
+import static org.constellation.coverage.ws.WCSConstant.SUPPORTED_INTERPOLATIONS_V100;
+import static org.constellation.coverage.ws.WCSConstant.getOperationMetadata;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.CURRENT_UPDATE_SEQUENCE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_CRS;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_DIMENSION_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_FORMAT;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_UPDATE_SEQUENCE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.LAYER_NOT_DEFINED;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.LAYER_NOT_QUERYABLE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
+
+// GeoAPI dependencies
 
 
 /**

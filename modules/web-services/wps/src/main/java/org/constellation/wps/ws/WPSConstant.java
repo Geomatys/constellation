@@ -18,16 +18,13 @@
  */
 package org.constellation.wps.ws;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
 import org.constellation.dto.Details;
 import org.geotoolkit.ows.xml.AbstractContact;
 import org.geotoolkit.ows.xml.AbstractDCP;
 import org.geotoolkit.ows.xml.AbstractDomain;
+import org.geotoolkit.ows.xml.AbstractOnlineResourceType;
 import org.geotoolkit.ows.xml.AbstractOperation;
 import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
 import org.geotoolkit.ows.xml.AbstractResponsiblePartySubset;
@@ -37,8 +34,11 @@ import org.geotoolkit.ows.xml.OWSXmlFactory;
 import org.geotoolkit.wps.xml.WPSCapabilities;
 import org.geotoolkit.wps.xml.WPSXmlFactory;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
-import org.geotoolkit.ows.xml.AbstractOnlineResourceType;
 
 /**
  *  WPS Constants

@@ -19,20 +19,20 @@
 
 package org.constellation.metadata.index.analyzer;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-
 import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.util.logging.Logging;
 import org.constellation.util.Util;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.lucene.index.LuceneIndexSearcher;
-import org.apache.sis.util.logging.Logging;
 import org.opengis.filter.FilterFactory2;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 
 /**
  *

@@ -19,16 +19,6 @@
 
 package org.constellation.generic.database;
 
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import org.apache.sis.test.XMLComparator;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.configuration.SOSConfiguration;
@@ -37,9 +27,24 @@ import org.constellation.dto.Contact;
 import org.constellation.dto.Details;
 import org.constellation.dto.ObservationFilter;
 import org.constellation.dto.ParameterValues;
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.w3c.dom.Node;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  *

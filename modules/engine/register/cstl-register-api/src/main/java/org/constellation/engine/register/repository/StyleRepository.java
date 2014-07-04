@@ -18,12 +18,12 @@
  */
 package org.constellation.engine.register.repository;
 
-import java.util.List;
-
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Layer;
 import org.constellation.engine.register.Style;
 import org.constellation.engine.register.i18n.StyleWithI18N;
+
+import java.util.List;
 
 public interface StyleRepository {
 

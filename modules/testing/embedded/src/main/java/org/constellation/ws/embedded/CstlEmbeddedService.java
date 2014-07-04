@@ -18,20 +18,6 @@
  */
 package org.constellation.ws.embedded;
 
-import java.io.IOException;
-import java.net.URI;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.core.UriBuilder;
-import javax.xml.ws.Endpoint;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.ws.rs.CstlApplication;
 import org.constellation.ws.rs.jackson.JacksonFeature;
@@ -44,6 +30,22 @@ import org.glassfish.jersey.server.ApplicationHandler;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
+
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.core.UriBuilder;
+import javax.xml.ws.Endpoint;
+import java.io.IOException;
+import java.net.URI;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * An Abstract class to run the web service in an embedded container.

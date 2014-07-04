@@ -18,7 +18,43 @@
  */
 package org.constellation.provider.coveragesql;
 
-import java.awt.Dimension;
+import org.apache.sis.measure.MeasurementRange;
+import org.apache.sis.storage.DataStoreException;
+import org.constellation.ServiceDef;
+import org.constellation.provider.AbstractData;
+import org.constellation.provider.CoverageData;
+import org.constellation.provider.DataProviders;
+import org.constellation.provider.StyleProviders;
+import org.geotoolkit.coverage.DefaultCoverageReference;
+import org.geotoolkit.coverage.grid.GeneralGridGeometry;
+import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.io.CoverageStoreException;
+import org.geotoolkit.coverage.io.GridCoverageReadParam;
+import org.geotoolkit.coverage.io.GridCoverageReader;
+import org.geotoolkit.coverage.sql.Layer;
+import org.geotoolkit.coverage.sql.LayerCoverageReader;
+import org.geotoolkit.display.PortrayalException;
+import org.geotoolkit.display2d.ext.dimrange.DimRangeSymbolizer;
+import org.geotoolkit.display2d.ext.legend.LegendTemplate;
+import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.image.io.metadata.SpatialMetadata;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.map.CoverageMapLayer;
+import org.geotoolkit.map.ElevationModel;
+import org.geotoolkit.map.MapBuilder;
+import org.geotoolkit.map.MapLayer;
+import org.geotoolkit.style.MutableStyle;
+import org.geotoolkit.style.RandomStyleBuilder;
+import org.geotoolkit.util.DateRange;
+import org.opengis.geometry.Envelope;
+import org.opengis.style.FeatureTypeStyle;
+import org.opengis.style.RasterSymbolizer;
+import org.opengis.style.Rule;
+import org.opengis.style.ShadedRelief;
+import org.opengis.style.Style;
+import org.opengis.style.Symbolizer;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
@@ -29,47 +65,6 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
-
-import org.constellation.ServiceDef;
-import org.constellation.provider.AbstractData;
-import org.constellation.provider.CoverageData;
-import org.constellation.provider.DataProviders;
-import org.constellation.provider.StyleProviders;
-
-import org.geotoolkit.coverage.DefaultCoverageReference;
-import org.geotoolkit.coverage.grid.GeneralGridGeometry;
-import org.geotoolkit.coverage.grid.GridCoverage2D;
-import org.geotoolkit.coverage.io.CoverageStoreException;
-import org.geotoolkit.coverage.io.GridCoverageReadParam;
-import org.geotoolkit.coverage.io.GridCoverageReader;
-import org.geotoolkit.coverage.sql.Layer;
-import org.geotoolkit.coverage.sql.LayerCoverageReader;
-import org.apache.sis.storage.DataStoreException;
-import org.geotoolkit.display.PortrayalException;
-import org.geotoolkit.display2d.ext.dimrange.DimRangeSymbolizer;
-import org.geotoolkit.display2d.ext.legend.LegendTemplate;
-import org.geotoolkit.image.io.metadata.SpatialMetadata;
-import org.geotoolkit.internal.sql.table.Database;
-import org.geotoolkit.map.CoverageMapLayer;
-import org.geotoolkit.map.ElevationModel;
-import org.geotoolkit.map.MapBuilder;
-import org.geotoolkit.map.MapLayer;
-import org.apache.sis.metadata.iso.extent.DefaultGeographicBoundingBox;
-import org.geotoolkit.style.MutableStyle;
-import org.geotoolkit.util.DateRange;
-import org.apache.sis.measure.MeasurementRange;
-import org.geotoolkit.style.RandomStyleBuilder;
-
-import org.geotoolkit.feature.type.Name;
-import org.opengis.geometry.Envelope;
-import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.opengis.referencing.operation.TransformException;
-import org.opengis.style.FeatureTypeStyle;
-import org.opengis.style.RasterSymbolizer;
-import org.opengis.style.Rule;
-import org.opengis.style.ShadedRelief;
-import org.opengis.style.Style;
-import org.opengis.style.Symbolizer;
 
 
 /**

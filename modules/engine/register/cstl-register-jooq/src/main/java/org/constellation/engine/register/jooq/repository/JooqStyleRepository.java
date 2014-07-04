@@ -1,16 +1,12 @@
 package org.constellation.engine.register.jooq.repository;
 
-import java.util.List;
-
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Layer;
 import org.constellation.engine.register.Style;
 import org.constellation.engine.register.StyleI18n;
-
-import static org.constellation.engine.register.jooq.Tables.STYLE;
-import static org.constellation.engine.register.jooq.Tables.STYLED_DATA;
-import static org.constellation.engine.register.jooq.Tables.STYLED_LAYER;
-
 import org.constellation.engine.register.i18n.StyleWithI18N;
 import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.tables.records.StyleRecord;
@@ -22,9 +18,11 @@ import org.jooq.Record;
 import org.jooq.Result;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
+import java.util.List;
+
+import static org.constellation.engine.register.jooq.Tables.STYLE;
+import static org.constellation.engine.register.jooq.Tables.STYLED_DATA;
+import static org.constellation.engine.register.jooq.Tables.STYLED_LAYER;
 
 @Component
 public class JooqStyleRepository extends AbstractJooqRespository<StyleRecord, Style> implements StyleRepository {

@@ -19,11 +19,7 @@
 
 package org.constellation.admin;
 
-import java.util.HashSet;
-import java.util.logging.Logger;
-
-import javax.inject.Inject;
-
+import com.google.common.base.Optional;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -40,7 +36,9 @@ import org.constellation.engine.register.User;
 import org.constellation.engine.register.repository.UserRepository;
 import org.mdweb.model.auth.MDwebRole;
 
-import com.google.common.base.Optional;
+import javax.inject.Inject;
+import java.util.HashSet;
+import java.util.logging.Logger;
 
 /**
  * 

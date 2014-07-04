@@ -17,25 +17,20 @@ package org.constellation.engine.register.jooq;
  *    Lesser General Public License for more details.
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.sql.DataSource;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.sis.util.Static;
 import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
+
+import javax.sql.DataSource;
+import java.io.File;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Constellation embedded administration database class.

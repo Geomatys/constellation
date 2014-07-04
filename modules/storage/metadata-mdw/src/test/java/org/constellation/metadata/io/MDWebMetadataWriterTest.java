@@ -21,12 +21,28 @@
 package org.constellation.metadata.io;
 
 
-import java.io.File;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.sql.Connection;
-import java.util.TimeZone;
+import org.apache.sis.internal.jaxb.LegacyNamespaces;
+import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.test.XMLComparator;
+import org.apache.sis.xml.MarshallerPool;
+import org.apache.sis.xml.XML;
+import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
+import org.constellation.jaxb.MarshallWarnings;
+import org.constellation.test.utils.Order;
+import org.constellation.test.utils.TestRunner;
+import org.constellation.util.Util;
+import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
+import org.geotoolkit.internal.sql.DefaultDataSource;
+import org.geotoolkit.lang.Setup;
+import org.geotoolkit.util.sql.DerbySqlScriptRunner;
+import org.geotoolkit.xml.AnchoredMarshallerPool;
+import org.junit.runner.RunWith;
+import org.mdweb.model.storage.FullRecord;
+import org.mdweb.model.storage.LinkedValue;
+import org.mdweb.model.storage.Value;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -39,36 +55,14 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.File;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.sql.Connection;
+import java.util.TimeZone;
 
-import org.apache.sis.internal.jaxb.LegacyNamespaces;
-import org.apache.sis.metadata.iso.DefaultMetadata;
-import org.apache.sis.xml.MarshallerPool;
-import org.apache.sis.test.XMLComparator;
-import org.apache.sis.xml.XML;
-
-import org.constellation.generic.database.Automatic;
-import org.constellation.generic.database.BDD;
-import org.constellation.jaxb.MarshallWarnings;
-import org.constellation.util.Util;
-import org.constellation.test.utils.Order;
-import org.constellation.test.utils.TestRunner;
-
-import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
-import org.geotoolkit.internal.sql.DefaultDataSource;
-import org.geotoolkit.lang.Setup;
-import org.geotoolkit.xml.AnchoredMarshallerPool;
-import org.geotoolkit.util.sql.DerbySqlScriptRunner;
-
-import org.mdweb.model.storage.FullRecord;
-import org.mdweb.model.storage.LinkedValue;
-import org.mdweb.model.storage.Value;
-
-import org.junit.*;
-import org.junit.runner.RunWith;
 import static org.junit.Assert.*;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
 /**
  *

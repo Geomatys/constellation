@@ -18,12 +18,12 @@
  */
 package org.constellation.provider;
 
-import java.util.logging.Logger;
-import org.constellation.provider.configuration.ProviderParameters;
-import org.geotoolkit.parameter.Parameters;
 import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.parameter.Parameters;
 import org.opengis.metadata.quality.ConformanceResult;
 import org.opengis.parameter.ParameterValueGroup;
+
+import java.util.logging.Logger;
 
 /**
  *

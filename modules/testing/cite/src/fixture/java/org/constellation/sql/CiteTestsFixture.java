@@ -20,7 +20,7 @@ package org.constellation.sql;
 
 import com.greenpepper.interpreter.flow.scenario.Check;
 import com.greenpepper.interpreter.flow.scenario.Display;
-import com.greenpepper.interpreter.flow.scenario.Given;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;

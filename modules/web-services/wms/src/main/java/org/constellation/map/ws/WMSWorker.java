@@ -19,22 +19,23 @@
 package org.constellation.map.ws;
 
 //J2SE dependencies
+
+import org.constellation.portrayal.internal.PortrayalResponse;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.Worker;
+import org.geotoolkit.sld.xml.GetLegendGraphic;
+import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
+import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
+import org.geotoolkit.wms.xml.DescribeLayer;
+import org.geotoolkit.wms.xml.GetCapabilities;
+import org.geotoolkit.wms.xml.GetFeatureInfo;
+import org.geotoolkit.wms.xml.GetMap;
+
 import java.awt.image.BufferedImage;
 import java.util.Map;
 
 //Constellation dependencies
-import org.constellation.portrayal.internal.PortrayalResponse;
-import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.Worker;
-
 //Geotoolkit dependencies
-import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
-import org.geotoolkit.wms.xml.DescribeLayer;
-import org.geotoolkit.wms.xml.GetCapabilities;
-import org.geotoolkit.wms.xml.GetMap;
-import org.geotoolkit.wms.xml.GetFeatureInfo;
-import org.geotoolkit.sld.xml.GetLegendGraphic;
-import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
 
 
 /**

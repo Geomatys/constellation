@@ -21,7 +21,6 @@ package org.constellation.gui.util;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.constellation.configuration.StyleBrief;
-import org.constellation.dto.StyleBean;
 
 import java.util.Comparator;
 

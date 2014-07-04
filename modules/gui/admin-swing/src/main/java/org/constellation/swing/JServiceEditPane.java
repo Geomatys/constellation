@@ -19,12 +19,13 @@
 
 package org.constellation.swing;
 
-import java.awt.BorderLayout;
-import java.io.IOException;
 import org.constellation.ServiceDef;
 import org.constellation.admin.service.ConstellationClient;
 import org.constellation.configuration.Instance;
 import org.openide.util.Exceptions;
+
+import java.awt.*;
+import java.io.IOException;
 
 /**
  * Edit a service.

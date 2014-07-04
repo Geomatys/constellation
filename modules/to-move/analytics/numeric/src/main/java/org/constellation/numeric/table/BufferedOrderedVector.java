@@ -19,17 +19,18 @@
 package org.constellation.numeric.table;
 
 // J2SE dependencies
-import java.util.Arrays;
-import java.nio.DoubleBuffer;
-import java.lang.reflect.Field;
 
-// Static imports
-import static java.lang.Math.abs;
+import java.lang.reflect.Field;
+import java.nio.DoubleBuffer;
+import java.util.Arrays;
+
 import static java.lang.Double.NaN;
 import static java.lang.Double.isNaN;
 import static java.lang.System.arraycopy;
-import static org.constellation.numeric.table.DataOrder.*;
 import static org.apache.sis.util.ArraysExt.isSorted;
+import static org.constellation.numeric.table.DataOrder.*;
+
+// Static imports
 
 
 /**

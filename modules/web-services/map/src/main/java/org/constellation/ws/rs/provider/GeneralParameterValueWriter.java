@@ -18,21 +18,22 @@
  */
 package org.constellation.ws.rs.provider;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.xml.parameter.ParameterValueWriter;
+import org.opengis.parameter.GeneralParameterValue;
+
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.xml.stream.XMLStreamException;
-import org.apache.sis.util.logging.Logging;
-import org.geotoolkit.xml.parameter.ParameterValueWriter;
-import org.opengis.parameter.GeneralParameterValue;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *

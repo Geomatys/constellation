@@ -19,14 +19,16 @@
 package org.constellation.observation.fishery.sql;
 
 // SQL dependencies
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
-// Constellation dependencies
 import org.constellation.catalog.ConfigurationKey;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.Query;
 import org.constellation.catalog.SingletonTable;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+// Constellation dependencies
 
 
 /**

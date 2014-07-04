@@ -25,7 +25,6 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.RefAddr;
 import javax.naming.Reference;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;

@@ -19,13 +19,13 @@
 package org.constellation.gui.map;
 
 // Geometry
-import java.awt.Shape;
-import java.awt.Rectangle;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.PathIterator;
+
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.IllegalPathStateException;
+import java.awt.geom.PathIterator;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 
 /**

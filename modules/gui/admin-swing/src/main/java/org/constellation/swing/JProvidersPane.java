@@ -18,10 +18,23 @@
  */
 package org.constellation.swing;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Font;
+import org.constellation.admin.service.ConstellationClient;
+import org.constellation.configuration.ProviderReport;
+import org.constellation.configuration.ProviderServiceReport;
+import org.constellation.configuration.ProvidersReport;
+import org.constellation.security.RoleController;
+import org.constellation.swing.action.Action;
+import org.constellation.swing.action.ActionEditor;
+import org.constellation.swing.action.ActionRenderer;
+import org.jdesktop.swingx.JXTable;
+import org.openide.util.Exceptions;
+
+import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableModel;
+import javax.swing.tree.DefaultMutableTreeNode;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -34,27 +47,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JToggleButton;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableModel;
-import javax.swing.tree.DefaultMutableTreeNode;
-import org.constellation.admin.service.ConstellationClient;
-import org.constellation.configuration.ProviderReport;
-import org.constellation.configuration.ProviderServiceReport;
-import org.constellation.configuration.ProvidersReport;
-import org.constellation.security.RoleController;
-import static org.constellation.security.ActionPermissions.*;
-import org.constellation.swing.action.Action;
-import org.constellation.swing.action.ActionEditor;
-import org.constellation.swing.action.ActionRenderer;
-import org.jdesktop.swingx.JXTable;
-import org.openide.util.Exceptions;
+
+import static org.constellation.security.ActionPermissions.NEW_PROVIDER;
 
 /**
  * Top component to manage constellation providers.

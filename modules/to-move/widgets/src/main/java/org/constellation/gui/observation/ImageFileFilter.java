@@ -19,27 +19,28 @@
 package org.constellation.gui.observation;
 
 // Collections
-import java.util.List;
-import java.util.Locale;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.ArrayList;
-import java.util.Comparator;
 
-// Other J2SE dependencies
-import java.io.File;
-import java.io.IOException;
+import org.geotoolkit.util.Utilities;
+
+import javax.imageio.IIOException;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageWriter;
-import javax.imageio.IIOException;
 import javax.imageio.spi.IIORegistry;
 import javax.imageio.spi.ImageReaderSpi;
-import javax.imageio.spi.ImageWriterSpi;
 import javax.imageio.spi.ImageReaderWriterSpi;
+import javax.imageio.spi.ImageWriterSpi;
 import javax.swing.filechooser.FileFilter;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
 
+// Other J2SE dependencies
 // Geotools dependencies
-import org.geotoolkit.util.Utilities;
 
 
 /**

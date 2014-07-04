@@ -19,27 +19,6 @@
 
 package org.constellation.rest.api;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
-import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.DataBusiness;
 import org.constellation.configuration.AcknowlegementType;
@@ -61,7 +40,6 @@ import org.constellation.provider.DataProviderFactory;
 import org.constellation.provider.ProviderFactory;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviderFactory;
-import static org.constellation.utils.RESTfulUtilities.ok;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.process.ProcessDescriptor;
@@ -72,6 +50,30 @@ import org.opengis.parameter.InvalidParameterValueException;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.NoSuchIdentifierException;
+
+import javax.inject.Inject;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
+
+import static org.constellation.utils.RESTfulUtilities.ok;
 
 /**
  *

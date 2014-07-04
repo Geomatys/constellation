@@ -19,18 +19,18 @@
 
 package org.constellation.ws.rs.provider;
 
-import java.awt.image.RenderedImage;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
+import org.geotoolkit.util.ImageIOUtilities;
+
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-
-import org.geotoolkit.util.ImageIOUtilities;
+import java.awt.image.RenderedImage;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 
 @Provider
 public class RenderedImageWriter<T extends RenderedImage> implements MessageBodyWriter<T> {

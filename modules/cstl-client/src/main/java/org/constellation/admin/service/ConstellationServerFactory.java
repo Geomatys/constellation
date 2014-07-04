@@ -18,10 +18,11 @@
  */
 package org.constellation.admin.service;
 
-import org.geotoolkit.client.AbstractClientFactory;
 import org.apache.sis.metadata.iso.DefaultIdentifier;
 import org.apache.sis.metadata.iso.citation.DefaultCitation;
 import org.apache.sis.metadata.iso.identification.DefaultServiceIdentification;
+import org.apache.sis.storage.DataStoreException;
+import org.geotoolkit.client.AbstractClientFactory;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.opengis.metadata.Identifier;
@@ -31,7 +32,6 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
 import java.util.Collections;
-import org.apache.sis.storage.DataStoreException;
 
 /**
  *

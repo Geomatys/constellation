@@ -24,8 +24,10 @@ import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 
+import static org.constellation.process.service.RestartServiceDescriptor.CLOSE;
+import static org.constellation.process.service.RestartServiceDescriptor.IDENTIFIER;
+import static org.constellation.process.service.RestartServiceDescriptor.SERVICE_TYPE;
 import static org.geotoolkit.parameter.Parameters.value;
-import static org.constellation.process.service.RestartServiceDescriptor.*;
 
 /**
  * Restart an instance for the specified WMS identifier. Or all instances if identifier is not specified.

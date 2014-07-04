@@ -18,11 +18,12 @@
  */
 package org.constellation.configuration;
 
+import org.geotoolkit.display2d.ext.text.DefaultTextTemplate;
+import org.geotoolkit.display2d.ext.text.TextTemplate;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import org.geotoolkit.display2d.ext.text.DefaultTextTemplate;
-import org.geotoolkit.display2d.ext.text.TextTemplate;
 
 /**
  *

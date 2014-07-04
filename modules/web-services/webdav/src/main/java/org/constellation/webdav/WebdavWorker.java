@@ -20,13 +20,14 @@ package org.constellation.webdav;
 
 import com.bradmcevoy.common.Path;
 import com.bradmcevoy.http.Resource;
-import java.io.File;
-import java.util.logging.Level;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef;
-import org.constellation.configuration.WebdavContext;
 import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.WebdavContext;
 import org.constellation.ws.AbstractWorker;
+
+import java.io.File;
+import java.util.logging.Level;
 
 /**
  *

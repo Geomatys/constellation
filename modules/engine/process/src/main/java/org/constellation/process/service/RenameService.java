@@ -19,15 +19,16 @@
 
 package org.constellation.process.service;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.process.AbstractCstlProcess;
-import static org.constellation.process.service.RenameServiceDescriptor.*;
-import static org.geotoolkit.parameter.Parameters.*;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
+
+import static org.constellation.process.service.RenameServiceDescriptor.IDENTIFIER;
+import static org.constellation.process.service.RenameServiceDescriptor.NEW_NAME;
+import static org.constellation.process.service.RenameServiceDescriptor.SERVICE_TYPE;
+import static org.geotoolkit.parameter.Parameters.value;
 
 /**
  *

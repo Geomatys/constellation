@@ -20,60 +20,31 @@
 package org.constellation.metadata;
 
 // J2SE dependencies
-import java.io.StringWriter;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.logging.Level;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.TimeZone;
 
-// JAXB dependencies
-import java.util.logging.Logger;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-// constellation dependencies
+import org.apache.sis.metadata.iso.DefaultExtendedElementInformation;
+import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.metadata.iso.extent.DefaultGeographicBoundingBox;
+import org.apache.sis.test.XMLComparator;
+import org.apache.sis.util.ComparisonMode;
+import org.apache.sis.util.iso.SimpleInternationalString;
+import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
+import org.apache.sis.xml.Namespaces;
+import org.apache.sis.xml.XML;
+import org.constellation.util.NodeUtilities;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
-import static org.constellation.test.utils.MetadataUtilities.*;
-import static org.constellation.metadata.CSWConstants.*;
-
-// geotoolkit dependencies
-import org.geotoolkit.ogc.xml.v110.FilterType;
-import org.apache.sis.metadata.iso.DefaultMetadata;
-import org.apache.sis.metadata.iso.DefaultExtendedElementInformation;
-import org.geotoolkit.metadata.iso.citation.DefaultResponsibleParty;
-import org.apache.sis.metadata.iso.extent.DefaultGeographicBoundingBox;
-import org.apache.sis.test.XMLComparator;
-import org.geotoolkit.ogc.xml.v110.SortByType;
-import org.geotoolkit.ogc.xml.v110.SortOrderType;
-import org.geotoolkit.ogc.xml.v110.SortPropertyType;
-import org.geotoolkit.ows.xml.v100.AcceptFormatsType;
-import org.geotoolkit.ows.xml.v100.AcceptVersionsType;
-import org.geotoolkit.ows.xml.v100.SectionsType;
-import org.geotoolkit.csw.xml.DomainValues;
-import org.geotoolkit.csw.xml.GetDomainResponse;
-import org.geotoolkit.csw.xml.ElementSetType;
-import org.geotoolkit.csw.xml.GetRecordByIdResponse;
-import org.geotoolkit.csw.xml.ResultType;
-import org.geotoolkit.csw.xml.v202.AcknowledgementType;
-import org.geotoolkit.csw.xml.v202.GetRecordsResponseType;
-import org.geotoolkit.csw.xml.v202.BriefRecordType;
 import org.geotoolkit.csw.xml.AbstractCapabilities;
 import org.geotoolkit.csw.xml.DescribeRecordResponse;
+import org.geotoolkit.csw.xml.DomainValues;
+import org.geotoolkit.csw.xml.ElementSetType;
+import org.geotoolkit.csw.xml.GetDomainResponse;
+import org.geotoolkit.csw.xml.GetRecordByIdResponse;
+import org.geotoolkit.csw.xml.ResultType;
 import org.geotoolkit.csw.xml.TransactionResponse;
+import org.geotoolkit.csw.xml.v202.AcknowledgementType;
+import org.geotoolkit.csw.xml.v202.BriefRecordType;
 import org.geotoolkit.csw.xml.v202.DeleteType;
 import org.geotoolkit.csw.xml.v202.DescribeRecordType;
 import org.geotoolkit.csw.xml.v202.DomainValuesType;
@@ -83,6 +54,7 @@ import org.geotoolkit.csw.xml.v202.GetDomainResponseType;
 import org.geotoolkit.csw.xml.v202.GetDomainType;
 import org.geotoolkit.csw.xml.v202.GetRecordByIdResponseType;
 import org.geotoolkit.csw.xml.v202.GetRecordByIdType;
+import org.geotoolkit.csw.xml.v202.GetRecordsResponseType;
 import org.geotoolkit.csw.xml.v202.GetRecordsType;
 import org.geotoolkit.csw.xml.v202.InsertType;
 import org.geotoolkit.csw.xml.v202.ListOfValuesType;
@@ -95,40 +67,82 @@ import org.geotoolkit.csw.xml.v202.TransactionType;
 import org.geotoolkit.csw.xml.v202.UpdateType;
 import org.geotoolkit.ebrim.xml.v250.ExtrinsicObjectType;
 import org.geotoolkit.ebrim.xml.v300.RegistryPackageType;
+import org.geotoolkit.metadata.iso.citation.DefaultResponsibleParty;
+import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.LiteralType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsEqualToType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsLessThanOrEqualToType;
 import org.geotoolkit.ogc.xml.v110.PropertyNameType;
-import org.apache.sis.util.logging.Logging;
-import org.geotoolkit.xml.AnchoredMarshallerPool;
-import org.apache.sis.util.iso.SimpleInternationalString;
-import org.apache.sis.xml.MarshallerPool;
-import org.apache.sis.xml.Namespaces;
-import org.apache.sis.util.ComparisonMode;
-import org.apache.sis.xml.XML;
-import org.constellation.util.NodeUtilities;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory.*;
-import static org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory.*;
-import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
-import static org.geotoolkit.csw.xml.TypeNames.*;
+import org.geotoolkit.ogc.xml.v110.SortByType;
+import org.geotoolkit.ogc.xml.v110.SortOrderType;
+import org.geotoolkit.ogc.xml.v110.SortPropertyType;
+import org.geotoolkit.ows.xml.v100.AcceptFormatsType;
+import org.geotoolkit.ows.xml.v100.AcceptVersionsType;
+import org.geotoolkit.ows.xml.v100.SectionsType;
 import org.geotoolkit.temporal.object.TemporalUtilities;
-
-// GeoAPI dependencies
+import org.geotoolkit.xml.AnchoredMarshallerPool;
+import org.junit.Ignore;
 import org.opengis.metadata.Datatype;
 import org.opengis.metadata.ExtendedElementInformation;
 import org.opengis.metadata.citation.Role;
-
-// JUnit dependencies
-import org.junit.Ignore;
-import static org.junit.Assert.*;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.StringWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.TimeZone;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.constellation.metadata.CSWConstants.OUTPUT_SCHEMA;
+import static org.constellation.metadata.CSWConstants.PARAMETERNAME;
+import static org.constellation.metadata.CSWConstants.TYPENAMES;
+import static org.constellation.test.utils.MetadataUtilities.ebrimEquals;
+import static org.constellation.test.utils.MetadataUtilities.metadataEquals;
+import static org.geotoolkit.csw.xml.TypeNames.CAPABILITIES_QNAME;
+import static org.geotoolkit.csw.xml.TypeNames.EXTRINSIC_OBJECT_25_QNAME;
+import static org.geotoolkit.csw.xml.TypeNames.EXTRINSIC_OBJECT_QNAME;
+import static org.geotoolkit.csw.xml.TypeNames.ISO_TYPE_NAMES;
+import static org.geotoolkit.csw.xml.TypeNames.METADATA_QNAME;
+import static org.geotoolkit.csw.xml.TypeNames.RECORD_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Date_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Format_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Identifier_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Subject_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory._Modified_QNAME;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
+import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+// JAXB dependencies
+// constellation dependencies
+// geotoolkit dependencies
+// GeoAPI dependencies
+// JUnit dependencies
 
 /**
  * Test the different methods of CSWWorker with a FileSystem reader/writer.

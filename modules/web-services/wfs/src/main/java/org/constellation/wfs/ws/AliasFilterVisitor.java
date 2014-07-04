@@ -19,12 +19,13 @@
 
 package org.constellation.wfs.ws;
 
+import org.geotoolkit.filter.visitor.DuplicatingFilterVisitor;
+import org.opengis.filter.expression.PropertyName;
+
+import javax.xml.namespace.QName;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.xml.namespace.QName;
-import org.geotoolkit.filter.visitor.DuplicatingFilterVisitor;
-import org.opengis.filter.expression.PropertyName;
 
 /**
  *

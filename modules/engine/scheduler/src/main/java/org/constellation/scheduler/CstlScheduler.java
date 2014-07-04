@@ -18,19 +18,6 @@
  */
 package org.constellation.scheduler;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.EventListener;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.swing.event.EventListenerList;
-import javax.xml.stream.XMLStreamException;
-
 import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.scheduler.configuration.XMLTaskConfigurator;
@@ -46,7 +33,18 @@ import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
 
-import static org.quartz.impl.matchers.EverythingMatcher.*;
+import javax.swing.event.EventListenerList;
+import javax.xml.stream.XMLStreamException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.quartz.impl.matchers.EverythingMatcher.allJobs;
 
 /**
  * Constellation can run tasks at regular intervals. 

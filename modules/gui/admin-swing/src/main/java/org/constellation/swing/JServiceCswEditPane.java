@@ -19,8 +19,15 @@
 
 package org.constellation.swing;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import org.constellation.admin.service.ConstellationClient;
+import org.constellation.configuration.AbstractConfigurationObject;
+import org.constellation.configuration.DataSourceType;
+import org.constellation.configuration.Instance;
+import org.constellation.generic.database.Automatic;
+import org.openide.util.Exceptions;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -28,21 +35,6 @@ import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.GroupLayout;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.LayoutStyle;
-import org.constellation.admin.service.ConstellationClient;
-import org.constellation.configuration.AbstractConfigurationObject;
-import org.constellation.configuration.DataSourceType;
-import org.constellation.configuration.Instance;
-import org.constellation.generic.database.Automatic;
-import static org.constellation.swing.JServiceEditionPane.LOGGER;
-import org.openide.util.Exceptions;
 
 /**
  *

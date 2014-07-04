@@ -19,8 +19,6 @@
 package org.constellation.wfs.ws;
 
 import com.vividsolutions.jts.geom.Geometry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.geotoolkit.filter.visitor.DuplicatingFilterVisitor;
 import org.geotoolkit.filter.visitor.FillCrsVisitor;
 import org.geotoolkit.geometry.DefaultBoundingBox;
@@ -33,6 +31,9 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *

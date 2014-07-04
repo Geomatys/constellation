@@ -18,18 +18,17 @@
  */
 package org.constellation.portrayal;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
 import org.constellation.provider.Data;
-
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapItem;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.style.MutableStyle;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 
 /**

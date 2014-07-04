@@ -18,16 +18,7 @@
  */
 package org.constellation.process.service;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.nio.charset.Charset;
-import java.util.Collection;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.xml.namespace.QName;
 import org.constellation.configuration.ConfigurationException;
-
 import org.constellation.configuration.GetFeatureInfoCfg;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerContext;
@@ -35,8 +26,8 @@ import org.constellation.map.featureinfo.CSVFeatureInfoFormat;
 import org.constellation.map.featureinfo.FeatureInfoUtilities;
 import org.constellation.process.ConstellationProcessFactory;
 import org.constellation.provider.DataProvider;
-import org.constellation.provider.DataProviders;
 import org.constellation.provider.DataProviderFactory;
+import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.util.DataReference;
@@ -46,14 +37,28 @@ import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.util.FileUtilities;
 import org.junit.AfterClass;
-import org.junit.Test;
-import static org.junit.Assert.*;
 import org.junit.BeforeClass;
+import org.junit.Test;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.NoSuchIdentifierException;
+
+import javax.xml.namespace.QName;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.nio.charset.Charset;
+import java.util.Collection;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  *

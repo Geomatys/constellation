@@ -18,14 +18,13 @@
  */
 package org.constellation.ws.embedded;
 
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.sis.util.logging.Logging;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.logging.Logger;
-
-import org.apache.maven.plugin.MojoFailureException;
-
-import org.apache.sis.util.logging.Logging;
 
 
 /**

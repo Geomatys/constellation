@@ -20,14 +20,6 @@
 package org.constellation.sos.configuration;
 
 import com.sun.istack.logging.Logger;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.util.Properties;
-import java.util.logging.Level;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import org.constellation.engine.template.TemplateEngine;
 import org.constellation.engine.template.TemplateEngineException;
 import org.constellation.engine.template.TemplateEngineFactory;
@@ -35,6 +27,15 @@ import org.constellation.util.Util;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
 import org.geotoolkit.util.FileUtilities;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.util.Properties;
+import java.util.logging.Level;
 
 /**
  *

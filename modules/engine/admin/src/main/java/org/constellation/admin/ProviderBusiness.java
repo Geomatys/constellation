@@ -1,22 +1,10 @@
 package org.constellation.admin;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
-import javax.inject.Inject;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.admin.util.IOUtilities;
 import org.constellation.engine.register.Data;
-import org.constellation.engine.register.MetadataIOUtils;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.Style;
 import org.constellation.engine.register.repository.ProviderRepository;
@@ -24,6 +12,16 @@ import org.constellation.utils.ISOMarshallerPool;
 import org.opengis.parameter.GeneralParameterValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class ProviderBusiness {

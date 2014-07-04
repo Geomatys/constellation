@@ -19,15 +19,17 @@
 package org.constellation.observation.fishery.sql;
 
 // J2SE dependencies
+
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.ConfigurationKey;
+import org.constellation.catalog.Database;
+import org.constellation.catalog.SingletonTable;
+import org.constellation.sampling.SamplingFeatureTable;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 // Constellation dependencies
-import org.constellation.catalog.ConfigurationKey;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.SingletonTable;
-import org.constellation.catalog.CatalogException;
-import org.constellation.sampling.SamplingFeatureTable;
 
 
 /**

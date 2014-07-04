@@ -19,23 +19,20 @@
 
 package org.constellation.ws.rs.provider;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import java.util.logging.Logger;
+import org.geotoolkit.sld.xml.StyleXmlIO;
+import org.opengis.sld.StyledLayerDescriptor;
+import org.opengis.style.Style;
+
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBException;
-
-import org.geotoolkit.sld.xml.StyleXmlIO;
-import org.apache.sis.util.logging.Logging;
-
-import org.opengis.sld.StyledLayerDescriptor;
-import org.opengis.style.Style;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 
 /**
  * Write a SLD/Style response in the stream.

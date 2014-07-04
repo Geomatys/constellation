@@ -19,11 +19,12 @@
 
 package org.constellation.ws;
 
+import org.apache.sis.util.Version;
+import org.constellation.ServiceDef;
+
+import javax.xml.validation.Schema;
 import java.util.List;
 import java.util.logging.Level;
-import javax.xml.validation.Schema;
-import org.constellation.ServiceDef;
-import org.apache.sis.util.Version;
 
 /**
  * Generic definition of a worker.

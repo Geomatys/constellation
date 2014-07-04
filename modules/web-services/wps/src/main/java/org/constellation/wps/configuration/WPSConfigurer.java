@@ -19,7 +19,6 @@
 
 package org.constellation.wps.configuration;
 
-import org.constellation.configuration.ProcessContext;
 import org.constellation.ogc.configuration.OGCConfigurer;
 
 /**

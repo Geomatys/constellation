@@ -19,13 +19,11 @@
 
 package org.constellation.swing;
 
-import java.util.ResourceBundle;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.GroupLayout;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.generic.database.Automatic;
+
+import javax.swing.*;
+import java.util.ResourceBundle;
 
 /**
  *

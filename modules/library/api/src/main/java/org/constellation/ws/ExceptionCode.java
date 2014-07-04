@@ -18,9 +18,10 @@
  */
 package org.constellation.ws;
 
+import org.opengis.util.CodeList;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.opengis.util.CodeList;
 
 
 /**

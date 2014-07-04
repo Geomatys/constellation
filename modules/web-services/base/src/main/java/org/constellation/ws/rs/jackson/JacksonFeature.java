@@ -18,11 +18,12 @@
  */
 package org.constellation.ws.rs.jackson;
 
+import org.glassfish.jersey.CommonProperties;
+
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
-import org.glassfish.jersey.CommonProperties;
 
 
 /**

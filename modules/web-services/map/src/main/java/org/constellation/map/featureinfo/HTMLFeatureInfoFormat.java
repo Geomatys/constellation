@@ -19,29 +19,34 @@
 package org.constellation.map.featureinfo;
 
 import org.constellation.ws.MimeType;
+import org.geotoolkit.coverage.GridSampleDimension;
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.display2d.canvas.RenderingContext2D;
+import org.geotoolkit.display2d.primitive.ProjectedCoverage;
 import org.geotoolkit.display2d.primitive.ProjectedFeature;
 import org.geotoolkit.display2d.primitive.SearchAreaJ2D;
 import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
-
-import org.geotoolkit.map.FeatureMapLayer;
-import org.geotoolkit.ows.xml.GetFeatureInfo;
+import org.geotoolkit.feature.ComplexAttribute;
 import org.geotoolkit.feature.Feature;
 import org.geotoolkit.feature.Property;
-import org.geotoolkit.feature.type.PropertyDescriptor;
-
-import java.awt.Rectangle;
-import java.lang.reflect.Array;
-import java.util.*;
-import javax.measure.unit.Unit;
-import org.geotoolkit.coverage.GridSampleDimension;
-import org.geotoolkit.display2d.primitive.ProjectedCoverage;
-import org.geotoolkit.feature.ComplexAttribute;
 import org.geotoolkit.feature.type.FeatureType;
+import org.geotoolkit.feature.type.PropertyDescriptor;
+import org.geotoolkit.map.FeatureMapLayer;
+import org.geotoolkit.ows.xml.GetFeatureInfo;
 import org.opengis.util.InternationalString;
+
+import javax.measure.unit.Unit;
+import java.awt.*;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A generic FeatureInfoFormat that produce HTML output for Features and Coverages.

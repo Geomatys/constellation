@@ -19,9 +19,11 @@
 package org.constellation.observation.fishery;
 
 // J2SE dependencies
-import java.awt.Color;
-import java.util.Locale;
+
 import org.opengis.observation.Phenomenon;
+
+import java.awt.*;
+import java.util.Locale;
 
 
 /**

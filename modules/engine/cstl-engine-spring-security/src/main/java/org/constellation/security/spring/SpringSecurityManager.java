@@ -18,20 +18,18 @@
  */
 package org.constellation.security.spring;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import org.constellation.security.IncorrectCredentialsException;
 import org.constellation.security.NoSecurityManagerException;
 import org.constellation.security.SecurityManager;
 import org.constellation.security.UnknownAccountException;
-import org.springframework.security.access.intercept.RunAsUserToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * 

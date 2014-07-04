@@ -1,9 +1,9 @@
 package org.constellation.engine.register.i18n;
 
-import java.util.Map;
-
 import org.constellation.engine.register.Style;
 import org.constellation.engine.register.StyleI18n;
+
+import java.util.Map;
 
 public class StyleWithI18N extends Style {
     

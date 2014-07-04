@@ -18,7 +18,23 @@
  */
 
 package org.constellation.configuration;
-import java.awt.RenderingHints;
+
+import org.apache.sis.util.ArraysExt;
+import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.display2d.GO2Hints;
+import org.geotoolkit.display2d.service.OutputDef;
+import org.geotoolkit.display2d.service.PortrayalExtension;
+import org.geotoolkit.factory.Hints;
+
+import javax.imageio.spi.IIORegistry;
+import javax.imageio.spi.ImageWriterSpi;
+import javax.imageio.spi.ServiceRegistry;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,16 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.imageio.spi.IIORegistry;
-import javax.imageio.spi.ImageWriterSpi;
-import javax.imageio.spi.ServiceRegistry;
-import javax.xml.bind.annotation.*;
-import org.geotoolkit.display2d.GO2Hints;
-import org.geotoolkit.display2d.service.OutputDef;
-import org.geotoolkit.display2d.service.PortrayalExtension;
-import org.geotoolkit.factory.Hints;
-import org.apache.sis.util.ArraysExt;
-import org.apache.sis.util.logging.Logging;
 
 /**
  *

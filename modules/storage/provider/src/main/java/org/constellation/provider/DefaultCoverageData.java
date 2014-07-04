@@ -18,23 +18,16 @@
  */
 package org.constellation.provider;
 
-import java.awt.Dimension;
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.CancellationException;
-import java.util.logging.Level;
-
 import org.apache.sis.measure.MeasurementRange;
 import org.apache.sis.storage.DataStoreException;
-import static org.constellation.provider.AbstractData.LOGGER;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.grid.GeneralGridGeometry;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
-import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReadParam;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.display.PortrayalException;
+import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.image.io.metadata.SpatialMetadata;
 import org.geotoolkit.map.DefaultCoverageMapLayer;
 import org.geotoolkit.map.MapBuilder;
@@ -43,7 +36,6 @@ import org.geotoolkit.referencing.cs.DiscreteCoordinateSystemAxis;
 import org.geotoolkit.style.DefaultStyleFactory;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.StyleConstants;
-import org.geotoolkit.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -53,6 +45,16 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
 
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
+import java.awt.*;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.concurrent.CancellationException;
+import java.util.logging.Level;
 
 
 /**

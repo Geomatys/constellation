@@ -18,10 +18,9 @@
  */
 package org.constellation.engine.register.jpa;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import org.constellation.engine.register.DomainAccess;
+import org.constellation.engine.register.DomainAccessDTO;
+import org.constellation.engine.register.User;
 
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
@@ -31,18 +30,10 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToOne;
-import javax.persistence.MapKeyJoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.DomainAccess;
-import org.constellation.engine.register.DomainAccessDTO;
-import org.constellation.engine.register.DomainRole;
-import org.constellation.engine.register.User;
-import org.hibernate.annotations.Target;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(schema = "`admin`", name = "`user`")

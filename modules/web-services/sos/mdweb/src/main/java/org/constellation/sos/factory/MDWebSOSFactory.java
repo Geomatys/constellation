@@ -19,14 +19,15 @@
 
 package org.constellation.sos.factory;
 
-import java.util.Map;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.MetadataIoException;
-import org.constellation.sos.io.mdweb.MDWebSensorReader;
-import org.constellation.sos.io.mdweb.MDWebSensorWriter;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
+import org.constellation.sos.io.mdweb.MDWebSensorReader;
+import org.constellation.sos.io.mdweb.MDWebSensorWriter;
+
+import java.util.Map;
 
 import static org.constellation.configuration.DataSourceType.*;
 

@@ -20,14 +20,6 @@
 
 package org.constellation.sos.io.lucene;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.logging.Level;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -41,18 +33,26 @@ import org.apache.lucene.util.Version;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.ws.SOSUtils;
-import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.AbstractGML;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
-import org.geotoolkit.observation.xml.v100.MeasurementType;
 import org.geotoolkit.observation.xml.Process;
+import org.geotoolkit.observation.xml.v100.MeasurementType;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.swe.xml.Phenomenon;
 import org.opengis.observation.Observation;
 import org.opengis.temporal.Instant;
 import org.opengis.temporal.Period;
 import org.opengis.temporal.TemporalObject;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import java.io.File;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
+import java.util.logging.Level;
 
 /**
  *

@@ -19,33 +19,25 @@
 package org.constellation.gui;
 
 // Temps et utilitaires
-import java.util.TimeZone;
-import java.util.Arrays;
 
-// Interface utilisateur
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-import javax.swing.JScrollPane;
-import javax.swing.BorderFactory;
-import javax.swing.ListSelectionModel;
-
-// Evénements
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentAdapter;
-import java.beans.PropertyChangeListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
-// Geotools
+import org.constellation.resources.i18n.ResourceKeys;
+import org.constellation.resources.i18n.Resources;
 import org.geotools.resources.SwingUtilities;
 
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.beans.PropertyChangeListener;
+import java.util.Arrays;
+import java.util.TimeZone;
+
+// Interface utilisateur
+// Evénements
+// Geotools
 // Divers
-import org.constellation.resources.i18n.Resources;
-import org.constellation.resources.i18n.ResourceKeys;
 
 
 /**

@@ -19,14 +19,7 @@
 package org.constellation.ws.rs;
 
 // J2SE dependencies
-import java.io.IOException;
-import java.util.*;
-import java.util.logging.Level;
-import javax.annotation.PreDestroy;
-import javax.inject.Inject;
-import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBElement;
-import javax.xml.validation.Schema;
+
 import net.iharder.Base64;
 import org.apache.sis.util.iso.Types;
 import org.apache.sis.xml.MarshallerPool;
@@ -44,12 +37,33 @@ import org.constellation.ws.ServiceConfigurer;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-
-// Apache SIS dependencies
 import org.geotoolkit.util.StringUtilities;
 import org.opengis.util.CodeList;
+
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBElement;
+import javax.xml.validation.Schema;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_CRS;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_FORMAT;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_POINT;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_REQUEST;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_UPDATE_SEQUENCE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.LAYER_NOT_DEFINED;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.OPERATION_NOT_SUPPORTED;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.STYLE_NOT_DEFINED;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
+
+// Apache SIS dependencies
 
 
 /**

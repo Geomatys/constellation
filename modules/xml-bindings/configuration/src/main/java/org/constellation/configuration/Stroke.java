@@ -18,10 +18,12 @@
  */
 package org.constellation.configuration;
 
-import java.awt.BasicStroke;
-import java.io.Serializable;
-import javax.xml.bind.annotation.*;
 import org.constellation.configuration.utils.WMSPortrayalUtils;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import java.awt.*;
 
 /**
  * Background used by decorations and legend template.

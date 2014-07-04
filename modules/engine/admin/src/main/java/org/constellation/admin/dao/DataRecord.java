@@ -21,6 +21,7 @@ package org.constellation.admin.dao;
 
 import org.constellation.admin.EmbeddedDatabase;
 
+import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -29,8 +30,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import javax.xml.namespace.QName;
 
 /**
  * @author Fabien Bernard (Geomatys).

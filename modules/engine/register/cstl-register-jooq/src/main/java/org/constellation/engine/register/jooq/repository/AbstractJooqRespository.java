@@ -18,10 +18,6 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -29,6 +25,10 @@ import org.jooq.RecordMapper;
 import org.jooq.SelectQuery;
 import org.jooq.TableLike;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public abstract class AbstractJooqRespository<T extends Record, U> {
 

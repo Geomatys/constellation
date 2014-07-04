@@ -19,27 +19,24 @@
 package org.constellation.numeric.table;
 
 // J2SE and Java3D dependencies
-import java.util.Locale;
-import java.text.NumberFormat;
-import java.text.DecimalFormat;
-import java.text.FieldPosition;
-import java.io.Writer;
-import java.io.IOException;
-import java.nio.DoubleBuffer;
-import java.nio.ReadOnlyBufferException;
-import javax.vecmath.MismatchedSizeException;
-import java.lang.reflect.Field;
 
-// GeoAPI dependencies
 import org.opengis.referencing.operation.Matrix;
 
-// Static imports
-import static java.lang.Math.abs;
-import static java.lang.Double.NaN;
-import static java.lang.Double.isNaN;
-import static java.lang.System.arraycopy;
-import static org.apache.sis.util.ArraysExt.isSorted;
+import javax.vecmath.MismatchedSizeException;
+import java.io.IOException;
+import java.io.Writer;
+import java.lang.reflect.Field;
+import java.nio.DoubleBuffer;
+import java.nio.ReadOnlyBufferException;
+import java.text.DecimalFormat;
+import java.text.FieldPosition;
+import java.text.NumberFormat;
+import java.util.Locale;
+
 import static org.apache.sis.util.CharSequences.spaces;
+
+// GeoAPI dependencies
+// Static imports
 
 
 /**

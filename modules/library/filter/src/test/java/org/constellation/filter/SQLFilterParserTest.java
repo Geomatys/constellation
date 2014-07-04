@@ -19,18 +19,25 @@
 
 package org.constellation.filter;
 
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.Map;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
+import org.apache.sis.xml.MarshallerPool;
 import org.geotoolkit.csw.xml.v202.QueryConstraintType;
 import org.geotoolkit.ogc.xml.FilterMarshallerPool;
 import org.geotoolkit.ogc.xml.v110.FilterType;
-import org.apache.sis.xml.MarshallerPool;
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
+import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  *

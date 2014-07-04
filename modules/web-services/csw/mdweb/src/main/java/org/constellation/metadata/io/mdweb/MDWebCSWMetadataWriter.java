@@ -19,28 +19,11 @@
 
 package org.constellation.metadata.io.mdweb;
 
-import java.util.HashMap;
-import java.sql.Timestamp;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.logging.Level;
-
-// Constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.MDWebMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
-
-// Geotoolkit dependencies
-import org.geotoolkit.lucene.index.AbstractIndexer;
-import java.util.Objects;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-
-// MDWeb meta model dependencies
+import org.geotoolkit.lucene.index.AbstractIndexer;
 import org.mdweb.io.MD_IOException;
 import org.mdweb.model.schemas.Classe;
 import org.mdweb.model.schemas.PrimitiveType;
@@ -50,6 +33,23 @@ import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.logging.Level;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
+// Constellation dependencies
+// Geotoolkit dependencies
+// MDWeb meta model dependencies
 
 /**
  * A CSW Metadata Writer specific for MDweb data source.

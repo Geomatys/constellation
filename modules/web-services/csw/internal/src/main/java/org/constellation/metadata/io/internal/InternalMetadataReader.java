@@ -18,6 +18,29 @@
  */
 package org.constellation.metadata.io.internal;
 
+import org.apache.sis.xml.Namespaces;
+import org.constellation.admin.MetadataBusiness;
+import org.constellation.admin.SpringHelper;
+import org.constellation.generic.database.Automatic;
+import org.constellation.metadata.io.CSWMetadataReader;
+import org.constellation.metadata.io.DomMetadataReader;
+import org.constellation.metadata.io.ElementSetType;
+import org.constellation.metadata.io.MetadataIoException;
+import org.constellation.metadata.io.MetadataType;
+import org.constellation.util.NodeUtilities;
+import org.geotoolkit.csw.xml.DomainValues;
+import org.geotoolkit.csw.xml.v202.DomainValuesType;
+import org.geotoolkit.csw.xml.v202.ListOfValuesType;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
+import javax.inject.Inject;
+import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -27,37 +50,27 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-import javax.inject.Inject;
-import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLStreamException;
-import org.apache.sis.xml.Namespaces;
-import org.constellation.admin.MetadataBusiness;
-import org.constellation.admin.SpringHelper;
-import org.constellation.generic.database.Automatic;
 
-import static org.constellation.metadata.CSWQueryable.*;
+import static org.constellation.metadata.CSWQueryable.DUBLIN_CORE_QUERYABLE;
+import static org.constellation.metadata.CSWQueryable.ISO_QUERYABLE;
+import static org.geotoolkit.csw.xml.TypeNames.METADATA_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Creator_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Date_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Description_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Format_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Identifier_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Language_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Publisher_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Subject_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Title_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Type_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory._Abstract_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory._Modified_QNAME;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.OPERATION_NOT_SUPPORTED;
+import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
 
 // Geotoolkit dependencies
-import org.constellation.metadata.io.CSWMetadataReader;
-import org.constellation.metadata.io.DomMetadataReader;
-import org.constellation.metadata.io.ElementSetType;
-import org.constellation.metadata.io.MetadataIoException;
-import org.constellation.metadata.io.MetadataType;
-import org.constellation.util.NodeUtilities;
-import org.geotoolkit.csw.xml.DomainValues;
-import static org.geotoolkit.csw.xml.TypeNames.*;
-import org.geotoolkit.csw.xml.v202.DomainValuesType;
-import org.geotoolkit.csw.xml.v202.ListOfValuesType;
-import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory.*;
-import static org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory.*;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 /**
  * A CSW Metadata Reader. This reader does not require a database.

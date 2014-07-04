@@ -19,10 +19,11 @@
 package org.constellation.ws.soap;
 
 import com.sun.xml.ws.developer.ValidationErrorHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.sis.util.logging.Logging;
 import org.xml.sax.SAXParseException;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * use with @SchemaValidation(handler = ValidationHandler.class) annotations a JAX-WS service classes.

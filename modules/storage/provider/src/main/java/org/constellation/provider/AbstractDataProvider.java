@@ -19,23 +19,23 @@
 
 package org.constellation.provider;
 
+import org.constellation.admin.dao.ProviderRecord.ProviderType;
+import org.constellation.provider.configuration.ProviderParameters;
+import org.geotoolkit.feature.type.DefaultName;
+import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.gui.swing.tree.Trees;
+import org.geotoolkit.map.ElevationModel;
+import org.opengis.parameter.ParameterValueGroup;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
-import org.constellation.admin.dao.ProviderRecord.ProviderType;
-import org.constellation.provider.configuration.ProviderParameters;
 
-import org.geotoolkit.feature.type.DefaultName;
-import org.geotoolkit.gui.swing.tree.Trees;
-import org.geotoolkit.map.ElevationModel;
-
-import org.geotoolkit.feature.type.Name;
-import org.opengis.parameter.ParameterValueGroup;
-
-import static org.constellation.provider.configuration.ProviderParameters.*;
-import static org.geotoolkit.parameter.Parameters.*;
+import static org.constellation.provider.configuration.ProviderParameters.LAYER_NAME_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.getLayers;
+import static org.geotoolkit.parameter.Parameters.stringValue;
 
 /**
  * Abstract implementation of LayerProvider which only handle the

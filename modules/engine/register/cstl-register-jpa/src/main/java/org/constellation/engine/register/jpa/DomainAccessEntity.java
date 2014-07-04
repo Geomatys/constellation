@@ -18,7 +18,8 @@
  */
 package org.constellation.engine.register.jpa;
 
-import java.util.Set;
+import org.constellation.engine.register.Domain;
+import org.constellation.engine.register.DomainAccess;
 
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
@@ -29,10 +30,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.DomainAccess;
-import org.constellation.engine.register.User;
+import java.util.Set;
 
 @Entity
 @Table(schema="`admin`", name = "`user_x_domain`")

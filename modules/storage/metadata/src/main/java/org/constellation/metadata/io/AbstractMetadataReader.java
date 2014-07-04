@@ -19,6 +19,9 @@
 
 package org.constellation.metadata.io;
 
+import org.apache.sis.util.logging.Logging;
+import org.w3c.dom.Node;
+
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,9 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.apache.sis.util.logging.Logging;
-import org.w3c.dom.Node;
 
 /**
  *

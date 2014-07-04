@@ -19,67 +19,47 @@
 package org.constellation.gui.observation;
 
 // Interface utilisateur
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Component;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JOptionPane;
-import javax.swing.JFileChooser;
-import javax.swing.BorderFactory;
-import javax.swing.SwingConstants;
-import javax.swing.event.EventListenerList;
 
-// Formattage
-import java.util.Date;
-import java.util.Locale;
-
-// Entrés/sorties
-import java.io.File;
-import java.io.Writer;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.BufferedWriter;
-import javax.imageio.IIOException;
-import javax.imageio.ImageIO;
-import javax.imageio.IIOImage;
-import javax.imageio.ImageReader;
-import javax.imageio.ImageWriter;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.spi.ImageWriterSpi;
-import javax.imageio.stream.ImageOutputStream;
-import javax.imageio.event.IIOReadWarningListener;
-
-// Collections
-import java.util.Set;
-import java.util.HashSet;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-
-// OpenGIS
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-// Geotools
-import org.geotoolkit.referencing.crs.DefaultCompoundCRS;
-import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
+import org.constellation.coverage.catalog.CoverageReference;
+import org.constellation.resources.i18n.ResourceKeys;
+import org.constellation.resources.i18n.Resources;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.processing.Operations;
-import org.geotoolkit.image.io.IIOListeners;
-import org.geotoolkit.gui.swing.ProgressWindow;
 import org.geotoolkit.gui.swing.ExceptionMonitor;
-import org.geotools.coverage.io.MetadataBuilder;
-import org.geotools.util.ProgressListener;
-import org.geotoolkit.util.Utilities;
-import org.geotools.resources.SwingUtilities;
+import org.geotoolkit.gui.swing.ProgressWindow;
+import org.geotoolkit.image.io.IIOListeners;
 import org.geotoolkit.internal.referencing.CRSUtilities;
+import org.geotoolkit.referencing.crs.DefaultCompoundCRS;
+import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
+import org.geotoolkit.util.Utilities;
+import org.geotools.coverage.io.MetadataBuilder;
+import org.geotools.resources.SwingUtilities;
+import org.geotools.util.ProgressListener;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.ImageWriter;
+import javax.imageio.event.IIOReadWarningListener;
+import javax.imageio.stream.ImageOutputStream;
+import javax.swing.*;
+import java.awt.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.Locale;
+import java.util.Set;
+
+// Formattage
+// Entrés/sorties
+// Collections
+// OpenGIS
+// Geotools
 // Constellation
-import org.constellation.coverage.catalog.CoverageReference;
-import org.constellation.resources.i18n.Resources;
-import org.constellation.resources.i18n.ResourceKeys;
 
 
 /**

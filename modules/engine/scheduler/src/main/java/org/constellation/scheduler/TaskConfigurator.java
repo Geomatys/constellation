@@ -19,10 +19,11 @@
 
 package org.constellation.scheduler;
 
-import java.util.List;
-import java.util.logging.Logger;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.ConfigurationException;
+
+import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Responsible for saving tasks definitions.

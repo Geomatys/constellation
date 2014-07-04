@@ -19,6 +19,13 @@
 
 package org.constellation.rest.api;
 
+import org.apache.sis.util.logging.Logging;
+import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.TargetNotFoundException;
+import org.constellation.dto.PortrayalContext;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.rs.LayerProviders;
+
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -29,14 +36,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
-
-import org.apache.sis.util.logging.Logging;
-import org.constellation.configuration.AcknowlegementType;
-import org.constellation.configuration.TargetNotFoundException;
-import org.constellation.dto.PortrayalContext;
-import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.rs.LayerProviders;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

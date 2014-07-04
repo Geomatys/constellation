@@ -19,11 +19,11 @@
 
 package org.constellation.generic.database;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import java.util.Objects;
 
 /**

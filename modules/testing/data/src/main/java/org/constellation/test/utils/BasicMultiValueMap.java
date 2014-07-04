@@ -19,11 +19,11 @@
 
 package org.constellation.test.utils;
 
+import javax.ws.rs.core.MultivaluedMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import javax.ws.rs.core.MultivaluedMap;
 
 /**
  *

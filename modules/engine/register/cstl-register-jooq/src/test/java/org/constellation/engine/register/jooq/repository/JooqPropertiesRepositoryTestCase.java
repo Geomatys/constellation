@@ -18,15 +18,15 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.constellation.engine.register.Property;
 import org.constellation.engine.register.jooq.AbstractJooqTestTestCase;
 import org.constellation.engine.register.repository.PropertyRepository;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class JooqPropertiesRepositoryTestCase extends AbstractJooqTestTestCase {
 

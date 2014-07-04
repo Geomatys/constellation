@@ -18,30 +18,22 @@
  */
 package org.constellation.swing;
 
-import java.awt.Dimension;
+import org.constellation.configuration.DataSourceType;
+import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
+import org.openide.util.NbBundle;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.GroupLayout;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
-import javax.swing.LayoutStyle;
-import org.constellation.configuration.DataSourceType;
-import org.constellation.generic.database.Automatic;
-import org.constellation.generic.database.BDD;
+
 //import org.mdweb.sql.DatabaseCreator;
 //import org.mdweb.sql.DatabaseUpdater;
 //import org.mdweb.sql.DefaultDatabaseUpdater;
-import org.openide.util.NbBundle;
 
 /**
  *

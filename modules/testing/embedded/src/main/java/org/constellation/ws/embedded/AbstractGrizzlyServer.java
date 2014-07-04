@@ -21,6 +21,19 @@ package org.constellation.ws.embedded;
 // JAI dependencies
 
 // J2SE dependencies
+
+import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
+import org.constellation.data.CoverageSQLTestCase;
+import org.constellation.util.Util;
+import org.geotoolkit.image.io.XImageIO;
+import org.geotoolkit.internal.io.IOUtilities;
+
+import javax.imageio.ImageReader;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
@@ -37,19 +50,6 @@ import java.net.URLConnection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
-import javax.imageio.ImageReader;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import org.apache.sis.util.logging.Logging;
-
-import org.constellation.data.CoverageSQLTestCase;
-import org.constellation.util.Util;
-import org.geotoolkit.image.io.XImageIO;
-import org.geotoolkit.internal.io.IOUtilities;
-import org.geotoolkit.util.StringUtilities;
-import org.apache.sis.xml.MarshallerPool;
 
 /**
  * Launches a Grizzly server in a thread at the beginning of the testing process

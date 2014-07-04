@@ -18,10 +18,9 @@
  */
 package org.constellation.engine.register.jpa;
 
-import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Id;
+import java.io.Serializable;
 
 
 public class ServiceMetaDataEntityPk implements Serializable {

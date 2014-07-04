@@ -19,30 +19,9 @@
 
 package org.constellation.swing;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.IOException;
-import java.util.*;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-import javax.swing.table.AbstractTableModel;
-import javax.xml.stream.XMLStreamException;
 import org.constellation.admin.service.ConstellationClient;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.ProviderReport;
-import org.geotoolkit.gui.swing.style.JColorMapPane;
-import org.geotoolkit.gui.swing.util.ActionCell;
-import org.geotoolkit.gui.swing.util.JOptionDialog;
 import org.geotoolkit.gui.swing.propertyedit.JFeatureOutLine;
 import org.geotoolkit.gui.swing.propertyedit.LayerStylePropertyPanel;
 import org.geotoolkit.gui.swing.propertyedit.styleproperty.JAdvancedStylePanel;
@@ -51,6 +30,9 @@ import org.geotoolkit.gui.swing.propertyedit.styleproperty.JClassificationSingle
 import org.geotoolkit.gui.swing.propertyedit.styleproperty.JSLDImportExportPanel;
 import org.geotoolkit.gui.swing.propertyedit.styleproperty.JSimpleStylePanel;
 import org.geotoolkit.gui.swing.resource.MessageBundle;
+import org.geotoolkit.gui.swing.style.JColorMapPane;
+import org.geotoolkit.gui.swing.util.ActionCell;
+import org.geotoolkit.gui.swing.util.JOptionDialog;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.parameter.Parameters;
@@ -62,6 +44,20 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterNotFoundException;
 import org.opengis.parameter.ParameterValueGroup;
 import org.openide.util.Exceptions;
+
+import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import javax.xml.stream.XMLStreamException;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.ResourceBundle;
 
 /**
  * Edit a provider.

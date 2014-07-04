@@ -19,26 +19,15 @@
 
 package org.constellation.metadata;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.generic.database.Automatic;
-import static org.constellation.metadata.FileSystemCSWworkerTest.writeDataFile;
 import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.util.NodeUtilities;
 import org.constellation.ws.MimeType;
 import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.ResultType;
-import static org.geotoolkit.csw.xml.TypeNames.RECORD_QNAME;
 import org.geotoolkit.csw.xml.v202.ElementSetNameType;
 import org.geotoolkit.csw.xml.v202.GetRecordsResponseType;
 import org.geotoolkit.csw.xml.v202.GetRecordsType;
@@ -47,8 +36,6 @@ import org.geotoolkit.csw.xml.v202.QueryType;
 import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.ogc.xml.v110.SortByType;
 import org.junit.AfterClass;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,6 +44,21 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
 import org.w3c.dom.Node;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.constellation.metadata.FileSystemCSWworkerTest.writeDataFile;
+import static org.geotoolkit.csw.xml.TypeNames.RECORD_QNAME;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * The purpose of this test is to run a "discovery" CSW and launch a spatial request on it.

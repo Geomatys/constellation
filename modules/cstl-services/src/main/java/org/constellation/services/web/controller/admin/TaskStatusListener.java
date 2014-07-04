@@ -18,16 +18,15 @@
  */
 package org.constellation.services.web.controller.admin;
 
-import javax.annotation.PostConstruct;
-
 import org.constellation.dto.TaskStatus;
 import org.constellation.scheduler.CstlScheduler;
 import org.constellation.scheduler.CstlSchedulerListener;
 import org.constellation.scheduler.TaskState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
 
 @Component
 public class TaskStatusListener {

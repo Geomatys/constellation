@@ -19,40 +19,22 @@
 package org.constellation.gui;
 
 // User interface
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Component;
-import java.awt.BorderLayout;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.JSlider;
-import javax.swing.ButtonGroup;
-import javax.swing.JTabbedPane;
-import javax.swing.JRadioButton;
-import javax.swing.JToggleButton;
-import javax.swing.BorderFactory;
-import javax.swing.JColorChooser;
-import javax.swing.SwingConstants;
 
-// Miscellaneous
-import java.awt.Shape;
+import org.constellation.resources.i18n.ResourceKeys;
+import org.constellation.resources.i18n.Resources;
+import org.geotools.resources.SwingUtilities;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.RenderedImage;
 
+// Miscellaneous
 // Events
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 // Geotools dependencies
-import org.geotools.resources.SwingUtilities;
-
 // Constellation
-import org.constellation.resources.i18n.Resources;
-import org.constellation.resources.i18n.ResourceKeys;
 
 
 /**

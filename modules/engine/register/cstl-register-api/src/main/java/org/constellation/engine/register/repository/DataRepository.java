@@ -18,12 +18,12 @@
  */
 package org.constellation.engine.register.repository;
 
-import java.util.List;
-import java.util.Map;
-
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.i18n.DataWithI18N;
+
+import java.util.List;
+import java.util.Map;
 
 public interface DataRepository {
 

@@ -19,60 +19,60 @@
 
 package org.constellation.test.utils;
 
-import java.util.Iterator;
-import java.util.Collection;
-import javax.xml.bind.JAXBElement;
-
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.metadata.iso.identification.DefaultDataIdentification;
 import org.apache.sis.util.ComparisonMode;
 import org.apache.sis.util.Utilities;
 import org.apache.sis.util.iso.DefaultInternationalString;
 import org.apache.sis.xml.IdentifierSpace;
-import org.geotoolkit.csw.xml.v202.QueryType;
 import org.geotoolkit.csw.xml.v202.GetRecordsType;
-import org.geotoolkit.ebrim.xml.v300.RegistryPackageType;
+import org.geotoolkit.csw.xml.v202.QueryType;
 import org.geotoolkit.ebrim.xml.v250.ExtrinsicObjectType;
-import org.geotoolkit.sml.xml.v100.ComponentType;
-import org.geotoolkit.swe.xml.v100.DataRecordType;
-import org.geotoolkit.sml.xml.v100.IoComponentPropertyType;
-import org.geotoolkit.sml.xml.v100.SystemType;
-import org.geotoolkit.sml.xml.v100.SensorML;
-import org.geotoolkit.feature.catalog.PropertyTypeImpl;
-import org.geotoolkit.feature.catalog.FeatureTypeImpl;
 import org.geotoolkit.ebrim.xml.v250.SlotType;
 import org.geotoolkit.ebrim.xml.v300.AdhocQueryType;
 import org.geotoolkit.ebrim.xml.v300.IdentifiableType;
 import org.geotoolkit.ebrim.xml.v300.RegistryObjectType;
+import org.geotoolkit.ebrim.xml.v300.RegistryPackageType;
 import org.geotoolkit.feature.catalog.FeatureAttributeImpl;
 import org.geotoolkit.feature.catalog.FeatureCatalogueImpl;
+import org.geotoolkit.feature.catalog.FeatureTypeImpl;
+import org.geotoolkit.feature.catalog.PropertyTypeImpl;
 import org.geotoolkit.service.ServiceIdentificationImpl;
-
-import org.opengis.metadata.identification.DataIdentification;
-import org.opengis.metadata.content.ContentInformation;
+import org.geotoolkit.sml.xml.v100.ComponentType;
+import org.geotoolkit.sml.xml.v100.IoComponentPropertyType;
+import org.geotoolkit.sml.xml.v100.SensorML;
+import org.geotoolkit.sml.xml.v100.SystemType;
+import org.geotoolkit.swe.xml.v100.DataRecordType;
+import org.opengis.metadata.acquisition.AcquisitionInformation;
+import org.opengis.metadata.acquisition.Operation;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.citation.CitationDate;
-import org.opengis.metadata.identification.Identification;
-import org.opengis.metadata.lineage.Algorithm;
-import org.opengis.metadata.acquisition.Operation;
-import org.opengis.metadata.acquisition.AcquisitionInformation;
-import org.opengis.metadata.content.RangeDimension;
-import org.opengis.metadata.lineage.Source;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.constraint.Constraints;
+import org.opengis.metadata.content.ContentInformation;
 import org.opengis.metadata.content.CoverageDescription;
 import org.opengis.metadata.content.FeatureCatalogueDescription;
+import org.opengis.metadata.content.RangeDimension;
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.extent.GeographicExtent;
 import org.opengis.metadata.extent.VerticalExtent;
+import org.opengis.metadata.identification.DataIdentification;
+import org.opengis.metadata.identification.Identification;
+import org.opengis.metadata.lineage.Algorithm;
 import org.opengis.metadata.lineage.ProcessStep;
+import org.opengis.metadata.lineage.Source;
 import org.opengis.metadata.quality.DataQuality;
 import org.opengis.metadata.quality.Element;
 import org.opengis.metadata.spatial.Georectified;
 import org.opengis.metadata.spatial.SpatialRepresentation;
-
-import static org.junit.Assert.*;
 import org.opengis.referencing.ReferenceIdentifier;
+
+import javax.xml.bind.JAXBElement;
+import java.util.Collection;
+import java.util.Iterator;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  *

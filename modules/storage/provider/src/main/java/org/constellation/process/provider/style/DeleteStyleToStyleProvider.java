@@ -26,7 +26,8 @@ import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.constellation.process.provider.style.DeleteStyleToStyleProviderDescriptor.*;
+import static org.constellation.process.provider.style.DeleteStyleToStyleProviderDescriptor.PROVIDER_ID;
+import static org.constellation.process.provider.style.DeleteStyleToStyleProviderDescriptor.STYLE_ID;
 import static org.geotoolkit.parameter.Parameters.value;
 
 /**

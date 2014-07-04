@@ -19,32 +19,29 @@
 
 package org.constellation.data.om2;
 
+import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.sis.metadata.iso.DefaultIdentifier;
 import org.apache.sis.metadata.iso.citation.DefaultCitation;
 import org.apache.sis.metadata.iso.identification.DefaultServiceIdentification;
-import org.opengis.metadata.Identifier;
-import java.util.Collections;
-import org.geotoolkit.parameter.Parameters;
-import org.opengis.metadata.identification.Identification;
-import org.opengis.parameter.ParameterDescriptor;
-import org.apache.commons.dbcp.BasicDataSource;
-
-import java.io.IOException;
-
+import org.apache.sis.metadata.iso.quality.DefaultConformanceResult;
+import org.apache.sis.storage.DataStoreException;
+import org.apache.sis.util.iso.ResourceInternationalString;
 import org.geotoolkit.data.AbstractFeatureStoreFactory;
 import org.geotoolkit.data.FeatureStore;
-import org.geotoolkit.jdbc.ManageableDataSource;
 import org.geotoolkit.jdbc.DBCPDataSource;
-import org.apache.sis.storage.DataStoreException;
-import org.apache.sis.metadata.iso.quality.DefaultConformanceResult;
+import org.geotoolkit.jdbc.ManageableDataSource;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
-
+import org.geotoolkit.parameter.Parameters;
+import org.opengis.metadata.Identifier;
+import org.opengis.metadata.identification.Identification;
 import org.opengis.metadata.quality.ConformanceResult;
+import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 
-import org.apache.sis.util.iso.ResourceInternationalString;
+import java.io.IOException;
+import java.util.Collections;
 
 /**
  *

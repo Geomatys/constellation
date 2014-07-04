@@ -18,39 +18,64 @@
  */
 package org.constellation.wps.ws.rs;
 
-import javax.inject.Singleton;
 import org.constellation.ServiceDef;
-import org.constellation.ws.ServiceConfigurer;
+import org.constellation.ServiceDef.Specification;
 import org.constellation.wps.configuration.WPSConfigurer;
 import org.constellation.wps.ws.WPSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
-import org.constellation.ws.rs.OGCWebService;
-import org.constellation.ServiceDef.Specification;
+import org.constellation.ws.ServiceConfigurer;
 import org.constellation.ws.Worker;
-
-import static org.constellation.api.QueryConstants.*;
-import static org.constellation.wps.ws.WPSConstant.*;
-
+import org.constellation.ws.rs.OGCWebService;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.CodeType;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.geotoolkit.wps.xml.WPSMarshallerPool;
-import org.geotoolkit.wps.xml.v100.*;
+import org.geotoolkit.wps.xml.v100.DataInputsType;
+import org.geotoolkit.wps.xml.v100.DataType;
+import org.geotoolkit.wps.xml.v100.DescribeProcess;
+import org.geotoolkit.wps.xml.v100.DocumentOutputDefinitionType;
+import org.geotoolkit.wps.xml.v100.Execute;
+import org.geotoolkit.wps.xml.v100.GetCapabilities;
+import org.geotoolkit.wps.xml.v100.InputReferenceType;
+import org.geotoolkit.wps.xml.v100.InputType;
+import org.geotoolkit.wps.xml.v100.OutputDefinitionType;
+import org.geotoolkit.wps.xml.v100.ProcessDescriptions;
+import org.geotoolkit.wps.xml.v100.ResponseDocumentType;
+import org.geotoolkit.wps.xml.v100.ResponseFormType;
+import org.geotoolkit.wps.xml.v100.WPSCapabilitiesType;
 
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-
+import javax.inject.Singleton;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
+
+import static org.constellation.api.QueryConstants.ACCEPT_VERSIONS_PARAMETER;
+import static org.constellation.api.QueryConstants.REQUEST_PARAMETER;
+import static org.constellation.api.QueryConstants.SERVICE_PARAMETER;
+import static org.constellation.api.QueryConstants.UPDATESEQUENCE_PARAMETER;
+import static org.constellation.api.QueryConstants.VERSION_PARAMETER;
+import static org.constellation.wps.ws.WPSConstant.DESCRIBEPROCESS;
+import static org.constellation.wps.ws.WPSConstant.EXECUTE;
+import static org.constellation.wps.ws.WPSConstant.GETCAPABILITIES;
+import static org.constellation.wps.ws.WPSConstant.IDENTIFER_PARAMETER;
+import static org.constellation.wps.ws.WPSConstant.LANGUAGE_PARAMETER;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_FORMAT;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_REQUEST;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.OPERATION_NOT_SUPPORTED;
 
 /**
  * WPS web service class.

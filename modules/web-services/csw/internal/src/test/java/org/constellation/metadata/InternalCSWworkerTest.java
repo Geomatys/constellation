@@ -20,16 +20,6 @@
 
 package org.constellation.metadata;
 
-import java.io.File;
-import java.io.StringWriter;
-import java.util.TimeZone;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.xml.XML;
 import org.constellation.admin.ConfigurationEngine;
@@ -40,17 +30,39 @@ import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.generic.database.Automatic;
 import org.constellation.provider.DataProviderFactory;
 import org.constellation.provider.DataProviders;
-import static org.constellation.provider.configuration.ProviderParameters.*;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.util.Util;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
-
-import org.junit.*;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opengis.parameter.ParameterValueGroup;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import java.io.File;
+import java.io.StringWriter;
+import java.util.TimeZone;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.SOURCE_LOADALL_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.COVERAGESQL_DESCRIPTOR;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.NAMESPACE_DESCRIPTOR;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.PASSWORD_DESCRIPTOR;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.ROOT_DIRECTORY_DESCRIPTOR;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.SCHEMA_DESCRIPTOR;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.URL_DESCRIPTOR;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.USER_DESCRIPTOR;
 
 /**
  *

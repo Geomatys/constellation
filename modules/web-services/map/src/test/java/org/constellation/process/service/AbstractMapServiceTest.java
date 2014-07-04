@@ -18,11 +18,12 @@
  */
 package org.constellation.process.service;
 
-import java.util.logging.Level;
-import javax.inject.Inject;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
 import org.constellation.map.configuration.LayerBusiness;
+
+import javax.inject.Inject;
+import java.util.logging.Level;
 
 /**
  *

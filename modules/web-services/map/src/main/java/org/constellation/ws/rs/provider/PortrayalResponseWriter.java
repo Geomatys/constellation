@@ -19,6 +19,21 @@
 
 package org.constellation.ws.rs.provider;
 
+import org.apache.sis.util.logging.Logging;
+import org.constellation.portrayal.internal.CstlPortrayalService;
+import org.constellation.portrayal.internal.PortrayalResponse;
+import org.geotoolkit.display.PortrayalException;
+import org.geotoolkit.display2d.service.CanvasDef;
+import org.geotoolkit.display2d.service.DefaultPortrayalService;
+import org.geotoolkit.display2d.service.OutputDef;
+import org.geotoolkit.display2d.service.SceneDef;
+import org.geotoolkit.display2d.service.ViewDef;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.Provider;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,16 +42,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.Provider;
-import org.constellation.portrayal.internal.CstlPortrayalService;
-import org.constellation.portrayal.internal.PortrayalResponse;
-import org.geotoolkit.display.PortrayalException;
-import org.geotoolkit.display2d.service.*;
-import org.apache.sis.util.logging.Logging;
 
 /**
  * Write a portrayal response in the stream.

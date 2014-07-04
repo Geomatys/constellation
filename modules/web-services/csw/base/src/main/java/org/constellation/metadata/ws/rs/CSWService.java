@@ -19,29 +19,11 @@
 package org.constellation.metadata.ws.rs;
 
 // java se dependencies
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.logging.Level;
-import javax.inject.Singleton;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.Duration;
-import javax.xml.namespace.QName;
+
 import org.apache.sis.xml.Namespaces;
 import org.constellation.ServiceDef;
 import org.constellation.ServiceDef.Specification;
-
-import static org.constellation.api.QueryConstants.*;
 import org.constellation.jaxb.CstlXMLSerializer;
-import static org.constellation.metadata.CSWConstants.*;
-
-// Geotoolkit dependencies
 import org.constellation.metadata.CSWworker;
 import org.constellation.metadata.configuration.CSWConfigurer;
 import org.constellation.metadata.utils.CSWUtils;
@@ -75,12 +57,39 @@ import org.geotoolkit.ogc.xml.v110.SortOrderType;
 import org.geotoolkit.ogc.xml.v110.SortPropertyType;
 import org.geotoolkit.ows.xml.AcceptFormats;
 import org.geotoolkit.ows.xml.AcceptVersions;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ows.xml.Sections;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
 import org.geotoolkit.ows.xml.v100.SectionsType;
+
+import javax.inject.Singleton;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.Duration;
+import javax.xml.namespace.QName;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
+
+import static org.constellation.api.QueryConstants.ACCEPT_FORMATS_PARAMETER;
+import static org.constellation.api.QueryConstants.ACCEPT_VERSIONS_PARAMETER;
+import static org.constellation.api.QueryConstants.SECTIONS_PARAMETER;
+import static org.constellation.api.QueryConstants.SERVICE_PARAMETER;
+import static org.constellation.api.QueryConstants.UPDATESEQUENCE_PARAMETER;
+import static org.constellation.api.QueryConstants.VERSION_PARAMETER;
+import static org.constellation.metadata.CSWConstants.MALFORMED;
+import static org.constellation.metadata.CSWConstants.NAMESPACE;
+import static org.constellation.metadata.CSWConstants.NOT_EXIST;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.OPERATION_NOT_SUPPORTED;
+
+// Geotoolkit dependencies
 
 /**
  * RestFul CSW service.

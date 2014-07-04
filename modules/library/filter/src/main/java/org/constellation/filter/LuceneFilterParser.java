@@ -19,27 +19,8 @@
 package org.constellation.filter;
 
 // J2SE dependencies
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
 
-// JAXB dependencies
-import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
-
-// Lucene dependencies
 import org.apache.lucene.search.Filter;
-
-// GeoAPI dependencies
-import org.opengis.filter.PropertyIsLike;
-import org.opengis.filter.expression.PropertyName;
-
-// geotoolkit dependencies
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.ogc.xml.v110.AndType;
@@ -55,7 +36,26 @@ import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
 import org.geotoolkit.ogc.xml.v110.TemporalOpsType;
 import org.geotoolkit.ogc.xml.v110.UnaryLogicOpType;
 import org.geotoolkit.temporal.object.TemporalUtilities;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.opengis.filter.PropertyIsLike;
+import org.opengis.filter.expression.PropertyName;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+
+// JAXB dependencies
+// Lucene dependencies
+// GeoAPI dependencies
+// geotoolkit dependencies
 
 
 

@@ -18,17 +18,16 @@
  */
 package org.constellation.webdav;
 
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import com.bradmcevoy.http.Resource;
 import com.bradmcevoy.http.ResourceFactory;
-
 import org.apache.sis.util.logging.Logging;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
+
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A resource factory which provides access to files in a file system.

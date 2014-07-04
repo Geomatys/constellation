@@ -18,10 +18,6 @@
  */
 package org.constellation.configuration;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.display2d.canvas.J2DCanvas;
 import org.geotoolkit.display2d.ext.PositionedGraphic2D;
@@ -37,7 +33,16 @@ import org.geotoolkit.display2d.ext.scalebar.ScaleBarTemplate;
 import org.geotoolkit.display2d.ext.text.GraphicTextJ2D;
 import org.geotoolkit.display2d.ext.text.TextTemplate;
 import org.geotoolkit.display2d.service.PortrayalExtension;
-import static org.constellation.configuration.Decorations.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static org.constellation.configuration.Decorations.DECORATION_OFFSET_X;
+import static org.constellation.configuration.Decorations.DECORATION_OFFSET_Y;
+import static org.constellation.configuration.Decorations.DECORATION_POSITION;
+import static org.constellation.configuration.Decorations.DECORATION_TYPE;
+import static org.constellation.configuration.Decorations.DECORATION_VALUE;
 
 /**
  *

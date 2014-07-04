@@ -19,12 +19,13 @@
 
 package org.constellation.metadata.io.filesystem.sql;
 
+import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.util.collection.CloseableIterator;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.sis.util.logging.Logging;
-import org.geotoolkit.util.collection.CloseableIterator;
 
 /**
  *

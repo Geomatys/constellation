@@ -18,21 +18,20 @@
  */
 package org.constellation.xacml.factory;
 
-import java.net.InetAddress;
-import java.net.URI;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import org.constellation.xacml.XMLSchemaConstants;
+import org.geotoolkit.xacml.xml.policy.AttributeDesignatorType;
+import org.geotoolkit.xacml.xml.policy.AttributeValueType;
+import org.geotoolkit.xacml.xml.policy.SubjectAttributeDesignatorType;
 
 import javax.security.auth.x500.X500Principal;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
-
-import org.constellation.xacml.XMLSchemaConstants;
-import org.geotoolkit.xacml.xml.policy.AttributeValueType;
-import org.geotoolkit.xacml.xml.policy.AttributeDesignatorType;
-import org.geotoolkit.xacml.xml.policy.SubjectAttributeDesignatorType;
+import java.net.InetAddress;
+import java.net.URI;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 
 /**

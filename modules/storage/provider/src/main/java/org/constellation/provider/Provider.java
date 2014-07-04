@@ -18,12 +18,12 @@
  */
 package org.constellation.provider;
 
+import org.constellation.admin.dao.DataRecord.DataType;
+import org.constellation.admin.dao.ProviderRecord.ProviderType;
 import org.opengis.parameter.ParameterValueGroup;
 
 import java.beans.PropertyChangeListener;
 import java.util.Set;
-import org.constellation.admin.dao.DataRecord.DataType;
-import org.constellation.admin.dao.ProviderRecord.ProviderType;
 
 /**
  * A data provider is basically a index class

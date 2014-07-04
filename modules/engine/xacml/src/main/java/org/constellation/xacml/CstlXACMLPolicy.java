@@ -20,6 +20,9 @@ package org.constellation.xacml;
 
 import com.sun.xacml.AbstractPolicy;
 import com.sun.xacml.finder.PolicyFinder;
+import org.constellation.xacml.api.XACMLPolicy;
+import org.xml.sax.SAXException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -27,8 +30,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.constellation.xacml.api.XACMLPolicy;
-import org.xml.sax.SAXException;
 
 
 /**

@@ -19,34 +19,27 @@
 
 package org.constellation.provider.configuration;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import javax.inject.Inject;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.namespace.QName;
-
 import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.admin.*;
+import org.constellation.admin.DataBusiness;
+import org.constellation.admin.ProviderBusiness;
+import org.constellation.admin.SpringHelper;
+import org.constellation.admin.StyleBusiness;
 import org.constellation.admin.dao.ProviderRecord;
 import org.constellation.admin.dao.StyleRecord;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.admin.util.IOUtilities;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.CoverageMetadataBean;
-import org.constellation.engine.register.*;
+import org.constellation.engine.register.Style;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
-import org.constellation.provider.*;
 import org.constellation.provider.Data;
+import org.constellation.provider.DataProvider;
+import org.constellation.provider.DataProviders;
 import org.constellation.provider.Provider;
+import org.constellation.provider.ProviderFactory;
+import org.constellation.provider.StyleProviders;
 import org.constellation.util.MetadataMapBuilder;
 import org.constellation.util.SimplyMetadataTreeNode;
 import org.geotoolkit.coverage.CoverageReference;
@@ -65,6 +58,19 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.style.RasterSymbolizer;
 import org.opengis.style.Symbolizer;
 import org.w3c.dom.Node;
+
+import javax.inject.Inject;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.namespace.QName;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
 
 /**
  *

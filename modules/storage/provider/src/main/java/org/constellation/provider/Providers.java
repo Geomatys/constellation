@@ -18,10 +18,11 @@
  */
 package org.constellation.provider;
 
-import java.util.logging.Logger;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.provider.configuration.Configurator;
 import org.constellation.provider.configuration.DefaultConfigurator;
+
+import java.util.logging.Logger;
 
 /**
  * Common informations for providers.

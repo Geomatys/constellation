@@ -19,12 +19,7 @@
 
 package org.constellation.map.ws;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import javax.xml.bind.JAXBElement;
 import net.jcip.annotations.Immutable;
-import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import org.apache.sis.util.iso.DefaultNameFactory;
 import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
@@ -56,6 +51,13 @@ import org.geotoolkit.wms.xml.v130.Request;
 import org.opengis.metadata.maintenance.ScopeCode;
 import org.opengis.util.LocalName;
 import org.opengis.util.NameFactory;
+
+import javax.xml.bind.JAXBElement;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
 /**
  *  WMS Constants

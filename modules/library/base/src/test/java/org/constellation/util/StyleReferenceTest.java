@@ -19,12 +19,13 @@
 package org.constellation.util;
 
 import org.geotoolkit.feature.type.DefaultName;
-import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
 
 import java.util.Date;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 /**
  * @author Quentin Boileau (Geomatys)

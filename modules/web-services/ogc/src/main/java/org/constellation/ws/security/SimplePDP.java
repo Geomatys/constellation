@@ -18,12 +18,13 @@
  */
 package org.constellation.ws.security;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
+
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import org.apache.sis.util.logging.Logging;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**

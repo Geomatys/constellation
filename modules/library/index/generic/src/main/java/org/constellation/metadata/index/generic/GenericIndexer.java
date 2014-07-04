@@ -20,6 +20,26 @@
 package org.constellation.metadata.index.generic;
 
 // J2SE dependencies
+
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+import org.constellation.concurrent.BoundedCompletionService;
+import org.constellation.metadata.index.AbstractCSWIndexer;
+import org.constellation.metadata.io.MetadataIoException;
+import org.constellation.metadata.io.MetadataReader;
+import org.constellation.metadata.io.MetadataType;
+import org.constellation.metadata.utils.Utils;
+import org.constellation.util.ReflectionUtilities;
+import org.constellation.util.Util;
+import org.constellation.util.XpathUtils;
+import org.geotoolkit.lucene.IndexingException;
+import org.opengis.metadata.Metadata;
+import org.opengis.temporal.Instant;
+import org.opengis.temporal.Position;
+import org.opengis.util.InternationalString;
+import org.opengis.util.LocalName;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,30 +57,9 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 
 // Apache Lucene dependencies
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-
 // constellation dependencies
-import org.constellation.concurrent.BoundedCompletionService;
-import org.constellation.metadata.index.AbstractCSWIndexer;
-import org.constellation.metadata.io.MetadataReader;
-import org.constellation.metadata.io.MetadataIoException;
-import org.constellation.metadata.io.MetadataType;
-import org.constellation.metadata.utils.Utils;
-import org.constellation.util.ReflectionUtilities;
-import org.constellation.util.Util;
-import org.constellation.util.XpathUtils;
-
 // geotoolkit dependencies
-import org.geotoolkit.lucene.IndexingException;
-
 // GeoAPI dependencies
-import org.opengis.metadata.Metadata;
-import org.opengis.temporal.Instant;
-import org.opengis.temporal.Position;
-import org.opengis.util.InternationalString;
-import org.opengis.util.LocalName;
 
 
 /**

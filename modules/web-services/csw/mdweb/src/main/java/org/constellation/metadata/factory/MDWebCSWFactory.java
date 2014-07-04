@@ -19,35 +19,36 @@
 
 package org.constellation.metadata.factory;
 
-import java.io.File;
-import java.util.List;
-import java.util.Map;
-import java.util.Arrays;
-
-// Constellation dependencies
-import org.constellation.filter.SQLFilterParser;
-import org.constellation.filter.LuceneFilterParser;
-import org.constellation.filter.FilterParser;
 import org.constellation.configuration.DataSourceType;
+import org.constellation.filter.FilterParser;
+import org.constellation.filter.LuceneFilterParser;
+import org.constellation.filter.SQLFilterParser;
 import org.constellation.generic.database.Automatic;
-import org.constellation.metadata.index.mdweb.MDWebIndexer;
-import org.constellation.metadata.io.CSWMetadataReader;
-import org.constellation.metadata.io.mdweb.MDWebCSWMetadataReader;
-import org.constellation.metadata.io.mdweb.MDWebCSWMetadataWriter;
-import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.metadata.harvest.ByIDHarvester;
 import org.constellation.metadata.harvest.CatalogueHarvester;
 import org.constellation.metadata.harvest.DefaultCatalogueHarvester;
 import org.constellation.metadata.harvest.FileSystemHarvester;
+import org.constellation.metadata.index.mdweb.MDWebIndexer;
+import org.constellation.metadata.io.CSWMetadataReader;
+import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
-import org.geotoolkit.lucene.IndexingException;
-import org.geotoolkit.lucene.index.LuceneIndexSearcher;
-import org.geotoolkit.lucene.index.AbstractIndexer;
-
-import static org.constellation.generic.database.Automatic.*;
+import org.constellation.metadata.io.mdweb.MDWebCSWMetadataReader;
+import org.constellation.metadata.io.mdweb.MDWebCSWMetadataWriter;
 import org.constellation.metadata.security.MetadataSecurityFilter;
 import org.constellation.metadata.security.NoMetadataSecurityFilter;
+import org.geotoolkit.lucene.IndexingException;
+import org.geotoolkit.lucene.index.AbstractIndexer;
+import org.geotoolkit.lucene.index.LuceneIndexSearcher;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import static org.constellation.generic.database.Automatic.*;
+
+// Constellation dependencies
 
 /**
  * A default implementation of the CSW factory.

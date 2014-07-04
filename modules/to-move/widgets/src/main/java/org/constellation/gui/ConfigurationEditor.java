@@ -19,40 +19,28 @@
 package org.constellation.gui;
 
 // Interface utilisateur
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Component;
-import java.awt.Font;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.JComponent;
-import javax.swing.JSplitPane;
-import javax.swing.JScrollPane;
-import javax.swing.BorderFactory;
 
-// Modèles et événements
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.AbstractListModel;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
-// Divers
-import java.util.List;
-import java.util.ArrayList;
-import java.util.logging.Logger;
-
-// Geotools dependencies
+import org.constellation.catalog.ConfigurationKey;
+import org.constellation.catalog.Database;
+import org.constellation.resources.i18n.ResourceKeys;
+import org.constellation.resources.i18n.Resources;
 import org.geotoolkit.util.Utilities;
 import org.geotools.resources.SwingUtilities;
 
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
+
+// Modèles et événements
+// Divers
+// Geotools dependencies
 // Constellation
-import org.constellation.catalog.Database;
-import org.constellation.catalog.ConfigurationKey;
-import org.constellation.resources.i18n.ResourceKeys;
-import org.constellation.resources.i18n.Resources;
 
 
 /**

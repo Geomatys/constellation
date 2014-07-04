@@ -27,9 +27,9 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Properties;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.hamcrest.CoreMatchers.*;
 
 /** Test Class GroovyTemplateEngine
  * Created by christophe mourette on 02/04/14 for Geomatys.

@@ -19,9 +19,16 @@
 package org.constellation.setup;
 
 
-import java.util.EnumSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.health.HealthCheckRegistry;
+import com.codahale.metrics.servlet.InstrumentedFilter;
+import com.codahale.metrics.servlets.AdminServlet;
+import com.codahale.metrics.servlets.HealthCheckServlet;
+import com.codahale.metrics.servlets.MetricsServlet;
+import org.apache.sis.util.logging.Logging;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterRegistration;
@@ -29,18 +36,9 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletRegistration;
-
-import org.apache.sis.util.logging.Logging;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
-
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.health.HealthCheckRegistry;
-import com.codahale.metrics.servlet.InstrumentedFilter;
-import com.codahale.metrics.servlets.AdminServlet;
-import com.codahale.metrics.servlets.HealthCheckServlet;
-import com.codahale.metrics.servlets.MetricsServlet;
+import java.util.EnumSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Use this installer to initialize Geotk and copy a file-system configuration into db config.

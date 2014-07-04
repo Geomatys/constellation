@@ -19,19 +19,6 @@
 
 package org.constellation.map.configuration;
 
-import com.sun.istack.logging.Logger;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import javax.imageio.spi.ServiceRegistry;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
-import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.LayerContext;
@@ -40,7 +27,6 @@ import org.constellation.dto.AddLayer;
 import org.constellation.engine.register.ConstellationPersistenceException;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Layer;
-import org.constellation.engine.register.MetadataIOUtils;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.Style;
@@ -56,10 +42,21 @@ import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.constellation.util.DataReference;
-import org.constellation.utils.CstlMetadatas;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.imageio.spi.ServiceRegistry;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  *

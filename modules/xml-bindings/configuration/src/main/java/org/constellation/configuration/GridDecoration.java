@@ -18,22 +18,20 @@
  */
 package org.constellation.configuration;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Paint;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
+import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.utils.WMSPortrayalUtils;
 import org.geotoolkit.display2d.ext.grid.DefaultGridTemplate;
 import org.geotoolkit.display2d.ext.grid.GridTemplate;
 import org.geotoolkit.referencing.CRS;
-import org.apache.sis.util.logging.Logging;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.FactoryException;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import java.awt.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *

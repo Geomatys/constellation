@@ -19,15 +19,12 @@
 
 package org.constellation.swing;
 
-import javax.swing.GroupLayout;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.LayoutStyle;
 import org.constellation.configuration.AbstractConfigurationObject;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.WebdavContext;
 import org.openide.util.NbBundle;
+
+import javax.swing.*;
 
 /**
  *

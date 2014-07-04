@@ -23,22 +23,12 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.io.WKTWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.logging.Level;
-import javax.imageio.spi.ServiceRegistry;
-import javax.xml.bind.JAXBException;
 import org.apache.sis.storage.DataStoreException;
-import org.constellation.configuration.*;
+import org.constellation.configuration.AcknowlegementType;
+import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.DataSourceType;
+import org.constellation.configuration.Instance;
+import org.constellation.configuration.SOSConfiguration;
 import org.constellation.dto.SensorMLTree;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.ogc.configuration.OGCConfigurer;
@@ -67,7 +57,24 @@ import org.opengis.temporal.Instant;
 import org.opengis.temporal.Period;
 import org.opengis.temporal.TemporalGeometricPrimitive;
 import org.opengis.util.FactoryException;
-import static org.geotoolkit.sml.xml.SensorMLUtilities.*;
+
+import javax.imageio.spi.ServiceRegistry;
+import javax.xml.bind.JAXBException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.logging.Level;
+
+import static org.geotoolkit.sml.xml.SensorMLUtilities.getSensorMLType;
+import static org.geotoolkit.sml.xml.SensorMLUtilities.getSmlID;
 
 /**
  * {@link org.constellation.configuration.ServiceConfigurer} implementation for SOS service.

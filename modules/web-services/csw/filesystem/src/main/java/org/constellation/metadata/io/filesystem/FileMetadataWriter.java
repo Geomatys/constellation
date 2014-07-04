@@ -18,15 +18,14 @@
  */
 package org.constellation.metadata.io.filesystem;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.logging.Level;
+import org.constellation.generic.database.Automatic;
+import org.constellation.metadata.io.AbstractMetadataWriter;
+import org.constellation.metadata.io.MetadataIoException;
+import org.constellation.metadata.io.filesystem.sql.MetadataDatasource;
+import org.constellation.metadata.io.filesystem.sql.Session;
+import org.constellation.metadata.utils.Utils;
+import org.constellation.util.NodeUtilities;
+import org.geotoolkit.lucene.index.AbstractIndexer;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -34,7 +33,6 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
-// JAXB dependencies
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -44,22 +42,22 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.logging.Level;
 
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+
+// JAXB dependencies
 //geotoolkit dependencies
-import org.geotoolkit.lucene.index.AbstractIndexer;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-
 // Constellation dependencies
-import org.constellation.generic.database.Automatic;
-import org.constellation.metadata.io.AbstractMetadataWriter;
-import org.constellation.metadata.io.MetadataIoException;
-import org.constellation.metadata.utils.Utils;
-import org.constellation.util.NodeUtilities;
-
-import static org.constellation.metadata.io.filesystem.FileMetadataUtils.*;
-import org.constellation.metadata.io.filesystem.sql.MetadataDatasource;
-import org.constellation.metadata.io.filesystem.sql.Session;
 
 
 /**

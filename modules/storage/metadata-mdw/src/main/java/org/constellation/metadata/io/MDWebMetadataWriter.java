@@ -20,18 +20,46 @@
 package org.constellation.metadata.io;
 
 // J2SE dependencies
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.net.URI;
-import java.sql.Date;
-import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.logging.Level;
+
+import org.apache.sis.internal.jaxb.LegacyNamespaces;
+import org.apache.sis.metadata.iso.extent.DefaultGeographicDescription;
+import org.apache.sis.referencing.NamedIdentifier;
+import org.apache.sis.util.iso.DefaultInternationalString;
+import org.apache.sis.xml.IdentifiedObject;
+import org.apache.sis.xml.IdentifierSpace;
+import org.apache.sis.xml.XLink;
+import org.apache.sis.xml.XLink.Type;
+import org.apache.sis.xml.XML;
+import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
+import org.constellation.jaxb.MarshallWarnings;
+import org.constellation.metadata.utils.Utils;
+import org.constellation.util.ReflectionUtilities;
+import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
+import org.geotoolkit.util.StringUtilities;
+import org.mdweb.io.MD_IOException;
+import org.mdweb.io.MD_IOFactory;
+import org.mdweb.io.Writer;
+import org.mdweb.model.profiles.Profile;
+import org.mdweb.model.schemas.Classe;
+import org.mdweb.model.schemas.CodeList;
+import org.mdweb.model.schemas.CodeListElement;
+import org.mdweb.model.schemas.Path;
+import org.mdweb.model.schemas.PrimitiveType;
+import org.mdweb.model.schemas.Property;
+import org.mdweb.model.schemas.Standard;
+import org.mdweb.model.storage.FullRecord;
+import org.mdweb.model.storage.LinkedValue;
+import org.mdweb.model.storage.RecordInfo;
+import org.mdweb.model.storage.RecordSet;
+import org.mdweb.model.storage.RecordSet.EXPOSURE;
+import org.mdweb.model.storage.TextValue;
+import org.mdweb.model.storage.Value;
+import org.mdweb.model.users.User;
+import org.opengis.annotation.UML;
+import org.opengis.metadata.Metadata;
+import org.w3c.dom.Node;
+
 import javax.imageio.spi.ServiceRegistry;
 import javax.sql.DataSource;
 import javax.xml.bind.JAXBElement;
@@ -44,54 +72,34 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.net.URI;
+import java.sql.Date;
+import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.MissingResourceException;
+import java.util.TimeZone;
+import java.util.logging.Level;
 
 // constellation dependencies
-import org.constellation.generic.database.Automatic;
-import org.constellation.generic.database.BDD;
-import org.constellation.metadata.utils.Utils;
-import org.constellation.util.ReflectionUtilities;
-
 // Geotoolkit dependencies
-import org.geotoolkit.util.StringUtilities;
-import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
-
 // Apache dependencies
-import org.apache.sis.metadata.iso.extent.DefaultGeographicDescription;
-import org.apache.sis.util.iso.DefaultInternationalString;
-import org.apache.sis.xml.IdentifiedObject;
-import org.apache.sis.xml.IdentifierSpace;
-import org.apache.sis.xml.XLink;
-import org.apache.sis.xml.XLink.Type;
-import org.apache.sis.internal.jaxb.LegacyNamespaces;
-import org.apache.sis.referencing.NamedIdentifier;
-import org.apache.sis.xml.XML;
-import org.constellation.jaxb.MarshallWarnings;
-
 // MDWeb dependencies
-import org.mdweb.model.profiles.Profile;
-import org.mdweb.model.schemas.Classe;
-import org.mdweb.model.schemas.CodeList;
-import org.mdweb.model.schemas.CodeListElement;
-import org.mdweb.model.schemas.Path;
-import org.mdweb.model.schemas.Property;
-import org.mdweb.model.schemas.Standard;
-import org.mdweb.model.storage.RecordSet;
-import org.mdweb.model.storage.FullRecord;
-import org.mdweb.model.storage.LinkedValue;
-import org.mdweb.model.storage.TextValue;
-import org.mdweb.model.storage.Value;
-import org.mdweb.model.users.User;
-import org.mdweb.io.MD_IOException;
-import org.mdweb.io.MD_IOFactory;
-import org.mdweb.io.Writer;
-import org.mdweb.model.schemas.PrimitiveType;
-import org.mdweb.model.storage.RecordInfo;
-import org.mdweb.model.storage.RecordSet.EXPOSURE;
-
 // GeoAPI
-import org.opengis.annotation.UML;
-import org.opengis.metadata.Metadata;
-import org.w3c.dom.Node;
 
 /**
  *

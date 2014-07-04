@@ -19,50 +19,9 @@
 
 package org.constellation.wfs.ws;
 
-import static org.constellation.wfs.ws.WFSConstants.IDENTIFIER_FILTER;
-import static org.constellation.wfs.ws.WFSConstants.IDENTIFIER_PARAM;
-import static org.constellation.wfs.ws.WFSConstants.OPERATIONS_METADATA_V110;
-import static org.constellation.wfs.ws.WFSConstants.OPERATIONS_METADATA_V200;
-import static org.constellation.wfs.ws.WFSConstants.TYPE_PARAM;
-import static org.constellation.wfs.ws.WFSConstants.UNKNOW_TYPENAME;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_VALUE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.OPERATION_NOT_SUPPORTED;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
-import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildBBOX;
-import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildCreateStoredQueryResponse;
-import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildDescribeStoredQueriesResponse;
-import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildDropStoredQueryResponse;
-import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildFeatureCollection;
-import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildFeatureType;
-import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildFeatureTypeList;
-import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildListStoredQueriesResponse;
-import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildSections;
-import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildTransactionResponse;
-import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildValueCollection;
-import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildWFSCapabilities;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-
-import javax.inject.Named;
-import javax.xml.bind.JAXBElement;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import org.apache.sis.referencing.IdentifiedObjects;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
@@ -188,9 +147,48 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
+import javax.inject.Named;
+import javax.xml.bind.JAXBElement;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+
+import static org.constellation.wfs.ws.WFSConstants.IDENTIFIER_FILTER;
+import static org.constellation.wfs.ws.WFSConstants.IDENTIFIER_PARAM;
+import static org.constellation.wfs.ws.WFSConstants.OPERATIONS_METADATA_V110;
+import static org.constellation.wfs.ws.WFSConstants.OPERATIONS_METADATA_V200;
+import static org.constellation.wfs.ws.WFSConstants.TYPE_PARAM;
+import static org.constellation.wfs.ws.WFSConstants.UNKNOW_TYPENAME;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.OPERATION_NOT_SUPPORTED;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildBBOX;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildCreateStoredQueryResponse;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildDescribeStoredQueriesResponse;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildDropStoredQueryResponse;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildFeatureCollection;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildFeatureType;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildFeatureTypeList;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildListStoredQueriesResponse;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildSections;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildTransactionResponse;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildValueCollection;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildWFSCapabilities;
 
 
 /**

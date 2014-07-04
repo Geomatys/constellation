@@ -19,16 +19,15 @@
 
 package org.constellation.admin.dao;
 
+import org.constellation.ServiceDef.Specification;
+import org.constellation.admin.EmbeddedDatabase;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.Locale;
-
-import org.constellation.ServiceDef.Specification;
-import org.constellation.admin.EmbeddedDatabase;
 
 /**
  * @author Fabien Bernard (Geomatys).

@@ -19,33 +19,7 @@
 package org.constellation.ws.embedded;
 
 // J2SE dependencies
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.imageio.spi.ImageWriterSpi;
-import javax.imageio.spi.ImageReaderSpi;
-import javax.imageio.ImageIO;
-import javax.xml.namespace.QName;
 
-// Constellation dependencies
-import org.constellation.data.CoverageSQLTestCase;
-import org.constellation.configuration.WMSPortrayal;
-import org.constellation.provider.DataProviders;
-import org.constellation.provider.StyleProviders;
-import org.constellation.provider.configuration.Configurator;
-import org.constellation.provider.sld.SLDProviderService;
-
-import org.geotoolkit.image.io.plugin.WorldFileImageReader;
-import org.geotoolkit.internal.io.IOUtilities;
-import org.geotoolkit.util.FileUtilities;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.configuration.DataSourceType;
@@ -57,19 +31,45 @@ import org.constellation.configuration.ProcessFactory;
 import org.constellation.configuration.Processes;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.configuration.Source;
+import org.constellation.configuration.WMSPortrayal;
+import org.constellation.data.CoverageSQLTestCase;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
+import org.constellation.provider.DataProviders;
 import org.constellation.provider.Provider;
 import org.constellation.provider.ProviderService;
+import org.constellation.provider.StyleProviders;
+import org.constellation.provider.configuration.Configurator;
+import org.constellation.provider.sld.SLDProviderService;
+import org.constellation.util.DataReference;
+import org.constellation.util.Util;
+import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.image.jai.Registry;
-
+import org.geotoolkit.internal.io.IOUtilities;
+import org.geotoolkit.util.FileUtilities;
 import org.opengis.parameter.ParameterValueGroup;
+
+import javax.imageio.ImageIO;
+import javax.imageio.spi.ImageReaderSpi;
+import javax.imageio.spi.ImageWriterSpi;
+import javax.xml.namespace.QName;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.constellation.provider.configuration.ProviderParameters.*;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
-import org.constellation.util.DataReference;
-import org.constellation.util.Util;
 import static org.geotoolkit.parameter.ParametersExt.*;
+
+// Constellation dependencies
 
 
 /**

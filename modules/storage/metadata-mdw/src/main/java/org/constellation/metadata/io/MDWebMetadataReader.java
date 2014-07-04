@@ -19,6 +19,53 @@
 package org.constellation.metadata.io;
 
 // J2SE dependencies
+
+import org.apache.sis.internal.jaxb.LegacyNamespaces;
+import org.apache.sis.io.wkt.UnformattableObjectException;
+import org.apache.sis.metadata.iso.ISOMetadata;
+import org.apache.sis.util.Locales;
+import org.apache.sis.util.iso.DefaultInternationalString;
+import org.apache.sis.util.iso.DefaultLocalName;
+import org.apache.sis.util.iso.DefaultNameFactory;
+import org.apache.sis.util.iso.Types;
+import org.apache.sis.xml.IdentifiedObject;
+import org.apache.sis.xml.IdentifierSpace;
+import org.apache.sis.xml.XLink;
+import org.apache.sis.xml.XML;
+import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
+import org.constellation.jaxb.MarshallWarnings;
+import org.constellation.util.ReflectionUtilities;
+import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
+import org.geotoolkit.temporal.object.TemporalUtilities;
+import org.geotoolkit.util.FileUtilities;
+import org.geotoolkit.util.UnlimitedInteger;
+import org.mdweb.io.MD_IOException;
+import org.mdweb.io.MD_IOFactory;
+import org.mdweb.io.Reader;
+import org.mdweb.model.schemas.Classe;
+import org.mdweb.model.schemas.CodeListElement;
+import org.mdweb.model.schemas.Path;
+import org.mdweb.model.storage.FullRecord;
+import org.mdweb.model.storage.LinkedValue;
+import org.mdweb.model.storage.RecordSet;
+import org.mdweb.model.storage.TextValue;
+import org.mdweb.model.storage.Value;
+import org.opengis.referencing.cs.CoordinateSystemAxis;
+import org.opengis.util.CodeList;
+import org.opengis.util.TypeName;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+
+import javax.imageio.spi.ServiceRegistry;
+import javax.measure.unit.Unit;
+import javax.sql.DataSource;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -29,62 +76,24 @@ import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.TimeZone;
 import java.util.logging.Level;
-import javax.imageio.spi.ServiceRegistry;
-import javax.measure.unit.Unit;
-import javax.sql.DataSource;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import org.apache.sis.internal.jaxb.LegacyNamespaces;
 
 // Constellation Dependencies
-import org.apache.sis.metadata.iso.ISOMetadata;
-import org.apache.sis.util.Locales;
-import org.apache.sis.util.iso.DefaultInternationalString;
-import org.apache.sis.util.iso.DefaultLocalName;
-import org.apache.sis.util.iso.DefaultNameFactory;
-import org.apache.sis.xml.IdentifiedObject;
-import org.apache.sis.xml.IdentifierSpace;
-import org.constellation.generic.database.Automatic;
-import org.constellation.generic.database.BDD;
-import org.constellation.util.ReflectionUtilities;
-
 // MDWeb dependencies
-import org.mdweb.model.schemas.CodeListElement;
-import org.mdweb.model.schemas.Classe;
-import org.mdweb.model.schemas.Path;
-import org.mdweb.model.storage.RecordSet;
-import org.mdweb.model.storage.FullRecord;
-import org.mdweb.model.storage.TextValue;
-import org.mdweb.model.storage.Value;
-import org.mdweb.model.storage.LinkedValue;
-import org.mdweb.io.MD_IOException;
-import org.mdweb.io.MD_IOFactory;
-import org.mdweb.io.Reader;
-
 // Geotoolkit dependencies
-import org.apache.sis.util.iso.Types;
-import org.apache.sis.io.wkt.UnformattableObjectException;
-import org.geotoolkit.temporal.object.TemporalUtilities;
-import org.geotoolkit.util.FileUtilities;
-import org.geotoolkit.util.UnlimitedInteger;
-import org.apache.sis.xml.XLink;
-import org.apache.sis.xml.XML;
-import org.constellation.jaxb.MarshallWarnings;
-import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
-
 // GeoAPI dependencies
-import org.opengis.referencing.cs.CoordinateSystemAxis;
-import org.opengis.util.CodeList;
-import org.opengis.util.TypeName;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
 
 /**

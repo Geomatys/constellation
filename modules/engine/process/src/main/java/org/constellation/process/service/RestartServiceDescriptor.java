@@ -18,8 +18,6 @@
  */
 package org.constellation.process.service;
 
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.sis.util.iso.SimpleInternationalString;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.process.AbstractCstlProcessDescriptor;
@@ -32,6 +30,9 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.IdentifiedObject;
 import org.opengis.util.InternationalString;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Restart an instance for the specified service identifier. Or all service instances if identifier is not specified.

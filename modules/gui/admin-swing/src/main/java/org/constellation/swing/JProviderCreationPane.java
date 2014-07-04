@@ -18,15 +18,6 @@
  */
 package org.constellation.swing;
 
-import java.awt.Component;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.xml.stream.XMLStreamException;
 import org.constellation.admin.service.ConstellationClient;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ProviderServiceReport;
@@ -39,6 +30,13 @@ import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.openide.util.Exceptions;
+
+import javax.swing.*;
+import javax.xml.stream.XMLStreamException;
+import java.awt.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *

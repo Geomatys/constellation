@@ -18,6 +18,22 @@
  */
 package org.constellation.metadata.io;
 
+import org.apache.sis.xml.Namespaces;
+import org.constellation.util.NodeUtilities;
+import org.geotoolkit.temporal.object.TemporalUtilities;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,23 +48,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.logging.Level;
-import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import org.apache.sis.xml.Namespaces;
-import static org.constellation.metadata.io.AbstractMetadataReader.LOGGER;
-import org.constellation.util.NodeUtilities;
+
 import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
-import org.geotoolkit.temporal.object.TemporalUtilities;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  *

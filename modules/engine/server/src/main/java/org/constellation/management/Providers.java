@@ -19,18 +19,17 @@
 
 package org.constellation.management;
 
+import org.apache.sis.util.logging.Logging;
+import org.constellation.provider.DataProviders;
+import org.constellation.provider.StyleProviders;
+import org.geotoolkit.feature.type.DefaultName;
+import org.geotoolkit.feature.type.Name;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.constellation.provider.DataProviders;
-import org.constellation.provider.StyleProviders;
-import org.geotoolkit.feature.type.DefaultName;
-import org.apache.sis.util.logging.Logging;
-
-import org.geotoolkit.feature.type.Name;
 
 /**
  * Providers MBean implementation.

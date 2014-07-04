@@ -18,6 +18,11 @@
  */
 package org.constellation.ws.embedded;
 
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.sis.util.logging.Logging;
+import org.constellation.sql.Result;
+import org.constellation.sql.ResultsDatabase;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,12 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.apache.maven.plugin.MojoFailureException;
-
-import org.constellation.sql.Result;
-import org.constellation.sql.ResultsDatabase;
-import org.apache.sis.util.logging.Logging;
 
 
 /**

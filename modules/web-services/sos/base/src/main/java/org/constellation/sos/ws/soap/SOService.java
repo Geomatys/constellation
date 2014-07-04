@@ -19,12 +19,33 @@
 package org.constellation.sos.ws.soap;
 
 // JDK dependencies
-import java.util.logging.Level;
 
-// JAX-WS dependencies
+import org.constellation.ServiceDef.Specification;
+import org.constellation.sos.configuration.SOSConfigurer;
+import org.constellation.sos.ws.SOSworker;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.ServiceConfigurer;
+import org.constellation.ws.soap.OGCWebService;
+import org.geotoolkit.ows.xml.OWSExceptionCode;
+import org.geotoolkit.ows.xml.v110.ExceptionType;
+import org.geotoolkit.ows.xml.v110.ObjectFactory;
+import org.geotoolkit.sos.xml.GetCapabilities;
+import org.geotoolkit.sos.xml.GetFeatureOfInterest;
+import org.geotoolkit.sos.xml.GetObservation;
+import org.geotoolkit.sos.xml.GetObservationById;
+import org.geotoolkit.sos.xml.GetResult;
+import org.geotoolkit.sos.xml.GetResultTemplate;
+import org.geotoolkit.sos.xml.InsertObservation;
+import org.geotoolkit.sos.xml.InsertResult;
+import org.geotoolkit.sos.xml.InsertResultTemplate;
+import org.geotoolkit.sos.xml.SOSMarshallerPool;
+import org.geotoolkit.sos.xml.v100.GetFeatureOfInterestTime;
+import org.geotoolkit.swes.xml.DeleteSensor;
+import org.geotoolkit.swes.xml.DescribeSensor;
+import org.geotoolkit.swes.xml.InsertSensor;
+
 import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.ParameterStyle;
-import javax.xml.ws.BindingType;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.soap.Detail;
@@ -32,36 +53,15 @@ import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPConstants;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
+import javax.xml.ws.BindingType;
 import javax.xml.ws.Service;
 import javax.xml.ws.ServiceMode;
 import javax.xml.ws.WebServiceProvider;
+import java.util.logging.Level;
 
+// JAX-WS dependencies
 // Constellation dependencies
-import org.constellation.ServiceDef.Specification;
-import org.constellation.ws.ServiceConfigurer;
-import org.constellation.sos.configuration.SOSConfigurer;
-import org.constellation.ws.CstlServiceException;
-import org.constellation.sos.ws.SOSworker;
-
 // Geotoolkit dependencies
-import org.constellation.ws.soap.OGCWebService;
-import org.geotoolkit.ows.xml.OWSExceptionCode;
-import org.geotoolkit.ows.xml.v110.ExceptionType;
-import org.geotoolkit.ows.xml.v110.ObjectFactory;
-import org.geotoolkit.sos.xml.GetCapabilities;
-import org.geotoolkit.sos.xml.GetObservation;
-import org.geotoolkit.sos.xml.GetResult;
-import org.geotoolkit.sos.xml.InsertObservation;
-import org.geotoolkit.sos.xml.GetObservationById;
-import org.geotoolkit.sos.xml.GetResultTemplate;
-import org.geotoolkit.sos.xml.InsertResult;
-import org.geotoolkit.sos.xml.InsertResultTemplate;
-import org.geotoolkit.sos.xml.SOSMarshallerPool;
-import org.geotoolkit.sos.xml.GetFeatureOfInterest;
-import org.geotoolkit.sos.xml.v100.GetFeatureOfInterestTime;
-import org.geotoolkit.swes.xml.DescribeSensor;
-import org.geotoolkit.swes.xml.DeleteSensor;
-import org.geotoolkit.swes.xml.InsertSensor;
 
 /**
  *

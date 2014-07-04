@@ -18,13 +18,14 @@
  */
 package org.constellation.ws.rs.jackson;
 
+import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.codehaus.jackson.jaxrs.Annotations;
+import org.codehaus.jackson.map.ObjectMapper;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Provider;
-import org.apache.sis.metadata.iso.DefaultMetadata;
-import org.codehaus.jackson.jaxrs.Annotations;
-import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * Complete the {@link org.constellation.ws.rs.jackson.JacksonJaxbJsonProvider} with some

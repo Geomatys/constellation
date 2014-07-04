@@ -19,12 +19,6 @@
 
 package org.constellation.sos.ws;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.gml.xml.AbstractFeature;
 import org.geotoolkit.gml.xml.AbstractTimePosition;
@@ -44,12 +38,17 @@ import org.geotoolkit.swe.xml.DataArrayProperty;
 import org.geotoolkit.swe.xml.DataComponentProperty;
 import org.geotoolkit.swe.xml.PhenomenonProperty;
 import org.geotoolkit.swe.xml.v101.CompositePhenomenonType;
-import org.opengis.observation.AnyFeature;
 import org.opengis.observation.Observation;
 import org.opengis.observation.ObservationCollection;
-import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.temporal.Instant;
 import org.opengis.temporal.Period;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Static methods use to create valid XML file, by setting object into referenceMode.

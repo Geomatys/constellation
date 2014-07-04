@@ -19,9 +19,6 @@
 
 package org.constellation.admin.dao;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.admin.dao.DataRecord.DataType;
@@ -31,9 +28,14 @@ import org.constellation.admin.dao.TaskRecord.TaskState;
 import org.constellation.admin.util.IOUtilities;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
+import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 
+import javax.xml.namespace.QName;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
@@ -54,10 +56,8 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.namespace.QName;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
-import org.opengis.parameter.GeneralParameterDescriptor;
 
 /**
  * Session for administration database operations

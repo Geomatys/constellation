@@ -18,15 +18,15 @@
  */
 package org.constellation.engine.register.jpa;
 
+import org.constellation.engine.register.Task;
+import org.constellation.engine.register.User;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import org.constellation.engine.register.Task;
-import org.constellation.engine.register.User;
 
 
 

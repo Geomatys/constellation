@@ -19,9 +19,9 @@
 
 package org.constellation.configuration;
 
-import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import java.util.List;
 
 /**
  *

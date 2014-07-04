@@ -18,15 +18,20 @@
  */
 package org.constellation.process.provider;
 
-import java.util.Collection;
 import org.constellation.process.AbstractCstlProcess;
+import org.constellation.provider.DataProviders;
+import org.constellation.provider.Provider;
+import org.constellation.provider.StyleProviders;
+import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 
-import static org.constellation.process.provider.GetConfigProviderDescriptor.*;
-import org.constellation.provider.*;
-import static org.geotoolkit.parameter.Parameters.*;
-import org.geotoolkit.process.ProcessDescriptor;
+import java.util.Collection;
+
+import static org.constellation.process.provider.GetConfigProviderDescriptor.CONFIG;
+import static org.constellation.process.provider.GetConfigProviderDescriptor.PROVIDER_ID;
+import static org.geotoolkit.parameter.Parameters.getOrCreate;
+import static org.geotoolkit.parameter.Parameters.value;
 
 /**
  * Remove a provider from constellation. Throw an ProcessException if Provider is not found.

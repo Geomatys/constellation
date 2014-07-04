@@ -18,6 +18,7 @@
  */
 package org.constellation.coverage;
 
+import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.dao.TaskRecord;
 import org.constellation.provider.DataProviders;
 import org.geotoolkit.parameter.ParameterGroup;
@@ -34,7 +35,6 @@ import java.util.Date;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.constellation.admin.ConfigurationEngine;
 
 /**
  * Listener for Pyramidal process loaded via {@link PyramidCoverageHelper}

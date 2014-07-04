@@ -18,12 +18,12 @@
  */
 package org.constellation.engine.register.jpa;
 
+import org.constellation.engine.register.Role;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.constellation.engine.register.Role;
 
 @Entity
 @Table(name="`role`", schema="`admin`")

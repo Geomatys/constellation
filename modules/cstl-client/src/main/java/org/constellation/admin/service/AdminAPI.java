@@ -19,12 +19,14 @@
 
 package org.constellation.admin.service;
 
-import java.io.IOException;
-import javax.ws.rs.core.MediaType;
-import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.dto.Configuration;
 import org.constellation.dto.SimpleValue;
+
+import javax.ws.rs.core.MediaType;
+import java.io.IOException;
+
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
 /**
  *

@@ -19,23 +19,23 @@
 package org.constellation.openoffice;
 
 // J2SE dependencies
-import java.util.logging.Logger;
 
-// OpenOffice dependencies
 import com.sun.star.beans.XPropertySet;
-import com.sun.star.lang.XSingleServiceFactory;
-import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.comp.loader.FactoryHelper;
+import com.sun.star.lang.XMultiServiceFactory;
+import com.sun.star.lang.XSingleServiceFactory;
 import com.sun.star.registry.XRegistryKey;
-
-// Geotools dependencies
+import org.constellation.numeric.table.Interpolation;
+import org.constellation.numeric.table.Table;
+import org.constellation.numeric.table.TableFactory;
 import org.geotools.openoffice.Formulas;
 import org.geotools.openoffice.MethodInfo;
 
+import java.util.logging.Logger;
+
+// OpenOffice dependencies
+// Geotools dependencies
 // Constellation dependencies
-import org.constellation.numeric.table.Table;
-import org.constellation.numeric.table.TableFactory;
-import org.constellation.numeric.table.Interpolation;
 
 
 /**

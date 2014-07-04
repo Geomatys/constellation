@@ -19,12 +19,10 @@
 
 package org.constellation.wps.ws.rs;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
+import org.geotoolkit.wps.xml.WPSMarshallerPool;
+
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -32,9 +30,12 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
-import org.apache.sis.util.logging.Logging;
-import org.geotoolkit.wps.xml.WPSMarshallerPool;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *

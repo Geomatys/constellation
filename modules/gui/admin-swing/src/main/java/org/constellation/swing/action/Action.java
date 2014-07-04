@@ -18,13 +18,14 @@
  */
 package org.constellation.swing.action;
 
-import java.awt.Color;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import javax.swing.ImageIcon;
-import javax.swing.event.EventListenerList;
 import org.constellation.admin.service.ConstellationClient;
 import org.constellation.swing.FrameDisplayer;
+
+import javax.swing.*;
+import javax.swing.event.EventListenerList;
+import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  *

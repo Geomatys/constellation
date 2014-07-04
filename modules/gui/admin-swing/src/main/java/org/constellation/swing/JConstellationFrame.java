@@ -18,12 +18,7 @@
  */
 package org.constellation.swing;
 
-import java.net.MalformedURLException;
-
-import javax.swing.JFrame;
-import javax.swing.JTabbedPane;
 import org.constellation.admin.service.ConstellationClient;
-
 import org.constellation.security.RoleController;
 import org.constellation.swing.action.ProviderDeleteAction;
 import org.constellation.swing.action.ProviderEditAction;
@@ -34,6 +29,9 @@ import org.constellation.swing.action.ServiceEditAction;
 import org.constellation.swing.action.ServiceReloadAction;
 import org.constellation.swing.action.ServiceStartStopAction;
 import org.constellation.swing.action.ServiceViewAction;
+
+import javax.swing.*;
+import java.net.MalformedURLException;
 
 /**
  *

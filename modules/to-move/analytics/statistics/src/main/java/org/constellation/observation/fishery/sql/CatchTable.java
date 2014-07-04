@@ -18,10 +18,9 @@
  */
 package org.constellation.observation.fishery.sql;
 
-import org.constellation.catalog.ConfigurationKey;
 import org.constellation.catalog.Database;
-import org.constellation.observation.fishery.Catch;
 import org.constellation.observation.MeasurementTable;
+import org.constellation.observation.fishery.Catch;
 
 
 /**

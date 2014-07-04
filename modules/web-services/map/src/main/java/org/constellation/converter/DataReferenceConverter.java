@@ -18,18 +18,19 @@
  */
 package org.constellation.converter;
 
-import java.util.Collection;
-import java.util.List;
+import org.apache.sis.util.UnconvertibleObjectException;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviders;
 import org.constellation.util.DataReference;
-import org.apache.sis.util.UnconvertibleObjectException;
 import org.geotoolkit.feature.type.Name;
 import org.opengis.style.Description;
 import org.opengis.style.FeatureTypeStyle;
 import org.opengis.style.Style;
 import org.opengis.style.StyleVisitor;
 import org.opengis.style.Symbolizer;
+
+import java.util.Collection;
+import java.util.List;
 
 
 /**

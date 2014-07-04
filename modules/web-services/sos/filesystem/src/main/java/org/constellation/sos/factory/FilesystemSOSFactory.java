@@ -19,16 +19,17 @@
 
 package org.constellation.sos.factory;
 
-import java.util.Map;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.MetadataIoException;
-import org.constellation.sos.io.filesystem.FileSensorReader;
-import org.constellation.sos.io.filesystem.FileSensorWriter;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
+import org.constellation.sos.io.filesystem.FileSensorReader;
+import org.constellation.sos.io.filesystem.FileSensorWriter;
 
-import static org.constellation.configuration.DataSourceType.*;
+import java.util.Map;
+
+import static org.constellation.configuration.DataSourceType.FILESYSTEM;
 
 /**
   * A FileSystem implementation of the SOS SensorML factory.

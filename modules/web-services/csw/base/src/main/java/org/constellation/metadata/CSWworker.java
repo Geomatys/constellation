@@ -19,103 +19,160 @@
 package org.constellation.metadata;
 
 // J2SE dependencies
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.sql.SQLException;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
 
-
-
-// JAXB dependencies
-import javax.imageio.spi.ServiceRegistry;
-import javax.inject.Named;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
-
-
-
-// Apache Lucene dependencies
 import com.codahale.metrics.annotation.Timed;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
-
-//Constellation dependencies
+import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.util.logging.MonolineFormatter;
+import org.apache.sis.xml.MarshallerPool;
+import org.apache.sis.xml.Namespaces;
 import org.constellation.ServiceDef;
+import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.dto.Details;
 import org.constellation.filter.FilterParser;
 import org.constellation.filter.FilterParserException;
 import org.constellation.filter.SQLQuery;
 import org.constellation.generic.database.Automatic;
-import org.constellation.metadata.io.CSWMetadataReader;
-import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.metadata.factory.AbstractCSWFactory;
+import org.constellation.metadata.harvest.CatalogueHarvester;
+import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.MetadataIoException;
+import org.constellation.metadata.io.MetadataType;
+import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.metadata.security.MetadataSecurityFilter;
-
+import org.constellation.metadata.utils.CSWUtils;
 import org.constellation.security.SecurityManagerHolder;
 import org.constellation.util.Util;
-import org.constellation.ws.CstlServiceException;
-
-import static org.constellation.api.QueryConstants.*;
-import static org.constellation.metadata.CSWQueryable.*;
-import static org.constellation.metadata.CSWConstants.*;
-
-//geotoolkit dependencies
-import org.constellation.metadata.harvest.CatalogueHarvester;
 import org.constellation.ws.AbstractWorker;
+import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.UnauthorizedException;
-import org.geotoolkit.csw.xml.*;
+import org.geotoolkit.csw.xml.AbstractCapabilities;
+import org.geotoolkit.csw.xml.AbstractCswRequest;
+import org.geotoolkit.csw.xml.Acknowledgement;
+import org.geotoolkit.csw.xml.CSWMarshallerPool;
+import org.geotoolkit.csw.xml.CswXmlFactory;
+import org.geotoolkit.csw.xml.Delete;
+import org.geotoolkit.csw.xml.DescribeRecord;
+import org.geotoolkit.csw.xml.DescribeRecordResponse;
+import org.geotoolkit.csw.xml.DistributedSearch;
+import org.geotoolkit.csw.xml.DomainValues;
+import org.geotoolkit.csw.xml.ElementSetName;
+import org.geotoolkit.csw.xml.ElementSetType;
+import org.geotoolkit.csw.xml.GetCapabilities;
+import org.geotoolkit.csw.xml.GetDomain;
+import org.geotoolkit.csw.xml.GetDomainResponse;
+import org.geotoolkit.csw.xml.GetRecordById;
+import org.geotoolkit.csw.xml.GetRecordByIdResponse;
+import org.geotoolkit.csw.xml.GetRecordsRequest;
+import org.geotoolkit.csw.xml.GetRecordsResponse;
+import org.geotoolkit.csw.xml.Harvest;
+import org.geotoolkit.csw.xml.HarvestResponse;
+import org.geotoolkit.csw.xml.Insert;
+import org.geotoolkit.csw.xml.Query;
+import org.geotoolkit.csw.xml.ResultType;
+import org.geotoolkit.csw.xml.SchemaComponent;
+import org.geotoolkit.csw.xml.SearchResults;
+import org.geotoolkit.csw.xml.Transaction;
+import org.geotoolkit.csw.xml.TransactionResponse;
+import org.geotoolkit.csw.xml.TransactionSummary;
+import org.geotoolkit.csw.xml.TypeNames;
+import org.geotoolkit.csw.xml.Update;
+import org.geotoolkit.csw.xml.v202.AbstractRecordType;
+import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
+import org.geotoolkit.ebrim.xml.v300.IdentifiableType;
 import org.geotoolkit.factory.FactoryNotFoundException;
+import org.geotoolkit.feature.catalog.FeatureCatalogueImpl;
 import org.geotoolkit.inspire.xml.InspireCapabilitiesType;
 import org.geotoolkit.inspire.xml.MultiLingualCapabilities;
-import org.apache.sis.metadata.iso.DefaultMetadata;
-import org.geotoolkit.csw.xml.v202.AbstractRecordType;
-import org.geotoolkit.ebrim.xml.v300.IdentifiableType;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.SearchingException;
 import org.geotoolkit.lucene.filter.SpatialQuery;
-import org.geotoolkit.lucene.index.LuceneIndexSearcher;
 import org.geotoolkit.lucene.index.AbstractIndexer;
+import org.geotoolkit.lucene.index.LuceneIndexSearcher;
 import org.geotoolkit.ogc.xml.SortBy;
-import org.geotoolkit.ows.xml.AbstractServiceIdentification;
-import org.geotoolkit.ows.xml.AbstractServiceProvider;
 import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
-import org.geotoolkit.ows.xml.AcceptVersions;
-import org.geotoolkit.ows.xml.Sections;
 import org.geotoolkit.ows.xml.AbstractDomain;
 import org.geotoolkit.ows.xml.AbstractOperation;
 import org.geotoolkit.ows.xml.AbstractOperationsMetadata;
+import org.geotoolkit.ows.xml.AbstractServiceIdentification;
+import org.geotoolkit.ows.xml.AbstractServiceProvider;
+import org.geotoolkit.ows.xml.AcceptVersions;
+import org.geotoolkit.ows.xml.Sections;
 import org.geotoolkit.ows.xml.v100.SectionsType;
 import org.geotoolkit.util.StringUtilities;
-import org.apache.sis.xml.MarshallerPool;
-import org.apache.sis.xml.Namespaces;
-import org.constellation.configuration.ConfigDirectory;
-import org.constellation.configuration.ConfigurationException;
-import org.constellation.metadata.io.MetadataType;
-import org.constellation.metadata.utils.CSWUtils;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
-import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import static org.geotoolkit.csw.xml.TypeNames.*;
-
-import org.geotoolkit.feature.catalog.FeatureCatalogueImpl;
-
-// GeoAPI dependencies
-import org.opengis.filter.sort.SortOrder;
 import org.opengis.filter.capability.FilterCapabilities;
+import org.opengis.filter.sort.SortOrder;
 import org.opengis.util.CodeList;
 import org.springframework.context.annotation.Scope;
 import org.w3c.dom.Node;
+
+import javax.imageio.spi.ServiceRegistry;
+import javax.inject.Named;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+
+import static org.constellation.api.QueryConstants.SERVICE_PARAMETER;
+import static org.constellation.metadata.CSWConstants.ALL;
+import static org.constellation.metadata.CSWConstants.CSW;
+import static org.constellation.metadata.CSWConstants.CSW_202_VERSION;
+import static org.constellation.metadata.CSWConstants.CSW_FILTER_CAPABILITIES;
+import static org.constellation.metadata.CSWConstants.EBRIM_25;
+import static org.constellation.metadata.CSWConstants.EBRIM_30;
+import static org.constellation.metadata.CSWConstants.FILTER_CAPABILITIES;
+import static org.constellation.metadata.CSWConstants.OPERATIONS_METADATA;
+import static org.constellation.metadata.CSWConstants.OUTPUT_SCHEMA;
+import static org.constellation.metadata.CSWConstants.PARAMETERNAME;
+import static org.constellation.metadata.CSWConstants.SOURCE;
+import static org.constellation.metadata.CSWConstants.TRANSACTION_TYPE;
+import static org.constellation.metadata.CSWConstants.TYPENAMES;
+import static org.constellation.metadata.CSWQueryable.DUBLIN_CORE_QUERYABLE;
+import static org.constellation.metadata.CSWQueryable.ISO_QUERYABLE;
+import static org.geotoolkit.csw.xml.TypeNames.CAPABILITIES_QNAME;
+import static org.geotoolkit.csw.xml.TypeNames.DC_TYPE_NAMES;
+import static org.geotoolkit.csw.xml.TypeNames.EBRIM25_TYPE_NAMES;
+import static org.geotoolkit.csw.xml.TypeNames.EBRIM30_TYPE_NAMES;
+import static org.geotoolkit.csw.xml.TypeNames.EXTRINSIC_OBJECT_25_QNAME;
+import static org.geotoolkit.csw.xml.TypeNames.EXTRINSIC_OBJECT_QNAME;
+import static org.geotoolkit.csw.xml.TypeNames.FC_TYPE_NAMES;
+import static org.geotoolkit.csw.xml.TypeNames.ISO_TYPE_NAMES;
+import static org.geotoolkit.csw.xml.TypeNames.METADATA_QNAME;
+import static org.geotoolkit.csw.xml.TypeNames.RECORD_QNAME;
+import static org.geotoolkit.csw.xml.TypeNames.containsOneOfEbrim25;
+import static org.geotoolkit.csw.xml.TypeNames.containsOneOfEbrim30;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.OPERATION_NOT_SUPPORTED;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
+
+// JAXB dependencies
+// Apache Lucene dependencies
+//Constellation dependencies
+//geotoolkit dependencies
+// GeoAPI dependencies
 
 
 /**

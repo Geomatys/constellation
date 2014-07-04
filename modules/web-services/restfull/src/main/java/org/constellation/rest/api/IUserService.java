@@ -18,9 +18,9 @@
  */
 package org.constellation.rest.api;
 
-import javax.ws.rs.core.Response;
-
 import org.constellation.engine.register.User;
+
+import javax.ws.rs.core.Response;
 
 public interface IUserService {
 

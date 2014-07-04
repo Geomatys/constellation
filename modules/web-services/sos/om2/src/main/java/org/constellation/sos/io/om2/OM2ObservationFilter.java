@@ -19,37 +19,40 @@
 
 package org.constellation.sos.io.om2;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.*;
-import java.util.Map;
-import java.util.logging.Level;
-import javax.sql.DataSource;
-import javax.xml.namespace.QName;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import static org.constellation.sos.io.om2.OM2BaseReader.LOGGER;
-import static org.constellation.sos.ws.SOSConstants.*;
-
-// Geotoolkit dependencies
-import static org.constellation.sos.ws.SOSUtils.*;
 import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.observation.ObservationFilter;
 import org.geotoolkit.observation.ObservationResult;
 import org.geotoolkit.observation.ObservationStoreException;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-
-// GeoAPI dependencies
 import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.sos.xml.ResponseModeType;
 import org.geotoolkit.swe.xml.CompositePhenomenon;
 import org.opengis.observation.Phenomenon;
 import org.opengis.temporal.Instant;
 import org.opengis.temporal.Period;
+
+import javax.sql.DataSource;
+import javax.xml.namespace.QName;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+
+import static org.constellation.sos.ws.SOSConstants.EVENT_TIME;
+import static org.constellation.sos.ws.SOSUtils.getTimeValue;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+
+// Geotoolkit dependencies
+// GeoAPI dependencies
 
 /**
  *

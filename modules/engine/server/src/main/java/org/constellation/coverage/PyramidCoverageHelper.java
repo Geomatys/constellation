@@ -18,45 +18,43 @@
  */
 package org.constellation.coverage;
 
-import java.awt.Dimension;
-
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.ArraysExt;
+import org.constellation.admin.ConfigurationEngine;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.coverage.CoverageStoreFinder;
 import org.geotoolkit.coverage.PyramidCoverageBuilder;
 import org.geotoolkit.coverage.filestore.FileCoverageStoreFactory;
-import org.geotoolkit.coverage.xmlstore.XMLCoverageStoreFactory;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.grid.GridGeometry2D;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.coverage.memory.MPCoverageStore;
 import org.geotoolkit.coverage.postgresql.PGCoverageStoreFactory;
+import org.geotoolkit.coverage.xmlstore.XMLCoverageStoreFactory;
 import org.geotoolkit.feature.type.DefaultName;
+import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.image.interpolation.InterpolationCase;
 import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.process.ProcessListener;
 import org.geotoolkit.referencing.adapters.NetcdfCRS;
 import org.opengis.coverage.grid.GridCoverage;
-import org.geotoolkit.feature.type.Name;
 import org.opengis.geometry.Envelope;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.FactoryException;
 
+import java.awt.*;
 import java.io.File;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
-import org.constellation.admin.ConfigurationEngine;
 
 /**
  * Helper class to ease the pyramid process.

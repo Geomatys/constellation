@@ -20,52 +20,18 @@
 package org.constellation.wfs.ws.rs;
 
 // J2SE dependencies
-import java.lang.reflect.Proxy;
-import javax.xml.bind.JAXBContext;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLEventReader;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 
-// JAXB dependencies
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-
-// jersey dependencies
-import javax.inject.Singleton;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-
-// constellation dependencies
-import org.constellation.ws.rs.GridWebService;
-import org.constellation.ws.WebServiceUtilities;
+import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.wfs.ws.DefaultWFSWorker;
 import org.constellation.wfs.ws.WFSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.UnauthorizedException;
-import org.constellation.xml.PrefixMappingInvocationHandler;
+import org.constellation.ws.WebServiceUtilities;
 import org.constellation.ws.Worker;
-
-import static org.constellation.api.QueryConstants.*;
-import static org.constellation.wfs.ws.WFSConstants.*;
-
-// Geotoolkit dependencies
-import org.geotoolkit.ows.xml.RequestBase;
+import org.constellation.ws.rs.GridWebService;
+import org.constellation.xml.PrefixMappingInvocationHandler;
 import org.geotoolkit.client.RequestsUtilities;
 import org.geotoolkit.ogc.xml.FilterXmlFactory;
 import org.geotoolkit.ogc.xml.SortBy;
@@ -73,17 +39,104 @@ import org.geotoolkit.ogc.xml.XMLFilter;
 import org.geotoolkit.ows.xml.AcceptFormats;
 import org.geotoolkit.ows.xml.AcceptVersions;
 import org.geotoolkit.ows.xml.ExceptionResponse;
-import org.geotoolkit.ows.xml.v100.SectionsType;
+import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ows.xml.Sections;
-import org.geotoolkit.wfs.xml.*;
+import org.geotoolkit.ows.xml.v100.SectionsType;
 import org.geotoolkit.wfs.xml.AllSomeType;
+import org.geotoolkit.wfs.xml.BaseRequest;
+import org.geotoolkit.wfs.xml.CreateStoredQuery;
+import org.geotoolkit.wfs.xml.DeleteElement;
+import org.geotoolkit.wfs.xml.DescribeFeatureType;
+import org.geotoolkit.wfs.xml.DescribeStoredQueries;
+import org.geotoolkit.wfs.xml.DropStoredQuery;
+import org.geotoolkit.wfs.xml.GetCapabilities;
+import org.geotoolkit.wfs.xml.GetFeature;
+import org.geotoolkit.wfs.xml.GetGmlObject;
+import org.geotoolkit.wfs.xml.GetPropertyValue;
+import org.geotoolkit.wfs.xml.ListStoredQueries;
+import org.geotoolkit.wfs.xml.LockFeature;
+import org.geotoolkit.wfs.xml.Parameter;
+import org.geotoolkit.wfs.xml.ParameterExpression;
+import org.geotoolkit.wfs.xml.Query;
 import org.geotoolkit.wfs.xml.ResultTypeType;
-import org.apache.sis.xml.MarshallerPool;
-
+import org.geotoolkit.wfs.xml.StoredQuery;
+import org.geotoolkit.wfs.xml.Transaction;
 import org.opengis.filter.sort.SortOrder;
 
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import static org.geotoolkit.wfs.xml.WFSXmlFactory.*;
+import javax.inject.Singleton;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.lang.reflect.Proxy;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
+
+import static org.constellation.api.QueryConstants.ACCEPT_FORMATS_PARAMETER;
+import static org.constellation.api.QueryConstants.ACCEPT_VERSIONS_PARAMETER;
+import static org.constellation.api.QueryConstants.REQUEST_PARAMETER;
+import static org.constellation.api.QueryConstants.SECTIONS_PARAMETER;
+import static org.constellation.api.QueryConstants.SERVICE_PARAMETER;
+import static org.constellation.api.QueryConstants.UPDATESEQUENCE_PARAMETER;
+import static org.constellation.api.QueryConstants.VERSION_PARAMETER;
+import static org.constellation.wfs.ws.WFSConstants.FILTER;
+import static org.constellation.wfs.ws.WFSConstants.GML_3_1_1;
+import static org.constellation.wfs.ws.WFSConstants.GML_3_2_1;
+import static org.constellation.wfs.ws.WFSConstants.HANDLE;
+import static org.constellation.wfs.ws.WFSConstants.NAMESPACE;
+import static org.constellation.wfs.ws.WFSConstants.STR_CREATE_STORED_QUERY;
+import static org.constellation.wfs.ws.WFSConstants.STR_DESCRIBEFEATURETYPE;
+import static org.constellation.wfs.ws.WFSConstants.STR_DESCRIBE_STORED_QUERIES;
+import static org.constellation.wfs.ws.WFSConstants.STR_DROP_STORED_QUERY;
+import static org.constellation.wfs.ws.WFSConstants.STR_GETCAPABILITIES;
+import static org.constellation.wfs.ws.WFSConstants.STR_GETFEATURE;
+import static org.constellation.wfs.ws.WFSConstants.STR_GETGMLOBJECT;
+import static org.constellation.wfs.ws.WFSConstants.STR_GET_PROPERTY_VALUE;
+import static org.constellation.wfs.ws.WFSConstants.STR_LIST_STORED_QUERIES;
+import static org.constellation.wfs.ws.WFSConstants.STR_LOCKFEATURE;
+import static org.constellation.wfs.ws.WFSConstants.STR_TRANSACTION;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildAcceptFormat;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildAcceptVersion;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildBBOXFilter;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildDecribeFeatureType;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildDeleteElement;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildDescribeStoredQueries;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildDropStoredQuery;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildGetCapabilities;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildGetFeature;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildGetGmlObject;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildGetPropertyValue;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildListStoredQueries;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildLockFeature;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildParameter;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildQuery;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildSections;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildSortBy;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildStoredQuery;
+import static org.geotoolkit.wfs.xml.WFSXmlFactory.buildTransaction;
+
+// JAXB dependencies
+// jersey dependencies
+// constellation dependencies
+// Geotoolkit dependencies
 
 
 /**

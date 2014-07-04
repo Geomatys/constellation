@@ -19,20 +19,21 @@
 package org.constellation.observation.fishery.sql;
 
 // J2SE dependencies
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.awt.geom.Point2D;
 
-// OpenGIS dependencies
-import org.opengis.metadata.citation.Citation;
-import org.opengis.observation.sampling.SamplingFeature;
-import org.opengis.observation.sampling.SamplingFeatureCollection;
-
-// Constellation dependencies
 import org.constellation.catalog.ConfigurationKey;
 import org.constellation.catalog.Database;
 import org.constellation.sampling.SamplingFeatureTable;
 import org.geotoolkit.util.DateRange;
+import org.opengis.metadata.citation.Citation;
+import org.opengis.observation.sampling.SamplingFeature;
+import org.opengis.observation.sampling.SamplingFeatureCollection;
+
+import java.awt.geom.Point2D;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+// OpenGIS dependencies
+// Constellation dependencies
 
 
 

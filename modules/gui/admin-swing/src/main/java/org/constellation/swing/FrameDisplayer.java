@@ -18,10 +18,11 @@
  */
 package org.constellation.swing;
 
-import javax.swing.JComponent;
 import org.constellation.admin.service.ConstellationClient;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.ProviderReport;
+
+import javax.swing.*;
 
 /**
  *

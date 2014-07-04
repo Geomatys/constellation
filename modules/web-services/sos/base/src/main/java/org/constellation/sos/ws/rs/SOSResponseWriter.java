@@ -19,12 +19,11 @@
 
 package org.constellation.sos.ws.rs;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.sos.xml.SOSMarshallerPool;
+import org.geotoolkit.sos.xml.SOSResponseWrapper;
+import org.geotoolkit.swes.xml.SOSResponse;
+
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -33,10 +32,12 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import org.geotoolkit.sos.xml.SOSMarshallerPool;
-import org.geotoolkit.swes.xml.SOSResponse;
-import org.geotoolkit.sos.xml.SOSResponseWrapper;
-import org.apache.sis.util.logging.Logging;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *

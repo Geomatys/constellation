@@ -18,9 +18,9 @@
  */
 package org.constellation.sos.component;
 
-import javax.inject.Named;
-
 import org.constellation.ws.ConstellationOGCModule;
+
+import javax.inject.Named;
 
 @Named
 public class SOSConstellationOGCModule implements ConstellationOGCModule {

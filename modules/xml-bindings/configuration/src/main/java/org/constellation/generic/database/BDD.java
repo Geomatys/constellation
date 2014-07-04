@@ -20,28 +20,26 @@
 
 package org.constellation.generic.database;
 
+import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.internal.sql.DefaultDataSource;
+import org.geotoolkit.jdbc.DBCPDataSource;
+import org.geotoolkit.jdbc.WrappedDataSource;
+import org.postgresql.ds.PGSimpleDataSource;
+import org.postgresql.ds.common.BaseDataSource;
+
+import javax.sql.ConnectionPoolDataSource;
+import javax.sql.DataSource;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.lang.reflect.UndeclaredThrowableException;
-import javax.sql.DataSource;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-
-import org.apache.commons.dbcp.BasicDataSource;
-
-import org.geotoolkit.internal.sql.DefaultDataSource;
-import org.geotoolkit.jdbc.DBCPDataSource;
-import org.geotoolkit.jdbc.WrappedDataSource;
-import org.apache.sis.util.logging.Logging;
-
-import javax.sql.ConnectionPoolDataSource;
-import org.postgresql.ds.PGSimpleDataSource;
-import org.postgresql.ds.common.BaseDataSource;
 
 /**
  *

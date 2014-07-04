@@ -18,20 +18,21 @@
  */
 package org.constellation.scheduler.configuration;
 
+import javanet.staxutils.IndentingXMLStreamWriter;
+import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.ConfigurationException;
+import org.constellation.scheduler.Task;
+import org.constellation.scheduler.TaskConfigurator;
+
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import javanet.staxutils.IndentingXMLStreamWriter;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-import org.constellation.configuration.ConfigDirectory;
-import org.constellation.configuration.ConfigurationException;
-import org.constellation.scheduler.Task;
-import org.constellation.scheduler.TaskConfigurator;
 
 /**
  * Task configurator saving configuration in an XML file.

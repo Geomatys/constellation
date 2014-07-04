@@ -18,9 +18,10 @@
  */
 package org.constellation.gui.event;
 
-import java.util.EventObject;
-import org.opengis.coverage.grid.GridCoverage;
 import org.constellation.coverage.catalog.CoverageReference;
+import org.opengis.coverage.grid.GridCoverage;
+
+import java.util.EventObject;
 
 
 /**

@@ -19,15 +19,7 @@
 package org.constellation.metadata.harvest;
 
 // J2SE dependencies
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.apache.sis.xml.Namespaces;
@@ -37,9 +29,20 @@ import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.csw.xml.GetRecordsRequest;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.w3c.dom.Node;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
 
 /**
  *

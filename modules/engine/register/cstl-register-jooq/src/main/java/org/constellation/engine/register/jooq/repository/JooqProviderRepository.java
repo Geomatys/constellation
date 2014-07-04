@@ -18,19 +18,23 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
-import java.util.List;
-
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.Style;
 import org.constellation.engine.register.jooq.tables.Data;
 import org.constellation.engine.register.jooq.tables.DataXDomain;
-import org.constellation.engine.register.jooq.tables.records.LayerRecord;
 import org.constellation.engine.register.jooq.tables.records.ProviderRecord;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.jooq.UpdateConditionStep;
 import org.springframework.stereotype.Component;
 
-import static org.constellation.engine.register.jooq.Tables.*;
+import java.util.List;
+
+import static org.constellation.engine.register.jooq.Tables.DATA;
+import static org.constellation.engine.register.jooq.Tables.DATA_X_DOMAIN;
+import static org.constellation.engine.register.jooq.Tables.LAYER;
+import static org.constellation.engine.register.jooq.Tables.PROVIDER;
+import static org.constellation.engine.register.jooq.Tables.SERVICE;
+import static org.constellation.engine.register.jooq.Tables.STYLE;
 
 @Component
 public class JooqProviderRepository extends AbstractJooqRespository<ProviderRecord, Provider> implements

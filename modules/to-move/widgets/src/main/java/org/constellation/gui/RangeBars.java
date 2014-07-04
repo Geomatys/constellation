@@ -19,78 +19,47 @@
 package org.constellation.gui;
 
 // User interface
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.ImageIcon;
-import javax.swing.UIManager;
-import javax.swing.JComponent;
-import javax.swing.JScrollBar;
-import javax.swing.LookAndFeel;
-import javax.swing.SwingConstants;
-import javax.swing.BorderFactory;
-import javax.swing.border.Border;
-import javax.swing.BoundedRangeModel;
-import javax.swing.text.JTextComponent;
-import javax.swing.DefaultBoundedRangeModel;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 
-// Graphics
-import java.awt.Font;
-import java.awt.Paint;
-import java.awt.Color;
-import java.awt.Insets;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.font.GlyphVector;
-import java.awt.font.FontRenderContext;
-
-// Geometry
-import java.awt.Shape;
-import java.awt.Dimension;
-import java.awt.Rectangle;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.NoninvertibleTransformException;
-
-// Collections
-import java.util.Map;
-import java.util.List;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.lang.reflect.Array;
-import java.util.ConcurrentModificationException;
-import javax.media.jai.util.Range;
-
-// Miscellaneous
-import java.util.Date;
-import java.util.TimeZone;
-import java.text.Format;
-import javax.units.Unit;
-
-// Geotools dependencies
-import org.geotoolkit.util.collection.RangeSet;
-import org.geotoolkit.gui.swing.ZoomPane;
+import org.constellation.resources.i18n.ResourceKeys;
+import org.constellation.resources.i18n.Resources;
+import org.geotoolkit.display.axis.AbstractGraduation;
+import org.geotoolkit.display.axis.Axis2D;
+import org.geotoolkit.display.axis.DateGraduation;
+import org.geotoolkit.display.axis.Graduation;
+import org.geotoolkit.display.axis.NumberGraduation;
 import org.geotoolkit.gui.swing.ExceptionMonitor;
+import org.geotoolkit.gui.swing.ZoomPane;
+import org.geotoolkit.util.collection.RangeSet;
 import org.geotoolkit.util.converter.ConverterRegistry;
 
+import javax.media.jai.util.Range;
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.units.Unit;
+import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphVector;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.text.Format;
+import java.util.ConcurrentModificationException;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.TimeZone;
+
+// Graphics
+// Geometry
+// Collections
+// Miscellaneous
+// Geotools dependencies
 // Axis and graduation
 //import org.geotools.units.Unit;
-import org.geotoolkit.display.axis.Axis2D;
-import org.geotoolkit.display.axis.Graduation;
-import org.geotoolkit.display.axis.DateGraduation;
-import org.geotoolkit.display.axis.NumberGraduation;
-import org.geotoolkit.display.axis.AbstractGraduation;
-
 // Resources
-import org.constellation.resources.i18n.Resources;
-import org.constellation.resources.i18n.ResourceKeys;
 
 
 /**

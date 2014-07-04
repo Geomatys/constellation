@@ -19,9 +19,6 @@
 
 package org.constellation.admin;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.inject.Inject;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.Service;
@@ -29,6 +26,10 @@ import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
 import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *

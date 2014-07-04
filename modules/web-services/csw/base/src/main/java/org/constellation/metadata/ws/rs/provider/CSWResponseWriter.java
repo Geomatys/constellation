@@ -20,13 +20,14 @@
 package org.constellation.metadata.ws.rs.provider;
 
 import com.sun.xml.bind.marshaller.DataWriter;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.XML;
+import org.constellation.jaxb.CstlXMLSerializer;
+import org.constellation.jaxb.MarshallWarnings;
+import org.constellation.metadata.utils.SerializerResponse;
+import org.geotoolkit.csw.xml.CSWMarshallerPool;
+import org.geotoolkit.csw.xml.CSWResponse;
+
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -35,13 +36,13 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import org.apache.sis.util.logging.Logging;
-import org.apache.sis.xml.XML;
-import org.constellation.jaxb.CstlXMLSerializer;
-import org.constellation.jaxb.MarshallWarnings;
-import org.constellation.metadata.utils.SerializerResponse;
-import org.geotoolkit.csw.xml.CSWMarshallerPool;
-import org.geotoolkit.csw.xml.CSWResponse;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Note: replace <T extends CSWResponse> by <T extends Object> because an strange bug arrive with DescribeRecordResponse not passing in this Provider.

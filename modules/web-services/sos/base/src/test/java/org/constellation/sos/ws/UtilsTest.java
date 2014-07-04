@@ -19,10 +19,6 @@
 
 package org.constellation.sos.ws;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import javax.xml.bind.Unmarshaller;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.util.Util;
 import org.geotoolkit.gml.xml.AbstractGeometry;
@@ -33,8 +29,6 @@ import org.geotoolkit.gml.xml.v311.PointType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.observation.ObservationStoreException;
 import org.geotoolkit.observation.xml.v100.ObservationType;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.sampling.xml.v100.SamplingPointType;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
@@ -42,11 +36,20 @@ import org.geotoolkit.swe.xml.v101.PhenomenonType;
 import org.geotoolkit.temporal.object.TemporalUtilities;
 import org.junit.After;
 import org.junit.AfterClass;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opengis.observation.Observation;
+
+import javax.xml.bind.Unmarshaller;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  *

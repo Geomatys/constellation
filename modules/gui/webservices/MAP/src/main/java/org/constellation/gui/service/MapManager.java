@@ -19,7 +19,6 @@
 
 package org.constellation.gui.service;
 
-import org.constellation.ServiceDef;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.LayerList;
 

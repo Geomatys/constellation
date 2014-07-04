@@ -20,6 +20,18 @@ package org.constellation.xacml;
 
 import com.sun.xacml.ParsingException;
 import com.sun.xacml.ctx.RequestCtx;
+import org.constellation.xacml.api.RequestContext;
+import org.geotoolkit.xacml.xml.context.ObjectFactory;
+import org.geotoolkit.xacml.xml.context.RequestType;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import javax.xml.bind.JAXB;
+import javax.xml.bind.JAXBElement;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,20 +39,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.xml.bind.JAXB;
-import javax.xml.bind.JAXBElement;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import javax.xml.parsers.ParserConfigurationException;
-import org.geotoolkit.xacml.xml.context.ObjectFactory;
-import org.geotoolkit.xacml.xml.context.RequestType;
-import org.constellation.xacml.api.RequestContext;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 
 /**

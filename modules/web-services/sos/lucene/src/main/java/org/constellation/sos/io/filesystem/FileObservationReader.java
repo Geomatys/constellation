@@ -20,17 +20,6 @@
 package org.constellation.sos.io.filesystem;
 
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
@@ -38,8 +27,6 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.sos.factory.OMFactory;
 import org.geotoolkit.gml.xml.AbstractGeometry;
 import org.geotoolkit.observation.ObservationReader;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-
 import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.sos.xml.ResponseModeType;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
@@ -48,6 +35,18 @@ import org.opengis.observation.Observation;
 import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.temporal.TemporalGeometricPrimitive;
 import org.opengis.temporal.TemporalPrimitive;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  *

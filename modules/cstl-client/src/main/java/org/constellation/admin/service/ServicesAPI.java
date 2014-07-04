@@ -19,13 +19,6 @@
 
 package org.constellation.admin.service;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBElement;
-import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.AbstractConfigurationObject;
 import org.constellation.configuration.Instance;
@@ -39,6 +32,15 @@ import org.constellation.dto.AddLayer;
 import org.constellation.dto.Details;
 import org.constellation.dto.SimpleValue;
 import org.constellation.generic.database.Automatic;
+
+import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXBElement;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
 /**
  * Constellation RESTful API for services management/configuration.

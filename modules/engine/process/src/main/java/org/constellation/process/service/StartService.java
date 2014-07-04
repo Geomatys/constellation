@@ -20,13 +20,13 @@ package org.constellation.process.service;
 
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.process.AbstractCstlProcess;
-
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 
+import static org.constellation.process.service.StartServiceDescriptor.IDENTIFIER;
+import static org.constellation.process.service.StartServiceDescriptor.SERVICE_TYPE;
 import static org.geotoolkit.parameter.Parameters.value;
-import static org.constellation.process.service.StartServiceDescriptor.*;
 
 /**
  *

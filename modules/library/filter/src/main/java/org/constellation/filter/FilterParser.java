@@ -19,25 +19,14 @@
 
 package org.constellation.filter;
 
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
-import java.util.logging.Level;
-
-// JAXB dependencies
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.namespace.QName;
-
-// Apache Lucene dependencies
+import com.vividsolutions.jts.geom.Geometry;
 import org.apache.lucene.search.Filter;
-
-// Geotoolkit dependencies
+import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.cql.CQL;
+import org.geotoolkit.cql.CQLException;
 import org.geotoolkit.csw.xml.QueryConstraint;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
-import org.geotoolkit.cql.CQL;
-import org.geotoolkit.cql.CQLException;
 import org.geotoolkit.filter.FilterFactoryImpl;
 import org.geotoolkit.filter.SpatialFilterType;
 import org.geotoolkit.geometry.jts.SRIDGenerator;
@@ -50,49 +39,65 @@ import org.geotoolkit.gml.xml.Point;
 import org.geotoolkit.gml.xml.Polygon;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
+import org.geotoolkit.ogc.xml.v110.AbstractIdType;
 import org.geotoolkit.ogc.xml.v110.BBOXType;
+import org.geotoolkit.ogc.xml.v110.BinaryComparisonOpType;
 import org.geotoolkit.ogc.xml.v110.ComparisonOpsType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.LogicOpsType;
-import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
 import org.geotoolkit.ogc.xml.v110.LowerBoundaryType;
-import org.geotoolkit.ogc.xml.v110.AbstractIdType;
-import org.geotoolkit.ogc.xml.v110.BinaryComparisonOpType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsBetweenType;
-import org.geotoolkit.ogc.xml.v110.UpperBoundaryType;
+import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
 import org.geotoolkit.ogc.xml.v110.TemporalOpsType;
-import org.apache.sis.util.logging.Logging;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import static org.geotoolkit.lucene.filter.LuceneOGCFilter.*;
-import static org.geotoolkit.ogc.xml.FilterXmlFactory.*;
-
-// GeoAPI dependencies
-import org.opengis.filter.FilterFactory2;
-import org.opengis.filter.PropertyIsLike;
+import org.geotoolkit.ogc.xml.v110.UpperBoundaryType;
 import org.opengis.filter.BinaryComparisonOperator;
-import org.opengis.filter.PropertyIsNull;
-import org.opengis.filter.expression.Literal;
-import org.opengis.filter.expression.PropertyName;
-import org.opengis.filter.expression.Expression;
-import org.opengis.filter.spatial.BinarySpatialOperator;
-import org.opengis.filter.spatial.DistanceBufferOperator;
+import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.PropertyIsGreaterThan;
 import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
 import org.opengis.filter.PropertyIsLessThan;
 import org.opengis.filter.PropertyIsLessThanOrEqualTo;
+import org.opengis.filter.PropertyIsLike;
 import org.opengis.filter.PropertyIsNotEqualTo;
+import org.opengis.filter.PropertyIsNull;
+import org.opengis.filter.expression.Expression;
+import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.PropertyName;
+import org.opengis.filter.spatial.BinarySpatialOperator;
+import org.opengis.filter.spatial.DistanceBufferOperator;
 import org.opengis.filter.temporal.After;
 import org.opengis.filter.temporal.Before;
 import org.opengis.filter.temporal.BinaryTemporalOperator;
 import org.opengis.filter.temporal.During;
 import org.opengis.filter.temporal.TEquals;
-import org.opengis.util.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
+import org.opengis.util.FactoryException;
 
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.geotoolkit.lucene.filter.LuceneOGCFilter.GEOMETRY_PROPERTY;
+import static org.geotoolkit.lucene.filter.LuceneOGCFilter.wrap;
+import static org.geotoolkit.ogc.xml.FilterXmlFactory.buildPropertyIsEquals;
+import static org.geotoolkit.ogc.xml.FilterXmlFactory.buildPropertyIsGreaterThan;
+import static org.geotoolkit.ogc.xml.FilterXmlFactory.buildPropertyIsGreaterThanOrEqualTo;
+import static org.geotoolkit.ogc.xml.FilterXmlFactory.buildPropertyIsLessThan;
+import static org.geotoolkit.ogc.xml.FilterXmlFactory.buildPropertyIsLessThanOrEqualTo;
+import static org.geotoolkit.ogc.xml.FilterXmlFactory.buildPropertyIsNotEquals;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.OPERATION_NOT_SUPPORTED;
+
+// JAXB dependencies
+// Apache Lucene dependencies
+// Geotoolkit dependencies
+// GeoAPI dependencies
 // JTS dependencies
-import com.vividsolutions.jts.geom.Geometry;
 
 
 /**

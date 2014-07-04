@@ -19,25 +19,12 @@
 
 package org.constellation.sos.ws;
 
-import java.sql.Timestamp;
-import java.util.Date;
-import java.util.List;
-import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.sis.storage.DataStoreException;
-
-// Constellation dependencies
-import static org.constellation.sos.ws.SOSUtils.*;
-
-// Geotk dependencies
+import org.apache.sis.util.logging.Logging;
 import org.geotoolkit.swe.xml.AbstractEncoding;
 import org.geotoolkit.swe.xml.DataArray;
 import org.geotoolkit.swe.xml.TextBlock;
 import org.geotoolkit.temporal.object.ISODateParser;
-import org.apache.sis.util.logging.Logging;
-
-// GeoAPI dependencies
 import org.opengis.filter.Filter;
 import org.opengis.filter.temporal.After;
 import org.opengis.filter.temporal.Before;
@@ -45,6 +32,19 @@ import org.opengis.filter.temporal.During;
 import org.opengis.filter.temporal.TEquals;
 import org.opengis.temporal.Instant;
 import org.opengis.temporal.Period;
+
+import java.sql.Timestamp;
+import java.util.Date;
+import java.util.List;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.constellation.sos.ws.SOSUtils.getTimestampValue;
+
+// Constellation dependencies
+// Geotk dependencies
+// GeoAPI dependencies
 
 /**
  *

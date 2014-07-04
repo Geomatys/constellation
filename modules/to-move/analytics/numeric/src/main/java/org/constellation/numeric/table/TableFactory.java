@@ -19,8 +19,9 @@
 package org.constellation.numeric.table;
 
 // J2SE dependencies and extensions
-import java.nio.DoubleBuffer;
+
 import javax.vecmath.MismatchedSizeException;
+import java.nio.DoubleBuffer;
 
 
 /**

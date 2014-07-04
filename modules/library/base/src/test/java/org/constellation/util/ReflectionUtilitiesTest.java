@@ -19,11 +19,6 @@
 
 package org.constellation.util;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.metadata.iso.citation.DefaultCitation;
 import org.apache.sis.metadata.iso.citation.DefaultCitationDate;
@@ -34,24 +29,35 @@ import org.apache.sis.metadata.iso.identification.DefaultDataIdentification;
 import org.apache.sis.metadata.iso.identification.DefaultKeywords;
 import org.apache.sis.util.iso.DefaultInternationalString;
 import org.apache.sis.util.iso.SimpleInternationalString;
-import org.geotoolkit.gml.xml.v311.TimePositionType;
-import org.geotoolkit.gml.xml.v311.TimePeriodType;
-import org.geotoolkit.ebrim.xml.v250.NotifyActionType;
 import org.geotoolkit.ebrim.xml.v250.ClassificationSchemeType;
+import org.geotoolkit.ebrim.xml.v250.NotifyActionType;
 import org.geotoolkit.ebrim.xml.v250.UserType;
-
-import org.opengis.metadata.extent.TemporalExtent;
-import org.opengis.metadata.citation.ResponsibleParty;
+import org.geotoolkit.gml.xml.v311.TimePeriodType;
+import org.geotoolkit.gml.xml.v311.TimePositionType;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.opengis.metadata.citation.CitationDate;
 import org.opengis.metadata.citation.DateType;
+import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.citation.Role;
+import org.opengis.metadata.extent.TemporalExtent;
 import org.opengis.metadata.identification.DataIdentification;
 import org.opengis.metadata.identification.KeywordType;
 import org.opengis.util.InternationalString;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 // JUnit dependencies
-import org.junit.*;
-import static org.junit.Assert.*;
 
 /**
  *

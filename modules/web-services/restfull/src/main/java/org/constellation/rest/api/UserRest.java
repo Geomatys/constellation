@@ -18,6 +18,14 @@
  */
 package org.constellation.rest.api;
 
+import org.constellation.configuration.AcknowlegementType;
+import org.constellation.engine.register.DomainUser;
+import org.constellation.engine.register.repository.DomainroleRepository;
+import org.constellation.engine.register.repository.UserRepository;
+import org.geotoolkit.util.StringUtilities;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.Consumes;
@@ -31,14 +39,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import org.constellation.configuration.AcknowlegementType;
-import org.constellation.engine.register.DomainUser;
-import org.constellation.engine.register.repository.DomainroleRepository;
-import org.constellation.engine.register.repository.UserRepository;
-import org.geotoolkit.util.StringUtilities;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 /**
  * RestFull user configuration service

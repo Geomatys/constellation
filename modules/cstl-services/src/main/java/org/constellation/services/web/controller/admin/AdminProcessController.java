@@ -18,10 +18,6 @@
  */
 package org.constellation.services.web.controller.admin;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
 import org.geotoolkit.process.ProcessingRegistry;
@@ -31,6 +27,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 @RestController
 @RequestMapping("/admin/process")

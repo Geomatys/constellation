@@ -18,12 +18,12 @@
  */
 package org.constellation.engine.register.jpa;
 
+import org.constellation.engine.register.Property;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.constellation.engine.register.Property;
 
 @Entity
 @Table(schema = "`admin`", name = "`properties`")

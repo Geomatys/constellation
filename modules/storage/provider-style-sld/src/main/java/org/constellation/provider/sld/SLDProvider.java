@@ -18,17 +18,8 @@
  */
 package org.constellation.provider.sld;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
-import javax.xml.bind.JAXBException;
-
+import org.apache.sis.util.collection.Cache;
 import org.constellation.provider.AbstractStyleProvider;
-
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.sld.MutableLayer;
@@ -41,15 +32,21 @@ import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
 import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.style.MutableFeatureTypeStyle;
 import org.geotoolkit.style.MutableStyle;
-import org.apache.sis.util.collection.Cache;
 import org.geotoolkit.style.MutableStyleFactory;
-import org.apache.sis.util.logging.Logging;
-
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.FactoryException;
 
-import static org.constellation.provider.sld.SLDProviderFactory.*;
+import javax.xml.bind.JAXBException;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+
+import static org.constellation.provider.sld.SLDProviderFactory.FOLDER_DESCRIPTOR;
 
 /**
  * Style provider. index and cache MutableStyle within the given folder.

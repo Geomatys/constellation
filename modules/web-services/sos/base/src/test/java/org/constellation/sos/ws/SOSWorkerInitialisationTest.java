@@ -19,10 +19,6 @@
 
 package org.constellation.sos.ws;
 
-import java.io.StringWriter;
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.xml.bind.Marshaller;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.SOSConfiguration;
@@ -33,18 +29,28 @@ import org.constellation.generic.database.BDD;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.ws.CstlServiceException;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-
-// JUnit dependencies
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.sos.xml.v100.GetCapabilities;
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.xml.bind.Marshaller;
+import java.io.StringWriter;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+// JUnit dependencies
 
 /**
  * Test some erroned initialisation of SOS Worker

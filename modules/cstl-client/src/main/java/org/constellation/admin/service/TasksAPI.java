@@ -19,12 +19,6 @@
 
 package org.constellation.admin.service;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import javax.ws.rs.core.MediaType;
-import javax.xml.stream.XMLStreamException;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.StringList;
 import org.constellation.dto.TaskStatus;
@@ -33,6 +27,12 @@ import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterDescriptorGroup;
+
+import javax.ws.rs.core.MediaType;
+import javax.xml.stream.XMLStreamException;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  *

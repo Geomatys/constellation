@@ -18,11 +18,11 @@
  */
 package org.constellation.engine.register.repository;
 
-import java.util.List;
-
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Layer;
 import org.constellation.engine.register.Service;
+
+import java.util.List;
 
 public interface LayerRepository {
 

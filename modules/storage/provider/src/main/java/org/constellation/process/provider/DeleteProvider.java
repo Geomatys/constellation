@@ -29,7 +29,8 @@ import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
 
-import static org.constellation.process.provider.DeleteProviderDescriptor.*;
+import static org.constellation.process.provider.DeleteProviderDescriptor.DELETE_DATA;
+import static org.constellation.process.provider.DeleteProviderDescriptor.PROVIDER_ID;
 import static org.geotoolkit.parameter.Parameters.value;
 
 /**

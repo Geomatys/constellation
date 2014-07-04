@@ -19,6 +19,8 @@
 
 package org.constellation.generic;
 
+import org.apache.sis.util.logging.Logging;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +28,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.sis.util.logging.Logging;
 
 /**
  * A container for values retrieved from a database by a generic reader.

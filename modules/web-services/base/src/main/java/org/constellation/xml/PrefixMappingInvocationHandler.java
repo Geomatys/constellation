@@ -18,15 +18,15 @@
  */
 package org.constellation.xml;
 
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.events.Namespace;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.Map;
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.events.Namespace;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
 
 /**
  *

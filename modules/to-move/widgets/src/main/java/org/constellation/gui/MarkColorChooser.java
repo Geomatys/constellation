@@ -19,33 +19,22 @@
 package org.constellation.gui;
 
 // User interface
-import java.awt.Color;
-import java.awt.Insets;
-import java.awt.Graphics;
-import java.awt.Dimension;
-import java.awt.Rectangle;
-import java.awt.Component;
-import java.awt.Graphics2D;
-import java.awt.BorderLayout;
-import javax.swing.JComponent;
-import javax.swing.JColorChooser;
-import javax.swing.BorderFactory;
-import javax.swing.plaf.ComponentUI;
-import javax.swing.colorchooser.AbstractColorChooserPanel;
 
-// Events
+import org.geotoolkit.display.shape.Arrow2D;
+
+import javax.swing.*;
+import javax.swing.colorchooser.AbstractColorChooserPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
-// Geometry and images
-import java.awt.Shape;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.GeneralPath;
+import javax.swing.plaf.ComponentUI;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
 import java.awt.image.RenderedImage;
 
+// Events
+// Geometry and images
 // Geotools dependencies
-import org.geotoolkit.display.shape.Arrow2D;
 
 
 /**

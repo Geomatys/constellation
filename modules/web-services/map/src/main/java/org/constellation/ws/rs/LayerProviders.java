@@ -20,25 +20,8 @@
 package org.constellation.ws.rs;
 
 import com.vividsolutions.jts.geom.Geometry;
-
-import java.awt.*;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.inject.Inject;
-import javax.measure.unit.NonSI;
-import javax.measure.unit.Unit;
-import javax.xml.bind.JAXBException;
 import org.apache.sis.geometry.GeneralEnvelope;
 import org.apache.sis.storage.DataStoreException;
-import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
-import static org.apache.sis.util.ArgumentChecks.ensurePositive;
-
-import org.apache.sis.util.Static;
 import org.constellation.admin.StyleBusiness;
 import org.constellation.configuration.TargetNotFoundException;
 import org.constellation.dto.BandDescription;
@@ -85,11 +68,6 @@ import org.geotoolkit.sld.xml.Specification;
 import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.MutableStyleFactory;
-import static org.geotoolkit.style.StyleConstants.DEFAULT_CATEGORIZE_LOOKUP;
-import static org.geotoolkit.style.StyleConstants.DEFAULT_DESCRIPTION;
-import static org.geotoolkit.style.StyleConstants.DEFAULT_FALLBACK;
-import static org.geotoolkit.style.StyleConstants.DEFAULT_GEOM;
-import static org.geotoolkit.style.StyleConstants.LITERAL_ONE_FLOAT;
 import org.geotoolkit.style.function.InterpolationPoint;
 import org.geotoolkit.style.function.Method;
 import org.geotoolkit.style.function.Mode;
@@ -108,6 +86,27 @@ import org.opengis.style.ShadedRelief;
 import org.opengis.style.Symbolizer;
 import org.opengis.util.FactoryException;
 import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import javax.measure.unit.NonSI;
+import javax.measure.unit.Unit;
+import javax.xml.bind.JAXBException;
+import java.awt.*;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import static org.apache.sis.util.ArgumentChecks.ensurePositive;
+import static org.geotoolkit.style.StyleConstants.DEFAULT_CATEGORIZE_LOOKUP;
+import static org.geotoolkit.style.StyleConstants.DEFAULT_DESCRIPTION;
+import static org.geotoolkit.style.StyleConstants.DEFAULT_FALLBACK;
+import static org.geotoolkit.style.StyleConstants.DEFAULT_GEOM;
+import static org.geotoolkit.style.StyleConstants.LITERAL_ONE_FLOAT;
 
 /**
  * Utility class for layer provider management/configuration.

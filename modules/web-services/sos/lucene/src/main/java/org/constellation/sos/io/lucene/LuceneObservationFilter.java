@@ -19,31 +19,34 @@
 
 package org.constellation.sos.io.lucene;
 
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.xml.namespace.QName;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.generic.database.Automatic;
-import org.geotoolkit.observation.ObservationFilter;
-import org.geotoolkit.observation.ObservationResult;
-import static org.constellation.sos.ws.SOSConstants.*;
-import static org.constellation.sos.ws.SOSUtils.*;
-
-import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.Envelope;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.SearchingException;
 import org.geotoolkit.lucene.filter.SpatialQuery;
+import org.geotoolkit.observation.ObservationFilter;
+import org.geotoolkit.observation.ObservationResult;
 import org.geotoolkit.observation.ObservationStoreException;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-
 import org.geotoolkit.sos.xml.ObservationOffering;
 import org.geotoolkit.sos.xml.ResponseModeType;
 import org.opengis.temporal.Instant;
 import org.opengis.temporal.Period;
+
+import javax.xml.namespace.QName;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.constellation.sos.ws.SOSConstants.EVENT_TIME;
+import static org.constellation.sos.ws.SOSConstants.MEASUREMENT_QNAME;
+import static org.constellation.sos.ws.SOSUtils.getLuceneTimeValue;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 /**
  * TODO
  * 

@@ -18,11 +18,12 @@
  */
 package org.constellation.process;
 
-import java.util.logging.Level;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
 import org.constellation.process.service.DeleteServiceTest;
 import org.constellation.wmts.ws.DefaultWMTSWorker;
+
+import java.util.logging.Level;
 
 /**
  *

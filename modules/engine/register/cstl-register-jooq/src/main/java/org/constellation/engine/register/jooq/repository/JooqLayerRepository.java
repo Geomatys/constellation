@@ -18,12 +18,6 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
-import static org.constellation.engine.register.jooq.Tables.DATA;
-import static org.constellation.engine.register.jooq.Tables.LAYER;
-import static org.constellation.engine.register.jooq.Tables.PROVIDER;
-
-import java.util.List;
-
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Layer;
 import org.constellation.engine.register.Service;
@@ -32,6 +26,12 @@ import org.constellation.engine.register.repository.LayerRepository;
 import org.jooq.DeleteConditionStep;
 import org.jooq.UpdateConditionStep;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+import static org.constellation.engine.register.jooq.Tables.DATA;
+import static org.constellation.engine.register.jooq.Tables.LAYER;
+import static org.constellation.engine.register.jooq.Tables.PROVIDER;
 
 @Component
 public class JooqLayerRepository extends AbstractJooqRespository<LayerRecord, Layer> implements LayerRepository {

@@ -19,9 +19,13 @@
 
 package org.constellation.rest.api;
 
-import static org.constellation.utils.RESTfulUtilities.ok;
-
-import java.util.Locale;
+import org.constellation.admin.StyleBusiness;
+import org.constellation.configuration.AcknowlegementType;
+import org.constellation.dto.ParameterValues;
+import org.constellation.dto.StyleListBrief;
+import org.constellation.json.binding.Style;
+import org.geotoolkit.style.DefaultMutableStyle;
+import org.geotoolkit.style.MutableStyle;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -37,14 +41,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
+import java.util.Locale;
 
-import org.constellation.configuration.AcknowlegementType;
-import org.constellation.dto.ParameterValues;
-import org.constellation.dto.StyleListBrief;
-import org.constellation.json.binding.Style;
-import org.constellation.admin.StyleBusiness;
-import org.geotoolkit.style.DefaultMutableStyle;
-import org.geotoolkit.style.MutableStyle;
+import static org.constellation.utils.RESTfulUtilities.ok;
 
 /**
  * RESTful API for style providers configuration.

@@ -18,6 +18,31 @@
  */
 package org.constellation.metadata.io.filesystem;
 
+import org.apache.sis.xml.Namespaces;
+import org.constellation.generic.database.Automatic;
+import org.constellation.metadata.io.CSWMetadataReader;
+import org.constellation.metadata.io.DomMetadataReader;
+import org.constellation.metadata.io.ElementSetType;
+import org.constellation.metadata.io.MetadataIoException;
+import org.constellation.metadata.io.MetadataType;
+import org.constellation.metadata.io.filesystem.sql.IdentifierIterator;
+import org.constellation.metadata.io.filesystem.sql.MetadataDatasource;
+import org.constellation.metadata.io.filesystem.sql.RecordIterator;
+import org.constellation.metadata.io.filesystem.sql.Session;
+import org.constellation.util.NodeUtilities;
+import org.geotoolkit.csw.xml.DomainValues;
+import org.geotoolkit.csw.xml.v202.DomainValuesType;
+import org.geotoolkit.csw.xml.v202.ListOfValuesType;
+import org.geotoolkit.util.collection.CloseableIterator;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
+import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -35,47 +60,31 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 
-// XML dependencies
-import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
-// constellation dependencies
-import org.constellation.generic.database.Automatic;
-import org.constellation.metadata.io.CSWMetadataReader;
-import org.constellation.metadata.io.MetadataIoException;
-import org.constellation.metadata.io.MetadataType;
-import org.constellation.util.NodeUtilities;
-import org.constellation.metadata.io.DomMetadataReader;
-import org.constellation.metadata.io.ElementSetType;
-import org.constellation.metadata.io.filesystem.sql.IdentifierIterator;
-import org.constellation.metadata.io.filesystem.sql.MetadataDatasource;
-import org.constellation.metadata.io.filesystem.sql.Session;
-
-import static org.constellation.metadata.CSWQueryable.*;
-import static org.constellation.metadata.CSWConstants.*;
-
-// Geotoolkit dependencies
-import org.geotoolkit.csw.xml.DomainValues;
-import org.geotoolkit.csw.xml.v202.DomainValuesType;
-import org.geotoolkit.csw.xml.v202.ListOfValuesType;
-import org.geotoolkit.util.collection.CloseableIterator;
-
+import static org.constellation.metadata.CSWConstants.XML_EXT;
+import static org.constellation.metadata.CSWQueryable.DUBLIN_CORE_QUERYABLE;
+import static org.constellation.metadata.CSWQueryable.ISO_QUERYABLE;
+import static org.geotoolkit.csw.xml.TypeNames.METADATA_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Creator_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Date_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Description_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Format_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Identifier_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Language_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Publisher_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Subject_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Title_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory._Type_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory._Abstract_QNAME;
+import static org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory._Modified_QNAME;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.OPERATION_NOT_SUPPORTED;
 import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory.*;
-import static org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory.*;
-import static org.geotoolkit.csw.xml.TypeNames.*;
 
+// XML dependencies
+// constellation dependencies
+// Geotoolkit dependencies
 // Apache SIS dependencies
-import org.apache.sis.xml.Namespaces;
-import org.constellation.metadata.io.filesystem.sql.RecordIterator;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 /**
  * A CSW Metadata Reader. This reader does not require a database.

@@ -19,13 +19,18 @@
 
 package org.constellation.metadata.index;
 
+import org.constellation.util.XpathUtils;
+import org.junit.Test;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Test;
-import static org.junit.Assert.*;
 
-import static org.constellation.metadata.CSWQueryable.*;
-import org.constellation.util.XpathUtils;
+import static org.constellation.metadata.CSWQueryable.DUBLIN_CORE_QUERYABLE;
+import static org.constellation.metadata.CSWQueryable.EBRIM_QUERYABLE;
+import static org.constellation.metadata.CSWQueryable.INSPIRE_QUERYABLE;
+import static org.constellation.metadata.CSWQueryable.ISO_FC_QUERYABLE;
+import static org.constellation.metadata.CSWQueryable.ISO_QUERYABLE;
+import static org.junit.Assert.assertEquals;
 
 /**
  *

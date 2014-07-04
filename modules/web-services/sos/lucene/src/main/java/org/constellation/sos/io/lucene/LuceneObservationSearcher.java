@@ -19,14 +19,6 @@
 
 package org.constellation.sos.io.lucene;
 
-import java.io.File;
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-
-// Apache Lucene dependencies
 import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Term;
@@ -40,18 +32,26 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
-
-// constellation dependencies
 import org.apache.lucene.util.Version;
-import org.geotoolkit.observation.ObservationResult;
-import static org.constellation.sos.ws.SOSUtils.*;
-
-// Geotoolkit dependencies
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.SearchingException;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.lucene.index.LuceneIndexSearcher;
+import org.geotoolkit.observation.ObservationResult;
+
+import java.io.File;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+
+import static org.constellation.sos.ws.SOSUtils.unLuceneTimeValue;
+
+// Apache Lucene dependencies
+// constellation dependencies
+// Geotoolkit dependencies
 
 /**
  *  A Lucene searcher for an index connected to an O&M DataSource.

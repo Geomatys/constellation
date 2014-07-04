@@ -19,12 +19,13 @@
 
 package org.constellation.provider.configuration;
 
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.logging.Logger;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.ConfigurationException;
 import org.opengis.parameter.ParameterValueGroup;
+
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.logging.Logger;
 
 /**
  * @author Johann Sorel (Geomatys)

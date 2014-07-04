@@ -36,12 +36,13 @@ import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 import com.bradmcevoy.http.http11.auth.DigestResponse;
 import com.ettrema.http.fs.LockManager;
 import com.ettrema.http.fs.NullSecurityManager;
+import org.apache.sis.util.logging.Logging;
+import org.constellation.configuration.WebdavContext;
+
 import java.io.File;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.constellation.configuration.WebdavContext;
-import org.apache.sis.util.logging.Logging;
 
 /**
  *

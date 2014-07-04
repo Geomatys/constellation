@@ -18,16 +18,6 @@
  */
 package org.constellation.metadata.io.netcdf;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.xml.bind.Unmarshaller;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.test.XMLComparator;
 import org.apache.sis.util.ComparisonMode;
@@ -37,10 +27,6 @@ import org.constellation.admin.SpringHelper;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.CSWworker;
 import org.constellation.metadata.CSWworkerTest;
-
-import static org.constellation.test.utils.MetadataUtilities.*;
-
-// JUnit dependencies
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.util.Util;
@@ -51,10 +37,28 @@ import org.geotoolkit.csw.xml.v202.GetRecordByIdResponseType;
 import org.geotoolkit.csw.xml.v202.GetRecordByIdType;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.xml.AnchoredMarshallerPool;
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.w3c.dom.Node;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.xml.bind.Unmarshaller;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.constellation.test.utils.MetadataUtilities.metadataEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+// JUnit dependencies
 
 
 /**

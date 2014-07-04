@@ -19,11 +19,11 @@
 
 package org.constellation.register;
 
-import java.util.List;
-
 import org.constellation.ServiceDef;
 import org.constellation.provider.Data;
 import org.geotoolkit.feature.type.Name;
+
+import java.util.List;
 
 /**
  * This interface does *not* aim to be a general abstraction of the register but 

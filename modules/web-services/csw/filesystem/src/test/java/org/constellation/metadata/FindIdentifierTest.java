@@ -20,17 +20,19 @@
 
 package org.constellation.metadata;
 
+import org.constellation.util.Util;
+import org.junit.Assert;
+import org.junit.Test;
+
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
+
 import static org.constellation.metadata.CSWQueryable.DUBLIN_CORE_QUERYABLE;
-import org.constellation.util.Util;
-import org.junit.Assert;
-import org.junit.Test;
 
 /**
  *

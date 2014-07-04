@@ -18,14 +18,20 @@
  */
 package org.constellation.wps.ws;
 
+import org.apache.sis.util.logging.Logging;
+import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.process.quartz.ProcessJobDetail;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.SchedulerFactory;
+import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
+import org.quartz.impl.StdSchedulerFactory;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.constellation.ws.CstlServiceException;
+
 import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
-import org.geotoolkit.process.quartz.ProcessJobDetail;
-import org.apache.sis.util.logging.Logging;
-import org.quartz.*;
-import org.quartz.impl.StdSchedulerFactory;
 /**
  * 
  * @author Quentin Boileau (Geomatys)

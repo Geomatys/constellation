@@ -19,9 +19,9 @@
 
 package org.constellation.dto;
 
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.HashMap;
 import java.util.Map;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Legal Guilhem (Geomatys).

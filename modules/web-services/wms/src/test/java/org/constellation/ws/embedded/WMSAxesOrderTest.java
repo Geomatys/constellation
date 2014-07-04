@@ -19,6 +19,44 @@
 package org.constellation.ws.embedded;
 
 // J2SE dependencies
+
+import org.constellation.admin.DataBusiness;
+import org.constellation.admin.ProviderBusiness;
+import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
+import org.constellation.admin.dao.ProviderRecord;
+import org.constellation.configuration.Language;
+import org.constellation.configuration.Languages;
+import org.constellation.configuration.LayerContext;
+import org.constellation.configuration.WMSPortrayal;
+import org.constellation.map.configuration.LayerBusiness;
+import org.constellation.provider.Data;
+import org.constellation.provider.DataProviders;
+import org.constellation.provider.ProviderFactory;
+import org.constellation.test.ImageTesting;
+import org.constellation.test.utils.Order;
+import org.constellation.test.utils.SpringTestRunner;
+import org.geotoolkit.feature.type.DefaultName;
+import org.geotoolkit.image.io.plugin.WorldFileImageReader;
+import org.geotoolkit.image.jai.Registry;
+import org.geotoolkit.test.Commons;
+import org.junit.AfterClass;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.context.ContextConfiguration;
+
+import javax.annotation.PostConstruct;
+import javax.imageio.ImageIO;
+import javax.imageio.spi.ImageReaderSpi;
+import javax.imageio.spi.ImageWriterSpi;
+import javax.inject.Inject;
+import javax.xml.namespace.QName;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -28,49 +66,24 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
-import javax.imageio.ImageIO;
-import javax.imageio.spi.ImageReaderSpi;
-import javax.imageio.spi.ImageWriterSpi;
-import javax.inject.Inject;
-import javax.xml.namespace.QName;
-import org.constellation.admin.ConfigurationEngine;
-import org.constellation.admin.DataBusiness;
-import org.constellation.admin.ProviderBusiness;
-import org.constellation.admin.ServiceBusiness;
-import org.constellation.admin.SpringHelper;
-import org.constellation.admin.dao.ProviderRecord;
-import org.constellation.configuration.ConfigurationException;
-import org.constellation.configuration.Language;
-import org.constellation.configuration.Languages;
-import org.constellation.configuration.LayerContext;
-import org.constellation.configuration.WMSPortrayal;
-import org.constellation.map.configuration.LayerBusiness;
-import org.constellation.provider.Data;
-import org.constellation.provider.DataProviders;
-import org.constellation.provider.ProviderFactory;
-import static org.constellation.provider.configuration.ProviderParameters.*;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.*;
-import org.constellation.test.ImageTesting;
-import org.constellation.test.utils.Order;
-import org.constellation.test.utils.SpringTestRunner;
-import static org.constellation.ws.embedded.AbstractGrizzlyServer.finish;
-import org.geotoolkit.feature.type.DefaultName;
-import org.geotoolkit.image.io.plugin.WorldFileImageReader;
-import org.geotoolkit.image.jai.Registry;
-import org.geotoolkit.test.Commons;
+
+import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.SOURCE_LOADALL_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.COVERAGESQL_DESCRIPTOR;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.NAMESPACE_DESCRIPTOR;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.PASSWORD_DESCRIPTOR;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.ROOT_DIRECTORY_DESCRIPTOR;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.SCHEMA_DESCRIPTOR;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.URL_DESCRIPTOR;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.USER_DESCRIPTOR;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeNoException;
+import static org.junit.Assume.assumeTrue;
 
 // JUnit dependencies
-import org.junit.*;
-import static org.junit.Assert.*;
-import static org.junit.Assume.*;
-import org.junit.runner.RunWith;
-import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.test.context.ContextConfiguration;
 
 
 /**

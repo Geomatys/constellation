@@ -18,22 +18,40 @@
  */
 package org.constellation.process.service;
 
-import java.util.*;
-import javax.xml.namespace.QName;
-import org.constellation.configuration.*;
+import org.constellation.configuration.ConfigurationException;
+import org.constellation.configuration.DimensionDefinition;
+import org.constellation.configuration.GetFeatureInfoCfg;
+import org.constellation.configuration.Layer;
 import org.constellation.map.configuration.LayerBusiness;
 import org.constellation.process.AbstractCstlProcess;
-import static org.constellation.process.service.AddLayerToMapServiceDescriptor.*;
 import org.constellation.util.DataReference;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.ogc.xml.v110.FilterType;
-import static org.geotoolkit.parameter.Parameters.*;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.geotoolkit.sld.xml.StyleXmlIO;
 import org.opengis.filter.Filter;
 import org.opengis.parameter.ParameterValueGroup;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.xml.namespace.QName;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
+import static org.constellation.process.service.AddLayerToMapServiceDescriptor.LAYER_ALIAS;
+import static org.constellation.process.service.AddLayerToMapServiceDescriptor.LAYER_CUSTOM_GFI;
+import static org.constellation.process.service.AddLayerToMapServiceDescriptor.LAYER_DIMENSION;
+import static org.constellation.process.service.AddLayerToMapServiceDescriptor.LAYER_FILTER;
+import static org.constellation.process.service.AddLayerToMapServiceDescriptor.LAYER_REF;
+import static org.constellation.process.service.AddLayerToMapServiceDescriptor.LAYER_STYLE;
+import static org.constellation.process.service.AddLayerToMapServiceDescriptor.OUT_LAYER;
+import static org.constellation.process.service.AddLayerToMapServiceDescriptor.SERVICE_INSTANCE;
+import static org.constellation.process.service.AddLayerToMapServiceDescriptor.SERVICE_TYPE;
+import static org.geotoolkit.parameter.Parameters.getOrCreate;
+import static org.geotoolkit.parameter.Parameters.value;
 
 /**
  * Process that add a new layer layerContext from a webMapService configuration.

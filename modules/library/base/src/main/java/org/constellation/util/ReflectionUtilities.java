@@ -19,6 +19,12 @@
 
 package org.constellation.util;
 
+import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.util.StringUtilities;
+import org.opengis.annotation.UML;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.annotation.XmlElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -31,11 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.XmlElement;
-import org.geotoolkit.util.StringUtilities;
-import org.apache.sis.util.logging.Logging;
-import org.opengis.annotation.UML;
 
 
 /**

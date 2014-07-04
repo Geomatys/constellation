@@ -19,12 +19,13 @@
 
 package org.constellation.admin.dao;
 
+import org.constellation.admin.EmbeddedDatabase;
+
+import javax.xml.bind.annotation.XmlTransient;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import javax.xml.bind.annotation.XmlTransient;
-import org.constellation.admin.EmbeddedDatabase;
 
 /**
  *

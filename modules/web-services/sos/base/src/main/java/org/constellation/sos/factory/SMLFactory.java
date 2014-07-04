@@ -19,12 +19,13 @@
 
 package org.constellation.sos.factory;
 
-import java.util.Map;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
+
+import java.util.Map;
 
 /**
  * Factory used to load various implementation of sensor metadata reader/writer.

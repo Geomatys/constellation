@@ -20,39 +20,42 @@
 package org.constellation.metadata;
 
 // JAXB dependencies
-import java.io.StringWriter;
-import java.util.logging.Level;
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-
-import org.constellation.generic.database.Automatic;
-import org.constellation.generic.database.BDD;
-import org.constellation.ws.CstlServiceException;
-
-import org.geotoolkit.csw.xml.CSWMarshallerPool;
-import org.geotoolkit.csw.xml.v202.GetCapabilitiesType;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.SpringHelper;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.repository.ServiceRepository;
+import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
 import org.constellation.test.utils.SpringTestRunner;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-
-// JUnit dependencies
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.csw.xml.CSWMarshallerPool;
+import org.geotoolkit.csw.xml.v202.GetCapabilitiesType;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.io.StringWriter;
+import java.util.logging.Level;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+// JUnit dependencies
 
 /**
  * Test some erroned initialisation of CSW Worker

@@ -19,27 +19,27 @@
 
 package org.constellation.sos.io.filesystem;
 
-import java.util.Map;
+import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
+import org.constellation.generic.database.Automatic;
+import org.constellation.metadata.io.MetadataIoException;
+import org.constellation.sos.factory.SMLFactory;
+import org.constellation.sos.io.SensorWriter;
+import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 
-import org.constellation.generic.database.Automatic;
-import org.constellation.metadata.io.MetadataIoException;
-import org.constellation.sos.io.SensorWriter;
-import org.constellation.ws.CstlServiceException;
-import org.constellation.sos.factory.SMLFactory;
-
-import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
-import org.geotoolkit.sml.xml.AbstractSensorML;
-import org.apache.sis.util.logging.Logging;
-import org.apache.sis.xml.MarshallerPool;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
 
 /**
  * A sensorML Writer working on a fileSystem.

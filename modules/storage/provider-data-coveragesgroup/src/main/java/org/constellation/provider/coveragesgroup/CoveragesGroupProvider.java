@@ -18,30 +18,34 @@
  */
 package org.constellation.provider.coveragesgroup;
 
+import org.apache.sis.storage.DataStore;
+import org.constellation.admin.dao.DataRecord.DataType;
+import org.constellation.provider.AbstractDataProvider;
+import org.constellation.provider.Data;
+import org.constellation.provider.ProviderFactory;
+import org.constellation.provider.coveragesgroup.util.MapContextIO;
+import org.geotoolkit.feature.type.DefaultName;
+import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.map.MapContext;
+import org.geotoolkit.util.FileUtilities;
+import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
+
 import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.FileFilter;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
-import org.apache.sis.storage.DataStore;
 
-import org.geotoolkit.feature.type.Name;
-import org.opengis.parameter.ParameterValue;
-import org.opengis.parameter.ParameterValueGroup;
-
-import org.geotoolkit.feature.type.DefaultName;
-import org.geotoolkit.map.MapContext;
-import org.geotoolkit.util.FileUtilities;
-
-import org.constellation.provider.AbstractDataProvider;
-import org.constellation.provider.Data;
-import org.constellation.provider.ProviderFactory;
-import org.constellation.provider.coveragesgroup.util.MapContextIO;
-import org.constellation.admin.dao.DataRecord.DataType;
-
-import static org.constellation.provider.coveragesgroup.CoveragesGroupProviderService.*;
+import static org.constellation.provider.coveragesgroup.CoveragesGroupProviderService.SOURCE_CONFIG_DESCRIPTOR;
+import static org.constellation.provider.coveragesgroup.CoveragesGroupProviderService.URL;
 
 /**
  *

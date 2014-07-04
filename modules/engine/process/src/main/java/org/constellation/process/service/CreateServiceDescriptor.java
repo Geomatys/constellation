@@ -24,7 +24,6 @@ import org.constellation.dto.Details;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.process.AbstractCstlProcessDescriptor;
 import org.constellation.process.ConstellationProcessFactory;
-import static org.constellation.process.service.ServiceProcessCommon.*;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.parameter.ExtendedParameterDescriptor;
@@ -33,6 +32,8 @@ import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.util.InternationalString;
+
+import static org.constellation.process.service.ServiceProcessCommon.SUPPORTED_SERVICE_TYPE;
 
 /**
  * ProcessDescriptor for create a new Map service like WMS, WMTS, WCS or WFS.

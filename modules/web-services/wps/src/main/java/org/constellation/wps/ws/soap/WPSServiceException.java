@@ -18,12 +18,13 @@
  */
 package org.constellation.wps.ws.soap;
 
+import org.geotoolkit.ows.xml.v110.ExceptionReport;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.ws.WebFault;
 import javax.xml.ws.WebServiceException;
-import org.geotoolkit.ows.xml.v110.ExceptionReport;
 
 /**
  *

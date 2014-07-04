@@ -19,18 +19,18 @@
 
 package org.constellation.sos.factory;
 
-import java.util.Properties;
-import org.constellation.metadata.io.MetadataIoException;
-import java.util.Map;
-import java.util.HashMap;
+import org.constellation.configuration.DataSourceType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.constellation.configuration.DataSourceType;
-import javax.imageio.spi.ServiceRegistry;
-import java.util.Iterator;
+import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
-import org.junit.*;
+
+import javax.imageio.spi.ServiceRegistry;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import static org.junit.Assert.*;
 
 /**

@@ -19,19 +19,24 @@
 package org.constellation.process.client;
 
 
+import org.constellation.admin.service.ConstellationServer;
+import org.constellation.process.AbstractCstlProcess;
+import org.geotoolkit.process.ProcessDescriptor;
+import org.opengis.parameter.ParameterValueGroup;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.constellation.admin.service.ConstellationServer;
-import org.constellation.process.AbstractCstlProcess;
-
-import org.opengis.parameter.ParameterValueGroup;
-
-import static org.geotoolkit.io.X364.*;
-import static org.constellation.process.client.RestartDescriptor.*;
-import org.geotoolkit.process.ProcessDescriptor;
+import static org.constellation.process.client.RestartDescriptor.CSTL_DESCRIPTOR_GROUP;
+import static org.constellation.process.client.RestartDescriptor.CSTL_WS_INSTANCE;
+import static org.constellation.process.client.RestartDescriptor.CSTL_WS_TYPE;
+import static org.geotoolkit.io.X364.BOLD;
+import static org.geotoolkit.io.X364.FOREGROUND_DEFAULT;
+import static org.geotoolkit.io.X364.FOREGROUND_GREEN;
+import static org.geotoolkit.io.X364.FOREGROUND_RED;
+import static org.geotoolkit.io.X364.RESET;
 
 /**
  * @author Guilhem Legal (Geomatys)

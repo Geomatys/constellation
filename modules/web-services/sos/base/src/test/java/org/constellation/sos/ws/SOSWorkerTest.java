@@ -19,17 +19,7 @@
 
 package org.constellation.sos.ws;
 
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
 import org.apache.sis.xml.MarshallerPool;
-import static org.constellation.sos.ws.SOSConstants.*;
 import org.constellation.test.utils.MetadataUtilities;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
@@ -50,7 +40,6 @@ import org.geotoolkit.ogc.xml.v110.TimeAfterType;
 import org.geotoolkit.ogc.xml.v110.TimeBeforeType;
 import org.geotoolkit.ogc.xml.v110.TimeDuringType;
 import org.geotoolkit.ogc.xml.v110.TimeEqualsType;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.SectionsType;
@@ -78,14 +67,40 @@ import org.geotoolkit.swe.xml.v101.DataArrayType;
 import org.geotoolkit.swe.xml.v101.SimpleDataRecordType;
 import org.geotoolkit.swe.xml.v101.TimeType;
 import org.geotoolkit.swes.xml.InsertSensorResponse;
-
-// JUnit dependencies
-import static org.junit.Assert.*;
 import org.opengis.observation.sampling.SamplingPoint;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+
+import static org.constellation.sos.ws.SOSConstants.MEASUREMENT_QNAME;
+import static org.constellation.sos.ws.SOSConstants.OBSERVATION_QNAME;
+import static org.constellation.sos.ws.SOSConstants.OBSERVATION_TEMPLATE;
+import static org.constellation.sos.ws.SOSConstants.OFFERING;
+import static org.constellation.sos.ws.SOSConstants.PROCEDURE;
+import static org.constellation.sos.ws.SOSConstants.RESPONSE_FORMAT;
+import static org.constellation.sos.ws.SOSConstants.RESPONSE_MODE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.OPERATION_NOT_SUPPORTED;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+// JUnit dependencies
 
 /**
  *

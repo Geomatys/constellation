@@ -18,6 +18,7 @@
  */
 package org.constellation.map.featureinfo;
 
+import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.GFIParam;
 import org.constellation.configuration.GetFeatureInfoCfg;
@@ -25,25 +26,31 @@ import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.coveragesgroup.CoveragesGroupProvider;
 import org.constellation.provider.coveragesgroup.util.ConvertersJaxbToGeotk;
-import org.geotoolkit.display2d.GraphicVisitor;
-import org.geotoolkit.display.canvas.RenderingContext;
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.display.SearchArea;
+import org.geotoolkit.display.canvas.RenderingContext;
+import org.geotoolkit.display2d.GraphicVisitor;
 import org.geotoolkit.display2d.primitive.ProjectedObject;
-import org.geotoolkit.display2d.service.*;
+import org.geotoolkit.display2d.service.CanvasDef;
+import org.geotoolkit.display2d.service.DefaultPortrayalService;
+import org.geotoolkit.display2d.service.SceneDef;
+import org.geotoolkit.display2d.service.ViewDef;
+import org.geotoolkit.display2d.service.VisitDef;
+import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapItem;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.ows.xml.GetFeatureInfo;
-
-import org.apache.sis.util.logging.Logging;
 import org.opengis.display.primitive.Graphic;
-import org.geotoolkit.feature.type.Name;
 
 import javax.xml.bind.JAXBException;
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

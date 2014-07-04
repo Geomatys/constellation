@@ -18,8 +18,12 @@
  */
 package org.constellation.engine.register.jpa;
 
-import java.util.List;
-import java.util.Set;
+import org.constellation.engine.register.Data;
+import org.constellation.engine.register.Domain;
+import org.constellation.engine.register.Layer;
+import org.constellation.engine.register.Provider;
+import org.constellation.engine.register.Style;
+import org.constellation.engine.register.User;
 
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
@@ -34,13 +38,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.Layer;
-import org.constellation.engine.register.Provider;
-import org.constellation.engine.register.Style;
-import org.constellation.engine.register.User;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(schema = "`admin`", name = "`data`")

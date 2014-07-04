@@ -18,8 +18,6 @@
  */
 package org.constellation.util;
 
-import java.util.Date;
-
 /**
  * Define a reference to a Style in a StyleProvider.
  *

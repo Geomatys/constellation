@@ -26,7 +26,7 @@ import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
 import org.geotoolkit.ows.xml.GetFeatureInfo;
 
-import java.awt.Rectangle;
+import java.awt.*;
 import java.util.List;
 
 /**

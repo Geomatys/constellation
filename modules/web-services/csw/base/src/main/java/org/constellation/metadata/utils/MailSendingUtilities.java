@@ -20,7 +20,22 @@
 package org.constellation.metadata.utils;
 
 import com.sun.mail.smtp.SMTPTransport;
+import org.apache.sis.util.logging.Logging;
+import org.constellation.configuration.ConfigDirectory;
+import org.constellation.configuration.MailingProperties;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 
+import javax.crypto.KeyGenerator;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+import javax.naming.NamingException;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.IOException;
 import java.security.KeyStore;
@@ -33,21 +48,6 @@ import java.util.Date;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.crypto.KeyGenerator;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-import javax.naming.NamingException;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import org.constellation.configuration.ConfigDirectory;
-import org.apache.sis.util.logging.Logging;
-import org.constellation.configuration.MailingProperties;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 
 /**
  * Utility class to send mails

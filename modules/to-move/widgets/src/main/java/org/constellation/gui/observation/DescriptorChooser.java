@@ -19,52 +19,36 @@
 package org.constellation.gui.observation;
 
 // J2SE dependencies
-import java.util.Set;
-import java.util.Map;
-import java.util.HashSet;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.StringTokenizer;
-import java.util.prefs.Preferences;
-import static java.lang.Boolean.TRUE;
-import static java.lang.Boolean.FALSE;
 
-// AWT/Swing dependencies
-import java.awt.Font;
-import java.awt.Window;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.CardLayout;
-import java.awt.GridLayout;
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.Box;
-import javax.swing.JList;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JFrame;
-import javax.swing.JButton;
-import javax.swing.ListModel;
-import javax.swing.JScrollPane;
-import javax.swing.BorderFactory;
-import javax.swing.JInternalFrame;
-import javax.swing.AbstractListModel;
-import javax.swing.ListSelectionModel;
-
-// Geotools dependencies
+import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.Element;
+import org.constellation.coverage.catalog.Catalog;
+import org.constellation.coverage.catalog.Layer;
+import org.constellation.coverage.model.Descriptor;
+import org.constellation.coverage.model.Operation;
+import org.constellation.coverage.model.RegionOfInterest;
+import org.constellation.resources.XArray;
 import org.geotoolkit.gui.swing.DisjointLists;
 import org.geotools.resources.SwingUtilities;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.prefs.Preferences;
+
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+
+// AWT/Swing dependencies
+// Geotools dependencies
 // J2SE dependencies
-import org.constellation.resources.XArray;
-import org.constellation.catalog.Element;
-import org.constellation.coverage.catalog.Catalog;
-import org.constellation.catalog.CatalogException;
-import org.constellation.coverage.catalog.Layer;
-import org.constellation.coverage.model.Operation;
-import org.constellation.coverage.model.Descriptor;
-import org.constellation.coverage.model.RegionOfInterest;
 
 
 /**

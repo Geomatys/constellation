@@ -18,13 +18,13 @@
  */
 package org.constellation.swing;
 
-import java.awt.BorderLayout;
-import java.util.logging.Logger;
-import javax.swing.ImageIcon;
-import javax.swing.JPanel;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.AbstractConfigurationObject;
 import org.constellation.configuration.DataSourceType;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.logging.Logger;
 
 /**
  *

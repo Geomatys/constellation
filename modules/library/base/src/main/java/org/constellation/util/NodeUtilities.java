@@ -19,6 +19,13 @@
 
 package org.constellation.util;
 
+import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.temporal.object.TemporalUtilities;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,15 +33,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.geotoolkit.temporal.object.TemporalUtilities;
-
-import org.apache.sis.util.logging.Logging;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  *

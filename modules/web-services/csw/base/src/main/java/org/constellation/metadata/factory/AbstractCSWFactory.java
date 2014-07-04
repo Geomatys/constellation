@@ -19,25 +19,25 @@
 
 package org.constellation.metadata.factory;
 
-import java.io.File;
-import java.util.List;
-import java.util.Map;
-
-// constellation dependencies
 import org.constellation.configuration.DataSourceType;
 import org.constellation.filter.FilterParser;
 import org.constellation.generic.database.Automatic;
-import org.constellation.metadata.security.MetadataSecurityFilter;
 import org.constellation.metadata.harvest.CatalogueHarvester;
 import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
-
-// Geotoolkit dependencies
+import org.constellation.metadata.security.MetadataSecurityFilter;
 import org.geotoolkit.lucene.IndexingException;
-import org.geotoolkit.lucene.index.LuceneIndexSearcher;
 import org.geotoolkit.lucene.index.AbstractIndexer;
+import org.geotoolkit.lucene.index.LuceneIndexSearcher;
+
+import java.io.File;
+import java.util.List;
+import java.util.Map;
+
+// constellation dependencies
+// Geotoolkit dependencies
 
 /**
  * Factory used to load various implementation of metadata reader/writer, and Lucene indexer/searcher.

@@ -18,15 +18,15 @@
  */
 package org.constellation.portrayal;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
-
 import org.geotoolkit.display.PortrayalException;
 import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.OutputDef;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
 import org.geotoolkit.display2d.service.VisitDef;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
 
 /**
  * The interface for portrayal methods provided by Constellation.

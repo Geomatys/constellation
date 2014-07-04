@@ -18,17 +18,19 @@
  */
 package org.constellation.admin.conf;
 
-import org.constellation.admin.conf.CstlConfig;
 import org.geotoolkit.util.StringUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-
 import java.io.IOException;
 
 @Configuration

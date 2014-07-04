@@ -18,8 +18,10 @@
  */
 package org.constellation.services.logger;
 
-import java.io.IOException;
-import java.lang.invoke.MethodHandles;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -28,11 +30,8 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
-import org.slf4j.bridge.SLF4JBridgeHandler;
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 
 /**
  * Filter that exposes OGC service ids in log {@link MDC} <br />

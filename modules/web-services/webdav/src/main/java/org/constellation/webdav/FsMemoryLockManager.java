@@ -18,9 +18,15 @@
  */
 package org.constellation.webdav;
 
-import com.bradmcevoy.http.*;
+import com.bradmcevoy.http.LockInfo;
+import com.bradmcevoy.http.LockResult;
+import com.bradmcevoy.http.LockTimeout;
+import com.bradmcevoy.http.LockToken;
+import com.bradmcevoy.http.LockableResource;
 import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 import com.ettrema.http.fs.LockManager;
+import org.apache.sis.util.logging.Logging;
+
 import java.io.File;
 import java.util.Date;
 import java.util.HashMap;
@@ -28,7 +34,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.sis.util.logging.Logging;
 
 /**
  *

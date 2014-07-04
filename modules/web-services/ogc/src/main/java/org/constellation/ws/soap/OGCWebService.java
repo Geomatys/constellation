@@ -19,14 +19,22 @@
 package org.constellation.ws.soap;
 
 // J2SE dependencies
-import java.lang.reflect.Proxy;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
+import org.constellation.ServiceDef.Specification;
+import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.WSEngine;
+import org.constellation.ws.WebServiceUtilities;
+import org.constellation.ws.Worker;
+import org.constellation.xml.PrefixMappingInvocationHandler;
+import org.opengis.util.CodeList;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXParseException;
+
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import javax.inject.Inject;
@@ -50,26 +58,21 @@ import javax.xml.validation.Schema;
 import javax.xml.ws.Provider;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
+import java.lang.reflect.Proxy;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_REQUEST;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.NO_APPLICABLE_CODE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.OPERATION_NOT_SUPPORTED;
 
 // Constellation dependencies
-import org.constellation.ServiceDef.Specification;
-import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.WSEngine;
-import org.constellation.ws.WebServiceUtilities;
-import org.constellation.ws.Worker;
-import org.constellation.xml.PrefixMappingInvocationHandler;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-
 // Geotoolkit dependencies
-import org.apache.sis.util.logging.Logging;
-import org.apache.sis.xml.MarshallerPool;
-import org.constellation.admin.ServiceBusiness;
-import org.constellation.admin.SpringHelper;
-import org.opengis.util.CodeList;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXParseException;
 
 
 // GeoAPI dependencies

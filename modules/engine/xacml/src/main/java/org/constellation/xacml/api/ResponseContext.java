@@ -18,12 +18,12 @@
  */
 package org.constellation.xacml.api;
 
+import org.geotoolkit.xacml.xml.context.ResultType;
+import org.w3c.dom.Node;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import org.geotoolkit.xacml.xml.context.ResultType;
-import org.w3c.dom.Node;
  
 
 /**

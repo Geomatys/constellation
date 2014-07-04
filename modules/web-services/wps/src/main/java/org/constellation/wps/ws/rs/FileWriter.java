@@ -18,6 +18,13 @@
  */
 package org.constellation.wps.ws.rs;
 
+import org.apache.sis.util.logging.Logging;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.ext.MessageBodyWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -25,18 +32,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.Provider;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
-import org.geotoolkit.util.FileUtilities;
-import org.apache.sis.util.logging.Logging;
-import org.geotoolkit.wps.xml.WPSMarshallerPool;
-import java.io.File;
 
 /**
  * A class to manage the file writing operation into request response messages.

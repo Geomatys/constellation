@@ -18,8 +18,9 @@
  */
 package org.constellation.util;
 
-import java.util.Comparator;
 import org.geotoolkit.feature.type.Name;
+
+import java.util.Comparator;
 
 /**
  *

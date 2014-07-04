@@ -19,6 +19,14 @@
 
 package org.constellation.util;
 
+import org.apache.sis.util.logging.Logging;
+import org.geotoolkit.feature.type.DefaultName;
+import org.geotoolkit.feature.type.Name;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,13 +41,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
-import org.geotoolkit.feature.type.DefaultName;
-import org.apache.sis.util.logging.Logging;
-import org.geotoolkit.feature.type.Name;
 
 /**
  * Utility methods of general use.

@@ -19,13 +19,14 @@
 
 package org.constellation.ws;
 
-import java.util.logging.Logger;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.NotRunningServiceException;
 import org.constellation.util.ReflectionUtilities;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
+
+import java.util.logging.Logger;
 
 /**
  * @author Bernard Fabien (Geomatys).

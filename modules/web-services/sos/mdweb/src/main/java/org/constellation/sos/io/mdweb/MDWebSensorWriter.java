@@ -19,25 +19,7 @@
 
 package org.constellation.sos.io.mdweb;
 
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.ResultSet;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Savepoint;
-
-// JAXB dependencies
-import java.util.*;
-import java.util.logging.Level;
-import javax.sql.DataSource;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import org.apache.sis.internal.jaxb.LegacyNamespaces;
-
-// Constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.metadata.io.MDWebMetadataWriter;
@@ -45,18 +27,37 @@ import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.sos.factory.OMFactory;
 import org.constellation.sos.io.SensorWriter;
 import org.constellation.ws.CstlServiceException;
-
 import org.geotoolkit.sml.xml.AbstractSensorML;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
-
-// MDWeb dependencies
-import org.mdweb.model.storage.RecordSet;
-import org.mdweb.model.storage.RecordSet.EXPOSURE;
 import org.mdweb.io.MD_IOException;
 import org.mdweb.io.sql.AbstractReader;
+import org.mdweb.model.storage.RecordSet;
+import org.mdweb.model.storage.RecordSet.EXPOSURE;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+
+import javax.sql.DataSource;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Savepoint;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+import java.util.logging.Level;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
+// JAXB dependencies
+// Constellation dependencies
+// MDWeb dependencies
 
 /**
  *

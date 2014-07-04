@@ -19,6 +19,15 @@
 
 package org.constellation.generic;
 
+import org.apache.sis.util.logging.Logging;
+import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
+import org.constellation.generic.database.Queries;
+import org.constellation.generic.database.Query;
+import org.constellation.generic.database.QueryList;
+import org.constellation.metadata.io.MetadataIoException;
+
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ParameterMetaData;
 import java.sql.PreparedStatement;
@@ -34,18 +43,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-// constellation dependecies
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.sql.DataSource;
-import org.constellation.generic.database.Automatic;
-import org.constellation.generic.database.BDD;
-import org.constellation.generic.database.Queries;
-import org.constellation.generic.database.Query;
-import org.constellation.generic.database.QueryList;
-import org.constellation.metadata.io.MetadataIoException;
-import org.apache.sis.util.logging.Logging;
+
+// constellation dependecies
 
 /**
  *

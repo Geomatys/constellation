@@ -18,15 +18,14 @@
  */
 package org.constellation.swing.action;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.image.BufferedImage;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import org.constellation.admin.service.ConstellationClient;
 import org.constellation.swing.JServicesPane;
 import org.geotoolkit.gui.swing.util.ActionCell;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
 
 /**
  *

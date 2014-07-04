@@ -20,11 +20,11 @@
 package org.constellation.engine.template;
 
 import groovy.lang.GroovyClassLoader;
-import java.io.File;
-import java.io.InputStream;
-import java.net.URL;
 import org.constellation.util.Util;
 import org.geotoolkit.util.FileUtilities;
+
+import java.io.File;
+import java.io.InputStream;
 
 /** Factory for TemplateEngine
  * Created by christophem on 02/04/14.

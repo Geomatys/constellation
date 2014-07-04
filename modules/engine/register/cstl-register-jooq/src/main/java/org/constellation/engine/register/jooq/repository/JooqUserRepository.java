@@ -18,20 +18,10 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
-import static org.constellation.engine.register.jooq.Tables.USER;
-import static org.constellation.engine.register.jooq.Tables.USER_X_DOMAIN_X_DOMAINROLE;
-import static org.constellation.engine.register.jooq.Tables.USER_X_ROLE;
-
-import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
+import com.google.common.base.Optional;
 import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.Domainrole;
 import org.constellation.engine.register.DomainUser;
+import org.constellation.engine.register.Domainrole;
 import org.constellation.engine.register.User;
 import org.constellation.engine.register.helper.UserHelper;
 import org.constellation.engine.register.jooq.Tables;
@@ -56,7 +46,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Optional;
+import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import static org.constellation.engine.register.jooq.Tables.USER;
+import static org.constellation.engine.register.jooq.Tables.USER_X_DOMAIN_X_DOMAINROLE;
+import static org.constellation.engine.register.jooq.Tables.USER_X_ROLE;
 
 @Component
 public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User> implements UserRepository {

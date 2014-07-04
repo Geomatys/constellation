@@ -18,8 +18,8 @@
  */
 package org.constellation.util;
 
-import java.util.Comparator;
 import javax.xml.namespace.QName;
+import java.util.Comparator;
 
 /**
  *

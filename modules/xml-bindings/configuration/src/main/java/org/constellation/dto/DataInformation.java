@@ -19,12 +19,11 @@
 package org.constellation.dto;
 
 //import juzu.Mapped;
+
 import org.constellation.util.SimplyMetadataTreeNode;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**

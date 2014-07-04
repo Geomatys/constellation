@@ -18,14 +18,6 @@
  */
 package org.constellation.gui.service;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.inject.Inject;
-
 import org.apache.sis.util.logging.Logging;
 import org.constellation.ServiceDef.Specification;
 import org.constellation.configuration.AbstractConfigurationObject;
@@ -33,7 +25,13 @@ import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
 import org.constellation.dto.Service;
 import org.constellation.dto.StyleListBrief;
-import org.constellation.generic.database.Automatic;
+
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Juzu service to call constellation services server side

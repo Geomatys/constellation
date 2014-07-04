@@ -19,6 +19,20 @@
 
 package org.constellation.metadata;
 
+import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
+import org.constellation.configuration.HarvestTask;
+import org.constellation.configuration.HarvestTasks;
+import org.constellation.metadata.harvest.CatalogueHarvester;
+import org.constellation.metadata.utils.MailSendingUtilities;
+import org.constellation.ws.CstlServiceException;
+
+import javax.mail.MessagingException;
+import javax.naming.NamingException;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -31,21 +45,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.mail.MessagingException;
-import javax.naming.NamingException;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-
-import org.constellation.configuration.HarvestTask;
-import org.constellation.configuration.HarvestTasks;
-import org.constellation.metadata.harvest.CatalogueHarvester;
-import org.constellation.metadata.utils.MailSendingUtilities;
-import org.constellation.ws.CstlServiceException;
-import org.apache.sis.util.logging.Logging;
-
-import org.apache.sis.xml.MarshallerPool;
 
 /**
  *

@@ -19,21 +19,22 @@
 
 package org.constellation.provider;
 
-import java.awt.Dimension;
+import org.apache.sis.measure.MeasurementRange;
+import org.apache.sis.storage.DataStoreException;
+import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.display.PortrayalException;
+import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.map.MapItem;
+import org.geotoolkit.style.MutableStyle;
+import org.opengis.geometry.Envelope;
+
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import org.apache.sis.measure.MeasurementRange;
-import org.apache.sis.storage.DataStoreException;
-import org.geotoolkit.coverage.grid.GridCoverage2D;
-import org.geotoolkit.display.PortrayalException;
-import org.geotoolkit.map.MapItem;
-import org.geotoolkit.style.MutableStyle;
-import org.geotoolkit.feature.type.Name;
-import org.opengis.geometry.Envelope;
 
 /**
  *

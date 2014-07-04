@@ -18,8 +18,9 @@
  */
 package org.constellation.wfs.ws.rs;
 
-import java.util.Map;
 import org.geotoolkit.data.FeatureCollection;
+
+import java.util.Map;
 /**
  *
  * @author Guilhem Legal (Geomatys)

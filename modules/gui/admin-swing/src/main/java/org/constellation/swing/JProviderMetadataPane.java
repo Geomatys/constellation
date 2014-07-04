@@ -24,25 +24,22 @@
 
 package org.constellation.swing;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import javax.swing.GroupLayout;
-import javax.swing.JButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.LayoutStyle;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.service.ConstellationClient;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
+
+import javax.swing.*;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 
 /**
  *
