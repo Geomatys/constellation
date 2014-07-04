@@ -20,6 +20,8 @@ package org.constellation.admin;
 
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.LayerContext;
+import org.constellation.dto.AccessConstraint;
+import org.constellation.dto.Contact;
 import org.constellation.dto.Details;
 import org.junit.Assert;
 import org.junit.Test;
@@ -27,6 +29,10 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
@@ -47,7 +53,8 @@ public class ServiceBusinessTest {
         serviceDTO.setStatus("STARTED");
         serviceDTO.setTitle("title test");
         serviceDTO.setType();*/
-        Object conf = serviceBusiness.create("wms", "test", new LayerContext(), new Details(),null);
+        final Details details = new Details("name", "identifier", Arrays.asList("keyword1", "keyword2"), "description", Arrays.asList("version1"), new Contact(), new AccessConstraint(), true, "FR");
+        Object conf = serviceBusiness.create("wms", "test", new LayerContext(), details,null);
         Assert.assertTrue(serviceBusiness.getServiceIdentifiers("wms").contains("test"));
         
     }

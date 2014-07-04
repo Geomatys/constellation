@@ -101,8 +101,9 @@ public class ServiceBusiness {
         service.setStatus(ServiceStatus.STOPPED.toString());
         //TODO metadata-Iso
         service.setVersions(StringUtils.join(details.getVersions(), "|"));
+        int serviceId = serviceRepository.create(service);
         if (domainId != null){
-            domainRepository.addServiceToDomain(service.getId(),domainId);
+            domainRepository.addServiceToDomain(serviceId,domainId);
         }
         setInstanceDetails(serviceType, identifier, details, details.getLang());
         return configuration;
@@ -616,7 +617,7 @@ public class ServiceBusiness {
             instance.setLayersNumber(layersNumber);
             instance.setName(details.getName());
             instance.setType(service.getType());
-            instance.setVersions(Arrays.asList(service.getVersions().split("|")));
+            instance.setVersions(Arrays.asList(service.getVersions().split("\\|")));
             instance.setStatus(ServiceStatus.valueOf(service.getStatus()));
             return instance;
         } catch (ConfigurationException e) {

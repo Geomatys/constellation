@@ -78,48 +78,48 @@ public class ConfigurationEngine {
 
    
 
-    public static Details readServiceMetadata(final String identifier, final String serviceType, String language)
-            throws IOException, JAXBException {
-        ensureNonNull("identifier", identifier);
-        ensureNonNull("serviceType", serviceType);
-        if (language == null) {
-            language = "eng";
-        }
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            final ServiceRecord rec = session.readService(identifier,serviceType.toLowerCase());
-            if (rec != null) {
-                final InputStream is = rec.getMetadata(language);
-                if (is != null) {
-                    final Unmarshaller u = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-                    final Details config = (Details) u.unmarshal(is);
-                    GenericDatabaseMarshallerPool.getInstance().recycle(u);
-                    return config;
-                } else {
-                    final InputStream in = Util.getResourceAsStream("org/constellation/xml/" + serviceType.toUpperCase()
-                            + "Capabilities.xml");
-                    if (in != null) {
-                        final Unmarshaller u = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-                        final Details metadata = (Details) u.unmarshal(in);
-                        GenericDatabaseMarshallerPool.getInstance().recycle(u);
-                        in.close();
-                        metadata.setIdentifier(identifier);
-                        return metadata;
-                    } else {
-                        throw new IOException("Unable to find the capabilities skeleton from resource.");
-                    }
-                }
-            }
-
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred while updating provider database", ex);
-        } finally {
-            if (session != null)
-                session.close();
-        }
-        return null;
-    }
+//    public static Details readServiceMetadata(final String identifier, final String serviceType, String language)
+//            throws IOException, JAXBException {
+//        ensureNonNull("identifier", identifier);
+//        ensureNonNull("serviceType", serviceType);
+//        if (language == null) {
+//            language = "eng";
+//        }
+//        Session session = null;
+//        try {
+//            session = EmbeddedDatabase.createSession();
+//            final ServiceRecord rec = session.readService(identifier,serviceType.toLowerCase());
+//            if (rec != null) {
+//                final InputStream is = rec.getMetadata(language);
+//                if (is != null) {
+//                    final Unmarshaller u = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+//                    final Details config = (Details) u.unmarshal(is);
+//                    GenericDatabaseMarshallerPool.getInstance().recycle(u);
+//                    return config;
+//                } else {
+//                    final InputStream in = Util.getResourceAsStream("org/constellation/xml/" + serviceType.toUpperCase()
+//                            + "Capabilities.xml");
+//                    if (in != null) {
+//                        final Unmarshaller u = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
+//                        final Details metadata = (Details) u.unmarshal(in);
+//                        GenericDatabaseMarshallerPool.getInstance().recycle(u);
+//                        in.close();
+//                        metadata.setIdentifier(identifier);
+//                        return metadata;
+//                    } else {
+//                        throw new IOException("Unable to find the capabilities skeleton from resource.");
+//                    }
+//                }
+//            }
+//
+//        } catch (SQLException ex) {
+//            LOGGER.log(Level.WARNING, "An error occurred while updating provider database", ex);
+//        } finally {
+//            if (session != null)
+//                session.close();
+//        }
+//        return null;
+//    }
 
     public static void clearDatabase() {
         EmbeddedDatabase.clear();
@@ -148,108 +148,108 @@ public class ConfigurationEngine {
         return configurationService.getProperty(key, defaultValue);
     }
 
-    public static void setConstellationProperty(final String key, final String value) {
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            if (session.readProperty(key) == null) {
-                session.writeProperty(key, value);
-            } else {
-                session.updateProperty(key, value);
-            }
-
-            // update metadata when service URL key is updated
-            if (SERVICES_URL_KEY.equals(key)) {
-                updateServiceUrlForMetadata(value);
-            }
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred getting constellation property", ex);
-        } finally {
-            if (session != null) {
-                session.close();
-            }
-        }
-    }
-
-
-
-    private static void updateServiceUrlForMetadata(final String url) {
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            final List<ServiceRecord> records = session.readServices();
-            for (ServiceRecord record : records) {
-                if (record.hasIsoMetadata()) {
-                    final DefaultMetadata servMeta = MetadataIOUtils.unmarshallMetadata(record.getIsoMetadata());
-                    CstlMetadatas.updateServiceMetadataURL(record.getIdentifier(), record.getType().name(), url,
-                            servMeta);
-                    final StringReader sr = MetadataIOUtils.marshallMetadata(servMeta);
-                    record.setIsoMetadata(servMeta.getFileIdentifier(), sr);
-                }
-            }
-        } catch (SQLException | JAXBException | IOException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred updating service URL", ex);
-        } finally {
-            if (session != null) {
-                session.close();
-            }
-        }
-    }
+//    public static void setConstellationProperty(final String key, final String value) {
+//        Session session = null;
+//        try {
+//            session = EmbeddedDatabase.createSession();
+//            if (session.readProperty(key) == null) {
+//                session.writeProperty(key, value);
+//            } else {
+//                session.updateProperty(key, value);
+//            }
+//
+//            // update metadata when service URL key is updated
+//            if (SERVICES_URL_KEY.equals(key)) {
+//                updateServiceUrlForMetadata(value);
+//            }
+//        } catch (SQLException ex) {
+//            LOGGER.log(Level.WARNING, "An error occurred getting constellation property", ex);
+//        } finally {
+//            if (session != null) {
+//                session.close();
+//            }
+//        }
+//    }
 
 
 
-    public static boolean existInternalMetadata(final String metadataID, final boolean includeService) {
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            final Record record = session.searchMetadata(metadataID, includeService);
-            return record != null;
+//    private static void updateServiceUrlForMetadata(final String url) {
+//        Session session = null;
+//        try {
+//            session = EmbeddedDatabase.createSession();
+//            final List<ServiceRecord> records = session.readServices();
+//            for (ServiceRecord record : records) {
+//                if (record.hasIsoMetadata()) {
+//                    final DefaultMetadata servMeta = MetadataIOUtils.unmarshallMetadata(record.getIsoMetadata());
+//                    CstlMetadatas.updateServiceMetadataURL(record.getIdentifier(), record.getType().name(), url,
+//                            servMeta);
+//                    final StringReader sr = MetadataIOUtils.marshallMetadata(servMeta);
+//                    record.setIsoMetadata(servMeta.getFileIdentifier(), sr);
+//                }
+//            }
+//        } catch (SQLException | JAXBException | IOException ex) {
+//            LOGGER.log(Level.WARNING, "An error occurred updating service URL", ex);
+//        } finally {
+//            if (session != null) {
+//                session.close();
+//            }
+//        }
+//    }
 
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred while looking for provider metadata existance", ex);
-        } finally {
-            if (session != null) {
-                session.close();
-            }
-        }
-        return false;
-    }
+
+
+//    public static boolean existInternalMetadata(final String metadataID, final boolean includeService) {
+//        Session session = null;
+//        try {
+//            session = EmbeddedDatabase.createSession();
+//            final Record record = session.searchMetadata(metadataID, includeService);
+//            return record != null;
+//
+//        } catch (SQLException ex) {
+//            LOGGER.log(Level.WARNING, "An error occurred while looking for provider metadata existance", ex);
+//        } finally {
+//            if (session != null) {
+//                session.close();
+//            }
+//        }
+//        return false;
+//    }
 
 
 
-    public static List<String> getInternalMetadataIds(final boolean includeService) {
-        final List<String> results = new ArrayList<>();
-        Session session = null;
-        try {
-            session = EmbeddedDatabase.createSession();
-            final List<ProviderRecord> providers = session.readProviders();
-            for (ProviderRecord record : providers) {
-                if (record.hasMetadata()) {
-                    results.add(record.getMetadataId());
-                }
-            }
-            if (includeService) {
-                final List<ServiceRecord> services = session.readServices();
-                for (ServiceRecord record : services) {
-                    if (record.hasIsoMetadata()) {
-                        results.add(record.getMetadataId());
-                    }
-                }
-            }
-            final List<DataRecord> datas = session.readData();
-            for (DataRecord record : datas) {
-                if (record.isVisible() && record.hasIsoMetadata()) {
-                    results.add(record.getMetadataId());
-                }
-            }
-        } catch (SQLException | IOException ex) {
-            LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
-        } finally {
-            if (session != null)
-                session.close();
-        }
-        return results;
-    }
+//    public static List<String> getInternalMetadataIds(final boolean includeService) {
+//        final List<String> results = new ArrayList<>();
+//        Session session = null;
+//        try {
+//            session = EmbeddedDatabase.createSession();
+//            final List<ProviderRecord> providers = session.readProviders();
+//            for (ProviderRecord record : providers) {
+//                if (record.hasMetadata()) {
+//                    results.add(record.getMetadataId());
+//                }
+//            }
+//            if (includeService) {
+//                final List<ServiceRecord> services = session.readServices();
+//                for (ServiceRecord record : services) {
+//                    if (record.hasIsoMetadata()) {
+//                        results.add(record.getMetadataId());
+//                    }
+//                }
+//            }
+//            final List<DataRecord> datas = session.readData();
+//            for (DataRecord record : datas) {
+//                if (record.isVisible() && record.hasIsoMetadata()) {
+//                    results.add(record.getMetadataId());
+//                }
+//            }
+//        } catch (SQLException | IOException ex) {
+//            LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
+//        } finally {
+//            if (session != null)
+//                session.close();
+//        }
+//        return results;
+//    }
 
 
 

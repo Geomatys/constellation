@@ -194,15 +194,15 @@ public final class DataRecord extends Record {
 
   
 
-    public List<StyleRecord> getLinkedStyles() throws SQLException {
-        ensureConnectionNotClosed();
-        return session.readStyles(this);
-    }
+//    public List<StyleRecord> getLinkedStyles() throws SQLException {
+//        ensureConnectionNotClosed();
+//        return session.readStyles(this);
+//    }
 
-    public void linkToStyle(final StyleRecord style) throws SQLException {
-        ensureConnectionNotClosed();
-        session.writeStyledData(style, this);
-    }
+//    public void linkToStyle(final StyleRecord style) throws SQLException {
+//        ensureConnectionNotClosed();
+//        session.writeStyledData(style, this);
+//    }
 
     public InputStream getMetadata() throws IOException, SQLException {
         ensureConnectionNotClosed();

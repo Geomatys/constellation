@@ -73,6 +73,7 @@ public class Details {
         this.versions = versions;
         this.transactional = transactionnal;
         this.lang = lang;
+        this.versions = versions;
     }
 
     public String getLang() {

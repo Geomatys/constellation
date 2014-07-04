@@ -357,28 +357,28 @@ public final class Session implements Closeable {
         new Query(DELETE_I18N).with(id).update();
     }
 
-    public Record searchMetadata(final String metadataId, final boolean includeService) throws SQLException {
-        final Result rs = new Query(SEARCH_PROVIDER_METADATA).with(metadataId).select();
-        if (rs.rs.next()) {
-            final int id = rs.rs.getInt(1);
-            return readProvider(id);
-        }
-        
-        final Result rs2 = new Query(SEARCH_DATA_ISO_METADATA).with(metadataId).select();
-        if (rs2.rs.next()) {
-            final int id = rs2.rs.getInt(1);
-            return readData(id);
-        }
-        
-        if (includeService) {
-            final Result rs3 = new Query(SEARCH_SERVICE_ISO_METADATA).with(metadataId).select();
-            if (rs3.rs.next()) {
-                final int id = rs3.rs.getInt(1);
-                return readService(id);
-            }
-        }
-        return null;
-    }
+//    public Record searchMetadata(final String metadataId, final boolean includeService) throws SQLException {
+//        final Result rs = new Query(SEARCH_PROVIDER_METADATA).with(metadataId).select();
+//        if (rs.rs.next()) {
+//            final int id = rs.rs.getInt(1);
+//            return readProvider(id);
+//        }
+//
+//        final Result rs2 = new Query(SEARCH_DATA_ISO_METADATA).with(metadataId).select();
+//        if (rs2.rs.next()) {
+//            final int id = rs2.rs.getInt(1);
+//            return readData(id);
+//        }
+//
+//        if (includeService) {
+//            final Result rs3 = new Query(SEARCH_SERVICE_ISO_METADATA).with(metadataId).select();
+//            if (rs3.rs.next()) {
+//                final int id = rs3.rs.getInt(1);
+//                return readService(id);
+//            }
+//        }
+//        return null;
+//    }
 
     /**
      * Updates the user with specified {@code login}.
@@ -388,9 +388,9 @@ public final class Session implements Closeable {
      * @param newName  the new user name
      * @throws SQLException if a database access error occurs
      */
-    /* internal */ void updateUser(final String login, final String newPwd, final String newName) throws SQLException {
-        new Query(UPDATE_USER).with(newPwd, newName, login).update();
-    }
+//    /* internal */ void updateUser(final String login, final String newPwd, final String newName) throws SQLException {
+//        new Query(UPDATE_USER).with(newPwd, newName, login).update();
+//    }
 
 
     /**************************************************************************
@@ -463,9 +463,9 @@ public final class Session implements Closeable {
      * @return a {@link List} of {@link ProviderRecord}s
      * @throws SQLException if a database access error occurs
      */
-    public List<ProviderRecord> readProviders() throws SQLException {
-        return new Query(LIST_PROVIDERS).select().getAll(ProviderRecord.class);
-    }
+//    public List<ProviderRecord> readProviders() throws SQLException {
+//        return new Query(LIST_PROVIDERS).select().getAll(ProviderRecord.class);
+//    }
 
     /**
      * Queries the list of registered providers for the specified {@link ProviderType}.
@@ -474,10 +474,10 @@ public final class Session implements Closeable {
      * @return a {@link List} of {@link ProviderRecord}s
      * @throws SQLException if a database access error occurs
      */
-    public List<ProviderRecord> readProviders(final ProviderType type) throws SQLException {
-        ensureNonNull("type", type);
-        return new Query(LIST_PROVIDERS_FROM_TYPE).with(type.name()).select().getAll(ProviderRecord.class);
-    }
+//    public List<ProviderRecord> readProviders(final ProviderType type) throws SQLException {
+//        ensureNonNull("type", type);
+//        return new Query(LIST_PROVIDERS_FROM_TYPE).with(type.name()).select().getAll(ProviderRecord.class);
+//    }
 
     /**
      * Queries the list of registered providers for the specified implementation.
@@ -486,10 +486,10 @@ public final class Session implements Closeable {
      * @return a {@link List} of {@link ProviderRecord}s
      * @throws SQLException if a database access error occurs
      */
-    public List<ProviderRecord> readProviders(final String implementation) throws SQLException {
-        ensureNonNull("implementation", implementation);
-        return new Query(LIST_PROVIDERS_FROM_IMPL).with(implementation).select().getAll(ProviderRecord.class);
-    }
+//    public List<ProviderRecord> readProviders(final String implementation) throws SQLException {
+//        ensureNonNull("implementation", implementation);
+//        return new Query(LIST_PROVIDERS_FROM_IMPL).with(implementation).select().getAll(ProviderRecord.class);
+//    }
     
     /**
      * Queries the list of registered providers for the specified parent provider.
@@ -498,10 +498,10 @@ public final class Session implements Closeable {
      * @return a {@link List} of {@link ProviderRecord}s
      * @throws SQLException if a database access error occurs
      */
-    public List<ProviderRecord> readProvidersFromParent(final String parentIdentifier) throws SQLException {
-        ensureNonNull("parentIdentifier", parentIdentifier);
-        return new Query(LIST_PROVIDERS_FROM_PARENT).with(parentIdentifier).select().getAll(ProviderRecord.class);
-    }
+//    public List<ProviderRecord> readProvidersFromParent(final String parentIdentifier) throws SQLException {
+//        ensureNonNull("parentIdentifier", parentIdentifier);
+//        return new Query(LIST_PROVIDERS_FROM_PARENT).with(parentIdentifier).select().getAll(ProviderRecord.class);
+//    }
 
 
 
@@ -527,10 +527,10 @@ public final class Session implements Closeable {
      * @param updatedProvider An existing provider which contains updated fields.
      * @throws SQLException
      */
-    public void updateProvider(final ProviderRecord updatedProvider) throws SQLException {
-        new Query(UPDATE_PROVIDER).with(updatedProvider.getIdentifier(), updatedProvider.getParentIdentifier(), updatedProvider.getType().name(),
-                updatedProvider.getImpl(), updatedProvider.getOwnerLogin(), updatedProvider.id).update();
-    }
+//    public void updateProvider(final ProviderRecord updatedProvider) throws SQLException {
+//        new Query(UPDATE_PROVIDER).with(updatedProvider.getIdentifier(), updatedProvider.getParentIdentifier(), updatedProvider.getType().name(),
+//                updatedProvider.getImpl(), updatedProvider.getOwnerLogin(), updatedProvider.id).update();
+//    }
 
     /**
      * Updates the configuration of the provider with the specified {@code generatedId}.
@@ -583,10 +583,10 @@ public final class Session implements Closeable {
      * @return the {@link SensorRecord} instance or {@code null}
      * @throws SQLException if a database access error occurs
      */
-    public SensorRecord readSensor(final String identifier) throws SQLException {
-        ensureNonNull("identifier", identifier);
-        return new Query(READ_SENSOR).with(identifier).select().getFirst(SensorRecord.class);
-    }
+//    public SensorRecord readSensor(final String identifier) throws SQLException {
+//        ensureNonNull("identifier", identifier);
+//        return new Query(READ_SENSOR).with(identifier).select().getFirst(SensorRecord.class);
+//    }
 
     /**
      * Queries the metadata of the sensor with the specified {@code generatedId}.
@@ -618,9 +618,9 @@ public final class Session implements Closeable {
      * @return a {@link List} of {@link SensorRecord}s
      * @throws SQLException if a database access error occurs
      */
-    public List<SensorRecord> readSensors() throws SQLException {
-        return new Query(LIST_SENSORS).select().getAll(SensorRecord.class);
-    }
+//    public List<SensorRecord> readSensors() throws SQLException {
+//        return new Query(LIST_SENSORS).select().getAll(SensorRecord.class);
+//    }
 
     /**
      * Queries the list of registered providers for the specified parent sensor.
@@ -644,20 +644,20 @@ public final class Session implements Closeable {
      * @throws SQLException if a database access error occurs
      * @throws IOException if the configuration cannot be written
      */
-    public SensorRecord writeSensor(final String identifier, String type, String parent,
-            final String owner) throws SQLException, IOException {
-        ensureNonNull("identifier", identifier);
-        if(parent==null) parent="";
-
-        // Prepare insertion.
-        final String login        = owner;
-
-        // Proceed to insertion.
-        final int id = new Query(WRITE_SENSOR).with(identifier, type, parent, login).insert();
-
-        // Return inserted line.
-        return new SensorRecord(this, id, identifier, type, parent, login);
-    }
+//    public SensorRecord writeSensor(final String identifier, String type, String parent,
+//            final String owner) throws SQLException, IOException {
+//        ensureNonNull("identifier", identifier);
+//        if(parent==null) parent="";
+//
+//        // Prepare insertion.
+//        final String login        = owner;
+//
+//        // Proceed to insertion.
+//        final int id = new Query(WRITE_SENSOR).with(identifier, type, parent, login).insert();
+//
+//        // Return inserted line.
+//        return new SensorRecord(this, id, identifier, type, parent, login);
+//    }
 
     /**
      * Updates the sensor with the specified {@code generatedId}.
@@ -702,15 +702,15 @@ public final class Session implements Closeable {
      * @param identifier the sensor identifier
      * @throws SQLException if a database access error occurs
      */
-    public void deleteSensor(final String identifier) throws SQLException {
-        ensureNonNull("identifier", identifier);
-        //remove children
-        final List<SensorRecord> children = readSensorsFromParent(identifier);
-        for (SensorRecord child : children) {
-            deleteSensor(child.getIdentifier());
-        }
-        new Query(DELETE_SENSOR).with(identifier).update();
-    }
+//    public void deleteSensor(final String identifier) throws SQLException {
+//        ensureNonNull("identifier", identifier);
+//        //remove children
+//        final List<SensorRecord> children = readSensorsFromParent(identifier);
+//        for (SensorRecord child : children) {
+//            deleteSensor(child.getIdentifier());
+//        }
+//        new Query(DELETE_SENSOR).with(identifier).update();
+//    }
 
 
     /**************************************************************************
@@ -737,11 +737,11 @@ public final class Session implements Closeable {
      * @return the {@link StyleRecord} instance or {@code null}
      * @throws SQLException if a database access error occurs
      */
-    public StyleRecord readStyle(final String name, final String providerId) throws SQLException {
-        ensureNonNull("name",       name);
-        ensureNonNull("providerId", providerId);
-        return new Query(READ_STYLE).with(name, providerId).select().getFirst(StyleRecord.class);
-    }
+//    public StyleRecord readStyle(final String name, final String providerId) throws SQLException {
+//        ensureNonNull("name",       name);
+//        ensureNonNull("providerId", providerId);
+//        return new Query(READ_STYLE).with(name, providerId).select().getFirst(StyleRecord.class);
+//    }
 
     /**
      * Queries the body of the style with the specified {@code generatedId}.
@@ -761,9 +761,9 @@ public final class Session implements Closeable {
      * @return a {@link List} of {@link ProviderRecord}s
      * @throws SQLException if a database access error occurs
      */
-    public List<StyleRecord> readStyles() throws SQLException {
-        return new Query(LIST_STYLES).select().getAll(StyleRecord.class);
-    }
+//    public List<StyleRecord> readStyles() throws SQLException {
+//        return new Query(LIST_STYLES).select().getAll(StyleRecord.class);
+//    }
 
     /**
      * Queries the list of registered styles related to the specified {@link DataRecord}.
@@ -772,10 +772,10 @@ public final class Session implements Closeable {
      * @return a {@link List} of {@link StyleRecord}s
      * @throws SQLException if a database access error occurs
      */
-    public List<StyleRecord> readStyles(final DataRecord data) throws SQLException {
-        ensureNonNull("data", data);
-        return new Query(LIST_STYLES_FROM_DATA).with(data.id).select().getAll(StyleRecord.class);
-    }
+//    public List<StyleRecord> readStyles(final DataRecord data) throws SQLException {
+//        ensureNonNull("data", data);
+//        return new Query(LIST_STYLES_FROM_DATA).with(data.id).select().getAll(StyleRecord.class);
+//    }
 
     /**
      * Queries the list of registered styles related to the specified {@link ProviderRecord}.
@@ -784,10 +784,10 @@ public final class Session implements Closeable {
      * @return a {@link List} of {@link StyleRecord}s
      * @throws SQLException if a database access error occurs
      */
-    public List<StyleRecord> readStyles(final ProviderRecord provider) throws SQLException {
-        ensureNonNull("provider", provider);
-        return new Query(LIST_STYLES_FROM_PROVIDER).with(provider.id).select().getAll(StyleRecord.class);
-    }
+//    public List<StyleRecord> readStyles(final ProviderRecord provider) throws SQLException {
+//        ensureNonNull("provider", provider);
+//        return new Query(LIST_STYLES_FROM_PROVIDER).with(provider.id).select().getAll(StyleRecord.class);
+//    }
 
     /**
      * Inserts a new style.
@@ -801,23 +801,23 @@ public final class Session implements Closeable {
      * @throws SQLException if a database access error occurs
      * @throws IOException if the body cannot be written
      */
-    public StyleRecord writeStyle(final String name, final ProviderRecord provider, final StyleType type, final MutableStyle body, final String owner) throws SQLException, IOException {
-        ensureNonNull("name",     name);
-        ensureNonNull("provider", provider);
-        ensureNonNull("type",     type);
-        ensureNonNull("body",     body);
-
-        // Prepare insertion.
-        final Date date           = new Date();
-        final StringReader reader = new StringReader(IOUtilities.writeStyle(body));
-        final String login        = owner;
-
-        // Proceed to insertion.
-        final int id = new Query(WRITE_STYLE).with(name, provider.id, type.name(), date.getTime(), reader, login).insert();
-
-        // Return inserted line.
-        return new StyleRecord(this, id, name, provider.id, type, date, login);
-    }
+//    public StyleRecord writeStyle(final String name, final ProviderRecord provider, final StyleType type, final MutableStyle body, final String owner) throws SQLException, IOException {
+//        ensureNonNull("name",     name);
+//        ensureNonNull("provider", provider);
+//        ensureNonNull("type",     type);
+//        ensureNonNull("body",     body);
+//
+//        // Prepare insertion.
+//        final Date date           = new Date();
+//        final StringReader reader = new StringReader(IOUtilities.writeStyle(body));
+//        final String login        = owner;
+//
+//        // Proceed to insertion.
+//        final int id = new Query(WRITE_STYLE).with(name, provider.id, type.name(), date.getTime(), reader, login).insert();
+//
+//        // Return inserted line.
+//        return new StyleRecord(this, id, name, provider.id, type, date, login);
+//    }
 
     /**
      * Updates the style with the specified {@code generatedId}.
@@ -854,11 +854,11 @@ public final class Session implements Closeable {
      * @param providerId the style provider identifier
      * @throws SQLException if a database access error occurs
      */
-    public void deleteStyle(final String name, final String providerId) throws SQLException {
-        ensureNonNull("name",       name);
-        ensureNonNull("providerId", providerId);
-        new Query(DELETE_STYLE).with(name, providerId).update();
-    }
+//    public void deleteStyle(final String name, final String providerId) throws SQLException {
+//        ensureNonNull("name",       name);
+//        ensureNonNull("providerId", providerId);
+//        new Query(DELETE_STYLE).with(name, providerId).update();
+//    }
 
 
     /**************************************************************************
@@ -869,11 +869,11 @@ public final class Session implements Closeable {
         return new Query(READ_DATA_FROM_ID).with(generatedId).select().getFirst(DataRecord.class);
     }
 
-    public DataRecord readDatafromLayer(final String layerAlias, final String providerId) throws SQLException {
-        ensureNonNull("layerAlias", layerAlias);
-        ensureNonNull("providerId", providerId);
-        return new Query(READ_DATA_FROM_LAYER).with(layerAlias, providerId).select().getFirst(DataRecord.class);
-    }
+//    public DataRecord readDatafromLayer(final String layerAlias, final String providerId) throws SQLException {
+//        ensureNonNull("layerAlias", layerAlias);
+//        ensureNonNull("providerId", providerId);
+//        return new Query(READ_DATA_FROM_LAYER).with(layerAlias, providerId).select().getFirst(DataRecord.class);
+//    }
 
     public DataRecord readData(final QName name, final String providerId) throws SQLException {
         ensureNonNull("name",       name);

@@ -7,8 +7,8 @@
         <div class="modal-body">
             <div class="row">
                 <div class="col-sm-offset-3">
-                    <a ng-repeat="v in versions" ng-click="chooseVersion(v)" ng-class="{'col-sm-3':versions.length==2, 'col-sm-2':versions.length==3}"
-                       class="btn btn-info btn-push-right">{{service.type}} {{v}}</a>
+                    <a ng-repeat="versionSelect in versions" ng-click="chooseVersion(versionSelect)" ng-class="{'col-sm-3':versions.length==2, 'col-sm-2':versions.length==3}"
+                       class="btn btn-info btn-push-right">{{service.type}} {{versionSelect}}</a>
                 </div>
             </div>
         </div>

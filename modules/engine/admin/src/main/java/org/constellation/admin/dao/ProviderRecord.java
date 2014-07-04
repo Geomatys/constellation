@@ -164,10 +164,10 @@ public final class ProviderRecord extends Record {
         session.updateProviderMetadata(id, metadataId, metadata);
     }
 
-    public List<StyleRecord> getStyles() throws SQLException {
-        ensureConnectionNotClosed();
-        return session.readStyles(this);
-    }
+//    public List<StyleRecord> getStyles() throws SQLException {
+//        ensureConnectionNotClosed();
+//        return session.readStyles(this);
+//    }
 
     public List<DataRecord> getData() throws SQLException {
         ensureConnectionNotClosed();

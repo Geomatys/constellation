@@ -561,11 +561,12 @@ public class GenericConfigurationXMLBindingTest {
         String result =  sw.toString();
         String expResult =
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-        "<ns2:service xmlns:ns2=\"http://www.constellation.org/config\">\n" +
+        "<ns2:details xmlns:ns2=\"http://www.constellation.org/config\">\n" +
         "  <ns2:description>desc1</ns2:description>\n" +
         "  <ns2:identifier>id1</ns2:identifier>\n" +
         "  <ns2:keywords>kw1</ns2:keywords>\n" +
         "  <ns2:keywords>kw2</ns2:keywords>\n" +
+        "  <ns2:lang>FR</ns2:lang>\n" +
         "  <ns2:name>name1</ns2:name>\n" +
         "  <ns2:serviceConstraints>\n" +
         "    <ns2:accessConstraint>constraint1</ns2:accessConstraint>\n" +
@@ -593,7 +594,7 @@ public class GenericConfigurationXMLBindingTest {
         "  <ns2:transactional>false</ns2:transactional>\n" +
         "  <ns2:versions>1.0.0</ns2:versions>\n" +
         "  <ns2:versions>2.0.0</ns2:versions>\n" +
-        "</ns2:service>" + '\n';
+        "</ns2:details>" + '\n';
 
         final XMLComparator comparator = new XMLComparator(expResult, result);
         comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
