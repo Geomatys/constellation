@@ -62,7 +62,8 @@ import java.util.logging.Logger;
  */
 public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
     
-    private static final Logger LOGGER = Logging.getLogger(AbstractGrizzlyServer.class);
+    protected static final Logger LOGGER = Logging.getLogger(AbstractGrizzlyServer.class);
+    
     /**
      * The grizzly server that will received some HTTP requests.
      */

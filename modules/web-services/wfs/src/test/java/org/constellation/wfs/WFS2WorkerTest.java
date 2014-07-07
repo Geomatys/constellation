@@ -19,6 +19,7 @@
 package org.constellation.wfs;
 
 import org.apache.sis.xml.MarshallerPool;
+import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.DataBusiness;
 import org.constellation.admin.ProviderBusiness;
@@ -155,6 +156,7 @@ import static org.constellation.provider.configuration.ProviderParameters.SOURCE
 import static org.constellation.provider.configuration.ProviderParameters.SOURCE_LOADALL_DESCRIPTOR;
 import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
 import static org.constellation.provider.featurestore.FeatureStoreProviderService.SOURCE_CONFIG_DESCRIPTOR;
+import org.constellation.test.utils.TestDatabaseHandler;
 import static org.geotoolkit.data.AbstractFeatureStoreFactory.NAMESPACE;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.DATABASE;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.HOST;
@@ -181,6 +183,8 @@ import static org.junit.Assert.fail;
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
 public class WFS2WorkerTest implements ApplicationContextAware {
 
+    private static final Logger LOGGER = Logging.getLogger(WFS2WorkerTest.class);
+    
     protected ApplicationContext applicationContext;
     
     @Override
@@ -222,6 +226,8 @@ public class WFS2WorkerTest implements ApplicationContextAware {
     
     private static boolean mdweb_active = true;
     
+    private static boolean localdb_active = true;
+    
     @PostConstruct
     public void setUpClass() {
         SpringHelper.setApplicationContext(applicationContext);
@@ -234,28 +240,33 @@ public class WFS2WorkerTest implements ApplicationContextAware {
                 dataBusiness.deleteAll();
                 providerBusiness.removeAll();
                 
-                 final ProviderFactory featfactory = DataProviders.getInstance().getFactory("feature-store");
+                final ProviderFactory featfactory = DataProviders.getInstance().getFactory("feature-store");
 
-                // Defines a PostGis data provider
-                final ParameterValueGroup source = featfactory.getProviderDescriptor().createValue();;
-                source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgisSrc");
+                // PostGIS datastore
+                localdb_active = TestDatabaseHandler.hasLocalDatabase();
+                if (localdb_active) {
+                    final ParameterValueGroup source = featfactory.getProviderDescriptor().createValue();;
+                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgisSrc");
 
-                final ParameterValueGroup choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
-                final ParameterValueGroup pgconfig = createGroup(choice, "PostgresParameters");
-                pgconfig.parameter(DATABASE.getName().getCode()).setValue("cite-wfs");
-                pgconfig.parameter(HOST.getName().getCode()).setValue("localhost");
-                pgconfig.parameter(SCHEMA.getName().getCode()).setValue("public");
-                pgconfig.parameter(USER.getName().getCode()).setValue("test");
-                pgconfig.parameter(PASSWORD.getName().getCode()).setValue("test");
-                pgconfig.parameter(NAMESPACE.getName().getCode()).setValue("http://cite.opengeospatial.org/gmlsf");
-                choice.values().add(pgconfig);
+                    final ParameterValueGroup choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
+                    final ParameterValueGroup pgconfig = createGroup(choice, "PostgresParameters");
+                    pgconfig.parameter(DATABASE.getName().getCode()).setValue("cite-wfs");
+                    pgconfig.parameter(HOST.getName().getCode()).setValue("localhost");
+                    pgconfig.parameter(SCHEMA.getName().getCode()).setValue("public");
+                    pgconfig.parameter(USER.getName().getCode()).setValue("test");
+                    pgconfig.parameter(PASSWORD.getName().getCode()).setValue("test");
+                    pgconfig.parameter(NAMESPACE.getName().getCode()).setValue("http://cite.opengeospatial.org/gmlsf");
+                    choice.values().add(pgconfig);
 
-                providerBusiness.createProvider("postgisSrc", null, ProviderRecord.ProviderType.LAYER, "feature-store", source);
+                    providerBusiness.createProvider("postgisSrc", null, ProviderRecord.ProviderType.LAYER, "feature-store", source);
 
-                dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "AggregateGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);
-                dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "PrimitiveGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);
-                dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "EntitéGénérique"),     "postgisSrc", "VECTOR", false, true, null, null);
+                    dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "AggregateGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);
+                    dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "PrimitiveGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);
+                    dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "EntitéGénérique"),     "postgisSrc", "VECTOR", false, true, null, null);
+                } else {
+                    LOGGER.log(Level.WARNING, "-- SOME TEST WILL BE SKIPPED BECAUSE THE LOCAL DATABASE IS MISSING --");
+                }
                 
                 final File outputDir = initDataDirectory();
                 final ParameterValueGroup sourcef = featfactory.getProviderDescriptor().createValue();

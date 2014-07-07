@@ -89,6 +89,7 @@ import static org.constellation.provider.configuration.ProviderParameters.SOURCE
 import static org.constellation.provider.configuration.ProviderParameters.SOURCE_LOADALL_DESCRIPTOR;
 import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
 import static org.constellation.provider.featurestore.FeatureStoreProviderService.SOURCE_CONFIG_DESCRIPTOR;
+import org.constellation.test.utils.TestDatabaseHandler;
 import static org.geotoolkit.data.AbstractFeatureStoreFactory.NAMESPACE;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.DATABASE;
 import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.HOST;
@@ -134,8 +135,6 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
     @Inject
     protected DataBusiness dataBusiness;
     
-    private static boolean datasourceCreated = false;
-
     private static final String WFS_GETCAPABILITIES_URL_NO_SERV = "request=GetCapabilities&version=1.1.0";
     private static final String WFS_GETCAPABILITIES_URL_NO_SERV2 = "request=GetCapabilities&version=2.0.0";
     
@@ -174,14 +173,11 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
 
     private static String EPSG_VERSION;
 
-    public static boolean hasLocalDatabase() {
-        return true; // TODO
-    }
-
     private static boolean initialized = false;
     
     private static boolean mdweb_active = true;
     
+    private static boolean localdb_active = true;
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
@@ -197,40 +193,46 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
                 dataBusiness.deleteAll();
                 providerBusiness.removeAll();
                 
-                 final ProviderFactory featfactory = DataProviders.getInstance().getFactory("feature-store");
+                final ProviderFactory featfactory = DataProviders.getInstance().getFactory("feature-store");
 
-                // Defines a PostGis data provider
-                final ParameterValueGroup source = featfactory.getProviderDescriptor().createValue();;
-                source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgisSrc");
+                // PostGIS datastore
+                localdb_active = TestDatabaseHandler.hasLocalDatabase();
+                if (localdb_active) {
+                    final ParameterValueGroup source = featfactory.getProviderDescriptor().createValue();;
+                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("postgisSrc");
 
-                final ParameterValueGroup choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
-                final ParameterValueGroup pgconfig = createGroup(choice, "PostgresParameters");
-                pgconfig.parameter(DATABASE.getName().getCode()).setValue("cite-wfs");
-                pgconfig.parameter(HOST.getName().getCode()).setValue("localhost");
-                pgconfig.parameter(SCHEMA.getName().getCode()).setValue("public");
-                pgconfig.parameter(USER.getName().getCode()).setValue("test");
-                pgconfig.parameter(PASSWORD.getName().getCode()).setValue("test");
-                pgconfig.parameter(NAMESPACE.getName().getCode()).setValue("http://cite.opengeospatial.org/gmlsf");
-                choice.values().add(pgconfig);
+                    final ParameterValueGroup choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
+                    final ParameterValueGroup pgconfig = createGroup(choice, "PostgresParameters");
+                    pgconfig.parameter(DATABASE.getName().getCode()).setValue("cite-wfs");
+                    pgconfig.parameter(HOST.getName().getCode()).setValue("localhost");
+                    pgconfig.parameter(SCHEMA.getName().getCode()).setValue("public");
+                    pgconfig.parameter(USER.getName().getCode()).setValue("test");
+                    pgconfig.parameter(PASSWORD.getName().getCode()).setValue("test");
+                    pgconfig.parameter(NAMESPACE.getName().getCode()).setValue("http://cite.opengeospatial.org/gmlsf");
+                    choice.values().add(pgconfig);
+                    
+                    //add a custom sql query layer
+                    final ParameterValueGroup layer = getOrCreateGroup(source, "Layer");
+                    getOrCreateValue(layer, "name").setValue("CustomSQLQuery");
+                    getOrCreateValue(layer, "language").setValue("CUSTOM-SQL");
+                    getOrCreateValue(layer, "statement").setValue("SELECT name as nom, \"pointProperty\" as geom FROM \"PrimitiveGeoFeature\" ");
+
+
+                    providerBusiness.createProvider("postgisSrc", null, ProviderRecord.ProviderType.LAYER, "feature-store", source);
+
+                    dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "AggregateGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);
+                    dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "PrimitiveGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);
+                    dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "EntitéGénérique"),     "postgisSrc", "VECTOR", false, true, null, null);
+                    dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "CustomSQLQuery"),      "postgisSrc", "VECTOR", false, true, null, null);
+                    
+                }  else {
+                    LOGGER.log(Level.WARNING, "-- SOME TEST WILL BE SKIPPED BECAUSE THE LOCAL DATABASE IS MISSING --");
+                }
                 
-                //add a custom sql query layer
-                final ParameterValueGroup layer = getOrCreateGroup(source, "Layer");
-                getOrCreateValue(layer, "name").setValue("CustomSQLQuery");
-                getOrCreateValue(layer, "language").setValue("CUSTOM-SQL");
-                getOrCreateValue(layer, "statement").setValue("SELECT name as nom, \"pointProperty\" as geom FROM \"PrimitiveGeoFeature\" ");
                 
-
-                providerBusiness.createProvider("postgisSrc", null, ProviderRecord.ProviderType.LAYER, "feature-store", source);
-
-                dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "AggregateGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);
-                dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "PrimitiveGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);
-                dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "EntitéGénérique"),     "postgisSrc", "VECTOR", false, true, null, null);
-                dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "CustomSQLQuery"),      "postgisSrc", "VECTOR", false, true, null, null);
-                
-                final ProviderFactory ffactory = DataProviders.getInstance().getFactory("feature-store");
                 final File outputDir = initDataDirectory();
-                final ParameterValueGroup sourcef = ffactory.getProviderDescriptor().createValue();
+                final ParameterValueGroup sourcef = featfactory.getProviderDescriptor().createValue();
                 getOrCreateValue(sourcef, "id").setValue("shapeSrc");
                 getOrCreateValue(sourcef, "load_all").setValue(true);
 
@@ -321,10 +323,12 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
                 config.getCustomParameters().put("transactionnal", "true");
 
                 serviceBusiness.create("wfs", "default", config, null, null);
-                layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "wfs", null);
-                layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "wfs", null);
-                layerBusiness.add("EntitéGénérique",     "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "wfs", null);
-                layerBusiness.add("CustomSQLQuery",      "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "WFS", null);
+                if (localdb_active) {
+                    layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "wfs", null);
+                    layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "wfs", null);
+                    layerBusiness.add("EntitéGénérique",     "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "wfs", null);
+                    layerBusiness.add("CustomSQLQuery",      "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "default", "WFS", null);
+                }
                 layerBusiness.add("SamplingPoint",       "http://www.opengis.net/sampling/1.0",  "omSrc",      null, "default", "wfs", null);
                 layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml",       "shapeSrc",   null, "default", "wfs", null);
                 layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml",       "shapeSrc",   null, "default", "wfs", null);
@@ -340,10 +344,12 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
                 layerBusiness.add("Ponds",               "http://www.opengis.net/gml",       "shapeSrc",   null, "default", "wfs", null);
 
                 serviceBusiness.create("wfs", "test", config, null, null);
-                layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "test", "wfs", null);
-                layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "test", "wfs", null);
-                layerBusiness.add("EntitéGénérique",     "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "test", "wfs", null);
-                layerBusiness.add("CustomSQLQuery",      "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "test", "WFS", null);
+                if (localdb_active) {
+                    layerBusiness.add("AggregateGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "test", "wfs", null);
+                    layerBusiness.add("PrimitiveGeoFeature", "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "test", "wfs", null);
+                    layerBusiness.add("EntitéGénérique",     "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "test", "wfs", null);
+                    layerBusiness.add("CustomSQLQuery",      "http://cite.opengeospatial.org/gmlsf", "postgisSrc", null, "test", "WFS", null);
+                }
                 layerBusiness.add("SamplingPoint",       "http://www.opengis.net/sampling/1.0",  "omSrc",      null, "test", "wfs", null);
                 layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml",       "shapeSrc",   null, "test", "wfs", null);
                 layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml",       "shapeSrc",   null, "test", "wfs", null);
@@ -406,7 +412,6 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
     @AfterClass
     public static void shutDown() {
         ConfigurationEngine.shutdownTestEnvironement("WFSRequestTest");
-        DataProviders.getInstance().setConfigurator(Providers.DEFAULT_CONFIGURATOR);
         File f = new File("derby.log");
         if (f.exists()) {
             f.delete();
@@ -608,7 +613,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         assertTrue(obj instanceof Schema);
 
         Schema schema = (Schema) obj;
-        if (hasLocalDatabase()) {
+        if (localdb_active) {
             assertEquals(17, schema.getElements().size());
         } else {
             assertEquals(13, schema.getElements().size());
@@ -626,7 +631,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         assertTrue("was:" + obj, obj instanceof Schema);
 
         schema = (Schema) obj;
-        if (hasLocalDatabase()) {
+        if (localdb_active) {
             assertEquals(17, schema.getElements().size());
         } else {
             assertEquals(13, schema.getElements().size());

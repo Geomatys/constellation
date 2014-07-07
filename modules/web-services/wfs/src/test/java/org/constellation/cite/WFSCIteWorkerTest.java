@@ -29,6 +29,7 @@ import org.constellation.configuration.LayerContext;
 import org.constellation.map.configuration.LayerBusiness;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
+import org.constellation.test.utils.TestDatabaseHandler;
 import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.wfs.ws.DefaultWFSWorker;
 import org.constellation.wfs.ws.WFSWorker;
@@ -64,6 +65,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
 
 import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
 import static org.constellation.provider.configuration.ProviderParameters.SOURCE_LOADALL_DESCRIPTOR;
@@ -89,6 +91,8 @@ import static org.junit.Assume.assumeTrue;
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
 public class WFSCIteWorkerTest implements ApplicationContextAware {
 
+    private static final Logger LOGGER = Logging.getLogger(WFSCIteWorkerTest.class);
+    
     protected ApplicationContext applicationContext;
     
     @Override
@@ -112,15 +116,17 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
     @Inject
     protected DataBusiness dataBusiness;
 
-    public static boolean hasLocalDatabase() {
-        return true; // TODO
-    }
     private static boolean initialized = false;
     
     @PostConstruct
     public void setUpClass() {
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
+            if (!TestDatabaseHandler.hasLocalDatabase()) {
+                LOGGER.warning("-- SOME TESTS WILL BE SKIPPED BECAUSE TEST DATABASE IS MISSING --");
+                initialized = true;
+                return;
+            }
             try {
                 ConfigurationEngine.setupTestEnvironement("WFSCiteWorkerTest");
 
@@ -175,7 +181,7 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        ConfigurationEngine.shutdownTestEnvironement("WFSCIteWorkerTest");
+        ConfigurationEngine.shutdownTestEnvironement("WFSCiteWorkerTest");
     }
 
     @Before
@@ -193,7 +199,7 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
      */
     @Test
     public void getFeatureShapeFileTest() throws Exception {
-        assumeTrue(hasLocalDatabase());
+        assumeTrue(TestDatabaseHandler.hasLocalDatabase());
 
         /**
          * Test 1 : query on typeName aggragateGeofeature
