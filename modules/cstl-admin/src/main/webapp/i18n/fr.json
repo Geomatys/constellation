@@ -437,6 +437,15 @@
     "main.menu.ws.create.subtitle": "Créer un service web",
     "main.menu.ws.create.title": "Services web",
 
+    "mapcontext.modal.cancel": "Annuler",
+    "mapcontext.modal.label.crs": "CRS",
+    "mapcontext.modal.label.description": "Description",
+    "mapcontext.modal.label.envelope": "Emprise",
+    "mapcontext.modal.label.keywords": "Mots clés",
+    "mapcontext.modal.label.name": "Nom",
+    "mapcontext.modal.title": "Ajouter un contexte cartographique",
+    "mapcontext.modal.validate": "Valider",
+
     "md.iso.abstract": "Résumé",
     "md.iso.data.date": "Date des données",
     "md.iso.date.type": "Type de date",

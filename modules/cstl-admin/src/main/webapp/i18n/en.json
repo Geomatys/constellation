@@ -388,6 +388,15 @@
     "listing.title": "Metadata list",
     "listing.no.available.md": "No available metadata",
 
+    "mapcontext.modal.cancel": "Cancel",
+    "mapcontext.modal.label.crs": "CRS",
+    "mapcontext.modal.label.description": "Description",
+    "mapcontext.modal.label.envelope": "Envelope",
+    "mapcontext.modal.label.keywords": "Keywords",
+    "mapcontext.modal.label.name": "Name",
+    "mapcontext.modal.title": "Add map context",
+    "mapcontext.modal.validate": "Validate",
+
     "menu.administration.label": "Administration",
     "menu.data.label": "Data",
     "menu.geoviewer.label": "Geoviewer",

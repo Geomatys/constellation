@@ -140,18 +140,6 @@
                                 </div>
                             </div>
                             <div class="block-action">
-                                <div class="row" style="padding-bottom: 5px">
-                                    <div class="col-sm-6">
-                                        <a id="exportMD" class="btn btn-info" ng-href="{{cstlUrl}}api/1/domain/{{domainId}}/data/export/{{selected.Provider}}/{{selected.Name}};jsessionid={{cstlSessionId}}">
-                                            <i class="icon-download-alt"></i> <span translate="layer.listing.selected.export.button">Export</span>
-                                        </a>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <button type="button" id="seeMetadata" class="btn btn-warning" ng-click="displayMetadata()">
-                                            <i class="icon-file-alt"></i> <span translate="layer.listing.selected.metadata.button">Metadata</span>
-                                        </button>
-                                    </div>
-                                </div>
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <button id="showData" class="btn btn-success" type="button" ng-click="showData()">
@@ -159,7 +147,7 @@
                                         </button>
                                     </div>
                                     <div class="col-sm-6">
-                                        <button type="button" id="deleteLayer" class="btn btn-danger" ng-click="deleteData();">
+                                        <button type="button" id="deleteLayer" class="btn btn-danger" ng-click="deleteMapContext();">
                                             <i class="icon-trash"></i> <span translate="layer.listing.selected.delete.button">Delete</span>
                                         </button>
                                     </div>

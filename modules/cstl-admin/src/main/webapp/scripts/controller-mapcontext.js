@@ -53,17 +53,43 @@ cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', '$growl
         $scope.addMapContext = function() {
             var modal = $modal.open({
                 templateUrl: 'views/mapcontext/modalAddContext.html',
-                controller: 'SensorAddModalController'
+                controller: 'MapContextAddModalController'
             });
 
             modal.result.then(function() {
-                sensor.list({}, function(sensors) {
-                    $dashboard($scope, sensors.children, false);
-                    $scope.init();
-                });
+                $scope.init();
             });
+        };
+
+        $scope.deleteMapContext = function() {
+            if (confirm("Are you sure?")) {
+                var ctxtName = $scope.selected.name;
+                mapcontext.delete({id: $scope.selected.id}, function () {
+                    $growl('success', 'Success', 'Map context ' + ctxtName + ' successfully removed');
+                    $scope.init();
+                }, function () {
+                    $growl('error', 'Error', 'Unable to remove map context ' + ctxtName);
+                });
+            }
         };
     }]);
 
+cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstance', 'mapcontext', '$growl',
+    function ($scope, $modalInstance, mapcontext, $growl) {
+        $scope.ctxt = {};
 
+        $scope.close = function () {
+            $modalInstance.dismiss('close');
+        };
+
+        $scope.finish = function () {
+            mapcontext.add({}, $scope.ctxt, function() {
+                $growl('success','Success','Map context created');
+                $modalInstance.close();
+            }, function() {
+                $growl('error','Error','Unable to create map context');
+                $modalInstance.dismiss('close');
+            });
+        };
+    }]);
                                      
