@@ -205,8 +205,35 @@
                                         </gml:VerticalCS>
                                     </gml:verticalCS>
                                     <gml:verticalDatum>
-                                        <gml:VerticalDatum gml:id="Geoidal">
-                                            <gml:name>Geoidal</gml:name>
+                                        <gml:VerticalDatum gml:id="epsg-datum-5100">
+                                            <gml:identifier codeSpace="EPSG">urn:ogc:def:datum:EPSG::5100</gml:identifier>
+                                            <gml:name codeSpace="EPSG">Mean Sea Level</gml:name>
+                                            <gml:domainOfValidity>
+                                                <gmd:EX_Extent>
+                                                    <gmd:description>
+                                                        <gco:CharacterString>Monde</gco:CharacterString>
+                                                    </gmd:description>
+                                                    <gmd:geographicElement>
+                                                        <gmd:EX_GeographicBoundingBox>
+                                                            <gmd:extentTypeCode>
+                                                                <gco:Boolean>true</gco:Boolean>
+                                                            </gmd:extentTypeCode>
+                                                            <gmd:westBoundLongitude>
+                                                                <gco:Decimal>-180.0</gco:Decimal>
+                                                            </gmd:westBoundLongitude>
+                                                            <gmd:eastBoundLongitude>
+                                                                <gco:Decimal>180.0</gco:Decimal>
+                                                            </gmd:eastBoundLongitude>
+                                                            <gmd:southBoundLatitude>
+                                                                <gco:Decimal>-90.0</gco:Decimal>
+                                                            </gmd:southBoundLatitude>
+                                                            <gmd:northBoundLatitude>
+                                                                <gco:Decimal>90.0</gco:Decimal>
+                                                            </gmd:northBoundLatitude>
+                                                        </gmd:EX_GeographicBoundingBox>
+                                                    </gmd:geographicElement>
+                                                </gmd:EX_Extent>
+                                            </gml:domainOfValidity>
                                         </gml:VerticalDatum>
                                     </gml:verticalDatum>
                                 </gml:VerticalCRS>

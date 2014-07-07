@@ -3239,7 +3239,7 @@ public class CSWworkerTest implements ApplicationContextAware {
      * @return
      * @throws Exception
      */
-    private static String getStringFromNode(final Node n) throws Exception {
+    protected static String getStringFromNode(final Node n) throws Exception {
         TransformerFactory tf = TransformerFactory.newInstance();
         Transformer transformer = tf.newTransformer();
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
