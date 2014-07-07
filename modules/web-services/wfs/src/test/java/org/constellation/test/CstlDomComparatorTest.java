@@ -18,6 +18,7 @@
  */
 package org.constellation.test;
 
+import org.constellation.test.utils.CstlDOMComparator;
 import org.junit.Test;
 
 import static org.junit.Assert.fail;

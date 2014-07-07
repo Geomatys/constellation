@@ -30,7 +30,7 @@ import org.constellation.sos.ws.soap.SOService;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.util.Util;
-import org.geotoolkit.util.StringUtilities;
+import org.constellation.test.utils.CstlDOMComparator;
 import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,10 +48,13 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.geotoolkit.internal.sql.DefaultDataSource;
+import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assume.assumeNoException;
@@ -71,12 +74,14 @@ public class SOSSoapRequestTest extends AbstractGrizzlyServer implements Applica
         this.applicationContext = applicationContext;
     }
 
-    private static final String SOS_DEFAULT = "http://localhost:9191/sos/default?";
+    private static final String SOS_DEFAULT = "http://localhost:9191/sos/default";
 
     @Inject
     private ServiceBusiness serviceBusiness;
     
     private static boolean initialized = false;
+    
+    private static DefaultDataSource ds = null;
     
     @PostConstruct
     public void initLayerList() {
@@ -96,12 +101,22 @@ public class SOSSoapRequestTest extends AbstractGrizzlyServer implements Applica
                 writeDataFile(dataDirectory, "urn-ogc-object-sensor-SunSpot-0014.4F01.0000.2626");
                 writeDataFile(dataDirectory, "urn-ogc-object-sensor-SunSpot-2");
 
+                String url = "jdbc:derby:memory:OM2Test1;create=true";
+                ds = new DefaultDataSource(url);
+
+                Connection con = ds.getConnection();
+
+                DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
+                sr.setEncoding("UTF-8");
+                sr.run(Util.getResourceAsStream("org/constellation/om2/structure_observations.sql"));
+                sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data-om2.sql"));
+        
                 final Automatic smlConfig = new Automatic(null, dataDirectory.getPath());
-                final Automatic omCOnfig = new Automatic(null, new BDD("org.postgresql.Driver", "jdbc:postgresql://flupke.geomatys.com:5432/observation", "test", "test"));
+                final Automatic omCOnfig = new Automatic(null, new BDD("", url, "test", "test"));
                 final SOSConfiguration sosconf = new SOSConfiguration(smlConfig, omCOnfig);
-                sosconf.setObservationFilterType(DataSourceType.POSTGRID);
-                sosconf.setObservationReaderType(DataSourceType.POSTGRID);
-                sosconf.setObservationWriterType(DataSourceType.POSTGRID);
+                sosconf.setObservationFilterType(DataSourceType.OM2);
+                sosconf.setObservationReaderType(DataSourceType.OM2);
+                sosconf.setObservationWriterType(DataSourceType.OM2);
                 sosconf.setSMLType(DataSourceType.FILESYSTEM);
                 sosconf.setProfile("transactional");
                 sosconf.setObservationIdBase("urn:ogc:object:observation:SunSpot:");
@@ -125,6 +140,9 @@ public class SOSSoapRequestTest extends AbstractGrizzlyServer implements Applica
     @AfterClass
     public static void shutDown() {
         ConfigurationEngine.shutdownTestEnvironement("SOSSoapRequestTest");
+        if (ds != null) {
+            ds.shutdown();
+        }
         finish();
     }
 
@@ -151,9 +169,9 @@ public class SOSSoapRequestTest extends AbstractGrizzlyServer implements Applica
         String result    = getStringResponse(conec);
         String expResult = getStringFromFile("org/constellation/xml/sos/GetCapabilitiesResponseSOAP.xml");
 
-        result = cleanXMlString(result);
-        expResult = cleanXMlString(expResult);
-        assertEquals(expResult, result);
+        // System.out.println("result:\n" + result);
+        
+        domCompare(result, expResult);
     }
 
     @Test
@@ -170,12 +188,9 @@ public class SOSSoapRequestTest extends AbstractGrizzlyServer implements Applica
         String result    = getStringResponse(conec);
         String expResult = getStringFromFile("org/constellation/xml/sos/GetFeatureOfInterestResponseSOAP.xml");
 
-        result = cleanXMlString(result);
-        expResult = cleanXMlString(expResult);
+        // System.out.println("result:\n" + result);
 
-        System.out.println("result:\n" + result);
-
-        assertEquals(expResult, result);
+        domCompare(expResult, result);
 
         conec = getCapsUrl.openConnection();
 
@@ -185,22 +200,9 @@ public class SOSSoapRequestTest extends AbstractGrizzlyServer implements Applica
         expResult = getStringFromFile("org/constellation/xml/sos/GetFeatureOfInterestResponseSOAP2.xml");
 
 
-        result = cleanXMlString(result);
-        expResult = cleanXMlString(expResult);
+        // System.out.println("result:\n" + result);
 
-        System.out.println("result:\n" + result);
-
-        assertEquals(expResult, result);
-    }
-
-    private static String cleanXMlString(String s) {
-        s = s.substring(s.indexOf('>') + 1);
-        s = StringUtilities.removeXmlns(s);
-        for (int i = 0; i< 17; i++) {
-            s = StringUtilities.removePrefix("ns" + i);
-        }
-
-        return s;
+        domCompare(result, expResult);
     }
 
     public static void writeDataFile(File dataDirectory, String resourceName) throws IOException {
@@ -223,5 +225,13 @@ public class SOSSoapRequestTest extends AbstractGrizzlyServer implements Applica
         }
         in.close();
         fw.close();
+    }
+    
+     public static void domCompare(final Object actual, final Object expected) throws Exception {
+
+        final CstlDOMComparator comparator = new CstlDOMComparator(expected, actual);
+        comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
+        comparator.ignoredAttributes.add("updateSequence");
+        comparator.compare();
     }
 }

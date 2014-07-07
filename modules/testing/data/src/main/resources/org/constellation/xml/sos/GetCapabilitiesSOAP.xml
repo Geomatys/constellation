@@ -8,9 +8,9 @@
 		<GetCapabilities xmlns="http://www.opengis.net/sos/1.0"
 			xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xlink="http://www.w3.org/1999/xlink"
 			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="SOS">
-			<AcceptVersions>
+			<ows:AcceptVersions>
 				<ows:Version>1.0.0</ows:Version>
-			</AcceptVersions>
+			</ows:AcceptVersions>
 		</GetCapabilities>
 	</soap:Body>
 </soap:Envelope>

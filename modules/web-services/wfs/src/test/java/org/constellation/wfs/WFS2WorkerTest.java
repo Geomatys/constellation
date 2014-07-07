@@ -31,7 +31,7 @@ import org.constellation.map.configuration.LayerBusiness;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.FeatureData;
 import org.constellation.provider.ProviderFactory;
-import org.constellation.test.CstlDOMComparator;
+import org.constellation.test.utils.CstlDOMComparator;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.util.QNameComparator;

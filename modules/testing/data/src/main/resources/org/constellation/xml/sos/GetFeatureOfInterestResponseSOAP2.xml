@@ -1,27 +1,27 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<S:Envelope xmlns:S="http://www.w3.org/2003/05/soap-envelope">
-    <S:Body>
-        <ns16:getFeatureOfInterestResponse xmlns:ns3="http://www.opengis.net/sensorML/1.0" xmlns:ns4="http://www.opengis.net/gml" xmlns:ns5="http://www.w3.org/1999/xlink" xmlns:ns6="urn:us:gov:ic:ism:v2" xmlns:ns7="http://www.opengis.net/swe/1.0" xmlns:ns8="http://www.opengis.net/sos/1.0" xmlns:ns9="http://www.opengis.net/om/1.0" xmlns:ns10="http://www.opengis.net/swe/1.0.1" xmlns:ns11="http://www.opengis.net/sampling/1.0" xmlns:ns12="http://www.opengis.net/gml/" xmlns:ns13="http://www.opengis.net/sensorML/1.0.1" xmlns:ns14="http://www.opengis.net/ows/1.1" xmlns:ns15="http://www.opengis.net/ogc" xmlns:ns16="http://soap.ws.sos.constellation.org/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns11:SamplingCurveType" ns4:id="station-003">
-            <ns4:description>Geology traverse</ns4:description>
-            <ns4:name>cycle1</ns4:name>
-            <ns4:boundedBy>
-                <ns4:Envelope srsName="urn:ogc:def:crs:epsg:7.9:27582" ns4:id="bound-1">
-                    <ns4:lowerCorner>-30.711 134.196</ns4:lowerCorner>
-                    <ns4:upperCorner>-30.702 134.205</ns4:upperCorner>
-                </ns4:Envelope>
-            </ns4:boundedBy>
-            <ns11:shape>
-                <ns4:LineString srsName="urn:ogc:def:crs:EPSG:27582" ns4:id="pr1_ls1">
-                    <ns4:pos>-30.711 134.205</ns4:pos>
-                    <ns4:pos>-30.71 134.204</ns4:pos>
-                    <ns4:pos>-30.709 134.203</ns4:pos>
-                    <ns4:pos>-30.708 134.201</ns4:pos>
-                    <ns4:pos>-30.706 134.196</ns4:pos>
-                    <ns4:pos>-30.703 134.197</ns4:pos>
-                    <ns4:pos>-30.702 134.199</ns4:pos>
-                </ns4:LineString>
-            </ns11:shape>
-            <ns11:length>NaN</ns11:length>
-        </ns16:getFeatureOfInterestResponse>
-    </S:Body>
-</S:Envelope>
+<env:Envelope xmlns:env="http://www.w3.org/2003/05/soap-envelope">
+    <env:Body>
+        <sampling:SamplingCurve xmlns:fes="http://www.opengis.net/fes/2.0" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:icism="urn:us:gov:ic:ism:v2" xmlns:ns16="http://www.opengis.net/gml" xmlns:ns20="http://www.opengis.net/sos/2.0" xmlns:ns23="http://www.opengis.net/om/2.0" xmlns:ns24="http://www.opengis.net/sampling/2.0" xmlns:ns26="http://www.w3.org/2005/08/addressing" xmlns:ns27="http://www.opengis.net/swe/2.0" xmlns:ns28="http://docs.oasis-open.org/wsn/t-1" xmlns:ns29="http://www.opengis.net/gml/" xmlns:ogc="http://www.opengis.net/ogc" xmlns:om="http://www.opengis.net/om/1.0" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:sampling="http://www.opengis.net/sampling/1.0" xmlns:samplingspatial="http://www.opengis.net/samplingSpatial/2.0" xmlns:sml="http://www.opengis.net/sensorML/1.0.1" xmlns:sml1="http://www.opengis.net/sensorML/1.0" xmlns:sos="http://www.opengis.net/sos/1.0" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:swe="http://www.opengis.net/swe/1.0.1" xmlns:swe1="http://www.opengis.net/swe/1.0" xmlns:swes="http://www.opengis.net/swes/2.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ns16:id="station-006">
+            <ns16:description>Geology traverse</ns16:description>
+            <ns16:name>cycle1</ns16:name>
+            <ns16:boundedBy>
+                <ns16:Envelope ns16:id="bound-1" srsName="urn:ogc:def:crs:epsg:7.9:27582">
+                    <ns16:lowerCorner>-30.711 134.196</ns16:lowerCorner>
+                    <ns16:upperCorner>-30.702 134.205</ns16:upperCorner>
+                </ns16:Envelope>
+            </ns16:boundedBy>
+            <sampling:shape>
+                <ns16:LineString ns16:id="line-station-006" srsName="urn:ogc:def:crs:epsg:7.9:27582">
+                    <ns16:pos>-30.711 134.205</ns16:pos>
+                    <ns16:pos>-30.71 134.204</ns16:pos>
+                    <ns16:pos>-30.709 134.203</ns16:pos>
+                    <ns16:pos>-30.708 134.201</ns16:pos>
+                    <ns16:pos>-30.706 134.196</ns16:pos>
+                    <ns16:pos>-30.703 134.197</ns16:pos>
+                    <ns16:pos>-30.702 134.199</ns16:pos>
+                </ns16:LineString>
+            </sampling:shape>
+            <sampling:length>0.0</sampling:length>
+        </sampling:SamplingCurve>
+    </env:Body>
+</env:Envelope>

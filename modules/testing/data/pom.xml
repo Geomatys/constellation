@@ -76,6 +76,12 @@
       <version>${sis.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.apache.sis.core</groupId>
+      <artifactId>sis-utility</artifactId>
+      <type>test-jar</type>
+      <version>${sis.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.constellation.library</groupId>
       <artifactId>cstl-lib-base</artifactId>
       <version>${project.version}</version>

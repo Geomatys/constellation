@@ -6,7 +6,7 @@
 	http://www.w3.org/2003/05/soap-envelope">
 	<soap:Body>
 		<GetFeatureOfInterest xmlns="http://www.opengis.net/sos/1.0" service="SOS" version="1.0.0">
-                    <FeatureOfInterestId>station-003</FeatureOfInterestId>
+                    <FeatureOfInterestId>station-006</FeatureOfInterestId>
                 </GetFeatureOfInterest>
 	</soap:Body>
 </soap:Envelope>
