@@ -19,7 +19,7 @@
 package org.constellation.ws.embedded;
 
 // J2SE dependencies
-
+import org.constellation.test.utils.TestDatabaseHandler;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.DataBusiness;
 import org.constellation.admin.ProviderBusiness;
@@ -202,9 +202,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
     private static final String WMS_GETMAP_GIF_TRANSPARENT =
     "TrAnSpArEnT=TRUE&CrS=CRS:84&FoRmAt=image%2Fgif&VeRsIoN=1.3.0&HeIgHt=100&WiDtH=200&StYlEs=&LaYeRs=cite%3ALakes&ReQuEsT=GetMap&BbOx=0,-0.0020,0.0040,0";
 
-    public static boolean hasLocalDatabase() {
-        return true; // TODO
-    }
+    private static boolean localdb_active = true;
 
     private static boolean initialized = false;
     
@@ -223,22 +221,27 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                 dataBusiness.deleteAll();
                 providerBusiness.removeAll();
                 
-                
-                final ProviderFactory factory = DataProviders.getInstance().getFactory("coverage-sql");
-                final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
-                final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
-                srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://localhost:5432/coverages");
-                srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
-                final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
-                srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
-                srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
-                srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
-                srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
-                source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
-                providerBusiness.createProvider("coverageTestSrc", null, ProviderRecord.ProviderType.LAYER, "coverage-sql", source);
+                // coverage-sql datastore
+                localdb_active = TestDatabaseHandler.hasLocalDatabase();
+                if (localdb_active) {
+                    final ProviderFactory factory = DataProviders.getInstance().getFactory("coverage-sql");
+                    final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                    final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
+                    srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://localhost:5432/coverages");
+                    srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
+                    final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
+                    srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
+                    srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
+                    srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
+                    srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
+                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
+                    providerBusiness.createProvider("coverageTestSrc", null, ProviderRecord.ProviderType.LAYER, "coverage-sql", source);
 
-                dataBusiness.create(new QName("SST_tests"), "coverageTestSrc", rootDir, false, true, null, null);
+                    dataBusiness.create(new QName("SST_tests"), "coverageTestSrc", rootDir, false, true, null, null);
+                } else {
+                    LOGGER.log(Level.WARNING, "-- SOME TEST WILL BE SKIPPED BECAUSE THE LOCAL DATABASE IS MISSING --");
+                }
 
 
                 final ProviderFactory ffactory = DataProviders.getInstance().getFactory("feature-store");
@@ -258,20 +261,18 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
 
                 providerBusiness.createProvider("shapeSrc", null, ProviderRecord.ProviderType.LAYER, "feature-store", sourcef);
 
-                dataBusiness.create(new QName("http://www.opengis.net/gml", "BuildingCenters"), "shapeSrc", rootDir, false, true, null, null);
-                dataBusiness.create(new QName("http://www.opengis.net/gml", "BasicPolygons"),   "shapeSrc", rootDir, false, true, null, null);
-                dataBusiness.create(new QName("http://www.opengis.net/gml", "Bridges"),         "shapeSrc", rootDir, false, true, null, null);
-                dataBusiness.create(new QName("http://www.opengis.net/gml", "Streams"),         "shapeSrc", rootDir, false, true, null, null);
-                dataBusiness.create(new QName("http://www.opengis.net/gml", "Lakes"),           "shapeSrc", rootDir, false, true, null, null);
-                dataBusiness.create(new QName("http://www.opengis.net/gml", "NamedPlaces"),     "shapeSrc", rootDir, false, true, null, null);
-                dataBusiness.create(new QName("http://www.opengis.net/gml", "Buildings"),       "shapeSrc", rootDir, false, true, null, null);
-                dataBusiness.create(new QName("http://www.opengis.net/gml", "RoadSegments"),    "shapeSrc", rootDir, false, true, null, null);
-                dataBusiness.create(new QName("http://www.opengis.net/gml", "DividedRoutes"),   "shapeSrc", rootDir, false, true, null, null);
-                dataBusiness.create(new QName("http://www.opengis.net/gml", "Forests"),         "shapeSrc", rootDir, false, true, null, null);
-                dataBusiness.create(new QName("http://www.opengis.net/gml", "MapNeatline"),     "shapeSrc", rootDir, false, true, null, null);
-                dataBusiness.create(new QName("http://www.opengis.net/gml", "Ponds"),           "shapeSrc", rootDir, false, true, null, null);
-
-
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "BuildingCenters"), "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "BasicPolygons"),   "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Bridges"),         "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Streams"),         "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Lakes"),           "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "NamedPlaces"),     "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Buildings"),       "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "RoadSegments"),    "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "DividedRoutes"),   "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Forests"),         "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "MapNeatline"),     "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Ponds"),           "shapeSrc", "VECTOR", false, true, null, null);
 
 
                 final LayerContext config = new LayerContext();
@@ -279,7 +280,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                 config.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
 
                 serviceBusiness.create("wms", "default", config, null, null);
-                layerBusiness.add("SST_tests",            null,                              "coverageTestSrc", null, "default", "wms", null);
+                if (localdb_active)layerBusiness.add("SST_tests",            null,           "coverageTestSrc", null, "default", "wms", null);
                 layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
                 layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
                 layerBusiness.add("Bridges",             "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
@@ -335,7 +336,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                 config3.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
 
                 serviceBusiness.create("wms", "wms2", config3, null, null);
-                layerBusiness.add("SST_tests",            null,                              "coverageTestSrc", null, "wms2", "wms", null);
+                if (localdb_active) layerBusiness.add("SST_tests",            null,          "coverageTestSrc", null, "wms2", "wms", null);
                 layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml",       "shapeSrc",        null, "wms2", "wms", null);
                 layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml",       "shapeSrc",        null, "wms2", "wms", null);
                 layerBusiness.add("Bridges",             "http://www.opengis.net/gml",       "shapeSrc",        null, "wms2", "wms", null);
@@ -411,7 +412,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
     @Order(order=2)
     public void testWMSGetMap() throws Exception {
         waitForStart();
-        if (hasLocalDatabase()) {
+        if (localdb_active) {
             // Creates a valid GetMap url.
             final URL getMapUrl;
             try {
@@ -593,7 +594,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
         assertTrue("was:" + obj, obj instanceof WMT_MS_Capabilities);
         WMT_MS_Capabilities responseCaps = (WMT_MS_Capabilities)obj;
 
-        if (hasLocalDatabase()) {
+        if (localdb_active) {
         
             Layer layer = (Layer) responseCaps.getLayerFromName(LAYER_TEST.getLocalPart());
 
@@ -624,7 +625,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
 
         responseCaps = (WMT_MS_Capabilities) obj;
 
-        if (hasLocalDatabase()) {
+        if (localdb_active) {
             // The layer test must be excluded
             Layer layer = (Layer) responseCaps.getLayerFromName(LAYER_TEST.getLocalPart());
             assertNull(layer);
@@ -755,7 +756,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
     @Order(order=10)
     public void testWMSGetFeatureInfo() throws Exception {
         waitForStart();
-        if (hasLocalDatabase()) {
+        if (localdb_active) {
             // Creates a valid GetFeatureInfo url.
             final URL gfi;
             try {

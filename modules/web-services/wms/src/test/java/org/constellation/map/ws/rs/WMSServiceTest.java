@@ -19,6 +19,7 @@
 
 package org.constellation.map.ws.rs;
 
+import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.DataBusiness;
 import org.constellation.admin.ProviderBusiness;
@@ -37,6 +38,7 @@ import org.constellation.ws.WSEngine;
 import org.constellation.ws.Worker;
 import org.constellation.ws.embedded.AbstractGrizzlyServer;
 import org.constellation.ws.rs.WebService;
+import org.constellation.test.utils.TestDatabaseHandler;
 import org.geotoolkit.internal.referencing.CRSUtilities;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.ReferencingUtilities;
@@ -92,8 +94,10 @@ import static org.junit.Assert.assertEquals;
  */
 @RunWith(SpringTestRunner.class)
 @ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
-public class WMSServiceTest  implements ApplicationContextAware {
+public class WMSServiceTest implements ApplicationContextAware {
 
+    private static final Logger LOGGER = Logging.getLogger(WMSServiceTest.class);
+    
     protected ApplicationContext applicationContext;
     
     @Override
@@ -121,6 +125,8 @@ public class WMSServiceTest  implements ApplicationContextAware {
 
     private static boolean initialized = false;
     
+    private static boolean localdb_active = true;
+    
     @PostConstruct
     public void init() {
         SpringHelper.setApplicationContext(applicationContext);
@@ -133,23 +139,28 @@ public class WMSServiceTest  implements ApplicationContextAware {
                 serviceBusiness.deleteAll();
                 dataBusiness.deleteAll();
                 providerBusiness.removeAll();
+                
+                // coverage-sql datastore
+                localdb_active = TestDatabaseHandler.hasLocalDatabase();
+                if (localdb_active) {
+                    final ProviderFactory factory = DataProviders.getInstance().getFactory("coverage-sql");
+                    final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                    final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
+                    srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://localhost:5432/coverages");
+                    srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
+                    final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
+                    srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
+                    srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
+                    srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
+                    srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
+                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
+                    providerBusiness.createProvider("coverageTestSrc", null, ProviderRecord.ProviderType.LAYER, "coverage-sql", source);
 
-                final ProviderFactory factory = DataProviders.getInstance().getFactory("coverage-sql");
-                final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
-                final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
-                srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://localhost:5432/coverages");
-                srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
-                final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
-                srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
-                srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
-                srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
-                srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
-                source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
-                providerBusiness.createProvider("coverageTestSrc", null, ProviderRecord.ProviderType.LAYER, "coverage-sql", source);
-
-                dataBusiness.create(new QName("SST_tests"), "coverageTestSrc", rootDir, false, true, null, null);
-
+                    dataBusiness.create(new QName("SST_tests"), "coverageTestSrc", "COVERAGE", false, true, null, null);
+                } else {
+                    LOGGER.log(Level.WARNING, "-- SOME TEST WILL BE SKIPPED BECAUSE THE LOCAL DATABASE IS MISSING --");
+                }
 
                 final ProviderFactory ffactory = DataProviders.getInstance().getFactory("feature-store");
                 final File outputDir = AbstractGrizzlyServer.initDataDirectory();
@@ -168,24 +179,24 @@ public class WMSServiceTest  implements ApplicationContextAware {
 
                 providerBusiness.createProvider("shapeSrc", null, ProviderRecord.ProviderType.LAYER, "feature-store", sourcef);
 
-                dataBusiness.create(new QName("http://www.opengis.net/gml", "BuildingCenters"), "shapeSrc", rootDir, false, true, null, null);
-                dataBusiness.create(new QName("http://www.opengis.net/gml", "BasicPolygons"),   "shapeSrc", rootDir, false, true, null, null);
-                dataBusiness.create(new QName("http://www.opengis.net/gml", "Bridges"),         "shapeSrc", rootDir, false, true, null, null);
-                dataBusiness.create(new QName("http://www.opengis.net/gml", "Streams"),         "shapeSrc", rootDir, false, true, null, null);
-                dataBusiness.create(new QName("http://www.opengis.net/gml", "Lakes"),           "shapeSrc", rootDir, false, true, null, null);
-                dataBusiness.create(new QName("http://www.opengis.net/gml", "NamedPlaces"),     "shapeSrc", rootDir, false, true, null, null);
-                dataBusiness.create(new QName("http://www.opengis.net/gml", "Buildings"),       "shapeSrc", rootDir, false, true, null, null);
-                dataBusiness.create(new QName("http://www.opengis.net/gml", "RoadSegments"),    "shapeSrc", rootDir, false, true, null, null);
-                dataBusiness.create(new QName("http://www.opengis.net/gml", "DividedRoutes"),   "shapeSrc", rootDir, false, true, null, null);
-                dataBusiness.create(new QName("http://www.opengis.net/gml", "Forests"),         "shapeSrc", rootDir, false, true, null, null);
-                dataBusiness.create(new QName("http://www.opengis.net/gml", "MapNeatline"),     "shapeSrc", rootDir, false, true, null, null);
-                dataBusiness.create(new QName("http://www.opengis.net/gml", "Ponds"),           "shapeSrc", rootDir, false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "BuildingCenters"), "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "BasicPolygons"),   "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Bridges"),         "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Streams"),         "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Lakes"),           "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "NamedPlaces"),     "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Buildings"),       "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "RoadSegments"),    "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "DividedRoutes"),   "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Forests"),         "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "MapNeatline"),     "shapeSrc", "VECTOR", false, true, null, null);
+                dataBusiness.create(new QName("http://www.opengis.net/gml", "Ponds"),           "shapeSrc", "VECTOR", false, true, null, null);
 
                 final LayerContext config = new LayerContext();
                 config.getCustomParameters().put("shiroAccessible", "false");
 
                 serviceBusiness.create("wms", "default", config, null, null);
-                layerBusiness.add("SST_tests",            null,                              "coverageTestSrc", null, "default", "wms", null);
+                if (localdb_active) layerBusiness.add("SST_tests",            null,          "coverageTestSrc", null, "default", "wms", null);
                 layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
                 layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);
                 layerBusiness.add("Bridges",             "http://www.opengis.net/gml",       "shapeSrc",        null, "default", "wms", null);

@@ -19,7 +19,7 @@
 package org.constellation.ws.embedded;
 
 // J2SE dependencies
-
+import org.constellation.test.utils.TestDatabaseHandler;
 import org.constellation.admin.DataBusiness;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
@@ -30,7 +30,6 @@ import org.constellation.configuration.Languages;
 import org.constellation.configuration.LayerContext;
 import org.constellation.configuration.WMSPortrayal;
 import org.constellation.map.configuration.LayerBusiness;
-import org.constellation.provider.Data;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
 import org.constellation.test.ImageTesting;
@@ -63,7 +62,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -78,7 +76,6 @@ import static org.constellation.provider.coveragesql.CoverageSQLProviderService.
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.URL_DESCRIPTOR;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.USER_DESCRIPTOR;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeNoException;
 import static org.junit.Assume.assumeTrue;
@@ -125,11 +122,6 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
     private static final DefaultName LAYER_TEST = new DefaultName("SST_tests");
 
     /**
-     * A list of available layers to be requested in WMS.
-     */
-    private static List<Data> layers;
-
-    /**
      * Checksum value on the returned image expressed in a geographic CRS for the SST_tests layer.
      */
     private Long sstChecksumGeo = null;
@@ -166,11 +158,9 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
                                       "crs=CRS:84&bbox=-180,-90,180,90&" +
                                       "layers="+ LAYER_TEST +"&styles=";
 
-    public static boolean hasLocalDatabase() {
-        return true; // TODO
-    }
-    
     private static boolean initialized = false;
+    
+    private static boolean localdb_active = true;
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
@@ -184,28 +174,33 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
                 serviceBusiness.deleteAll();
                 providerBusiness.removeAll();
                 
-                
-                final ProviderFactory factory = DataProviders.getInstance().getFactory("coverage-sql");
-                final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
-                final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
-                srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://localhost:5432/coverages");
-                srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
-                final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
-                srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
-                srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
-                srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
-                srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
-                source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
-                providerBusiness.createProvider("coverageTestSrc", null, ProviderRecord.ProviderType.LAYER, "coverage-sql", source);
+                // coverage-sql datastore
+                localdb_active = TestDatabaseHandler.hasLocalDatabase();
+                if (localdb_active) {
+                    final ProviderFactory factory = DataProviders.getInstance().getFactory("coverage-sql");
+                    final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                    final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
+                    srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://localhost:5432/coverages");
+                    srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
+                    final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
+                    srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
+                    srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
+                    srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
+                    srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
+                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
+                    providerBusiness.createProvider("coverageTestSrc", null, ProviderRecord.ProviderType.LAYER, "coverage-sql", source);
 
-                dataBusiness.create(new QName("SST_tests"), "coverageTestSrc", rootDir, false, true, null, null);
+                    dataBusiness.create(new QName("SST_tests"), "coverageTestSrc", rootDir, false, true, null, null);
+                } else {
+                    LOGGER.log(Level.WARNING, "-- SOME TEST WILL BE SKIPPED BECAUSE THE LOCAL DATABASE IS MISSING --");
+                }
 
                 final LayerContext config = new LayerContext();
                 config.getCustomParameters().put("shiroAccessible", "false");
 
                 serviceBusiness.create("wms", "default", config, null, null);
-                layerBusiness.add("SST_tests", null, "coverageTestSrc", null, "default", "wms", null);
+                if (localdb_active) layerBusiness.add("SST_tests", null, "coverageTestSrc", null, "default", "wms", null);
 
 
                 final LayerContext config2 = new LayerContext();
@@ -214,7 +209,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
 
 
                 serviceBusiness.create("wms", "wms1", config2, null, null);
-                layerBusiness.add("SST_tests", null, "coverageTestSrc", null, "wms1", "wms", null);
+                if (localdb_active) layerBusiness.add("SST_tests", null, "coverageTestSrc", null, "wms1", "wms", null);
 
                 initServer(null, null);
 
@@ -232,7 +227,6 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
                 }
 
                 // Get the list of layers
-                layers = DataProviders.getInstance().getAll();
                 initialized = true;
             } catch (Exception ex) {
                 Logger.getLogger(WMSAxesOrderTest.class.getName()).log(Level.SEVERE, null, ex);
@@ -245,26 +239,11 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
      */
     @AfterClass
     public static void shutDown() {
-        layers = null;
         File f = new File("derby.log");
         if (f.exists()) {
             f.delete();
         }
         finish();
-    }
-    /**
-     * Returns {@code true} if the {@code SST_tests} layer is found in the list of
-     * available layers. It means the postgrid database, pointed by the postgrid.xml
-     * file in the configuration directory, contains this layer and can then be requested
-     * in WMS.
-     */
-    private static boolean containsTestLayer() {
-        for (Data layer : layers) {
-            if (layer.getName().equals(LAYER_TEST)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -277,9 +256,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
     public void testGetMap111And130Projected() throws Exception {
         waitForStart();
 
-        assertNotNull(layers);
-        assumeTrue(!(layers.isEmpty()));
-        assumeTrue(containsTestLayer());
+        assumeTrue(localdb_active);
 
         // Creates a valid GetMap url.
         final URL getMap111Url, getMap130Url;
@@ -315,9 +292,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
     @Ignore
     @Order(order = 2)
     public void testCRSGeographique111() throws IOException {
-        assertNotNull(layers);
-        assumeTrue(!(layers.isEmpty()));
-        assumeTrue(containsTestLayer());
+        assumeTrue(localdb_active);
 
         // Creates a valid GetMap url.
         final URL getMapUrl;
@@ -343,9 +318,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
     @Test
     @Order(order = 3)
     public void testGetMap111Epsg4326() throws IOException {
-        assertNotNull(layers);
-        assumeTrue(!(layers.isEmpty()));
-        assumeTrue(containsTestLayer());
+        assumeTrue(localdb_active);
 
         // Creates a valid GetMap url.
         final URL getMapUrl;
@@ -377,9 +350,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
     @Test
     @Order(order = 4)
     public void testGetMap130Epsg4326() throws IOException {
-        assertNotNull(layers);
-        assumeTrue(!(layers.isEmpty()));
-        assumeTrue(containsTestLayer());
+        assumeTrue(localdb_active);
 
         // Creates a valid GetMap url.
         final URL getMapUrl;
@@ -410,9 +381,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
     @Test
     @Order(order = 5)
     public void testGetMap111Crs84() throws IOException {
-        assertNotNull(layers);
-        assumeTrue(!(layers.isEmpty()));
-        assumeTrue(containsTestLayer());
+        assumeTrue(localdb_active);
 
         // Creates a valid GetMap url.
         final URL getMapUrl;
@@ -447,9 +416,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
     @Test
     @Order(order = 6)
     public void testGetMap130Crs84() throws IOException {
-        assertNotNull(layers);
-        assumeTrue(!(layers.isEmpty()));
-        assumeTrue(containsTestLayer());
+        assumeTrue(localdb_active);
 
         // Creates a valid GetMap url.
         final URL getMapUrl;
