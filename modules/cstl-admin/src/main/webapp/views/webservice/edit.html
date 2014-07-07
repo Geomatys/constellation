@@ -116,7 +116,7 @@
                                                     <div class="top">
                                                         <span class="item-title" title="{{layer.Name}}">{{layer.Name}}</span>
                                                         <span class="pull-right text-right item-list-style">{{layer.Type==='coverage-store'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector':layer.Type}}</span>
-                                                        <img ng-if="(layer.Type=='vector' || layer.Type=='feature-store') && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer!=selected"
+                                                        <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer!=selected"
                                                              src="images/vector-multipoint.svg"
                                                              class="pull-right"
                                                              style="margin-top:6px; margin-right:10px;" />
@@ -124,19 +124,19 @@
                                                              src="images/vector-multigeometry.svg"
                                                              class="pull-right"
                                                              style="margin-top:6px; margin-right:10px; width:22px" />
-                                                        <img ng-if="(layer.Type=='vector' || layer.Type=='feature-store') && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon') && layer!=selected"
+                                                        <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon') && layer!=selected"
                                                              src="images/vector-poly.svg"
                                                              class="pull-right"
                                                              style="margin-top:6px; margin-right:10px;" />
-                                                        <img ng-if="(layer.Type=='vector' || layer.Type=='feature-store') && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString') && layer!=selected"
+                                                        <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString') && layer!=selected"
                                                              src="images/vector-polyline.svg"
                                                              class="pull-right"
                                                              style="margin-top:6px; margin-right:10px;" />
-                                                        <img ng-if="(layer.Type=='vector' || layer.Type=='feature-store') && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer==selected"
+                                                        <img ng-if="layer.Type=='VECTOR' && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer==selected"
                                                              src="images/vector-multipoint-selected.svg"
                                                              class="pull-right"
                                                              style="margin-top:6px; margin-right:10px;" />
-                                                        <img ng-if="(layer.Type=='vector' || layer.Type=='feature-store') && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon') && layer==selected"
+                                                        <img ng-if="layer.Type=='VECTOR' && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon') && layer==selected"
                                                              src="images/vector-poly-selected.svg"
                                                              class="pull-right"
                                                              style="margin-top:6px; margin-right:10px;" />
@@ -144,7 +144,7 @@
                                                              src="images/vector-multigeometry-selected.svg"
                                                              class="pull-right"
                                                              style="margin-top:6px; margin-right:10px; width:22px" />
-                                                        <img ng-if="(layer.Type=='vector' || layer.Type=='feature-store') && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString') && layer==selected"
+                                                        <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString') && layer==selected"
                                                              src="images/vector-polyline-selected.svg"
                                                              class="pull-right"
                                                              style="margin-top:6px; margin-right:10px;" />
@@ -278,7 +278,7 @@
 
                                                 <div class="separator"></div>
                                                 <h6 translate="label.type">Type</h6>
-                                                <span>{{selected.Type==='coverage-store'?'raster':selected.Type==='feature-store'?'vector':selected.Type==='observation-store'?'vector':selected.Type}}</span>
+                                                <span>{{selected.Type==='coverage-store'?'raster':selected.Type==='feature-store'?'vector':selected.Type==='observation-store'?'vector':selected.Type.toLowerCase()}}</span>
 
                                                 <div ng-if="service.type.toLowerCase() === 'wms'">
                                                     <div class="separator"></div>

@@ -49,7 +49,7 @@ public class JooqLayerRepository extends AbstractJooqRespository<LayerRecord, La
     @Override
     public Layer save(Layer layer) {
         LayerRecord newRecord = dsl.newRecord(LAYER);
-
+        newRecord.setOwner(layer.getOwner());
         newRecord.setAlias(layer.getAlias());
         newRecord.setConfig(layer.getConfig());
         newRecord.setData(layer.getData());

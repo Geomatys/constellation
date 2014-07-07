@@ -212,6 +212,7 @@ public class DataBusiness {
             db.setSensorable(data.isSensorable());
             db.setTargetSensor(sensorRepository.getLinkedSensors(data));
 
+
             final List<StyleBrief> styleBriefs = new ArrayList<>(0);
             for (Style style : styles) {
                 final StyleBrief sb = new StyleBrief();
