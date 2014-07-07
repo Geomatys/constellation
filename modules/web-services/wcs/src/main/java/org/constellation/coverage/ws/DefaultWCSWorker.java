@@ -59,7 +59,7 @@ import org.geotoolkit.ows.xml.v110.BoundingBoxType;
 import org.geotoolkit.ows.xml.v110.SectionsType;
 import org.geotoolkit.ows.xml.v110.WGS84BoundingBoxType;
 import org.geotoolkit.referencing.CRS;
-import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
+import org.apache.sis.referencing.CommonCRS;
 import org.geotoolkit.resources.Errors;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.StringUtilities;
@@ -704,9 +704,9 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                 Envelope requestGeoEnv = envelope;
                 // We have to transform the objective envelope into an envelope that uses a geographic CRS,
                 // in order to be able to verify the intersection between those two envelopes.
-                if (!CRS.equalsIgnoreMetadata(envelope.getCoordinateReferenceSystem(), DefaultGeographicCRS.WGS84)) {
+                if (!CRS.equalsIgnoreMetadata(envelope.getCoordinateReferenceSystem(), CommonCRS.WGS84.normalizedGeographic())) {
                     try {
-                        requestGeoEnv = CRS.transform(envelope, DefaultGeographicCRS.WGS84);
+                        requestGeoEnv = CRS.transform(envelope, CommonCRS.WGS84.normalizedGeographic());
                     } catch (TransformException ex) {
                         throw new CstlServiceException(ex, NO_APPLICABLE_CODE, KEY_BBOX.toLowerCase());
                     }
@@ -732,7 +732,7 @@ public final class DefaultWCSWorker extends LayerWorker implements WCSWorker {
                 }
                 envelope = new JTSEnvelope2D(geoBbox.getWestBoundLongitude(), geoBbox.getEastBoundLongitude(),
                                              geoBbox.getSouthBoundLatitude(), geoBbox.getNorthBoundLatitude(),
-                                             DefaultGeographicCRS.WGS84);
+                                             CommonCRS.WGS84.normalizedGeographic());
             } catch (DataStoreException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE, KEY_BBOX.toLowerCase());
             }

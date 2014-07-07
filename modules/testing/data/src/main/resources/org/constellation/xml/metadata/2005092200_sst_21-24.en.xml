@@ -187,13 +187,16 @@
                                 <gco:Real>0.0</gco:Real>
                             </gmd:maximumValue>
                             <gmd:verticalCRS>
-                                <gml:VerticalCRS gml:id="Gravityrelatedheight">
-                                    <gml:name>Gravity-related height</gml:name>
+                                <gml:VerticalCRS gml:id="epsg-crs-5714">
+                                    <gml:identifier>urn:ogc:def:crs:EPSG::5714</gml:identifier>
+                                    <gml:name>MSL height</gml:name>
                                     <gml:verticalCS>
-                                        <gml:VerticalCS gml:id="Gravityrelatedheight">
-                                            <gml:name>Gravity-related height</gml:name>
+                                        <gml:VerticalCS gml:id="epsg-cs-6499">
+                                            <gml:identifier>urn:ogc:def:cs:EPSG::6499</gml:identifier>
+                                            <gml:name>Vertical CS. Axis: height (H).</gml:name>
                                             <gml:axis>
-                                                <gml:CoordinateSystemAxis uom="urn:ogc:def:uom:EPSG::9001" gml:id="Gravityrelatedheight">
+                                                <gml:CoordinateSystemAxis uom="urn:ogc:def:uom:EPSG::9001" gml:id="epsg-axis-114">
+                                                    <gml:identifier>urn:ogc:def:axis:EPSG::114</gml:identifier>
                                                     <gml:name>Gravity-related height</gml:name>
                                                     <gml:axisAbbrev>H</gml:axisAbbrev>
                                                     <gml:axisDirection codeSpace="EPSG">up</gml:axisDirection>

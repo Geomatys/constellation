@@ -74,7 +74,7 @@ import org.geotoolkit.map.MapItem;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.referencing.ReferencingUtilities;
-import org.geotoolkit.referencing.cs.DefaultCoordinateSystemAxis;
+import org.apache.sis.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotoolkit.referencing.cs.DiscreteCoordinateSystemAxis;
 import org.geotoolkit.se.xml.v110.OnlineResourceType;
 import org.geotoolkit.sld.MutableLayer;
@@ -1479,7 +1479,7 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                         crs = CommonCRS.Temporal.JAVA.crs();
                     }else{
                         final EngineeringDatum customDatum = new DefaultEngineeringDatum(Collections.singletonMap("name", crsname));
-                        final CoordinateSystemAxis csAxis = new DefaultCoordinateSystemAxis(crsname, "u", AxisDirection.valueOf(crsname), Unit.ONE);
+                        final CoordinateSystemAxis csAxis = new DefaultCoordinateSystemAxis(Collections.singletonMap("name", crsname), "u", AxisDirection.valueOf(crsname), Unit.ONE);
                         final AbstractCS customCs = new AbstractCS(Collections.singletonMap("name", crsname), csAxis);
                         crs = new DefaultEngineeringCRS(Collections.singletonMap("name", crsname), customDatum, customCs);
                     }
