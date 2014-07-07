@@ -25,7 +25,8 @@ cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', '$growl
                 controller: 'ModalInstanceCtrl'
             });
             mapcontext.list({}, function(response) {
-                $dashboard($scope, response, false);
+                $dashboard($scope, response, true);
+                $scope.ordertype='name';
                 modalLoader.close();
             }, function() {
                 modalLoader.close();
@@ -51,7 +52,7 @@ cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', '$growl
 
         $scope.addMapContext = function() {
 
-        }
+        };
     }]);
 
 
