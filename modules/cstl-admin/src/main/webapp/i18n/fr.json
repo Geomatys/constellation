@@ -370,6 +370,8 @@
     "label.color":"Couleur",
     "label.outline":"Contour",
     "label.contrast":"Contraste et relief",
+    "label.color.model":"Modèle de couleur",
+    
 
     "layer.listing.data.add.button.label": "Ajouter une donnée",
     "layer.listing.data.create.button.label": "Créer une donnée",
@@ -714,7 +716,7 @@
     "users.filter": "Filtrer: ",
 
     "sldeditor.raster.1band.titleTab": "Bande Unique",
-    "sldeditor.raster.1band.grayBand": "Bande grise",
+    "sldeditor.raster.1band.band": "Bande",
     "sldeditor.raster.1band.band1": "Bande 1",
     "sldeditor.raster.1band.band2": "Bande 2",
     "sldeditor.raster.1band.band3": "Bande 3",
@@ -725,6 +727,7 @@
     "sldeditor.raster.1band.Max": "Max.",
     "sldeditor.raster.1band.NaN": "NaN",
     "sldeditor.raster.3bands.titleTab": "Triples bandes",
+    "sldeditor.raster.repartition":"Répartition",
     "sldeditor.vector.polygon": "Polygone",
     "sldeditor.vector.line": "Ligne",
     "sldeditor.vector.point": "Point",

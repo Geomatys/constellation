@@ -13,6 +13,13 @@
 .modal-dialog-sld label{
     font-size: 13px;
 }
+
+.modal-dialog-sld .control-label{
+    font-size: 13px;
+	font-weight: bold;	
+}
+
+
 .modal-dialog-sld .breadcrumb{
 	margin-top: 0px;
     margin-bottom: 8px;

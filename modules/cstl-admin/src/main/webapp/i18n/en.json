@@ -330,6 +330,7 @@
     "label.color":"Color",
     "label.outline":"Outline",
     "label.contrast":"Contrast and relief",
+    "label.color.model":"Color model",
 
     "layer.listing.data.add.button.label": "Add data",
     "layer.listing.data.create.button.label": "Create data",
@@ -742,7 +743,7 @@
     "users.filter": "User filter: ",
 
     "sldeditor.raster.1band.titleTab": "Unique band",
-    "sldeditor.raster.1band.grayBand": "Gray band",
+    "sldeditor.raster.1band.band": "Band",
     "sldeditor.raster.1band.band1": "Band 1",
     "sldeditor.raster.1band.band2": "Band 2",
     "sldeditor.raster.1band.band3": "Band 3",
@@ -753,6 +754,7 @@
     "sldeditor.raster.1band.Max": "Max.",
     "sldeditor.raster.1band.NaN": "NaN",
     "sldeditor.raster.3bands.titleTab": "Triple bands",
+    "sldeditor.raster.repartition":"Distribution",
     "sldeditor.vector.polygon":"Polygon",
     "sldeditor.vector.line":"Line",
     "sldeditor.vector.point":"Point",

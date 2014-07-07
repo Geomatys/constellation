@@ -1232,5 +1232,13 @@ cstlAdminApp.controller('SldRasterController', ['$scope', function($scope){
     $scope.colorModel= $scope.colorModels[0];
 
     $scope.symbolPills = 'color';
+    
+    $scope.distribution = {
+    	floor:0,
+    	ceil:255,
+    	step:1,
+    	max:255,
+    	min:0
+    };
 
 }]);
