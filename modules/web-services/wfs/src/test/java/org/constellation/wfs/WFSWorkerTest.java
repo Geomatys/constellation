@@ -209,11 +209,11 @@ public class WFSWorkerTest implements ApplicationContextAware {
 
                     final ParameterValueGroup choice = getOrCreate(SOURCE_CONFIG_DESCRIPTOR,source);
                     final ParameterValueGroup pgconfig = createGroup(choice, "PostgresParameters");
-                    pgconfig.parameter(DATABASE.getName().getCode()).setValue("cite-wfs");
-                    pgconfig.parameter(HOST.getName().getCode()).setValue("localhost");
-                    pgconfig.parameter(SCHEMA.getName().getCode()).setValue("public");
-                    pgconfig.parameter(USER.getName().getCode()).setValue("test");
-                    pgconfig.parameter(PASSWORD.getName().getCode()).setValue("test");
+                    pgconfig.parameter(DATABASE .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_name"));
+                    pgconfig.parameter(HOST     .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_host"));
+                    pgconfig.parameter(SCHEMA   .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_schema"));
+                    pgconfig.parameter(USER     .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_user"));
+                    pgconfig.parameter(PASSWORD .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("feature_db_pass"));
                     pgconfig.parameter(NAMESPACE.getName().getCode()).setValue("http://cite.opengeospatial.org/gmlsf");
                     choice.values().add(pgconfig);
 

@@ -224,18 +224,19 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                 // coverage-sql datastore
                 localdb_active = TestDatabaseHandler.hasLocalDatabase();
                 if (localdb_active) {
-                    final ProviderFactory factory = DataProviders.getInstance().getFactory("coverage-sql");
-                    final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                    final String rootDir                = System.getProperty("java.io.tmpdir") + "/Constellation/images";
+                    final ProviderFactory factory       = DataProviders.getInstance().getFactory("coverage-sql");
+                    final ParameterValueGroup source    = factory.getProviderDescriptor().createValue();
                     final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
-                    srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://localhost:5432/coverages");
-                    srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
-                    final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
+                    
+                    srcconfig.parameter(URL_DESCRIPTOR           .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("coverage_db_url"));
+                    srcconfig.parameter(PASSWORD_DESCRIPTOR      .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("coverage_db_pass"));
                     srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
-                    srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
-                    srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
-                    srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
-                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
+                    srcconfig.parameter(USER_DESCRIPTOR          .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("coverage_db_user"));
+                    srcconfig.parameter(SCHEMA_DESCRIPTOR        .getName().getCode()).setValue(TestDatabaseHandler.testProperties.getProperty("coverage_db_schema"));
+                    srcconfig.parameter(NAMESPACE_DESCRIPTOR     .getName().getCode()).setValue("no namespace");
+                    source.parameter(SOURCE_LOADALL_DESCRIPTOR   .getName().getCode()).setValue(Boolean.TRUE);
+                    source.parameter(SOURCE_ID_DESCRIPTOR        .getName().getCode()).setValue("coverageTestSrc");
                     providerBusiness.createProvider("coverageTestSrc", null, ProviderRecord.ProviderType.LAYER, "coverage-sql", source);
 
                     dataBusiness.create(new QName("SST_tests"), "coverageTestSrc", rootDir, false, true, null, null);
