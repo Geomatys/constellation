@@ -46,28 +46,6 @@
             </ns9:WGS84BoundingBox>
         </ns8:FeatureType>
         <ns8:FeatureType>
-            <ns8:Name xmlns:sml="http://www.opengis.net/sml/1.0">sml:Component</ns8:Name>
-            <ns8:Title>Component</ns8:Title>
-            <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
-            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
-            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:3395</ns8:OtherCRS>
-            <ns9:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
-                <ns9:LowerCorner>-180.0 -90.0</ns9:LowerCorner>
-                <ns9:UpperCorner>180.0 90.0</ns9:UpperCorner>
-            </ns9:WGS84BoundingBox>
-        </ns8:FeatureType>
-        <ns8:FeatureType>
-            <ns8:Name xmlns:sml="http://www.opengis.net/sml/1.0">sml:DataSourceType</ns8:Name>
-            <ns8:Title>DataSourceType</ns8:Title>
-            <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
-            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
-            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:3395</ns8:OtherCRS>
-            <ns9:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
-                <ns9:LowerCorner>-180.0 -90.0</ns9:LowerCorner>
-                <ns9:UpperCorner>180.0 90.0</ns9:UpperCorner>
-            </ns9:WGS84BoundingBox>
-        </ns8:FeatureType>
-        <ns8:FeatureType>
             <ns8:Name>gml:DividedRoutes</ns8:Name>
             <ns8:Title>DividedRoutes</ns8:Title>
             <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
@@ -134,28 +112,6 @@
             </ns9:WGS84BoundingBox>
         </ns8:FeatureType>
         <ns8:FeatureType>
-            <ns8:Name xmlns:sml="http://www.opengis.net/sml/1.0">sml:ProcessChain</ns8:Name>
-            <ns8:Title>ProcessChain</ns8:Title>
-            <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
-            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
-            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:3395</ns8:OtherCRS>
-            <ns9:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
-                <ns9:LowerCorner>-180.0 -90.0</ns9:LowerCorner>
-                <ns9:UpperCorner>180.0 90.0</ns9:UpperCorner>
-            </ns9:WGS84BoundingBox>
-        </ns8:FeatureType>
-        <ns8:FeatureType>
-            <ns8:Name xmlns:sml="http://www.opengis.net/sml/1.0">sml:ProcessModel</ns8:Name>
-            <ns8:Title>ProcessModel</ns8:Title>
-            <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
-            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
-            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:3395</ns8:OtherCRS>
-            <ns9:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
-                <ns9:LowerCorner>-180.0 -90.0</ns9:LowerCorner>
-                <ns9:UpperCorner>180.0 90.0</ns9:UpperCorner>
-            </ns9:WGS84BoundingBox>
-        </ns8:FeatureType>
-        <ns8:FeatureType>
             <ns8:Name>gml:RoadSegments</ns8:Name>
             <ns8:Title>RoadSegments</ns8:Title>
             <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
@@ -188,18 +144,7 @@
                 <ns9:UpperCorner>0.0024 0.0036</ns9:UpperCorner>
             </ns9:WGS84BoundingBox>
         </ns8:FeatureType>
-        <ns8:FeatureType>
-            <ns8:Name xmlns:sml="http://www.opengis.net/sml/1.0">sml:System</ns8:Name>
-            <ns8:Title>System</ns8:Title>
-            <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
-            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
-            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:3395</ns8:OtherCRS>
-            <ns9:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
-                <ns9:LowerCorner>-4.267780806810321 42.38479618090486</ns9:LowerCorner>
-                <ns9:UpperCorner>-4.121179134071048 43.46478200379223</ns9:UpperCorner>
-            </ns9:WGS84BoundingBox>
-        </ns8:FeatureType>
-    </ns8:FeatureTypeList>
+      </ns8:FeatureTypeList>
     <fes:Filter_Capabilities>
         <fes:Conformance>
             <fes:Constraint name="ImplementsQuery">

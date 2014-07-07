@@ -180,6 +180,8 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
 
     private static boolean initialized = false;
     
+    private static boolean mdweb_active = true;
+    
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
@@ -277,35 +279,39 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
                 providerBusiness.createProvider("omSrc", null, ProviderRecord.ProviderType.LAYER, "feature-store", sourceOM);
                 dataBusiness.create(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"), "omSrc", "VECTOR", false, true, null, null);
                 
-                final String url2 = "jdbc:derby:memory:TestWFSRequestSMl";
-                DefaultDataSource ds2 = new DefaultDataSource(url2 + ";create=true");
-                Connection con2 = ds2.getConnection();
-                DerbySqlScriptRunner sr2 = new DerbySqlScriptRunner(con2);
-                sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/model/mdw_schema_2.4_derby.sql"));
-                sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19115.sql"));
-                sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19119.sql"));
-                sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19108.sql"));
-                sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/data/defaultRecordSets.sql"));
-                sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/users/creation_user.sql"));
-                sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/SensorML.sql"));
-                sr2.run(Util.getResourceAsStream("org/constellation/sql/sml-data.sql"));
-                con.close();
+                // MDWEB store
+                mdweb_active = Util.getResourceAsStream("org/mdweb/sql/v24/metadata/model/mdw_schema_2.4_derby.sql") != null;
+                if (mdweb_active) {
+                    final String url2 = "jdbc:derby:memory:TestWFSRequestSMl";
+                    DefaultDataSource ds2 = new DefaultDataSource(url2 + ";create=true");
+                    Connection con2 = ds2.getConnection();
+                    DerbySqlScriptRunner sr2 = new DerbySqlScriptRunner(con2);
+                    sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/model/mdw_schema_2.4_derby.sql"));
+                    sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19115.sql"));
+                    sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19119.sql"));
+                    sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19108.sql"));
+                    sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/data/defaultRecordSets.sql"));
+                    sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/users/creation_user.sql"));
+                    sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/SensorML.sql"));
+                    sr2.run(Util.getResourceAsStream("org/constellation/sql/sml-data.sql"));
+                    con.close();
 
-                final ParameterValueGroup sourceSML = featfactory.getProviderDescriptor().createValue();
-                getOrCreateValue(sourceSML, "id").setValue("smlSrc");
-                getOrCreateValue(sourceSML, "load_all").setValue(true);             
+                    final ParameterValueGroup sourceSML = featfactory.getProviderDescriptor().createValue();
+                    getOrCreateValue(sourceSML, "id").setValue("smlSrc");
+                    getOrCreateValue(sourceSML, "load_all").setValue(true);             
 
-                final ParameterValueGroup choiceSML = getOrCreateGroup(sourceSML, "choice");
-                final ParameterValueGroup smlconfig = createGroup(choiceSML, "SMLParameters");
-                getOrCreateValue(smlconfig, "sgbdtype").setValue("derby");
-                getOrCreateValue(smlconfig, "derbyurl").setValue(url2);
-                
-                providerBusiness.createProvider("smlSrc", null, ProviderRecord.ProviderType.LAYER, "feature-store", sourceSML);
-                dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "System"),         "smlSrc", "VECTOR", false, true, null, null);
-                dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "Component"),      "smlSrc", "VECTOR", false, true, null, null);
-                dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "DataSourceType"), "smlSrc", "VECTOR", false, true, null, null);
-                dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "ProcessModel"),   "smlSrc", "VECTOR", false, true, null, null);
-                dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "ProcessChain"),   "smlSrc", "VECTOR", false, true, null, null);
+                    final ParameterValueGroup choiceSML = getOrCreateGroup(sourceSML, "choice");
+                    final ParameterValueGroup smlconfig = createGroup(choiceSML, "SMLParameters");
+                    getOrCreateValue(smlconfig, "sgbdtype").setValue("derby");
+                    getOrCreateValue(smlconfig, "derbyurl").setValue(url2);
+
+                    providerBusiness.createProvider("smlSrc", null, ProviderRecord.ProviderType.LAYER, "feature-store", sourceSML);
+                    dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "System"),         "smlSrc", "VECTOR", false, true, null, null);
+                    dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "Component"),      "smlSrc", "VECTOR", false, true, null, null);
+                    dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "DataSourceType"), "smlSrc", "VECTOR", false, true, null, null);
+                    dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "ProcessModel"),   "smlSrc", "VECTOR", false, true, null, null);
+                    dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "ProcessChain"),   "smlSrc", "VECTOR", false, true, null, null);
+                }
                 
                 DataProviders.getInstance().reload();
                 
@@ -372,11 +378,13 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
                 layerBusiness.add("Forests",             "http://www.opengis.net/gml",       "shapeSrc",   null, "test1", "wfs", null);
                 layerBusiness.add("MapNeatline",         "http://www.opengis.net/gml",       "shapeSrc",   null, "test1", "wfs", null);
                 layerBusiness.add("Ponds",               "http://www.opengis.net/gml",       "shapeSrc",   null, "test1", "wfs", null);
-                layerBusiness.add("System",              "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "wfs", null);
-                layerBusiness.add("Component",           "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "wfs", null);
-                layerBusiness.add("DataSourceType",      "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "wfs", null);
-                layerBusiness.add("ProcessModel",        "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "wfs", null);
-                layerBusiness.add("ProcessChain",        "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "wfs", null);
+                if (mdweb_active) {
+                    layerBusiness.add("System",              "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "wfs", null);
+                    layerBusiness.add("Component",           "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "wfs", null);
+                    layerBusiness.add("DataSourceType",      "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "wfs", null);
+                    layerBusiness.add("ProcessModel",        "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "wfs", null);
+                    layerBusiness.add("ProcessChain",        "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "wfs", null);
+                }
 
                 initServer(null, null);
 

@@ -169,6 +169,28 @@
             </ows:WGS84BoundingBox>
         </wfs:FeatureType>
         <wfs:FeatureType>
+            <wfs:Name xmlns:sml="http://www.opengis.net/sml/1.0">sml:Component</wfs:Name>
+            <wfs:Title>Component</wfs:Title>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
+            <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ows:LowerCorner>-180.0 -90.0</ows:LowerCorner>
+                <ows:UpperCorner>180.0 90.0</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+        </wfs:FeatureType>
+        <wfs:FeatureType>
+            <wfs:Name xmlns:sml="http://www.opengis.net/sml/1.0">sml:DataSourceType</wfs:Name>
+            <wfs:Title>DataSourceType</wfs:Title>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
+            <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ows:LowerCorner>-180.0 -90.0</ows:LowerCorner>
+                <ows:UpperCorner>180.0 90.0</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+        </wfs:FeatureType>
+        <wfs:FeatureType>
             <wfs:Name xmlns:ns9="http://www.opengis.net/gml">ns9:DividedRoutes</wfs:Name>
             <wfs:Title>DividedRoutes</wfs:Title>
             <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
@@ -235,6 +257,28 @@
             </ows:WGS84BoundingBox>
         </wfs:FeatureType>
         <wfs:FeatureType>
+            <wfs:Name xmlns:sml="http://www.opengis.net/sml/1.0">sml:ProcessChain</wfs:Name>
+            <wfs:Title>ProcessChain</wfs:Title>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
+            <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ows:LowerCorner>-180.0 -90.0</ows:LowerCorner>
+                <ows:UpperCorner>180.0 90.0</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+        </wfs:FeatureType>
+        <wfs:FeatureType>
+            <wfs:Name xmlns:sml="http://www.opengis.net/sml/1.0">sml:ProcessModel</wfs:Name>
+            <wfs:Title>ProcessModel</wfs:Title>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
+            <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ows:LowerCorner>-180.0 -90.0</ows:LowerCorner>
+                <ows:UpperCorner>180.0 90.0</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+        </wfs:FeatureType>
+        <wfs:FeatureType>
             <wfs:Name xmlns:ns9="http://www.opengis.net/gml">ns9:RoadSegments</wfs:Name>
             <wfs:Title>RoadSegments</wfs:Title>
             <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
@@ -265,6 +309,17 @@
             <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
                 <ows:LowerCorner>-0.0024 -4.0E-4</ows:LowerCorner>
                 <ows:UpperCorner>0.0024 0.0036</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+        </wfs:FeatureType>
+        <wfs:FeatureType>
+            <wfs:Name xmlns:sml="http://www.opengis.net/sml/1.0">sml:System</wfs:Name>
+            <wfs:Title>System</wfs:Title>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
+            <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ows:LowerCorner>-4.267780806810321 42.38479618090486</ows:LowerCorner>
+                <ows:UpperCorner>-4.121179134071048 43.46478200379223</ows:UpperCorner>
             </ows:WGS84BoundingBox>
         </wfs:FeatureType>
     </wfs:FeatureTypeList>

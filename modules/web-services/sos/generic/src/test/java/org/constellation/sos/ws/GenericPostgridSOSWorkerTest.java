@@ -46,12 +46,14 @@ import java.io.File;
 import java.sql.Connection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.junit.Ignore;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
 @RunWith(SpringTestRunner.class)
+@Ignore
 public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
 
     private static DefaultDataSource ds = null;

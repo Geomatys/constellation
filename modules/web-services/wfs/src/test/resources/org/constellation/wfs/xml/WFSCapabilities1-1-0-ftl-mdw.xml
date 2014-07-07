@@ -1,128 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <wfs:WFS_Capabilities version="1.1.0" xmlns:fes="http://www.opengis.net/fes/2.0" xmlns:ogc="http://www.opengis.net/ogc" xmlns:wfs="http://www.opengis.net/wfs" xmlns:ins="http://www.inspire.org" xmlns:ows="http://www.opengis.net/ows" xmlns:ns9="http://www.opengis.net/ows/1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:ns8="http://www.opengis.net/wfs/2.0">
-    <ows:ServiceIdentification>
-        <ows:Title>Web Feature Service (Constellation)</ows:Title>
-        <ows:Abstract>Features provided by constellation SDI server.</ows:Abstract>
-        <ows:Keywords>
-            <ows:Keyword>WFS</ows:Keyword>
-            <ows:Keyword>Constellation</ows:Keyword>
-            <ows:Keyword>Geomatys</ows:Keyword>
-        </ows:Keywords>
-        <ows:ServiceType>WFS</ows:ServiceType>
-        <ows:ServiceTypeVersion>1.1.0</ows:ServiceTypeVersion>
-        <ows:ServiceTypeVersion>2.0.0</ows:ServiceTypeVersion>
-        <ows:Fees>NONE</ows:Fees>
-        <ows:AccessConstraints>NONE</ows:AccessConstraints>
-    </ows:ServiceIdentification>
-    <ows:ServiceProvider>
-        <ows:ProviderName>Geomatys</ows:ProviderName>
-        <ows:ProviderSite xlink:href="http://constellation.codehaus.org"/>
-        <ows:ServiceContact>
-            <ows:IndividualName>Vincent Heurteaux</ows:IndividualName>
-            <ows:PositionName>PDG</ows:PositionName>
-            <ows:ContactInfo>
-                <ows:Phone>
-                    <ows:Voice>04 67 54 87 30</ows:Voice>
-                    <ows:Facsimile>04 67 54 87 00</ows:Facsimile>
-                </ows:Phone>
-                <ows:Address>
-                    <ows:DeliveryPoint>24 rue Pierre Renaudel</ows:DeliveryPoint>
-                    <ows:City>Arles</ows:City>
-                    <ows:AdministrativeArea>Bouches du rhone</ows:AdministrativeArea>
-                    <ows:PostalCode>13200</ows:PostalCode>
-                    <ows:Country>France</ows:Country>
-                    <ows:ElectronicMailAddress>vincent.heurteaux@geomatys.com</ows:ElectronicMailAddress>
-                </ows:Address>
-                <ows:HoursOfService>9h - 19h</ows:HoursOfService>
-                <ows:ContactInstructions>none</ows:ContactInstructions>
-            </ows:ContactInfo>
-        </ows:ServiceContact>
-    </ows:ServiceProvider>
-    <ows:OperationsMetadata>
-        <ows:Operation name="GetCapabilities">
-            <ows:DCP>
-                <ows:HTTP>
-                    <ows:Get xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
-                    <ows:Post xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
-                </ows:HTTP>
-            </ows:DCP>
-            <ows:Parameter name="AcceptVersions">
-                <ows:Value>1.1.0</ows:Value>
-            </ows:Parameter>
-            <ows:Parameter name="AcceptFormats">
-                <ows:Value>text/xml</ows:Value>
-            </ows:Parameter>
-            <ows:Parameter name="Service">
-                <ows:Value>WFS</ows:Value>
-            </ows:Parameter>
-        </ows:Operation>
-        <ows:Operation name="DescribeFeatureType">
-            <ows:DCP>
-                <ows:HTTP>
-                    <ows:Get xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
-                    <ows:Post xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
-                </ows:HTTP>
-            </ows:DCP>
-            <ows:Parameter name="outputFormat">
-                <ows:Value>text/xml; subtype=gml/3.1.1</ows:Value>
-            </ows:Parameter>
-            <ows:Parameter name="Service">
-                <ows:Value>WFS</ows:Value>
-            </ows:Parameter>
-            <ows:Parameter name="Version">
-                <ows:Value>1.1.0</ows:Value>
-            </ows:Parameter>
-        </ows:Operation>
-        <ows:Operation name="GetFeature">
-            <ows:DCP>
-                <ows:HTTP>
-                    <ows:Get xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
-                    <ows:Post xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
-                </ows:HTTP>
-            </ows:DCP>
-            <ows:Parameter name="resultType">
-                <ows:Value>results</ows:Value>
-                <ows:Value>hits</ows:Value>
-            </ows:Parameter>
-            <ows:Parameter name="outputFormat">
-                <ows:Value>text/xml; subtype=gml/3.1.1</ows:Value>
-            </ows:Parameter>
-            <ows:Parameter name="Service">
-                <ows:Value>WFS</ows:Value>
-            </ows:Parameter>
-            <ows:Parameter name="Version">
-                <ows:Value>1.1.0</ows:Value>
-            </ows:Parameter>
-            <ows:Constraint name="LocalTraverseXLinkScope">
-                <ows:Value>2</ows:Value>
-            </ows:Constraint>
-        </ows:Operation>
-        <ows:Operation name="Transaction">
-            <ows:DCP>
-                <ows:HTTP>
-                    <ows:Post xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
-                </ows:HTTP>
-            </ows:DCP>
-            <ows:Parameter name="inputFormat">
-                <ows:Value>text/xml; subtype=gml/3.1.1</ows:Value>
-            </ows:Parameter>
-            <ows:Parameter name="idgen">
-                <ows:Value>GenerateNew</ows:Value>
-                <ows:Value>UseExisting</ows:Value>
-                <ows:Value>ReplaceDuplicate</ows:Value>
-            </ows:Parameter>
-            <ows:Parameter name="releaseAction">
-                <ows:Value>ALL</ows:Value>
-                <ows:Value>SOME</ows:Value>
-            </ows:Parameter>
-            <ows:Parameter name="Service">
-                <ows:Value>WFS</ows:Value>
-            </ows:Parameter>
-            <ows:Parameter name="Version">
-                <ows:Value>1.1.0</ows:Value>
-            </ows:Parameter>
-        </ows:Operation>
-    </ows:OperationsMetadata>
     <wfs:FeatureTypeList>
         <wfs:FeatureType>
             <wfs:Name xmlns:ns9="http://www.opengis.net/gml">ns9:BasicPolygons</wfs:Name>
@@ -166,6 +43,28 @@
             <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
                 <ows:LowerCorner>5.0E-4 8.0E-4</ows:LowerCorner>
                 <ows:UpperCorner>0.001 0.0024</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+        </wfs:FeatureType>
+        <wfs:FeatureType>
+            <wfs:Name xmlns:sml="http://www.opengis.net/sml/1.0">sml:Component</wfs:Name>
+            <wfs:Title>Component</wfs:Title>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
+            <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ows:LowerCorner>-180.0 -90.0</ows:LowerCorner>
+                <ows:UpperCorner>180.0 90.0</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+        </wfs:FeatureType>
+        <wfs:FeatureType>
+            <wfs:Name xmlns:sml="http://www.opengis.net/sml/1.0">sml:DataSourceType</wfs:Name>
+            <wfs:Title>DataSourceType</wfs:Title>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
+            <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ows:LowerCorner>-180.0 -90.0</ows:LowerCorner>
+                <ows:UpperCorner>180.0 90.0</ows:UpperCorner>
             </ows:WGS84BoundingBox>
         </wfs:FeatureType>
         <wfs:FeatureType>
@@ -235,6 +134,28 @@
             </ows:WGS84BoundingBox>
         </wfs:FeatureType>
         <wfs:FeatureType>
+            <wfs:Name xmlns:sml="http://www.opengis.net/sml/1.0">sml:ProcessChain</wfs:Name>
+            <wfs:Title>ProcessChain</wfs:Title>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
+            <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ows:LowerCorner>-180.0 -90.0</ows:LowerCorner>
+                <ows:UpperCorner>180.0 90.0</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+        </wfs:FeatureType>
+        <wfs:FeatureType>
+            <wfs:Name xmlns:sml="http://www.opengis.net/sml/1.0">sml:ProcessModel</wfs:Name>
+            <wfs:Title>ProcessModel</wfs:Title>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
+            <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ows:LowerCorner>-180.0 -90.0</ows:LowerCorner>
+                <ows:UpperCorner>180.0 90.0</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+        </wfs:FeatureType>
+        <wfs:FeatureType>
             <wfs:Name xmlns:ns9="http://www.opengis.net/gml">ns9:RoadSegments</wfs:Name>
             <wfs:Title>RoadSegments</wfs:Title>
             <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
@@ -265,6 +186,17 @@
             <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
                 <ows:LowerCorner>-0.0024 -4.0E-4</ows:LowerCorner>
                 <ows:UpperCorner>0.0024 0.0036</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+        </wfs:FeatureType>
+        <wfs:FeatureType>
+            <wfs:Name xmlns:sml="http://www.opengis.net/sml/1.0">sml:System</wfs:Name>
+            <wfs:Title>System</wfs:Title>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
+            <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ows:LowerCorner>-4.267780806810321 42.38479618090486</ows:LowerCorner>
+                <ows:UpperCorner>-4.121179134071048 43.46478200379223</ows:UpperCorner>
             </ows:WGS84BoundingBox>
         </wfs:FeatureType>
     </wfs:FeatureTypeList>

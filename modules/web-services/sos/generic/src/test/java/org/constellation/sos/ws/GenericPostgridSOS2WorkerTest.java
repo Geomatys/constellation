@@ -21,6 +21,13 @@ package org.constellation.sos.ws;
 
 // JUnit dependencies
 
+import java.io.File;
+import java.sql.Connection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.xml.bind.Unmarshaller;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.ServiceBusiness;
@@ -36,22 +43,16 @@ import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.xml.bind.Unmarshaller;
-import java.io.File;
-import java.sql.Connection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
 @RunWith(SpringTestRunner.class)
+@Ignore
 public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
 
     private static DefaultDataSource ds = null;

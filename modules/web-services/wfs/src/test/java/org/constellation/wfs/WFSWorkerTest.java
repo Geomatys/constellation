@@ -178,6 +178,8 @@ public class WFSWorkerTest implements ApplicationContextAware {
 
     private static boolean initialized = false;
     
+    private static boolean mdweb_active = true;
+    
     @PostConstruct
     public void setUpClass() {
         SpringHelper.setApplicationContext(applicationContext);
@@ -264,35 +266,39 @@ public class WFSWorkerTest implements ApplicationContextAware {
                 providerBusiness.createProvider("omSrc", null, ProviderRecord.ProviderType.LAYER, "feature-store", sourceOM);
                 dataBusiness.create(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"), "omSrc", "VECTOR", false, true, null, null);
                 
-                final String url2 = "jdbc:derby:memory:TestWFSWorkerSMl";
-                ds2 = new DefaultDataSource(url2 + ";create=true");
-                Connection con2 = ds2.getConnection();
-                DerbySqlScriptRunner sr2 = new DerbySqlScriptRunner(con2);
-                sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/model/mdw_schema_2.4_derby.sql"));
-                sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19115.sql"));
-                sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19119.sql"));
-                sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19108.sql"));
-                sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/data/defaultRecordSets.sql"));
-                sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/users/creation_user.sql"));
-                sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/SensorML.sql"));
-                sr2.run(Util.getResourceAsStream("org/constellation/sql/sml-data.sql"));
-                con.close();
+                // MDWEB store
+                mdweb_active = Util.getResourceAsStream("org/mdweb/sql/v24/metadata/model/mdw_schema_2.4_derby.sql") != null;
+                if (mdweb_active) {
+                    final String url2 = "jdbc:derby:memory:TestWFSWorkerSMl";
+                    ds2 = new DefaultDataSource(url2 + ";create=true");
+                    Connection con2 = ds2.getConnection();
+                    DerbySqlScriptRunner sr2 = new DerbySqlScriptRunner(con2);
+                    sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/model/mdw_schema_2.4_derby.sql"));
+                    sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19115.sql"));
+                    sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19119.sql"));
+                    sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/ISO19108.sql"));
+                    sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/data/defaultRecordSets.sql"));
+                    sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/users/creation_user.sql"));
+                    sr2.run(Util.getResourceAsStream("org/mdweb/sql/v24/metadata/schemas/SensorML.sql"));
+                    sr2.run(Util.getResourceAsStream("org/constellation/sql/sml-data.sql"));
+                    con.close();
 
-                final ParameterValueGroup sourceSML = featfactory.getProviderDescriptor().createValue();
-                getOrCreateValue(sourceSML, "id").setValue("smlSrc");
-                getOrCreateValue(sourceSML, "load_all").setValue(true);             
+                    final ParameterValueGroup sourceSML = featfactory.getProviderDescriptor().createValue();
+                    getOrCreateValue(sourceSML, "id").setValue("smlSrc");
+                    getOrCreateValue(sourceSML, "load_all").setValue(true);             
 
-                final ParameterValueGroup choiceSML = getOrCreateGroup(sourceSML, "choice");
-                final ParameterValueGroup smlconfig = createGroup(choiceSML, "SMLParameters");
-                getOrCreateValue(smlconfig, "sgbdtype").setValue("derby");
-                getOrCreateValue(smlconfig, "derbyurl").setValue(url2);
-                
-                providerBusiness.createProvider("smlSrc", null, ProviderRecord.ProviderType.LAYER, "feature-store", sourceSML);
-                dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "System"),         "smlSrc", "VECTOR", false, true, null, null);
-                dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "Component"),      "smlSrc", "VECTOR", false, true, null, null);
-                dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "DataSourceType"), "smlSrc", "VECTOR", false, true, null, null);
-                dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "ProcessModel"),   "smlSrc", "VECTOR", false, true, null, null);
-                dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "ProcessChain"),   "smlSrc", "VECTOR", false, true, null, null);
+                    final ParameterValueGroup choiceSML = getOrCreateGroup(sourceSML, "choice");
+                    final ParameterValueGroup smlconfig = createGroup(choiceSML, "SMLParameters");
+                    getOrCreateValue(smlconfig, "sgbdtype").setValue("derby");
+                    getOrCreateValue(smlconfig, "derbyurl").setValue(url2);
+
+                    providerBusiness.createProvider("smlSrc", null, ProviderRecord.ProviderType.LAYER, "feature-store", sourceSML);
+                    dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "System"),         "smlSrc", "VECTOR", false, true, null, null);
+                    dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "Component"),      "smlSrc", "VECTOR", false, true, null, null);
+                    dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "DataSourceType"), "smlSrc", "VECTOR", false, true, null, null);
+                    dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "ProcessModel"),   "smlSrc", "VECTOR", false, true, null, null);
+                    dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "ProcessChain"),   "smlSrc", "VECTOR", false, true, null, null);
+                }
                 
                 DataProviders.getInstance().reload();
                 
@@ -357,11 +363,13 @@ public class WFSWorkerTest implements ApplicationContextAware {
                 layerBusiness.add("Forests",             "http://www.opengis.net/gml",       "shapeSrc",   null, "test1", "wfs", null);
                 layerBusiness.add("MapNeatline",         "http://www.opengis.net/gml",       "shapeSrc",   null, "test1", "wfs", null);
                 layerBusiness.add("Ponds",               "http://www.opengis.net/gml",       "shapeSrc",   null, "test1", "wfs", null);
-                layerBusiness.add("System",              "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "wfs", null);
-                layerBusiness.add("Component",           "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "wfs", null);
-                layerBusiness.add("DataSourceType",      "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "wfs", null);
-                layerBusiness.add("ProcessModel",        "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "wfs", null);
-                layerBusiness.add("ProcessChain",        "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "wfs", null);
+                if (mdweb_active) {
+                    layerBusiness.add("System",              "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "wfs", null);
+                    layerBusiness.add("Component",           "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "wfs", null);
+                    layerBusiness.add("DataSourceType",      "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "wfs", null);
+                    layerBusiness.add("ProcessModel",        "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "wfs", null);
+                    layerBusiness.add("ProcessChain",        "http://www.opengis.net/sml/1.0",       "smlSrc",     null, "test1", "wfs", null);
+                }
 
                 pool = WFSMarshallerPool.getInstance();
 
@@ -438,9 +446,15 @@ public class WFSWorkerTest implements ApplicationContextAware {
 
         StringWriter sw = new StringWriter();
         marshaller.marshal(result, sw);
-        domCompare(
-                FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-ftl.xml"),
-                sw.toString());
+        if (mdweb_active) {
+            domCompare(
+                    FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-ftl-mdw.xml"),
+                    sw.toString());
+        } else {
+            domCompare(
+                    FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-ftl.xml"),
+                    sw.toString());
+        }
 
         
         request = new GetCapabilitiesType("WFS");
@@ -448,9 +462,15 @@ public class WFSWorkerTest implements ApplicationContextAware {
 
         sw = new StringWriter();
         marshaller.marshal(result, sw);
-        domCompare(
-                FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0.xml"),
-                sw.toString());
+        if (mdweb_active) {
+            domCompare(
+                    FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-mdw.xml"),
+                    sw.toString());
+        } else {
+            domCompare(
+                    FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0.xml"),
+                    sw.toString());
+        }
 
         acceptVersion = new AcceptVersionsType("2.3.0");
         request = new GetCapabilitiesType(acceptVersion, null, null, null, "WFS");
@@ -846,6 +866,8 @@ public class WFSWorkerTest implements ApplicationContextAware {
     @Order(order=4)
     public void getFeatureSMLTest() throws Exception {
 
+        if (!mdweb_active) return;
+        
         /**
          * Test 1 : query on typeName sml:System
          */
@@ -1285,28 +1307,30 @@ public class WFSWorkerTest implements ApplicationContextAware {
         /**
          * Test 3 : describe Feature type System
          */
-        typeNames = new ArrayList<>();
-        typeNames.add(new QName("http://www.opengis.net/sml/1.0", "System"));
-        request = new DescribeFeatureTypeType("WFS", "1.1.0", null, typeNames, "text/gml; subtype=gml/3.1.1");
+        if (mdweb_active) {
+            typeNames = new ArrayList<>();
+            typeNames.add(new QName("http://www.opengis.net/sml/1.0", "System"));
+            request = new DescribeFeatureTypeType("WFS", "1.1.0", null, typeNames, "text/gml; subtype=gml/3.1.1");
 
-        result = worker.describeFeatureType(request);
+            result = worker.describeFeatureType(request);
 
-        ExpResult = (Schema) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/wfs/xsd/system.xsd"));
+            ExpResult = (Schema) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/wfs/xsd/system.xsd"));
 
-        assertEquals(ExpResult.getElements().size(), result.getElements().size());
-        for (int i = 0; i < ExpResult.getElements().size(); i++) {
-            TopLevelElement expElem = ExpResult.getElements().get(i);
-            TopLevelElement resElem = result.getElements().get(i);
-            assertEquals(expElem, resElem);
+            assertEquals(ExpResult.getElements().size(), result.getElements().size());
+            for (int i = 0; i < ExpResult.getElements().size(); i++) {
+                TopLevelElement expElem = ExpResult.getElements().get(i);
+                TopLevelElement resElem = result.getElements().get(i);
+                assertEquals(expElem, resElem);
+            }
+            assertEquals(ExpResult.getComplexTypes().size(), result.getComplexTypes().size());
+            for (int i = 0; i < ExpResult.getComplexTypes().size(); i++) {
+                TopLevelComplexType expElem = ExpResult.getComplexTypes().get(i);
+                TopLevelComplexType resElem = result.getComplexTypes().get(i);
+                assertEquals(expElem, resElem);
+            }
+
+            assertEquals(ExpResult, result);
         }
-        assertEquals(ExpResult.getComplexTypes().size(), result.getComplexTypes().size());
-        for (int i = 0; i < ExpResult.getComplexTypes().size(); i++) {
-            TopLevelComplexType expElem = ExpResult.getComplexTypes().get(i);
-            TopLevelComplexType resElem = result.getComplexTypes().get(i);
-            assertEquals(expElem, resElem);
-        }
-
-        assertEquals(ExpResult, result);
 
         XSDMarshallerPool.getInstance().recycle(unmarshaller);
     }

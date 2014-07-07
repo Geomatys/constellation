@@ -1,316 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ns8:WFS_Capabilities version="2.0.0" xmlns:fes="http://www.opengis.net/fes/2.0" xmlns:ogc="http://www.opengis.net/ogc" xmlns:wfs="http://www.opengis.net/wfs" xmlns:ins="http://www.inspire.org" xmlns:ows="http://www.opengis.net/ows" xmlns:ns9="http://www.opengis.net/ows/1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:ns8="http://www.opengis.net/wfs/2.0">
-    <ns9:ServiceIdentification>
-        <ns9:Title>Web Feature Service (Constellation)</ns9:Title>
-        <ns9:Abstract>Features provided by constellation SDI server.</ns9:Abstract>
-        <ns9:Keywords>
-            <ns9:Keyword>WFS</ns9:Keyword>
-            <ns9:Keyword>Constellation</ns9:Keyword>
-            <ns9:Keyword>Geomatys</ns9:Keyword>
-        </ns9:Keywords>
-        <ns9:ServiceType>WFS</ns9:ServiceType>
-        <ns9:ServiceTypeVersion>1.1.0</ns9:ServiceTypeVersion>
-        <ns9:ServiceTypeVersion>2.0.0</ns9:ServiceTypeVersion>
-        <ns9:Fees>NONE</ns9:Fees>
-        <ns9:AccessConstraints>NONE</ns9:AccessConstraints>
-    </ns9:ServiceIdentification>
-    <ns9:ServiceProvider>
-        <ns9:ProviderName>Geomatys</ns9:ProviderName>
-        <ns9:ProviderSite xlink:href="http://constellation.codehaus.org"/>
-        <ns9:ServiceContact>
-            <ns9:IndividualName>Vincent Heurteaux</ns9:IndividualName>
-            <ns9:PositionName>PDG</ns9:PositionName>
-            <ns9:ContactInfo>
-                <ns9:Phone>
-                    <ns9:Voice>04 67 54 87 30</ns9:Voice>
-                    <ns9:Facsimile>04 67 54 87 00</ns9:Facsimile>
-                </ns9:Phone>
-                <ns9:Address>
-                    <ns9:DeliveryPoint>24 rue Pierre Renaudel</ns9:DeliveryPoint>
-                    <ns9:City>Arles</ns9:City>
-                    <ns9:AdministrativeArea>Bouches du rhone</ns9:AdministrativeArea>
-                    <ns9:PostalCode>13200</ns9:PostalCode>
-                    <ns9:Country>France</ns9:Country>
-                    <ns9:ElectronicMailAddress>vincent.heurteaux@geomatys.com</ns9:ElectronicMailAddress>
-                </ns9:Address>
-                <ns9:HoursOfService>9h - 19h</ns9:HoursOfService>
-                <ns9:ContactInstructions>none</ns9:ContactInstructions>
-            </ns9:ContactInfo>
-        </ns9:ServiceContact>
-    </ns9:ServiceProvider>
-    <ns9:OperationsMetadata>
-        <ns9:Operation name="GetCapabilities">
-            <ns9:DCP>
-                <ns9:HTTP>
-                    <ns9:Get xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
-                    <ns9:Post xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
-                </ns9:HTTP>
-            </ns9:DCP>
-            <ns9:Parameter name="AcceptVersions">
-                <ns9:AllowedValues>
-                    <ns9:Value>2.0.0</ns9:Value>
-                    <ns9:Value>1.1.0</ns9:Value>
-                </ns9:AllowedValues>
-            </ns9:Parameter>
-            <ns9:Parameter name="AcceptFormats">
-                <ns9:AllowedValues>
-                    <ns9:Value>text/xml</ns9:Value>
-                </ns9:AllowedValues>
-            </ns9:Parameter>
-            <ns9:Parameter name="Service">
-                <ns9:AllowedValues>
-                    <ns9:Value>WFS</ns9:Value>
-                </ns9:AllowedValues>
-            </ns9:Parameter>
-        </ns9:Operation>
-        <ns9:Operation name="DescribeFeatureType">
-            <ns9:DCP>
-                <ns9:HTTP>
-                    <ns9:Get xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
-                    <ns9:Post xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
-                </ns9:HTTP>
-            </ns9:DCP>
-            <ns9:Parameter name="outputFormat">
-                <ns9:AllowedValues>
-                    <ns9:Value>application/gml+xml; version=3.2</ns9:Value>
-                </ns9:AllowedValues>
-            </ns9:Parameter>
-            <ns9:Parameter name="Service">
-                <ns9:AllowedValues>
-                    <ns9:Value>WFS</ns9:Value>
-                </ns9:AllowedValues>
-            </ns9:Parameter>
-            <ns9:Parameter name="Version">
-                <ns9:AllowedValues>
-                    <ns9:Value>2.0.0</ns9:Value>
-                </ns9:AllowedValues>
-            </ns9:Parameter>
-        </ns9:Operation>
-        <ns9:Operation name="GetFeature">
-            <ns9:DCP>
-                <ns9:HTTP>
-                    <ns9:Get xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
-                    <ns9:Post xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
-                </ns9:HTTP>
-            </ns9:DCP>
-            <ns9:Parameter name="resultType">
-                <ns9:AllowedValues>
-                    <ns9:Value>results</ns9:Value>
-                    <ns9:Value>hits</ns9:Value>
-                </ns9:AllowedValues>
-            </ns9:Parameter>
-            <ns9:Parameter name="outputFormat">
-                <ns9:AllowedValues>
-                    <ns9:Value>application/gml+xml; version=3.2</ns9:Value>
-                </ns9:AllowedValues>
-            </ns9:Parameter>
-            <ns9:Parameter name="Service">
-                <ns9:AllowedValues>
-                    <ns9:Value>WFS</ns9:Value>
-                </ns9:AllowedValues>
-            </ns9:Parameter>
-            <ns9:Parameter name="Version">
-                <ns9:AllowedValues>
-                    <ns9:Value>2.0.0</ns9:Value>
-                </ns9:AllowedValues>
-            </ns9:Parameter>
-            <ns9:Constraint name="LocalTraverseXLinkScope">
-                <ns9:AllowedValues>
-                    <ns9:Value>2</ns9:Value>
-                </ns9:AllowedValues>
-            </ns9:Constraint>
-        </ns9:Operation>
-        <ns9:Operation name="Transaction">
-            <ns9:DCP>
-                <ns9:HTTP>
-                    <ns9:Post xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
-                </ns9:HTTP>
-            </ns9:DCP>
-            <ns9:Parameter name="inputFormat">
-                <ns9:AllowedValues>
-                    <ns9:Value>application/gml+xml; version=3.2</ns9:Value>
-                </ns9:AllowedValues>
-            </ns9:Parameter>
-            <ns9:Parameter name="idgen">
-                <ns9:AllowedValues>
-                    <ns9:Value>GenerateNew</ns9:Value>
-                    <ns9:Value>UseExisting</ns9:Value>
-                    <ns9:Value>ReplaceDuplicate</ns9:Value>
-                </ns9:AllowedValues>
-            </ns9:Parameter>
-            <ns9:Parameter name="releaseAction">
-                <ns9:AllowedValues>
-                    <ns9:Value>ALL</ns9:Value>
-                    <ns9:Value>SOME</ns9:Value>
-                </ns9:AllowedValues>
-            </ns9:Parameter>
-            <ns9:Parameter name="Service">
-                <ns9:AllowedValues>
-                    <ns9:Value>WFS</ns9:Value>
-                </ns9:AllowedValues>
-            </ns9:Parameter>
-            <ns9:Parameter name="Version">
-                <ns9:AllowedValues>
-                    <ns9:Value>2.0.0</ns9:Value>
-                </ns9:AllowedValues>
-            </ns9:Parameter>
-        </ns9:Operation>
-        <ns9:Operation name="ListStoredQueries">
-            <ns9:DCP>
-                <ns9:HTTP>
-                    <ns9:Get xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
-                    <ns9:Post xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
-                </ns9:HTTP>
-            </ns9:DCP>
-            <ns9:Parameter name="Service">
-                <ns9:AllowedValues>
-                    <ns9:Value>WFS</ns9:Value>
-                </ns9:AllowedValues>
-            </ns9:Parameter>
-            <ns9:Parameter name="Version">
-                <ns9:AllowedValues>
-                    <ns9:Value>2.0.0</ns9:Value>
-                </ns9:AllowedValues>
-            </ns9:Parameter>
-        </ns9:Operation>
-        <ns9:Operation name="DescribeStoredQueries">
-            <ns9:DCP>
-                <ns9:HTTP>
-                    <ns9:Get xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
-                    <ns9:Post xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
-                </ns9:HTTP>
-            </ns9:DCP>
-            <ns9:Parameter name="Service">
-                <ns9:AllowedValues>
-                    <ns9:Value>WFS</ns9:Value>
-                </ns9:AllowedValues>
-            </ns9:Parameter>
-            <ns9:Parameter name="Version">
-                <ns9:AllowedValues>
-                    <ns9:Value>2.0.0</ns9:Value>
-                </ns9:AllowedValues>
-            </ns9:Parameter>
-        </ns9:Operation>
-        <ns9:Operation name="GetPropertyValue">
-            <ns9:DCP>
-                <ns9:HTTP>
-                    <ns9:Get xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
-                    <ns9:Post xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
-                </ns9:HTTP>
-            </ns9:DCP>
-            <ns9:Parameter name="Service">
-                <ns9:AllowedValues>
-                    <ns9:Value>WFS</ns9:Value>
-                </ns9:AllowedValues>
-            </ns9:Parameter>
-            <ns9:Parameter name="Version">
-                <ns9:AllowedValues>
-                    <ns9:Value>2.0.0</ns9:Value>
-                </ns9:AllowedValues>
-            </ns9:Parameter>
-        </ns9:Operation>
-        <ns9:Operation name="CreateStoredQuery">
-            <ns9:DCP>
-                <ns9:HTTP>
-                    <ns9:Get xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
-                    <ns9:Post xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
-                </ns9:HTTP>
-            </ns9:DCP>
-            <ns9:Parameter name="Service">
-                <ns9:AllowedValues>
-                    <ns9:Value>WFS</ns9:Value>
-                </ns9:AllowedValues>
-            </ns9:Parameter>
-            <ns9:Parameter name="Version">
-                <ns9:AllowedValues>
-                    <ns9:Value>2.0.0</ns9:Value>
-                </ns9:AllowedValues>
-            </ns9:Parameter>
-        </ns9:Operation>
-        <ns9:Operation name="DropStoredQuery">
-            <ns9:DCP>
-                <ns9:HTTP>
-                    <ns9:Get xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
-                    <ns9:Post xlink:href="http://geomatys.com/constellation/WS/wfs/test1?"/>
-                </ns9:HTTP>
-            </ns9:DCP>
-            <ns9:Parameter name="Service">
-                <ns9:AllowedValues>
-                    <ns9:Value>WFS</ns9:Value>
-                </ns9:AllowedValues>
-            </ns9:Parameter>
-            <ns9:Parameter name="Version">
-                <ns9:AllowedValues>
-                    <ns9:Value>2.0.0</ns9:Value>
-                </ns9:AllowedValues>
-            </ns9:Parameter>
-        </ns9:Operation>
-        <ns9:Parameter name="version">
-            <ns9:AllowedValues>
-                <ns9:Value>2.0.0</ns9:Value>
-            </ns9:AllowedValues>
-        </ns9:Parameter>
-        <ns9:Constraint name="ImplementsSimpleWFS">
-            <ns9:NoValues/>
-            <ns9:DefaultValue>TRUE</ns9:DefaultValue>
-        </ns9:Constraint>
-        <ns9:Constraint name="ImplementsBasicWFS">
-            <ns9:NoValues/>
-            <ns9:DefaultValue>TRUE</ns9:DefaultValue>
-        </ns9:Constraint>
-        <ns9:Constraint name="ImplementsTransactionalWFS">
-            <ns9:NoValues/>
-            <ns9:DefaultValue>TRUE</ns9:DefaultValue>
-        </ns9:Constraint>
-        <ns9:Constraint name="ImplementsLockingWFS">
-            <ns9:NoValues/>
-            <ns9:DefaultValue>FALSE</ns9:DefaultValue>
-        </ns9:Constraint>
-        <ns9:Constraint name="KVPEncoding">
-            <ns9:NoValues/>
-            <ns9:DefaultValue>TRUE</ns9:DefaultValue>
-        </ns9:Constraint>
-        <ns9:Constraint name="XMLEncoding">
-            <ns9:NoValues/>
-            <ns9:DefaultValue>TRUE</ns9:DefaultValue>
-        </ns9:Constraint>
-        <ns9:Constraint name="SOAPEncoding">
-            <ns9:NoValues/>
-            <ns9:DefaultValue>FALSE</ns9:DefaultValue>
-        </ns9:Constraint>
-        <ns9:Constraint name="ImplementsInheritance">
-            <ns9:NoValues/>
-            <ns9:DefaultValue>FALSE</ns9:DefaultValue>
-        </ns9:Constraint>
-        <ns9:Constraint name="ImplementsRemoteResolve">
-            <ns9:NoValues/>
-            <ns9:DefaultValue>FALSE</ns9:DefaultValue>
-        </ns9:Constraint>
-        <ns9:Constraint name="ImplementsResultPaging">
-            <ns9:NoValues/>
-            <ns9:DefaultValue>TRUE</ns9:DefaultValue>
-        </ns9:Constraint>
-        <ns9:Constraint name="ImplementsStandardJoins">
-            <ns9:NoValues/>
-            <ns9:DefaultValue>FALSE</ns9:DefaultValue>
-        </ns9:Constraint>
-        <ns9:Constraint name="ImplementsSpatialJoins">
-            <ns9:NoValues/>
-            <ns9:DefaultValue>FALSE</ns9:DefaultValue>
-        </ns9:Constraint>
-        <ns9:Constraint name="ImplementsTemporalJoins">
-            <ns9:NoValues/>
-            <ns9:DefaultValue>FALSE</ns9:DefaultValue>
-        </ns9:Constraint>
-        <ns9:Constraint name="ImplementsFeatureVersioning">
-            <ns9:NoValues/>
-            <ns9:DefaultValue>FALSE</ns9:DefaultValue>
-        </ns9:Constraint>
-        <ns9:Constraint name="ManageStoredQueries">
-            <ns9:NoValues/>
-            <ns9:DefaultValue>TRUE</ns9:DefaultValue>
-        </ns9:Constraint>
-    </ns9:OperationsMetadata>
     <ns8:FeatureTypeList>
         <ns8:FeatureType>
             <ns8:Name>gml:BasicPolygons</ns8:Name>
@@ -354,6 +43,28 @@
             <ns9:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
                 <ns9:LowerCorner>5.0E-4 8.0E-4</ns9:LowerCorner>
                 <ns9:UpperCorner>0.001 0.0024</ns9:UpperCorner>
+            </ns9:WGS84BoundingBox>
+        </ns8:FeatureType>
+        <ns8:FeatureType>
+            <ns8:Name xmlns:sml="http://www.opengis.net/sml/1.0">sml:Component</ns8:Name>
+            <ns8:Title>Component</ns8:Title>
+            <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
+            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
+            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:3395</ns8:OtherCRS>
+            <ns9:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ns9:LowerCorner>-180.0 -90.0</ns9:LowerCorner>
+                <ns9:UpperCorner>180.0 90.0</ns9:UpperCorner>
+            </ns9:WGS84BoundingBox>
+        </ns8:FeatureType>
+        <ns8:FeatureType>
+            <ns8:Name xmlns:sml="http://www.opengis.net/sml/1.0">sml:DataSourceType</ns8:Name>
+            <ns8:Title>DataSourceType</ns8:Title>
+            <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
+            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
+            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:3395</ns8:OtherCRS>
+            <ns9:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ns9:LowerCorner>-180.0 -90.0</ns9:LowerCorner>
+                <ns9:UpperCorner>180.0 90.0</ns9:UpperCorner>
             </ns9:WGS84BoundingBox>
         </ns8:FeatureType>
         <ns8:FeatureType>
@@ -423,6 +134,28 @@
             </ns9:WGS84BoundingBox>
         </ns8:FeatureType>
         <ns8:FeatureType>
+            <ns8:Name xmlns:sml="http://www.opengis.net/sml/1.0">sml:ProcessChain</ns8:Name>
+            <ns8:Title>ProcessChain</ns8:Title>
+            <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
+            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
+            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:3395</ns8:OtherCRS>
+            <ns9:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ns9:LowerCorner>-180.0 -90.0</ns9:LowerCorner>
+                <ns9:UpperCorner>180.0 90.0</ns9:UpperCorner>
+            </ns9:WGS84BoundingBox>
+        </ns8:FeatureType>
+        <ns8:FeatureType>
+            <ns8:Name xmlns:sml="http://www.opengis.net/sml/1.0">sml:ProcessModel</ns8:Name>
+            <ns8:Title>ProcessModel</ns8:Title>
+            <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
+            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
+            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:3395</ns8:OtherCRS>
+            <ns9:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ns9:LowerCorner>-180.0 -90.0</ns9:LowerCorner>
+                <ns9:UpperCorner>180.0 90.0</ns9:UpperCorner>
+            </ns9:WGS84BoundingBox>
+        </ns8:FeatureType>
+        <ns8:FeatureType>
             <ns8:Name>gml:RoadSegments</ns8:Name>
             <ns8:Title>RoadSegments</ns8:Title>
             <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
@@ -453,6 +186,17 @@
             <ns9:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
                 <ns9:LowerCorner>-0.0024 -4.0E-4</ns9:LowerCorner>
                 <ns9:UpperCorner>0.0024 0.0036</ns9:UpperCorner>
+            </ns9:WGS84BoundingBox>
+        </ns8:FeatureType>
+        <ns8:FeatureType>
+            <ns8:Name xmlns:sml="http://www.opengis.net/sml/1.0">sml:System</ns8:Name>
+            <ns8:Title>System</ns8:Title>
+            <ns8:DefaultCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:DefaultCRS>
+            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:4326</ns8:OtherCRS>
+            <ns8:OtherCRS>urn:x-ogc:def:crs:EPSG:7.01:3395</ns8:OtherCRS>
+            <ns9:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ns9:LowerCorner>-4.267780806810321 42.38479618090486</ns9:LowerCorner>
+                <ns9:UpperCorner>-4.121179134071048 43.46478200379223</ns9:UpperCorner>
             </ns9:WGS84BoundingBox>
         </ns8:FeatureType>
     </ns8:FeatureTypeList>
