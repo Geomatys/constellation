@@ -118,7 +118,7 @@ cstlAdminApp
                     controller: 'LogoutController'
                 })
                 .when('/webservice', {
-                    templateUrl: 'views/webservice.html',
+                    templateUrl: 'views/webservice/webservice.html',
                     controller: 'WebServiceController'
                 })
                 .when('/webservice/:type/:id', {
@@ -134,23 +134,23 @@ cstlAdminApp
                     controller: 'WebServiceCreateController'
                 })
                 .when('/description/:type/:id/:missing', {
-                    templateUrl: 'views/description.html',
+                    templateUrl: 'views/data/description.html',
                     controller: 'DescriptionController'
                 })
                 .when('/data', {
-                    templateUrl: 'views/data.html',
+                    templateUrl: 'views/data/data.html',
                     controller: 'DataController'
                 })
                 .when('/sensors', {
-                    templateUrl: 'views/sensors.html',
+                    templateUrl: 'views/sensor/sensors.html',
                     controller: 'SensorsController'
                 })
                 .when('/styles', {
-                    templateUrl: 'views/styles.html',
+                    templateUrl: 'views/style/styles.html',
                     controller: 'StylesController'
                 })
                 .when('/mapcontext', {
-                    templateUrl: 'views/mapcontext.html',
+                    templateUrl: 'views/mapcontext/mapcontext.html',
                     controller: 'MapcontextController'
                 })
                 .when('/tasks', {

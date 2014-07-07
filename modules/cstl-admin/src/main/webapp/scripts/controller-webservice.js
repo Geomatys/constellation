@@ -41,7 +41,7 @@ cstlAdminApp.controller('WebServiceController', ['$scope', 'webService', 'provid
         $scope.showCapa = function(service) {
             if (service.versions.length > 1) {
                 var modal = $modal.open({
-                    templateUrl: 'views/modalChooseVersion.html',
+                    templateUrl: 'views/webservice/modalChooseVersion.html',
                     controller: 'WebServiceVersionsController',
                     resolve: {
                         service: function() { return service; }
@@ -57,7 +57,7 @@ cstlAdminApp.controller('WebServiceController', ['$scope', 'webService', 'provid
 
         function showModalCapa(service, version) {
             $modal.open({
-                templateUrl: 'views/modalCapa.html',
+                templateUrl: 'views/webservice/modalCapa.html',
                 controller: 'WebServiceUtilsController',
                 resolve: {
                     'details': function(textService){
@@ -71,7 +71,7 @@ cstlAdminApp.controller('WebServiceController', ['$scope', 'webService', 'provid
         $scope.showLogs = function(service) {
 
             $modal.open({
-                templateUrl: 'views/modalLogs.html',
+                templateUrl: 'views/webservice/modalLogs.html',
                 controller: 'WebServiceUtilsController',
                 resolve: {
                     'details': function(textService){
@@ -580,7 +580,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
         $scope.showCapa = function(service) {
             if (service.versions.length > 1) {
                 var modal = $modal.open({
-                    templateUrl: 'views/modalChooseVersion.html',
+                    templateUrl: 'views/webservice/modalChooseVersion.html',
                     controller: 'WebServiceVersionsController',
                     resolve: {
                         service: function() { return service; }
@@ -596,7 +596,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
 
         function showModalCapa(service, version) {
             $modal.open({
-                templateUrl: 'views/modalCapa.html',
+                templateUrl: 'views/webservice/modalCapa.html',
                 controller: 'WebServiceUtilsController',
                 resolve: {
                     'details': function(textService){
@@ -610,7 +610,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
         $scope.showLogs = function(service) {
 
             $modal.open({
-                templateUrl: 'views/modalLogs.html',
+                templateUrl: 'views/webservice/modalLogs.html',
                 controller: 'WebServiceUtilsController',
                 resolve: {
                     'details': function(textService){
@@ -650,7 +650,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
         // Allow to choose data to add for this service
         $scope.showDataToAdd = function() {
             var modal = $modal.open({
-                templateUrl: 'views/modalDataChoose.html',
+                templateUrl: 'views/data/modalDataChoose.html',
                 controller: 'DataModalController',
                 resolve: {
                     exclude: function() { return $scope.layers; },
@@ -805,7 +805,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
         $scope.showSensor = function() {
             var sensorId = ($scope.selectedSensorsChild != null) ? $scope.selectedSensorsChild.id : $scope.selected.id;
             $modal.open({
-                templateUrl: 'views/modalSensorView.html',
+                templateUrl: 'views/sensor/modalSensorView.html',
                 controller: 'SensorModalController',
                 resolve: {
                     service: function() { return $scope.service; },

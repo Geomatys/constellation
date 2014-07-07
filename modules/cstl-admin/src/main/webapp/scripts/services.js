@@ -467,7 +467,7 @@ cstlAdminApp.factory('StyleSharedService', ['$modal', 'style', 'webService', '$g
         return {
             showStyleList : function($scope) {
                 var modal = $modal.open({
-                    templateUrl: 'views/modalStyleChoose.html',
+                    templateUrl: 'views/style/modalStyleChoose.html',
                     controller: 'StyleModalController',
                     resolve: {
                         exclude: function() { return $scope.selected.TargetStyle },
@@ -548,7 +548,7 @@ cstlAdminApp.factory('StyleSharedService', ['$modal', 'style', 'webService', '$g
 
             showStyleCreate : function(scope) {
                 var modal = $modal.open({
-                    templateUrl: 'views/modalStyleCreate.html',
+                    templateUrl: 'views/style/modalStyleCreate.html',
                     controller: 'StyleModalController',
                     resolve: {
                         newStyle: function() { return null; },
@@ -570,7 +570,7 @@ cstlAdminApp.factory('StyleSharedService', ['$modal', 'style', 'webService', '$g
 
             showStyleEdit : function(scope, response) {
                 var modal = $modal.open({
-                    templateUrl: 'views/modalStyleEdit.html',
+                    templateUrl: 'views/style/modalStyleEdit.html',
                     controller: 'StyleModalController',
                     resolve: {
                         newStyle: function() { return response},

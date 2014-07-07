@@ -124,7 +124,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
 
         $scope.displayMetadata = function() {
             $modal.open({
-                templateUrl: 'views/modalViewMetadata.html',
+                templateUrl: 'views/data/modalViewMetadata.html',
                 controller: 'ViewMetadataModalController',
                 resolve: {
                     'details': function(textService){
@@ -145,7 +145,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
 
         $scope.showSensorsList = function() {
             $modal.open({
-                templateUrl: 'views/modalSensorChoose.html',
+                templateUrl: 'views/sensor/modalSensorChoose.html',
                 controller: 'SensorModalChooseController',
                 resolve: {
                     'selectedData': function() { return $scope.selected; }

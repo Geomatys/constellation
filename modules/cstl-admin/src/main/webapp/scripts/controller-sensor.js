@@ -39,7 +39,7 @@ cstlAdminApp.controller('SensorsController', ['$scope', '$dashboard', 'webServic
         // Data loading
         $scope.addSensor = function() {
             var modal = $modal.open({
-                templateUrl: 'views/modalAddSensor.html',
+                templateUrl: 'views/sensor/modalAddSensor.html',
                 controller: 'SensorAddModalController'
             });
 
@@ -76,7 +76,7 @@ cstlAdminApp.controller('SensorsController', ['$scope', '$dashboard', 'webServic
         $scope.showSensor = function() {
             var idToView = ($scope.selectedSensorsChild !== null) ? $scope.selectedSensorsChild.id : $scope.selected.id;
             $modal.open({
-                templateUrl: 'views/modalViewSensorMetadata.html',
+                templateUrl: 'views/sensor/modalViewSensorMetadata.html',
                 controller: 'ViewMetadataModalController',
                 resolve: {
                     'details': function(textService){

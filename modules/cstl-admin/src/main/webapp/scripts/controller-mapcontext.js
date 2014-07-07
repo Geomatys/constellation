@@ -51,7 +51,17 @@ cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', '$growl
         };
 
         $scope.addMapContext = function() {
+            var modal = $modal.open({
+                templateUrl: 'views/mapcontext/modalAddContext.html',
+                controller: 'SensorAddModalController'
+            });
 
+            modal.result.then(function() {
+                sensor.list({}, function(sensors) {
+                    $dashboard($scope, sensors.children, false);
+                    $scope.init();
+                });
+            });
         };
     }]);
 
