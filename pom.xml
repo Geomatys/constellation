@@ -1052,9 +1052,9 @@
             </releases>
         </pluginRepository>
         <pluginRepository>
-            <id>maven2.geomatys</id>
-            <name>Maven2 Geomatys Snapshot</name>
-            <url>http://maven2.geomatys.com/nexus/content/repositories/snapshots/</url>
+            <id>maven.nexus</id>
+            <name>Maven Geomatys Snapshot</name>
+            <url>http://dev.geomatys.com/nexus/content/repositories/snapshots/</url>
             <snapshots><enabled>true</enabled></snapshots>
             <releases><enabled>false</enabled></releases>
         </pluginRepository>
