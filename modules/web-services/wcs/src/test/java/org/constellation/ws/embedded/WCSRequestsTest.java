@@ -19,7 +19,7 @@
 package org.constellation.ws.embedded;
 
 // J2SE dependencies
-
+import org.constellation.test.utils.TestDatabaseHandler;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.DataBusiness;
 import org.constellation.admin.ProviderBusiness;
@@ -64,12 +64,10 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
 import static org.constellation.provider.configuration.ProviderParameters.SOURCE_LOADALL_DESCRIPTOR;
@@ -157,11 +155,9 @@ public class WCSRequestsTest extends AbstractGrizzlyServer implements Applicatio
 
     private static final String WCS_DESCRIBECOVERAGE ="request=DescribeCoverage&coverage=SST_tests&service=wcs&version=1.0.0";
 
-    public static boolean hasLocalDatabase() {
-        return true; // TODO
-    }
-
     private static boolean initialized = false;
+    
+    protected static boolean localdb_active = true;
     
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
@@ -178,30 +174,36 @@ public class WCSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                 dataBusiness.deleteAll();
                 providerBusiness.removeAll();
                 
-                final ProviderFactory factory = DataProviders.getInstance().getFactory("coverage-sql");
-                final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
-                final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
-                srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://localhost:5432/coverages");
-                srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
-                final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
-                srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
-                srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
-                srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
-                srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
-                source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
-                providerBusiness.createProvider("coverageTestSrc", null, ProviderRecord.ProviderType.LAYER, "coverage-sql", source);
+                // coverage-sql datastore
+                localdb_active = TestDatabaseHandler.hasLocalDatabase();
+                if (localdb_active) {
+                    final ProviderFactory factory = DataProviders.getInstance().getFactory("coverage-sql");
+                    final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                    final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
+                    srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://localhost:5432/coverages");
+                    srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
+                    final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
+                    srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
+                    srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
+                    srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
+                    srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
+                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
+                    providerBusiness.createProvider("coverageTestSrc", null, ProviderRecord.ProviderType.LAYER, "coverage-sql", source);
 
-                dataBusiness.create(new QName("SST_tests"), "coverageTestSrc", rootDir, false, true, null, null);
+                    dataBusiness.create(new QName("SST_tests"), "coverageTestSrc", rootDir, false, true, null, null);
+                } else {
+                    LOGGER.log(Level.WARNING, "-- SOME TEST WILL BE SKIPPED BECAUSE THE LOCAL DATABASE IS MISSING --");
+                }
                 
                 final LayerContext config = new LayerContext();
                 config.getCustomParameters().put("shiroAccessible", "false");
 
-                serviceBusiness.create("WCS", "default", config, null, null);
-                layerBusiness.add("SST_tests", null, "coverageTestSrc", null, "default", "WCS", null);
+                serviceBusiness.create("wcs", "default", config, null, null);
+                if (localdb_active) layerBusiness.add("SST_tests", null, "coverageTestSrc", null, "default", "wcs", null);
 
-                serviceBusiness.create("WCS", "test", config, null, null);
-                layerBusiness.add("SST_tests", null, "coverageTestSrc", null, "test",    "WCS", null);
+                serviceBusiness.create("wcs", "test", config, null, null);
+                if (localdb_active) layerBusiness.add("SST_tests", null, "coverageTestSrc", null, "test",    "wcs", null);
 
                 initServer(null, null);
 
@@ -221,7 +223,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                 initialized = true;
                 DataProviders.getInstance().reload();
             } catch (Exception ex) {
-                Logger.getLogger(WCSRequestsTest.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -286,7 +288,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer implements Applicatio
     @Test
     @Order(order=2)
     public void testWCSGetCoverage() throws Exception {
-        assumeTrue(hasLocalDatabase());
+        assumeTrue(localdb_active);
         // Creates a valid GetCoverage url.
         final URL getCoverageUrl;
         try {
@@ -317,8 +319,8 @@ public class WCSRequestsTest extends AbstractGrizzlyServer implements Applicatio
      */
     @Ignore
     @Order(order=3)
-    public void testWCSGetCoverageMatrixFormat() throws IOException {
-        assumeTrue(hasLocalDatabase());
+    public void testWCSGetCoverageMatrixFormat() throws Exception {
+        assumeTrue(localdb_active);
 
         // Creates a valid GetCoverage url.
         final URL getCovMatrixUrl;
@@ -339,8 +341,8 @@ public class WCSRequestsTest extends AbstractGrizzlyServer implements Applicatio
      */
     @Test
     @Order(order=4)
-    public void testWCSGetCapabilities() throws JAXBException, IOException {
-        assumeTrue(hasLocalDatabase());
+    public void testWCSGetCapabilities() throws Exception {
+        assumeTrue(localdb_active);
         
         // Creates a valid GetCapabilities url.
         URL getCapsUrl;
@@ -422,8 +424,8 @@ public class WCSRequestsTest extends AbstractGrizzlyServer implements Applicatio
      */
     @Test
     @Order(order=5)
-    public void testWCSDescribeCoverage() throws JAXBException, IOException {
-        assumeTrue(hasLocalDatabase());
+    public void testWCSDescribeCoverage() throws Exception {
+        assumeTrue(localdb_active);
         
         // Creates a valid DescribeCoverage url.
         final URL getCapsUrl;

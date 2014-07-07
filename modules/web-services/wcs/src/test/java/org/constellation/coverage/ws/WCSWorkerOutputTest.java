@@ -83,7 +83,7 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
      */
     @Test
     public void testGetCapabilities() throws JAXBException, CstlServiceException {
-        assumeTrue(hasLocalDatabase());
+        assumeTrue(localdb_active);
 
         GetCapabilities request = new GetCapabilitiesType("1.0.0", "WCS", null, null);
         GetCapabilitiesResponse response = WORKER.getCapabilities(request);
@@ -142,7 +142,7 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
      */
     @Test
     public void testDescribeCoverage() throws JAXBException, CstlServiceException {
-        assumeTrue(hasLocalDatabase());
+        assumeTrue(localdb_active);
         
         final DescribeCoverage request = new DescribeCoverageType(LAYER_TEST);
         final DescribeCoverageResponse response = WORKER.describeCoverage(request);
@@ -191,7 +191,7 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
      */
     @Test
     public void testGetCoverage() throws JAXBException, CstlServiceException {
-        assumeTrue(hasLocalDatabase());
+        assumeTrue(localdb_active);
 
         // Builds the GetCoverage request
         final List<String> axis = new ArrayList<>();

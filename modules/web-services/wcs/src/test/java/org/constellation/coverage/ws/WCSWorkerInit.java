@@ -18,6 +18,7 @@
  */
 package org.constellation.coverage.ws;
 
+import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.DataBusiness;
 import org.constellation.admin.ProviderBusiness;
@@ -29,7 +30,7 @@ import org.constellation.data.CoverageSQLTestCase;
 import org.constellation.map.configuration.LayerBusiness;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
-import org.constellation.provider.Providers;
+import org.constellation.test.utils.TestDatabaseHandler;
 import org.junit.AfterClass;
 import org.opengis.parameter.ParameterValueGroup;
 import org.springframework.beans.BeansException;
@@ -54,6 +55,7 @@ import static org.constellation.provider.coveragesql.CoverageSQLProviderService.
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.URL_DESCRIPTOR;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.USER_DESCRIPTOR;
 
+
 /**
  * Initializes a {@link WCSWorker} for testing GetCapabilities, DescribeCoverage and GetCoverage
  * requests. Ensures that a PostGRID data preconfigured is handled by the {@link WCSWorker}.
@@ -65,6 +67,8 @@ import static org.constellation.provider.coveragesql.CoverageSQLProviderService.
  */
 public class WCSWorkerInit extends CoverageSQLTestCase implements ApplicationContextAware {
 
+    private static final Logger LOGGER = Logging.getLogger(WCSWorkerInit.class);
+    
     protected ApplicationContext applicationContext;
     
     @Override
@@ -91,11 +95,9 @@ public class WCSWorkerInit extends CoverageSQLTestCase implements ApplicationCon
     @Inject
     protected DataBusiness dataBusiness;
     
-    public static boolean hasLocalDatabase() {
-        return true; // TODO
-    }
-
     private static boolean initialized = false;
+    
+    protected static boolean localdb_active = true;
     
     /**
      * Initialisation of the worker and the PostGRID data provider before launching
@@ -112,38 +114,45 @@ public class WCSWorkerInit extends CoverageSQLTestCase implements ApplicationCon
                 dataBusiness.deleteAll();
                 providerBusiness.removeAll();
 
-                final ProviderFactory factory = DataProviders.getInstance().getFactory("coverage-sql");
-                final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
-                final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
-                srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://localhost:5432/coverages");
-                srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
-                final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
-                srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
-                srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
-                srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
-                srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
-                source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
-                source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
-                providerBusiness.createProvider("coverageTestSrc", null, ProviderRecord.ProviderType.LAYER, "coverage-sql", source);
+                // coverage-sql datastore
+                localdb_active = TestDatabaseHandler.hasLocalDatabase();
+                if (localdb_active) {
+                    final ProviderFactory factory = DataProviders.getInstance().getFactory("coverage-sql");
+                    final ParameterValueGroup source = factory.getProviderDescriptor().createValue();
+                    final ParameterValueGroup srcconfig = getOrCreate(COVERAGESQL_DESCRIPTOR,source);
+                    srcconfig.parameter(URL_DESCRIPTOR.getName().getCode()).setValue("jdbc:postgresql://localhost:5432/coverages");
+                    srcconfig.parameter(PASSWORD_DESCRIPTOR.getName().getCode()).setValue("test");
+                    final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
+                    srcconfig.parameter(ROOT_DIRECTORY_DESCRIPTOR.getName().getCode()).setValue(rootDir);
+                    srcconfig.parameter(USER_DESCRIPTOR.getName().getCode()).setValue("test");
+                    srcconfig.parameter(SCHEMA_DESCRIPTOR.getName().getCode()).setValue("coverages");
+                    srcconfig.parameter(NAMESPACE_DESCRIPTOR.getName().getCode()).setValue("no namespace");
+                    source.parameter(SOURCE_LOADALL_DESCRIPTOR.getName().getCode()).setValue(Boolean.TRUE);
+                    source.parameter(SOURCE_ID_DESCRIPTOR.getName().getCode()).setValue("coverageTestSrc");
+                    providerBusiness.createProvider("coverageTestSrc", null, ProviderRecord.ProviderType.LAYER, "coverage-sql", source);
 
-                dataBusiness.create(new QName("SST_tests"), "coverageTestSrc", rootDir, false, true, null, null);
+                    dataBusiness.create(new QName("SST_tests"), "coverageTestSrc", rootDir, false, true, null, null);
+                } else {
+                    LOGGER.log(Level.WARNING, "-- SOME TEST WILL BE SKIPPED BECAUSE THE LOCAL DATABASE IS MISSING --");
+                }
 
                 final LayerContext config = new LayerContext();
                 config.getCustomParameters().put("shiroAccessible", "false");
 
-                serviceBusiness.create("WCS", "default", config, null, null);
-                layerBusiness.add("SST_tests", null, "coverageTestSrc", null, "default", "WCS", null);
+                serviceBusiness.create("wcs", "default", config, null, null);
+                if (localdb_active) layerBusiness.add("SST_tests", null, "coverageTestSrc", null, "default", "wcs", null);
 
-                serviceBusiness.create("WCS", "test", config, null, null);
-                layerBusiness.add("SST_tests", null, "coverageTestSrc", null, "test",    "WCS", null);
+                serviceBusiness.create("wcs", "test", config, null, null);
+                if (localdb_active) layerBusiness.add("SST_tests", null, "coverageTestSrc", null, "test",    "wcss", null);
 
                 DataProviders.getInstance().reload();
                 
                 WORKER = new DefaultWCSWorker("default");
                 // Default instanciation of the worker' servlet context and uri context.
                 WORKER.setServiceUrl("http://localhost:9090");
+                initialized = true;
             } catch (Exception ex) {
-                Logger.getLogger(WCSWorkerInit.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.log(Level.SEVERE, null, ex);
             }
         }
 
@@ -152,7 +161,6 @@ public class WCSWorkerInit extends CoverageSQLTestCase implements ApplicationCon
     @AfterClass
     public static void tearDownClass() throws Exception {
         ConfigurationEngine.shutdownTestEnvironement("WCSWorkerInit");
-        DataProviders.getInstance().setConfigurator(Providers.DEFAULT_CONFIGURATOR);
         File derbyLog = new File("derby.log");
         if (derbyLog.exists()) {
             derbyLog.delete();
