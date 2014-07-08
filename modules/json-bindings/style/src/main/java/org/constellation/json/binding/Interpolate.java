@@ -36,7 +36,9 @@ import static org.constellation.json.util.StyleUtilities.listType;
  */
 public final class Interpolate implements Function {
 
-    private List<InterpolationPoint> points = new ArrayList<InterpolationPoint>();
+	private static final long serialVersionUID = 1L;
+
+	private List<InterpolationPoint> points = new ArrayList<InterpolationPoint>();
 
     public Interpolate() {
     }

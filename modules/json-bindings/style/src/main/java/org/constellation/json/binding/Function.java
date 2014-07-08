@@ -29,7 +29,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  */
 @JsonTypeInfo(use=JsonTypeInfo.Id.NAME, include=JsonTypeInfo.As.PROPERTY, property="@function")
 @JsonSubTypes({
-        @JsonSubTypes.Type(value=Interpolate.class, name="interpolate")
+        @JsonSubTypes.Type(value=Interpolate.class, name="interpolate"),
+        @JsonSubTypes.Type(value=Categorize.class, name="categorize")
 })
 public interface Function extends StyleElement<org.opengis.filter.expression.Function> {
 }

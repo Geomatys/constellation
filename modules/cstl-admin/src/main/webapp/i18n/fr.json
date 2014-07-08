@@ -772,6 +772,8 @@
     "sldeditor.button.cancel":"Annuler",
     "sldeditor.button.validate":"Valider",
     "sldeditor.button.create":"Créer le style",
+    "sldeditor.interpolation.solidcolor":"Aplat de couleur",
+    "sldeditor.interpolation.interpolatecolor":"palette interpolé",
 
     "tooltip.service.create.name":"L'identifiant peut être le même que le nom",
     "tooltip.service.create.tag":"Utiliser la touche Tab ou Entrée pour valider un mot-clé",

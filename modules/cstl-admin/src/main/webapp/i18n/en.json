@@ -799,6 +799,8 @@
     "sldeditor.button.cancel":"Cancel",
     "sldeditor.button.validate":"Validate",
     "sldeditor.button.create":"Create the style",
+    "sldeditor.interpolation.solidcolor":"Solid color",
+    "sldeditor.interpolation.interpolatecolor":"Interpolate palette",
 
     "tooltip.service.create.name":"The identifier can be the same as the name",
     "tooltip.service.create.tag":"Use Tab or Enter keys to validate keyword",

@@ -30,7 +30,9 @@ import static org.constellation.json.util.StyleUtilities.type;
  */
 public final class ColorMap implements StyleElement<org.opengis.style.ColorMap> {
 
-    private Function function = null;
+	private static final long serialVersionUID = 1L;
+
+	private Function function = null;
 
     public ColorMap() {
     }
@@ -40,6 +42,8 @@ public final class ColorMap implements StyleElement<org.opengis.style.ColorMap> 
         if (colorMap.getFunction() != null) {
             if (colorMap.getFunction() instanceof org.geotoolkit.style.function.Interpolate) {
                 this.function = new Interpolate((org.geotoolkit.style.function.Interpolate) colorMap.getFunction());
+            }else if(colorMap.getFunction() instanceof org.geotoolkit.style.function.Categorize){
+            	this.function = new Categorize((org.geotoolkit.style.function.Categorize) colorMap.getFunction());
             }
         }
     }

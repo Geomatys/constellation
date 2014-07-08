@@ -146,6 +146,26 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             }]
         };
 
+        
+        
+        $scope.colorModels = [
+          {name:'palette', value:'Palette'},
+          {name:'grayscale', value:'Grascale /RGB'}];
+
+	      $scope.colorModel= $scope.colorModels[0];
+	
+	      $scope.symbolPills = 'color';
+	      
+	      $scope.selectedBand = undefined;
+        
+	      $scope.test = {
+	    		  'selected':undefined
+	      };
+        
+	      $scope.ichanged = function(){
+	    	  console.log($scope.test);
+	      }
+	      
         /**
          * The json model that represents the style sld.
          */
@@ -190,12 +210,13 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         $scope.palette = {
             index: undefined,
             img_palette: 'images/palette0.png',
-            rasterMinValue: undefined,
-            rasterMaxValue: undefined,
+            rasterMinValue: 0,
+            rasterMaxValue: 0,
             intervalles: 1,
             channelSelection: undefined,
             nan: false,
-            inverse: false
+            inverse: false,
+            interpolation:'interpolate'
         };
 
         /**
@@ -816,7 +837,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         $scope.loadDataProperties = function() {
             provider.dataDesc({providerId: $scope.providerId, dataId: $scope.layerName},
                 function(response) {
-                    $scope.dataProperties = response.properties;
+                    $scope.dataProperties = response;
                 },
                 function() {
                     $growl('error', 'Error', 'Unable to get data properties for layer '+$scope.layerName);
@@ -919,13 +940,16 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             $scope.palette.index = index;
         };
 
+      
         $scope.addPalette = function() {
             if ($scope.palette.index == undefined) {
                 return;
             }
 
-            if ($scope.newStyle.rules[0].symbolizers[0].colorMap == undefined || $scope.newStyle.rules[0].symbolizers[0].colorMap.function == undefined) {
-                $scope.newStyle.rules[0].symbolizers[0].colorMap = {'function': {'@function': 'interpolate'}};
+            if ($scope.newStyle.rules[0].symbolizers[0].colorMap == undefined || 
+            		$scope.newStyle.rules[0].symbolizers[0].colorMap.function == undefined ||
+            		$scope.newStyle.rules[0].symbolizers[0].colorMap.function['@function'] != $scope.palette.interpolation) {
+            	$scope.newStyle.rules[0].symbolizers[0].colorMap = {'function': {'@function': $scope.palette.interpolation}};
             }
             switch ($scope.palette.index) {
                 case 1:
@@ -1222,23 +1246,3 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         };
 
     }]);
-
-cstlAdminApp.controller('SldRasterController', ['$scope', function($scope){
-
-    $scope.colorModels = [
-        {name:'palette', value:'Palette'},
-        {name:'grayscale', value:'Grascale /RGB'}];
-
-    $scope.colorModel= $scope.colorModels[0];
-
-    $scope.symbolPills = 'color';
-    
-    $scope.distribution = {
-    	floor:0,
-    	ceil:255,
-    	step:1,
-    	max:255,
-    	min:0
-    };
-
-}]);

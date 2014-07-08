@@ -30,7 +30,9 @@ import static org.constellation.json.util.StyleUtilities.literal;
  */
 public final class InterpolationPoint implements StyleElement<org.geotoolkit.style.function.InterpolationPoint> {
 
-    private Number data  = null;
+	private static final long serialVersionUID = 1L;
+
+	private Number data  = null;
     private String color = "#000000";
 
     public InterpolationPoint() {
