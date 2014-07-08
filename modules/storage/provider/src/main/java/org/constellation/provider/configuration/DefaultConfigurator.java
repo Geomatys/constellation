@@ -71,6 +71,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import org.apache.sis.util.UnconvertibleObjectException;
 
 /**
  *
@@ -96,10 +97,14 @@ public final class DefaultConfigurator implements Configurator {
     public List<Map.Entry<String, ParameterValueGroup>> getProviderConfigurations() throws ConfigurationException {
         final List<String> ids = providerBusiness.getProviderIds();
         final List<Map.Entry<String,ParameterValueGroup>> entries = new ArrayList<>();
-        for(String id : ids){
-            ParameterValueGroup param = getProviderConfiguration(id);
-            if(param!=null){
-                entries.add(new AbstractMap.SimpleImmutableEntry<>(id, param));
+        for (String id : ids) {
+            try {
+                ParameterValueGroup param = getProviderConfiguration(id);
+                if (param != null) {
+                    entries.add(new AbstractMap.SimpleImmutableEntry<>(id, param));
+                }
+            } catch (ConfigurationException ex) {
+                LOGGER.log(Level.WARNING, "error while getting configuration for provider " + id, ex);
             }
         }
         return entries;
@@ -109,10 +114,14 @@ public final class DefaultConfigurator implements Configurator {
     public List<ProviderInformation> getProviderInformations() throws ConfigurationException {
         final List<org.constellation.engine.register.Provider> records = providerBusiness.getProviders();
         final List<ProviderInformation> entries = new ArrayList<>();
-        for(org.constellation.engine.register.Provider record : records){
-            ParameterValueGroup param = getProviderConfiguration(record.getIdentifier());
-            if(param!=null){
-                entries.add(new ProviderInformation(record.getIdentifier(), record.getImpl(), param));
+        for (org.constellation.engine.register.Provider record : records) {
+            try {
+                final ParameterValueGroup param = getProviderConfiguration(record.getIdentifier());
+                if (param != null) {
+                    entries.add(new ProviderInformation(record.getIdentifier(), record.getImpl(), param));
+                }
+            } catch (ConfigurationException ex) {
+                LOGGER.log(Level.WARNING, "error while getting configuration for provider " + record.getIdentifier(), ex);
             }
         }
         return entries;
@@ -128,8 +137,8 @@ public final class DefaultConfigurator implements Configurator {
         try {
             ParameterValueGroup params = (ParameterValueGroup)IOUtilities.readParameter(record.getConfig(), factory.getProviderDescriptor());
             return params;
-        } catch (IOException ex) {
-            throw new ConfigurationException(ex);
+        } catch (IOException | UnconvertibleObjectException ex) {
+            throw new ConfigurationException("Error while reading provider configuration for:" + providerId, ex);
         }
     }
 
