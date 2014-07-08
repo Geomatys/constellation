@@ -296,6 +296,7 @@ cstlAdminApp.factory('style', ['$resource',
 cstlAdminApp.factory('provider', ['$resource',
     function ($resource) {
         return $resource('@cstl/api/1/provider', {}, {
+            'test':     {method: "POST", url: '@cstl/api/1/domain/$domainId/provider/:id;jsessionid='},
             'create':   {method: 'PUT', url: '@cstl/api/1/domain/$domainId/provider/:id;jsessionid='},
             'delete':   {method: 'DELETE', url: '@cstl/api/1/domain/$domainId/provider/:id;jsessionid='},
             'metadata': {method: 'GET', url: '@cstl/api/1/domain/$domainId/provider/metadata/:providerId;jsessionid='},

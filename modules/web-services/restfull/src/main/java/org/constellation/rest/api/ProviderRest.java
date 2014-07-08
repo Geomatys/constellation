@@ -99,7 +99,28 @@ public final class ProviderRest {
     
     @Inject
     private ProviderBusiness providerBusiness;
-    
+
+    @POST
+    @Path("/{id}")
+    public Response test( final @PathParam("domainId") int domainId, final @PathParam("id") String id, final ProviderConfiguration configuration){
+        try {
+            final String type = configuration.getType();
+            final String subType = configuration.getSubType();
+            final Map<String,String> inParams = configuration.getParameters();
+
+            final DataProviderFactory providerService = DataProviders.getInstance().getFactory(type);
+            final ParameterDescriptorGroup sourceDesc = providerService.getProviderDescriptor();
+            ParameterValueGroup sources = sourceDesc.createValue();
+            sources.parameter("id").setValue(id);
+            sources.parameter("providerType").setValue(type);
+            sources = fillProviderParameter(type, subType, inParams, sources);
+            DataProviders.getInstance().testProvider(id, providerService, sources);
+        } catch (Exception e) {
+            return Response.status(500).build();
+        }
+        return Response.ok().build();
+    }
+
     /**
      * Create a new provider from the given configuration.
      */
@@ -112,10 +133,30 @@ public final class ProviderRest {
 
         final DataProviderFactory providerService = DataProviders.getInstance().getFactory(type);
         final ParameterDescriptorGroup sourceDesc = providerService.getProviderDescriptor();
-        final ParameterValueGroup sources = sourceDesc.createValue();
+        ParameterValueGroup sources = sourceDesc.createValue();
         sources.parameter("id").setValue(id);
         sources.parameter("providerType").setValue(type);
 
+        sources = fillProviderParameter(type, subType, inParams, sources);
+
+        final DataProvider old = DataProviders.getInstance().getProvider(id);
+        if (old != null) {
+            // Provider already exists, update config
+            old.updateSource(sources);
+        } else {
+            try {
+                DataProvider dataProvider = DataProviders.getInstance().createProvider(id, providerService, sources);
+                int count = domainRepository.addProviderDataToDomain(id, domainId );
+                LOGGER.info("Added " + count + " data to domain " + domainId);
+            } catch (ConfigurationException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+                return Response.status(500).build();
+            }
+        }
+        return Response.ok().build();
+    }
+
+    private ParameterValueGroup fillProviderParameter(String type, String subType, Map<String, String> inParams, ParameterValueGroup sources) {
         switch (type) {
             case "sld":
                 final String sldPath = inParams.get("path");
@@ -123,7 +164,7 @@ public final class ProviderRest {
                 sources.groups("sldFolder").get(0).parameter("path").setValue(folderPath);
                 break;
             case "feature-store":
-                
+
                 boolean foundProvider = false;
                 try {
                     final String filePath = inParams.get("path");
@@ -192,7 +233,7 @@ public final class ProviderRest {
                 } catch (MalformedURLException e) {
                     LOGGER.log(Level.WARNING, "unable to create url from path", e);
                 }
-                
+
                 if(!foundProvider){
                     switch (subType) {
                         case "shapefile":
@@ -292,21 +333,21 @@ public final class ProviderRest {
 
                 switch (subType) {
                     case "observation-file":
-                        
+
                         final ParameterValueGroup ncObsParams = sources.groups("choice").get(0).addGroup("ObservationFileParameters");
                         ncObsParams.parameter("identifier").setValue("observationFile");
                         ncObsParams.parameter("namespace").setValue("no namespace");
                         ncObsParams.parameter("url").setValue(new File(inParams.get("path")));
                         break;
-                    
+
                     case "observation-xml":
-                        
+
                         final ParameterValueGroup xmlObsParams = sources.groups("choice").get(0).addGroup("ObservationXmlFileParameters");
                         xmlObsParams.parameter("identifier").setValue("observationXmlFile");
                         xmlObsParams.parameter("namespace").setValue("no namespace");
                         xmlObsParams.parameter("url").setValue(new File(inParams.get("path")));
                         break;
-                   
+
                     default:
                         LOGGER.log(Level.WARNING, "error on subtype definition");
                 }
@@ -316,22 +357,7 @@ public final class ProviderRest {
                     LOGGER.log(Level.FINER, "Provider type not known");
                 }
         }
-
-        final DataProvider old = DataProviders.getInstance().getProvider(id);
-        if (old != null) {
-            // Provider already exists, update config
-            old.updateSource(sources);
-        } else {
-            try {
-                DataProvider dataProvider = DataProviders.getInstance().createProvider(id, providerService, sources);
-                int count = domainRepository.addProviderDataToDomain(id, domainId );
-                LOGGER.info("Added " + count + " data to domain " + domainId);
-            } catch (ConfigurationException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
-                return Response.status(500).build();
-            }
-        }
-        return Response.ok().build();
+        return sources;
     }
 
     /**

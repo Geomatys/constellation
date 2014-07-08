@@ -18,8 +18,11 @@
  */
 package org.constellation.provider;
 
+import org.apache.sis.storage.DataStoreException;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.provider.configuration.Configurator.ProviderInformation;
+import org.geotoolkit.coverage.CoverageStore;
+import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.map.ElevationModel;
@@ -121,6 +124,19 @@ public final class DataProviders extends Providers implements PropertyChangeList
         getConfigurator().addProviderConfiguration(id,params);
         fireUpdateEvent();
         return provider;
+    }
+
+    public void testProvider(String id, final DataProviderFactory factory, final ParameterValueGroup params) throws DataStoreException {
+        getProviders();
+        final DataProvider provider = factory.createProvider(id, params);
+        //test to read data
+
+        if (provider.getMainStore() instanceof FeatureStore) {
+            ((FeatureStore) provider.getMainStore()).getNames();
+        } else if (provider.getMainStore() instanceof CoverageStore) {
+            ((CoverageStore) provider.getMainStore()).getNames();
+        }
+
     }
 
     public DataProvider removeProvider(final DataProvider provider) throws ConfigurationException{

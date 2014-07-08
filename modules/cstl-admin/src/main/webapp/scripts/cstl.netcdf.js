@@ -8,22 +8,7 @@ Netcdf = {
      * Change layer saw
      * @param $caller
      */
-    changeLayer : function ($caller, providerId){
-        Netcdf.$caller = $caller;
-        Netcdf.loadCRS(providerId);
 
-        for (var i = 0; i < map.layers.length; i++) {
-            var layer = map.layers[i];
-            map.removeLayer(layer);
-        }
-
-        var layer = Netcdf.createLayer($caller.data("value"), providerId);
-        $("#coverageName").empty();
-        $("#coverageName").html($caller.data("value"));
-
-        map.addLayer(layer);
-        map.zoomToExtent();
-    },
 
     updateCRS : function (data) {
         var crs = data.Entry;
@@ -50,11 +35,7 @@ Netcdf = {
         }
     },
 
-    loadCRS : function (providerId){
-        var url = window.location.protocol + "//" + window.location.host +"/constellation/api/1/crs/";
-        url = url + providerId+"/"+Netcdf.$caller.data("value");
-        $.getJSON(url, Netcdf.updateCRS);
-    },
+
 
     /**
      *

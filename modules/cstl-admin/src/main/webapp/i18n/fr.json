@@ -556,6 +556,7 @@
     "service.config.source.database.type": "Type de base de données",
     "service.config.source.database.url": "URL de la base de données",
     "service.config.source.database.username": "Nom d'utilisateur",
+    "service.config.source.database.test": "Tester la connexion",
     "service.config.source.file": "Système de fichiers",
     "service.config.source.file.description": "Jeu de métadonnées stocké dans le système de fichiers local",
     "service.config.source.file.sml": "Dossier contenant des fichiers SensorML",

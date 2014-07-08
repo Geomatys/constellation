@@ -52,6 +52,8 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
             $scope.import.allowSubmit = true;
         };
 
+
+
         $scope.importDb = function() {
             var providerId = "postgis-"+ $scope.import.db.name;
             provider.create({
@@ -332,12 +334,39 @@ cstlAdminApp.controller('ModalImportDataStep1ServerController', ['$scope', 'data
         };
     }]);
 
-cstlAdminApp.controller('ModalImportDataStep1DatabaseController', ['$scope',
-    function($scope) {
+cstlAdminApp.controller('ModalImportDataStep1DatabaseController', ['$scope','provider', '$growl',
+    function($scope, provider, $growl) {
+        $scope.import.allowNext = false;
+        $scope.import.testConnected = false;
+
         $scope.import.next = function() {
             $scope.import.currentStep = 'step2Metadata';
-            $scope.import.allowNext = true;
+
         };
+        $scope.testDB = function(){
+            var providerId = "postgis-"+ $scope.import.db.name;
+            provider.test({
+                id: providerId
+            }, {
+                type: "feature-store",
+                subType: "postgresql",
+                parameters: {
+                    host: $scope.import.db.url,
+                    port: $scope.import.db.port,
+                    user: $scope.import.db.user,
+                    password: $scope.import.db.password,
+                    database: $scope.import.db.name
+                }
+            }, function(response) {
+                $growl('success', 'Success', 'Connected to database');
+                $scope.import.testConnected = true;
+                $scope.import.allowNext = true;
+
+            },function(response){
+                $growl('error','Error','Unable to connect database. Verify parrameters');
+            });
+        }
+
     }]);
 
 cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$cookies',

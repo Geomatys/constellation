@@ -432,6 +432,7 @@
     "service.config.source.database.type": "Database type",
     "service.config.source.database.url": "Database URL",
     "service.config.source.database.username": "User name",
+    "service.config.source.database.test": "Test connection",
     "service.config.source.file": "File system",
     "service.config.source.file.description": "Sets of metadata records stored in the local file system",
     "service.config.source.file.sml": "SensorML folder",

@@ -37,6 +37,9 @@
                     <input type="password" class="form-control" ng-model="import.db.password">
                 </div>
             </div>
+            <div style="text-align:center">
+                <button type="button" id="testDBButton" ng-show="!(import.testConnected)" class="btn btn-primary ng-scope" ng-click="testDB();" translate="service.config.source.database.test">Test</button>
+            </div>
         </fieldset>
     </form>
 </div>
