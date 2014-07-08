@@ -55,6 +55,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
+import javax.inject.Inject;
+import org.constellation.admin.SpringHelper;
+import org.constellation.engine.register.repository.PropertyRepository;
 
 /**
  * Helper class to ease the pyramid process.
@@ -86,9 +89,12 @@ public class PyramidCoverageHelper {
     private CoverageNamer coverageNamer;
     private List<GridCoverage2D> coveragesPyramid;
     private double[] depth;
+    
+    @Inject
+    private PropertyRepository propertyRepository;
 
     public PyramidCoverageHelper(Builder builder) throws DataStoreException {
-
+        SpringHelper.injectDependencies(this);
         this.store = builder.buildInputStore();
         final List<GridCoverage2D> coverages = buildCoverages();
 
@@ -151,8 +157,8 @@ public class PyramidCoverageHelper {
             final double widthGeometry = gridGeometry.getExtent2D().getWidth();
             final double heightGeometry = gridGeometry.getExtent2D().getHeight();
 
-            final String pictureHeight = ConfigurationEngine.getConstellationProperty("picture_max_height", "500");
-            final String pictureWidth  = ConfigurationEngine.getConstellationProperty("picture_max_width", "500");
+            final String pictureHeight = propertyRepository.getValue("picture_max_height", "500");
+            final String pictureWidth  = propertyRepository.getValue("picture_max_width", "500");
             final double userWidth     = Double.parseDouble(pictureWidth);
             final double userHeight    = Double.parseDouble(pictureHeight);
 

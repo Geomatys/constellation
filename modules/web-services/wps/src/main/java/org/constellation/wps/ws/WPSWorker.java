@@ -23,8 +23,6 @@ import org.apache.sis.util.ArgumentChecks;
 import org.apache.sis.util.UnconvertibleObjectException;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef;
-import org.constellation.admin.ConfigurationEngine;
-import org.constellation.admin.SecurityManagerAdapter;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.Process;
 import org.constellation.configuration.ProcessContext;
@@ -481,18 +479,17 @@ public class WPSWorker extends AbstractWorker {
                 if (SecurityManagerHolder.getInstance().isAuthenticated()) {
                     serviceBusiness.create("webdav", webdavName, webdavCtx, null, null);
                 } else {
-                    try {
+                    serviceBusiness.create("webdav", webdavName, webdavCtx, null, null);
+                    /*try {
                         ConfigurationEngine.setSecurityManager(new SecurityManagerAdapter() {
                             @Override
                             public String getCurrentUserLogin() {
                                 return "admin";
                             }
                         });
-                        
-                        serviceBusiness.create("webdav", webdavName, webdavCtx, null, null);
                     } finally {
                         ConfigurationEngine.setSecurityManager(SecurityManagerHolder.getInstance());
-                    }
+                    }*/
                 }
                 // /!\ CASE SENSITIVE /!\
                 final Worker worker = WSEngine.buildWorker("WEBDAV", webdavName);

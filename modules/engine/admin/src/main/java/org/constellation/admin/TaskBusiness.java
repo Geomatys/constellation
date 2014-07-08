@@ -16,19 +16,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.constellation.engine.register.repository;
+
+package org.constellation.admin;
 
 import org.constellation.engine.register.Task;
+import org.constellation.engine.register.repository.TaskRepository;
+import org.springframework.stereotype.Component;
 
-import java.util.List;
+/**
+ *
+ * @author Guilhem Legal (Geomatys)
+ */
+@Component
+public class TaskBusiness {
+    
+    private TaskRepository taskRepository;
 
-public interface TaskRepository {
-
-    List<? extends Task> findAll();
+    public void writeTask(String uuidTask, String pyramid, String login, final long start) {
+        final Task t = new Task(uuidTask, "PENDING", "TODO-TYPE", start, null, login);
+        taskRepository.create(t);
+    }
     
-    void create(Task task);
+    public Task getTask(String uuid) {
+        return taskRepository.get(uuid);
+    }
     
-    Task get(String uuid);
-    
-    void update(Task task);
+    public void update(Task task) {
+        taskRepository.update(task);
+    }
 }

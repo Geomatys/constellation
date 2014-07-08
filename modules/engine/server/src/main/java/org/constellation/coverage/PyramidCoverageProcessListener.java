@@ -18,23 +18,24 @@
  */
 package org.constellation.coverage;
 
-import org.constellation.admin.ConfigurationEngine;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.util.Date;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.inject.Inject;
+import org.constellation.admin.SpringHelper;
+import org.constellation.admin.TaskBusiness;
 import org.constellation.admin.dao.TaskRecord;
+import org.constellation.engine.register.Task;
 import org.constellation.provider.DataProviders;
 import org.geotoolkit.parameter.ParameterGroup;
 import org.geotoolkit.process.ProcessEvent;
 import org.geotoolkit.process.ProcessListener;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
-
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Listener for Pyramidal process loaded via {@link PyramidCoverageHelper}
@@ -49,11 +50,15 @@ public class PyramidCoverageProcessListener implements ProcessListener {
 
     private String uuidTask;
 
-    private String login;
-    private String path;
-    private String identifier;
+    private final String login;
+    private final String path;
+    private final String identifier;
 
+    @Inject
+    private TaskBusiness taskBusiness;
+    
     public PyramidCoverageProcessListener(final String login, final String path, final String identifier) {
+        SpringHelper.injectDependencies(this);
         this.login = login;
         this.path = path;
         this.identifier = identifier;
@@ -63,7 +68,7 @@ public class PyramidCoverageProcessListener implements ProcessListener {
     public void started(final ProcessEvent processEvent) {
         //Create task on database (state : pending)
         uuidTask = UUID.randomUUID().toString();
-        ConfigurationEngine.writeTask(uuidTask, "pyramid", login);
+        taskBusiness.writeTask(uuidTask, "pyramid", login, System.currentTimeMillis());
     }
 
     @Override
@@ -83,16 +88,13 @@ public class PyramidCoverageProcessListener implements ProcessListener {
 
     @Override
     public void completed(final ProcessEvent processEvent) {
-        try {
-            //Update state (pass to completed) on database
-            final TaskRecord pyramidTask = ConfigurationEngine.getTask(uuidTask);
-            pyramidTask.setState(TaskRecord.TaskState.SUCCEED);
+        //Update state (pass to completed) on database
+        final Task pyramidTask = taskBusiness.getTask(uuidTask);
+        pyramidTask.setState(TaskRecord.TaskState.SUCCEED.name());
+        taskBusiness.update(pyramidTask);
 
-            //update provider
-            updateProvider();
-        } catch (SQLException e) {
-            LOGGER.log(Level.WARNING, "Unable to save task", e);
-        }
+        //update provider
+        updateProvider();
     }
 
     /**
@@ -122,12 +124,9 @@ public class PyramidCoverageProcessListener implements ProcessListener {
 
     @Override
     public void failed(final ProcessEvent processEvent) {
-        //Update state (pass to completed) on database
-        try {
-            final TaskRecord pyramidTask = ConfigurationEngine.getTask(uuidTask);
-            pyramidTask.setState(TaskRecord.TaskState.FAILED);
-        } catch (SQLException e) {
-            LOGGER.log(Level.WARNING, "Unable to save task", e);
-        }
+        //Update state (pass to failed) on database
+        final Task pyramidTask = taskBusiness.getTask(uuidTask);
+        pyramidTask.setState(TaskRecord.TaskState.FAILED.name());
+        taskBusiness.update(pyramidTask);
     }
 }

@@ -62,9 +62,6 @@ public class ConfigurationServiceInit implements ApplicationContextAware {
     public void init() {
         
     	SpringHelper.setApplicationContext(applicationContext);
-        ConfigurationEngine.setSecurityManager(SecurityManagerHolder.getInstance());
-        ConfigurationEngine.setConfigurationService(configurationService);
-        
         WSEngine.setWorkerFactory(new WorkerFactory() {
 
             @Override

@@ -91,17 +91,4 @@ public class CRSRest {
         final StringList sl = new StringList(crs);
         return Response.ok(sl).build();
     }
-
-    @POST
-    @Path("/update")
-    public Response saveCRSModification(final ParameterValues values){
-        //save on database
-        Map<String, String> layers = values.getValues();
-        String providerId = layers.get("providerId");
-        layers.remove("providerId");
-        for (String s : layers.keySet()) {
-            ConfigurationEngine.writeCRSData(new QName(s), providerId, layers.get(s));
-        }
-        return Response.ok().build();
-    }
 }
