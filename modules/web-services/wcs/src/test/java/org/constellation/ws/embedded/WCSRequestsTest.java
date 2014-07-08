@@ -19,20 +19,43 @@
 package org.constellation.ws.embedded;
 
 // J2SE dependencies
-import org.constellation.test.utils.TestDatabaseHandler;
+import java.awt.image.BufferedImage;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.List;
+import java.util.logging.Level;
+import javax.annotation.PostConstruct;
+import javax.imageio.ImageIO;
+import javax.imageio.spi.ImageReaderSpi;
+import javax.imageio.spi.ImageWriterSpi;
+import javax.inject.Inject;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.DataBusiness;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
-import org.constellation.admin.dao.ProviderRecord;
+import org.constellation.api.ProviderType;
 import org.constellation.configuration.LayerContext;
 import org.constellation.map.configuration.LayerBusiness;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
+import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.SOURCE_LOADALL_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.COVERAGESQL_DESCRIPTOR;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.NAMESPACE_DESCRIPTOR;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.PASSWORD_DESCRIPTOR;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.ROOT_DIRECTORY_DESCRIPTOR;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.SCHEMA_DESCRIPTOR;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.URL_DESCRIPTOR;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.USER_DESCRIPTOR;
 import org.constellation.test.ImageTesting;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.SpringTestRunner;
+import org.constellation.test.utils.TestDatabaseHandler;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.image.jai.Registry;
@@ -46,6 +69,15 @@ import org.geotoolkit.wcs.xml.v100.DCPTypeType.HTTP.Get;
 import org.geotoolkit.wcs.xml.v100.LonLatEnvelopeType;
 import org.geotoolkit.wcs.xml.v100.WCSCapabilitiesType;
 import org.junit.AfterClass;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeNoException;
+import static org.junit.Assume.assumeTrue;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -54,37 +86,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
-
-import javax.annotation.PostConstruct;
-import javax.imageio.ImageIO;
-import javax.imageio.spi.ImageReaderSpi;
-import javax.imageio.spi.ImageWriterSpi;
-import javax.inject.Inject;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.namespace.QName;
-import java.awt.image.BufferedImage;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.List;
-import java.util.logging.Level;
-
-import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
-import static org.constellation.provider.configuration.ProviderParameters.SOURCE_LOADALL_DESCRIPTOR;
-import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.COVERAGESQL_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.NAMESPACE_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.PASSWORD_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.ROOT_DIRECTORY_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.SCHEMA_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.URL_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.USER_DESCRIPTOR;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeNoException;
-import static org.junit.Assume.assumeTrue;
 
 // JUnit dependencies
 
@@ -190,7 +191,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                     srcconfig.parameter(NAMESPACE_DESCRIPTOR     .getName().getCode()).setValue("no namespace");
                     source.parameter(SOURCE_LOADALL_DESCRIPTOR   .getName().getCode()).setValue(Boolean.TRUE);
                     source.parameter(SOURCE_ID_DESCRIPTOR        .getName().getCode()).setValue("coverageTestSrc");
-                    providerBusiness.createProvider("coverageTestSrc", null, ProviderRecord.ProviderType.LAYER, "coverage-sql", source);
+                    providerBusiness.createProvider("coverageTestSrc", null, ProviderType.LAYER, "coverage-sql", source);
 
                     dataBusiness.create(new QName("SST_tests"), "coverageTestSrc", rootDir, false, true, null, null);
                 } else {

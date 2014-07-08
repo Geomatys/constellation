@@ -16,35 +16,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.constellation.admin.dao;
 
-import java.sql.SQLException;
+package org.constellation.api;
 
-public class CRSRecord extends Record{
-
-    private String dataid;
-
-    private String crscode;
-
-    public String getCrscode() {
-        return crscode;
-    }
-
-    public void setCrscode(final String crscode) {
-        this.crscode = crscode;
-    }
-
-    public String getDataid() {
-        return dataid;
-    }
-
-    public void setDataid(final String dataid) {
-        this.dataid = dataid;
-    }
-
-    /**
-     * Do nothing in this implementation.
-     */
-    @Override
-    protected void ensureConnectionNotClosed() throws SQLException {}
+/**
+ *
+ * @author Guilhem Legal (Geomatys)
+ */
+public enum DataType {
+    
+    VECTOR,
+    COVERAGE
 }

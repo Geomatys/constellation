@@ -19,7 +19,7 @@
 package org.constellation.provider.coveragesgroup;
 
 import org.apache.sis.storage.DataStore;
-import org.constellation.admin.dao.DataRecord.DataType;
+import org.constellation.api.DataType;
 import org.constellation.provider.AbstractDataProvider;
 import org.constellation.provider.Data;
 import org.constellation.provider.ProviderFactory;

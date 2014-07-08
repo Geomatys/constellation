@@ -20,7 +20,7 @@
 package org.constellation.provider;
 
 import org.apache.sis.storage.DataStoreException;
-import org.constellation.admin.dao.DataRecord.DataType;
+import org.constellation.api.DataType;
 import org.geotoolkit.data.AbstractFeatureStoreFactory;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.memory.ExtendedFeatureStore;

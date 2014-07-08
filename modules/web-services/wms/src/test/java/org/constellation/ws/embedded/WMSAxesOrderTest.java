@@ -24,7 +24,7 @@ import org.constellation.admin.DataBusiness;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
-import org.constellation.admin.dao.ProviderRecord;
+import org.constellation.api.ProviderType;
 import org.constellation.configuration.Language;
 import org.constellation.configuration.Languages;
 import org.constellation.configuration.LayerContext;
@@ -190,7 +190,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer  implements Applicat
                     srcconfig.parameter(NAMESPACE_DESCRIPTOR     .getName().getCode()).setValue("no namespace");
                     source.parameter(SOURCE_LOADALL_DESCRIPTOR   .getName().getCode()).setValue(Boolean.TRUE);
                     source.parameter(SOURCE_ID_DESCRIPTOR        .getName().getCode()).setValue("coverageTestSrc");
-                    providerBusiness.createProvider("coverageTestSrc", null, ProviderRecord.ProviderType.LAYER, "coverage-sql", source);
+                    providerBusiness.createProvider("coverageTestSrc", null, ProviderType.LAYER, "coverage-sql", source);
 
                     dataBusiness.create(new QName("SST_tests"), "coverageTestSrc", rootDir, false, true, null, null);
                 } else {

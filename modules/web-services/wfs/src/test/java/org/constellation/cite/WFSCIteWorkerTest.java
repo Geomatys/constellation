@@ -18,23 +18,43 @@
  */
 package org.constellation.cite;
 
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.xml.namespace.QName;
 import org.apache.sis.geometry.GeneralDirectPosition;
+import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.DataBusiness;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
-import org.constellation.admin.dao.ProviderRecord;
+import org.constellation.api.ProviderType;
 import org.constellation.configuration.LayerContext;
 import org.constellation.map.configuration.LayerBusiness;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
-import org.constellation.test.utils.TestDatabaseHandler;
+import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.SOURCE_LOADALL_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
+import static org.constellation.provider.featurestore.FeatureStoreProviderService.SOURCE_CONFIG_DESCRIPTOR;
 import org.constellation.test.utils.SpringTestRunner;
+import org.constellation.test.utils.TestDatabaseHandler;
 import org.constellation.wfs.ws.DefaultWFSWorker;
 import org.constellation.wfs.ws.WFSWorker;
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
 import org.geotoolkit.data.FeatureCollection;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.DATABASE;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.HOST;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.NAMESPACE;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.PASSWORD;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.SCHEMA;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.USER;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.geotoolkit.gml.xml.v311.MultiPointType;
@@ -42,11 +62,17 @@ import org.geotoolkit.gml.xml.v311.PointPropertyType;
 import org.geotoolkit.gml.xml.v311.PointType;
 import org.geotoolkit.ogc.xml.v110.EqualsType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
+import static org.geotoolkit.parameter.ParametersExt.createGroup;
 import org.geotoolkit.wfs.xml.ResultTypeType;
 import org.geotoolkit.wfs.xml.v110.GetFeatureType;
 import org.geotoolkit.wfs.xml.v110.QueryType;
 import org.junit.After;
 import org.junit.AfterClass;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -55,32 +81,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.xml.namespace.QName;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.apache.sis.util.logging.Logging;
-
-import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
-import static org.constellation.provider.configuration.ProviderParameters.SOURCE_LOADALL_DESCRIPTOR;
-import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
-import static org.constellation.provider.featurestore.FeatureStoreProviderService.SOURCE_CONFIG_DESCRIPTOR;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.DATABASE;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.HOST;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.NAMESPACE;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.PASSWORD;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.SCHEMA;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.USER;
-import static org.geotoolkit.parameter.ParametersExt.createGroup;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeTrue;
 
 
 /**
@@ -152,7 +152,7 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
                 pgconfig.parameter(NAMESPACE.getName().getCode()).setValue("http://cite.opengeospatial.org/gmlsf");
                 choice.values().add(pgconfig);
 
-                providerBusiness.createProvider("postgisSrc", null, ProviderRecord.ProviderType.LAYER, "feature-store", source);
+                providerBusiness.createProvider("postgisSrc", null, ProviderType.LAYER, "feature-store", source);
 
                 dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "AggregateGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);
                 dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "PrimitiveGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);

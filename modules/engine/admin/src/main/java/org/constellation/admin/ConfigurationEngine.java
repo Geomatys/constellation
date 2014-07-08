@@ -35,10 +35,6 @@ public class ConfigurationEngine {
 
     private static final Logger LOGGER = Logging.getLogger(ConfigurationEngine.class);
 
-    public static void clearDatabase() {
-        EmbeddedDatabase.clear();
-    }
-
     public static File setupTestEnvironement(final String directoryName) {
         final File configDir = new File(directoryName);
         if (configDir.exists()) {
@@ -52,7 +48,6 @@ public class ConfigurationEngine {
 
     public static void shutdownTestEnvironement(final String directoryName) {
         FileUtilities.deleteDirectory(new File(directoryName));
-        clearDatabase();
         ConfigDirectory.setConfigDirectory(null);
     }
 }

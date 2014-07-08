@@ -19,17 +19,30 @@
 
 package org.constellation.provider.configuration;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import javax.inject.Inject;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.namespace.QName;
 import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
+import org.apache.sis.util.UnconvertibleObjectException;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.DataBusiness;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.admin.StyleBusiness;
-import org.constellation.admin.dao.ProviderRecord;
-import org.constellation.admin.dao.StyleRecord;
 import org.constellation.admin.exception.ConstellationException;
 import org.constellation.admin.util.IOUtilities;
+import org.constellation.api.ProviderType;
+import org.constellation.api.StyleType;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.dto.CoverageMetadataBean;
 import org.constellation.engine.register.Style;
@@ -58,20 +71,6 @@ import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.style.RasterSymbolizer;
 import org.opengis.style.Symbolizer;
 import org.w3c.dom.Node;
-
-import javax.inject.Inject;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.namespace.QName;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import org.apache.sis.util.UnconvertibleObjectException;
 
 /**
  *
@@ -147,7 +146,7 @@ public final class DefaultConfigurator implements Configurator {
         
         Provider provider = DataProviders.getInstance().getProvider(providerId);
         if(provider==null) provider = StyleProviders.getInstance().getProvider(providerId);
-        final ProviderRecord.ProviderType type = provider.getProviderType();
+        final ProviderType type = provider.getProviderType();
         final String factoryName = provider.getFactory().getName();
         
 //        final ProviderRecord pr = ConfigurationEngine.writeProvider(providerId, null, type, factoryName, config)
@@ -164,7 +163,7 @@ public final class DefaultConfigurator implements Configurator {
 //        final List<DataRecord> list = pr.getData();
         final List<org.constellation.engine.register.Data> list = providerBusiness.getDatasFromProviderId(pr.getId());
         final String type = pr.getType();
-        if (type.equals(ProviderRecord.ProviderType.LAYER.name())) {
+        if (type.equals(ProviderType.LAYER.name())) {
             final Provider provider = DataProviders.getInstance().getProvider(pr.getIdentifier());
             
             // Remove no longer existing layer.
@@ -278,14 +277,14 @@ public final class DefaultConfigurator implements Configurator {
                     }
                 }
                 if (!found) {
-                    StyleRecord.StyleType styleType = StyleRecord.StyleType.VECTOR;
+                    StyleType styleType = StyleType.VECTOR;
                     MutableStyle style = (MutableStyle) provider.get(key);
                     fts:
                     for (MutableFeatureTypeStyle mutableFeatureTypeStyle : style.featureTypeStyles()) {
                         for (MutableRule mutableRule : mutableFeatureTypeStyle.rules()) {
                             for (Symbolizer symbolizer : mutableRule.symbolizers()) {
                                 if (symbolizer instanceof RasterSymbolizer) {
-                                    styleType = StyleRecord.StyleType.COVERAGE;
+                                    styleType = StyleType.COVERAGE;
                                     break fts;
                                 }
                             }

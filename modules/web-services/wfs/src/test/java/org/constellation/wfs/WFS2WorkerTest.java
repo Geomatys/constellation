@@ -18,22 +18,47 @@
  */
 package org.constellation.wfs;
 
-import org.apache.sis.xml.MarshallerPool;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.net.URL;
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
 import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.DataBusiness;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
-import org.constellation.admin.dao.ProviderRecord;
+import org.constellation.api.ProviderType;
 import org.constellation.configuration.LayerContext;
 import org.constellation.map.configuration.LayerBusiness;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.FeatureData;
 import org.constellation.provider.ProviderFactory;
+import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.SOURCE_LOADALL_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
+import static org.constellation.provider.featurestore.FeatureStoreProviderService.SOURCE_CONFIG_DESCRIPTOR;
 import org.constellation.test.utils.CstlDOMComparator;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.SpringTestRunner;
+import org.constellation.test.utils.TestDatabaseHandler;
 import org.constellation.util.QNameComparator;
 import org.constellation.util.Util;
 import org.constellation.wfs.ws.DefaultWFSWorker;
@@ -41,7 +66,13 @@ import org.constellation.wfs.ws.WFSWorker;
 import org.constellation.wfs.ws.rs.FeatureCollectionWrapper;
 import org.constellation.wfs.ws.rs.ValueCollectionWrapper;
 import org.constellation.ws.CstlServiceException;
+import static org.geotoolkit.data.AbstractFeatureStoreFactory.NAMESPACE;
 import org.geotoolkit.data.FeatureCollection;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.DATABASE;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.HOST;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.PASSWORD;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.SCHEMA;
+import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.USER;
 import org.geotoolkit.feature.Feature;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.FeatureType;
@@ -66,6 +97,13 @@ import org.geotoolkit.ogc.xml.v200.SortByType;
 import org.geotoolkit.ogc.xml.v200.SortOrderType;
 import org.geotoolkit.ogc.xml.v200.SortPropertyType;
 import org.geotoolkit.ogc.xml.v200.SpatialOpsType;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
+import static org.geotoolkit.parameter.ParametersExt.createGroup;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
+import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
@@ -121,6 +159,11 @@ import org.geotoolkit.xsd.xml.v2001.TopLevelElement;
 import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
 import org.junit.After;
 import org.junit.AfterClass;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -130,49 +173,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.net.URL;
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
-import static org.constellation.provider.configuration.ProviderParameters.SOURCE_LOADALL_DESCRIPTOR;
-import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
-import static org.constellation.provider.featurestore.FeatureStoreProviderService.SOURCE_CONFIG_DESCRIPTOR;
-import org.constellation.test.utils.TestDatabaseHandler;
-import static org.geotoolkit.data.AbstractFeatureStoreFactory.NAMESPACE;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.DATABASE;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.HOST;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.PASSWORD;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.SCHEMA;
-import static org.geotoolkit.db.AbstractJDBCFeatureStoreFactory.USER;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_VALUE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.MISSING_PARAMETER_VALUE;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
-import static org.geotoolkit.parameter.ParametersExt.createGroup;
-import static org.geotoolkit.parameter.ParametersExt.getOrCreateGroup;
-import static org.geotoolkit.parameter.ParametersExt.getOrCreateValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 
 /**
@@ -259,7 +259,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
                     pgconfig.parameter(NAMESPACE.getName().getCode()).setValue("http://cite.opengeospatial.org/gmlsf");
                     choice.values().add(pgconfig);
 
-                    providerBusiness.createProvider("postgisSrc", null, ProviderRecord.ProviderType.LAYER, "feature-store", source);
+                    providerBusiness.createProvider("postgisSrc", null, ProviderType.LAYER, "feature-store", source);
 
                     dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "AggregateGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);
                     dataBusiness.create(new QName("http://cite.opengeospatial.org/gmlsf", "PrimitiveGeoFeature"), "postgisSrc", "VECTOR", false, true, null, null);
@@ -282,7 +282,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
                 getOrCreateValue(layer, "name").setValue("NamedPlaces");
                 getOrCreateValue(layer, "style").setValue("cite_style_NamedPlaces");
 
-                providerBusiness.createProvider("shapeSrc", null, ProviderRecord.ProviderType.LAYER, "feature-store", sourcef);
+                providerBusiness.createProvider("shapeSrc", null, ProviderType.LAYER, "feature-store", sourcef);
 
                 dataBusiness.create(new QName("http://www.opengis.net/gml/3.2", "BuildingCenters"), "shapeSrc", "VECTOR", false, true, null, null);
                 dataBusiness.create(new QName("http://www.opengis.net/gml/3.2", "BasicPolygons"),   "shapeSrc", "VECTOR", false, true, null, null);
@@ -315,7 +315,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
                 getOrCreateValue(omconfig, "sgbdtype").setValue("derby");
                 getOrCreateValue(omconfig, "derbyurl").setValue(url);
                 
-                providerBusiness.createProvider("omSrc", null, ProviderRecord.ProviderType.LAYER, "feature-store", sourceOM);
+                providerBusiness.createProvider("omSrc", null, ProviderType.LAYER, "feature-store", sourceOM);
                 dataBusiness.create(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"), "omSrc", "VECTOR", false, true, null, null);
                 
                 // MDWEB store
@@ -344,7 +344,7 @@ public class WFS2WorkerTest implements ApplicationContextAware {
                     getOrCreateValue(smlconfig, "sgbdtype").setValue("derby");
                     getOrCreateValue(smlconfig, "derbyurl").setValue(url2);
 
-                    providerBusiness.createProvider("smlSrc", null, ProviderRecord.ProviderType.LAYER, "feature-store", sourceSML);
+                    providerBusiness.createProvider("smlSrc", null, ProviderType.LAYER, "feature-store", sourceSML);
                     dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "System"),         "smlSrc", "VECTOR", false, true, null, null);
                     dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "Component"),      "smlSrc", "VECTOR", false, true, null, null);
                     dataBusiness.create(new QName("http://www.opengis.net/sml/1.0", "DataSourceType"), "smlSrc", "VECTOR", false, true, null, null);

@@ -25,7 +25,7 @@ import org.constellation.admin.DataBusiness;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
-import org.constellation.admin.dao.ProviderRecord;
+import org.constellation.api.ProviderType;
 import org.constellation.configuration.Language;
 import org.constellation.configuration.Languages;
 import org.constellation.configuration.LayerContext;
@@ -237,7 +237,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                     srcconfig.parameter(NAMESPACE_DESCRIPTOR     .getName().getCode()).setValue("no namespace");
                     source.parameter(SOURCE_LOADALL_DESCRIPTOR   .getName().getCode()).setValue(Boolean.TRUE);
                     source.parameter(SOURCE_ID_DESCRIPTOR        .getName().getCode()).setValue("coverageTestSrc");
-                    providerBusiness.createProvider("coverageTestSrc", null, ProviderRecord.ProviderType.LAYER, "coverage-sql", source);
+                    providerBusiness.createProvider("coverageTestSrc", null, ProviderType.LAYER, "coverage-sql", source);
 
                     dataBusiness.create(new QName("SST_tests"), "coverageTestSrc", rootDir, false, true, null, null);
                 } else {
@@ -260,7 +260,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                 getOrCreateValue(layer, "name").setValue("NamedPlaces");
                 getOrCreateValue(layer, "style").setValue("cite_style_NamedPlaces");
 
-                providerBusiness.createProvider("shapeSrc", null, ProviderRecord.ProviderType.LAYER, "feature-store", sourcef);
+                providerBusiness.createProvider("shapeSrc", null, ProviderType.LAYER, "feature-store", sourcef);
 
                 dataBusiness.create(new QName("http://www.opengis.net/gml", "BuildingCenters"), "shapeSrc", "VECTOR", false, true, null, null);
                 dataBusiness.create(new QName("http://www.opengis.net/gml", "BasicPolygons"),   "shapeSrc", "VECTOR", false, true, null, null);

@@ -18,10 +18,24 @@
  */
 package org.constellation.admin;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.inject.Inject;
+import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import org.apache.sis.util.logging.Logging;
-import org.constellation.admin.dao.DataRecord;
-import org.constellation.admin.dao.StyleRecord;
 import org.constellation.admin.util.IOUtilities;
+import org.constellation.api.StyleType;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.StyleBrief;
@@ -59,23 +73,6 @@ import org.opengis.style.Symbolizer;
 import org.opengis.style.TextSymbolizer;
 import org.opengis.util.FactoryException;
 import org.springframework.stereotype.Component;
-
-import javax.inject.Inject;
-import javax.xml.bind.JAXBException;
-import javax.xml.namespace.QName;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 
 /**
  * @author Bernard Fabien (Geomatys)
@@ -649,7 +646,7 @@ public final class StyleBusiness {
     }
 
 
-    public void writeStyle(final String name, final Integer providerId, final StyleRecord.StyleType type, final MutableStyle body) throws IOException {
+    public void writeStyle(final String name, final Integer providerId, final StyleType type, final MutableStyle body) throws IOException {
         final String login = securityManager.getCurrentUserLogin();
         Style style = new Style();
         style.setBody(IOUtilities.writeStyle(body));

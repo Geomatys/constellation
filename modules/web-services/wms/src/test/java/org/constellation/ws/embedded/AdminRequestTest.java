@@ -24,7 +24,7 @@ import org.constellation.admin.DataBusiness;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
-import org.constellation.admin.dao.ProviderRecord;
+import org.constellation.api.ProviderType;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.Instance;
 import org.constellation.configuration.InstanceReport;
@@ -128,7 +128,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer  implements Applicat
                 getOrCreateValue(layer, "name").setValue("NamedPlaces");
                 getOrCreateValue(layer, "style").setValue("cite_style_NamedPlaces");
 
-                providerBusiness.createProvider("shapeSrc", null, ProviderRecord.ProviderType.LAYER, "feature-store", sourcef);
+                providerBusiness.createProvider("shapeSrc", null, ProviderType.LAYER, "feature-store", sourcef);
 
                 dataBusiness.create(new QName("http://www.opengis.net/gml", "BuildingCenters"), "shapeSrc", "VECTOR", false, true, null, null);
                 dataBusiness.create(new QName("http://www.opengis.net/gml", "BasicPolygons"),   "shapeSrc", "VECTOR", false, true, null, null);

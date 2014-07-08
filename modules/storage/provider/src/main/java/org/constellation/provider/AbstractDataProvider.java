@@ -19,7 +19,7 @@
 
 package org.constellation.provider;
 
-import org.constellation.admin.dao.ProviderRecord.ProviderType;
+import org.constellation.api.ProviderType;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.Name;

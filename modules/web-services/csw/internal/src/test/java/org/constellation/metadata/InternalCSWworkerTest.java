@@ -20,16 +20,36 @@
 
 package org.constellation.metadata;
 
+import java.io.File;
+import java.io.StringWriter;
+import java.util.TimeZone;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.xml.XML;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
-import org.constellation.admin.dao.ProviderRecord;
+import org.constellation.api.ProviderType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.provider.DataProviderFactory;
 import org.constellation.provider.DataProviders;
+import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.SOURCE_LOADALL_DESCRIPTOR;
+import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.COVERAGESQL_DESCRIPTOR;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.NAMESPACE_DESCRIPTOR;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.PASSWORD_DESCRIPTOR;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.ROOT_DIRECTORY_DESCRIPTOR;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.SCHEMA_DESCRIPTOR;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.URL_DESCRIPTOR;
+import static org.constellation.provider.coveragesql.CoverageSQLProviderService.USER_DESCRIPTOR;
 import org.constellation.test.utils.Order;
 import org.constellation.test.utils.SpringTestRunner;
 import org.constellation.util.Util;
@@ -41,28 +61,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.opengis.parameter.ParameterValueGroup;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import java.io.File;
-import java.io.StringWriter;
-import java.util.TimeZone;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
-import static org.constellation.provider.configuration.ProviderParameters.SOURCE_LOADALL_DESCRIPTOR;
-import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.COVERAGESQL_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.NAMESPACE_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.PASSWORD_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.ROOT_DIRECTORY_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.SCHEMA_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.URL_DESCRIPTOR;
-import static org.constellation.provider.coveragesql.CoverageSQLProviderService.USER_DESCRIPTOR;
 
 /**
  *
@@ -274,7 +272,7 @@ public class InternalCSWworkerTest extends CSWworkerTest {
         pool.recycle(m);
         
         
-        providerBusiness.createProvider(identifier, null, ProviderRecord.ProviderType.LAYER, service.getName(), source);
+        providerBusiness.createProvider(identifier, null, ProviderType.LAYER, service.getName(), source);
         providerBusiness.updateMetadata(identifier, null, meta.getFileIdentifier(), sw.toString());
         
     }

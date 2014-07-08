@@ -18,32 +18,24 @@
  */
 package org.constellation.coverage.ws;
 
+import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.xml.namespace.QName;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.DataBusiness;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
-import org.constellation.admin.dao.ProviderRecord;
+import org.constellation.api.ProviderType;
 import org.constellation.configuration.LayerContext;
 import org.constellation.data.CoverageSQLTestCase;
 import org.constellation.map.configuration.LayerBusiness;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.ProviderFactory;
-import org.constellation.test.utils.TestDatabaseHandler;
-import org.junit.AfterClass;
-import org.opengis.parameter.ParameterValueGroup;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.xml.namespace.QName;
-import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import static org.constellation.provider.configuration.ProviderParameters.SOURCE_ID_DESCRIPTOR;
 import static org.constellation.provider.configuration.ProviderParameters.SOURCE_LOADALL_DESCRIPTOR;
 import static org.constellation.provider.configuration.ProviderParameters.getOrCreate;
@@ -54,6 +46,12 @@ import static org.constellation.provider.coveragesql.CoverageSQLProviderService.
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.SCHEMA_DESCRIPTOR;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.URL_DESCRIPTOR;
 import static org.constellation.provider.coveragesql.CoverageSQLProviderService.USER_DESCRIPTOR;
+import org.constellation.test.utils.TestDatabaseHandler;
+import org.junit.AfterClass;
+import org.opengis.parameter.ParameterValueGroup;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 
 /**
@@ -130,7 +128,7 @@ public class WCSWorkerInit extends CoverageSQLTestCase implements ApplicationCon
                     srcconfig.parameter(NAMESPACE_DESCRIPTOR     .getName().getCode()).setValue("no namespace");
                     source.parameter(SOURCE_LOADALL_DESCRIPTOR   .getName().getCode()).setValue(Boolean.TRUE);
                     source.parameter(SOURCE_ID_DESCRIPTOR        .getName().getCode()).setValue("coverageTestSrc");
-                    providerBusiness.createProvider("coverageTestSrc", null, ProviderRecord.ProviderType.LAYER, "coverage-sql", source);
+                    providerBusiness.createProvider("coverageTestSrc", null, ProviderType.LAYER, "coverage-sql", source);
 
                     dataBusiness.create(new QName("SST_tests"), "coverageTestSrc", rootDir, false, true, null, null);
                 } else {

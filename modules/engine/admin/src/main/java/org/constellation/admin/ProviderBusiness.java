@@ -2,7 +2,7 @@ package org.constellation.admin;
 
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.admin.dao.ProviderRecord;
+import org.constellation.api.ProviderType;
 import org.constellation.admin.util.IOUtilities;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Provider;
@@ -91,7 +91,7 @@ public class ProviderBusiness {
     }
 
     public Provider createProvider(final String identifier, final String parent,
-                                   final ProviderRecord.ProviderType type, final String serviceName, final GeneralParameterValue config) throws IOException {
+                                   final ProviderType type, final String serviceName, final GeneralParameterValue config) throws IOException {
         String login = securityManager.getCurrentUserLogin();
         Provider provider = new Provider();
         provider.setOwner(login);

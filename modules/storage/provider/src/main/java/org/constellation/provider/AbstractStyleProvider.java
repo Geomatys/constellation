@@ -19,8 +19,8 @@
 
 package org.constellation.provider;
 
-import org.constellation.admin.dao.DataRecord.DataType;
-import org.constellation.admin.dao.ProviderRecord.ProviderType;
+import org.constellation.api.DataType;
+import org.constellation.api.ProviderType;
 import org.geotoolkit.style.MutableStyle;
 import org.opengis.parameter.ParameterValueGroup;
 

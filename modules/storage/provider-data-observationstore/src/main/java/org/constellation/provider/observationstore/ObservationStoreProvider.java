@@ -20,7 +20,7 @@ package org.constellation.provider.observationstore;
 
 import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
-import org.constellation.admin.dao.DataRecord;
+import org.constellation.api.DataType;
 import org.constellation.provider.AbstractDataProvider;
 import org.constellation.provider.Data;
 import org.constellation.provider.DefaultFeatureData;
@@ -68,8 +68,8 @@ public class ObservationStoreProvider extends AbstractDataProvider {
     }
 
     @Override
-    public DataRecord.DataType getDataType() {
-        return DataRecord.DataType.VECTOR;
+    public DataType getDataType() {
+        return DataType.VECTOR;
     }
 
     @Override

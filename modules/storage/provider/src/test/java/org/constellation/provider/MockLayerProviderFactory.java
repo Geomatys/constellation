@@ -20,7 +20,7 @@
 package org.constellation.provider;
 
 import org.apache.sis.storage.DataStore;
-import org.constellation.admin.dao.DataRecord.DataType;
+import org.constellation.api.DataType;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.Name;

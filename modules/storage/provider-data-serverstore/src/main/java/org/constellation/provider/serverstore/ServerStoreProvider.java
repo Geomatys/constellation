@@ -20,7 +20,7 @@ package org.constellation.provider.serverstore;
 
 import org.apache.sis.storage.DataStore;
 import org.apache.sis.storage.DataStoreException;
-import org.constellation.admin.dao.DataRecord.DataType;
+import org.constellation.api.DataType;
 import org.constellation.provider.AbstractDataProvider;
 import org.constellation.provider.Data;
 import org.constellation.provider.DefaultCoverageData;
