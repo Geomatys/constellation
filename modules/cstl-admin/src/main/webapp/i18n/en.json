@@ -800,6 +800,7 @@
     "sldeditor.button.create":"Create the style",
 
     "tooltip.service.create.name":"The identifier can be the same as the name",
+    "tooltip.service.create.tag":"Use Tab or Enter keys to validate keyword",
     "tooltip.service.create.version":"At least one version must be selected",
     "tooltip.service.create.port":"The port number for database",
     "tooltip.service.source.url":"Fill only the domain name",
