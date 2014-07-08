@@ -20,27 +20,6 @@ package org.constellation.ws;
 
 //J2SE dependencies
 
-import org.apache.sis.internal.util.UnmodifiableArrayList;
-import org.apache.sis.util.Version;
-import org.apache.sis.util.logging.Logging;
-import org.apache.sis.xml.MarshallerPool;
-import org.constellation.ServiceDef;
-import org.constellation.ServiceDef.Specification;
-import org.constellation.admin.ServiceBusiness;
-import org.constellation.admin.SpringHelper;
-import org.constellation.configuration.ConfigurationException;
-import org.constellation.dto.Details;
-import org.constellation.security.SecurityManagerHolder;
-import org.constellation.ws.security.SimplePDP;
-import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
-import org.geotoolkit.ows.xml.OWSExceptionCode;
-import org.geotoolkit.util.StringUtilities;
-import org.opengis.util.CodeList;
-import org.xml.sax.SAXException;
-
-import javax.inject.Inject;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -51,9 +30,29 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import javax.inject.Inject;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import org.apache.sis.internal.util.UnmodifiableArrayList;
+import org.apache.sis.util.Version;
+import org.apache.sis.util.logging.Logging;
+import org.apache.sis.xml.MarshallerPool;
+import org.constellation.ServiceDef;
+import org.constellation.ServiceDef.Specification;
+import org.constellation.admin.ServiceBusiness;
+import org.constellation.admin.SpringHelper;
+import org.constellation.configuration.ConfigurationException;
+import org.constellation.dto.Details;
+import org.constellation.engine.register.Service;
+import org.constellation.security.SecurityManagerHolder;
+import org.constellation.ws.security.SimplePDP;
+import org.geotoolkit.ows.xml.AbstractCapabilitiesCore;
+import org.geotoolkit.ows.xml.OWSExceptionCode;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.VERSION_NEGOTIATION_FAILED;
+import org.geotoolkit.util.StringUtilities;
+import org.opengis.util.CodeList;
+import org.xml.sax.SAXException;
 
 /**
  * Abstract definition of a {@code Web Map Service} worker called by a facade
@@ -149,10 +148,10 @@ public abstract class AbstractWorker implements Worker {
      * @throws org.constellation.ws.CstlServiceException if a version in the property "supported_versions" is not supported.
      */
     protected void applySupportedVersion() throws CstlServiceException {
-        final String versions = getProperty("supported_versions");
-        if (versions != null) {
+        final Service service = serviceBusiness.getServiceByIdentifierAndType(specification.name(), id);
+        if (service != null) {
             final List<ServiceDef> definitions = new ArrayList<>();
-            final StringTokenizer tokenizer = new StringTokenizer(versions, ",");
+            final StringTokenizer tokenizer = new StringTokenizer(service.getVersions(), "|");
             while (tokenizer.hasMoreTokens()) {
                 final String version = tokenizer.nextToken();
                 final ServiceDef def = ServiceDef.getServiceDefinition(specification, version);
