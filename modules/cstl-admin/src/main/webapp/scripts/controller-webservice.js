@@ -165,6 +165,8 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
         $scope.serviceRights = false;
         $scope.metadata = {};
         $scope.metadata.keywords = [];
+        $scope.newService = {};
+        $scope.newService.tagText = '';
 
         $scope.getCurrentLang = function() {
             return $translate.use();
@@ -224,17 +226,17 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
         };
 
         $scope.addTag = function() {
-            if (!$scope.tagText || $scope.tagText == '' || $scope.tagText.length == 0) {
+            if (!$scope.newService.tagText || $scope.newService.tagText == '' || $scope.newService.tagText.length == 0) {
                 return;
             }
 
-            $scope.metadata.keywords.push($scope.tagText);
-            $scope.tagText = '';
+            $scope.metadata.keywords.push($scope.newService.tagText);
+            $scope.newService.tagText = '';
         };
 
         $scope.deleteTag = function(key) {
             if ($scope.metadata.keywords.length > 0 &&
-                $scope.tagText.length == 0 &&
+                $scope.newService.tagText.length == 0 &&
                 key === undefined) {
                 $scope.metadata.keywords.pop();
             } else if (key != undefined) {
