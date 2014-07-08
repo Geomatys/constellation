@@ -139,33 +139,45 @@ public class AdminRest {
 
     @GET
     @Path("/domain/{domainId}/instances")
-    public Response listInstances(@PathParam("domainId") int domainId, @Context HttpServletRequest httpServletRequest) throws ConfigurationException {
-        return listInstances(domainId,null, httpServletRequest);
+    public Response listInstances(@PathParam("domainId") int domainId) throws ConfigurationException {
+        return listInstances(domainId,null);
     }
 
+    @GET
+    @Path("/domain/{domainId}/instances/{lang}")
+    public Response listInstances(@PathParam("domainId") int domainId, @PathParam("lang") String lang) throws ConfigurationException {
+        final List<Instance> instances = new ArrayList<>();
+        final List<ServiceDTO> services = serviceBusiness.getAllServicesByDomainId(domainId, lang);
+        for (ServiceDTO service : services) {
+            final Instance instance = convertToInstance(service);
+            instances.add(instance);
+        }
+        return Response.ok(new InstanceReport(instances)).build();
+    }
 
-        /**
-      *
-      * @return
-      */
- @GET
- @Path("/domain/{domainId}/instances/{lang}")
- public Response listInstances(@PathParam("domainId") int domainId, @PathParam("lang") String lang, @Context HttpServletRequest httpServletRequest) throws ConfigurationException {
-     final List<Instance> instances = new ArrayList<>();
-     final List<ServiceDTO> services = serviceBusiness.getAllServicesByDomainId(domainId, lang);
-     for (ServiceDTO service : services) {
-	    Instance instance = new Instance();
-	    instance.setId(service.getId());
-	    instance.set_abstract(service.getDescription());
-	    instance.setIdentifier(service.getIdentifier());
-	    int layersNumber = layerRepository.findByServiceId(service.getId()).size();
-	    instance.setLayersNumber(layersNumber);
-	    instance.setName(service.getTitle());
-	    instance.setType(service.getType());
-	    instance.setVersions(Arrays.asList(service.getVersions().split("|")));
+    @GET
+    @Path("/domain/{domainId}/instances/{lang}/{type}")
+    public Response listInstances(@PathParam("domainId") int domainId, @PathParam("lang") String lang, @PathParam("type") String type) throws ConfigurationException {
+        final List<Instance> instances = new ArrayList<>();
+        final List<ServiceDTO> services = serviceBusiness.getAllServicesByDomainIdAndType(domainId, lang, type);
+        for (ServiceDTO service : services) {
+            final Instance instance = convertToInstance(service);
+            instances.add(instance);
+        }
+        return Response.ok(new InstanceReport(instances)).build();
+    }
+
+    private Instance convertToInstance(final ServiceDTO service) {
+        final Instance instance = new Instance();
+        instance.setId(service.getId());
+        instance.set_abstract(service.getDescription());
+        instance.setIdentifier(service.getIdentifier());
+        int layersNumber = layerRepository.findByServiceId(service.getId()).size();
+        instance.setLayersNumber(layersNumber);
+        instance.setName(service.getTitle());
+        instance.setType(service.getType());
+        instance.setVersions(Arrays.asList(service.getVersions().split("|")));
         instance.setStatus(ServiceStatus.valueOf(service.getStatus()));
-	    instances.add(instance);
+        return instance;
     }
-     return Response.ok(new InstanceReport(instances)).build();
- }
 }

@@ -256,6 +256,10 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
                 .where(SERVICE_X_DOMAIN.DOMAIN_ID.eq(domainId))));
     }
 
-
+    @Override
+    public List<Service> findByDomainAndType(int domainId, String type) {
+        return findBy(SERVICE.ID.in(dsl.select(Tables.SERVICE_X_DOMAIN.SERVICE_ID).from(SERVICE_X_DOMAIN,SERVICE)
+                .where(SERVICE_X_DOMAIN.DOMAIN_ID.eq(domainId).and(SERVICE.TYPE.eq(type)))));
+    }
 
 }

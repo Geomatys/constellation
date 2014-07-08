@@ -419,7 +419,8 @@ CREATE TABLE "admin"."mapcontext_styled_layer" (
   "layer_id"       INTEGER     NOT NULL,
   "style_id"       INTEGER     NOT NULL,
   "order"          INTEGER     NOT NULL   DEFAULT 1,
-  "opacity"        INTEGER     NOT NULL   DEFAULT 100
+  "opacity"        INTEGER     NOT NULL   DEFAULT 100,
+  "visible"        BOOLEAN     NOT NULL   DEFAULT TRUE
 );
 
 ALTER TABLE "admin"."mapcontext_styled_layer" ADD CONSTRAINT mapcontext_styled_layer_pk PRIMARY KEY ("mapcontext_id","layer_id","style_id");

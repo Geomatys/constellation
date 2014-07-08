@@ -39,6 +39,8 @@ public interface ServiceRepository {
     List<Service> findByDataId(int dataId);
     
     List<Service> findByDomain(int domainId);
+
+    List<Service> findByDomainAndType(int domainId, String type);
     
     List<Service> findByType(String type);
     

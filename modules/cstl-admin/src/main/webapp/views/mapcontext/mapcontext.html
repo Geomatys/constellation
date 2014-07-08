@@ -80,21 +80,6 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                <div class="item {{service.Type | lowercase}}" style="margin-top:0;" ng-if="context==selected" ng-repeat="contextchild in context.children" ng-class="{'selected':contextchild===selectedSensorsChild, 'child':small==false, 'col-xs-11':small==true, 'col-sm-offset-1':small==true}" ng-click="selectMapcontextChild(contextchild)">
-                                    <div class="top">
-                                        <span class="item-title">{{contextchild.id}}</span>
-                                        <span class="pull-right text-right item-list-style" translate="label.sensor">{{contextchild.type}}</span>
-                                    </div>
-                                    <div class="bottom">
-                                        <div class="block">
-                                            <i class="icon-calendar"></i>{{contextchild.createDate | date:'yyyy-MM-dd'}}
-                                        </div>
-                                        <div class="block">
-                                            <i class="icon-user"></i>{{contextchild.creator}}
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -102,33 +87,22 @@
                 <div class="pull-left" style="width: 40%;">
                     <div id="selection">
                         <div class="alert alert-info alert-mapcontext" ng-class="{hide: selected != null}">
-                            <h4 translate="label.no.selected.data">No selected data</h4>
+                            <h4 translate="label.no.selected.mapcontext">No selected map context</h4>
 
-                            <p translate="msg.no.selected.data" style="font-weight:normal;">Click on a data to display more information</p>
+                            <p translate="msg.no.selected.mapcontext" style="font-weight:normal;">Click on a map context to display more information</p>
                         </div>
                         <div class="selected-item" id="selected-item" ng-class="{hide: selected == null}">
                             <div class="block-header" ng-click="toggleUpDownSelected()">
                                 <strong class="item-title title-bloc" title="{{selected.name}}">{{selected.name}}</strong><i class="icon-chevron-up pull-right"></i>
                             </div>
                             <div class="block-content">
-                                <h6 translate="label.owner">Owner</h6>
-                                <span>{{selected.owner}}</span>
+                                <h6 translate="label.description">Description</h6>
+                                <span>{{selected.description}}</span>
 
                                 <div class="separator"></div>
-                                <h6>
-                                    <span translate="label.related.style">Related style(s)</span>
-                                    <button type="button" ng-click="showStyleList();"
-                                            class="btn btn-sm pull-right">
-                                        <i class="icon-plus"></i></button>
-                                </h6>
-                                <div id="linkedList">
-                                    <span ng-show="selected.TargetStyle.length == 0" translate="label.no.association">No association</span>
-                                    <div ng-show="selected.TargetStyle.length > 0" class="style" ng-repeat="style in selected.TargetStyle">
-                                        <button type="button" ng-click="unlinkStyle(style.Provider, style.Name, selected.Provider, selected.Name);"
-                                                class="btn btn-small"><i class="icon-minus"></i></button>
-                                        {{style.Name}}
-                                    </div>
-                                </div>
+
+                                <h6 translate="label.owner">Owner</h6>
+                                <span>{{selected.owner}}</span>
 
                                 <div class="separator"></div>
                                 <h6 translate="label.related.service">Related service(s)</h6>

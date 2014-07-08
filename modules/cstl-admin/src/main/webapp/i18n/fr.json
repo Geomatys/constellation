@@ -441,8 +441,11 @@
     "mapcontext.modal.label.crs": "CRS",
     "mapcontext.modal.label.description": "Description",
     "mapcontext.modal.label.envelope": "Emprise",
+    "mapcontext.modal.label.external": "Externe",
+    "mapcontext.modal.label.internal": "Interne",
     "mapcontext.modal.label.keywords": "Mots clés",
     "mapcontext.modal.label.name": "Nom",
+    "mapcontext.modal.select.source": "Sélectionner la source de votre couche",
     "mapcontext.modal.title": "Ajouter un contexte cartographique",
     "mapcontext.modal.validate": "Valider",
 

@@ -392,8 +392,11 @@
     "mapcontext.modal.label.crs": "CRS",
     "mapcontext.modal.label.description": "Description",
     "mapcontext.modal.label.envelope": "Envelope",
+    "mapcontext.modal.label.external": "External",
+    "mapcontext.modal.label.internal": "Internal",
     "mapcontext.modal.label.keywords": "Keywords",
     "mapcontext.modal.label.name": "Name",
+    "mapcontext.modal.select.source": "Select your layer source",
     "mapcontext.modal.title": "Add map context",
     "mapcontext.modal.validate": "Validate",
 

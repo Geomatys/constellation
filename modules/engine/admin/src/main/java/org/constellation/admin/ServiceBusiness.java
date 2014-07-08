@@ -600,25 +600,40 @@ public class ServiceBusiness {
     public List<ServiceDTO> getAllServicesByDomainId(int domainId, String lang) throws ConfigurationException {
         List<ServiceDTO> serviceDTOs = new ArrayList<>();
         List<Service> services = serviceRepository.findByDomain(domainId);
-        for (Service service : services){
+        for (Service service : services) {
             final Details details = getInstanceDetails(service.getId(), lang);
-            ServiceDTO serviceDTO = new ServiceDTO();
-            serviceDTO.setMetadataIso(service.getMetadataIso());
-            serviceDTO.setOwner(service.getOwner());
-            serviceDTO.setConfig(service.getConfig());
-            serviceDTO.setDate(new Date(service.getDate()));
-            serviceDTO.setDescription(details!=null ? details.getDescription() : "");
-            serviceDTO.setId(service.getId());
-            serviceDTO.setIdentifier(service.getIdentifier());
-            serviceDTO.setMetadataId(service.getMetadataId());
-            serviceDTO.setStatus(service.getStatus());
-            serviceDTO.setTitle(details!=null ? details.getName() : "");
-            serviceDTO.setType(service.getType());
-            serviceDTO.setVersions(service.getVersions());
+            final ServiceDTO serviceDTO = convertIntoServiceDto(service, details);
             serviceDTOs.add(serviceDTO);
-
         }
         return serviceDTOs;
+    }
+
+    public List<ServiceDTO> getAllServicesByDomainIdAndType(int domainId, String lang, String type) throws ConfigurationException {
+        List<ServiceDTO> serviceDTOs = new ArrayList<>();
+        List<Service> services = serviceRepository.findByDomainAndType(domainId, type);
+        for (Service service : services) {
+            final Details details = getInstanceDetails(service.getId(), lang);
+            final ServiceDTO serviceDTO = convertIntoServiceDto(service, details);
+            serviceDTOs.add(serviceDTO);
+        }
+        return serviceDTOs;
+    }
+
+    private ServiceDTO convertIntoServiceDto(final Service service, final Details details) {
+        final ServiceDTO serviceDTO = new ServiceDTO();
+        serviceDTO.setMetadataIso(service.getMetadataIso());
+        serviceDTO.setOwner(service.getOwner());
+        serviceDTO.setConfig(service.getConfig());
+        serviceDTO.setDate(new Date(service.getDate()));
+        serviceDTO.setDescription(details!=null ? details.getDescription() : "");
+        serviceDTO.setId(service.getId());
+        serviceDTO.setIdentifier(service.getIdentifier());
+        serviceDTO.setMetadataId(service.getMetadataId());
+        serviceDTO.setStatus(service.getStatus());
+        serviceDTO.setTitle(details!=null ? details.getName() : "");
+        serviceDTO.setType(service.getType());
+        serviceDTO.setVersions(service.getVersions());
+        return serviceDTO;
     }
 
     public Instance getI18nInstance(String serviceType, String identifier, String lang) {
@@ -639,9 +654,5 @@ public class ServiceBusiness {
         } catch (ConfigurationException e) {
             throw new ConstellationException(e);
         }
-
-
-
-
     }
 }

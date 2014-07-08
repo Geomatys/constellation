@@ -4,59 +4,122 @@
             <button type="button" class="close" ng-click="close()">×</button>
             <h4 class="modal-title" translate="mapcontext.modal.title">Add map context</h4>
         </div>
-        <div class="modal-body modal-body-style" style="overflow-y: auto;">
-            <div class="row">
+        <div class="modal-body modal-body-style" style="overflow-y: auto;" ng-init="selTab='tabInfo';">
+            <!-- General mode -->
+            <div class="row" ng-if="mode.display==='general'">
+                <!-- Left part -->
                 <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding-left: 0;padding-right: 0;">
-                    <form class="form-horizontal form-style" role="form">
-                        <div class="form-group">
-                            <label class="col-sm-4 col-md-3 control-label" translate="mapcontext.modal.label.name">Name</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" ng-model="ctxt.name"/>
+                    <ul class="nav nav-tabs">
+                        <li id="infoTab" class="active">
+                            <a ng-click="selTab='tabInfo'" data-toggle="tab"><span>Information</span></a>
+                        </li>
+                        <li id="descriptionTab">
+                            <a ng-click="selTab='tabLayers'" data-toggle="tab"><span>Layers</span></a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <!-- Tab map context information -->
+                        <div class="tab-pane" ng-class="{active:selTab==='tabInfo'}">
+                            <form class="form-horizontal form-style" role="form">
+                                <div class="form-group">
+                                    <label class="col-sm-4 col-md-3 control-label" translate="mapcontext.modal.label.name">Name</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" ng-model="ctxt.name"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 col-md-3 control-label" translate="mapcontext.modal.label.description">Description</label>
+                                    <div class="col-sm-8">
+                                        <textarea rows="5" class="form-control" ng-model="ctxt.description"></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 col-md-3 control-label" translate="mapcontext.modal.label.crs">CRS</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" ng-model="ctxt.crs"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 col-md-3 control-label" translate="mapcontext.modal.label.envelope">Envelope</label>
+                                    <div class="col-sm-2">
+                                        <input type="text" class="form-control" ng-model="ctxt.west"/>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <input type="text" class="form-control" ng-model="ctxt.north"/>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <input type="text" class="form-control" ng-model="ctxt.east"/>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <input type="text" class="form-control" ng-model="ctxt.south"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 col-md-3 control-label" translate="mapcontext.modal.label.keywords">Keywords</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" ng-model="ctxt.keywords"/>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Tab layers list -->
+                        <div class="tab-pane" ng-class="{active:selTab==='tabLayers'}">
+                            <div class="row">
+                                <div class="col-sm-4"></div>
+                                <div class="col-sm-offset-4 col-sm-4">
+                                    <button type="button" class="btn btn-info" ng-click="addLayerToContext()">
+                                        <span translate="">Add layer</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="dash-inner">
+                                <div id="list" data-role="list">
+                                    <div class="item-list" style="margin-top:40px;">
+                                        <div ng-repeat="mapItem in ctxt.mapItems" class="item {{mapItem.Type | lowercase}}">
+
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label class="col-sm-4 col-md-3 control-label" translate="mapcontext.modal.label.description">Description</label>
-                            <div class="col-sm-8">
-                                <textarea rows="5" class="form-control" ng-model="ctxt.description"></textarea>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-sm-4 col-md-3 control-label" translate="mapcontext.modal.label.crs">CRS</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" ng-model="ctxt.crs"/>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-sm-4 col-md-3 control-label" translate="mapcontext.modal.label.envelope">Envelope</label>
-                            <div class="col-sm-2">
-                                <input type="text" class="form-control" ng-model="ctxt.west"/>
-                            </div>
-                            <div class="col-sm-2">
-                                <input type="text" class="form-control" ng-model="ctxt.north"/>
-                            </div>
-                            <div class="col-sm-2">
-                                <input type="text" class="form-control" ng-model="ctxt.east"/>
-                            </div>
-                            <div class="col-sm-2">
-                                <input type="text" class="form-control" ng-model="ctxt.south"/>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-sm-4 col-md-3 control-label" translate="mapcontext.modal.label.keywords">Keywords</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" ng-model="ctxt.keywords"/>
-                            </div>
-                        </div>
-                    </form>
+                    </div>
                 </div>
+
+                <!-- Right part -->
                 <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
                     <div id="mapContextMap" class="col-sm-6" style="height: 500px; width:100%;padding: 0;"/>
+                </div>
+            </div>
+
+            <!-- Add mode, choose kind of source -->
+            <div ng-if="mode.display==='addChooseSource'">
+                <div class="row title-form-blue">
+                    <span translate="mapcontext.modal.select.source">Select your layer source</span>
+                </div>
+                <div class="row">
+                    <input type="radio" ng-model="mode.source" value="interne"><span translate="mapcontext.modal.label.internal">Internal</span>
+                </div>
+                <div class="row">
+                    <input type="radio" ng-model="mode.source" value="externe"><span translate="mapcontext.modal.label.external">External</span>
+                </div>
+            </div>
+
+            <!-- Choose a layer to add -->
+            <div class="row" ng-if="mode.display==='chooseLayer'">
+                <div ng-if="mode.source==='interne'" ng-init="initInternalWmsServices()">
+                    Interne
+                </div>
+                <div ng-if="mode.source==='externe'">
+                    Externe
                 </div>
             </div>
         </div>
         <div class="modal-footer">
             <button type="button" id="cancelButton" class="btn btn-default" ng-click="close()" translate="mapcontext.modal.cancel">Cancel</button>
-            <button type="button" id="submitButton" class="btn btn-primary" ng-click="finish()" translate="mapcontext.modal.validate">Validate</button>
+            <button type="button" id="submitButton" class="btn btn-primary" ng-click="validate()" translate="mapcontext.modal.validate">Validate</button>
         </div>
     </div>
 </div>

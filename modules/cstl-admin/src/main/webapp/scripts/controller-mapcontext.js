@@ -74,22 +74,60 @@ cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', '$growl
         };
     }]);
 
-cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstance', 'mapcontext', '$growl',
-    function ($scope, $modalInstance, mapcontext, $growl) {
-        $scope.ctxt = {};
+cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstance', 'mapcontext', 'webService', '$growl', '$translate',
+    function ($scope, $modalInstance, mapcontext, webService, $growl, $translate) {
+        $scope.ctxt = {
+            mapItems: []
+        };
+
+        $scope.mode = {
+            display: 'general',
+            source: 'interne'
+        };
+
+        $scope.layers = {
+            available: null,
+            selected: null
+        };
 
         $scope.close = function () {
             $modalInstance.dismiss('close');
         };
 
-        $scope.finish = function () {
-            mapcontext.add({}, $scope.ctxt, function() {
-                $growl('success','Success','Map context created');
-                $modalInstance.close();
-            }, function() {
-                $growl('error','Error','Unable to create map context');
-                $modalInstance.dismiss('close');
+        $scope.getCurrentLang = function() {
+            return $translate.use();
+        };
+
+        $scope.initInternalWmsServices = function() {
+            webService.listAllByType({lang: $scope.getCurrentLang(), type: 'wms'}, function(response) {
+                $scope.layers.available = response;
             });
+        };
+
+        $scope.validate = function () {
+            // Verify on which step the user is.
+            if ($scope.mode.display==='general') {
+                mapcontext.add({}, $scope.ctxt, function () {
+                    $growl('success', 'Success', 'Map context created');
+                    $modalInstance.close();
+                }, function () {
+                    $growl('error', 'Error', 'Unable to create map context');
+                    $modalInstance.dismiss('close');
+                });
+            } else if ($scope.mode.display==='addChooseSource') {
+                $scope.mode.display = 'chooseLayer';
+            } else if ($scope.mode.display==='chooseLayer') {
+                // Add the selected layer to the current map context
+                if ($scope.layers.selected) {
+                    $scope.ctxt.mapItems.push($scope.layers.selected);
+                }
+                // Go back to first screen
+                $scope.mode.display = 'general';
+            }
+        };
+
+        $scope.addLayerToContext = function() {
+            $scope.mode.display = 'addChooseSource';
         };
     }]);
                                      
