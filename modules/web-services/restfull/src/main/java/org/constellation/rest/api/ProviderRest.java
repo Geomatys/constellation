@@ -47,6 +47,7 @@ import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.data.FeatureStoreFactory;
 import org.geotoolkit.data.FeatureStoreFinder;
 import org.geotoolkit.data.FileFeatureStoreFactory;
+import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.parameter.ParametersExt;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -76,6 +77,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -102,11 +104,11 @@ public final class ProviderRest {
 
     @POST
     @Path("/{id}")
-    public Response test( final @PathParam("domainId") int domainId, final @PathParam("id") String id, final ProviderConfiguration configuration){
+    public Response test( final @PathParam("domainId") int domainId, final @PathParam("id") String id, final ProviderConfiguration configuration) {
         try {
             final String type = configuration.getType();
             final String subType = configuration.getSubType();
-            final Map<String,String> inParams = configuration.getParameters();
+            final Map<String, String> inParams = configuration.getParameters();
 
             final DataProviderFactory providerService = DataProviders.getInstance().getFactory(type);
             final ParameterDescriptorGroup sourceDesc = providerService.getProviderDescriptor();
@@ -114,8 +116,12 @@ public final class ProviderRest {
             sources.parameter("id").setValue(id);
             sources.parameter("providerType").setValue(type);
             sources = fillProviderParameter(type, subType, inParams, sources);
-            DataProviders.getInstance().testProvider(id, providerService, sources);
-        } catch (Exception e) {
+            Set<Name> names = DataProviders.getInstance().testProvider(id, providerService, sources);
+            if (names==null || names.size()==0){
+                return Response.status(500).build();
+            }
+
+        } catch (DataStoreException e) {
             return Response.status(500).build();
         }
         return Response.ok().build();

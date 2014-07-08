@@ -126,17 +126,17 @@ public final class DataProviders extends Providers implements PropertyChangeList
         return provider;
     }
 
-    public void testProvider(String id, final DataProviderFactory factory, final ParameterValueGroup params) throws DataStoreException {
+    public Set<Name> testProvider(String id, final DataProviderFactory factory, final ParameterValueGroup params) throws DataStoreException {
         getProviders();
         final DataProvider provider = factory.createProvider(id, params);
         //test to read data
-
+        Set<Name> names = null;
         if (provider.getMainStore() instanceof FeatureStore) {
-            ((FeatureStore) provider.getMainStore()).getNames();
+            names = ((FeatureStore) provider.getMainStore()).getNames();
         } else if (provider.getMainStore() instanceof CoverageStore) {
-            ((CoverageStore) provider.getMainStore()).getNames();
+            names = ((CoverageStore) provider.getMainStore()).getNames();
         }
-
+        return names;
     }
 
     public DataProvider removeProvider(final DataProvider provider) throws ConfigurationException{
