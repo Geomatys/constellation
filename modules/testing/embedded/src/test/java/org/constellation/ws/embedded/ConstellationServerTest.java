@@ -19,7 +19,7 @@
 package org.constellation.ws.embedded;
 
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.admin.service.ConstellationClient;
@@ -84,7 +84,7 @@ public class ConstellationServerTest extends AbstractGrizzlyServer implements Ap
                     serviceBusiness.delete("csw", "csw2");
                 } catch (ConfigurationException ex) {}
                 
-                final File configDirectory = ConfigurationEngine.setupTestEnvironement("ConstellationServerTest");
+                final File configDirectory = ConfigDirectory.setupTestEnvironement("ConstellationServerTest");
 
                 final File dataDirectory2 = new File(configDirectory, "dataCsw2");
                 dataDirectory2.mkdir();
@@ -146,7 +146,7 @@ public class ConstellationServerTest extends AbstractGrizzlyServer implements Ap
         if (f.exists()) {
             f.delete();
         }
-        ConfigurationEngine.shutdownTestEnvironement("ConstellationServerTest");
+        ConfigDirectory.shutdownTestEnvironement("ConstellationServerTest");
         finish();
     }
 

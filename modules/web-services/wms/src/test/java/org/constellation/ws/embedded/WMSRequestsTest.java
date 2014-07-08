@@ -20,7 +20,7 @@ package org.constellation.ws.embedded;
 
 // J2SE dependencies
 import org.constellation.test.utils.TestDatabaseHandler;
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.DataBusiness;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
@@ -214,7 +214,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
-                ConfigurationEngine.setupTestEnvironement("WMSRequestTest");
+                ConfigDirectory.setupTestEnvironement("WMSRequestTest");
                 
                 layerBusiness.removeAll();
                 serviceBusiness.deleteAll();
@@ -318,7 +318,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                 serviceEng.setVersions(Arrays.asList("1.1.1", "1.3.0"));
 
                 serviceBusiness.setInstanceDetails("wms", "wms1", serviceEng, "eng", true);
-                //ConfigurationEngine.writeServiceMetadata("wms1", "wms", serviceEng, "eng");
+                //ConfigDirectory.writeServiceMetadata("wms1", "wms", serviceEng, "eng");
 
                 final Details serviceFre = new Details();
                 serviceFre.setDescription("Serveur Cartographique.  Contact: someone@geomatys.fr.  Carte haute qualité.");
@@ -377,7 +377,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
 
     @AfterClass
     public static void shutDown() throws JAXBException {
-        ConfigurationEngine.shutdownTestEnvironement("WMSRequestTest");
+        ConfigDirectory.shutdownTestEnvironement("WMSRequestTest");
         finish();
     }
 

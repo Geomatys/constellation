@@ -19,7 +19,7 @@
 package org.constellation.process.provider;
 
 
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.process.AbstractProcessTest;
 import org.constellation.provider.DataProvider;
@@ -64,7 +64,7 @@ public abstract class AbstractProviderTest extends AbstractProcessTest {
     @BeforeClass
     public static void initFolder() throws MalformedURLException {
 
-        final File configDirectory = ConfigurationEngine.setupTestEnvironement("ProcessProviderTest");
+        final File configDirectory = ConfigDirectory.setupTestEnvironement("ProcessProviderTest");
         final File providerDirectory = new File(configDirectory, "provider");
         providerDirectory.mkdir();
 
@@ -75,7 +75,7 @@ public abstract class AbstractProviderTest extends AbstractProcessTest {
 
     @AfterClass
     public static void destroyFolder() {
-        ConfigurationEngine.shutdownTestEnvironement("ProcessProviderTest");
+        ConfigDirectory.shutdownTestEnvironement("ProcessProviderTest");
     }
 
     /**

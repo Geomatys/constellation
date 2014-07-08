@@ -604,6 +604,19 @@ public final class ConfigDirectory {
         return value;
     }
 
-	
+    public static File setupTestEnvironement(final String directoryName) {
+        final File configDir = new File(directoryName);
+        if (configDir.exists()) {
+            FileUtilities.deleteDirectory(configDir);
+        }
+        configDir.mkdir();
+        setConfigDirectory(configDir);
 
+        return configDir;
+    }
+
+    public static void shutdownTestEnvironement(final String directoryName) {
+        FileUtilities.deleteDirectory(new File(directoryName));
+        setConfigDirectory(null);
+    }
 }

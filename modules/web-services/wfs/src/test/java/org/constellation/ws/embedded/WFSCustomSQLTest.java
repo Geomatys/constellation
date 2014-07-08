@@ -22,7 +22,7 @@ package org.constellation.ws.embedded;
 
 import org.apache.sis.test.XMLComparator;
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.DataBusiness;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
@@ -129,7 +129,7 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer implements Applicati
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
-                ConfigurationEngine.setupTestEnvironement("WFSCustomSQLTest");
+                ConfigDirectory.setupTestEnvironement("WFSCustomSQLTest");
 
                 layerBusiness.removeAll();
                 serviceBusiness.deleteAll();
@@ -260,7 +260,7 @@ public class WFSCustomSQLTest extends AbstractGrizzlyServer implements Applicati
 
     @AfterClass
     public static void shutDown() {
-        ConfigurationEngine.shutdownTestEnvironement("WFSCustomSQLTest");
+        ConfigDirectory.shutdownTestEnvironement("WFSCustomSQLTest");
         DataProviders.getInstance().setConfigurator(Providers.DEFAULT_CONFIGURATOR);
         File f = new File("derby.log");
         if (f.exists()) {

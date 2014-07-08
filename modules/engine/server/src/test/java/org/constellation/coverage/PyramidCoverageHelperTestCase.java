@@ -18,16 +18,33 @@
  */
 package org.constellation.coverage;
 
+import java.net.MalformedURLException;
 import junit.framework.Assert;
 import org.apache.sis.storage.DataStoreException;
+import org.constellation.admin.SpringHelper;
+import org.constellation.test.utils.SpringTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.test.context.ContextConfiguration;
 
-import java.net.MalformedURLException;
+@RunWith(SpringTestRunner.class)
+@ContextConfiguration("classpath:/cstl/spring/test-derby.xml")
+public class PyramidCoverageHelperTestCase  implements ApplicationContextAware {
 
-public class PyramidCoverageHelperTestCase {
+    protected ApplicationContext applicationContext;
+    
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+
 
     @Test
     public void testSimple() throws MalformedURLException, DataStoreException {
+        SpringHelper.setApplicationContext(applicationContext);
         PyramidCoverageHelper helper = PyramidCoverageHelper.builder("name")
                 .inputFormat("PNG").fromImage("path/to/a/geo.tiff")
                 .toMemoryStore().build();

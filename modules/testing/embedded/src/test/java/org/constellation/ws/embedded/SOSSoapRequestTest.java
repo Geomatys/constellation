@@ -18,7 +18,7 @@
  */
 package org.constellation.ws.embedded;
 
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.ConfigurationException;
@@ -56,7 +56,6 @@ import java.util.logging.Logger;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assume.assumeNoException;
 
 /**
@@ -92,7 +91,7 @@ public class SOSSoapRequestTest extends AbstractGrizzlyServer implements Applica
                     serviceBusiness.delete("sos", "default");
                 } catch (ConfigurationException ex) {}
                 
-                final File configDirectory = ConfigurationEngine.setupTestEnvironement("SOSSoapRequestTest");
+                final File configDirectory = ConfigDirectory.setupTestEnvironement("SOSSoapRequestTest");
 
                 final File dataDirectory = new File(configDirectory, "dataSos");
                 dataDirectory.mkdir();
@@ -139,7 +138,7 @@ public class SOSSoapRequestTest extends AbstractGrizzlyServer implements Applica
 
     @AfterClass
     public static void shutDown() {
-        ConfigurationEngine.shutdownTestEnvironement("SOSSoapRequestTest");
+        ConfigDirectory.shutdownTestEnvironement("SOSSoapRequestTest");
         if (ds != null) {
             ds.shutdown();
         }

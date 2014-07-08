@@ -32,12 +32,12 @@ import javax.inject.Inject;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
-import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.DataBusiness;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.api.ProviderType;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.LayerContext;
 import org.constellation.map.configuration.LayerBusiness;
 import org.constellation.provider.DataProviders;
@@ -168,7 +168,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer implements Applicatio
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
-                ConfigurationEngine.setupTestEnvironement("WCSRequestsTest");
+                ConfigDirectory.setupTestEnvironement("WCSRequestsTest");
 
                 layerBusiness.removeAll();
                 serviceBusiness.deleteAll();
@@ -232,7 +232,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer implements Applicatio
 
     @AfterClass
     public static void shutDown() throws JAXBException {
-        ConfigurationEngine.shutdownTestEnvironement("WCSRequestsTest");
+        ConfigDirectory.shutdownTestEnvironement("WCSRequestsTest");
         finish();
     }
 

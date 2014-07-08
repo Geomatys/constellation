@@ -22,7 +22,7 @@ package org.constellation.sos.ws;
 // JUnit dependencies
 
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.DataSourceType;
@@ -78,7 +78,7 @@ public class OM2SOS2WorkerTest extends SOS2WorkerTest {
         MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
         Marshaller marshaller =  pool.acquireMarshaller();
 
-        final File workingDirectory = ConfigurationEngine.setupTestEnvironement("OM2SOSWorkerTest2");
+        final File workingDirectory = ConfigDirectory.setupTestEnvironement("OM2SOSWorkerTest2");
         File CSWDirectory  = new File(workingDirectory, "SOS");
         CSWDirectory.mkdir();
         final File instDirectory = new File(CSWDirectory, "default");
@@ -152,7 +152,7 @@ public class OM2SOS2WorkerTest extends SOS2WorkerTest {
         if (ds != null) {
             ds.shutdown();
         }
-        ConfigurationEngine.shutdownTestEnvironement("OM2SOSWorkerTest2");
+        ConfigDirectory.shutdownTestEnvironement("OM2SOSWorkerTest2");
     }
 
     /**

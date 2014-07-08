@@ -22,7 +22,7 @@ package org.constellation.sos.ws;
 // JUnit dependencies
 
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.DataSourceType;
@@ -64,7 +64,7 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
         MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
         Marshaller marshaller =  pool.acquireMarshaller();
 
-        final File configDir = ConfigurationEngine.setupTestEnvironement("FSSOSWorkerTest");
+        final File configDir = ConfigDirectory.setupTestEnvironement("FSSOSWorkerTest");
 
         File SOSDirectory  = new File(configDir, "SOS");
         SOSDirectory.mkdir();
@@ -141,7 +141,7 @@ public class FileSystemSOS2WorkerTest extends SOS2WorkerTest {
         if (worker != null) {
             worker.destroy();
         }
-        ConfigurationEngine.shutdownTestEnvironement("FSSOSWorkerTest");
+        ConfigDirectory.shutdownTestEnvironement("FSSOSWorkerTest");
     }
 
     public static void writeCommonDataFile(File dataDirectory, String resourceName, String identifier) throws IOException {

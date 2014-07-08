@@ -21,7 +21,7 @@ package org.constellation.ws.embedded;
 // JUnit dependencies
 
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.AcknowlegementType;
@@ -95,7 +95,7 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer implements A
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
-                configDirectory = ConfigurationEngine.setupTestEnvironement("ConfigurationRequestTest");
+                configDirectory = ConfigDirectory.setupTestEnvironement("ConfigurationRequestTest");
 
                 try {
                     serviceBusiness.delete("csw", "default");
@@ -162,7 +162,7 @@ public class ConfigurationRequestTest extends AbstractGrizzlyServer implements A
         if (f.exists()) {
             f.delete();
         }
-        ConfigurationEngine.shutdownTestEnvironement("ConfigurationRequestTest");
+        ConfigDirectory.shutdownTestEnvironement("ConfigurationRequestTest");
         finish();
     }
 

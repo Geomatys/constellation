@@ -32,7 +32,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.xml.XML;
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
@@ -86,7 +86,7 @@ public class InternalCSWworkerTest extends CSWworkerTest {
                 pool = EBRIMMarshallerPool.getInstance();
                 fillPoolAnchor((AnchoredMarshallerPool) pool);
 
-                final File configDir = ConfigurationEngine.setupTestEnvironement("InternalCSWWorkerTest");
+                final File configDir = ConfigDirectory.setupTestEnvironement("InternalCSWWorkerTest");
 
                 File CSWDirectory  = new File(configDir, "CSW");
                 CSWDirectory.mkdir();
@@ -131,7 +131,7 @@ public class InternalCSWworkerTest extends CSWworkerTest {
         if (worker != null) {
             worker.destroy();
         }
-        ConfigurationEngine.shutdownTestEnvironement("InternalCSWWorkerTest");
+        ConfigDirectory.shutdownTestEnvironement("InternalCSWWorkerTest");
     }
 
     @Before

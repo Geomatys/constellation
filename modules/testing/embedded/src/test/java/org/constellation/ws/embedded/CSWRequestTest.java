@@ -19,7 +19,7 @@
 
 package org.constellation.ws.embedded;
 
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.ConfigurationException;
@@ -117,7 +117,7 @@ public class CSWRequestTest extends AbstractGrizzlyServer implements Application
                     serviceBusiness.delete("csw", "csw2");
                 } catch (ConfigurationException ex) {}
                 
-                final File configDirectory = ConfigurationEngine.setupTestEnvironement("CSWRequestTest");
+                final File configDirectory = ConfigDirectory.setupTestEnvironement("CSWRequestTest");
 
                 final File dataDirectory2 = new File(configDirectory, "dataCsw2");
                 dataDirectory2.mkdir();
@@ -174,7 +174,7 @@ public class CSWRequestTest extends AbstractGrizzlyServer implements Application
         if (f.exists()) {
             f.delete();
         }
-        ConfigurationEngine.shutdownTestEnvironement("CSWRequestTest");
+        ConfigDirectory.shutdownTestEnvironement("CSWRequestTest");
         finish();
     }
 

@@ -25,12 +25,12 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
 import org.apache.sis.util.logging.Logging;
-import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.DataBusiness;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.api.ProviderType;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.LayerContext;
 import org.constellation.data.CoverageSQLTestCase;
 import org.constellation.map.configuration.LayerBusiness;
@@ -106,7 +106,7 @@ public class WCSWorkerInit extends CoverageSQLTestCase implements ApplicationCon
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
-                ConfigurationEngine.setupTestEnvironement("WCSWorkerInit");
+                ConfigDirectory.setupTestEnvironement("WCSWorkerInit");
                 layerBusiness.removeAll();
                 serviceBusiness.deleteAll();
                 dataBusiness.deleteAll();
@@ -159,7 +159,7 @@ public class WCSWorkerInit extends CoverageSQLTestCase implements ApplicationCon
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        ConfigurationEngine.shutdownTestEnvironement("WCSWorkerInit");
+        ConfigDirectory.shutdownTestEnvironement("WCSWorkerInit");
         File derbyLog = new File("derby.log");
         if (derbyLog.exists()) {
             derbyLog.delete();

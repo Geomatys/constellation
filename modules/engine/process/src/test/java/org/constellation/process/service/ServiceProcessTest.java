@@ -18,7 +18,7 @@
  */
 package org.constellation.process.service;
 
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.process.AbstractProcessTest;
@@ -55,13 +55,13 @@ public abstract class ServiceProcessTest extends AbstractProcessTest {
     @BeforeClass
     public static void setEnvironement() {
         configName = UUID.randomUUID().toString();
-        ConfigurationEngine.setupTestEnvironement(configName);
+        ConfigDirectory.setupTestEnvironement(configName);
     }
 
     @AfterClass
     public static void destroyFolder() {
         WSEngine.destroyInstances(serviceName);
-        ConfigurationEngine.shutdownTestEnvironement(configName);
+        ConfigDirectory.shutdownTestEnvironement(configName);
     }
 
     /**

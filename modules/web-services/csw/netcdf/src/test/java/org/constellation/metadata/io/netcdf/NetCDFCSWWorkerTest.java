@@ -21,7 +21,7 @@ package org.constellation.metadata.io.netcdf;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.test.XMLComparator;
 import org.apache.sis.util.ComparisonMode;
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.generic.database.Automatic;
@@ -77,7 +77,7 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
     public static void setUpClass() throws Exception {
         deleteTemporaryFile();
         
-        final File configDir = ConfigurationEngine.setupTestEnvironement("NCCSWWorkerTest");
+        final File configDir = ConfigDirectory.setupTestEnvironement("NCCSWWorkerTest");
             
         File CSWDirectory  = new File(configDir, "CSW");
         CSWDirectory.mkdir();
@@ -127,7 +127,7 @@ public class NetCDFCSWWorkerTest extends CSWworkerTest {
         if (worker != null) {
             worker.destroy();
         }
-        ConfigurationEngine.shutdownTestEnvironement("NCCSWWorkerTest");
+        ConfigDirectory.shutdownTestEnvironement("NCCSWWorkerTest");
     }
 
     /**

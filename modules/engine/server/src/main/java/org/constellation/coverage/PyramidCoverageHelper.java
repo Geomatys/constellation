@@ -20,7 +20,6 @@ package org.constellation.coverage;
 
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.ArraysExt;
-import org.constellation.admin.ConfigurationEngine;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.coverage.CoverageStoreFinder;

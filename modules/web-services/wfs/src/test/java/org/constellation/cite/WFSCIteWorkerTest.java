@@ -29,7 +29,7 @@ import javax.inject.Inject;
 import javax.xml.namespace.QName;
 import org.apache.sis.geometry.GeneralDirectPosition;
 import org.apache.sis.util.logging.Logging;
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.DataBusiness;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
@@ -69,8 +69,6 @@ import org.geotoolkit.wfs.xml.v110.QueryType;
 import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 import org.junit.Before;
@@ -128,7 +126,7 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
                 return;
             }
             try {
-                ConfigurationEngine.setupTestEnvironement("WFSCiteWorkerTest");
+                ConfigDirectory.setupTestEnvironement("WFSCiteWorkerTest");
 
                 layerBusiness.removeAll();
                 serviceBusiness.deleteAll();
@@ -181,7 +179,7 @@ public class WFSCIteWorkerTest implements ApplicationContextAware {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        ConfigurationEngine.shutdownTestEnvironement("WFSCiteWorkerTest");
+        ConfigDirectory.shutdownTestEnvironement("WFSCiteWorkerTest");
     }
 
     @Before

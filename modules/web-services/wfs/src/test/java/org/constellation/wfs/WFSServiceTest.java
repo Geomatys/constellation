@@ -19,7 +19,7 @@
 
 package org.constellation.wfs;
 
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.DataBusiness;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
@@ -113,7 +113,7 @@ public class WFSServiceTest implements ApplicationContextAware {
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
-                ConfigurationEngine.setupTestEnvironement("WFSServiceTest");
+                ConfigDirectory.setupTestEnvironement("WFSServiceTest");
 
                 layerBusiness.removeAll();
                 serviceBusiness.deleteAll();
@@ -170,7 +170,7 @@ public class WFSServiceTest implements ApplicationContextAware {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        ConfigurationEngine.shutdownTestEnvironement("WFSServiceTest");
+        ConfigDirectory.shutdownTestEnvironement("WFSServiceTest");
         
         if (service != null) {
             service.destroy();

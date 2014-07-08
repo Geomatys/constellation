@@ -21,7 +21,7 @@ package org.constellation.ws.embedded;
 
 // JUnit dependencies
 
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.ConfigurationException;
@@ -112,7 +112,7 @@ public class SOSRequestTest extends AbstractGrizzlyServer implements Application
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
-                final File configDirectory = ConfigurationEngine.setupTestEnvironement("SOSRequestTest");
+                final File configDirectory = ConfigDirectory.setupTestEnvironement("SOSRequestTest");
 
                 final String url = "jdbc:derby:memory:TestOM2;create=true";
                 final DefaultDataSource ds = new DefaultDataSource(url);
@@ -171,7 +171,7 @@ public class SOSRequestTest extends AbstractGrizzlyServer implements Application
         if (f.exists()) {
             f.delete();
         }
-        ConfigurationEngine.shutdownTestEnvironement("SOSRequestTest");
+        ConfigDirectory.shutdownTestEnvironement("SOSRequestTest");
         finish();
     }
 

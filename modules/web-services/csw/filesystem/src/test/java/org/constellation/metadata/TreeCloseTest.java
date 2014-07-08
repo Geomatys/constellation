@@ -19,7 +19,7 @@
 
 package org.constellation.metadata;
 
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.generic.database.Automatic;
@@ -87,7 +87,7 @@ public class TreeCloseTest implements ApplicationContextAware {
     public static void setUpClass() throws Exception {
         deleteTemporaryFile();
             
-        final File configDir = ConfigurationEngine.setupTestEnvironement("TreeCloseTest");
+        final File configDir = ConfigDirectory.setupTestEnvironement("TreeCloseTest");
 
         File CSWDirectory  = new File(configDir, "CSW");
         CSWDirectory.mkdir();
@@ -134,7 +134,7 @@ public class TreeCloseTest implements ApplicationContextAware {
         if (worker != null) {
             worker.destroy();
         }
-        ConfigurationEngine.shutdownTestEnvironement("TreeCloseTest");
+        ConfigDirectory.shutdownTestEnvironement("TreeCloseTest");
     }
 
     /**

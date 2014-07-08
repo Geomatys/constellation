@@ -18,7 +18,7 @@
  */
 package org.constellation.ws.embedded.wps;
 
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.ProcessContext;
@@ -79,7 +79,7 @@ public class WPSSoapRequestTest extends AbstractGrizzlyServer implements Applica
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
-                ConfigurationEngine.setupTestEnvironement("WPSSoapRequestTest");
+                ConfigDirectory.setupTestEnvironement("WPSSoapRequestTest");
                 serviceBusiness.deleteAll();
                 
                 final List<ProcessFactory> process = Arrays.asList(new ProcessFactory("jts", true));
@@ -103,7 +103,7 @@ public class WPSSoapRequestTest extends AbstractGrizzlyServer implements Applica
 
     @AfterClass
     public static void shutdown() {
-        ConfigurationEngine.shutdownTestEnvironement("WPSSoapRequestTest");
+        ConfigDirectory.shutdownTestEnvironement("WPSSoapRequestTest");
         finish();
     }
 

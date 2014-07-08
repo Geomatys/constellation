@@ -20,7 +20,7 @@ package org.constellation.ws.embedded.wps;
 
 // JUnit dependencies
 
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.ProcessContext;
@@ -84,7 +84,7 @@ public class WPSRequestTest  extends AbstractGrizzlyServer implements Applicatio
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
-                ConfigurationEngine.setupTestEnvironement("WPSRequestTest");
+                ConfigDirectory.setupTestEnvironement("WPSRequestTest");
                 serviceBusiness.deleteAll();
                 
                 final List<ProcessFactory> process = Arrays.asList(new ProcessFactory("jts", true));
@@ -109,7 +109,7 @@ public class WPSRequestTest  extends AbstractGrizzlyServer implements Applicatio
 
     @AfterClass
     public static void shutDown() {
-        ConfigurationEngine.shutdownTestEnvironement("WPSRequestTest");
+        ConfigDirectory.shutdownTestEnvironement("WPSRequestTest");
         finish();
     }
 

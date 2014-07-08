@@ -39,7 +39,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.DataBusiness;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
@@ -126,8 +126,6 @@ import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
 import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Before;
@@ -191,7 +189,7 @@ public class WFSWorkerTest implements ApplicationContextAware {
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
-                ConfigurationEngine.setupTestEnvironement("WFSWorkerTest");
+                ConfigDirectory.setupTestEnvironement("WFSWorkerTest");
                 
                 layerBusiness.removeAll();
                 serviceBusiness.deleteAll();
@@ -416,7 +414,7 @@ public class WFSWorkerTest implements ApplicationContextAware {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        ConfigurationEngine.shutdownTestEnvironement("WFSWorkerTest");
+        ConfigDirectory.shutdownTestEnvironement("WFSWorkerTest");
         if (ds != null) {
             ds.shutdown();
         }

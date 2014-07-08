@@ -7,74 +7,92 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.constellation</groupId>
-    <artifactId>engine</artifactId>
-    <version>0.9-SNAPSHOT</version>
-  </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.constellation</groupId>
+        <artifactId>engine</artifactId>
+        <version>0.9-SNAPSHOT</version>
+    </parent>
 
 
 
-  <!--  Module description.  -->
-  <groupId>org.constellation.engine</groupId>
-  <artifactId>cstl-engine-server</artifactId>
-  <packaging>jar</packaging>
-  <name>Constellation Server Engine</name>
-  <description>
-    The Engine of the Constellation server provides the full API needed by services.
-  </description>
+    <!--  Module description.  -->
+    <groupId>org.constellation.engine</groupId>
+    <artifactId>cstl-engine-server</artifactId>
+    <packaging>jar</packaging>
+    <name>Constellation Server Engine</name>
+    <description>
+        The Engine of the Constellation server provides the full API needed by services.
+    </description>
 
 
 
-  <!--  Developers and contributors.  -->
-  <developers>
-    <developer>
-      <id>acuster</id>
-      <name>Adrian Custer</name>
-      <email>adrian.custerl@geomatys.fr</email>
-      <organization>Geomatys</organization>
-      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-    <developer>
-      <id>jsorel</id>
-      <name>Johann Sorel</name>
-      <email>johann.sorel@geomatys.fr</email>
-      <organization>Geomatys</organization>
-      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-  </developers>
+    <!--  Developers and contributors.  -->
+    <developers>
+        <developer>
+            <id>acuster</id>
+            <name>Adrian Custer</name>
+            <email>adrian.custerl@geomatys.fr</email>
+            <organization>Geomatys</organization>
+            <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+        <developer>
+            <id>jsorel</id>
+            <name>Johann Sorel</name>
+            <email>johann.sorel@geomatys.fr</email>
+            <organization>Geomatys</organization>
+            <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
 
-  <!--
-    Required dependencies for building. These dependencies wil be included into
-    the JARs list that Maven will put into the directory "target/binaries".
-  -->
-  <dependencies>
-    <dependency>
-        <groupId>org.constellation.storage</groupId>
-        <artifactId>cstl-store-provider</artifactId>
-        <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.geotoolkit</groupId>
-      <artifactId>geotk-render2d</artifactId>
-    </dependency>
-      <dependency>
-          <groupId>org.geotoolkit</groupId>
-          <artifactId>geotk-coverage-netcdf</artifactId>
-      </dependency>
-      <dependency>
-          <groupId>org.geotoolkit</groupId>
-          <artifactId>geotk-coverage-geotiff</artifactId>
-      </dependency>
-  </dependencies>
+    <!--
+      Required dependencies for building. These dependencies wil be included into
+      the JARs list that Maven will put into the directory "target/binaries".
+    -->
+    <dependencies>
+        <dependency>
+            <groupId>org.constellation.storage</groupId>
+            <artifactId>cstl-store-provider</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-render2d</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-coverage-netcdf</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-coverage-geotiff</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.testing</groupId>
+            <artifactId>cstl-test-data</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.engine.register</groupId>
+            <artifactId>cstl-register-jooq</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.constellation.engine</groupId>
+            <artifactId>cstl-engine-spring-security</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
 </project>

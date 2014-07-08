@@ -20,7 +20,7 @@ package org.constellation.wmts.ws;
 
 import org.apache.sis.test.XMLComparator;
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
 import org.constellation.configuration.ConfigurationException;
@@ -82,7 +82,7 @@ public class WMTSWorkerTest implements ApplicationContextAware {
     public void setUpClass(){
         SpringHelper.setApplicationContext(applicationContext);
         try {
-            ConfigurationEngine.setupTestEnvironement("WMTSWorkerTest");
+            ConfigDirectory.setupTestEnvironement("WMTSWorkerTest");
             pool = WMTSMarshallerPool.getInstance();
             
 
@@ -101,7 +101,7 @@ public class WMTSWorkerTest implements ApplicationContextAware {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        ConfigurationEngine.shutdownTestEnvironement("WMTSWorkerTest");
+        ConfigDirectory.shutdownTestEnvironement("WMTSWorkerTest");
     }
 
     @Before

@@ -20,7 +20,7 @@
 package org.constellation.ws.embedded;
 
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.DataBusiness;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
@@ -185,7 +185,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
         try {
-                ConfigurationEngine.setupTestEnvironement("WFSRequestTest");
+                ConfigDirectory.setupTestEnvironement("WFSRequestTest");
             
                 layerBusiness.removeAll();
                 serviceBusiness.deleteAll();
@@ -410,7 +410,7 @@ public class WFSRequestTest extends AbstractGrizzlyServer implements Application
 
     @AfterClass
     public static void shutDown() {
-        ConfigurationEngine.shutdownTestEnvironement("WFSRequestTest");
+        ConfigDirectory.shutdownTestEnvironement("WFSRequestTest");
         File f = new File("derby.log");
         if (f.exists()) {
             f.delete();

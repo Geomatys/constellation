@@ -20,7 +20,7 @@
 package org.constellation.map.ws.rs;
 
 import org.apache.sis.util.logging.Logging;
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.DataBusiness;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
@@ -132,7 +132,7 @@ public class WMSServiceTest implements ApplicationContextAware {
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
-                ConfigurationEngine.setupTestEnvironement("WMSServiceTest");
+                ConfigDirectory.setupTestEnvironement("WMSServiceTest");
 
 
                 layerBusiness.removeAll();
@@ -222,7 +222,7 @@ public class WMSServiceTest implements ApplicationContextAware {
     @AfterClass
     public static void finish() {
         service.destroy();
-        ConfigurationEngine.shutdownTestEnvironement("WMSServiceTest");
+        ConfigDirectory.shutdownTestEnvironement("WMSServiceTest");
     }
     
     public void setFields() throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException {

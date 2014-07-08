@@ -19,7 +19,7 @@
 package org.constellation.ws.embedded;
 
 
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.DataBusiness;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
@@ -106,7 +106,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer  implements Applicat
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
-                ConfigurationEngine.setupTestEnvironement("AdminRequestTest");
+                ConfigDirectory.setupTestEnvironement("AdminRequestTest");
 
                 layerBusiness.removeAll();
                 serviceBusiness.deleteAll();
@@ -186,7 +186,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer  implements Applicat
         if (f.exists()) {
             f.delete();
         }
-        ConfigurationEngine.shutdownTestEnvironement("AdminRequestTest");
+        ConfigDirectory.shutdownTestEnvironement("AdminRequestTest");
         finish();
     }
 

@@ -35,7 +35,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.sis.metadata.iso.DefaultMetadata;
 import org.apache.sis.xml.XML;
 import org.constellation.ServiceDef;
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.ProviderBusiness;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
@@ -107,7 +107,7 @@ public class OGCRestTest extends AbstractGrizzlyServer implements ApplicationCon
         SpringHelper.setApplicationContext(applicationContext);
         if (!initialized) {
             try {
-                final File configDirectory = ConfigurationEngine.setupTestEnvironement("OGCRestTest");
+                final File configDirectory = ConfigDirectory.setupTestEnvironement("OGCRestTest");
                 final File dataDirectory2 = new File(configDirectory, "dataCsw2");
                 dataDirectory2.mkdir();
 
@@ -141,7 +141,7 @@ public class OGCRestTest extends AbstractGrizzlyServer implements ApplicationCon
         if (f.exists()) {
             f.delete();
         }
-        ConfigurationEngine.shutdownTestEnvironement("OGCRestTest");
+        ConfigDirectory.shutdownTestEnvironement("OGCRestTest");
         finish();
     }
 

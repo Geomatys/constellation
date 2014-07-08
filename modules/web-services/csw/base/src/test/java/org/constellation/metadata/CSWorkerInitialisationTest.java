@@ -22,7 +22,7 @@ package org.constellation.metadata;
 // JAXB dependencies
 
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.admin.SpringHelper;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.repository.ServiceRepository;
@@ -86,13 +86,13 @@ public class CSWorkerInitialisationTest implements ApplicationContextAware {
     
     @BeforeClass
     public static void setUpClass() throws Exception {
-        ConfigurationEngine.setupTestEnvironement("CSWorkerInitialisationTest");
+        ConfigDirectory.setupTestEnvironement("CSWorkerInitialisationTest");
         pool = CSWMarshallerPool.getInstance();
     }
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        ConfigurationEngine.shutdownTestEnvironement("CSWorkerInitialisationTest");
+        ConfigDirectory.shutdownTestEnvironement("CSWorkerInitialisationTest");
     }
     
 

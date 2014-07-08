@@ -18,7 +18,7 @@
  */
 package org.constellation.process.provider.style;
 
-import org.constellation.admin.ConfigurationEngine;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.process.AbstractProcessTest;
 import org.constellation.provider.ProviderFactory;
@@ -62,7 +62,7 @@ public abstract class AbstractMapStyleTest extends AbstractProcessTest {
     @BeforeClass
     public static void initFolder() throws MalformedURLException {
 
-        configDirectory = ConfigurationEngine.setupTestEnvironement("AbstractMapStyleTest");
+        configDirectory = ConfigDirectory.setupTestEnvironement("AbstractMapStyleTest");
 
         File providerDirectory = new File(configDirectory, "provider");
         providerDirectory.mkdir();
@@ -74,7 +74,7 @@ public abstract class AbstractMapStyleTest extends AbstractProcessTest {
 
     @AfterClass
     public static void destroyFolder() {
-        ConfigurationEngine.shutdownTestEnvironement("AbstractMapStyleTest");
+        ConfigDirectory.shutdownTestEnvironement("AbstractMapStyleTest");
     }
 
     /**

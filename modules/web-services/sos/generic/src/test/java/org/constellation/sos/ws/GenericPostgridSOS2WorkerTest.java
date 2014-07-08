@@ -29,9 +29,9 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.xml.bind.Unmarshaller;
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
@@ -72,7 +72,7 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
         sr.run(Util.getResourceAsStream("org/constellation/data/om2/structure_observations.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data-om2.sql"));
 
-        ConfigurationEngine.setupTestEnvironement("GPGSOSWorkerTest");
+        ConfigDirectory.setupTestEnvironement("GPGSOSWorkerTest");
 
     }
     
@@ -149,7 +149,7 @@ public class GenericPostgridSOS2WorkerTest extends SOS2WorkerTest {
         if (ds != null) {
             ds.shutdown();
         }
-        ConfigurationEngine.shutdownTestEnvironement("GPGSOSWorkerTest");
+        ConfigDirectory.shutdownTestEnvironement("GPGSOSWorkerTest");
     }
 
     /**

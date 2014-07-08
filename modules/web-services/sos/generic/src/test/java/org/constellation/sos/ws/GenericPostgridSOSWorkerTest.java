@@ -21,10 +21,17 @@ package org.constellation.sos.ws;
 
 // JUnit dependencies
 
+import java.io.File;
+import java.sql.Connection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.xml.bind.Unmarshaller;
 import org.apache.sis.xml.MarshallerPool;
-import org.constellation.admin.ConfigurationEngine;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.SpringHelper;
+import org.constellation.configuration.ConfigDirectory;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
@@ -36,17 +43,9 @@ import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.xml.bind.Unmarshaller;
-import java.io.File;
-import java.sql.Connection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.junit.Ignore;
 
 /**
  *
@@ -81,7 +80,7 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
         try {
             
             
-            ConfigurationEngine.setupTestEnvironement("GPGSOSWorkerTest");
+            ConfigDirectory.setupTestEnvironement("GPGSOSWorkerTest");
             
             MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
             Unmarshaller unmarshaller = pool.acquireUnmarshaller();
@@ -152,7 +151,7 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
         if (ds != null) {
             ds.shutdown();
         }
-        ConfigurationEngine.shutdownTestEnvironement("GPGSOSWorkerTest");
+        ConfigDirectory.shutdownTestEnvironement("GPGSOSWorkerTest");
     }
 
 
