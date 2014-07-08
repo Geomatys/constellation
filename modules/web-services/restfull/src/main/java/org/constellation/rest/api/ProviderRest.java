@@ -103,7 +103,7 @@ public final class ProviderRest {
     private ProviderBusiness providerBusiness;
 
     @POST
-    @Path("/{id}")
+    @Path("/{id}/test")
     public Response test( final @PathParam("domainId") int domainId, final @PathParam("id") String id, final ProviderConfiguration configuration) {
         try {
             final String type = configuration.getType();
@@ -127,6 +127,29 @@ public final class ProviderRest {
         return Response.ok().build();
     }
 
+    @POST
+    @Path("/{id}")
+    public Response update(final @PathParam("domainId") int domainId, final @PathParam("id") String id, final ProviderConfiguration config) {
+        final String type = config.getType();
+        final String subType = config.getSubType();
+        final Map<String, String> inParams = config.getParameters();
+
+        final DataProviderFactory providerService = DataProviders.getInstance().getFactory(type);
+        final ParameterDescriptorGroup sourceDesc = providerService.getProviderDescriptor();
+        ParameterValueGroup sources = sourceDesc.createValue();
+        sources.parameter("id").setValue(id);
+        sources.parameter("providerType").setValue(type);
+
+        sources = fillProviderParameter(type, subType, inParams, sources);
+
+        final DataProvider old = DataProviders.getInstance().getProvider(id);
+        if (old != null) {
+            // Provider already exists, update config
+            old.updateSource(sources);
+        }
+        return Response.ok().build();
+    }
+
     /**
      * Create a new provider from the given configuration.
      */
@@ -145,11 +168,7 @@ public final class ProviderRest {
 
         sources = fillProviderParameter(type, subType, inParams, sources);
 
-        final DataProvider old = DataProviders.getInstance().getProvider(id);
-        if (old != null) {
-            // Provider already exists, update config
-            old.updateSource(sources);
-        } else {
+
             try {
                 DataProvider dataProvider = DataProviders.getInstance().createProvider(id, providerService, sources);
                 int count = domainRepository.addProviderDataToDomain(id, domainId );
@@ -158,7 +177,7 @@ public final class ProviderRest {
                 LOGGER.log(Level.WARNING, null, ex);
                 return Response.status(500).build();
             }
-        }
+
         return Response.ok().build();
     }
 
