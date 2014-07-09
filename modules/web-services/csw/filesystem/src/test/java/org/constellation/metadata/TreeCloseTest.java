@@ -83,6 +83,8 @@ public class TreeCloseTest implements ApplicationContextAware {
 
     private static File dataDirectory;
     
+    private boolean initialized = false;
+    
     @BeforeClass
     public static void setUpClass() throws Exception {
         deleteTemporaryFile();
@@ -108,7 +110,9 @@ public class TreeCloseTest implements ApplicationContextAware {
     public void setUp() {
         SpringHelper.setApplicationContext(applicationContext);
         try {
-            if (!serviceBusiness.getServiceIdentifiers("csw").contains("default")) {
+            if (!initialized) {
+                serviceBusiness.deleteAll();
+                
                 //we write the configuration file
                 Automatic configuration = new Automatic("filesystem", dataDirectory.getPath());
                 configuration.setProfile("discovery");
@@ -119,6 +123,7 @@ public class TreeCloseTest implements ApplicationContextAware {
 
                 worker = new CSWworker("default");
                 worker.setLogLevel(Level.FINER);
+                initialized = true;
             }
         } catch (Exception ex) {
             Logger.getLogger(TreeCloseTest.class.getName()).log(Level.SEVERE, null, ex);
