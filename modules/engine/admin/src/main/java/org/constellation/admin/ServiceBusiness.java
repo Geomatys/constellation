@@ -118,7 +118,7 @@ public class ServiceBusiness {
         
         final String versions;
         if (details.getVersions() != null) {
-            versions = StringUtils.join(details.getVersions(), "|");
+            versions = StringUtils.join(details.getVersions(), "µ");
         } else {
             versions = "";
         }
@@ -649,7 +649,7 @@ public class ServiceBusiness {
             instance.setLayersNumber(layersNumber);
             instance.setName(details.getName());
             instance.setType(service.getType());
-            instance.setVersions(Arrays.asList(service.getVersions().split("\\|")));
+            instance.setVersions(Arrays.asList(service.getVersions().split("µ")));
             instance.setStatus(ServiceStatus.valueOf(service.getStatus()));
             return instance;
         } catch (ConfigurationException e) {

@@ -151,7 +151,7 @@ public abstract class AbstractWorker implements Worker {
         final Service service = serviceBusiness.getServiceByIdentifierAndType(specification.name(), id);
         if (service != null) {
             final List<ServiceDef> definitions = new ArrayList<>();
-            final StringTokenizer tokenizer = new StringTokenizer(service.getVersions(), "|");
+            final StringTokenizer tokenizer = new StringTokenizer(service.getVersions(), "µ");
             while (tokenizer.hasMoreTokens()) {
                 final String version = tokenizer.nextToken();
                 final ServiceDef def = ServiceDef.getServiceDefinition(specification, version);

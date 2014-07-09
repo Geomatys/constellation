@@ -176,7 +176,7 @@ public class AdminRest {
         instance.setLayersNumber(layersNumber);
         instance.setName(service.getTitle());
         instance.setType(service.getType());
-        instance.setVersions(Arrays.asList(service.getVersions().split("|")));
+        instance.setVersions(Arrays.asList(service.getVersions().split("µ")));
         instance.setStatus(ServiceStatus.valueOf(service.getStatus()));
         return instance;
     }
