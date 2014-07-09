@@ -127,7 +127,7 @@ public final class ProviderRest {
         return Response.ok().build();
     }
 
-    @POST
+    @PUT
     @Path("/{id}")
     public Response update(final @PathParam("domainId") int domainId, final @PathParam("id") String id, final ProviderConfiguration config) {
         final String type = config.getType();
@@ -153,7 +153,7 @@ public final class ProviderRest {
     /**
      * Create a new provider from the given configuration.
      */
-    @PUT
+    @POST
     @Path("/{id}")
     public Response create(final @PathParam("domainId") int domainId, final @PathParam("id") String id, final ProviderConfiguration config) {
         final String type = config.getType();
