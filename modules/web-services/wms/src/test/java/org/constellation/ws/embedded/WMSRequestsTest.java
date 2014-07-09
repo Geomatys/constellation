@@ -299,7 +299,6 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                 final LayerContext config2 = new LayerContext();
                 config2.setSupportedLanguages(new Languages(Arrays.asList(new Language("fre"), new Language("eng", true))));
                 config2.getCustomParameters().put("shiroAccessible", "false");
-                config2.getCustomParameters().put("supported_versions", "1.1.1,1.3.0");
                 config2.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
 
                 serviceBusiness.create("wms", "wms1", config2, null, null);
@@ -335,8 +334,12 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
                 config3.getCustomParameters().put("shiroAccessible", "false");
                 config3.getCustomParameters().put("supported_versions", "1.3.0");
                 config3.setGetFeatureInfoCfgs(FeatureInfoUtilities.createGenericConfiguration());
+                final Details details3 = new Details(); 
+                details3.setIdentifier("wms2");
+                details3.setName("wms2");
+                details3.setVersions(Arrays.asList("1.3.0"));
 
-                serviceBusiness.create("wms", "wms2", config3, null, null);
+                serviceBusiness.create("wms", "wms2", config3, details3, null);
                 if (localdb_active) layerBusiness.add("SST_tests",            null,          "coverageTestSrc", null, "wms2", "wms", null);
                 layerBusiness.add("BuildingCenters",     "http://www.opengis.net/gml",       "shapeSrc",        null, "wms2", "wms", null);
                 layerBusiness.add("BasicPolygons",       "http://www.opengis.net/gml",       "shapeSrc",        null, "wms2", "wms", null);
@@ -667,7 +670,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer implements Applicatio
         }
         //the service WMS2 does not support 1.1.0 version
         obj = unmarshallResponse(getCapsUrl);
-        assertTrue(obj instanceof WMSCapabilities);
+        assertTrue("was :" + obj.getClass().getName(), obj instanceof WMSCapabilities);
 
          // Creates a valid GetCapabilities url.
         try {

@@ -25,6 +25,6 @@
         <state>PACA</state>
         <zipCode>13200</zipCode>
     </serviceContact>
-    <versions>1.1.1</versions>
     <versions>1.3.0</versions>
+    <versions>1.1.1</versions>
 </details>

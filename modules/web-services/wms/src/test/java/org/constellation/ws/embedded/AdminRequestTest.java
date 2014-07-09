@@ -209,7 +209,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer  implements Applicat
         meta.setIdentifier("wms2");
         meta.setName("OGC:WMS");
         meta.setDescription("Constellation Map Server");
-        meta.setVersions(Arrays.asList("1.1.1", "1.3.0"));
+        meta.setVersions(Arrays.asList( "1.3.0", "1.1.1"));
         putRequestObject(conec, meta, GenericDatabaseMarshallerPool.getInstance());
         Object obj = unmarshallResponse(conec);
 
@@ -232,7 +232,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer  implements Applicat
         assertTrue(obj instanceof InstanceReport);
 
         final List<Instance> instances = new ArrayList<>();
-        final List<String> versions = Arrays.asList("1.1.1", "1.3.0");
+        final List<String> versions = Arrays.asList( "1.3.0", "1.1.1");
         instances.add(new Instance(1, "default", "OGC:WMS", "Constellation Map Server", "wms", versions, 12, ServiceStatus.STARTED));
         instances.add(new Instance(2, "wms1",    "OGC:WMS", "Constellation Map Server", "wms", versions, 1,  ServiceStatus.STARTED));
         instances.add(new Instance(3, "wms2",    "OGC:WMS", "Constellation Map Server", "wms", versions, 0,  ServiceStatus.STOPPED));
@@ -288,7 +288,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer  implements Applicat
         assertTrue(obj instanceof InstanceReport);
 
         List<Instance> instances = new ArrayList<>();
-        final List<String> versions = Arrays.asList("1.1.1", "1.3.0");
+        final List<String> versions = Arrays.asList( "1.3.0", "1.1.1");
         instances.add(new Instance(1, "default", "OGC:WMS", "Constellation Map Server", "wms", versions, 12, ServiceStatus.STARTED));
         instances.add(new Instance(2, "wms1",    "OGC:WMS", "Constellation Map Server", "wms", versions, 1,  ServiceStatus.STARTED));
         instances.add(new Instance(3, "wms2",    "OGC:WMS", "Constellation Map Server", "wms", versions, 0,  ServiceStatus.STARTED));
@@ -380,7 +380,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer  implements Applicat
         assertTrue(obj instanceof InstanceReport);
 
         final List<Instance> instances = new ArrayList<>();
-        final List<String> versions = Arrays.asList("1.1.1", "1.3.0");
+        final List<String> versions = Arrays.asList( "1.3.0", "1.1.1");
         instances.add(new Instance(1, "default", "OGC:WMS", "Constellation Map Server", "wms", versions, 12, ServiceStatus.STARTED));
         instances.add(new Instance(2, "wms1",    "OGC:WMS", "Constellation Map Server", "wms", versions, 1,  ServiceStatus.STARTED));
         instances.add(new Instance(3, "wms2",    "OGC:WMS", "Constellation Map Server", "wms", versions, 0, ServiceStatus.STOPPED));
@@ -421,7 +421,7 @@ public class AdminRequestTest extends AbstractGrizzlyServer  implements Applicat
         assertTrue(obj instanceof InstanceReport);
 
         final List<Instance> instances = new ArrayList<>();
-        final List<String> versions = Arrays.asList("1.1.1", "1.3.0");
+        final List<String> versions = Arrays.asList( "1.3.0", "1.1.1");
         instances.add(new Instance(1, "default", "OGC:WMS", "Constellation Map Server", "wms", versions, 12, ServiceStatus.STARTED));
         instances.add(new Instance(2, "wms1",    "OGC:WMS", "Constellation Map Server", "wms", versions, 1,  ServiceStatus.STARTED));
         InstanceReport expResult2 = new InstanceReport(instances);

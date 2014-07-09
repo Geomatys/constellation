@@ -26,6 +26,6 @@
         <hoursOfService>9h - 19h</hoursOfService>
         <contactInstructions>none</contactInstructions>
     </serviceContact>
-    <versions>1.1.0</versions>
     <versions>2.0.0</versions>
+    <versions>1.1.0</versions>
 </details>
