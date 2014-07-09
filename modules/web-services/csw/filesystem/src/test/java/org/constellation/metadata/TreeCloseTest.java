@@ -88,22 +88,7 @@ public class TreeCloseTest implements ApplicationContextAware {
     @BeforeClass
     public static void setUpClass() throws Exception {
         deleteTemporaryFile();
-            
-        final File configDir = ConfigDirectory.setupTestEnvironement("TreeCloseTest");
 
-        File CSWDirectory  = new File(configDir, "CSW");
-        CSWDirectory.mkdir();
-        final File instDirectory = new File(CSWDirectory, "default");
-        instDirectory.mkdir();
-
-        //we write the data files
-        dataDirectory = new File(instDirectory, "data");
-        dataDirectory.mkdir();
-        writeDataFile(dataDirectory, "meta1.xml", "42292_5p_19900609195600");
-        writeDataFile(dataDirectory, "meta2.xml", "42292_9s_19900610041000");
-        writeDataFile(dataDirectory, "meta3.xml", "39727_22_19750113062500");
-        writeDataFile(dataDirectory, "meta4.xml", "11325_158_19640418141800");
-        writeDataFile(dataDirectory, "meta5.xml", "40510_145_19930221211500");
     }
     
     @PostConstruct
@@ -112,15 +97,31 @@ public class TreeCloseTest implements ApplicationContextAware {
         try {
             if (!initialized) {
                 serviceBusiness.deleteAll();
-                
+                final File configDir = ConfigDirectory.setupTestEnvironement("TreeCloseTest");
+                File CSWDirectory  = new File(configDir, "CSW");
+                CSWDirectory.mkdir();
+                final File instDirectory = new File(CSWDirectory, "default");
+                instDirectory.mkdir();
+
+                //we write the data files
+                dataDirectory = new File(instDirectory, "data");
+                dataDirectory.mkdir();
+                writeDataFile(dataDirectory, "meta1.xml", "42292_5p_19900609195600");
+                writeDataFile(dataDirectory, "meta2.xml", "42292_9s_19900610041000");
+                writeDataFile(dataDirectory, "meta3.xml", "39727_22_19750113062500");
+                writeDataFile(dataDirectory, "meta4.xml", "11325_158_19640418141800");
+                writeDataFile(dataDirectory, "meta5.xml", "40510_145_19930221211500");
                 //we write the configuration file
-                Automatic configuration = new Automatic("filesystem", dataDirectory.getPath());
+                Automatic configuration = new Automatic("filesystem", dataDirectory.getAbsolutePath());
                 configuration.setProfile("discovery");
                 configuration.putParameter("transactionSecurized", "false");
                 configuration.putParameter("shiroAccessible", "false");
 
                 serviceBusiness.create("csw", "default", configuration, null, null);
 
+                if (!dataDirectory.isDirectory()) {
+                    throw new Exception("the data directory does no longer exist");
+                }
                 worker = new CSWworker("default");
                 worker.setLogLevel(Level.FINER);
                 initialized = true;

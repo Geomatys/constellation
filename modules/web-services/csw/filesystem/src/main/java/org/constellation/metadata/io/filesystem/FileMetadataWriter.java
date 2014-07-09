@@ -42,9 +42,12 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
@@ -117,8 +120,10 @@ public class FileMetadataWriter extends AbstractMetadataWriter {
             TransformerFactory tf = TransformerFactory.newInstance();
             Transformer transformer = tf.newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            FileWriter writer = new FileWriter(f);
-            transformer.transform(new DOMSource(original), new StreamResult(writer));
+            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+            FileOutputStream fos = new FileOutputStream(f);
+            StreamResult sr = new StreamResult(new OutputStreamWriter(fos, "UTF-8"));
+            transformer.transform(new DOMSource(original),sr);
             
             
             if (indexer != null) {
