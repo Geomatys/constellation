@@ -29,22 +29,22 @@ public class JooqSensorRepository extends AbstractJooqRespository<SensorRecord, 
     @Override
     public List<Data> getLinkedDatas(Sensor sensor) {
         return dsl.select().from(DATA).join(SENSORED_DATA).onKey()
-                .where(SENSORED_DATA.SENSOR.eq(sensor.getId())).fetch().into(Data.class);
+                .where(SENSORED_DATA.SENSOR.eq(sensor.getId())).fetchInto(Data.class);
     }
 
     @Override
     public Sensor findByIdentifier(String identifier) {
-        return dsl.select().from(SENSOR).where(SENSOR.IDENTIFIER.eq(identifier)).fetchOne().into(Sensor.class);
+        return dsl.select().from(SENSOR).where(SENSOR.IDENTIFIER.eq(identifier)).fetchOneInto(Sensor.class);
     }
 
     @Override
     public List<Sensor> getChildren(Sensor sensor) {
-        return dsl.select().from(SENSOR).where(SENSOR.PARENT.eq(sensor.getIdentifier())).fetch().into(Sensor.class);
+        return dsl.select().from(SENSOR).where(SENSOR.PARENT.eq(sensor.getIdentifier())).fetchInto(Sensor.class);
     }
 
     @Override
     public List<Sensor> findAll() {
-        return dsl.select().from(SENSOR).fetch().into(Sensor.class);
+        return dsl.select().from(SENSOR).fetchInto(Sensor.class);
     }
 
     @Override
