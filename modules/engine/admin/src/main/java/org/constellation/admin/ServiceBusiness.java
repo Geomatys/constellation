@@ -510,10 +510,11 @@ public class ServiceBusiness {
                 details = serviceRepository.getServiceDetails(serviceId, language);
             }
             if (details == null) {
-                throw new ConfigurationException("service " + serviceId + " does not have a details object for language:" + language);
-            } else {
-                return (Details) getObjectFromString(details.getContent(), GenericDatabaseMarshallerPool.getInstance());
+                details = serviceRepository.getServiceDetailsForDefaultLang(serviceId);
             }
+
+            return (Details) getObjectFromString(details.getContent(), GenericDatabaseMarshallerPool.getInstance());
+
         } catch (JAXBException ex) {
             throw new ConstellationException(ex);
         }
