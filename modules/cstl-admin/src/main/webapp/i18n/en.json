@@ -293,6 +293,7 @@
     "label.no.selected.data": "No selected data.",
     "label.no.selected.sensor": "No selected sensor.",
     "label.no.selected.layer": "No selected layer.",
+    "label.no.selected.mapcontext": "No selected map context",
     "label.no.selected.metadata": "No selected metadata.",
     "label.no.selected.style": "No selected style.",
     "label.no.selected.task": "No selected task.",
@@ -420,6 +421,7 @@
     "msg.no.selected.sensor": "Click on a sensor to display more information.",
     "msg.no.selected.layer": "Click on a layer to display more information.",
     "msg.no.selected.metadata": "Click on a metadata to display more information.",
+    "msg.no.selected.mapcontext": "Click on a map context to display more information.",
     "msg.no.selected.style": "Click on a style to display more information.",
     "msg.no.selected.task":"Click on a task to display more information.",
 

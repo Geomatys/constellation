@@ -334,6 +334,7 @@
     "label.no.selected.sensor": "Aucun capteur sélectionné.",
     "label.no.selected.layer": "Aucune couche sélectionnée.",
     "label.no.selected.metadata": "Aucune métadonnée sélectionnée.",
+    "label.no.selected.mapcontext": "Aucun contexte cartographique sélectionné",
     "label.no.selected.style": "Aucun style sélectionné.",
     "label.no.selected.task": "Aucun traitement sélectionné.",
     "label.observation": "Observation",
@@ -529,6 +530,7 @@
     "msg.no.selected.sensor": "Cliquez sur un capteur ci-contre pour afficher plus d'informations.",
     "msg.no.selected.layer": "Cliquez sur une couche ci-contre pour afficher plus d'informations.",
     "msg.no.selected.metadata": "Cliquez sur une fiche de métadonnées ci-contre pour afficher plus d'informations.",
+    "msg.no.selected.mapcontext": "Cliquez sur un contexte cartographique pour afficher plus d'informations.",
     "msg.no.selected.style": "Cliquez sur un style ci-contre pour afficher plus d'informations.",
     "msg.no.selected.task": "Cliquez sur un traitement ci-contre pour afficher plus d'informations.",
 

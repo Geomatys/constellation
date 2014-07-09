@@ -604,7 +604,6 @@ p.error-select-one{
 .item-title{
     width: 545px;
     overflow:hidden;
-    float:left;
     white-space:nowrap;
     text-overflow:ellipsis;
 }
