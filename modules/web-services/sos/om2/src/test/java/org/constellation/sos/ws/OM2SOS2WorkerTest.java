@@ -62,6 +62,8 @@ public class OM2SOS2WorkerTest extends SOS2WorkerTest {
     
     private static String url;
     
+    private static boolean initialized = false;
+    
     @BeforeClass
     public static void setUpClass() throws Exception {
         url = "jdbc:derby:memory:OM2Test2;create=true";
@@ -78,11 +80,7 @@ public class OM2SOS2WorkerTest extends SOS2WorkerTest {
         MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
         Marshaller marshaller =  pool.acquireMarshaller();
 
-        final File workingDirectory = ConfigDirectory.setupTestEnvironement("OM2SOSWorkerTest2");
-        File CSWDirectory  = new File(workingDirectory, "SOS");
-        CSWDirectory.mkdir();
-        final File instDirectory = new File(CSWDirectory, "default");
-        instDirectory.mkdir();
+        ConfigDirectory.setupTestEnvironement("OM2SOSWorkerTest2");
         
         pool.recycle(marshaller);
     }
@@ -92,37 +90,33 @@ public class OM2SOS2WorkerTest extends SOS2WorkerTest {
         SpringHelper.setApplicationContext(applicationContext);
         try {
             
-            //we write the configuration file
-            Automatic SMLConfiguration = new Automatic();
-            
-            Automatic OMConfiguration  = new Automatic();
-            BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
-            OMConfiguration.setBdd(bdd);
-            SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
-            configuration.setObservationReaderType(DataSourceType.OM2);
-            configuration.setObservationWriterType(DataSourceType.OM2);
-            configuration.setObservationFilterType(DataSourceType.OM2);
-            configuration.setSMLType(DataSourceType.NONE);
-            configuration.setPhenomenonIdBase("urn:ogc:def:phenomenon:GEOM:");
-            configuration.setProfile("transactional");
-            configuration.setObservationTemplateIdBase("urn:ogc:object:observation:template:GEOM:");
-            configuration.setObservationIdBase("urn:ogc:object:observation:GEOM:");
-            configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
-            configuration.getParameters().put("transactionSecurized", "false");
-            
-            if (!serviceBusiness.getServiceIdentifiers("sos").contains("default")) {
+            if (!initialized) {
+                serviceBusiness.deleteAll();
+
+                //we write the configuration file
+                Automatic SMLConfiguration = new Automatic();
+
+                Automatic OMConfiguration  = new Automatic();
+                BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
+                OMConfiguration.setBdd(bdd);
+                SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
+                configuration.setObservationReaderType(DataSourceType.OM2);
+                configuration.setObservationWriterType(DataSourceType.OM2);
+                configuration.setObservationFilterType(DataSourceType.OM2);
+                configuration.setSMLType(DataSourceType.NONE);
+                configuration.setPhenomenonIdBase("urn:ogc:def:phenomenon:GEOM:");
+                configuration.setProfile("transactional");
+                configuration.setObservationTemplateIdBase("urn:ogc:object:observation:template:GEOM:");
+                configuration.setObservationIdBase("urn:ogc:object:observation:GEOM:");
+                configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
+                configuration.getParameters().put("transactionSecurized", "false");
+
                 serviceBusiness.create("sos", "default", configuration, null, null);
                 init();
                 worker = new SOSworker("default");
                 worker.setServiceUrl(URL);
                 worker.setLogLevel(Level.FINER);
-            } else if (worker == null) {
-                serviceBusiness.delete("sos", "default");
-                serviceBusiness.create("sos", "default", configuration, null, null);
-                init();
-                worker = new SOSworker("default");
-                worker.setServiceUrl(URL);
-                worker.setLogLevel(Level.FINER);
+                initialized = true;
             }
         } catch (Exception ex) {
             Logger.getLogger(OM2SOS2WorkerTest.class.getName()).log(Level.SEVERE, null, ex);

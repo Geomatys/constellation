@@ -28,7 +28,7 @@ public class JooqSensorRepository extends AbstractJooqRespository<SensorRecord, 
     
     @Override
     public List<Data> getLinkedDatas(Sensor sensor) {
-        return dsl.select().from(DATA).join(SENSORED_DATA).onKey()
+        return dsl.select(DATA.fields()).from(DATA).join(SENSORED_DATA).onKey()
                 .where(SENSORED_DATA.SENSOR.eq(sensor.getId())).fetchInto(Data.class);
     }
 

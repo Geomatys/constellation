@@ -297,7 +297,7 @@ public class SOSRest {
         // look for provider ids
         final Set<String> providerIDs = new HashSet<>();
         for (Data data : datas) {
-            final org.constellation.engine.register.Provider provider = providerBusiness.getProvider(data.getId());
+            final org.constellation.engine.register.Provider provider = providerBusiness.getProvider(data.getProvider());
             providerIDs.add(provider.getIdentifier());
         }
         
