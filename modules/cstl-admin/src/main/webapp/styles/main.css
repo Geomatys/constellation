@@ -1306,6 +1306,11 @@ a.btn-push-right {
     border-top: 1px solid #eeeeee;
     padding-bottom: 20px;
 }
+
+.row .no-padding {
+    padding-left: 0;
+    padding-right: 0;
+}
 /*
 Users
 */

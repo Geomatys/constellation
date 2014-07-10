@@ -126,7 +126,11 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
             } else if ($scope.mode.display==='chooseLayer') {
                 // Add the selected layer to the current map context
                 if ($scope.selected.layer) {
-                    $scope.layers.toAdd.push($scope.selected);
+                    $scope.layers.toAdd.push(
+                        {layer: $scope.selected.layer,
+                         service: $scope.selected.service,
+                         visible: true
+                        });
                 }
                 // Go back to first screen
                 $scope.mode.display = 'general';
