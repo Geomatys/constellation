@@ -24,15 +24,19 @@ import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
+
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.util.IOUtilities;
 import org.constellation.api.StyleType;
@@ -65,6 +69,9 @@ import org.geotoolkit.style.MutableFeatureTypeStyle;
 import org.geotoolkit.style.MutableRule;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.MutableStyleFactory;
+import org.geotoolkit.style.function.Categorize;
+import org.geotoolkit.style.function.Interpolate;
+import org.opengis.filter.expression.Function;
 import org.opengis.style.LineSymbolizer;
 import org.opengis.style.PointSymbolizer;
 import org.opengis.style.PolygonSymbolizer;
@@ -273,6 +280,45 @@ public final class StyleBusiness {
     public MutableStyle getStyle(final String providerId, final String styleId) throws TargetNotFoundException {
         final Style style = ensureExistingStyle(providerId, styleId);
         return parseStyle(style.getName(), style.getBody());
+    }
+
+    /**
+     * 
+     * @param providerId the style provider identifier
+     * @param styleId the style identifier
+     * @param ruleName the {@link MutableStyle} instance name
+     * @return a {@link Function} 
+     * @throws TargetNotFoundException
+     */
+    public Function getFunctionColorMap(String providerId, String styleId, String ruleName) throws TargetNotFoundException{
+    	//get style
+    	Style style = ensureExistingStyle(providerId, styleId);
+    	MutableStyle mStyle = parseStyle(style.getName(), style.getBody());
+    	List<MutableRule> mutableRules = new ArrayList<MutableRule>(0);
+        if (!mStyle.featureTypeStyles().isEmpty()) {
+            mutableRules.addAll(mStyle.featureTypeStyles().get(0).rules());
+        }
+        
+        // search related rule
+        MutableRule searchedRule = null;
+        for (MutableRule mutableRule : mutableRules) {
+        	if(mutableRule.getName().equalsIgnoreCase(ruleName)){
+        		
+        		searchedRule = mutableRule;
+        		for (Symbolizer symbolizer : searchedRule.symbolizers()) {
+        			
+        			//search raster symbolizer and return function 
+					if(symbolizer instanceof RasterSymbolizer){
+						RasterSymbolizer rasterSymbolizer = (RasterSymbolizer) symbolizer;
+						Function colorMapFunction = rasterSymbolizer.getColorMap().getFunction();
+							return colorMapFunction;
+						}
+					}
+				}
+        		break;
+    	}
+        
+        return null;
     }
 
     /**
@@ -657,6 +703,5 @@ public final class StyleBusiness {
         style.setType(type.name());
         styleRepository.create(style);
     }
-
 
 }

@@ -26,6 +26,9 @@ import org.constellation.dto.StyleListBrief;
 import org.constellation.json.binding.Style;
 import org.geotoolkit.style.DefaultMutableStyle;
 import org.geotoolkit.style.MutableStyle;
+import org.geotoolkit.style.function.Categorize;
+import org.geotoolkit.style.function.Interpolate;
+import org.opengis.filter.expression.Function;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -41,6 +44,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
+
 import java.util.Locale;
 
 import static org.constellation.utils.RESTfulUtilities.ok;
@@ -89,6 +93,21 @@ public final class StyleRest {
     	return ok(new Style(styleBusiness.getStyle(id, styleId)));
     }
 
+    /**
+     * @see StyleBusiness#getFunctionColorMap(String, String, String)
+     */
+    @GET
+    @Path("{id}/style/{styleId}/{ruleName}")
+    public Response getPaletteStyle(@PathParam("id") String id, @PathParam("styleId") String styleId, @PathParam("ruleName") String ruleName) throws Exception{
+    	Function function = styleBusiness.getFunctionColorMap(id, styleId, ruleName);
+    	if(function instanceof Categorize){
+    		return ok(new org.constellation.json.binding.Categorize((Categorize)function).getPoints());
+    	}else if(function instanceof Interpolate){
+    		return ok(new org.constellation.json.binding.Interpolate((Interpolate)function).getPoints());
+    	}
+    	return ok(new AcknowlegementType("Failure", "function unknow"));
+    }
+    
     /**
      * @see StyleBusiness#getAvailableStyles(String)
      */

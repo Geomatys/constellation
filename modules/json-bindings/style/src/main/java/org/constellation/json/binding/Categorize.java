@@ -56,8 +56,9 @@ public class Categorize implements Function{
 		ensureNonNull("categorize", categorize);
 		for (Expression expression : categorize.getThresholds().keySet()) {
 			InterpolationPoint ip = new InterpolationPoint();
-			Expression colorHex = categorize.getThresholds().get(expression);
-			if(colorHex instanceof Color){
+			Expression colorHexExp = categorize.getThresholds().get(expression);
+			if(colorHexExp instanceof DefaultLiteral){
+				Object colorHex = ((DefaultLiteral)colorHexExp).getValue();
 				ip.setColor("#"+Integer.toHexString(((Color)colorHex).getRGB()).substring(2));
 			}
 			
@@ -67,6 +68,7 @@ public class Categorize implements Function{
 					ip.setData((Number)obj);
 				}
 			}
+			points.add(ip);
 		}
 	}
 

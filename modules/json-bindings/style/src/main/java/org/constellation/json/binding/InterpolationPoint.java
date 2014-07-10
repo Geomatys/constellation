@@ -23,6 +23,10 @@ import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 import static org.constellation.json.util.StyleFactories.SF;
 import static org.constellation.json.util.StyleUtilities.literal;
 
+import java.awt.Color;
+
+import org.geotoolkit.filter.DefaultLiteral;
+
 /**
  * @author Fabien Bernard (Geomatys).
  * @version 0.9
@@ -40,6 +44,13 @@ public final class InterpolationPoint implements StyleElement<org.geotoolkit.sty
 
     public InterpolationPoint(final org.geotoolkit.style.function.InterpolationPoint interpolationPoint) {
         ensureNonNull("interpolationPoint", interpolationPoint);
+        data = interpolationPoint.getData();
+		if(interpolationPoint.getValue() instanceof DefaultLiteral){
+			Object obj = ((DefaultLiteral)interpolationPoint.getValue()).getValue();
+			if(obj instanceof Color){
+				color = "#"+Integer.toHexString(((Color)obj).getRGB()).substring(2);
+			}
+		}
     }
 
     public Number getData() {
