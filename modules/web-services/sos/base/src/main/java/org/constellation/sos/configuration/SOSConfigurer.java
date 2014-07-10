@@ -23,6 +23,22 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.io.WKTWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+
+import javax.imageio.spi.ServiceRegistry;
+import javax.xml.bind.JAXBException;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
@@ -48,6 +64,8 @@ import org.geotoolkit.observation.ObservationReader;
 import org.geotoolkit.observation.ObservationWriter;
 import org.geotoolkit.observation.xml.AbstractObservation;
 import org.geotoolkit.sml.xml.AbstractSensorML;
+import static org.geotoolkit.sml.xml.SensorMLUtilities.getSensorMLType;
+import static org.geotoolkit.sml.xml.SensorMLUtilities.getSmlID;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.observation.Observation;
 import org.opengis.observation.ObservationCollection;
@@ -57,25 +75,6 @@ import org.opengis.temporal.Instant;
 import org.opengis.temporal.Period;
 import org.opengis.temporal.TemporalGeometricPrimitive;
 import org.opengis.util.FactoryException;
-
-import javax.imageio.spi.ServiceRegistry;
-import javax.xml.bind.JAXBException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static org.geotoolkit.sml.xml.SensorMLUtilities.getSensorMLType;
-import static org.geotoolkit.sml.xml.SensorMLUtilities.getSmlID;
 
 /**
  * {@link org.constellation.configuration.ServiceConfigurer} implementation for SOS service.
@@ -494,7 +493,7 @@ public class SOSConfigurer extends OGCConfigurer {
         if (config != null) {
             final SMLFactory smlfactory = getSMLFactory(config.getSMLType());
             try {
-                return smlfactory.getSensorReader(config.getSMLType(), config.getSMLConfiguration(), new HashMap<String, Object>());
+                return smlfactory.getSensorReader(config.getSMLType(), config.getSMLConfiguration(), getProperties(config));
 
             } catch (MetadataIoException ex) {
                 throw new ConfigurationException("MetadataIoException while initializing the reader:" + ex.getMessage(), ex);
@@ -573,7 +572,7 @@ public class SOSConfigurer extends OGCConfigurer {
         if (config != null) {
             final OMFactory omfactory = getOMFactory(config.getObservationWriterType());
             try {
-                return omfactory.getObservationWriter(config.getObservationWriterType(), config.getOMConfiguration(), new HashMap<String, Object>());
+                return omfactory.getObservationWriter(config.getObservationWriterType(), config.getOMConfiguration(), getProperties(config));
 
             } catch (DataStoreException ex) {
                 throw new ConfigurationException("JAXBException while initializing the writer!", ex);
@@ -598,7 +597,7 @@ public class SOSConfigurer extends OGCConfigurer {
         if (config != null) {
             final OMFactory omfactory = getOMFactory(config.getObservationWriterType());
             try {
-                return omfactory.getObservationReader(config.getObservationWriterType(), config.getOMConfiguration(), new HashMap<String, Object>());
+                return omfactory.getObservationReader(config.getObservationWriterType(), config.getOMConfiguration(), getProperties(config));
 
             } catch (DataStoreException ex) {
                 throw new ConfigurationException("JAXBException while initializing the writer!", ex);
@@ -623,7 +622,7 @@ public class SOSConfigurer extends OGCConfigurer {
         if (config != null) {
             final OMFactory omfactory = getOMFactory(config.getObservationWriterType());
             try {
-                return (ObservationFilterReader) omfactory.getObservationFilter(DataSourceType.OM2, config.getOMConfiguration(), new HashMap<String, Object>());
+                return (ObservationFilterReader) omfactory.getObservationFilter(DataSourceType.OM2, config.getOMConfiguration(), getProperties(config));
 
             } catch (DataStoreException ex) {
                 throw new ConfigurationException("JAXBException while initializing the filter reader!", ex);
@@ -631,5 +630,38 @@ public class SOSConfigurer extends OGCConfigurer {
         } else {
             throw new ConfigurationException("there is no configuration file correspounding to this ID:" + serviceID);
         }
+    }
+    
+    private Map<String, Object> getProperties(final SOSConfiguration configuration) {
+        //we initialize the properties attribute
+        final String observationIdBase  = configuration.getObservationIdBase() != null ?
+        configuration.getObservationIdBase() : "urn:ogc:object:observation:unknow:";
+
+        final String sensorIdBase              = configuration.getSensorIdBase() != null ?
+        configuration.getSensorIdBase() : "urn:ogc:object:sensor:unknow:";
+
+        final String phenomenonIdBase          = configuration.getPhenomenonIdBase() != null ?
+        configuration.getPhenomenonIdBase() : "urn:ogc:def:phenomenon:OGC:1.0.30:";
+
+        final String observationTemplateIdBase = configuration.getObservationTemplateIdBase() != null ?
+        configuration.getObservationTemplateIdBase() : "urn:ogc:object:observationTemplate:unknow:";
+
+        final boolean alwaysFeatureCollection   = configuration.getBooleanParameter(OMFactory.ALWAYS_FEATURE_COLLECTION);
+
+        // we fill a map of properties to sent to the reader/writer/filter
+        final Map<String, Object> properties = new HashMap<>();
+        properties.put(OMFactory.OBSERVATION_ID_BASE, observationIdBase);
+        properties.put(OMFactory.OBSERVATION_TEMPLATE_ID_BASE, observationTemplateIdBase);
+        properties.put(OMFactory.SENSOR_ID_BASE, sensorIdBase);
+        properties.put(OMFactory.PHENOMENON_ID_BASE, phenomenonIdBase);
+        
+        // we add the general parameters to the properties
+        properties.putAll(configuration.getParameters());
+
+        // we add the custom parameters to the properties
+        properties.putAll(configuration.getOMConfiguration().getCustomparameters());
+        properties.putAll(configuration.getSMLConfiguration().getCustomparameters());
+        return properties;
+
     }
 }
