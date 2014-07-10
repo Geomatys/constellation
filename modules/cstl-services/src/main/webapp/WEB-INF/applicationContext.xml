@@ -1,15 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans default-lazy-init="default" xmlns="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
-  xmlns:tx="http://www.springframework.org/schema/tx"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
-		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+<beans default-lazy-init="default"
+  xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:tx="http://www.springframework.org/schema/tx" xmlns:security="http://www.springframework.org/schema/security"
+  xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
 
   <import resource="classpath:/spring/constellation-context.xml" />
 
-  <import resource="classpath:/cstl/spring/register-context.xml"/>
+  <import resource="classpath:/cstl/spring/register-context.xml" />
 
-  <import resource="classpath:/cstl/spring/security-context.xml"/>  
-  
+  <import resource="classpath:/cstl/spring/security-context.xml" />
+
+  <security:jdbc-user-service id="cstlUserService"
+    data-source-ref="dataSource" /> 
+
+    
+<!--   <security:jdbc-user-service id="cstlUserService" data-source-ref="dataSource"  -->
+<!--     users-by-username-query='select "login" as "username", "password" as "password", "active" as "enabled" from "admin"."user" where "login" = ?' -->
+<!--     authorities-by-username-query='select "u"."login" as "username", "uXr"."role" as "authority" from "admin"."user" "u"  left join "admin"."user_x_role" "uXr" on "u"."id" = "uXr"."user_id" where "u"."login" = ?' /> -->
+
+
 </beans>
