@@ -19,18 +19,17 @@
 package org.constellation.rest.api;
 
 import org.constellation.admin.ConfigurationBusiness;
+import org.constellation.admin.DataBusiness;
 import org.constellation.admin.ServiceBusiness;
 import org.constellation.admin.dto.ServiceDTO;
+import org.constellation.admin.dto.ServiceLayersDTO;
 import org.constellation.api.CommonConstants;
-import org.constellation.configuration.AcknowlegementType;
-import org.constellation.configuration.ConfigurationException;
-import org.constellation.configuration.Instance;
-import org.constellation.configuration.InstanceReport;
-import org.constellation.configuration.ServiceReport;
-import org.constellation.configuration.ServiceStatus;
+import org.constellation.configuration.*;
 import org.constellation.dto.Configuration;
 import org.constellation.dto.SimpleValue;
 import org.constellation.engine.register.repository.LayerRepository;
+import org.constellation.map.configuration.LayerBusiness;
+import org.constellation.security.*;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.WSEngine;
 
@@ -65,6 +64,15 @@ public class AdminRest {
     private ServiceBusiness serviceBusiness;
     @Inject
     private LayerRepository layerRepository;
+
+    @Inject
+    private LayerBusiness layerBusiness;
+
+    @Inject
+    private DataBusiness dataBusiness;
+
+    @Inject
+    private org.constellation.security.SecurityManager securityManager;
     
     @Inject
     private ConfigurationBusiness configurationBusiness;
@@ -157,7 +165,7 @@ public class AdminRest {
 
     @GET
     @Path("/domain/{domainId}/instances/{lang}/{type}")
-    public Response listInstances(@PathParam("domainId") int domainId, @PathParam("lang") String lang, @PathParam("type") String type) throws ConfigurationException {
+    public Response listInstancesByType(@PathParam("domainId") int domainId, @PathParam("lang") String lang, @PathParam("type") String type) throws ConfigurationException {
         final List<Instance> instances = new ArrayList<>();
         final List<ServiceDTO> services = serviceBusiness.getAllServicesByDomainIdAndType(domainId, lang, type);
         for (ServiceDTO service : services) {
@@ -165,6 +173,25 @@ public class AdminRest {
             instances.add(instance);
         }
         return Response.ok(new InstanceReport(instances)).build();
+    }
+
+    @GET
+    @Path("/domain/{domainId}/service/layers/{lang}")
+    public Response listServiceLayers(@PathParam("domainId") int domainId, @PathParam("lang") String lang) throws ConfigurationException {
+        final List<ServiceLayersDTO> serviceLayers = new ArrayList<>();
+        final List<ServiceDTO> services = serviceBusiness.getAllServicesByDomainIdAndType(domainId, lang, "wms");
+        for (final ServiceDTO service : services) {
+            final List<Layer> layers = layerBusiness.getLayers("wms", service.getIdentifier(), securityManager.getCurrentUserLogin());
+            final List<LayerSummary> layerSummaries = new ArrayList<>();
+            for (final Layer lay : layers) {
+                final DataBrief db = dataBusiness.getDataBrief(lay.getName(), lay.getProviderID());
+                final LayerSummary sum = new LayerSummary(lay, db);
+                layerSummaries.add(sum);
+            }
+            final ServiceLayersDTO servLay = new ServiceLayersDTO(service, layerSummaries);
+            serviceLayers.add(servLay);
+        }
+        return Response.ok(serviceLayers).build();
     }
 
     private Instance convertToInstance(final ServiceDTO service) {

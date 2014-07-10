@@ -383,36 +383,36 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
         $scope.getCurrentLang = function() {
             return $translate.use();
         };
-        
-        webService.get({type: $scope.type, id:$routeParams.id, lang:$scope.getCurrentLang()}, function(service){
-           $scope.service = service  
-           webService.permissionByDomainRole(function(domainroles){
-             $scope.domainroles = domainroles;          
-           })
-           webService.domains({id:service.id}, function(domains){
-             $scope.domains = domains;          
-           })
-           
-           $scope.toggleDomain = function(i){
-             var pathParams = {domainId: $scope.domains[i].id, serviceId:service.id};
-             if($scope.domains[i].linked){
-               webService.unlinkFromDomain(pathParams, function(){
-                 $scope.domains[i].linked = !$scope.domains[i].linked;
-                 $scope.domains[i].linked = false;
-               }, function(response){
-                 $growl('error','error', response.data.message );
-                  webService.domains({id:service.id}, function(domains){
-                    $scope.domains = domains;          
-                  })
-               }); 
-             }else{
-               webService.linkToDomain(pathParams, {}, function(){
-                 $scope.domains[i].linked = true;
-               }, function(){
-                 
-               }); 
-             }
-           }
+
+        webService.get({type: $scope.type, id: $routeParams.id, lang: $scope.getCurrentLang()}, function (service) {
+            $scope.service = service;
+            webService.permissionByDomainRole(function (domainroles) {
+                $scope.domainroles = domainroles;
+            });
+            webService.domains({id: service.id}, function (domains) {
+                $scope.domains = domains;
+            });
+
+            $scope.toggleDomain = function (i) {
+                var pathParams = {domainId: $scope.domains[i].id, serviceId: service.id};
+                if ($scope.domains[i].linked) {
+                    webService.unlinkFromDomain(pathParams, function () {
+                        $scope.domains[i].linked = !$scope.domains[i].linked;
+                        $scope.domains[i].linked = false;
+                    }, function (response) {
+                        $growl('error', 'error', response.data.message);
+                        webService.domains({id: service.id}, function (domains) {
+                            $scope.domains = domains;
+                        })
+                    });
+                } else {
+                    webService.linkToDomain(pathParams, {}, function () {
+                        $scope.domains[i].linked = true;
+                    }, function () {
+
+                    });
+                }
+            };
 
         });
 

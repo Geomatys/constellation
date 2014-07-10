@@ -110,7 +110,61 @@
             <!-- Choose a layer to add -->
             <div class="row" ng-if="mode.display==='chooseLayer'">
                 <div ng-if="mode.source==='interne'" ng-init="initInternalWmsServices()">
-                    Interne
+                    <div ng-repeat="serviceLayers in servicesLayers">
+                        <div class="title">Service {{serviceLayers.name}}</div>
+                        <div class="dash-inner row dashboard" ng-init="small=false">
+                            <div data-role="list">
+                                <div class="item-list">
+                                    <div class="item" ng-repeat="layer in serviceLayers.layers" ng-class="{selected:layer==selected.layer,coverage:layer.Type.toUpperCase()==='coverage-store'.toUpperCase()||layer.Type.toUpperCase()==='raster'.toUpperCase(),vector:layer.Type.toUpperCase()==='feature-store'.toUpperCase()||layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layer.Type.toUpperCase()==='vector'.toUpperCase(), 'col-xs-6':small==true}" ng-click="select(layer, serviceLayers.identifier)">
+                                        <div class="top">
+                                            <span class="item-title" title="{{layer.Name}}">{{layer.Name}}</span>
+                                            <span class="pull-right text-right item-list-style">{{layer.Type==='coverage-store'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector':layer.Type}}</span>
+                                            <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer!=selected.layer"
+                                                 src="images/vector-multipoint.svg"
+                                                 class="pull-right"
+                                                 style="margin-top:6px; margin-right:10px;" />
+                                            <img ng-if="layer.Subtype=='Geometry' && layer!=selected.layer"
+                                                 src="images/vector-multigeometry.svg"
+                                                 class="pull-right"
+                                                 style="margin-top:6px; margin-right:10px; width:22px" />
+                                            <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon') && layer!=selected.layer"
+                                                 src="images/vector-poly.svg"
+                                                 class="pull-right"
+                                                 style="margin-top:6px; margin-right:10px;" />
+                                            <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString') && layer!=selected.layer"
+                                                 src="images/vector-polyline.svg"
+                                                 class="pull-right"
+                                                 style="margin-top:6px; margin-right:10px;" />
+                                            <img ng-if="layer.Type=='VECTOR' && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer==selected.layer"
+                                                 src="images/vector-multipoint-selected.svg"
+                                                 class="pull-right"
+                                                 style="margin-top:6px; margin-right:10px;" />
+                                            <img ng-if="layer.Type=='VECTOR' && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon') && layer==selected.layer"
+                                                 src="images/vector-poly-selected.svg"
+                                                 class="pull-right"
+                                                 style="margin-top:6px; margin-right:10px;" />
+                                            <img ng-if="layer.Subtype=='Geometry' && layer==selected.layer"
+                                                 src="images/vector-multigeometry-selected.svg"
+                                                 class="pull-right"
+                                                 style="margin-top:6px; margin-right:10px; width:22px" />
+                                            <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString') && layer==selected.layer"
+                                                 src="images/vector-polyline-selected.svg"
+                                                 class="pull-right"
+                                                 style="margin-top:6px; margin-right:10px;" />
+                                        </div>
+                                        <div class="bottom">
+                                            <div class="block">
+                                                <i class="icon-calendar"></i>{{layer.Date | date:'yyyy-MM-dd'}}
+                                            </div>
+                                            <div class="block">
+                                                <i class="icon-user"></i>{{layer.Owner}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div ng-if="mode.source==='externe'">
                     Externe

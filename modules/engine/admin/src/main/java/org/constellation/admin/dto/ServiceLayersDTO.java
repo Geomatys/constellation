@@ -1,0 +1,101 @@
+package org.constellation.admin.dto;
+
+
+import org.constellation.configuration.LayerSummary;
+
+import java.util.List;
+
+public class ServiceLayersDTO {
+    private int id;
+    private String identifier;
+    private String name;
+    private String versions;
+    private List<LayerSummary> layers;
+
+    public ServiceLayersDTO() {}
+
+    public ServiceLayersDTO(final ServiceDTO serviceDto, final List<LayerSummary> layerSummaries) {
+        this.id = serviceDto.getId();
+        this.identifier = serviceDto.getIdentifier();
+        this.name = serviceDto.getTitle();
+        this.versions = serviceDto.getVersions();
+        this.layers = layerSummaries;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getVersions() {
+        return versions;
+    }
+
+    public void setVersions(String versions) {
+        this.versions = versions;
+    }
+
+    public List<LayerSummary> getLayers() {
+        return layers;
+    }
+
+    public void setLayers(List<LayerSummary> layers) {
+        this.layers = layers;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ServiceLayersDTO that = (ServiceLayersDTO) o;
+
+        if (id != that.id) return false;
+        if (identifier != null ? !identifier.equals(that.identifier) : that.identifier != null) return false;
+        if (layers != null ? !layers.equals(that.layers) : that.layers != null) return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (versions != null ? !versions.equals(that.versions) : that.versions != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + (identifier != null ? identifier.hashCode() : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (versions != null ? versions.hashCode() : 0);
+        result = 31 * result + (layers != null ? layers.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "ServiceLayersDTO{" +
+                "id=" + id +
+                ", identifier='" + identifier + '\'' +
+                ", name='" + name + '\'' +
+                ", versions='" + versions + '\'' +
+                ", layers=" + layers +
+                '}';
+    }
+}

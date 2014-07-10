@@ -76,18 +76,18 @@ cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', '$growl
 
 cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstance', 'mapcontext', 'webService', '$growl', '$translate',
     function ($scope, $modalInstance, mapcontext, webService, $growl, $translate) {
-        $scope.ctxt = {
-            mapItems: []
-        };
+        // item to save in the end
+        $scope.ctxt = {};
 
+        // handle display mode for this modal popup
         $scope.mode = {
             display: 'general',
             source: 'interne'
         };
 
         $scope.layers = {
-            available: null,
-            selected: null
+            map: [],
+            toAdd: []
         };
 
         $scope.close = function () {
@@ -99,9 +99,16 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
         };
 
         $scope.initInternalWmsServices = function() {
-            webService.listAllByType({lang: $scope.getCurrentLang(), type: 'wms'}, function(response) {
-                $scope.layers.available = response;
+            webService.listServiceLayers({lang: $scope.getCurrentLang()}, function(response) {
+                $scope.servicesLayers = response;
             });
+        };
+
+        $scope.select = function(layer,service) {
+            $scope.selected = {
+                layer: layer,
+                service: service
+            };
         };
 
         $scope.validate = function () {
@@ -119,7 +126,7 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
             } else if ($scope.mode.display==='chooseLayer') {
                 // Add the selected layer to the current map context
                 if ($scope.layers.selected) {
-                    $scope.ctxt.mapItems.push($scope.layers.selected);
+                    $scope.layers.toAdd.push($scope.layers.selected);
                 }
                 // Go back to first screen
                 $scope.mode.display = 'general';
