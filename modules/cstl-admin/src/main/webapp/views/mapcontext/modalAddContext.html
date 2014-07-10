@@ -67,7 +67,9 @@
                         <!-- Tab layers list -->
                         <div class="tab-pane" ng-class="{active:selTab==='tabLayers'}">
                             <div class="row">
-                                <div class="col-sm-4"></div>
+                                <div class="col-sm-4">
+                                    <span translate="layer.listing.title">Layers list</span>
+                                </div>
                                 <div class="col-sm-offset-4 col-sm-4">
                                     <button type="button" class="btn btn-info" ng-click="addLayerToContext()">
                                         <span translate="">Add layer</span>
@@ -75,11 +77,38 @@
                                 </div>
                             </div>
 
-                            <div class="dash-inner">
-                                <div id="list" data-role="list">
-                                    <div class="item-list" style="margin-top:40px;">
-                                        <div ng-repeat="mapItem in ctxt.mapItems" class="item {{mapItem.Type | lowercase}}">
-
+                            <div class="dash-inner row dashboard" ng-init="small=false">
+                                <div data-role="list">
+                                    <div class="item-list">
+                                        <div class="item" ng-repeat="layerToAdd in layers.toAdd" ng-class="{coverage:layerToAdd.layer.Type.toUpperCase()==='coverage-store'.toUpperCase()||layerToAdd.layer.Type.toUpperCase()==='raster'.toUpperCase(),vector:layerToAdd.layer.Type.toUpperCase()==='feature-store'.toUpperCase()||layerToAdd.layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layerToAdd.layer.Type.toUpperCase()==='vector'.toUpperCase(), 'col-xs-6':small==true}">
+                                            <div class="top">
+                                                <span class="item-title" title="{{layerToAdd.layer.Name}}">{{layerToAdd.layer.Name}}</span>
+                                                <span class="pull-right text-right item-list-style">{{layerToAdd.layer.Type==='coverage-store'?'raster':layerToAdd.layer.Type==='feature-store'?'vector':layerToAdd.layer.Type==='observation-store'?'vector':layerToAdd.layer.Type}}</span>
+                                                <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='Point' || layerToAdd.layer.Subtype=='MultiPoint')"
+                                                     src="images/vector-multipoint.svg"
+                                                     class="pull-right"
+                                                     style="margin-top:6px; margin-right:10px;" />
+                                                <img ng-if="layerToAdd.layer.Subtype=='Geometry'"
+                                                     src="images/vector-multigeometry.svg"
+                                                     class="pull-right"
+                                                     style="margin-top:6px; margin-right:10px; width:22px" />
+                                                <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='Polygon' || layerToAdd.layer.Subtype=='MultiPolygon')"
+                                                     src="images/vector-poly.svg"
+                                                     class="pull-right"
+                                                     style="margin-top:6px; margin-right:10px;" />
+                                                <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='LineString' || layerToAdd.layer.Subtype=='MultiLineString')"
+                                                     src="images/vector-polyline.svg"
+                                                     class="pull-right"
+                                                     style="margin-top:6px; margin-right:10px;" />
+                                            </div>
+                                            <div class="bottom">
+                                                <div class="block">
+                                                    <i class="icon-calendar"></i>{{layerToAdd.layer.Date | date:'yyyy-MM-dd'}}
+                                                </div>
+                                                <div class="block">
+                                                    <i class="icon-user"></i>{{layerToAdd.layer.Owner}}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -90,6 +119,7 @@
 
                 <!-- Right part -->
                 <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                    Work in progress ...
                     <div id="mapContextMap" class="col-sm-6" style="height: 500px; width:100%;padding: 0;"/>
                 </div>
             </div>
@@ -110,56 +140,93 @@
             <!-- Choose a layer to add -->
             <div class="row" ng-if="mode.display==='chooseLayer'">
                 <div ng-if="mode.source==='interne'" ng-init="initInternalWmsServices()">
-                    <div ng-repeat="serviceLayers in servicesLayers">
-                        <div class="title">Service {{serviceLayers.name}}</div>
-                        <div class="dash-inner row dashboard" ng-init="small=false">
-                            <div data-role="list">
-                                <div class="item-list">
-                                    <div class="item" ng-repeat="layer in serviceLayers.layers" ng-class="{selected:layer==selected.layer,coverage:layer.Type.toUpperCase()==='coverage-store'.toUpperCase()||layer.Type.toUpperCase()==='raster'.toUpperCase(),vector:layer.Type.toUpperCase()==='feature-store'.toUpperCase()||layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layer.Type.toUpperCase()==='vector'.toUpperCase(), 'col-xs-6':small==true}" ng-click="select(layer, serviceLayers.identifier)">
-                                        <div class="top">
-                                            <span class="item-title" title="{{layer.Name}}">{{layer.Name}}</span>
-                                            <span class="pull-right text-right item-list-style">{{layer.Type==='coverage-store'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector':layer.Type}}</span>
-                                            <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer!=selected.layer"
-                                                 src="images/vector-multipoint.svg"
-                                                 class="pull-right"
-                                                 style="margin-top:6px; margin-right:10px;" />
-                                            <img ng-if="layer.Subtype=='Geometry' && layer!=selected.layer"
-                                                 src="images/vector-multigeometry.svg"
-                                                 class="pull-right"
-                                                 style="margin-top:6px; margin-right:10px; width:22px" />
-                                            <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon') && layer!=selected.layer"
-                                                 src="images/vector-poly.svg"
-                                                 class="pull-right"
-                                                 style="margin-top:6px; margin-right:10px;" />
-                                            <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString') && layer!=selected.layer"
-                                                 src="images/vector-polyline.svg"
-                                                 class="pull-right"
-                                                 style="margin-top:6px; margin-right:10px;" />
-                                            <img ng-if="layer.Type=='VECTOR' && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer==selected.layer"
-                                                 src="images/vector-multipoint-selected.svg"
-                                                 class="pull-right"
-                                                 style="margin-top:6px; margin-right:10px;" />
-                                            <img ng-if="layer.Type=='VECTOR' && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon') && layer==selected.layer"
-                                                 src="images/vector-poly-selected.svg"
-                                                 class="pull-right"
-                                                 style="margin-top:6px; margin-right:10px;" />
-                                            <img ng-if="layer.Subtype=='Geometry' && layer==selected.layer"
-                                                 src="images/vector-multigeometry-selected.svg"
-                                                 class="pull-right"
-                                                 style="margin-top:6px; margin-right:10px; width:22px" />
-                                            <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString') && layer==selected.layer"
-                                                 src="images/vector-polyline-selected.svg"
-                                                 class="pull-right"
-                                                 style="margin-top:6px; margin-right:10px;" />
-                                        </div>
-                                        <div class="bottom">
-                                            <div class="block">
-                                                <i class="icon-calendar"></i>{{layer.Date | date:'yyyy-MM-dd'}}
+                    <div class="dashboard">
+                        <div class="col-xs-8">
+                            <div ng-repeat="serviceLayers in servicesLayers" class="services-layers-dashboard">
+                                <div class="title">
+                                    <i class="icon-chevron-down"></i>
+                                    <span>Service {{serviceLayers.name}}</span>
+                                </div>
+                                <div class="dash-inner row dashboard" ng-init="small=false">
+                                    <div data-role="list">
+                                        <div class="item-list">
+                                            <div class="item" ng-repeat="layer in serviceLayers.layers" ng-class="{selected:layer==selected.layer,coverage:layer.Type.toUpperCase()==='coverage-store'.toUpperCase()||layer.Type.toUpperCase()==='raster'.toUpperCase(),vector:layer.Type.toUpperCase()==='feature-store'.toUpperCase()||layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layer.Type.toUpperCase()==='vector'.toUpperCase(), 'col-xs-6':small==true}" ng-click="select(layer, serviceLayers)">
+                                                <div class="top">
+                                                    <span class="item-title" title="{{layer.Name}}">{{layer.Name}}</span>
+                                                    <span class="pull-right text-right item-list-style">{{layer.Type==='coverage-store'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector':layer.Type}}</span>
+                                                    <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer!=selected.layer"
+                                                         src="images/vector-multipoint.svg"
+                                                         class="pull-right"
+                                                         style="margin-top:6px; margin-right:10px;" />
+                                                    <img ng-if="layer.Subtype=='Geometry' && layer!=selected.layer"
+                                                         src="images/vector-multigeometry.svg"
+                                                         class="pull-right"
+                                                         style="margin-top:6px; margin-right:10px; width:22px" />
+                                                    <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon') && layer!=selected.layer"
+                                                         src="images/vector-poly.svg"
+                                                         class="pull-right"
+                                                         style="margin-top:6px; margin-right:10px;" />
+                                                    <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString') && layer!=selected.layer"
+                                                         src="images/vector-polyline.svg"
+                                                         class="pull-right"
+                                                         style="margin-top:6px; margin-right:10px;" />
+                                                    <img ng-if="layer.Type=='VECTOR' && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer==selected.layer"
+                                                         src="images/vector-multipoint-selected.svg"
+                                                         class="pull-right"
+                                                         style="margin-top:6px; margin-right:10px;" />
+                                                    <img ng-if="layer.Type=='VECTOR' && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon') && layer==selected.layer"
+                                                         src="images/vector-poly-selected.svg"
+                                                         class="pull-right"
+                                                         style="margin-top:6px; margin-right:10px;" />
+                                                    <img ng-if="layer.Subtype=='Geometry' && layer==selected.layer"
+                                                         src="images/vector-multigeometry-selected.svg"
+                                                         class="pull-right"
+                                                         style="margin-top:6px; margin-right:10px; width:22px" />
+                                                    <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString') && layer==selected.layer"
+                                                         src="images/vector-polyline-selected.svg"
+                                                         class="pull-right"
+                                                         style="margin-top:6px; margin-right:10px;" />
+                                                </div>
+                                                <div class="bottom">
+                                                    <div class="block">
+                                                        <i class="icon-calendar"></i>{{layer.Date | date:'yyyy-MM-dd'}}
+                                                    </div>
+                                                    <div class="block">
+                                                        <i class="icon-user"></i>{{layer.Owner}}
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="block">
-                                                <i class="icon-user"></i>{{layer.Owner}}
-                                            </div>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-4">
+                            <div id="selection">
+                                <div class="alert alert-info alert-data" ng-show="selected.layer == null">
+                                    <h4 translate="label.no.selected.data">No selected data</h4>
+
+                                    <p translate="msg.no.selected.data" style="font-weight:normal;">Click on a data to display more information</p>
+                                </div>
+                                <div class="selected-item" id="selected-item" ng-hide="selected.layer == null">
+                                    <div class="block-header" ng-click="toggleUpDownSelected()">
+                                        <strong class="item-title title-bloc-service" title="{{selected.layer.Name}}">{{selected.layer.Name}}</strong><i class="icon-chevron-down pull-right"></i>
+                                    </div>
+                                    <div class="block-content">
+                                        <h6>Service</h6>
+                                        <span>{{selected.service.name}}</span>
+
+                                        <div class="separator"></div>
+                                        <h6 translate="label.owner">Owner</h6>
+                                        <span>{{selected.layer.Owner}}</span>
+
+                                        <div class="separator"></div>
+                                        <h6 translate="label.date">Date</h6>
+                                        <span>{{selected.layer.Date | date:'yyyy-MM-dd'}}</span>
+
+                                        <div class="separator"></div>
+                                        <h6 translate="label.type">Type</h6>
+                                        <span>{{selected.layer.Type==='coverage-store'?'raster':selected.layer.Type==='feature-store'?'vector':selected.layer.Type==='observation-store'?'vector':selected.layer.Type.toLowerCase()}}</span>
                                     </div>
                                 </div>
                             </div>
@@ -167,7 +234,7 @@
                     </div>
                 </div>
                 <div ng-if="mode.source==='externe'">
-                    Externe
+                    Work in progress ...
                 </div>
             </div>
         </div>

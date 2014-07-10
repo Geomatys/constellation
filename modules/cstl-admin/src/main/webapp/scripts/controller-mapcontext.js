@@ -86,7 +86,6 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
         };
 
         $scope.layers = {
-            map: [],
             toAdd: []
         };
 
@@ -114,6 +113,7 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
         $scope.validate = function () {
             // Verify on which step the user is.
             if ($scope.mode.display==='general') {
+                // On the general panel, it means saving the whole context
                 mapcontext.add({}, $scope.ctxt, function () {
                     $growl('success', 'Success', 'Map context created');
                     $modalInstance.close();
@@ -125,8 +125,8 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
                 $scope.mode.display = 'chooseLayer';
             } else if ($scope.mode.display==='chooseLayer') {
                 // Add the selected layer to the current map context
-                if ($scope.layers.selected) {
-                    $scope.layers.toAdd.push($scope.layers.selected);
+                if ($scope.selected.layer) {
+                    $scope.layers.toAdd.push($scope.selected);
                 }
                 // Go back to first screen
                 $scope.mode.display = 'general';
@@ -135,6 +135,12 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
 
         $scope.addLayerToContext = function() {
             $scope.mode.display = 'addChooseSource';
+        };
+
+        $scope.toggleUpDownSelected = function() {
+            var $header = $('#selection').find('.selected-item').find('.block-header');
+            $header.next().slideToggle(200);
+            $header.find('i').toggleClass('icon-chevron-down icon-chevron-up');
         };
     }]);
                                      
