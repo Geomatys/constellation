@@ -100,7 +100,7 @@ a.choix_type:hover{
 	margin-top: 15px;
 }
 .btn-generer{
-	float: right;
+	margin-right: 15px;
 }
 .text_transparent{
 	background-color: transparent;
@@ -230,6 +230,34 @@ ul.dropdown-images li a:hover{
 .tab-content .tab-pane.tab-style-edition{
      	padding-top:2px;
      }
+
+/** color panel sld editor **/
+     
+.tab-pane.colormodel{
+	padding-top : 10px;
+}
+     
+.tab-pane.colormodel .form-group{
+	margin-bottom: 10px;
+}
+
+.tab-pane.colormodel .form-control{
+	height: 30px;
+}
+     
+.tab-pane.colormodel .panel-body{
+	padding-bottom: 0px;
+}
+
+.tab-pane.colormodel .panel-heading{
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.tab-pane.colormodel .panel-heading h4{
+	font-size: 15px;
+}
+
 /* Small devices (tablets, 768px and up) */
 @media (min-width: 768px) and (max-width: 991px) { 
 	/*choix type*/
@@ -314,8 +342,8 @@ ul.dropdown-images li a:hover{
 		padding-right: 0;
 		margin-right: 15px;
 	}
-	img.img_palette{
-		width: 267px;
+	 img.img_palette{
+		width: 235px;
 	}
 	.bloc_apercu{
 		width:465px;

@@ -26,6 +26,10 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  * @author Fabien Bernard (Geomatys).
  * @version 0.9
  * @since 0.9
+ * 
+ * ColorMap function. 
+ * Interval and NanColor getter/setter are here to ensure 
+ * implementation have methods.
  */
 @JsonTypeInfo(use=JsonTypeInfo.Id.NAME, include=JsonTypeInfo.As.PROPERTY, property="@function")
 @JsonSubTypes({
@@ -33,4 +37,12 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value=Categorize.class, name="categorize")
 })
 public interface Function extends StyleElement<org.opengis.filter.expression.Function> {
+	
+	public double getInterval();
+
+	public void setInterval(Double interval);
+	
+    public String getNanColor();
+
+	public void setNanColor(String nanColor);
 }

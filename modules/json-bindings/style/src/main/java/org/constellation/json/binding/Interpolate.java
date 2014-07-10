@@ -19,9 +19,11 @@
 
 package org.constellation.json.binding;
 
+import org.geotoolkit.style.StyleConstants;
 import org.geotoolkit.style.function.Method;
 import org.geotoolkit.style.function.Mode;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +42,10 @@ public final class Interpolate implements Function {
 
 	private List<InterpolationPoint> points = new ArrayList<InterpolationPoint>();
 
+	private Double interval;
+	
+	private String nanColor;
+	
     public Interpolate() {
     }
 
@@ -58,8 +64,66 @@ public final class Interpolate implements Function {
         this.points = points;
     }
 
-    @Override
-    public org.opengis.filter.expression.Function toType() {
-        return SF.interpolateFunction(null, listType(points), Method.COLOR, Mode.LINEAR, null);
+        
+    public double getInterval() {
+		return interval;
+	}
+
+	public void setInterval(Double interval) {
+		this.interval = interval;
+	}
+	
+
+    public String getNanColor() {
+		return nanColor;
+	}
+
+	public void setNanColor(String nanColor) {
+		this.nanColor = nanColor;
+	}
+
+	public org.opengis.filter.expression.Function toType() {
+		if(nanColor !=null){
+			InterpolationPoint nanPoint = new InterpolationPoint();
+			nanPoint.setColor(nanColor);
+			nanPoint.setData(Double.NaN);
+			points.add(nanPoint);
+		}
+		
+		
+        org.geotoolkit.style.function.Interpolate inter =  SF.interpolateFunction(StyleConstants.DEFAULT_CATEGORIZE_LOOKUP, listType(points), Method.COLOR, Mode.LINEAR, StyleConstants.DEFAULT_FALLBACK);
+        
+        Double min = null, max= null;
+        
+        // Iteration to find min and max values
+        for (InterpolationPoint interpolationPoint : points) {
+			if(min==null && max==null){
+				min = interpolationPoint.getData().doubleValue();
+				max = interpolationPoint.getData().doubleValue();
+			}
+			
+			min = Math.min(min,  interpolationPoint.getData().doubleValue());
+			max = Math.max(max,  interpolationPoint.getData().doubleValue());
+		}
+        
+        //init final InterpolationPoint list and coefficient
+        List<InterpolationPoint> recomputePoints = new ArrayList<>(0);
+		double coefficient = max-min;
+		if(interval!=null || coefficient!=1){
+			coefficient = coefficient/(interval-1);
+		}
+        
+		// Loop to create points with new point evaluation
+        for (int i = 0; i < interval; i++) {
+			double val = min + (coefficient * i);
+			Color color = inter.evaluate(val, Color.class);
+			InterpolationPoint point = new InterpolationPoint();
+			point.setColor("#"+Integer.toHexString(color.getRGB()).substring(2));
+			point.setData(val);
+			recomputePoints.add(point);
+		}
+        
+        return SF.interpolateFunction(StyleConstants.DEFAULT_CATEGORIZE_LOOKUP, listType(recomputePoints), Method.COLOR, Mode.LINEAR, StyleConstants.DEFAULT_FALLBACK);
+        
     }
 }

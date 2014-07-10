@@ -31,7 +31,9 @@ import static org.constellation.json.util.StyleUtilities.type;
  */
 public final class RasterSymbolizer implements Symbolizer {
 
-    private String name;
+	private static final long serialVersionUID = 1L;
+
+	private String name;
     private double opacity                          = 1.0;
     private ChannelSelection channelSelection       = null;
     private ColorMap colorMap                       = null;

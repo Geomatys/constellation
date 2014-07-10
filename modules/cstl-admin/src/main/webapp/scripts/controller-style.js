@@ -128,6 +128,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
 
         $scope.chosenTab = 'description';
 
+        $scope.openPalette = false;
         /**
          * SLD model object that store all needed variables to avoid angular bug behaviour in modal.
          */
@@ -158,13 +159,9 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
 	      
 	      $scope.selectedBand = undefined;
         
-	      $scope.test = {
+	      $scope.band = {
 	    		  'selected':undefined
 	      };
-        
-	      $scope.ichanged = function(){
-	    	  console.log($scope.test);
-	      }
 	      
         /**
          * The json model that represents the style sld.
@@ -214,9 +211,13 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             rasterMaxValue: 0,
             intervalles: 1,
             channelSelection: undefined,
-            nan: false,
+            nan: {
+            	color:undefined,
+            	selected:false
+            },
             inverse: false,
-            interpolation:'interpolate'
+            interpolation:'interpolate',
+            open:false
         };
 
         /**
@@ -380,6 +381,9 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                         "symbolizers": [],
                         "filter": null
                     };
+                    
+                    rule.symbolizers.push({'@symbol':'raster'});
+                    
                     $scope.newStyle.rules.push(rule);
                     $scope.setSelectedRule(rule);
                     $scope.editSelectedRule();
@@ -945,12 +949,16 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             if ($scope.palette.index == undefined) {
                 return;
             }
-
+            
             if ($scope.newStyle.rules[0].symbolizers[0].colorMap == undefined || 
             		$scope.newStyle.rules[0].symbolizers[0].colorMap.function == undefined ||
             		$scope.newStyle.rules[0].symbolizers[0].colorMap.function['@function'] != $scope.palette.interpolation) {
             	$scope.newStyle.rules[0].symbolizers[0].colorMap = {'function': {'@function': $scope.palette.interpolation}};
             }
+            
+            $scope.newStyle.rules[0].symbolizers[0].colorMap.function.interval = $scope.palette.intervalles;
+            $scope.newStyle.rules[0].symbolizers[0].colorMap.function.nanColor = $scope.palette.nan.color;
+            
             switch ($scope.palette.index) {
                 case 1:
                     var delta = $scope.palette.rasterMaxValue - $scope.palette.rasterMinValue;
@@ -1194,6 +1202,8 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                     }
                 );
             }
+            
+            $scope.palette.open = true;
         };
 
         $scope.setMinScale = function(){
