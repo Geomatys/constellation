@@ -124,7 +124,7 @@ public class OM2BaseReader {
             final int srid;
             final PreparedStatement stmt;
             if (isPostgres) {
-                stmt  = c.prepareStatement("SELECT \"id\", \"name\", \"description\", \"sampledfeature\", \"postgis\".st_asBinary(\"shape\"), \"crs\" FROM \"om\".\"sampling_features\" WHERE \"id\"=?");
+                stmt  = c.prepareStatement("SELECT \"id\", \"name\", \"description\", \"sampledfeature\", st_asBinary(\"shape\"), \"crs\" FROM \"om\".\"sampling_features\" WHERE \"id\"=?");
             } else {
                 stmt  = c.prepareStatement("SELECT * FROM \"om\".\"sampling_features\" WHERE \"id\"=?");
             }

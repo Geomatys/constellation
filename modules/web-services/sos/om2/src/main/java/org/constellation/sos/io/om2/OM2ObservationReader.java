@@ -466,7 +466,7 @@ public class OM2ObservationReader extends OM2BaseReader implements ObservationRe
             final int srid;
             final PreparedStatement stmt;
             if (isPostgres) {
-                stmt  = c.prepareStatement("SELECT \"postgis\".st_asBinary(\"shape\"), \"crs\" FROM \"om\".\"procedures\" WHERE \"id\"=?");
+                stmt  = c.prepareStatement("SELECT st_asBinary(\"shape\"), \"crs\" FROM \"om\".\"procedures\" WHERE \"id\"=?");
             } else {
                 stmt  = c.prepareStatement("SELECT \"shape\", \"crs\" FROM \"om\".\"procedures\" WHERE \"id\"=?");
             }
