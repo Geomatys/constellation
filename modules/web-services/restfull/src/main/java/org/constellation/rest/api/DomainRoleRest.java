@@ -37,6 +37,10 @@ public class DomainRoleRest {
         
         private List<Permission> permissions;
         
+        public DomainroleWithPermissions(Domainrole domainRole) {
+            copyFrom(domainRole);
+        }
+
         public void setPermissions(List<Permission> permissions) {
             this.permissions = permissions;
         }
@@ -53,6 +57,10 @@ public class DomainRoleRest {
         
         
         private String memberList;
+
+        public DomainroleWithMembers(Domainrole domainrole) {
+            copyFrom(domainrole);
+        }
 
         public String getMemberList() {
             return memberList;
@@ -77,11 +85,7 @@ public class DomainRoleRest {
                     .findAllWithMembers();
 
             for (Entry<Domainrole, List<Pair<User, List<Domain>>>> domainEntry : findAllWithMembers.entrySet()) {
-                DomainroleWithMembers domainRoleWithMember = new DomainroleWithMembers();
-                domainRoleWithMember.setSystem(domainEntry.getKey().isSystem());
-                domainRoleWithMember.setId(domainEntry.getKey().getId());
-                domainRoleWithMember.setName(domainEntry.getKey().getName());
-                domainRoleWithMember.setDescription(domainEntry.getKey().getDescription());
+                DomainroleWithMembers domainRoleWithMember = new DomainroleWithMembers(domainEntry.getKey());
                 List<Pair<User, List<Domain>>> value = domainEntry.getValue();
                 StringBuilder builder = new StringBuilder();
                 boolean afterFirstUser = false;
@@ -119,8 +123,7 @@ public class DomainRoleRest {
     public Response get(@PathParam("id") int id) {
         Optional<Pair<Domainrole, List<Permission>>> opt = domainRoleRepository.findOneWithPermission(id);
         if(opt.isPresent()) {
-            DomainroleWithPermissions domainroleWithPermissions = new DomainroleWithPermissions();          
-            
+            DomainroleWithPermissions domainroleWithPermissions = new DomainroleWithPermissions(opt.get().getKey());          
             domainroleWithPermissions.setPermissions(opt.get().getValue());
             return Response.ok(domainroleWithPermissions).build();
         }
