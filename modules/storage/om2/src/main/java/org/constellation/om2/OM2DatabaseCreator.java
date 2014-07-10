@@ -57,7 +57,7 @@ public class OM2DatabaseCreator {
         
         final Connection con  = dataSource.getConnection();
         try {
-            if (isPostgres) {
+            if (isPostgres && postgisInstall != null) {
                 final PostgisInstaller pgInstaller = new PostgisInstaller(con);
                 // not needed in pg 9.1
                 try {

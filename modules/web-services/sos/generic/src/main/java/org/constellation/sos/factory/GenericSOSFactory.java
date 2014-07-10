@@ -93,4 +93,10 @@ public class GenericSOSFactory implements OMFactory {
         return null;
     }
 
+    @Override
+    public boolean buildDatasource(Automatic configuration, Map<String, Object> parameters) {
+        // do nothing
+        return true;
+    }
+
 }

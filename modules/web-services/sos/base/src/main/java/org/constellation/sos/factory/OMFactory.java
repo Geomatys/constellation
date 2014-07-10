@@ -96,5 +96,7 @@ public interface OMFactory {
      * @throws DataStoreException
      */
     ObservationWriter getObservationWriter(DataSourceType type,  Automatic configuration, Map<String, Object> properties) throws DataStoreException;
+    
+    boolean buildDatasource(Automatic configuration, final Map<String, Object> parameters) throws DataStoreException;
 
 }

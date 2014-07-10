@@ -319,17 +319,18 @@ cstlAdminApp.factory('csw', ['$resource',
 cstlAdminApp.factory('sos', ['$resource',
     function ($resource) {
         return $resource('@cstl/api/1/SOS', {}, {
-            'count':        {method: 'GET',  url: '@cstl/api/1/SOS/:id/sensors/count;jsessionid='},
-            'add':          {method: 'PUT',  url: '@cstl/api/1/SOS/:id/observations;jsessionid='},
-            'removeSensor': {method: 'DELETE', url: '@cstl/api/1/SOS/:id/sensor/:sensor;jsessionid='},
-            'getFeatures':  {method: 'GET',  url: '@cstl/api/1/SOS/:id/sensor/location/:sensor;jsessionid='},
-            'listSensors':  {method: 'GET',  url: '@cstl/api/1/SOS/:id/sensors/identifiers;jsessionid='},
-            'sensorsTree':  {method: 'GET',  url: '@cstl/api/1/SOS/:id/sensors;jsessionid='},
-            'listMeasures': {method: 'GET',  url: '@cstl/api/1/SOS/:id/observedProperties/identifiers;jsessionid='},
-            'measuresForSensor':    {method: 'GET', url: '@cstl/api/1/SOS/:id/observedProperty/identifiers/:sensorID;jsessionid='},
-            'sensorsForMeasure':    {method: 'GET', url: '@cstl/api/1/SOS/:id/sensors/identifiers/:measure;jsessionid='},
-            'importSensor': {method: 'PUT', url: '@cstl/api/1/SOS/:id/sensor/import;jsessionid='},
-            'getCsvObs' :   {method: 'POST', url: '@cstl/api/1/SOS/:id/observations;jsessionid='}
+            'count':             {method: 'GET',    url: '@cstl/api/1/SOS/:id/sensors/count;jsessionid='},
+            'add':               {method: 'PUT',    url: '@cstl/api/1/SOS/:id/observations;jsessionid='},
+            'removeSensor':      {method: 'DELETE', url: '@cstl/api/1/SOS/:id/sensor/:sensor;jsessionid='},
+            'getFeatures':       {method: 'GET',    url: '@cstl/api/1/SOS/:id/sensor/location/:sensor;jsessionid='},
+            'listSensors':       {method: 'GET',    url: '@cstl/api/1/SOS/:id/sensors/identifiers;jsessionid='},
+            'sensorsTree':       {method: 'GET',    url: '@cstl/api/1/SOS/:id/sensors;jsessionid='},
+            'listMeasures':      {method: 'GET',    url: '@cstl/api/1/SOS/:id/observedProperties/identifiers;jsessionid='},
+            'measuresForSensor': {method: 'GET',    url: '@cstl/api/1/SOS/:id/observedProperty/identifiers/:sensorID;jsessionid='},
+            'sensorsForMeasure': {method: 'GET',    url: '@cstl/api/1/SOS/:id/sensors/identifiers/:measure;jsessionid='},
+            'importSensor':      {method: 'PUT',    url: '@cstl/api/1/SOS/:id/sensor/import;jsessionid='},
+            'getCsvObs' :        {method: 'POST',   url: '@cstl/api/1/SOS/:id/observations;jsessionid='},
+            'build' :            {method: 'GET',    url: '@cstl/api/1/SOS/:id/build;jsessionid='}
         });
     }]);
 

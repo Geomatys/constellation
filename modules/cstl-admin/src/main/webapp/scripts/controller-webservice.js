@@ -285,8 +285,8 @@ cstlAdminApp.controller('WebServiceCreateController', ['$scope','$routeParams', 
         };
     }]);
 
-cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routeParams', 'webService', 'provider', '$growl', '$location',
-    function ($scope, $routeParams , webService, provider, $growl, $location) {
+cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routeParams', 'webService', 'provider', 'sos', '$growl', '$location',
+    function ($scope, $routeParams , webService, provider, sos, $growl, $location) {
         $scope.type = $routeParams.type;
         $scope.id = $routeParams.id;
         $scope.db = {
@@ -334,6 +334,7 @@ cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routePar
                 $growl('success','Success','Service '+ $scope.id +' successfully updated');
                 if ($scope.type.toLowerCase() === 'sos') {
                     createOmProvider();
+                    buildOmDatasource();
                 }
                 $location.path('/webservice');
             }, function() {
@@ -357,6 +358,13 @@ cstlAdminApp.controller('WebServiceChooseSourceController', ['$scope','$routePar
                 }
             }, function() {}, function() {
                 $growl('error','Error','Unable to create OM2 provider');
+            });
+        }
+        function buildOmDatasource() {
+            sos.build({
+                id: $scope.id
+            }, function() {}, function() {
+                $growl('error','Error','Unable to build OM2 datasource');
             });
         }
     }]);

@@ -86,4 +86,10 @@ public class LuceneSOSFactory implements OMFactory {
     public ObservationWriter getObservationWriter(DataSourceType type, Automatic configuration, Map<String, Object> properties) throws DataStoreException {
         return new FileObservationWriter(configuration, properties);
     }
+    
+    @Override
+    public boolean buildDatasource(Automatic configuration, Map<String, Object> parameters) {
+        // do nothing
+        return true;
+    }
 }

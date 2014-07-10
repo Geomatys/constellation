@@ -19,9 +19,17 @@
 
 package org.constellation.sos.factory;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Map;
+import java.util.logging.Logger;
+import javax.sql.DataSource;
 import org.apache.sis.storage.DataStoreException;
+import org.apache.sis.util.logging.Logging;
 import org.constellation.configuration.DataSourceType;
+import static org.constellation.configuration.DataSourceType.OM2;
 import org.constellation.generic.database.Automatic;
+import org.constellation.om2.OM2DatabaseCreator;
 import org.constellation.sos.io.om2.OM2ObservationFilter;
 import org.constellation.sos.io.om2.OM2ObservationFilterReader;
 import org.constellation.sos.io.om2.OM2ObservationReader;
@@ -29,10 +37,6 @@ import org.constellation.sos.io.om2.OM2ObservationWriter;
 import org.geotoolkit.observation.ObservationFilter;
 import org.geotoolkit.observation.ObservationReader;
 import org.geotoolkit.observation.ObservationWriter;
-
-import java.util.Map;
-
-import static org.constellation.configuration.DataSourceType.OM2;
 
 /**
   * A postgrid implementation of the SOS factory.
@@ -42,6 +46,8 @@ import static org.constellation.configuration.DataSourceType.OM2;
  */
 public class OM2SOSFactory implements OMFactory {
 
+    private static final Logger LOGGER = Logging.getLogger(OM2SOSFactory.class);
+    
     /**
      * {@inheritDoc}
      */
@@ -85,4 +91,24 @@ public class OM2SOSFactory implements OMFactory {
         return new OM2ObservationWriter(configuration, properties);
     }
 
+    @Override
+    public boolean buildDatasource(Automatic configuration, Map<String, Object> parameters) throws DataStoreException {
+        try {
+            final DataSource source = configuration.getBdd().getDataSource();
+            if (OM2DatabaseCreator.validConnection(source)) {
+                if (!OM2DatabaseCreator.structurePresent(source)) {
+                    OM2DatabaseCreator.createObservationDatabase(source, true, null);
+                    return true;
+                } else {
+                    LOGGER.info("OM2 structure already present");
+                }
+                return true;
+            } else {
+                LOGGER.warning("unable to connect OM datasource");
+            }
+            return false;
+        } catch (SQLException | IOException ex) {
+            throw new DataStoreException("Erro while building OM2 datasource", ex);
+        }
+    }
 }

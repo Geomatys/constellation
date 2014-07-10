@@ -72,6 +72,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.geotoolkit.sml.xml.SensorMLUtilities.getSensorMLType;
 import static org.geotoolkit.sml.xml.SensorMLUtilities.getSmlID;
@@ -440,6 +441,19 @@ public class SOSConfigurer extends OGCConfigurer {
         }
     }
     
+    public boolean buildDatasource(final String serviceID) throws ConfigurationException {
+        final SOSConfiguration config = getServiceConfiguration(serviceID);
+        if (config != null) {
+            final OMFactory omfactory = getOMFactory(config.getObservationWriterType());
+            try {
+                return omfactory.buildDatasource(config.getOMConfiguration(), new HashMap<String, Object>());
+            } catch (DataStoreException ex) {
+                LOGGER.log(Level.WARNING, "Error while building O&M datasource", ex);
+            }
+        }
+        return false;
+    }
+            
     /**
      * Build a new Sensor writer for the specified service ID.
      *

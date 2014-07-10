@@ -78,6 +78,18 @@ public class SOSRest {
     @Inject
     private ProviderBusiness providerBusiness;
     
+    @GET
+    @Path("{id}/build")
+    public Response buildDatasourceOM(final @PathParam("id") String id) throws Exception {
+        final AcknowlegementType ack;
+        if (getConfigurer().buildDatasource(id)) {
+            ack = AcknowlegementType.success("O&M datasource created");
+        } else {
+            ack = AcknowlegementType.failure("error while creating O&M datasource");
+        }
+        return ok(ack);
+    }
+    
     @PUT
     @Path("{id}/sensors")
     public Response importSensorMetadata(final @PathParam("id") String id, final File sensor) throws Exception {
