@@ -19,6 +19,7 @@
 package org.constellation.rest.api;
 
 import org.constellation.admin.MapContextBusiness;
+import org.constellation.admin.dto.MapContextLayersDTO;
 import org.constellation.engine.register.Mapcontext;
 import org.constellation.engine.register.MapcontextStyledLayer;
 import org.constellation.engine.register.repository.MapContextRepository;
@@ -50,6 +51,12 @@ public class MapContextRest {
     @Path("/list")
     public Response findAll() {
         return Response.ok(contextRepository.findAll()).build();
+    }
+
+    @GET
+    @Path("/list/layers")
+    public Response findAllMapContextLayers() {
+        return Response.ok(contextBusiness.findAllMapContextLayers()).build();
     }
 
     @PUT

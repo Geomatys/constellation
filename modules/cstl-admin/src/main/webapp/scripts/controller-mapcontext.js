@@ -24,7 +24,7 @@ cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', '$growl
                 templateUrl: 'views/modalLoader.html',
                 controller: 'ModalInstanceCtrl'
             });
-            mapcontext.list({}, function(response) {
+            mapcontext.listLayers({}, function(response) {
                 $dashboard($scope, response, true);
                 $scope.ordertype='name';
                 modalLoader.close();
@@ -33,13 +33,13 @@ cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', '$growl
             });
         };
 
-        $scope.selectedMapcontextChild = null;
+        $scope.selectedLayer = null;
 
         $scope.selectContextChild = function(item) {
-            if ($scope.selectedMapcontextChild === item) {
-                $scope.selectedMapcontextChild = null;
+            if ($scope.selectedLayer === item) {
+                $scope.selectedLayer = null;
             } else {
-                $scope.selectedMapcontextChild = item;
+                $scope.selectedLayer = item;
             }
         };
 

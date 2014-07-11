@@ -27,6 +27,8 @@ import java.util.List;
 public interface LayerRepository {
 
     List<Layer> findAll();
+
+    Layer findById(Integer layerId);
     
     List<Layer> findByServiceId(int serviceId);
 
