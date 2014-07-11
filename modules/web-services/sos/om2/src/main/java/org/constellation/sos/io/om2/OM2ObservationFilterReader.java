@@ -609,7 +609,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             
             while (rs.next()) {
                 
-                long currentMainValue = 0;
+                long currentMainValue = -1;
                 for (int i = 0; i < fields.size(); i++) {
                     String value = rs.getString(i + 3);
                     Field field = fields.get(i);
@@ -619,15 +619,17 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                             final Timestamp currentTime   = Timestamp.valueOf(value);
                             currentMainValue = currentTime.getTime();
                         } else if (field.fieldType.equals("Quantity")) {
-                            final Double d = Double.parseDouble(value);
-                            currentMainValue = d.longValue();
+                            if (value != null && !value.isEmpty()) {
+                                final Double d = Double.parseDouble(value);
+                                currentMainValue = d.longValue();
+                            }
                         }
                     }
                     addToMapVal(minVal, maxVal, field.fieldName, value);
                 }
                 
 
-                if (currentMainValue > (start + step)) {
+                if (currentMainValue != -1 && currentMainValue > (start + step)) {
                     //min
                     if (fields.get(0).fieldType.equals("Time")) {
                         long minTime = start;
@@ -635,7 +637,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                     } else if (fields.get(0).fieldType.equals("Quantity")){
                         values.append(start);
                     } else {
-                        throw new DataStoreException("main field other than Time or QUantity are not yet allowed");
+                        throw new DataStoreException("main field other than Time or Quantity are not yet allowed");
                     }
                     for (Field field : fields) {
                         if (!field.equals(fields.get(0))) {
@@ -654,7 +656,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                     } else if (fields.get(0).fieldType.equals("Quantity")){
                         values.append(start + step);
                     } else {
-                        throw new DataStoreException("main field other than Time or QUantity are not yet allowed");
+                        throw new DataStoreException("main field other than Time or Quantity are not yet allowed");
                     }
                     for (Field field : fields) {
                         if (!field.equals(fields.get(0))) {
@@ -697,6 +699,8 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
     }
     
     private void addToMapVal(final Map<String, Double> minMap, final Map<String, Double> maxMap, final String field, final String value) {
+        if (value == null || value.isEmpty()) return;
+        
         final Double minPrevious = minMap.get(field);
         final Double maxPrevious = maxMap.get(field);
         try {

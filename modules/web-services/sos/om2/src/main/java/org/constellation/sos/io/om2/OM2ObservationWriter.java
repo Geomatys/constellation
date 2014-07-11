@@ -978,7 +978,11 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                         }
                         final String desc = q.getDefinition();
                         fields.add(new Field("Quantity", field.getName(), desc, uom));
-                        sb.append("double,");
+                        if (!isPostgres) {
+                            sb.append("double,");
+                        } else {
+                            sb.append("double precision,");
+                        }
                     } else if (field.getValue() instanceof AbstractText) {
                         final AbstractText q = (AbstractText)field.getValue();
                         final String desc = q.getDefinition();
@@ -988,7 +992,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                         final AbstractBoolean q = (AbstractBoolean)field.getValue();
                         final String desc = q.getDefinition();
                         fields.add(new Field("Boolean", field.getName(), desc, null));
-                        if (isPostgres) {
+                        if (!isPostgres) {
                             sb.append("boolean,");
                         } else {
                             sb.append("integer,");
@@ -1013,17 +1017,21 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                         final String uom  = q.getUom().getCode();
                         final String desc = q.getDefinition();
                         fields.add(new Field("Quantity", field.getName(), desc, uom));
-                        sb.append("double,"); // TODO Double ?
+                        if (!isPostgres) {
+                            sb.append("double,");
+                        } else {
+                            sb.append("double precision,");
+                        }
                     } else if (field.getValue() instanceof AbstractText) {
                         final AbstractText q = (AbstractText)field.getValue();
                         final String desc = q.getDefinition();
                         fields.add(new Field("Text", field.getName(), desc, null));
-                        sb.append("character varying(1000),"); // TODO Double ?
+                        sb.append("character varying(1000),"); 
                     } else if (field.getValue() instanceof AbstractBoolean) {
                         final AbstractBoolean q = (AbstractBoolean)field.getValue();
                         final String desc = q.getDefinition();
                         fields.add(new Field("Boolean", field.getName(), desc, null));
-                        if (isPostgres) {
+                        if (!isPostgres) {
                             sb.append("boolean,");
                         } else {
                             sb.append("integer,");
@@ -1106,7 +1114,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                     value =  "'" + value + "'";
                 }
                 
-                if (value != null) {
+                if (value != null && !value.isEmpty()) {
                     sql.append(value).append(",");
                 } else {
                     sql.append("NULL,");
