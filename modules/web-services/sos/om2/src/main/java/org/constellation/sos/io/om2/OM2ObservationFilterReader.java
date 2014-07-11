@@ -513,22 +513,19 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             LOGGER.info(sqlRequest.toString());
             final ResultSet rs                          = currentStatement.executeQuery(sqlRequest.toString());
             final StringBuilder values                  = new StringBuilder();
+            final List<Field> fields                    = readFields(currentProcedure, c);
             final TextBlock encoding;
             if ("text/csv".equals(responseFormat)) {
                 encoding = getCsvTextEncoding("2.0.0");
                 // Add the header
-                final List<String> fieldNames = getFieldsForGetResult(fieldRequest, c);
-                values.append("date,");
-                for (String pheno : fieldNames) {
-                    values.append(pheno).append(',');
+                for (Field pheno : fields) {
+                    values.append(pheno.fieldName).append(',');
                 }
                 values.setCharAt(values.length() - 1, '\n');
             } else {
                 encoding = getDefaultTextEncoding("2.0.0");
             }
 
-            final List<Field> fields   = readFields(currentProcedure, c);
-            
             while (rs.next()) {
                 
                 for (int i = 0; i < fields.size(); i++) {
@@ -569,58 +566,69 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             final ResultSet rs                          = currentStatement.executeQuery(sqlRequest.toString());
             final StringBuilder values                  = new StringBuilder();
             final TextBlock encoding;
-            final List<String> fieldNames               = getFieldsForGetResult(fieldRequest, c);
+            final List<Field> fields                    = readFields(currentProcedure, c);
             if ("text/csv".equals(responseFormat)) {
                 encoding = getCsvTextEncoding("2.0.0");
                 // Add the header
-                values.append("date,");
-                for (String pheno : fieldNames) {
-                    values.append(pheno).append(',');
+                for (Field pheno : fields) {
+                    values.append(pheno.fieldName).append(',');
                 }
                 values.setCharAt(values.length() - 1, '\n');
             } else {
                 encoding = getDefaultTextEncoding("2.0.0");
             }
-            Map<String, Double> minVal = initMapVal(fieldNames, false);
-            Map<String, Double> maxVal = initMapVal(fieldNames, true);
+            Map<String, Double> minVal = initMapVal(fields, false);
+            Map<String, Double> maxVal = initMapVal(fields, true);
             final long[] times               = getTimeStepForGetResult(fieldRequest, c, width);
             final long step                  = times[1];
             long start                       = times[0];
             
             while (rs.next()) {
-                final Timestamp currentTime   = rs.getTimestamp("time");
-                final long currentTimeMs      = currentTime.getTime();
-                final String value            = rs.getString("value");
-                final String fieldName        = rs.getString("field_name");
-
-                addToMapVal(minVal, maxVal, fieldName, value);
+                
+                long currentTimeMs = 0;
+                for (int i = 0; i < fields.size(); i++) {
+                    String value = rs.getString(i + 3);
+                    Field field = fields.get(i);
+                    
+                    // for time TODO remove when field will be typed
+                    if (field.fieldType.equals("Time")) {
+                        final Timestamp currentTime   = Timestamp.valueOf(value);
+                        currentTimeMs      = currentTime.getTime();
+                    }
+                    addToMapVal(minVal, maxVal, field.fieldName, value);
+                }
+                
 
                 if (currentTimeMs > (start + step)) {
                     //min
                     long minTime = start + 1000;
                     values.append(format.format(new Date(minTime)));
-                    for (String field : fieldNames) {
-                        values.append(encoding.getTokenSeparator());
-                        final double minValue = minVal.get(field);
-                        if (minValue != Double.MAX_VALUE) {
-                            values.append(minValue);
+                    for (Field field : fields) {
+                        if (!field.fieldType.equals("Time")) {
+                            values.append(encoding.getTokenSeparator());
+                            final double minValue = minVal.get(field.fieldName);
+                            if (minValue != Double.MAX_VALUE) {
+                                values.append(minValue);
+                            }
                         }
                     }
                     values.append(encoding.getBlockSeparator());
                     //max
                     long maxTime = start + step + 1000;
                     values.append(format.format(new Date(maxTime)));
-                    for (String field : fieldNames) {
-                        values.append(encoding.getTokenSeparator());
-                        final double maxValue = maxVal.get(field);
-                        if (maxValue != -Double.MAX_VALUE) {
-                            values.append(maxValue);
+                    for (Field field : fields) {
+                        if (!field.fieldType.equals("Time")) {
+                            values.append(encoding.getTokenSeparator());
+                            final double maxValue = maxVal.get(field.fieldName);
+                            if (maxValue != -Double.MAX_VALUE) {
+                                values.append(maxValue);
+                            }
                         }
                     }
                     values.append(encoding.getBlockSeparator());
                     start = currentTimeMs;
-                    minVal = initMapVal(fieldNames, false);
-                    maxVal = initMapVal(fieldNames, true);
+                    minVal = initMapVal(fields, false);
+                    maxVal = initMapVal(fields, true);
                 }
             }
             
@@ -634,7 +642,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
         }
     }
     
-    private Map<String, Double> initMapVal(final List<String> fields, final boolean max) {
+    private Map<String, Double> initMapVal(final List<Field> fields, final boolean max) {
         final Map<String, Double> result = new HashMap<>();
         final double value;
         if (max) {
@@ -642,8 +650,8 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
         } else {
             value = Double.MAX_VALUE;
         }
-        for (String field : fields) {
-            result.put(field, value);
+        for (Field field : fields) {
+            result.put(field.fieldName, value);
         }
         return result;
     }
@@ -664,21 +672,8 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
         }
     }
     
-    private List<String> getFieldsForGetResult(String request, final Connection c) throws SQLException {
-        request = request.replace("SELECT \"time\", \"value\", \"field_name\"", "SELECT DISTINCT \"field_name\"");
-        final Statement stmt = c.createStatement();
-        final ResultSet rs = stmt.executeQuery(request);
-        final List<String> results = new ArrayList<>();
-        while (rs.next()) {
-            results.add(rs.getString(1));
-        }
-        rs.close();
-        stmt.close();
-        return results;
-    }
-    
     private long[] getTimeStepForGetResult(String request, final Connection c, final int width) throws SQLException {
-        request = request.replace("SELECT \"time\", \"value\", \"field_name\"", "SELECT MIN(\"time\"), MAX(\"time\") ");
+        request = request.replace("SELECT m.*", "SELECT MIN(\"time\"), MAX(\"time\") ");
         final Statement stmt = c.createStatement();
         final ResultSet rs = stmt.executeQuery(request);
         final long[] result = {-1L, -1L};
