@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<om:OM_Observation xmlns:sos="http://www.opengis.net/sos/2.0"
+                   xmlns:swe="http://www.opengis.net/swe/2.0" 
+                   xmlns:gml="http://www.opengis.net/gml/3.2" 
+                   xmlns:om="http://www.opengis.net/om/2.0" 
+                   xmlns:sams="http://www.opengis.net/samplingSpatial/2.0"
+                   xmlns:sf="http://www.opengis.net/sampling/2.0" 
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns:xlink="http://www.w3.org/1999/xlink"
+                   gml:id="obs-201">
+    <gml:name>urn:ogc:object:observation:GEOM:201</gml:name>
+    <om:type xlink:href="http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_ComplexObservation"/>
+    <om:phenomenonTime>
+        <gml:TimePeriod gml:id="time-201">
+            <gml:beginPosition>2001-01-01T00:00:00.0</gml:beginPosition>
+            <gml:endPosition>2001-01-01T00:00:00.0</gml:endPosition>
+        </gml:TimePeriod>
+    </om:phenomenonTime>
+    <om:resultTime/>
+    <om:procedure xlink:href="urn:ogc:object:sensor:GEOM:2"/>
+    <om:observedProperty xlink:href="urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon"/>
+    <om:featureOfInterest>
+        <sams:SF_SpatialSamplingFeature gml:id="station-002">
+            <gml:description>Point d'eau BSSS</gml:description>
+            <gml:name>10972X0137-PLOUF</gml:name>
+            <sf:type xlink:href="http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingPoint"/>
+            <sf:sampledFeature xlink:href="urn:-sandre:object:bdrhf:123X"/>
+            <sams:shape>
+                <gml:Point gml:id="STATION-LOCALISATION">
+                    <gml:pos srsName="urn:ogc:def:crs:epsg:7.9:27582">65400.0 1731368.0</gml:pos>
+                </gml:Point>
+            </sams:shape>
+        </sams:SF_SpatialSamplingFeature>
+    </om:featureOfInterest>
+    <om:result xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="swe:DataArrayPropertyType">
+        <swe:DataArray id="dataArray-2">
+            <swe:elementCount>
+                <swe:Count>
+                    <swe:value>7</swe:value>
+                </swe:Count>
+            </swe:elementCount>
+            <swe:elementType name="dataArray-2">
+                <swe:DataRecord id="datarecord-0">
+                    <swe:field name="depth">
+                        <swe:Quantity definition="urn:ogc:def:phenomenon:GEOM:depth">
+                            <swe:uom code="m"/>
+                        </swe:Quantity>
+                    </swe:field>
+                    <swe:field name="temperature">
+                        <swe:Quantity definition="urn:ogc:def:phenomenon:GEOM:temperature">
+                            <swe:uom code="°C"/>
+                        </swe:Quantity>
+                    </swe:field>
+                </swe:DataRecord>
+            </swe:elementType>
+            <swe:encoding>
+                <swe:TextEncoding blockSeparator="@@" decimalSeparator="." tokenSeparator="," id="encoding-1"/>
+            </swe:encoding>
+            <swe:values>12,18.5@@24,19.7@@48,21.2@@96,23.9@@192,26.2@@384,31.4@@768,35.1@@</swe:values>
+        </swe:DataArray>
+    </om:result>
+</om:OM_Observation>

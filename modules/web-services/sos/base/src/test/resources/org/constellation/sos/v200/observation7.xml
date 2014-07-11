@@ -47,7 +47,7 @@
         <swe:DataArray id="dataArray-4">
             <swe:elementCount>
                 <swe:Count>
-                    <swe:value>1</swe:value>
+                    <swe:value>7</swe:value>
                 </swe:Count>
             </swe:elementCount>
             <swe:elementType name="dataArray-4">
@@ -62,7 +62,7 @@
             <swe:encoding>
                 <swe:TextEncoding blockSeparator="@@" decimalSeparator="." tokenSeparator="," id="encoding-1"/>
             </swe:encoding>
-            <swe:values>18.5@@</swe:values>
+            <swe:values>18.5@@19.7@@21.2@@23.9@@22.2@@18.4@@17.1@@</swe:values>
         </swe:DataArray>
     </om:result>
 </om:OM_Observation>

@@ -62,6 +62,7 @@ INSERT INTO "om"."offering_foi" VALUES ('offering-5','station-002');
 INSERT INTO "om"."offering_foi" VALUES ('offering-8','station-006');
 INSERT INTO "om"."offering_foi" VALUES ('offering-9','station-006');
 
+INSERT INTO "om"."observations"  VALUES ('urn:ogc:object:observation:GEOM:201', 201, '2001-01-01 00:00:00.0', '2001-01-01 00:00:00.0', 'urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon', 'urn:ogc:object:sensor:GEOM:2', 'station-002');
 INSERT INTO "om"."observations"  VALUES ('urn:ogc:object:observation:GEOM:406', 406, '2007-05-01 12:59:00.0', '2007-05-01 16:59:00.0', 'urn:ogc:def:phenomenon:GEOM:depth',               'urn:ogc:object:sensor:GEOM:4', 'station-001');
 INSERT INTO "om"."observations"  VALUES ('urn:ogc:object:observation:GEOM:304', 304, '2007-05-01 02:59:00.0', '2007-05-01 06:59:00.0', 'urn:ogc:def:phenomenon:GEOM:depth',               'urn:ogc:object:sensor:GEOM:3', 'station-001');
 INSERT INTO "om"."observations"  VALUES ('urn:ogc:object:observation:GEOM:305', 305, '2007-05-01 07:59:00.0', '2007-05-01 11:59:00.0', 'urn:ogc:def:phenomenon:GEOM:depth',               'urn:ogc:object:sensor:GEOM:3', 'station-001');
@@ -72,6 +73,8 @@ INSERT INTO "om"."observations"  VALUES ('urn:ogc:object:observation:GEOM:802', 
 INSERT INTO "om"."observations"  VALUES ('urn:ogc:object:observation:GEOM:901', 901, '2009-05-01 13:47:00.0', '2009-05-01 13:47:00.0', 'urn:ogc:def:phenomenon:GEOM:depth',               'urn:ogc:object:sensor:GEOM:9', 'station-006');
 
 
+INSERT INTO "om"."procedure_descriptions"  VALUES ('urn:ogc:object:sensor:GEOM:2', 1, 'depth',       'Quantity', 'urn:ogc:def:phenomenon:GEOM:depth',        'm');
+INSERT INTO "om"."procedure_descriptions"  VALUES ('urn:ogc:object:sensor:GEOM:2', 2, 'temperature', 'Quantity', 'urn:ogc:def:phenomenon:GEOM:temperature',  '°C');
 INSERT INTO "om"."procedure_descriptions"  VALUES ('urn:ogc:object:sensor:GEOM:3', 1, 'Time',        'Time',     'urn:ogc:data:time:iso8601',                 NULL);
 INSERT INTO "om"."procedure_descriptions"  VALUES ('urn:ogc:object:sensor:GEOM:3', 2, 'depth',       'Quantity', 'urn:ogc:def:phenomenon:GEOM:depth',        'm');
 INSERT INTO "om"."procedure_descriptions"  VALUES ('urn:ogc:object:sensor:GEOM:4', 1, 'Time',        'Time',     'urn:ogc:data:time:iso8601',                 NULL);
@@ -84,6 +87,20 @@ INSERT INTO "om"."procedure_descriptions"  VALUES ('urn:ogc:object:sensor:GEOM:8
 INSERT INTO "om"."procedure_descriptions"  VALUES ('urn:ogc:object:sensor:GEOM:7', 1, 'Time',        'Time',     'urn:ogc:data:time:iso8601',                 NULL);
 INSERT INTO "om"."procedure_descriptions"  VALUES ('urn:ogc:object:sensor:GEOM:7', 2, 'temperature', 'Quantity', 'urn:ogc:def:phenomenon:GEOM:temperature',  '°C');
 INSERT INTO "om"."procedure_descriptions"  VALUES ('urn:ogc:object:sensor:GEOM:9', 1, 'depth',       'Quantity', 'urn:ogc:def:phenomenon:GEOM:depth',        'm');
+
+
+CREATE TABLE "mesures"."mesure2"("id_observation" integer NOT NULL,
+                                 "id"             integer NOT NULL,
+                                 "depth"          character varying(1000),
+                                 "temperature"    character varying(1000));
+
+INSERT INTO "mesures"."mesure2" VALUES (201, 1, '12',  '18.5');
+INSERT INTO "mesures"."mesure2" VALUES (201, 2, '24',  '19.7');
+INSERT INTO "mesures"."mesure2" VALUES (201, 3, '48',  '21.2');
+INSERT INTO "mesures"."mesure2" VALUES (201, 4, '96',  '23.9');
+INSERT INTO "mesures"."mesure2" VALUES (201, 5, '192', '26.2');
+INSERT INTO "mesures"."mesure2" VALUES (201, 6, '384', '31.4');
+INSERT INTO "mesures"."mesure2" VALUES (201, 7, '768', '35.1');
 
 CREATE TABLE "mesures"."mesure3"("id_observation" integer NOT NULL,
                                  "id"             integer NOT NULL,
@@ -154,3 +171,9 @@ CREATE TABLE "mesures"."mesure9"("id_observation" integer NOT NULL,
                                  "depth"          character varying(1000));
 
 INSERT INTO "mesures"."mesure9" VALUES (901, 1,  '18.5');
+INSERT INTO "mesures"."mesure9" VALUES (901, 2,  '19.7');
+INSERT INTO "mesures"."mesure9" VALUES (901, 3,  '21.2');
+INSERT INTO "mesures"."mesure9" VALUES (901, 4,  '23.9');
+INSERT INTO "mesures"."mesure9" VALUES (901, 5,  '22.2');
+INSERT INTO "mesures"."mesure9" VALUES (901, 6,  '18.4');
+INSERT INTO "mesures"."mesure9" VALUES (901, 7,  '17.1');

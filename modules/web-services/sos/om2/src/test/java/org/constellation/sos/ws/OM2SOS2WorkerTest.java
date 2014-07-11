@@ -212,13 +212,25 @@ public class OM2SOS2WorkerTest extends SOS2WorkerTest {
     }
     
     /**
-     * Tests the GetObservationById method
+     * Tests the GetObservation method
      *
      * @throws java.lang.Exception
      */
     @Test
     @Override
     @Order(order=6)
+    public void GetObservationProfileTest() throws Exception {
+        super.GetObservationProfileTest();
+    }
+    
+    /**
+     * Tests the GetObservationById method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    @Override
+    @Order(order=7)
     public void GetObservationByIdTest() throws Exception {
         super.GetObservationByIdTest();
     }
@@ -230,7 +242,7 @@ public class OM2SOS2WorkerTest extends SOS2WorkerTest {
      */
     @Test
     @Override
-    @Order(order=7)
+    @Order(order=8)
     public void GetResultTemplateTest() throws Exception {
         super.GetResultTemplateTest();
     }
@@ -242,7 +254,7 @@ public class OM2SOS2WorkerTest extends SOS2WorkerTest {
      */
     @Test
     @Override
-    @Order(order=8)
+    @Order(order=9)
     public void GetResultErrorTest() throws Exception {
         super.GetResultErrorTest();
     }
@@ -254,7 +266,7 @@ public class OM2SOS2WorkerTest extends SOS2WorkerTest {
      */
     @Test
     @Override
-    @Order(order=9)
+    @Order(order=10)
     public void GetResultTest() throws Exception {
         super.GetResultTest();
     }
@@ -266,7 +278,7 @@ public class OM2SOS2WorkerTest extends SOS2WorkerTest {
      */
     @Test
     @Override
-    @Order(order=10)
+    @Order(order=11)
     public void insertObservationTest() throws Exception {
         super.insertObservationTest();
     }
@@ -278,7 +290,7 @@ public class OM2SOS2WorkerTest extends SOS2WorkerTest {
      */
     @Test
     @Override
-    @Order(order=11)
+    @Order(order=12)
     public void GetFeatureOfInterestErrorTest() throws Exception {
         super.GetFeatureOfInterestErrorTest();
     }
@@ -290,21 +302,21 @@ public class OM2SOS2WorkerTest extends SOS2WorkerTest {
      */
     @Test
     @Override
-    @Order(order=12)
+    @Order(order=13)
     public void GetFeatureOfInterestTest() throws Exception {
         super.GetFeatureOfInterestTest();
     }
 
     @Test
     @Override
-    @Order(order=13)
+    @Order(order=14)
     public void insertResultTest() throws Exception {
         super.insertResultTest();
     }
     
     @Test
     @Override
-    @Order(order=14)
+    @Order(order=15)
     public void GetFeatureOfInterestObservedPropertiesTest() throws Exception {
         super.GetFeatureOfInterestObservedPropertiesTest();
     }
@@ -316,7 +328,7 @@ public class OM2SOS2WorkerTest extends SOS2WorkerTest {
      */
     @Test
     @Override
-    @Order(order=15)
+    @Order(order=16)
     public void destroyTest() throws Exception {
         super.destroyTest();
     }
