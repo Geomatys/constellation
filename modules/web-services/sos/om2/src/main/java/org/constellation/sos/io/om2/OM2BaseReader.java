@@ -19,6 +19,7 @@
 
 package org.constellation.sos.io.om2;
 
+import com.google.common.base.Objects;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
@@ -251,7 +252,22 @@ public class OM2BaseReader {
                       rs.getString("field_definition"),
                       rs.getString("uom")));
         }
+        rs.close();
         return results;
+    }
+
+    protected Field getTimeField(final String procedureID, final Connection c) throws SQLException {
+        Field result = null;
+        final PreparedStatement stmt = c.prepareStatement("SELECT * FROM \"om\".\"procedure_descriptions\" WHERE \"procedure\"=? AND \"field_type\"='Time' ORDER BY \"order\"");
+        stmt.setString(1, procedureID);
+        final ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            result = new Field(rs.getString("field_type"),
+                      rs.getString("field_name"),
+                      rs.getString("field_definition"),
+                      rs.getString("uom"));
+        }
+        return result;
     }
     
     protected int getPIDFromObservation(final String obsIdentifier, final Connection c) throws SQLException {
@@ -320,6 +336,20 @@ public class OM2BaseReader {
                 throw new IllegalArgumentException("Unexpected field Type:" + fieldType);
             }
             return buildAnyScalar(version, null, fieldName, compo);
+        }
+        
+        public boolean equals(final Object obj) {
+            if (obj == this) {
+                return true;
+            }
+            if (obj instanceof Field) {
+                final Field that = (Field) obj;
+                return Objects.equal(this.fieldDesc, that.fieldDesc) &&
+                       Objects.equal(this.fieldName, that.fieldName) &&
+                       Objects.equal(this.fieldType, that.fieldType) &&
+                       Objects.equal(this.fieldUom,  that.fieldUom);
+            }
+            return false;
         }
     }
 }

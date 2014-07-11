@@ -47,33 +47,47 @@ public abstract class SOSConfigurerTest  implements ApplicationContextAware {
         
         String result = configurer.getDecimatedObservationsCsv("default", "urn:ogc:object:sensor:GEOM:3", Arrays.asList("urn:ogc:def:phenomenon:GEOM:depth"), null, null, 10);
         String expResult = "Time,depth\n" +
-                                 "2007-05-01T02:59:01,6.56\n" +
-                                 "2007-05-01T04:53:01,6.56\n" +
-                                 "2007-05-01T04:59:01,6.56\n" +
-                                 "2007-05-01T06:53:01,6.56\n" +
-                                 "2007-05-01T06:59:01,6.56\n" +
-                                 "2007-05-01T08:53:01,6.56\n" +
-                                 "2007-05-01T08:59:01,6.56\n" +
-                                 "2007-05-01T10:53:01,6.56\n" +
-                                 "2007-05-01T10:59:01,6.56\n" +
-                                 "2007-05-01T12:53:01,6.56\n" +
-                                 "2007-05-01T17:59:01,6.55\n" +
-                                 "2007-05-01T19:53:01,6.55\n" +
-                                 "2007-05-01T19:59:01,6.55\n" +
-                                 "2007-05-01T21:53:01,6.55\n";
+                                 "2007-05-01T02:59:00,6.56\n" +
+                                 "2007-05-01T04:53:00,6.56\n" +
+                                 "2007-05-01T04:59:00,6.56\n" +
+                                 "2007-05-01T06:53:00,6.56\n" +
+                                 "2007-05-01T06:59:00,6.56\n" +
+                                 "2007-05-01T08:53:00,6.56\n" +
+                                 "2007-05-01T08:59:00,6.56\n" +
+                                 "2007-05-01T10:53:00,6.56\n" +
+                                 "2007-05-01T10:59:00,6.56\n" +
+                                 "2007-05-01T12:53:00,6.56\n" +
+                                 "2007-05-01T17:59:00,6.55\n" +
+                                 "2007-05-01T19:53:00,6.55\n" +
+                                 "2007-05-01T19:59:00,6.55\n" +
+                                 "2007-05-01T21:53:00,6.55\n";
         Assert.assertEquals(expResult, result);
         
         result = configurer.getDecimatedObservationsCsv("default", "urn:ogc:object:sensor:GEOM:8", Arrays.asList("urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon"), null, null, 10);
         expResult = "Time,depth,temperature\n" +
-                    "2007-05-01T12:59:01,6.56,12.0\n" +
-                    "2007-05-01T13:23:01,6.56,13.0\n" +
-                    "2007-05-01T13:59:01,6.56,14.0\n" +
-                    "2007-05-01T14:23:01,6.56,14.0\n" +
-                    "2007-05-01T14:59:01,6.56,15.0\n" +
-                    "2007-05-01T15:23:01,6.56,15.0\n" +
-                    "2007-05-01T15:59:01,6.56,16.0\n" +
-                    "2007-05-01T16:23:01,6.56,16.0\n";
+                    "2007-05-01T12:59:00,6.56,12.0\n" +
+                    "2007-05-01T13:23:00,6.56,13.0\n" +
+                    "2007-05-01T13:59:00,6.56,14.0\n" +
+                    "2007-05-01T14:23:00,6.56,14.0\n" +
+                    "2007-05-01T14:59:00,6.56,15.0\n" +
+                    "2007-05-01T15:23:00,6.56,15.0\n" +
+                    "2007-05-01T15:59:00,6.56,16.0\n" +
+                    "2007-05-01T16:23:00,6.56,16.0\n";
         
+        Assert.assertEquals(expResult, result);
+    }
+    
+    public void getObservationsCsvProfileTest() throws Exception {
+        String result = configurer.getDecimatedObservationsCsv("default", "urn:ogc:object:sensor:GEOM:2", Arrays.asList("urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon"), null, null, 10);
+        String expResult = "depth,temperature\n" +
+                           "12,18.5\n" +
+                           "87,23.9\n" +
+                           "96,26.2\n" +
+                           "171,26.2\n" +
+                           "192,31.4\n" +
+                           "267,31.4\n" +
+                           "384,35.1\n" +
+                           "459,35.1\n";
         Assert.assertEquals(expResult, result);
     }
     

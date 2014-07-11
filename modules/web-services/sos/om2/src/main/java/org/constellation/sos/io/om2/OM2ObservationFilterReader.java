@@ -104,7 +104,8 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
         } else if (time instanceof Instant) {
             final Instant ti      = (Instant) time;
             final String position = getTimeValue(ti.getPosition());
-            sqlRequest.append("AND (\"time\"='").append(position).append("') ");
+            //sqlRequest.append("AND (\"time_begin\"='").append(position).append("' AND \"time_end\"='").append(position).append("') ");
+            sqlMeasureRequest.append("AND (\"$time\"='").append(position).append("') ");
 
         } else {
             throw new ObservationStoreException("TM_Equals operation require timeInstant or TimePeriod!",
@@ -122,7 +123,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             final Instant ti      = (Instant) time;
             final String position = getTimeValue(ti.getPosition());
             sqlRequest.append("AND (\"time_begin\"<='").append(position).append("')");
-            sqlMeasureRequest.append("AND (\"time\"<='").append(position).append("')");
+            sqlMeasureRequest.append("AND (\"$time\"<='").append(position).append("')");
 
         } else {
             throw new ObservationStoreException("TM_Before operation require timeInstant!",
@@ -140,7 +141,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             final Instant ti      = (Instant) time;
             final String position = getTimeValue(ti.getPosition());
             sqlRequest.append("AND (\"time_end\">='").append(position).append("')");
-            sqlMeasureRequest.append("AND (\"time\">='").append(position).append("')");
+            sqlMeasureRequest.append("AND (\"$time\">='").append(position).append("')");
         } else {
             throw new ObservationStoreException("TM_After operation require timeInstant!",
                     INVALID_PARAMETER_VALUE, EVENT_TIME);
@@ -173,7 +174,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             // the multiple observations which overlaps the whole period
             sqlRequest.append(" (\"time_begin\"<='").append(begin).append("' AND \"time_end\">='").append(end).append("'))");
             
-            sqlMeasureRequest.append("AND (\"time\">='").append(begin).append("' AND \"time\"<= '").append(end).append("')");
+            sqlMeasureRequest.append("AND (\"$time\">='").append(begin).append("' AND \"$time\"<= '").append(end).append("')");
         } else {
             throw new ObservationStoreException("TM_During operation require TimePeriod!",
                     INVALID_PARAMETER_VALUE, EVENT_TIME);
@@ -331,9 +332,16 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                     /*
                      *  BUILD RESULT
                      */
-                    final PreparedStatement stmt  = c.prepareStatement("SELECT * FROM \"mesures\".\"mesure" + pid + "\" m "
-                                                         + "WHERE \"id_observation\" = ? " + sqlMeasureRequest.toString() 
-                                                         + "ORDER BY m.\"id\"");
+                    final Field timeField = getTimeField(procedure);
+                    final String sqlRequest;
+                    if (timeField != null) {
+                        sqlRequest = "SELECT * FROM \"mesures\".\"mesure" + pid + "\" m "
+                                                         + "WHERE \"id_observation\" = ? " + sqlMeasureRequest.toString().replace("$time", timeField.fieldName)
+                                                         + "ORDER BY m.\"id\"";
+                    } else {
+                        sqlRequest = "SELECT * FROM \"mesures\".\"mesure" + pid + "\" m WHERE \"id_observation\" = ? ORDER BY m.\"id\"";
+                    }
+                    final PreparedStatement stmt  = c.prepareStatement(sqlRequest);
                     
                     stmt.setInt(1, oid);
                     final ResultSet rs2 = stmt.executeQuery();
@@ -367,9 +375,16 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                     observations.put(procedure + '-' + featureID, observation);
                 } else {
                     String lastTime = null;
-                    final PreparedStatement stmt  = c.prepareStatement("SELECT * FROM \"mesures\".\"mesure" + pid + "\" m "
-                                                         + "WHERE \"id_observation\" = ? " + sqlMeasureRequest.toString() 
-                                                         + "ORDER BY m.\"id\"");
+                    final Field timeField = getTimeField(procedure);
+                    final String sqlRequest;
+                    if (timeField != null) {
+                        sqlRequest = "SELECT * FROM \"mesures\".\"mesure" + pid + "\" m "
+                                                         + "WHERE \"id_observation\" = ? " + sqlMeasureRequest.toString().replace("$time", timeField.fieldName)
+                                                         + "ORDER BY m.\"id\"";
+                    } else {
+                        sqlRequest = "SELECT * FROM \"mesures\".\"mesure" + pid + "\" m WHERE \"id_observation\" = ? ORDER BY m.\"id\"";
+                    }
+                    final PreparedStatement stmt  = c.prepareStatement(sqlRequest);
                     
                     stmt.setInt(1, oid);
                     final ResultSet rs2 = stmt.executeQuery();
@@ -460,9 +475,16 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                 /*
                  *  BUILD RESULT
                  */
-                final PreparedStatement stmt  = c.prepareStatement("SELECT * FROM \"mesures\".\"mesure" + pid + "\" m "
-                                                     + "WHERE \"id_observation\" = ? " + sqlMeasureRequest.toString() 
-                                                     + "ORDER BY m.\"id\"");
+                final Field timeField = getTimeField(procedure);
+                final String sqlRequest;
+                if (timeField != null) {
+                    sqlRequest = "SELECT * FROM \"mesures\".\"mesure" + pid + "\" m "
+                                                     + "WHERE \"id_observation\" = ? " + sqlMeasureRequest.toString().replace("$time", timeField.fieldName)
+                                                     + "ORDER BY m.\"id\"";
+                } else {
+                    sqlRequest = "SELECT * FROM \"mesures\".\"mesure" + pid + "\" m WHERE \"id_observation\" = ? ORDER BY m.\"id\"";
+                }
+                final PreparedStatement stmt  = c.prepareStatement(sqlRequest);
                 stmt.setInt(1, oid);
                 final ResultSet rs2 = stmt.executeQuery();
                 Double dValue       = null;
@@ -503,8 +525,10 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
     public String getResults() throws DataStoreException {
         try {
             // add orderby to the query
-            final String fieldRequest = sqlRequest.toString();
-            sqlRequest.append(sqlMeasureRequest);
+            final Field timeField = getTimeField(currentProcedure);
+            if (timeField != null) {
+                sqlRequest.append(sqlMeasureRequest.toString().replace("$time", timeField.fieldName));
+            }
             sqlRequest.append(" ORDER BY  o.\"id\", m.\"id\"");
             
             final Connection c                          = source.getConnection();
@@ -579,32 +603,42 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
             }
             Map<String, Double> minVal = initMapVal(fields, false);
             Map<String, Double> maxVal = initMapVal(fields, true);
-            final long[] times               = getTimeStepForGetResult(fieldRequest, c, width);
+            final long[] times               = getMainFieldStepForGetResult(fieldRequest, fields.get(0), c, width);
             final long step                  = times[1];
             long start                       = times[0];
             
             while (rs.next()) {
                 
-                long currentTimeMs = 0;
+                long currentMainValue = 0;
                 for (int i = 0; i < fields.size(); i++) {
                     String value = rs.getString(i + 3);
                     Field field = fields.get(i);
                     
-                    // for time TODO remove when field will be typed
-                    if (field.fieldType.equals("Time")) {
-                        final Timestamp currentTime   = Timestamp.valueOf(value);
-                        currentTimeMs      = currentTime.getTime();
+                    if (i == 0) {
+                        if (field.fieldType.equals("Time")) {
+                            final Timestamp currentTime   = Timestamp.valueOf(value);
+                            currentMainValue = currentTime.getTime();
+                        } else if (field.fieldType.equals("Quantity")) {
+                            final Double d = Double.parseDouble(value);
+                            currentMainValue = d.longValue();
+                        }
                     }
                     addToMapVal(minVal, maxVal, field.fieldName, value);
                 }
                 
 
-                if (currentTimeMs > (start + step)) {
+                if (currentMainValue > (start + step)) {
                     //min
-                    long minTime = start + 1000;
-                    values.append(format.format(new Date(minTime)));
+                    if (fields.get(0).fieldType.equals("Time")) {
+                        long minTime = start;
+                        values.append(format.format(new Date(minTime)));
+                    } else if (fields.get(0).fieldType.equals("Quantity")){
+                        values.append(start);
+                    } else {
+                        throw new DataStoreException("main field other than Time or QUantity are not yet allowed");
+                    }
                     for (Field field : fields) {
-                        if (!field.fieldType.equals("Time")) {
+                        if (!field.equals(fields.get(0))) {
                             values.append(encoding.getTokenSeparator());
                             final double minValue = minVal.get(field.fieldName);
                             if (minValue != Double.MAX_VALUE) {
@@ -614,10 +648,16 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                     }
                     values.append(encoding.getBlockSeparator());
                     //max
-                    long maxTime = start + step + 1000;
-                    values.append(format.format(new Date(maxTime)));
+                    if (fields.get(0).fieldType.equals("Time")) {
+                        long maxTime = start + step;
+                        values.append(format.format(new Date(maxTime)));
+                    } else if (fields.get(0).fieldType.equals("Quantity")){
+                        values.append(start + step);
+                    } else {
+                        throw new DataStoreException("main field other than Time or QUantity are not yet allowed");
+                    }
                     for (Field field : fields) {
-                        if (!field.fieldType.equals("Time")) {
+                        if (!field.equals(fields.get(0))) {
                             values.append(encoding.getTokenSeparator());
                             final double maxValue = maxVal.get(field.fieldName);
                             if (maxValue != -Double.MAX_VALUE) {
@@ -626,7 +666,7 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
                         }
                     }
                     values.append(encoding.getBlockSeparator());
-                    start = currentTimeMs;
+                    start = currentMainValue;
                     minVal = initMapVal(fields, false);
                     maxVal = initMapVal(fields, true);
                 }
@@ -672,20 +712,33 @@ public class OM2ObservationFilterReader extends OM2ObservationFilter implements 
         }
     }
     
-    private long[] getTimeStepForGetResult(String request, final Connection c, final int width) throws SQLException {
-        request = request.replace("SELECT m.*", "SELECT MIN(\"time\"), MAX(\"time\") ");
+    private long[] getMainFieldStepForGetResult(String request, final Field mainField, final Connection c, final int width) throws SQLException {
+        request = request.replace("SELECT m.*", "SELECT MIN(\"" + mainField.fieldName + "\"), MAX(\"" + mainField.fieldName + "\") ");
         final Statement stmt = c.createStatement();
         final ResultSet rs = stmt.executeQuery(request);
         final long[] result = {-1L, -1L};
         try {
             if (rs.next()) {
-                final Timestamp minT = rs.getTimestamp(1);
-                final Timestamp maxT = rs.getTimestamp(2);
-                if (minT != null && maxT != null) {
-                    final long min = minT.getTime();
-                    final long max = maxT.getTime();
-                    result[0] = min;
-                    result[1] = (max - min) / width;
+                if (mainField.fieldType.equals("Time")) {
+                    final Timestamp minT = rs.getTimestamp(1);
+                    final Timestamp maxT = rs.getTimestamp(2);
+                    if (minT != null && maxT != null) {
+                        final long min = minT.getTime();
+                        final long max = maxT.getTime();
+                        result[0] = min;
+                        result[1] = (max - min) / width;
+                    }
+                } else if (mainField.fieldType.equals("Quantity")) {
+                    final Double minT = rs.getDouble(1);
+                    final Double maxT = rs.getDouble(2);
+                    if (minT != null && maxT != null) {
+                        final long min = minT.longValue();
+                        final long max = maxT.longValue();
+                        result[0] = min;
+                        result[1] = (max - min) / width;
+                    }
+                } else {
+                    throw new SQLException("unable to extract bound from a " + mainField.fieldType + " main field.");
                 }
             }
         } finally {

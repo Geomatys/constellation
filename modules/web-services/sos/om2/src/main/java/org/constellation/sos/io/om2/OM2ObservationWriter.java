@@ -393,7 +393,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
             final Measure measure = (Measure) result;
             stmt.setInt(1, oid);
             stmt.setInt(2, 1);
-            stmt.setString(4, Double.toString(measure.getValue()));
+            stmt.setDouble(4, measure.getValue());
             stmt.executeUpdate();
             stmt.close();
         } else if (result instanceof DataArrayProperty) {
@@ -978,7 +978,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                         }
                         final String desc = q.getDefinition();
                         fields.add(new Field("Quantity", field.getName(), desc, uom));
-                        sb.append("character varying(1000),"); // TODO Double ?
+                        sb.append("double,");
                     } else if (field.getValue() instanceof AbstractText) {
                         final AbstractText q = (AbstractText)field.getValue();
                         final String desc = q.getDefinition();
@@ -1013,7 +1013,7 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                         final String uom  = q.getUom().getCode();
                         final String desc = q.getDefinition();
                         fields.add(new Field("Quantity", field.getName(), desc, uom));
-                        sb.append("character varying(1000),"); // TODO Double ?
+                        sb.append("double,"); // TODO Double ?
                     } else if (field.getValue() instanceof AbstractText) {
                         final AbstractText q = (AbstractText)field.getValue();
                         final String desc = q.getDefinition();
@@ -1098,14 +1098,16 @@ public class OM2ObservationWriter extends OM2BaseReader implements ObservationWr
                 if (field.fieldType.equals("Time")) {
                     try {
                         final long millis = new ISODateParser().parseToMillis(value);
-                        value = new Timestamp(millis).toString();
+                        value = "'" + new Timestamp(millis).toString() + "'";
                     } catch (IllegalArgumentException ex) {
                         throw new SQLException("Bad format of timestamp for:" + value);
                     }
-                } 
+                } else if (field.fieldType.equals("Text")) {
+                    value =  "'" + value + "'";
+                }
                 
                 if (value != null) {
-                    sql.append("'").append(value).append("',");
+                    sql.append(value).append(",");
                 } else {
                     sql.append("NULL,");
                 }

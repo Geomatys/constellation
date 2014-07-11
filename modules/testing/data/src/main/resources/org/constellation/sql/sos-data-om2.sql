@@ -91,89 +91,89 @@ INSERT INTO "om"."procedure_descriptions"  VALUES ('urn:ogc:object:sensor:GEOM:9
 
 CREATE TABLE "mesures"."mesure2"("id_observation" integer NOT NULL,
                                  "id"             integer NOT NULL,
-                                 "depth"          character varying(1000),
-                                 "temperature"    character varying(1000));
+                                 "depth"          double,
+                                 "temperature"    double);
 
-INSERT INTO "mesures"."mesure2" VALUES (201, 1, '12',  '18.5');
-INSERT INTO "mesures"."mesure2" VALUES (201, 2, '24',  '19.7');
-INSERT INTO "mesures"."mesure2" VALUES (201, 3, '48',  '21.2');
-INSERT INTO "mesures"."mesure2" VALUES (201, 4, '96',  '23.9');
-INSERT INTO "mesures"."mesure2" VALUES (201, 5, '192', '26.2');
-INSERT INTO "mesures"."mesure2" VALUES (201, 6, '384', '31.4');
-INSERT INTO "mesures"."mesure2" VALUES (201, 7, '768', '35.1');
+INSERT INTO "mesures"."mesure2" VALUES (201, 1, 12,  18.5);
+INSERT INTO "mesures"."mesure2" VALUES (201, 2, 24,  19.7);
+INSERT INTO "mesures"."mesure2" VALUES (201, 3, 48,  21.2);
+INSERT INTO "mesures"."mesure2" VALUES (201, 4, 96,  23.9);
+INSERT INTO "mesures"."mesure2" VALUES (201, 5, 192, 26.2);
+INSERT INTO "mesures"."mesure2" VALUES (201, 6, 384, 31.4);
+INSERT INTO "mesures"."mesure2" VALUES (201, 7, 768, 35.1);
 
 CREATE TABLE "mesures"."mesure3"("id_observation" integer NOT NULL,
                                  "id"             integer NOT NULL,
-                                 "time"           timestamp,
-                                 "depth"          character varying(1000));
+                                 "Time"           timestamp,
+                                 "depth"          double);
 
-INSERT INTO "mesures"."mesure3" VALUES (304, 1, '2007-05-01 02:59:00','6.56');
-INSERT INTO "mesures"."mesure3" VALUES (304, 2, '2007-05-01 03:59:00','6.56');
-INSERT INTO "mesures"."mesure3" VALUES (304, 3, '2007-05-01 04:59:00','6.56');
-INSERT INTO "mesures"."mesure3" VALUES (304, 4, '2007-05-01 05:59:00','6.56');
-INSERT INTO "mesures"."mesure3" VALUES (304, 5, '2007-05-01 06:59:00','6.56');
+INSERT INTO "mesures"."mesure3" VALUES (304, 1, '2007-05-01 02:59:00',6.56);
+INSERT INTO "mesures"."mesure3" VALUES (304, 2, '2007-05-01 03:59:00',6.56);
+INSERT INTO "mesures"."mesure3" VALUES (304, 3, '2007-05-01 04:59:00',6.56);
+INSERT INTO "mesures"."mesure3" VALUES (304, 4, '2007-05-01 05:59:00',6.56);
+INSERT INTO "mesures"."mesure3" VALUES (304, 5, '2007-05-01 06:59:00',6.56);
 
-INSERT INTO "mesures"."mesure3" VALUES (305, 1, '2007-05-01 07:59:00','6.56');
-INSERT INTO "mesures"."mesure3" VALUES (305, 2, '2007-05-01 08:59:00','6.56');
-INSERT INTO "mesures"."mesure3" VALUES (305, 3, '2007-05-01 09:59:00','6.56');
-INSERT INTO "mesures"."mesure3" VALUES (305, 4, '2007-05-01 10:59:00','6.56');
-INSERT INTO "mesures"."mesure3" VALUES (305, 5, '2007-05-01 11:59:00','6.56');
+INSERT INTO "mesures"."mesure3" VALUES (305, 1, '2007-05-01 07:59:00',6.56);
+INSERT INTO "mesures"."mesure3" VALUES (305, 2, '2007-05-01 08:59:00',6.56);
+INSERT INTO "mesures"."mesure3" VALUES (305, 3, '2007-05-01 09:59:00',6.56);
+INSERT INTO "mesures"."mesure3" VALUES (305, 4, '2007-05-01 10:59:00',6.56);
+INSERT INTO "mesures"."mesure3" VALUES (305, 5, '2007-05-01 11:59:00',6.56);
 
-INSERT INTO "mesures"."mesure3" VALUES (307, 1, '2007-05-01 17:59:00','6.56');
-INSERT INTO "mesures"."mesure3" VALUES (307, 2, '2007-05-01 18:59:00','6.55');
-INSERT INTO "mesures"."mesure3" VALUES (307, 3, '2007-05-01 19:59:00','6.55');
-INSERT INTO "mesures"."mesure3" VALUES (307, 4, '2007-05-01 20:59:00','6.55');
-INSERT INTO "mesures"."mesure3" VALUES (307, 5, '2007-05-01 21:59:00','6.55');
+INSERT INTO "mesures"."mesure3" VALUES (307, 1, '2007-05-01 17:59:00',6.56);
+INSERT INTO "mesures"."mesure3" VALUES (307, 2, '2007-05-01 18:59:00',6.55);
+INSERT INTO "mesures"."mesure3" VALUES (307, 3, '2007-05-01 19:59:00',6.55);
+INSERT INTO "mesures"."mesure3" VALUES (307, 4, '2007-05-01 20:59:00',6.55);
+INSERT INTO "mesures"."mesure3" VALUES (307, 5, '2007-05-01 21:59:00',6.55);
 
 CREATE TABLE "mesures"."mesure5"("id_observation" integer NOT NULL,
                                  "id"             integer NOT NULL,
-                                 "time"           timestamp,
-                                 "depth"          character varying(1000));
+                                 "Time"           timestamp,
+                                 "depth"          double);
 
-INSERT INTO "mesures"."mesure5" VALUES (507, 1, '2007-05-01 12:59:00','6.56');
-INSERT INTO "mesures"."mesure5" VALUES (507, 2, '2007-05-01 13:59:00','6.56');
-INSERT INTO "mesures"."mesure5" VALUES (507, 3, '2007-05-01 14:59:00','6.56');
-INSERT INTO "mesures"."mesure5" VALUES (507, 4, '2007-05-01 15:59:00','6.56');
-INSERT INTO "mesures"."mesure5" VALUES (507, 5, '2007-05-01 16:59:00','6.56');
+INSERT INTO "mesures"."mesure5" VALUES (507, 1, '2007-05-01 12:59:00',6.56);
+INSERT INTO "mesures"."mesure5" VALUES (507, 2, '2007-05-01 13:59:00',6.56);
+INSERT INTO "mesures"."mesure5" VALUES (507, 3, '2007-05-01 14:59:00',6.56);
+INSERT INTO "mesures"."mesure5" VALUES (507, 4, '2007-05-01 15:59:00',6.56);
+INSERT INTO "mesures"."mesure5" VALUES (507, 5, '2007-05-01 16:59:00',6.56);
 
 CREATE TABLE "mesures"."mesure4"("id_observation" integer NOT NULL,
                                  "id"             integer NOT NULL,
-                                 "time"           timestamp,
-                                 "depth"          character varying(1000));
+                                 "Time"           timestamp,
+                                 "depth"          double);
 
-INSERT INTO "mesures"."mesure4" VALUES (406, 1, '2007-05-01 12:59:00','6.56');
-INSERT INTO "mesures"."mesure4" VALUES (406, 2, '2007-05-01 13:59:00','6.56');
-INSERT INTO "mesures"."mesure4" VALUES (406, 3, '2007-05-01 14:59:00','6.56');
-INSERT INTO "mesures"."mesure4" VALUES (406, 4, '2007-05-01 15:59:00','6.56');
-INSERT INTO "mesures"."mesure4" VALUES (406, 5, '2007-05-01 16:59:00','6.56');
+INSERT INTO "mesures"."mesure4" VALUES (406, 1, '2007-05-01 12:59:00',6.56);
+INSERT INTO "mesures"."mesure4" VALUES (406, 2, '2007-05-01 13:59:00',6.56);
+INSERT INTO "mesures"."mesure4" VALUES (406, 3, '2007-05-01 14:59:00',6.56);
+INSERT INTO "mesures"."mesure4" VALUES (406, 4, '2007-05-01 15:59:00',6.56);
+INSERT INTO "mesures"."mesure4" VALUES (406, 5, '2007-05-01 16:59:00',6.56);
 
 CREATE TABLE "mesures"."mesure8"("id_observation" integer NOT NULL,
                                  "id"             integer NOT NULL,
-                                 "time"           timestamp,
-                                 "depth"          character varying(1000),
-                                 "temperature"    character varying(1000));
+                                 "Time"           timestamp,
+                                 "depth"          double,
+                                 "temperature"    double);
 
-INSERT INTO "mesures"."mesure8" VALUES (801, 1,  '2007-05-01 12:59:00','6.56','12.0');
-INSERT INTO "mesures"."mesure8" VALUES (801, 3,  '2007-05-01 13:59:00','6.56','13.0');
-INSERT INTO "mesures"."mesure8" VALUES (801, 5,  '2007-05-01 14:59:00','6.56','14.0');
-INSERT INTO "mesures"."mesure8" VALUES (801, 7,  '2007-05-01 15:59:00','6.56','15.0');
-INSERT INTO "mesures"."mesure8" VALUES (801, 9,  '2007-05-01 16:59:00','6.56','16.0');
+INSERT INTO "mesures"."mesure8" VALUES (801, 1,  '2007-05-01 12:59:00',6.56,12.0);
+INSERT INTO "mesures"."mesure8" VALUES (801, 3,  '2007-05-01 13:59:00',6.56,13.0);
+INSERT INTO "mesures"."mesure8" VALUES (801, 5,  '2007-05-01 14:59:00',6.56,14.0);
+INSERT INTO "mesures"."mesure8" VALUES (801, 7,  '2007-05-01 15:59:00',6.56,15.0);
+INSERT INTO "mesures"."mesure8" VALUES (801, 9,  '2007-05-01 16:59:00',6.56,16.0);
 
 CREATE TABLE "mesures"."mesure7"("id_observation" integer NOT NULL,
                                  "id"             integer NOT NULL,
-                                 "time"           timestamp,
-                                 "temperature"    character varying(1000));
+                                 "Time"           timestamp,
+                                 "temperature"    double);
 
-INSERT INTO "mesures"."mesure7" VALUES (802, 1,  '2007-05-01 16:59:00','6.56');
+INSERT INTO "mesures"."mesure7" VALUES (802, 1,  '2007-05-01 16:59:00',6.56);
 
 CREATE TABLE "mesures"."mesure9"("id_observation" integer NOT NULL,
                                  "id"             integer NOT NULL,
-                                 "depth"          character varying(1000));
+                                 "depth"          double);
 
-INSERT INTO "mesures"."mesure9" VALUES (901, 1,  '18.5');
-INSERT INTO "mesures"."mesure9" VALUES (901, 2,  '19.7');
-INSERT INTO "mesures"."mesure9" VALUES (901, 3,  '21.2');
-INSERT INTO "mesures"."mesure9" VALUES (901, 4,  '23.9');
-INSERT INTO "mesures"."mesure9" VALUES (901, 5,  '22.2');
-INSERT INTO "mesures"."mesure9" VALUES (901, 6,  '18.4');
-INSERT INTO "mesures"."mesure9" VALUES (901, 7,  '17.1');
+INSERT INTO "mesures"."mesure9" VALUES (901, 1,  18.5);
+INSERT INTO "mesures"."mesure9" VALUES (901, 2,  19.7);
+INSERT INTO "mesures"."mesure9" VALUES (901, 3,  21.2);
+INSERT INTO "mesures"."mesure9" VALUES (901, 4,  23.9);
+INSERT INTO "mesures"."mesure9" VALUES (901, 5,  22.2);
+INSERT INTO "mesures"."mesure9" VALUES (901, 6,  18.4);
+INSERT INTO "mesures"."mesure9" VALUES (901, 7,  17.1);

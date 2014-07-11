@@ -56,7 +56,7 @@
             <swe:encoding>
                 <swe:TextEncoding blockSeparator="@@" decimalSeparator="." tokenSeparator="," id="encoding-1"/>
             </swe:encoding>
-            <swe:values>12,18.5@@24,19.7@@48,21.2@@96,23.9@@192,26.2@@384,31.4@@768,35.1@@</swe:values>
+            <swe:values>12.0,18.5@@24.0,19.7@@48.0,21.2@@96.0,23.9@@192.0,26.2@@384.0,31.4@@768.0,35.1@@</swe:values>
         </swe:DataArray>
     </om:result>
 </om:OM_Observation>
