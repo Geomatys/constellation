@@ -398,6 +398,8 @@
     "mapcontext.modal.label.keywords": "Keywords",
     "mapcontext.modal.label.name": "Name",
     "mapcontext.modal.select.source": "Select your layer source",
+    "mapcontext.modal.tab.info": "Information",
+    "mapcontext.modal.tab.layers": "Layers",
     "mapcontext.modal.title": "Add map context",
     "mapcontext.modal.validate": "Validate",
 

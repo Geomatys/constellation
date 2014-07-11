@@ -1301,6 +1301,10 @@ a.btn-push-right {
     color: #2f96b4;
     font-weight: bold;
 }
+.modal-body .block-border {
+    border: 1px solid #ddd;
+    border-top-color: transparent;
+}
 
 .row .form-separator {
     border-top: 1px solid #eeeeee;
