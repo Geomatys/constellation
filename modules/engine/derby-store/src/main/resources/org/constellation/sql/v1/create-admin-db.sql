@@ -430,14 +430,15 @@ ALTER TABLE "admin"."mapcontext" ADD CONSTRAINT mapcontext_owner_fk FOREIGN KEY 
 CREATE TABLE "admin"."mapcontext_styled_layer" (
   "mapcontext_id"  INTEGER     NOT NULL,
   "layer_id"       INTEGER     NOT NULL,
-  "style_id"       INTEGER     NOT NULL,
+  "style_id"       INTEGER,
+  "external_style" VARCHAR(32),
   "order"          INTEGER     NOT NULL   DEFAULT 1,
   "opacity"        INTEGER     NOT NULL   DEFAULT 100,
   "visible"        BOOLEAN     NOT NULL   DEFAULT TRUE
 );
 
-ALTER TABLE "admin"."mapcontext_styled_layer" ADD CONSTRAINT mapcontext_styled_layer_pk PRIMARY KEY ("mapcontext_id","layer_id","style_id");
+ALTER TABLE "admin"."mapcontext_styled_layer" ADD CONSTRAINT mapcontext_styled_layer_pk PRIMARY KEY ("mapcontext_id","layer_id");
 ALTER TABLE "admin"."mapcontext_styled_layer" ADD CONSTRAINT mapcontext_styled_layer_context_fk   FOREIGN KEY ("mapcontext_id") REFERENCES "admin"."mapcontext"("id") ON DELETE CASCADE;
 ALTER TABLE "admin"."mapcontext_styled_layer" ADD CONSTRAINT mapcontext_styled_layer_layer_fk     FOREIGN KEY ("layer_id")      REFERENCES "admin"."layer"("id")  ON DELETE CASCADE;
-ALTER TABLE "admin"."mapcontext_styled_layer" ADD CONSTRAINT mapcontext_styled_layer_style_fk     FOREIGN KEY ("style_id")      REFERENCES "admin"."style"("id")  ON DELETE CASCADE;
+--ALTER TABLE "admin"."mapcontext_styled_layer" ADD CONSTRAINT mapcontext_styled_layer_style_fk     FOREIGN KEY ("style_id")      REFERENCES "admin"."style"("id")  ON DELETE CASCADE;
 

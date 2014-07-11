@@ -239,7 +239,7 @@ public class ConfigurationXmlBindingTest {
         // title, abstract, keyword, MDUrl, DataUrl,
         // authUrl, identifier, attribution, opaque and CRS
         /////////////////////////////////////////
-        Layer mainLayer = new Layer(null, "mainTitle", null, null, null, null, null, null, null, null, Arrays.asList("CRS-custo1", "CRS-custo2"));
+        Layer mainLayer = new Layer(null, null, "mainTitle", null, null, null, null, null, null, null, null, Arrays.asList("CRS-custo1", "CRS-custo2"));
         context = new LayerContext();
         context.setMainLayer(mainLayer);
         sw = new StringWriter();

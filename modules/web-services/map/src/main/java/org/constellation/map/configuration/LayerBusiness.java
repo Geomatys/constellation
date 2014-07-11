@@ -196,12 +196,10 @@ public class LayerBusiness {
                 final Provider provider  = providerRepository.findOne(data.getProvider());
                 final QName name         = new QName(layer.getNamespace(), layer.getName());
                 final List<Style> styles = styleRepository.findByLayer(layer);
-                org.constellation.configuration.Layer layerConfig = readLayerConfiguration(layer.getConfig());
+
                 if (securityFilter.allowed(login, name)) {
-                    if (layerConfig == null) {
-                        layerConfig = new org.constellation.configuration.Layer(name);
-                    }
-                    
+                    final org.constellation.configuration.Layer layerConfig = new org.constellation.configuration.Layer(layer.getId(), name);
+
                     // override with table values (TODO remove)
                     layerConfig.setAlias(layer.getAlias());
                     layerConfig.setDate(new Date(layer.getDate()));

@@ -32,6 +32,8 @@ import java.util.List;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class LayerSummary {
+    @XmlElement(name="Id")
+    private Integer id;
     @XmlElement(name = "Name")
     private String name;
     @XmlElement(name = "Namespace")
@@ -54,6 +56,7 @@ public class LayerSummary {
     public LayerSummary() {}
 
     public LayerSummary(final Layer layer, final DataBrief db) {
+        this.id = layer.getId();
         this.name = layer.getName().getLocalPart();
         this.namespace = layer.getName().getNamespaceURI();
         this.alias = layer.getAlias();
@@ -78,6 +81,14 @@ public class LayerSummary {
             }
         }
         return briefs;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -157,6 +168,7 @@ public class LayerSummary {
 
         LayerSummary that = (LayerSummary) o;
 
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
         if (alias != null ? !alias.equals(that.alias) : that.alias != null) return false;
         if (date != null ? !date.equals(that.date) : that.date != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
@@ -173,6 +185,7 @@ public class LayerSummary {
     @Override
     public int hashCode() {
         int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (id != null ? id.hashCode() : 0);
         result = 31 * result + (namespace != null ? namespace.hashCode() : 0);
         result = 31 * result + (alias != null ? alias.hashCode() : 0);
         result = 31 * result + (type != null ? type.hashCode() : 0);
@@ -187,7 +200,8 @@ public class LayerSummary {
     @Override
     public String toString() {
         return "LayerSummary{" +
-                "name='" + name + '\'' +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
                 ", namespace='" + namespace + '\'' +
                 ", alias='" + alias + '\'' +
                 ", type='" + type + '\'' +

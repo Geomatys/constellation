@@ -352,9 +352,10 @@ cstlAdminApp.factory('sensor', ['$resource',
 cstlAdminApp.factory('mapcontext', ['$resource',
     function ($resource) {
         return $resource('@cstl/api/1/context', {}, {
-            'list':   {method: 'GET',    url: '@cstl/api/1/context/list;jsessionid=', isArray: true},
-            'add':    {method: 'PUT',    url: '@cstl/api/1/context;jsessionid='},
-            'delete': {method: 'DELETE', url: '@cstl/api/1/context/:id;jsessionid='}
+            'list':      {method: 'GET',    url: '@cstl/api/1/context/list;jsessionid=', isArray: true},
+            'add':       {method: 'PUT',    url: '@cstl/api/1/context;jsessionid='},
+            'delete':    {method: 'DELETE', url: '@cstl/api/1/context/:id;jsessionid='},
+            'setLayers': {method: 'POST',   url: '@cstl/api/1/context/layers/:id;jsessionid='}
         });
     }]);
 

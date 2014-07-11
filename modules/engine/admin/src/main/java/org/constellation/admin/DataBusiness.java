@@ -216,7 +216,8 @@ public class DataBusiness {
             final List<StyleBrief> styleBriefs = new ArrayList<>(0);
             for (Style style : styles) {
                 final StyleBrief sb = new StyleBrief();
-                sb.setType(style.getType().toString());
+                sb.setId(style.getId());
+                sb.setType(style.getType());
                 sb.setProvider(getProviderIdentifier(style.getProvider()));
                 sb.setDate(new Date(style.getDate()));
                 sb.setName(style.getName());

@@ -30,6 +30,8 @@ public interface MapContextRepository {
 
     List<MapcontextStyledLayer> getLinkedLayers(int mapContextId);
 
+    void setLinkedLayers(int mapContextId, List<MapcontextStyledLayer> layers);
+
     Mapcontext create(Mapcontext mapContext);
 
     int delete(int id);

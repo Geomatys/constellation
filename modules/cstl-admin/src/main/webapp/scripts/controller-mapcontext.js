@@ -86,7 +86,8 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
         };
 
         $scope.layers = {
-            toAdd: []
+            toAdd: [], // Stores temp layers, selected to be added at the saving time
+            toSend: [] // List of layers really sent
         };
 
         $scope.close = function () {
@@ -114,9 +115,24 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
             // Verify on which step the user is.
             if ($scope.mode.display==='general') {
                 // On the general panel, it means saving the whole context
-                mapcontext.add({}, $scope.ctxt, function () {
-                    $growl('success', 'Success', 'Map context created');
-                    $modalInstance.close();
+                mapcontext.add({}, $scope.ctxt, function (ctxtCreated) {
+                    // Prepare layers to be added
+                    for (var i=0; i<$scope.layers.toAdd.length; i++) {
+                        var l = $scope.layers.toAdd[i];
+                        $scope.layers.toSend.push({
+                            mapcontextId: ctxtCreated.id, layerId: l.layer.Id,
+                            styleId: (l.layer.TargetStyle.length > 0)? l.layer.TargetStyle[0].Id : null,
+                            order: i, visible: l.visible
+                        });
+                    }
+
+                    mapcontext.setLayers({id: ctxtCreated.id}, $scope.layers.toSend, function() {
+                        $growl('success', 'Success', 'Map context created');
+                        $modalInstance.close();
+                    }, function() {
+                        $growl('error', 'Error', 'Unable to add layers to map context');
+                        $modalInstance.dismiss('close');
+                    });
                 }, function () {
                     $growl('error', 'Error', 'Unable to create map context');
                     $modalInstance.dismiss('close');

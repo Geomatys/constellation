@@ -19,8 +19,6 @@
 
 package org.constellation.configuration;
 
-//import juzu.Mapped;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -35,8 +33,9 @@ import java.util.Date;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-//@Mapped
 public final class StyleBrief implements Serializable {
+    @XmlElement(name="Id")
+    private Integer id;
 
     @XmlElement(name="Name")
     private String name;
@@ -56,6 +55,13 @@ public final class StyleBrief implements Serializable {
     @XmlElement(name="Owner")
     private String owner;
 
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(final Integer id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -112,6 +118,7 @@ public final class StyleBrief implements Serializable {
 
         StyleBrief that = (StyleBrief) o;
 
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
         if (date != null ? !date.equals(that.date) : that.date != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         if (owner != null ? !owner.equals(that.owner) : that.owner != null) return false;
@@ -125,6 +132,7 @@ public final class StyleBrief implements Serializable {
     @Override
     public int hashCode() {
         int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (id != null ? id.hashCode() : 0);
         result = 31 * result + (provider != null ? provider.hashCode() : 0);
         result = 31 * result + (title != null ? title.hashCode() : 0);
         result = 31 * result + (date != null ? date.hashCode() : 0);
@@ -136,7 +144,8 @@ public final class StyleBrief implements Serializable {
     @Override
     public String toString() {
         return "StyleBrief{" +
-                "name='" + name + '\'' +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
                 ", provider='" + provider + '\'' +
                 ", title='" + title + '\'' +
                 ", date=" + date +

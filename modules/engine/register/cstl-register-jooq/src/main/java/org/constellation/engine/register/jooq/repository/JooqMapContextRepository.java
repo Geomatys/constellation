@@ -50,6 +50,26 @@ public class JooqMapContextRepository extends AbstractJooqRespository<Mapcontext
     }
 
     @Override
+    public void setLinkedLayers(int contextId, List<MapcontextStyledLayer> layers) {
+        if (layers.isEmpty()) {
+            return;
+        }
+
+        // Remove eventually existing old layers for this map context
+        dsl.delete(MAPCONTEXT_STYLED_LAYER).where(MAPCONTEXT_STYLED_LAYER.MAPCONTEXT_ID.eq(contextId)).execute();
+
+        for (final MapcontextStyledLayer layer : layers) {
+            dsl.insertInto(MAPCONTEXT_STYLED_LAYER)
+               .set(MAPCONTEXT_STYLED_LAYER.LAYER_ID, layer.getLayerId())
+               .set(MAPCONTEXT_STYLED_LAYER.MAPCONTEXT_ID, layer.getMapcontextId())
+               .set(MAPCONTEXT_STYLED_LAYER.STYLE_ID, layer.getStyleId())
+               .set(MAPCONTEXT_STYLED_LAYER.VISIBLE, layer.isVisible())
+               .set(MAPCONTEXT_STYLED_LAYER.ORDER, layer.getOrder())
+               .execute();
+        }
+    }
+
+    @Override
     public Mapcontext create(Mapcontext mapContext) {
         MapcontextRecord newRecord = MapcontextHelper.copy(mapContext, dsl.newRecord(MAPCONTEXT));
 

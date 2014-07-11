@@ -20,19 +20,15 @@ package org.constellation.rest.api;
 
 import org.constellation.admin.MapContextBusiness;
 import org.constellation.engine.register.Mapcontext;
+import org.constellation.engine.register.MapcontextStyledLayer;
 import org.constellation.engine.register.repository.MapContextRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
 
 
 /**
@@ -60,8 +56,8 @@ public class MapContextRest {
     @Path("/")
     @Transactional
     public Response create(final Mapcontext mapContext) {
-        contextRepository.create(mapContext);
-        return Response.status(201).build();
+        final Mapcontext mapContextCreated = contextRepository.create(mapContext);
+        return Response.ok(mapContextCreated).build();
     }
 
     @DELETE
@@ -70,5 +66,12 @@ public class MapContextRest {
     public Response delete(@PathParam("id") final int contextId) {
         contextRepository.delete(contextId);
         return Response.status(204).build();
+    }
+
+    @POST
+    @Path("/layers/{id}")
+    public Response addMapItems(@PathParam("id") final int contextId, final List<MapcontextStyledLayer> layers) {
+        contextBusiness.addMapItems(contextId, layers);
+        return Response.status(201).build();
     }
 }

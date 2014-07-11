@@ -43,6 +43,8 @@ import java.util.Objects;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Layer {
+    @XmlAttribute
+    private Integer id;
 
     @XmlAttribute
     private QName name;
@@ -115,34 +117,41 @@ public class Layer {
         this.name = name;
     }
 
-    public Layer(final QName name, final List<DataReference> styles) {
+    public Layer(final Integer id, final QName name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public Layer(final Integer id, final QName name, final List<DataReference> styles) {
+        this.id = id;
         this.name = name;
         this.styles = styles;
     }
 
-    public Layer(final QName name, final String title, final String abstrac, final List<String> keywords, final FormatURL metadataURL,
+    public Layer(final Integer id, final QName name, final String title, final String abstrac, final List<String> keywords, final FormatURL metadataURL,
             final FormatURL dataURL, final FormatURL authorityURL, final Reference identifier, final AttributionType attribution, final Boolean opaque,
             final List<String> crs)
     {
-        this(name, null, null, null, title, abstrac, keywords, metadataURL, dataURL, authorityURL, identifier, attribution, opaque, crs);
+        this(id, name, null, null, null, title, abstrac, keywords, metadataURL, dataURL, authorityURL, identifier, attribution, opaque, crs);
     }
 
-    public Layer(final QName name, final List<DataReference> styles, final FilterType filter, final String alias, final String title, final String abstrac, final List<String> keywords, final FormatURL metadataURL,
+    public Layer(final Integer id, final QName name, final List<DataReference> styles, final FilterType filter, final String alias, final String title, final String abstrac, final List<String> keywords, final FormatURL metadataURL,
             final FormatURL dataURL, final FormatURL authorityURL, final Reference identifier, final AttributionType attribution, final Boolean opaque,
             final List<String> crs)
     {
-        this(name, styles, filter, alias, title, abstrac, keywords, metadataURL, dataURL, authorityURL, identifier, attribution, opaque, crs, null);
+        this(id, name, styles, filter, alias, title, abstrac, keywords, metadataURL, dataURL, authorityURL, identifier, attribution, opaque, crs, null);
     }
 
-    public Layer(final QName name, final List<DataReference> styles, final FilterType filter, final String alias, final String title, final String abstrac, final List<String> keywords, final FormatURL metadataURL,
+    public Layer(final Integer id, final QName name, final List<DataReference> styles, final FilterType filter, final String alias, final String title, final String abstrac, final List<String> keywords, final FormatURL metadataURL,
             final FormatURL dataURL, final FormatURL authorityURL, final Reference identifier, final AttributionType attribution, final Boolean opaque,
             final List<String> crs, final List<DimensionDefinition> dimensions) {
-        this(name, styles, filter, alias, title, abstrac, keywords, metadataURL, dataURL, authorityURL, identifier, attribution, opaque, crs, dimensions, null);
+        this(id, name, styles, filter, alias, title, abstrac, keywords, metadataURL, dataURL, authorityURL, identifier, attribution, opaque, crs, dimensions, null);
     }
 
-    public Layer(final QName name, final List<DataReference> styles, final FilterType filter, final String alias, final String title, final String abstrac, final List<String> keywords, final FormatURL metadataURL,
+    public Layer(final Integer id, final QName name, final List<DataReference> styles, final FilterType filter, final String alias, final String title, final String abstrac, final List<String> keywords, final FormatURL metadataURL,
                  final FormatURL dataURL, final FormatURL authorityURL, final Reference identifier, final AttributionType attribution, final Boolean opaque,
                  final List<String> crs, final List<DimensionDefinition> dimensions, final Date version) {
+        this.id           = id;
         this.name         = name;
         this.styles       = styles;
         this.filter       = filter;
@@ -160,6 +169,14 @@ public class Layer {
         this.version      = version != null ? Long.valueOf(version.getTime()): null;
         this.alias        = alias;
         this.getFeatureInfoCfgs = null;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     /**
@@ -388,6 +405,9 @@ public class Layer {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("[Layer]");
+        if (id != null) {
+            sb.append("id:\n").append(id).append('\n');
+        }
         if (name != null) {
             sb.append("name:\n").append(name).append('\n');
         }
@@ -455,6 +475,7 @@ public class Layer {
         if (obj instanceof Layer) {
             final Layer that = (Layer) obj;
             return Objects.equals(this.abstrac,      that.abstrac) &&
+                   Objects.equals(this.id,           that.id) &&
                    Objects.equals(this.attribution,  that.attribution) &&
                    Objects.equals(this.authorityURL, that.authorityURL) &&
                    Objects.equals(this.crs,          that.crs) &&
@@ -477,6 +498,7 @@ public class Layer {
     @Override
     public int hashCode() {
         int hash = 7;
+        hash = 79 * hash + (this.id != null ? this.id.hashCode() : 0);
         hash = 79 * hash + (this.name != null ? this.name.hashCode() : 0);
         hash = 79 * hash + (this.styles != null ? this.styles.hashCode() : 0);
         hash = 79 * hash + (this.filter != null ? this.filter.hashCode() : 0);

@@ -161,6 +161,7 @@ public final class StyleBusiness {
     private StyleBrief getBriefFromRecord(final Style record, final Locale locale) throws SQLException {
         final Provider provider = providerRepository.findOne(record.getProvider());
         final StyleBrief brief = new StyleBrief();
+        brief.setId(record.getId());
         brief.setName(record.getName());
         brief.setProvider(provider.getIdentifier());
         //FIXME I18N
@@ -204,6 +205,7 @@ public final class StyleBusiness {
                 continue; // skip "GO2" provider
             }
             final StyleBrief bean = new StyleBrief();
+            bean.setId(style.getId());
             bean.setName(style.getName());
             bean.setProvider(provider.getIdentifier());
             bean.setType(style.getType());
@@ -234,6 +236,7 @@ public final class StyleBusiness {
         final List<StyleBrief> beans = new ArrayList<>();
         for (final Style style : styles) {
             final StyleBrief bean = new StyleBrief();
+            bean.setId(style.getId());
             bean.setName(style.getName());
             bean.setProvider(providerId);
             bean.setType(style.getType());
