@@ -385,7 +385,7 @@ public class DataRest {
             final File uploadFolder = new File(ConfigDirectory.getDataDirectory(), "upload");
             final ImportedData importedData = new ImportedData();
             if (filePath != null) {
-                if (filePath.endsWith(".zip")) {
+                if (filePath.toLowerCase().endsWith(".zip")) {
                     final File zipFile = new File(filePath);
                     final String fileNameWithoutExt = zipFile.getName().substring(0, zipFile.getName().indexOf("."));
                     final File zipDir = new File(dataIntegratedDirectory, fileNameWithoutExt);
