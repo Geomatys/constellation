@@ -86,10 +86,10 @@
                                 </div>
 
                                 <div ng-if="context==selected" ng-repeat="layer in context.layers" style="padding-left:0;">
-                                    <div class="item child" ng-class="{'selected':layer==selectedLayer, coverage:layer.Type.toUpperCase()==='coverage-store'.toUpperCase()||layer.Type.toUpperCase()==='raster'.toUpperCase(),vector:layer.Type.toUpperCase()==='feature-store'.toUpperCase()||layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layer.Type.toUpperCase()==='vector'.toUpperCase()}" ng-click="selectContextChild(layer);">
+                                    <div class="item child" ng-class="{'selected':layer==selectedLayer, coverage:layer.Type.toUpperCase()==='coverage'.toUpperCase()||layer.Type.toUpperCase()==='raster'.toUpperCase(),vector:layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layer.Type.toUpperCase()==='vector'.toUpperCase()}" ng-click="selectContextChild(layer);">
                                         <div class="top">
                                             <span class="item-title" title="{{layer.Name}}">{{layer.Name}}</span>
-                                            <span class="pull-right text-right item-list-style">{{layer.Type==='coverage-store'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector':layer.Type}}</span>
+                                            <span class="pull-right text-right item-list-style">{{layer.Type==='coverage'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector':layer.Type}}</span>
                                             <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer!=selected"
                                                  src="images/vector-multipoint.svg"
                                                  class="pull-right"

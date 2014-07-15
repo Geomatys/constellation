@@ -98,7 +98,7 @@
                                                     <div class="item" ng-class="{coverage:layerToAdd.layer.Type.toUpperCase()==='coverage'.toUpperCase(),vector:layerToAdd.layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layerToAdd.layer.Type.toUpperCase()==='vector'.toUpperCase()}">
                                                         <div class="top">
                                                             <span class="item-title" title="{{layerToAdd.layer.Name}}">{{layerToAdd.layer.Name}}</span>
-                                                            <span class="pull-right text-right item-list-style">{{layerToAdd.layer.Type==='coverage-store'?'raster':layerToAdd.layer.Type==='feature-store'?'vector':layerToAdd.layer.Type==='observation-store'?'vector':layerToAdd.layer.Type}}</span>
+                                                            <span class="pull-right text-right item-list-style">{{layerToAdd.layer.Type==='coverage'?'raster':layerToAdd.layer.Type==='feature-store'?'vector':layerToAdd.layer.Type==='observation-store'?'vector':layerToAdd.layer.Type}}</span>
                                                             <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='Point' || layerToAdd.layer.Subtype=='MultiPoint')"
                                                                  src="images/vector-multipoint.svg"
                                                                  class="pull-right"
@@ -188,10 +188,10 @@
                                 <div class="dash-inner row dashboard" ng-init="small=false">
                                     <div data-role="list">
                                         <div class="item-list">
-                                            <div class="item" ng-repeat="layer in serviceLayers.layers" ng-class="{selected:layer==selected.layer,coverage:layer.Type.toUpperCase()==='coverage-store'.toUpperCase()||layer.Type.toUpperCase()==='raster'.toUpperCase(),vector:layer.Type.toUpperCase()==='feature-store'.toUpperCase()||layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layer.Type.toUpperCase()==='vector'.toUpperCase(), 'col-xs-6':small==true}" ng-click="select(layer, serviceLayers)">
+                                            <div class="item" ng-repeat="layer in serviceLayers.layers" ng-class="{selected:layer==selected.layer,coverage:layer.Type.toUpperCase()==='coverage'.toUpperCase()||layer.Type.toUpperCase()==='raster'.toUpperCase(),vector:layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layer.Type.toUpperCase()==='vector'.toUpperCase(), 'col-xs-6':small==true}" ng-click="select(layer, serviceLayers)">
                                                 <div class="top">
                                                     <span class="item-title" title="{{layer.Name}}">{{layer.Name}}</span>
-                                                    <span class="pull-right text-right item-list-style">{{layer.Type==='coverage-store'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector':layer.Type}}</span>
+                                                    <span class="pull-right text-right item-list-style">{{layer.Type==='coverage'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector':layer.Type}}</span>
                                                     <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer!=selected.layer"
                                                          src="images/vector-multipoint.svg"
                                                          class="pull-right"
@@ -264,7 +264,7 @@
 
                                         <div class="separator"></div>
                                         <h6 translate="label.type">Type</h6>
-                                        <span>{{selected.layer.Type==='coverage-store'?'raster':selected.layer.Type==='feature-store'?'vector':selected.layer.Type==='observation-store'?'vector':selected.layer.Type.toLowerCase()}}</span>
+                                        <span>{{selected.layer.Type==='coverage'?'raster':selected.layer.Type==='feature-store'?'vector':selected.layer.Type==='observation-store'?'vector':selected.layer.Type.toLowerCase()}}</span>
                                     </div>
                                 </div>
                             </div>

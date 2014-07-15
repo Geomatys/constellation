@@ -115,7 +115,7 @@
                                                 <div class="item" ng-repeat="layer in dataList" ng-class="{selected:layer==selected,coverage:layer.Type.toUpperCase()==='coverage'.toUpperCase(),vector:layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layer.Type.toUpperCase()==='vector'.toUpperCase(), 'col-xs-6':small==true}" ng-click="select(layer)">
                                                     <div class="top">
                                                         <span class="item-title" title="{{layer.Name}}">{{layer.Name}}</span>
-                                                        <span class="pull-right text-right item-list-style">{{layer.Type==='coverage-store'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector':layer.Type}}</span>
+                                                        <span class="pull-right text-right item-list-style">{{layer.Type==='coverage'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector':layer.Type}}</span>
                                                         <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer!=selected"
                                                              src="images/vector-multipoint.svg"
                                                              class="pull-right"
@@ -278,7 +278,7 @@
 
                                                 <div class="separator"></div>
                                                 <h6 translate="label.type">Type</h6>
-                                                <span>{{selected.Type==='coverage-store'?'raster':selected.Type==='feature-store'?'vector':selected.Type==='observation-store'?'vector':selected.Type.toLowerCase()}}</span>
+                                                <span>{{selected.Type==='coverage'?'raster':selected.Type==='feature-store'?'vector':selected.Type==='observation-store'?'vector':selected.Type.toLowerCase()}}</span>
 
                                                 <div ng-if="service.type.toLowerCase() === 'wms'">
                                                     <div class="separator"></div>
