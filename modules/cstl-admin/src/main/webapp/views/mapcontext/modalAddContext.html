@@ -89,8 +89,8 @@
                                 <div class="dash-inner row dashboard" ng-init="small=false">
                                     <div data-role="list">
                                         <div class="item-list">
-                                            <div ng-repeat="layerToAdd in layers.toAdd">
-                                                <div class="col-xs-1" style="padding-top:30px;">
+                                            <div ng-repeat="layerToAdd in layers.toAdd" class="row">
+                                                <div class="col-xs-1" style="padding-top:35px;">
                                                     <!-- Visibility -->
                                                     <input type="checkbox" ng-model="layerToAdd.visible">
                                                 </div>
@@ -135,12 +135,12 @@
                                                         <span class="glyphicon glyphicon-pencil"></span>
                                                     </a>
                                                 </div>
-                                                <div class="col-xs-1 no-padding">
+                                                <div class="col-xs-1 no-padding" style="padding-top:12px;">
                                                     <!-- Order -->
-                                                    <a ng-if="$index > 0" class="btn btn-default btn-sm" ng-click="orderUp()" style="padding:5px;margin-bottom:3px;">
+                                                    <a class="btn btn-sm" ng-click="orderUp()" style="padding:5px;margin-bottom:3px;">
                                                         <span class="glyphicon glyphicon-chevron-up"></span>
                                                     </a>
-                                                    <a ng-if="$index < layers.toAdd.length - 1" class="btn btn-sm" ng-click="orderDown()" style="padding:5px;">
+                                                    <a class="btn btn-sm" ng-click="orderDown()" style="padding:5px;">
                                                         <span class="glyphicon glyphicon-chevron-down"></span>
                                                     </a>
                                                 </div>

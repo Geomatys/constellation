@@ -713,11 +713,17 @@ p.error-select-one{
 .dashboard .item-list .item.coverage {
     background: transparent url('../images/raster.svg') right center no-repeat;
 }
+.dashboard .item-list .item.coverage.compo {
+    background: transparent url('../images/raster-compo.svg') right center no-repeat;
+}
 .dashboard .item-list .item.coverage.selected, .dashboard .item-list .item.metadata-coverage.selected {
     background: transparent url('../images/raster-selected.svg') right center no-repeat;
 }
 .dashboard .item-list .item.vector {
     background: transparent url('../images/vector.svg') right center no-repeat;
+}
+.dashboard .item-list .item.vector.compo {
+    background: transparent url('../images/vector-compo.svg') right center no-repeat;
 }
 .dashboard .item-list .item.vector.selected, .dashboard .item-list .item.metadata-vector.selected {
     background: transparent url('../images/vector-selected.svg') right center no-repeat;
