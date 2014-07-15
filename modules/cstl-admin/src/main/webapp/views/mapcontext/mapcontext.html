@@ -74,9 +74,13 @@
                                         </div>
                                         <div class="block pull-right">
                                             <i class="icon-paper-clip"></i>
-                                            <span ng-if="context.layers == null || context.layers.length == 0" translate="md.listing.no.data">No</span>
-                                            <span ng-if="context.layers.length > 0">{{context.layers.length}}</span>
-                                            <span translate="service.edit.dashboard.mapcontext.list.associated">associated data</span>
+                                            <span ng-if="context.layers == null || context.layers.length == 0" translate="label.no.layers">No layers</span>
+                                            <span ng-if="context.layers.length == 1">
+                                                <span>{{context.layers.length}} </span><span translate="label.layer">layer</span>
+                                            </span>
+                                            <span ng-if="context.layers.length > 1">
+                                                <span>{{context.layers.length}} </span><span translate="label.layers">layers</span>
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
