@@ -124,7 +124,7 @@ public final class ProviderRest {
         } catch (DataStoreException e) {
             return Response.status(500).build();
         }
-        return Response.ok().build();
+        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     @PUT
@@ -147,7 +147,7 @@ public final class ProviderRest {
             // Provider already exists, update config
             old.updateSource(sources);
         }
-        return Response.ok().build();
+        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     /**
@@ -178,7 +178,7 @@ public final class ProviderRest {
                 return Response.status(500).build();
             }
 
-        return Response.ok().build();
+        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     private ParameterValueGroup fillProviderParameter(String type, String subType, Map<String, String> inParams, ParameterValueGroup sources) {

@@ -654,7 +654,7 @@ public class DataRest {
             final QName name = Utils.getQnameFromName(dataName);
             dataBusiness.saveMetadata(providerId,name,mergedMetadata);
         }
-        return Response.status(200).build();
+        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     /**
@@ -684,7 +684,7 @@ public class DataRest {
             //Save metadata
             dataBusiness.saveMetadata(providerId,name,previous);
         }
-        return Response.status(200).build();
+        return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
     private static void printXml(final DefaultMetadata meta) throws JAXBException {
