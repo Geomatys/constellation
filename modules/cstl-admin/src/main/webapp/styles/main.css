@@ -1305,6 +1305,13 @@ a.btn-push-right {
     border: 1px solid #ddd;
     border-top-color: transparent;
 }
+.modal-body .border-bottom{
+    border-bottom: 1px solid #ddd;
+}
+.modal-body .title-form-blue {
+    background-color: #3399CC;
+    color: white;
+}
 
 .row .form-separator {
     border-top: 1px solid #eeeeee;
