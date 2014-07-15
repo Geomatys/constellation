@@ -55,8 +55,8 @@ import org.opengis.metadata.identification.DataIdentification;
 import org.opengis.metadata.identification.Identification;
 import org.opengis.metadata.identification.Keywords;
 import org.opengis.metadata.identification.TopicCategory;
-import org.opengis.service.CouplingType;
-import org.opengis.service.DCPList;
+import org.opengis.metadata.service.CouplingType;
+import org.opengis.metadata.service.DistributedComputingPlatform;
 import org.opengis.service.OperationMetadata;
 import org.opengis.util.InternationalString;
 import org.opengis.util.NameFactory;
@@ -83,7 +83,7 @@ import java.util.logging.Logger;
 public class MetadataFeeder {
 
     private static final Logger LOGGER = Logging.getLogger(MetadataFeeder.class);
-    
+
     /**
      * metadata target
      */
@@ -104,7 +104,7 @@ public class MetadataFeeder {
         setKeywordsNoType(serviceInfo.getKeywords());
         feedServiceContraint(serviceInfo.getServiceConstraints());
         feedServiceContact(serviceInfo.getServiceContact());
-        
+
     }
 
     private void feedServiceContraint(final AccessConstraint constraint) {
@@ -122,13 +122,13 @@ public class MetadataFeeder {
             identification.setResourceConstraints(Arrays.asList(legalConstraint));
         }
     }
-    
+
     private void feedServiceContact(final Contact contact) {
         if (contact != null) {
             final AbstractIdentification identification = (AbstractIdentification) getIdentification(eater);
             final DefaultResponsibleParty ct = new DefaultResponsibleParty(Role.POINT_OF_CONTACT);
             final DefaultContact cont = new DefaultContact();
-            
+
             boolean hasAddress = false;
             final DefaultAddress adr = new DefaultAddress();
             if (contact.getAddress() != null && !contact.getAddress().isEmpty()) {
@@ -158,14 +158,14 @@ public class MetadataFeeder {
             if (hasAddress) {
                 cont.setAddress(adr);
             }
-            
+
             if (contact.getContactInstructions() != null && !contact.getContactInstructions().isEmpty()) {
                 cont.setContactInstructions(new SimpleInternationalString(contact.getContactInstructions()));
             }
             if (contact.getHoursOfService() != null && !contact.getHoursOfService().isEmpty()) {
                 cont.setHoursOfService(new SimpleInternationalString(contact.getHoursOfService()));
             }
-            
+
             final DefaultTelephone phone = new DefaultTelephone();
             boolean hasPhone = false;
             if (contact.getPhone() != null && !contact.getPhone().isEmpty()) {
@@ -179,7 +179,7 @@ public class MetadataFeeder {
             if (hasPhone) {
                 cont.setPhone(phone);
             }
-            
+
             if (contact.getUrl() != null && !contact.getUrl().isEmpty()) {
                 try {
                     final DefaultOnlineResource or = new DefaultOnlineResource(new URI(contact.getUrl()));
@@ -193,22 +193,22 @@ public class MetadataFeeder {
             if (contact.getFirstname()!= null && !contact.getFirstname().isEmpty()) {
                 fullName = contact.getFirstname();
             }
-            
+
             if (contact.getLastname()!= null && !contact.getLastname().isEmpty()) {
                 fullName = fullName + " " + contact.getLastname();
             }
-            
+
             if (!fullName.isEmpty()) {
                 ct.setIndividualName(fullName);
             }
-            
+
             if (contact.getOrganisation()!= null && !contact.getOrganisation().isEmpty()) {
                 ct.setOrganisationName(new SimpleInternationalString(contact.getOrganisation()));
             }
             if (contact.getPosition()!= null && !contact.getPosition().isEmpty()) {
                 ct.setPositionName(new SimpleInternationalString(contact.getPosition()));
             }
-            
+
             identification.setPointOfContacts(Arrays.asList(ct));
         }
     }
@@ -236,7 +236,7 @@ public class MetadataFeeder {
             final DateType dt = DateType.valueOf(feeded.getDateType());
             setCitationDate(feeded.getDate(), dt);
         }
-        
+
         setTitle(feeded.getTitle());
         setAbstract(feeded.getAnAbstract());
         setContact(feeded.getUsername(), feeded.getOrganisationName(), feeded.getRole());
@@ -257,7 +257,7 @@ public class MetadataFeeder {
         setKeywordsNoType(feeded.getKeywords());
         setTopicCategory(feeded.getTopicCategory());
     }
-    
+
     /**
      * Get IdentifiationInformation from metadata
      *
@@ -271,7 +271,7 @@ public class MetadataFeeder {
 
         return metadata.getIdentificationInfo().iterator().next();
     }
-    
+
      private Identification getServiceIdentification(DefaultMetadata metadata) {
         if (metadata.getIdentificationInfo().isEmpty()) {
             metadata.getIdentificationInfo().add(new ServiceIdentificationImpl());
@@ -279,7 +279,7 @@ public class MetadataFeeder {
 
         return metadata.getIdentificationInfo().iterator().next();
     }
-     
+
     public Identification getServiceIdentification() {
         return getServiceIdentification(eater);
     }
@@ -297,7 +297,7 @@ public class MetadataFeeder {
         }
         return null;
     }
-    
+
     /**
      * Add title on metadata
      *
@@ -315,7 +315,7 @@ public class MetadataFeeder {
             citation.setTitle(internationalizeTitle);
         }
     }
-    
+
     private CitationDate getCitationDate() {
         final AbstractIdentification identification = (AbstractIdentification) getIdentification(eater);
         if (identification.getCitation() != null) {
@@ -326,7 +326,7 @@ public class MetadataFeeder {
         }
         return null;
     }
-    
+
     /**
      * Add data date on metadata
      *
@@ -350,7 +350,7 @@ public class MetadataFeeder {
         dates.add(citDate);
         citation.setDates(dates);
     }
-    
+
     public void setCreationDate(final Date date) {
         final DefaultCitationDate creationDate = new DefaultCitationDate(date, DateType.CREATION);
         final AbstractIdentification ident = (AbstractIdentification)getIdentification(eater);
@@ -372,7 +372,7 @@ public class MetadataFeeder {
         //add the new creation date
         citation.getDates().add(creationDate);
     }
-    
+
     public void setCitationIdentifier(final String fileIdentifier) {
         final Identification id = getIdentification(eater);
         DefaultCitation citation = (DefaultCitation) id.getCitation();
@@ -392,7 +392,7 @@ public class MetadataFeeder {
         }
         return null;
     }
-    
+
     /**
      * Add abstract on metadata
      *
@@ -408,7 +408,7 @@ public class MetadataFeeder {
         }
         identification.setAbstract(internationalizeAbstract);
     }
-    
+
     public final List<String> getKeywordsNoType() {
         final List<String> keywords = new ArrayList<>();
         final AbstractIdentification ident = (AbstractIdentification) getIdentification(eater);
@@ -472,7 +472,7 @@ public class MetadataFeeder {
             identification.getLanguages().add(dataLocale);
         }
     }
-    
+
     public void setDataLanguage(final Locale dataLocale) {
         if (dataLocale == null) {
             return;
@@ -493,7 +493,7 @@ public class MetadataFeeder {
         }
         return null;
     }
-    
+
     /**
      * Add a topicCategory on metadata
      *
@@ -511,7 +511,7 @@ public class MetadataFeeder {
             identification.getTopicCategories().add(topic);
         }
     }
-    
+
     public void setTopicCategory(final String topicCategoryName) {
         if (topicCategoryName == null) {
             return;
@@ -534,7 +534,7 @@ public class MetadataFeeder {
     private void setIdentifier(final String identifier) {
         eater.setFileIdentifier(identifier);
     }
-    
+
     public String getIdentifier() {
         return eater.getFileIdentifier();
     }
@@ -554,7 +554,7 @@ public class MetadataFeeder {
         }
         return null;
     }
-    
+
     /**
      * Add locale on metadata
      *
@@ -582,7 +582,7 @@ public class MetadataFeeder {
         newContact.setRole(currentRole);
         eater.getContacts().add(newContact);
     }
-    
+
     private void setContact(final String individualName, final String organisationName, final String userRole) {
         DefaultResponsibleParty newContact = new DefaultResponsibleParty();
         newContact.setIndividualName(individualName);
@@ -593,7 +593,7 @@ public class MetadataFeeder {
         eater.getContacts().clear();
         eater.getContacts().add(newContact);
     }
-    
+
     private String getOrganisationName() {
         if (!eater.getContacts().isEmpty()) {
             final InternationalString is = eater.getContacts().iterator().next().getOrganisationName();
@@ -603,14 +603,14 @@ public class MetadataFeeder {
         }
         return null;
     }
-    
+
     private String getIndividualName() {
         if (!eater.getContacts().isEmpty()) {
             return eater.getContacts().iterator().next().getIndividualName();
         }
         return null;
     }
-    
+
     private String getRole() {
         if (!eater.getContacts().isEmpty()) {
             final Role is = eater.getContacts().iterator().next().getRole();
@@ -620,7 +620,7 @@ public class MetadataFeeder {
         }
         return null;
     }
-    
+
     public String getServiceType() {
         final Collection<Identification> idents = eater.getIdentificationInfo();
         ServiceIdentificationImpl servIdent = null;
@@ -683,7 +683,7 @@ public class MetadataFeeder {
         servIdent.setCouplingType(CouplingType.LOOSE);
         servIdent.setServiceType(nameFacto.createLocalName(null, serviceType));
         servIdent.setContainsOperations(getOperation(serviceType, url));
-        
+
         try {
             Distribution dist = eater.getDistributionInfo();
             if (dist == null) {
@@ -698,7 +698,7 @@ public class MetadataFeeder {
             LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
         }
     }
-    
+
     public void updateServiceURL(final String url) {
         final Collection<Identification> idents = eater.getIdentificationInfo();
         ServiceIdentificationImpl servIdent = null;
@@ -733,7 +733,7 @@ public class MetadataFeeder {
             }
         }
     }
-    
+
     private List<OperationMetadata> getOperation(final String serviceType, final String url) {
         final List<OperationMetadata> operations = new ArrayList<>();
         operations.add(buildOperation("GetCapabilities", url));
@@ -783,10 +783,10 @@ public class MetadataFeeder {
         // TODO other service
         return operations;
     }
-    
+
     private OperationMetadata buildOperation(final String operationName, final String url) {
         final OperationMetadataImpl op = new OperationMetadataImpl(operationName);
-        op.setDCP(DCPList.WEBSERVICES);
+        op.setDCP(DistributedComputingPlatform.WEB_SERVICES);
         try {
             op.setConnectPoint(Arrays.asList((OnlineResource)new DefaultOnlineResource(new URI(url))));
         } catch (URISyntaxException ex) {
@@ -794,7 +794,7 @@ public class MetadataFeeder {
         }
         return op;
     }
-    
+
     public void setServiceMetadataIdForData(final List<String> layerIds) {
         final Collection<Identification> idents = eater.getIdentificationInfo();
         ServiceIdentificationImpl servIdent = null;
@@ -816,7 +816,7 @@ public class MetadataFeeder {
         }
         servIdent.setOperatesOn(resources);
     }
-    
+
     public void addServiceMetadataIdForData(final String layerId) {
         final Collection<Identification> idents = eater.getIdentificationInfo();
         ServiceIdentificationImpl servIdent = null;
@@ -842,7 +842,7 @@ public class MetadataFeeder {
         dataIdent.getIdentifierMap().put(IdentifierSpace.HREF, layerId);
         servIdent.getOperatesOn().add(dataIdent);
     }
-    
+
     /**
      * Copy the elements of a source into a destination collection, without adding the elements
      * which are already present in the destination collection.
@@ -853,7 +853,7 @@ public class MetadataFeeder {
         if (source == null || source.isEmpty()) {
             return;
         }
-       
+
         if (destination.isEmpty()) {
             destination.addAll(source);
         } else {
@@ -867,15 +867,15 @@ public class MetadataFeeder {
 
     public DataMetadata extractDataMetadata() {
         final DataMetadata result = new DataMetadata();
-        
+
         result.setAnAbstract(getAbstract());
-        
+
         final CitationDate date = getCitationDate();
         if (date != null) {
             result.setDate(date.getDate());
             result.setDateType(date.getDateType().name());
         }
-        
+
         result.setKeywords(getKeywordsNoType());
         result.setLocaleData(getDataLanguage());
         result.setLocaleMetadata(getMetadataLocale());
