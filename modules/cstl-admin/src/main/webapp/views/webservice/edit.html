@@ -112,7 +112,7 @@
                                         </div>
                                         <div class="item-list">
                                             <div ng-if="type !== 'csw' && type!== 'sos'">
-                                                <div class="item" ng-repeat="layer in dataList" ng-class="{selected:layer==selected,coverage:layer.Type.toUpperCase()==='coverage-store'.toUpperCase()||layer.Type.toUpperCase()==='raster'.toUpperCase(),vector:layer.Type.toUpperCase()==='feature-store'.toUpperCase()||layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layer.Type.toUpperCase()==='vector'.toUpperCase(), 'col-xs-6':small==true}" ng-click="select(layer)">
+                                                <div class="item" ng-repeat="layer in dataList" ng-class="{selected:layer==selected,coverage:layer.Type.toUpperCase()==='coverage'.toUpperCase(),vector:layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layer.Type.toUpperCase()==='vector'.toUpperCase(), 'col-xs-6':small==true}" ng-click="select(layer)">
                                                     <div class="top">
                                                         <span class="item-title" title="{{layer.Name}}">{{layer.Name}}</span>
                                                         <span class="pull-right text-right item-list-style">{{layer.Type==='coverage-store'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector':layer.Type}}</span>

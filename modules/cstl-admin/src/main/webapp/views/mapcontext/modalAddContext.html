@@ -95,7 +95,7 @@
                                                     <input type="checkbox" ng-model="layerToAdd.visible">
                                                 </div>
                                                 <div class="col-xs-9 no-padding">
-                                                    <div class="item" ng-class="{coverage:layerToAdd.layer.Type.toUpperCase()==='coverage-store'.toUpperCase()||layerToAdd.layer.Type.toUpperCase()==='raster'.toUpperCase(),vector:layerToAdd.layer.Type.toUpperCase()==='feature-store'.toUpperCase()||layerToAdd.layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layerToAdd.layer.Type.toUpperCase()==='vector'.toUpperCase()}">
+                                                    <div class="item" ng-class="{coverage:layerToAdd.layer.Type.toUpperCase()==='coverage'.toUpperCase(),vector:layerToAdd.layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layerToAdd.layer.Type.toUpperCase()==='vector'.toUpperCase()}">
                                                         <div class="top">
                                                             <span class="item-title" title="{{layerToAdd.layer.Name}}">{{layerToAdd.layer.Name}}</span>
                                                             <span class="pull-right text-right item-list-style">{{layerToAdd.layer.Type==='coverage-store'?'raster':layerToAdd.layer.Type==='feature-store'?'vector':layerToAdd.layer.Type==='observation-store'?'vector':layerToAdd.layer.Type}}</span>
@@ -126,17 +126,23 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-xs-1" style="padding-top:12px;">
+                                                <div class="col-xs-1 no-padding" style="padding-top:12px;">
                                                     <a class="btn btn-default btn-sm" ng-click="editMapItem()" style="padding:5px;margin-bottom:3px;">
-                                                        <span class="glyphicon glyphicon-edit"></span>
+                                                        <span class="glyphicon glyphicon-info-sign"></span>
                                                     </a>
                                                     <!-- Edition -->
                                                     <a class="btn btn-default btn-sm" ng-click="styleMapItem()" style="padding:5px;">
                                                         <span class="glyphicon glyphicon-pencil"></span>
                                                     </a>
                                                 </div>
-                                                <div class="col-xs-1">
+                                                <div class="col-xs-1 no-padding">
                                                     <!-- Order -->
+                                                    <a ng-if="$index > 0" class="btn btn-default btn-sm" ng-click="orderUp()" style="padding:5px;margin-bottom:3px;">
+                                                        <span class="glyphicon glyphicon-chevron-up"></span>
+                                                    </a>
+                                                    <a ng-if="$index < layers.toAdd.length - 1" class="btn btn-sm" ng-click="orderDown()" style="padding:5px;">
+                                                        <span class="glyphicon glyphicon-chevron-down"></span>
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
