@@ -103,7 +103,7 @@
           <arguments>
             <argument>-classpath</argument>
             <classpath />
-            <argument>org.constellation.admin.util.TempDatabase</argument>
+            <argument>org.constellation.admin.util.LiquidDatabase</argument>
             <argument>${basedir}/target/builddb</argument>
           </arguments>
         </configuration>
@@ -154,7 +154,7 @@
               <name>org.jooq.util.derby.DerbyDatabase</name>
               <includes>.*</includes>
               <excludes></excludes>
-              <inputSchema>admin</inputSchema>
+              <inputSchema>ADMIN</inputSchema>
             </database>
             <target>
               <packageName>org.constellation.engine.register.jooq</packageName>

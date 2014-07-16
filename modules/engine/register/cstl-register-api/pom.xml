@@ -61,8 +61,8 @@
               <goal>generate</goal>
             </goals>
             <configuration>
-              <targetSchema>admin</targetSchema>
-              <classpathSQL>/org/constellation/sql/v1/create-admin-db.sql</classpathSQL>
+              <targetSchema>ADMIN</targetSchema>
+              <changeLog>cstl/db/db-changelog.xml</changeLog>
               <targetPackage>org.constellation.engine.register</targetPackage>
             </configuration>
           </execution>

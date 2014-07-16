@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+
+  <changeSet id="init-data-v1" author="olivier">
+   
+
+
+<!-- Insert data -->
+
+<!-- Application roles -->
+
+    <insert schemaName="admin" tableName="role">
+      <column name="name" value="cstl-admin" />
+    </insert>
+    
+    <!-- Application permissions -->
+
+    <insert schemaName="admin" tableName="permission">
+      <column name="id" valueNumeric="1" />
+      <column name="name" value="SERVICE_READ_ACCESS" />
+      <column name="description" value="Accès en lecture des service" />
+    </insert>
+    <insert schemaName="admin" tableName="permission">
+      <column name="id" valueNumeric="2" />
+      <column name="name" value="SERVICE_WRITE_ACCESS" />
+      <column name="description" value="Accès en écriture des service" />
+    </insert>
+    <insert schemaName="admin" tableName="permission">
+      <column name="id" valueNumeric="3" />
+      <column name="name" value="SERVICE_CREATION" />
+      <column name="description" value="Création de service" />
+    </insert>
+    <insert schemaName="admin" tableName="permission">
+      <column name="id" valueNumeric="4" />
+      <column name="name" value="DATA_CREATION" />
+      <column name="description" value="Création de donnée" />
+    </insert>
+
+<!-- Default domains data -->
+
+    <insert schemaName="admin" tableName="domainrole">
+      <column name="name" value="default" />
+      <column name="system" value="TRUE" />
+    </insert>
+
+    <insert schemaName="admin" tableName="domainrole">
+      <column name="name" value="manager" />
+      <column name="system" value="FALSE" />
+    </insert>
+
+    <insert schemaName="admin" tableName="domain">
+      <column name="id" valueNumeric="0" />
+      <column name="name" value="anonymous" />
+      <column name="description" value="Anonymous users" />
+      <column name="system" value="TRUE" />
+    </insert>
+
+<!-- Anonymous user can access to services linked with anonymous domain. -->
+
+    <insert schemaName="admin" tableName="domainrole_x_permission">
+      <column name="domainrole_id" valueNumeric="1" />
+      <column name="permission_id" valueNumeric="1" />
+    </insert>
+
+
+    <insert schemaName="admin" tableName="domain">
+      <column name="name" value="default" />
+      <column name="description" value="Default domain" />
+      <column name="system" value="TRUE" />
+    </insert>
+
+    <insert schemaName="admin" tableName="domainrole_x_permission">
+      <column name="domainrole_id" valueNumeric="2" />
+      <column name="permission_id" valueNumeric="1" />
+    </insert>
+    <insert schemaName="admin" tableName="domainrole_x_permission">
+      <column name="domainrole_id" valueNumeric="2" />
+      <column name="permission_id" valueNumeric="2" />
+    </insert>
+    <insert schemaName="admin" tableName="domainrole_x_permission">
+      <column name="domainrole_id" valueNumeric="2" />
+      <column name="permission_id" valueNumeric="3" />
+    </insert>
+    <insert schemaName="admin" tableName="domainrole_x_permission">
+      <column name="domainrole_id" valueNumeric="2" />
+      <column name="permission_id" valueNumeric="4" />
+    </insert>
+
+
+<!-- Default admin user -->
+
+    <insert schemaName="admin" tableName='"USER"'>
+      <column name="login" value="admin" />
+      <column name="password" value="21232f297a57a5a743894a0e4a801fc3" />
+      <column name="firstname" value="Frédéric" />
+      <column name="lastname" value="Houbie" />
+      <column name="email" value="frederic.houbie@geomatys.com" />
+      <column name="active" valueBoolean="true" />
+    </insert>
+
+    <insert schemaName="admin" tableName="user_x_role">
+      <column name="user_id" valueNumeric="1" />
+      <column name="role" value="cstl-admin" />
+    </insert>
+
+    <insert schemaName="admin" tableName="user_x_domain_x_domainrole">
+      <column name="user_id" valueNumeric="1" />
+      <column name="domain_id" valueNumeric="1" />
+      <column name="domainrole_id" valueNumeric="1" />
+    </insert>
+
+
+
+  </changeSet>
+
+  
+
+</databaseChangeLog>

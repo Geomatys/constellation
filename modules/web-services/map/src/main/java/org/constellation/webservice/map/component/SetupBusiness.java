@@ -43,11 +43,13 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.style.GraphicalSymbol;
 import org.opengis.util.NoSuchIdentifierException;
+import org.springframework.context.annotation.DependsOn;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -71,6 +73,7 @@ import static org.geotoolkit.style.StyleConstants.DEFAULT_RASTER_SYMBOLIZER;
  * @author Cédric Briançon (Geomatys)
  */
 @Named
+@DependsOn("database-initer")
 public class SetupBusiness  {
 
     private static final Logger LOGGER = Logging.getLogger(SetupBusiness.class);

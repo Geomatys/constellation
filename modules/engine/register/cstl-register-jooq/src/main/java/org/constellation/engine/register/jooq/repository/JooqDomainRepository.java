@@ -19,6 +19,7 @@
 package org.constellation.engine.register.jooq.repository;
 
 import org.constellation.engine.register.Domain;
+import org.constellation.engine.register.jooq.Keys;
 import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.tables.records.DataXDomainRecord;
 import org.constellation.engine.register.jooq.tables.records.DomainRecord;

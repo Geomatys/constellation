@@ -13,6 +13,13 @@
   <name>Derby Utilities</name>
 
   <dependencies>
+
+    <dependency>
+      <groupId>org.liquibase</groupId>
+      <artifactId>liquibase-core</artifactId>
+      <version>3.2.0</version>
+    </dependency>
+
     <dependency>
       <groupId>org.apache.derby</groupId>
       <artifactId>derby</artifactId>
@@ -29,7 +36,7 @@
       <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-utility-jdbc</artifactId>
     </dependency>
-    
-    
+
+
   </dependencies>
 </project>

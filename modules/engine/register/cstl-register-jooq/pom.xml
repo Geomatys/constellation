@@ -37,8 +37,14 @@
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
-   
 
+
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-jdbc</artifactId>
+      <version>7.0.54</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
 
