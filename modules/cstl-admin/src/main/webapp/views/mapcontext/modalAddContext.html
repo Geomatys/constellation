@@ -4,23 +4,23 @@
             <button type="button" class="close" ng-click="close()">×</button>
             <h4 class="modal-title" translate="mapcontext.modal.title">Add map context</h4>
         </div>
-        <div class="modal-body modal-body-style" style="overflow-y: auto;" ng-init="selTab='tabInfo';">
+        <div class="modal-body modal-body-style" style="overflow-y: auto;">
             <!-- General mode -->
             <div class="row" ng-if="mode.display==='general'">
                 <!-- Left part -->
                 <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
                     <ul class="nav nav-tabs">
-                        <li id="infoTab" class="active">
-                            <a ng-click="selTab='tabInfo'" data-toggle="tab"><span translate="mapcontext.modal.tab.info">Information</span></a>
+                        <li id="infoTab" ng-class="{active:mode.selTab==='tabInfo'}">
+                            <a ng-click="mode.selTab='tabInfo'" data-toggle="tab"><span translate="mapcontext.modal.tab.info">Information</span></a>
                         </li>
-                        <li id="descriptionTab">
-                            <a ng-click="selTab='tabLayers'" data-toggle="tab"><span translate="mapcontext.modal.tab.layers">Layers</span></a>
+                        <li id="descriptionTab" ng-class="{active:mode.selTab==='tabLayers'}">
+                            <a ng-click="mode.selTab='tabLayers'" data-toggle="tab"><span translate="mapcontext.modal.tab.layers">Layers</span></a>
                         </li>
                     </ul>
 
                     <div class="tab-content">
                         <!-- Tab map context information -->
-                        <div class="tab-pane block-border" ng-class="{active:selTab==='tabInfo'}">
+                        <div class="tab-pane block-border" ng-class="{active:mode.selTab==='tabInfo'}">
                             <form class="form-horizontal form-style" role="form">
                                 <div class="form-group">
                                     <label class="col-sm-4 col-md-3 control-label" translate="mapcontext.modal.label.name">Name</label>
@@ -67,7 +67,7 @@
                         </div>
 
                         <!-- Tab layers list -->
-                        <div class="tab-pane block-border" ng-class="{active:selTab==='tabLayers'}">
+                        <div class="tab-pane block-border" ng-class="{active:mode.selTab==='tabLayers'}">
                             <div class="row dash-inner" ng-class="{'border-bottom':layers.toAdd.length > 0}">
                                 <div class="col-sm-6">
                                     <h3 translate="layer.listing.title">Layers list</h3>
@@ -127,20 +127,20 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-xs-1 no-padding" style="padding-top:12px;">
-                                                    <a class="btn btn-default btn-sm" ng-click="editMapItem()" style="padding:5px;margin-bottom:3px;">
+                                                    <a class="btn btn-default btn-sm" ng-click="editMapItem(layerToAdd)" style="padding:5px;margin-bottom:3px;">
                                                         <span class="glyphicon glyphicon-info-sign"></span>
                                                     </a>
                                                     <!-- Edition -->
-                                                    <a class="btn btn-default btn-sm" ng-click="styleMapItem()" style="padding:5px;">
+                                                    <a class="btn btn-default btn-sm" ng-click="styleMapItem(layerToAdd)" style="padding:5px;">
                                                         <span class="glyphicon glyphicon-pencil"></span>
                                                     </a>
                                                 </div>
                                                 <div class="col-xs-1 no-padding" style="padding-top:12px;">
                                                     <!-- Order -->
-                                                    <a class="btn btn-sm" ng-click="orderUp()" style="padding:5px;margin-bottom:3px;">
+                                                    <a class="btn btn-sm" ng-click="orderUp($index)" style="padding:5px;margin-bottom:3px;">
                                                         <span class="glyphicon glyphicon-chevron-up"></span>
                                                     </a>
-                                                    <a class="btn btn-sm" ng-click="orderDown()" style="padding:5px;">
+                                                    <a class="btn btn-sm" ng-click="orderDown($index)" style="padding:5px;">
                                                         <span class="glyphicon glyphicon-chevron-down"></span>
                                                     </a>
                                                 </div>

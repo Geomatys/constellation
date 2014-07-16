@@ -37,7 +37,7 @@ public class MapContextBusiness {
     @Inject
     private ProviderRepository providerRepository;
 
-    public void addMapItems(final int contextId, final List<MapcontextStyledLayer> layers) {
+    public void setMapItems(final int contextId, final List<MapcontextStyledLayer> layers) {
         mapContextRepository.setLinkedLayers(contextId, layers);
     }
 

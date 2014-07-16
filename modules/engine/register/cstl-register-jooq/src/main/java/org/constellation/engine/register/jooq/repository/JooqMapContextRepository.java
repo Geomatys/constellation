@@ -78,6 +78,21 @@ public class JooqMapContextRepository extends AbstractJooqRespository<Mapcontext
     }
 
     @Override
+    public int update(Mapcontext mapContext) {
+        return dsl.update(MAPCONTEXT)
+                   .set(MAPCONTEXT.CRS, mapContext.getCrs())
+                   .set(MAPCONTEXT.WEST, mapContext.getWest())
+                   .set(MAPCONTEXT.SOUTH, mapContext.getSouth())
+                   .set(MAPCONTEXT.EAST, mapContext.getEast())
+                   .set(MAPCONTEXT.NORTH, mapContext.getNorth())
+                   .set(MAPCONTEXT.DESCRIPTION, mapContext.getDescription())
+                   .set(MAPCONTEXT.KEYWORDS, mapContext.getKeywords())
+                   .set(MAPCONTEXT.NAME, mapContext.getName())
+                   .set(MAPCONTEXT.OWNER, mapContext.getOwner())
+                   .where(MAPCONTEXT.ID.eq(mapContext.getId())).execute();
+    }
+
+    @Override
     public int delete(int id) {
         return dsl.delete(MAPCONTEXT).where(MAPCONTEXT.ID.eq(id)).execute();
     }

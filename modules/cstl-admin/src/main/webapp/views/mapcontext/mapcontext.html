@@ -38,7 +38,7 @@
                     <div class="pull-right">
                         <div style="position:relative;">
                             <div class="ajax-loader" style="right:0;position:absolute;"></div>
-                            <input type="text" ng-model="filtertext" class="searchbox search-query form-control" placeholder="Search" />
+                            <input type="text" ng-model="filtertext" class="searchbox search-query form-control" placeholder="{{'label.search' | translate}}" />
                         </div>
                     </div>
                 </div>
@@ -156,25 +156,28 @@
 
                                 <h6 translate="label.owner">Owner</h6>
                                 <span>{{selected.owner}}</span>
-
-                                <div class="separator"></div>
-                                <h6 translate="label.related.service">Related service(s)</h6>
-                                <div id="linkedServiceList">
-                                    <span ng-show="selected.TargetService.length == 0" translate="label.no.association">No association</span>
-                                    <div ng-show="selected.TargetService.length > 0" class="style" ng-repeat="service in selected.TargetService">
-                                        {{service.name}}
-                                    </div>
-                                </div>
                             </div>
                             <div class="block-action">
-                                <div class="row">
+                                <div class="row" style="padding-bottom: 5px;">
                                     <div class="col-sm-6">
-                                        <button id="showData" class="btn btn-success" type="button" ng-click="showData()">
-                                            <i class="icon-map-marker"></i> <span translate="layer.listing.selected.data.button">Layers</span>
+                                        <button type="button" class="btn btn-info">
+                                            <i class="icon-download-alt"></i> <span translate="layer.listing.selected.export.button">Export</span>
                                         </button>
                                     </div>
                                     <div class="col-sm-6">
-                                        <button type="button" id="deleteLayer" class="btn btn-danger" ng-click="deleteMapContext();">
+                                        <button class="btn btn-warning" type="button" ng-click="editMapContext()">
+                                            <i class="icon-edit"></i> <span translate="layer.listing.selected.edit.button">Edit</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <button class="btn btn-success" type="button" ng-click="showMapContext()">
+                                            <i class="icon-map-marker"></i> <span translate="layer.listing.selected.data.button">View</span>
+                                        </button>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <button class="btn btn-danger" type="button" ng-click="deleteMapContext()">
                                             <i class="icon-trash"></i> <span translate="layer.listing.selected.delete.button">Delete</span>
                                         </button>
                                     </div>

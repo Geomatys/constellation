@@ -355,6 +355,7 @@ cstlAdminApp.factory('mapcontext', ['$resource',
             'list':       {method: 'GET',    url: '@cstl/api/1/context/list;jsessionid=', isArray: true},
             'listLayers': {method: 'GET',    url: '@cstl/api/1/context/list/layers;jsessionid=', isArray: true},
             'add':        {method: 'PUT',    url: '@cstl/api/1/context;jsessionid='},
+            'update':     {method: 'POST',   url: '@cstl/api/1/context;jsessionid='},
             'delete':     {method: 'DELETE', url: '@cstl/api/1/context/:id;jsessionid='},
             'setLayers':  {method: 'POST',   url: '@cstl/api/1/context/layers/:id;jsessionid='}
         });

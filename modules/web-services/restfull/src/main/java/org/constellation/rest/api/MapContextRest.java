@@ -67,6 +67,14 @@ public class MapContextRest {
         return Response.ok(mapContextCreated).build();
     }
 
+    @POST
+    @Path("/")
+    @Transactional
+    public Response update(final Mapcontext mapContext) {
+        contextRepository.update(mapContext);
+        return Response.ok(mapContext).build();
+    }
+
     @DELETE
     @Path("/{id}")
     @Transactional
@@ -77,8 +85,8 @@ public class MapContextRest {
 
     @POST
     @Path("/layers/{id}")
-    public Response addMapItems(@PathParam("id") final int contextId, final List<MapcontextStyledLayer> layers) {
-        contextBusiness.addMapItems(contextId, layers);
+    public Response setMapItems(@PathParam("id") final int contextId, final List<MapcontextStyledLayer> layers) {
+        contextBusiness.setMapItems(contextId, layers);
         return Response.status(201).build();
     }
 }

@@ -34,5 +34,7 @@ public interface MapContextRepository {
 
     Mapcontext create(Mapcontext mapContext);
 
+    int update(Mapcontext mapContext);
+
     int delete(int id);
 }
