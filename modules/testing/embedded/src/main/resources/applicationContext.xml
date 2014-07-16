@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans default-lazy-init="default" xmlns="http://www.springframework.org/schema/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
-  xmlns:tx="http://www.springframework.org/schema/tx"
+  xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
@@ -15,7 +15,21 @@
 
   <bean id="securityManager" class="org.constellation.security.spring.SpringSecurityManager"></bean>
   
-  <bean id="dataSource" class="org.constellation.engine.register.jooq.EmbeddedTestDatabase" factory-method="getOrCreateDataSource"></bean>
+ <bean id="dataSource"
+    class="org.springframework.jdbc.datasource.DriverManagerDataSource"
+    p:driverClassName="org.apache.derby.jdbc.EmbeddedDriver" p:url="jdbc:derby:memory:db;create=true" />
+
+
+
+  <bean id="liquibase" class="liquibase.integration.spring.SpringLiquibase">
+    <property name="dataSource" ref="dataSource" />
+    <property name="changeLog" value="classpath:/cstl/db/db-changelog.xml" />
+
+      <!--
+      contexts specifies the runtime contexts to use.
+      -->
+    <property name="contexts" value="test, production" />
+  </bean>
 
   <import resource="classpath:/cstl/spring/cstl-tx.xml" />
   

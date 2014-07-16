@@ -158,7 +158,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         assertEquals(STYLE_DATA_REF ,outLayer.getStyles().get(0));
         
         assertTrue(checkInstanceExist("addLayer1"));
-        deleteInstance(serviceBusiness, "addLayer1");
+        deleteInstance(serviceBusiness, layerBusiness, "addLayer1");
     }
 
 
@@ -203,7 +203,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         assertEquals(STYLE_DATA_REF ,outLayer.getStyles().get(0));
         
         assertTrue(checkInstanceExist("addLayer2"));
-        deleteInstance(serviceBusiness, "addLayer2");
+        deleteInstance(serviceBusiness, layerBusiness,  "addLayer2");
     }
 
      /**
@@ -265,7 +265,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         assertEquals(STYLE_DATA_REF ,outLayer.getStyles().get(0));
         
         assertTrue(checkInstanceExist("addLayer3"));
-        deleteInstance(serviceBusiness, "addLayer3");
+        deleteInstance(serviceBusiness, layerBusiness, "addLayer3");
     }
 
 
@@ -342,7 +342,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         
         
         assertTrue(checkInstanceExist("addLayer5"));
-        deleteInstance(serviceBusiness, "addLayer5");
+        deleteInstance(serviceBusiness, layerBusiness, "addLayer5");
 
     }
 
@@ -384,7 +384,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         assertTrue(outLayer.getStyles().isEmpty());
         
         assertTrue(checkInstanceExist("addLayer6"));
-        deleteInstance(serviceBusiness, "addLayer6");
+        deleteInstance(serviceBusiness, layerBusiness, "addLayer6");
 
     }
 
@@ -439,7 +439,7 @@ public abstract class AddLayerToMapServiceTest extends AbstractMapServiceTest {
         assertEquals(CSVFeatureInfoFormat.class.getCanonicalName(), outGFI.getBinding());
 
         assertTrue(checkInstanceExist("addLayer7"));
-        deleteInstance(serviceBusiness, "addLayer7");
+        deleteInstance(serviceBusiness, layerBusiness, "addLayer7");
     }
     
 }

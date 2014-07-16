@@ -24,6 +24,10 @@ import org.constellation.map.configuration.LayerBusiness;
 
 import javax.inject.Inject;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.constellation.admin.ServiceBusiness;
+import static org.constellation.process.service.ServiceProcessTest.serviceName;
+import org.constellation.ws.WSEngine;
 
 /**
  *
@@ -93,4 +97,11 @@ public abstract class AbstractMapServiceTest extends ServiceProcessTest {
         return context;
     }
 
+    protected static void deleteInstance(final ServiceBusiness serviceBusiness, final LayerBusiness layerBusiness, String identifier) {
+        try {
+            layerBusiness.removeForService(serviceName, identifier);
+        } catch (ConfigurationException ex) {
+            Logger.getLogger(AbstractMapServiceTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 }

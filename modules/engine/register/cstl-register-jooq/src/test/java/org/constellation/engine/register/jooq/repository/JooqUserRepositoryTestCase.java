@@ -25,8 +25,9 @@ import org.constellation.engine.register.repository.UserRepository;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
-
+@Transactional
 public class JooqUserRepositoryTestCase extends AbstractJooqTestTestCase {
 
     @Autowired

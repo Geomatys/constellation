@@ -15,7 +15,21 @@
   
   <tx:annotation-driven transaction-manager="transactionManager" />
 
-  <bean id="dataSource" class="org.constellation.engine.register.jooq.EmbeddedTestDatabase" factory-method="getOrCreateDataSource"></bean>
+  <bean id="dataSource"
+    class="org.springframework.jdbc.datasource.DriverManagerDataSource"
+    p:driverClassName="org.apache.derby.jdbc.EmbeddedDriver" p:url="jdbc:derby:memory:db;create=true" />
+
+
+
+  <bean id="liquibase" class="liquibase.integration.spring.SpringLiquibase">
+    <property name="dataSource" ref="dataSource" />
+    <property name="changeLog" value="classpath:/cstl/db/db-changelog.xml" />
+
+      <!--
+      contexts specifies the runtime contexts to use.
+      -->
+    <property name="contexts" value="test, production" />
+  </bean>
 
   <bean id="securityManager" class="org.constellation.security.spring.SpringSecurityManager"></bean>
 

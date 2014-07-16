@@ -72,13 +72,12 @@ public class DataBusiness {
     private SensorRepository sensorRepository;
 
 
+    public DefaultMetadata loadIsoDataMetadata(String providerId, QName name) {
 
-	public DefaultMetadata loadIsoDataMetadata(String providerId, QName name) {
-
-		DefaultMetadata metadata = null;
-		Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(), name.getNamespaceURI(), providerId);
-		MarshallerPool pool = ISOMarshallerPool.getInstance();
-		InputStream sr;
+        DefaultMetadata metadata = null;
+        Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(), name.getNamespaceURI(), providerId);
+        MarshallerPool pool = ISOMarshallerPool.getInstance();
+        InputStream sr;
 
         try {
             sr = new ByteArrayInputStream(data.getIsoMetadata().getBytes("UTF-8"));
@@ -310,5 +309,16 @@ public class DataBusiness {
                     .withErrorCode("error.data.lastdomain");
         }
         domainRepository.removeDataFromDomain(dataId, domainId);
+    }
+    
+    @Transactional
+    public synchronized void removeDataFromProvider(String providerID) {
+        final Provider p = providerRepository.findByIdentifier(providerID);
+        if (p != null) {
+            final List<Data> datas = dataRepository.findByProviderId(p.getId());
+            for (Data data : datas) {
+                dataRepository.delete(data.getId());
+            }
+        } 
     }
 }

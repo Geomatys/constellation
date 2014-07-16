@@ -314,6 +314,7 @@ public final class DefaultConfigurator implements Configurator {
 
     @Override
     public void removeProviderConfiguration(String providerId) throws ConfigurationException {
+        dataBusiness.removeDataFromProvider(providerId);
         providerBusiness.removeProvider(providerId);
     }
         
