@@ -19,10 +19,10 @@
     See here for more details on commons-dbcp versus tomcat-jdbc:
     http://blog.ippon.fr/2013/03/13/improving-the-performance-of-the-spring-petclinic-sample-application-part-3-of-5/-->
 
+ <bean id="dataSource" class="org.constellation.admin.EmbeddedDatabase" factory-method="getOrCreateDataSource"></bean>
+<!--     <bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close" -->
+<!--           p:driverClassName="${jdbc.driverClassName}" p:url="jdbc:${jdbc.database}:${user.home}/.constellation/admin-db;create=true" /> -->
 
-    <bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close"
-          p:driverClassName="${jdbc.driverClassName}" p:url="jdbc:${jdbc.database}:${user.home}/.constellation/admin-db;create=true" />
-<!--           p:username="${jdbc.username}" p:password="${jdbc.password}"/> -->
 
   <bean id="database-initer" class="liquibase.integration.spring.SpringLiquibase">
     <property name="dataSource" ref="dataSource" />
