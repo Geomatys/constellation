@@ -156,8 +156,15 @@ public class PyramidCoverageHelper {
             final double widthGeometry = gridGeometry.getExtent2D().getWidth();
             final double heightGeometry = gridGeometry.getExtent2D().getHeight();
 
-            final String pictureHeight = propertyRepository.getValue("picture_max_height", "500");
-            final String pictureWidth  = propertyRepository.getValue("picture_max_width", "500");
+            final String pictureWidth;
+            final String pictureHeight;
+            if (propertyRepository != null) {
+                pictureHeight = propertyRepository.getValue("picture_max_height", "500");
+                pictureWidth  = propertyRepository.getValue("picture_max_width", "500");
+            } else {
+                pictureHeight = "500";
+                pictureWidth  = "500";
+            }
             final double userWidth     = Double.parseDouble(pictureWidth);
             final double userHeight    = Double.parseDouble(pictureHeight);
 

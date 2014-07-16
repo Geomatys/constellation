@@ -224,6 +224,7 @@ public final class MetadataUtilities {
             assertEquals(expResp.getRole(), resResp.getRole());
             if (expResp.getContactInfo() != null) {
                 assertEquals(expResp.getContactInfo().getHoursOfService(), resResp.getContactInfo().getHoursOfService());
+                assertEquals(expResp.getContactInfo().getContactType(), resResp.getContactInfo().getContactType());
                 assertEquals(expResp.getContactInfo().getContactInstructions(), resResp.getContactInfo().getContactInstructions());
                 assertEquals(expResp.getContactInfo().getPhone(), resResp.getContactInfo().getPhone());
                 assertEquals(expResp.getContactInfo().getOnlineResource(), resResp.getContactInfo().getOnlineResource());

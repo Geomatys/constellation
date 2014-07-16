@@ -18,10 +18,14 @@
  */
 package org.constellation.admin;
 
+import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
 import org.springframework.context.ApplicationContext;
 
 public class SpringHelper {
 
+    private static final Logger LOGGER = Logging.getLogger(SpringHelper.class);
+    
     private static ApplicationContext applicationContext;
 
     public static void setApplicationContext(ApplicationContext applicationContext) {
@@ -29,7 +33,11 @@ public class SpringHelper {
     }
 
     public static void injectDependencies(Object object) {
-        SpringHelper.applicationContext.getAutowireCapableBeanFactory().autowireBean(object);
+        if (SpringHelper.applicationContext != null) {
+            SpringHelper.applicationContext.getAutowireCapableBeanFactory().autowireBean(object);
+        } else {
+            LOGGER.warning("No spring application context available");
+        }
     }
 
 }
