@@ -26,6 +26,7 @@ import org.geotoolkit.util.StringUtilities;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.Consumes;
@@ -62,6 +63,7 @@ public class UserRest  {
     
     @GET
     @Path("/")
+    @RolesAllowed("cstl-admin")
     public Response findAll(@QueryParam("withDomainAndRoles") boolean withDomainAndRole) {
         if(withDomainAndRole) {
             return Response.ok(userRepository.findAllWithDomainAndRole()).build();
@@ -85,6 +87,7 @@ public class UserRest  {
 
     @DELETE
     @Path("/{id}")
+    @RolesAllowed("cstl-admin")
     public Response delete(@PathParam("id") int id) {
         if(userRepository.isLastAdmin(id))
             return Response.serverError().entity("admin.user.last.admin").build();
@@ -95,6 +98,7 @@ public class UserRest  {
     @POST
     @Path("/")
     @Transactional
+    @RolesAllowed("cstl-admin")
     public Response post(DomainUser userDTO) {
         if (StringUtils.hasText(userDTO.getPassword()))
             userDTO.setPassword(StringUtilities.MD5encode(userDTO.getPassword()));
@@ -108,6 +112,7 @@ public class UserRest  {
     @PUT
     @Path("/")
     @Transactional
+    @RolesAllowed("cstl-admin")
     public Response put(DomainUser userDTO) {
         userRepository.update(userDTO, userDTO.getRoles());
 
