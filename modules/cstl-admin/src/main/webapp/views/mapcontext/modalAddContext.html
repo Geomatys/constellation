@@ -74,6 +74,7 @@
                                 </div>
                                 <div class="col-sm-offset-1 col-sm-5">
                                     <button type="button" class="btn btn-primary form-control" ng-click="addLayerToContext()">
+                                        <span class="icon-plus icon-white" style="margin-right:5px;"></span>
                                         <span translate="mapcontext.modal.add.layer">Add layer</span>
                                     </button>
                                 </div>
@@ -126,14 +127,18 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-xs-1 no-padding" style="padding-top:12px;">
-                                                    <a class="btn btn-default btn-sm" ng-click="editMapItem(layerToAdd)" style="padding:5px;margin-bottom:3px;">
+                                                <div class="col-xs-1 no-padding">
+                                                    <div class="btn btn-sm" ng-click="editMapItem(layerToAdd)" style="padding:2px 5px; margin-top:8px;">
                                                         <span class="glyphicon glyphicon-info-sign"></span>
-                                                    </a>
+                                                    </div>
                                                     <!-- Edition -->
-                                                    <a class="btn btn-default btn-sm" ng-click="styleMapItem(layerToAdd)" style="padding:5px;">
+                                                    <div class="btn btn-sm" ng-click="styleMapItem(layerToAdd)" style="padding:2px 5px;">
                                                         <span class="glyphicon glyphicon-pencil"></span>
-                                                    </a>
+                                                    </div>
+                                                    <!-- Delete -->
+                                                    <div class="btn btn-sm" ng-click="deleteMapItem(layerToAdd)" style="padding:2px 5px;">
+                                                        <span class="glyphicon glyphicon-trash"></span>
+                                                    </div>
                                                 </div>
                                                 <div class="col-xs-1 no-padding" style="padding-top:12px;">
                                                     <!-- Order -->

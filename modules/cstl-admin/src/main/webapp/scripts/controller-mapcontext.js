@@ -93,6 +93,9 @@ cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', '$growl
                                 }
                             );
                         }
+                        lays.sort(function (a, b) {
+                            return a.layer.mapContextStyledLayer.order - b.layer.mapContextStyledLayer.order;
+                        });
                         return lays;
                     }
                 }
@@ -231,11 +234,17 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
             }
         };
 
-        $scope.editMapItem = function(layerToAdd) {
+        $scope.editMapItem = function(layer) {
 
         };
-        $scope.styleMapItem = function(layerToAdd) {
+        $scope.styleMapItem = function(layer) {
 
+        };
+        $scope.deleteMapItem = function(layer) {
+            var index = $scope.layers.toAdd.indexOf(layer);
+            if (index != -1) {
+                $scope.layers.toAdd.splice(index, 1);
+            }
         };
     }]);
                                      

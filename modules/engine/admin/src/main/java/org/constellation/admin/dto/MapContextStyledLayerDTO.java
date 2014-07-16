@@ -5,7 +5,7 @@ import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerSummary;
 import org.constellation.engine.register.MapcontextStyledLayer;
 
-public class MapContextStyledLayerDTO extends LayerSummary {
+public class MapContextStyledLayerDTO extends LayerSummary implements Comparable<MapContextStyledLayerDTO> {
     private MapcontextStyledLayer mapContextStyledLayer;
 
     public MapContextStyledLayerDTO(final MapcontextStyledLayer mapContextStyledLayer, final Layer layer, final DataBrief db) {
@@ -21,4 +21,8 @@ public class MapContextStyledLayerDTO extends LayerSummary {
         this.mapContextStyledLayer = mapContextStyledLayer;
     }
 
+    @Override
+    public int compareTo(MapContextStyledLayerDTO o) {
+        return this.getMapContextStyledLayer().getOrder() - o.getMapContextStyledLayer().getOrder();
+    }
 }

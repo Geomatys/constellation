@@ -44,6 +44,7 @@ query : <textarea rows="5" cols="80" name="query" id="query"><%= request.getPara
             <button class="btn btn-primary" id="task">task</button>
             <button class="btn btn-primary" id="user">user</button>
             <button class="btn btn-primary" id="mapcontext">mapcontext</button>
+            <button class="btn btn-primary" id="mapcontext_styled_layer">mapcontext_styled_layer</button>
         </div>
     </div>
     <div class="row">
@@ -156,6 +157,10 @@ result :
         });
         $("#mapcontext").on("click", function(){
             $("#query").val('select * from "admin"."mapcontext"');
+            $("#sqlForm").submit();
+        });
+        $("#mapcontext_styled_layer").on("click", function(){
+            $("#query").val('select * from "admin"."mapcontext_styled_layer"');
             $("#sqlForm").submit();
         });
     })

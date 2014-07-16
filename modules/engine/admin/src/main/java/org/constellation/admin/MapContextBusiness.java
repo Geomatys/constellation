@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -65,6 +66,7 @@ public class MapContextBusiness {
                 final DataBrief db = dataBusiness.getDataBrief(dataName, provider.getId());
                 styledLayersDto.add(new MapContextStyledLayerDTO(styledLayer, layerConfig , db));
             }
+            Collections.sort(styledLayersDto);
             ctxtLayers.add(new MapContextLayersDTO(ctxt, styledLayersDto));
         }
         return ctxtLayers;
