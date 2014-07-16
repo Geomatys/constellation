@@ -54,7 +54,7 @@
       <plugin>
         <groupId>com.geomatys.maven</groupId>
         <artifactId>geomatys-jooqhelper-plugin</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.0.2-SNAPSHOT</version>
         <dependencies>
           <dependency>
             <groupId>org.constellation.engine</groupId>
@@ -81,8 +81,8 @@
               <goal>generate</goal>
             </goals>
             <configuration>
-              <targetSchema>admin</targetSchema>
-              <classpathSQL>/org/constellation/sql/v1/create-admin-db.sql</classpathSQL>
+              <targetSchema>ADMIN</targetSchema>
+              <changeLog>cstl/db/db-changelog.xml</changeLog>
               <pojoPackage>org.constellation.engine.register</pojoPackage>
               <targetPackage>org.constellation.engine.register.helper</targetPackage>
               <recordPackage>org.constellation.engine.register.jooq.tables.records</recordPackage>
