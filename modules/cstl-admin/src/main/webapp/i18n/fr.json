@@ -410,6 +410,7 @@
     "layer.listing.reduce.button.label": "réduire ou agrandir",
     "layer.listing.selectall.button": "sélectionner toutes les couches",
     "layer.listing.selected.data.button": "Voir",
+    "layer.listing.selected.domain.button": "Domaines",
     "layer.listing.selected.delete.button": "Supprimer",
     "layer.listing.selected.export.button": "Exporter",
     "layer.listing.selected.metadata.button": "Métadonnées",
