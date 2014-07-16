@@ -7,6 +7,6 @@
   <include file="cstl/db/db-init.xml"/>
   <include file="cstl/db/db-init-data.xml"/>
   
-<!--   <include file="cstl/db/update/sample-patch.xml"/> -->
+  <include file="cstl/db/update/patch-v1.1.xml"/>
   
   </databaseChangeLog>

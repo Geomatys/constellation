@@ -108,59 +108,59 @@ result :
 <script>
     $(function(){
         $("#task").on("click", function(){
-            $("#query").val('select * from "admin"."task"');
+            $("#query").val('select * from admin.task');
             $("#sqlForm").submit();
         });
         $("#provider").on("click", function(){
-            $("#query").val('select * from "admin"."provider"');
+            $("#query").val('select * from admin.provider');
             $("#sqlForm").submit();
         });
         $("#data").on("click", function(){
-            $("#query").val('select * from "admin"."data"');
+            $("#query").val('select * from admin.data');
             $("#sqlForm").submit();
         });
         $("#service").on("click", function(){
-            $("#query").val('select * from "admin"."service"');
+            $("#query").val('select * from admin.service');
             $("#sqlForm").submit();
         });
         $("#layer").on("click", function(){
-            $("#query").val('select * from "admin"."layer"');
+            $("#query").val('select * from admin.layer');
             $("#sqlForm").submit();
         });
         $("#service_details").on("click", function(){
-            $("#query").val('select * from "admin"."service_details"');
+            $("#query").val('select * from admin.service_details');
             $("#sqlForm").submit();
         });
         $("#service_i18n").on("click", function(){
-            $("#query").val('select * from "admin"."service_i18n"');
+            $("#query").val('select * from admin.service_i18n');
             $("#sqlForm").submit();
         });
         $("#style").on("click", function(){
-            $("#query").val('select * from "admin"."style"');
+            $("#query").val('select * from admin.style');
             $("#sqlForm").submit();
         });
         $("#user").on("click", function(){
-            $("#query").val('select * from "admin"."user"');
+            $("#query").val('select * from admin."USER"');
             $("#sqlForm").submit();
         });
         $("#styled_data").on("click", function(){
-            $("#query").val('select * from "admin"."styled_data"');
+            $("#query").val('select * from admin.styled_data');
             $("#sqlForm").submit();
         });
         $("#sensor").on("click", function(){
-            $("#query").val('select * from "admin"."sensor"');
+            $("#query").val('select * from admin.sensor');
             $("#sqlForm").submit();
         });
         $("#sensored_data").on("click", function(){
-            $("#query").val('select * from "admin"."sensored_data"');
+            $("#query").val('select * from admin.sensored_data');
             $("#sqlForm").submit();
         });
         $("#mapcontext").on("click", function(){
-            $("#query").val('select * from "admin"."mapcontext"');
+            $("#query").val('select * from admin.mapcontext');
             $("#sqlForm").submit();
         });
         $("#mapcontext_styled_layer").on("click", function(){
-            $("#query").val('select * from "admin"."mapcontext_styled_layer"');
+            $("#query").val('select * from admin.mapcontext_styled_layer');
             $("#sqlForm").submit();
         });
     })
