@@ -49,17 +49,16 @@ import org.apache.sis.metadata.iso.identification.DefaultKeywords;
 import org.apache.sis.metadata.iso.spatial.DefaultGeometricObjects;
 import org.apache.sis.metadata.iso.spatial.DefaultVectorSpatialRepresentation;
 import org.apache.sis.referencing.AbstractIdentifiedObject;
-import org.apache.sis.referencing.NamedIdentifier;
 import org.apache.sis.referencing.crs.DefaultVerticalCRS;
 import org.apache.sis.referencing.cs.DefaultCoordinateSystemAxis;
 import org.apache.sis.referencing.cs.DefaultVerticalCS;
 import org.apache.sis.referencing.datum.DefaultVerticalDatum;
+import org.apache.sis.test.integration.DefaultMetadataTest;
 import org.apache.sis.test.XMLComparator;
 import org.apache.sis.util.iso.SimpleInternationalString;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.apache.sis.xml.XML;
-import org.constellation.test.utils.MetadataUtilities;
 import org.constellation.util.Util;
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
@@ -121,21 +120,17 @@ import java.util.logging.Logger;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-// Junit dependencies
-// Constellation dependencies
-// geotoolkit dependencies
-// GeoAPI dependencies
 
 /**
  *
  * @author Guilhem Legal
  */
-public class MetadataUnmarshallTest {
+public class MetadataUnmarshallTest extends DefaultMetadataTest {
     private static MarshallerPool testPool;
     private static Unmarshaller unmarshaller;
     private static Marshaller marshaller;
     private static final Logger LOGGER = Logging.getLogger(MetadataUnmarshallTest.class);
-    
+
     @BeforeClass
     public static void setUp() throws JAXBException, URISyntaxException {
         testPool = CSWMarshallerPool.getInstance();
@@ -155,461 +150,25 @@ public class MetadataUnmarshallTest {
     }
 
     /**
+     * Invoked by {@link DefaultMetadataTest} for setting the temporal extent of the metadata to be tested.
+     *
+     * @param extent    The extent to set.
+     * @param startTime The start time in the {@code "yyy-mm-dd"} format.
+     * @param endTime   The end time in the {@code "yyy-mm-dd"} format.
+     */
+    @Override
+    protected void setTemporalBounds(final DefaultTemporalExtent extent, final String startTime, final String endTime) {
+        extent.setExtent(new TimePeriodType(null, startTime, endTime));
+    }
+
+    /**
      * Tests the unmarshall of a metadata.
      *
      * @throws java.lang.Exception
      */
     @Test
     public void unmarshallTest() throws Exception {
-
         unmarshaller = testPool.acquireUnmarshaller();
-        Object obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta1.xml"));
-        
-        assertTrue(obj instanceof DefaultMetadata);
-        DefaultMetadata result = (DefaultMetadata) obj;
-
-        DefaultMetadata expResult = new DefaultMetadata();
-
-        /*
-         * static part
-         */
-        expResult.setFileIdentifier("42292_5p_19900609195600");
-        expResult.setLanguage(Locale.ENGLISH);
-        expResult.setCharacterSet(CharacterSet.UTF_8);
-        Set set = new HashSet();
-        set.add(ScopeCode.DATASET);
-        expResult.setHierarchyLevels(set);
-        set = new HashSet();
-        set.add("Common Data Index record");
-        expResult.setHierarchyLevelNames(set);
-        /*
-         * contact parts
-         */
-        DefaultResponsibleParty author = new DefaultResponsibleParty(Role.AUTHOR);
-        author.setOrganisationName(new SimpleInternationalString("IFREMER / IDM/SISMER"));
-        DefaultContact contact = new DefaultContact();
-        DefaultTelephone t = new DefaultTelephone();
-        set = new HashSet();
-        set.add("+33 (0)2 98.22.49.16");
-        t.setVoices(set);
-        set = new HashSet();
-        set.add("+33 (0)2 98.22.46.44");
-        t.setFacsimiles(set);
-        contact.setPhone(t);
-        DefaultAddress add = new DefaultAddress();
-        set = new HashSet();
-        set.add("Centre IFREMER de Brest BP 70");
-        add.setDeliveryPoints(set);
-        add.setCity(new SimpleInternationalString("PLOUZANE"));
-        add.setPostalCode("29280");
-        add.setCountry(new Anchor(URI.create("SDN:C320:2:FR"), "France"));
-        set = new HashSet();
-        set.add("sismer@ifremer.fr");
-        add.setElectronicMailAddresses(set);
-        contact.setAddress(add);
-        DefaultOnlineResource o = new DefaultOnlineResource(new URI("http://www.ifremer.fr/sismer/"));
-        o.setProtocol("http");
-        contact.setOnlineResource(o);
-        author.setContactInfo(contact);
-        set = new HashSet();
-        set.add(author);
-        expResult.setContacts(set);
-
-        /*
-         * creation date
-         */
-        expResult.setDateStamp(TemporalUtilities.parseDate("2009-01-01T06:00:00+0200"));
-
-        /*
-         * Spatial representation info
-         */
-        DefaultVectorSpatialRepresentation spatialRep = new DefaultVectorSpatialRepresentation();
-        DefaultGeometricObjects geoObj = new DefaultGeometricObjects(GeometricObjectType.valueOf("POINT"));
-        set = new HashSet();
-        set.add(geoObj);
-        spatialRep.setGeometricObjects(set);
-
-        set = new HashSet();
-        set.add(spatialRep);
-        expResult.setSpatialRepresentationInfo(set);
-
-        /*
-         * Reference system info
-         */
-        String code = "EPSG:4326";
-
-        DefaultCitation RScitation = new DefaultCitation();
-
-        RScitation.setTitle(new SimpleInternationalString("SeaDataNet geographic co-ordinate reference frames"));
-        set = new HashSet();
-        set.add(new SimpleInternationalString("L101"));
-        RScitation.setAlternateTitles(set);
-        set = new HashSet();
-        set.add(new ImmutableIdentifier(null, null, "http://www.seadatanet.org/urnurl/"));
-        RScitation.setIdentifiers(set);
-        RScitation.setEdition(new Anchor(new URI("SDN:C371:1:2"),"2"));
-
-        ImmutableIdentifier Nidentifier = new ImmutableIdentifier(RScitation, "L101", code);
-        ReferenceSystemMetadata rs = new ReferenceSystemMetadata(Nidentifier);
-        set = new HashSet();
-        set.add(rs);
-        expResult.setReferenceSystemInfo(set);
-
-
-        /*
-         * extension information
-         */
-        DefaultMetadataExtensionInformation extensionInfo = new DefaultMetadataExtensionInformation();
-        Set<ExtendedElementInformation> elements = new HashSet<>();
-
-        //EDMO
-        ExtendedElementInformation edmo =  createExtensionInfo("SDN:EDMO::");
-        elements.add(edmo);
-
-        /*L021
-        ExtendedElementInformation L021 = createExtensionInfo("SDN:L021:1:");
-        elements.add(L021);
-
-        //L031
-        ExtendedElementInformation L031 = createExtensionInfo("SDN:L031:2:");
-        elements.add(L031);
-
-        //L071
-        ExtendedElementInformation L071 = createExtensionInfo("SDN:L071:1:");
-        elements.add(L071);
-
-        //L081
-        ExtendedElementInformation L081 = createExtensionInfo("SDN:L081:1:");
-        elements.add(L081);
-
-        //L231
-        ExtendedElementInformation L231 = createExtensionInfo("SDN:L231:3:");
-        elements.add(L231);
-
-        //L241
-        ExtendedElementInformation L241 = createExtensionInfo("SDN:L241:1:");
-        elements.add(L241);*/
-
-        extensionInfo.setExtendedElementInformation(elements);
-
-        set = new HashSet();
-        set.add(extensionInfo);
-        expResult.setMetadataExtensionInfo(set);
-
-        /*
-         * Data indentification
-         */
-        DefaultDataIdentification dataIdentification = new DefaultDataIdentification();
-
-        DefaultCitation citation = new DefaultCitation();
-        citation.setTitle(new SimpleInternationalString("90008411.ctd"));
-        set = new HashSet();
-        set.add(new SimpleInternationalString("42292_5p_19900609195600"));
-        citation.setAlternateTitles(set);
-
-        DefaultCitationDate revisionDate = new DefaultCitationDate();
-        revisionDate.setDateType(DateType.REVISION);
-        Date d = TemporalUtilities.parseDate("1990-06-05T00:00:00+0200");
-        revisionDate.setDate(d);
-        DefaultCitationDate creationDate = new DefaultCitationDate();
-        creationDate.setDateType(DateType.CREATION);
-        Date dc = TemporalUtilities.parseDate("1979-08-03T00:00:00+0200");
-        creationDate.setDate(dc);
-        List<CitationDate> dates = new ArrayList<>();
-        dates.add(revisionDate);
-        dates.add(creationDate);
-        citation.setDates(dates);
-
-
-        Set<ResponsibleParty> originators = new HashSet<>();
-        DefaultResponsibleParty originator = new DefaultResponsibleParty(Role.ORIGINATOR);
-        originator.setOrganisationName(new SimpleInternationalString("UNIVERSITE DE LA MEDITERRANNEE (U2) / COM - LAB. OCEANOG. BIOGEOCHIMIE - LUMINY"));
-        contact = new DefaultContact();
-        t = new DefaultTelephone();
-        set = new HashSet();
-        set.add("+33(0)4 91 82 91 15");
-        t.setVoices(set);
-        set = new HashSet();
-        set.add("+33(0)4 91.82.65.48");
-        t.setFacsimiles(set);
-        contact.setPhone(t);
-        add = new DefaultAddress();
-        set = new HashSet();
-        set.add("UFR Centre Oceanologique de Marseille Campus de Luminy Case 901");
-        add.setDeliveryPoints(set);
-        add.setCity(new SimpleInternationalString("Marseille cedex 9"));
-        add.setPostalCode("13288");
-        add.setCountry(new Anchor(URI.create("SDN:C320:2:FR"), "France"));
-        set = new HashSet();
-        add.setElectronicMailAddresses(set);
-        contact.setAddress(add);
-        o = new DefaultOnlineResource(new URI("http://www.com.univ-mrs.fr/LOB/"));
-        contact.setOnlineResource(o);
-        o.setProtocol("http");
-        originator.setContactInfo(contact);
-        originators.add(originator);
-        citation.setCitedResponsibleParties(originators);
-
-        dataIdentification.setCitation(citation);
-
-
-        dataIdentification.setAbstract(new SimpleInternationalString("Donnees CTD NEDIPROD VI 120"));
-
-        DefaultResponsibleParty custodian = new DefaultResponsibleParty(Role.CUSTODIAN);
-        custodian.setOrganisationName(new SimpleInternationalString("IFREMER / IDM/SISMER"));
-        contact = new DefaultContact();
-        t = new DefaultTelephone();
-        set = new HashSet();
-        set.add("+33 (0)2 98.22.49.16");
-        t.setVoices(set);
-        set = new HashSet();
-        set.add("+33 (0)2 98.22.46.44");
-        t.setFacsimiles(set);
-        contact.setPhone(t);
-        add = new DefaultAddress();
-        set = new HashSet();
-        set.add("Centre IFREMER de Brest BP 70");
-        add.setDeliveryPoints(set);
-        add.setCity(new SimpleInternationalString("PLOUZANE"));
-        add.setPostalCode("29280");
-        add.setCountry(new Anchor(URI.create("SDN:C320:2:FR"), "France"));
-        set = new HashSet();
-        set.add("sismer@ifremer.fr");
-        add.setElectronicMailAddresses(set);
-        contact.setAddress(add);
-        o = new DefaultOnlineResource(new URI("http://www.ifremer.fr/sismer/"));
-        o.setProtocol("http");
-        contact.setOnlineResource(o);
-        custodian.setContactInfo(contact);
-        set = new HashSet();
-        set.add(custodian);
-        dataIdentification.setPointOfContacts(set);
-
-        /*
-         * Browse graphic
-         */
-        DefaultBrowseGraphic go = new DefaultBrowseGraphic(URI.create("http://fr.wikipedia.org/wiki/Fichier:Death_skull.svg"));
-        go.setFileDescription(new SimpleInternationalString("thumbnail"));
-        dataIdentification.setGraphicOverviews(Arrays.asList(go));
-        /*
-         * keywords
-         */
-        Set<Keywords> keywords = new HashSet<>();
-
-        //parameter
-        Set<String> keys = new HashSet<>();
-        keys.add("Transmittance and attenuance of the water column");
-        Keywords keyword = createKeyword(keys, "parameter", "BODC Parameter Discovery Vocabulary", "P021", "2008-11-26T01:00:00+0200", "35");
-        keywords.add(keyword);
-
-        dataIdentification.setDescriptiveKeywords(keywords);
-
-        /*
-         * resource constraint
-         */
-        DefaultLegalConstraints constraint = new DefaultLegalConstraints();
-        Set<Restriction> restrictions  = new HashSet<>();
-        restrictions.add(Restriction.LICENSE);
-
-        constraint.setAccessConstraints(restrictions);
-        set = new HashSet();
-        set.add(constraint);
-        dataIdentification.setResourceConstraints(set);
-
-        /*
-         * Aggregate info
-         */
-        Set<DefaultAggregateInformation> aggregateInfos = new HashSet<>();
-
-        //cruise
-        DefaultAggregateInformation aggregateInfo = new DefaultAggregateInformation();
-        citation = new DefaultCitation();
-        citation.setTitle(new SimpleInternationalString("MEDIPROD VI"));
-        set = new HashSet();
-        set.add(new SimpleInternationalString("90008411"));
-        citation.setAlternateTitles(set);
-        revisionDate = new DefaultCitationDate();
-        revisionDate.setDateType(DateType.REVISION);
-        d = TemporalUtilities.parseDate("1990-06-05T00:00:00+0200");
-        revisionDate.setDate(d);
-        set = new HashSet();
-        set.add(revisionDate);
-        citation.setDates(set);
-        aggregateInfo.setAggregateDataSetName(citation);
-        aggregateInfo.setInitiativeType(InitiativeType.CAMPAIGN);
-        aggregateInfo.setAssociationType(AssociationType.LARGER_WORD_CITATION);
-        aggregateInfos.add(aggregateInfo);
-
-        dataIdentification.setAggregationInfo(aggregateInfos);
-
-        //static part
-        set = new HashSet();
-        set.add(Locale.ENGLISH);
-        dataIdentification.setLanguages(set);
-        set = new HashSet();
-        set.add(TopicCategory.OCEANS);
-        dataIdentification.setTopicCategories(set);
-
-        /*
-         * Extent
-         */
-        DefaultExtent extent = new DefaultExtent();
-
-        // geographic extent
-        extent.setGeographicElements(createGeographicExtent("1.1667", "1.1667", "36.6", "36.6"));
-
-        //temporal extent
-        DefaultTemporalExtent tempExtent = new DefaultTemporalExtent();
-
-        TimePeriodType period = new TimePeriodType(null, "1990-06-05", "1990-07-02");
-        tempExtent.setExtent(period);
-
-        set = new HashSet();
-        set.add(tempExtent);
-        extent.setTemporalElements(set);
-
-
-
-        //vertical extent
-        DefaultVerticalExtent vertExtent = new DefaultVerticalExtent();
-        String miv = null;
-        String mav = null;
-
-        if (miv != null) {
-            vertExtent.setMinimumValue(Double.parseDouble(miv));
-        }
-        if (mav != null) {
-            vertExtent.setMaximumValue(Double.parseDouble(mav));
-        }
-
-        // vertical datum
-        NamedIdentifier datumID = new NamedIdentifier(null, "D28");
-
-        Map<String, Object> prop = new HashMap<>();
-        prop.put(DefaultVerticalDatum.NAME_KEY, datumID);
-        DefaultVerticalDatum datum = new DefaultVerticalDatum(prop, VerticalDatumType.OTHER_SURFACE);
-
-
-        // vertical coordinate system  TODO var 32 uom?
-        HashMap<String, Object> propCoo = new HashMap<>();
-
-
-        NamedIdentifier m = new NamedIdentifier(null,  "meters");
-        propCoo.put(DefaultCoordinateSystemAxis.NAME_KEY, m);
-//        propCoo.put(DefaultCoordinateSystemAxis.ALIAS_KEY, "");
-        DefaultCoordinateSystemAxis axis = new DefaultCoordinateSystemAxis(propCoo, "meters", AxisDirection.DOWN, Unit.valueOf("m"));
-
-        HashMap<String,Object> csProp = new HashMap<>();
-        NamedIdentifier i = new NamedIdentifier(null, "meters");
-        csProp.put(DefaultVerticalCRS.NAME_KEY, i);
-        DefaultVerticalCS cs = new DefaultVerticalCS(csProp, axis);
-
-        prop = new HashMap<>();
-        NamedIdentifier idVert = new NamedIdentifier(null, "idvertCRS");
-        prop.put(DefaultVerticalCRS.NAME_KEY, idVert);
-        prop.put(DefaultVerticalCRS.SCOPE_KEY, null);
-        //prop.put(DefaultVerticalCRS.ALIAS_KEY, DefaultCoordinateSystemAxis.UNDEFINED.getAlias());
-        DefaultVerticalCRS vcrs = new DefaultVerticalCRS(prop, datum, cs);
-
-
-        // TODO vertical limit? var 35
-        vertExtent.setVerticalCRS(vcrs);
-
-        set = new HashSet();
-        set.add(vertExtent);
-        extent.setVerticalElements(set);
-
-        set = new HashSet();
-        set.add(extent);
-        dataIdentification.setExtents(set);
-
-        set = new HashSet();
-        set.add(dataIdentification);
-        expResult.setIdentificationInfo(set);
-
-        /*
-         * Content info
-         */
-        DefaultImageDescription contentInfo = new DefaultImageDescription();
-        contentInfo.setCloudCoverPercentage(50.0);
-        expResult.setContentInfo(Arrays.asList(contentInfo));
-        
-        
-        /*
-         * Distribution info
-         */
-        DefaultDistribution distributionInfo = new DefaultDistribution();
-
-        //distributor
-        DefaultDistributor distributor       = new DefaultDistributor();
-
-        DefaultResponsibleParty distributorContact = new DefaultResponsibleParty(Role.DISTRIBUTOR);
-        distributorContact.setOrganisationName(new SimpleInternationalString("IFREMER / IDM/SISMER"));
-        contact = new DefaultContact();
-        t = new DefaultTelephone();
-        set = new HashSet();
-        set.add("+33 (0)2 98.22.49.16");
-        t.setVoices(set);
-        set = new HashSet();
-        set.add("+33 (0)2 98.22.46.44");
-        t.setFacsimiles(set);
-        contact.setPhone(t);
-        add = new DefaultAddress();
-        set = new HashSet();
-        set.add("Centre IFREMER de Brest BP 70");
-        add.setDeliveryPoints(set);
-        add.setCity(new SimpleInternationalString("PLOUZANE"));
-        add.setPostalCode("29280");
-        add.setCountry(new Anchor(URI.create("SDN:C320:2:FR"), "France"));
-        set = new HashSet();
-        set.add("sismer@ifremer.fr");
-        add.setElectronicMailAddresses(set);
-        contact.setAddress(add);
-        o = new DefaultOnlineResource(new URI("http://www.ifremer.fr/sismer/"));
-        o.setProtocol("http");
-        contact.setOnlineResource(o);
-        distributorContact.setContactInfo(contact);
-
-        distributor.setDistributorContact(distributorContact);
-        set = new HashSet();
-        set.add(distributor);
-        distributionInfo.setDistributors(set);
-
-        //format
-        Set<Format> formats  = new HashSet<>();
-
-        DefaultFormat format = new DefaultFormat();
-        String name = "MEDATLAS ASCII";
-        format.setName(new Anchor(new URI("SDN:L241:1:MEDATLAS"),name));
-        format.setVersion(new SimpleInternationalString("1.0"));
-        formats.add(format);
-
-        distributionInfo.setDistributionFormats(formats);
-
-        //transfert options
-        DefaultDigitalTransferOptions digiTrans = new DefaultDigitalTransferOptions();
-
-        digiTrans.setTransferSize(2.431640625);
-
-        DefaultOnlineResource onlines = new DefaultOnlineResource();
-
-        String uri = "http://www.ifremer.fr/sismerData/jsp/visualisationMetadata3.jsp?langue=EN&pageOrigine=CS&cle1=42292_1&cle2=CTDF02";
-        onlines.setLinkage(new URI(uri));
-
-        onlines.setDescription(new SimpleInternationalString("CTDF02"));
-        onlines.setFunction(OnLineFunction.DOWNLOAD);
-        onlines.setProtocol("http");
-        set = new HashSet();
-        set.add(onlines);
-        digiTrans.setOnLines(set);
-
-        set = new HashSet();
-        set.add(digiTrans);
-        distributionInfo.setTransferOptions(set);
-
-        expResult.setDistributionInfo(distributionInfo);
-
-        MetadataUtilities.metadataEquals(expResult, result);
 
         String xml =
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + '\n' +
@@ -676,7 +235,7 @@ public class MetadataUnmarshallTest {
         "</gmd:MD_Metadata>";
 
         StringReader sr = new StringReader(xml);
-        obj = unmarshaller.unmarshal(sr);
+        Object obj = unmarshaller.unmarshal(sr);
 
         assertTrue(obj instanceof DefaultMetadata);
         DefaultMetadata meta = (DefaultMetadata) obj;
@@ -684,7 +243,7 @@ public class MetadataUnmarshallTest {
         assertTrue(meta.getIdentificationInfo().size() == 1);
         Identification ident = meta.getIdentificationInfo().iterator().next();
         assertTrue(ident instanceof DataIdentification);
-        
+
         DataIdentification dataIdent = (DataIdentification) ident;
 
         assertTrue(dataIdent.getExtents().size() == 2);
@@ -701,8 +260,6 @@ public class MetadataUnmarshallTest {
         obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/metadata/meta7.xml"));
 
         assertTrue(obj instanceof DefaultMetadata);
-        result = (DefaultMetadata) obj;
-
     }
 
     protected ExtendedElementInformation createExtensionInfo(String name) {
@@ -787,10 +344,12 @@ public class MetadataUnmarshallTest {
 
 
      /**
-     * Tests the unmarshall of a metadata.
-     *
-     * @throws java.lang.Exception
-     */
+      * Tests the unmarshall of a metadata.
+      *
+      * @throws java.lang.Exception
+      *
+      * @todo Remove (together with the XML file) after we enabled {@link DefaultMetadataTest#testMarshalling()}.
+      */
     @Test
     public void marshallTest() throws Exception {
 
@@ -993,7 +552,7 @@ public class MetadataUnmarshallTest {
         DefaultBrowseGraphic go = new DefaultBrowseGraphic(URI.create("http://fr.wikipedia.org/wiki/Fichier:Death_skull.svg"));
         go.setFileDescription(new SimpleInternationalString("thumbnail"));
         dataIdentification.setGraphicOverviews(Arrays.asList(go));
-        
+
         /*
          * keywords
          */
@@ -1067,10 +626,9 @@ public class MetadataUnmarshallTest {
         //temporal extent
         DefaultTemporalExtent tempExtent = new DefaultTemporalExtent();
 
-        
         TimePeriodType period = new TimePeriodType(null, "1990-06-05", "1990-07-02");
         period.setId("extent");
-        
+
         tempExtent.setExtent(period);
 
         set = new HashSet();
@@ -1136,7 +694,7 @@ public class MetadataUnmarshallTest {
         DefaultImageDescription contentInfo = new DefaultImageDescription();
         contentInfo.setCloudCoverPercentage(50.0);
         metadata.setContentInfo(Arrays.asList(contentInfo));
-        
+
         /*
          * Distribution info
          */
@@ -1225,7 +783,7 @@ public class MetadataUnmarshallTest {
         while ((size = in.read(buffer, 0, 1024)) > 0) {
             out.write(new String(buffer, 0, size));
         }
-        
+
         String expResult = out.toString();
         XMLComparator comparator = new XMLComparator(expResult, result);
         comparator.ignoredAttributes.add("http://www.w3.org/2000/xmlns:*");
