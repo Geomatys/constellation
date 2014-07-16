@@ -137,7 +137,7 @@ public final class EmbeddedDatabase extends Static {
         Connection conec = null;
         try {
             conec = DATA_SOURCE.getConnection();
-            if (!schemaExists("admin", conec)) {
+            if (false && !schemaExists("admin", conec)) {
                 // Load database schema SQL stream.
                 final ClassLoader loader = AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
                     public ClassLoader run() {
