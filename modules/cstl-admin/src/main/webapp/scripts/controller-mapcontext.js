@@ -234,7 +234,7 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
         };
 
         $scope.toggleUpDownSelected = function() {
-            var $header = $('#selection').find('.selected-item').find('.block-header');
+            var $header = $('#selectionLayer').find('.selected-item').find('.block-header');
             $header.next().slideToggle(200);
             $header.find('i').toggleClass('icon-chevron-down icon-chevron-up');
         };
