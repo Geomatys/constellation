@@ -82,19 +82,19 @@ cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', '$growl
                 templateUrl: 'views/mapcontext/modalAddContext.html',
                 controller: 'MapContextAddModalController',
                 resolve: {
-                    ctxtToEdit: function () { return $scope.selected; },
+                    ctxtToEdit: function () { return angular.copy($scope.selected); },
                     layersForCtxt: function () {
                         var lays = [];
                         for (var i=0; i<$scope.selected.layers.length; i++) {
                             var lay = $scope.selected.layers[i];
                             lays.push(
                                 {layer: lay,
-                                 visible: lay.mapContextStyledLayer.visible
+                                 visible: lay.visible
                                 }
                             );
                         }
                         lays.sort(function (a, b) {
-                            return a.layer.mapContextStyledLayer.order - b.layer.mapContextStyledLayer.order;
+                            return a.layer.order - b.layer.order;
                         });
                         return lays;
                     }
@@ -107,8 +107,8 @@ cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', '$growl
         };
     }]);
 
-cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstance', 'mapcontext', 'webService', '$growl', '$translate', 'ctxtToEdit', 'layersForCtxt',
-    function ($scope, $modalInstance, mapcontext, webService, $growl, $translate, ctxtToEdit, layersForCtxt) {
+cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstance', 'mapcontext', 'webService', 'style', '$growl', '$translate', 'ctxtToEdit', 'layersForCtxt',
+    function ($scope, $modalInstance, mapcontext, webService, style, $growl, $translate, ctxtToEdit, layersForCtxt) {
         // item to save in the end
         $scope.ctxt = {};
         // defines if we are in adding or edition mode
@@ -130,7 +130,13 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
 
         $scope.layers = {
             toAdd: layersForCtxt || [], // Stores temp layers, selected to be added at the saving time
-            toSend: [] // List of layers really sent
+            toSend: [], // List of layers really sent
+            toStyle: null // Layer on which to apply the selected style
+        };
+
+        $scope.styles = {
+            existing: [],
+            selected: null
         };
 
         $scope.close = function () {
@@ -147,11 +153,21 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
             });
         };
 
+        $scope.initStyles = function() {
+            style.listAll({provider: 'sld'}, function(response) {
+                $scope.styles.existing = response.styles;
+            });
+        };
+
         $scope.select = function(layer,service) {
             $scope.selected = {
                 layer: layer,
                 service: service
             };
+        };
+
+        $scope.selectStyle = function(item) {
+            $scope.styles.selected = item;
         };
 
         $scope.validate = function () {
@@ -175,6 +191,10 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
                 }
             } else if ($scope.mode.display==='addChooseSource') {
                 $scope.mode.display = 'chooseLayer';
+            } else if ($scope.mode.display==='addChooseStyle') {
+                $scope.layers.toStyle.layer.styleId = $scope.styles.selected.Id;
+                $scope.layers.toStyle.layer.styleName = $scope.styles.selected.Name;
+                $scope.mode.display = 'general';
             } else if ($scope.mode.display==='chooseLayer') {
                 // Add the selected layer to the current map context
                 if ($scope.selected.layer) {
@@ -195,7 +215,7 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
                 var l = $scope.layers.toAdd[i];
                 $scope.layers.toSend.push({
                     mapcontextId: ctxt.id, layerId: l.layer.Id,
-                    styleId: (l.layer.TargetStyle.length > 0) ? l.layer.TargetStyle[0].Id : null,
+                    styleId: l.layer.styleId,
                     order: i, visible: l.visible
                 });
             }
@@ -237,9 +257,12 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
         $scope.editMapItem = function(layer) {
 
         };
-        $scope.styleMapItem = function(layer) {
 
+        $scope.styleMapItem = function(layer) {
+            $scope.mode.display = 'addChooseStyle';
+            $scope.layers.toStyle = layer;
         };
+
         $scope.deleteMapItem = function(layer) {
             var index = $scope.layers.toAdd.indexOf(layer);
             if (index != -1) {

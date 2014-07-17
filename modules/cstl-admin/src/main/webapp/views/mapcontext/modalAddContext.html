@@ -124,6 +124,9 @@
                                                             <div class="block">
                                                                 <i class="icon-user"></i>{{layerToAdd.layer.Owner}}
                                                             </div>
+                                                            <div class="block">
+                                                                <i class="icon-pencil"></i>{{layerToAdd.layer.styleName}}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -164,6 +167,45 @@
                         <span translate="label.preview"></span>
                     </div>
                     <div id="mapContextMap" class="col-sm-6" style="height: 500px; width:100%;padding: 0;"/>
+                </div>
+            </div>
+
+            <!-- Add mode, choose style for a map item -->
+            <div ng-if="mode.display==='addChooseStyle'">
+                <!-- Left part -->
+                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" ng-init="initStyles()">
+                    <div class="dash-inner row dashboard" ng-init="small=false">
+                        <div data-role="list">
+                            <div class="item-list">
+                                <div ng-repeat="styleItem in styles.existing" class="row">
+                                    <div class="item style-{{styleItem.Type | lowercase}}"
+                                         ng-class="{selected: styles.selected===styleItem}"
+                                         ng-click="selectStyle(styleItem)">
+                                        <div class="top">
+                                            <span class="item-title" title="{{styleItem.Name}}">{{styleItem.Name}}</span>
+                                            <span class="pull-right text-right item-list-style">{{styleItem.Type}}</span>
+                                        </div>
+                                        <div class="bottom">
+                                            <div class="block">
+                                                <i class="icon-calendar"></i>{{styleItem.Date | date:'yyyy-MM-dd'}}
+                                            </div>
+                                            <div class="block">
+                                                <i class="icon-user"></i>{{styleItem.Owner}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right part -->
+                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                    <div class="row">
+                        <span translate="label.preview"></span>
+                    </div>
+                    <div id="mapContextStyleMap" class="col-sm-6" style="height: 500px; width:100%;padding: 0;"/>
                 </div>
             </div>
 

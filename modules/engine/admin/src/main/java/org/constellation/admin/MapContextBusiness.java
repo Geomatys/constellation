@@ -3,14 +3,8 @@ package org.constellation.admin;
 import org.constellation.admin.dto.MapContextLayersDTO;
 import org.constellation.admin.dto.MapContextStyledLayerDTO;
 import org.constellation.configuration.DataBrief;
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Mapcontext;
-import org.constellation.engine.register.MapcontextStyledLayer;
-import org.constellation.engine.register.Provider;
-import org.constellation.engine.register.repository.DataRepository;
-import org.constellation.engine.register.repository.LayerRepository;
-import org.constellation.engine.register.repository.MapContextRepository;
-import org.constellation.engine.register.repository.ProviderRepository;
+import org.constellation.engine.register.*;
+import org.constellation.engine.register.repository.*;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -38,6 +32,9 @@ public class MapContextBusiness {
     @Inject
     private ProviderRepository providerRepository;
 
+    @Inject
+    private StyleRepository styleRepository;
+
     public void setMapItems(final int contextId, final List<MapcontextStyledLayer> layers) {
         mapContextRepository.setLinkedLayers(contextId, layers);
     }
@@ -64,7 +61,15 @@ public class MapContextBusiness {
 
                 final QName dataName = new QName(data.getNamespace(), data.getName());
                 final DataBrief db = dataBusiness.getDataBrief(dataName, provider.getId());
-                styledLayersDto.add(new MapContextStyledLayerDTO(styledLayer, layerConfig , db));
+                final MapContextStyledLayerDTO dto = new MapContextStyledLayerDTO(styledLayer, layerConfig , db);
+                if (styledLayer.getStyleId() != null) {
+                    final Style style = styleRepository.findById(styledLayer.getStyleId());
+                    if (style != null) {
+                        dto.setStyleName(style.getName());
+                    }
+                }
+
+                styledLayersDto.add(dto);
             }
             Collections.sort(styledLayersDto);
             ctxtLayers.add(new MapContextLayersDTO(ctxt, styledLayersDto));

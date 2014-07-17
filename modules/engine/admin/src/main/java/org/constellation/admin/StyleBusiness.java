@@ -137,15 +137,15 @@ public final class StyleBusiness {
      * style provider with the specified identifier.
      *
      * @param providerId the style provider identifier
-     * @param styleId the style identifier
+     * @param styleName the style identifier
      * @throws TargetNotFoundException if the style instance can't be found
      */
-    private Style ensureExistingStyle(final String providerId, final String styleId) throws TargetNotFoundException {
+    private Style ensureExistingStyle(final String providerId, final String styleName) throws TargetNotFoundException {
         final Provider provider = ensureExistingProvider(providerId);
-        final Style style = styleRepository.findByNameAndProvider(provider.getId(), styleId);
+        final Style style = styleRepository.findByNameAndProvider(provider.getId(), styleName);
         if (style == null) {
             throw new TargetNotFoundException("Style provider with identifier \"" + providerId
-                    + "\" does not contain style named \"" + styleId + "\".");
+                    + "\" does not contain style named \"" + styleName + "\".");
         }
         return style;
     }
@@ -275,27 +275,27 @@ public final class StyleBusiness {
      * identifier.
      *
      * @param providerId the style provider identifier
-     * @param styleId the style identifier
+     * @param styleName the style identifier
      * @return the {@link MutableStyle} instance
      * @throws TargetNotFoundException if the style with the specified
      * identifier can't be found
      */
-    public MutableStyle getStyle(final String providerId, final String styleId) throws TargetNotFoundException {
-        final Style style = ensureExistingStyle(providerId, styleId);
+    public MutableStyle getStyle(final String providerId, final String styleName) throws TargetNotFoundException {
+        final Style style = ensureExistingStyle(providerId, styleName);
         return parseStyle(style.getName(), style.getBody());
     }
 
     /**
      * 
      * @param providerId the style provider identifier
-     * @param styleId the style identifier
+     * @param styleName the style identifier
      * @param ruleName the {@link MutableStyle} instance name
      * @return a {@link Function} 
      * @throws TargetNotFoundException
      */
-    public Function getFunctionColorMap(String providerId, String styleId, String ruleName) throws TargetNotFoundException{
+    public Function getFunctionColorMap(String providerId, String styleName, String ruleName) throws TargetNotFoundException{
     	//get style
-    	Style style = ensureExistingStyle(providerId, styleId);
+    	Style style = ensureExistingStyle(providerId, styleName);
     	MutableStyle mStyle = parseStyle(style.getName(), style.getBody());
     	List<MutableRule> mutableRules = new ArrayList<MutableRule>(0);
         if (!mStyle.featureTypeStyles().isEmpty()) {
@@ -338,21 +338,21 @@ public final class StyleBusiness {
      * </ul>
      *
      * @param providerId the style provider identifier
-     * @param styleId the style identifier
+     * @param styleName the style identifier
      * @param locale the locale for report internationalization
      * @return a {@link StyleReport} instance
      * @throws TargetNotFoundException if the style with the specified
      * identifier can't be found
      * @throws ConfigurationException if the operation has failed for any reason
      */
-    public StyleReport getStyleReport(final String providerId, final String styleId, final Locale locale) throws ConfigurationException {
+    public StyleReport getStyleReport(final String providerId, final String styleName, final Locale locale) throws ConfigurationException {
         final StyleReport report = new StyleReport();
 
         final Provider provider = ensureExistingProvider(providerId);
 
         // Extract information from the administration database.
         try {
-            final Style record = styleRepository.findByNameAndProvider(provider.getId(), styleId);
+            final Style record = styleRepository.findByNameAndProvider(provider.getId(), styleName);
             if (record != null) {
                 report.setBrief(getBriefFromRecord(record, locale));
                 //FIXME I18N
@@ -363,15 +363,15 @@ public final class StyleBusiness {
                     report.getTargetData().add(getBriefFromRecord(r, locale));
                 }
             } else {
-                LOGGER.log(Level.WARNING, "Style named \"" + styleId + "\" from provider with id \"" + providerId
+                LOGGER.log(Level.WARNING, "Style named \"" + styleName + "\" from provider with id \"" + providerId
                         + "\" can't be found from database.");
             }
         } catch (SQLException ex) {
-            throw new ConfigurationException("An error occurred while reading data list for style named \"" + styleId + "\".", ex);
+            throw new ConfigurationException("An error occurred while reading data list for style named \"" + styleName + "\".", ex);
         }
 
         // Extract additional information from the style body.
-        final MutableStyle style = getStyle(providerId, styleId);
+        final MutableStyle style = getStyle(providerId, styleName);
         for (final MutableFeatureTypeStyle fts : style.featureTypeStyles()) {
             for (final MutableRule rule : fts.rules()) {
                 for (final Symbolizer symbolizer : rule.symbolizers()) {
@@ -419,40 +419,40 @@ public final class StyleBusiness {
      * Updates an existing from a style provider instance.
      *
      * @param providerId the style provider identifier
-     * @param styleId the style identifier
+     * @param styleName the style identifier
      * @param style the new style body
      * @throws TargetNotFoundException if the style with the specified
      * identifier can't be found
      * @throws ConfigurationException if the operation has failed for any reason
      */
-    public void setStyle(final String providerId, final String styleId, final MutableStyle style)
+    public void setStyle(final String providerId, final String styleName, final MutableStyle style)
             throws ConfigurationException {
-        ensureExistingStyle(providerId, styleId);
-        createOrUpdateStyle(providerId, styleId, style);
+        ensureExistingStyle(providerId, styleName);
+        createOrUpdateStyle(providerId, styleName, style);
     }
 
     /**
      * Creates or updates a style into/from a style provider instance.
      *
      * @param providerId the style provider identifier
-     * @param styleId the style identifier
+     * @param styleName the style identifier
      * @param style the new style body
      * @throws TargetNotFoundException if the style with the specified
      * identifier can't be found
      * @throws ConfigurationException if the operation has failed for any reason
      */
-    private void createOrUpdateStyle(final String providerId, String styleId, final MutableStyle style)
+    private void createOrUpdateStyle(final String providerId, String styleName, final MutableStyle style)
             throws ConfigurationException {
 
         // Proceed style name.
-        if (isBlank(styleId)) {
+        if (isBlank(styleName)) {
             if (isBlank(style.getName())) {
                 throw new ConfigurationException("Unable to create/update the style. No specified style name.");
             } else {
-                styleId = style.getName();
+                styleName = style.getName();
             }
         } else {
-            style.setName(styleId);
+            style.setName(styleName);
         }
         
         // Retrieve or not the provider instance.
@@ -469,12 +469,12 @@ public final class StyleBusiness {
             throw new ConfigurationException(ex);
         }
         
-        final Style s = styleRepository.findByNameAndProvider(provider.getId(), styleId);
+        final Style s = styleRepository.findByNameAndProvider(provider.getId(), styleName);
         if (s != null) {
             s.setBody(sw.toString());
             styleRepository.save(s);
         } else {
-            final Style newStyle = new Style(styleId, provider.getId(), getTypeFromMutableStyle(style), new Date().getTime(), sw.toString(), securityManager.getCurrentUserLogin());
+            final Style newStyle = new Style(styleName, provider.getId(), getTypeFromMutableStyle(style), new Date().getTime(), sw.toString(), securityManager.getCurrentUserLogin());
             styleRepository.create(newStyle);
         }
         
@@ -484,39 +484,39 @@ public final class StyleBusiness {
      * Removes a style from a style provider instance.
      *
      * @param providerId the style provider identifier
-     * @param styleId the style identifier
+     * @param styleName the style identifier
      * @throws TargetNotFoundException if the style with the specified
      * identifier can't be found
      * @throws ConfigurationException if the operation has failed for any reason
      */
-    public void deleteStyle(final String providerId, final String styleId) throws ConfigurationException {
+    public void deleteStyle(final String providerId, final String styleName) throws ConfigurationException {
         ensureNonNull("providerId", providerId);
-        ensureNonNull("styleId", styleId);
+        ensureNonNull("styleId", styleName);
         final Provider provider = ensureExistingProvider(providerId);
-        ensureExistingStyle(providerId, styleId);
+        ensureExistingStyle(providerId, styleName);
 
-        styleRepository.deleteStyle(provider.getId(), styleId);
+        styleRepository.deleteStyle(provider.getId(), styleName);
     }
 
     /**
      * Links a style resource to an existing data resource.
      *
      * @param styleProvider the style provider identifier
-     * @param styleId the style identifier
+     * @param styleName the style identifier
      * @param dataProvider the data provider identifier
      * @param dataId the data identifier
      * @throws TargetNotFoundException if the style with the specified
      * identifier can't be found
      * @throws ConfigurationException if the operation has failed for any reason
      */
-    public void linkToData(final String styleProvider, final String styleId, final String dataProvider, final QName dataId)
+    public void linkToData(final String styleProvider, final String styleName, final String dataProvider, final QName dataId)
             throws ConfigurationException {
         ensureNonNull("dataProvider", dataProvider);
         ensureNonNull("dataId", dataId);
-        final Style style = ensureExistingStyle(styleProvider, styleId);
+        final Style style = ensureExistingStyle(styleProvider, styleName);
 
         if (style == null) {
-            throw new ConfigurationException("Style named \"" + styleId + "\" can't be found from database.");
+            throw new ConfigurationException("Style named \"" + styleName + "\" can't be found from database.");
         }
         Data data = dataRepository.findDataFromProvider(dataId.getNamespaceURI(), dataId.getLocalPart(), dataProvider);
         if (data == null) {
@@ -531,21 +531,21 @@ public final class StyleBusiness {
      * Unlink a style resource from an existing data resource.
      *
      * @param styleProvider the style provider identifier
-     * @param styleId the style identifier
+     * @param styleName the style identifier
      * @param dataProvider the data provider identifier
      * @param dataId the data identifier
      * @throws TargetNotFoundException if the style with the specified
      * identifier can't be found
      * @throws ConfigurationException if the operation has failed for any reason
      */
-    public void unlinkFromData(final String styleProvider, final String styleId, final String dataProvider,
+    public void unlinkFromData(final String styleProvider, final String styleName, final String dataProvider,
             final QName dataId) throws ConfigurationException {
         ensureNonNull("dataProvider", dataProvider);
         ensureNonNull("dataId", dataId);
-        final Style style = ensureExistingStyle(styleProvider, styleId);
+        final Style style = ensureExistingStyle(styleProvider, styleName);
 
         if (style == null) {
-            throw new ConfigurationException("Style named \"" + styleId + "\" can't be found from database.");
+            throw new ConfigurationException("Style named \"" + styleName + "\" can't be found from database.");
         }
         final Data data = dataRepository.findDataFromProvider(dataId.getNamespaceURI(), dataId.getLocalPart(), dataProvider);
         if (data == null) {

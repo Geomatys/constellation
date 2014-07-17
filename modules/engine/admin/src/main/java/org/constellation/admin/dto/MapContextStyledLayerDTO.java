@@ -6,23 +6,92 @@ import org.constellation.configuration.LayerSummary;
 import org.constellation.engine.register.MapcontextStyledLayer;
 
 public class MapContextStyledLayerDTO extends LayerSummary implements Comparable<MapContextStyledLayerDTO> {
-    private MapcontextStyledLayer mapContextStyledLayer;
+    private Integer mapcontextId;
+    private Integer layerId;
+    private Integer styleId;
+    private String styleName;
+    private int order;
+    private int opacity;
+    private boolean visible;
+    private String externalStyle;
 
     public MapContextStyledLayerDTO(final MapcontextStyledLayer mapContextStyledLayer, final Layer layer, final DataBrief db) {
         super(layer, db);
-        this.mapContextStyledLayer = mapContextStyledLayer;
+        this.mapcontextId = mapContextStyledLayer.getMapcontextId();
+        this.layerId = mapContextStyledLayer.getLayerId();
+        this.styleId = mapContextStyledLayer.getStyleId();
+        this.order = mapContextStyledLayer.getOrder();
+        this.opacity = mapContextStyledLayer.getOpacity();
+        this.visible = mapContextStyledLayer.isVisible();
+        this.externalStyle = mapContextStyledLayer.getExternalStyle();
     }
 
-    public MapcontextStyledLayer getMapContextStyledLayer() {
-        return mapContextStyledLayer;
+    public Integer getMapcontextId() {
+        return mapcontextId;
     }
 
-    public void setMapContextStyledLayer(MapcontextStyledLayer mapContextStyledLayer) {
-        this.mapContextStyledLayer = mapContextStyledLayer;
+    public void setMapcontextId(Integer mapcontextId) {
+        this.mapcontextId = mapcontextId;
+    }
+
+    public Integer getLayerId() {
+        return layerId;
+    }
+
+    public void setLayerId(Integer layerId) {
+        this.layerId = layerId;
+    }
+
+    public Integer getStyleId() {
+        return styleId;
+    }
+
+    public void setStyleId(Integer styleId) {
+        this.styleId = styleId;
+    }
+
+    public String getStyleName() {
+        return styleName;
+    }
+
+    public void setStyleName(String styleName) {
+        this.styleName = styleName;
+    }
+
+    public int getOrder() {
+        return order;
+    }
+
+    public void setOrder(int order) {
+        this.order = order;
+    }
+
+    public int getOpacity() {
+        return opacity;
+    }
+
+    public void setOpacity(int opacity) {
+        this.opacity = opacity;
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
+
+    public String getExternalStyle() {
+        return externalStyle;
+    }
+
+    public void setExternalStyle(String externalStyle) {
+        this.externalStyle = externalStyle;
     }
 
     @Override
     public int compareTo(MapContextStyledLayerDTO o) {
-        return this.getMapContextStyledLayer().getOrder() - o.getMapContextStyledLayer().getOrder();
+        return getOrder() - o.getOrder();
     }
 }
