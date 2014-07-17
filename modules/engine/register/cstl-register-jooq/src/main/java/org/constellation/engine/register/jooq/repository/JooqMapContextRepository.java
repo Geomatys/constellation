@@ -51,12 +51,12 @@ public class JooqMapContextRepository extends AbstractJooqRespository<Mapcontext
 
     @Override
     public void setLinkedLayers(int contextId, List<MapcontextStyledLayer> layers) {
+        // Remove eventually existing old layers for this map context
+        dsl.delete(MAPCONTEXT_STYLED_LAYER).where(MAPCONTEXT_STYLED_LAYER.MAPCONTEXT_ID.eq(contextId)).execute();
+
         if (layers.isEmpty()) {
             return;
         }
-
-        // Remove eventually existing old layers for this map context
-        dsl.delete(MAPCONTEXT_STYLED_LAYER).where(MAPCONTEXT_STYLED_LAYER.MAPCONTEXT_ID.eq(contextId)).execute();
 
         for (final MapcontextStyledLayer layer : layers) {
             dsl.insertInto(MAPCONTEXT_STYLED_LAYER)
