@@ -120,6 +120,8 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                                     path: importedData
                                 }
                             }, function() {
+                                //TODO verify CRS exist
+
                                 if (importedMetaData) {
                                     dataListing.setUpMetadata({values: {'providerId': $scope.import.providerId, 'mdPath': importedMetaData}});
                                 }
@@ -141,6 +143,8 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                                     path: importedData
                                 }
                             }, function() {
+                                //TODO verify CRS exist
+
                                 if (importedMetaData) {
                                     dataListing.setUpMetadata({values: {'providerId': $scope.import.providerId, 'mdPath': importedMetaData}});
                                 }
