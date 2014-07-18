@@ -50,7 +50,7 @@
       <column name="config" type="CLOB(2147483647)">
         <constraints nullable="false" />
       </column>
-      <column name="owner" type="VARCHAR(32)" />
+      <column name="owner" type="INTEGER" />
       <column name="metadata_id" type="VARCHAR(512)" />
       <column name="metadata" type="CLOB(2147483647)" />
     </createTable>
@@ -94,7 +94,7 @@
       <column name="date" type="BIGINT">
         <constraints nullable="false" />
       </column>
-      <column name="owner" type="VARCHAR(32)" />
+      <column name="owner" type="INTEGER" />
       <column name="metadata" type="CLOB(2147483647)" />
       <column name="metadata_id" type="VARCHAR(512)" />
       <column name="iso_metadata" type="CLOB(2147483647)" />
@@ -115,7 +115,7 @@
       baseTableSchemaName="admin" referencedTableSchemaName="admin"
       constraintName="data_owner_fk" baseTableName="data"
       baseColumnNames="owner" referencedTableName='"USER"'
-      referencedColumnNames="login" />
+      referencedColumnNames="id" />
 
     <addForeignKeyConstraint
       baseTableSchemaName="admin" referencedTableSchemaName="admin"
@@ -312,7 +312,7 @@
         <constraints nullable="false" />
       </column>
       <column name="config" type="CLOB(2147483647)" />
-      <column name="owner" type="VARCHAR(32)" />
+      <column name="owner" type="INTEGER" />
       <column name="metadata_id" type="VARCHAR(512)" />
       <column name="metadata_iso" type="CLOB(2147483647)" />
       <column name="status" type="VARCHAR(32)">
@@ -341,7 +341,7 @@
       baseTableSchemaName="admin" referencedTableSchemaName="admin"
       constraintName="service_owner_fk" baseTableName="service"
       baseColumnNames="owner" referencedTableName='"USER"'
-      referencedColumnNames="login" />
+      referencedColumnNames="id" />
 
 
     <createTable schemaName="admin" tableName="layer">
@@ -363,7 +363,7 @@
         <constraints nullable="false" />
       </column>
       <column name="config" type="CLOB(2147483647)" />
-      <column name="owner" type="VARCHAR(32)" />
+      <column name="owner" type="INTEGER" />
     </createTable>
 
     <createIndex indexName="LAYER_NAME-SERVICE_IDX"
@@ -395,7 +395,7 @@
       baseTableSchemaName="admin" referencedTableSchemaName="admin"
       constraintName="layer_owner_fk" baseTableName="layer"
       baseColumnNames="owner" referencedTableName='"USER"'
-      referencedColumnNames="login" />
+      referencedColumnNames="id" />
 
     <addForeignKeyConstraint
       baseTableSchemaName="admin" referencedTableSchemaName="admin"
@@ -448,7 +448,7 @@
       <column name="name" type="VARCHAR(512)">
         <constraints nullable="false" />
       </column>
-      <column name="owner" type="VARCHAR(32)" />
+      <column name="owner" type="INTEGER" />
       <column name="description" type="VARCHAR(512)" />
       <column name="crs" type="VARCHAR(32)" />
       <column name="west" type="DOUBLE" />
@@ -468,7 +468,7 @@
       baseTableSchemaName="admin" referencedTableSchemaName="admin"
       constraintName="mapcontext_owner_fk" baseTableName="mapcontext"
       baseColumnNames="owner" referencedTableName='"USER"'
-      referencedColumnNames="login" onDelete="CASCADE" />
+      referencedColumnNames="id" onDelete="CASCADE" />
 
 
     <createTable schemaName="admin" tableName="style">
@@ -490,7 +490,7 @@
       <column name="body" type="CLOB(2147483647)">
         <constraints nullable="false" />
       </column>
-      <column name="owner" type="VARCHAR(32)" />
+      <column name="owner" type="INTEGER" />
     </createTable>
 
     <createIndex indexName="STYLE_OWNER_IDX" schemaName="admin"
@@ -508,7 +508,7 @@
       baseTableSchemaName="admin" referencedTableSchemaName="admin"
       constraintName="style_owner_fk" baseTableName="style"
       baseColumnNames="owner" referencedTableName='"USER"'
-      referencedColumnNames="login" />
+      referencedColumnNames="id" />
 
     <addForeignKeyConstraint
       baseTableSchemaName="admin" referencedTableSchemaName="admin"
@@ -599,7 +599,7 @@
       baseTableSchemaName="admin" referencedTableSchemaName="admin"
       constraintName="provider_owner_fk" baseTableName="provider"
       baseColumnNames="owner" referencedTableName='"USER"'
-      referencedColumnNames="login" onDelete="CASCADE" />
+      referencedColumnNames="id" onDelete="CASCADE" />
 
 
     <createTable schemaName="admin" tableName="sensor">
@@ -613,7 +613,7 @@
         <constraints nullable="false" />
       </column>
       <column name="parent" type="VARCHAR(512)" />
-      <column name="owner" type="VARCHAR(32)" />
+      <column name="owner" type="INTEGER" />
       <column name="metadata" type="CLOB(2147483647)" />
     </createTable>
 
@@ -633,7 +633,7 @@
       baseTableSchemaName="admin" referencedTableSchemaName="admin"
       constraintName="sensor_owner_fk" baseTableName="sensor"
       baseColumnNames="owner" referencedTableName='"USER"'
-      referencedColumnNames="login" onDelete="CASCADE" />
+      referencedColumnNames="id" onDelete="CASCADE" />
 
     <createTable schemaName="admin" tableName="sensored_data">
       <column name="sensor" type="INTEGER">
@@ -921,7 +921,7 @@
         <constraints nullable="false" />
       </column>
       <column name='"end"' type="BIGINT" />
-      <column name="owner" type="VARCHAR(32)" />
+      <column name="owner" type="INTEGER" />
     </createTable>
 
 
@@ -934,7 +934,7 @@
       baseTableSchemaName="admin" referencedTableSchemaName="admin"
       constraintName="task_owner_fk" baseTableName="task"
       baseColumnNames="owner" referencedTableName='"USER"'
-      referencedColumnNames="login" onDelete="CASCADE" />
+      referencedColumnNames="id" onDelete="CASCADE" />
 
 
 

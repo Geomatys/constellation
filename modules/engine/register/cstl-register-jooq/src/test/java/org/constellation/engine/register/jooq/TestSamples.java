@@ -35,7 +35,7 @@ public class TestSamples {
         data.setDate(new Date().getTime());
         data.setName("testdata");
         data.setNamespace("");
-        data.setOwner(owner.getLogin());
+        data.setOwner(owner.getId());
         data.setType("type");
         data.setProvider(provider.getId());
         return data;
@@ -45,7 +45,7 @@ public class TestSamples {
         Provider provider = new Provider();
         provider.setIdentifier("test");
         provider.setImpl("immmmp");
-        provider.setOwner(owner.getLogin());
+        provider.setOwner(owner.getId());
         provider.setType("coverage");
         provider.setParent("");
         provider.setConfig("<root />");

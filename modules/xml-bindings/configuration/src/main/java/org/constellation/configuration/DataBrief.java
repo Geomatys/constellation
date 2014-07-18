@@ -70,7 +70,7 @@ public final class DataBrief implements Serializable {
     private boolean sensorable;
 
     @XmlElement(name="Owner")
-    private String owner;
+    private Integer owner;
 
     @XmlElement(name="TargetStyle")
     private List<StyleBrief> targetStyle = new ArrayList<>(0);
@@ -162,11 +162,11 @@ public final class DataBrief implements Serializable {
         this.sensorable = sensorable;
     }
 
-    public String getOwner() {
+    public Integer getOwner() {
         return owner;
     }
 
-    public void setOwner(final String owner) {
+    public void setOwner(final Integer owner) {
         this.owner = owner;
     }
 

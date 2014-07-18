@@ -53,7 +53,7 @@ public interface UserRepository {
 
     boolean isLastAdmin(int userId);
 
-    User findOne(String username);
+    User findOne(String login);
 
     List<String> getRoles(int userId);
     

@@ -7,7 +7,9 @@ import org.constellation.admin.util.IOUtilities;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.Style;
+import org.constellation.engine.register.User;
 import org.constellation.engine.register.repository.ProviderRepository;
+import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.utils.ISOMarshallerPool;
 import org.opengis.parameter.GeneralParameterValue;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,7 +30,10 @@ import java.util.List;
 public class ProviderBusiness {
 
     @Inject
-    ProviderRepository providerRepository;
+    private UserRepository userRepository;
+    
+    @Inject
+    private ProviderRepository providerRepository;
 
     @Autowired
     private org.constellation.security.SecurityManager securityManager;
@@ -92,9 +98,9 @@ public class ProviderBusiness {
 
     public Provider createProvider(final String identifier, final String parent,
                                    final ProviderType type, final String serviceName, final GeneralParameterValue config) throws IOException {
-        String login = securityManager.getCurrentUserLogin();
+        User user = userRepository.findOne(securityManager.getCurrentUserLogin());
         Provider provider = new Provider();
-        provider.setOwner(login);
+        provider.setOwner(user.getId());
         provider.setParent(parent);
         provider.setType(type.name());
         provider.setConfig(IOUtilities.writeParameter(config));

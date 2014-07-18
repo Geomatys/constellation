@@ -32,7 +32,7 @@ public class ServiceDTO {
     private String title;
     private String description;
     private String config;
-    private String owner;
+    private Integer owner;
     private String status;
     private String metadataIso;
     private String metadataId;
@@ -82,10 +82,10 @@ public class ServiceDTO {
 	public void setConfig(String config) {
 		this.config = config;
 	}
-	public String getOwner() {
+	public Integer getOwner() {
 		return owner;
 	}
-	public void setOwner(String owner) {
+	public void setOwner(Integer owner) {
 		this.owner = owner;
 	}
 	public String getStatus() {

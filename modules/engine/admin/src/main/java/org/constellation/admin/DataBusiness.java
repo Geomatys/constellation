@@ -15,6 +15,7 @@ import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.Style;
+import org.constellation.engine.register.User;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.LayerRepository;
@@ -22,6 +23,7 @@ import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.engine.register.repository.SensorRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
 import org.constellation.engine.register.repository.StyleRepository;
+import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.utils.ISOMarshallerPool;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +33,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -47,6 +50,9 @@ public class DataBusiness {
 
     private static final Logger LOGGER = Logging.getLogger(DataBusiness.class);
 
+    @Inject
+    private UserRepository userRepository;
+    
     @Inject
     private DomainRepository domainRepository;
     
@@ -274,7 +280,8 @@ public class DataBusiness {
             data.setDate(new Date().getTime());
             data.setName(name.getLocalPart());
             data.setNamespace(name.getNamespaceURI());
-            data.setOwner(securityManager.getCurrentUserLogin());
+            User user = userRepository.findOne(securityManager.getCurrentUserLogin());
+            data.setOwner(user.getId());
             data.setProvider(provider.getId());
             data.setSensorable(sensorable);
             data.setType(type);

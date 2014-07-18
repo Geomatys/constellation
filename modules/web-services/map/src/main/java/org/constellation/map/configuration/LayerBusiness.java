@@ -30,11 +30,13 @@ import org.constellation.engine.register.Layer;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.Style;
+import org.constellation.engine.register.User;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.LayerRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
 import org.constellation.engine.register.repository.StyleRepository;
+import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.map.factory.MapFactory;
 import org.constellation.map.security.LayerSecurityFilter;
@@ -47,10 +49,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.imageio.spi.ServiceRegistry;
+import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -65,6 +69,8 @@ import java.util.List;
 @Component
 public class LayerBusiness {
     
+    @Inject
+    private UserRepository userRepository;
     @Autowired
     private StyleRepository styleRepository;
     @Autowired
@@ -116,7 +122,8 @@ public class LayerBusiness {
             layer.setService(service.getId());
             layer.setData(data.getId());
             layer.setDate(System.currentTimeMillis());
-            layer.setOwner(securityManager.getCurrentUserLogin());
+            User user = userRepository.findOne(securityManager.getCurrentUserLogin());
+            layer.setOwner(user.getId());
             final String configXml = getStringFromLayerConfig(config);
             layer.setConfig(configXml);
             

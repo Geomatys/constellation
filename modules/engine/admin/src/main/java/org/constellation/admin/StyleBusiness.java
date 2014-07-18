@@ -50,11 +50,13 @@ import org.constellation.engine.register.Layer;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.Style;
+import org.constellation.engine.register.User;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.LayerRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
 import org.constellation.engine.register.repository.StyleRepository;
+import org.constellation.engine.register.repository.UserRepository;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.sld.MutableLayer;
@@ -103,6 +105,9 @@ import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
 @Component
 public final class StyleBusiness {
 
+    @Inject
+    UserRepository userRepository;
+    
     @Inject
     StyleRepository styleRepository;
 
@@ -488,7 +493,8 @@ public final class StyleBusiness {
             s.setBody(sw.toString());
             styleRepository.save(s);
         } else {
-            final Style newStyle = new Style(styleName, provider.getId(), getTypeFromMutableStyle(style), new Date().getTime(), sw.toString(), securityManager.getCurrentUserLogin());
+            User user = userRepository.findOne(securityManager.getCurrentUserLogin());
+            final Style newStyle = new Style(styleName, provider.getId(), getTypeFromMutableStyle(style), new Date().getTime(), sw.toString(), user.getId());
             styleRepository.create(newStyle);
         }
         

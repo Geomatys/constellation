@@ -21,17 +21,23 @@ package org.constellation.admin;
 
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Sensor;
+import org.constellation.engine.register.User;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.SensorRepository;
+import org.constellation.engine.register.repository.UserRepository;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
+
 import java.util.List;
 
 @Component
 public class SensorBusiness {
 
+    @Inject
+    private UserRepository userRepository;
+    
     @Inject
     private SensorRepository sensorRepository;
 
@@ -80,10 +86,11 @@ public class SensorBusiness {
     }
 
     public Sensor create(final String identifier, final String type, final String parent, final String metadata) {
+        User user = userRepository.findOne(securityManager.getCurrentUserLogin());
         Sensor sensor = new Sensor();
         sensor.setIdentifier(identifier);
         sensor.setType(type);
-        sensor.setOwner(securityManager.getCurrentUserLogin());
+        sensor.setOwner(user.getId());
         sensor.setParent(parent);
         sensor.setMetadata(metadata);
         return sensorRepository.create(sensor);

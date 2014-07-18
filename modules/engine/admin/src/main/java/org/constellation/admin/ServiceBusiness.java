@@ -19,9 +19,11 @@ import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.ServiceDetails;
 import org.constellation.engine.register.ServiceExtraConfig;
+import org.constellation.engine.register.User;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.LayerRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
+import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.security.SecurityManager;
 import org.constellation.util.Util;
@@ -36,6 +38,7 @@ import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,6 +56,9 @@ public class ServiceBusiness {
 
     @Inject
     private SecurityManager securityManager;
+    
+    @Inject
+    private UserRepository userRepository;
             
     @Inject
     private DomainRepository domainRepository;
@@ -85,13 +91,14 @@ public class ServiceBusiness {
         if (configuration == null) {
             configuration = DefaultServiceConfiguration.getDefaultConfiguration(serviceType);
         }
+        User user = userRepository.findOne(securityManager.getCurrentUserLogin());
 
         final String config   = getStringFromObject(configuration, GenericDatabaseMarshallerPool.getInstance());
         final Service service = new Service();
         service.setConfig(config);
         service.setDate(new Date().getTime());
         service.setType( ServiceDef.Specification.valueOf(serviceType.toUpperCase()).name().toLowerCase());
-        service.setOwner(securityManager.getCurrentUserLogin());
+        service.setOwner(user.getId());
         service.setIdentifier(identifier);
         service.setStatus(ServiceStatus.STOPPED.toString());
         //TODO metadata-Iso

@@ -224,8 +224,8 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
     }
 
     @Override
-    public User findOne(String username) {
-        return dsl.select().from(USER).where(USER.LOGIN.eq(username)).fetchOneInto(User.class);
+    public User findOne(String login) {
+        return dsl.select().from(USER).where(USER.LOGIN.eq(login)).fetchOneInto(User.class);
     }
 
     @Override
