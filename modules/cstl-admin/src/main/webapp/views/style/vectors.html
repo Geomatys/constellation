@@ -1,7 +1,7 @@
 
 <div class="row">
     <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-        <div ng-if="!optionsSLD.enableRuleEditor">
+        <div ng-if="!optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor">
             <div style="margin-bottom:0px;">
                 <div class="form-group col-xs-12" style="margin: 3px 0; height:35px;padding: 0;">
                     <label class="col-xs-5 col-sm-5 col-md-4 control-label"
@@ -30,10 +30,9 @@
                             <ul class="dropdown-menu" style="font-size: 12px;">
                                 <li><a ng-click="createRules('manual')"
                                        translate="edition.style.label.new.rules.manual">Manually create rules</a></li>
-                                <li><a ng-click="createRules('auto_interval')"
-                                       ng-disabled="true"
+                                <li ng-if="selectedLayer !== null"><a ng-click="createRules('auto_interval')"
                                        translate="edition.style.label.new.rules.auto_interval">Automatically create by intervals</a></li>
-                                <li><a ng-click="createRules('auto_values')"
+                                <li ng-if="selectedLayer !== null"><a ng-click="createRules('auto_values')"
                                        ng-disabled="true"
                                        translate="edition.style.label.new.rules.auto_values">Automatically create by unique values</a></li>
                             </ul>
@@ -42,6 +41,7 @@
                     <div class="panel-body" style="padding:0pt;">
                         <div class="list-group" style="height: 350px;overflow-y: auto;margin: 0;">
                             <a class="list-group-item"
+                               title="{{rule.title}}"
                                ng-class="{active:rule===optionsSLD.selectedRule}"
                                ng-repeat="rule in newStyle.rules"
                                ng-click="setSelectedRule(rule);">
@@ -63,7 +63,7 @@
                 </div>
             </div>
         </div>
-        <div ng-if="optionsSLD.enableRuleEditor">
+        <div ng-if="optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor">
             <ol class="breadcrumb col-xs-12 col-sm-12 col-md-12 col-lg-12">
                 <li>
                     <a ng-click="goBack()">
@@ -91,9 +91,9 @@
                     </a>
                 </li>
             </ul>
-            <div class="tab-content">
+            <div class="tab-content" style="max-height: 415px;overflow-x: hidden;overflow-y: auto;">
                 <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='description'}">
-                    <form class="form-horizontal" role="form">
+                    <form class="form-horizontal form-style" role="form">
                         <div class="row">
                             <div class="col-xs-12 col-sm-11 col-md-11 col-lg-11" style="margin-top: 20pt;">
                                 <div class="form-group">
@@ -134,7 +134,7 @@
                     </form>
                 </div>
                 <div class="tab-pane tab-style-edition" ng-class="{active:chosenTab==='symbols'}">
-                    <form class="form-horizontal" role="form">
+                    <form class="form-horizontal form-style" role="form">
                         <div class="row">
                             <div class="col-xs-12 col-sm-11 col-md-11 col-lg-11" style="margin-top: 20pt;">
                                 <div class="form-group">
@@ -261,7 +261,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group" ng-show="optionsSLD.filtersEnabled">
+                                    <div class="form-group" ng-show="optionsSLD.filtersEnabled" style="">
                                         <table ng-init="restoreFilters();">
                                             <tbody>
                                                 <tr ng-repeat="filter in optionsSLD.filters">
@@ -271,7 +271,7 @@
                                                                 ng-model="filter.attribute"
                                                                 ng-change="applyFilter();">
                                                             <option ng-value="dp.name"
-                                                                    ng-repeat="dp in $parent.dataProperties">{{dp.name}}</option>
+                                                                    ng-repeat="dp in $parent.dataProperties.properties">{{dp.name}}</option>
                                                         </select>
                                                     </td>
                                                     <td>
@@ -313,6 +313,142 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div ng-if="optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableRuleEditor">
+            <ol class="breadcrumb col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <li>
+                    <a ng-click="goBack()">
+                        <span translate="sldeditor.breadcrumb.type">Back to rules list</span>
+                    </a>
+                </li>
+                <li class="active">
+                    <span translate="edition.style.label.new.rules.auto_interval">Auto by intervals</span>
+                </li>
+            </ol>
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a data-toggle="tab">
+                        <span translate="edition.style.label.auto.intervals" >By intervals</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane tab-style-edition active">
+                    <form class="form-horizontal form-style" role="form" style="margin-bottom: 20pt;">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 10pt;">
+                            <div class="form-group">
+                                <label class="col-xs-6 col-sm-6 col-md-6 col-lg-6 control-label"
+                                       translate="sldeditor.edition.field">Attribute field</label>
+                                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                    <select class="form-control"
+                                            ng-init="loadDataProperties();"
+                                            ng-model="optionsSLD.autoIntervalValues.attr">
+                                        <option ng-repeat="dp in $parent.attributesTypeNumber" ng-value="dp.name">{{dp.name}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-xs-6 col-sm-6 col-md-6 col-lg-6 control-label"
+                                       translate="sldeditor.edition.intervalsCount">Intervals count</label>
+                                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                    <input type="number"
+                                           class="form-control"
+                                           ng-model="optionsSLD.autoIntervalValues.nbIntervals"
+                                           min="1"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-xs-6 col-sm-6 col-md-6 col-lg-6 control-label"
+                                       translate="sldeditor.edition.method">Quantization method</label>
+                                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                    <select class="form-control"
+                                            ng-model="optionsSLD.autoIntervalValues.method">
+                                        <option value="equidistant" translate="sldeditor.edition.equidistant">equidistant cutting</option>
+                                        <option value="mediane" translate="sldeditor.edition.mediane">median cut</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-xs-6 col-sm-6 col-md-6 col-lg-6 control-label"
+                                       translate="sldeditor.edition.symboltype">Symbol type</label>
+                                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                    <select class="form-control"
+                                            ng-model="optionsSLD.autoIntervalValues.symbol">
+                                        <option value="point" translate="edition.style.label.point">Point</option>
+                                        <option value="line" translate="edition.style.label.line">Line</option>
+                                        <option value="polygon" translate="edition.style.label.polygon">Polygon</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-xs-6 col-sm-6 col-md-6 col-lg-6 control-label " translate="sldeditor.edition.palette.label">Palette</label>
+                                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                    <div class="pull-right btn-group dropup select select-block">
+                                        <button class="btn dropdown-toggle btn-default" data-toggle="dropdown">
+                                            <span class="filter-option pull-left">
+                                                <img class="img_palette img_palette_ajust" ng-src="{{optionsSLD.autoIntervalValues.palette.img_palette}}"/>
+                                            </span>&nbsp;
+                                            <span class="caret"></span>
+                                        </button>
+                                        <span class="dropdown-arrow dropdown-arrow-inverse"></span>
+                                        <ul class="dropdown-menu dropdown-inverse dropdown-images" role="menu"
+                                            style="overflow-y: auto; min-width: 70px; min-height: 108px;">
+                                            <li ng-click="$parent.choosePaletteVectorInterval(0)"><a><img class="img_palette img_palette_ajust" src="images/palette0.png"/></a></li>
+                                            <li ng-click="$parent.choosePaletteVectorInterval(1)"><a><img class="img_palette img_palette_ajust" src="images/palette1.png"/></a></li>
+                                            <li ng-click="$parent.choosePaletteVectorInterval(2)"><a><img class="img_palette img_palette_ajust" src="images/palette2.png"/></a></li>
+                                            <li ng-click="$parent.choosePaletteVectorInterval(3)"><a><img class="img_palette img_palette_ajust" src="images/palette3.png"/></a></li>
+                                            <li ng-click="$parent.choosePaletteVectorInterval(4)"><a><img class="img_palette img_palette_ajust" src="images/palette4.png"/></a></li>
+                                            <li ng-click="$parent.choosePaletteVectorInterval(5)"><a><img class="img_palette img_palette_ajust" src="images/palette5.png"/></a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group" style="height: 15pt;">
+                                <label class="col-xs-6 col-sm-6 col-md-6 col-lg-6 control-label "
+                                       translate="sldeditor.edition.palette.custom">Use custom palette</label>
+                                <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1">
+                                    <input style="margin-top: 6pt;"
+                                           type="checkbox"
+                                           ng-model="optionsSLD.autoIntervalValues.customPalette.enabled"
+                                           ng-change="$parent.affectDefaultPalette();"/>
+                                </div>
+                                <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5"
+                                     style="padding: 0pt;"
+                                     ng-show="optionsSLD.autoIntervalValues.customPalette.enabled">
+                                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                        <input type='text'
+                                               name="picker"
+                                               class="picker"
+                                               spectrum
+                                               ng-model="optionsSLD.autoIntervalValues.customPalette.color1"/>
+                                    </div>
+                                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                        <input type='text'
+                                               name="picker"
+                                               class="picker"
+                                               spectrum
+                                               ng-model="optionsSLD.autoIntervalValues.customPalette.color2"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-xs-6 col-sm-6 col-md-6 col-lg-6 control-label "
+                                       translate="sldeditor.edition.reversecolors">Reverse colors</label>
+                                <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1">
+                                    <input style="margin-top: 6pt;"
+                                           type="checkbox"
+                                           ng-model="optionsSLD.autoIntervalValues.palette.reverseColors"/>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <button type="button"
+                            class="btn btn-default pull-right"
+                            ng-click="generateAutoInterval()">
+                        <span translate="sldeditor.edition.autointerval.generate">Generate rules</span>
+                    </button>
                 </div>
             </div>
         </div>

@@ -86,7 +86,9 @@
                                         <span class="nb-results pull-left">{{countdata}}&nbsp;</span>
                                         <span class="nb-results" translate="label.count.style">available data</span>
                                     </strong>
-                                    <select class="nb-per-page input-small form-control pull-right" ng-model="wrapScope.nbbypage">
+                                    <select class="nb-per-page input-small form-control pull-right"
+                                            style="padding-left: 5px;padding-right: 5px;"
+                                            ng-model="wrapScope.nbbypage">
                                         <option value="5">5</option>
                                         <option value="10">10</option>
                                         <option value="20">20</option>
@@ -128,7 +130,7 @@
         <div class="modal-footer" style="margin-top: 0;">
             <button type="button"
                     class="btn btn-default"
-                    ng-show="!optionsSLD.enableRuleEditor"
+                    ng-show="!optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor"
                     ng-click="close()" >
                 <span translate="sldeditor.button.cancel">Cancel</span>
             </button>
@@ -140,13 +142,13 @@
             </button>
             <button type="button"
                     class="btn btn-primary"
-                    ng-show="isSelectedChooser('new') && !optionsSLD.enableRuleEditor"
+                    ng-show="isSelectedChooser('new') && !optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor"
                     ng-click="createStyle();">
                 <span translate="sldeditor.button.create">Create</span>
             </button>
             <button type="button"
                     class="btn btn-primary"
-                    ng-show="optionsSLD.enableRuleEditor"
+                    ng-show="optionsSLD.enableRuleEditor || optionsSLD.enableAutoIntervalEditor"
                     ng-click="goBack();">
                 <span translate="sldeditor.breadcrumb.backToListOfRules">Back to the rules list</span>
             </button>

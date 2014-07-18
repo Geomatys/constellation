@@ -19,16 +19,37 @@
 
 package org.constellation.rest.api;
 
+import org.apache.sis.storage.DataStore;
+import org.apache.sis.util.iso.DefaultInternationalString;
 import org.constellation.admin.StyleBusiness;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.dto.ParameterValues;
 import org.constellation.dto.StyleListBrief;
 import org.constellation.json.binding.Style;
-import org.geotoolkit.style.DefaultMutableStyle;
-import org.geotoolkit.style.MutableStyle;
+import org.constellation.provider.DataProvider;
+import org.constellation.provider.DataProviders;
+import org.constellation.rest.dto.AutoIntervalValuesDTO;
+import org.constellation.rest.dto.WrapperIntervalDTO;
+import org.geotoolkit.data.FeatureCollection;
+import org.geotoolkit.data.FeatureIterator;
+import org.geotoolkit.data.FeatureStore;
+import org.geotoolkit.data.query.QueryBuilder;
+import org.geotoolkit.factory.FactoryFinder;
+import org.geotoolkit.factory.Hints;
+import org.geotoolkit.feature.Feature;
+import org.geotoolkit.feature.type.DefaultName;
+import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.style.*;
 import org.geotoolkit.style.function.Categorize;
 import org.geotoolkit.style.function.Interpolate;
+import org.geotoolkit.style.interval.DefaultIntervalPalette;
+import org.geotoolkit.style.interval.IntervalPalette;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Function;
+import org.opengis.filter.expression.PropertyName;
+import org.opengis.style.*;
+import org.opengis.style.Stroke;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -45,9 +66,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
 
-import java.util.Locale;
+import java.awt.*;
+import java.util.*;
+import java.util.List;
 
 import static org.constellation.utils.RESTfulUtilities.ok;
+import static org.geotoolkit.style.StyleConstants.DEFAULT_DESCRIPTION;
+import static org.geotoolkit.style.StyleConstants.DEFAULT_DISPLACEMENT;
+import static org.geotoolkit.style.StyleConstants.DEFAULT_UOM;
 
 /**
  * RESTful API for style providers configuration.
@@ -107,6 +133,234 @@ public final class StyleRest {
     	}
     	return ok(new AcknowlegementType("Failure", "function unknow"));
     }
+
+    /**
+     * Creates a style and calculate the rules as palette defined as interval set.
+     * Returns the new style object as json.
+     * @param id
+     * @param wrapper
+     * @return
+     * @throws Exception
+     */
+    @POST
+    @Path("{id}/style/generateAutoInterval")
+    public Response generateAutoIntervalStyle(final @PathParam("id") String id, final WrapperIntervalDTO wrapper) throws Exception {
+        //get style and interval params
+        final Style style = wrapper.getStyle();
+        final AutoIntervalValuesDTO intervalValues = wrapper.getIntervalValues();
+
+        final String dataProviderId = wrapper.getDataProvider();
+        final String layerName = wrapper.getLayerName();
+
+        final String attribute = intervalValues.getAttr();
+        if(attribute ==null || attribute.trim().isEmpty()){
+            return ok(AcknowlegementType.failure("Attribute field should not be empty!"));
+        }
+
+        final String method = intervalValues.getMethod();
+        final int intervals = intervalValues.getNbIntervals();
+
+        final String symbolizerType = intervalValues.getSymbol();
+        final List<String> colorsList = intervalValues.getColors();
+
+        //rules that will be added to the style
+        final List<MutableRule> newRules = new ArrayList<MutableRule>();
+
+        /*
+         * I - Get feature type and feature data.
+         */
+        final DataProvider dataprovider = DataProviders.getInstance().getProvider(dataProviderId);
+        final DataStore dataStore = dataprovider.getMainStore();
+        final Name typeName = new DefaultName(layerName);
+        final QueryBuilder queryBuilder = new QueryBuilder();
+        queryBuilder.setTypeName(typeName);
+        queryBuilder.setProperties(new String[]{attribute});
+        if(dataStore instanceof FeatureStore) {
+            final FeatureStore fstore = (FeatureStore) dataStore;
+            final FeatureCollection featureCollection = fstore.createSession(false).getFeatureCollection(queryBuilder.buildQuery());
+
+            /*
+            * II - Search extreme values.
+            */
+            final Set<Double> values = new HashSet<Double>();
+            double minimum = Double.POSITIVE_INFINITY;
+            double maximum = Double.NEGATIVE_INFINITY;
+
+            final MutableStyleFactory SF = (MutableStyleFactory) FactoryFinder.getStyleFactory(
+                    new Hints(Hints.STYLE_FACTORY, MutableStyleFactory.class));
+            final FilterFactory2 FF = (FilterFactory2) FactoryFinder.getFilterFactory(
+                    new Hints(Hints.FILTER_FACTORY, FilterFactory2.class));
+
+            final PropertyName property = FF.property(attribute);
+
+            final FeatureIterator it = featureCollection.iterator();
+            while(it.hasNext()){
+                final Feature feature = it.next();
+                final Number number = property.evaluate(feature, Number.class);
+                final Double value = number.doubleValue();
+                values.add(value);
+                if (value < minimum) {
+                    minimum = value;
+                }
+                if (value > maximum) {
+                    maximum = value;
+                }
+            }
+            it.close();
+
+            /*
+            * III - Analyze values.
+            */
+            final Double[] allValues = values.toArray(new Double[values.size()]);
+            double[] interValues = new double[0];
+            if ("equidistant".equals(method)) {
+                interValues = new double[intervals + 1];
+                for (int i = 0; i < interValues.length; i++) {
+                    interValues[i] = minimum + (float) i / (interValues.length - 1) * (maximum - minimum);
+                }
+            } else if ("mediane".equals(method)) {
+                interValues = new double[intervals + 1];
+                for (int i = 0; i < interValues.length; i++) {
+                    interValues[i] = allValues[i * (allValues.length - 1) / (interValues.length - 1)];
+                }
+            } else {
+                if (interValues.length != intervals + 1) {
+                    interValues = Arrays.copyOf(interValues, intervals + 1);
+                }
+            }
+
+            /*
+            * IV - Generate rules deriving symbolizer with given colors.
+            */
+            final Symbolizer symbolizer = createSymbolizer(symbolizerType, SF, FF);
+            final Color[] colors = new Color[colorsList.size()];
+            int loop = 0;
+            for(final String c : colorsList){
+                colors[loop] = Color.decode(c);
+                loop++;
+            }
+            final IntervalPalette palette = new DefaultIntervalPalette(colors);
+            int count = 0;
+
+            /*
+             * Create one rule for each interval.
+             */
+            for (int i = 1; i < interValues.length; i++) {
+                final double step = (double) (i - 1) / (interValues.length - 2); // derivation step
+                double start = interValues[i - 1];
+                double end = interValues[i];
+                /*
+                * Create the interval filter.
+                */
+                final Filter above = FF.greaterOrEqual(property, FF.literal(start));
+                final Filter under;
+                if (i == interValues.length - 1) {
+                    under = FF.lessOrEqual(property, FF.literal(end));
+                } else {
+                    under = FF.less(property, FF.literal(end));
+                }
+                final Filter interval = FF.and(above, under);
+                /*
+                * Create new rule deriving the base symbolizer.
+                */
+                final MutableRule rule = SF.rule();
+                rule.setName((count++)+" - AutoInterval - " + property.getPropertyName());
+                rule.setDescription(new DefaultDescription(new DefaultInternationalString(property.getPropertyName()+" "+start+" - "+end),null));
+                rule.setFilter(interval);
+                rule.symbolizers().add(derivateSymbolizer(symbolizer, palette.interpolate(step),SF,FF));
+                newRules.add(rule);
+            }
+        }
+
+        //add rules to the style
+        final MutableStyle mutableStyle = style.toType();
+        //remove all auto intervals rules if exists before adding the new list.
+        final List<MutableRule> backupRules = new ArrayList<MutableRule>(mutableStyle.featureTypeStyles().get(0).rules());
+        final List<MutableRule> rulesToRemove = new ArrayList<MutableRule>();
+        for(final MutableRule r : backupRules){
+            if(r.getName().contains("AutoInterval")){
+                rulesToRemove.add(r);
+            }
+        }
+        backupRules.removeAll(rulesToRemove);
+        mutableStyle.featureTypeStyles().get(0).rules().clear();
+        mutableStyle.featureTypeStyles().get(0).rules().addAll(backupRules);
+        mutableStyle.featureTypeStyles().get(0).rules().addAll(newRules);
+
+        //create the style in server
+        styleBusiness.createStyle(id, mutableStyle);
+
+        return ok(new Style(mutableStyle));
+    }
+
+    private Symbolizer createSymbolizer(final String symbolizerType, final MutableStyleFactory SF, final FilterFactory2 FF) {
+        final Symbolizer symbolizer;
+        if ("polygon".equals(symbolizerType)) {
+            final Stroke stroke = SF.stroke(Color.BLACK, 1);
+            final Fill fill = SF.fill(Color.BLUE);
+            symbolizer = new DefaultPolygonSymbolizer(
+                    stroke,
+                    fill,
+                    DEFAULT_DISPLACEMENT,
+                    FF.literal(0),
+                    DEFAULT_UOM,
+                    null,
+                    "polygon",
+                    DEFAULT_DESCRIPTION);
+        } else if ("line".equals(symbolizerType)) {
+            final Stroke stroke = SF.stroke(Color.BLUE, 2);
+            symbolizer = new DefaultLineSymbolizer(
+                    stroke,
+                    FF.literal(0),
+                    DEFAULT_UOM,
+                    null,
+                    "line",
+                    DEFAULT_DESCRIPTION);
+        } else {
+            final Stroke stroke = SF.stroke(Color.BLACK, 1);
+            final Fill fill = SF.fill(Color.BLUE);
+            final List<GraphicalSymbol> symbols = new ArrayList<GraphicalSymbol>();
+            symbols.add(SF.mark(StyleConstants.MARK_CIRCLE, fill, stroke));
+            final Graphic gra = SF.graphic(symbols, FF.literal(1), FF.literal(12), FF.literal(0), SF.anchorPoint(), SF.displacement());
+            symbolizer = new DefaultPointSymbolizer(
+                    gra,
+                    DEFAULT_UOM,
+                    null,
+                    "point",
+                    DEFAULT_DESCRIPTION);
+        }
+        return symbolizer;
+    }
+
+    private Symbolizer derivateSymbolizer(final Symbolizer symbol, final Color color, final MutableStyleFactory SF, final FilterFactory2 FF) {
+        if (symbol instanceof PolygonSymbolizer) {
+            final PolygonSymbolizer ps = (PolygonSymbolizer) symbol;
+            final Fill fill = SF.fill(SF.literal(color), ps.getFill().getOpacity());
+            return SF.polygonSymbolizer(ps.getName(), ps.getGeometryPropertyName(),
+                    ps.getDescription(), ps.getUnitOfMeasure(), ps.getStroke(),
+                    fill, ps.getDisplacement(), ps.getPerpendicularOffset());
+        } else if (symbol instanceof LineSymbolizer) {
+            final LineSymbolizer ls = (LineSymbolizer) symbol;
+            final Stroke oldStroke = ls.getStroke();
+            final Stroke stroke = SF.stroke(SF.literal(color), oldStroke.getOpacity(), oldStroke.getWidth(),
+                    oldStroke.getLineJoin(), oldStroke.getLineCap(), oldStroke.getDashArray(), oldStroke.getDashOffset());
+            return SF.lineSymbolizer(ls.getName(), ls.getGeometryPropertyName(),
+                    ls.getDescription(), ls.getUnitOfMeasure(), stroke, ls.getPerpendicularOffset());
+        } else if (symbol instanceof PointSymbolizer) {
+            final PointSymbolizer ps = (PointSymbolizer) symbol;
+            final Graphic oldGraphic = ps.getGraphic();
+            final Mark oldMark = (Mark) oldGraphic.graphicalSymbols().get(0);
+            final Fill fill = SF.fill(SF.literal(color), oldMark.getFill().getOpacity());
+            final List<GraphicalSymbol> symbols = new ArrayList<GraphicalSymbol>();
+            symbols.add(SF.mark(oldMark.getWellKnownName(), fill, oldMark.getStroke()));
+            final Graphic graphic = SF.graphic(symbols, oldGraphic.getOpacity(), oldGraphic.getSize(),
+                    oldGraphic.getRotation(), oldGraphic.getAnchorPoint(), oldGraphic.getDisplacement());
+            return SF.pointSymbolizer(graphic, ps.getGeometryPropertyName());
+        } else {
+            throw new IllegalArgumentException("Unexpected symbolizer type: " + symbol);
+        }
+    }
+
     
     /**
      * @see StyleBusiness#getAvailableStyles(String)

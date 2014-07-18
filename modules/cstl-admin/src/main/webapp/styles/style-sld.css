@@ -2,6 +2,17 @@
 .frame-sldEditor{
     box-shadow: none;
 }
+.modal-dialog-sld{
+    padding-bottom: 0;
+}
+
+.modal-dialog-sld .modal-content{
+    max-height: 650px !important;
+}
+.modal-dialog-sld .modal-body {
+    max-height: 513px !important;
+}
+
 .modal-dialog-sld h2{
     font-size: 18px;
 }
@@ -321,6 +332,9 @@ ul.dropdown-images li a:hover{
 	img.img_palette{
 		width: 235px;
 	}
+    img.img_palette_ajust{
+        width: 160px;
+    }
 	.bloc_apercu{
 		width:430px;
 	}
@@ -345,6 +359,9 @@ ul.dropdown-images li a:hover{
 	 img.img_palette{
 		width: 235px;
 	}
+    img.img_palette_ajust{
+        width: 160px;
+    }
 	.bloc_apercu{
 		width:465px;
 	}
