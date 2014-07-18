@@ -1428,7 +1428,12 @@ public class DefaultWMSWorker extends LayerWorker implements WMSWorker {
                     //try to grab the style if provided
                     //a style has been given for this layer, try to use it
                     final String namedStyle = styleNames.get(i);
-                    style = getLayerStyle(namedStyle);
+                    final DataReference styleRef = config.getStyle(namedStyle);
+                    if (styleRef == null) {
+                        style = null;
+                    } else {
+                        style = (styleRef.getLayerId() == null) ? null : getStyle(styleRef);
+                    }
                     if (style == null) {
                         throw new CstlServiceException("Style provided not found.", STYLE_NOT_DEFINED);
                     }

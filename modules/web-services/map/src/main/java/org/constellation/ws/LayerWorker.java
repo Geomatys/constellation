@@ -332,10 +332,6 @@ public abstract class LayerWorker extends AbstractWorker {
         return style;
     }
 
-    protected MutableStyle getLayerStyle(final String styleName) {
-        return StyleProviders.getInstance().get(styleName);
-    }
-
     protected Layer getMainLayer() {
         if (layerContext == null) {
             return null;

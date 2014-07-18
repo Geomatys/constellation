@@ -1123,19 +1123,19 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                     styleName = $scope.selected.Name;
                 }
                 var layerData;
-                if (serviceName) {
-                    if(styleName){
-                        layerData = DataViewer.createLayerWMSWithStyle($cookies.cstlUrl, $scope.layerName, $scope.serviceName, styleName);
-                    }   else {
-                        layerData = DataViewer.createLayerWMS($cookies.cstlUrl, $scope.layerName, $scope.serviceName);
-                    }
-                } else {
+//                if (serviceName) {
+//                    if(styleName){
+//                        layerData = DataViewer.createLayerWMSWithStyle($cookies.cstlUrl, $scope.layerName, $scope.serviceName, styleName);
+//                    }   else {
+//                        layerData = DataViewer.createLayerWMS($cookies.cstlUrl, $scope.layerName, $scope.serviceName);
+//                    }
+//                } else {
                     if(styleName){
                         layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName, $scope.providerId, styleName);
                     }else {
                         layerData = DataViewer.createLayer($cookies.cstlUrl, $scope.layerName, $scope.providerId);
                     }
-                }
+//                }
                 //to force the browser cache reloading styled layer.
                 layerData.mergeNewParams({ts:new Date().getTime()});
                 var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");

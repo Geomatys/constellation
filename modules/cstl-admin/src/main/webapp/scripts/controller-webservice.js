@@ -756,34 +756,38 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
             } else {
                 var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
                 var layerData;
-                if ($scope.service.type === 'WMS') {
-                    textService.capa($scope.service.type.toLowerCase(), $scope.service.identifier, $scope.service.versions[0])
-                        .success(function (data, status, headers, config) {
-                            var capabilities = DataViewer.format.read(data);
-                            var layers = capabilities.capability.layers;
-                            var capsLayer;
-                            for(var i=0; i < layers.length; i++) {
-                                var l = layers[i];
-                                if (l.name === layerName) {
-                                    capsLayer = l;
-                                    break;
-                                }
-                            }
-                            var llbbox = capsLayer.llbbox;
-                            var extent = new OpenLayers.Bounds(llbbox[0], llbbox[1], llbbox[2], llbbox[3]);
-                            layerData = DataViewer.createLayerWMS($cookies.cstlUrl, layerName, $scope.service.identifier);
-
-                            //to force the browser cache reloading styled layer.
-                            layerData.mergeNewParams({ts:new Date().getTime()});
-
-                            DataViewer.layers = [layerData, layerBackground];
-                            DataViewer.initMap('dataMap');
-                            DataViewer.map.zoomToExtent(extent, true);
-                            modalLoader.close();
-                        });
-                } else {
+//                if ($scope.service.type === 'WMS') {
+//                    textService.capa($scope.service.type.toLowerCase(), $scope.service.identifier, $scope.service.versions[0])
+//                        .success(function (data, status, headers, config) {
+//                            var capabilities = DataViewer.format.read(data);
+//                            var layers = capabilities.capability.layers;
+//                            var capsLayer;
+//                            for(var i=0; i < layers.length; i++) {
+//                                var l = layers[i];
+//                                if (l.name === layerName) {
+//                                    capsLayer = l;
+//                                    break;
+//                                }
+//                            }
+//                            var llbbox = capsLayer.llbbox;
+//                            var extent = new OpenLayers.Bounds(llbbox[0], llbbox[1], llbbox[2], llbbox[3]);
+//                            layerData = DataViewer.createLayerWMS($cookies.cstlUrl, layerName, $scope.service.identifier);
+//
+//                            //to force the browser cache reloading styled layer.
+//                            layerData.mergeNewParams({ts:new Date().getTime()});
+//
+//                            DataViewer.layers = [layerData, layerBackground];
+//                            DataViewer.initMap('dataMap');
+//                            DataViewer.map.zoomToExtent(extent, true);
+//                            modalLoader.close();
+//                        });
+//                } else {
                     var providerId = $scope.selected.Provider;
-                    layerData = DataViewer.createLayer($cookies.cstlUrl, layerName, providerId);
+                    if ($scope.selected.TargetStyle && $scope.selected.TargetStyle.length > 0) {
+                        layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, layerName, providerId, $scope.selected.TargetStyle[0].Name);
+                    } else {
+                        layerData = DataViewer.createLayer($cookies.cstlUrl, layerName, providerId);
+                    }
                     DataViewer.layers = [layerData, layerBackground];
                     dataListing.metadata({providerId: providerId, dataId: layerName}, {}, function(response) {
                         // Success getting the metadata, try to find the data extent
@@ -808,7 +812,7 @@ cstlAdminApp.controller('WebServiceEditController', ['$rootScope', '$scope','$ro
                         DataViewer.initMap('dataMap');
                         modalLoader.close();
                     });
-                }
+//                }
             }
         };
 

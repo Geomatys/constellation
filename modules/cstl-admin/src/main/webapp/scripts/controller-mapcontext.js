@@ -107,8 +107,8 @@ cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', '$growl
         };
     }]);
 
-cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstance', 'mapcontext', 'webService', 'style', '$growl', '$translate', 'ctxtToEdit', 'layersForCtxt',
-    function ($scope, $modalInstance, mapcontext, webService, style, $growl, $translate, ctxtToEdit, layersForCtxt) {
+cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstance', 'mapcontext', 'webService', 'style', '$growl', '$translate', 'ctxtToEdit', 'layersForCtxt', '$cookies',
+    function ($scope, $modalInstance, mapcontext, webService, style, $growl, $translate, ctxtToEdit, layersForCtxt, $cookies) {
         // item to save in the end
         $scope.ctxt = {};
         // defines if we are in adding or edition mode
@@ -268,6 +268,23 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
             if (index != -1) {
                 $scope.layers.toAdd.splice(index, 1);
             }
+        };
+
+        $scope.viewMap = function() {
+            var cstlUrl = $cookies.cstlUrl;
+            var layersToView = [];
+            for (var i=0; i<$scope.layers.toAdd.length; i++) {
+                var l = $scope.layers.toAdd[i];
+                var layerData;
+                if (l.layer.styleName) {
+                    layerData = DataViewer.createLayerWMSWithStyle(cstlUrl, l.layer.Name, 'toto', l.layer.styleName);
+                } else {
+                    layerData = DataViewer.createLayerWMS(cstlUrl, l.layer.Name, 'toto');
+                }
+                layersToView.push(layerData);
+            }
+            DataViewer.layers = layersToView;
+            DataViewer.initMap('mapContextMap');
         };
     }]);
                                      
