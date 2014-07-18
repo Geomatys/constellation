@@ -19,27 +19,24 @@
 
 package org.constellation.rest.dto;
 
+import java.io.Serializable;
+import java.util.List;
+
 /**
  * This model store all necessary parameters
  * to pass from client to server for creating automatically
- * rules by intervals based on vector data's field.
+ * rules by unique values based on vector data's field.
  *
  * @author Mehdi Sidhoum (Geomatys).
  * @version 0.9
  * @since 0.9
  */
-import java.io.Serializable;
-import java.util.List;
-
-public class AutoIntervalValuesDTO implements Serializable{
-
+public class AutoUniqueValuesDTO implements Serializable {
     private String attr;
-    private int nbIntervals;
-    private String method;
     private String symbol;
     private List<String> colors;
 
-    public AutoIntervalValuesDTO(){
+    public AutoUniqueValuesDTO(){
 
     }
 
@@ -49,22 +46,6 @@ public class AutoIntervalValuesDTO implements Serializable{
 
     public void setAttr(String attr) {
         this.attr = attr;
-    }
-
-    public int getNbIntervals() {
-        return nbIntervals;
-    }
-
-    public void setNbIntervals(int nbIntervals) {
-        this.nbIntervals = nbIntervals;
-    }
-
-    public String getMethod() {
-        return method;
-    }
-
-    public void setMethod(String method) {
-        this.method = method;
     }
 
     public String getSymbol() {

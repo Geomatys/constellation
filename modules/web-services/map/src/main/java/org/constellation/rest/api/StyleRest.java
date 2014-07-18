@@ -29,6 +29,7 @@ import org.constellation.json.binding.Style;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.rest.dto.AutoIntervalValuesDTO;
+import org.constellation.rest.dto.AutoUniqueValuesDTO;
 import org.constellation.rest.dto.WrapperIntervalDTO;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.FeatureIterator;
@@ -79,6 +80,7 @@ import static org.geotoolkit.style.StyleConstants.DEFAULT_UOM;
  * RESTful API for style providers configuration.
  *
  * @author Bernard Fabien (Geomatys)
+ * @author Mehdi Sidhoum (Geomatys)
  * @version 0.9
  * @since 0.9
  */
@@ -137,9 +139,9 @@ public final class StyleRest {
     /**
      * Creates a style and calculate the rules as palette defined as interval set.
      * Returns the new style object as json.
-     * @param id
-     * @param wrapper
-     * @return
+     * @param id the style provider identifier.
+     * @param wrapper object that contains the style and the config parameter to generate the palette rules.
+     * @return the style as json.
      * @throws Exception
      */
     @POST
@@ -359,6 +361,119 @@ public final class StyleRest {
         } else {
             throw new IllegalArgumentException("Unexpected symbolizer type: " + symbol);
         }
+    }
+
+    /**
+     * Creates a style and calculate the rules as palette defined as unique values set.
+     * Returns the new style object as json.
+     * @param id style provider identifier
+     * @param wrapper object that contains the style and the config parameter to generate the palette rules.
+     * @return new style as json
+     * @throws Exception
+     */
+    @POST
+    @Path("{id}/style/generateAutoUnique")
+    public Response generateAutoUniqueStyle(final @PathParam("id") String id, final WrapperIntervalDTO wrapper) throws Exception {
+        //get style and interval params
+        final Style style = wrapper.getStyle();
+        final AutoUniqueValuesDTO autoUniqueValues = wrapper.getUniqueValues();
+
+        final String dataProviderId = wrapper.getDataProvider();
+        final String layerName = wrapper.getLayerName();
+
+        final String attribute = autoUniqueValues.getAttr();
+        if(attribute ==null || attribute.trim().isEmpty()){
+            return ok(AcknowlegementType.failure("Attribute field should not be empty!"));
+        }
+
+        final String symbolizerType = autoUniqueValues.getSymbol();
+        final List<String> colorsList = autoUniqueValues.getColors();
+
+        //rules that will be added to the style
+        final List<MutableRule> newRules = new ArrayList<MutableRule>();
+
+        /*
+         * I - Get feature type and feature data.
+         */
+        final DataProvider dataprovider = DataProviders.getInstance().getProvider(dataProviderId);
+        final DataStore dataStore = dataprovider.getMainStore();
+        final Name typeName = new DefaultName(layerName);
+        final QueryBuilder queryBuilder = new QueryBuilder();
+        queryBuilder.setTypeName(typeName);
+        queryBuilder.setProperties(new String[]{attribute});
+        if(dataStore instanceof FeatureStore) {
+            final FeatureStore fstore = (FeatureStore) dataStore;
+            final FeatureCollection featureCollection = fstore.createSession(false).getFeatureCollection(queryBuilder.buildQuery());
+            /*
+            * II - Extract all different values.
+            */
+            final MutableStyleFactory SF = (MutableStyleFactory) FactoryFinder.getStyleFactory(
+                    new Hints(Hints.STYLE_FACTORY, MutableStyleFactory.class));
+            final FilterFactory2 FF = (FilterFactory2) FactoryFinder.getFilterFactory(
+                    new Hints(Hints.FILTER_FACTORY, FilterFactory2.class));
+            final PropertyName property = FF.property(attribute);
+            final List<Object> differentValues = new ArrayList<Object>();
+
+            final FeatureIterator it = featureCollection.iterator();
+            while(it.hasNext()){
+                final Feature feature = it.next();
+                final Object value = property.evaluate(feature);
+                if (!differentValues.contains(value)) {
+                    differentValues.add(value);
+                }
+            }
+            it.close();
+            /*
+            * III - Generate rules deriving symbolizer with colors array.
+            */
+            final Symbolizer symbolizer = createSymbolizer(symbolizerType, SF, FF);
+            final Color[] colors = new Color[colorsList.size()];
+            int loop = 0;
+            for(final String c : colorsList){
+                colors[loop] = Color.decode(c);
+                loop++;
+            }
+            final IntervalPalette palette = new DefaultIntervalPalette(colors);
+            int count = 0;
+            /*
+            * Create one rule for each different value.
+            */
+            for (int i = 0; i < differentValues.size(); i++) {
+                final double step = ((double) i) / (differentValues.size() - 1); // derivation step
+                final Object value = differentValues.get(i);
+                /*
+                 * Create the unique value filter.
+                 */
+                final Filter filter = FF.equals(property, FF.literal(value));
+                /*
+                 * Create new rule derivating the base symbolizer.
+                 */
+                final MutableRule rule = SF.rule(derivateSymbolizer(symbolizer, palette.interpolate(step),SF,FF));
+                rule.setName((count++)+" - AutoUnique - " + property.getPropertyName());
+                rule.setDescription(new DefaultDescription(new DefaultInternationalString(property.getPropertyName()+" = "+value),null));
+                rule.setFilter(filter);
+                newRules.add(rule);
+            }
+        }
+
+        //add rules to the style
+        final MutableStyle mutableStyle = style.toType();
+        //remove all auto unique values rules if exists before adding the new list.
+        final List<MutableRule> backupRules = new ArrayList<MutableRule>(mutableStyle.featureTypeStyles().get(0).rules());
+        final List<MutableRule> rulesToRemove = new ArrayList<MutableRule>();
+        for(final MutableRule r : backupRules){
+            if(r.getName().contains("AutoUnique")){
+                rulesToRemove.add(r);
+            }
+        }
+        backupRules.removeAll(rulesToRemove);
+        mutableStyle.featureTypeStyles().get(0).rules().clear();
+        mutableStyle.featureTypeStyles().get(0).rules().addAll(backupRules);
+        mutableStyle.featureTypeStyles().get(0).rules().addAll(newRules);
+
+        //create the style in server
+        styleBusiness.createStyle(id, mutableStyle);
+        return ok(new Style(mutableStyle));
     }
 
     

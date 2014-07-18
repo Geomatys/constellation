@@ -130,7 +130,7 @@
         <div class="modal-footer" style="margin-top: 0;">
             <button type="button"
                     class="btn btn-default"
-                    ng-show="!optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor"
+                    ng-show="!optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableAutoUniqueEditor"
                     ng-click="close()" >
                 <span translate="sldeditor.button.cancel">Cancel</span>
             </button>
@@ -142,13 +142,13 @@
             </button>
             <button type="button"
                     class="btn btn-primary"
-                    ng-show="isSelectedChooser('new') && !optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor"
+                    ng-show="isSelectedChooser('new') && !optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableAutoUniqueEditor"
                     ng-click="createStyle();">
                 <span translate="sldeditor.button.create">Create</span>
             </button>
             <button type="button"
                     class="btn btn-primary"
-                    ng-show="optionsSLD.enableRuleEditor || optionsSLD.enableAutoIntervalEditor"
+                    ng-show="optionsSLD.enableRuleEditor || optionsSLD.enableAutoIntervalEditor || optionsSLD.enableAutoUniqueEditor"
                     ng-click="goBack();">
                 <span translate="sldeditor.breadcrumb.backToListOfRules">Back to the rules list</span>
             </button>

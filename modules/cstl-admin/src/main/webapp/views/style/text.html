@@ -24,7 +24,7 @@
             <select class="form-control"
                     ng-init="loadDataProperties();"
                     ng-model="symbolizer.label">
-                <option ng-value="'{'+dp.name+'}'" ng-repeat="dp in $parent.dataProperties.properties">{{dp.name}}</option>
+                <option ng-value="'{'+dp.name+'}'" ng-repeat="dp in $parent.attributesExcludeGeometry">{{dp.name}}</option>
             </select>
         </div>
     </div>

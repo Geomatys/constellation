@@ -24,6 +24,10 @@ import org.constellation.json.binding.Style;
 import java.io.Serializable;
 
 /**
+ * This model used to pass object from client to server in post method,
+ * it contains the style object and all necessary parameters to generate
+ * automatically a list of rules for palette.
+ *
  * @author Mehdi Sidhoum (Geomatys).
  * @version 0.9
  * @since 0.9
@@ -39,6 +43,8 @@ public class WrapperIntervalDTO implements Serializable {
     private Style style;
 
     private AutoIntervalValuesDTO intervalValues;
+
+    private AutoUniqueValuesDTO uniqueValues;
 
     public WrapperIntervalDTO(){
 
@@ -82,5 +88,13 @@ public class WrapperIntervalDTO implements Serializable {
 
     public void setIntervalValues(AutoIntervalValuesDTO intervalValues) {
         this.intervalValues = intervalValues;
+    }
+
+    public AutoUniqueValuesDTO getUniqueValues() {
+        return uniqueValues;
+    }
+
+    public void setUniqueValues(AutoUniqueValuesDTO uniqueValues) {
+        this.uniqueValues = uniqueValues;
     }
 }

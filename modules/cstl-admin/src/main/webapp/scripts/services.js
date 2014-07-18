@@ -290,7 +290,8 @@ cstlAdminApp.factory('style', ['$resource',
             'delete':  { method: 'DELETE', url: '@cstl/api/1/SP/:provider/style/:name;jsessionid='},
             'link':    { method: 'POST',   url: '@cstl/api/1/SP/:provider/style/:name/linkData;jsessionid='},
             'unlink':  { method: 'POST',   url: '@cstl/api/1/SP/:provider/style/:name/unlinkData;jsessionid='},
-            'generateAutoIntervalStyle':{ method : 'POST', url: '@cstl/api/1/SP/:provider/style/generateAutoInterval'}
+            'generateAutoIntervalStyle':{ method : 'POST', url: '@cstl/api/1/SP/:provider/style/generateAutoInterval'},
+            'generateAutoUniqueStyle':{ method : 'POST', url: '@cstl/api/1/SP/:provider/style/generateAutoUnique'}
         });
     }]);
 

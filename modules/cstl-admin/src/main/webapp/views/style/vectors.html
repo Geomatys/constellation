@@ -1,7 +1,7 @@
 
 <div class="row">
     <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-        <div ng-if="!optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor">
+        <div ng-if="!optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableAutoUniqueEditor">
             <div style="margin-bottom:0px;">
                 <div class="form-group col-xs-12" style="margin: 3px 0; height:35px;padding: 0;">
                     <label class="col-xs-5 col-sm-5 col-md-4 control-label"
@@ -33,7 +33,6 @@
                                 <li ng-if="selectedLayer !== null"><a ng-click="createRules('auto_interval')"
                                        translate="edition.style.label.new.rules.auto_interval">Automatically create by intervals</a></li>
                                 <li ng-if="selectedLayer !== null"><a ng-click="createRules('auto_values')"
-                                       ng-disabled="true"
                                        translate="edition.style.label.new.rules.auto_values">Automatically create by unique values</a></li>
                             </ul>
                         </div>
@@ -63,7 +62,7 @@
                 </div>
             </div>
         </div>
-        <div ng-if="optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor">
+        <div ng-if="optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableAutoUniqueEditor">
             <ol class="breadcrumb col-xs-12 col-sm-12 col-md-12 col-lg-12">
                 <li>
                     <a ng-click="goBack()">
@@ -271,7 +270,7 @@
                                                                 ng-model="filter.attribute"
                                                                 ng-change="applyFilter();">
                                                             <option ng-value="dp.name"
-                                                                    ng-repeat="dp in $parent.dataProperties.properties">{{dp.name}}</option>
+                                                                    ng-repeat="dp in $parent.attributesExcludeGeometry">{{dp.name}}</option>
                                                         </select>
                                                     </td>
                                                     <td>
@@ -316,7 +315,7 @@
                 </div>
             </div>
         </div>
-        <div ng-if="optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableRuleEditor">
+        <div ng-if="optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableRuleEditor && !optionsSLD.enableAutoUniqueEditor">
             <ol class="breadcrumb col-xs-12 col-sm-12 col-md-12 col-lg-12">
                 <li>
                     <a ng-click="goBack()">
@@ -330,7 +329,7 @@
             <ul class="nav nav-tabs">
                 <li class="active">
                     <a data-toggle="tab">
-                        <span translate="edition.style.label.auto.intervals" >By intervals</span>
+                        <span>Configuration</span>
                     </a>
                 </li>
             </ul>
@@ -447,6 +446,123 @@
                     <button type="button"
                             class="btn btn-default pull-right"
                             ng-click="generateAutoInterval()">
+                        <span translate="sldeditor.edition.autointerval.generate">Generate rules</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div ng-if="optionsSLD.enableAutoUniqueEditor && !optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor">
+            <ol class="breadcrumb col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <li>
+                    <a ng-click="goBack()">
+                        <span translate="sldeditor.breadcrumb.type">Back to rules list</span>
+                    </a>
+                </li>
+                <li class="active">
+                    <span translate="edition.style.label.new.rules.auto_values">Auto by unique values</span>
+                </li>
+            </ol>
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a data-toggle="tab">
+                        <span>Configuration</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane tab-style-edition active">
+                    <form class="form-horizontal form-style" role="form" style="margin-bottom: 20pt;">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-top: 10pt;">
+                            <div class="form-group">
+                                <label class="col-xs-6 col-sm-6 col-md-6 col-lg-6 control-label"
+                                       translate="sldeditor.edition.field">Attribute field</label>
+                                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                    <select class="form-control"
+                                            ng-init="loadDataProperties();"
+                                            ng-model="optionsSLD.autoUniqueValues.attr">
+                                        <option ng-repeat="dp in $parent.attributesExcludeGeometry" ng-value="dp.name">{{dp.name}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-xs-6 col-sm-6 col-md-6 col-lg-6 control-label"
+                                       translate="sldeditor.edition.symboltype">Symbol type</label>
+                                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                    <select class="form-control"
+                                            ng-model="optionsSLD.autoUniqueValues.symbol">
+                                        <option value="point" translate="edition.style.label.point">Point</option>
+                                        <option value="line" translate="edition.style.label.line">Line</option>
+                                        <option value="polygon" translate="edition.style.label.polygon">Polygon</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-xs-6 col-sm-6 col-md-6 col-lg-6 control-label "
+                                       translate="sldeditor.edition.palette.label">Palette</label>
+                                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                    <div class="pull-right btn-group select select-block">
+                                        <button class="btn dropdown-toggle btn-default" data-toggle="dropdown">
+                                            <span class="filter-option pull-left">
+                                                <img class="img_palette img_palette_ajust" ng-src="{{optionsSLD.autoUniqueValues.palette.img_palette}}"/>
+                                            </span>&nbsp;
+                                            <span class="caret"></span>
+                                        </button>
+                                        <span class="dropdown-arrow dropdown-arrow-inverse"></span>
+                                        <ul class="dropdown-menu dropdown-inverse dropdown-images" role="menu"
+                                            style="overflow-y: auto; min-width: 70px; min-height: 108px;">
+                                            <li ng-click="$parent.choosePaletteVectorUnique(0)"><a><img class="img_palette img_palette_ajust" src="images/palette0.png"/></a></li>
+                                            <li ng-click="$parent.choosePaletteVectorUnique(1)"><a><img class="img_palette img_palette_ajust" src="images/palette1.png"/></a></li>
+                                            <li ng-click="$parent.choosePaletteVectorUnique(2)"><a><img class="img_palette img_palette_ajust" src="images/palette2.png"/></a></li>
+                                            <li ng-click="$parent.choosePaletteVectorUnique(3)"><a><img class="img_palette img_palette_ajust" src="images/palette3.png"/></a></li>
+                                            <li ng-click="$parent.choosePaletteVectorUnique(4)"><a><img class="img_palette img_palette_ajust" src="images/palette4.png"/></a></li>
+                                            <li ng-click="$parent.choosePaletteVectorUnique(5)"><a><img class="img_palette img_palette_ajust" src="images/palette5.png"/></a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group" style="height: 15pt;">
+                                <label class="col-xs-6 col-sm-6 col-md-6 col-lg-6 control-label "
+                                       translate="sldeditor.edition.palette.custom">Use custom palette</label>
+                                <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1">
+                                    <input style="margin-top: 6pt;"
+                                           type="checkbox"
+                                           ng-model="optionsSLD.autoUniqueValues.customPalette.enabled"
+                                           ng-change="$parent.affectDefaultPalette();"/>
+                                </div>
+                                <div class="col-xs-5 col-sm-5 col-md-5 col-lg-5"
+                                     style="padding: 0pt;"
+                                     ng-show="optionsSLD.autoUniqueValues.customPalette.enabled">
+                                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                        <input type='text'
+                                               name="picker"
+                                               class="picker"
+                                               spectrum
+                                               ng-model="optionsSLD.autoUniqueValues.customPalette.color1"/>
+                                    </div>
+                                    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                                        <input type='text'
+                                               name="picker"
+                                               class="picker"
+                                               spectrum
+                                               ng-model="optionsSLD.autoUniqueValues.customPalette.color2"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-xs-6 col-sm-6 col-md-6 col-lg-6 control-label "
+                                       translate="sldeditor.edition.reversecolors">Reverse colors</label>
+                                <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1">
+                                    <input style="margin-top: 6pt;"
+                                           type="checkbox"
+                                           ng-model="optionsSLD.autoUniqueValues.palette.reverseColors"/>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <button type="button"
+                            class="btn btn-default pull-right"
+                            ng-click="generateAutoUnique()">
                         <span translate="sldeditor.edition.autointerval.generate">Generate rules</span>
                     </button>
                 </div>

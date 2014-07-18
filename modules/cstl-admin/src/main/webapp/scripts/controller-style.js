@@ -154,6 +154,22 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                 }
             },
             enableAutoIntervalEditor:false,
+            autoUniqueValues:{
+                "attr":"",
+                "symbol":"polygon",
+                "palette": {
+                    index: 0,
+                    img_palette: 'images/palette1.png',
+                    colors:[],
+                    reverseColors:false
+                },
+                "customPalette":{
+                    "enabled":false,
+                    "color1":'#ffffff',
+                    "color2":'#0022fc'
+                }
+            },
+            enableAutoUniqueEditor:false,
             selectedSymbolizerType:"",
             selectedSymbolizer:null,
             filtersEnabled:false,
@@ -220,6 +236,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
          */
         $scope.dataProperties = null;
         $scope.attributesTypeNumber = [];
+        $scope.attributesExcludeGeometry = [];
         $scope.dataBbox = null;
         $scope.dataBands = null;
 
@@ -340,6 +357,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         $scope.goBack = function() {
             $scope.optionsSLD.enableRuleEditor = false;
             $scope.optionsSLD.enableAutoIntervalEditor = false;
+            $scope.optionsSLD.enableAutoUniqueEditor = false;
         };
 
         /**
@@ -408,7 +426,22 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                     };
                     $scope.editAutoIntervalPanel();
                 }else if(mode ==='auto_values'){
-
+                    $scope.optionsSLD.autoUniqueValues = {
+                        "attr":"",
+                        "symbol":"polygon",
+                        "palette": {
+                            index: 0,
+                            img_palette: 'images/palette1.png',
+                            colors:[],
+                            reverseColors:false
+                        },
+                        "customPalette":{
+                            "enabled":false,
+                            "color1":'#ffffff',
+                            "color2":'#0022fc'
+                        }
+                    };
+                    $scope.editAutoUniquePanel();
                 }else if(mode ==='raster_palette'){
                     var rule = {
                         "name": 'palette-rule',
@@ -485,12 +518,22 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             if($scope.optionsSLD.selectedRule !== null){
                 $scope.optionsSLD.enableRuleEditor = true;
                 $scope.optionsSLD.enableAutoIntervalEditor = false;
+                $scope.optionsSLD.enableAutoUniqueEditor = false;
             }
         };
 
         $scope.editAutoIntervalPanel = function(){
             if($scope.optionsSLD.autoIntervalValues !== null){
                 $scope.optionsSLD.enableAutoIntervalEditor=true;
+                $scope.optionsSLD.enableRuleEditor = false;
+                $scope.optionsSLD.enableAutoUniqueEditor = false;
+            }
+        };
+
+        $scope.editAutoUniquePanel = function(){
+            if($scope.optionsSLD.autoUniqueValues !== null){
+                $scope.optionsSLD.enableAutoUniqueEditor = true;
+                $scope.optionsSLD.enableAutoIntervalEditor=false;
                 $scope.optionsSLD.enableRuleEditor = false;
             }
         };
@@ -887,9 +930,13 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             provider.dataDesc({providerId: $scope.providerId, dataId: $scope.layerName},
                 function(response) {
                     $scope.dataProperties = response;
-                    $scope.attributesTypeNumber = getOnlyNumbersType(response.properties);
+                    $scope.attributesTypeNumber = getOnlyNumbersFields(response.properties);
+                    $scope.attributesExcludeGeometry = getFieldsExcludeGeometry(response.properties);
                     if($scope.attributesTypeNumber.length>0){
                         $scope.optionsSLD.autoIntervalValues.attr=$scope.attributesTypeNumber[0].name;
+                    }
+                    if($scope.attributesExcludeGeometry.length>0){
+                        $scope.optionsSLD.autoUniqueValues.attr=$scope.attributesExcludeGeometry[0].name;
                     }
                 },
                 function() {
@@ -903,7 +950,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
          * @param properties
          * @returns {Array}
          */
-        var getOnlyNumbersType = function(properties){
+        var getOnlyNumbersFields = function(properties){
             var arrayRes = [];
             if(properties && properties.length>0){
                 for(var i=0;i<properties.length;i++){
@@ -913,6 +960,24 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                        properties[i].type ==='java.lang.Number' ||
                        properties[i].type ==='java.lang.Long' ||
                         properties[i].type ==='java.lang.Short' ){
+                        arrayRes.push(properties[i]);
+                    }
+                }
+            }
+            return arrayRes;
+        };
+
+        /**
+         * Returns all fields excepts the geometry properties.
+         * @param properties
+         * @returns {Array}
+         */
+        var getFieldsExcludeGeometry = function(properties){
+            var arrayRes = [];
+            if(properties && properties.length>0){
+                for(var i=0;i<properties.length;i++){
+                    //skip geometry field
+                    if(properties[i].type.indexOf('com.vividsolutions') == -1){
                         arrayRes.push(properties[i]);
                     }
                 }
@@ -1016,25 +1081,33 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         };
 
         $scope.choosePaletteVectorInterval = function(index) {
-            $scope.optionsSLD.autoIntervalValues.palette.img_palette = 'images/palette' + index + '.png';
-            $scope.optionsSLD.autoIntervalValues.palette.index = index;
+            $scope.choosePaletteVector(index,$scope.optionsSLD.autoIntervalValues.palette);
+        };
 
-            $scope.optionsSLD.autoIntervalValues.palette.colors = [];
+        $scope.choosePaletteVectorUnique = function(index) {
+            $scope.choosePaletteVector(index,$scope.optionsSLD.autoUniqueValues.palette);
+        };
+
+        $scope.choosePaletteVector = function(index, paletteObj) {
+            paletteObj.img_palette = 'images/palette' + index + '.png';
+            paletteObj.index = index;
+
+            paletteObj.colors = [];
             switch (index) {
                 case 1:
-                    $scope.optionsSLD.autoIntervalValues.palette.colors.push('#e52520','#ffde00','#95c11f','#1d71b8','#662483');
+                    paletteObj.colors.push('#e52520','#ffde00','#95c11f','#1d71b8','#662483');
                     break;
                 case 2:
-                    $scope.optionsSLD.autoIntervalValues.palette.colors.push('#3F3460','#EC1876');
+                    paletteObj.colors.push('#3F3460','#EC1876');
                     break;
                 case 3:
-                    $scope.optionsSLD.autoIntervalValues.palette.colors.push('#036531','#FDF01A');
+                    paletteObj.colors.push('#036531','#FDF01A');
                     break;
                 case 4:
-                    $scope.optionsSLD.autoIntervalValues.palette.colors.push('#2d2e83','#1d71b8','#ffde00','#e52520');
+                    paletteObj.colors.push('#2d2e83','#1d71b8','#ffde00','#e52520');
                     break;
                 case 5:
-                    $scope.optionsSLD.autoIntervalValues.palette.colors.push('#000000','#FFFFFF');
+                    paletteObj.colors.push('#000000','#FFFFFF');
                     break;
                 default:
                     break;
@@ -1048,10 +1121,13 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             if($scope.optionsSLD.autoIntervalValues.customPalette.enabled){
                 $scope.choosePaletteVectorInterval(0);
             }
+            if($scope.optionsSLD.autoUniqueValues.customPalette.enabled){
+                $scope.choosePaletteVectorUnique(0);
+            }
         };
 
         /**
-         *
+         * proceed to generate rules automatically for intervals and apply on current style.
          */
         $scope.generateAutoInterval = function() {
             if(! $scope.layerName){
@@ -1116,7 +1192,68 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                     }
                 }
             );
+        };
 
+        /**
+         * proceed to generate rules automatically for unique values and apply on current style.
+         */
+        $scope.generateAutoUnique = function() {
+            if(! $scope.layerName){
+                return;
+            }
+            if(! $scope.selectedLayer){
+                return;
+            }
+
+            //get parameters
+            //current layer name and namespace
+            var layerName = $scope.layerName;
+            var namespace = $scope.selectedLayer.Namespace;
+            var dataProvider = $scope.selectedLayer.Provider;
+            //selected field
+            var fieldName = $scope.optionsSLD.autoUniqueValues.attr;
+            //symbol
+            var symbol = $scope.optionsSLD.autoUniqueValues.symbol;
+            //palette colors
+            var customPalette =$scope.optionsSLD.autoUniqueValues.customPalette.enabled;
+            var colors = [];
+            if(customPalette){
+                colors.push($scope.optionsSLD.autoUniqueValues.customPalette.color1,$scope.optionsSLD.autoUniqueValues.customPalette.color2);
+            }else {
+                colors =$scope.optionsSLD.autoUniqueValues.palette.colors;
+            }
+            if(colors.length==0){
+                colors.push('#e52520','#ffde00','#95c11f','#1d71b8','#662483');
+            }
+            var reverseColors =$scope.optionsSLD.autoUniqueValues.palette.reverseColors;
+            if(reverseColors){
+                colors = colors.reverse();
+            }
+
+            var autoUnique = {
+                "attr": fieldName,
+                "symbol": symbol,
+                "colors":colors
+            };
+
+            var wrapper = {
+                "layerName": layerName,
+                "namespace": namespace,
+                "dataProvider":dataProvider,
+                "style": $scope.newStyle,
+                "uniqueValues": autoUnique
+            };
+
+            //Now send all params to server and it will create the temporary style and returns the full style as json object.
+            style.generateAutoUniqueStyle({provider: 'sld_temp'}, wrapper,
+                function(response) {
+                    //push rules array in current newStyle object to trigger the changes on the map.
+                    if(response.rules && response.rules.length >0){
+                        $scope.newStyle.rules = response.rules;
+                        $scope.goBack();
+                    }
+                }
+            );
         };
 
       
