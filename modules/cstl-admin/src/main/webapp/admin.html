@@ -152,7 +152,7 @@
                     <!--             <span translate="global.menu.viewer">visualiseur</span> -->
                     <!--         </a></li> -->
 
-                    <li class="hidden-sm hidden-md" ng-show="hasRole('cstl-admin')">
+                    <li class="hidden-sm hidden-md" ng-class="{'hidden-lg':!hasRole('cstl-admin'), 'hidden-xs':!hasRole('cstl-admin')}" ng-show="hasRole('cstl-admin')">
                         <a ng-class="navClass('admin')" href="#/admin">
                             <span ng-class="navClass('admin')" class="glyphicon glyphicon-wrench"></span>
                             <span translate="global.menu.admin.main">Administration</span>
