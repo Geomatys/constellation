@@ -121,17 +121,27 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                                 }
                             }, function() {
                                 //TODO verify CRS exist
+                                provider.verifyCRS({ id: fileName},
+                                    function() {
+                                        //success
+                                        if (importedMetaData) {
+                                            dataListing.setUpMetadata({values: {'providerId': $scope.import.providerId, 'mdPath': importedMetaData}});
+                                        }
 
-                                if (importedMetaData) {
-                                    dataListing.setUpMetadata({values: {'providerId': $scope.import.providerId, 'mdPath': importedMetaData}});
-                                }
+                                        $growl('success','Success','Shapefile data '+ fileName +' successfully added');
+                                        if ($scope.sensor.checked) {
+                                            $scope.showAssociate();
+                                        } else {
+                                            $modalInstance.close({type: "vector", file: fileName, missing: $scope.import.metadata == null});
+                                        }
 
-                                $growl('success','Success','Shapefile data '+ fileName +' successfully added');
-                                if ($scope.sensor.checked) {
-                                    $scope.showAssociate();
-                                } else {
-                                    $modalInstance.close({type: "vector", file: fileName, missing: $scope.import.metadata == null});
-                                }
+                                    }, function() {
+                                        //failure
+                                        $growl('error','Error','Data '+ fileName +' without CRS');
+                                        provider.delete({id: fileName});
+                                    }
+                                );
+
                             });
                         } else if ($scope.import.uploadType === "raster") {
                             provider.create({
@@ -145,17 +155,29 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                             }, function() {
                                 //TODO verify CRS exist
 
-                                if (importedMetaData) {
-                                    dataListing.setUpMetadata({values: {'providerId': $scope.import.providerId, 'mdPath': importedMetaData}});
-                                }
+                                provider.verifyCRS({ id: fileName},
+                                    function() {
+                                        //success
+                                        if (importedMetaData) {
+                                            dataListing.setUpMetadata({values: {'providerId': $scope.import.providerId, 'mdPath': importedMetaData}});
+                                        }
 
-                                if (!fileExtension || fileExtension !== "nc") {
-                                    $growl('success','Success','Coverage data '+ fileName +' successfully added');
-                                    $modalInstance.close({type: "raster", file: fileName, missing: $scope.import.metadata == null});
-                                } else {
-                                    $scope.showAssociate();
-                                    // todo: displayNetCDF(fileName);
-                                }
+                                        if (!fileExtension || fileExtension !== "nc") {
+                                            $growl('success','Success','Coverage data '+ fileName +' successfully added');
+                                            $modalInstance.close({type: "raster", file: fileName, missing: $scope.import.metadata == null});
+                                        } else {
+                                            $scope.showAssociate();
+                                            // todo: displayNetCDF(fileName);
+                                        }
+
+                                    }, function() {
+                                        //failure
+                                        $growl('error','Error','Data '+ fileName +' without CRS');
+                                        provider.delete({id: fileName});
+                                    }
+                                );
+
+
                             });
                         } else if ($scope.import.uploadType === "observation" && fileExtension === "xml") {
                             provider.create({

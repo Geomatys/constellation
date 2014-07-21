@@ -54,6 +54,8 @@ import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opengis.referencing.ReferenceIdentifier;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.crs.ImageCRS;
 import org.opengis.util.NoSuchIdentifierException;
 
 import javax.inject.Inject;
@@ -74,6 +76,7 @@ import java.net.URI;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -104,7 +107,7 @@ public final class ProviderRest {
 
     @POST
     @Path("/{id}/test")
-    public Response test( final @PathParam("domainId") int domainId, final @PathParam("id") String id, final ProviderConfiguration configuration) {
+    public Response test( final @PathParam("domainId") int domainId, final @PathParam("id") String providerIdentifier, final ProviderConfiguration configuration) {
         try {
             final String type = configuration.getType();
             final String subType = configuration.getSubType();
@@ -113,10 +116,10 @@ public final class ProviderRest {
             final DataProviderFactory providerService = DataProviders.getInstance().getFactory(type);
             final ParameterDescriptorGroup sourceDesc = providerService.getProviderDescriptor();
             ParameterValueGroup sources = sourceDesc.createValue();
-            sources.parameter("id").setValue(id);
+            sources.parameter("id").setValue(providerIdentifier);
             sources.parameter("providerType").setValue(type);
             sources = fillProviderParameter(type, subType, inParams, sources);
-            Set<Name> names = DataProviders.getInstance().testProvider(id, providerService, sources);
+            Set<Name> names = DataProviders.getInstance().testProvider(providerIdentifier, providerService, sources);
             if (names==null || names.size()==0){
                 return Response.status(500).build();
             }
@@ -179,6 +182,29 @@ public final class ProviderRest {
             }
 
         return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
+    }
+
+
+    /**
+     * Create a new provider from the given configuration.
+     */
+    @GET
+    @Path("/{id}/crs")
+    public Response verifyCRS(final @PathParam("domainId") int domainId, final @PathParam("id") String providerIdentifier){
+        try {
+
+
+            final HashMap<Name, CoordinateReferenceSystem> nameCoordinateReferenceSystemHashMap = DataProviders.getInstance().getCRS(providerIdentifier);
+            for( CoordinateReferenceSystem crs : nameCoordinateReferenceSystemHashMap.values()){
+                if (crs == null || crs instanceof ImageCRS){
+                    return Response.status(500).build();
+                }
+            }
+            return Response.ok(true).build();
+
+        } catch (DataStoreException e) {
+            return Response.status(500).build();
+        }
     }
 
     private ParameterValueGroup fillProviderParameter(String type, String subType, Map<String, String> inParams, ParameterValueGroup sources) {
@@ -398,7 +424,7 @@ public final class ProviderRest {
             LOGGER.log(Level.WARNING, null, ex);
             return Response.status(500).build();
         }
-        return Response.status(200).build();
+        return Response.ok().build();
     }
 
     /**

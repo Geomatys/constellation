@@ -305,7 +305,8 @@ cstlAdminApp.factory('provider', ['$resource',
             'delete':   {method: 'DELETE', url: '@cstl/api/1/domain/$domainId/provider/:id;jsessionid='},
             'metadata': {method: 'GET', url: '@cstl/api/1/domain/$domainId/provider/metadata/:providerId;jsessionid='},
             'dataDesc': {method: 'GET', url: '@cstl/api/1/domain/$domainId/provider/:providerId/:dataId/dataDescription;jsessionid='},
-            'isGeophysic': {method: 'GET', url: '@cstl/api/1/domain/$domainId/provider/:providerId/:dataId/isGeophysic;jsessionid='}
+            'isGeophysic': {method: 'GET', url: '@cstl/api/1/domain/$domainId/provider/:providerId/:dataId/isGeophysic;jsessionid='},
+            'verifyCRS' : {method: 'GET', url: '@cstl/api/1/domain/$domainId/provider/:id/crs'}
         });
     }]);
 

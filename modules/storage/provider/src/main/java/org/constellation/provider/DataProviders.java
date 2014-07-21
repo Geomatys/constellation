@@ -21,12 +21,18 @@ package org.constellation.provider;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.provider.configuration.Configurator.ProviderInformation;
+import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
+import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.data.FeatureStore;
+import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.map.ElevationModel;
+import org.geotoolkit.referencing.CRS;
+import org.opengis.geometry.Envelope;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -35,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -137,6 +144,31 @@ public final class DataProviders extends Providers implements PropertyChangeList
             names = ((CoverageStore) provider.getMainStore()).getNames();
         }
         return names;
+    }
+
+    public HashMap<Name, CoordinateReferenceSystem> getCRS(String id) throws DataStoreException {
+        HashMap<Name,CoordinateReferenceSystem> nameCoordinateReferenceSystemHashMap = new HashMap<>();
+        getProviders();
+        final DataProvider provider = getProvider(id);
+        //test getting CRS from data
+        Set<Name> names = null;
+        if (provider.getMainStore() instanceof FeatureStore) {
+            names =  ((FeatureStore) provider.getMainStore()).getNames();
+            for (Name name : names){
+                final Envelope envelope = ((FeatureStore) provider.getMainStore()).getEnvelope(QueryBuilder.all(name));
+                final CoordinateReferenceSystem coordinateReferenceSystem = envelope.getCoordinateReferenceSystem();
+                nameCoordinateReferenceSystemHashMap.put(name,coordinateReferenceSystem);
+            }
+        } else if (provider.getMainStore() instanceof CoverageStore) {
+            names = ((CoverageStore) provider.getMainStore()).getNames();
+            for (Name name : names){
+                final CoverageReference coverageReference = ((CoverageStore) provider.getMainStore()).getCoverageReference(name);
+                final GridCoverageReader coverageReader = coverageReference.acquireReader();
+                final CoordinateReferenceSystem coordinateReferenceSystem = coverageReader.getGridGeometry(0).getCoordinateReferenceSystem();
+                nameCoordinateReferenceSystemHashMap.put(name,coordinateReferenceSystem);
+            }
+        }
+        return nameCoordinateReferenceSystemHashMap;
     }
 
     public DataProvider removeProvider(final DataProvider provider) throws ConfigurationException{
