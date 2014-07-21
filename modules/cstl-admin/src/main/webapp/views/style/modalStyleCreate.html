@@ -16,12 +16,12 @@
                     translate="edition.style.label.cancel">Cancel</button>
             <button type="button"
                     ng-show="chooseType===true && !optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableAutoUniqueEditor"
-                    class="btn btn-primary"
+                    class="btn btn-add"
                     ng-click="createStyle();">
                 <span translate="sldeditor.button.create">Create</span>
             </button>
             <button type="button"
-                    class="btn btn-primary"
+                    class="btn btn-add"
                     ng-show="optionsSLD.enableRuleEditor || optionsSLD.enableAutoIntervalEditor || optionsSLD.enableAutoUniqueEditor"
                     ng-click="goBack();">
                 <span translate="sldeditor.breadcrumb.backToListOfRules">Back to the rules list</span>

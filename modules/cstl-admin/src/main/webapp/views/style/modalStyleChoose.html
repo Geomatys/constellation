@@ -12,13 +12,13 @@
                     </div>
                     <div class="col-xs-7 col-sm-4 col-md-6 col-lg-6 pull-right buttons-div"
                          ng-if="serviceName === null">
-                        <button type="button" class="btn btn-info"
+                        <button type="button" class="btn btn-add"
                                 ng-class="{'bouton-choix-style-normal': isSelectedChooser('new'), 'bouton-choix-style-selected':isSelectedChooser('existing')}"
                                 ng-click="setStyleChooser('existing');"
                                 style="font-size: 12px;">
                             <span translate="edition.style.label.choice.existing">Use existing style</span>
                         </button>
-                        <button type="button" class="btn btn-info "
+                        <button type="button" class="btn btn-add "
                                 ng-class="{'bouton-choix-style-selected': isSelectedChooser('new'), 'bouton-choix-style-normal':isSelectedChooser('existing')}"
                                 ng-click="setStyleChooser('new');"
                                 style="font-size: 12px;">
@@ -135,19 +135,19 @@
                 <span translate="sldeditor.button.cancel">Cancel</span>
             </button>
             <button type="button"
-                    class="btn btn-primary"
+                    class="btn btn-add"
                     ng-show="isSelectedChooser('existing')"
                     ng-disabled="!selected && isSelectedChooser('existing')" ng-click="ok();">
                 <span translate="sldeditor.button.validate">Validate</span>
             </button>
             <button type="button"
-                    class="btn btn-primary"
+                    class="btn btn-add"
                     ng-show="isSelectedChooser('new') && !optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableAutoUniqueEditor"
                     ng-click="createStyle();">
                 <span translate="sldeditor.button.create">Create</span>
             </button>
             <button type="button"
-                    class="btn btn-primary"
+                    class="btn btn-add"
                     ng-show="optionsSLD.enableRuleEditor || optionsSLD.enableAutoIntervalEditor || optionsSLD.enableAutoUniqueEditor"
                     ng-click="goBack();">
                 <span translate="sldeditor.breadcrumb.backToListOfRules">Back to the rules list</span>

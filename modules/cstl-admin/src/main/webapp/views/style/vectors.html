@@ -22,7 +22,7 @@
                     <div class="panel-heading well-header">
                         <strong translate="edition.style.label.rules">Rules</strong>
                         <div class="dropdown pull-right" style="margin-top: -5px;">
-                            <a data-toggle="dropdown" class="btn btn-info dropdown-toggle" style="font-size: 12px;">
+                            <a data-toggle="dropdown" class="btn btn-add dropdown-toggle" style="font-size: 12px;">
                                 <span class="icon-plus icon-white" style="margin-right:5px;"></span>
                                 <span translate="edition.style.label.new.rules">Add rule(s)</span>
                                 <span class="caret"></span>
@@ -582,7 +582,7 @@
                 </div>
             </div>
             <div class="col-xs-4">
-                <button type="button" class="pull-right btn btn-primary"
+                <button type="button" class="pull-right btn btn-add"
                         ng-click="displayCurrentStyle('styledMapOL');"
                         ng-show="! optionsSLD.autoPreview"
                         style="font-size: 13px;">
@@ -591,8 +591,8 @@
             </div>
         </div>
         <div style="position: absolute; z-index: 800; padding-left: 5px; padding-top: 5px;" ng-show="chosenTab==='filters'">
-            <button type="button" class="btn btn-primary" ng-click="setMinScale()" title="min scale filter">min</button>
-            <button type="button" class="btn btn-primary" ng-click="setMaxScale()" title="max scale filter">max</button>
+            <button type="button" class="btn btn-add" ng-click="setMinScale()" title="min scale filter">min</button>
+            <button type="button" class="btn btn-add" ng-click="setMaxScale()" title="max scale filter">max</button>
         </div>
         <div class="bloc_apercu" id="styledMapOL" style="height: 448px;"></div>
     </div>
