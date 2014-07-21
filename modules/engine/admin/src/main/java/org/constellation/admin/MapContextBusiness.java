@@ -18,20 +18,29 @@
  */
 package org.constellation.admin;
 
+import org.apache.sis.geometry.GeneralEnvelope;
+import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.metadata.iso.extent.DefaultExtent;
 import org.constellation.admin.dto.MapContextLayersDTO;
 import org.constellation.admin.dto.MapContextStyledLayerDTO;
 import org.constellation.configuration.DataBrief;
+import org.constellation.dto.ParameterValues;
 import org.constellation.engine.register.*;
 import org.constellation.engine.register.repository.*;
 import org.constellation.util.DataReference;
+import org.constellation.util.Util;
+import org.geotoolkit.referencing.CRS;
+import org.opengis.metadata.extent.Extent;
+import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.metadata.identification.DataIdentification;
+import org.opengis.metadata.identification.Identification;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.util.FactoryException;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Component
 public class MapContextBusiness {
@@ -119,5 +128,72 @@ public class MapContextBusiness {
             ctxtLayers.add(new MapContextLayersDTO(ctxt, styledLayersDto));
         }
         return ctxtLayers;
+    }
+
+    /**
+     * Get the extent of all included layers in this map context.
+     *
+     * @param contextId Context identifier
+     * @return
+     */
+    public ParameterValues getExtent(int contextId) throws FactoryException {
+        final ParameterValues values = new ParameterValues();
+        final Mapcontext context = mapContextRepository.findById(contextId);
+        GeneralEnvelope env = null;
+        if (context.getWest() != null && context.getSouth() != null && context.getEast() != null && context.getNorth() != null && context.getCrs() != null) {
+            final CoordinateReferenceSystem crs = CRS.decode(context.getCrs(), true);
+            env = new GeneralEnvelope(crs);
+            env.setRange(0, context.getWest(), context.getEast());
+            env.setRange(1, context.getSouth(), context.getNorth());
+        }
+
+        final List<MapcontextStyledLayer> styledLayers = mapContextRepository.getLinkedLayers(contextId);
+        for (final MapcontextStyledLayer styledLayer : styledLayers) {
+            if (!styledLayer.isVisible()) {
+                continue;
+            }
+            final Layer layerRecord = layerRepository.findById(styledLayer.getLayerId());
+            final Data data = dataRepository.findById(layerRecord.getData());
+            final Provider provider = providerRepository.findOne(data.getProvider());
+
+            final DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(provider.getIdentifier(), Util.parseQName(data.getName()));
+            if (metadata == null || metadata.getIdentificationInfo() == null || metadata.getIdentificationInfo().isEmpty()) {
+                continue;
+            }
+            final Identification identification = metadata.getIdentificationInfo().iterator().next();
+            if (!(identification instanceof DataIdentification)) {
+                continue;
+            }
+            final Collection<? extends Extent> extents = ((DataIdentification)identification).getExtents();
+            if (extents == null || extents.isEmpty()) {
+                continue;
+            }
+            final DefaultExtent extent = (DefaultExtent)extents.iterator().next();
+            if (extent.getGeographicElements() == null || extent.getGeographicElements().isEmpty()) {
+                continue;
+            }
+            final GeographicBoundingBox geoBBox = (GeographicBoundingBox) extent.getGeographicElements().iterator().next();
+
+            final GeneralEnvelope tempEnv = new GeneralEnvelope(CRS.decode("CRS:84"));
+            tempEnv.setRange(0, geoBBox.getWestBoundLongitude(), geoBBox.getEastBoundLongitude());
+            tempEnv.setRange(1, geoBBox.getSouthBoundLatitude(), geoBBox.getNorthBoundLatitude());
+            if (env == null) {
+                env = tempEnv;
+            } else {
+                env.add(tempEnv);
+            }
+        }
+
+        if (env == null) {
+            return null;
+        }
+
+        final HashMap<String,String> vals = new HashMap<>();
+        vals.put("west", String.valueOf(env.getLower(0)));
+        vals.put("east", String.valueOf(env.getUpper(0)));
+        vals.put("south", String.valueOf(env.getLower(1)));
+        vals.put("north", String.valueOf(env.getUpper(1)));
+        values.setValues(vals);
+        return values;
     }
 }

@@ -20,9 +20,12 @@ package org.constellation.rest.api;
 
 import org.constellation.admin.MapContextBusiness;
 import org.constellation.admin.dto.MapContextLayersDTO;
+import org.constellation.dto.ParameterValues;
 import org.constellation.engine.register.Mapcontext;
 import org.constellation.engine.register.MapcontextStyledLayer;
 import org.constellation.engine.register.repository.MapContextRepository;
+import org.constellation.provider.Providers;
+import org.opengis.util.FactoryException;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
@@ -30,6 +33,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.logging.Level;
 
 
 /**
@@ -88,5 +92,21 @@ public class MapContextRest {
     public Response setMapItems(@PathParam("id") final int contextId, final List<MapcontextStyledLayer> layers) {
         contextBusiness.setMapItems(contextId, layers);
         return Response.status(201).build();
+    }
+
+    @GET
+    @Path("/{id}/extent")
+    public Response getContextExtents(@PathParam("id") final int contextId) {
+        final ParameterValues values;
+        try {
+            values = contextBusiness.getExtent(contextId);
+        } catch (FactoryException ex) {
+            Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            return Response.ok("Failed to extract envelope for context "+contextId+". "+ex.getMessage()).status(500).build();
+        }
+        if (values == null) {
+            return Response.status(500).build();
+        }
+        return Response.ok(values).build();
     }
 }

@@ -198,6 +198,8 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
                          visible: true
                         });
                 }
+                $scope.viewMap();
+
                 // Go back to first screen
                 $scope.mode.display = 'general';
             }
@@ -283,6 +285,7 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
             }
 
             var cstlUrl = $cookies.cstlUrl;
+
             var layersToView = [];
             for (var i=0; i<$scope.layers.toAdd.length; i++) {
                 var l = $scope.layers.toAdd[i];
@@ -294,6 +297,16 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
             }
             DataViewer.layers = layersToView;
             DataViewer.initMap('mapContextMap');
+
+            mapcontext.extent({id: $scope.ctxt.id}, function(response) {
+                var values = response.values;
+                $scope.ctxt.west = values['west'];
+                $scope.ctxt.south = values['south'];
+                $scope.ctxt.east = values['east'];
+                $scope.ctxt.north = values['north'];
+                var extent = new OpenLayers.Bounds($scope.ctxt.west, $scope.ctxt.south, $scope.ctxt.east, $scope.ctxt.north);
+                DataViewer.map.zoomToExtent(extent, true);
+            });
         };
     }]);
                                      

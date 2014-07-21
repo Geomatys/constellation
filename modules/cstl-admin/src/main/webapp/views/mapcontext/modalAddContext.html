@@ -8,7 +8,7 @@
             <!-- General mode -->
             <div class="row" ng-if="mode.display==='general'">
                 <!-- Left part -->
-                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                <div class="col-sm-6">
                     <ul class="nav nav-tabs">
                         <li id="infoTab" ng-class="{active:mode.selTab==='tabInfo'}">
                             <a ng-click="mode.selTab='tabInfo'" data-toggle="tab"><span translate="mapcontext.modal.tab.info">Information</span></a>
@@ -43,17 +43,26 @@
                                 </div>
                                 <div class="form-group">
                                     <label class="col-sm-4 col-md-3 control-label" translate="mapcontext.modal.label.envelope">Envelope</label>
-                                    <div class="col-sm-2">
-                                        <input type="text" class="form-control" ng-model="ctxt.west" placeholder="{{'label.west.first.letter' | translate}}"/>
-                                    </div>
-                                    <div class="col-sm-2">
-                                        <input type="text" class="form-control" ng-model="ctxt.north" placeholder="{{'label.north.first.letter' | translate}}"/>
-                                    </div>
-                                    <div class="col-sm-2">
-                                        <input type="text" class="form-control" ng-model="ctxt.east" placeholder="{{'label.east.first.letter' | translate}}"/>
-                                    </div>
-                                    <div class="col-sm-2">
-                                        <input type="text" class="form-control" ng-model="ctxt.south" placeholder="{{'label.south.first.letter' | translate}}"/>
+                                    <div class="col-sm-8">
+                                        <div class="row" style="margin-bottom: 5px;">
+                                            <div class="col-sm-offset-3 col-sm-6">
+                                                <input type="text" class="form-control" ng-model="ctxt.north" placeholder="{{'label.north.first.letter' | translate}}"/>
+                                            </div>
+                                        </div>
+                                        <div class="row" style="margin-bottom: 5px;">
+                                            <div class="col-sm-6">
+                                                <input type="text" class="form-control" ng-model="ctxt.west" placeholder="{{'label.west.first.letter' | translate}}"/>
+                                            </div>
+
+                                            <div class="col-sm-6">
+                                                <input type="text" class="form-control" ng-model="ctxt.east" placeholder="{{'label.east.first.letter' | translate}}"/>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-offset-3 col-sm-6">
+                                                <input type="text" class="form-control" ng-model="ctxt.south" placeholder="{{'label.south.first.letter' | translate}}"/>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <hr/>
@@ -73,7 +82,7 @@
                                     <h3 translate="layer.listing.title">Layers list</h3>
                                 </div>
                                 <div class="col-sm-offset-1 col-sm-5">
-                                    <button type="button" class="btn btn-primary form-control" ng-click="addLayerToContext()">
+                                    <button type="button" class="btn btn-add form-control" ng-click="addLayerToContext()">
                                         <span class="icon-plus icon-white" style="margin-right:5px;"></span>
                                         <span translate="mapcontext.modal.add.layer">Add layer</span>
                                     </button>
@@ -162,12 +171,11 @@
                 </div>
 
                 <!-- Right part -->
-                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                <div class="col-sm-6" ng-init="viewMap()">
                     <div class="row">
                         <span translate="label.preview"></span>
                     </div>
-                    <div id="mapContextMap" class="col-sm-6" style="height: 500px; width:100%;padding: 0;"/>
-                    <div ng-init="viewMap()"/>
+                    <div id="mapContextMap" class="col-sm-6" style="height: 460px; width:460px;padding: 0;"/>
                 </div>
             </div>
 
@@ -202,11 +210,13 @@
                 </div>
 
                 <!-- Right part -->
-                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                <div class="col-sm-6">
                     <div class="row">
                         <span translate="label.preview"></span>
                     </div>
-                    <div id="mapContextStyleMap" class="col-sm-6" style="height: 500px; width:100%;padding: 0;"/>
+                    <div class="row">
+                        <div id="mapContextStyleMap" style="height: 500px; width:100%;padding: 0;"/>
+                    </div>
                 </div>
             </div>
 
