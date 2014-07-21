@@ -32,8 +32,8 @@ public class TaskBusiness {
     
     private TaskRepository taskRepository;
 
-    public void writeTask(String uuidTask, String pyramid, String login, final long start) {
-        final Task t = new Task(uuidTask, "PENDING", "TODO-TYPE", start, null, login);
+    public void writeTask(String uuidTask, String pyramid, Integer userId, final long start) {
+        final Task t = new Task(uuidTask, "PENDING", "TODO-TYPE", start, null, userId);
         taskRepository.create(t);
     }
     

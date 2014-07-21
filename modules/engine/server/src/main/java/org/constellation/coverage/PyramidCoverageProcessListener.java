@@ -50,16 +50,16 @@ public class PyramidCoverageProcessListener implements ProcessListener {
 
     private String uuidTask;
 
-    private final String login;
+    private final Integer userId;
     private final String path;
     private final String identifier;
 
     @Inject
     private TaskBusiness taskBusiness;
     
-    public PyramidCoverageProcessListener(final String login, final String path, final String identifier) {
+    public PyramidCoverageProcessListener(final Integer userId, final String path, final String identifier) {
         SpringHelper.injectDependencies(this);
-        this.login = login;
+        this.userId = userId;
         this.path = path;
         this.identifier = identifier;
     }
@@ -68,7 +68,7 @@ public class PyramidCoverageProcessListener implements ProcessListener {
     public void started(final ProcessEvent processEvent) {
         //Create task on database (state : pending)
         uuidTask = UUID.randomUUID().toString();
-        taskBusiness.writeTask(uuidTask, "pyramid", login, System.currentTimeMillis());
+        taskBusiness.writeTask(uuidTask, "pyramid", userId, System.currentTimeMillis());
     }
 
     @Override

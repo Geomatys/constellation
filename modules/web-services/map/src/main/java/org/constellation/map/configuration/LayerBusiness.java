@@ -48,6 +48,8 @@ import org.geotoolkit.factory.FactoryNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.google.common.base.Optional;
+
 import javax.imageio.spi.ServiceRegistry;
 import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
@@ -122,8 +124,10 @@ public class LayerBusiness {
             layer.setService(service.getId());
             layer.setData(data.getId());
             layer.setDate(System.currentTimeMillis());
-            User user = userRepository.findOne(securityManager.getCurrentUserLogin());
-            layer.setOwner(user.getId());
+            Optional<User> user = userRepository.findOne(securityManager.getCurrentUserLogin());
+            if(user.isPresent()) {
+                layer.setOwner(user.get().getId());
+            }
             final String configXml = getStringFromLayerConfig(config);
             layer.setConfig(configXml);
             

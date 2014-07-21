@@ -54,7 +54,7 @@ public class LoginController {
 	public String loggedin(HttpServletRequest httpServletRequest) {
 		String sessionId = httpServletRequest.getSession().getId();
 		String adminUrl = retrieveCstlAdmin(httpServletRequest);
-		User user = userRepository.findOne(httpServletRequest.getUserPrincipal().getName());
+		User user = userRepository.findOne(httpServletRequest.getUserPrincipal().getName()).get();
 		Domain defaultDomain = domainRepository.findDefaultByUserId(user.getId());
 		int domainId = defaultDomain==null?0:defaultDomain.getId();
 		if(adminUrl==null)

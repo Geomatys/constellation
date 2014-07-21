@@ -91,9 +91,8 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
     }
 
     private SelectJoinStep<Record> getSelectWithRolesAndDomains() {
-        SelectJoinStep<Record> records = dsl.select().from(userTable).leftOuterJoin(UDD)
-                .on(userTable.ID.eq(UDD.USER_ID)).leftOuterJoin(userXroleTable)
-                .on(userTable.ID.eq(userXroleTable.USER_ID)).leftOuterJoin(domainTable)
+        SelectJoinStep<Record> records = dsl.select().from(userTable).leftOuterJoin(UDD).on(userTable.ID.eq(UDD.USER_ID))
+                .leftOuterJoin(userXroleTable).on(userTable.ID.eq(userXroleTable.USER_ID)).leftOuterJoin(domainTable)
                 .on(domainTable.ID.eq(UDD.DOMAIN_ID));
         return records;
     }
@@ -135,14 +134,12 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
     @Transactional
     public User update(User user, List<String> roles) {
 
-        UpdateConditionStep<UserRecord> update = dsl.update(USER).set(USER.EMAIL, user.getEmail())
-                .set(USER.LASTNAME, user.getLastname()).set(USER.FIRSTNAME, user.getFirstname())
-                .where(USER.LOGIN.eq(user.getLogin()));
+        UpdateConditionStep<UserRecord> update = dsl.update(USER).set(USER.EMAIL, user.getEmail()).set(USER.LASTNAME, user.getLastname())
+                .set(USER.FIRSTNAME, user.getFirstname()).where(USER.LOGIN.eq(user.getLogin()));
 
         update.execute();
 
-        DeleteConditionStep<UserXRoleRecord> deleteRoles = dsl.delete(USER_X_ROLE).where(
-                USER_X_ROLE.USER_ID.eq(user.getId()));
+        DeleteConditionStep<UserXRoleRecord> deleteRoles = dsl.delete(USER_X_ROLE).where(USER_X_ROLE.USER_ID.eq(user.getId()));
 
         deleteRoles.execute();
 
@@ -159,7 +156,7 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
         UserRecord newRecord = dsl.newRecord(USER);
 
         UserHelper.copy(user, newRecord);
-        
+
         if (newRecord.store() > 0) {
             user.setId(newRecord.getId());
         }
@@ -171,8 +168,8 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
 
     private void insertRoles(User user, List<String> roles) {
         for (String role : roles) {
-            InsertSetMoreStep<UserXRoleRecord> insertRole = dsl.insertInto(USER_X_ROLE)
-                    .set(USER_X_ROLE.USER_ID, user.getId()).set(USER_X_ROLE.ROLE, role);
+            InsertSetMoreStep<UserXRoleRecord> insertRole = dsl.insertInto(USER_X_ROLE).set(USER_X_ROLE.USER_ID, user.getId())
+                    .set(USER_X_ROLE.ROLE, role);
             insertRole.execute();
         }
     }
@@ -224,8 +221,10 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
     }
 
     @Override
-    public User findOne(String login) {
-        return dsl.select().from(USER).where(USER.LOGIN.eq(login)).fetchOneInto(User.class);
+    public Optional<User> findOne(String login) {
+        if (login == null)
+            return Optional.absent();
+        return Optional.fromNullable(dsl.select().from(USER).where(USER.LOGIN.eq(login)).fetchOneInto(User.class));
     }
 
     @Override
@@ -245,15 +244,15 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
 
     @Override
     public List<User> findUsersByDomainId(int domainId) {
-        return findBy(USER.ID.in(dsl.selectDistinct(USER_X_DOMAIN_X_DOMAINROLE.USER_ID)
-                .from(USER_X_DOMAIN_X_DOMAINROLE).where(USER_X_DOMAIN_X_DOMAINROLE.DOMAIN_ID.eq(domainId))));
+        return findBy(USER.ID.in(dsl.selectDistinct(USER_X_DOMAIN_X_DOMAINROLE.USER_ID).from(USER_X_DOMAIN_X_DOMAINROLE)
+                .where(USER_X_DOMAIN_X_DOMAINROLE.DOMAIN_ID.eq(domainId))));
     }
 
     @Override
     public Map<User, List<Domainrole>> findUsersWithDomainRoles(int domainId) {
         Map<User, List<Domainrole>> result = new LinkedHashMap<>();
-        SelectConditionStep<Record> groupBy = dsl.select().from(USER).join(USER_X_DOMAIN_X_DOMAINROLE).onKey().join(Tables.DOMAINROLE).onKey()
-                .where(USER_X_DOMAIN_X_DOMAINROLE.DOMAIN_ID.eq(domainId));
+        SelectConditionStep<Record> groupBy = dsl.select().from(USER).join(USER_X_DOMAIN_X_DOMAINROLE).onKey().join(Tables.DOMAINROLE)
+                .onKey().where(USER_X_DOMAIN_X_DOMAINROLE.DOMAIN_ID.eq(domainId));
         groupBy.execute();
         Map<Record, Result<Record>> intoGroups = groupBy.getResult().intoGroups(Tables.USER.fields());
         for (Entry<Record, Result<Record>> userRecord : intoGroups.entrySet()) {
@@ -263,15 +262,14 @@ public class JooqUserRepository extends AbstractJooqRespository<UserRecord, User
         }
         return result;
     }
-    
+
     @Override
     public List<User> findUsersNotInDomain(int domainId) {
         return dsl
                 .select()
                 .from(USER)
-                .where(USER.ID.notIn(dsl.selectDistinct(USER_X_DOMAIN_X_DOMAINROLE.USER_ID)
-                        .from(USER_X_DOMAIN_X_DOMAINROLE).where(USER_X_DOMAIN_X_DOMAINROLE.DOMAIN_ID.eq(domainId))))
-                .fetchInto(User.class);
+                .where(USER.ID.notIn(dsl.selectDistinct(USER_X_DOMAIN_X_DOMAINROLE.USER_ID).from(USER_X_DOMAIN_X_DOMAINROLE)
+                        .where(USER_X_DOMAIN_X_DOMAINROLE.DOMAIN_ID.eq(domainId)))).fetchInto(User.class);
     }
-    
+
 }

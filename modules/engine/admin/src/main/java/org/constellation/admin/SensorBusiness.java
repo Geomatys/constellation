@@ -27,6 +27,8 @@ import org.constellation.engine.register.repository.SensorRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.springframework.stereotype.Component;
 
+import com.google.common.base.Optional;
+
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
 
@@ -86,11 +88,13 @@ public class SensorBusiness {
     }
 
     public Sensor create(final String identifier, final String type, final String parent, final String metadata) {
-        User user = userRepository.findOne(securityManager.getCurrentUserLogin());
+        Optional<User> user = userRepository.findOne(securityManager.getCurrentUserLogin());
         Sensor sensor = new Sensor();
         sensor.setIdentifier(identifier);
         sensor.setType(type);
-        sensor.setOwner(user.getId());
+        if(user.isPresent()) {
+            sensor.setOwner(user.get().getId());
+        }
         sensor.setParent(parent);
         sensor.setMetadata(metadata);
         return sensorRepository.create(sensor);

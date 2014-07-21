@@ -46,6 +46,8 @@ import org.constellation.dto.ProviderData;
 import org.constellation.dto.PyramidParams;
 import org.constellation.dto.SimpleValue;
 import org.constellation.engine.register.Provider;
+import org.constellation.engine.register.User;
+import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.model.SelectedExtension;
 import org.constellation.provider.CoverageData;
@@ -112,6 +114,8 @@ import org.opengis.util.FactoryException;
 import org.opengis.util.InternationalString;
 import org.opengis.util.NoSuchIdentifierException;
 
+import com.google.common.base.Optional;
+
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -132,6 +136,7 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+
 import java.awt.*;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -174,6 +179,9 @@ public class DataRest {
 
     private static final Logger LOGGER = Logging.getLogger(DataRest.class);
 
+    @Inject
+    private UserRepository userRepository;
+    
     @Inject
     private SessionData sessionData;
 
@@ -711,9 +719,9 @@ public class DataRest {
             final String pyramidPath = dataPyramidFolder.getAbsolutePath();
 
             String login = SecurityManagerHolder.getInstance().getCurrentUserLogin();
-
+            User user = userRepository.findOne(login).get();
             //create listener which save information on Database
-            final ProcessListener listener = new PyramidCoverageProcessListener(login, pyramidPath, providerId);
+            final ProcessListener listener = new PyramidCoverageProcessListener(user.getId(), pyramidPath, providerId);
 
             Runnable pyramidRunnable = new Runnable() {
                 @Override

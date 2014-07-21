@@ -15,6 +15,8 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.google.common.base.Optional;
+
 import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -31,17 +33,17 @@ public class ProviderBusiness {
 
     @Inject
     private UserRepository userRepository;
-    
+
     @Inject
     private ProviderRepository providerRepository;
 
     @Autowired
     private org.constellation.security.SecurityManager securityManager;
-    
+
     public List<Provider> getProviders() {
         return providerRepository.findAll();
     }
-    
+
     public Provider getProvider(final String identifier) {
         return providerRepository.findByIdentifier(identifier);
     }
@@ -53,27 +55,27 @@ public class ProviderBusiness {
     public Provider getProvider(final int id) {
         return providerRepository.findOne(id);
     }
-    
+
     public List<String> getProviderIds() {
         final List<String> ids = new ArrayList<>();
-        final List<Provider> providers =  providerRepository.findAll();
+        final List<Provider> providers = providerRepository.findAll();
         for (Provider p : providers) {
             ids.add(p.getIdentifier());
         }
         return ids;
     }
-    
+
     public void removeProvider(final String identifier) {
         providerRepository.deleteByIdentifier(identifier);
     }
-    
+
     public void removeAll() {
         final List<Provider> providers = providerRepository.findAll();
         for (Provider p : providers) {
             providerRepository.delete(p.getId());
         }
     }
-    
+
     public List<Provider> getProviderChildren(final String identifier) {
         return providerRepository.findChildren(identifier);
     }
@@ -96,11 +98,13 @@ public class ProviderBusiness {
         return providerRepository.findStylesByProviderId(providerId);
     }
 
-    public Provider createProvider(final String identifier, final String parent,
-                                   final ProviderType type, final String serviceName, final GeneralParameterValue config) throws IOException {
-        User user = userRepository.findOne(securityManager.getCurrentUserLogin());
+    public Provider createProvider(final String identifier, final String parent, final ProviderType type, final String serviceName,
+            final GeneralParameterValue config) throws IOException {
         Provider provider = new Provider();
-        provider.setOwner(user.getId());
+        Optional<User> user = userRepository.findOne(securityManager.getCurrentUserLogin());
+        if (user.isPresent()) {
+            provider.setOwner(user.get().getId());
+        }
         provider.setParent(parent);
         provider.setType(type.name());
         provider.setConfig(IOUtilities.writeParameter(config));
@@ -111,12 +115,12 @@ public class ProviderBusiness {
 
     }
 
-
     public DefaultMetadata getMetadata(String providerId, int domainId) throws JAXBException {
         final Provider provider = getProvider(providerId, domainId);
         final MarshallerPool pool = ISOMarshallerPool.getInstance();
         final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        final DefaultMetadata metadata = (DefaultMetadata)unmarshaller.unmarshal(new ByteArrayInputStream(provider.getMetadata().getBytes()));
+        final DefaultMetadata metadata = (DefaultMetadata) unmarshaller.unmarshal(new ByteArrayInputStream(provider.getMetadata()
+                .getBytes()));
         pool.recycle(unmarshaller);
         metadata.prune();
         return metadata;
@@ -126,14 +130,14 @@ public class ProviderBusiness {
         final MarshallerPool pool = ISOMarshallerPool.getInstance();
         final Marshaller marshaller = pool.acquireMarshaller();
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        marshaller.marshal(metadata,outputStream);
+        marshaller.marshal(metadata, outputStream);
         final String metadataString = outputStream.toString();
         final Provider provider = providerRepository.findByIdentifierAndDomainId(providerIdentifier, domainId);
         provider.setMetadata(metadataString);
         provider.setMetadataId(metadata.getFileIdentifier());
         providerRepository.update(provider);
     }
-    
+
     public void updateMetadata(String providerIdentifier, Integer domainId, String metaId, String metadataXml) throws JAXBException {
         final Provider provider = providerRepository.findByIdentifierAndDomainId(providerIdentifier, domainId);
         provider.setMetadata(metadataXml);

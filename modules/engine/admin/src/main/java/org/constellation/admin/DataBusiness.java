@@ -28,6 +28,8 @@ import org.constellation.utils.ISOMarshallerPool;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.base.Optional;
+
 import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -47,15 +49,14 @@ import java.util.logging.Logger;
 @Component
 public class DataBusiness {
 
-
     private static final Logger LOGGER = Logging.getLogger(DataBusiness.class);
 
     @Inject
     private UserRepository userRepository;
-    
+
     @Inject
     private DomainRepository domainRepository;
-    
+
     @Inject
     private DataRepository dataRepository;
 
@@ -77,7 +78,6 @@ public class DataBusiness {
     @Inject
     private SensorRepository sensorRepository;
 
-
     public DefaultMetadata loadIsoDataMetadata(String providerId, QName name) {
 
         DefaultMetadata metadata = null;
@@ -97,20 +97,18 @@ public class DataBusiness {
         return metadata;
     }
 
-
     public void saveMetadata(String providerId, QName name, DefaultMetadata metadata) {
         final StringWriter sw = new StringWriter();
         try {
             final Marshaller marshaller = ISOMarshallerPool.getInstance().acquireMarshaller();
             marshaller.marshal(metadata, sw);
-        } catch (JAXBException ex){
+        } catch (JAXBException ex) {
             throw new ConstellationException(ex);
         }
         Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(), name.getNamespaceURI(), providerId);
         data.setIsoMetadata(sw.toString());
         dataRepository.update(data);
     }
-
 
     /**
      * Load a metadata for a provider.
@@ -121,8 +119,7 @@ public class DataBusiness {
      * @param name
      * @return
      */
-    public CoverageMetadataBean loadDataMetadata(final String providerIdentifier, final QName name,
-                                                        final MarshallerPool pool) {
+    public CoverageMetadataBean loadDataMetadata(final String providerIdentifier, final QName name, final MarshallerPool pool) {
         CoverageMetadataBean metadata = null;
         try {
             Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(), name.getNamespaceURI(), providerIdentifier);
@@ -133,7 +130,7 @@ public class DataBusiness {
                 pool.recycle(m);
                 return metadata;
             }
-        } catch ( JAXBException ex) {
+        } catch (JAXBException ex) {
             LOGGER.log(Level.WARNING, "An error occurred while updating service database", ex);
             throw new ConstellationException(ex);
         }
@@ -144,7 +141,7 @@ public class DataBusiness {
         List<Data> datas = new ArrayList<>();
         datas.add(data);
         List<DataBrief> dataBriefs = getDataBriefFrom(datas);
-        if (dataBriefs !=null && dataBriefs.size()==1){
+        if (dataBriefs != null && dataBriefs.size() == 1) {
             return dataBriefs.get(0);
         }
         throw new ConstellationException(new Exception("Problem : DataBrief Construction is null or multiple"));
@@ -155,7 +152,7 @@ public class DataBusiness {
         List<Data> datas = new ArrayList<>();
         datas.add(data);
         List<DataBrief> dataBriefs = getDataBriefFrom(datas);
-        if (dataBriefs !=null && dataBriefs.size()==1){
+        if (dataBriefs != null && dataBriefs.size() == 1) {
             return dataBriefs.get(0);
         }
         throw new ConstellationException(new Exception("Problem : DataBrief Construction is null or multiple"));
@@ -200,7 +197,6 @@ public class DataBusiness {
             List<Style> styles = styleRepository.findByData(data);
             List<Service> services = serviceRepository.findByDataId(data.getId());
 
-
             final DataBrief db = new DataBrief();
             db.setId(data.getId());
             db.setOwner(data.getOwner());
@@ -212,7 +208,6 @@ public class DataBusiness {
             db.setSubtype(data.getSubtype());
             db.setSensorable(data.isSensorable());
             db.setTargetSensor(sensorRepository.getLinkedSensors(data));
-
 
             final List<StyleBrief> styleBriefs = new ArrayList<>(0);
             for (Style style : styles) {
@@ -253,7 +248,7 @@ public class DataBusiness {
             dataRepository.delete(name.getNamespaceURI(), name.getLocalPart(), provider.getId());
         }
     }
-    
+
     public void deleteDataForProvider(final String providerIdentifier) {
         final Provider provider = providerRepository.findByIdentifier(providerIdentifier);
         if (provider != null) {
@@ -261,27 +256,29 @@ public class DataBusiness {
             for (Data data : datas) {
                 dataRepository.delete(data.getId());
             }
-            
+
         }
     }
-    
+
     public void deleteAll() {
         final List<Data> datas = dataRepository.findAll();
         for (Data data : datas) {
             dataRepository.delete(data.getId());
         }
     }
-    
-    public void create(final QName name, final String providerIdentifier, final String type, final boolean sensorable, final boolean visible,
-                       final String subType, final String metadata) {
+
+    public void create(final QName name, final String providerIdentifier, final String type, final boolean sensorable,
+            final boolean visible, final String subType, final String metadata) {
         final Provider provider = providerRepository.findByIdentifier(providerIdentifier);
         if (provider != null) {
             final Data data = new Data();
             data.setDate(new Date().getTime());
             data.setName(name.getLocalPart());
             data.setNamespace(name.getNamespaceURI());
-            User user = userRepository.findOne(securityManager.getCurrentUserLogin());
-            data.setOwner(user.getId());
+            Optional<User> user = userRepository.findOne(securityManager.getCurrentUserLogin());
+            if (user.isPresent()) {
+                data.setOwner(user.get().getId());
+            }
             data.setProvider(provider.getId());
             data.setSensorable(sensorable);
             data.setType(type);
@@ -293,13 +290,12 @@ public class DataBusiness {
     }
 
     public void updateDataVisibility(QName name, String providerIdentifier, boolean visibility) {
-        final Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(), name.getNamespaceURI(), providerIdentifier);
+        final Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(), name.getNamespaceURI(),
+                providerIdentifier);
         data.setVisible(visibility);
         dataRepository.update(data);
     }
-    
-    
-    
+
     public void addDataToDomain(int dataId, int domainId) {
         domainRepository.addDataToDomain(dataId, domainId);
     }
@@ -308,12 +304,11 @@ public class DataBusiness {
     public synchronized void removeDataFromDomain(int dataId, int domainId) {
         List<Domain> findByLinkedService = domainRepository.findByLinkedData(dataId);
         if (findByLinkedService.size() == 1) {
-            throw new CstlConfigurationRuntimeException("Could not unlink last domain from a data")
-                    .withErrorCode("error.data.lastdomain");
+            throw new CstlConfigurationRuntimeException("Could not unlink last domain from a data").withErrorCode("error.data.lastdomain");
         }
         domainRepository.removeDataFromDomain(dataId, domainId);
     }
-    
+
     @Transactional
     public synchronized void removeDataFromProvider(String providerID) {
         final Provider p = providerRepository.findByIdentifier(providerID);
@@ -322,6 +317,6 @@ public class DataBusiness {
             for (Data data : datas) {
                 dataRepository.delete(data.getId());
             }
-        } 
+        }
     }
 }
