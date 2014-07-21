@@ -27,8 +27,8 @@ a.list-group-item{
 
 .menuLeft
 .list-group-item.active, .list-group-item.active:hover, .list-group-item.active:focus{
-    background-color: #5BC0DE;
-    border-color: #5BC0DE;
+    background-color: #2e8bbf;
+    border-color: #297dad;
 }
 
 .well-header {
@@ -38,3 +38,10 @@ a.list-group-item{
     padding:15px;
 }
 
+h3.panel-title{
+    color:#777;
+}
+
+.permissionsList select[multiple]{
+    font-size:12px;
+}

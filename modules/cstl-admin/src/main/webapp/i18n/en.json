@@ -641,6 +641,7 @@
     "settings.form.password.placeholder": "Your password",
     "settings.form.button.close":"Close",
     "settings.form.modal.title": "New User",
+    "settings.form.domains": "Domains",
     "settings.messages.error": "<strong>An error has occured!</strong> Settings could not be saved.",
     "settings.messages.success": "<strong>Settings saved!</strong>",
     "settings.messages.validate.firstname.required": "Your first name is required.",

@@ -675,6 +675,7 @@
     "sessions.title": "Sessions actives de [<b>{{username}}</b>]",
 
     "settings.form.button": "Sauvegarder",
+    "settings.form.domains": "Domaines",
     "settings.form.email": "Email",
     "settings.form.firstname": "Prénom",
     "settings.form.lastname": "Nom",

@@ -11,7 +11,7 @@
 				<form name="form" role="form" novalidate
 					class="ng-scope ng-invalid ng-invalid-required ng-dirty ng-valid-minlength">				
 					<div class="form-group">
-						<label class="col-sm-12" translate="admin.domain.tab.name" style="font-size:18px;">Domain name</label> 
+						<label class="col-sm-12" translate="admin.domain.tab.name" style="font-size:14px;">Domain name</label>
 						<div class="col-sm-6">
 						<input
 							type="text" class="form-control" name="name"
@@ -20,7 +20,7 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-sm-12" translate="admin.domain.tab.description" style="font-size:18px;">Domain description</label> 
+						<label class="col-sm-12" translate="admin.domain.tab.description" style="font-size:14px; margin-top:15px;">Domain description</label>
 						<div class="col-sm-10">
 						<input
 							type="textarea" class="form-control" name="description"
@@ -35,11 +35,11 @@
 		</div>
 		<div class="modal-footer">
 			<button type="button" id="cancelButton" class="btn btn-default" translate="settings.form.button.close" ng-click="close()">Close</button>
-			<button type="button" ng-disabled="form.$invalid" class="btn btn-primary" ng-click="save()"><span translate="settings.form.button">Save</span></button>
+			<button type="button" ng-disabled="form.$invalid" class="btn btn-add" ng-click="save()"><span translate="settings.form.button">Save</span></button>
 			<button ng-show="$parent.allowNext" type="button" id="nextButton"
-				class="btn btn-primary" ng-click="next();">Next</button>
+				class="btn btn-add" ng-click="next();">Next</button>
 			<button ng-show="$parent.allowSubmit" type="button" id="submitButton"
-				class="btn btn-primary" ng-click="upload();">Finish</button>
+				class="btn btn-add" ng-click="upload();">Finish</button>
 		</div>
 	</div>
 </div>

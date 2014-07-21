@@ -21,7 +21,7 @@
                         <button type="button" class="btn btn-default btn-sm" ng-click="showCapa(service)"
                                 ng-disabled="service.status!=='STARTED'">GetCapabilities</button>
                         <button type="button" class="btn btn-default btn-sm"  ng-click="showLogs(service)">Logs</button>
-                        <button type="button" class="btn btn-default btn-sm btn-info" ng-click="reload(service)" translate="service.description.reload.button">Reload</button>
+                        <button type="button" class="btn btn-default btn-sm btn-add" ng-click="reload(service)" translate="service.description.reload.button">Reload</button>
                         <button type="button" class="btn btn-default btn-sm"  ng-class="{'started':service.status=='STARTED','stopped':service.status!='STARTED'}" ng-click="startOrStop(service)">
                             <i ng-class="{'icon-play':service.status!='STARTED','icon-stop':service.status=='STARTED'}"></i>
                         </button>
@@ -246,7 +246,7 @@
                         <div class="col-sm-4">
                             <!-- begin add data button -->
                             <div style="margin-bottom:10px;" ng-if="service.type.toLowerCase() !== 'csw' && service.type.toLowerCase() !== 'wps'">
-                                <a data-toggle="modal" class="btn btn-info btn-lg btn-block" ng-click="showDataToAdd()">
+                                <a data-toggle="modal" class="btn btn-add btn-lg btn-block" ng-click="showDataToAdd()">
                                     <span class="icon-plus icon-white" style="margin-right:5px;"></span>
                                     <span translate="service.edit.dashboard.action.add.button">Add</span>
                                 </a>
@@ -379,7 +379,7 @@
                                                 </div>
                                             </div>
 
-                                            <div class="block-action">
+                                            <div class="block-action block-action-metadata">
                                                 <div class="row" style="padding-bottom: 5px">
                                                     <div class="col-sm-6">
                                                         <a id="exportMD"
@@ -429,7 +429,7 @@
                                                     <span translate="label.sensor">sensor</span>
                                                 </div>
                                             </div>
-                                            <div class="block-action">
+                                            <div class="block-action block-action-sensor">
                                                 <div class="row">
                                                     <div class="col-sm-6">
                                                         <button class="btn btn-success"
@@ -460,7 +460,7 @@
                         <!-- End DashBoard -->
                     </div>
                 </div>
-                <div class="tab-pane" ng-class="{active:tabdesc}" ng-show="tabdesc">
+                <div class="tab-pane" style="padding-top: 20px;" ng-class="{active:tabdesc}" ng-show="tabdesc">
 
                     <!-- Description Service Tab -->
                     <div class="col-sm-12">
@@ -536,7 +536,7 @@
                         </fieldset>
                     </div>
                     <div class="pull-right" style="margin: 20px;">
-                        <button class="btn btn-info"
+                        <button class="btn btn-add"
                                 style="margin-left:20px;"
                                 type="button"
                                 ng-click="saveServiceMetadata()"
@@ -545,9 +545,9 @@
 
                     <!-- END Description Service Tab -->
                 </div>
-                <div class="tab-pane form_service_md" ng-class="{active:tabmetadata}" ng-show="tabmetadata">
+                <div class="tab-pane form_service_md" style="padding-top: 20px;" ng-class="{active:tabmetadata}" ng-show="tabmetadata">
                     <div class="row">
-                        <div class="col-sm-6">
+                        <div class="col-sm-6" style="padding-left: 50px;">
                             <!-- contact part -->
                             <fieldset>
                                 <legend translate="create.contact.legend">Contact information</legend>
@@ -591,7 +591,7 @@
                                 </form>
                             </fieldset>
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-sm-6" style="padding-right: 50px;">
                             <!-- address part -->
                             <fieldset>
                                 <legend translate="create.contact.address.legend">Contact address</legend>
@@ -623,7 +623,7 @@
                         </div>
                     </div>
                     <div class="row" style="margin-top: 20px;">
-                        <div class="col-sm-6">
+                        <div class="col-sm-6" style="padding-left: 50px;">
                             <!-- access constraints part -->
                             <fieldset>
                                 <legend translate="create.accessconstraint.legend">Access constraints</legend>
@@ -679,66 +679,66 @@
                     </div>
                     <div class="row" style="margin-top: 20px;">
                         <div class="pull-right">
-                            <button class="btn btn-info" style="margin-right:30px;" type="button" ng-click="saveServiceMetadata()" translate="label.save">Save</button>
+                            <button class="btn btn-add" style="margin-right:30px;" type="button" ng-click="saveServiceMetadata()" translate="label.save">Save</button>
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane" ng-class="{active:tabrights}" ng-show="tabrights">
-                    <div class="col-sm-12">
-                        <div style="padding-left:20px;">
-                            <legend><span translate="service.rights">Service rights</span></legend>
-                            <div class="col-sm-5">
-                                <span class="searchicon glyphicon glyphicon-search" style="float:right; width:200px; right: 35px;">
-                                    <input type="text" ng-model="filter" class="form-control " maxlength="10">
-                                </span>
-                                <table class="table table-condensed table-striped table-bordered table-responsive user-table">
-                                    <thead>
-                                        <tr title="click to order">
-                                            <td ng-click="predicate = 'roles'; reverse=!reverse"
-                                                translate="service.rights.group.list">Liste des groupes</td>
-                                            <td translate="service.rights.group.read">Lecture</td>
-                                            <td translate="service.rights.group.write">Ecriture</td>
+                <div class="tab-pane" style="padding-top: 20px;" ng-class="{active:tabrights}" ng-show="tabrights">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div style="padding-left:20px;">
+                                <legend><span translate="service.rights">Service rights</span></legend>
+                                <div class="col-sm-6">
+                                    <span class="searchicon glyphicon glyphicon-search" style="float:right; width:200px; right: 35px;">
+                                        <input type="text" ng-model="filter" class="form-control " maxlength="10">
+                                    </span>
+                                    <table class="table table-condensed table-striped table-bordered table-responsive user-table">
+                                        <thead>
+                                            <tr title="click to order">
+                                                <td ng-click="predicate = 'roles'; reverse=!reverse"
+                                                    translate="service.rights.group.list">Liste des groupes</td>
+                                                <td translate="service.rights.group.read">Lecture</td>
+                                                <td translate="service.rights.group.write">Ecriture</td>
+                                            </tr>
+                                        </thead>
+                                        <tr ng-click="details($index)" style='cursor:pointer'
+                                            ng-repeat="entry in domainroles | filter:filter | orderBy:predicate:reverse">
+                                            <td>{{entry.domainRole}}</td>
+                                            <td><input type="checkbox" disabled="true" ng-checked="domain.access.indexOf('READ') != -1"></td>
+                                            <td><input type="checkbox" disabled="true"></td>
+                                            <td class="user-delete" style="width:20px;" ng-click="details($index)"><span class="glyphicon glyphicon-plus"></span></td>
                                         </tr>
-                                    </thead>
-                                    <tr ng-click="details($index)" style='cursor:pointer'
-                                        ng-repeat="entry in domainroles | filter:filter | orderBy:predicate:reverse">
-                                        <td>{{entry.domainRole}}</td>
-                                        <td><input type="checkbox" disabled="true" ng-checked="domain.access.indexOf('READ') != -1"></td>
-                                        <td><input type="checkbox" disabled="true"></td>
-                                        <td class="user-delete" style="width:20px;" ng-click="details($index)"><span class="glyphicon glyphicon-plus"></span></td>
-                                    </tr>
-                                </table>
-                            </div>
-                             <div class="col-sm-5">
-                                <span class="searchicon glyphicon glyphicon-search" style="float:right; width:200px; right: 35px;">
-                                    <input type="text" ng-model="domainFilter" class="form-control " maxlength="10">
-                                </span>
-                                <table class="table table-condensed table-striped table-bordered table-responsive user-table">
-                                    <thead>
-                                        <tr title="click to order">
-                                            <td ng-click="predicate = 'roles'; reverse=!reverse"
-                                                translate="domain.list">Liste des domaines</td>
-                                            <td ng-click="predicate = 'roles'; reverse=!reverse"
-                                                translate="domain.linked">Linked</td>
+                                    </table>
+                                </div>
+                                 <div class="col-sm-6">
+                                    <span class="searchicon glyphicon glyphicon-search" style="float:right; width:200px; right: 35px;">
+                                        <input type="text" ng-model="domainFilter" class="form-control " maxlength="10">
+                                    </span>
+                                    <table class="table table-condensed table-striped table-bordered table-responsive user-table">
+                                        <thead>
+                                            <tr title="click to order">
+                                                <td ng-click="predicate = 'roles'; reverse=!reverse"
+                                                    translate="domain.list">Liste des domaines</td>
+                                                <td ng-click="predicate = 'roles'; reverse=!reverse"
+                                                    translate="domain.linked">Linked</td>
+                                            </tr>
+                                        </thead>
+                                        <tr ng-click="details($index)" style='cursor:pointer'
+                                            ng-repeat="domain in domains | filter:domainFilter | orderBy:predicate:reverse">
+                                            <td>{{domain.name}}</td>
+                                            <td><input type="checkbox" ng-click="toggleDomain($index)" ng-checked="domain.linked" ng-disabled="!domain.canPublish"></td>
+                                            <td class="user-delete" style="width:20px;" ng-click="details($index)"><span class="glyphicon glyphicon-plus"></span></td>
                                         </tr>
-                                    </thead>
-                                    <tr ng-click="details($index)" style='cursor:pointer'
-                                        ng-repeat="domain in domains | filter:domainFilter | orderBy:predicate:reverse">
-                                        <td>{{domain.name}}</td>
-                                        <td><input type="checkbox" ng-click="toggleDomain($index)" ng-checked="domain.linked" ng-disabled="!domain.canPublish"></td>
-                                        <td class="user-delete" style="width:20px;" ng-click="details($index)"><span class="glyphicon glyphicon-plus"></span></td>
-                                    </tr>
-                                </table>
+                                    </table>
+                                </div>
+
                             </div>
-                          
                         </div>
                     </div>
                     
-                    
-                    
                     <div class="row" style="margin-top: 20px;">
                         <div class="pull-right">
-                            <button class="btn btn-info" style="margin-right:30px;" type="button" ng-click="" translate="label.save">Save</button>
+                            <button class="btn btn-add" style="margin-right:30px;" type="button" ng-click="" translate="label.save">Save</button>
                         </div>
                     </div>
                 </div>

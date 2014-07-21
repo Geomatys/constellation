@@ -5,7 +5,7 @@
     <!-- Menu to create services -->
     <div class="col-sm-3">
         <div class="dropdown pull-right">
-            <a data-toggle="dropdown" class="btn btn-info btn-lg dropdown-toggle" style="margin-top:8px;padding:15px 19px;">
+            <a data-toggle="dropdown" class="btn btn-add btn-lg dropdown-toggle" style="margin-top:8px;padding:15px 19px;">
                 <span class="icon-plus icon-white" style="margin-right:5px;"></span>
                 <span translate="webservicepage.button.create.label">Create a service</span>
                 <span class="caret"></span>
@@ -64,7 +64,7 @@
                                         <li ng-if="service.type.toLowerCase() === 'csw'"><a ng-click="refreshIndex(service)" translate="service.menu.refresh.label">Refresh</a></li>
                                     </ul>
                                 </div>
-                                <a style="margin-left: 5px;" class="btn btn-default btn-info" ng-click="reload(service)">
+                                <a style="margin-left: 5px;" class="btn btn-default btn-add" ng-click="reload(service)">
                                     <i class="icon-refresh"></i>
                                 </a>
                                 <a class="btn btn-default" ng-class="{'started':service.status=='STARTED','stopped':service.status!='STARTED'}" ng-click="startOrStop(service)">
