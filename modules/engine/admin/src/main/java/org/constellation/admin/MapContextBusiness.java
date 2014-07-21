@@ -1,3 +1,21 @@
+/*
+ *    Constellation - An open source and standard compliant SDI
+ *    http://www.constellation-sdi.org
+ *
+ * Copyright 2014 Geomatys.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.constellation.admin;
 
 import org.constellation.admin.dto.MapContextLayersDTO;
@@ -5,6 +23,7 @@ import org.constellation.admin.dto.MapContextStyledLayerDTO;
 import org.constellation.configuration.DataBrief;
 import org.constellation.engine.register.*;
 import org.constellation.engine.register.repository.*;
+import org.constellation.util.DataReference;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -35,6 +54,12 @@ public class MapContextBusiness {
     @Inject
     private StyleRepository styleRepository;
 
+    @Inject
+    private ServiceRepository serviceRepository;
+
+    @Inject
+    private StyledLayerRepository styledLayerRepository;
+
     public void setMapItems(final int contextId, final List<MapcontextStyledLayer> layers) {
         mapContextRepository.setLinkedLayers(contextId, layers);
     }
@@ -59,15 +84,34 @@ public class MapContextBusiness {
                 layerConfig.setProviderID(provider.getIdentifier());
                 layerConfig.setProviderType(provider.getType());
 
+                final List<StyledLayer> styledLays = styledLayerRepository.findByLayer(layer.getId());
+                final List<DataReference> drs = new ArrayList<>();
+                for (final StyledLayer styledLay : styledLays) {
+                    final Style s = styleRepository.findById(styledLay.getStyle());
+                    if (s == null) {
+                        continue;
+                    }
+                    final DataReference dr = DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, "sld", s.getName());
+                    drs.add(dr);
+                }
+                layerConfig.setStyles(drs);
+
                 final QName dataName = new QName(data.getNamespace(), data.getName());
                 final DataBrief db = dataBusiness.getDataBrief(dataName, provider.getId());
                 final MapContextStyledLayerDTO dto = new MapContextStyledLayerDTO(styledLayer, layerConfig , db);
                 if (styledLayer.getStyleId() != null) {
+                    // Extract style information for this layer
                     final Style style = styleRepository.findById(styledLayer.getStyleId());
                     if (style != null) {
                         dto.setStyleName(style.getName());
                     }
                 }
+
+                // Extract service information for this layer
+                final Layer layerRecord = layerRepository.findById(styledLayer.getLayerId());
+                final Service serviceRecord = serviceRepository.findById(layerRecord.getService());
+                dto.setServiceIdentifier(serviceRecord.getIdentifier());
+                dto.setServiceVersions(serviceRecord.getVersions());
 
                 styledLayersDto.add(dto);
             }

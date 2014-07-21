@@ -8,6 +8,8 @@ import org.constellation.engine.register.MapcontextStyledLayer;
 public class MapContextStyledLayerDTO extends LayerSummary implements Comparable<MapContextStyledLayerDTO> {
     private Integer mapcontextId;
     private Integer layerId;
+    private String serviceIdentifier;
+    private String serviceVersions;
     private Integer styleId;
     private String styleName;
     private int order;
@@ -90,6 +92,21 @@ public class MapContextStyledLayerDTO extends LayerSummary implements Comparable
         this.externalStyle = externalStyle;
     }
 
+    public String getServiceIdentifier() {
+        return serviceIdentifier;
+    }
+
+    public void setServiceIdentifier(String serviceIdentifier) {
+        this.serviceIdentifier = serviceIdentifier;
+    }
+
+    public String getServiceVersions() {
+        return serviceVersions;
+    }
+
+    public void setServiceVersions(String serviceVersions) {
+        this.serviceVersions = serviceVersions;
+    }
     @Override
     public int compareTo(MapContextStyledLayerDTO o) {
         return getOrder() - o.getOrder();

@@ -153,12 +153,6 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
             });
         };
 
-        $scope.initStyles = function() {
-            style.listAll({provider: 'sld'}, function(response) {
-                $scope.styles.existing = response.styles;
-            });
-        };
-
         $scope.select = function(layer,service) {
             $scope.selected = {
                 layer: layer,
@@ -254,13 +248,26 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
             }
         };
 
-        $scope.editMapItem = function(layer) {
+        $scope.editMapItem = function(item) {
 
         };
 
-        $scope.styleMapItem = function(layer) {
+        $scope.styleMapItem = function(item) {
+            style.listAll({provider: 'sld'}, function(response) {
+                $scope.styles.existing = [];
+                for (var j=0; j<item.layer.TargetStyle.length; j++) {
+                    var tgStyle = item.layer.TargetStyle[j];
+                    for (var i=0; i<response.styles.length; i++) {
+                        var style = response.styles[i];
+                        if (style.Name===tgStyle.Name && style.Provider===tgStyle.Provider) {
+                            $scope.styles.existing.push(style);
+                            break;
+                        }
+                    }
+                }
+            });
             $scope.mode.display = 'addChooseStyle';
-            $scope.layers.toStyle = layer;
+            $scope.layers.toStyle = item;
         };
 
         $scope.deleteMapItem = function(layer) {
@@ -271,16 +278,18 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
         };
 
         $scope.viewMap = function() {
+            if (!$scope.layers.toAdd || $scope.layers.toAdd.length===0) {
+                return;
+            }
+
             var cstlUrl = $cookies.cstlUrl;
             var layersToView = [];
             for (var i=0; i<$scope.layers.toAdd.length; i++) {
                 var l = $scope.layers.toAdd[i];
-                var layerData;
-                if (l.layer.styleName) {
-                    layerData = DataViewer.createLayerWMSWithStyle(cstlUrl, l.layer.Name, 'toto', l.layer.styleName);
-                } else {
-                    layerData = DataViewer.createLayerWMS(cstlUrl, l.layer.Name, 'toto');
-                }
+                var serviceName = (l.layer.serviceIdentifier) ? l.layer.serviceIdentifier : l.service.identifier;
+                var layerData = (l.layer.styleName) ?
+                    DataViewer.createLayerWMSWithStyle(cstlUrl, l.layer.Name, serviceName, l.layer.styleName) :
+                    DataViewer.createLayerWMS(cstlUrl, l.layer.Name, serviceName);
                 layersToView.push(layerData);
             }
             DataViewer.layers = layersToView;
