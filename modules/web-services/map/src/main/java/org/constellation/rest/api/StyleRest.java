@@ -473,13 +473,21 @@ public final class StyleRest {
                 /*
                  * Create the unique value filter.
                  */
-                final Filter filter = FF.equals(property, FF.literal(value));
+                final Filter filter;
+                if(value instanceof String && !value.toString().isEmpty() && value.toString().contains("'")){
+                    final String val = ((String) value).replaceAll("'","\\"+"'");
+                    filter = FF.like(property,FF.literal(val).toString(),"*","?","\\",true);
+                }else {
+                    filter = FF.equals(property, FF.literal(value));
+                }
+
                 /*
                  * Create new rule derivating the base symbolizer.
                  */
                 final MutableRule rule = SF.rule(derivateSymbolizer(symbolizer, palette.interpolate(step),SF,FF));
                 rule.setName((count++)+" - AutoUnique - " + property.getPropertyName());
-                rule.setDescription(new DefaultDescription(new DefaultInternationalString(property.getPropertyName()+" = "+value),null));
+                final Object valStr = value instanceof String && ((String) value).isEmpty() ? "''":value;
+                rule.setDescription(new DefaultDescription(new DefaultInternationalString(property.getPropertyName()+" = "+valStr),null));
                 rule.setFilter(filter);
                 newRules.add(rule);
             }

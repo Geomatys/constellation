@@ -21,6 +21,7 @@ package org.constellation.json.binding;
 
 import org.geotoolkit.cql.CQL;
 import org.geotoolkit.style.MutableRule;
+import org.opengis.filter.PropertyIsLike;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,6 +77,11 @@ public final class Rule implements StyleElement<MutableRule> {
         }
         if (rule.getFilter() != null) {
             filter = CQL.write(rule.getFilter());
+
+            //for generated rules auto unique values we need to escape quotes.
+            if(filter.contains("''") && !filter.endsWith("''") && rule.getFilter() instanceof PropertyIsLike){
+                filter = filter.replaceAll("''","\\\\'");
+            }
         }
     }
 

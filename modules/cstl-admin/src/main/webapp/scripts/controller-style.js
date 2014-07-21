@@ -707,7 +707,14 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                                 }
                             }
                         }else {
-                            strQuery += operator+filter.attribute + ' ' + filter.comparator + ' \''+ filter.value +'\'';
+                            var strFilter = filter.value;
+                            //escape CQL quote from the ui value before apply
+                            if(strFilter.indexOf("'") != -1){
+                                var find = "'";
+                                var re = new RegExp(find, 'g');
+                                strFilter = strFilter.replace(re, "\\'");
+                             }
+                            strQuery += operator+filter.attribute + ' ' + filter.comparator + ' \''+ strFilter +'\'';
                         }
                         if(filter.operator !== ''){
                             operator = ' '+filter.operator+' ';
@@ -729,6 +736,12 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         $scope.restoreFilters = function() {
             if($scope.optionsSLD.selectedRule.filter !== null){
                 var cql = $scope.optionsSLD.selectedRule.filter;
+                if(cql.indexOf('\\\'') != -1){
+                    var find = "\\\\\'";
+                    var re = new RegExp(find, 'g');
+                    cql = cql.replace(re, "''");
+                }
+
                 var format = new OpenLayers.Format.CQL();
                 var olfilter;
                 try {
@@ -739,6 +752,14 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                 if(olfilter){
                     $scope.optionsSLD.filters = convertOLFilterToArray(olfilter);
                     $scope.optionsSLD.filtersEnabled=true;
+                }else {
+                    $scope.optionsSLD.filtersEnabled=false;
+                    $scope.optionsSLD.filters=[{
+                        "attribute":"",
+                        "comparator":"=",
+                        "value":"",
+                        "operator":''
+                    }];
                 }
             }else {
                 $scope.optionsSLD.filtersEnabled=false;
