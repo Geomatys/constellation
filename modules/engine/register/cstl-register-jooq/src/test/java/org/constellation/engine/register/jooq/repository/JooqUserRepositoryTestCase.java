@@ -18,7 +18,7 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
-import org.constellation.engine.register.User;
+import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.jooq.AbstractJooqTestTestCase;
 import org.constellation.engine.register.jooq.TestSamples;
 import org.constellation.engine.register.repository.UserRepository;
@@ -41,7 +41,7 @@ public class JooqUserRepositoryTestCase extends AbstractJooqTestTestCase {
     @Test
     public void crude() throws Throwable {
         
-        User insert = userRepository.insert(TestSamples.newAdminUser(), TestSamples.adminRoles());
+        CstlUser insert = userRepository.insert(TestSamples.newAdminUser(), TestSamples.adminRoles());
         Assert.assertNotNull(insert);
         
         Assert.assertEquals("Should have deleled 1 record",1, userRepository.delete(insert.getId()));

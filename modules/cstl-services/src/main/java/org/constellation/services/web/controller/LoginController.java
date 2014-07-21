@@ -19,7 +19,7 @@
 package org.constellation.services.web.controller;
 
 import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.User;
+import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +54,7 @@ public class LoginController {
 	public String loggedin(HttpServletRequest httpServletRequest) {
 		String sessionId = httpServletRequest.getSession().getId();
 		String adminUrl = retrieveCstlAdmin(httpServletRequest);
-		User user = userRepository.findOne(httpServletRequest.getUserPrincipal().getName()).get();
+		CstlUser user = userRepository.findOne(httpServletRequest.getUserPrincipal().getName()).get();
 		Domain defaultDomain = domainRepository.findDefaultByUserId(user.getId());
 		int domainId = defaultDomain==null?0:defaultDomain.getId();
 		if(adminUrl==null)

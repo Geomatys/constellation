@@ -28,7 +28,7 @@ public interface PropertyRepository {
     
     List<? extends Property> findIn(List<String> keys);
     
-	void save(Property prop);
+    void save(Property prop);
 	
 	List<? extends Property> startWith(String string);
 

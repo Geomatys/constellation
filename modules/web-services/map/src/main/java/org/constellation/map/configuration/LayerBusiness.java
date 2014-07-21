@@ -30,7 +30,7 @@ import org.constellation.engine.register.Layer;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.Style;
-import org.constellation.engine.register.User;
+import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.LayerRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
@@ -124,7 +124,7 @@ public class LayerBusiness {
             layer.setService(service.getId());
             layer.setData(data.getId());
             layer.setDate(System.currentTimeMillis());
-            Optional<User> user = userRepository.findOne(securityManager.getCurrentUserLogin());
+            Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
             if(user.isPresent()) {
                 layer.setOwner(user.get().getId());
             }

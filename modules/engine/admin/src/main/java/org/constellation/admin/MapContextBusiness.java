@@ -149,7 +149,7 @@ public class MapContextBusiness {
 
         final List<MapcontextStyledLayer> styledLayers = mapContextRepository.getLinkedLayers(contextId);
         for (final MapcontextStyledLayer styledLayer : styledLayers) {
-            if (!styledLayer.isVisible()) {
+            if (!styledLayer.isLayerVisible()) {
                 continue;
             }
             final Layer layerRecord = layerRepository.findById(styledLayer.getLayerId());

@@ -1,18 +1,18 @@
 package org.constellation.engine.register.jooq;
 
-import org.constellation.engine.register.Data;
-import org.constellation.engine.register.Domain;
-import org.constellation.engine.register.Provider;
-import org.constellation.engine.register.User;
-
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.constellation.engine.register.CstlUser;
+import org.constellation.engine.register.Data;
+import org.constellation.engine.register.Domain;
+import org.constellation.engine.register.Provider;
+
 public class TestSamples {
 
-    public static User newAdminUser() {
-        User user = new User();
+    public static CstlUser newAdminUser() {
+        CstlUser user = new CstlUser();
         user.setFirstname("olivier");
         user.setLastname("Nouguier");
         user.setLogin("olivier");
@@ -30,7 +30,7 @@ public class TestSamples {
     }
     
     
-    public static Data newData(User owner, Provider provider) {
+    public static Data newData(CstlUser owner, Provider provider) {
         Data data = new Data();
         data.setDate(new Date().getTime());
         data.setName("testdata");
@@ -41,7 +41,7 @@ public class TestSamples {
         return data;
     }
 
-    public static Provider newProvider(User owner) {
+    public static Provider newProvider(CstlUser owner) {
         Provider provider = new Provider();
         provider.setIdentifier("test");
         provider.setImpl("immmmp");

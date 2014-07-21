@@ -5,7 +5,7 @@
 
 
   <changeSet id="init-v1" author="olivier">
-    <createTable schemaName="admin" tableName='"USER"'>
+    <createTable schemaName="admin" tableName="cstl_user">
       <column autoIncrement="true" name="id" type="INTEGER">
         <constraints primaryKey="true" primaryKeyName="USER_PK" />
       </column>
@@ -114,14 +114,14 @@
     <addForeignKeyConstraint
       baseTableSchemaName="admin" referencedTableSchemaName="admin"
       constraintName="data_owner_fk" baseTableName="data"
-      baseColumnNames="owner" referencedTableName='"USER"'
-      referencedColumnNames="id" />
+      baseColumnNames="owner" referencedTableName="cstl_user"
+      referencedColumnNames="id"/>
 
     <addForeignKeyConstraint
       baseTableSchemaName="admin" referencedTableSchemaName="admin"
       constraintName="data_provider_fk" baseTableName="data"
       baseColumnNames="provider" referencedTableName="provider"
-      referencedColumnNames="id" />
+      referencedColumnNames="id" onDelete="CASCADE"/>
 
 
 
@@ -156,7 +156,7 @@
       baseTableSchemaName="admin" referencedTableSchemaName="admin"
       constraintName="data_i18n_data_id_fk" baseColumnNames="data_id"
       baseTableName="data_i18n" referencedTableName="data"
-      referencedColumnNames="id" />
+      referencedColumnNames="id" onDelete="CASCADE" />
 
 
     <createTable schemaName="admin" tableName="crs">
@@ -289,13 +289,13 @@
       baseTableSchemaName="admin" referencedTableSchemaName="admin"
       constraintName="domainrole_x_permission_domainrole_id_fk"
       referencedTableName="domainrole" baseColumnNames="domainrole_id"
-      baseTableName="domainrole_x_permission" referencedColumnNames="id" />
+      baseTableName="domainrole_x_permission" referencedColumnNames="id" onDelete="CASCADE" />
 
     <addForeignKeyConstraint
       baseTableSchemaName="admin" referencedTableSchemaName="admin"
       constraintName="domainrole_x_permission_permission_id_fk"
       baseTableName="domainrole_x_permission" baseColumnNames="permission_id"
-      referencedTableName="permission" referencedColumnNames="id" />
+      referencedTableName="permission" referencedColumnNames="id" onDelete="CASCADE"/>
 
 
     <createTable schemaName="admin" tableName="service">
@@ -340,7 +340,7 @@
     <addForeignKeyConstraint
       baseTableSchemaName="admin" referencedTableSchemaName="admin"
       constraintName="service_owner_fk" baseTableName="service"
-      baseColumnNames="owner" referencedTableName='"USER"'
+      baseColumnNames="owner" referencedTableName="cstl_user"
       referencedColumnNames="id" />
 
 
@@ -394,20 +394,20 @@
     <addForeignKeyConstraint
       baseTableSchemaName="admin" referencedTableSchemaName="admin"
       constraintName="layer_owner_fk" baseTableName="layer"
-      baseColumnNames="owner" referencedTableName='"USER"'
+      baseColumnNames="owner" referencedTableName="cstl_user"
       referencedColumnNames="id" />
 
     <addForeignKeyConstraint
       baseTableSchemaName="admin" referencedTableSchemaName="admin"
       constraintName="layer_service_fk" baseTableName="layer"
       baseColumnNames="service" referencedTableName="service"
-      referencedColumnNames="id" />
+      referencedColumnNames="id" onDelete="CASCADE"/>
 
     <addForeignKeyConstraint
       baseTableSchemaName="admin" referencedTableSchemaName="admin"
       constraintName="layer_data_fk" baseTableName="layer"
       baseColumnNames="data" referencedTableName="data"
-      referencedColumnNames="id" />
+      referencedColumnNames="id" onDelete="CASCADE"/>
 
     <createTable schemaName="admin" tableName="layer_i18n">
       <column name="layer_id" type="INTEGER">
@@ -438,7 +438,7 @@
       baseTableSchemaName="admin" referencedTableSchemaName="admin"
       constraintName="layer_i18n_layer_id_fk" baseTableName="layer_i18n"
       baseColumnNames="layer_id" referencedTableName="layer"
-      referencedColumnNames="id" />
+      referencedColumnNames="id" onDelete="CASCADE"/>
 
 
     <createTable schemaName="admin" tableName="mapcontext">
@@ -467,8 +467,8 @@
     <addForeignKeyConstraint
       baseTableSchemaName="admin" referencedTableSchemaName="admin"
       constraintName="mapcontext_owner_fk" baseTableName="mapcontext"
-      baseColumnNames="owner" referencedTableName='"USER"'
-      referencedColumnNames="id" onDelete="CASCADE" />
+      baseColumnNames="owner" referencedTableName="cstl_user"
+      referencedColumnNames="id" />
 
 
     <createTable schemaName="admin" tableName="style">
@@ -507,7 +507,7 @@
     <addForeignKeyConstraint
       baseTableSchemaName="admin" referencedTableSchemaName="admin"
       constraintName="style_owner_fk" baseTableName="style"
-      baseColumnNames="owner" referencedTableName='"USER"'
+      baseColumnNames="owner" referencedTableName="cstl_user"
       referencedColumnNames="id" />
 
     <addForeignKeyConstraint
@@ -526,13 +526,13 @@
       <column name="style_id" type="INTEGER">
         <constraints nullable="false" />
       </column>
-      <column defaultValue="1" name='"order"' type="INTEGER">
+      <column defaultValue="1" name="layer_order" type="INTEGER">
         <constraints nullable="false" />
       </column>
-      <column defaultValue="100" name="opacity" type="INTEGER">
+      <column defaultValue="100" name="layer_opacity" type="INTEGER">
         <constraints nullable="false" />
       </column>
-      <column defaultValueBoolean="true" name="visible" type="BOOLEAN">
+      <column defaultValueBoolean="true" name="layer_visible" type="BOOLEAN">
         <constraints nullable="false" />
       </column>
     </createTable>
@@ -583,7 +583,7 @@
 
 
     <createTable schemaName="admin" tableName="property">
-      <column name='"KEY"' type="VARCHAR(32)">
+      <column name='name' type="VARCHAR(32)">
         <constraints nullable="false" />
       </column>
       <column name="value" type="VARCHAR(64)">
@@ -591,15 +591,15 @@
       </column>
     </createTable>
 
-    <addPrimaryKey columnNames='"KEY"' constraintName="PROPERTY_PK"
+    <addPrimaryKey columnNames='name' constraintName="PROPERTY_PK"
       schemaName="admin" tableName="property" />
 
 
     <addForeignKeyConstraint
       baseTableSchemaName="admin" referencedTableSchemaName="admin"
       constraintName="provider_owner_fk" baseTableName="provider"
-      baseColumnNames="owner" referencedTableName='"USER"'
-      referencedColumnNames="id" onDelete="CASCADE" />
+      baseColumnNames="owner" referencedTableName="cstl_user"
+      referencedColumnNames="id" />
 
 
     <createTable schemaName="admin" tableName="sensor">
@@ -632,8 +632,8 @@
     <addForeignKeyConstraint
       baseTableSchemaName="admin" referencedTableSchemaName="admin"
       constraintName="sensor_owner_fk" baseTableName="sensor"
-      baseColumnNames="owner" referencedTableName='"USER"'
-      referencedColumnNames="id" onDelete="CASCADE" />
+      baseColumnNames="owner" referencedTableName="cstl_user"
+      referencedColumnNames="id" />
 
     <createTable schemaName="admin" tableName="sensored_data">
       <column name="sensor" type="INTEGER">
@@ -933,8 +933,8 @@
     <addForeignKeyConstraint
       baseTableSchemaName="admin" referencedTableSchemaName="admin"
       constraintName="task_owner_fk" baseTableName="task"
-      baseColumnNames="owner" referencedTableName='"USER"'
-      referencedColumnNames="id" onDelete="CASCADE" />
+      baseColumnNames="owner" referencedTableName="cstl_user"
+      referencedColumnNames="id" />
 
 
 
@@ -1041,7 +1041,7 @@
     <addForeignKeyConstraint constraintName="user_x_domain_x_role_user_id_fk"
       baseTableSchemaName="admin" referencedTableSchemaName="admin"
       baseTableName="user_x_domain_x_domainrole" baseColumnNames="user_id"
-      referencedTableName='"USER"' referencedColumnNames="id"
+      referencedTableName="cstl_user" referencedColumnNames="id"
       deleteCascade="true" onDelete="CASCADE" />
 
     <addForeignKeyConstraint constraintName="user_x_domain_x_role_domain_id_fk"
@@ -1059,7 +1059,7 @@
 
     <addForeignKeyConstraint
       baseTableSchemaName="admin" referencedTableSchemaName="admin"
-      constraintName="user_x_role_user_id_fk" referencedTableName='"USER"'
+      constraintName="user_x_role_user_id_fk" referencedTableName="cstl_user"
       baseColumnNames="user_id" baseTableName="user_x_role"
       referencedColumnNames="id" onDelete="CASCADE" />
 
@@ -1106,11 +1106,11 @@
 
 
     <createView viewName="AUTHORITIES">SELECT u.LOGIN AS username, uXr.role AS authority
-  FROM ADMIN."USER" u LEFT JOIN admin.user_x_role uXr ON u.id = uXr.user_id</createView>
+  FROM admin.cstl_user u LEFT JOIN admin.user_x_role uXr ON u.id = uXr.user_id</createView>
 
 
     <createView viewName="USERS">SELECT login AS username, password AS password, active AS enabled
-  FROM ADMIN."USER"</createView>
+  FROM admin.cstl_user</createView>
 
 
 

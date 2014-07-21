@@ -22,9 +22,9 @@ public class MapContextStyledLayerDTO extends LayerSummary implements Comparable
         this.mapcontextId = mapContextStyledLayer.getMapcontextId();
         this.layerId = mapContextStyledLayer.getLayerId();
         this.styleId = mapContextStyledLayer.getStyleId();
-        this.order = mapContextStyledLayer.getOrder();
-        this.opacity = mapContextStyledLayer.getOpacity();
-        this.visible = mapContextStyledLayer.isVisible();
+        this.order = mapContextStyledLayer.getLayerOrder();
+        this.opacity = mapContextStyledLayer.getLayerOpacity();
+        this.visible = mapContextStyledLayer.isLayerVisible();
         this.externalStyle = mapContextStyledLayer.getExternalStyle();
     }
 

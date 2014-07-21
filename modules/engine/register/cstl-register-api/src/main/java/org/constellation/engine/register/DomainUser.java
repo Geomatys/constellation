@@ -3,7 +3,7 @@ package org.constellation.engine.register;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DomainUser extends User {
+public class DomainUser extends CstlUser {
 
     private List<Domain> domains = new ArrayList<Domain>();
     

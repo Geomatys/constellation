@@ -18,7 +18,7 @@ import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.ServiceDetails;
 import org.constellation.engine.register.ServiceExtraConfig;
-import org.constellation.engine.register.User;
+import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.LayerRepository;
 import org.constellation.engine.register.repository.ServiceRepository;
@@ -95,7 +95,7 @@ public class ServiceBusiness {
         if (configuration == null) {
             configuration = DefaultServiceConfiguration.getDefaultConfiguration(serviceType);
         }
-        Optional<User> user = userRepository.findOne(securityManager.getCurrentUserLogin());
+        Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
 
         final String config = getStringFromObject(configuration, GenericDatabaseMarshallerPool.getInstance());
         final Service service = new Service();

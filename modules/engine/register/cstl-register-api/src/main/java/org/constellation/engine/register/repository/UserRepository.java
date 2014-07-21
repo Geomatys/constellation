@@ -21,7 +21,7 @@ package org.constellation.engine.register.repository;
 import com.google.common.base.Optional;
 import org.constellation.engine.register.DomainUser;
 import org.constellation.engine.register.Domainrole;
-import org.constellation.engine.register.User;
+import org.constellation.engine.register.CstlUser;
 
 import java.util.List;
 import java.util.Map;
@@ -29,13 +29,13 @@ import java.util.Map;
 
 public interface UserRepository {
 
-    List<User> findAll();
+    List<CstlUser> findAll();
     
     List<DomainUser> findAllWithDomainAndRole();
     
-    List<User> findUsersByDomainId(int domainId);
+    List<CstlUser> findUsersByDomainId(int domainId);
     
-    User insert(User user, List<String> roles);
+    CstlUser insert(CstlUser user, List<String> roles);
 
     /**
      * Update user, should not update password.
@@ -43,9 +43,13 @@ public interface UserRepository {
      * @param roles
      * @return
      */
-    User update(User user, List<String> roles);
+    CstlUser update(CstlUser user, List<String> roles);
     
     int delete(int userId);
+    
+    int desactivate(int userId);
+    
+    int activate(int userId);
     
     Optional<DomainUser> findOneWithRolesAndDomains(String login);
     
@@ -53,7 +57,7 @@ public interface UserRepository {
 
     boolean isLastAdmin(int userId);
 
-    Optional<User> findOne(String login);
+    Optional<CstlUser> findOne(String login);
 
     List<String> getRoles(int userId);
     
@@ -63,8 +67,8 @@ public interface UserRepository {
     
     boolean loginAvailable(String login);
 
-    Map<User, List<Domainrole>> findUsersWithDomainRoles(int domainId);
+    Map<CstlUser, List<Domainrole>> findUsersWithDomainRoles(int domainId);
 
-    List<User> findUsersNotInDomain(int domainId);
+    List<CstlUser> findUsersNotInDomain(int domainId);
     
 }

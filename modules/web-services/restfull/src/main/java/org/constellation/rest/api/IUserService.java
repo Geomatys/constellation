@@ -18,7 +18,7 @@
  */
 package org.constellation.rest.api;
 
-import org.constellation.engine.register.User;
+import org.constellation.engine.register.CstlUser;
 
 import javax.ws.rs.core.Response;
 
@@ -36,8 +36,8 @@ public interface IUserService {
 
     public abstract Response delete(String id);
 
-    public abstract Response post(User userDTO);
+    public abstract Response post(CstlUser userDTO);
 
-    Response put(User userDTO);
+    Response put(CstlUser userDTO);
 
 }

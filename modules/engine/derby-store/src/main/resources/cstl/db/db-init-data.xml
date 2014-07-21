@@ -92,7 +92,7 @@
 
 <!-- Default admin user -->
 
-    <insert schemaName="admin" tableName='"USER"'>
+    <insert schemaName="admin" tableName="cstl_user">
       <column name="login" value="admin" />
       <column name="password" value="21232f297a57a5a743894a0e4a801fc3" />
       <column name="firstname" value="Frédéric" />

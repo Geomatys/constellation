@@ -50,7 +50,7 @@ public class ContactResource {
 		List<? extends Property> properties = propertyRepository.startWith("contact.%");
 		Properties javaProperties = new Properties();
 		for (Property property : properties)
-			javaProperties.put(property.getKey(), property.getValue());
+			javaProperties.put(property.getName(), property.getValue());
 
 		
 		
@@ -68,10 +68,10 @@ public class ContactResource {
 		List<? extends Property> propertiesDB = propertyRepository.startWith("contact.%");
 		for (Iterator iterator = propertiesDB.iterator(); iterator.hasNext();) {
 			Property property = (Property) iterator.next();
-			String posted = properties.getProperty(property.getKey());
+			String posted = properties.getProperty(property.getName());
 			if(StringUtils.isNotBlank(posted)) {
 				property.setValue(posted);
-				properties.remove(property.getKey());
+				properties.remove(property.getName());
 			}else {
 				propertyRepository.delete(property);
 			}

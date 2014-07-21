@@ -91,7 +91,7 @@ public class UserRest  {
     public Response delete(@PathParam("id") int id) {
         if(userRepository.isLastAdmin(id))
             return Response.serverError().entity("admin.user.last.admin").build();
-        userRepository.delete(id);
+        userRepository.desactivate(id);
         return Response.noContent().build();
     }
 

@@ -183,9 +183,9 @@ public class JooqServiceRepository extends AbstractJooqRespository<ServiceRecord
 
         Result<Record2<String, String>> result = dsl.selectDistinct(SERVICE.IDENTIFIER, SERVICE.TYPE).from(SERVICE)
                 .join(Tables.SERVICE_X_DOMAIN).onKey().join(USER_X_DOMAIN_X_DOMAINROLE)
-                .on(Tables.SERVICE_X_DOMAIN.DOMAIN_ID.eq(USER_X_DOMAIN_X_DOMAINROLE.DOMAIN_ID)).join(Tables.USER)
-                .on(Tables.USER.ID.eq(USER_X_DOMAIN_X_DOMAINROLE.USER_ID))
-                .where(Tables.USER.LOGIN.eq(userName).and(USER_X_DOMAIN_X_DOMAINROLE.DOMAIN_ID.eq(domainId))).fetch();
+                .on(Tables.SERVICE_X_DOMAIN.DOMAIN_ID.eq(USER_X_DOMAIN_X_DOMAINROLE.DOMAIN_ID)).join(Tables.CSTL_USER)
+                .on(Tables.CSTL_USER.ID.eq(USER_X_DOMAIN_X_DOMAINROLE.USER_ID))
+                .where(Tables.CSTL_USER.LOGIN.eq(userName).and(USER_X_DOMAIN_X_DOMAINROLE.DOMAIN_ID.eq(domainId))).fetch();
 
         Map<String, Set<String>> resultM = new HashMap<>();
 

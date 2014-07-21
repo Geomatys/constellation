@@ -44,7 +44,7 @@ public class JooqPropertiesRepository extends AbstractJooqRespository<PropertyRe
     @Override
     public Property findOne(String key) {
         SelectQuery<PropertyRecord> selectQuery = dsl.selectQuery(PROPERTY);
-        selectQuery.addConditions(PROPERTY.KEY.equal(key));
+        selectQuery.addConditions(PROPERTY.NAME.equal(key));
         PropertyRecord fetchOne = dsl.fetchOne(selectQuery);
         return maptoDTO(fetchOne);
     }
@@ -52,7 +52,7 @@ public class JooqPropertiesRepository extends AbstractJooqRespository<PropertyRe
     @Override
     public List<? extends Property> findIn(List<String> keys) {
         SelectQuery<PropertyRecord> selectQuery = dsl.selectQuery(PROPERTY);
-        selectQuery.addConditions(PROPERTY.KEY.in(keys));
+        selectQuery.addConditions(PROPERTY.NAME.in(keys));
         return mapResult(selectQuery);
     }
 
@@ -65,14 +65,14 @@ public class JooqPropertiesRepository extends AbstractJooqRespository<PropertyRe
     @Override
     public List<? extends Property> startWith(String string) {
         SelectQuery<PropertyRecord> selectQuery = dsl.selectQuery(Tables.PROPERTY);
-        selectQuery.addConditions(Tables.PROPERTY.KEY.like((string)));
+        selectQuery.addConditions(Tables.PROPERTY.NAME.like((string)));
         return selectQuery.fetch().into(Property.class);
     }
 
     @Override
     public void delete(Property property) {
         DeleteConditionStep<PropertyRecord> deleteConditionStep = dsl.delete(PROPERTY).where(
-                PROPERTY.KEY.eq(property.getKey()));
+                PROPERTY.NAME.eq(property.getName()));
         deleteConditionStep.execute();
 
     }
@@ -81,14 +81,14 @@ public class JooqPropertiesRepository extends AbstractJooqRespository<PropertyRe
         if (propertiesRecord == null)
             return null;
         Property Property = new Property();
-        Property.setKey(propertiesRecord.getKey());
+        Property.setName(propertiesRecord.getName());
         Property.setValue(propertiesRecord.getValue());
         return Property;
     }
 
     @Override
     public String getValue(String key, String defaultValue) {
-        Record1<String> fetchOne = dsl.select(PROPERTY.VALUE).from(PROPERTY).where(PROPERTY.KEY.eq(key)).fetchOne();
+        Record1<String> fetchOne = dsl.select(PROPERTY.VALUE).from(PROPERTY).where(PROPERTY.NAME.eq(key)).fetchOne();
         if (fetchOne == null)
             return defaultValue;
         return fetchOne.value1();

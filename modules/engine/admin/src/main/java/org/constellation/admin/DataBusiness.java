@@ -15,7 +15,7 @@ import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.Style;
-import org.constellation.engine.register.User;
+import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.LayerRepository;
@@ -275,7 +275,7 @@ public class DataBusiness {
             data.setDate(new Date().getTime());
             data.setName(name.getLocalPart());
             data.setNamespace(name.getNamespaceURI());
-            Optional<User> user = userRepository.findOne(securityManager.getCurrentUserLogin());
+            Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
             if (user.isPresent()) {
                 data.setOwner(user.get().getId());
             }

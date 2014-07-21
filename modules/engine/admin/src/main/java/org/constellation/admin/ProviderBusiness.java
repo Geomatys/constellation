@@ -7,7 +7,7 @@ import org.constellation.admin.util.IOUtilities;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.Style;
-import org.constellation.engine.register.User;
+import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.repository.ProviderRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.utils.ISOMarshallerPool;
@@ -101,7 +101,7 @@ public class ProviderBusiness {
     public Provider createProvider(final String identifier, final String parent, final ProviderType type, final String serviceName,
             final GeneralParameterValue config) throws IOException {
         Provider provider = new Provider();
-        Optional<User> user = userRepository.findOne(securityManager.getCurrentUserLogin());
+        Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
         if (user.isPresent()) {
             provider.setOwner(user.get().getId());
         }

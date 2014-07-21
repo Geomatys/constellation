@@ -46,7 +46,7 @@ import org.constellation.dto.ProviderData;
 import org.constellation.dto.PyramidParams;
 import org.constellation.dto.SimpleValue;
 import org.constellation.engine.register.Provider;
-import org.constellation.engine.register.User;
+import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.model.SelectedExtension;
@@ -719,7 +719,7 @@ public class DataRest {
             final String pyramidPath = dataPyramidFolder.getAbsolutePath();
 
             String login = SecurityManagerHolder.getInstance().getCurrentUserLogin();
-            User user = userRepository.findOne(login).get();
+            CstlUser user = userRepository.findOne(login).get();
             //create listener which save information on Database
             final ProcessListener listener = new PyramidCoverageProcessListener(user.getId(), pyramidPath, providerId);
 

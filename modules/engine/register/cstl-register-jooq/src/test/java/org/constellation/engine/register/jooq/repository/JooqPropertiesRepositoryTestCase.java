@@ -55,7 +55,7 @@ public class JooqPropertiesRepositoryTestCase extends AbstractJooqTestTestCase {
     @Test
     public void save() {
         Property dto = new Property();
-        dto.setKey("test");
+        dto.setName("test");
         dto.setValue("value");
         propertyRepository.save(dto);
     }
@@ -63,7 +63,7 @@ public class JooqPropertiesRepositoryTestCase extends AbstractJooqTestTestCase {
     @Test
     public void delete() {
         Property dto = new Property();
-        dto.setKey("test");
+        dto.setName("test");
         dto.setValue("value");
         propertyRepository.delete(dto);
     }

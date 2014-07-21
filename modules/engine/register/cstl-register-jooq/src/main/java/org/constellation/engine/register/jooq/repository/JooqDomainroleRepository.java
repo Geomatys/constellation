@@ -1,12 +1,23 @@
 package org.constellation.engine.register.jooq.repository;
 
-import com.google.common.base.Optional;
-import com.google.common.primitives.Ints;
+import static org.constellation.engine.register.jooq.Tables.CSTL_USER;
+import static org.constellation.engine.register.jooq.Tables.DOMAIN;
+import static org.constellation.engine.register.jooq.Tables.DOMAINROLE;
+import static org.constellation.engine.register.jooq.Tables.DOMAINROLE_X_PERMISSION;
+import static org.constellation.engine.register.jooq.Tables.USER_X_DOMAIN_X_DOMAINROLE;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.apache.commons.lang3.tuple.Pair;
+import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.Domainrole;
 import org.constellation.engine.register.Permission;
-import org.constellation.engine.register.User;
 import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.tables.records.DomainroleRecord;
 import org.constellation.engine.register.jooq.tables.records.DomainroleXPermissionRecord;
@@ -18,18 +29,8 @@ import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import static org.constellation.engine.register.jooq.Tables.DOMAIN;
-import static org.constellation.engine.register.jooq.Tables.DOMAINROLE;
-import static org.constellation.engine.register.jooq.Tables.DOMAINROLE_X_PERMISSION;
-import static org.constellation.engine.register.jooq.Tables.USER;
-import static org.constellation.engine.register.jooq.Tables.USER_X_DOMAIN_X_DOMAINROLE;
+import com.google.common.base.Optional;
+import com.google.common.primitives.Ints;
 
 @Component
 public class JooqDomainroleRepository extends AbstractJooqRespository<DomainroleRecord, Domainrole> implements
@@ -143,17 +144,17 @@ public class JooqDomainroleRepository extends AbstractJooqRespository<Domainrole
     }
 
     @Override
-    public Map<Domainrole, List<Pair<User, List<Domain>>>> findAllWithMembers() {
-        Map<Domainrole, List<Pair<User, List<Domain>>>> result = new LinkedHashMap<>();
+    public Map<Domainrole, List<Pair<CstlUser, List<Domain>>>> findAllWithMembers() {
+        Map<Domainrole, List<Pair<CstlUser, List<Domain>>>> result = new LinkedHashMap<>();
         Map<Record, Result<Record>> domainRoles = dsl.select().from(DOMAINROLE)
                 .leftOuterJoin(Tables.USER_X_DOMAIN_X_DOMAINROLE).onKey().leftOuterJoin(DOMAIN).onKey()
-                .leftOuterJoin(USER).onKey().orderBy(DSL.lower(DOMAINROLE.NAME).asc()).fetchGroups(DOMAINROLE.fields());
+                .leftOuterJoin(CSTL_USER).onKey().orderBy(DSL.lower(DOMAINROLE.NAME).asc()).fetchGroups(DOMAINROLE.fields());
         for (Entry<Record, Result<Record>> domainRoleEntry : domainRoles.entrySet()) {
             Domainrole domainRole = domainRoleEntry.getKey().into(Domainrole.class);
-            Map<Record, Result<Record>> users = domainRoleEntry.getValue().intoGroups(USER.fields());
-            List<Pair<User, List<Domain>>> userList = new ArrayList<Pair<User, List<Domain>>>();
+            Map<Record, Result<Record>> users = domainRoleEntry.getValue().intoGroups(CSTL_USER.fields());
+            List<Pair<CstlUser, List<Domain>>> userList = new ArrayList<Pair<CstlUser, List<Domain>>>();
             for (Entry<Record, Result<Record>> userRecord : users.entrySet()) {
-                User user = userRecord.getKey().into(User.class);
+                CstlUser user = userRecord.getKey().into(CstlUser.class);
                 if (user.getId() == null)
                     continue;
                 List<Domain> domains = filter(userRecord.getValue().into(Domain.class), nullDomain);

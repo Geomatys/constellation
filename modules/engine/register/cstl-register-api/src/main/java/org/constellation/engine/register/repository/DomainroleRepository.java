@@ -5,7 +5,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.Domainrole;
 import org.constellation.engine.register.Permission;
-import org.constellation.engine.register.User;
+import org.constellation.engine.register.CstlUser;
 
 import java.util.List;
 import java.util.Map;
@@ -32,7 +32,7 @@ public interface DomainroleRepository {
 
     List<Permission> allPermission();
 
-    Map<Domainrole, List<Pair<User, List<Domain>>>> findAllWithMembers();
+    Map<Domainrole, List<Pair<CstlUser, List<Domain>>>> findAllWithMembers();
 
     Map<Domainrole, List<Integer>> findAllWithPermissions(int ... serviceWriteAccessPermissionId);
 

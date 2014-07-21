@@ -21,7 +21,7 @@ package org.constellation.admin;
 
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Sensor;
-import org.constellation.engine.register.User;
+import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.SensorRepository;
 import org.constellation.engine.register.repository.UserRepository;
@@ -88,7 +88,7 @@ public class SensorBusiness {
     }
 
     public Sensor create(final String identifier, final String type, final String parent, final String metadata) {
-        Optional<User> user = userRepository.findOne(securityManager.getCurrentUserLogin());
+        Optional<CstlUser> user = userRepository.findOne(securityManager.getCurrentUserLogin());
         Sensor sensor = new Sensor();
         sensor.setIdentifier(identifier);
         sensor.setType(type);

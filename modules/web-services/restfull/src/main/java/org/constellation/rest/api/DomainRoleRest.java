@@ -6,7 +6,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.Domainrole;
 import org.constellation.engine.register.Permission;
-import org.constellation.engine.register.User;
+import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.repository.DomainroleRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,15 +85,15 @@ public class DomainRoleRest {
     public Response all(@QueryParam("withMembers") boolean withMembers) {
         if (withMembers) {
             List<DomainroleWithMembers> result = new ArrayList<DomainroleWithMembers>();
-            Map<Domainrole, List<Pair<User, List<Domain>>>> findAllWithMembers = domainRoleRepository
+            Map<Domainrole, List<Pair<CstlUser, List<Domain>>>> findAllWithMembers = domainRoleRepository
                     .findAllWithMembers();
 
-            for (Entry<Domainrole, List<Pair<User, List<Domain>>>> domainEntry : findAllWithMembers.entrySet()) {
+            for (Entry<Domainrole, List<Pair<CstlUser, List<Domain>>>> domainEntry : findAllWithMembers.entrySet()) {
                 DomainroleWithMembers domainRoleWithMember = new DomainroleWithMembers(domainEntry.getKey());
-                List<Pair<User, List<Domain>>> value = domainEntry.getValue();
+                List<Pair<CstlUser, List<Domain>>> value = domainEntry.getValue();
                 StringBuilder builder = new StringBuilder();
                 boolean afterFirstUser = false;
-                for (Pair<User, List<Domain>> userDomainsPair : value) {
+                for (Pair<CstlUser, List<Domain>> userDomainsPair : value) {
                     if (afterFirstUser)
                         builder.append(", ");
                     else

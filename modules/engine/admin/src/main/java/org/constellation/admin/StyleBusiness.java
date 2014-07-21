@@ -50,7 +50,7 @@ import org.constellation.engine.register.Layer;
 import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.Service;
 import org.constellation.engine.register.Style;
-import org.constellation.engine.register.User;
+import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.repository.DataRepository;
 import org.constellation.engine.register.repository.LayerRepository;
 import org.constellation.engine.register.repository.ProviderRepository;
@@ -511,9 +511,9 @@ public final class StyleBusiness {
             s.setBody(sw.toString());
             styleRepository.save(s);
         } else {
-            Integer userId = userRepository.findOne(securityManager.getCurrentUserLogin()).transform(new com.google.common.base.Function<User, Integer>() {
+            Integer userId = userRepository.findOne(securityManager.getCurrentUserLogin()).transform(new com.google.common.base.Function<CstlUser, Integer>() {
                 @Override
-                public Integer apply(User input) {
+                public Integer apply(CstlUser input) {
                     return input.getId();
                 }
             }).orNull();
@@ -760,7 +760,7 @@ public final class StyleBusiness {
         style.setBody(IOUtilities.writeStyle(body));
         style.setDate(System.currentTimeMillis());
         style.setName(name);
-        Optional<User> optionalUser = userRepository.findOne(login);
+        Optional<CstlUser> optionalUser = userRepository.findOne(login);
         if(optionalUser.isPresent())
             style.setOwner(optionalUser.get().getId());
         style.setProvider(providerId);

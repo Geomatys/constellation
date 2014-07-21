@@ -20,7 +20,7 @@ package org.constellation.rest.api;
 
 import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.Domainrole;
-import org.constellation.engine.register.User;
+import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.engine.register.repository.UserRepository;
 import org.slf4j.Logger;
@@ -60,28 +60,28 @@ public class DomainRest {
         public DomainWithUsers() {
         }
 
-        public DomainWithUsers(Domain domain, List<User> users) {
+        public DomainWithUsers(Domain domain, List<CstlUser> users) {
             super(domain.getId(), domain.getName(), domain.getDescription(), domain.isSystem());
             this.users = users;
         }
 
-        List<User> users;
+        List<CstlUser> users;
 
-        public List<User> getUsers() {
+        public List<CstlUser> getUsers() {
             return users;
         }
 
-        public void setUsers(List<User> users) {
+        public void setUsers(List<CstlUser> users) {
             this.users = users;
         }
 
     }
     
     public static class UserWithDomainRoles  {
-        private User user;
+        private CstlUser user;
         private List<Domainrole> domainRoles;
 
-        public UserWithDomainRoles(User user, List<Domainrole> domainRoles) {
+        public UserWithDomainRoles(CstlUser user, List<Domainrole> domainRoles) {
             this.user = user;
             this.domainRoles = domainRoles; 
         }
@@ -179,7 +179,7 @@ public class DomainRest {
         if (withMembers) {
             List<DomainWithUsers> result = new ArrayList<DomainWithUsers>();
             for (Domain domain : domains) {
-                List<User> users = userRepository.findUsersByDomainId(domain.getId());
+                List<CstlUser> users = userRepository.findUsersByDomainId(domain.getId());
                 result.add(new DomainWithUsers(domain, users));
             }
             return Response.ok(result).build();
@@ -234,11 +234,11 @@ public class DomainRest {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/members/{id}")
     public Response members(@PathParam("id") int domainId) {
-        Map<User, List<Domainrole>> findUsersWithDomainRoles = userRepository.findUsersWithDomainRoles(domainId);
+        Map<CstlUser, List<Domainrole>> findUsersWithDomainRoles = userRepository.findUsersWithDomainRoles(domainId);
         
         List<UserWithDomainRoles> result = new ArrayList<DomainRest.UserWithDomainRoles>();
         
-        for (Map.Entry<User, List<Domainrole>> e : findUsersWithDomainRoles.entrySet()) {
+        for (Map.Entry<CstlUser, List<Domainrole>> e : findUsersWithDomainRoles.entrySet()) {
             result.add(new UserWithDomainRoles(e.getKey(), e.getValue()));
         }
         

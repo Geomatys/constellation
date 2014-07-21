@@ -18,10 +18,17 @@
  */
 package org.constellation.engine.register.jooq.repository;
 
+import static org.constellation.engine.register.jooq.Tables.DATA;
+import static org.constellation.engine.register.jooq.Tables.DATA_X_DOMAIN;
+import static org.constellation.engine.register.jooq.Tables.PROVIDER;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import org.constellation.engine.register.CstlUser;
 import org.constellation.engine.register.Data;
 import org.constellation.engine.register.Domain;
 import org.constellation.engine.register.Provider;
-import org.constellation.engine.register.User;
 import org.constellation.engine.register.jooq.AbstractJooqTestTestCase;
 import org.constellation.engine.register.jooq.Tables;
 import org.constellation.engine.register.jooq.TestSamples;
@@ -34,13 +41,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import static org.constellation.engine.register.jooq.Tables.DATA;
-import static org.constellation.engine.register.jooq.Tables.DATA_X_DOMAIN;
-import static org.constellation.engine.register.jooq.Tables.PROVIDER;
 
 @Transactional
 public class JooqDomainRespositoryTestCase extends AbstractJooqTestTestCase {
@@ -79,7 +79,7 @@ public class JooqDomainRespositoryTestCase extends AbstractJooqTestTestCase {
 
     @Test
     public void testAddUserToDomain() {
-        User user = userRepository.insert(TestSamples.newAdminUser(), TestSamples.adminRoles());
+        CstlUser user = userRepository.insert(TestSamples.newAdminUser(), TestSamples.adminRoles());
         Domain domain = domainRepository.save(TestSamples.newDomain());
         Set<Integer> roles = new HashSet<>();
         roles.add(1);
@@ -96,7 +96,7 @@ public class JooqDomainRespositoryTestCase extends AbstractJooqTestTestCase {
     @Test
     public void addDataToDomain() {
         Domain domain = domainRepository.save(TestSamples.newDomain());
-        User user = userRepository.insert(TestSamples.newAdminUser(), TestSamples.adminRoles());
+        CstlUser user = userRepository.insert(TestSamples.newAdminUser(), TestSamples.adminRoles());
         Provider provider = providerRepository.insert(TestSamples.newProvider(user));
         Data data = dataRepository.create(TestSamples.newData(user, provider));
 
