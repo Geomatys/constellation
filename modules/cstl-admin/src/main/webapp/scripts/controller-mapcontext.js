@@ -298,15 +298,25 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
             DataViewer.layers = layersToView;
             DataViewer.initMap('mapContextMap');
 
-            mapcontext.extent({id: $scope.ctxt.id}, function(response) {
-                var values = response.values;
-                $scope.ctxt.west = values['west'];
-                $scope.ctxt.south = values['south'];
-                $scope.ctxt.east = values['east'];
-                $scope.ctxt.north = values['north'];
-                var extent = new OpenLayers.Bounds($scope.ctxt.west, $scope.ctxt.south, $scope.ctxt.east, $scope.ctxt.north);
-                DataViewer.map.zoomToExtent(extent, true);
-            });
+            if ($scope.ctxt.id) {
+                mapcontext.extent({id: $scope.ctxt.id}, function (response) {
+                    useExtentForLayers(response.values);
+                });
+            } else {
+                mapcontext.extentForLayers({}, {layers: $scope.layers.toAdd}, function(response) {
+                    useExtentForLayers(response.values);
+                });
+            }
         };
+
+        function useExtentForLayers(values) {
+            $scope.ctxt.crs = values['crs'];
+            $scope.ctxt.west = values['west'];
+            $scope.ctxt.south = values['south'];
+            $scope.ctxt.east = values['east'];
+            $scope.ctxt.north = values['north'];
+            var extent = new OpenLayers.Bounds($scope.ctxt.west, $scope.ctxt.south, $scope.ctxt.east, $scope.ctxt.north);
+            DataViewer.map.zoomToExtent(extent, true)
+        }
     }]);
                                      

@@ -363,7 +363,8 @@ cstlAdminApp.factory('mapcontext', ['$resource',
             'update':     {method: 'POST',   url: '@cstl/api/1/context;jsessionid='},
             'delete':     {method: 'DELETE', url: '@cstl/api/1/context/:id;jsessionid='},
             'setLayers':  {method: 'POST',   url: '@cstl/api/1/context/layers/:id;jsessionid='},
-            'extent':     {method: 'GET',    url: '@cstl/api/1/context/:id/extent;jsessionid='}
+            'extent':     {method: 'GET',    url: '@cstl/api/1/context/:id/extent;jsessionid='},
+            'extentForLayers': {method: 'POST', url: '@cstl/api/1/context/extent/layers;jsessionid='}
         });
     }]);
 

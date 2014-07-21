@@ -20,6 +20,7 @@ package org.constellation.rest.api;
 
 import org.constellation.admin.MapContextBusiness;
 import org.constellation.admin.dto.MapContextLayersDTO;
+import org.constellation.admin.dto.MapContextStyledLayerDTO;
 import org.constellation.dto.ParameterValues;
 import org.constellation.engine.register.Mapcontext;
 import org.constellation.engine.register.MapcontextStyledLayer;
@@ -103,6 +104,22 @@ public class MapContextRest {
         } catch (FactoryException ex) {
             Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             return Response.ok("Failed to extract envelope for context "+contextId+". "+ex.getMessage()).status(500).build();
+        }
+        if (values == null) {
+            return Response.status(500).build();
+        }
+        return Response.ok(values).build();
+    }
+
+    @POST
+    @Path("/extent/layers")
+    public Response getContextExtents(final List<MapcontextStyledLayer> layers) {
+        final ParameterValues values;
+        try {
+            values = contextBusiness.getExtentForLayers(layers);
+        } catch (FactoryException ex) {
+            Providers.LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            return Response.ok("Failed to extract envelope for these layers. "+ex.getMessage()).status(500).build();
         }
         if (values == null) {
             return Response.status(500).build();

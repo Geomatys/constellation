@@ -135,6 +135,7 @@ public class MapContextBusiness {
      *
      * @param contextId Context identifier
      * @return
+     * @throws FactoryException
      */
     public ParameterValues getExtent(int contextId) throws FactoryException {
         final ParameterValues values = new ParameterValues();
@@ -148,6 +149,49 @@ public class MapContextBusiness {
         }
 
         final List<MapcontextStyledLayer> styledLayers = mapContextRepository.getLinkedLayers(contextId);
+        env = getEnvelopeForLayers(styledLayers, env);
+
+        if (env == null) {
+            return null;
+        }
+
+        final HashMap<String,String> vals = new HashMap<>();
+        vals.put("crs", (context.getCrs() != null && !context.getCrs().isEmpty()) ? context.getCrs() : "CRS:84");
+        vals.put("west", String.valueOf(env.getLower(0)));
+        vals.put("east", String.valueOf(env.getUpper(0)));
+        vals.put("south", String.valueOf(env.getLower(1)));
+        vals.put("north", String.valueOf(env.getUpper(1)));
+        values.setValues(vals);
+        return values;
+    }
+
+    /**
+     * Get the extent for the given layers.
+     *
+     * @param styledLayers Layers to consider.
+     * @return
+     * @throws FactoryException
+     */
+    public ParameterValues getExtentForLayers(final List<MapcontextStyledLayer> styledLayers) throws FactoryException {
+        final GeneralEnvelope env = getEnvelopeForLayers(styledLayers, null);
+
+        if (env == null) {
+            return null;
+        }
+
+        final ParameterValues values = new ParameterValues();
+        final HashMap<String,String> vals = new HashMap<>();
+        vals.put("crs", "CRS:84");
+        vals.put("west", String.valueOf(env.getLower(0)));
+        vals.put("east", String.valueOf(env.getUpper(0)));
+        vals.put("south", String.valueOf(env.getLower(1)));
+        vals.put("north", String.valueOf(env.getUpper(1)));
+        values.setValues(vals);
+        return values;
+    }
+
+    private GeneralEnvelope getEnvelopeForLayers(final List<MapcontextStyledLayer> styledLayers, final GeneralEnvelope ctxtEnv) throws FactoryException {
+        GeneralEnvelope env = ctxtEnv;
         for (final MapcontextStyledLayer styledLayer : styledLayers) {
             if (!styledLayer.isLayerVisible()) {
                 continue;
@@ -183,17 +227,6 @@ public class MapContextBusiness {
                 env.add(tempEnv);
             }
         }
-
-        if (env == null) {
-            return null;
-        }
-
-        final HashMap<String,String> vals = new HashMap<>();
-        vals.put("west", String.valueOf(env.getLower(0)));
-        vals.put("east", String.valueOf(env.getUpper(0)));
-        vals.put("south", String.valueOf(env.getLower(1)));
-        vals.put("north", String.valueOf(env.getUpper(1)));
-        values.setValues(vals);
-        return values;
+        return env;
     }
 }
