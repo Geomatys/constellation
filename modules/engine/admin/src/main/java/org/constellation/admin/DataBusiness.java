@@ -77,15 +77,14 @@ public class DataBusiness {
         DefaultMetadata metadata = null;
         Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(), name.getNamespaceURI(), providerId);
         MarshallerPool pool = ISOMarshallerPool.getInstance();
-        InputStream sr;
-
         try {
-            sr = new ByteArrayInputStream(data.getIsoMetadata().getBytes("UTF-8"));
-            final Unmarshaller m = pool.acquireUnmarshaller();
-            if (sr != null) {
+            if (data.getIsoMetadata() != null) {
+                InputStream sr = new ByteArrayInputStream(data.getIsoMetadata().getBytes("UTF-8"));
+                final Unmarshaller m = pool.acquireUnmarshaller();
                 metadata = (DefaultMetadata) m.unmarshal(sr);
+                pool.recycle(m);
             }
-            pool.recycle(m);
+            
         } catch (UnsupportedEncodingException | JAXBException e) {
             throw new ConstellationException(e);
         }
@@ -121,12 +120,10 @@ public class DataBusiness {
         CoverageMetadataBean metadata = null;
         try {
             Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(), name.getNamespaceURI(), providerIdentifier);
-            if (data != null) {
+            if (data != null && data.getMetadata() != null) {
                 final InputStream sr = new ByteArrayInputStream(data.getMetadata().getBytes());
                 final Unmarshaller m = pool.acquireUnmarshaller();
-                if (sr != null) {
-                    metadata = (CoverageMetadataBean) m.unmarshal(sr);
-                }
+                metadata = (CoverageMetadataBean) m.unmarshal(sr);
                 pool.recycle(m);
                 return metadata;
             }
@@ -138,7 +135,7 @@ public class DataBusiness {
     }
     public DataBrief getDataBrief(QName fullName,Integer providerId){
         Data data = dataRepository.findByNameAndNamespaceAndProviderId(fullName.getLocalPart(),fullName.getNamespaceURI(), providerId);
-        List<Data> datas = new ArrayList<Data>();
+        List<Data> datas = new ArrayList<>();
         datas.add(data);
         List<DataBrief> dataBriefs = getDataBriefFrom(datas);
         if (dataBriefs !=null && dataBriefs.size()==1){
@@ -149,7 +146,7 @@ public class DataBusiness {
 
     public DataBrief getDataBrief(QName fullName, String providerIdentifier) {
         Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(fullName.getLocalPart(), fullName.getNamespaceURI(), providerIdentifier);
-        List<Data> datas = new ArrayList<Data>();
+        List<Data> datas = new ArrayList<>();
         datas.add(data);
         List<DataBrief> dataBriefs = getDataBriefFrom(datas);
         if (dataBriefs !=null && dataBriefs.size()==1){
@@ -165,10 +162,10 @@ public class DataBusiness {
 
     public DataBrief getDataLayer(final String layerAlias, final String dataProviderIdentifier) {
         Data data = layerRepository.findDatasFromLayerAlias(layerAlias,dataProviderIdentifier);
-        List<Data> datas = new ArrayList<Data>();
+        List<Data> datas = new ArrayList<>();
         datas.add(data);
         List<DataBrief> dataBriefs = getDataBriefFrom(datas);
-        if (dataBriefs !=null && dataBriefs.size()==0){
+        if (dataBriefs != null && !dataBriefs.isEmpty()){
             return dataBriefs.get(0);
         }
         throw new ConstellationException(new Exception("Problem : DataBrief Construction is null or multiple"));
@@ -176,24 +173,23 @@ public class DataBusiness {
     }
 
     private  List<Data> findByMetadataId(String metadataId) {
-        List<Data> dataResult = new ArrayList<Data>();
-        Provider provider = providerRepository.findByMetadataId(metadataId);
-        Data data = dataRepository.findByMetadataId(metadataId);
-        Service service = serviceRepository.findByMetadataId(metadataId);
-        if (provider!=null){
+        List<Data> dataResult   = new ArrayList<>();
+        final Provider provider = providerRepository.findByMetadataId(metadataId);
+        final Data data         = dataRepository.findByMetadataId(metadataId);
+        final Service service   = serviceRepository.findByMetadataId(metadataId);
+        if (provider != null){
             dataResult = dataRepository.findByProviderId(provider.getId());
-        } else if (service!=null) {
+        } else if (service!= null) {
             dataResult = serviceRepository.findDataByServiceId(service.getId());
-        } else {
+        } else if (data != null) {
             dataResult.add(data);
         }
-
         return dataResult;
 
     }
 
     private List<DataBrief> getDataBriefFrom(List<Data> datas) {
-        List<DataBrief> dataBriefs = new ArrayList<DataBrief>();
+        List<DataBrief> dataBriefs = new ArrayList<>();
         for (Data data : datas) {
             List<Style> styles = styleRepository.findByData(data);
             List<Service> services = serviceRepository.findByDataId(data.getId());
