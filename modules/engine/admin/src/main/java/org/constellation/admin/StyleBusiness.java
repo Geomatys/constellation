@@ -78,6 +78,23 @@ import org.opengis.style.TextSymbolizer;
 import org.opengis.util.FactoryException;
 import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
+import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+
 /**
  * @author Bernard Fabien (Geomatys)
  * @version 0.9
@@ -703,5 +720,4 @@ public final class StyleBusiness {
         style.setType(type.name());
         styleRepository.create(style);
     }
-
 }

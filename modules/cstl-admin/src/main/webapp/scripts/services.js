@@ -291,7 +291,9 @@ cstlAdminApp.factory('style', ['$resource',
             'link':    { method: 'POST',   url: '@cstl/api/1/SP/:provider/style/:name/linkData;jsessionid='},
             'unlink':  { method: 'POST',   url: '@cstl/api/1/SP/:provider/style/:name/unlinkData;jsessionid='},
             'generateAutoIntervalStyle':{ method : 'POST', url: '@cstl/api/1/SP/:provider/style/generateAutoInterval'},
-            'generateAutoUniqueStyle':{ method : 'POST', url: '@cstl/api/1/SP/:provider/style/generateAutoUnique'}
+            'generateAutoUniqueStyle':{ method : 'POST', url: '@cstl/api/1/SP/:provider/style/generateAutoUnique'},
+            'paletteStyle':  { method: 'GET',   url: '@cstl/api/1/SP/:provider/style/:name/:ruleName;jsessionid=', isArray: true},
+            'statistics':{method:'POST', url: '@cstl/api/1/SP/statistics;jsessionid='}
         });
     }]);
 

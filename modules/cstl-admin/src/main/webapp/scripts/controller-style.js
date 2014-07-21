@@ -129,6 +129,10 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         $scope.chosenTab = 'description';
 
         $scope.openPalette = false;
+        
+        $scope.repartition = undefined; 
+        
+        
         /**
          * SLD model object that store all needed variables to avoid angular bug behaviour in modal.
          */
@@ -938,6 +942,9 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                     if($scope.attributesExcludeGeometry.length>0){
                         $scope.optionsSLD.autoUniqueValues.attr=$scope.attributesExcludeGeometry[0].name;
                     }
+                    $scope.band.selected = $scope.dataProperties.bands[0];
+                    $scope.palette.rasterMinValue = $scope.band.selected.minValue;
+                    $scope.palette.rasterMaxValue = $scope.band.selected.maxValue;
                 },
                 function() {
                     $growl('error', 'Error', 'Unable to get data properties for layer '+$scope.layerName);
@@ -1514,7 +1521,33 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                     }
                 );
             }
-            
+
+            //show palette
+            style.paletteStyle({provider: 'sld_temp', name : $scope.newStyle.name, ruleName : $scope.newStyle.rules[0].name}, 
+    		function(response) {
+            	$scope.repartition = response;
+            },
+            function() {
+                $growl('error', 'Error', 'Unable to get palette for '+$scope.layerName);
+            });
+
+            ///show histogram
+            var values = {
+                "values":{
+                    "dataProvider":$scope.providerId,
+                    "dataId":$scope.layerName
+                }
+            };
+
+            style.statistics({}, values,
+                function(response){
+                    console.log("repartition size => "+response.bands[0].repartition);
+                },
+                function(){
+                    $growl('error', 'Error', 'Unable to get statistics '+$scope.layerName);
+
+                });
+
             $scope.palette.open = true;
         };
 

@@ -1,6 +1,6 @@
 <form class="form-horizontal" role="form" ng-init="loadDataProperties();">
 	<ul class="nav nav-pills" role="tablist">
-		<li ng-class="{active:symbolPills==='color'}"><a ng-click="symbolPills='color'" role="tab"> <span
+		<li ng-class="{active:symbolPills==='color'}"><a ng-click="symbolPills='color';$broadcast('rzSliderForceRender')" role="tab"> <span
 				translate="label.color">Color</span>
 		</a></li>
 		<li ng-class="{active:symbolPills==='outline'}"><a ng-click="symbolPills='outline'" role="tab"> <span
@@ -55,8 +55,7 @@
 										<span class="control-label" translate="sldeditor.raster.repartition">distribution</span>
 									</div>
 									<div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
-										<input type="text" class="form-control" ng-model="palette.rasterMinValue" id="minValue" required
-											max="{{dataBands[0].maxValue}}" min="{{dataBands[0].minValue}}">
+										<input type="text" class="form-control" ng-model="palette.rasterMinValue" id="minValue" required>
 									</div>
 									<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
 										<rzslider rz-slider-floor="band.selected.minValue" rz-slider-ceil="band.selected.maxValue"
@@ -152,58 +151,24 @@
                             <span style="margin-left: 10pt;font-size: 15px;">Palette</span>
                         </div>
                     </accordion-heading>
-					<div class="style_bloc">
-							<table class="table">
-								<tr>
-									<td><img src="images/polygone_mini.png"></td>
-									<td><input type	='text' class="text_transparent" value='0  >  100' /></td>
-									<td>
-										<button type="button" class="btn btn-default btn-xs btn-remove">
-											<span class="glyphicon glyphicon-remove"></span>
-										</button>
-									</td>
-								</tr>
-								<tr>
-									<td><img src="images/polygone_mini.png"></td>
-									<td><input type='text' class="text_transparent" value='100  >  200' /></td>
-									<td>
-										<button type="button" class="btn btn-default btn-xs btn-remove">
-											<span class="glyphicon glyphicon-remove"></span>
-										</button>
-									</td>
-								</tr>
-								<tr>
-									<td><img src="images/polygone_mini.png"></td>
-									<td><input type='text' class="text_transparent" value='200  >  300' /></td>
-									<td>
-										<button type="button" class="btn btn-default btn-xs btn-remove">
-											<span class="glyphicon glyphicon-remove"></span>
-										</button>
-									</td>
-								</tr>
-								<tr>
-									<td><img src="images/polygone_mini.png"></td>
-									<td><input type='text' class="text_transparent" value='300  >  400' /></td>
-									<td>
-										<button type="button" class="btn btn-default btn-xs btn-remove">
-											<span class="glyphicon glyphicon-remove"></span>
-										</button>
-									</td>
-								</tr>
-								<tr>
-									<td><img src="images/polygone_mini.png"></td>
-									<td><input type='text' class="text_transparent" value='400  >  500' /></td>
-									<td>
-										<button type="button" class="btn btn-default btn-xs btn-remove">
-											<span class="glyphicon glyphicon-remove"></span>
-										</button>
-									</td>
-								</tr>
-							</table>
-						</div>
-						<div class="col-xs-12 div-btn-add" ng-show="displayIntervalles==true">
-							<button type="button" class="btn-apercu btn btn-default">Ajouter une valeur</button>
-						</div>
+					<div class="style_bloc" ng-show="repartition">
+                        <div class="palette-array">
+                            <table class="table">
+                                    <tr ng-repeat="data in repartition">
+                                        <td><div style="background-color: {{data.color}};width: 20px;height: 20px"/></td>
+                                        <td><span>{{data.data}}</span><span ng-if="$index != $last"> &gt; {{repartition[$index+1].data}}</span></td>
+                                        <td>
+                                            <button type="button" class="btn btn-default btn-xs btn-remove">
+                                                <span class="glyphicon glyphicon-remove"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </table>
+                        </div>
+                        <div class="col-xs-12 div-btn-add">
+                            <button type="button" class="btn-apercu btn btn-default">Ajouter une valeur</button>
+                        </div>
+                    </div>
 				</accordion-group>
 			</accordion>
 			

@@ -20,6 +20,7 @@
 package org.constellation.rest.api;
 
 import org.apache.sis.storage.DataStore;
+import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.iso.DefaultInternationalString;
 import org.constellation.admin.StyleBusiness;
 import org.constellation.configuration.AcknowlegementType;
@@ -31,6 +32,9 @@ import org.constellation.provider.DataProviders;
 import org.constellation.rest.dto.AutoIntervalValuesDTO;
 import org.constellation.rest.dto.AutoUniqueValuesDTO;
 import org.constellation.rest.dto.WrapperIntervalDTO;
+import org.geotoolkit.coverage.CoverageReference;
+import org.geotoolkit.coverage.CoverageStore;
+import org.geotoolkit.coverage.io.GridCoverageReadParam;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.FeatureIterator;
 import org.geotoolkit.data.FeatureStore;
@@ -40,17 +44,39 @@ import org.geotoolkit.factory.Hints;
 import org.geotoolkit.feature.Feature;
 import org.geotoolkit.feature.type.DefaultName;
 import org.geotoolkit.feature.type.Name;
-import org.geotoolkit.style.*;
+import org.geotoolkit.process.ProcessDescriptor;
+import org.geotoolkit.process.ProcessException;
+import org.geotoolkit.process.ProcessFinder;
+import org.geotoolkit.process.coverage.statistics.ImageStatistics;
+import org.geotoolkit.style.DefaultDescription;
+import org.geotoolkit.style.DefaultLineSymbolizer;
+import org.geotoolkit.style.DefaultMutableStyle;
+import org.geotoolkit.style.DefaultPointSymbolizer;
+import org.geotoolkit.style.DefaultPolygonSymbolizer;
+import org.geotoolkit.style.MutableRule;
+import org.geotoolkit.style.MutableStyle;
+import org.geotoolkit.style.MutableStyleFactory;
+import org.geotoolkit.style.StyleConstants;
 import org.geotoolkit.style.function.Categorize;
 import org.geotoolkit.style.function.Interpolate;
 import org.geotoolkit.style.interval.DefaultIntervalPalette;
 import org.geotoolkit.style.interval.IntervalPalette;
+import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Function;
 import org.opengis.filter.expression.PropertyName;
-import org.opengis.style.*;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.style.Fill;
+import org.opengis.style.Graphic;
+import org.opengis.style.GraphicalSymbol;
+import org.opengis.style.LineSymbolizer;
+import org.opengis.style.Mark;
+import org.opengis.style.PointSymbolizer;
+import org.opengis.style.PolygonSymbolizer;
 import org.opengis.style.Stroke;
+import org.opengis.style.Symbolizer;
+import org.opengis.util.NoSuchIdentifierException;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -66,10 +92,13 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
-
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 import static org.constellation.utils.RESTfulUtilities.ok;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_DESCRIPTION;
@@ -569,4 +598,24 @@ public final class StyleRest {
         org.constellation.provider.StyleProviders.getInstance().reload();
         return ok(new AcknowlegementType("Success", "All style providers have been restarted."));
     }
+
+   @POST
+   @Path("statistics")
+   public Response getHistogram(final ParameterValues values) throws NoSuchIdentifierException, ProcessException, DataStoreException {
+       final DataProvider provider = DataProviders.getInstance().getProvider(values.get("dataProvider"));
+       final CoverageReference coverageReference = ((CoverageStore) provider.getMainStore()).getCoverageReference(new DefaultName(values.get("dataId")));
+       GridCoverageReadParam params = new GridCoverageReadParam();
+       params.setDeferred(true);
+       final GridCoverage coverage = coverageReference.acquireReader().read(coverageReference.getImageIndex(), params);
+
+       //call process to get Histograms
+       final ProcessDescriptor desc = ProcessFinder.getProcessDescriptor("coverage", "statistic");
+       final ParameterValueGroup procparams = desc.getInputDescriptor().createValue();
+       procparams.parameter("inCoverage").setValue(coverage);
+       final org.geotoolkit.process.Process process = desc.createProcess(procparams);
+       final ParameterValueGroup result = process.call();
+       ImageStatistics statistics = (ImageStatistics) result.parameter("outStatistic").getValue();
+       return ok(statistics);
+   }
+
 }

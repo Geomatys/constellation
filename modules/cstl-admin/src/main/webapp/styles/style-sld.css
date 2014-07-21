@@ -269,6 +269,11 @@ ul.dropdown-images li a:hover{
 	font-size: 15px;
 }
 
+.palette-array{
+    overflow: auto;
+    height: 147px;
+}
+
 /* Small devices (tablets, 768px and up) */
 @media (min-width: 768px) and (max-width: 991px) { 
 	/*choix type*/

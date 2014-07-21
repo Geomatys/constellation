@@ -412,6 +412,7 @@ public final class LayerProviders {
         return provider;
     }
 
+
     /**
      * Gets a {@link Data} instance from its layer provider and its name.
      *
