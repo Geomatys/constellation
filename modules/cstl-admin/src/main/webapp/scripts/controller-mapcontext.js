@@ -94,7 +94,7 @@ cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', '$growl
                             );
                         }
                         lays.sort(function (a, b) {
-                            return a.layer.order - b.layer.order;
+                            return a.layer.layerOrder - b.layer.layerOrder;
                         });
                         return lays;
                     }
@@ -207,14 +207,7 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
 
         function handleLayersForContext(ctxt) {
             // Prepare layers to be added
-            for (var i = 0; i < $scope.layers.toAdd.length; i++) {
-                var l = $scope.layers.toAdd[i];
-                $scope.layers.toSend.push({
-                    mapcontextId: ctxt.id, layerId: l.layer.Id,
-                    styleId: l.layer.styleId,
-                    order: i, visible: l.visible
-                });
-            }
+            fillLayersToSend(ctxt);
 
             mapcontext.setLayers({id: ctxt.id}, $scope.layers.toSend, function () {
                 $growl('success', 'Success', 'Map context created');
@@ -223,6 +216,18 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
                 $growl('error', 'Error', 'Unable to add layers to map context');
                 $modalInstance.dismiss('close');
             });
+        }
+
+        function fillLayersToSend(ctxt) {
+            $scope.layers.toSend = [];
+            for (var i = 0; i < $scope.layers.toAdd.length; i++) {
+                var l = $scope.layers.toAdd[i];
+                $scope.layers.toSend.push({
+                    mapcontextId: (ctxt) ? ctxt.id : null, layerId: l.layer.Id,
+                    styleId: l.layer.styleId,
+                    layerOrder: i, layerVisible: l.visible
+                });
+            }
         }
 
         $scope.addLayerToContext = function() {
@@ -303,7 +308,8 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
                     useExtentForLayers(response.values);
                 });
             } else {
-                mapcontext.extentForLayers({}, {layers: $scope.layers.toAdd}, function(response) {
+                fillLayersToSend();
+                mapcontext.extentForLayers({}, $scope.layers.toSend, function(response) {
                     useExtentForLayers(response.values);
                 });
             }
