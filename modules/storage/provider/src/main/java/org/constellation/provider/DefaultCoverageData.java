@@ -19,6 +19,7 @@
 package org.constellation.provider;
 
 import org.apache.sis.measure.MeasurementRange;
+import org.apache.sis.referencing.CommonCRS;
 import org.apache.sis.storage.DataStoreException;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.grid.GeneralGridGeometry;
@@ -32,6 +33,7 @@ import org.geotoolkit.image.io.metadata.SpatialMetadata;
 import org.geotoolkit.map.DefaultCoverageMapLayer;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapLayer;
+import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.cs.DiscreteCoordinateSystemAxis;
 import org.geotoolkit.style.DefaultStyleFactory;
 import org.geotoolkit.style.MutableStyle;
@@ -39,12 +41,14 @@ import org.geotoolkit.style.StyleConstants;
 import org.opengis.filter.Filter;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.cs.AxisDirection;
+import org.opengis.referencing.crs.TemporalCRS;
+import org.opengis.referencing.crs.VerticalCRS;
 import org.opengis.referencing.cs.CoordinateSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.util.FactoryException;
 
-import javax.measure.unit.SI;
-import javax.measure.unit.Unit;
 import java.awt.*;
 import java.io.IOException;
 import java.util.Collections;
@@ -161,41 +165,59 @@ public class DefaultCoverageData extends AbstractData implements CoverageData {
     public SortedSet<Date> getAvailableTimes() throws DataStoreException {
         SortedSet<Date> dates = new TreeSet<>();
         final Envelope env = getEnvelope();
-            
+
         final CoordinateReferenceSystem crs = env.getCoordinateReferenceSystem();
-        final CoordinateSystem cs = crs.getCoordinateSystem();
 
-        final int nbDim = cs.getDimension();
+        final TemporalCRS temporalCRS = org.apache.sis.referencing.CRS.getTemporalComponent(crs);
+        if (temporalCRS != null) {
+            try {
+                final CoordinateSystem cs = temporalCRS.getCoordinateSystem();
+                if (cs.getDimension() != 1) {
+                    throw new DataStoreException("Invalid temporal CRS : "+temporalCRS);
+                }
 
-        for (int i = 0; i < nbDim; i++) {
-            final CoordinateSystemAxis axis = cs.getAxis(i);
-            final AxisDirection direction = axis.getDirection();
+                final CoordinateSystemAxis axis = cs.getAxis(0);
 
-            //TEMPORAL AXIS
-            if (direction.equals(AxisDirection.PAST) || direction.equals(AxisDirection.FUTURE)) {
+                double[] temporalArray;
                 if (axis instanceof DiscreteCoordinateSystemAxis) {
-                    final DiscreteCoordinateSystemAxis discretAxis =(DiscreteCoordinateSystemAxis) axis;
+                    final DiscreteCoordinateSystemAxis discretAxis = (DiscreteCoordinateSystemAxis) axis;
                     final int nbOrdinate = discretAxis.length();
-                    for (int j = 0; j < nbOrdinate; j++) {
-                        Object value = discretAxis.getOrdinateAt(j);
-                        if(value instanceof Date){
-                            dates.add((Date)value);
-                        }else{                            
-                            Number n = (Number) value;
-                            dates.add(new Date(n.longValue()));
+                    temporalArray = new double[nbOrdinate];
+
+                    for (int i = 0; i < nbOrdinate; i++) {
+                        final Comparable c = discretAxis.getOrdinateAt(i);
+                        if (c instanceof Date) {
+                            dates.add((Date) c);
+                        } else {
+                            temporalArray[i] = ((Number)c).doubleValue();
                         }
                     }
                 } else {
-                    final Double min = Double.valueOf(axis.getMinimumValue());
-                    final Double max = Double.valueOf(axis.getMaximumValue());
-                    final long intMin = min.longValue();
-                    final long intMax = max.longValue();
+                    temporalArray = new double[] {
+                            axis.getMinimumValue(),
+                            axis.getMaximumValue()
+                    };
+                }
 
-                    dates.add(new Date(intMin));
-                    dates.add(new Date(intMax));
-                } 
-            } 
+                // transformation needed.
+                int coordLength = temporalArray.length;
+                if (coordLength > 0) {
+                    //find transform from data temporal CRS to default temporal CRS
+                    final MathTransform transform = CRS.findMathTransform(temporalCRS, CommonCRS.Temporal.JAVA.crs());
+                    transform.transform(temporalArray, 0, temporalArray, 0, coordLength);
+
+                    for (int i = 0; i < coordLength; i++) {
+                        dates.add(new Date(Double.valueOf(temporalArray[i]).longValue()));
+                    }
+                }
+
+            } catch (FactoryException e) {
+                throw new DataStoreException(e.getMessage(), e);
+            } catch (TransformException e) {
+                throw new DataStoreException(e.getMessage(), e);
+            }
         }
+
         return dates;
     }
 
@@ -207,33 +229,52 @@ public class DefaultCoverageData extends AbstractData implements CoverageData {
         SortedSet<Number> elevations = new TreeSet<>();
         final Envelope env = getEnvelope();
         final CoordinateReferenceSystem crs = env.getCoordinateReferenceSystem();
-        final CoordinateSystem cs = crs.getCoordinateSystem();
-        
-        final int nbDim = cs.getDimension();
-        
-        for (int i = 0; i < nbDim; i++) {
-            final CoordinateSystemAxis axis = cs.getAxis(i);
-            final AxisDirection direction = axis.getDirection();
-            final Unit unit = axis.getUnit();
 
-            //test if axis unit is a length unit
-            if (unit.isCompatible(SI.METRE)) {
-                //ELEVATION AXIS
-                if (direction.equals(AxisDirection.DOWN) || direction.equals(AxisDirection.UP)) {
-                    if (axis instanceof DiscreteCoordinateSystemAxis) {
-                        final DiscreteCoordinateSystemAxis discretAxis =(DiscreteCoordinateSystemAxis) axis;
-                        final int nbOrdinate = discretAxis.length();
-                        for (int j = 0; j < nbOrdinate; j++) {
-                            elevations.add((Number) discretAxis.getOrdinateAt(j));
-                        }
-                    } else {
-                        elevations.add(Double.valueOf(axis.getMinimumValue()));
-                        elevations.add(Double.valueOf(axis.getMaximumValue()));
+        final VerticalCRS verticalCRS = org.apache.sis.referencing.CRS.getVerticalComponent(crs, true);
+        if (verticalCRS != null) {
+
+            try {
+                final CoordinateSystem cs = verticalCRS.getCoordinateSystem();
+                if (cs.getDimension() != 1) {
+                    throw new DataStoreException("Invalid vertical CRS : "+verticalCRS);
+                }
+
+                //find transform from data vertical CRS to default vertical CRS
+                final MathTransform transform = CRS.findMathTransform(verticalCRS, CommonCRS.Vertical.ELLIPSOIDAL.crs());
+
+                final CoordinateSystemAxis axis = cs.getAxis(0);
+                double[] elevationOrd;
+                if (axis instanceof DiscreteCoordinateSystemAxis) {
+                    final DiscreteCoordinateSystemAxis discretAxis =(DiscreteCoordinateSystemAxis) axis;
+                    final int nbOrdinate = discretAxis.length();
+
+                    elevationOrd = new double[nbOrdinate];
+                    for (int i = 0; i < nbOrdinate; i++) {
+                        elevationOrd[i] = ((Number)discretAxis.getOrdinateAt(i)).doubleValue();
+                    }
+
+                } else {
+                    elevationOrd = new double[] {
+                            axis.getMinimumValue(),
+                            axis.getMaximumValue()
+                    };
+                }
+
+                int coordLength = elevationOrd.length;
+                if (coordLength > 0) {
+                    transform.transform(elevationOrd, 0, elevationOrd, 0, coordLength);
+                    for (int i = 0; i < coordLength; i++) {
+                        elevations.add(elevationOrd[i]);
                     }
                 }
+
+            } catch (FactoryException e) {
+                throw new DataStoreException(e.getMessage(), e);
+            } catch (TransformException e) {
+                throw new DataStoreException(e.getMessage(), e);
             }
         }
-        
+
         return elevations;
     }
 
