@@ -1,2 +1,3 @@
 org.constellation.process.client.RefreshIndexDescriptor
 org.constellation.process.client.RestartDescriptor
+org.constellation.process.data.ProviderToDataReferenceDescriptor

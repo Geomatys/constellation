@@ -35,6 +35,7 @@ import org.constellation.provider.DataProviderFactory;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.configuration.ProviderParameters;
 import org.geotoolkit.coverage.xmlstore.XMLCoverageStoreFactory;
+import org.geotoolkit.feature.type.DefaultName;
 import static org.geotoolkit.parameter.Parameters.getOrCreate;
 import static org.geotoolkit.parameter.Parameters.value;
 import org.geotoolkit.parameter.ParametersExt;
@@ -62,7 +63,7 @@ public class PyramidCoverageProcess extends AbstractCstlProcess {
         final File pyramidFolder      = value(PYRAMID_FOLDER, inputParameters);
         try {
             PyramidCoverageHelper pyramidHelper = PyramidCoverageHelper.builder(coverageBaseName).
-                    inputFormat("AUTO").withDeeps(new double[]{1}).
+                    inputFormat("AUTO").withDeeps(new double[]{1}).withBaseCoverageNamer(new SimpleCoverageNamer()).
                     fromImage(imageFilePath).toFileStore(pyramidFolder.getAbsolutePath()).build();
             pyramidHelper.buildPyramid(null);
         } catch (DataStoreException | TransformException | FactoryException | MalformedURLException ex) {
@@ -84,5 +85,13 @@ public class PyramidCoverageProcess extends AbstractCstlProcess {
             throw new ProcessException("the pyramid folder path is malformed", this, ex);
         }
     } 
+ 
+    private static class SimpleCoverageNamer implements PyramidCoverageHelper.CoverageNamer {
+
+        @Override
+        public DefaultName getName(String baseName, int n) {
+            return new DefaultName(baseName);
+        }
     
+}
 }
