@@ -127,13 +127,18 @@ public class FileMetadataWriter extends AbstractMetadataWriter {
             
             
             if (indexer != null) {
+                indexer.removeDocument(identifier);
                 indexer.indexDocument(original);
             }
 
             Session session = null;
             try {
                 session = MetadataDatasource.createSession(serviceID);
-                session.putRecord(identifier, f.getPath());
+                if (!session.existRecord(identifier)) {
+                    session.putRecord(identifier, f.getPath());
+                } else {
+                    session.updateRecord(identifier, f.getPath());
+                }
             } catch (SQLException ex) {
                 throw new MetadataIoException("SQL Exception while reading path for record", ex, NO_APPLICABLE_CODE);
             } finally {

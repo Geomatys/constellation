@@ -42,6 +42,8 @@ public class Session implements Closeable {
     private final Connection con;
 
     private PreparedStatement insertStatement = null;
+    
+    private PreparedStatement updateStatement = null;
 
     public Session(final Connection con) {
         this.con = con;
@@ -86,6 +88,20 @@ public class Session implements Closeable {
             insertStatement.setString(1, identifier);
             insertStatement.setString(2, path);
             insertStatement.executeUpdate();
+
+        } catch (SQLException unexpected) {
+            LOGGER.log(Level.WARNING, "Unexpected error occurred while inserting in csw database schema(id=" + identifier + " path=" + path +")", unexpected);
+        }
+    }
+    
+    public void updateRecord(final String identifier, final String path) throws SQLException {
+        try {
+            if (updateStatement == null) {
+                updateStatement = con.prepareStatement("UPDATE \"csw\".\"records\" SET \"path\" = ? WHERE \"identifier\"=?");
+            }
+            updateStatement.setString(1, path);
+            updateStatement.setString(2, identifier);
+            updateStatement.executeUpdate();
 
         } catch (SQLException unexpected) {
             LOGGER.log(Level.WARNING, "Unexpected error occurred while inserting in csw database schema(id=" + identifier + " path=" + path +")", unexpected);
@@ -199,6 +215,9 @@ public class Session implements Closeable {
         try {
             if (insertStatement != null) {
                 insertStatement.close();
+            }
+            if (updateStatement != null) {
+                updateStatement.close();
             }
             con.close();
         } catch (SQLException ex) {

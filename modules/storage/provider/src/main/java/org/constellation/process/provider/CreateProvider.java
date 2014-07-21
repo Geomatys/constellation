@@ -18,8 +18,15 @@
  */
 package org.constellation.process.provider;
 
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import javax.xml.namespace.QName;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.process.AbstractCstlProcess;
+import static org.constellation.process.provider.CreateProviderDescriptor.PROVIDER_TYPE;
+import static org.constellation.process.provider.CreateProviderDescriptor.SOURCE;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviderFactory;
 import org.constellation.provider.DataProviders;
@@ -28,18 +35,11 @@ import org.constellation.provider.ProviderFactory;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviderFactory;
 import org.constellation.provider.StyleProviders;
+import org.geotoolkit.feature.type.Name;
+import static org.geotoolkit.parameter.Parameters.value;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
-
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.constellation.process.provider.CreateProviderDescriptor.PROVIDER_TYPE;
-import static org.constellation.process.provider.CreateProviderDescriptor.SOURCE;
-import static org.geotoolkit.parameter.Parameters.value;
 
 /**
  * Create a new provider in constellation.

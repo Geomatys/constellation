@@ -19,11 +19,11 @@
 package org.constellation.process.provider;
 
 import org.apache.sis.util.iso.SimpleInternationalString;
+import org.constellation.process.AbstractCstlProcess;
+import org.constellation.process.AbstractCstlProcessDescriptor;
 import org.constellation.process.ConstellationProcessFactory;
 import org.geotoolkit.parameter.DefaultParameterDescriptor;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
-import org.geotoolkit.process.AbstractProcessDescriptor;
-import org.geotoolkit.process.Process;
 import org.opengis.parameter.GeneralParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptor;
 import org.opengis.parameter.ParameterDescriptorGroup;
@@ -34,7 +34,7 @@ import org.opengis.util.InternationalString;
  *
  * @author Quentin Boileau (Geomatys).
  */
-public class CreateProviderDescriptor extends AbstractProcessDescriptor {
+public class CreateProviderDescriptor extends AbstractCstlProcessDescriptor {
 
     public static final String NAME = "provider.create";
     public static final InternationalString ABSTRACT = new SimpleInternationalString("Create a new provider in constellation.");
@@ -68,7 +68,7 @@ public class CreateProviderDescriptor extends AbstractProcessDescriptor {
     }
 
     @Override
-    public Process createProcess(ParameterValueGroup input) {
+    public AbstractCstlProcess buildProcess(ParameterValueGroup input) {
         return new CreateProvider(this, input);
     }
 

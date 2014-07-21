@@ -21,6 +21,8 @@ package org.constellation.coverage.process;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import org.apache.sis.storage.DataStoreException;
 import org.constellation.coverage.PyramidCoverageHelper;
 import static org.constellation.coverage.process.PyramidCoverageDescriptor.COVERAGE_BASE_NAME;
@@ -74,7 +76,8 @@ public class PyramidCoverageProcess extends AbstractCstlProcess {
             ParametersExt.getOrCreateValue(pparams, ProviderParameters.SOURCE_TYPE_DESCRIPTOR.getName().getCode()).setValue("coverage-store");
             final ParameterValueGroup choiceparams = ParametersExt.getOrCreateGroup(pparams, factory.getStoreDescriptor().getName().getCode());
             final ParameterValueGroup xmlpyramidparams = ParametersExt.getOrCreateGroup(choiceparams, XMLCoverageStoreFactory.PARAMETERS_DESCRIPTOR.getName().getCode());
-            ParametersExt.getOrCreateValue(xmlpyramidparams, XMLCoverageStoreFactory.PATH.getName().getCode()).setValue(pyramidFolder.toURL());
+            final URL fileUrl = URI.create("file:"+ pyramidFolder.getAbsolutePath() +"/tiles").toURL();
+            ParametersExt.getOrCreateValue(xmlpyramidparams, XMLCoverageStoreFactory.PATH.getName().getCode()).setValue(fileUrl);
             ParametersExt.getOrCreateValue(xmlpyramidparams, XMLCoverageStoreFactory.NAMESPACE.getName().getCode()).setValue("no namespace");
             getOrCreate(PROVIDER_SOURCE, outputParameters).setValue(pparams);
         } catch (MalformedURLException ex) {

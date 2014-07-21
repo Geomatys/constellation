@@ -452,7 +452,9 @@ public class CSWConfigurer extends OGCConfigurer {
         try {
             // we get the CSW configuration file
             final Automatic config = (Automatic) serviceBusiness.getConfiguration("CSW", id);
-            config.setConfigurationDirectory(instanceDirectory);
+            if (config !=  null) {
+                config.setConfigurationDirectory(instanceDirectory);
+            }
             return config;
 
         } catch (ConfigurationException ex) {
