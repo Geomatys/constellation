@@ -188,6 +188,7 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
             } else if ($scope.mode.display==='addChooseStyle') {
                 $scope.layers.toStyle.layer.styleId = $scope.styles.selected.Id;
                 $scope.layers.toStyle.layer.styleName = $scope.styles.selected.Name;
+                $scope.viewMap();
                 $scope.mode.display = 'general';
             } else if ($scope.mode.display==='chooseLayer') {
                 // Add the selected layer to the current map context
@@ -201,6 +202,14 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
                 $scope.viewMap();
 
                 // Go back to first screen
+                $scope.mode.display = 'general';
+            }
+        };
+
+        $scope.cancel = function() {
+            if ($scope.mode.display==='general') {
+                $scope.close();
+            } else {
                 $scope.mode.display = 'general';
             }
         };
@@ -230,7 +239,7 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
             }
         }
 
-        $scope.addLayerToContext = function() {
+        $scope.goToAddLayerToContext = function() {
             $scope.mode.display = 'addChooseSource';
         };
 
@@ -256,6 +265,8 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
         };
 
         $scope.viewLayerInfo = function(item) {
+            var serviceIdentifier = (item.service) ? item.service.name : item.layer.serviceIdentifier;
+            var serviceVersions = (item.service) ? item.service.versions : item.layer.serviceVersions;
             return '<div><b>Name</b></div>' +
                 '<div>'+ item.layer.Name +'</div>' +
                 '<div><b>Alias</b></div>' +
@@ -263,12 +274,12 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
                 '<div><b>Type</b></div>' +
                 '<div>'+ item.layer.Type +'</div>' +
                 '<div><b>Service name</b></div>' +
-                '<div>'+ item.layer.serviceIdentifier +'</div>' +
+                '<div>'+ serviceIdentifier +'</div>' +
                 '<div><b>Service version(s)</b></div>' +
-                '<div>'+ item.layer.serviceVersions +'</div>';
+                '<div>'+ serviceVersions +'</div>';
         };
 
-        $scope.styleMapItem = function(item) {
+        $scope.goToStyleMapItem = function(item) {
             style.listAll({provider: 'sld'}, function(response) {
                 $scope.styles.existing = [];
                 for (var j=0; j<item.layer.TargetStyle.length; j++) {
@@ -286,10 +297,28 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
             $scope.layers.toStyle = item;
         };
 
-        $scope.deleteMapItem = function(layer) {
-            var index = $scope.layers.toAdd.indexOf(layer);
+        $scope.deleteMapItem = function(item) {
+            var index = $scope.layers.toAdd.indexOf(item);
             if (index != -1) {
                 $scope.layers.toAdd.splice(index, 1);
+            }
+
+            for (var i=0; i<DataViewer.layers.length; i++) {
+                var l = DataViewer.layers[i];
+                if (l.name === item.layer.Name) {
+                    DataViewer.map.removeLayer(l);
+                    return;
+                }
+            }
+        };
+
+        $scope.changeVisibility = function(item) {
+            for (var i=0; i<DataViewer.layers.length; i++) {
+                var l = DataViewer.layers[i];
+                if (l.name === item.layer.Name) {
+                    l.setVisibility(item.visible);
+                    return;
+                }
             }
         };
 
@@ -303,13 +332,20 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
             var layersToView = [];
             for (var i=0; i<$scope.layers.toAdd.length; i++) {
                 var l = $scope.layers.toAdd[i];
-                var serviceName = (l.layer.serviceIdentifier) ? l.layer.serviceIdentifier : l.service.identifier;
-                var layerData = (l.layer.styleName) ?
-                    DataViewer.createLayerWMSWithStyle(cstlUrl, l.layer.Name, serviceName, l.layer.styleName) :
-                    DataViewer.createLayerWMS(cstlUrl, l.layer.Name, serviceName);
-                layersToView.push(layerData);
+                if (l.visible) {
+                    var serviceName = (l.layer.serviceIdentifier) ? l.layer.serviceIdentifier : l.service.identifier;
+                    var layerData = (l.layer.styleName) ?
+                        DataViewer.createLayerWMSWithStyle(cstlUrl, l.layer.Name, serviceName, l.layer.styleName) :
+                        DataViewer.createLayerWMS(cstlUrl, l.layer.Name, serviceName);
+                    layersToView.push(layerData);
+                }
             }
+
             DataViewer.layers = layersToView;
+            if (layersToView.length === 0) {
+                return;
+            }
+
             DataViewer.initMap('mapContextMap');
 
             if ($scope.ctxt.id) {

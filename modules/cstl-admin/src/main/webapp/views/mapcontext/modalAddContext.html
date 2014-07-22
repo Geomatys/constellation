@@ -83,7 +83,7 @@
                                         <h3 translate="layer.listing.title">Layers list</h3>
                                     </div>
                                     <div class="col-sm-offset-1 col-sm-5">
-                                        <button type="button" class="btn btn-add form-control" ng-click="addLayerToContext()">
+                                        <button type="button" class="btn btn-add form-control" ng-click="goToAddLayerToContext()">
                                             <span class="icon-plus icon-white" style="margin-right:5px;"></span>
                                             <span translate="mapcontext.modal.add.layer">Add layer</span>
                                         </button>
@@ -103,7 +103,7 @@
                                                 <div ng-repeat="layerToAdd in layers.toAdd" class="row">
                                                     <div class="col-xs-1" style="padding-top:35px;">
                                                         <!-- Visibility -->
-                                                        <input type="checkbox" ng-model="layerToAdd.visible">
+                                                        <input type="checkbox" ng-model="layerToAdd.visible" ng-change="changeVisibility(layerToAdd)">
                                                     </div>
                                                     <div class="col-xs-9 no-padding">
                                                         <div class="item" ng-class="{coverage:layerToAdd.layer.Type.toUpperCase()==='coverage'.toUpperCase(),vector:layerToAdd.layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layerToAdd.layer.Type.toUpperCase()==='vector'.toUpperCase()}">
@@ -145,7 +145,7 @@
                                                             <span class="glyphicon glyphicon-info-sign"></span>
                                                         </div>
                                                         <!-- Edition -->
-                                                        <div class="btn btn-sm" ng-click="styleMapItem(layerToAdd)" style="padding:2px 5px;">
+                                                        <div class="btn btn-sm" ng-click="goToStyleMapItem(layerToAdd)" style="padding:2px 5px;">
                                                             <span class="glyphicon glyphicon-pencil"></span>
                                                         </div>
                                                         <!-- Delete -->
@@ -325,7 +325,7 @@
             </div>
         </div>
         <div class="modal-footer">
-            <button type="button" id="cancelButton" class="btn btn-default" ng-click="close()" translate="mapcontext.modal.cancel">Cancel</button>
+            <button type="button" id="cancelButton" class="btn btn-default" ng-click="cancel()" translate="mapcontext.modal.cancel">Cancel</button>
             <button type="button" id="submitButton" class="btn btn-primary" ng-click="validate()" translate="mapcontext.modal.validate">Validate</button>
         </div>
     </div>
