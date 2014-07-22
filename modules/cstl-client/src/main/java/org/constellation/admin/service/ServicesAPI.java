@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.apache.sis.util.ArgumentChecks.ensureNonNull;
+import org.constellation.configuration.WebdavContext;
 
 /**
  * Constellation RESTful API for services management/configuration.
@@ -148,6 +149,8 @@ public final class ServicesAPI {
             classBinding = ProcessContext.class;
         } else if (Specification.SOS.equals(serviceType)) {
             classBinding = SOSConfiguration.class;
+        } else if (Specification.WEBDAV.equals(serviceType)) {
+            classBinding = WebdavContext.class;
         } else {
             throw new IOException("Invalid specification chosen to get instance configuration "+ serviceType);
         }

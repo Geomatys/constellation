@@ -39,9 +39,9 @@ public class JServiceEditPane extends javax.swing.JPanel {
     private final Instance serviceInstance;
     private final JServiceEditionPane serviceEditionPanel;
 
-    public JServiceEditPane(final ConstellationClient serverV2, final String serviceType, final Instance serviceInstance) throws IOException {
+    public JServiceEditPane(final ConstellationClient serverV2, final String serviceTyp, final Instance serviceInstance) throws IOException {
         this.serverV2 = serverV2;
-        this.serviceType = serviceType;
+        this.serviceType = serviceTyp.toUpperCase();
         this.serviceInstance = serviceInstance;
         Object configuration = serverV2.services.getInstanceConfiguration(ServiceDef.Specification.valueOf(serviceType), serviceInstance.getIdentifier());
         initComponents();
@@ -167,8 +167,10 @@ public class JServiceEditPane extends javax.swing.JPanel {
     private void guiSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guiSaveActionPerformed
         try {
             correctName();
-            serverV2.services.rename(ServiceDef.Specification.valueOf(serviceType), serviceInstance.getIdentifier(), guiName.getText());
-            serviceInstance.setIdentifier(guiName.getText());
+            if (!serviceInstance.getIdentifier().equals(guiName.getText())) {
+                serverV2.services.rename(ServiceDef.Specification.valueOf(serviceType), serviceInstance.getIdentifier(), guiName.getText());
+                serviceInstance.setIdentifier(guiName.getText());
+            }
             if (serviceEditionPanel != null) {
                 serverV2.services.setInstanceConfiguration(ServiceDef.Specification.fromShortName(serviceType), serviceInstance.getIdentifier(), serviceEditionPanel.getConfiguration());
             }

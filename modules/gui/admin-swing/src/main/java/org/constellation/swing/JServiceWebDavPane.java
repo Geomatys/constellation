@@ -46,7 +46,9 @@ public class JServiceWebDavPane extends JServiceEditionPane {
             this.guiHideFileCheckBox.setSelected(this.configuration.isHideDotFile());
             this.guiTextContextPath.setText(this.configuration.getContextPath());
             this.guiTextDefaultPage.setText(this.configuration.getDefaultPage());
-            this.guiTextRootFolder.setText(this.configuration.getRootFile().getPath());
+            if (this.configuration.getRootFile() != null) {
+                this.guiTextRootFolder.setText(this.configuration.getRootFile().getPath());
+            }
         }
     }
 

@@ -132,7 +132,11 @@ public final class MapRest {
     @POST
     @Path("{id}/delete/{layerid}")
     public Response deleteLayer(final @PathParam("spec") String spec, final @PathParam("id") String serviceId, final @PathParam("layerid") String layerId, final SimpleValue layernmsp) throws ConfigurationException {
-        layerBusiness.remove(spec, serviceId, layerId, layernmsp.getValue());
+        String namespace = null;
+        if (layernmsp != null && !layernmsp.getValue().isEmpty()) {
+            namespace = layernmsp.getValue();
+        }
+        layerBusiness.remove(spec, serviceId, layerId, namespace);
         return Response.ok().build();
     }
 

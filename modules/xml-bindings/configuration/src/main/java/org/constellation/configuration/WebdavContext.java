@@ -65,7 +65,10 @@ public class WebdavContext extends AbstractConfigurationObject {
      * @return the rootFile
      */
     public File getRootFile() {
-        return new File(rootFile);
+        if (rootFile != null) {
+            return new File(rootFile);
+        }
+        return null;
     }
 
     /**

@@ -179,7 +179,8 @@ public final class JServicesPane extends JPanel implements ActionListener, Prope
             for(Map.Entry<String,List<String>> service : services.entrySet()){
 
                 if("all".equals(action) || action.equalsIgnoreCase(service.getKey())){
-                    final InstanceReport report = cstlV2.services.getInstances(ServiceDef.Specification.valueOf(service.getKey()));
+                    final String serviceType = service.getKey().toUpperCase();
+                    final InstanceReport report = cstlV2.services.getInstances(ServiceDef.Specification.valueOf(serviceType));
                     if (report != null) {
                         if (report.getInstances() == null) continue;
                         for(Instance instance : report.getInstances()){
@@ -312,7 +313,8 @@ public final class JServicesPane extends JPanel implements ActionListener, Prope
             try {
                 final Details metadata = new Details();
                 metadata.setIdentifier(params[1]);
-                cstlV2.services.newInstance(ServiceDef.Specification.valueOf(params[0]), metadata);
+                final String serviceType = params[0].toUpperCase();
+                cstlV2.services.newInstance(ServiceDef.Specification.valueOf(serviceType), metadata);
                 updateInstanceList();
             } catch (IOException ex) {
                 Exceptions.printStackTrace(ex);
