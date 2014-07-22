@@ -255,8 +255,17 @@ cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstan
             }
         };
 
-        $scope.editMapItem = function(item) {
-
+        $scope.viewLayerInfo = function(item) {
+            return '<div><b>Name</b></div>' +
+                '<div>'+ item.layer.Name +'</div>' +
+                '<div><b>Alias</b></div>' +
+                '<div>'+ item.layer.Alias +'</div>' +
+                '<div><b>Type</b></div>' +
+                '<div>'+ item.layer.Type +'</div>' +
+                '<div><b>Service name</b></div>' +
+                '<div>'+ item.layer.serviceIdentifier +'</div>' +
+                '<div><b>Service version(s)</b></div>' +
+                '<div>'+ item.layer.serviceVersions +'</div>';
         };
 
         $scope.styleMapItem = function(item) {
