@@ -152,7 +152,7 @@
                     <!--             <span translate="global.menu.viewer">visualiseur</span> -->
                     <!--         </a></li> -->
 
-                    <li class="hidden-sm hidden-md" ng-class="{'hidden-lg':!hasRole('cstl-admin'), 'hidden-xs':!hasRole('cstl-admin')}" ng-show="hasRole('cstl-admin')">
+                    <li class="hidden-sm hidden-md" ng-if="hasRole('cstl-admin')">
                         <a ng-class="navClass('admin')" href="#/admin">
                             <span ng-class="navClass('admin')" class="glyphicon glyphicon-wrench"></span>
                             <span translate="global.menu.admin.main">Administration</span>
@@ -179,7 +179,7 @@
                                     <span translate="global.menu.tasks">Tasks</span>
                                 </a>
                             </li>
-                            <li ng-show="hasRole('cstl-admin')">
+                            <li ng-if="hasRole('cstl-admin')">
                                 <a ng-class="navClass('admin')" href="#/admin">
                                     <span ng-class="navClass('admin')" class="glyphicon glyphicon-wrench"></span>
                                     <span translate="global.menu.admin.main">Administration</span>
@@ -302,6 +302,7 @@
 <script src="bower_components/angular-ui-ace/ui-ace.js"></script>
 <script src="scripts/angularui-buttons.js"></script>
 <script src="scripts/angularui-accordion.js"></script>
+<script src="scripts/angularui-popover.js"></script>
 <!-- endbuild -->
 </body>
 

@@ -3,7 +3,7 @@
     <div class="form-group">
         <label class="col-sm-4 col-md-3 control-label" translate="edition.style.label.name">Name</label>
         <div class="col-sm-5">
-            <input type="text" class="form-control" ng-model="symbolizer.name"/>
+            <input type="text" class="form-control form-control-fix" ng-model="symbolizer.name"/>
         </div>
     </div>
     <hr/>
@@ -41,13 +41,13 @@
     <div class="form-group">
         <label class="col-sm-3 control-label" translate="sldeditor.edition.size">Size</label>
         <div class="col-sm-9 col-md-4">
-            <input type="number"class="form-control" ng-model="symbolizer.stroke.width" min="0"/>
+            <input type="number"class="form-control form-control-fix" ng-model="symbolizer.stroke.width" min="0"/>
         </div>
     </div>
     <div class="form-group">
         <label  class="col-sm-3 control-label">Type</label>
         <div class="col-sm-9 col-lg-4">
-            <select ng-model="traitType" class="form-control" ng-change="$parent.addStrokeDashArray(symbolizer,traitType)">
+            <select ng-model="traitType" class="form-control form-control-fix" ng-change="$parent.addStrokeDashArray(symbolizer,traitType)">
                 <option value="" translate="sldeditor.edition.full">Full</option>
                 <option value="pointille" translate="sldeditor.edition.stipple">Dashed</option>
             </select>
@@ -59,7 +59,7 @@
                 </div>
                 <div class="col-sm-9 col-md-3 col-xs-6">
                     <input type="number"
-                           class="form-control"
+                           class="form-control form-control-fix"
                            ng-model="symbolizer.stroke.dashArray[0]"/>
                 </div>
                 <div class="col-sm-3 col-lg-2 col-xs-12">
@@ -67,7 +67,7 @@
                 </div>
                 <div class="col-sm-9 col-md-3 col-xs-6">
                     <input type="number"
-                           class="form-control"
+                           class="form-control form-control-fix"
                            ng-model="symbolizer.stroke.dashArray[1]"/>
                 </div>
             </div>
@@ -132,7 +132,7 @@
     <div class="form-group">
         <label class="col-sm-3 control-label" translate="sldeditor.edition.offset">Offset</label>
         <div class="col-sm-4">
-            <input type="number" class="form-control" ng-model="symbolizer.stroke.dashOffset"/>
+            <input type="number" class="form-control form-control-fix" ng-model="symbolizer.stroke.dashOffset"/>
         </div>
     </div>
 </form>

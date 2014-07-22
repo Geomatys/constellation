@@ -1589,3 +1589,8 @@ vertical-align: middle;
     color: #FFFFFF !important;
     text-decoration: none;
 }
+
+h3.popover-title {
+    font-size: 14px;
+    font-weight: normal;
+}

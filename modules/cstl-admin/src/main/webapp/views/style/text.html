@@ -2,14 +2,14 @@
     <div class="form-group">
         <label class="col-sm-4 col-md-3 control-label" translate="edition.style.label.name">Name</label>
         <div class="col-sm-5">
-            <input type="text" class="form-control" ng-model="symbolizer.name"/>
+            <input type="text" class="form-control form-control-fix" ng-model="symbolizer.name"/>
         </div>
     </div>
     <hr/>
     <div class="form-group">
         <label class="col-sm-4 col-md-3 control-label" translate="sldeditor.edition.label">Label</label>
         <div class="col-sm-8 col-md-6">
-            <input type="text" class="form-control" ng-model="symbolizer.label"/>
+            <input type="text" class="form-control form-control-fix" ng-model="symbolizer.label"/>
         </div>
         <div class="col-sm-offset-4 col-sm-1 col-md-offset-0">
             <button type="button"
@@ -21,7 +21,7 @@
         <div class="col-sm-6 col-md-offset-3 col-md-6"
              ng-show="dispPropNames"
              style="margin-top:10px;">
-            <select class="form-control"
+            <select class="form-control form-control-fix"
                     ng-init="loadDataProperties();"
                     ng-model="symbolizer.label">
                 <option ng-value="'{'+dp.name+'}'" ng-repeat="dp in $parent.attributesExcludeGeometry">{{dp.name}}</option>
@@ -31,7 +31,7 @@
     <div class="form-group">
         <label class="col-sm-4 col-md-3 control-label" translate="sldeditor.edition.font">Font</label>
         <div class="col-sm-6">
-            <select class="form-control"
+            <select class="form-control form-control-fix"
                     ng-init="$parent.initFontFamilies(symbolizer)"
                     ng-model="symbolizer.font.family[0]">
                 <option value="Arial" style="font-family: Arial;">Arial</option>

@@ -274,6 +274,11 @@ ul.dropdown-images li a:hover{
     height: 147px;
 }
 
+.form-control-fix{
+    padding: 6px;
+    font-size: 12px;
+}
+
 /* Small devices (tablets, 768px and up) */
 @media (min-width: 768px) and (max-width: 991px) { 
 	/*choix type*/

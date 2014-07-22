@@ -126,11 +126,9 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             pageSld: 'views/style/chooseType.html'
         };
 
-        $scope.chosenTab = 'description';
-
         $scope.openPalette = false;
         
-        $scope.repartition = undefined; 
+        $scope.repartition = undefined;
         
         
         /**
@@ -963,9 +961,13 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                     if($scope.attributesExcludeGeometry.length>0){
                         $scope.optionsSLD.autoUniqueValues.attr=$scope.attributesExcludeGeometry[0].name;
                     }
-                    $scope.band.selected = $scope.dataProperties.bands[0];
-                    $scope.palette.rasterMinValue = $scope.band.selected.minValue;
-                    $scope.palette.rasterMaxValue = $scope.band.selected.maxValue;
+
+                    //for raster only
+                    if($scope.dataProperties.bands){
+                        $scope.band.selected = $scope.dataProperties.bands[0];
+                        $scope.palette.rasterMinValue = $scope.band.selected.minValue;
+                        $scope.palette.rasterMaxValue = $scope.band.selected.maxValue;
+                    }
                 },
                 function() {
                     $growl('error', 'Error', 'Unable to get data properties for layer '+$scope.layerName);
@@ -1539,37 +1541,55 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                             var extent = new OpenLayers.Bounds($scope.dataBbox[0], $scope.dataBbox[1], $scope.dataBbox[2], $scope.dataBbox[3]);
                             DataViewer.map.zoomToExtent(extent, true);
                         }
+                        DataViewer.map.events.register("moveend", DataViewer.map, function(){
+                            setCurrentScale();
+                        });
+                        setCurrentScale();
                     }
                 );
             }
 
-            //show palette
-            style.paletteStyle({provider: 'sld_temp', name : $scope.newStyle.name, ruleName : $scope.newStyle.rules[0].name}, 
-    		function(response) {
-            	$scope.repartition = response;
-            },
-            function() {
-                $growl('error', 'Error', 'Unable to get palette for '+$scope.layerName);
-            });
+            //For raster only
+            if ($scope.dataType.toLowerCase() === 'coverage' || $scope.dataType.toLowerCase() === 'raster') {
+                //show palette
+                style.paletteStyle({provider: 'sld_temp', name : $scope.newStyle.name, ruleName : $scope.newStyle.rules[0].name},
+                    function(response) {
+                        $scope.repartition = response;
+                    },
+                    function() {
+                        $growl('error', 'Error', 'Unable to get palette for '+$scope.layerName);
+                    });
 
-            ///show histogram
-            var values = {
-                "values":{
-                    "dataProvider":$scope.providerId,
-                    "dataId":$scope.layerName
-                }
-            };
+                ///show histogram
+                var values = {
+                    "values":{
+                        "dataProvider":$scope.providerId,
+                        "dataId":$scope.layerName
+                    }
+                };
 
-            style.statistics({}, values,
-                function(response){
-                    console.log("repartition size => "+response.bands[0].repartition);
-                },
-                function(){
-                    $growl('error', 'Error', 'Unable to get statistics '+$scope.layerName);
+                style.statistics({}, values,
+                    function(response){
+                        console.log("repartition size => "+response.bands[0].repartition);
+                    },
+                    function(){
+                        $growl('error', 'Error', 'Unable to get statistics '+$scope.layerName);
 
-                });
+                    });
 
-            $scope.palette.open = true;
+                $scope.palette.open = true;
+            }
+        };
+
+        /**
+         * Utility function to set the current scale of OL map into page element.
+         */
+        var setCurrentScale = function(){
+            if(DataViewer.map) {
+                var currentScale=DataViewer.map.getScale();
+                //currentScale = Math.round(currentScale);
+                jQuery('.currentScale').html("1 / "+currentScale);
+            }
         };
 
         $scope.setMinScale = function(){

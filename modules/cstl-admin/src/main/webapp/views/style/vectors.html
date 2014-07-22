@@ -8,7 +8,7 @@
                            style="margin-top: 8px;"
                            translate="sldeditor.name">Style name</label>
                     <div class="col-xs-7 col-sm-7 col-md-8">
-                        <input type="text" class="form-control" ng-model="$parent.newStyle.name">
+                        <input type="text" class="form-control form-control-fix" ng-model="$parent.newStyle.name">
                     </div>
                 </div>
             </div>
@@ -73,19 +73,19 @@
                     <span translate="sldeditor.breadcrumb.edition">Rule edition</span>
                 </li>
             </ol>
-            <ul class="nav nav-tabs">
-                <li ng-class="{active: $parent.chosenTab==='description'}">
-                    <a ng-click="$parent.chosenTab = 'description'" data-toggle="tab">
+            <ul class="nav nav-tabs" ng-init="chosenTab = 'description'">
+                <li ng-class="{active: chosenTab==='description'}">
+                    <a ng-click="chosenTab = 'description'" data-toggle="tab">
                         <span translate="edition.style.label.description" >Description</span>
                     </a>
                 </li>
-                <li ng-class="{active: $parent.chosenTab==='symbols'}">
-                    <a ng-click="$parent.chosenTab = 'symbols'" data-toggle="tab">
+                <li ng-class="{active: chosenTab==='symbols'}">
+                    <a ng-click="chosenTab = 'symbols'" data-toggle="tab">
                         <span translate="label.symbols" >Symbols</span>
                     </a>
                 </li>
-                <li ng-class="{active: $parent.chosenTab==='filters'}">
-                    <a ng-click="$parent.chosenTab = 'filters'" data-toggle="tab">
+                <li ng-class="{active: chosenTab==='filters'}">
+                    <a ng-click="chosenTab = 'filters'" data-toggle="tab">
                         <span translate="edition.style.label.filters" >Filters</span>
                     </a>
                 </li>
@@ -101,7 +101,7 @@
                                            translate="label.name">Name</label>
                                     <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
                                         <input type="text"
-                                               class="form-control"
+                                               class="form-control form-control-fix"
                                                id="inputrulename"
                                                ng-model="optionsSLD.selectedRule.name"/>
                                     </div>
@@ -112,7 +112,7 @@
                                            translate="label.title">Title</label>
                                     <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
                                         <input type="text"
-                                               class="form-control"
+                                               class="form-control form-control-fix"
                                                id="inputRuleTitle"
                                                ng-model="optionsSLD.selectedRule.title"/>
                                     </div>
@@ -123,7 +123,7 @@
                                            translate="description">Description</label>
                                     <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
                                         <textarea id="inputRuleDesc"
-                                                  class="form-control"
+                                                  class="form-control form-control-fix"
                                                   rows="3"
                                                   ng-model="optionsSLD.selectedRule.description"></textarea>
                                     </div>
@@ -213,8 +213,9 @@
                                             <span class="pull-left"
                                                   style="position:absolute"
                                                   ng-if="optionsSLD.selectedRule.minScale != undefined && optionsSLD.selectedRule.minScale !== 0">1/</span>
-                                            <input type="text"
+                                            <input type="number"
                                                    class="form-control"
+                                                   style="font-size: 12px;"
                                                    id="minScale"
                                                    ng-model="optionsSLD.selectedRule.minScale"
                                                    min="0"/>
@@ -229,24 +230,23 @@
                                             <span class="pull-left"
                                                   style="position:absolute"
                                                   ng-if="optionsSLD.selectedRule.maxScale != undefined && optionsSLD.selectedRule.maxScale !== 0">1/</span>
-                                            <input type="text"
+                                            <input type="number"
                                                    class="form-control"
+                                                   style="font-size: 12px;"
                                                    id="maxScale"
                                                    ng-model="optionsSLD.selectedRule.maxScale"
                                                    min="0"/>
                                         </div>
                                     </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-5 col-md-4"
+                                               style="font-size: 13px;font-weight:normal;margin-bottom:0;padding-left:15px;padding-right:15px;text-align:right;color:#808080;">
+                                            <em translate="sldeditor.edition.currentScale">Current scale of the map</em>
+                                        </label>
+                                        <em style="font-size: 13px;color:#808080;"
+                                            class="col-sm-7 col-md-8 currentScale"></em>
+                                    </div>
                                     <hr style="margin-bottom:10px;"/>
-                                    <!--div class="form-group">
-                                        <div class="col-sm-5 col-md-4">
-                                            <button type="button" class="btn btn-default btn-md btn-editer">
-                                                <span class="glyphicon glyphicon-pencil"></span> Editer
-                                            </button>
-                                        </div>
-                                        <div class="col-sm-7 col-md-8">
-                                            <textarea class="form-control" rows="3" ng-model="optionsSLD.selectedRule.filter"></textarea>
-                                        </div>
-                                    </div-->
                                     <div class="form-group">
                                         <div class="col-xs-8">
                                             <div>
@@ -265,7 +265,7 @@
                                             <tbody>
                                                 <tr ng-repeat="filter in optionsSLD.filters">
                                                     <td>
-                                                        <select class="form-control"
+                                                        <select class="form-control form-control-fix"
                                                                 ng-init="loadDataProperties();"
                                                                 ng-model="filter.attribute"
                                                                 ng-change="applyFilter();">
@@ -274,7 +274,7 @@
                                                         </select>
                                                     </td>
                                                     <td>
-                                                        <select class="form-control"
+                                                        <select class="form-control form-control-fix"
                                                                 ng-model="filter.comparator"
                                                                 size="1"
                                                                 ng-change="applyFilter();">
@@ -290,12 +290,12 @@
                                                     </td>
                                                     <td>
                                                         <input type="text"
-                                                               class="form-control"
+                                                               class="form-control form-control-fix"
                                                                ng-model="filter.value"
                                                                ng-change="applyFilter();"/>
                                                     </td>
                                                     <td>
-                                                        <select class="form-control"
+                                                        <select class="form-control form-control-fix"
                                                                 ng-model="filter.operator"
                                                                 ng-change="addNewFilter(filter.operator,$index);"
                                                                 size="1">
@@ -341,7 +341,7 @@
                                 <label class="col-xs-6 col-sm-6 col-md-6 col-lg-6 control-label"
                                        translate="sldeditor.edition.field">Attribute field</label>
                                 <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                                    <select class="form-control"
+                                    <select class="form-control form-control-fix"
                                             ng-init="loadDataProperties();"
                                             ng-model="optionsSLD.autoIntervalValues.attr">
                                         <option ng-repeat="dp in $parent.attributesTypeNumber" ng-value="dp.name">{{dp.name}}</option>
@@ -353,7 +353,7 @@
                                        translate="sldeditor.edition.intervalsCount">Intervals count</label>
                                 <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
                                     <input type="number"
-                                           class="form-control"
+                                           class="form-control form-control-fix"
                                            ng-model="optionsSLD.autoIntervalValues.nbIntervals"
                                            min="1"/>
                                 </div>
@@ -362,7 +362,7 @@
                                 <label class="col-xs-6 col-sm-6 col-md-6 col-lg-6 control-label"
                                        translate="sldeditor.edition.method">Quantization method</label>
                                 <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                                    <select class="form-control"
+                                    <select class="form-control form-control-fix"
                                             ng-model="optionsSLD.autoIntervalValues.method">
                                         <option value="equidistant" translate="sldeditor.edition.equidistant">equidistant cutting</option>
                                         <option value="mediane" translate="sldeditor.edition.mediane">median cut</option>
@@ -373,7 +373,7 @@
                                 <label class="col-xs-6 col-sm-6 col-md-6 col-lg-6 control-label"
                                        translate="sldeditor.edition.symboltype">Symbol type</label>
                                 <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                                    <select class="form-control"
+                                    <select class="form-control form-control-fix"
                                             ng-model="optionsSLD.autoIntervalValues.symbol">
                                         <option value="point" translate="edition.style.label.point">Point</option>
                                         <option value="line" translate="edition.style.label.line">Line</option>
@@ -478,7 +478,7 @@
                                 <label class="col-xs-6 col-sm-6 col-md-6 col-lg-6 control-label"
                                        translate="sldeditor.edition.field">Attribute field</label>
                                 <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                                    <select class="form-control"
+                                    <select class="form-control form-control-fix"
                                             ng-init="loadDataProperties();"
                                             ng-model="optionsSLD.autoUniqueValues.attr">
                                         <option ng-repeat="dp in $parent.attributesExcludeGeometry" ng-value="dp.name">{{dp.name}}</option>
@@ -489,7 +489,7 @@
                                 <label class="col-xs-6 col-sm-6 col-md-6 col-lg-6 control-label"
                                        translate="sldeditor.edition.symboltype">Symbol type</label>
                                 <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                                    <select class="form-control"
+                                    <select class="form-control form-control-fix"
                                             ng-model="optionsSLD.autoUniqueValues.symbol">
                                         <option value="point" translate="edition.style.label.point">Point</option>
                                         <option value="line" translate="edition.style.label.line">Line</option>
@@ -590,10 +590,10 @@
                 </button>
             </div>
         </div>
-        <div style="position: absolute; z-index: 800; padding-left: 5px; padding-top: 5px;" ng-show="chosenTab==='filters'">
+        <!--div style="position: absolute; z-index: 800; padding-left: 5px; padding-top: 5px;" ng-show="chosenTab==='filters'">
             <button type="button" class="btn btn-add" ng-click="setMinScale()" title="min scale filter">min</button>
             <button type="button" class="btn btn-add" ng-click="setMaxScale()" title="max scale filter">max</button>
-        </div>
+        </div-->
         <div class="bloc_apercu" id="styledMapOL" style="height: 448px;"></div>
     </div>
 </div>

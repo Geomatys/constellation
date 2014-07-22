@@ -5,8 +5,8 @@
  * Version: 0.10.0 - 2014-01-15
  * License: MIT
  */
-angular.module("ui.bootstrap", ["ui.bootstrap.tpls", "ui.bootstrap.transition","ui.bootstrap.collapse","ui.bootstrap.accordion"]);
-angular.module("ui.bootstrap.tpls", ["template/accordion/accordion-group.html","template/accordion/accordion.html"]);
+angular.module("ui.bootstrap", ["ui.bootstrap.tpls-accordion", "ui.bootstrap.transition","ui.bootstrap.collapse","ui.bootstrap.accordion"]);
+angular.module("ui.bootstrap.tpls-accordion", ["template/accordion/accordion-group.html","template/accordion/accordion.html"]);
 angular.module('ui.bootstrap.transition', [])
 
 /**
