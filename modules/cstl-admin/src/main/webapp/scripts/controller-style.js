@@ -129,8 +129,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         $scope.openPalette = false;
         
         $scope.repartition = undefined;
-        
-        
+
         /**
          * SLD model object that store all needed variables to avoid angular bug behaviour in modal.
          */
