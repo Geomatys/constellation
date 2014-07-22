@@ -81,8 +81,10 @@ public class LoginController {
 		}
 		
 		Cookie cookie = new Cookie("cstlAdmin", adminUrl);
-		cookie.setPath("/constellation/spring/auth/");
-		response.addCookie(cookie);
+
+		cookie.setPath( request.getContextPath() + "/spring/auth/");
+
+        response.addCookie(cookie);
 	}
 
 	private String retrieveCstlAdmin(HttpServletRequest httpServletRequest) {
