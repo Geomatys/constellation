@@ -813,6 +813,9 @@
     "sldeditor.edition.palette.label":"Palette",
     "sldeditor.edition.palette.custom":"Personnaliser une palette",
     "sldeditor.edition.autointerval.generate":"Générer les règles",
+    "sldeditor.edition.filter.scale.help.title":"A propos",
+    "sldeditor.edition.filter.scale.help":"Vous pouvez filtrer sur l'échelle de zoom en spécifiant un intervalle d'échelles où la donnée sera visible.",
+    "sldeditor.edition.filter.getScale":"Récupérer l'échelle courante de la carte.",
 
     "tooltip.service.create.name":"L'identifiant peut être le même que le nom",
     "tooltip.service.create.tag":"Utiliser la touche Tab ou Entrée pour valider un mot-clé",

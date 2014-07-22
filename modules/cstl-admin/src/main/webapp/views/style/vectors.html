@@ -199,6 +199,13 @@
                         <div class="row">
                             <div class="col-xs-10">
                                 <strong translate="edition.style.label.filterScale">Filter based on the zoom level</strong>
+                                <i popover-placement="bottom"
+                                   popover-trigger="mouseenter"
+                                   popover="{{'sldeditor.edition.filter.scale.help' | translate}}"
+                                   popover-title="{{'sldeditor.edition.filter.scale.help.title' | translate}}">
+                                             <span style="font-size: 18px;cursor:pointer;"
+                                                   class="glyphicon glyphicon-question-sign"></span>
+                                </i>
                             </div>
                         </div>
                         <div class="row" style="margin-top: 8pt;">
@@ -206,45 +213,65 @@
                                 <form class="form-horizontal form-style" role="form">
                                     <div class="form-group">
                                         <label for="minScale"
-                                               class="col-sm-5 col-md-4 control-label"
+                                               class="col-xs-5 col-sm-5 col-md-5 col-lg-4 control-label"
                                                style="font-size: 12px;font-weight: normal;"
                                                translate="edition.style.label.filterScaleMin">Minimal scale</label>
-                                        <div class="col-sm-7 col-md-8">
+                                        <div class="col-xs-7 col-sm-7 col-md-6 col-lg-6">
                                             <span class="pull-left"
                                                   style="position:absolute"
                                                   ng-if="optionsSLD.selectedRule.minScale != undefined && optionsSLD.selectedRule.minScale !== 0">1/</span>
-                                            <input type="number"
-                                                   class="form-control"
-                                                   style="font-size: 12px;"
-                                                   id="minScale"
-                                                   ng-model="optionsSLD.selectedRule.minScale"
-                                                   min="0"/>
+                                            <div class="input-group">
+                                                <input type="number"
+                                                       class="form-control"
+                                                       style="font-size: 12px;"
+                                                       id="minScale"
+                                                       ng-model="optionsSLD.selectedRule.minScale"
+                                                       min="0"/>
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-info"
+                                                            type="button"
+                                                            ng-click="setMinScale();"
+                                                            title="{{'sldeditor.edition.filter.getScale' | translate}}">
+                                                        <i class="glyphicon glyphicon-arrow-left"></i>
+                                                    </button>
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="maxScale"
-                                               class="col-sm-5 col-md-4 control-label"
+                                               class="col-xs-5 col-sm-5 col-md-5 col-lg-4 control-label"
                                                style="font-size: 12px;font-weight: normal;"
                                                translate="edition.style.label.filterScaleMax">Maximal scale</label>
-                                        <div class="col-sm-7 col-md-8">
+                                        <div class="col-xs-7 col-sm-7 col-md-6 col-lg-6">
                                             <span class="pull-left"
                                                   style="position:absolute"
                                                   ng-if="optionsSLD.selectedRule.maxScale != undefined && optionsSLD.selectedRule.maxScale !== 0">1/</span>
-                                            <input type="number"
-                                                   class="form-control"
-                                                   style="font-size: 12px;"
-                                                   id="maxScale"
-                                                   ng-model="optionsSLD.selectedRule.maxScale"
-                                                   min="0"/>
+                                            <div class="input-group">
+                                                <input type="number"
+                                                       class="form-control"
+                                                       style="font-size: 12px;"
+                                                       id="maxScale"
+                                                       ng-model="optionsSLD.selectedRule.maxScale"
+                                                       min="0"/>
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-info"
+                                                            type="button"
+                                                            ng-click="setMaxScale();"
+                                                            title="{{'sldeditor.edition.filter.getScale' | translate}}">
+                                                        <i class="glyphicon glyphicon-arrow-left"></i>
+                                                    </button>
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="col-sm-5 col-md-4"
+                                        <label class="col-xs-5 col-sm-5 col-md-6 col-lg-6"
                                                style="font-size: 13px;font-weight:normal;margin-bottom:0;padding-left:15px;padding-right:15px;text-align:right;color:#808080;">
                                             <em translate="sldeditor.edition.currentScale">Current scale of the map</em>
                                         </label>
                                         <em style="font-size: 13px;color:#808080;"
-                                            class="col-sm-7 col-md-8 currentScale"></em>
+                                            class="col-xs-7 col-sm-7 col-md-6 col-lg-6 currentScale"></em>
                                     </div>
                                     <hr style="margin-bottom:10px;"/>
                                     <div class="form-group">

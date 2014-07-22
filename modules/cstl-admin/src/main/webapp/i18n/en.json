@@ -839,6 +839,9 @@
     "sldeditor.edition.palette.label":"Palette",
     "sldeditor.edition.palette.custom":"Use custom palette",
     "sldeditor.edition.autointerval.generate":"Generate rules",
+    "sldeditor.edition.filter.scale.help.title":"About",
+    "sldeditor.edition.filter.scale.help":"You can add a filter by specifying the scale where the data will be displayed",
+    "sldeditor.edition.filter.getScale":"Get the current scale of the map.",
 
     "tooltip.service.create.name":"The identifier can be the same as the name",
     "tooltip.service.create.tag":"Use Tab or Enter keys to validate keyword",

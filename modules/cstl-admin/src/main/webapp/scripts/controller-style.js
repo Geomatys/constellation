@@ -400,7 +400,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                         "name": 'default',
                         "title":'',
                         "description":'',
-                        "maxScale":1.7976931348623157E308,
+                        "maxScale":500000000,
                         "symbolizers": [],
                         "filter": null
                     };
@@ -448,7 +448,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                         "name": 'palette-rule',
                         "title":'',
                         "description":'',
-                        "maxScale":1.7976931348623157E308,
+                        "maxScale":500000000,
                         "symbolizers": [],
                         "filter": null
                     };
@@ -463,7 +463,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                         "name": 'cell-rule',
                         "title":'',
                         "description":'',
-                        "maxScale":1.7976931348623157E308,
+                        "maxScale":500000000,
                         "symbolizers": [],
                         "filter": null
                     };
@@ -1464,19 +1464,11 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                     styleName = $scope.selected.Name;
                 }
                 var layerData;
-//                if (serviceName) {
-//                    if(styleName){
-//                        layerData = DataViewer.createLayerWMSWithStyle($cookies.cstlUrl, $scope.layerName, $scope.serviceName, styleName);
-//                    }   else {
-//                        layerData = DataViewer.createLayerWMS($cookies.cstlUrl, $scope.layerName, $scope.serviceName);
-//                    }
-//                } else {
-                    if(styleName){
-                        layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName, $scope.providerId, styleName);
-                    }else {
-                        layerData = DataViewer.createLayer($cookies.cstlUrl, $scope.layerName, $scope.providerId);
-                    }
-//                }
+                if(styleName){
+                    layerData = DataViewer.createLayerWithStyle($cookies.cstlUrl, $scope.layerName, $scope.providerId, styleName);
+                }else {
+                    layerData = DataViewer.createLayer($cookies.cstlUrl, $scope.layerName, $scope.providerId);
+                }
                 //to force the browser cache reloading styled layer.
                 layerData.mergeNewParams({ts:new Date().getTime()});
                 var layerBackground = DataViewer.createLayer($cookies.cstlUrl, "CNTR_BN_60M_2006", "generic_shp");
@@ -1586,30 +1578,30 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         var setCurrentScale = function(){
             if(DataViewer.map) {
                 var currentScale=DataViewer.map.getScale();
-                //currentScale = Math.round(currentScale);
+                currentScale = Math.round(currentScale);
                 jQuery('.currentScale').html("1 / "+currentScale);
             }
         };
 
+        /**
+         * Binding action to set the map's scale as filter min scale.
+         */
         $scope.setMinScale = function(){
             if(DataViewer.map) {
                 var currentScale=DataViewer.map.getScale();
-                if(currentScale < $scope.optionsSLD.selectedRule.maxScale){
-                	$scope.optionsSLD.selectedRule.minScale = currentScale;
-                }else{
-                	console.log("currenscale > maxScale");
-                }
+                currentScale = Math.round(currentScale);
+                $scope.optionsSLD.selectedRule.minScale = currentScale;
             }
         };
 
+        /**
+         * Binding action to set the map's scale as filter max scale.
+         */
         $scope.setMaxScale = function(){
             if(DataViewer.map) {
                 var currentScale=DataViewer.map.getScale();
-                if(currentScale > $scope.optionsSLD.selectedRule.minScale){
-                	$scope.optionsSLD.selectedRule.maxScale = currentScale;                	
-                }else{
-                	console.log("currenscale < minScale");
-                }
+                currentScale = Math.round(currentScale);
+                $scope.optionsSLD.selectedRule.maxScale = currentScale;
             }
         };
 
