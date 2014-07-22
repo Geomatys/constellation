@@ -267,6 +267,9 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
                 var previous = $scope.layers.toAdd[i - 1];
                 $scope.layers.toAdd[i - 1] = $scope.layers.toAdd[i];
                 $scope.layers.toAdd[i] = previous;
+
+                // Now switch layer order for the map
+                DataViewer.map.setLayerIndex(DataViewer.map.layers[i], i-1);
             }
         };
         $scope.orderDown = function(i) {
@@ -274,6 +277,9 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
                 var next = $scope.layers.toAdd[i + 1];
                 $scope.layers.toAdd[i + 1] = $scope.layers.toAdd[i];
                 $scope.layers.toAdd[i] = next;
+
+                // Now switch layer order for the map
+                DataViewer.map.setLayerIndex(DataViewer.map.layers[i+1], i);
             }
         };
 

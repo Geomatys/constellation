@@ -114,7 +114,8 @@ DataViewer = {
                 layers:      layerName,
                 version:     '1.3.0',
                 sld_version: '1.1.0',
-                format:      'image/png'
+                format:      'image/png',
+                transparent: 'true'
             },
             {
                 ratio: 1,
@@ -138,7 +139,8 @@ DataViewer = {
                 version:     '1.3.0',
                 sld_version: '1.1.0',
                 format:      'image/png',
-                Styles: style
+                Styles: style,
+                transparent: 'true'
             },
             {
                 ratio: 1,
