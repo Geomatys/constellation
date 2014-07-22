@@ -53,7 +53,7 @@ cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', '$growl
         $scope.addMapContext = function() {
             var modal = $modal.open({
                 templateUrl: 'views/mapcontext/modalAddContext.html',
-                controller: 'MapContextAddModalController',
+                controller: 'MapContextModalController',
                 resolve: {
                     ctxtToEdit: function () { return null; },
                     layersForCtxt: function () { return null; }
@@ -80,24 +80,10 @@ cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', '$growl
         $scope.editMapContext = function() {
             var modal = $modal.open({
                 templateUrl: 'views/mapcontext/modalAddContext.html',
-                controller: 'MapContextAddModalController',
+                controller: 'MapContextModalController',
                 resolve: {
                     ctxtToEdit: function () { return angular.copy($scope.selected); },
-                    layersForCtxt: function () {
-                        var lays = [];
-                        for (var i=0; i<$scope.selected.layers.length; i++) {
-                            var lay = $scope.selected.layers[i];
-                            lays.push(
-                                {layer: lay,
-                                 visible: lay.visible
-                                }
-                            );
-                        }
-                        lays.sort(function (a, b) {
-                            return a.layer.layerOrder - b.layer.layerOrder;
-                        });
-                        return lays;
-                    }
+                    layersForCtxt: function() { return $scope.resolveLayers(); }
                 }
             });
 
@@ -105,9 +91,36 @@ cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', '$growl
                 $scope.init();
             });
         };
+
+        $scope.showMapContext = function() {
+            $modal.open({
+                templateUrl: 'views/mapcontext/modalViewer.html',
+                controller: 'MapContextModalController',
+                resolve: {
+                    ctxtToEdit: function () { return angular.copy($scope.selected); },
+                    layersForCtxt: function() { return $scope.resolveLayers(); }
+                }
+            });
+        };
+
+        $scope.resolveLayers = function() {
+            var lays = [];
+            for (var i=0; i<$scope.selected.layers.length; i++) {
+                var lay = $scope.selected.layers[i];
+                lays.push(
+                    {layer: lay,
+                        visible: lay.visible
+                    }
+                );
+            }
+            lays.sort(function (a, b) {
+                return a.layer.layerOrder - b.layer.layerOrder;
+            });
+            return lays;
+        };
     }]);
 
-cstlAdminApp.controller('MapContextAddModalController', ['$scope', '$modalInstance', 'mapcontext', 'webService', 'style', '$growl', '$translate', 'ctxtToEdit', 'layersForCtxt', '$cookies',
+cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance', 'mapcontext', 'webService', 'style', '$growl', '$translate', 'ctxtToEdit', 'layersForCtxt', '$cookies',
     function ($scope, $modalInstance, mapcontext, webService, style, $growl, $translate, ctxtToEdit, layersForCtxt, $cookies) {
         // item to save in the end
         $scope.ctxt = {};
