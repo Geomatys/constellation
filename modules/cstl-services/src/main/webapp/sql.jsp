@@ -7,14 +7,8 @@
 <%@page import="java.sql.Statement"%>
 <html>
 <head>
-    <link href='http://fonts.googleapis.com/css?family=Ubuntu' rel='stylesheet' type='text/css'>
-    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
-    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
-    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css">
-    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
-    <style>
-        body{font-family: 'Ubuntu', sans-serif;}
-    </style>
+    <script src="scripts/jquery.js"></script>
+    <link rel="stylesheet" href="styles/bootstrap.css">
 </head>
 <body>
 <div class="container">
