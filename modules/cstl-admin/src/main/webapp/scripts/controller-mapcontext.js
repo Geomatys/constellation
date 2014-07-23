@@ -198,11 +198,6 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
                 }
             } else if ($scope.mode.display==='addChooseSource') {
                 $scope.mode.display = 'chooseLayer';
-            } else if ($scope.mode.display==='addChooseStyle') {
-                $scope.layers.toStyle.layer.styleId = $scope.styles.selected.Id;
-                $scope.layers.toStyle.layer.styleName = $scope.styles.selected.Name;
-                $scope.viewMap();
-                $scope.mode.display = 'general';
             } else if ($scope.mode.display==='chooseLayer') {
                 // Add the selected layer to the current map context
                 if ($scope.selected.layer) {
@@ -212,9 +207,14 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
                          visible: true
                         });
                 }
-                $scope.viewMap();
+                $scope.viewMap(false);
 
                 // Go back to first screen
+                $scope.mode.display = 'general';
+            } else if ($scope.mode.display==='addChooseStyle') {
+                $scope.layers.toStyle.layer.styleId = $scope.styles.selected.Id;
+                $scope.layers.toStyle.layer.styleName = $scope.styles.selected.Name;
+                $scope.viewMap(false);
                 $scope.mode.display = 'general';
             }
         };
@@ -341,7 +341,7 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
             }
         };
 
-        $scope.viewMap = function() {
+        $scope.viewMap = function(firstTime) {
             if (!$scope.layers.toAdd || $scope.layers.toAdd.length===0) {
                 return;
             }
@@ -367,10 +367,9 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
 
             DataViewer.initMap('mapContextMap');
 
-            if ($scope.ctxt.id) {
-                mapcontext.extent({id: $scope.ctxt.id}, function (response) {
-                    useExtentForLayers(response.values);
-                });
+            if (firstTime) {
+                var extent = new OpenLayers.Bounds($scope.ctxt.west, $scope.ctxt.south, $scope.ctxt.east, $scope.ctxt.north);
+                DataViewer.map.zoomToExtent(extent, true);
             } else {
                 fillLayersToSend();
                 mapcontext.extentForLayers({}, $scope.layers.toSend, function(response) {
@@ -388,5 +387,14 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
             var extent = new OpenLayers.Bounds($scope.ctxt.west, $scope.ctxt.south, $scope.ctxt.east, $scope.ctxt.north);
             DataViewer.map.zoomToExtent(extent, true)
         }
+
+        $scope.applyExtent = function() {
+            var currentMapExtent = DataViewer.map.getExtent();
+            var extent = currentMapExtent.toArray();
+            $scope.ctxt.west = extent[0];
+            $scope.ctxt.south = extent[1];
+            $scope.ctxt.east = extent[2];
+            $scope.ctxt.north = extent[3];
+        };
     }]);
                                      

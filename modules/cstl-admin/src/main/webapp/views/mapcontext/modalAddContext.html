@@ -49,6 +49,11 @@
                                                 <div class="col-sm-offset-3 col-sm-6">
                                                     <input type="text" class="form-control" ng-model="ctxt.north" placeholder="{{'label.north.first.letter' | translate}}"/>
                                                 </div>
+                                                <div class="col-sm-offset-1 col-sm-2">
+                                                    <button class="btn btn-add" type="button" ng-click="applyExtent()" title="{{'' | translate}}">
+                                                        <i class="glyphicon glyphicon-arrow-left"></i>
+                                                    </button>
+                                                </div>
                                             </div>
                                             <div class="row" style="margin-bottom: 5px;">
                                                 <div class="col-sm-6">
@@ -200,10 +205,7 @@
                     </div>
                 </div>
                 <!-- Right part -->
-                <div class="col-sm-6" ng-init="viewMap()">
-                    <!--div class="row">
-                        <span translate="label.preview"></span>
-                    </div-->
+                <div class="col-sm-6" ng-init="viewMap(true)">
                     <div id="mapContextMap" style="height: 460px; width:460px; margin-top: 38px; border: 1px solid #DDD;"/>
                 </div>
             </div>
@@ -324,7 +326,7 @@
         </div>
         <div class="modal-footer">
             <button type="button" id="cancelButton" class="btn btn-default" ng-click="cancel()" translate="mapcontext.modal.cancel">Cancel</button>
-            <button type="button" id="submitButton" class="btn btn-primary" ng-click="validate()" translate="mapcontext.modal.validate">Validate</button>
+            <button type="button" id="submitButton" class="btn btn-add" ng-click="validate()" translate="mapcontext.modal.validate">Validate</button>
         </div>
     </div>
 </div>
