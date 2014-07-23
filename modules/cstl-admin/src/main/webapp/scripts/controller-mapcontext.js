@@ -147,10 +147,16 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
             toStyle: null // Layer on which to apply the selected style
         };
 
+        $scope.selected = {};
+
         $scope.styles = {
             existing: [],
             selected: null
         };
+
+        $scope.$watch('layers.toAdd.layer.opacity', function() {
+
+        }, true);
 
         $scope.close = function () {
             $modalInstance.dismiss('close');
@@ -167,10 +173,12 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
         };
 
         $scope.select = function(layer,service) {
-            $scope.selected = {
-                layer: layer,
-                service: service
-            };
+            $scope.selected.layer = layer;
+            $scope.selected.service = service;
+        };
+
+        $scope.selectItem = function(item) {
+            $scope.selected.item = item;
         };
 
         $scope.selectStyle = function(item) {
@@ -245,9 +253,8 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
             for (var i = 0; i < $scope.layers.toAdd.length; i++) {
                 var l = $scope.layers.toAdd[i];
                 $scope.layers.toSend.push({
-                    mapcontextId: (ctxt) ? ctxt.id : null, layerId: l.layer.Id,
-                    styleId: l.layer.styleId,
-                    layerOrder: i, layerVisible: l.visible
+                    mapcontextId: (ctxt) ? ctxt.id : null, layerId: l.layer.Id, styleId: l.layer.styleId,
+                    layerOrder: i, layerOpacity: l.layer.opacity, layerVisible: l.visible
                 });
             }
         }
@@ -341,6 +348,16 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
             }
         };
 
+        $scope.updateOpacity = function(item) {
+            for (var i=0; i<DataViewer.layers.length; i++) {
+                var l = DataViewer.layers[i];
+                if (l.name === item.layer.Name) {
+                    l.setOpacity(item.layer.opacity / 100);
+                    return;
+                }
+            }
+        };
+
         $scope.viewMap = function(firstTime) {
             if (!$scope.layers.toAdd || $scope.layers.toAdd.length===0) {
                 return;
@@ -356,6 +373,7 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
                     var layerData = (l.layer.styleName) ?
                         DataViewer.createLayerWMSWithStyle(cstlUrl, l.layer.Name, serviceName, l.layer.styleName) :
                         DataViewer.createLayerWMS(cstlUrl, l.layer.Name, serviceName);
+                    layerData.setOpacity(l.layer.opacity / 100);
                     layersToView.push(layerData);
                 }
             }

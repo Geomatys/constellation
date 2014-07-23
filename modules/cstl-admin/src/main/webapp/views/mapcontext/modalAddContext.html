@@ -96,76 +96,82 @@
                                 </div>
 
                                 <div ng-if="layers.toAdd">
-                                    <!--div class="dash-inner row">
-                                        <div class="col-xs-1">Visible</div>
-                                        <div class="col-xs-offset2 col-xs-7 no-padding">Layers</div>
-                                        <div class="col-xs-1">Edit</div>
-                                        <div class="col-xs-1">Order</div>
-                                    </div-->
                                     <div class="dash-inner row dashboard" ng-init="small=false">
                                         <div data-role="list">
                                             <div class="item-list">
-                                                <div ng-repeat="layerToAdd in layers.toAdd" class="row">
-                                                    <div class="col-xs-1" style="padding-top:35px;">
-                                                        <!-- Visibility -->
-                                                        <input type="checkbox" ng-model="layerToAdd.visible" ng-change="changeVisibility(layerToAdd)">
-                                                    </div>
-                                                    <div class="col-xs-9 no-padding">
-                                                        <div class="item" ng-class="{coverage:layerToAdd.layer.Type.toUpperCase()==='coverage'.toUpperCase(),vector:layerToAdd.layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layerToAdd.layer.Type.toUpperCase()==='vector'.toUpperCase()}">
-                                                            <div class="top">
-                                                                <span class="item-title" title="{{layerToAdd.layer.Name}}">{{layerToAdd.layer.Name}}</span>
-                                                                <span class="pull-right text-right item-list-style">{{layerToAdd.layer.Type==='coverage'?'raster':layerToAdd.layer.Type==='feature-store'?'vector':layerToAdd.layer.Type==='observation-store'?'vector':layerToAdd.layer.Type}}</span>
-                                                                <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='Point' || layerToAdd.layer.Subtype=='MultiPoint')"
-                                                                     src="images/vector-multipoint.svg"
-                                                                     class="pull-right"
-                                                                     style="margin-top:6px; margin-right:10px;" />
-                                                                <img ng-if="layerToAdd.layer.Subtype=='Geometry'"
-                                                                     src="images/vector-multigeometry.svg"
-                                                                     class="pull-right"
-                                                                     style="margin-top:6px; margin-right:10px; width:22px" />
-                                                                <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='Polygon' || layerToAdd.layer.Subtype=='MultiPolygon')"
-                                                                     src="images/vector-poly.svg"
-                                                                     class="pull-right"
-                                                                     style="margin-top:6px; margin-right:10px;" />
-                                                                <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='LineString' || layerToAdd.layer.Subtype=='MultiLineString')"
-                                                                     src="images/vector-polyline.svg"
-                                                                     class="pull-right"
-                                                                     style="margin-top:6px; margin-right:10px;" />
+                                                <div ng-repeat="layerToAdd in layers.toAdd" ng-click="selectItem(layerToAdd)">
+                                                    <div class="row">
+                                                        <div class="col-xs-1" style="padding-top:35px;">
+                                                            <!-- Visibility -->
+                                                            <input type="checkbox" ng-model="layerToAdd.visible" ng-change="changeVisibility(layerToAdd)">
+                                                        </div>
+                                                        <div class="col-xs-9 no-padding">
+                                                            <div class="item" ng-class="{'selected':layerToAdd===selected.item,coverage:layerToAdd.layer.Type.toUpperCase()==='coverage'.toUpperCase(),vector:layerToAdd.layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layerToAdd.layer.Type.toUpperCase()==='vector'.toUpperCase()}">
+                                                                <div class="top">
+                                                                    <span class="item-title" title="{{layerToAdd.layer.Name}}">{{layerToAdd.layer.Name}}</span>
+                                                                    <span class="pull-right text-right item-list-style">{{layerToAdd.layer.Type==='coverage'?'raster':layerToAdd.layer.Type==='feature-store'?'vector':layerToAdd.layer.Type==='observation-store'?'vector':layerToAdd.layer.Type}}</span>
+                                                                    <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='Point' || layerToAdd.layer.Subtype=='MultiPoint')"
+                                                                         src="images/vector-multipoint.svg"
+                                                                         class="pull-right"
+                                                                         style="margin-top:6px; margin-right:10px;" />
+                                                                    <img ng-if="layerToAdd.layer.Subtype=='Geometry'"
+                                                                         src="images/vector-multigeometry.svg"
+                                                                         class="pull-right"
+                                                                         style="margin-top:6px; margin-right:10px; width:22px" />
+                                                                    <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='Polygon' || layerToAdd.layer.Subtype=='MultiPolygon')"
+                                                                         src="images/vector-poly.svg"
+                                                                         class="pull-right"
+                                                                         style="margin-top:6px; margin-right:10px;" />
+                                                                    <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='LineString' || layerToAdd.layer.Subtype=='MultiLineString')"
+                                                                         src="images/vector-polyline.svg"
+                                                                         class="pull-right"
+                                                                         style="margin-top:6px; margin-right:10px;" />
+                                                                </div>
+                                                                <div class="bottom">
+                                                                    <div class="block">
+                                                                        <i class="icon-calendar"></i>{{layerToAdd.layer.Date | date:'yyyy-MM-dd'}}
+                                                                    </div>
+                                                                    <div class="block">
+                                                                        <i class="icon-user"></i>{{layerToAdd.layer.Owner}}
+                                                                    </div>
+                                                                    <div class="block">
+                                                                        <i class="glyphicon glyphicon-pencil"></i>{{layerToAdd.layer.styleName}}
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                            <div class="bottom">
-                                                                <div class="block">
-                                                                    <i class="icon-calendar"></i>{{layerToAdd.layer.Date | date:'yyyy-MM-dd'}}
-                                                                </div>
-                                                                <div class="block">
-                                                                    <i class="icon-user"></i>{{layerToAdd.layer.Owner}}
-                                                                </div>
-                                                                <div class="block">
-                                                                    <i class="glyphicon glyphicon-pencil"></i>{{layerToAdd.layer.styleName}}
-                                                                </div>
+                                                        </div>
+                                                        <div class="col-xs-1 no-padding">
+                                                            <div class="btn btn-sm" popover-placement="left" popover="{{viewLayerInfo(layerToAdd)}}" popover-trigger="mouseenter" style="padding:2px 5px; margin-top:8px;">
+                                                                <span class="glyphicon glyphicon-info-sign"></span>
+                                                            </div>
+                                                            <!-- Edition -->
+                                                            <div class="btn btn-sm" ng-click="goToStyleMapItem(layerToAdd)" style="padding:2px 5px;">
+                                                                <span class="glyphicon glyphicon-pencil"></span>
+                                                            </div>
+                                                            <!-- Delete -->
+                                                            <div class="btn btn-sm" ng-click="deleteMapItem(layerToAdd)" style="padding:2px 5px;">
+                                                                <span class="glyphicon glyphicon-trash"></span>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="col-xs-1 no-padding">
-                                                        <div class="btn btn-sm" popover-placement="left" popover="{{viewLayerInfo(layerToAdd)}}" popover-trigger="mouseenter" style="padding:2px 5px; margin-top:8px;">
-                                                            <span class="glyphicon glyphicon-info-sign"></span>
-                                                        </div>
-                                                        <!-- Edition -->
-                                                        <div class="btn btn-sm" ng-click="goToStyleMapItem(layerToAdd)" style="padding:2px 5px;">
-                                                            <span class="glyphicon glyphicon-pencil"></span>
-                                                        </div>
-                                                        <!-- Delete -->
-                                                        <div class="btn btn-sm" ng-click="deleteMapItem(layerToAdd)" style="padding:2px 5px;">
-                                                            <span class="glyphicon glyphicon-trash"></span>
+                                                        <div class="col-xs-1 no-padding" style="padding-top:12px;">
+                                                            <!-- Order -->
+                                                            <a class="btn btn-sm" ng-click="orderUp($index)" style="padding:5px;margin-bottom:3px;">
+                                                                <span class="glyphicon glyphicon-chevron-up"></span>
+                                                            </a>
+                                                            <a class="btn btn-sm" ng-click="orderDown($index)" style="padding:5px;">
+                                                                <span class="glyphicon glyphicon-chevron-down"></span>
+                                                            </a>
                                                         </div>
                                                     </div>
-                                                    <div class="col-xs-1 no-padding" style="padding-top:12px;">
-                                                        <!-- Order -->
-                                                        <a class="btn btn-sm" ng-click="orderUp($index)" style="padding:5px;margin-bottom:3px;">
-                                                            <span class="glyphicon glyphicon-chevron-up"></span>
-                                                        </a>
-                                                        <a class="btn btn-sm" ng-click="orderDown($index)" style="padding:5px;">
-                                                            <span class="glyphicon glyphicon-chevron-down"></span>
-                                                        </a>
+                                                    <div ng-if="selected.item === layerToAdd" class="row child">
+                                                        <div class="col-sm-3">
+                                                            <span translate="sldeditor.edition.opacity">Opacity</span>
+                                                        </div>
+                                                        <div class="col-sm-6">
+                                                            <rzslider rz-slider-floor="0" rz-slider-ceil="100"
+                                                                      rz-slider-model="layerToAdd.layer.opacity" rz-slider-step="1" ng-click="updateOpacity(layerToAdd)">
+                                                            </rzslider>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>

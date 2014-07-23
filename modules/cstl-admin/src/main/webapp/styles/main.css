@@ -229,7 +229,12 @@ ul.unstyled {
     border-color:#64adc6;
 }
 
-
+.dashboard rzslider{
+    margin: 10px 0;
+}
+.dashboard rzslider .bubble{
+    display: none;
+}
 .dashboard .selected-item .block-action.block-action-style {
     background-color:#ededf3;
 }
@@ -906,7 +911,7 @@ p.error-select-one{
 .dashboard .item-list .item.process-child {
     height: 36px;
 }
-.dashboard .item-list .item.child {
+.dashboard .item-list .child {
     margin-left: 30px;
     margin-top: 0px;
 }
