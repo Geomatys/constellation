@@ -32,6 +32,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
             layer: null,
             db: {}
         };
+        $scope.enableSelectEPSGCode = false;
 
         $scope.sensor = {
             mode : "existing",
@@ -120,7 +121,6 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                                     path: importedData
                                 }
                             }, function() {
-                                //TODO verify CRS exist
                                 provider.verifyCRS({ id: fileName},
                                     function() {
                                         //success
@@ -137,8 +137,22 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
 
                                     }, function() {
                                         //failure
-                                        $growl('error','Error','Data '+ fileName +' without CRS');
-                                        provider.delete({id: fileName});
+                                        $growl('error','Error','Data '+ fileName +' without Projection');
+
+                                        //TODO div select EPSG
+                                        $scope.import.enableSelectEPSGCode = true;
+                                        provider.getAllCodeEPSG({ id: fileName},
+                                            function(response){
+                                                //success
+                                                $scope.epsgList = response.list;
+                                                $scope.import.fileName = fileName;
+
+                                            },
+                                            function(){
+                                                //error
+                                                $growl('error','Error','Impossible to get all EPSG code');
+                                            });
+
                                     }
                                 );
 
@@ -153,8 +167,6 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                                     path: importedData
                                 }
                             }, function() {
-                                //TODO verify CRS exist
-
                                 provider.verifyCRS({ id: fileName},
                                     function() {
                                         //success
@@ -172,8 +184,23 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
 
                                     }, function() {
                                         //failure
-                                        $growl('error','Error','Data '+ fileName +' without CRS');
-                                        provider.delete({id: fileName});
+                                        $growl('error','Error','Data '+ fileName +' without Projection');
+                                        //TODO div select EPSG
+                                        $scope.import.enableSelectEPSGCode = true;
+                                        provider.getAllCodeEPSG({ id: fileName},
+                                            function(response){
+                                                //success
+                                                $scope.epsgList = response.list;
+                                                $scope.import.fileName = fileName;
+
+                                            },
+                                            function(){
+                                                //error
+                                                $growl('error','Error','Impossible to get all EPSG code');
+                                            });
+
+
+                                        //provider.delete({id: fileName});
                                     }
                                 );
 
@@ -240,6 +267,24 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
         $scope.import.finish = function() {
             $scope.uploaded();
         };
+
+        $scope.addProjection = function (){
+            console.log($scope.import.epsgSelected);
+            var codeEpsg = $scope.import.epsgSelected.substr(0,$scope.import.epsgSelected.indexOf(" "));
+            provider.createPRJ({ id: $scope.import.fileName },{codeEpsg: codeEpsg},
+                function(){
+                    //success
+                    console.log('prj created')
+                    $modalInstance.close();
+                },
+                function(){
+                    //
+                    console.error('prj not created')
+                    $growl('error','Error','Impossible to set projection for data '+ $scope.import.fileName );
+                }
+            );
+
+        }
     }]);
 
 cstlAdminApp.controller('ModalImportDataStep1LocalController', ['$scope', 'dataListing', '$cookies',

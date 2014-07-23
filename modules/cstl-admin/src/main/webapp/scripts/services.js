@@ -306,7 +306,9 @@ cstlAdminApp.factory('provider', ['$resource',
             'metadata': {method: 'GET', url: '@cstl/api/1/domain/$domainId/provider/metadata/:providerId;jsessionid='},
             'dataDesc': {method: 'GET', url: '@cstl/api/1/domain/$domainId/provider/:providerId/:dataId/dataDescription;jsessionid='},
             'isGeophysic': {method: 'GET', url: '@cstl/api/1/domain/$domainId/provider/:providerId/:dataId/isGeophysic;jsessionid='},
-            'verifyCRS' : {method: 'GET', url: '@cstl/api/1/domain/$domainId/provider/:id/crs'}
+            'verifyCRS' : {method: 'GET', url: '@cstl/api/1/domain/$domainId/provider/:id/crs'},
+            'createPRJ' : {method: 'POST', url: '@cstl/api/1/domain/$domainId/provider/:id/createprj'},
+            'getAllCodeEPSG' : {method: 'GET',  url: '@cstl/api/1/domain/$domainId/provider/:id/epsgCode', transformResponse: function (data) {return {list: angular.fromJson(data)} }}
         });
     }]);
 

@@ -397,6 +397,8 @@
     "layer.listing.data.upload.remove.label": "Enlever",
     "layer.listing.data.upload.select.label": "Choisir un fichier",
     "layer.listing.data.upload.sensor.label": "Donnée capteur",
+    "layer.listing.data.upload.selectEPSG":"Selectionner un code EPSG",
+    "layer.listing.data.upload.createEPSG":"Affecter",
     "layer.listing.data.upload.title": "Envoyer une donnée",
     "layer.listing.data.upload.vector.label": "Donnée vecteur",
     "layer.listing.data.upload.associate":"Associer à un capteur",

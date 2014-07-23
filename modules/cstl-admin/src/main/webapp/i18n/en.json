@@ -359,6 +359,8 @@
     "layer.listing.data.upload.title": "Upload data",
     "layer.listing.data.upload.vector.label": "Vector data",
     "layer.listing.data.upload.associate":"Associate with a sensor",
+    "layer.listing.data.upload.selectEPSG":"Select projection",
+    "layer.listing.data.upload.createEPSG":"Affect",
     "layer.listing.layer.label": "layers",
     "layer.listing.numberbypage.10.label": "10 layers",
     "layer.listing.numberbypage.100.label": "100 layers",

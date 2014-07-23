@@ -20,6 +20,7 @@
 package org.constellation.rest.api;
 
 import org.apache.sis.metadata.iso.DefaultMetadata;
+import org.apache.sis.referencing.crs.DefaultGeographicCRS;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.constellation.admin.ProviderBusiness;
@@ -48,14 +49,21 @@ import org.geotoolkit.data.FeatureStoreFactory;
 import org.geotoolkit.data.FeatureStoreFinder;
 import org.geotoolkit.data.FileFeatureStoreFactory;
 import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.io.ContentFormatException;
+import org.geotoolkit.io.wkt.PrjFiles;
 import org.geotoolkit.parameter.ParametersExt;
 import org.geotoolkit.process.ProcessException;
+import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.storage.DataFileStore;
 import org.opengis.parameter.ParameterDescriptorGroup;
 import org.opengis.parameter.ParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.AuthorityFactory;
 import org.opengis.referencing.ReferenceIdentifier;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.ImageCRS;
+import org.opengis.util.FactoryException;
 import org.opengis.util.NoSuchIdentifierException;
 
 import javax.inject.Inject;
@@ -71,10 +79,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -184,6 +194,39 @@ public final class ProviderRest {
         return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
+    @GET
+    @Path("/{id}/epsgCode")
+    public Response getAllEpsgCode(final @PathParam("domainId") int domainId, final @PathParam("id") String providerIdentifier) throws FactoryException {
+        final CRSAuthorityFactory factory = CRS.getAuthorityFactory(Boolean.FALSE);
+        final Set<String> authorityCodes = factory.getAuthorityCodes(CoordinateReferenceSystem.class);
+        List<String> codes = new ArrayList<>();
+        for (String code : authorityCodes){
+            code += " - " + factory.getDescriptionText(code).toString();
+            codes.add(code);
+        }
+        return Response.ok().entity(codes).build();
+    }
+
+
+
+    @POST
+    @Path("/{id}/createprj")
+    public Response createPrj(final @PathParam("domainId") int domainId, final @PathParam("id") String providerIdentifier, Map<String,String> epsgCode) throws DataStoreException, FactoryException, IOException {
+        final DataProvider provider = DataProviders.getInstance().getProvider(providerIdentifier);
+        if (provider.getMainStore() instanceof DataFileStore){
+            File[] dataFiles = ((DataFileStore) provider.getMainStore()).getDataFiles();
+            if (dataFiles.length == 1 && dataFiles[0].isDirectory()){
+                dataFiles = dataFiles[0].listFiles();
+            }
+            final String fileNameWithoutExtention = dataFiles[0].getName().substring(0, dataFiles[0].getName().indexOf('.'));
+            final String parentPath = dataFiles[0].getParentFile().getAbsolutePath();
+            final CoordinateReferenceSystem coordinateReferenceSystem = CRS.decode(epsgCode.get("codeEpsg"));
+            PrjFiles.write(coordinateReferenceSystem, new File(parentPath+File.separator+fileNameWithoutExtention+".prj"));
+            provider.reload();
+            return Response.ok().build();
+        }
+        return Response.status(500).build();
+    }
 
     /**
      * Create a new provider from the given configuration.
