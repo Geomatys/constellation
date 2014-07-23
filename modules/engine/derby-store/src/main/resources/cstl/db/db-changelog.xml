@@ -8,5 +8,6 @@
   <include file="cstl/db/db-init-data.xml"/>
   
   <include file="cstl/db/update/patch-v1.1.xml"/>
+  <include file="cstl/db/update/patch-v1.2.xml"/>
   
   </databaseChangeLog>
