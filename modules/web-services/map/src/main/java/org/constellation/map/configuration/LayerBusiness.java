@@ -88,7 +88,8 @@ public class LayerBusiness {
     
     public void add(final AddLayer addLayerData) throws ConfigurationException {
         final String name        = addLayerData.getLayerId();
-        final String namespace   = addLayerData.getLayerNamespace();
+        // Prevents adding empty layer namespace, put null instead
+        final String namespace   = (addLayerData.getLayerNamespace() != null && addLayerData.getLayerNamespace().isEmpty()) ? null : addLayerData.getLayerNamespace();
         final String providerId  = addLayerData.getProviderId();
         final String alias       = addLayerData.getLayerAlias();
         final String serviceId   = addLayerData.getServiceId();
@@ -102,7 +103,12 @@ public class LayerBusiness {
         final Service service = serviceRepository.findByIdentifierAndType(serviceId, serviceType.toLowerCase());
         
         if (service !=null) {
-            
+
+            if (namespace != null && namespace.isEmpty()) {
+                // Prevents adding empty layer namespace, put null instead
+                namespace = null;
+            }
+
             // look for layer namespace
             if (namespace == null) {
                 final DataProvider provider = DataProviders.getInstance().getProvider(providerId);
