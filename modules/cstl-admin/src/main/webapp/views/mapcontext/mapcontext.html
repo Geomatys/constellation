@@ -91,35 +91,35 @@
                                             <span class="item-title" title="{{layer.Name}}">{{layer.Name}}</span>
                                             <span class="pull-right text-right item-list-style">{{layer.Type==='coverage'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector':layer.Type}}</span>
                                             <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer!=selectedLayer"
-                                                 src="images/vector-multipoint.svg"
+                                                 src="images/vector-multipoint-mapcontext.svg"
                                                  class="pull-right"
                                                  style="margin-top:6px; margin-right:10px;" />
                                             <img ng-if="layer.Subtype=='Geometry' && layer!=selectedLayer"
-                                                 src="images/vector-multigeometry.svg"
+                                                 src="images/vector-multigeometry-mapcontext.svg"
                                                  class="pull-right"
                                                  style="margin-top:6px; margin-right:10px; width:22px" />
                                             <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon') && layer!=selectedLayer"
-                                                 src="images/vector-poly.svg"
+                                                 src="images/vector-poly-mapcontext.svg"
                                                  class="pull-right"
                                                  style="margin-top:6px; margin-right:10px;" />
                                             <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString') && layer!=selectedLayer"
-                                                 src="images/vector-polyline.svg"
+                                                 src="images/vector-polyline-mapcontext.svg"
                                                  class="pull-right"
                                                  style="margin-top:6px; margin-right:10px;" />
                                             <img ng-if="layer.Type=='VECTOR' && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer==selectedLayer"
-                                                 src="images/vector-multipoint-selected.svg"
+                                                 src="images/vector-multipoint-mapcontext-selected.svg"
                                                  class="pull-right"
                                                  style="margin-top:6px; margin-right:10px;" />
                                             <img ng-if="layer.Type=='VECTOR' && (layer.Subtype=='Polygon' || layer.Subtype=='MultiPolygon') && layer==selectedLayer"
-                                                 src="images/vector-poly-selected.svg"
+                                                 src="images/vector-poly-mapcontext-selected.svg"
                                                  class="pull-right"
                                                  style="margin-top:6px; margin-right:10px;" />
                                             <img ng-if="layer.Subtype=='Geometry' && layer==selectedLayer"
-                                                 src="images/vector-multigeometry-selected.svg"
+                                                 src="images/vector-multigeometry-mapcontext-selected.svg"
                                                  class="pull-right"
                                                  style="margin-top:6px; margin-right:10px; width:22px" />
                                             <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString') && layer==selectedLayer"
-                                                 src="images/vector-polyline-selected.svg"
+                                                 src="images/vector-polyline-mapcontext-selected.svg"
                                                  class="pull-right"
                                                  style="margin-top:6px; margin-right:10px;" />
                                         </div>
