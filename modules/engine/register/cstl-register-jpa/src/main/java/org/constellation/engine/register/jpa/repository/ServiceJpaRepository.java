@@ -38,7 +38,7 @@ public interface ServiceJpaRepository extends JpaRepository<ServiceEntity, Integ
     @Query("select m from ServiceEntity s join s.metaDatas m where s.identifier = ?1 and s.type = ?2 and m.lang = ?3")    
     ServiceMetaData findMetaDataForLangByIdentifierAndType(String identifier, String serviceType, String language);
 
-    @Transactional
+    @Transactional("txManager")
     void delete(Integer id);
     
     @Query("select s.identifier from ServiceEntity s where s.type = ?1")

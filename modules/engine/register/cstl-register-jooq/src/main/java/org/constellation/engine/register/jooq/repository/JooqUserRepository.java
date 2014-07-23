@@ -132,7 +132,7 @@ public class JooqUserRepository extends AbstractJooqRespository<CstlUserRecord, 
     }
 
     @Override
-    @Transactional
+    @Transactional("txManager")
     public CstlUser update(CstlUser user, List<String> roles) {
 
         UpdateConditionStep<CstlUserRecord> update = dsl.update(CSTL_USER).set(CSTL_USER.EMAIL, user.getEmail())
@@ -151,7 +151,7 @@ public class JooqUserRepository extends AbstractJooqRespository<CstlUserRecord, 
     }
 
     @Override
-    @Transactional
+    @Transactional("txManager")
     public CstlUser insert(CstlUser user, List<String> roles) {
 
         user.setActive(true);

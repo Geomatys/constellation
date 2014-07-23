@@ -97,7 +97,7 @@ public class UserRest  {
 
     @POST
     @Path("/")
-    @Transactional
+    @Transactional("txManager")
     @RolesAllowed("cstl-admin")
     public Response post(DomainUser userDTO) {
         if (StringUtils.hasText(userDTO.getPassword()))
@@ -111,7 +111,7 @@ public class UserRest  {
     
     @PUT
     @Path("/")
-    @Transactional
+    @Transactional("txManager")
     @RolesAllowed("cstl-admin")
     public Response put(DomainUser userDTO) {
         userRepository.update(userDTO, userDTO.getRoles());

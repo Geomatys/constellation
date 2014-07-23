@@ -77,7 +77,7 @@ public class ConfigurationJpaService implements ConfigurationService {
     
   
     @Override
-    @Transactional
+    @Transactional("txManager")
     public Object getConfiguration(String serviceType, String serviceID, String fileName, MarshallerPool pool)
             throws JAXBException, FileNotFoundException {
         final org.constellation.engine.register.Service rec = serviceRepository.findByIdentifierAndType(serviceID,
@@ -116,7 +116,7 @@ public class ConfigurationJpaService implements ConfigurationService {
     }
 
     @Override
-    @Transactional
+    @Transactional("txManager")
     public DataBrief getData(QName name, String providerId) {
         Data data = dataRepository.findByNameAndNamespaceAndProviderId(name.getLocalPart(), name.getNamespaceURI(),
                 providerId);

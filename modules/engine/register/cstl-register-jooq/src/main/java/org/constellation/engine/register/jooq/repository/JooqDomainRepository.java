@@ -208,7 +208,7 @@ public class JooqDomainRepository extends AbstractJooqRespository<DomainRecord, 
     }
 
     @Override
-    @Transactional
+    @Transactional("txManager")
     public Set<Integer> updateUserInDomain(int userId, int domainId, Set<Integer> roles) {
         dsl.delete(USER_X_DOMAIN_X_DOMAINROLE)
                 .where(USER_X_DOMAIN_X_DOMAINROLE.USER_ID.eq(userId).and(

@@ -647,7 +647,7 @@ public class ServiceBusiness {
         domainRepository.addServiceToDomain(serviceId, domainId);
     }
 
-    @Transactional
+    @Transactional("txManager")
     public synchronized void removeServiceFromDomain(int serviceId, int domainId) {
         List<Domain> findByLinkedService = domainRepository.findByLinkedService(serviceId);
         if (findByLinkedService.size() == 1) {

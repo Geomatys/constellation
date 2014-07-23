@@ -66,7 +66,7 @@ public class MapContextRest {
 
     @PUT
     @Path("/")
-    @Transactional
+    @Transactional("txManager")
     public Response create(final Mapcontext mapContext) {
         final Mapcontext mapContextCreated = contextRepository.create(mapContext);
         return Response.ok(mapContextCreated).build();
@@ -74,7 +74,7 @@ public class MapContextRest {
 
     @POST
     @Path("/")
-    @Transactional
+    @Transactional("txManager")
     public Response update(final Mapcontext mapContext) {
         contextRepository.update(mapContext);
         return Response.ok(mapContext).build();
@@ -82,7 +82,7 @@ public class MapContextRest {
 
     @DELETE
     @Path("/{id}")
-    @Transactional
+    @Transactional("txManager")
     public Response delete(@PathParam("id") final int contextId) {
         contextRepository.delete(contextId);
         return Response.status(204).build();

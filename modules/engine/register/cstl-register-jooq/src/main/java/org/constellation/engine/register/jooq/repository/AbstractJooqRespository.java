@@ -25,6 +25,7 @@ import org.jooq.RecordMapper;
 import org.jooq.SelectQuery;
 import org.jooq.TableLike;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,6 +34,7 @@ import java.util.List;
 public abstract class AbstractJooqRespository<T extends Record, U> {
 
     @Autowired
+    @Qualifier("dsl") // use qualifier to prevent multiple DSL conflict
     DSLContext dsl;
 
     private Class<U> dtoClass;

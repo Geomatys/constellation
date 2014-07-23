@@ -185,7 +185,7 @@ public class JooqConfigurationService implements ConfigurationService {
 //
 //    }
 //
-    @Transactional
+    @Transactional("txManager")
     public Object getConfiguration(String serviceType, String serviceID, String fileName, MarshallerPool pool)
             throws JAXBException, FileNotFoundException {
         final org.constellation.engine.register.Service rec = serviceRepository.findByIdentifierAndType(serviceID,

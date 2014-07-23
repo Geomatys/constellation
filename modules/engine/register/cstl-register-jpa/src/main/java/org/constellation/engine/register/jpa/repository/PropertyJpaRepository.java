@@ -35,7 +35,7 @@ public interface PropertyJpaRepository extends JpaRepository<PropertyEntity, Str
 	@Query("select p from PropertyEntity p where p.key LIKE ?1 ")
 	List<PropertyEntity> startWith(String startWith);
 	
-	@Transactional
+	@Transactional("txManager")
 	void save(Property prop);
 
 }

@@ -70,7 +70,7 @@ public class JooqDomainroleRepository extends AbstractJooqRespository<Domainrole
     }
 
     @Override
-    @Transactional
+    @Transactional("txManager")
     public Domainrole createWithPermissions(Domainrole group, List<Permission> permissions) {
 
         Domainrole saved = new Domainrole();
@@ -90,7 +90,7 @@ public class JooqDomainroleRepository extends AbstractJooqRespository<Domainrole
     }
 
     @Override
-    @Transactional
+    @Transactional("txManager")
     public Domainrole updateWithPermissions(Domainrole domainRole, List<Permission> permissions) {
 
         dsl.update(DOMAINROLE).set(DOMAINROLE.NAME, domainRole.getName())

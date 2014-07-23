@@ -300,7 +300,7 @@ public class DataBusiness {
         domainRepository.addDataToDomain(dataId, domainId);
     }
 
-    @Transactional
+    @Transactional("txManager")
     public synchronized void removeDataFromDomain(int dataId, int domainId) {
         List<Domain> findByLinkedService = domainRepository.findByLinkedData(dataId);
         if (findByLinkedService.size() == 1) {
@@ -309,7 +309,7 @@ public class DataBusiness {
         domainRepository.removeDataFromDomain(dataId, domainId);
     }
 
-    @Transactional
+    @Transactional("txManager")
     public synchronized void removeDataFromProvider(String providerID) {
         final Provider p = providerRepository.findByIdentifier(providerID);
         if (p != null) {

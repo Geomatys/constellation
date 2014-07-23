@@ -6,6 +6,7 @@
 
   <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
     <property name="dataSource" ref="dataSource" />
+    <qualifier value="txManager"/>
   </bean>
 
 
@@ -29,7 +30,7 @@
   
   <!-- Invoking an internal, package-private constructor for the example Implement your own Configuration for more reliable 
     behaviour -->
-  <bean id="config" class="org.jooq.impl.DefaultConfiguration" name="config">
+  <bean id="config" class="org.jooq.impl.DefaultConfiguration">
     <constructor-arg index="0" ref="connectionProvider" />
     <constructor-arg index="1">
       <null />
@@ -61,6 +62,7 @@
   <!-- Configure the DSL object, optionally overriding jOOQ Exceptions with Spring Exceptions -->
   <bean id="dsl" class="org.jooq.impl.DefaultDSLContext">
     <constructor-arg ref="config" />
+    <qualifier value="dsl"/>
   </bean>
 
 

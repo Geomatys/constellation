@@ -30,10 +30,10 @@ import java.util.List;
 
 public interface UserJpaRepository extends JpaRepository<UserEntity, String>, UserRepository {
 
-    @Transactional
+    @Transactional("txManager")
     void save(User user);
     
-    @Transactional
+    @Transactional("txManager")
     void delete(String id);
     
     @Query("select u from UserEntity u left join fetch u.domains where u.login = :login")
