@@ -30,7 +30,7 @@
         </div>
         
         <div class="modal-body modal-body-style" style="overflow-y: auto;">
-            <div ng-show="isSelectedChooser('new')">
+            <div ng-show="isSelectedChooser('new') || isSelectedChooser('edit') || isSelectedChooser('duplicate')">
                 <div ng-include="page.pageSld"/>
             </div>
             <div class="row"  ng-show="isSelectedChooser('existing')">
@@ -100,20 +100,34 @@
                                          on-select-page="displayPage(page)"></div>
                                 </div>
                                 <div class="item-list" style="margin-top:40px;">
-                                    <div class="item style-{{style.Type | lowercase}}"
-                                         ng-repeat="style in dataList"
-                                         ng-class="{selected:style==selected}"
-                                         ng-click="select(style);displayCurrentStyle('styledMapWithSelectedStyle');">
-                                        <div class="top">
-                                            <span class="item-title" style="width: 100%;">{{style.Name}}</span>
-                                            <span class="pull-right text-right item-list-style">{{style.Type}}</span>
+                                    <div ng-repeat="style in dataList">
+                                        <div class="btn-group pull-right" style="margin-left: 15px;">
+                                            <button type="button"
+                                                    class="btn btn-default dropdown-toggle"
+                                                    data-toggle="dropdown"
+                                                    style="margin-right: 2px;margin-top: 1px;padding: 5px;z-index: 1;">
+                                                <span class="glyphicon glyphicon-cog"></span>
+                                                <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu" role="menu" style="font-size: 12px;text-shadow: none;z-index: 2;">
+                                                <li ng-click="editChooseStyle(style);"><a><span translate="edition.style.label.edit">Edit</span></a></li>
+                                                <li ng-click="duplicateChooseStyle(style);"><a disabled="disabled"><span translate="sldeditor.edition.duplicate">Duplicate</span></a></li>
+                                            </ul>
                                         </div>
-                                        <div class="bottom">
-                                            <div class="block">
-                                                <i class="icon-calendar"></i>{{style.Date | date:'yyyy-MM-dd'}}
+                                        <div class="item style-{{style.Type | lowercase}}"
+                                             ng-class="{selected:style==selected}"
+                                             ng-click="select(style);displayCurrentStyle('styledMapWithSelectedStyle');">
+                                            <div class="top">
+                                                <span class="item-title" style="width: 100%;">{{style.Name}}</span>
+                                                <span class="pull-right text-right item-list-style">{{style.Type}}</span>
                                             </div>
-                                            <div class="block">
-                                                <i class="icon-user"></i>{{style.Owner}}
+                                            <div class="bottom">
+                                                <div class="block">
+                                                    <i class="icon-calendar"></i>{{style.Date | date:'yyyy-MM-dd'}}
+                                                </div>
+                                                <div class="block">
+                                                    <i class="icon-user"></i>{{style.Owner}}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -139,6 +153,13 @@
                     ng-show="isSelectedChooser('existing')"
                     ng-disabled="!selected && isSelectedChooser('existing')" ng-click="ok();">
                 <span translate="sldeditor.button.validate">Validate</span>
+            </button>
+            <button type="button"
+                    class="btn btn-add"
+                    ng-show="isSelectedChooser('edit') && !optionsSLD.enableRuleEditor && !optionsSLD.enableAutoIntervalEditor && !optionsSLD.enableAutoUniqueEditor"
+                    ng-disabled="!selected && isSelectedChooser('existing')"
+                    ng-click="updateStyle();">
+                <span translate="sldeditor.button.validateandsave">Save and validate</span>
             </button>
             <button type="button"
                     class="btn btn-add"

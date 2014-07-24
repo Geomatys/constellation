@@ -133,54 +133,58 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         /**
          * SLD model object that store all needed variables to avoid angular bug behaviour in modal.
          */
-        $scope.optionsSLD={
-            autoPreview:true,
-            selectedRule:null,
-            enableRuleEditor:false,
-            autoIntervalValues:{
-                "attr":"",
-                "nbIntervals":5,
-                "method":"equidistant",
-                "symbol":"polygon",
-                "palette": {
-                    index: 0,
-                    img_palette: 'images/palette1.png',
-                    colors:[],
-                    reverseColors:false
+
+        function initOptionsSLD(){
+            $scope.optionsSLD={
+                autoPreview:true,
+                selectedRule:null,
+                enableRuleEditor:false,
+                autoIntervalValues:{
+                    "attr":"",
+                    "nbIntervals":5,
+                    "method":"equidistant",
+                    "symbol":"polygon",
+                    "palette": {
+                        index: 0,
+                        img_palette: 'images/palette1.png',
+                        colors:[],
+                        reverseColors:false
+                    },
+                    "customPalette":{
+                        "enabled":false,
+                        "color1":'#ffffff',
+                        "color2":'#0022fc'
+                    }
                 },
-                "customPalette":{
-                    "enabled":false,
-                    "color1":'#ffffff',
-                    "color2":'#0022fc'
-                }
-            },
-            enableAutoIntervalEditor:false,
-            autoUniqueValues:{
-                "attr":"",
-                "symbol":"polygon",
-                "palette": {
-                    index: 0,
-                    img_palette: 'images/palette1.png',
-                    colors:[],
-                    reverseColors:false
+                enableAutoIntervalEditor:false,
+                autoUniqueValues:{
+                    "attr":"",
+                    "symbol":"polygon",
+                    "palette": {
+                        index: 0,
+                        img_palette: 'images/palette1.png',
+                        colors:[],
+                        reverseColors:false
+                    },
+                    "customPalette":{
+                        "enabled":false,
+                        "color1":'#ffffff',
+                        "color2":'#0022fc'
+                    }
                 },
-                "customPalette":{
-                    "enabled":false,
-                    "color1":'#ffffff',
-                    "color2":'#0022fc'
-                }
-            },
-            enableAutoUniqueEditor:false,
-            selectedSymbolizerType:"",
-            selectedSymbolizer:null,
-            filtersEnabled:false,
-            filters:[{
-                "attribute":"",
-                "comparator":"=",
-                "value":"",
-                "operator":''
-            }]
+                enableAutoUniqueEditor:false,
+                selectedSymbolizerType:"",
+                selectedSymbolizer:null,
+                filtersEnabled:false,
+                filters:[{
+                    "attribute":"",
+                    "comparator":"=",
+                    "value":"",
+                    "operator":''
+                }]
+            };
         };
+        initOptionsSLD();
 
         
         
@@ -359,6 +363,32 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             $scope.optionsSLD.enableRuleEditor = false;
             $scope.optionsSLD.enableAutoIntervalEditor = false;
             $scope.optionsSLD.enableAutoUniqueEditor = false;
+        };
+
+        /**
+         * Configure sld editor with given style object to edit them.
+         * @param styleObj
+         */
+        $scope.editChooseStyle = function(styleObj) {
+            //init all necessary objects for given style
+            $scope.setStyleChooser('edit');
+            var styleName = styleObj.Name;
+            var providerId = styleObj.Provider;
+            style.get({provider: providerId, name: styleName}, function(response) {
+                $scope.newStyle = response;
+                $scope.selectedStyle = styleObj;
+                initOptionsSLD();
+            });
+        };
+
+        /**
+         * Configure the sld editor with a copy of the given style object
+         * to create a new style based.
+         * @param styleObj
+         */
+        $scope.duplicateChooseStyle = function(styleObj) {
+            //@TODO make a duplication of given style to create a new style based on it.
+            //$scope.setStyleChooser('duplicate');
         };
 
         /**
@@ -1409,9 +1439,8 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
          * Proceed to update an existing style.
          */
         $scope.updateStyle = function() {
-            // style.updatejson({provider: 'sld', name: $scope.newStyle.name }, $scope.newStyle, function() {
-            style.createjson({provider: 'sld'}, $scope.newStyle, function() {
-                $growl('success', 'Success', 'Style ' + $scope.newStyle.name + ' successfully created');
+            style.updatejson({provider: 'sld', name: $scope.selectedStyle.Name}, $scope.newStyle, function() {
+                $growl('success', 'Success', 'Style ' + $scope.newStyle.name + ' successfully updated');
                 $modalInstance.close({"Provider": "sld", "Name": $scope.newStyle.name});
             }, function() {
                 $growl('error', 'Error', 'Unable to update style ' + $scope.newStyle.name);
@@ -1426,27 +1455,18 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             if ($scope.newStyle.name === "") {
                 $scope.noName = true;
             } else {
-                if ($scope.dataType.toLowerCase() !== 'coverage' && $scope.dataType.toLowerCase() !== 'raster') {
-                    style.createjson({provider: 'sld'}, $scope.newStyle, function() {
-                        $growl('success', 'Success', 'Style ' + $scope.newStyle.name + ' successfully updated');
-                        $modalInstance.close({"Provider": "sld", "Name": $scope.newStyle.name});
-                    }, function() {
-                        $growl('error', 'Error', 'Unable to create style ' + $scope.newStyle.name);
-                        $modalInstance.close();
-                    });
-                }
-                else if ($scope.dataType.toLowerCase() === 'coverage' || $scope.dataType.toLowerCase() === 'raster') {
-
+                //case for raster we need to treat the palette
+                if ($scope.dataType.toLowerCase() === 'coverage' || $scope.dataType.toLowerCase() === 'raster') {
                     $scope.addPalette();
-                    style.createjson({provider: 'sld'}, $scope.newStyle, function() {
-                        $growl('success', 'Success', 'Style ' + $scope.newStyle.name + ' successfully created');
-                        $modalInstance.close({"Provider": "sld", "Name": $scope.newStyle.name});
-                    }, function() {
-                        $growl('error', 'Error', 'Unable to create style ' + $scope.newStyle.name);
-                        $modalInstance.close();
-                    });
-
                 }
+                //write style in server side.
+                style.createjson({provider: 'sld'}, $scope.newStyle, function() {
+                    $growl('success', 'Success', 'Style ' + $scope.newStyle.name + ' successfully created');
+                    $modalInstance.close({"Provider": "sld", "Name": $scope.newStyle.name});
+                }, function() {
+                    $growl('error', 'Error', 'Unable to create style ' + $scope.newStyle.name);
+                    $modalInstance.close();
+                });
             }
         };
 

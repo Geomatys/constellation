@@ -805,6 +805,7 @@
     "sldeditor.edition.intervalsCount":"Nombre d'intervalles",
     "sldeditor.button.cancel":"Annuler",
     "sldeditor.button.validate":"Valider",
+    "sldeditor.button.validateandsave":"Enregistrer et valider",
     "sldeditor.button.create":"Créer le style",
     "sldeditor.interpolation.solidcolor":"Aplat de couleur",
     "sldeditor.interpolation.interpolatecolor":"palette interpolé",
@@ -818,6 +819,7 @@
     "sldeditor.edition.filter.scale.help.title":"A propos",
     "sldeditor.edition.filter.scale.help":"Vous pouvez filtrer sur l'échelle de zoom en spécifiant un intervalle d'échelles où la donnée sera visible.",
     "sldeditor.edition.filter.getScale":"Récupérer l'échelle courante de la carte.",
+    "sldeditor.edition.duplicate":"Dupliquer",
 
     "tooltip.service.create.name":"L'identifiant peut être le même que le nom",
     "tooltip.service.create.tag":"Utiliser la touche Tab ou Entrée pour valider un mot-clé",

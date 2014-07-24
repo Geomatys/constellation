@@ -832,6 +832,7 @@
     "sldeditor.edition.field":"Attribute field",
     "sldeditor.button.cancel":"Cancel",
     "sldeditor.button.validate":"Validate",
+    "sldeditor.button.validateandsave":"Save and validate",
     "sldeditor.button.create":"Create the style",
     "sldeditor.interpolation.solidcolor":"Solid color",
     "sldeditor.interpolation.interpolatecolor":"Interpolate palette",
@@ -844,6 +845,7 @@
     "sldeditor.edition.filter.scale.help.title":"About",
     "sldeditor.edition.filter.scale.help":"You can add a filter by specifying the scale where the data will be displayed",
     "sldeditor.edition.filter.getScale":"Get the current scale of the map.",
+    "sldeditor.edition.duplicate":"Duplicate",
 
     "tooltip.service.create.name":"The identifier can be the same as the name",
     "tooltip.service.create.tag":"Use Tab or Enter keys to validate keyword",

@@ -8,7 +8,12 @@
                            style="margin-top: 8px;"
                            translate="sldeditor.name">Style name</label>
                     <div class="col-xs-7 col-sm-7 col-md-8">
-                        <input type="text" class="form-control form-control-fix" ng-model="$parent.newStyle.name">
+                        <input ng-if="!isSelectedChooser('edit')"
+                               type="text"
+                               class="form-control form-control-fix"
+                               ng-model="$parent.newStyle.name"/>
+                        <label style="font-size: 12px;font-weight: normal;margin-top: 8px;"
+                               ng-if="isSelectedChooser('edit')">{{$parent.newStyle.name}}</label>
                     </div>
                 </div>
             </div>
