@@ -328,7 +328,61 @@
                     </div>
                 </div>
                 <div ng-if="mode.source==='externe'">
-                    Work in progress ...
+                    <div class="col-xs-8">
+                        <div class="row">
+                            <div class="col-xs-2">
+                                <label class="control-label" translate="service.menu.url.label">Service URL</label>
+                            </div>
+                            <div class="col-xs-8">
+                                <input type="text" class="form-control" ng-model="external.serviceUrl"/>
+                            </div>
+                            <div class="col-xs-2">
+                                <button type="button" class="btn" ng-click="searchAndDisplayWmsLayers()">
+                                    <span translate="label.validate">Validate</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div ng-if="mode.dispWmsLayers" style="margin-top:15px;">
+                        <div class="dashboard">
+                            <div class="col-xs-8">
+                                <div data-role="list">
+                                    <div class="item-list">
+                                        <div class="item coverage" ng-repeat="extLayer in external.layers" ng-class="{selected:extLayer==selected.extLayer}"
+                                             ng-click="selectExtLayer(extLayer)">
+                                            <div class="top">
+                                                <span class="item-title" title="{{extLayer.name}}">{{extLayer.name}}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-4">
+                                <div id="selectionExtLayer">
+                                    <div class="alert alert-info alert-data" ng-show="selected.extLayer == null">
+                                        <h4 translate="label.no.selected.data">No selected data</h4>
+
+                                        <p translate="msg.no.selected.data" style="font-weight:normal;">Click on a data to display more information</p>
+                                    </div>
+                                    <div class="selected-item" ng-hide="selected.extLayer == null">
+                                        <div class="block-header" ng-click="toggleUpDownExtSelected()">
+                                            <strong class="item-title title-bloc-service" title="{{selected.extLayer.name}}">{{selected.extLayer.name}}</strong><i class="icon-chevron-down pull-right"></i>
+                                        </div>
+                                        <div class="block-content">
+                                            <h6>Name</h6>
+                                            <span>{{selected.extLayer.name}}</span>
+
+                                            <div class="separator"></div>
+                                            <h6>Styles</h6>
+                                            <div ng-repeat="style in selected.extLayer.styles">
+                                                <div>{{style.name}}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

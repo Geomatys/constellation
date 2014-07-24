@@ -445,6 +445,9 @@ cstlAdminApp.factory('textService', ['$http', '$growl',
                 return $http.get('@cstl/WS/'+type+'/'+id+';jsessionid=?REQUEST=GetCapabilities&SERVICE='+type.toUpperCase()+'&VERSION='+version);
 
             },
+            capaWmsExterne : function(url){
+                return $http.get(url +'?REQUEST=GetCapabilities&SERVICE=WMS');
+            },
             createStyleXml : function(provider, styleXml){
                 return $http({
                     url: '@cstl/api/1/SP/'+provider+'/style;jsessionid=',

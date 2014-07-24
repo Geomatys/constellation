@@ -120,8 +120,8 @@ cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', '$growl
         };
     }]);
 
-cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance', 'mapcontext', 'webService', 'style', '$growl', '$translate', 'ctxtToEdit', 'layersForCtxt', '$cookies',
-    function ($scope, $modalInstance, mapcontext, webService, style, $growl, $translate, ctxtToEdit, layersForCtxt, $cookies) {
+cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance', 'mapcontext', 'webService', 'style', '$growl', '$translate', 'ctxtToEdit', 'layersForCtxt', '$cookies', 'textService',
+    function ($scope, $modalInstance, mapcontext, webService, style, $growl, $translate, ctxtToEdit, layersForCtxt, $cookies, textService) {
         // item to save in the end
         $scope.ctxt = {};
         // defines if we are in adding or edition mode
@@ -138,13 +138,18 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
         $scope.mode = {
             selTab: 'tabInfo',
             display: 'general',
-            source: 'interne'
+            source: 'interne',
+            dispWmsLayers: false
         };
 
         $scope.layers = {
             toAdd: layersForCtxt || [], // Stores temp layers, selected to be added at the saving time
             toSend: [], // List of layers really sent
             toStyle: null // Layer on which to apply the selected style
+        };
+
+        $scope.external = {
+            serviceUrl: null
         };
 
         $scope.selected = {};
@@ -179,6 +184,10 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
 
         $scope.selectItem = function(item) {
             $scope.selected.item = item;
+        };
+
+        $scope.selectExtLayer = function(extLayer) {
+            $scope.selected.extLayer = extLayer;
         };
 
         $scope.selectStyle = function(item) {
@@ -265,6 +274,11 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
 
         $scope.toggleUpDownSelected = function() {
             var $header = $('#selectionLayer').find('.selected-item').find('.block-header');
+            $header.next().slideToggle(200);
+            $header.find('i').toggleClass('icon-chevron-down icon-chevron-up');
+        };
+        $scope.toggleUpDownExtSelected = function() {
+            var $header = $('#selectionExtLayer').find('.selected-item').find('.block-header');
             $header.next().slideToggle(200);
             $header.find('i').toggleClass('icon-chevron-down icon-chevron-up');
         };
@@ -414,5 +428,17 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
             $scope.ctxt.east = extent[2];
             $scope.ctxt.north = extent[3];
         };
+
+        $scope.searchAndDisplayWmsLayers = function() {
+            if ($scope.external.serviceUrl) {
+                textService.capaWmsExterne($scope.external.serviceUrl)
+                    .success(function (data, status, headers, config) {
+                        var capabilities = DataViewer.format.read(data);
+                        $scope.external.layers = capabilities.capability.layers;
+
+                        $scope.mode.dispWmsLayers = true;
+                    });
+            }
+        }
     }]);
                                      
