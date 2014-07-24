@@ -2,6 +2,7 @@ target/
 *.log
 //Intellij
 *.iml
+.idea/
 //eclipse
 >>>>>>> engine-refactor
 .classpath
