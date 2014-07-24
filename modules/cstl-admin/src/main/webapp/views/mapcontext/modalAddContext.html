@@ -220,28 +220,30 @@
 
             <!-- Add mode, choose kind of source -->
             <div ng-if="mode.display==='addChooseSource'">
-                <div class="row well title-form-blue">
+                <div class="well title-form-blue">
                     <span translate="mapcontext.modal.select.source">Select your layer source</span>
                 </div>
-                <div>
-                    <input type="radio" ng-model="mode.source" value="interne"><span translate="mapcontext.modal.label.internal">Internal</span>
-                </div>
-                <div>
-                    <input type="radio" ng-model="mode.source" value="externe"><span translate="mapcontext.modal.label.external">External</span>
+                <div style="margin-left: 30px;">
+                    <div>
+                        <input type="radio" ng-model="mode.source" value="interne" style="margin-right: 5px;"><span translate="mapcontext.modal.label.internal">Internal</span>
+                    </div>
+                    <div>
+                        <input type="radio" ng-model="mode.source" value="externe" style="margin-right: 5px;"><span translate="mapcontext.modal.label.external">External</span>
+                    </div>
                 </div>
             </div>
 
             <!-- Choose a layer to add -->
-            <div class="row" ng-if="mode.display==='chooseLayer'">
+            <div ng-if="mode.display==='chooseLayer'">
                 <div ng-if="mode.source==='interne'" ng-init="initInternalWmsServices()">
-                    <div class="dashboard">
+                    <div class="row dashboard">
                         <div class="col-xs-8">
                             <div ng-repeat="serviceLayers in servicesLayers" class="services-layers-dashboard">
                                 <div class="title">
                                     <i class="icon-chevron-down"></i>
                                     <span>Service {{serviceLayers.name}}</span>
                                 </div>
-                                <div class="dash-inner row dashboard" ng-init="small=false">
+                                <div class="dash-inner row" ng-init="small=false">
                                     <div data-role="list">
                                         <div class="item-list">
                                             <div class="item" ng-repeat="layer in serviceLayers.layers" ng-class="{selected:layer==selected.layer,coverage:layer.Type.toUpperCase()==='coverage'.toUpperCase()||layer.Type.toUpperCase()==='raster'.toUpperCase(),vector:layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layer.Type.toUpperCase()==='vector'.toUpperCase(), 'col-xs-6':small==true}" ng-click="select(layer, serviceLayers)">
@@ -328,7 +330,7 @@
                     </div>
                 </div>
                 <div ng-if="mode.source==='externe'">
-                    <div class="col-xs-8">
+                    <div style="margin-top: 10px;">
                         <div class="row">
                             <div class="col-xs-2">
                                 <label class="control-label" translate="service.menu.url.label">Service URL</label>
@@ -343,39 +345,42 @@
                             </div>
                         </div>
                     </div>
-                    <div ng-if="mode.dispWmsLayers" style="margin-top:15px;">
-                        <div class="dashboard">
-                            <div class="col-xs-8">
-                                <div data-role="list">
-                                    <div class="item-list">
-                                        <div class="item coverage" ng-repeat="extLayer in external.layers" ng-class="{selected:extLayer==selected.extLayer}"
-                                             ng-click="selectExtLayer(extLayer)">
-                                            <div class="top">
-                                                <span class="item-title" title="{{extLayer.name}}">{{extLayer.name}}</span>
+                    <div ng-if="mode.dispWmsLayers">
+                        <hr/>
+                        <div style="margin-top:15px;">
+                            <div class="dashboard row">
+                                <div class="col-xs-8">
+                                    <div data-role="list">
+                                        <div class="item-list">
+                                            <div class="item coverage" ng-repeat="extLayer in external.layers" ng-class="{selected:extLayer==selected.extLayer}"
+                                                 ng-click="selectExtLayer(extLayer)">
+                                                <div class="top">
+                                                    <span class="item-title" title="{{extLayer.name}}">{{extLayer.name}}</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-xs-4">
-                                <div id="selectionExtLayer">
-                                    <div class="alert alert-info alert-data" ng-show="selected.extLayer == null">
-                                        <h4 translate="label.no.selected.data">No selected data</h4>
+                                <div class="col-xs-4">
+                                    <div id="selectionExtLayer">
+                                        <div class="alert alert-info alert-data" ng-show="selected.extLayer == null">
+                                            <h4 translate="label.no.selected.data">No selected data</h4>
 
-                                        <p translate="msg.no.selected.data" style="font-weight:normal;">Click on a data to display more information</p>
-                                    </div>
-                                    <div class="selected-item" ng-hide="selected.extLayer == null">
-                                        <div class="block-header" ng-click="toggleUpDownExtSelected()">
-                                            <strong class="item-title title-bloc-service" title="{{selected.extLayer.name}}">{{selected.extLayer.name}}</strong><i class="icon-chevron-down pull-right"></i>
+                                            <p translate="msg.no.selected.data" style="font-weight:normal;">Click on a data to display more information</p>
                                         </div>
-                                        <div class="block-content">
-                                            <h6>Name</h6>
-                                            <span>{{selected.extLayer.name}}</span>
+                                        <div class="selected-item" ng-hide="selected.extLayer == null">
+                                            <div class="block-header" ng-click="toggleUpDownExtSelected()">
+                                                <strong class="item-title title-bloc-service" title="{{selected.extLayer.name}}">{{selected.extLayer.name}}</strong><i class="icon-chevron-down pull-right"></i>
+                                            </div>
+                                            <div class="block-content">
+                                                <h6>Name</h6>
+                                                <span>{{selected.extLayer.name}}</span>
 
-                                            <div class="separator"></div>
-                                            <h6>Styles</h6>
-                                            <div ng-repeat="style in selected.extLayer.styles">
-                                                <div>{{style.name}}</div>
+                                                <div class="separator"></div>
+                                                <h6>Styles</h6>
+                                                <div ng-repeat="style in selected.extLayer.styles">
+                                                    <div>{{style.name}}</div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
