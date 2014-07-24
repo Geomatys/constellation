@@ -48,4 +48,19 @@ public class JooqChainProcessRepository extends AbstractJooqRespository<ChainPro
         newRecord.store();
         return newRecord.into(ChainProcess.class);
     }
+
+    @Override
+    public int delete(int id) {
+        return dsl.delete(CHAIN_PROCESS).where(CHAIN_PROCESS.ID.eq(id)).execute();
+    }
+
+    @Override
+    public int delete(String auth, String code) {
+        return dsl.delete(CHAIN_PROCESS).where(CHAIN_PROCESS.AUTH.eq(auth)).and(CHAIN_PROCESS.CODE.eq(code)).execute();
+    }
+
+    @Override
+    public ChainProcess findOne(String auth, String code) {
+        return dsl.select().from(CHAIN_PROCESS).where(CHAIN_PROCESS.AUTH.eq(auth)).and(CHAIN_PROCESS.CODE.eq(code)).fetchOneInto(ChainProcess.class);
+    }
 }

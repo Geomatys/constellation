@@ -30,5 +30,11 @@ public interface ChainProcessRepository {
     
     List<ChainProcess> findAll();
     
+    ChainProcess findOne(String auth, String code);
+    
     ChainProcess create(ChainProcess chain);
+    
+    int delete(int id);
+    
+    int delete(String auth, String code);
 }

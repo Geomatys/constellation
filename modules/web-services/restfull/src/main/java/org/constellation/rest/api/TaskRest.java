@@ -308,4 +308,14 @@ public final class TaskRest {
         processBusiness.createChainProcess(chain);
         return Response.ok().build();
     }
+    
+    @DELETE
+    @Path("chain/{authority}/{code}")
+    public AcknowlegementType deleteChain(final @PathParam("authority") String authority, final @PathParam("code") String code) {
+        if (processBusiness.deleteChainProcess(authority, code)) {
+            return new AcknowlegementType("Success", "The chain has been deleted");
+        } else {
+            return new AcknowlegementType("Failure", "Could not find chain for given authority/code.");
+        }
+    }
 }

@@ -92,4 +92,13 @@ public class ProcessBusiness {
         final ChainProcess process = new ChainProcess("constellation", code, config);
         chainRepository.create(process);
     }
+    
+    public boolean deleteChainProcess(final String auth, final String code) {
+        final ChainProcess chain = chainRepository.findOne(auth, code);
+        if (chain != null) {
+            chainRepository.delete(chain.getId());
+            return true;
+        }
+        return false;
+    }
 }
