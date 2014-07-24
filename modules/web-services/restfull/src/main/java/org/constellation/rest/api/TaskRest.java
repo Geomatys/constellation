@@ -18,6 +18,23 @@
  */
 package org.constellation.rest.api;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.inject.Inject;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.xml.stream.XMLStreamException;
+import org.constellation.admin.ProcessBusiness;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.configuration.StringList;
@@ -31,6 +48,7 @@ import org.geotoolkit.feature.type.Name;
 import org.geotoolkit.parameter.DefaultParameterDescriptorGroup;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessFinder;
+import org.geotoolkit.process.chain.model.Chain;
 import org.geotoolkit.process.quartz.ProcessJobDetail;
 import org.geotoolkit.xml.parameter.ParameterValueReader;
 import org.opengis.parameter.GeneralParameterDescriptor;
@@ -41,22 +59,6 @@ import org.opengis.util.NoSuchIdentifierException;
 import org.quartz.SimpleScheduleBuilder;
 import org.quartz.TriggerBuilder;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.xml.stream.XMLStreamException;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * RestFull API for task management/operations.
  * 
@@ -66,6 +68,9 @@ import java.util.Map;
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 public final class TaskRest {
+    
+    @Inject
+    private ProcessBusiness processBusiness;
     
     /**
      * List running tasks.
@@ -295,5 +300,12 @@ public final class TaskRest {
         ParameterDescriptorGroup idesc = desc.getInputDescriptor();
         idesc = new DefaultParameterDescriptorGroup("input", idesc.descriptors().toArray(new GeneralParameterDescriptor[0]));
         return idesc;
+    }
+    
+    @POST
+    @Path("chain")
+    public Response createChain(final Chain chain) throws ConfigurationException {
+        processBusiness.createChainProcess(chain);
+        return Response.ok().build();
     }
 }

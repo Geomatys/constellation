@@ -85,7 +85,11 @@ public final class WSEngine {
     }
     
     public static Map<String, Worker> getWorkersMap(final String specification) {
-        return WORKERS_MAP.get(specification.toLowerCase());
+        final Map<String, Worker> result = WORKERS_MAP.get(specification.toLowerCase());
+        if (result == null) {
+            return new HashMap<>();
+        }
+        return result;
     }
 
     @Deprecated

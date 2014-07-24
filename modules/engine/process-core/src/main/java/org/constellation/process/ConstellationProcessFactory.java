@@ -32,6 +32,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.sis.util.logging.Logging;
+import org.constellation.configuration.ConfigurationException;
 
 /**
  *
@@ -39,6 +43,8 @@ import java.util.List;
  */
 public class ConstellationProcessFactory extends AbstractProcessingRegistry {
 
+    private static final Logger LOGGER = Logging.getLogger(ConstellationProcessFactory.class);
+            
     /**Factory name*/
     public static final String NAME = "constellation";
     public static final DefaultServiceIdentification IDENTIFICATION;
@@ -72,6 +78,12 @@ public class ConstellationProcessFactory extends AbstractProcessingRegistry {
         final List<ProcessDescriptor> descriptors = new ArrayList<>();
         while (ite.hasNext()) {
             descriptors.add(ite.next());
+        }
+        
+        try {
+            descriptors.addAll(new ChainProcessRetriever().getChainDescriptors());
+        } catch (ConfigurationException ex) {
+            LOGGER.log(Level.WARNING, "Exception while retrieving chain process", ex);
         }
         
         return descriptors.toArray(new ProcessDescriptor[descriptors.size()]);
