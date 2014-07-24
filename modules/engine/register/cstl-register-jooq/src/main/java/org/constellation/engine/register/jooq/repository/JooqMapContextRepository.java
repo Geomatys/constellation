@@ -60,13 +60,17 @@ public class JooqMapContextRepository extends AbstractJooqRespository<Mapcontext
 
         for (final MapcontextStyledLayer layer : layers) {
             dsl.insertInto(MAPCONTEXT_STYLED_LAYER)
-               .set(MAPCONTEXT_STYLED_LAYER.LAYER_ID, layer.getLayerId())
-               .set(MAPCONTEXT_STYLED_LAYER.MAPCONTEXT_ID, layer.getMapcontextId())
-               .set(MAPCONTEXT_STYLED_LAYER.STYLE_ID, layer.getStyleId())
-               .set(MAPCONTEXT_STYLED_LAYER.LAYER_VISIBLE, layer.isLayerVisible())
-               .set(MAPCONTEXT_STYLED_LAYER.LAYER_ORDER, layer.getLayerOrder())
-               .set(MAPCONTEXT_STYLED_LAYER.LAYER_OPACITY, layer.getLayerOpacity())
-               .execute();
+                .set(MAPCONTEXT_STYLED_LAYER.LAYER_ID, layer.getLayerId())
+                .set(MAPCONTEXT_STYLED_LAYER.MAPCONTEXT_ID, layer.getMapcontextId())
+                .set(MAPCONTEXT_STYLED_LAYER.STYLE_ID, layer.getStyleId())
+                .set(MAPCONTEXT_STYLED_LAYER.LAYER_VISIBLE, layer.isLayerVisible())
+                .set(MAPCONTEXT_STYLED_LAYER.LAYER_ORDER, layer.getLayerOrder())
+                .set(MAPCONTEXT_STYLED_LAYER.LAYER_OPACITY, layer.getLayerOpacity())
+                .set(MAPCONTEXT_STYLED_LAYER.EXTERNAL_LAYER, layer.getExternalLayer())
+                .set(MAPCONTEXT_STYLED_LAYER.EXTERNAL_SERVICE_URL, layer.getExternalServiceUrl())
+                .set(MAPCONTEXT_STYLED_LAYER.EXTERNAL_SERVICE_VERSION, layer.getExternalServiceVersion())
+                .set(MAPCONTEXT_STYLED_LAYER.EXTERNAL_STYLE, layer.getExternalStyle())
+                .execute();
         }
     }
 

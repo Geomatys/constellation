@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="version_1.3" author="Cedric">
+        <dropTable schemaName="admin"
+                   tableName="mapcontext_styled_layer"/>
+
+        <createTable schemaName="admin" tableName="mapcontext_styled_layer">
+            <column autoIncrement="true" name="id" type="INTEGER">
+                <constraints primaryKey="true" primaryKeyName="MAPCONTEXT_STYLED_LAYER_PK" />
+            </column>
+            <column name="mapcontext_id" type="INTEGER">
+                <constraints nullable="false" />
+            </column>
+            <column name="layer_id" type="INTEGER">
+                <constraints nullable="true" />
+            </column>
+            <column name="style_id" type="INTEGER">
+                <constraints nullable="true" />
+            </column>
+            <column defaultValue="1" name="layer_order" type="INTEGER">
+                <constraints nullable="false" />
+            </column>
+            <column defaultValue="100" name="layer_opacity" type="INTEGER">
+                <constraints nullable="false" />
+            </column>
+            <column defaultValueBoolean="true" name="layer_visible" type="BOOLEAN">
+                <constraints nullable="false" />
+            </column>
+            <column name="external_layer" type="VARCHAR(512)">
+                <constraints nullable="true" />
+            </column>
+            <column name="external_service_url" type="VARCHAR(512)">
+                <constraints nullable="true" />
+            </column>
+            <column name="external_service_version" type="VARCHAR(32)">
+                <constraints nullable="true" />
+            </column>
+            <column name="external_style" type="VARCHAR(128)">
+                <constraints nullable="true" />
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableSchemaName="admin" referencedTableSchemaName="admin"
+                constraintName="mapcontext_styled_layer_mapcontext_id_fk"
+                baseTableName="mapcontext_styled_layer" baseColumnNames="mapcontext_id"
+                referencedTableName="mapcontext" referencedColumnNames="id"
+                onDelete="CASCADE" />
+        <addForeignKeyConstraint
+                baseTableSchemaName="admin" referencedTableSchemaName="admin"
+                constraintName="mapcontext_styled_layer_layer_id_fk"
+                baseTableName="mapcontext_styled_layer" baseColumnNames="layer_id"
+                referencedTableName="layer" referencedColumnNames="id" onDelete="CASCADE" />
+        <addForeignKeyConstraint
+                baseTableSchemaName="admin" referencedTableSchemaName="admin"
+                constraintName="mapcontext_styled_layer_style_id_fk"
+                baseTableName="mapcontext_styled_layer" baseColumnNames="style_id"
+                referencedTableName="style" referencedColumnNames="id" onDelete="CASCADE" />
+    </changeSet>
+
+
+</databaseChangeLog>

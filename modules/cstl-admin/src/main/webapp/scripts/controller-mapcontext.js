@@ -217,14 +217,20 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
                 $scope.mode.display = 'chooseLayer';
             } else if ($scope.mode.display==='chooseLayer') {
                 // Add the selected layer to the current map context
-                if ($scope.selected.layer) {
-                    $scope.layers.toAdd.push(
-                        {layer: $scope.selected.layer,
-                         service: $scope.selected.service,
-                         visible: true
-                        });
+                if ($scope.selected.extLayer) {
+
+                } else {
+                    if ($scope.selected.layer) {
+                        var layerToAdd = {
+                            layer: $scope.selected.layer,
+                            service: $scope.selected.service,
+                            visible: true
+                        };
+                        layerToAdd.layer.opacity = 100;
+                        $scope.layers.toAdd.push(layerToAdd);
+                    }
+                    $scope.viewMap(false);
                 }
-                $scope.viewMap(false);
 
                 // Go back to first screen
                 $scope.mode.display = 'general';
