@@ -120,8 +120,8 @@ cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', '$growl
         };
     }]);
 
-cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance', 'mapcontext', 'webService', 'style', '$growl', '$translate', 'ctxtToEdit', 'layersForCtxt', '$cookies',
-    function ($scope, $modalInstance, mapcontext, webService, style, $growl, $translate, ctxtToEdit, layersForCtxt, $cookies) {
+cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance', 'mapcontext', 'webService', 'style', '$growl', '$translate', 'ctxtToEdit', 'layersForCtxt', '$cookies', '$modal',
+    function ($scope, $modalInstance, mapcontext, webService, style, $growl, $translate, ctxtToEdit, layersForCtxt, $cookies, $modal) {
         // item to save in the end
         $scope.ctxt = {};
         // defines if we are in adding or edition mode
@@ -227,11 +227,23 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
                         llExtent = exCaps111.minx +','+ exCaps111.miny +','+ exCaps111.maxx +','+ exCaps111.maxy;
                     }
 
+                    var extStyle = '';
+                    if ($scope.selected.extLayer.Style) {
+                        for (var i=0; i < $scope.selected.extLayer.Style.length; i++) {
+                            if (i > 0) {
+                                extStyle += ',';
+                            }
+                            var capsStyle = $scope.selected.extLayer.Style[i];
+                            extStyle += capsStyle.Name;
+                        }
+                    }
+
                     var layerExt = {
                         externalLayer: $scope.selected.extLayer.Name,
                         externalLayerExtent: llExtent,
                         externalServiceUrl: $scope.external.serviceUrl,
                         externalServiceVersion: ($scope.selected.extLayer.EX_GeographicBoundingBox) ? '1.3.0' : '1.1.1',
+                        externalStyle: extStyle,
                         opacity: 100
                     };
                     var layerExtToAdd = {
@@ -255,8 +267,39 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
                 // Go back to first screen
                 $scope.mode.display = 'general';
             } else if ($scope.mode.display==='addChooseStyle') {
-                $scope.layers.toStyle.layer.styleId = $scope.styles.selected.Id;
-                $scope.layers.toStyle.layer.styleName = $scope.styles.selected.Name;
+                if ($scope.layers.toStyle.layer.externalStyle) {
+                    // It's an external WMS style, put the one chosen in first, as the default one
+                    var possibleStyles = $scope.layers.toStyle.layer.externalStyle.split(',');
+                    if (possibleStyles[0] !== $scope.styles.selected.Name) {
+                        var indexForStyle;
+                        for (var i=0; i<possibleStyles.length; i++) {
+                            var s = possibleStyles[i];
+                            if (s === $scope.styles.selected.Name) {
+                                indexForStyle = i;
+                            }
+                        }
+
+                        if (indexForStyle) {
+                            // Remove it from its old place
+                            possibleStyles.splice(indexForStyle, 1);
+                            // Put it in first
+                            possibleStyles.splice(0, 0, $scope.styles.selected.Name);
+                        }
+
+                        var finalStyles = '';
+                        for (var i=0; i<possibleStyles.length; i++) {
+                            if (i > 0) {
+                                finalStyles += ',';
+                            }
+                            finalStyles += possibleStyles[i];
+                        }
+                        $scope.layers.toStyle.layer.externalStyle = finalStyles;
+                    }
+                } else {
+                    // Internal style
+                    $scope.layers.toStyle.layer.styleId = $scope.styles.selected.Id;
+                    $scope.layers.toStyle.layer.styleName = $scope.styles.selected.Name;
+                }
                 $scope.viewMap(false);
                 $scope.mode.display = 'general';
             }
@@ -351,21 +394,33 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
         };
 
         $scope.goToStyleMapItem = function(item) {
-            style.listAll({provider: 'sld'}, function(response) {
-                $scope.styles.existing = [];
-                for (var j=0; j<item.layer.TargetStyle.length; j++) {
-                    var tgStyle = item.layer.TargetStyle[j];
-                    for (var i=0; i<response.styles.length; i++) {
-                        var style = response.styles[i];
-                        if (style.Name===tgStyle.Name && style.Provider===tgStyle.Provider) {
-                            $scope.styles.existing.push(style);
-                            break;
-                        }
+            $scope.styles.existing = [];
+            if (item.layer.externalLayer) {
+                var styleItems = [];
+                if (item.layer.externalStyle) {
+                    var styleNames = item.layer.externalStyle.split(',');
+                    for (var i = 0; i < styleNames.length; i++) {
+                        styleItems.push({Name: styleNames[i]});
                     }
                 }
-            });
-            $scope.mode.display = 'addChooseStyle';
+                $scope.styles.existing = styleItems;
+            } else {
+                // Internal layer
+                style.listAll({provider: 'sld'}, function (response) {
+                    for (var j = 0; j < item.layer.TargetStyle.length; j++) {
+                        var tgStyle = item.layer.TargetStyle[j];
+                        for (var i = 0; i < response.styles.length; i++) {
+                            var style = response.styles[i];
+                            if (style.Name === tgStyle.Name && style.Provider === tgStyle.Provider) {
+                                $scope.styles.existing.push(style);
+                                break;
+                            }
+                        }
+                    }
+                });
+            }
             $scope.layers.toStyle = item;
+            $scope.mode.display = 'addChooseStyle';
         };
 
         $scope.deleteMapItem = function(item) {
@@ -417,7 +472,7 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
                     var layerData;
                     if (l.layer.externalServiceUrl) {
                         layerData = (l.layer.externalStyle) ?
-                            DataViewer.createLayerExternalWMSWithStyle(l.layer.externalServiceUrl, l.layer.externalLayer, l.layer.externalStyle) :
+                            DataViewer.createLayerExternalWMSWithStyle(l.layer.externalServiceUrl, l.layer.externalLayer, l.layer.externalStyle.split(',')[0]) :
                             DataViewer.createLayerExternalWMS(l.layer.externalServiceUrl, l.layer.externalLayer);
                     } else {
                         var serviceName = (l.layer.serviceIdentifier) ? l.layer.serviceIdentifier : l.service.identifier;
@@ -469,18 +524,26 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
 
         $scope.searchAndDisplayWmsLayers = function() {
             if ($scope.external.serviceUrl) {
+                var modalLoader = $modal.open({
+                    templateUrl: 'views/modalLoader.html',
+                    controller: 'ModalInstanceCtrl'
+                });
+
                 // Try in WMS version 1.3.0
                 mapcontext.listExtLayers({version: "1.3.0"}, $scope.external.serviceUrl, function(response) {
                     $scope.external.layers = response;
+                    modalLoader.close();
 
                     $scope.mode.dispWmsLayers = true;
                 }, function() {
                     // If it fails tries it in version 1.1.1
                     mapcontext.listExtLayers({version: "1.1.1"}, $scope.external.serviceUrl, function(response) {
                         $scope.external.layers = response;
+                        modalLoader.close();
 
                         $scope.mode.dispWmsLayers = true;
                     }, function() {
+                        modalLoader.close();
                         $growl('error', 'Error', 'Unable to find layers for this url');
                     });
                 });

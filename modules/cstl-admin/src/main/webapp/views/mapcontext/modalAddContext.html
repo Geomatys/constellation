@@ -109,7 +109,7 @@
                                                             <div class="item" ng-class="{'selected':layerToAdd===selected.item,mapcontext: layerToAdd.layer.externalLayer, coverage:layerToAdd.layer.Type.toUpperCase()==='coverage'.toUpperCase(),vector:layerToAdd.layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layerToAdd.layer.Type.toUpperCase()==='vector'.toUpperCase()}">
                                                                 <div class="top">
                                                                     <span class="item-title" title="{{(layerToAdd.layer.Name) ? layerToAdd.layer.Name : layerToAdd.layer.externalLayer}}">{{(layerToAdd.layer.Name) ? layerToAdd.layer.Name : layerToAdd.layer.externalLayer}}</span>
-                                                                    <span class="pull-right text-right item-list-style">{{layerToAdd.layer.Type==='coverage'?'raster':layerToAdd.layer.Type==='feature-store'?'vector':layerToAdd.layer.Type==='observation-store'?'vector':layerToAdd.layer.Type}}</span>
+                                                                    <span class="pull-right text-right item-list-style">{{layerToAdd.layer.Type==='coverage'?'raster':layerToAdd.layer.Type==='feature-store'?'vector':layerToAdd.layer.Type==='observation-store'?'vector':(layerToAdd.layer.Type) ? layerToAdd.layer.Type : 'WMS'}}</span>
                                                                     <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='Point' || layerToAdd.layer.Subtype=='MultiPoint')"
                                                                          src="images/vector-multipoint.svg"
                                                                          class="pull-right"
@@ -127,15 +127,15 @@
                                                                          class="pull-right"
                                                                          style="margin-top:6px; margin-right:10px;" />
                                                                 </div>
-                                                                <div class="bottom" ng-hide="layerToAdd.layer.externalLayer">
-                                                                    <div class="block">
+                                                                <div class="bottom">
+                                                                    <div class="block" ng-hide="layerToAdd.layer.externalLayer">
                                                                         <i class="icon-calendar"></i>{{layerToAdd.layer.Date | date:'yyyy-MM-dd'}}
                                                                     </div>
-                                                                    <div class="block">
+                                                                    <div class="block" ng-hide="layerToAdd.layer.externalLayer">
                                                                         <i class="icon-user"></i>{{layerToAdd.layer.Owner}}
                                                                     </div>
                                                                     <div class="block">
-                                                                        <i class="glyphicon glyphicon-pencil"></i>{{layerToAdd.layer.styleName}}
+                                                                        <i class="glyphicon glyphicon-pencil"></i>{{(layerToAdd.layer.styleName) ? layerToAdd.layer.styleName : (layerToAdd.layer.externalStyle) ? layerToAdd.layer.externalStyle.split(',')[0] : ''}}
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -190,14 +190,14 @@
                             <div data-role="list">
                                 <div class="item-list">
                                     <div ng-repeat="styleItem in styles.existing" class="row">
-                                        <div class="item style-{{styleItem.Type | lowercase}}"
-                                             ng-class="{selected: styles.selected===styleItem}"
+                                        <div class="item"
+                                             ng-class="{selected: styles.selected===styleItem, 'style-coverage': (styleItem.Type && styleItem.Type.toLowerCase() === 'coverage') || styleItem.Type == null || styleItem.Type == undefined, 'style-vector': styleItem.Type && styleItem.Type.toLowerCase() === 'vector'}"
                                              ng-click="selectStyle(styleItem)">
                                             <div class="top">
                                                 <span class="item-title" title="{{styleItem.Name}}">{{styleItem.Name}}</span>
-                                                <span class="pull-right text-right item-list-style">{{styleItem.Type}}</span>
+                                                <span class="pull-right text-right item-list-style">{{(styleItem.Type) ? styleItem.Type : 'WMS'}}</span>
                                             </div>
-                                            <div class="bottom">
+                                            <div class="bottom" ng-show="styleItem.Date">
                                                 <div class="block">
                                                     <i class="icon-calendar"></i>{{styleItem.Date | date:'yyyy-MM-dd'}}
                                                 </div>
@@ -224,7 +224,7 @@
                     <span translate="mapcontext.modal.select.source">Select your layer source</span>
                 </div>
                 <div style="margin-left: 30px;">
-                    <div>
+                    <div style="margin-bottom: 5px;">
                         <input type="radio" ng-model="mode.source" value="interne" style="margin-right: 5px;"><span translate="mapcontext.modal.label.internal">Internal</span>
                     </div>
                     <div>
@@ -356,6 +356,7 @@
                                                  ng-click="selectExtLayer(extLayer)">
                                                 <div class="top">
                                                     <span class="item-title" title="{{extLayer.Name}}">{{extLayer.Name}}</span>
+                                                    <span class="pull-right text-right item-list-style">WMS</span>
                                                 </div>
                                             </div>
                                         </div>
