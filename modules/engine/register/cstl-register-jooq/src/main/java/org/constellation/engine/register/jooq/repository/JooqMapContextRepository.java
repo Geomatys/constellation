@@ -67,6 +67,7 @@ public class JooqMapContextRepository extends AbstractJooqRespository<Mapcontext
                 .set(MAPCONTEXT_STYLED_LAYER.LAYER_ORDER, layer.getLayerOrder())
                 .set(MAPCONTEXT_STYLED_LAYER.LAYER_OPACITY, layer.getLayerOpacity())
                 .set(MAPCONTEXT_STYLED_LAYER.EXTERNAL_LAYER, layer.getExternalLayer())
+                .set(MAPCONTEXT_STYLED_LAYER.EXTERNAL_LAYER_EXTENT, layer.getExternalLayerExtent())
                 .set(MAPCONTEXT_STYLED_LAYER.EXTERNAL_SERVICE_URL, layer.getExternalServiceUrl())
                 .set(MAPCONTEXT_STYLED_LAYER.EXTERNAL_SERVICE_VERSION, layer.getExternalServiceVersion())
                 .set(MAPCONTEXT_STYLED_LAYER.EXTERNAL_STYLE, layer.getExternalStyle())

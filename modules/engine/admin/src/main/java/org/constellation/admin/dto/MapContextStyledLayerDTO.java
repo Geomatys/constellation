@@ -61,6 +61,7 @@ public class MapContextStyledLayerDTO extends LayerSummary implements Comparable
         this.externalServiceUrl = mapContextStyledLayer.getExternalServiceUrl();
         this.externalServiceVersion = mapContextStyledLayer.getExternalServiceVersion();
         this.externalLayer = mapContextStyledLayer.getExternalLayer();
+        this.externalLayerExtent = mapContextStyledLayer.getExternalLayerExtent();
     }
 
     public Integer getId() {
