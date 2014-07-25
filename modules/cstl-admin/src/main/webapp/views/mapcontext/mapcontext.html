@@ -86,7 +86,7 @@
                                 </div>
 
                                 <div ng-if="context==selected" ng-repeat="layer in context.layers" style="padding-left:0;">
-                                    <div class="item child compo" ng-class="{'selected':layer==selectedLayer, coverage:layer.Type.toUpperCase()==='coverage'.toUpperCase()||layer.Type.toUpperCase()==='raster'.toUpperCase(),vector:layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layer.Type.toUpperCase()==='vector'.toUpperCase()}" ng-click="selectContextChild(layer);">
+                                    <div class="item child compo" ng-class="{'selected':layer==selectedLayer, mapcontext: layer.externalLayer, coverage:layer.Type.toUpperCase()==='coverage'.toUpperCase()||layer.Type.toUpperCase()==='raster'.toUpperCase(),vector:layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layer.Type.toUpperCase()==='vector'.toUpperCase()}" ng-click="selectContextChild(layer);">
                                         <div class="top">
                                             <span class="item-title" title="{{layer.Name}}">{{layer.Name}}</span>
                                             <span class="pull-right text-right item-list-style">{{layer.Type==='coverage'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector':layer.Type}}</span>
@@ -123,7 +123,7 @@
                                                  class="pull-right"
                                                  style="margin-top:6px; margin-right:10px;" />
                                         </div>
-                                        <div class="bottom">
+                                        <div class="bottom" ng-hide="layer.externalLayer">
                                             <div class="block">
                                                 <i class="icon-calendar"></i>{{layer.Date | date:'yyyy-MM-dd'}}
                                             </div>

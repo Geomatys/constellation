@@ -3,9 +3,13 @@ package org.constellation.admin.dto;
 import org.constellation.configuration.DataBrief;
 import org.constellation.configuration.Layer;
 import org.constellation.configuration.LayerSummary;
+import org.constellation.configuration.StyleBrief;
 import org.constellation.engine.register.MapcontextStyledLayer;
 
+import java.util.Collections;
+
 public class MapContextStyledLayerDTO extends LayerSummary implements Comparable<MapContextStyledLayerDTO> {
+    private Integer id;
     private Integer mapcontextId;
     private Integer layerId;
     private String serviceIdentifier;
@@ -16,9 +20,14 @@ public class MapContextStyledLayerDTO extends LayerSummary implements Comparable
     private int opacity;
     private boolean visible;
     private String externalStyle;
+    private String externalServiceUrl;
+    private String externalServiceVersion;
+    private String externalLayer;
+    private String externalLayerExtent;
 
-    public MapContextStyledLayerDTO(final MapcontextStyledLayer mapContextStyledLayer, final Layer layer, final DataBrief db) {
-        super(layer, db);
+    public MapContextStyledLayerDTO(final MapcontextStyledLayer mapContextStyledLayer) {
+        super();
+        this.id = mapContextStyledLayer.getId();
         this.mapcontextId = mapContextStyledLayer.getMapcontextId();
         this.layerId = mapContextStyledLayer.getLayerId();
         this.styleId = mapContextStyledLayer.getStyleId();
@@ -26,6 +35,40 @@ public class MapContextStyledLayerDTO extends LayerSummary implements Comparable
         this.opacity = mapContextStyledLayer.getLayerOpacity();
         this.visible = mapContextStyledLayer.isLayerVisible();
         this.externalStyle = mapContextStyledLayer.getExternalStyle();
+        this.externalServiceUrl = mapContextStyledLayer.getExternalServiceUrl();
+        this.externalServiceVersion = mapContextStyledLayer.getExternalServiceVersion();
+        this.externalLayer = mapContextStyledLayer.getExternalLayer();
+        this.externalLayerExtent = mapContextStyledLayer.getExternalLayerExtent();
+
+        super.setName(externalLayer);
+        super.setAlias(externalLayer);
+        final StyleBrief style = new StyleBrief();
+        style.setName(externalStyle);
+        style.setTitle(externalStyle);
+        super.setTargetStyle(Collections.singletonList(style));
+    }
+
+    public MapContextStyledLayerDTO(final MapcontextStyledLayer mapContextStyledLayer, final Layer layer, final DataBrief db) {
+        super(layer, db);
+        this.id = mapContextStyledLayer.getId();
+        this.mapcontextId = mapContextStyledLayer.getMapcontextId();
+        this.layerId = mapContextStyledLayer.getLayerId();
+        this.styleId = mapContextStyledLayer.getStyleId();
+        this.order = mapContextStyledLayer.getLayerOrder();
+        this.opacity = mapContextStyledLayer.getLayerOpacity();
+        this.visible = mapContextStyledLayer.isLayerVisible();
+        this.externalStyle = mapContextStyledLayer.getExternalStyle();
+        this.externalServiceUrl = mapContextStyledLayer.getExternalServiceUrl();
+        this.externalServiceVersion = mapContextStyledLayer.getExternalServiceVersion();
+        this.externalLayer = mapContextStyledLayer.getExternalLayer();
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public Integer getMapcontextId() {
@@ -92,6 +135,38 @@ public class MapContextStyledLayerDTO extends LayerSummary implements Comparable
         this.externalStyle = externalStyle;
     }
 
+    public String getExternalServiceUrl() {
+        return externalServiceUrl;
+    }
+
+    public void setExternalServiceUrl(String externalServiceUrl) {
+        this.externalServiceUrl = externalServiceUrl;
+    }
+
+    public String getExternalServiceVersion() {
+        return externalServiceVersion;
+    }
+
+    public void setExternalServiceVersion(String externalServiceVersion) {
+        this.externalServiceVersion = externalServiceVersion;
+    }
+
+    public String getExternalLayer() {
+        return externalLayer;
+    }
+
+    public void setExternalLayer(String externalLayer) {
+        this.externalLayer = externalLayer;
+    }
+
+    public String getExternalLayerExtent() {
+        return externalLayerExtent;
+    }
+
+    public void setExternalLayerExtent(String externalLayerExtent) {
+        this.externalLayerExtent = externalLayerExtent;
+    }
+
     public String getServiceIdentifier() {
         return serviceIdentifier;
     }
@@ -107,6 +182,7 @@ public class MapContextStyledLayerDTO extends LayerSummary implements Comparable
     public void setServiceVersions(String serviceVersions) {
         this.serviceVersions = serviceVersions;
     }
+
     @Override
     public int compareTo(MapContextStyledLayerDTO o) {
         return getOrder() - o.getOrder();

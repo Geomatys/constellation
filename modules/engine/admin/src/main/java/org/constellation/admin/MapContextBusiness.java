@@ -81,46 +81,52 @@ public class MapContextBusiness {
             final List<MapContextStyledLayerDTO> styledLayersDto = new ArrayList<>();
 
             for (final MapcontextStyledLayer styledLayer : styledLayers) {
-                final org.constellation.engine.register.Layer layer = layerRepository.findById(styledLayer.getLayerId());
-                final Data data = dataRepository.findById(layer.getData());
-                final Provider provider  = providerRepository.findOne(data.getProvider());
-                final QName name         = new QName(layer.getNamespace(), layer.getName());
+                final MapContextStyledLayerDTO dto;
+                if (styledLayer.getLayerId() != null) {
+                    final org.constellation.engine.register.Layer layer = layerRepository.findById(styledLayer.getLayerId());
+                    final Data data = dataRepository.findById(layer.getData());
+                    final Provider provider = providerRepository.findOne(data.getProvider());
+                    final QName name = new QName(layer.getNamespace(), layer.getName());
 
-                final org.constellation.configuration.Layer layerConfig = new org.constellation.configuration.Layer(layer.getId(), name);
-                layerConfig.setAlias(layer.getAlias());
-                layerConfig.setDate(new Date(layer.getDate()));
-                layerConfig.setOwner(layer.getOwner());
-                layerConfig.setProviderID(provider.getIdentifier());
-                layerConfig.setProviderType(provider.getType());
+                    final org.constellation.configuration.Layer layerConfig = new org.constellation.configuration.Layer(layer.getId(), name);
+                    layerConfig.setAlias(layer.getAlias());
+                    layerConfig.setDate(new Date(layer.getDate()));
+                    layerConfig.setOwner(layer.getOwner());
+                    layerConfig.setProviderID(provider.getIdentifier());
+                    layerConfig.setProviderType(provider.getType());
 
-                final List<StyledLayer> styledLays = styledLayerRepository.findByLayer(layer.getId());
-                final List<DataReference> drs = new ArrayList<>();
-                for (final StyledLayer styledLay : styledLays) {
-                    final Style s = styleRepository.findById(styledLay.getStyle());
-                    if (s == null) {
-                        continue;
+                    final List<StyledLayer> styledLays = styledLayerRepository.findByLayer(layer.getId());
+                    final List<DataReference> drs = new ArrayList<>();
+                    for (final StyledLayer styledLay : styledLays) {
+                        final Style s = styleRepository.findById(styledLay.getStyle());
+                        if (s == null) {
+                            continue;
+                        }
+                        final DataReference dr = DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, "sld", s.getName());
+                        drs.add(dr);
                     }
-                    final DataReference dr = DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, "sld", s.getName());
-                    drs.add(dr);
-                }
-                layerConfig.setStyles(drs);
+                    layerConfig.setStyles(drs);
 
-                final QName dataName = new QName(data.getNamespace(), data.getName());
-                final DataBrief db = dataBusiness.getDataBrief(dataName, provider.getId());
-                final MapContextStyledLayerDTO dto = new MapContextStyledLayerDTO(styledLayer, layerConfig , db);
-                if (styledLayer.getStyleId() != null) {
-                    // Extract style information for this layer
-                    final Style style = styleRepository.findById(styledLayer.getStyleId());
-                    if (style != null) {
-                        dto.setStyleName(style.getName());
+                    final QName dataName = new QName(data.getNamespace(), data.getName());
+                    final DataBrief db = dataBusiness.getDataBrief(dataName, provider.getId());
+                    dto = new MapContextStyledLayerDTO(styledLayer, layerConfig, db);
+
+                    if (styledLayer.getStyleId() != null) {
+                        // Extract style information for this layer
+                        final Style style = styleRepository.findById(styledLayer.getStyleId());
+                        if (style != null) {
+                            dto.setStyleName(style.getName());
+                        }
                     }
-                }
 
-                // Extract service information for this layer
-                final Layer layerRecord = layerRepository.findById(styledLayer.getLayerId());
-                final Service serviceRecord = serviceRepository.findById(layerRecord.getService());
-                dto.setServiceIdentifier(serviceRecord.getIdentifier());
-                dto.setServiceVersions(serviceRecord.getVersions());
+                    // Extract service information for this layer
+                    final Layer layerRecord = layerRepository.findById(styledLayer.getLayerId());
+                    final Service serviceRecord = serviceRepository.findById(layerRecord.getService());
+                    dto.setServiceIdentifier(serviceRecord.getIdentifier());
+                    dto.setServiceVersions(serviceRecord.getVersions());
+                } else {
+                    dto = new MapContextStyledLayerDTO(styledLayer);
+                }
 
                 styledLayersDto.add(dto);
             }
@@ -196,35 +202,51 @@ public class MapContextBusiness {
             if (!styledLayer.isLayerVisible()) {
                 continue;
             }
-            final Layer layerRecord = layerRepository.findById(styledLayer.getLayerId());
-            final Data data = dataRepository.findById(layerRecord.getData());
-            final Provider provider = providerRepository.findOne(data.getProvider());
 
-            final DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(provider.getIdentifier(), Util.parseQName(data.getName()));
-            if (metadata == null || metadata.getIdentificationInfo() == null || metadata.getIdentificationInfo().isEmpty()) {
-                continue;
-            }
-            final Identification identification = metadata.getIdentificationInfo().iterator().next();
-            if (!(identification instanceof DataIdentification)) {
-                continue;
-            }
-            final Collection<? extends Extent> extents = ((DataIdentification)identification).getExtents();
-            if (extents == null || extents.isEmpty()) {
-                continue;
-            }
-            final DefaultExtent extent = (DefaultExtent)extents.iterator().next();
-            if (extent.getGeographicElements() == null || extent.getGeographicElements().isEmpty()) {
-                continue;
-            }
-            final GeographicBoundingBox geoBBox = (GeographicBoundingBox) extent.getGeographicElements().iterator().next();
+            if (styledLayer.getLayerId() != null) {
+                final Layer layerRecord = layerRepository.findById(styledLayer.getLayerId());
+                final Data data = dataRepository.findById(layerRecord.getData());
+                final Provider provider = providerRepository.findOne(data.getProvider());
 
-            final GeneralEnvelope tempEnv = new GeneralEnvelope(CRS.decode("CRS:84"));
-            tempEnv.setRange(0, geoBBox.getWestBoundLongitude(), geoBBox.getEastBoundLongitude());
-            tempEnv.setRange(1, geoBBox.getSouthBoundLatitude(), geoBBox.getNorthBoundLatitude());
-            if (env == null) {
-                env = tempEnv;
+                final DefaultMetadata metadata = dataBusiness.loadIsoDataMetadata(provider.getIdentifier(), Util.parseQName(data.getName()));
+                if (metadata == null || metadata.getIdentificationInfo() == null || metadata.getIdentificationInfo().isEmpty()) {
+                    continue;
+                }
+                final Identification identification = metadata.getIdentificationInfo().iterator().next();
+                if (!(identification instanceof DataIdentification)) {
+                    continue;
+                }
+                final Collection<? extends Extent> extents = ((DataIdentification) identification).getExtents();
+                if (extents == null || extents.isEmpty()) {
+                    continue;
+                }
+                final DefaultExtent extent = (DefaultExtent) extents.iterator().next();
+                if (extent.getGeographicElements() == null || extent.getGeographicElements().isEmpty()) {
+                    continue;
+                }
+                final GeographicBoundingBox geoBBox = (GeographicBoundingBox) extent.getGeographicElements().iterator().next();
+
+                final GeneralEnvelope tempEnv = new GeneralEnvelope(CRS.decode("CRS:84"));
+                tempEnv.setRange(0, geoBBox.getWestBoundLongitude(), geoBBox.getEastBoundLongitude());
+                tempEnv.setRange(1, geoBBox.getSouthBoundLatitude(), geoBBox.getNorthBoundLatitude());
+                if (env == null) {
+                    env = tempEnv;
+                } else {
+                    env.add(tempEnv);
+                }
             } else {
-                env.add(tempEnv);
+                final String extLayerExtent = styledLayer.getExternalLayerExtent();
+                if (extLayerExtent != null && !extLayerExtent.isEmpty()) {
+                    final String[] layExtent = styledLayer.getExternalLayerExtent().split(",");
+                    final GeneralEnvelope tempEnv = new GeneralEnvelope(CRS.decode("CRS:84"));
+                    tempEnv.setRange(0, Double.parseDouble(layExtent[0]), Double.parseDouble(layExtent[2]));
+                    tempEnv.setRange(1, Double.parseDouble(layExtent[1]), Double.parseDouble(layExtent[3]));
+                    if (env == null) {
+                        env = tempEnv;
+                    } else {
+                        env.add(tempEnv);
+                    }
+                }
             }
         }
         return env;

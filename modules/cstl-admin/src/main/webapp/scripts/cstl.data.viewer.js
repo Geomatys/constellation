@@ -155,6 +155,53 @@ DataViewer = {
         return layer;
     },
 
+    createLayerExternalWMS : function(cstlUrl, layerName){
+        var layer = new OpenLayers.Layer.WMS(layerName, cstlUrl,
+            {
+                request:     'GetMap',
+                layers:      layerName,
+                version:     '1.3.0',
+                sld_version: '1.1.0',
+                format:      'image/png',
+                transparent: 'true'
+            },
+            {
+                ratio: 1,
+                isBaseLayer: true,
+                singleTile: true,
+                transitionEffect: 'resize',
+                tileOptions: {
+                    maxGetUrlLength: 2048
+                }
+            }
+        );
+        return layer;
+    },
+
+    createLayerExternalWMSWithStyle : function(cstlUrl, layerName, style){
+        var layer = new OpenLayers.Layer.WMS(layerName, cstlUrl,
+            {
+                request:     'GetMap',
+                layers:      layerName,
+                version:     '1.3.0',
+                sld_version: '1.1.0',
+                format:      'image/png',
+                Styles: style,
+                transparent: 'true'
+            },
+            {
+                ratio: 1,
+                isBaseLayer: true,
+                singleTile: true,
+                transitionEffect: 'resize',
+                tileOptions: {
+                    maxGetUrlLength: 2048
+                }
+            }
+        );
+        return layer;
+    },
+
     createSensorsLayer : function(layerName) {
         var style = new OpenLayers.StyleMap({
             'default': new OpenLayers.Style({

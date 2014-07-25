@@ -30,6 +30,9 @@
             <column name="external_layer" type="VARCHAR(512)">
                 <constraints nullable="true" />
             </column>
+            <column name="external_layer_extent" type="VARCHAR(512)">
+                <constraints nullable="true" />
+            </column>
             <column name="external_service_url" type="VARCHAR(512)">
                 <constraints nullable="true" />
             </column>

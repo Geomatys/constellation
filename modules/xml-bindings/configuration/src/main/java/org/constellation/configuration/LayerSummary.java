@@ -161,6 +161,14 @@ public class LayerSummary {
         this.namespace = namespace;
     }
 
+    public List<StyleBrief> getTargetStyle() {
+        return targetStyle;
+    }
+
+    public void setTargetStyle(List<StyleBrief> targetStyle) {
+        this.targetStyle = targetStyle;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

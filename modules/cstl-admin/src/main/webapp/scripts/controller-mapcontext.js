@@ -218,7 +218,27 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
             } else if ($scope.mode.display==='chooseLayer') {
                 // Add the selected layer to the current map context
                 if ($scope.selected.extLayer) {
-
+                    var llExtent = '';
+                    if ($scope.selected.extLayer.llbbox) {
+                        for (var i = 0; i < $scope.selected.extLayer.llbbox.length; i++) {
+                            if (i != 0) {
+                                llExtent += ',';
+                            }
+                            llExtent += $scope.selected.extLayer.llbbox[i];
+                        }
+                    }
+                    var layerExt = {
+                        externalLayer: $scope.selected.extLayer.name,
+                        externalLayerExtent: llExtent,
+                        externalServiceUrl: $scope.external.serviceUrl,
+                        externalServiceVersion: null,
+                        opacity: 100
+                    };
+                    var layerExtToAdd = {
+                        layer: layerExt,
+                        visible: true
+                    };
+                    $scope.layers.toAdd.push(layerExtToAdd);
                 } else {
                     if ($scope.selected.layer) {
                         var layerToAdd = {
@@ -229,8 +249,8 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
                         layerToAdd.layer.opacity = 100;
                         $scope.layers.toAdd.push(layerToAdd);
                     }
-                    $scope.viewMap(false);
                 }
+                $scope.viewMap(false);
 
                 // Go back to first screen
                 $scope.mode.display = 'general';
@@ -268,8 +288,10 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
             for (var i = 0; i < $scope.layers.toAdd.length; i++) {
                 var l = $scope.layers.toAdd[i];
                 $scope.layers.toSend.push({
-                    mapcontextId: (ctxt) ? ctxt.id : null, layerId: l.layer.Id, styleId: l.layer.styleId,
-                    layerOrder: i, layerOpacity: l.layer.opacity, layerVisible: l.visible
+                    mapcontextId: (ctxt) ? ctxt.id : null, layerId: (l.layer.Id) ? l.layer.Id : l.layer.layerId, styleId: l.layer.styleId,
+                    layerOrder: i, layerOpacity: l.layer.opacity, layerVisible: l.visible,
+                    externalServiceUrl: l.layer.externalServiceUrl, externalServiceVersion: l.layer.externalServiceVersion,
+                    externalLayer: l.layer.externalLayer, externalLayerExtent: l.layer.externalLayerExtent, externalStyle: l.layer.externalStyle
                 });
             }
         }
@@ -389,10 +411,17 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
             for (var i=0; i<$scope.layers.toAdd.length; i++) {
                 var l = $scope.layers.toAdd[i];
                 if (l.visible) {
-                    var serviceName = (l.layer.serviceIdentifier) ? l.layer.serviceIdentifier : l.service.identifier;
-                    var layerData = (l.layer.styleName) ?
-                        DataViewer.createLayerWMSWithStyle(cstlUrl, l.layer.Name, serviceName, l.layer.styleName) :
-                        DataViewer.createLayerWMS(cstlUrl, l.layer.Name, serviceName);
+                    var layerData;
+                    if (l.layer.externalServiceUrl) {
+                        layerData = (l.layer.externalStyle) ?
+                            DataViewer.createLayerExternalWMSWithStyle(l.layer.externalServiceUrl, l.layer.externalLayer, l.layer.externalStyle) :
+                            DataViewer.createLayerExternalWMS(l.layer.externalServiceUrl, l.layer.externalLayer);
+                    } else {
+                        var serviceName = (l.layer.serviceIdentifier) ? l.layer.serviceIdentifier : l.service.identifier;
+                        layerData = (l.layer.styleName) ?
+                            DataViewer.createLayerWMSWithStyle(cstlUrl, l.layer.Name, serviceName, l.layer.styleName) :
+                            DataViewer.createLayerWMS(cstlUrl, l.layer.Name, serviceName);
+                    }
                     layerData.setOpacity(l.layer.opacity / 100);
                     layersToView.push(layerData);
                 }
