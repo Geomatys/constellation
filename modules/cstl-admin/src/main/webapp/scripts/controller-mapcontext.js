@@ -120,8 +120,8 @@ cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', '$growl
         };
     }]);
 
-cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance', 'mapcontext', 'webService', 'style', '$growl', '$translate', 'ctxtToEdit', 'layersForCtxt', '$cookies', 'textService',
-    function ($scope, $modalInstance, mapcontext, webService, style, $growl, $translate, ctxtToEdit, layersForCtxt, $cookies, textService) {
+cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance', 'mapcontext', 'webService', 'style', '$growl', '$translate', 'ctxtToEdit', 'layersForCtxt', '$cookies',
+    function ($scope, $modalInstance, mapcontext, webService, style, $growl, $translate, ctxtToEdit, layersForCtxt, $cookies) {
         // item to save in the end
         $scope.ctxt = {};
         // defines if we are in adding or edition mode
@@ -219,19 +219,19 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
                 // Add the selected layer to the current map context
                 if ($scope.selected.extLayer) {
                     var llExtent = '';
-                    if ($scope.selected.extLayer.llbbox) {
-                        for (var i = 0; i < $scope.selected.extLayer.llbbox.length; i++) {
-                            if (i != 0) {
-                                llExtent += ',';
-                            }
-                            llExtent += $scope.selected.extLayer.llbbox[i];
-                        }
+                    if ($scope.selected.extLayer.EX_GeographicBoundingBox) {
+                        var exCaps130 = $scope.selected.extLayer.EX_GeographicBoundingBox;
+                        llExtent = exCaps130.westBoundLongitude +','+ exCaps130.southBoundLatitude +','+ exCaps130.eastBoundLongitude +','+ exCaps130.northBoundLatitude;
+                    } else if ($scope.selected.extLayer.LatLonBoundingBox) {
+                        var exCaps111 = $scope.selected.extLayer.LatLonBoundingBox;
+                        llExtent = exCaps111.minx +','+ exCaps111.miny +','+ exCaps111.maxx +','+ exCaps111.maxy;
                     }
+
                     var layerExt = {
-                        externalLayer: $scope.selected.extLayer.name,
+                        externalLayer: $scope.selected.extLayer.Name,
                         externalLayerExtent: llExtent,
                         externalServiceUrl: $scope.external.serviceUrl,
-                        externalServiceVersion: null,
+                        externalServiceVersion: ($scope.selected.extLayer.EX_GeographicBoundingBox) ? '1.3.0' : '1.1.1',
                         opacity: 100
                     };
                     var layerExtToAdd = {
@@ -333,18 +333,21 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
         };
 
         $scope.viewLayerInfo = function(item) {
-            var serviceIdentifier = (item.service) ? item.service.name : item.layer.serviceIdentifier;
-            var serviceVersions = (item.service) ? item.service.versions : item.layer.serviceVersions;
-            return '<div><b>Name</b></div>' +
+            var serviceIdentifier = (item.service) ? item.service.name : (item.layer.serviceIdentifier) ? item.layer.serviceIdentifier : item.layer.externalServiceUrl;
+            var serviceVersions = (item.service) ? item.service.versions : (item.layer.serviceVersions) ? (item.layer.serviceVersions) : item.layer.externalServiceVersion;
+            var str = '<div><b>Name</b></div>' +
                 '<div>'+ item.layer.Name +'</div>' +
                 '<div><b>Alias</b></div>' +
-                '<div>'+ item.layer.Alias +'</div>' +
-                '<div><b>Type</b></div>' +
-                '<div>'+ item.layer.Type +'</div>' +
-                '<div><b>Service name</b></div>' +
+                '<div>'+ item.layer.Alias +'</div>';
+            if (item.layer.Type) {
+                str += '<div><b>Type</b></div>' +
+                    '<div>'+ item.layer.Type +'</div>';
+            }
+            str += '<div><b>Service</b></div>' +
                 '<div>'+ serviceIdentifier +'</div>' +
                 '<div><b>Service version(s)</b></div>' +
                 '<div>'+ serviceVersions +'</div>';
+            return str;
         };
 
         $scope.goToStyleMapItem = function(item) {
@@ -466,13 +469,21 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
 
         $scope.searchAndDisplayWmsLayers = function() {
             if ($scope.external.serviceUrl) {
-                textService.capaWmsExterne($scope.external.serviceUrl)
-                    .success(function (data, status, headers, config) {
-                        var capabilities = DataViewer.format.read(data);
-                        $scope.external.layers = capabilities.capability.layers;
+                // Try in WMS version 1.3.0
+                mapcontext.listExtLayers({version: "1.3.0"}, $scope.external.serviceUrl, function(response) {
+                    $scope.external.layers = response;
+
+                    $scope.mode.dispWmsLayers = true;
+                }, function() {
+                    // If it fails tries it in version 1.1.1
+                    mapcontext.listExtLayers({version: "1.1.1"}, $scope.external.serviceUrl, function(response) {
+                        $scope.external.layers = response;
 
                         $scope.mode.dispWmsLayers = true;
+                    }, function() {
+                        $growl('error', 'Error', 'Unable to find layers for this url');
                     });
+                });
             }
         }
     }]);

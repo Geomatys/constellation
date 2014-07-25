@@ -359,14 +359,15 @@ cstlAdminApp.factory('sensor', ['$resource',
 cstlAdminApp.factory('mapcontext', ['$resource',
     function ($resource) {
         return $resource('@cstl/api/1/context', {}, {
-            'list':       {method: 'GET',    url: '@cstl/api/1/context/list;jsessionid=', isArray: true},
-            'listLayers': {method: 'GET',    url: '@cstl/api/1/context/list/layers;jsessionid=', isArray: true},
-            'add':        {method: 'PUT',    url: '@cstl/api/1/context;jsessionid='},
-            'update':     {method: 'POST',   url: '@cstl/api/1/context;jsessionid='},
-            'delete':     {method: 'DELETE', url: '@cstl/api/1/context/:id;jsessionid='},
-            'setLayers':  {method: 'POST',   url: '@cstl/api/1/context/layers/:id;jsessionid='},
-            'extent':     {method: 'GET',    url: '@cstl/api/1/context/:id/extent;jsessionid='},
-            'extentForLayers': {method: 'POST', url: '@cstl/api/1/context/extent/layers;jsessionid='}
+            'list':            {method: 'GET',    url: '@cstl/api/1/context/list;jsessionid=', isArray: true},
+            'listLayers':      {method: 'GET',    url: '@cstl/api/1/context/list/layers;jsessionid=', isArray: true},
+            'listExtLayers':   {method: 'POST',   url: '@cstl/api/1/context/external/capabilities/layers/:version;jsessionid=', isArray: true},
+            'add':             {method: 'PUT',    url: '@cstl/api/1/context;jsessionid='},
+            'update':          {method: 'POST',   url: '@cstl/api/1/context;jsessionid='},
+            'delete':          {method: 'DELETE', url: '@cstl/api/1/context/:id;jsessionid='},
+            'setLayers':       {method: 'POST',   url: '@cstl/api/1/context/layers/:id;jsessionid='},
+            'extent':          {method: 'GET',    url: '@cstl/api/1/context/:id/extent;jsessionid='},
+            'extentForLayers': {method: 'POST',   url: '@cstl/api/1/context/extent/layers;jsessionid='}
         });
     }]);
 

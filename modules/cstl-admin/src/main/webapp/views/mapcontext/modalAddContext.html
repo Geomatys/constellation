@@ -355,7 +355,7 @@
                                             <div class="item coverage" ng-repeat="extLayer in external.layers" ng-class="{selected:extLayer==selected.extLayer}"
                                                  ng-click="selectExtLayer(extLayer)">
                                                 <div class="top">
-                                                    <span class="item-title" title="{{extLayer.name}}">{{extLayer.name}}</span>
+                                                    <span class="item-title" title="{{extLayer.Name}}">{{extLayer.Name}}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -370,16 +370,16 @@
                                         </div>
                                         <div class="selected-item" ng-hide="selected.extLayer == null">
                                             <div class="block-header" ng-click="toggleUpDownExtSelected()">
-                                                <strong class="item-title title-bloc-service" title="{{selected.extLayer.name}}">{{selected.extLayer.name}}</strong><i class="icon-chevron-down pull-right"></i>
+                                                <strong class="item-title title-bloc-service" title="{{selected.extLayer.Name}}">{{selected.extLayer.Name}}</strong><i class="icon-chevron-down pull-right"></i>
                                             </div>
                                             <div class="block-content">
                                                 <h6>Name</h6>
-                                                <span>{{selected.extLayer.name}}</span>
+                                                <span>{{selected.extLayer.Name}}</span>
 
                                                 <div class="separator"></div>
                                                 <h6>Styles</h6>
-                                                <div ng-repeat="style in selected.extLayer.styles">
-                                                    <div>{{style.name}}</div>
+                                                <div ng-repeat="style in selected.extLayer.Style">
+                                                    <div>{{style.Name}}</div>
                                                 </div>
                                             </div>
                                         </div>

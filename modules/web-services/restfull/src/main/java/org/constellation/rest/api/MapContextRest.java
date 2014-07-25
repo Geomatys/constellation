@@ -18,14 +18,17 @@
  */
 package org.constellation.rest.api;
 
+import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.MapContextBusiness;
-import org.constellation.admin.dto.MapContextLayersDTO;
-import org.constellation.admin.dto.MapContextStyledLayerDTO;
 import org.constellation.dto.ParameterValues;
 import org.constellation.engine.register.Mapcontext;
 import org.constellation.engine.register.MapcontextStyledLayer;
 import org.constellation.engine.register.repository.MapContextRepository;
 import org.constellation.provider.Providers;
+import org.geotoolkit.wms.WebMapClient;
+import org.geotoolkit.wms.xml.AbstractLayer;
+import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
+import org.geotoolkit.wms.xml.WMSMarshallerPool;
 import org.opengis.util.FactoryException;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +36,12 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -125,5 +134,33 @@ public class MapContextRest {
             return Response.status(500).build();
         }
         return Response.ok(values).build();
+    }
+
+    @POST
+    @Path("/external/capabilities/layers/{version}")
+    public Response getLayersForWms(@PathParam("version") final String version, final String url) throws IOException, JAXBException {
+        final WebMapClient client = (version != null && !version.isEmpty()) ?
+                new WebMapClient(new URL(url), version) : new WebMapClient(new URL(url));
+        final InputStream response = client.createGetCapabilities().getResponseStream();
+        final MarshallerPool pool =  WMSMarshallerPool.getInstance();
+        final Unmarshaller unmarsh = pool.acquireUnmarshaller();
+        final Object obj = unmarsh.unmarshal(response);
+        pool.recycle(unmarsh);
+
+        if (!(obj instanceof AbstractWMSCapabilities)) {
+            throw new JAXBException("Unable to parse get capabilities response");
+        }
+
+        final List<AbstractLayer> layers = ((AbstractWMSCapabilities)obj).getLayers();
+        final List<AbstractLayer> finalList = new ArrayList<>();
+        for (final AbstractLayer layer : layers) {
+            // Remove layer groups, if any
+            if (layer.getLayer() != null && layer.getLayer().size() > 0) {
+                continue;
+            }
+            finalList.add(layer);
+        }
+
+        return Response.ok(finalList).build();
     }
 }
