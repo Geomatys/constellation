@@ -358,6 +358,7 @@ public class DataRest {
     @POST
     @Path("upload/metadata")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response uploadMetadata(@FormDataParam("metadata") InputStream mdFileIs,
                                @FormDataParam("metadata") FormDataContentDisposition fileMetaDetail,
                                @FormDataParam("identifier") String identifier,
@@ -378,7 +379,7 @@ public class DataRest {
                         }
                         Files.copy(mdFileIs, newFileMetaData.toPath(), StandardCopyOption.REPLACE_EXISTING);
                         mdFileIs.close();
-                        //TODO getMetadataTitle()
+
                         Object obj;
                         try {
                             final MarshallerPool pool = CSWMarshallerPool.getInstance();
@@ -387,11 +388,13 @@ public class DataRest {
                             pool.recycle(unmarsh);
                         } catch (JAXBException ex) {
                             LOGGER.log(Level.WARNING, "Error when trying to unmarshal metadata", ex);
-                            return Response.status(500).entity("failed").build();
+                            hashMap.put("msg", "metadata file is incorrect");
+                            return Response.status(500).entity(hashMap).build();
                         }
 
                         if (!(obj instanceof DefaultMetadata)) {
-                            return Response.status(500).entity("failed").build();
+                            hashMap.put("msg", "metadata file is incorrect");
+                            return Response.status(500).entity(hashMap).build();
                         }
 
                         final DefaultMetadata metadata = (DefaultMetadata)obj;
@@ -400,6 +403,8 @@ public class DataRest {
                             //dataName = metaIdentifier + addExtentionIfExist(fileDetail.getFileName());
                             hashMap.put("dataName", metaIdentifier);
                         }
+
+
                         hashMap.put("metadataPath",newFileMetaData.getAbsolutePath());
 
                         final String title = new MetadataFeeder(metadata).getTitle();
@@ -413,8 +418,14 @@ public class DataRest {
             }
         }
 
-        // Did nothing cause no metadata file was given
-        return Response.ok(hashMap).build();
+        //verify unicity of data identifier
+        final Provider dataName = providerBusiness.getProvider(hashMap.get("dataName"));
+        if (dataName!=null){
+            hashMap.put("msg", "dataName or identifier of metadata is already used");
+            return Response.status(500).entity(hashMap).build();
+        }
+
+        return Response.status(200).entity(hashMap).build();
     }
 
 

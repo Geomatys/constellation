@@ -447,9 +447,11 @@ cstlAdminApp.controller('ModalImportDataStep1DatabaseController', ['$scope','pro
         }
 
     }]);
+//cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$cookies','$growl',
+//    function($scope, $cookies, $growl) {
 
-cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$cookies',
-    function($scope, $cookies) {
+cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$cookies','$growl',
+    function($scope, $cookies, $growl) {
         $scope.import.next = function() {
             if ($scope.import.metadata || $scope.import.identifier) {
                 $scope.uploadMetadata();
@@ -479,14 +481,20 @@ cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$c
                 cache: false,
                 contentType: false,
                 processData: false,
-                success: function(data) {
-                    $scope.import.mdPath = data.metadataPath;
-                    $scope.import.dataName = data.dataName;
-                    $scope.import.dataTitle = data.metatitle;
-                    $scope.import.metaIdentifier = data.metaIdentifier;
+                success: function(result) {
+//                    $scope.$apply(function() {
+                        $scope.import.mdPath = result.metadataPath;
+                        $scope.import.dataName = result.dataName;
+                        $scope.import.dataTitle = result.metatitle;
+                        $scope.import.metaIdentifier = result.metaIdentifier;
+//                    });
                 },
-                error: function(){
-                    console.log("error post ajax");
+                error: function(result){
+
+                    $growl('error','Error',result.responseJSON.msg);
+                    $scope.import.currentStep = 'step2Metadata';
+                    $scope.import.allowNext = false;
+                    $scope.import.allowSubmit = false;
                 }
             });
         };
