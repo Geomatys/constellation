@@ -50,11 +50,16 @@ public class CreateProviderDescriptor extends AbstractCstlProcessDescriptor {
     private static final String SOURCE_REMARKS = "ParameterValueGroup use to create provider.";
     public static final ParameterDescriptor<ParameterValueGroup> SOURCE =
             new DefaultParameterDescriptor(SOURCE_NAME, SOURCE_REMARKS, ParameterValueGroup.class, null, true);
+    
+    public static final String DOMAIN_ID_NAME = "domain-id";
+    private static final String DOMAIN_ID_REMARKS = "Identifier of the domain to add data.";
+    public static final ParameterDescriptor<Integer> DOMAIN_ID =
+            new DefaultParameterDescriptor(DOMAIN_ID_NAME, DOMAIN_ID_REMARKS, Integer.class, null, false);
 
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC =
             new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{PROVIDER_TYPE, SOURCE});
+            new GeneralParameterDescriptor[]{PROVIDER_TYPE, SOURCE, DOMAIN_ID});
 
 
     /**Output parameters */

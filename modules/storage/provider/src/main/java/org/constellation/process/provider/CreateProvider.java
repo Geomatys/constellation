@@ -22,9 +22,10 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import javax.xml.namespace.QName;
 import org.constellation.configuration.ConfigurationException;
+import org.constellation.engine.register.repository.DomainRepository;
 import org.constellation.process.AbstractCstlProcess;
+import static org.constellation.process.provider.CreateProviderDescriptor.DOMAIN_ID;
 import static org.constellation.process.provider.CreateProviderDescriptor.PROVIDER_TYPE;
 import static org.constellation.process.provider.CreateProviderDescriptor.SOURCE;
 import org.constellation.provider.DataProvider;
@@ -35,11 +36,11 @@ import org.constellation.provider.ProviderFactory;
 import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviderFactory;
 import org.constellation.provider.StyleProviders;
-import org.geotoolkit.feature.type.Name;
 import static org.geotoolkit.parameter.Parameters.value;
 import org.geotoolkit.process.ProcessDescriptor;
 import org.geotoolkit.process.ProcessException;
 import org.opengis.parameter.ParameterValueGroup;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Create a new provider in constellation.
@@ -47,14 +48,18 @@ import org.opengis.parameter.ParameterValueGroup;
  */
 public final class CreateProvider extends AbstractCstlProcess {
 
+    @Autowired
+    protected DomainRepository domainRepository;
+    
     public CreateProvider(final ProcessDescriptor desc, final ParameterValueGroup parameter) {
         super(desc, parameter);
     }
 
     @Override
     protected void execute() throws ProcessException {
-        final String providerType = value(PROVIDER_TYPE, inputParameters);
+        final String providerType        = value(PROVIDER_TYPE, inputParameters);
         final ParameterValueGroup source = value(SOURCE, inputParameters);
+        final Integer domainId           = value(DOMAIN_ID, inputParameters);
 
         //initialize list of avaible Povider services
         final Map<String, ProviderFactory> services = new HashMap<>();
@@ -85,6 +90,10 @@ public final class CreateProvider extends AbstractCstlProcess {
                 source.parameter("date").setValue(new Date());
                 try {
                     DataProviders.getInstance().createProvider(id, (DataProviderFactory) service, source);
+                    if (domainId != null) {
+                        int count = domainRepository.addProviderDataToDomain(id, domainId );
+                        LOGGER.info("Added " + count + " data to domain " + domainId);
+                    }
                 } catch (ConfigurationException ex) {
                     throw new ProcessException("Failed to create provider : " + id+"  "+ex.getMessage(), this, ex);
                 }

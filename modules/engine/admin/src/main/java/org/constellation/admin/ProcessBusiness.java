@@ -101,4 +101,8 @@ public class ProcessBusiness {
         }
         return false;
     }
+    
+    public ChainProcess getChainProcess(final String auth, final String code) {
+        return chainRepository.findOne(auth, code);
+    }
 }
