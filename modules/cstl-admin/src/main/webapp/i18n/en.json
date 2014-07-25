@@ -119,7 +119,7 @@
     "data.modal.data":"Data",
     "data.modal.end":"Finish",
     "data.modal.local.title":"Local file",
-    "data.modal.metadata":"Metadata",
+    "data.modal.metadata":"Select Metadata File",
     "data.modal.netcdf":"NetCDF File",
     "data.modal.next":"Next",
     "data.modal.remove":"Remove",
@@ -128,6 +128,7 @@
     "data.modal.server.title":"Server file",
     "data.modal.validate":"Validate",
     "data.modal.view.metadata.title":"View metadata",
+    "data.modal.dataName.label": "Or fill an identifier for this data",
 
     "domain.list": "Domains",
     "domain.linked": "Linked Domains",
@@ -881,7 +882,7 @@
     "group.users.back":"Back",
     "group.new":"New group",
 
-    "message.uploading":"Your data is uploading...",
+    "message.uploading":"Your data(s) is uploading...",
 
     "alert.style.noname":"The style name is required"
 }

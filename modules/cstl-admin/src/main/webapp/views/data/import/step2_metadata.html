@@ -15,5 +15,9 @@
                 <a class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput" translate="data.modal.remove">Remove</a>
             </div>
         </div>
+        <div translate="data.modal.dataName.label">Or fill an identifier for this data</div>
+        <div class="input-group">
+            <input type="text" name="identifier" onchange="angular.element(this).scope().identifierChosen(this);">
+        </div>
     </form>
 </div>

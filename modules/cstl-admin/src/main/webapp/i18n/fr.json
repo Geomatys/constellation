@@ -118,7 +118,7 @@
     "data.modal.data": "Données",
     "data.modal.end": "Terminer",
     "data.modal.local.title": "Fichier local",
-    "data.modal.metadata": "Métadonnées",
+    "data.modal.metadata": "Sélectionner un fichier de métadonnées",
     "data.modal.netcdf":"Fichier netCDF",
     "data.modal.next": "Suivant",
     "data.modal.remove": "Enlever",
@@ -127,6 +127,7 @@
     "data.modal.server.title": "Fichier serveur",
     "data.modal.validate": "Valider",
     "data.modal.view.metadata.title": "Voir la métadonnée",
+    "data.modal.dataName.label": "Ou saisisser un identifiant pour cette donnée",
     
     "domain.list": "Domaines",
     "domain.linked": "Domaines liés",

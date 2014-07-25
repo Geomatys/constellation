@@ -146,6 +146,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.CopyOption;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -305,30 +306,52 @@ public class DataRest {
     @POST
     @Path("upload/data")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response uploadData(@FormDataParam("data") InputStream fileIs,
                                @FormDataParam("data") FormDataContentDisposition fileDetail,
+                               @FormDataParam("metadata") InputStream fileMetaIs,
+                               @FormDataParam("metadata") FormDataContentDisposition fileMetaDetail,
                                @Context HttpServletRequest request) {
     	final String sessionId = request.getSession(false).getId();
     	final File uploadDirectory = ConfigDirectory.getUploadDirectory(sessionId);
-        final File newFile = new File(uploadDirectory, fileDetail.getFileName());
+        HashMap<String,String> hashMap = new HashMap<>();
+        String dataName = fileDetail.getFileName();
+
+        final File newFileData = new File(uploadDirectory, dataName);
         try {
             if (fileIs != null) {
-                Files.copy(fileIs, newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                if (!uploadDirectory.exists()) {
+                    uploadDirectory.mkdir();
+                }
+                Files.copy(fileIs, newFileData.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 fileIs.close();
+                hashMap.put("dataPath", newFileData.getAbsolutePath());
             }
         } catch (IOException ex) {
             LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             return Response.status(500).entity("failed").build();
         }
 
-        return Response.ok(newFile.getAbsolutePath()).build();
+
+
+
+        return Response.ok(hashMap).build();
+
+    }
+
+    private String addExtentionIfExist(String fileName){
+        if (fileName.indexOf(".")>0) {
+            return fileName.substring(fileName.indexOf("."),fileName.length());
+        } else {
+            return "";
+        }
     }
 
     /**
      * Receive a {@link MultiPart} which contain a file need to be save on server to create data on provider
      *
      * @param mdFileIs
-     * @param mdFileDetail
+     * @param fileMetaDetail
      * @param request
      * @return A {@link Response} with 200 code if upload work, 500 if not work.
      */
@@ -336,38 +359,62 @@ public class DataRest {
     @Path("upload/metadata")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response uploadMetadata(@FormDataParam("metadata") InputStream mdFileIs,
-                               @FormDataParam("metadata") FormDataContentDisposition mdFileDetail,
+                               @FormDataParam("metadata") FormDataContentDisposition fileMetaDetail,
+                               @FormDataParam("identifier") String identifier,
                                @Context HttpServletRequest request) {
     	final String sessionId = request.getSession(false).getId();
         final File uploadDirectory = ConfigDirectory.getUploadDirectory(sessionId);
-       
-        File mdFile = null;
-        try {
-            if (mdFileIs != null && mdFileDetail != null && !mdFileDetail.getFileName().isEmpty()) {
-                final File mdFolder = new File(uploadDirectory, "metadata");
-                if (mdFolder.exists() && mdFolder.isFile()) {
-                    // Ensures we do not have a file named "metadata" in this folder
-                    mdFolder.delete();
-                }
-                if (!mdFolder.exists()) {
-                    mdFolder.mkdir();
-                }
-                mdFile = new File(mdFolder, mdFileDetail.getFileName());
-                Files.copy(mdFileIs, mdFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                mdFileIs.close();
-            }
-        } catch (IOException ex) {
-            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            return Response.status(500).entity("failed").build();
-        }
+        HashMap<String,String> hashMap = new HashMap<>();
+        if (identifier!=null && identifier.length()>0){
+            //dataName = identifier + addExtentionIfExist(fileDetail.getFileName());
+            hashMap.put("dataName", identifier);
+        } else {
+            if (fileMetaDetail.getFileName().length() > 0) {
+                final File newFileMetaData = new File(uploadDirectory, fileMetaDetail.getFileName());
+                try {
+                    if (mdFileIs != null) {
+                        if (!uploadDirectory.exists()) {
+                            uploadDirectory.mkdir();
+                        }
+                        Files.copy(mdFileIs, newFileMetaData.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        mdFileIs.close();
+                        //TODO getMetadataTitle()
+                        Object obj;
+                        try {
+                            final MarshallerPool pool = CSWMarshallerPool.getInstance();
+                            final Unmarshaller unmarsh = pool.acquireUnmarshaller();
+                            obj = unmarsh.unmarshal(newFileMetaData);
+                            pool.recycle(unmarsh);
+                        } catch (JAXBException ex) {
+                            LOGGER.log(Level.WARNING, "Error when trying to unmarshal metadata", ex);
+                            return Response.status(500).entity("failed").build();
+                        }
 
-        if (mdFile != null) {
-            String result = mdFile.getAbsolutePath();
-            return Response.ok(result).build();
+                        if (!(obj instanceof DefaultMetadata)) {
+                            return Response.status(500).entity("failed").build();
+                        }
+
+                        final DefaultMetadata metadata = (DefaultMetadata)obj;
+                        final String metaIdentifier = new MetadataFeeder(metadata).getIdentifier();
+                        if (metaIdentifier!=null && metaIdentifier.length()>0) {
+                            //dataName = metaIdentifier + addExtentionIfExist(fileDetail.getFileName());
+                            hashMap.put("dataName", metaIdentifier);
+                        }
+                        hashMap.put("metadataPath",newFileMetaData.getAbsolutePath());
+
+                        final String title = new MetadataFeeder(metadata).getTitle();
+                        hashMap.put("metatitle",title);
+                        hashMap.put("metaIdentifier",metaIdentifier);
+                    }
+                } catch (IOException ex) {
+                    LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+                    return Response.status(500).entity("failed").build();
+                }
+            }
         }
 
         // Did nothing cause no metadata file was given
-        return Response.status(200).build();
+        return Response.ok(hashMap).build();
     }
 
 
@@ -384,19 +431,21 @@ public class DataRest {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response importData(final ParameterValues values, @Context HttpServletRequest request) {
-        String filePath = values.getValues().get("filePath");
+        String filePath = values.getValues().get("dataPath");
         final String metadataFilePath = values.getValues().get("metadataFilePath");
         final String dataType = values.getValues().get("dataType");
+        final String dataName= values.getValues().get("dataName");
 
         try{
             final File dataIntegratedDirectory = ConfigDirectory.getDataIntegratedDirectory();
             final File uploadFolder = new File(ConfigDirectory.getDataDirectory(), "upload");
             final ImportedData importedData = new ImportedData();
             if (filePath != null) {
+                filePath = renameDataFile(dataName, filePath);
                 if (filePath.toLowerCase().endsWith(".zip")) {
                     final File zipFile = new File(filePath);
                     final String fileNameWithoutExt = zipFile.getName().substring(0, zipFile.getName().indexOf("."));
-                    final File zipDir = new File(dataIntegratedDirectory, fileNameWithoutExt);
+                    final File zipDir = new File(dataIntegratedDirectory, dataName);
                     if (zipDir.exists()) {
                         recursiveDelete(zipDir);
                     }
@@ -428,6 +477,15 @@ public class DataRest {
             LOGGER.log(Level.SEVERE, "Bad configuration for data Integrated directory", e);
             return Response.status(500).entity("failed").build();
         }
+    }
+
+    private String renameDataFile(String dataName, String filePath) throws IOException {
+        final File file = new File(filePath);
+        final String parent = file.getParentFile().getCanonicalPath();
+        final String fileExt = file.getName().substring(file.getName().indexOf("."), file.getName().length());
+        final java.nio.file.Path newPath = Paths.get(parent + File.separator + dataName + fileExt);
+        Files.move(Paths.get(file.getAbsolutePath()), newPath);
+        return newPath.toString();
     }
 
     @DELETE
@@ -538,30 +596,33 @@ public class DataRest {
     public Response saveUploadedMetadata(final ParameterValues values) {
         final String providerId         = values.getValues().get("providerId");
         final String mdPath             = values.getValues().get("mdPath");
+        final String dataName             = values.getValues().get("dataName");
         final DataProvider dataProvider = DataProviders.getInstance().getProvider(providerId);
 
-        final Object obj;
-        try {
-            final MarshallerPool pool = CSWMarshallerPool.getInstance();
-            final Unmarshaller unmarsh = pool.acquireUnmarshaller();
-            obj = unmarsh.unmarshal(new File(mdPath));
-            pool.recycle(unmarsh);
-        } catch (JAXBException ex) {
-            LOGGER.log(Level.WARNING, "Error when trying to unmarshal metadata", ex);
-            return Response.status(500).entity("failed").build();
-        }
+        if (mdPath != null && mdPath.length()>0) {
+            final Object obj;
+            try {
+                final MarshallerPool pool = CSWMarshallerPool.getInstance();
+                final Unmarshaller unmarsh = pool.acquireUnmarshaller();
+                obj = unmarsh.unmarshal(new File(mdPath));
+                pool.recycle(unmarsh);
+            } catch (JAXBException ex) {
+                LOGGER.log(Level.WARNING, "Error when trying to unmarshal metadata", ex);
+                return Response.status(500).entity("failed").build();
+            }
 
-        if (!(obj instanceof DefaultMetadata)) {
-            return Response.status(500).entity("failed").build();
-        }
+            if (!(obj instanceof DefaultMetadata)) {
+                return Response.status(500).entity("failed").build();
+            }
 
-        final DefaultMetadata metadata = (DefaultMetadata)obj;
+            final DefaultMetadata metadata = (DefaultMetadata) obj;
 
-        for (Name dataName : dataProvider.getKeys()) {
-            //Save metadata
-            final QName name = Utils.getQnameFromName(dataName);
-            dataBusiness.saveMetadata(providerId, name, metadata);
+            for (Name data : dataProvider.getKeys()) {
+                //Save metadata
+                final QName name = Utils.getQnameFromName(data);
+                dataBusiness.saveMetadata(providerId, name, metadata);
 
+            }
         }
 
         return Response.status(200).build();

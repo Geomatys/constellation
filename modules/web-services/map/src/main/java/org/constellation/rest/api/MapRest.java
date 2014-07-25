@@ -63,8 +63,7 @@ import static org.constellation.utils.RESTfulUtilities.ok;
 @Path("/1/MAP/{spec}")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-@Component
-public final class MapRest {
+public class MapRest {
     private static final Logger LOGGER = Logging.getLogger(MapRest.class);
 
     @Inject

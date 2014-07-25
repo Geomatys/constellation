@@ -89,7 +89,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
 
                 // Stores uploaded files in session for further use
                 var upFiles = $uploadFiles.files;
-                upFiles.file = upFile;
+                upFiles.file = $scope.import.dataName;
                 upFiles.mdFile = upMdFile;
 
                 var justFile = upFile.substring(upFile.lastIndexOf("/")+1);
@@ -99,7 +99,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                     fileName = fileName.substring(0, fileName.lastIndexOf("."));
                     fileExtension = justFile.substring(justFile.lastIndexOf(".")+1);
                 }
-                dataListing.importData({values: {'filePath': upFiles.file, 'metadataFilePath': upFiles.mdFile, dataType: $scope.import.uploadType}}, function(response) {
+                dataListing.importData({values: {'dataPath': $scope.import.dataPath, 'metadataFilePath': $scope.import.mdPath, dataType: $scope.import.uploadType, dataName: $scope.import.dataName}}, function(response) {
 
                     var importedData = response.dataFile;
                     var importedMetaData = response.metadataFile;
@@ -108,12 +108,12 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
 
 
                         // Store the providerId for further calls
-                        $scope.import.providerId = fileName;
+                        $scope.import.providerId = $scope.import.dataName;
                         $scope.import.uploadType = selectedExtension.dataType;
 
                         if ($scope.import.uploadType === "vector") {
                             provider.create({
-                                id: fileName
+                                id: $scope.import.providerId
                             }, {
                                 type: "feature-store",
                                 subType: "shapefile",
@@ -121,31 +121,31 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                                     path: importedData
                                 }
                             }, function() {
-                                provider.verifyCRS({ id: fileName},
+                                provider.verifyCRS({ id: $scope.import.providerId},
                                     function() {
                                         //success
-                                        if (importedMetaData) {
-                                            dataListing.setUpMetadata({values: {'providerId': $scope.import.providerId, 'mdPath': importedMetaData}});
+                                        if (importedMetaData || $scope.import.dataName) {
+                                            dataListing.setUpMetadata({values: {'providerId': $scope.import.providerId, 'mdPath': importedMetaData, dataName: $scope.import.dataName}});
                                         }
 
-                                        $growl('success','Success','Shapefile data '+ fileName +' successfully added');
+                                        $growl('success','Success','Shapefile data '+ $scope.import.providerId +' successfully added');
                                         if ($scope.sensor.checked) {
                                             $scope.showAssociate();
                                         } else {
-                                            $modalInstance.close({type: "vector", file: fileName, missing: $scope.import.metadata == null});
+                                            $modalInstance.close({type: "vector", file: $scope.import.providerId, missing: $scope.import.metadata == null});
                                         }
 
                                     }, function() {
                                         //failure
-                                        $growl('error','Error','Data '+ fileName +' without Projection');
+                                        $growl('error','Error','Data '+ $scope.import.providerId +' without Projection');
 
                                         //TODO div select EPSG
                                         $scope.import.enableSelectEPSGCode = true;
-                                        provider.getAllCodeEPSG({ id: fileName},
+                                        provider.getAllCodeEPSG({ id: $scope.import.providerId},
                                             function(response){
                                                 //success
                                                 $scope.epsgList = response.list;
-                                                $scope.import.fileName = fileName;
+                                                $scope.import.fileName = $scope.import.providerId;
 
                                             },
                                             function(){
@@ -159,7 +159,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                             });
                         } else if ($scope.import.uploadType === "raster") {
                             provider.create({
-                                id: fileName
+                                id: $scope.import.providerId
                             }, {
                                 type: "coverage-store",
                                 subType: "coverage-file",
@@ -167,7 +167,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                                     path: importedData
                                 }
                             }, function() {
-                                provider.verifyCRS({ id: fileName},
+                                provider.verifyCRS({ id: $scope.import.providerId},
                                     function() {
                                         //success
                                         if (importedMetaData) {
@@ -175,8 +175,8 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                                         }
 
                                         if (!fileExtension || fileExtension !== "nc") {
-                                            $growl('success','Success','Coverage data '+ fileName +' successfully added');
-                                            $modalInstance.close({type: "raster", file: fileName, missing: $scope.import.metadata == null});
+                                            $growl('success','Success','Coverage data '+ $scope.import.providerId +' successfully added');
+                                            $modalInstance.close({type: "raster", file: $scope.import.providerId, missing: $scope.import.metadata == null});
                                         } else {
                                             $scope.showAssociate();
                                             // todo: displayNetCDF(fileName);
@@ -184,14 +184,14 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
 
                                     }, function() {
                                         //failure
-                                        $growl('error','Error','Data '+ fileName +' without Projection');
+                                        $growl('error','Error','Data '+ $scope.import.providerId +' without Projection');
                                         //TODO div select EPSG
                                         $scope.import.enableSelectEPSGCode = true;
-                                        provider.getAllCodeEPSG({ id: fileName},
+                                        provider.getAllCodeEPSG({ id: $scope.import.providerId},
                                             function(response){
                                                 //success
                                                 $scope.epsgList = response.list;
-                                                $scope.import.fileName = fileName;
+                                                $scope.import.fileName = $scope.import.providerId;
 
                                             },
                                             function(){
@@ -297,6 +297,11 @@ cstlAdminApp.controller('ModalImportDataStep1LocalController', ['$scope', 'dataL
             $scope.uploadData();
         };
 
+        $scope.metadataChosen = function(md) {
+            $scope.import.metadata = md.value;
+            $scope.$digest();
+        };
+
         $scope.uploadData = function() {
             var $form = $('#uploadDataForm');
 
@@ -309,13 +314,16 @@ cstlAdminApp.controller('ModalImportDataStep1LocalController', ['$scope', 'dataL
                 cache: false,
                 contentType: false,
                 processData: false,
-                success: function (dataPath) {
+                success: function (data) {
                     $scope.$apply(function() {
-                        $scope.import.dataPath = dataPath;
+                        $scope.import.dataPath = data.dataPath;
                         $scope.loader.upload = false;
                         $scope.import.currentStep = 'step2Metadata';
                         $scope.import.allowNext = true;
                     });
+                },
+                error: function(){
+                    console.log("error post ajax");
                 }
             });
         };
@@ -443,7 +451,7 @@ cstlAdminApp.controller('ModalImportDataStep1DatabaseController', ['$scope','pro
 cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$cookies',
     function($scope, $cookies) {
         $scope.import.next = function() {
-            if ($scope.import.metadata) {
+            if ($scope.import.metadata || $scope.import.identifier) {
                 $scope.uploadMetadata();
             }
 
@@ -471,14 +479,24 @@ cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$c
                 cache: false,
                 contentType: false,
                 processData: false,
-                success: function(mdPath) {
-                    $scope.import.mdPath = mdPath;
+                success: function(data) {
+                    $scope.import.mdPath = data.metadataPath;
+                    $scope.import.dataName = data.dataName;
+                    $scope.import.dataTitle = data.metatitle;
+                    $scope.import.metaIdentifier = data.metaIdentifier;
+                },
+                error: function(){
+                    console.log("error post ajax");
                 }
             });
         };
 
         $scope.metadataChosen = function(md) {
             $scope.import.metadata = md.value;
+            $scope.$digest();
+        };
+        $scope.identifierChosen = function(identifier) {
+            $scope.import.identifier = identifier.value;
             $scope.$digest();
         };
     }]);
