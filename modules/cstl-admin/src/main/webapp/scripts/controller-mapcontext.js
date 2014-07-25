@@ -127,11 +127,20 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
         // defines if we are in adding or edition mode
         $scope.addMode = true;
 
+        $scope.tag = {
+            text: '',
+            keywords: []
+        };
+
         if (ctxtToEdit) {
             $scope.addMode = false;
             $scope.ctxt = ctxtToEdit;
             // remove property layers if it exists for serialization
             delete $scope.ctxt.layers;
+
+            if (ctxtToEdit.keywords) {
+                $scope.tag.keywords = ctxtToEdit.keywords.split(',');
+            }
         }
 
         // handle display mode for this modal popup
@@ -158,10 +167,6 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
             existing: [],
             selected: null
         };
-
-        $scope.$watch('layers.toAdd.layer.opacity', function() {
-
-        }, true);
 
         $scope.close = function () {
             $modalInstance.dismiss('close');
@@ -194,9 +199,37 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
             $scope.styles.selected = item;
         };
 
+        $scope.addTag = function() {
+            if (!$scope.tag.text || $scope.tag.text == '' || $scope.tag.text.length == 0) {
+                return;
+            }
+            $scope.tag.keywords.push($scope.tag.text);
+            $scope.tag.text = '';
+        };
+
+        $scope.deleteTag = function(key) {
+            if ($scope.tag.keywords.length > 0 &&
+                $scope.tag.text.length == 0 &&
+                key === undefined) {
+                $scope.tag.keywords.pop();
+            } else if (key != undefined) {
+                $scope.tag.keywords.splice(key, 1);
+            }
+        };
+
         $scope.validate = function () {
             // Verify on which step the user is.
             if ($scope.mode.display==='general') {
+                if ($scope.tag.keywords) {
+                    var str = '';
+                    for (var i = 0; i < $scope.tag.keywords.length; i++) {
+                        if (i > 0) {
+                            str += ',';
+                        }
+                        str += $scope.tag.keywords[i];
+                    }
+                    $scope.ctxt.keywords = str;
+                }
                 // On the general panel, it means saving the whole context
                 if ($scope.addMode) {
                     mapcontext.add({}, $scope.ctxt, function (ctxtCreated) {
