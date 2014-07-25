@@ -23,6 +23,7 @@ import org.constellation.ServiceDef;
 import org.constellation.configuration.ConfigurationException;
 import org.constellation.metadata.configuration.CSWConfigurer;
 import static org.constellation.metadata.process.AddMetadataDescriptor.METADATA_FILE;
+import static org.constellation.metadata.process.AddMetadataDescriptor.METADATA_ID;
 import static org.constellation.metadata.process.AddMetadataDescriptor.SERVICE_IDENTIFIER;
 import org.constellation.process.AbstractCstlProcess;
 import org.constellation.ws.ServiceConfigurer;
@@ -44,11 +45,16 @@ public class AddMetadaProcess extends AbstractCstlProcess {
     @Override
     protected void execute() throws ProcessException {
         final String serviceID  = value(SERVICE_IDENTIFIER, inputParameters);
+        final String metadataID = value(METADATA_ID, inputParameters);
         final File metadataFile = value(METADATA_FILE, inputParameters);
 
         try {
             final CSWConfigurer configurer = (CSWConfigurer) ServiceConfigurer.newInstance(ServiceDef.Specification.CSW);
-            configurer.importRecords(serviceID, metadataFile, metadataFile.getName());
+            if (configurer.metadataExist(serviceID, metadataID).getStatus().equalsIgnoreCase("Exist")) {
+                throw new ProcessException("The metadata is already present in CSW", this, null);
+            } else {
+                configurer.importRecords(serviceID, metadataFile, metadataFile.getName());
+            }
         } catch (ConfigurationException ex) {
             throw new ProcessException(null, this, ex);
         }

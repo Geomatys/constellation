@@ -50,9 +50,14 @@ public class AddMetadataDescriptor extends AbstractProcessDescriptor {
     public static final ParameterDescriptor<File> METADATA_FILE =
             new DefaultParameterDescriptor<>(METADATA_FILE_NAME, METADATA_FILE_REMARKS, File.class, null, true);
     
+    public static final String METADATA_ID_NAME = "metadata-id";
+    private static final String METADATA_ID_REMARKS = "The metadata identifier.";
+    public static final ParameterDescriptor<String> METADATA_ID =
+            new DefaultParameterDescriptor<>(METADATA_ID_NAME, METADATA_ID_REMARKS, String.class, null, true);
+    
     /**Input parameters */
     public static final ParameterDescriptorGroup INPUT_DESC = new DefaultParameterDescriptorGroup("InputParameters",
-            new GeneralParameterDescriptor[]{SERVICE_IDENTIFIER, METADATA_FILE});
+            new GeneralParameterDescriptor[]{SERVICE_IDENTIFIER, METADATA_FILE, METADATA_ID});
     
      /**Output parameters */
     public static final ParameterDescriptorGroup OUTPUT_DESC = new DefaultParameterDescriptorGroup("OutputParameters");
