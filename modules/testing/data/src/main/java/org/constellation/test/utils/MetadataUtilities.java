@@ -437,7 +437,7 @@ public final class MetadataUtilities {
                     assertEquals(idExpResult.getStandard(), idResult.getStandard());
                     assertEquals(idExpResult.getSupplementalInformation(), idResult.getSupplementalInformation());
                     assertEquals(idExpResult.getTopicCategories(), idResult.getTopicCategories());
-                    
+
                     assertEquals(idExpResult, idResult);
                 } else if (expId instanceof ServiceIdentificationImpl) {
                     ServiceIdentificationImpl expService = (ServiceIdentificationImpl) expId;
@@ -446,7 +446,7 @@ public final class MetadataUtilities {
                     assertEquals(expService.getContainsOperations(), resService.getContainsOperations());
                     assertEquals(expService.getCoupledResource(), resService.getCoupledResource());
                     assertEquals(expService.getCouplingType(), resService.getCouplingType());
-                    extentsEquals(expService.getExtent(), resService.getExtent());
+                    extentsEquals(expService.getExtents(), resService.getExtents());
                     assertEquals(expService.getOperatesOn().size(), resService.getOperatesOn().size());
                     Iterator<DataIdentification> expItOo = expService.getOperatesOn().iterator();
                     Iterator<DataIdentification> resItOo = resService.getOperatesOn().iterator();

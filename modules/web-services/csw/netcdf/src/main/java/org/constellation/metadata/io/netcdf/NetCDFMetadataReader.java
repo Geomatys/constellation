@@ -44,6 +44,7 @@ import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.ows.xml.v100.BoundingBoxType;
 import org.opengis.metadata.citation.ResponsibleParty;
+import org.opengis.metadata.citation.Responsibility;
 import org.opengis.metadata.citation.Role;
 import org.opengis.metadata.distribution.Distribution;
 import org.opengis.metadata.distribution.Distributor;
@@ -538,11 +539,10 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
 
             List<SimpleLiteral> creator = new ArrayList<>();
             for (Identification identification: metadata.getIdentificationInfo()) {
-                for (ResponsibleParty rp :identification.getPointOfContacts()) {
+                for (Responsibility rp :identification.getPointOfContacts()) {
                     if (Role.ORIGINATOR.equals(rp.getRole())) {
-                        creator.add(new SimpleLiteral(rp.getOrganisationName().toString()));
+                        creator.add(new SimpleLiteral(((ResponsibleParty) rp).getOrganisationName().toString()));
                     }
-
                 }
             }
             if (creator.isEmpty()) creator = null;
@@ -756,7 +756,7 @@ public class NetCDFMetadataReader extends AbstractMetadataReader implements CSWM
     public List<String> getAllIdentifiers() throws MetadataIoException {
         return getAllIdentifiers(dataDirectory, null);
     }
-    
+
     @Override
     public int getEntryCount() throws MetadataIoException {
         return getAllIdentifiers(dataDirectory, null).size();
