@@ -447,16 +447,20 @@ cstlAdminApp.controller('ModalImportDataStep1DatabaseController', ['$scope','pro
         }
 
     }]);
-//cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$cookies','$growl',
-//    function($scope, $cookies, $growl) {
+
 
 cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$cookies','$growl',
     function($scope, $cookies, $growl) {
         $scope.import.next = function() {
             if ($scope.import.metadata || $scope.import.identifier) {
                 $scope.uploadMetadata();
+            } else {
+                $scope.selectType();
             }
 
+        };
+
+        $scope.selectType = function(){
             $scope.import.allowNext = false;
             if ($scope.import.db.url) {
                 $scope.importDb();
@@ -466,7 +470,7 @@ cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$c
             } else {
                 $scope.uploaded();
             }
-        };
+        }
 
         $scope.uploadMetadata = function() {
             var $form = $('#uploadMetadataForm');
@@ -482,19 +486,18 @@ cstlAdminApp.controller('ModalImportDataStep2MetadataController', ['$scope', '$c
                 contentType: false,
                 processData: false,
                 success: function(result) {
-//                    $scope.$apply(function() {
-                        $scope.import.mdPath = result.metadataPath;
-                        $scope.import.dataName = result.dataName;
-                        $scope.import.dataTitle = result.metatitle;
-                        $scope.import.metaIdentifier = result.metaIdentifier;
-//                    });
+                    $scope.import.mdPath = result.metadataPath;
+                    $scope.import.dataName = result.dataName;
+                    $scope.import.dataTitle = result.metatitle;
+                    $scope.import.metaIdentifier = result.metaIdentifier;
+                    $scope.selectType();
                 },
                 error: function(result){
 
                     $growl('error','Error',result.responseJSON.msg);
-                    $scope.import.currentStep = 'step2Metadata';
-                    $scope.import.allowNext = false;
-                    $scope.import.allowSubmit = false;
+//                    $scope.import.currentStep = 'step2Metadata';
+//                    $scope.import.allowNext = false;
+//                    $scope.import.allowSubmit = false;
                 }
             });
         };
