@@ -147,11 +147,21 @@ public class JooqDataRepository extends AbstractJooqRespository<DataRecord, Data
     @Override
     public void update(Data data) {
 
-        dsl.update(DATA).set(DATA.DATE, data.getDate()).set(DATA.ISO_METADATA, data.getIsoMetadata())
-                .set(DATA.METADATA, data.getMetadata()).set(DATA.METADATA_ID, data.getMetadataId()).set(DATA.NAME, data.getName())
-                .set(DATA.NAMESPACE, data.getNamespace()).set(DATA.OWNER, data.getOwner()).set(DATA.PROVIDER, data.getProvider())
-                .set(DATA.SENSORABLE, data.isSensorable()).set(DATA.SUBTYPE, data.getSubtype()).set(DATA.TYPE, data.getType())
-                .set(DATA.VISIBLE, data.isVisible()).where(DATA.ID.eq(data.getId())).execute();
+        dsl.update(DATA)
+                .set(DATA.DATE, data.getDate())
+                .set(DATA.ISO_METADATA, data.getIsoMetadata())
+                .set(DATA.METADATA, data.getMetadata())
+                .set(DATA.METADATA_ID, data.getMetadataId())
+                .set(DATA.NAME, data.getName())
+                .set(DATA.NAMESPACE, data.getNamespace())
+                .set(DATA.OWNER, data.getOwner())
+                .set(DATA.PROVIDER, data.getProvider())
+                .set(DATA.SENSORABLE, data.isSensorable())
+                .set(DATA.SUBTYPE, data.getSubtype())
+                .set(DATA.TYPE, data.getType())
+                .set(DATA.VISIBLE, data.isVisible())
+                .where(DATA.ID.eq(data.getId()))
+                .execute();
 
     }
 

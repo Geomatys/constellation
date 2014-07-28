@@ -176,7 +176,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
                 }
             });
             modal.result.then(function(result) {
-                if (result) {
+                if (result.missing) {
                     dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}}, function () {
                         $location.path('/description/' + result.type + "/" + result.file + "/" + result.missing);
                     }, function () {
@@ -195,7 +195,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
                 }
             });
             modal.result.then(function(result) {
-                if (result) {
+                if (result.missing) {
                     dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}}, function () {
                         $location.path('/description/' + result.type + "/" + result.file + "/" + result.missing);
                     }, function () {
@@ -214,7 +214,7 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
                 }
             });
             modal.result.then(function(result) {
-                if (result) {
+                if (result.missing) {
                     dataListing.setMetadata({}, {values: {'providerId': result.file, 'dataType': result.type}}, function () {
                         $location.path('/description/' + result.type + "/" + result.file + "/" + result.missing);
                     }, function () {

@@ -103,6 +103,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
 
                     var importedData = response.dataFile;
                     var importedMetaData = response.metadataFile;
+                    $scope.import.metadata = importedMetaData;
 
                     dataListing.findDataType({values: {'filePath':importedData, 'extension': fileExtension, dataType: $scope.import.uploadType}}, function(selectedExtension) {
 
