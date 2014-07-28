@@ -902,7 +902,12 @@ p.error-select-one{
 .dashboard .item-list .item.mapcontext.layer.selected{
     background: transparent url('../images/layer-compo-selected.svg') right center no-repeat;
 }
-
+.dashboard .item-list .item.style-compo-layer.selected{
+    background: transparent url('../images/style-compo-layer-selected.svg') right center no-repeat;
+}
+.dashboard .item-list .item.style-compo-layer{
+    background: transparent url('../images/style-compo-layer.svg') right center no-repeat;
+}
 
 .dashboard .item-list .item {
     border: 1px solid white;
