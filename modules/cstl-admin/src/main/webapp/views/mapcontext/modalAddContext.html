@@ -112,24 +112,48 @@
                                                             <input type="checkbox" ng-model="layerToAdd.visible" ng-change="changeVisibility(layerToAdd)">
                                                         </div>
                                                         <div class="col-xs-9 no-padding">
-                                                            <div class="item" ng-class="{'selected':layerToAdd===selected.item,mapcontext: layerToAdd.layer.externalLayer, coverage:layerToAdd.layer.Type.toUpperCase()==='coverage'.toUpperCase(),vector:layerToAdd.layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layerToAdd.layer.Type.toUpperCase()==='vector'.toUpperCase()}">
+                                                            <div class="item layer compo" ng-class="{'selected':layerToAdd===selected.item,mapcontext: layerToAdd.layer.externalLayer, coverage:layerToAdd.layer.Type.toUpperCase()==='coverage'.toUpperCase(),vector:layerToAdd.layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layerToAdd.layer.Type.toUpperCase()==='vector'.toUpperCase()}">
                                                                 <div class="top">
                                                                     <span class="item-title" title="{{(layerToAdd.layer.Name) ? layerToAdd.layer.Name : layerToAdd.layer.externalLayer}}">{{(layerToAdd.layer.Name) ? layerToAdd.layer.Name : layerToAdd.layer.externalLayer}}</span>
                                                                     <span class="pull-right text-right item-list-style">{{layerToAdd.layer.Type==='coverage'?'raster':layerToAdd.layer.Type==='feature-store'?'vector':layerToAdd.layer.Type==='observation-store'?'vector':(layerToAdd.layer.Type) ? layerToAdd.layer.Type : 'WMS'}}</span>
-                                                                    <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='Point' || layerToAdd.layer.Subtype=='MultiPoint')"
-                                                                         src="images/vector-multipoint.svg"
+                                                                    <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='Point' || layerToAdd.layer.Subtype=='MultiPoint') && layerToAdd!=selected.item"
+                                                                         src="images/vector-multipoint-mapcontext.svg"
                                                                          class="pull-right"
                                                                          style="margin-top:6px; margin-right:10px;" />
-                                                                    <img ng-if="layerToAdd.layer.Subtype=='Geometry'"
-                                                                         src="images/vector-multigeometry.svg"
+                                                                    <img ng-if="layerToAdd.layer.Subtype=='Geometry' && layerToAdd!=selected.item"
+                                                                         src="images/vector-multigeometry-mapcontext.svg"
                                                                          class="pull-right"
                                                                          style="margin-top:6px; margin-right:10px; width:22px" />
-                                                                    <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='Polygon' || layerToAdd.layer.Subtype=='MultiPolygon')"
-                                                                         src="images/vector-poly.svg"
+                                                                    <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='Polygon' || layerToAdd.layer.Subtype=='MultiPolygon') && layerToAdd!=selected.item"
+                                                                         src="images/vector-poly-mapcontext.svg"
                                                                          class="pull-right"
                                                                          style="margin-top:6px; margin-right:10px;" />
-                                                                    <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='LineString' || layerToAdd.layer.Subtype=='MultiLineString')"
-                                                                         src="images/vector-polyline.svg"
+                                                                    <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='LineString' || layerToAdd.layer.Subtype=='MultiLineString') && layerToAdd!=selected.item"
+                                                                         src="images/vector-polyline-mapcontext.svg"
+                                                                         class="pull-right"
+                                                                         style="margin-top:6px; margin-right:10px;" />
+                                                                    <img ng-if="layerToAdd.layer.externalLayer && layerToAdd!==selected.item"
+                                                                         src="images/layer-external.svg"
+                                                                         class="pull-right"
+                                                                         style="margin-top:6px; margin-right:10px;" />
+                                                                    <img ng-if="layerToAdd.layer.Type=='VECTOR' && (layerToAdd.layer.Subtype=='Point' || layerToAdd.layer.Subtype=='MultiPoint') && layerToAdd==selected.item"
+                                                                         src="images/vector-multipoint-mapcontext-selected.svg"
+                                                                         class="pull-right"
+                                                                         style="margin-top:6px; margin-right:10px;" />
+                                                                    <img ng-if="layerToAdd.layer.Type=='VECTOR' && (layerToAdd.layer.Subtype=='Polygon' || layerToAdd.layer.Subtype=='MultiPolygon') && layerToAdd==selected.item"
+                                                                         src="images/vector-poly-mapcontext-selected.svg"
+                                                                         class="pull-right"
+                                                                         style="margin-top:6px; margin-right:10px;" />
+                                                                    <img ng-if="layerToAdd.layer.Subtype=='Geometry' && layerToAdd==selected.item"
+                                                                         src="images/vector-multigeometry-mapcontext-selected.svg"
+                                                                         class="pull-right"
+                                                                         style="margin-top:6px; margin-right:10px; width:22px" />
+                                                                    <img ng-if="layerToAdd.layer.Type=='VECTOR'  && (layerToAdd.layer.Subtype=='LineString' || layerToAdd.layer.Subtype=='MultiLineString') && layerToAdd==selected.item"
+                                                                         src="images/vector-polyline-mapcontext-selected.svg"
+                                                                         class="pull-right"
+                                                                         style="margin-top:6px; margin-right:10px;" />
+                                                                    <img ng-if="layerToAdd.layer.externalLayer && layerToAdd==selected.item"
+                                                                         src="images/layer-external-selected.svg"
                                                                          class="pull-right"
                                                                          style="margin-top:6px; margin-right:10px;" />
                                                                 </div>

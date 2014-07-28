@@ -86,7 +86,7 @@
                                 </div>
 
                                 <div ng-if="context==selected" ng-repeat="layer in context.layers" style="padding-left:0;">
-                                    <div class="item child compo" ng-class="{'selected':layer==selectedLayer, mapcontext: layer.externalLayer, coverage:layer.Type.toUpperCase()==='coverage'.toUpperCase()||layer.Type.toUpperCase()==='raster'.toUpperCase(),vector:layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layer.Type.toUpperCase()==='vector'.toUpperCase()}" ng-click="selectContextChild(layer);">
+                                    <div class="item child compo layer" ng-class="{'selected':layer==selectedLayer, mapcontext: layer.externalLayer, coverage:layer.Type.toUpperCase()==='coverage'.toUpperCase()||layer.Type.toUpperCase()==='raster'.toUpperCase(),vector:layer.Type.toUpperCase()==='observation-store'.toUpperCase()||layer.Type.toUpperCase()==='vector'.toUpperCase()}" ng-click="selectContextChild(layer);">
                                         <div class="top">
                                             <span class="item-title" title="{{layer.Name}}">{{layer.Name}}</span>
                                             <span class="pull-right text-right item-list-style">{{layer.Type==='coverage'?'raster':layer.Type==='feature-store'?'vector':layer.Type==='observation-store'?'vector': (layer.Type) ? layer.Type : 'WMS'}}</span>
@@ -106,6 +106,10 @@
                                                  src="images/vector-polyline-mapcontext.svg"
                                                  class="pull-right"
                                                  style="margin-top:6px; margin-right:10px;" />
+                                            <img ng-if="layer.externalLayer && layer!==selectedLayer"
+                                                 src="images/layer-external.svg"
+                                                 class="pull-right"
+                                                 style="margin-top:6px; margin-right:10px;" />
                                             <img ng-if="layer.Type=='VECTOR' && (layer.Subtype=='Point' || layer.Subtype=='MultiPoint') && layer==selectedLayer"
                                                  src="images/vector-multipoint-mapcontext-selected.svg"
                                                  class="pull-right"
@@ -120,6 +124,10 @@
                                                  style="margin-top:6px; margin-right:10px; width:22px" />
                                             <img ng-if="layer.Type=='VECTOR'  && (layer.Subtype=='LineString' || layer.Subtype=='MultiLineString') && layer==selectedLayer"
                                                  src="images/vector-polyline-mapcontext-selected.svg"
+                                                 class="pull-right"
+                                                 style="margin-top:6px; margin-right:10px;" />
+                                            <img ng-if="layer.externalLayer && layer==selectedLayer"
+                                                 src="images/layer-external-selected.svg"
                                                  class="pull-right"
                                                  style="margin-top:6px; margin-right:10px;" />
                                         </div>
