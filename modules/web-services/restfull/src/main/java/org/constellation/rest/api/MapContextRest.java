@@ -44,10 +44,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -189,6 +193,17 @@ public class MapContextRest {
         final TextType title = new TextType();
         title.getContent().add(ctxt.getName());
         entriesToSet.add(OBJ_ATOM_FACT.createEntryTypeTitle(title));
+
+        try {
+            final DateTimeType dateTime = new DateTimeType();
+            final Date date = new Date();
+            final GregorianCalendar gregCal = new GregorianCalendar();
+            gregCal.setTime(date);
+            dateTime.setValue(DatatypeFactory.newInstance().newXMLGregorianCalendar(gregCal));
+            entriesToSet.add(OBJ_ATOM_FACT.createEntryTypeUpdated(dateTime));
+        } catch (DatatypeConfigurationException ex) {
+            Providers.LOGGER.log(Level.INFO, ex.getMessage(), ex);
+        }
 
         for (final MapContextStyledLayerDTO styledLayer : ctxtItem.getLayers()) {
             final EntryType newEntry = new EntryType();
