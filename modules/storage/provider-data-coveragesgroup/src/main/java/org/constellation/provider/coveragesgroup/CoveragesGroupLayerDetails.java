@@ -18,6 +18,22 @@
  */
 package org.constellation.provider.coveragesgroup;
 
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import org.apache.sis.measure.MeasurementRange;
 import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
@@ -25,6 +41,8 @@ import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef.Query;
 import org.constellation.provider.AbstractData;
 import org.constellation.provider.coveragesgroup.util.ConvertersJaxbToGeotk;
+import org.geotoolkit.coverage.CoverageReference;
+import org.geotoolkit.coverage.DefaultCoverageReference;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.display.PortrayalException;
@@ -42,23 +60,6 @@ import org.opengis.filter.Filter;
 import org.opengis.filter.PropertyIsEqualTo;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.geometry.Envelope;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *

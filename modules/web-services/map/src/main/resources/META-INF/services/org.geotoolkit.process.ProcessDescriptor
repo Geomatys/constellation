@@ -1,2 +1,3 @@
 #Service process
 org.constellation.process.service.AddLayerToMapServiceDescriptor
+org.constellation.process.service.AddDataToMapContextDescriptor

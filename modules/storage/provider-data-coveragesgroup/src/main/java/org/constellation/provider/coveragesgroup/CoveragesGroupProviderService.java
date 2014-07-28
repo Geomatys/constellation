@@ -52,9 +52,12 @@ public class CoveragesGroupProviderService extends AbstractProviderFactory
 
     public static final ParameterDescriptor<URL> URL =
             new DefaultParameterDescriptor<URL>(KEY_PATH, "Map context path", URL.class, null, true);
+    
+    public static final ParameterDescriptor<String> NAMESPACE =
+            new DefaultParameterDescriptor<String>("namespace", "Provider general namespace", String.class, null, false);
 
     public static final ParameterDescriptorGroup SOURCE_CONFIG_DESCRIPTOR =
-            new DefaultParameterDescriptorGroup("coveragesgroup", URL);
+            new DefaultParameterDescriptorGroup("coveragesgroup", URL, NAMESPACE);
 
     public static final ParameterDescriptorGroup SERVICE_CONFIG_DESCRIPTOR =
             createDescriptor(SOURCE_CONFIG_DESCRIPTOR);

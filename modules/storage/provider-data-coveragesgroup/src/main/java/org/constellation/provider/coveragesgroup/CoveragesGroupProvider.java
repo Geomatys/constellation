@@ -67,7 +67,8 @@ public class CoveragesGroupProvider extends AbstractDataProvider {
 
     @Override
     public DataStore getMainStore() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        //throw new UnsupportedOperationException("Not supported yet.");
+        return null;
     }
 
     /**
