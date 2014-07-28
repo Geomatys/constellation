@@ -33,6 +33,7 @@ import org.apache.sis.metadata.iso.distribution.DefaultDistribution;
 import org.apache.sis.metadata.iso.identification.AbstractIdentification;
 import org.apache.sis.metadata.iso.identification.DefaultDataIdentification;
 import org.apache.sis.metadata.iso.identification.DefaultKeywords;
+import org.apache.sis.metadata.iso.service.DefaultOperationMetadata;
 import org.apache.sis.util.iso.DefaultInternationalString;
 import org.apache.sis.util.iso.DefaultNameFactory;
 import org.apache.sis.util.iso.SimpleInternationalString;
@@ -42,7 +43,6 @@ import org.constellation.dto.AccessConstraint;
 import org.constellation.dto.Contact;
 import org.constellation.dto.DataMetadata;
 import org.constellation.dto.Details;
-import org.geotoolkit.service.OperationMetadataImpl;
 import org.geotoolkit.service.ServiceIdentificationImpl;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.citation.CitationDate;
@@ -57,7 +57,7 @@ import org.opengis.metadata.identification.Keywords;
 import org.opengis.metadata.identification.TopicCategory;
 import org.opengis.metadata.service.CouplingType;
 import org.opengis.metadata.service.DistributedComputingPlatform;
-import org.opengis.service.OperationMetadata;
+import org.opengis.metadata.service.OperationMetadata;
 import org.opengis.util.InternationalString;
 import org.opengis.util.NameFactory;
 
@@ -72,6 +72,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 
 /**
  * Class which add some part on a metadata using {@link org.constellation.dto.DataMetadata}.
@@ -709,7 +710,7 @@ public class MetadataFeeder {
         }
         if (servIdent != null) {
             for (OperationMetadata om : servIdent.getContainsOperations()) {
-                for (OnlineResource or : om.getConnectPoint()) {
+                for (OnlineResource or : om.getConnectPoints()) {
                     final DefaultOnlineResource resource = (DefaultOnlineResource) or;
                     try {
                         resource.setLinkage(new URI(url));
@@ -736,63 +737,63 @@ public class MetadataFeeder {
 
     private List<OperationMetadata> getOperation(final String serviceType, final String url) {
         final List<OperationMetadata> operations = new ArrayList<>();
-        operations.add(buildOperation("GetCapabilities", url));
+        OnlineResource resource;
+        try {
+            resource = new DefaultOnlineResource(new URI(url));
+        } catch (URISyntaxException ex) {
+            LOGGER.log(Level.WARNING, "unvalid URL:" + url, ex);  // TODO: NON!!!!!
+            resource = null;
+        }
+        operations.add(buildOperation("GetCapabilities", resource));
 
         switch (serviceType) {
             case "WMS":
-                operations.add(buildOperation("GetMap", url));
-                operations.add(buildOperation("GetFeatureInfo", url));
-                operations.add(buildOperation("DescribeLayer", url));
-                operations.add(buildOperation("GetLegendGraphic", url));
+                operations.add(buildOperation("GetMap", resource));
+                operations.add(buildOperation("GetFeatureInfo", resource));
+                operations.add(buildOperation("DescribeLayer", resource));
+                operations.add(buildOperation("GetLegendGraphic", resource));
                 break;
             case "WFS":
-                operations.add(buildOperation("GetFeature", url));
-                operations.add(buildOperation("DescribeFeatureType", url));
-                operations.add(buildOperation("Transaction", url));
+                operations.add(buildOperation("GetFeature", resource));
+                operations.add(buildOperation("DescribeFeatureType", resource));
+                operations.add(buildOperation("Transaction", resource));
                 break;
             case "WCS":
-                operations.add(buildOperation("DescribeCoverage", url));
-                operations.add(buildOperation("GetCoverage", url));
+                operations.add(buildOperation("DescribeCoverage", resource));
+                operations.add(buildOperation("GetCoverage", resource));
                 break;
             case "WMTS":
-                operations.add(buildOperation("GetTile", url));
-                operations.add(buildOperation("GetFeatureInfo", url));
+                operations.add(buildOperation("GetTile", resource));
+                operations.add(buildOperation("GetFeatureInfo", resource));
                 break;
             case "CSW":
-                operations.add(buildOperation("GetRecords", url));
-                operations.add(buildOperation("GetRecordById", url));
-                operations.add(buildOperation("DescribeRecord", url));
-                operations.add(buildOperation("GetDomain", url));
-                operations.add(buildOperation("Transaction", url));
-                operations.add(buildOperation("Harvest", url));
+                operations.add(buildOperation("GetRecords", resource));
+                operations.add(buildOperation("GetRecordById", resource));
+                operations.add(buildOperation("DescribeRecord", resource));
+                operations.add(buildOperation("GetDomain", resource));
+                operations.add(buildOperation("Transaction", resource));
+                operations.add(buildOperation("Harvest", resource));
                 break;
             case "SOS":
-                operations.add(buildOperation("GetObservation", url));
-                operations.add(buildOperation("GetObservationById", url));
-                operations.add(buildOperation("DescribeSensor", url));
-                operations.add(buildOperation("GetFeatureOfInterest", url));
-                operations.add(buildOperation("InsertObservation", url));
-                operations.add(buildOperation("InsertSensor", url));
-                operations.add(buildOperation("DeleteSensor", url));
-                operations.add(buildOperation("InsertResult", url));
-                operations.add(buildOperation("InsertResultTemplate", url));
-                operations.add(buildOperation("GetResultTemplate", url));
-                operations.add(buildOperation("GetFeatureOfInterestTime", url));
+                operations.add(buildOperation("GetObservation", resource));
+                operations.add(buildOperation("GetObservationById", resource));
+                operations.add(buildOperation("DescribeSensor", resource));
+                operations.add(buildOperation("GetFeatureOfInterest", resource));
+                operations.add(buildOperation("InsertObservation", resource));
+                operations.add(buildOperation("InsertSensor", resource));
+                operations.add(buildOperation("DeleteSensor", resource));
+                operations.add(buildOperation("InsertResult", resource));
+                operations.add(buildOperation("InsertResultTemplate", resource));
+                operations.add(buildOperation("GetResultTemplate", resource));
+                operations.add(buildOperation("GetFeatureOfInterestTime", resource));
                 break;
         }
         // TODO other service
         return operations;
     }
 
-    private OperationMetadata buildOperation(final String operationName, final String url) {
-        final OperationMetadataImpl op = new OperationMetadataImpl(operationName);
-        op.setDCP(DistributedComputingPlatform.WEB_SERVICES);
-        try {
-            op.setConnectPoint(Arrays.asList((OnlineResource)new DefaultOnlineResource(new URI(url))));
-        } catch (URISyntaxException ex) {
-            LOGGER.log(Level.WARNING, "unvalid URL:" + url, ex);
-        }
-        return op;
+    private OperationMetadata buildOperation(final String operationName, final OnlineResource url) {
+        return new DefaultOperationMetadata(operationName, DistributedComputingPlatform.WEB_SERVICES, url);
     }
 
     public void setServiceMetadataIdForData(final List<String> layerIds) {
