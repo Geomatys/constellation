@@ -896,6 +896,12 @@ p.error-select-one{
 .dashboard .item-list .item.mapcontext.selected{
     background: transparent url('../images/map-context-selected.svg') right center no-repeat;
 }
+.dashboard .item-list .item.mapcontext.layer{
+    background: transparent url('../images/layer-compo.svg') right center no-repeat;
+}
+.dashboard .item-list .item.mapcontext.layer.selected{
+    background: transparent url('../images/layer-compo-selected.svg') right center no-repeat;
+}
 
 
 .dashboard .item-list .item {
