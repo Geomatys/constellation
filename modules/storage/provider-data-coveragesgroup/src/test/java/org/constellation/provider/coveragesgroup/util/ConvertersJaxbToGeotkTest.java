@@ -19,11 +19,17 @@
 
 package org.constellation.provider.coveragesgroup.util;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import org.constellation.admin.SpringHelper;
+import org.constellation.admin.StyleBusiness;
 import org.constellation.provider.coveragesgroup.xml.DataReference;
 import org.constellation.provider.coveragesgroup.xml.MapLayer;
 import org.constellation.provider.coveragesgroup.xml.StyleReference;
 import org.geotoolkit.map.MapItem;
+import static org.junit.Assert.assertNotNull;
+
+import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.BeansException;
@@ -31,10 +37,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import javax.annotation.PostConstruct;
-
-import static org.junit.Assert.assertNotNull;
 
 
 /**
@@ -46,6 +48,9 @@ import static org.junit.Assert.assertNotNull;
 public class ConvertersJaxbToGeotkTest implements ApplicationContextAware {
 
     private ApplicationContext applicationContext;
+    
+    @Inject
+    private StyleBusiness styleBusiness;
     
     @PostConstruct
     public void setUpClass() {
@@ -60,24 +65,26 @@ public class ConvertersJaxbToGeotkTest implements ApplicationContextAware {
 
     @Test
     public void testConvertsMapLayer() {
+        SpringHelper.injectDependencies(this);
         final StyleReference styleRef = new StyleReference("myStyle");
         final DataReference dataRef =
                 new DataReference("${providerLayerType|myProvider|myLayer}");
         final MapLayer mapLayer = new MapLayer(dataRef, styleRef);
 
-        final MapItem item = ConvertersJaxbToGeotk.convertsMapLayer(mapLayer, null, null);
+        final MapItem item = ConvertersJaxbToGeotk.convertsMapLayer(mapLayer, null, null, styleBusiness);
         assertNotNull(item);
     }
 
     @Test
     public void testConvertsMapLayerWithDataReferenceStyle() {
+        SpringHelper.injectDependencies(this);
         final StyleReference styleRef =
                 new StyleReference("${providerLayerType|sld|myStyle}");
         final DataReference dataRef =
                 new DataReference("${providerLayerType|myProvider|myLayer}");
         final MapLayer mapLayer = new MapLayer(dataRef, styleRef);
 
-        final MapItem item = ConvertersJaxbToGeotk.convertsMapLayer(mapLayer, null, null);
+        final MapItem item = ConvertersJaxbToGeotk.convertsMapLayer(mapLayer, null, null, styleBusiness);
         assertNotNull(item);
     }
 }

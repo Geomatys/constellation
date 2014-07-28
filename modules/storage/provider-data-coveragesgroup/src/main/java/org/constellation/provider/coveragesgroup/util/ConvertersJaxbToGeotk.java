@@ -27,8 +27,6 @@ import org.constellation.provider.Data;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
 import org.constellation.provider.FeatureData;
-import org.constellation.provider.StyleProvider;
-import org.constellation.provider.StyleProviders;
 import org.constellation.util.DataReference;
 import org.geotoolkit.client.Client;
 import org.geotoolkit.coverage.AbstractCoverageReference;
@@ -75,6 +73,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.constellation.admin.StyleBusiness;
+import org.constellation.configuration.TargetNotFoundException;
 
 
 /**
@@ -89,7 +89,7 @@ public final class ConvertersJaxbToGeotk {
     private static final Logger LOGGER = Logging.getLogger(ConvertersJaxbToGeotk.class);
     public static final String ORIGINAL_CONFIG = "original_config";
 
-    public static MapItem convertsMapLayer(final org.constellation.provider.coveragesgroup.xml.MapLayer mapLayer, final String login, final String password) {
+    public static MapItem convertsMapLayer(final org.constellation.provider.coveragesgroup.xml.MapLayer mapLayer, final String login, final String password, final StyleBusiness sb) {
         ArgumentChecks.ensureNonNull("mapLayer", mapLayer);
         ArgumentChecks.ensureNonNull("dataReference", mapLayer.getDataReference());
 
@@ -116,7 +116,7 @@ public final class ConvertersJaxbToGeotk {
         MutableStyle style = null;
         if (mapLayer.getStyleReference() != null) {
             final String styleReference = mapLayer.getStyleReference().getValue();
-            style = convertsDataReferenceToMutableStyle(styleReference);
+            style = convertsDataReferenceToMutableStyle(styleReference, sb);
         }
 
         final double opacity = (mapLayer.getOpacity() != null && mapLayer.getOpacity() <= 1 && mapLayer.getOpacity() >= 0) ? mapLayer.getOpacity() : 1;
@@ -137,26 +137,26 @@ public final class ConvertersJaxbToGeotk {
         return emptyLayer;
     }
 
-    public static MapItem convertsMapItem(final org.constellation.provider.coveragesgroup.xml.MapItem mapItem, final String login, final String password) {
+    public static MapItem convertsMapItem(final org.constellation.provider.coveragesgroup.xml.MapItem mapItem, final String login, final String password, final StyleBusiness sb) {
         final MapItem mi = MapBuilder.createItem();
         for (org.constellation.provider.coveragesgroup.xml.MapItem currentMapItem : mapItem.getMapItems()) {
             if (currentMapItem instanceof org.constellation.provider.coveragesgroup.xml.MapLayer) {
-                final MapItem layer = convertsMapLayer((org.constellation.provider.coveragesgroup.xml.MapLayer)currentMapItem, login, password);
+                final MapItem layer = convertsMapLayer((org.constellation.provider.coveragesgroup.xml.MapLayer)currentMapItem, login, password, sb);
                 if (layer != null) {
                     layer.setUserProperty(ORIGINAL_CONFIG, currentMapItem);
                     mi.items().add(layer);
                 }
             } else {
-                mi.items().add(convertsMapItem(currentMapItem, login, password));
+                mi.items().add(convertsMapItem(currentMapItem, login, password, sb));
             }
         }
         return mi;
     }
 
-    public static MapContext convertsMapContext(final org.constellation.provider.coveragesgroup.xml.MapContext mapContext, final String login, final String password) {
+    public static MapContext convertsMapContext(final org.constellation.provider.coveragesgroup.xml.MapContext mapContext, final String login, final String password, final StyleBusiness sb) {
         final MapContext mc = MapBuilder.createContext();
         mc.setName(mapContext.getName());
-        mc.items().add(convertsMapItem(mapContext.getMapItem(), login, password));
+        mc.items().add(convertsMapItem(mapContext.getMapItem(), login, password, sb));
         return mc;
     }
 
@@ -165,7 +165,7 @@ public final class ConvertersJaxbToGeotk {
      * @param styleRefStr
      * @return MutableStyle from DataReference if found, or default MutableStyle.
      */
-    private static MutableStyle convertsDataReferenceToMutableStyle(final String styleRefStr) {
+    private static MutableStyle convertsDataReferenceToMutableStyle(final String styleRefStr, final StyleBusiness sb) {
 
         String providerID = null;
         String styleName = null;
@@ -180,19 +180,10 @@ public final class ConvertersJaxbToGeotk {
             styleName = styleRefStr;
         }
 
-        final Collection<StyleProvider> providers = StyleProviders.getInstance().getProviders();
-        for (StyleProvider provider : providers) {
-            if (providerID != null) {
-                if (provider.getId().equals(providerID)) {
-                    style = provider.get(styleName);
-                    break;
-                }
-            } else {
-                if (provider.getKeys().contains(styleName)) {
-                    style = provider.get(styleName);
-                    break;
-                }
-            }
+        try {
+            style = sb.getStyle(providerID, styleName);
+        } catch (TargetNotFoundException ex) {
+            LOGGER.log(Level.WARNING, "map Item style not found {" + providerID + "}" + styleName, ex);
         }
         return style != null ? style : new DefaultStyleFactory().style();
     }

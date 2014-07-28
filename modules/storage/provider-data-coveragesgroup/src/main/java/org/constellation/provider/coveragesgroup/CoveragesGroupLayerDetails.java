@@ -39,6 +39,7 @@ import org.apache.sis.storage.DataStoreException;
 import org.apache.sis.util.logging.Logging;
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.ServiceDef.Query;
+import org.constellation.admin.StyleBusiness;
 import org.constellation.provider.AbstractData;
 import org.constellation.provider.coveragesgroup.util.ConvertersJaxbToGeotk;
 import org.geotoolkit.coverage.CoverageReference;
@@ -74,25 +75,25 @@ public class CoveragesGroupLayerDetails extends AbstractData {
     private MarshallerPool pool;
     private Unmarshaller unmarshaller;
 
-    public CoveragesGroupLayerDetails(final Name name, final File file) {
-        this(name, file, null, null);
+    public CoveragesGroupLayerDetails(final Name name, final File file, final StyleBusiness styleBusiness) {
+        this(name, file, null, null, styleBusiness);
     }
 
     /**
      * hacked method to pass the login/pass to WebMapServer
      */
-    public CoveragesGroupLayerDetails(final Name name, final File file, final String login, final String password) {
+    public CoveragesGroupLayerDetails(final Name name, final File file, final String login, final String password, final StyleBusiness styleBusiness) {
         super(name, Collections.EMPTY_LIST);
 
         // Parsing ctxt : MapBuilder.createContext
         try {
-            ctxt = createMapContextForFile(file, login, password);
+            ctxt = createMapContextForFile(file, login, password, styleBusiness);
         } catch (JAXBException e) {
             LOGGER.log(Level.INFO, "Unable to convert map context file into a valid object", e);
         }
     }
 
-    private MapContext createMapContextForFile(final File file, final String login, final String password) throws JAXBException {
+    private MapContext createMapContextForFile(final File file, final String login, final String password, final StyleBusiness styleBusiness) throws JAXBException {
         pool = new MarshallerPool(JAXBContext.newInstance(org.constellation.provider.coveragesgroup.xml.MapContext.class, org.apache.sis.internal.jaxb.geometry.ObjectFactory.class), null);
         unmarshaller = pool.acquireUnmarshaller();
         final Object result = unmarshaller.unmarshal(file);
@@ -100,7 +101,7 @@ public class CoveragesGroupLayerDetails extends AbstractData {
             throw new JAXBException("Wrong response for the unmarshalling");
         }
         final org.constellation.provider.coveragesgroup.xml.MapContext mapContext = (org.constellation.provider.coveragesgroup.xml.MapContext)result;
-        return ConvertersJaxbToGeotk.convertsMapContext(mapContext,login, password);
+        return ConvertersJaxbToGeotk.convertsMapContext(mapContext,login, password, styleBusiness);
     }
 
     @Override

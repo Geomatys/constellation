@@ -51,6 +51,7 @@ import static org.constellation.provider.Provider.RELOAD_TIME_PROPERTY;
  * @version $Id$
  * @author Johann Sorel (Geomatys)
  */
+@Deprecated
 public final class StyleProviders extends Providers implements PropertyChangeListener{
 
     private final PropertyChangeSupport listeners = new PropertyChangeSupport(this);

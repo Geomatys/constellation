@@ -18,20 +18,6 @@
  */
 package org.constellation.provider.coveragesgroup;
 
-import org.apache.sis.storage.DataStore;
-import org.constellation.api.DataType;
-import org.constellation.provider.AbstractDataProvider;
-import org.constellation.provider.Data;
-import org.constellation.provider.ProviderFactory;
-import org.constellation.provider.coveragesgroup.util.MapContextIO;
-import org.geotoolkit.feature.type.DefaultName;
-import org.geotoolkit.feature.type.Name;
-import org.geotoolkit.map.MapContext;
-import org.geotoolkit.util.FileUtilities;
-import org.opengis.parameter.ParameterValue;
-import org.opengis.parameter.ParameterValueGroup;
-
-import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.FileFilter;
 import java.net.URISyntaxException;
@@ -43,9 +29,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-
+import javax.inject.Inject;
+import javax.xml.bind.JAXBException;
+import org.apache.sis.storage.DataStore;
+import org.constellation.admin.SpringHelper;
+import org.constellation.admin.StyleBusiness;
+import org.constellation.api.DataType;
+import org.constellation.provider.AbstractDataProvider;
+import org.constellation.provider.Data;
+import org.constellation.provider.ProviderFactory;
 import static org.constellation.provider.coveragesgroup.CoveragesGroupProviderService.SOURCE_CONFIG_DESCRIPTOR;
 import static org.constellation.provider.coveragesgroup.CoveragesGroupProviderService.URL;
+import org.constellation.provider.coveragesgroup.util.MapContextIO;
+import org.geotoolkit.feature.type.DefaultName;
+import org.geotoolkit.feature.type.Name;
+import org.geotoolkit.map.MapContext;
+import org.geotoolkit.util.FileUtilities;
+import org.opengis.parameter.ParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
 
 /**
  *
@@ -60,9 +61,13 @@ public class CoveragesGroupProvider extends AbstractDataProvider {
     private boolean visited;
     private File path;
 
+    @Inject
+    private StyleBusiness styleBusiness;
+    
     public CoveragesGroupProvider(String providerId, final ProviderFactory service, final ParameterValueGroup param) {
         super(providerId, service,param);
         this.visited = false;
+        SpringHelper.injectDependencies(this);
     }
 
     @Override
@@ -107,7 +112,7 @@ public class CoveragesGroupProvider extends AbstractDataProvider {
         }
         final File mapContextFile = index.get(key);
         if (mapContextFile != null) {
-            return new CoveragesGroupLayerDetails(key, mapContextFile, login, password);
+            return new CoveragesGroupLayerDetails(key, mapContextFile, login, password, styleBusiness);
         }
         return null;
     }
@@ -126,7 +131,7 @@ public class CoveragesGroupProvider extends AbstractDataProvider {
         }
 
         final File mapContextFile = index.get(key);
-        return MapContextIO.readMapContextFile(mapContextFile, login, password);
+        return MapContextIO.readMapContextFile(mapContextFile, login, password, styleBusiness);
     }
 
     private static ParameterValueGroup getSourceConfiguration(final ParameterValueGroup params){
@@ -203,7 +208,7 @@ public class CoveragesGroupProvider extends AbstractDataProvider {
         index = new HashMap<Name, File>();
         for (final File candidate : candidates) {
             try {
-                final MapContext mapContext = MapContextIO.readMapContextFile(candidate, "", "");
+                final MapContext mapContext = MapContextIO.readMapContextFile(candidate, "", "", styleBusiness);
                 if (mapContext != null) {
                     final DefaultName name = new DefaultName(mapContext.getName());
                     index.put(name, candidate);
