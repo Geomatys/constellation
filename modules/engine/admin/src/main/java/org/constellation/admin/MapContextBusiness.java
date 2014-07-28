@@ -78,62 +78,73 @@ public class MapContextBusiness {
         final List<Mapcontext> ctxts = mapContextRepository.findAll();
         for (final Mapcontext ctxt : ctxts) {
             final List<MapcontextStyledLayer> styledLayers = mapContextRepository.getLinkedLayers(ctxt.getId());
-            final List<MapContextStyledLayerDTO> styledLayersDto = new ArrayList<>();
-
-            for (final MapcontextStyledLayer styledLayer : styledLayers) {
-                final MapContextStyledLayerDTO dto;
-                if (styledLayer.getLayerId() != null) {
-                    final org.constellation.engine.register.Layer layer = layerRepository.findById(styledLayer.getLayerId());
-                    final Data data = dataRepository.findById(layer.getData());
-                    final Provider provider = providerRepository.findOne(data.getProvider());
-                    final QName name = new QName(layer.getNamespace(), layer.getName());
-
-                    final org.constellation.configuration.Layer layerConfig = new org.constellation.configuration.Layer(layer.getId(), name);
-                    layerConfig.setAlias(layer.getAlias());
-                    layerConfig.setDate(new Date(layer.getDate()));
-                    layerConfig.setOwner(layer.getOwner());
-                    layerConfig.setProviderID(provider.getIdentifier());
-                    layerConfig.setProviderType(provider.getType());
-
-                    final List<StyledLayer> styledLays = styledLayerRepository.findByLayer(layer.getId());
-                    final List<DataReference> drs = new ArrayList<>();
-                    for (final StyledLayer styledLay : styledLays) {
-                        final Style s = styleRepository.findById(styledLay.getStyle());
-                        if (s == null) {
-                            continue;
-                        }
-                        final DataReference dr = DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, "sld", s.getName());
-                        drs.add(dr);
-                    }
-                    layerConfig.setStyles(drs);
-
-                    final QName dataName = new QName(data.getNamespace(), data.getName());
-                    final DataBrief db = dataBusiness.getDataBrief(dataName, provider.getId());
-                    dto = new MapContextStyledLayerDTO(styledLayer, layerConfig, db);
-
-                    if (styledLayer.getStyleId() != null) {
-                        // Extract style information for this layer
-                        final Style style = styleRepository.findById(styledLayer.getStyleId());
-                        if (style != null) {
-                            dto.setStyleName(style.getName());
-                        }
-                    }
-
-                    // Extract service information for this layer
-                    final Layer layerRecord = layerRepository.findById(styledLayer.getLayerId());
-                    final Service serviceRecord = serviceRepository.findById(layerRecord.getService());
-                    dto.setServiceIdentifier(serviceRecord.getIdentifier());
-                    dto.setServiceVersions(serviceRecord.getVersions());
-                } else {
-                    dto = new MapContextStyledLayerDTO(styledLayer);
-                }
-
-                styledLayersDto.add(dto);
-            }
-            Collections.sort(styledLayersDto);
+            final List<MapContextStyledLayerDTO> styledLayersDto = generateLayerDto(styledLayers);
             ctxtLayers.add(new MapContextLayersDTO(ctxt, styledLayersDto));
         }
         return ctxtLayers;
+    }
+
+    public MapContextLayersDTO findMapContextLayers(int contextId) {
+        final Mapcontext ctxt = mapContextRepository.findById(contextId);
+        final List<MapcontextStyledLayer> styledLayers = mapContextRepository.getLinkedLayers(contextId);
+        final List<MapContextStyledLayerDTO> styledLayersDto = generateLayerDto(styledLayers);
+        return new MapContextLayersDTO(ctxt, styledLayersDto);
+    }
+
+    private List<MapContextStyledLayerDTO> generateLayerDto(final List<MapcontextStyledLayer> styledLayers) {
+        final List<MapContextStyledLayerDTO> styledLayersDto = new ArrayList<>();
+        for (final MapcontextStyledLayer styledLayer : styledLayers) {
+            final MapContextStyledLayerDTO dto;
+            if (styledLayer.getLayerId() != null) {
+                final org.constellation.engine.register.Layer layer = layerRepository.findById(styledLayer.getLayerId());
+                final Data data = dataRepository.findById(layer.getData());
+                final Provider provider = providerRepository.findOne(data.getProvider());
+                final QName name = new QName(layer.getNamespace(), layer.getName());
+
+                final org.constellation.configuration.Layer layerConfig = new org.constellation.configuration.Layer(layer.getId(), name);
+                layerConfig.setAlias(layer.getAlias());
+                layerConfig.setDate(new Date(layer.getDate()));
+                layerConfig.setOwner(layer.getOwner());
+                layerConfig.setProviderID(provider.getIdentifier());
+                layerConfig.setProviderType(provider.getType());
+
+                final List<StyledLayer> styledLays = styledLayerRepository.findByLayer(layer.getId());
+                final List<DataReference> drs = new ArrayList<>();
+                for (final StyledLayer styledLay : styledLays) {
+                    final Style s = styleRepository.findById(styledLay.getStyle());
+                    if (s == null) {
+                        continue;
+                    }
+                    final DataReference dr = DataReference.createProviderDataReference(DataReference.PROVIDER_STYLE_TYPE, "sld", s.getName());
+                    drs.add(dr);
+                }
+                layerConfig.setStyles(drs);
+
+                final QName dataName = new QName(data.getNamespace(), data.getName());
+                final DataBrief db = dataBusiness.getDataBrief(dataName, provider.getId());
+                dto = new MapContextStyledLayerDTO(styledLayer, layerConfig, db);
+
+                if (styledLayer.getStyleId() != null) {
+                    // Extract style information for this layer
+                    final Style style = styleRepository.findById(styledLayer.getStyleId());
+                    if (style != null) {
+                        dto.setStyleName(style.getName());
+                    }
+                }
+
+                // Extract service information for this layer
+                final Layer layerRecord = layerRepository.findById(styledLayer.getLayerId());
+                final Service serviceRecord = serviceRepository.findById(layerRecord.getService());
+                dto.setServiceIdentifier(serviceRecord.getIdentifier());
+                dto.setServiceVersions(serviceRecord.getVersions());
+            } else {
+                dto = new MapContextStyledLayerDTO(styledLayer);
+            }
+
+            styledLayersDto.add(dto);
+        }
+        Collections.sort(styledLayersDto);
+        return styledLayersDto;
     }
 
     /**

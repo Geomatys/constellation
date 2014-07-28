@@ -106,6 +106,10 @@
         </dependency>
         <dependency>
             <groupId>org.geotoolkit</groupId>
+            <artifactId>geotk-xml-owc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.geotoolkit</groupId>
             <artifactId>geotk-processing</artifactId>
         </dependency>
         

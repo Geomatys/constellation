@@ -17,7 +17,9 @@
 
 cstlAdminApp.controller('MapcontextController', ['$scope', '$dashboard', '$growl', '$modal', '$cookies', 'mapcontext',
     function ($scope, $dashboard, $growl, $modal, $cookies, mapcontext){
+        $scope.cstlUrl = $cookies.cstlUrl;
         $scope.domainId = $cookies.cstlActiveDomainId;
+        $scope.cstlSessionId = $cookies.cstlSessionId;
 
         $scope.init = function() {
             var modalLoader = $modal.open({

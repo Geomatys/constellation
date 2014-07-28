@@ -20,17 +20,23 @@ package org.constellation.rest.api;
 
 import org.apache.sis.xml.MarshallerPool;
 import org.constellation.admin.MapContextBusiness;
+import org.constellation.admin.dto.MapContextLayersDTO;
+import org.constellation.admin.dto.MapContextStyledLayerDTO;
 import org.constellation.dto.ParameterValues;
 import org.constellation.engine.register.Mapcontext;
 import org.constellation.engine.register.MapcontextStyledLayer;
 import org.constellation.engine.register.repository.MapContextRepository;
 import org.constellation.provider.Providers;
+import org.geotoolkit.owc.xml.v10.MethodCodeType;
+import org.geotoolkit.owc.xml.v10.OfferingType;
+import org.geotoolkit.owc.xml.v10.OperationType;
 import org.geotoolkit.wms.WebMapClient;
 import org.geotoolkit.wms.xml.AbstractLayer;
 import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
 import org.geotoolkit.wms.xml.WMSMarshallerPool;
 import org.opengis.util.FactoryException;
 import org.springframework.transaction.annotation.Transactional;
+import org.w3._2005.atom.*;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -55,6 +61,9 @@ import java.util.logging.Level;
 @Produces({MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_JSON})
 public class MapContextRest {
+    private static final org.w3._2005.atom.ObjectFactory OBJ_ATOM_FACT = new org.w3._2005.atom.ObjectFactory();
+    private static final org.geotoolkit.owc.xml.v10.ObjectFactory OBJ_OWC_FACT = new org.geotoolkit.owc.xml.v10.ObjectFactory();
+
     @Inject
     private MapContextBusiness contextBusiness;
 
@@ -162,5 +171,69 @@ public class MapContextRest {
         }
 
         return Response.ok(finalList).build();
+    }
+
+    @GET
+    @Path("/{id}/export")
+    @Produces("application/xml")
+    public Response export(@PathParam("id") final int id) throws JAXBException {
+        final Mapcontext ctxt = contextRepository.findById(id);
+        final MapContextLayersDTO ctxtItem = contextBusiness.findMapContextLayers(id);
+
+        // Final object to return
+        final FeedType feed = new FeedType();
+        final List<Object> entriesToSet = feed.getAuthorOrCategoryOrContributor();
+        final IdType idFeed = new IdType();
+        idFeed.setValue(String.valueOf(id));
+        entriesToSet.add(OBJ_ATOM_FACT.createEntryTypeId(idFeed));
+        final TextType title = new TextType();
+        title.getContent().add(ctxt.getName());
+        entriesToSet.add(OBJ_ATOM_FACT.createEntryTypeTitle(title));
+
+        for (final MapContextStyledLayerDTO styledLayer : ctxtItem.getLayers()) {
+            final EntryType newEntry = new EntryType();
+            final List<Object> entryThings = newEntry.getAuthorOrCategoryOrContent();
+            final IdType idNewEntry = new IdType();
+            idNewEntry.setValue("Web Map Service Layer");
+            entryThings.add(OBJ_ATOM_FACT.createEntryTypeId(idNewEntry));
+            final TextType titleNewEntry = new TextType();
+            titleNewEntry.getContent().add(styledLayer.getExternalLayer());
+            entryThings.add(OBJ_ATOM_FACT.createEntryTypeTitle(titleNewEntry));
+            final org.w3._2005.atom.ContentType contentNewEntry = new org.w3._2005.atom.ContentType();
+            contentNewEntry.setType("html");
+            entryThings.add(OBJ_ATOM_FACT.createEntryTypeContent(contentNewEntry));
+            final CategoryType categoryNewEntry = new CategoryType();
+            categoryNewEntry.setScheme("http://www.opengis.net/spec/owc/active");
+            categoryNewEntry.setTerm("true");
+            entryThings.add(OBJ_ATOM_FACT.createEntryTypeCategory(categoryNewEntry));
+
+            final OfferingType offering = new OfferingType();
+            offering.setCode("http://www.opengis.net/spec/owc-atom/1.0/req/wms");
+
+            final OperationType opCaps = new OperationType();
+            opCaps.setCode("GetCapabilities");
+            opCaps.setMethod(MethodCodeType.GET);
+            final StringBuilder capsUrl = new StringBuilder();
+            capsUrl.append(styledLayer.getExternalServiceUrl()).append("?REQUEST=GetCapabilities&SERVICE=WMS");
+            opCaps.setHref(capsUrl.toString());
+            offering.getOperationOrContentOrStyleSet().add(OBJ_OWC_FACT.createOfferingTypeOperation(opCaps));
+
+            final OperationType opGetMap = new OperationType();
+            opGetMap.setCode("GetMap");
+            opGetMap.setMethod(MethodCodeType.GET);
+            final String defStyle = (styledLayer.getExternalStyle() != null) ? styledLayer.getExternalStyle().split(",")[0] : "";
+            final StringBuilder getMapUrl = new StringBuilder();
+            getMapUrl.append(styledLayer.getExternalServiceUrl()).append("?REQUEST=GetMap&SERVICE=WMS&FORMAT=image/png&TRANSPARENT=true&WIDTH=1024&HEIGHT=768&CRS=CRS:84&BBOX=")
+                    .append(styledLayer.getExternalLayerExtent()).append("&LAYERS=").append(styledLayer.getExternalLayer())
+                    .append("&STYLES=").append(defStyle)
+                    .append("&VERSION=1.3.0");
+            opGetMap.setHref(getMapUrl.toString());
+            offering.getOperationOrContentOrStyleSet().add(OBJ_OWC_FACT.createOfferingTypeOperation(opGetMap));
+
+            entryThings.add(OBJ_OWC_FACT.createOffering(offering));
+
+            entriesToSet.add(OBJ_ATOM_FACT.createEntry(newEntry));
+        }
+        return Response.ok(feed, MediaType.APPLICATION_XML_TYPE).header("Content-Disposition", "attachment; filename=\"context-" + ctxt.getName() + ".xml\"").build();
     }
 }
