@@ -91,7 +91,7 @@
         <module>admin-swing</module>
         <module>administration</module>
         <!--module>common</module-->
-        <module>data</module>
+        <!--module>data</module-->
         <!--module>style</module-->
         <!--module>webservices</module-->
         <!--module>cstl-web-client</module-->

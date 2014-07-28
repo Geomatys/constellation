@@ -64,12 +64,15 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
-            <modules>
-                <module>gui</module>
-            </modules>
         </profile>
         <profile>
             <id>noWar</id>
+        </profile>
+        <profile>
+            <id>swing</id>
+            <modules>
+                <module>gui</module>
+            </modules>
         </profile>
     </profiles>
 
