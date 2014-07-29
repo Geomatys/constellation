@@ -50,7 +50,7 @@ public class MetadataBusiness {
     public String searchMetadata(final String metadataId, final boolean includeService)  {
         final Provider provider = providerRepository.findByMetadataId(metadataId);
         if (provider != null) {
-            return provider.getMetadata();
+            return provider.getMetadataIso();
         }
         
         final Data data = dataRepository.findByMetadataId(metadataId);
@@ -75,7 +75,7 @@ public class MetadataBusiness {
         final List<String> results = new ArrayList<>();
         final List<Provider> providers = providerRepository.findAll();
         for (Provider record : providers) {
-            if (record.getMetadata() != null) {
+            if (record.getMetadataIso() != null) {
                 results.add(record.getMetadataId());
             }
         }

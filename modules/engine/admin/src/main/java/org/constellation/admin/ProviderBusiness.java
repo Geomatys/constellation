@@ -119,7 +119,7 @@ public class ProviderBusiness {
         final Provider provider = getProvider(providerId, domainId);
         final MarshallerPool pool = ISOMarshallerPool.getInstance();
         final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        final DefaultMetadata metadata = (DefaultMetadata) unmarshaller.unmarshal(new ByteArrayInputStream(provider.getMetadata()
+        final DefaultMetadata metadata = (DefaultMetadata) unmarshaller.unmarshal(new ByteArrayInputStream(provider.getMetadataIso()
                 .getBytes()));
         pool.recycle(unmarshaller);
         metadata.prune();
@@ -133,14 +133,14 @@ public class ProviderBusiness {
         marshaller.marshal(metadata, outputStream);
         final String metadataString = outputStream.toString();
         final Provider provider = providerRepository.findByIdentifierAndDomainId(providerIdentifier, domainId);
-        provider.setMetadata(metadataString);
+        provider.setMetadataIso(metadataString);
         provider.setMetadataId(metadata.getFileIdentifier());
         providerRepository.update(provider);
     }
 
     public void updateMetadata(String providerIdentifier, Integer domainId, String metaId, String metadataXml) throws JAXBException {
         final Provider provider = providerRepository.findByIdentifierAndDomainId(providerIdentifier, domainId);
-        provider.setMetadata(metadataXml);
+        provider.setMetadataIso(metadataXml);
         provider.setMetadataId(metaId);
         providerRepository.update(provider);
     }

@@ -45,8 +45,8 @@ import org.constellation.dto.ParameterValues;
 import org.constellation.dto.ProviderData;
 import org.constellation.dto.PyramidParams;
 import org.constellation.dto.SimpleValue;
-import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.CstlUser;
+import org.constellation.engine.register.Provider;
 import org.constellation.engine.register.repository.UserRepository;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.model.SelectedExtension;
@@ -64,7 +64,6 @@ import org.constellation.util.SimplyMetadataTreeNode;
 import org.constellation.util.Util;
 import org.constellation.utils.CstlMetadatas;
 import org.constellation.utils.GeotoolkitFileExtensionAvailable;
-import org.constellation.utils.ISOMarshallerPool;
 import org.constellation.utils.MetadataFeeder;
 import org.constellation.utils.MetadataUtilities;
 import org.geotoolkit.coverage.CoverageReference;
@@ -114,10 +113,9 @@ import org.opengis.util.FactoryException;
 import org.opengis.util.InternationalString;
 import org.opengis.util.NoSuchIdentifierException;
 
-import com.google.common.base.Optional;
-
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -130,13 +128,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-
 import java.awt.*;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -146,7 +142,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.nio.file.CopyOption;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -172,6 +167,7 @@ import java.util.zip.CRC32;
  * Manage data sending
  *
  * @author Benjamin Garcia (Geomatys)
+ * @author Christophe Mourette (Geomatys)
  */
 @Path("/1/domain/{domainId}/data/")
 public class DataRest {
@@ -183,8 +179,8 @@ public class DataRest {
     @Inject
     private UserRepository userRepository;
     
-    @Inject
-    private SessionData sessionData;
+//    @Inject
+//    private SessionData sessionData;
 
     @Inject
     private DataBusiness dataBusiness;
@@ -337,14 +333,6 @@ public class DataRest {
 
         return Response.ok(hashMap).build();
 
-    }
-
-    private String addExtentionIfExist(String fileName){
-        if (fileName.indexOf(".")>0) {
-            return fileName.substring(fileName.indexOf("."),fileName.length());
-        } else {
-            return "";
-        }
     }
 
     /**
@@ -552,8 +540,7 @@ public class DataRest {
         //call delete to delete files and empty directory
         file.delete();
     }
-    
-    
+
     /**
      * Load data from file selected 
      
@@ -590,9 +577,6 @@ public class DataRest {
         }
         return Response.status(418).build();
     }
-
-
-
 
     /**
      * Save metadata.
@@ -639,7 +623,6 @@ public class DataRest {
         return Response.status(200).build();
     }
 
-    
     @POST
     @Path("metadata/data")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -767,12 +750,6 @@ public class DataRest {
         return Response.ok().type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
-    private static void printXml(final DefaultMetadata meta) throws JAXBException {
-        final Marshaller m = ISOMarshallerPool.getInstance().acquireMarshaller();
-        m.marshal(meta, System.out);
-        ISOMarshallerPool.getInstance().recycle(m);
-    }
-    
     @POST
     @Path("pyramid/{id}/")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -927,7 +904,7 @@ public class DataRest {
             if(sampleDimensions!=null){
                 final int nbBand = sampleDimensions.size();
                 double[] fillValue = new double[nbBand];
-                Arrays.fill(fillValue,Double.NaN);
+                Arrays.fill(fillValue, Double.NaN);
                 for(int i=0;i<nbBand;i++){
                     final double[] nodata = sampleDimensions.get(i).geophysics(true).getNoDataValues();
                     if(nodata!=null && nodata.length>0){
@@ -1528,7 +1505,7 @@ public class DataRest {
 
         DefaultMetadata metadata = null;
         final Provider providerFromDB = providerBusiness.getProvider(providerId);
-        final String metadataFromDB = providerFromDB.getMetadata();
+        final String metadataFromDB = providerFromDB.getMetadataIso();
         final InputStream is = new ByteArrayInputStream(metadataFromDB.getBytes());
         final MarshallerPool pool = CSWMarshallerPool.getInstance();
         try {

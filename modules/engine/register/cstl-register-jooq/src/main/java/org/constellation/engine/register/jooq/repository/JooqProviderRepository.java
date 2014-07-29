@@ -95,7 +95,7 @@ public class JooqProviderRepository extends AbstractJooqRespository<ProviderReco
         newRecord.setConfig(provider.getConfig());
         newRecord.setIdentifier(provider.getIdentifier());
         newRecord.setImpl(provider.getImpl());
-        newRecord.setMetadata(provider.getMetadata());
+        newRecord.setMetadataIso(provider.getMetadataIso());
         newRecord.setMetadataId(provider.getMetadataId());
         newRecord.setOwner(provider.getOwner());
         newRecord.setType(provider.getType());
@@ -137,7 +137,7 @@ public class JooqProviderRepository extends AbstractJooqRespository<ProviderReco
         UpdateConditionStep<ProviderRecord> set = dsl.update(PROVIDER)
                 .set(PROVIDER.CONFIG, provider.getConfig())
                 .set(PROVIDER.IDENTIFIER, provider.getIdentifier())
-                .set(PROVIDER.METADATA, provider.getMetadata())
+                .set(PROVIDER.METADATA_ISO, provider.getMetadataIso())
                 .set(PROVIDER.METADATA_ID, provider.getMetadataId())
                 .set(PROVIDER.IMPL, provider.getImpl())
                 .set(PROVIDER.OWNER, provider.getOwner())
