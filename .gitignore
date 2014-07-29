@@ -4,7 +4,7 @@ target/
 *.iml
 .idea/
 //eclipse
->>>>>>> engine-refactor
 .classpath
 .project
 .settings/
+modules/cstl-sdi/overlays
