@@ -150,7 +150,8 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
             selTab: 'tabInfo',
             display: 'general',
             source: 'interne',
-            dispWmsLayers: false
+            dispWmsLayers: false,
+            errorNoGivenName: false
         };
 
         $scope.layers = {
@@ -219,9 +220,19 @@ cstlAdminApp.controller('MapContextModalController', ['$scope', '$modalInstance'
             }
         };
 
+        $scope.updateNamePresent = function() {
+            $scope.mode.errorNoGivenName = (!$scope.ctxt.name || $scope.ctxt.name == null);
+        };
+
         $scope.validate = function () {
             // Verify on which step the user is.
             if ($scope.mode.display==='general') {
+                if ($scope.ctxt.name == undefined || $scope.ctxt.name == null || $scope.ctxt.name === '') {
+                    $scope.mode.errorNoGivenName = true;
+                    $growl('error', 'Error', 'Name should be filled');
+                    return;
+                }
+
                 if ($scope.tag.keywords) {
                     var str = '';
                     for (var i = 0; i < $scope.tag.keywords.length; i++) {
