@@ -221,7 +221,7 @@
                                 <div class="item-list">
                                     <div ng-repeat="styleItem in styles.existing" class="row">
                                         <div class="item"
-                                             ng-class="{selected: styles.selected===styleItem, 'style-coverage': (styleItem.Type && styleItem.Type.toLowerCase() === 'coverage') || styleItem.Type == null || styleItem.Type == undefined, 'style-vector': styleItem.Type && styleItem.Type.toLowerCase() === 'vector'}"
+                                             ng-class="{selected: styles.selected===styleItem, 'style-coverage': (styleItem.Type && styleItem.Type.toLowerCase() === 'coverage'), 'style-vector': styleItem.Type && styleItem.Type.toLowerCase() === 'vector', 'style-compo-layer':styleItem.Type == null || styleItem.Type == undefined}"
                                              ng-click="selectStyle(styleItem)">
                                             <div class="top">
                                                 <span class="item-title" title="{{styleItem.Name}}">{{styleItem.Name}}</span>
