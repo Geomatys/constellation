@@ -405,6 +405,7 @@
     "listing.no.available.md": "No available metadata",
 
     "mapcontext.modal.add.layer": "Add layer",
+    "mapcontext.modal.apply.extent": "Use current map extent for this map context",
     "mapcontext.modal.cancel": "Cancel",
     "mapcontext.modal.label.crs": "CRS",
     "mapcontext.modal.label.description": "Description",
@@ -416,7 +417,7 @@
     "mapcontext.modal.select.source": "Select your layer source",
     "mapcontext.modal.tab.info": "Information",
     "mapcontext.modal.tab.layers": "Layers",
-    "mapcontext.modal.title": "Add map context",
+    "mapcontext.modal.title": "Add/Edit map context",
     "mapcontext.modal.validate": "Validate",
 
     "menu.administration.label": "Administration",

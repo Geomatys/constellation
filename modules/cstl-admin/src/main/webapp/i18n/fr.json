@@ -455,6 +455,7 @@
     "main.menu.ws.create.title": "Services web",
 
     "mapcontext.modal.add.layer": "Ajouter une couche",
+    "mapcontext.modal.apply.extent": "Utiliser l'étendue courante de la carte pour cette composition cartographique",
     "mapcontext.modal.cancel": "Annuler",
     "mapcontext.modal.label.crs": "CRS",
     "mapcontext.modal.label.description": "Description",
@@ -466,7 +467,7 @@
     "mapcontext.modal.select.source": "Sélectionner la source de votre couche",
     "mapcontext.modal.tab.info": "Informations",
     "mapcontext.modal.tab.layers": "Couches",
-    "mapcontext.modal.title": "Ajouter un contexte cartographique",
+    "mapcontext.modal.title": "Ajouter/Editer un contexte cartographique",
     "mapcontext.modal.validate": "Valider",
 
     "md.iso.abstract": "Résumé",

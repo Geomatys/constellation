@@ -2,7 +2,7 @@
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" ng-click="close()">×</button>
-            <h4 class="modal-title" translate="mapcontext.modal.title">Add map context</h4>
+            <h4 class="modal-title" translate="mapcontext.modal.title">Add/Edit map context</h4>
         </div>
         <div class="modal-body modal-body-style" style="overflow-y: auto;">
             <div ng-if="mode.display==='general' || mode.display==='addChooseStyle'">
@@ -50,7 +50,7 @@
                                                     <input type="text" class="form-control" ng-model="ctxt.north" placeholder="{{'label.north.first.letter' | translate}}"/>
                                                 </div>
                                                 <div class="col-sm-offset-1 col-sm-2">
-                                                    <button class="btn btn-add" type="button" ng-click="applyExtent()" title="{{'' | translate}}">
+                                                    <button class="btn btn-add" type="button" ng-click="applyExtent()" title="{{'mapcontext.modal.apply.extent' | translate}}">
                                                         <i class="glyphicon glyphicon-arrow-left"></i>
                                                     </button>
                                                 </div>
