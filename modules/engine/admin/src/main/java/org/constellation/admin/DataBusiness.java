@@ -107,6 +107,7 @@ public class DataBusiness {
         }
         Data data = dataRepository.findByNameAndNamespaceAndProviderIdentifier(name.getLocalPart(), name.getNamespaceURI(), providerId);
         data.setIsoMetadata(sw.toString());
+        data.setMetadataId(metadata.getFileIdentifier());
         dataRepository.update(data);
     }
 

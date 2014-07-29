@@ -483,7 +483,7 @@ public class DataRest {
         final String parent = file.getParentFile().getCanonicalPath();
         final String fileExt = file.getName().substring(file.getName().lastIndexOf("."), file.getName().length());
         final java.nio.file.Path newPath = Paths.get(parent + File.separator + dataName + fileExt);
-        Files.move(Paths.get(file.getAbsolutePath()), newPath);
+        Files.move(Paths.get(file.getAbsolutePath()), newPath,StandardCopyOption.REPLACE_EXISTING);
         return newPath.toString();
     }
 
