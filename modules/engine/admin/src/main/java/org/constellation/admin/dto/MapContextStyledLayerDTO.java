@@ -184,6 +184,11 @@ public class MapContextStyledLayerDTO extends LayerSummary implements Comparable
         this.serviceVersions = serviceVersions;
     }
 
+    public MapcontextStyledLayer getMapcontextStyledLayer() {
+        return new MapcontextStyledLayer(this.id, this.mapcontextId, this.layerId, this.styleId, this.order, this.opacity, this.visible,
+                this.externalLayer, this.externalLayerExtent, this.externalServiceUrl, this.externalServiceVersion, this.externalStyle);
+    }
+
     @Override
     public int compareTo(MapContextStyledLayerDTO o) {
         return getOrder() - o.getOrder();

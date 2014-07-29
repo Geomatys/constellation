@@ -91,6 +91,10 @@ public class MapContextBusiness {
         return new MapContextLayersDTO(ctxt, styledLayersDto);
     }
 
+    public String findStyleName(Integer styleId) {
+        return styleRepository.findById(styleId).getName();
+    }
+
     private List<MapContextStyledLayerDTO> generateLayerDto(final List<MapcontextStyledLayer> styledLayers) {
         final List<MapContextStyledLayerDTO> styledLayersDto = new ArrayList<>();
         for (final MapcontextStyledLayer styledLayer : styledLayers) {

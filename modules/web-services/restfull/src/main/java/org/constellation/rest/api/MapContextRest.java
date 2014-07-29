@@ -39,9 +39,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.w3._2005.atom.*;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -49,10 +52,7 @@ import javax.xml.datatype.DatatypeFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 
 
@@ -180,7 +180,7 @@ public class MapContextRest {
     @GET
     @Path("/{id}/export")
     @Produces("application/xml")
-    public Response export(@PathParam("id") final int id) throws JAXBException {
+    public Response export(@Context HttpServletRequest hsr, @PathParam("id") final int id) throws JAXBException {
         final Mapcontext ctxt = contextRepository.findById(id);
         final MapContextLayersDTO ctxtItem = contextBusiness.findMapContextLayers(id);
 
@@ -206,13 +206,16 @@ public class MapContextRest {
         }
 
         for (final MapContextStyledLayerDTO styledLayer : ctxtItem.getLayers()) {
+            final boolean isExternal = (styledLayer.getExternalLayer() != null);
+            final String layerName = (isExternal) ? styledLayer.getExternalLayer() : styledLayer.getName();
+
             final EntryType newEntry = new EntryType();
             final List<Object> entryThings = newEntry.getAuthorOrCategoryOrContent();
             final IdType idNewEntry = new IdType();
             idNewEntry.setValue("Web Map Service Layer");
             entryThings.add(OBJ_ATOM_FACT.createEntryTypeId(idNewEntry));
             final TextType titleNewEntry = new TextType();
-            titleNewEntry.getContent().add(styledLayer.getExternalLayer());
+            titleNewEntry.getContent().add(layerName);
             entryThings.add(OBJ_ATOM_FACT.createEntryTypeTitle(titleNewEntry));
             final org.w3._2005.atom.ContentType contentNewEntry = new org.w3._2005.atom.ContentType();
             contentNewEntry.setType("html");
@@ -225,21 +228,44 @@ public class MapContextRest {
             final OfferingType offering = new OfferingType();
             offering.setCode("http://www.opengis.net/spec/owc-atom/1.0/req/wms");
 
+            final String defStyle;
+            final String urlWms;
+            final String layerBBox;
+            if (isExternal) {
+                urlWms = styledLayer.getExternalServiceUrl();
+                defStyle = (styledLayer.getExternalStyle() != null) ? styledLayer.getExternalStyle().split(",")[0] : "";
+                layerBBox = styledLayer.getExternalLayerExtent();
+            } else {
+                final String reqUrl = hsr.getRequestURL().toString();
+                urlWms = reqUrl.split("/api")[0] +"/WS/wms/"+ styledLayer.getServiceIdentifier();
+                defStyle = (styledLayer.getStyleId() != null) ? contextBusiness.findStyleName(styledLayer.getStyleId()) : "";
+                ParameterValues extentValues = null;
+                try {
+                    extentValues = contextBusiness.getExtentForLayers(Collections.singletonList(styledLayer.getMapcontextStyledLayer()));
+                } catch (FactoryException ex) {
+                    Providers.LOGGER.log(Level.INFO, ex.getMessage(), ex);
+                }
+                if (extentValues != null) {
+                    layerBBox = extentValues.get("west") +","+ extentValues.get("south") +","+ extentValues.get("east") +","+ extentValues.get("north");
+                } else {
+                    layerBBox = "-180,-90,180,90";
+                }
+            }
+
             final OperationType opCaps = new OperationType();
             opCaps.setCode("GetCapabilities");
             opCaps.setMethod(MethodCodeType.GET);
             final StringBuilder capsUrl = new StringBuilder();
-            capsUrl.append(styledLayer.getExternalServiceUrl()).append("?REQUEST=GetCapabilities&SERVICE=WMS");
+            capsUrl.append(urlWms).append("?REQUEST=GetCapabilities&SERVICE=WMS");
             opCaps.setHref(capsUrl.toString());
             offering.getOperationOrContentOrStyleSet().add(OBJ_OWC_FACT.createOfferingTypeOperation(opCaps));
 
             final OperationType opGetMap = new OperationType();
             opGetMap.setCode("GetMap");
             opGetMap.setMethod(MethodCodeType.GET);
-            final String defStyle = (styledLayer.getExternalStyle() != null) ? styledLayer.getExternalStyle().split(",")[0] : "";
             final StringBuilder getMapUrl = new StringBuilder();
-            getMapUrl.append(styledLayer.getExternalServiceUrl()).append("?REQUEST=GetMap&SERVICE=WMS&FORMAT=image/png&TRANSPARENT=true&WIDTH=1024&HEIGHT=768&CRS=CRS:84&BBOX=")
-                    .append(styledLayer.getExternalLayerExtent()).append("&LAYERS=").append(styledLayer.getExternalLayer())
+            getMapUrl.append(urlWms).append("?REQUEST=GetMap&SERVICE=WMS&FORMAT=image/png&TRANSPARENT=true&WIDTH=1024&HEIGHT=768&CRS=CRS:84&BBOX=")
+                    .append(layerBBox).append("&LAYERS=").append(layerName)
                     .append("&STYLES=").append(defStyle)
                     .append("&VERSION=1.3.0");
             opGetMap.setHref(getMapUrl.toString());
