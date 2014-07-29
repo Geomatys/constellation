@@ -793,7 +793,7 @@ public class MetadataFeeder {
     }
 
     private OperationMetadata buildOperation(final String operationName, final OnlineResource url) {
-        return new DefaultOperationMetadata(operationName, DistributedComputingPlatform.WEB_SERVICES, url);
+        return new DefaultOperationMetadata(new DefaultInternationalString(operationName), DistributedComputingPlatform.WEB_SERVICES, url);
     }
 
     public void setServiceMetadataIdForData(final List<String> layerIds) {
