@@ -59,6 +59,8 @@ public interface UserRepository {
 
     Optional<CstlUser> findOne(String login);
 
+    Optional<CstlUser> findById(Integer id);
+
     List<String> getRoles(int userId);
     
     

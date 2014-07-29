@@ -128,6 +128,8 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                                         if (importedMetaData || $scope.import.dataName) {
                                             dataListing.setUpMetadata({values: {'providerId': $scope.import.providerId, 'mdPath': importedMetaData, dataName: $scope.import.dataName}});
                                         }
+                                        //update data & metadata files reminder for further use
+                                        $uploadFiles.files = {file: $scope.import.providerId, mdFile: importedMetaData};
 
                                         $growl('success','Success','Shapefile data '+ $scope.import.providerId +' successfully added');
                                         if ($scope.sensor.checked) {
@@ -174,6 +176,8 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                                         if (importedMetaData) {
                                             dataListing.setUpMetadata({values: {'providerId': $scope.import.providerId, 'mdPath': importedMetaData}});
                                         }
+                                        //update data & metadata files reminder for further use
+                                        $uploadFiles.files = {file: $scope.import.providerId, mdFile: importedMetaData};
 
                                         if (!fileExtension || fileExtension !== "nc") {
                                             $growl('success','Success','Coverage data '+ $scope.import.providerId +' successfully added');

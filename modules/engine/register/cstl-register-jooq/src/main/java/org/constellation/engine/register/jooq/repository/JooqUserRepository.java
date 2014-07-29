@@ -241,6 +241,13 @@ public class JooqUserRepository extends AbstractJooqRespository<CstlUserRecord, 
     }
 
     @Override
+    public Optional<CstlUser> findById(Integer id) {
+        if (id == null)
+            return Optional.absent();
+        return Optional.fromNullable(dsl.select().from(CSTL_USER).where(CSTL_USER.ID.eq(id)).fetchOneInto(CstlUser.class));
+    }
+
+    @Override
     public List<String> getRoles(int userId) {
         return dsl.select().from(CSTL_USER).where(USER_X_ROLE.USER_ID.eq(userId)).fetch(USER_X_ROLE.ROLE);
     }

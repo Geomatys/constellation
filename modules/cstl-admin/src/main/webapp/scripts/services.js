@@ -218,109 +218,109 @@ cstlAdminApp.factory('PermissionService', ['$http',
 }]);
 
 cstlAdminApp.factory('webService', ['$resource',
-                                     function ($resource) {
-                                         return $resource('@cstl/api/1/admin/domain/$domainId/instances/:lang', {}, {
-                                             'permissionByDomainRole' : {method: 'GET', url: '@cstl/api/1/servicepermission/access', isArray: true},
-                                             'domains':      {method: 'GET', url: '@cstl/api/1/servicepermission/user/$userId/service/:id', isArray: true},
-                                             'linkToDomain':      {method: 'POST',   url: '@cstl/api/1/serviceXdomain/:domainId/service/:serviceId'},
-                                             'unlinkFromDomain':  {method: 'DELETE', url: '@cstl/api/1/serviceXdomain/:domainId/service/:serviceId'},
-                                             'listAll':      {method: 'GET', isArray: false},
-                                             'listAllByType':{method: 'GET', url: '@cstl/api/1/admin/domain/$domainId/instances/:lang/:type', isArray: false},
-                                             'listServiceLayers': {method: 'GET', url: '@cstl/api/1/admin/domain/$domainId/service/layers/:lang', isArray: true},
-                                             'get':          {method: 'GET', url: '@cstl/api/1/OGC/:type/:id/:lang;jsessionid='},
-                                             'create':       {method: 'PUT', url: '@cstl/api/1/OGC/:type/domain/$domainId'},
-                                             'delete':       {method: 'DELETE', url: '@cstl/api/1/OGC/:type/:id;jsessionid='},
-                                             'restart':      {method: 'POST', url: '@cstl/api/1/OGC/:type/:id/restart;jsessionid='},
-                                             'start':        {method: 'POST', url: '@cstl/api/1/OGC/:type/:id/start;jsessionid='},
-                                             'stop':         {method: 'POST', url: '@cstl/api/1/OGC/:type/:id/stop;jsessionid='},
-                                             'metadata':     {method: 'GET', url: '@cstl/api/1/OGC/:type/:id/metadata/:lang;jsessionid='},
-                                             'updateMd':     {method: 'POST', url: '@cstl/api/1/OGC/:type/:id/metadata;jsessionid='},
-                                             'config':       {method: 'GET', url: '@cstl/api/1/OGC/:type/:id/config;jsessionid='},
-                                             'setConfig':    {method: 'POST', url: '@cstl/api/1/OGC/:type/:id/config;jsessionid='},
-                                             'logs':         {method: 'GET', url: '@cstl/api/1/log/:type/:id;jsessionid='},
-                                             'capabilities': {method: 'GET', url: '@cstl/WS/:type/:id;jsessionid=?REQUEST=GetCapabilities&SERVICE=:typeUpper&VERSION=:version'},
-                                             'layers' :      {method: 'GET', url: '@cstl/api/1/MAP/:type/:id/layersummary/all;jsessionid=', isArray: true},
-                                             'addLayer':     {method: 'PUT', url: '@cstl/api/1/MAP/:type/:id/layer;jsessionid='},
-                                             'deleteLayer':  {method: 'POST', url: '@cstl/api/1/MAP/:type/:id/delete/:layerid;jsessionid='},
-                                             'updateLayerStyle': {method: 'POST', url: '@cstl/api/1/MAP/:type/:id/updatestyle;jsessionid='},
-                                             'removeLayerStyle': {method: 'POST', url: '@cstl/api/1/MAP/:type/:id/removestyle;jsessionid='}
-                                         });
-                                     }]);
+     function ($resource) {
+         return $resource('@cstl/api/1/admin/domain/$domainId/instances/:lang', {}, {
+             'permissionByDomainRole' : {method: 'GET',     url: '@cstl/api/1/servicepermission/access', isArray: true},
+             'domains':                 {method: 'GET',     url: '@cstl/api/1/servicepermission/user/$userId/service/:id', isArray: true},
+             'linkToDomain':            {method: 'POST',    url: '@cstl/api/1/serviceXdomain/:domainId/service/:serviceId'},
+             'unlinkFromDomain':        {method: 'DELETE',  url: '@cstl/api/1/serviceXdomain/:domainId/service/:serviceId'},
+             'listAll':                 {method: 'GET',     isArray: false},
+             'listAllByType':           {method: 'GET',     url: '@cstl/api/1/admin/domain/$domainId/instances/:lang/:type', isArray: false},
+             'listServiceLayers':       {method: 'GET',     url: '@cstl/api/1/admin/domain/$domainId/service/layers/:lang', isArray: true},
+             'get':                     {method: 'GET',     url: '@cstl/api/1/OGC/:type/:id/:lang;jsessionid='},
+             'create':                  {method: 'PUT',     url: '@cstl/api/1/OGC/:type/domain/$domainId'},
+             'delete':                  {method: 'DELETE',  url: '@cstl/api/1/OGC/:type/:id;jsessionid='},
+             'restart':                 {method: 'POST',    url: '@cstl/api/1/OGC/:type/:id/restart;jsessionid='},
+             'start':                   {method: 'POST',    url: '@cstl/api/1/OGC/:type/:id/start;jsessionid='},
+             'stop':                    {method: 'POST',    url: '@cstl/api/1/OGC/:type/:id/stop;jsessionid='},
+             'metadata':                {method: 'GET',     url: '@cstl/api/1/OGC/:type/:id/metadata/:lang;jsessionid='},
+             'updateMd':                {method: 'POST',    url: '@cstl/api/1/OGC/:type/:id/metadata;jsessionid='},
+             'config':                  {method: 'GET',     url: '@cstl/api/1/OGC/:type/:id/config;jsessionid='},
+             'setConfig':               {method: 'POST',    url: '@cstl/api/1/OGC/:type/:id/config;jsessionid='},
+             'logs':                    {method: 'GET',     url: '@cstl/api/1/log/:type/:id;jsessionid='},
+             'capabilities':            {method: 'GET',     url: '@cstl/WS/:type/:id;jsessionid=?REQUEST=GetCapabilities&SERVICE=:typeUpper&VERSION=:version'},
+             'layers' :                 {method: 'GET',     url: '@cstl/api/1/MAP/:type/:id/layersummary/all;jsessionid=', isArray: true},
+             'addLayer':                {method: 'PUT',     url: '@cstl/api/1/MAP/:type/:id/layer;jsessionid='},
+             'deleteLayer':             {method: 'POST',    url: '@cstl/api/1/MAP/:type/:id/delete/:layerid;jsessionid='},
+             'updateLayerStyle':        {method: 'POST',    url: '@cstl/api/1/MAP/:type/:id/updatestyle;jsessionid='},
+             'removeLayerStyle':        {method: 'POST',    url: '@cstl/api/1/MAP/:type/:id/removestyle;jsessionid='}
+         });
+     }]);
 
 cstlAdminApp.factory('dataListing', ['$resource',
     function ($resource) {
         return $resource('@cstl/api/1/domain/$domainId/data/list/top/:filter;jsessionid=', {}, {
-            'listAll':      {method: 'GET', isArray: true},
-            'listData': {method: 'GET', url: '@cstl/api/1/domain/$domainId/data/list/provider;jsessionid='},
-            'listDataForProv': {method: 'GET', url: '@cstl/api/1/domain/$domainId/data/list/provider/:providerId;jsessionid=', isArray: true},
-            'listCoverage': {method: 'POST', url: '@cstl/api/1/domain/$domainId/data/coverage/list/;jsessionid='},
-            'pyramidData':  {method: 'POST', url: '@cstl/api/1/domain/$domainId/data/pyramid/create/:providerId/:dataId;jsessionid='},
-            'pyramidConform': {method: 'POST', url: '@cstl/api/1/domain/$domainId/data/pyramid/createconform/:providerId/:dataId;jsessionid='},
-            'pyramidScales':  {method: 'GET', url: '@cstl/api/1/domain/$domainId/data/pyramid/bestscales/:providerId/:dataId;jsessionid='},
-            'deletePyramidFolder': {method: 'DELETE', url: '@cstl/api/1/domain/$domainId/data/pyramid/folder/:providerId;jsessionid='},
-            'dataFolder':   {method: 'POST', url: '@cstl/api/1/domain/$domainId/data/datapath/true;jsessionid=', isArray: true},
-    		'importData':     {method: 'POST', url: '@cstl/api/1/domain/$domainId/data/import;jsessionid='},
-            'loadData':     {method: 'POST', url: '@cstl/api/1/domain/$domainId/data/load;jsessionid='},
-            'extension':    {method: 'POST', url: '@cstl/api/1/domain/$domainId/data/testextension;jsessionid='},
-            'hideData':   {method: 'POST', url: '@cstl/api/1/domain/$domainId/data/:providerid/:dataid/hidden;jsessionid='},
-            'setMetadata':  {method: 'POST', url: '@cstl/api/1/domain/$domainId/data/metadata;jsessionid='},
-            'setUpMetadata':  {method: 'POST', url: '@cstl/api/1/domain/$domainId/data/metadata/upload;jsessionid='},
-            'mergeMetadata':  {method: 'POST', url: '@cstl/api/1/domain/$domainId/data/metadata/merge;jsessionid='},
-            'metadata': {method: 'GET', url: '@cstl/api/1/domain/$domainId/data/metadata/iso/:providerId/:dataId;jsessionid='},
-            'dataForMetadata': {method:'POST', url: '@cstl/api/1/domain/$domainId/data/metadata/associated;jsessionid='},
-            'getDataMetadata': {method:'POST', url: '@cstl/api/1/domain/$domainId/data/metadata/data;jsessionid='},
-            'codeLists':    {method: 'GET', url: '@cstl/api/1/domain/$domainId/data/metadataCodeLists/:lang;jsessionid='},
-            'findDataType':    {method: 'POST', url: '@cstl/api/1/domain/$domainId/data/findDataType;jsessionid='},
-            'linkToSensor': {method: 'POST', url: '@cstl/api/1/domain/$domainId/data/link/sensor/:providerId/:dataId/:sensorId;jsessionid='},
-            'unlinkSensor': {method: 'POST', url: '@cstl/api/1/domain/$domainId/data/unlink/sensor/:providerId/:dataId/:sensorId;jsessionid='},
-            'generateSML': {method: 'PUT', url: '@cstl/api/1/sensor/generate;jsessionid='},
-            'linkToDomain':      {method: 'POST',   url: '@cstl/api/1/dataXdomain/:dataId/domain/:domainId'},
-            'unlinkFromDomain':  {method: 'DELETE', url: '@cstl/api/1/dataXdomain/:dataId/domain/:domainId'},
-            'domains':  {method: 'GET', url: '@cstl/api/1/dataXdomain/:dataId/user/$userId/domain', isArray: true}
+            'listAll':              {method: 'GET',     isArray: true},
+            'listData':             {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/list/provider;jsessionid='},
+            'listDataForProv':      {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/list/provider/:providerId;jsessionid=', isArray: true},
+            'listCoverage':         {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/coverage/list/;jsessionid='},
+            'pyramidData':          {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/pyramid/create/:providerId/:dataId;jsessionid='},
+            'pyramidConform':       {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/pyramid/createconform/:providerId/:dataId;jsessionid='},
+            'pyramidScales':        {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/pyramid/bestscales/:providerId/:dataId;jsessionid='},
+            'deletePyramidFolder':  {method: 'DELETE',  url: '@cstl/api/1/domain/$domainId/data/pyramid/folder/:providerId;jsessionid='},
+            'dataFolder':           {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/datapath/true;jsessionid=', isArray: true},
+    		'importData':           {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/import;jsessionid='},
+            'loadData':             {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/load;jsessionid='},
+            'extension':            {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/testextension;jsessionid='},
+            'hideData':             {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/:providerid/:dataid/hidden;jsessionid='},
+            'setMetadata':          {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/metadata;jsessionid='},
+            'setUpMetadata':        {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/metadata/upload;jsessionid='},
+            'mergeMetadata':        {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/metadata/merge;jsessionid='},
+            'metadata':             {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/metadata/iso/:providerId/:dataId;jsessionid='},
+            'dataForMetadata':      {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/metadata/associated;jsessionid='},
+            'getDataMetadata':      {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/metadata/data;jsessionid='},
+            'codeLists':            {method: 'GET',     url: '@cstl/api/1/domain/$domainId/data/metadataCodeLists/:lang;jsessionid='},
+            'findDataType':         {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/findDataType;jsessionid='},
+            'linkToSensor':         {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/link/sensor/:providerId/:dataId/:sensorId;jsessionid='},
+            'unlinkSensor':         {method: 'POST',    url: '@cstl/api/1/domain/$domainId/data/unlink/sensor/:providerId/:dataId/:sensorId;jsessionid='},
+            'generateSML':          {method: 'PUT',     url: '@cstl/api/1/sensor/generate;jsessionid='},
+            'linkToDomain':         {method: 'POST',    url: '@cstl/api/1/dataXdomain/:dataId/domain/:domainId'},
+            'unlinkFromDomain':     {method: 'DELETE',  url: '@cstl/api/1/dataXdomain/:dataId/domain/:domainId'},
+            'domains':              {method: 'GET',     url: '@cstl/api/1/dataXdomain/:dataId/user/$userId/domain', isArray: true}
         });
     }]);
 
 cstlAdminApp.factory('style', ['$resource',
     function ($resource) {
         return $resource('@cstl/api/1/SP/:provider/style/available;jsessionid=', {}, {
-            'listAll': { method: 'GET',    isArray: false },
-            'get': {method:'GET', url: '@cstl/api/1/SP/:provider/style/:name;jsessionid='},
-            'createjson':  { method: 'PUT',    url: '@cstl/api/1/SP/:provider/style/create;jsessionid='},
-            'updatejson':  { method: 'PUT',    url: '@cstl/api/1/SP/:provider/style/:name/update;jsessionid='},
-            'delete':  { method: 'DELETE', url: '@cstl/api/1/SP/:provider/style/:name;jsessionid='},
-            'link':    { method: 'POST',   url: '@cstl/api/1/SP/:provider/style/:name/linkData;jsessionid='},
-            'unlink':  { method: 'POST',   url: '@cstl/api/1/SP/:provider/style/:name/unlinkData;jsessionid='},
-            'generateAutoIntervalStyle':{ method : 'POST', url: '@cstl/api/1/SP/:provider/style/generateAutoInterval'},
-            'generateAutoUniqueStyle':{ method : 'POST', url: '@cstl/api/1/SP/:provider/style/generateAutoUnique'},
-            'paletteStyle':  { method: 'GET',   url: '@cstl/api/1/SP/:provider/style/:name/:ruleName;jsessionid=', isArray: true},
-            'statistics':{method:'POST', url: '@cstl/api/1/SP/statistics;jsessionid='}
+            'listAll':                      { method: 'GET',    isArray: false },
+            'get':                          { method: 'GET',    url: '@cstl/api/1/SP/:provider/style/:name;jsessionid='},
+            'createjson':                   { method: 'PUT',    url: '@cstl/api/1/SP/:provider/style/create;jsessionid='},
+            'updatejson':                   { method: 'PUT',    url: '@cstl/api/1/SP/:provider/style/:name/update;jsessionid='},
+            'delete':                       { method: 'DELETE', url: '@cstl/api/1/SP/:provider/style/:name;jsessionid='},
+            'link':                         { method: 'POST',   url: '@cstl/api/1/SP/:provider/style/:name/linkData;jsessionid='},
+            'unlink':                       { method: 'POST',   url: '@cstl/api/1/SP/:provider/style/:name/unlinkData;jsessionid='},
+            'generateAutoIntervalStyle':    { method: 'POST',   url: '@cstl/api/1/SP/:provider/style/generateAutoInterval'},
+            'generateAutoUniqueStyle':      { method: 'POST',   url: '@cstl/api/1/SP/:provider/style/generateAutoUnique'},
+            'paletteStyle':                 { method: 'GET',    url: '@cstl/api/1/SP/:provider/style/:name/:ruleName;jsessionid=', isArray: true},
+            'statistics':                   { method: 'POST',   url: '@cstl/api/1/SP/statistics;jsessionid='}
         });
     }]);
 
 cstlAdminApp.factory('provider', ['$resource',
     function ($resource) {
         return $resource('@cstl/api/1/provider', {}, {
-            'test':     {method: "POST", url: '@cstl/api/1/domain/$domainId/provider/:id/test;jsessionid='},
-            'create':   {method: 'POST', url: '@cstl/api/1/domain/$domainId/provider/:id;jsessionid='},
-            'delete':   {method: 'DELETE', url: '@cstl/api/1/domain/$domainId/provider/:id;jsessionid='},
-            'metadata': {method: 'GET', url: '@cstl/api/1/domain/$domainId/provider/metadata/:providerId;jsessionid='},
-            'dataDesc': {method: 'GET', url: '@cstl/api/1/domain/$domainId/provider/:providerId/:dataId/dataDescription;jsessionid='},
-            'isGeophysic': {method: 'GET', url: '@cstl/api/1/domain/$domainId/provider/:providerId/:dataId/isGeophysic;jsessionid='},
-            'verifyCRS' : {method: 'GET', url: '@cstl/api/1/domain/$domainId/provider/:id/crs'},
-            'createPRJ' : {method: 'POST', url: '@cstl/api/1/domain/$domainId/provider/:id/createprj'},
-            'getAllCodeEPSG' : {method: 'GET',  url: '@cstl/api/1/domain/$domainId/provider/:id/epsgCode', transformResponse: function (data) {return {list: angular.fromJson(data)} }}
+            'test':             {method: "POST",    url: '@cstl/api/1/domain/$domainId/provider/:id/test;jsessionid='},
+            'create':           {method: 'POST',    url: '@cstl/api/1/domain/$domainId/provider/:id;jsessionid='},
+            'delete':           {method: 'DELETE',  url: '@cstl/api/1/domain/$domainId/provider/:id;jsessionid='},
+            'metadata':         {method: 'GET',     url: '@cstl/api/1/domain/$domainId/provider/metadata/:providerId;jsessionid='},
+            'dataDesc':         {method: 'GET',     url: '@cstl/api/1/domain/$domainId/provider/:providerId/:dataId/dataDescription;jsessionid='},
+            'isGeophysic':      {method: 'GET',     url: '@cstl/api/1/domain/$domainId/provider/:providerId/:dataId/isGeophysic;jsessionid='},
+            'verifyCRS':        {method: 'GET',     url: '@cstl/api/1/domain/$domainId/provider/:id/crs'},
+            'createPRJ':        {method: 'POST',    url: '@cstl/api/1/domain/$domainId/provider/:id/createprj'},
+            'getAllCodeEPSG':   {method: 'GET',     url: '@cstl/api/1/domain/$domainId/provider/:id/epsgCode', transformResponse: function (data) {return {list: angular.fromJson(data)} }}
         });
     }]);
 
 cstlAdminApp.factory('csw', ['$resource',
     function ($resource) {
         return $resource('@cstl/api/1/CSW', {}, {
-            'count':      {method: 'GET',  url: '@cstl/api/1/CSW/:id/records/count;jsessionid='},
-            'getRecords': {method: 'GET',  url: '@cstl/api/1/CSW/:id/records/:count-:startIndex;jsessionid='},
-            'getRecord':  {method: 'GET',  url: '@cstl/api/1/CSW/:id/record/:metaId;jsessionid='},
-            'downloadMd': {method: 'GET',  url: '@cstl/api/1/CSW/:id/record/download/:metaId;jsessionid='},
-            'refresh':    {method: 'POST', url: '@cstl/api/1/CSW/:id/index/refresh;jsessionid='},
-            'delete':     {method: 'DELETE', url: '@cstl/api/1/CSW/:id/record/:metaId;jsessionid='}
+            'count':      {method: 'GET',       url: '@cstl/api/1/CSW/:id/records/count;jsessionid='},
+            'getRecords': {method: 'GET',       url: '@cstl/api/1/CSW/:id/records/:count-:startIndex;jsessionid='},
+            'getRecord':  {method: 'GET',       url: '@cstl/api/1/CSW/:id/record/:metaId;jsessionid='},
+            'downloadMd': {method: 'GET',       url: '@cstl/api/1/CSW/:id/record/download/:metaId;jsessionid='},
+            'refresh':    {method: 'POST',      url: '@cstl/api/1/CSW/:id/index/refresh;jsessionid='},
+            'delete':     {method: 'DELETE',    url: '@cstl/api/1/CSW/:id/record/:metaId;jsessionid='}
         });
     }]);
 

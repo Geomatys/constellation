@@ -441,7 +441,10 @@ public final class StyleBusiness {
         brief.setTitle("TODO " + locale);
         brief.setDate(new Date(record.getDate()));
         brief.setType(record.getType());
-        brief.setOwner(record.getOwner());
+        final Optional<CstlUser> user = userRepository.findById(record.getOwner());
+        if (user.isPresent()) {
+            brief.setOwner(user.get().getLogin());
+        }
         return brief;
     }
 

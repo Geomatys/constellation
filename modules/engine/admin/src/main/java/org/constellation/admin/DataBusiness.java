@@ -199,7 +199,10 @@ public class DataBusiness {
 
             final DataBrief db = new DataBrief();
             db.setId(data.getId());
-            db.setOwner(data.getOwner());
+            final Optional<CstlUser> user = userRepository.findById(data.getOwner());
+            if (user.isPresent()) {
+                db.setOwner(user.get().getLogin());
+            }
             db.setName(data.getName());
             db.setNamespace(data.getNamespace());
             db.setDate(new Date(data.getDate()));
