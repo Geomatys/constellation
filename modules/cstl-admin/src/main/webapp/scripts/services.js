@@ -275,17 +275,19 @@ cstlAdminApp.factory('dataListing', ['$resource',
 cstlAdminApp.factory('style', ['$resource',
     function ($resource) {
         return $resource('@cstl/api/1/SP/:provider/style/available;jsessionid=', {}, {
-            'listAll':                      { method: 'GET',    isArray: false },
-            'get':                          { method: 'GET',    url: '@cstl/api/1/SP/:provider/style/:name;jsessionid='},
-            'createjson':                   { method: 'PUT',    url: '@cstl/api/1/SP/:provider/style/create;jsessionid='},
-            'updatejson':                   { method: 'PUT',    url: '@cstl/api/1/SP/:provider/style/:name/update;jsessionid='},
-            'delete':                       { method: 'DELETE', url: '@cstl/api/1/SP/:provider/style/:name;jsessionid='},
-            'link':                         { method: 'POST',   url: '@cstl/api/1/SP/:provider/style/:name/linkData;jsessionid='},
-            'unlink':                       { method: 'POST',   url: '@cstl/api/1/SP/:provider/style/:name/unlinkData;jsessionid='},
-            'generateAutoIntervalStyle':    { method: 'POST',   url: '@cstl/api/1/SP/:provider/style/generateAutoInterval'},
-            'generateAutoUniqueStyle':      { method: 'POST',   url: '@cstl/api/1/SP/:provider/style/generateAutoUnique'},
-            'paletteStyle':                 { method: 'GET',    url: '@cstl/api/1/SP/:provider/style/:name/:ruleName;jsessionid=', isArray: true},
-            'statistics':                   { method: 'POST',   url: '@cstl/api/1/SP/statistics;jsessionid='}
+
+            'listAll':                  {method: 'GET',    isArray: false },
+            'get':                      {method: 'GET',    url: '@cstl/api/1/SP/:provider/style/:name;jsessionid='},
+            'createjson':               {method: 'PUT',    url: '@cstl/api/1/SP/:provider/style/create;jsessionid='},
+            'updatejson':               {method: 'PUT',    url: '@cstl/api/1/SP/:provider/style/:name/update;jsessionid='},
+            'delete':                   {method: 'DELETE', url: '@cstl/api/1/SP/:provider/style/:name;jsessionid='},
+            'link':                     {method: 'POST',   url: '@cstl/api/1/SP/:provider/style/:name/linkData;jsessionid='},
+            'unlink':                   {method: 'POST',   url: '@cstl/api/1/SP/:provider/style/:name/unlinkData;jsessionid='},
+            'generateAutoIntervalStyle':{method: 'POST',   url: '@cstl/api/1/SP/:provider/style/generateAutoInterval;jsessionid='},
+            'generateAutoUniqueStyle':  {method: 'POST',   url: '@cstl/api/1/SP/:provider/style/generateAutoUnique;jsessionid='},
+            'getChartDataJson':         {method: 'POST',   url: '@cstl/api/1/SP/getChartDataJson;jsessionid='},
+            'paletteStyle':             {method: 'GET',    url: '@cstl/api/1/SP/:provider/style/:name/:ruleName;jsessionid=', isArray: true},
+            'statistics':               {method: 'POST',   url: '@cstl/api/1/SP/statistics;jsessionid='}
         });
     }]);
 

@@ -29,9 +29,7 @@ import org.constellation.dto.StyleListBrief;
 import org.constellation.json.binding.Style;
 import org.constellation.provider.DataProvider;
 import org.constellation.provider.DataProviders;
-import org.constellation.rest.dto.AutoIntervalValuesDTO;
-import org.constellation.rest.dto.AutoUniqueValuesDTO;
-import org.constellation.rest.dto.WrapperIntervalDTO;
+import org.constellation.rest.dto.*;
 import org.geotoolkit.coverage.CoverageReference;
 import org.geotoolkit.coverage.CoverageStore;
 import org.geotoolkit.coverage.io.GridCoverageReadParam;
@@ -62,6 +60,8 @@ import org.geotoolkit.style.function.Interpolate;
 import org.geotoolkit.style.interval.DefaultIntervalPalette;
 import org.geotoolkit.style.interval.IntervalPalette;
 import org.opengis.coverage.grid.GridCoverage;
+import org.opengis.feature.AttributeType;
+import org.opengis.feature.PropertyType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.expression.Function;
@@ -93,12 +93,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.*;
 import java.util.List;
-import java.util.Locale;
-import java.util.Set;
 
 import static org.constellation.utils.RESTfulUtilities.ok;
 import static org.geotoolkit.style.StyleConstants.DEFAULT_DESCRIPTION;
@@ -581,7 +577,7 @@ public final class StyleRest {
     }
 
     /**
-     * @see StyleBusiness#linkToData(String, String, String, String)
+     * @see StyleBusiness#linkToData(String, String, String, QName)
      */
     @POST
     @Path("{id}/style/{styleId}/linkData")
@@ -591,7 +587,7 @@ public final class StyleRest {
     }
 
     /**
-     * @see StyleBusiness#unlinkFromData(String, String, String, String)
+     * @see StyleBusiness#unlinkFromData(String, String, String, QName)
      */
     @POST
     @Path("{id}/style/{styleId}/unlinkData")
@@ -605,6 +601,123 @@ public final class StyleRest {
     public Response restartStyleProviders() throws Exception {
         org.constellation.provider.StyleProviders.getInstance().reload();
         return ok(new AcknowlegementType("Success", "All style providers have been restarted."));
+    }
+
+    @POST
+    @Path("getChartDataJson")
+    public Response getChartDataJson(final ParameterValues params) throws Exception {
+        final String dataProviderId = params.get("dataProvider");
+        final String layerName = params.get("layerName");
+        final String attribute = params.get("attribute");
+        final int intervals = params.get("intervals") != null ? Integer.valueOf(params.get("intervals")):10;
+
+        if(attribute ==null || attribute.trim().isEmpty()){
+            return ok(AcknowlegementType.failure("Attribute field should not be empty!"));
+        }
+
+        final ChartDataModelDTO result = new ChartDataModelDTO();
+
+        final DataProvider dataprovider = DataProviders.getInstance().getProvider(dataProviderId);
+        final DataStore dataStore = dataprovider.getMainStore();
+        final Name typeName = new DefaultName(layerName);
+        final QueryBuilder queryBuilder = new QueryBuilder();
+        queryBuilder.setTypeName(typeName);
+        queryBuilder.setProperties(new String[]{attribute});
+        if(dataStore instanceof FeatureStore) {
+            final FeatureStore fstore = (FeatureStore) dataStore;
+            final FeatureCollection featureCollection = fstore.createSession(false).getFeatureCollection(queryBuilder.buildQuery());
+
+            final Map<Object,Long> mapping = new LinkedHashMap<>();
+            final FilterFactory2 FF = (FilterFactory2) FactoryFinder.getFilterFactory(
+                    new Hints(Hints.FILTER_FACTORY, FilterFactory2.class));
+            final PropertyName property = FF.property(attribute);
+
+            //check if property is numeric
+            // if it is numeric then proceed to create intervals as the keys and get for each interval the feature count.
+            // otherwise put each (string value, count) into the map
+
+            final PropertyType p = featureCollection.getFeatureType().getProperty(attribute);
+            if(p instanceof AttributeType){
+                final AttributeType at = (AttributeType) p;
+                final Class cl = at.getValueClass();
+                result.setNumberField(Number.class.isAssignableFrom(cl));
+            }
+
+            if(result.isNumberField()){
+                final Set<Double> values = new HashSet<>();
+
+                final FeatureIterator it = featureCollection.iterator();
+                while(it.hasNext()){
+                    final Feature feature = it.next();
+                    final Number number = property.evaluate(feature, Number.class);
+                    final Double value = number.doubleValue();
+                    values.add(value);
+                }
+                it.close();
+                final Double[] allValues = values.toArray(new Double[values.size()]);
+                Arrays.sort(allValues);
+                double minimum = allValues[0];
+                double maximum = allValues[allValues.length-1];
+
+                double[] interValues = new double[intervals + 1];
+                for (int i = 0; i < interValues.length; i++) {
+                    interValues[i] = minimum + ((maximum - minimum) * i / (interValues.length - 1))  ;
+                }
+
+                for (int i = 1; i < interValues.length; i++) {
+                    double start = interValues[i - 1];
+                    double end = interValues[i];
+                    QueryBuilder qb = new QueryBuilder();
+                    final Filter above = FF.greaterOrEqual(property, FF.literal(start));
+                    final Filter under;
+                    if (i == interValues.length - 1) {
+                        under = FF.lessOrEqual(property, FF.literal(end));
+                    } else {
+                        under = FF.less(property, FF.literal(end));
+                    }
+                    final Filter interval = FF.and(above, under);
+                    qb.setFilter(interval);
+                    qb.setTypeName(featureCollection.getFeatureType().getName());
+                    final FeatureCollection subCol = featureCollection.subCollection(qb.buildQuery());
+                    mapping.put((long)start+" - "+(long)end,(long)subCol.size());
+                }
+            }else {
+                final FeatureIterator it = featureCollection.iterator();
+                while(it.hasNext()){
+                    final Feature feature = it.next();
+                    final Object value = property.evaluate(feature);
+                    Long count = mapping.get(value);
+                    if(mapping.get(value)!=null){
+                        count++;
+                        mapping.put(value,count);
+                    }else {
+                        mapping.put(value,1L);
+                    }
+                }
+                it.close();
+                //adjust mapping size for performance in client side issue.
+                final Set<Object> keys = mapping.keySet();
+                final Map<Object,Long> newmap = new LinkedHashMap<>();
+                int limit = 100;
+                if(keys.size()>limit){
+                    int gap = keys.size()/limit;
+                    int i=1;
+                    for(final Object key : keys){
+                        if(i== gap){
+                            newmap.put(key,mapping.get(key));
+                            i=1;//reset i
+                        }else {
+                            i++;//skip the key and increase i
+                        }
+                    }
+                    mapping.clear();
+                    mapping.putAll(newmap);
+                }
+
+            }
+            result.setMapping(mapping);
+        }
+        return ok(result);
     }
 
    @POST

@@ -279,6 +279,16 @@ ul.dropdown-images li a:hover{
     font-size: 12px;
 }
 
+.vectorChart g.c3-event-rects{
+    cursor:default !important;
+}
+.vectorChart .c3-zoom-rect{
+    cursor:default !important;
+}
+.vectorChart .c3-axis-x text{
+    display:none !important;
+}
+
 /* Small devices (tablets, 768px and up) */
 @media (min-width: 768px) and (max-width: 991px) { 
 	/*choix type*/

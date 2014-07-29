@@ -136,6 +136,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
 
         function initOptionsSLD(){
             $scope.optionsSLD={
+                viewMode:'carto',
                 autoPreview:true,
                 selectedRule:null,
                 enableRuleEditor:false,
@@ -181,7 +182,11 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                     "comparator":"=",
                     "value":"",
                     "operator":''
-                }]
+                }],
+                chart:{
+                    "widget":null,
+                    "attribute":""
+                }
             };
         };
         initOptionsSLD();
@@ -366,6 +371,19 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
         };
 
         /**
+         * Binding function to control ng-if for displaying mode buttons to switch between carto or chart.
+         * the view mode must be activated only if the layer data exists.
+         * @returns {boolean}
+         */
+        $scope.displayViewModePanel = function() {
+            if($scope.selectedLayer){
+                return true;
+            }else {
+                return false;
+            }
+        };
+
+        /**
          * Configure sld editor with given style object to edit them.
          * @param styleObj
          */
@@ -378,6 +396,8 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                 $scope.newStyle = response;
                 $scope.selectedStyle = styleObj;
                 initOptionsSLD();
+                $scope.loadDataProperties();
+                $scope.initPlot();
             });
         };
 
@@ -501,6 +521,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
                     $scope.setSelectedRule(rule);
                     $scope.editSelectedRule();
                 }
+                $scope.optionsSLD.viewMode = 'carto';
                 $scope.optionsSLD.filtersEnabled=false;
                 $scope.optionsSLD.filters=[{
                     "attribute":"",
@@ -1200,7 +1221,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             //current layer name and namespace
             var layerName = $scope.layerName;
             var namespace = $scope.selectedLayer.Namespace;
-            var dataProvider = $scope.selectedLayer.Provider;
+            var dataProvider = $scope.providerId;
             //selected numeric field
             var fieldName = $scope.optionsSLD.autoIntervalValues.attr;
             //intervals count
@@ -1268,7 +1289,7 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             //current layer name and namespace
             var layerName = $scope.layerName;
             var namespace = $scope.selectedLayer.Namespace;
-            var dataProvider = $scope.selectedLayer.Provider;
+            var dataProvider = $scope.providerId;
             //selected field
             var fieldName = $scope.optionsSLD.autoUniqueValues.attr;
             //symbol
@@ -1474,7 +1495,12 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
          * Performs a preview of current style in map
          */
         $scope.displayCurrentStyle = function(mapId) {
+            //skip if layerName is undefined
             if(! $scope.layerName){
+                return;
+            }
+            //skip if view mode is not carto for styledMapOL case
+            if(mapId ==='styledMapOL' && $scope.optionsSLD.viewMode !== 'carto'){
                 return;
             }
 
@@ -1650,6 +1676,157 @@ cstlAdminApp.controller('StyleModalController', ['$scope', '$dashboard', '$modal
             style.listAll({provider: 'sld'}, function(response) {
                 $dashboard($scope, response.styles, true);
             });
+        };
+
+        /**
+         * Additional utility functions on Array
+         * @param from
+         * @param until
+         * @returns {Array}
+         */
+        if (typeof (Array.generate) == "undefined") {
+            Array.generate = function (length, generator) {
+                var list = new Array(length);
+                for (var i = 0; i < length; i++) {
+                    list[i] = generator(i);
+                }
+                return list;
+            }
+        }
+        if (typeof (Math.randomInt) == "undefined") {
+            Math.randomInt = function (min, max) {
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+        }
+        if (typeof (Array.generateNumbers) == "undefined") {
+            Array.generateNumbers = function (from, until) {
+                if (arguments.length == 1) {
+                    until = from;
+                    from = 0;
+                }
+                var length = until - from;
+                var list = new Array(length);
+                for (var i = 0; i < length; i++) {
+                    list[i] = i + from;
+                }
+                return list;
+            }
+        }
+
+        /**
+         * binding for ng-init to display zero data chart.
+         */
+        $scope.initPlot = function() {
+            $scope.loadPlot({
+                json: {
+                    x: [],
+                    data1: []
+                }
+            },'',true);
+        };
+
+        /**
+         * load histogram c3 chart for given data and attribute.
+         * @param data
+         * @param attr
+         * @param useCategories
+         */
+        $scope.loadPlot = function(data, attr,useCategories) {
+            $scope.optionsSLD.chart.widget = c3.generate({
+                bindto: '#chart',
+                size: {
+                    height: 400,
+                    width: 460
+                },
+                padding: {
+                    top: 20,
+                    right: 10,
+                    bottom: 6,
+                    left: 50
+                },
+                data: {
+                    x: 'x',
+                    json: data.json,
+                    types: {
+                        data1: 'bar'
+                    },
+                    names: {
+                        data1: attr
+                    }
+                },
+                color: {
+                    pattern: ['#9edae5']
+                },
+                zoom: {
+                    enabled: true
+                },
+                bar: {
+                    width: {
+                        ratio: 0.8
+                    }
+                },
+                axis: {
+                    x: {
+                        type: useCategories?'category':null
+                    },
+                    y: {
+                        label: {
+                            text: "Count",
+                            position: 'outer-middle'
+                        }
+                    }
+                }
+            });
+            $(window).resize(function() {
+                $scope.optionsSLD.chart.widget.resize();
+            });
+        };
+
+        $scope.loadPlotForAttribute = function(){
+            if(! $scope.layerName){
+                return;
+            }
+            if(! $scope.selectedLayer){
+                return;
+            }
+            if($scope.optionsSLD.chart.attribute ===''){
+                $scope.initPlot();
+                return;
+            }
+
+            //get parameters
+            //current layer name and namespace
+            var layerName = $scope.layerName;
+            var parameters = {
+                "values":{
+                    "layerName": layerName,
+                    "dataProvider":$scope.providerId,
+                    "attribute": $scope.optionsSLD.chart.attribute,
+                    "intervals":20
+                }
+            };
+
+            //Now send all params to server and it will create the temporary style and returns the full style as json object.
+            style.getChartDataJson({}, parameters,
+                function(response) {
+                    if(response.mapping){
+                        var xarray = [];
+                        var yarray = [];
+                        for(var key in response.mapping){
+                            xarray.push(key === '' ? 'empty':key);
+                            yarray.push(response.mapping[key]);
+                        }
+                        var dataRes = {
+                              json:{
+                                  x: xarray,
+                                  data1: yarray
+                              }
+                        };
+                        $scope.loadPlot(dataRes,$scope.optionsSLD.chart.attribute, true);
+                    }
+                }
+            );
+
         };
 
     }]);
