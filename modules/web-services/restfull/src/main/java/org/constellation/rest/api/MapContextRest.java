@@ -27,6 +27,9 @@ import org.constellation.engine.register.Mapcontext;
 import org.constellation.engine.register.MapcontextStyledLayer;
 import org.constellation.engine.register.repository.MapContextRepository;
 import org.constellation.provider.Providers;
+import org.geotoolkit.georss.xml.v100.WhereType;
+import org.geotoolkit.gml.xml.v311.DirectPositionType;
+import org.geotoolkit.gml.xml.v311.EnvelopeType;
 import org.geotoolkit.owc.xml.v10.MethodCodeType;
 import org.geotoolkit.owc.xml.v10.OfferingType;
 import org.geotoolkit.owc.xml.v10.OperationType;
@@ -44,7 +47,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -67,6 +69,7 @@ import java.util.logging.Level;
 public class MapContextRest {
     private static final org.w3._2005.atom.ObjectFactory OBJ_ATOM_FACT = new org.w3._2005.atom.ObjectFactory();
     private static final org.geotoolkit.owc.xml.v10.ObjectFactory OBJ_OWC_FACT = new org.geotoolkit.owc.xml.v10.ObjectFactory();
+    private static final org.geotoolkit.georss.xml.v100.ObjectFactory OBJ_GEORSS_FACT = new org.geotoolkit.georss.xml.v100.ObjectFactory();
 
     @Inject
     private MapContextBusiness contextBusiness;
@@ -203,6 +206,16 @@ public class MapContextRest {
             entriesToSet.add(OBJ_ATOM_FACT.createEntryTypeUpdated(dateTime));
         } catch (DatatypeConfigurationException ex) {
             Providers.LOGGER.log(Level.INFO, ex.getMessage(), ex);
+        }
+
+        if (ctxt.getWest() != null && ctxt.getNorth() != null && ctxt.getEast() != null && ctxt.getSouth() != null && ctxt.getCrs() != null) {
+            final DirectPositionType lowerCorner = new DirectPositionType(ctxt.getWest(), ctxt.getSouth());
+            final DirectPositionType upperCorner = new DirectPositionType(ctxt.getEast(), ctxt.getNorth());
+            final EnvelopeType envelope = new EnvelopeType(null, lowerCorner, upperCorner, ctxt.getCrs());
+            envelope.setSrsDimension(2);
+            final WhereType where = new WhereType();
+            where.setEnvelope(envelope);
+            entriesToSet.add(OBJ_GEORSS_FACT.createWhere(where));
         }
 
         for (final MapContextStyledLayerDTO styledLayer : ctxtItem.getLayers()) {

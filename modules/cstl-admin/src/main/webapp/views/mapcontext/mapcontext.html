@@ -167,6 +167,12 @@
 
                                 <h6 translate="label.owner">Owner</h6>
                                 <span>{{selected.owner}}</span>
+
+                                <div ng-if="selected.keywords">
+                                    <div class="separator"></div>
+                                    <h6 translate="mapcontext.modal.label.keywords">Keywords</h6>
+                                    <span>{{selected.keywords}}</span>
+                                </div>
                             </div>
                             <div class="block-action block-action-mapcontext">
                                 <div class="row" style="padding-bottom: 5px;">

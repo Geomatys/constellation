@@ -58,6 +58,8 @@ public class OWCBodyWriter implements MessageBodyWriter {
     static {
         XML_TO_JSON_NAMESPACES.put("http://www.w3.org/2005/Atom",    "atom");
         XML_TO_JSON_NAMESPACES.put("http://www.opengis.net/owc/1.0", "owc");
+        XML_TO_JSON_NAMESPACES.put("http://www.georss.org/georss",   "georss");
+        XML_TO_JSON_NAMESPACES.put("http://www.opengis.net/gml",     "gml");
     }
     private static final Logger LOGGER = Logging.getLogger(OWCBodyWriter.class);
 
@@ -79,7 +81,7 @@ public class OWCBodyWriter implements MessageBodyWriter {
                 // create json marshaller configuration and context
 
                 JettisonConfig config = JettisonConfig.mappedJettison().xml2JsonNs(XML_TO_JSON_NAMESPACES).build();
-                JettisonJaxbContext cxtx = new JettisonJaxbContext(config, "org.geotoolkit.owc.xml.v10:org.w3._2005.atom");
+                JettisonJaxbContext cxtx = new JettisonJaxbContext(config, "org.geotoolkit.owc.xml.v10:org.w3._2005.atom:org.geotoolkit.georss.xml.v100:org.geotoolkit.gml.xml.v311");
 
                 // create marshaller
                 JettisonMarshaller jsonMarshaller = cxtx.createJsonMarshaller();
@@ -88,7 +90,7 @@ public class OWCBodyWriter implements MessageBodyWriter {
                 jsonMarshaller.marshallToJSON(o, out);
             } else {
                 // Default : use xml marshaller
-                final JAXBContext jaxbCtxt = JAXBContext.newInstance("org.geotoolkit.owc.xml.v10:org.w3._2005.atom");
+                final JAXBContext jaxbCtxt = JAXBContext.newInstance("org.geotoolkit.owc.xml.v10:org.w3._2005.atom:org.geotoolkit.georss.xml.v100:org.geotoolkit.gml.xml.v311");
                 final MarshallerPool pool = new MarshallerPool(jaxbCtxt, null);
                 final Marshaller marsh = pool.acquireMarshaller();
                 marsh.marshal(o, out);
