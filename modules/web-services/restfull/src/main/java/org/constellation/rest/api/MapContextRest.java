@@ -39,7 +39,13 @@ import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
 import org.geotoolkit.wms.xml.WMSMarshallerPool;
 import org.opengis.util.FactoryException;
 import org.springframework.transaction.annotation.Transactional;
-import org.w3._2005.atom.*;
+import org.w3._2005.atom.CategoryType;
+import org.w3._2005.atom.DateTimeType;
+import org.w3._2005.atom.EntryType;
+import org.w3._2005.atom.FeedType;
+import org.w3._2005.atom.IdType;
+import org.w3._2005.atom.TextType;
+
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
