@@ -117,15 +117,12 @@ cstlAdminApp.factory('CookiesStorageService', ['$cookies', function($cookies){
   
 }]);
 
-
-
 cstlAdminApp.factory('StompService', ['$cookies', function($cookies){
   var cstlUrl = $cookies.cstlUrl;
   
   return new Stomper(cstlUrl + 'spring/ws/adminmessages')
   
 }]);
-
 
 cstlAdminApp.factory('Account', ['$resource',
     function ($resource) {
@@ -139,7 +136,6 @@ cstlAdminApp.factory('Contact', ['$resource',
             	 save: {method:'PUT'}
          });
 }]);
-
 
 cstlAdminApp.factory('Sessions', ['$resource',
     function ($resource) {
@@ -163,7 +159,6 @@ cstlAdminApp.factory('LogsService', ['$resource',
         });
     }]);
 
-
 cstlAdminApp.factory('GeneralService', ['$http',
      function ($http) {
        return {
@@ -175,8 +170,6 @@ cstlAdminApp.factory('GeneralService', ['$http',
         }
      }
 }]);
-
-
 
 cstlAdminApp.factory('UserResource', ['$resource', '$cookies',
    function ($resource, $cookies) {
@@ -198,7 +191,6 @@ cstlAdminApp.factory('DomainResource', ['$resource',
      'removeMemberFromDomain' : {method: 'DELETE', url: '@cstl/api/1/userXdomain/:domainId/user/:userId'}
     });
 }]);
-
 
 cstlAdminApp.factory('DomainRoleResource', ['$resource',
   function ($resource) {

@@ -16,7 +16,7 @@
 'use strict';
 
 cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 'webService', 'dataListing', 'DomainResource', 'provider',
-    'style', 'textService', '$modal', '$growl', 'StyleSharedService', '$cookies', 
+    'style', 'textService', '$modal', '$growl', 'StyleSharedService', '$cookies',
     function ($scope, $location, $dashboard, webService, dataListing, DomainResource,  provider, style, textService, $modal, $growl,
               StyleSharedService, $cookies) {
         $scope.cstlUrl = $cookies.cstlUrl;
@@ -33,6 +33,15 @@ cstlAdminApp.controller('DataController', ['$scope', '$location', '$dashboard', 
                 $scope.filtertype = "";
                 modalLoader.close();
             });
+        };
+
+        $scope.getDisplayName = function(providerName, dataName) {
+                if (providerName == dataName){
+                    return dataName;
+                } else {
+                    return dataName + ' ( ' + providerName + ' ) ';
+                }
+
         };
 
         // Map methods

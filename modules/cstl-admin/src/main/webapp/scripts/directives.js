@@ -16,6 +16,7 @@
 'use strict';
 
 angular.module('cstlAdminApp')
+
     .directive('activeMenu', ['$translate', function($translate) {
         return {
             restrict: 'A',
@@ -34,6 +35,7 @@ angular.module('cstlAdminApp')
             }
         };
     }])
+
     .directive('activeLink', ['$location', function(location) {
         return {
             restrict: 'A',
@@ -184,7 +186,6 @@ angular.module('cstlAdminApp')
             }
         };
     })
-
 
     .directive('multiSelect', function($q) {
         return {
