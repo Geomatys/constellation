@@ -127,7 +127,7 @@
     "data.modal.server.title": "Fichier serveur",
     "data.modal.validate": "Valider",
     "data.modal.view.metadata.title": "Voir la métadonnée",
-    "data.modal.dataName.label": "Ou saisisser un identifiant pour cette donnée",
+    "data.modal.dataName.label": "Ou saisisser un identifiant pour ce jeu de donnée",
     
     "domain.list": "Domaines",
     "domain.linked": "Domaines liés",

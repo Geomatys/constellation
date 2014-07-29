@@ -128,7 +128,7 @@
     "data.modal.server.title":"Server file",
     "data.modal.validate":"Validate",
     "data.modal.view.metadata.title":"View metadata",
-    "data.modal.dataName.label": "Or fill an identifier for this data",
+    "data.modal.dataName.label": "Or fill an identifier for this dataset",
 
     "domain.list": "Domains",
     "domain.linked": "Linked Domains",
