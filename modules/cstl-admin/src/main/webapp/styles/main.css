@@ -1347,6 +1347,7 @@ p.error-select-one{
     color: black;
     border: 0px;
     margin: 2px;
+    width: 50px;
 }
 
 .tag-input-ctn input:focus {
