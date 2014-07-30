@@ -25,6 +25,7 @@
                 <button ng-disabled="loader.upload" ng-show="import.allowNext" type="button" id="nextButton" class="btn btn-add" ng-click="import.next();" translate="data.modal.next">Next</button>
                 <button ng-show="import.allowSensorChoose" type="button" id="sensorChoose" class="btn btn-add" ng-click="uploaded()" translate="data.modal.next">Next</button>
                 <button ng-show="import.allowSubmit" type="button" id="submitButton" class="btn btn-add" ng-click="import.finish()" translate="data.modal.end">Finish</button>
+                <button ng-show="import.epsgSelected!=null" type="button" id="submitButtonProj" class="btn btn-add" ng-click="addProjection();" translate="data.modal.end">Finish with projection</button>
             </div>
         </div>
     </div>

@@ -75,7 +75,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                 }
 
                 $growl('success','Success','Postgis database successfully added');
-                $modalInstance.close({type: "vector", file: providerId, missing: $scope.import.metadata == null});
+                $modalInstance.close({type: "vector", file: $scope.import.identifier, missing: $scope.import.metadata == null});
             });
         };
 
@@ -135,13 +135,13 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                                         if ($scope.sensor.checked) {
                                             $scope.showAssociate();
                                         } else {
-                                            $modalInstance.close({type: "vector", file: $scope.import.providerId, missing: $scope.import.metadata == null});
+                                            $modalInstance.close({type: $scope.import.uploadType, file: $scope.import.providerId, missing: $scope.import.metadata == null});
                                         }
 
                                     }, function() {
                                         //failure
                                         $growl('error','Error','Data '+ $scope.import.providerId +' without Projection');
-
+                                        $scope.import.allowSubmit = false;
                                         //TODO div select EPSG
                                         $scope.import.enableSelectEPSGCode = true;
                                         provider.getAllCodeEPSG({ id: $scope.import.providerId},
@@ -181,7 +181,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
 
                                         if (!fileExtension || fileExtension !== "nc") {
                                             $growl('success','Success','Coverage data '+ $scope.import.providerId +' successfully added');
-                                            $modalInstance.close({type: "raster", file: $scope.import.providerId, missing: $scope.import.metadata == null});
+                                            $modalInstance.close({type: $scope.import.uploadType, file: $scope.import.providerId, missing: $scope.import.metadata == null});
                                         } else {
                                             $scope.showAssociate();
                                             // todo: displayNetCDF(fileName);
@@ -190,6 +190,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                                     }, function() {
                                         //failure
                                         $growl('error','Error','Data '+ $scope.import.providerId +' without Projection');
+                                        $scope.import.allowSubmit = false;
                                         //TODO div select EPSG
                                         $scope.import.enableSelectEPSGCode = true;
                                         provider.getAllCodeEPSG({ id: $scope.import.providerId},
@@ -280,7 +281,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
                 function(){
                     //success
                     console.log('prj created')
-                    $modalInstance.close();
+                    $modalInstance.close({type: $scope.import.uploadType, file: $scope.import.providerId, missing: $scope.import.metadata == null});
                 },
                 function(){
                     //
