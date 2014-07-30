@@ -56,7 +56,7 @@ cstlAdminApp.controller('ModalImportDataController', ['$scope', '$modalInstance'
 
 
         $scope.importDb = function() {
-            var providerId = "postgis-"+ $scope.import.db.name;
+            var providerId = $scope.import.identifier;
             provider.create({
                 id: providerId
             }, {
