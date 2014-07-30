@@ -60,7 +60,7 @@ import static org.constellation.utils.RESTfulUtilities.ok;
 @Path("/1/CSW")
 @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-public class CSWServices {
+public class CSWServicesRest {
 
     @Autowired
     protected ServiceBusiness serviceBusiness;
